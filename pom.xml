@@ -27,6 +27,7 @@
 	</properties>
 
 	<modules>
+        <module>ontrack-boot</module>
 	</modules>
 
 </project>
