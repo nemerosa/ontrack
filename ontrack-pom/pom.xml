@@ -11,4 +11,24 @@
 	<name>ontrack POM</name>
 	<description>Common definitions for all modules, to be imported as a POM.</description>
 
+    <properties>
+        <!-- Versions -->
+        <lombokVersion>1.12.6</lombokVersion>
+        <!-- General -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Lombok -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombokVersion}</version>
+                <scope>provided</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
 </project>

@@ -5,19 +5,23 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>net.nemerosa.ontrack</groupId>
+    <parent>
+        <groupId>net.nemerosa.ontrack</groupId>
+        <artifactId>ontrack-pom</artifactId>
+        <version>2.0.0.ALPHA-SNAPSHOT</version>
+        <relativePath>../ontrack-pom</relativePath>
+    </parent>
+
     <artifactId>ontrack-model</artifactId>
-    <version>2.0.0.ALPHA-SNAPSHOT</version>
 
     <name>ontrack Model</name>
 
     <dependencies>
+        <!-- Lombok -->
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>ontrack-pom</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>import</scope>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
