@@ -29,6 +29,7 @@
 	<modules>
         <module>ontrack-pom</module>
         <module>ontrack-boot</module>
-	</modules>
+        <module>ontrack-model</module>
+    </modules>
 
 </project>
