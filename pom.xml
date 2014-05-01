@@ -27,6 +27,7 @@
 	</properties>
 
 	<modules>
+        <module>ontrack-pom</module>
         <module>ontrack-boot</module>
 	</modules>
 

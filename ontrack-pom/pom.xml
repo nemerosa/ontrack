@@ -1,0 +1,14 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>net.nemerosa.ontrack</groupId>
+	<artifactId>ontrack-pom</artifactId>
+	<version>2.0.0.ALPHA-SNAPSHOT</version>
+
+	<packaging>pom</packaging>
+
+	<name>ontrack POM</name>
+	<description>Common definitions for all modules, to be imported as a POM.</description>
+
+</project>
