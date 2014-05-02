@@ -3,22 +3,15 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>net.nemerosa.ontrack</groupId>
+    <parent>
+        <groupId>net.nemerosa.ontrack</groupId>
+        <artifactId>ontrack-parent</artifactId>
+        <version>2.0.0.ALPHA-SNAPSHOT</version>
+    </parent>
+
     <artifactId>ontrack-boot</artifactId>
-    <version>2.0.0.ALPHA-SNAPSHOT</version>
 
     <name>ontrack Boot</name>
-
-    <!-- Inherit defaults from Spring Boot -->
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.0.2.RELEASE</version>
-    </parent>
-    ￼
-    <properties>
-        <java.version>1.8</java.version>
-    </properties>
 
     <!-- Add typical dependencies for a web application -->
     <dependencies>

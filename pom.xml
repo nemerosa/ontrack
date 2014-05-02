@@ -2,6 +2,13 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
+    <!-- Inherit defaults from Spring Boot -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.0.2.RELEASE</version>
+    </parent>
+
 	<groupId>net.nemerosa.ontrack</groupId>
 	<artifactId>ontrack-parent</artifactId>
 	<version>2.0.0.ALPHA-SNAPSHOT</version>
@@ -21,15 +28,34 @@
 
 	<properties>
 		<!-- Versions -->
+        <lombokVersion>1.12.6</lombokVersion>
 		<!-- General -->
+        <java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
 
 	<modules>
-        <module>ontrack-pom</module>
-        <module>ontrack-boot</module>
         <module>ontrack-model</module>
+        <module>ontrack-boot</module>
     </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Lombok -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombokVersion}</version>
+                <scope>provided</scope>
+            </dependency>
+            <!-- Validation API -->
+            <dependency>
+                <groupId>javax.validation</groupId>
+                <artifactId>validation-api</artifactId>
+                <version>1.1.0.Final</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 </project>

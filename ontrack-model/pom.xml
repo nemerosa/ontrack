@@ -7,9 +7,8 @@
 
     <parent>
         <groupId>net.nemerosa.ontrack</groupId>
-        <artifactId>ontrack-pom</artifactId>
+        <artifactId>ontrack-parent</artifactId>
         <version>2.0.0.ALPHA-SNAPSHOT</version>
-        <relativePath>../ontrack-pom</relativePath>
     </parent>
 
     <artifactId>ontrack-model</artifactId>
