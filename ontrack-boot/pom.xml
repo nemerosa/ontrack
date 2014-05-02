@@ -15,16 +15,13 @@
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>1.0.2.RELEASE</version>
     </parent>
+    ￼
+    <properties>
+        <java.version>1.8</java.version>
+    </properties>
 
     <!-- Add typical dependencies for a web application -->
     <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>ontrack-pom</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>import</scope>
-        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>ontrack-model</artifactId>
@@ -38,6 +35,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <!-- Validation API -->
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
         </dependency>
     </dependencies>
 
