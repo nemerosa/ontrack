@@ -12,7 +12,6 @@
     </parent>
 
     <artifactId>ontrack-web</artifactId>
-    <packaging>pom</packaging>
 
     <name>ontrack Web</name>
     <description>

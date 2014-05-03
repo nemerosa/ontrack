@@ -20,6 +20,14 @@
             <artifactId>ontrack-model</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- GUI -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ontrack-web</artifactId>
+            <version>${project.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- Spring Boot -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -49,5 +57,41 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+
+        <!-- Copies the compiled static resources -->
+
+        <profile>
+            <id>release</id>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-resources-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>release-web-resources</id>
+                                    <phase>compile</phase>
+                                    <goals>
+                                        <goal>copy-resources</goal>
+                                    </goals>
+                                    <configuration>
+                                        <outputDirectory>${project.basedir}/src/main/resources/static</outputDirectory>
+                                        <resources>
+                                            <resource>
+                                                <directory>../ontrack-web/target/prod</directory>
+                                            </resource>
+                                        </resources>
+                                    </configuration>
+                                </execution>
+                            </executions>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+    </profiles>
 
 </project>
