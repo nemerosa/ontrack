@@ -1,10 +1,5 @@
 module.exports = function (grunt) {
 
-    var devTarget = 'target/dev';
-    var tmp = 'target/tmp';
-
-    var appJs = '**/*.js';
-
     grunt.initConfig({
 
         /**
@@ -16,8 +11,27 @@ module.exports = function (grunt) {
          * Cleaning all directories
          */
         clean: [
-            devTarget
+            'target/dev'
         ],
+
+        /**
+         * Copy of files
+         */
+        copy: {
+            /**
+             * Direct copy of JS files in `dev` mode
+             */
+            dev_js: {
+                files: [
+                    {
+                        cwd: 'src',
+                        src: [ '**/*.js' ],
+                        dest: 'target/dev',
+                        expand: true
+                    }
+                ]
+            }
+        },
 
         /**
          * `ngmin` annotates the sources before minifying. That is, it allows us
@@ -29,7 +43,7 @@ module.exports = function (grunt) {
                     {
                         src: [ '**/*.js' ],
                         cwd: 'src',
-                        dest: tmp,
+                        dest: 'target/tmp',
                         expand: true
                     }
                 ]
@@ -87,7 +101,7 @@ module.exports = function (grunt) {
         // TODO 'copy:dev_app_assets',
         // TODO 'copy:dev_vendor_assets',
         // TODO 'copy:dev_vendor_fonts',
-        // TODO 'copy:dev_appjs',
+        'copy:dev_js',
         // TODO 'copy:dev_apptpl',
         // TODO 'copy:dev_vendorjs',
         // TODO 'copy:dev_vendorcss',
