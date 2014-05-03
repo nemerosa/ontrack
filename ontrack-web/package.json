@@ -1,0 +1,27 @@
+{
+  "author": "Damien Coraboeuf",
+  "name": "ontrack",
+  "version": "2.0.0",
+  "homepage": "https://github.com/nemerosa/ontrack",
+  "licenses": {
+    "type": "MIT",
+    "url": "https://raw.github.com/nemerosa/ontrack/master/LICENSE"
+  },
+  "bugs": "https://nemerosa.atlassian.net/browse/ONTRACK",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:nemerosa/ontrack.git"
+  },
+  "dependencies": {
+    "grunt": "^0.4.4",
+    "grunt-contrib-uglify": "^0.4.0",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-contrib-concat": "^0.4.0",
+    "grunt-contrib-less": "^0.11.0",
+    "grunt-contrib-clean": "^0.5.0",
+    "grunt-contrib-copy": "^0.5.0",
+    "grunt-ngmin": "0.0.3",
+    "grunt-html2js": "^0.2.4"
+  }
+}
