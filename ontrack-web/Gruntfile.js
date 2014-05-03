@@ -34,6 +34,21 @@ module.exports = function (grunt) {
                     }
                 ]
             }
+        },
+
+        /**
+         * Inclusion of sources
+         */
+        includeSource: {
+            dev: {
+                options: {
+                    basePath: 'src/app',
+                    baseUrl: 'app/'
+                },
+                files: {
+                    'target/dev/index.html': 'src/index.html'
+                }
+            }
         }
 
     });
@@ -51,6 +66,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-ngmin');
     grunt.loadNpmTasks('grunt-html2js');
+    grunt.loadNpmTasks('grunt-include-source');
 
     /**
      * Registering the tasks
@@ -65,7 +81,7 @@ module.exports = function (grunt) {
      * The `dev` task gets your app ready to run for development and testing.
      */
     grunt.registerTask('dev', [
-        'clean'
+        'clean',
         // TODO 'jshint',
         // TODO 'less:dev',
         // TODO 'copy:dev_app_assets',
@@ -76,7 +92,7 @@ module.exports = function (grunt) {
         // TODO 'copy:dev_vendorjs',
         // TODO 'copy:dev_vendorcss',
         // TODO 'html2js:dev',
-        // TODO 'index:dev'
+        'includeSource:dev'
     ]);
 
     /**
