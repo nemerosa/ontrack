@@ -1,6 +1,9 @@
 module.exports = function (grunt) {
 
     var devTarget = 'target/dev';
+    var tmp = 'target/tmp';
+
+    var appJs = '**/*.js';
 
     grunt.initConfig({
 
@@ -14,7 +17,24 @@ module.exports = function (grunt) {
          */
         clean: [
             devTarget
-        ]
+        ],
+
+        /**
+         * `ngmin` annotates the sources before minifying. That is, it allows us
+         * to code without the array syntax in AngularJS.
+         */
+        ngmin: {
+            prod: {
+                files: [
+                    {
+                        src: [ '**/*.js' ],
+                        cwd: 'src',
+                        dest: tmp,
+                        expand: true
+                    }
+                ]
+            }
+        }
 
     });
 
@@ -33,7 +53,47 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-html2js');
 
     /**
-     * TODO Registering the tasks
+     * Registering the tasks
      */
+
+    /**
+     * The default task is to prod.
+     */
+    grunt.registerTask('default', [ 'prod' ]);
+
+    /**
+     * The `dev` task gets your app ready to run for development and testing.
+     */
+    grunt.registerTask('dev', [
+        'clean'
+        // TODO 'jshint',
+        // TODO 'less:dev',
+        // TODO 'copy:dev_app_assets',
+        // TODO 'copy:dev_vendor_assets',
+        // TODO 'copy:dev_vendor_fonts',
+        // TODO 'copy:dev_appjs',
+        // TODO 'copy:dev_apptpl',
+        // TODO 'copy:dev_vendorjs',
+        // TODO 'copy:dev_vendorcss',
+        // TODO 'html2js:dev',
+        // TODO 'index:dev'
+    ]);
+
+    /**
+     * The `prod` task gets your app ready for deployment by concatenating and
+     * minifying your code.
+     */
+    grunt.registerTask('prod', [
+        'clean',
+        // TODO 'less:prod',
+        // TODO 'copy:prod_assets',
+        // TODO 'html2js:prod',
+        'ngmin:prod'
+        // TODO 'concat:prod_js',
+        // TODO 'concat:prod_css',
+        // TODO 'uglify:prod',
+        // TODO 'index:prod',
+        // TODO 'copy:prod_vendor_fonts'
+    ]);
 
 };
