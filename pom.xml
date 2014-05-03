@@ -37,6 +37,7 @@
 
 	<modules>
         <module>ontrack-model</module>
+        <module>ontrack-web</module>
         <module>ontrack-boot</module>
     </modules>
 
