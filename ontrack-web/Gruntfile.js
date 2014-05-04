@@ -1,5 +1,21 @@
 module.exports = function (grunt) {
 
+    /**
+     * List of files, per type, provided via bower in the vendor/ directory.
+     */
+    var vendor = {
+        js: [
+            'vendor/jquery/dist/jquery.js',
+            'vendor/angular/angular.js',
+            'vendor/angular-ui-router/release/angular-ui-router.js',
+            'vendor/angular-sanitize/angular-sanitize.js',
+            'vendor/angular-bootstrap/ui-bootstrap-tpls.js'
+        ],
+        fonts: [
+            'vendor/bootstrap/fonts/glyphicons-halflings-regular.*'
+        ]
+    };
+
     grunt.initConfig({
 
         /**
@@ -43,6 +59,19 @@ module.exports = function (grunt) {
                         expand: true
                     }
                 ]
+            },
+            /**
+             * Copy of vendor JS files
+             */
+            dev_vendor_js: {
+                files: [
+                    {
+                        src: vendor.js,
+                        dest: 'target/dev',
+                        cwd: '.',
+                        expand: true
+                    }
+                ]
             }
         },
 
@@ -51,17 +80,21 @@ module.exports = function (grunt) {
          */
         less: {
             dev: {
-                files: [{
-                    'src/assets/main.css': 'src/less/**/*.less'
-                }]
+                files: [
+                    {
+                        'target/dev/assets/main.css': 'src/less/**/*.less'
+                    }
+                ]
             },
             prod: {
                 options: {
                     compress: true
                 },
-                files: [{
-                    'target/tmp/assets/main.css': 'src/less/**/*.less'
-                }]
+                files: [
+                    {
+                        'target/tmp/assets/main.css': 'src/less/**/*.less'
+                    }
+                ]
             }
         },
 
@@ -88,7 +121,7 @@ module.exports = function (grunt) {
         includeSource: {
             dev: {
                 options: {
-                    basePath: 'src',
+                    basePath: 'target/dev',
                     baseUrl: ''
                 },
                 files: {
@@ -135,7 +168,7 @@ module.exports = function (grunt) {
         // TODO 'copy:dev_vendor_fonts',
         'copy:dev_js',
         // TODO 'copy:dev_apptpl',
-        // TODO 'copy:dev_vendorjs',
+        'copy:dev_vendor_js',
         // TODO 'copy:dev_vendorcss',
         // TODO 'html2js:dev',
         'includeSource:dev'
