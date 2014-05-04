@@ -145,6 +145,32 @@ module.exports = function (grunt) {
         },
 
         /**
+         * `grunt concat` concatenates multiple source files into a single file.
+         */
+        concat: {
+            /**
+             * The `prod_js` target is the concatenation of our application source
+             * code and all specified vendor source code into a single file.
+             */
+            prod_js: {
+                src: [
+                    'target/include/**/*.js'
+                ],
+                dest: 'target/prod/assets/<%= pkg.name %>-<%= pkg.version %>.js'
+            },
+            /**
+             * The `prod_css` target is the concatenation of our application source
+             * code and all specified vendor source code into a single file.
+             */
+            prod_css: {
+                src: [
+                    'target/include/**/*.css'
+                ],
+                dest: 'target/prod/assets/<%= pkg.name %>-<%= pkg.version %>.css'
+            }
+        },
+
+        /**
          * Inclusion of sources
          */
         includeSource: {
@@ -212,9 +238,9 @@ module.exports = function (grunt) {
         'less:prod',
         'copy:prod_assets',
         // TODO 'html2js:prod',
-        'ngmin:prod'
-        // TODO 'concat:prod_js',
-        // TODO 'concat:prod_css',
+        'ngmin:prod',
+        'concat:prod_js',
+        'concat:prod_css'
         // TODO 'uglify:prod',
         // TODO 'index:prod',
         // TODO 'copy:prod_vendor_fonts'
