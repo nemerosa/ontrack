@@ -39,6 +39,7 @@
         <module>ontrack-model</module>
         <module>ontrack-web</module>
         <module>ontrack-boot</module>
+        <module>ontrack-common</module>
     </modules>
 
     <dependencyManagement>
