@@ -280,6 +280,8 @@ module.exports = function (grunt) {
      * Registering the tasks
      */
 
+    // FIXME Watching task
+
     /**
      * The default task is to prod.
      */
