@@ -206,6 +206,15 @@ module.exports = function (grunt) {
                 files: {
                     'target/dev/index.html': 'src/index.html'
                 }
+            },
+            prod: {
+                options: {
+                    basePath: 'target/prod',
+                    baseUrl: ''
+                },
+                files: {
+                    'target/prod/index.html': 'src/index.html'
+                }
             }
         }
 
@@ -260,13 +269,13 @@ module.exports = function (grunt) {
         'less:prod',
         'copy:prod_assets',
         // TODO 'html2js:prod',
+        // TODO 'copy:prod_vendor_fonts',
         'ngmin:prod',
         'copy:prod_vendor_js',
         'concat:prod_js',
         'concat:prod_css',
-        'uglify:prod'
-        // TODO 'index:prod',
-        // TODO 'copy:prod_vendor_fonts'
+        'uglify:prod',
+        'includeSource:prod'
     ]);
 
 };
