@@ -171,6 +171,17 @@ module.exports = function (grunt) {
         },
 
         /**
+         * Minify the sources!
+         */
+        uglify: {
+            prod: {
+                files: {
+                    '<%= concat.prod_js.dest %>': '<%= concat.prod_js.dest %>'
+                }
+            }
+        },
+
+        /**
          * Inclusion of sources
          */
         includeSource: {
@@ -219,12 +230,10 @@ module.exports = function (grunt) {
         // TODO 'jshint',
         'less:dev',
         'copy:dev_assets',
-        // TODO 'copy:dev_vendor_assets',
         'copy:dev_js',
         // TODO 'copy:dev_apptpl',
         'copy:dev_vendor_js',
         'copy:dev_vendor_fonts',
-        // TODO 'copy:dev_vendorcss',
         // TODO 'html2js:dev',
         'includeSource:dev'
     ]);
@@ -240,8 +249,8 @@ module.exports = function (grunt) {
         // TODO 'html2js:prod',
         'ngmin:prod',
         'concat:prod_js',
-        'concat:prod_css'
-        // TODO 'uglify:prod',
+        'concat:prod_css',
+        'uglify:prod'
         // TODO 'index:prod',
         // TODO 'copy:prod_vendor_fonts'
     ]);
