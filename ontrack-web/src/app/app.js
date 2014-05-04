@@ -1,5 +1,3 @@
-'use strict';
-
 var ontrack = angular.module('ontrack', [
         'ui.bootstrap',
         'ngSanitize'
