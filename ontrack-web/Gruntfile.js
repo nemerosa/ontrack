@@ -30,6 +30,19 @@ module.exports = function (grunt) {
                         expand: true
                     }
                 ]
+            },
+            /**
+             * Copy of application assets
+             */
+            dev_assets: {
+                files: [
+                    {
+                        cwd: 'src/assets',
+                        src: [ '**' ],
+                        dest: 'target/dev/assets',
+                        expand: true
+                    }
+                ]
             }
         },
 
@@ -98,7 +111,7 @@ module.exports = function (grunt) {
         'clean',
         // TODO 'jshint',
         // TODO 'less:dev',
-        // TODO 'copy:dev_app_assets',
+        'copy:dev_assets',
         // TODO 'copy:dev_vendor_assets',
         // TODO 'copy:dev_vendor_fonts',
         'copy:dev_js',
