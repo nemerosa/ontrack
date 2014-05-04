@@ -27,7 +27,9 @@ module.exports = function (grunt) {
          * Cleaning all directories
          */
         clean: [
-            'target/dev'
+            'target/dev',
+            'target/prod',
+            'src/assets/main.css'
         ],
 
         /**
@@ -86,6 +88,19 @@ module.exports = function (grunt) {
                         flatten: true
                     }
                 ]
+            },
+            /**
+             * PROD: Copy of application assets
+             */
+            prod_assets: {
+                files: [
+                    {
+                        cwd: 'src/assets',
+                        src: [ '**' ],
+                        dest: 'target/prod/assets',
+                        expand: true
+                    }
+                ]
             }
         },
 
@@ -106,7 +121,7 @@ module.exports = function (grunt) {
                 },
                 files: [
                     {
-                        'target/tmp/assets/main.css': 'src/less/**/*.less'
+                        'target/include/assets/main.css': 'src/less/**/*.less'
                     }
                 ]
             }
@@ -122,7 +137,7 @@ module.exports = function (grunt) {
                     {
                         src: [ '**/*.js' ],
                         cwd: 'src',
-                        dest: 'target/tmp',
+                        dest: 'target/include',
                         expand: true
                     }
                 ]
@@ -195,7 +210,7 @@ module.exports = function (grunt) {
     grunt.registerTask('prod', [
         'clean',
         'less:prod',
-        // TODO 'copy:prod_assets',
+        'copy:prod_assets',
         // TODO 'html2js:prod',
         'ngmin:prod'
         // TODO 'concat:prod_js',
