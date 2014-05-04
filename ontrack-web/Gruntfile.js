@@ -101,6 +101,19 @@ module.exports = function (grunt) {
                         expand: true
                     }
                 ]
+            },
+            /**
+             * PROD: Copy of vendor JS files
+             */
+            prod_vendor_js: {
+                files: [
+                    {
+                        src: vendor.js,
+                        dest: 'target/include',
+                        cwd: '.',
+                        expand: true
+                    }
+                ]
             }
         },
 
@@ -248,6 +261,7 @@ module.exports = function (grunt) {
         'copy:prod_assets',
         // TODO 'html2js:prod',
         'ngmin:prod',
+        'copy:prod_vendor_js',
         'concat:prod_js',
         'concat:prod_css',
         'uglify:prod'
