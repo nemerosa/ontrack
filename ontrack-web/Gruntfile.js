@@ -47,6 +47,25 @@ module.exports = function (grunt) {
         },
 
         /**
+         * Less transformation.
+         */
+        less: {
+            dev: {
+                files: [{
+                    'src/assets/main.css': 'src/less/**/*.less'
+                }]
+            },
+            prod: {
+                options: {
+                    compress: true
+                },
+                files: [{
+                    'target/tmp/assets/main.css': 'src/less/**/*.less'
+                }]
+            }
+        },
+
+        /**
          * `ngmin` annotates the sources before minifying. That is, it allows us
          * to code without the array syntax in AngularJS.
          */
@@ -69,8 +88,8 @@ module.exports = function (grunt) {
         includeSource: {
             dev: {
                 options: {
-                    basePath: 'src/app',
-                    baseUrl: 'app/'
+                    basePath: 'src',
+                    baseUrl: ''
                 },
                 files: {
                     'target/dev/index.html': 'src/index.html'
@@ -110,7 +129,7 @@ module.exports = function (grunt) {
     grunt.registerTask('dev', [
         'clean',
         // TODO 'jshint',
-        // TODO 'less:dev',
+        'less:dev',
         'copy:dev_assets',
         // TODO 'copy:dev_vendor_assets',
         // TODO 'copy:dev_vendor_fonts',
@@ -128,7 +147,7 @@ module.exports = function (grunt) {
      */
     grunt.registerTask('prod', [
         'clean',
-        // TODO 'less:prod',
+        'less:prod',
         // TODO 'copy:prod_assets',
         // TODO 'html2js:prod',
         'ngmin:prod'
