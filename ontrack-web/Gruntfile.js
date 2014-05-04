@@ -72,6 +72,20 @@ module.exports = function (grunt) {
                         expand: true
                     }
                 ]
+            },
+            /**
+             * Copy of vendor fonts
+             */
+            dev_vendor_fonts: {
+                files: [
+                    {
+                        src: vendor.fonts,
+                        dest: 'target/dev/app/fonts',
+                        cwd: '.',
+                        expand: true,
+                        flatten: true
+                    }
+                ]
             }
         },
 
@@ -165,10 +179,10 @@ module.exports = function (grunt) {
         'less:dev',
         'copy:dev_assets',
         // TODO 'copy:dev_vendor_assets',
-        // TODO 'copy:dev_vendor_fonts',
         'copy:dev_js',
         // TODO 'copy:dev_apptpl',
         'copy:dev_vendor_js',
+        'copy:dev_vendor_fonts',
         // TODO 'copy:dev_vendorcss',
         // TODO 'html2js:dev',
         'includeSource:dev'
