@@ -114,6 +114,20 @@ module.exports = function (grunt) {
                         expand: true
                     }
                 ]
+            },
+            /**
+             * PROD: Copy of vendor fonts
+             */
+            prod_vendor_fonts: {
+                files: [
+                    {
+                        src: vendor.fonts,
+                        dest: 'target/prod/assets/fonts',
+                        cwd: '.',
+                        expand: true,
+                        flatten: true
+                    }
+                ]
             }
         },
 
@@ -269,7 +283,7 @@ module.exports = function (grunt) {
         'less:prod',
         'copy:prod_assets',
         // TODO 'html2js:prod',
-        // TODO 'copy:prod_vendor_fonts',
+        'copy:prod_vendor_fonts',
         'ngmin:prod',
         'copy:prod_vendor_js',
         'concat:prod_js',
