@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Collections;
 import java.util.List;
 
+import static net.nemerosa.ontrack.boot.resource.Link.of;
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.fromMethodCall;
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+
 @RestController
 @RequestMapping("/ui")
 public class UITop {
@@ -17,18 +21,21 @@ public class UITop {
      * Root access point
      */
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public Resource ui() {
+    public Resource<Object> ui() {
         return Resource.empty()
                 // TODO Version information
                 // TODO Admin access point
-                // TODO List of projects
+                // Self
+                .self(of(fromMethodCall(on(UITop.class).ui())))
+                        // List of projects
+                .link("projects", of(fromMethodCall(on(UITop.class).projects())))
                 ;
     }
 
     /**
      * FIXME List of projects
      */
-    @RequestMapping(value = "/project", method = RequestMethod.GET)
+    @RequestMapping(value = "/projects", method = RequestMethod.GET)
     public List<Resource<Project>> projects() {
         return Collections.emptyList();
     }
