@@ -50,7 +50,8 @@ public class UIProject {
         Project project = new Project(id, id, id);
         // Assembly
         Resource<Project> projectResource = resourceAssembler.toProjectResource(project, follow);
-        // TODO Follows the links
+        // Follows the links
+        projectResource = projectResource.follow(follow);
         // OK
         return projectResource;
     }
