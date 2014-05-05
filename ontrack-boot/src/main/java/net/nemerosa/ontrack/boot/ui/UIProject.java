@@ -3,13 +3,11 @@ package net.nemerosa.ontrack.boot.ui;
 import net.nemerosa.ontrack.boot.resource.Resource;
 import net.nemerosa.ontrack.model.Project;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static net.nemerosa.ontrack.boot.resource.Link.link;
@@ -30,13 +28,13 @@ public class UIProject {
     /**
      * FIXME List of projects
      */
-    @RequestMapping(value = "/projects", method = RequestMethod.GET)
+    @RequestMapping(value = "", method = RequestMethod.GET)
     public Resource<List<Resource<Project>>> projects() {
         List<Project> projects = Collections.emptyList();
         return Resource.of(
                 projects
                         .stream()
-                        .map(resourceAssembler::toProjectResource)
+                        .map(p -> resourceAssembler.toProjectResource(p, Collections.emptySet()))
                         .collect(Collectors.toList())
         )
                 .self(link(fromMethodCall(on(UIProject.class).projects())))
@@ -44,12 +42,17 @@ public class UIProject {
     }
 
     /**
-     * FIXME Gets a project.
+     * Gets a project.
      */
-    @RequestMapping(value = "/projects/{id}", method = RequestMethod.GET)
-    public Resource<Project> project(@PathVariable String id) {
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    public Resource<Project> project(@PathVariable String id, @RequestParam(required = false) Set<String> follow) {
+        // FIXME Calls the repository
         Project project = new Project(id, id, id);
-        return resourceAssembler.toProjectResource(project);
+        // Assembly
+        Resource<Project> projectResource = resourceAssembler.toProjectResource(project, follow);
+        // TODO Follows the links
+        // OK
+        return projectResource;
     }
 
 }
