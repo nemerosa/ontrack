@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.boot.resource.Resource;
+import net.nemerosa.ontrack.model.Branch;
 import net.nemerosa.ontrack.model.Project;
 import org.springframework.stereotype.Component;
 
@@ -14,10 +15,19 @@ public class UIResourceAssembler implements ResourceAssembler {
     @Override
     public Resource<Project> toProjectResource(Project project) {
         return Resource.of(project)
-                .self(link(fromMethodCall(on(UITop.class).project(project.getId()))))
+                .self(link(fromMethodCall(on(UIProject.class).project(project.getId()))))
                 // FIXME Branches
                 // FIXME Promotion levels
                 // FIXME Validation stamps
+                ;
+    }
+
+    @Override
+    public Resource<Branch> toBranchResource(Branch branch) {
+        return Resource.of(branch)
+                .self(link(fromMethodCall(on(UIBranch.class).getBranch(branch.getId()))))
+                // FIXME Project from branch
+                // FIXME Builds
                 ;
     }
 }
