@@ -257,6 +257,88 @@ module.exports = function (grunt) {
                     'target/prod/index.html': 'src/index.html'
                 }
             }
+        },
+
+        /**
+         * And for rapid development, we have a watch set up that checks to see if
+         * any of the files listed below change, and then to execute the listed
+         * tasks when they do. This just saves us from having to type "grunt" into
+         * the command-line every time we want to see what we're working on; we can
+         * instead just leave "grunt watch" running in a background terminal. Set it
+         * and forget it, as Ron Popeil used to tell us.
+         *
+         * But we don't need the same thing to happen for all the files.
+         */
+        delta: {
+            /**
+             * By default, we want the Live Reload to work for all tasks; this is
+             * overridden in some tasks (like this file) where browser resources are
+             * unaffected. It runs by default on port 35729, which your browser
+             * plugin should auto-detect.
+             */
+            options: {
+                livereload: true
+            },
+
+            /**
+             * When the Gruntfile changes, we just want to lint it. In fact, when
+             * your Gruntfile changes, it will automatically be reloaded!
+             */
+            gruntfile: {
+                files: 'Gruntfile.js',
+                tasks: [ 'jshint:gruntfile' ],
+                options: {
+                    livereload: false
+                }
+            },
+
+            /**
+             * When our JavaScript source files change, we want to run lint them and
+             * run our unit tests.
+             */
+            jssrc: {
+                files: [
+                    'src/**/*.js '
+                ],
+                tasks: [ 'jshint:src', 'copy:dev_js' ]
+            },
+
+            /**
+             * When assets are changed, copy them. Note that this will *not* copy new
+             * files, so this is probably not very useful.
+             */
+            assets: {
+                files: [
+                    'src/assets/**/*'
+                ],
+                tasks: [ 'copy:dev_assets' ]
+            },
+
+            /**
+             * When index.html changes, we need to compile it.
+             */
+            html: {
+                files: [ 'src/index.html' ],
+                tasks: [ 'includeSource:dev' ]
+            },
+
+            /**
+             * When our templates change, we only rewrite the template cache.
+             */
+            tpls: {
+                files: [
+                    'src/**/*.tpl.html'
+                ]
+                // FIXME tasks: [ 'copy:dev_apptpl', 'html2js:dev' ]
+            },
+
+            /**
+             * When the CSS files change, we need to compile and minify them.
+             */
+            less: {
+                files: [ 'src/**/*.less' ],
+                tasks: [ 'less:dev' ]
+            }
         }
 
     });
@@ -280,7 +362,15 @@ module.exports = function (grunt) {
      * Registering the tasks
      */
 
-    // FIXME Watching task
+    /**
+     * In order to make it safe to just compile or copy *only* what was changed,
+     * we need to ensure we are starting from a clean, fresh build. So we rename
+     * the `watch` task to `delta` (that's why the configuration var above is
+     * `delta`) and then add a new task called `watch` that does a clean build
+     * before watching for changes.
+     */
+    grunt.renameTask('watch', 'delta');
+    grunt.registerTask('watch', [ 'dev', 'delta' ]);
 
     /**
      * The default task is to prod.
