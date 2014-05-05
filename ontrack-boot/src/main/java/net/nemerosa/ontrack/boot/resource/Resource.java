@@ -17,6 +17,10 @@ public class Resource<T> {
         this.data = data;
     }
 
+    public static <T> Resource<T> of(T data) {
+        return new Resource<>(data);
+    }
+
     public static Resource<Object> empty() {
         return new Resource<>(null);
     }

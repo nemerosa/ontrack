@@ -8,7 +8,7 @@ public class Link {
 
     private final String uri;
 
-    public static String of(UriComponentsBuilder uriComponentsBuilder, Object... uriVariables) {
+    public static String link(UriComponentsBuilder uriComponentsBuilder, Object... uriVariables) {
         return uriComponentsBuilder.buildAndExpand(uriVariables).encode().toUriString();
     }
 }
