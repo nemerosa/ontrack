@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static net.nemerosa.ontrack.boot.resource.Link.link;
+import static net.nemerosa.ontrack.boot.resource.Resource.link;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.fromMethodCall;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 

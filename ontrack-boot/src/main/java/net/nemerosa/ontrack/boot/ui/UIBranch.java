@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static net.nemerosa.ontrack.boot.resource.Link.link;
+import static net.nemerosa.ontrack.boot.resource.Resource.link;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.fromMethodCall;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -31,7 +31,7 @@ public class UIBranch {
      * FIXME List of branches for a project
      */
     @RequestMapping(value = "/projects/{project}/branches", method = RequestMethod.GET)
-    public Resource<List<Resource<Branch>>> getBranchesForProject(@PathVariable int project) {
+    public Resource<List<Resource<Branch>>> getBranchesForProject(@PathVariable String project) {
         List<Branch> branches = Collections.emptyList();
         return Resource.of(
                 branches

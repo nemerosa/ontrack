@@ -1,14 +1,13 @@
 package net.nemerosa.ontrack.boot.resource;
 
 import lombok.Data;
-import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.function.Supplier;
 
 @Data
-public class Link {
+public class Link<T> {
 
     private final String uri;
+    private final Supplier<T> supplier;
 
-    public static String link(UriComponentsBuilder uriComponentsBuilder, Object... uriVariables) {
-        return uriComponentsBuilder.buildAndExpand(uriVariables).encode().toUriString();
-    }
 }
