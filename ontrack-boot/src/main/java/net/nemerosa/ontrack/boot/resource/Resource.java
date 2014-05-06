@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.resource;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
@@ -12,6 +13,7 @@ import java.util.function.Supplier;
 
 @EqualsAndHashCode
 @ToString
+@JsonSerialize(using = ResourceJsonSerializer.class)
 public class Resource<T> {
 
     private final T data;
