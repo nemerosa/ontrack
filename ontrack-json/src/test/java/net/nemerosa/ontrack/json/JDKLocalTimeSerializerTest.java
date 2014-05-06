@@ -1,0 +1,59 @@
+package net.nemerosa.ontrack.json;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.time.LocalTime;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
+public class JDKLocalTimeSerializerTest {
+
+    @Test
+    public void toJson() throws JsonProcessingException {
+        assertEquals(
+                "\"20:44\"",
+                ObjectMapperFactory.create().writeValueAsString(LocalTime.of(20, 44))
+        );
+    }
+
+    @Test
+    public void toJson_null() throws JsonProcessingException {
+        assertEquals(
+                "{\"time\":null}",
+                ObjectMapperFactory.create().writeValueAsString(new LTContainer(null))
+        );
+    }
+
+    @Test
+    public void fromJson() throws IOException {
+        assertEquals(
+                LocalTime.of(7, 30),
+                ObjectMapperFactory.create().readValue("\"07:30\"", LocalTime.class)
+        );
+    }
+
+    @Test
+    public void fromJson_null() throws IOException {
+        assertNull(
+                ObjectMapperFactory.create().readValue("{\"time\":null}", LTContainer.class).getTime()
+        );
+    }
+
+    @Test
+    public void fromJson_blank() throws IOException {
+        assertNull(
+                ObjectMapperFactory.create().readValue("{\"time\":\"\"}", LTContainer.class).getTime()
+        );
+    }
+
+    @Test
+    public void fromJson_none() throws IOException {
+        assertNull(
+                ObjectMapperFactory.create().readValue("{}", LTContainer.class).getTime()
+        );
+    }
+
+}
