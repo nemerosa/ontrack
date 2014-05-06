@@ -41,6 +41,7 @@
         <module>ontrack-boot</module>
         <module>ontrack-common</module>
         <module>ontrack-json</module>
+        <module>ontrack-test-utils</module>
     </modules>
 
     <dependencyManagement>
