@@ -49,6 +49,11 @@ public class Resource<T> {
         return this;
     }
 
+    public <L> Resource<T> link(String rel, String uri, Resource<L> resource) {
+        links.put(rel, new Link<>(uri, resource));
+        return this;
+    }
+
     public T getData() {
         return data;
     }
