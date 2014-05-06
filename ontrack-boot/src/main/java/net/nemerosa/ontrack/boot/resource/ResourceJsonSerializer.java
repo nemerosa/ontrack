@@ -36,10 +36,10 @@ public class ResourceJsonSerializer extends JsonSerializer<Resource<?>> {
         Resource<T> linkedResource = link.getResource();
         if (linkedResource != null) {
             ObjectNode linkedNode = toJson(linkedResource);
-            // Adds the URI
-            linkedNode.put("href", link.getUri());
             // Adds the node
             data.put(rel, linkedNode);
+        } else if (Resource.SELF.equals(rel)) {
+            data.put(Resource.SELF, link.getUri());
         } else {
             data.put(
                     rel,

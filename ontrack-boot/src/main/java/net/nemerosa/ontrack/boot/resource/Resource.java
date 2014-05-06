@@ -16,6 +16,7 @@ import java.util.function.Supplier;
 @JsonSerialize(using = ResourceJsonSerializer.class)
 public class Resource<T> {
 
+    public static final String SELF = "self";
     private final T data;
     private final Map<String, Link<?>> links = new LinkedHashMap<>();
 
@@ -36,7 +37,7 @@ public class Resource<T> {
     }
 
     public Resource<T> self(String uri) {
-        return link("self", uri);
+        return link(SELF, uri);
     }
 
     public Resource<T> link(String rel, String uri) {
