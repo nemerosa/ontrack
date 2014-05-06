@@ -26,17 +26,17 @@ public class UIResourceAssembler implements ResourceAssembler {
         this.applicationContext = applicationContext;
     }
 
-    private UIProject uiProject() {
-        return applicationContext.getBean(UIProject.class);
+    private UIProjectController uiProject() {
+        return applicationContext.getBean(UIProjectController.class);
     }
 
     @Override
     public Resource<Project> toProjectResource(Project project, Set<String> follow) {
         return Resource.of(project)
-                .self(link(fromMethodCall(on(UIProject.class).project(project.getId(), follow))))
+                .self(link(fromMethodCall(on(UIProjectController.class).project(project.getId(), follow))))
                         // Branches
                 .link("branches",
-                        link(fromMethodCall(on(UIProject.class).getBranchesForProject(project.getId()))),
+                        link(fromMethodCall(on(UIProjectController.class).getBranchesForProject(project.getId()))),
                         () -> uiProject().getBranchesForProject(project.getId())
                 )
                 // FIXME Promotion levels
@@ -47,7 +47,7 @@ public class UIResourceAssembler implements ResourceAssembler {
     @Override
     public Resource<Branch> toBranchResource(Branch branch) {
         return Resource.of(branch)
-                .self(link(fromMethodCall(on(UIProject.class).getBranch(branch.getId()))))
+                .self(link(fromMethodCall(on(UIProjectController.class).getBranch(branch.getId()))))
                 // FIXME Project from branch
                 // FIXME Builds
                 ;
@@ -60,7 +60,7 @@ public class UIResourceAssembler implements ResourceAssembler {
                         .map(p -> toProjectResource(p, Collections.emptySet()))
                         .collect(Collectors.toList())
         )
-                .self(link(fromMethodCall(on(UIProject.class).projects())));
+                .self(link(fromMethodCall(on(UIProjectController.class).projects())));
     }
 
     @Override
@@ -71,7 +71,7 @@ public class UIResourceAssembler implements ResourceAssembler {
                         .map(this::toBranchResource)
                         .collect(Collectors.toList())
         )
-                .self(link(fromMethodCall(on(UIProject.class).getBranchesForProject(project))))
+                .self(link(fromMethodCall(on(UIProjectController.class).getBranchesForProject(project))))
                 ;
     }
 }

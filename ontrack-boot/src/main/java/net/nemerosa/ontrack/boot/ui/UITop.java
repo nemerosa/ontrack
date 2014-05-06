@@ -32,7 +32,7 @@ public class UITop {
                 // Self
                 .self(link(fromMethodCall(on(UITop.class).ui())))
                         // List of projects
-                .link("projects", link(fromMethodCall(on(UIProject.class).projects())))
+                .link("projects", link(fromMethodCall(on(UIProjectController.class).projects())))
                 ;
     }
 
