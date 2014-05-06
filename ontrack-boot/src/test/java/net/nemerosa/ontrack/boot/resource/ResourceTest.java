@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
+import static net.nemerosa.ontrack.json.JsonUtils.array;
 import static net.nemerosa.ontrack.json.JsonUtils.object;
 
 public class ResourceTest {
@@ -142,7 +143,31 @@ public class ResourceTest {
                                         .end()
                         )
                         .with("builds", object()
-                                        .with("href", "http://host/branches/b/builds")
+                                        .with("collection", array()
+                                                .with(object()
+                                                                .with("id", "b11")
+                                                                .with("name", "11")
+                                                                .with("description", "Build 11")
+                                                                .with("self", "http://host/builds/b11")
+                                                                .with("branch", object()
+                                                                                .with("href", "http://host/branches/b")
+                                                                                .end()
+                                                                )
+                                                                .end()
+                                                )
+                                                .with(object()
+                                                                .with("id", "b12")
+                                                                .with("name", "12")
+                                                                .with("description", "Build 12")
+                                                                .with("self", "http://host/builds/b12")
+                                                                .with("branch", object()
+                                                                                .with("href", "http://host/branches/b")
+                                                                                .end()
+                                                                )
+                                                                .end()
+                                                )
+                                                .end())
+                                        .with("self", "http://host/branches/b/builds")
                                         .end()
                         )
                         .end(),

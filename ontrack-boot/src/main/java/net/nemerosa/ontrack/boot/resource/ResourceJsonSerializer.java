@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 
 public class ResourceJsonSerializer extends JsonSerializer<Resource<?>> {
@@ -22,14 +23,21 @@ public class ResourceJsonSerializer extends JsonSerializer<Resource<?>> {
     }
 
     private ObjectNode toJson(Resource<?> resource) {
-        // Data
-        ObjectNode data = mapper.valueToTree(resource.getData());
+        Object data = resource.getData();
+        // Root node
+        ObjectNode node;
+        if (data instanceof Collection) {
+            node = mapper.createObjectNode();
+            node.put("collection", mapper.valueToTree(data));
+        } else {
+            node = mapper.valueToTree(data);
+        }
         // Links
         Map<String, Link<?>> links = resource.getLinks();
         for (Map.Entry<String, Link<?>> linkEntry : links.entrySet()) {
-            addLink(data, linkEntry.getKey(), linkEntry.getValue());
+            addLink(node, linkEntry.getKey(), linkEntry.getValue());
         }
-        return data;
+        return node;
     }
 
     protected <T> void addLink(ObjectNode data, String rel, Link<T> link) {
