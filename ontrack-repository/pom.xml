@@ -15,10 +15,16 @@
     <name>ontrack Repository</name>
 
     <dependencies>
+        <!-- ontrack -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>ontrack-model</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <!-- Spring -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
         </dependency>
     </dependencies>
 
