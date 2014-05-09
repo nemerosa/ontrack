@@ -3,10 +3,10 @@ package net.nemerosa.ontrack.model;
 import lombok.Data;
 
 @Data
-public class PromotionRun {
+public class ValidationRun {
 
     private final String description;
     private final Signature signature;
-    private final PromotionLevel promotionLevel;
+    private final ValidationStamp validationStamp;
 
 }

@@ -2,16 +2,15 @@ package net.nemerosa.ontrack.model;
 
 import lombok.Data;
 
-import java.util.List;
+import java.util.Optional;
 
 @Data
-public class Build {
+public class ValidationStamp {
 
     private final String id;
     private final String name;
     private final String description;
     private final Branch branch;
-    private final List<PromotionRun> promotionRuns;
-    private final List<ValidationRun> validationRuns;
+    private final Optional<User> owner;
 
 }
