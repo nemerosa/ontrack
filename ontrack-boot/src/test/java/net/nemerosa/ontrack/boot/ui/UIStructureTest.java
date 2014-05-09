@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.boot.ui;
 
-import net.nemerosa.ontrack.boot.resource.Resource;
 import net.nemerosa.ontrack.it.AbstractITTestSupport;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.model.structure.Project;
@@ -17,9 +16,7 @@ public class UIStructureTest extends AbstractITTestSupport {
     @Test
     public void createProject() {
         NameDescription nameDescription = nameDescription();
-        Resource<Project> resource = structure.newProject(nameDescription);
-        assertNotNull("Resource not null", resource);
-        Project project = resource.getData();
+        Project project = structure.newProject(nameDescription);
         assertNotNull("Project not null", project);
         assertNotNull("Project ID not null", project.getId());
         assertTrue("Project ID set", project.getId().isSet());
