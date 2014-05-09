@@ -43,8 +43,8 @@
         <module>ontrack-json</module>
         <module>ontrack-test-utils</module>
         <module>ontrack-service</module>
-        <module>ontrack-service-impl</module>
         <module>ontrack-it-utils</module>
+        <module>ontrack-repository</module>
     </modules>
 
     <dependencyManagement>
