@@ -9,4 +9,7 @@ public class Project {
     private final String name;
     private final String description;
 
+    public Project withId(ID id) {
+        return new Project(id, name, description);
+    }
 }
