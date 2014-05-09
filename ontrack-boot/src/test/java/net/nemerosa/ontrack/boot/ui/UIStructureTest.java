@@ -7,8 +7,7 @@ import net.nemerosa.ontrack.model.structure.Project;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class UIStructureTest extends AbstractITTestSupport {
 
@@ -22,7 +21,8 @@ public class UIStructureTest extends AbstractITTestSupport {
         assertNotNull("Resource not null", resource);
         Project project = resource.getData();
         assertNotNull("Project not null", project);
-        assertNotNull("Project ID defined", project.getId());
+        assertNotNull("Project ID not null", project.getId());
+        assertTrue("Project ID set", project.getId().isSet());
         assertEquals("Project name", nameDescription.getName(), project.getName());
         assertEquals("Project description", nameDescription.getDescription(), project.getDescription());
     }
