@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.model;
+package net.nemerosa.ontrack.model.structure;
 
 import lombok.Data;
 

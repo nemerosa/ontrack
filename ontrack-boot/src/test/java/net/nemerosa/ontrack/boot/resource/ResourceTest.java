@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.boot.resource;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import net.nemerosa.ontrack.model.Branch;
-import net.nemerosa.ontrack.model.Build;
-import net.nemerosa.ontrack.model.Project;
+import net.nemerosa.ontrack.model.structure.Branch;
+import net.nemerosa.ontrack.model.structure.Build;
+import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.test.TestUtils;
 import org.junit.Test;
 

@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.boot.resource.Resource;
-import net.nemerosa.ontrack.model.Branch;
-import net.nemerosa.ontrack.model.Project;
+import net.nemerosa.ontrack.model.structure.Branch;
+import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
