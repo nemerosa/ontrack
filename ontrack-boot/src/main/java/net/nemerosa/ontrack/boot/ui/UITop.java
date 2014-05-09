@@ -31,8 +31,8 @@ public class UITop {
                 // TODO Admin access point
                 // Self
                 .self(link(fromMethodCall(on(UITop.class).ui())))
-                        // List of projects
-                .link("projects", link(fromMethodCall(on(UIProjectController.class).projects())))
+                // TODO Resource: List of projects
+                // .link("projects", link(fromMethodCall(on(UIStructureController.class).projects())))
                 ;
     }
 
