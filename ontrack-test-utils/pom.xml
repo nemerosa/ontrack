@@ -20,12 +20,6 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
-        <!-- Model -->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>ontrack-model</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <!-- Json -->
         <dependency>
             <groupId>${project.groupId}</groupId>

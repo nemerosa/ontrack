@@ -4,7 +4,6 @@ import net.nemerosa.ontrack.boot.resource.Resource;
 import net.nemerosa.ontrack.it.AbstractITTestSupport;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.model.structure.Project;
-import net.nemerosa.ontrack.test.TestUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -18,7 +17,7 @@ public class UIStructureIT extends AbstractITTestSupport {
 
     @Test
     public void createProject() {
-        NameDescription nameDescription = TestUtils.nameDescription();
+        NameDescription nameDescription = nameDescription();
         Resource<Project> resource = structure.newProject(nameDescription);
         assertNotNull("Resource not null", resource);
         Project project = resource.getData();

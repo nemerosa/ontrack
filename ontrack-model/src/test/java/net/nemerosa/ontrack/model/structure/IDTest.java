@@ -1,7 +1,10 @@
 package net.nemerosa.ontrack.model.structure;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import net.nemerosa.ontrack.json.JsonUtils;
 import org.junit.Test;
 
+import static net.nemerosa.ontrack.test.TestUtils.assertJsonWrite;
 import static org.junit.Assert.*;
 
 public class IDTest {
@@ -37,6 +40,22 @@ public class IDTest {
     @Test(expected = IllegalArgumentException.class)
     public void not_blank() {
         ID.of("  ");
+    }
+
+    @Test
+    public void set_to_json() throws JsonProcessingException {
+        assertJsonWrite(
+                JsonUtils.text("test"),
+                ID.of("test")
+        );
+    }
+
+    @Test
+    public void unset_to_json() throws JsonProcessingException {
+        assertJsonWrite(
+                JsonUtils.text(""),
+                ID.NONE
+        );
     }
 
 }

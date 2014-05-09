@@ -61,4 +61,8 @@ public final class JsonUtils {
                 return node.textValue();
         }
     }
+
+    public static JsonNode text(String text) {
+        return factory.textNode(text);
+    }
 }

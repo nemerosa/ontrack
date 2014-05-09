@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
-import net.nemerosa.ontrack.model.structure.NameDescription;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.SimpleDateFormat;
@@ -65,14 +64,6 @@ public final class TestUtils {
         assertEquals(
                 expectedResult,
                 mapper.treeToValue(jsonToRead, type)
-        );
-    }
-
-    public static NameDescription nameDescription() {
-        String uid = uid("");
-        return new NameDescription(
-                uid,
-                String.format("%s description", uid)
         );
     }
 }

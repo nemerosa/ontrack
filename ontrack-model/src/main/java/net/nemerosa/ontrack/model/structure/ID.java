@@ -1,12 +1,15 @@
 package net.nemerosa.ontrack.model.structure;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import net.nemerosa.ontrack.model.support.IDJsonSerializer;
 import org.apache.commons.lang3.Validate;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@JsonSerialize(using = IDJsonSerializer.class)
 public final class ID {
 
     public static ID NONE = new ID(null);
