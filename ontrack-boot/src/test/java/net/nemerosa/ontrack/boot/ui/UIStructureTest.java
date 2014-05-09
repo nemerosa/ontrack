@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class UIStructureIT extends AbstractITTestSupport {
+public class UIStructureTest extends AbstractITTestSupport {
 
     @Autowired
     private UIStructure structure;

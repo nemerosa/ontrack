@@ -8,14 +8,21 @@ public class DefaultStructureFactory implements StructureFactory {
 
     @Override
     public Project newProject(NameDescription nameDescription) {
-        // FIXME Method net.nemerosa.ontrack.service.DefaultStructureFactory.newProject
-        return null;
+        return new Project(
+                ID.NONE,
+                nameDescription.getName(),
+                nameDescription.getDescription()
+        );
     }
 
     @Override
     public Branch newBranch(Project project, NameDescription nameDescription) {
-        // FIXME Method net.nemerosa.ontrack.service.DefaultStructureFactory.newBranch
-        return null;
+        return new Branch(
+                ID.NONE,
+                nameDescription.getName(),
+                nameDescription.getDescription(),
+                project
+        );
     }
 
     @Override
