@@ -6,6 +6,11 @@ package net.nemerosa.ontrack.common;
 public interface RunProfile {
 
     /**
+     * Unit test mode
+     */
+    String UNIT_TEST = "unitTest";
+
+    /**
      * Development mode.
      */
     String DEV = "dev";

@@ -1,17 +1,12 @@
 package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.boot.resource.Resource;
-import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.StructureFactory;
-import net.nemerosa.ontrack.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/ui/structure")
@@ -20,6 +15,7 @@ public class UIStructureController implements UIStructure {
     private final ResourceAssembler resourceAssembler;
     private final StructureFactory structureFactory;
 
+    @Autowired
     public UIStructureController(ResourceAssembler resourceAssembler, StructureFactory structureFactory) {
         this.resourceAssembler = resourceAssembler;
         this.structureFactory = structureFactory;

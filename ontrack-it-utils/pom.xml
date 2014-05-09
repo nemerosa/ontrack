@@ -11,32 +11,41 @@
         <version>2.0.0.ALPHA-SNAPSHOT</version>
     </parent>
 
-    <artifactId>ontrack-test-utils</artifactId>
-    <name>ontrack Test Utils</name>
+    <artifactId>ontrack-it-utils</artifactId>
+    <name>ontrack IT Utils</name>
+    <description>Utility classes for integration tests</description>
 
     <dependencies>
-        <!-- Commons -->
+        <!-- ontrack -->
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ontrack-test-utils</artifactId>
+            <version>${project.version}</version>
         </dependency>
-        <!-- Model -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>ontrack-model</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- Json -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>ontrack-json</artifactId>
+            <artifactId>ontrack-common</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- JUnit -->
+        <!-- Tests -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>compile</scope>
+        </dependency>
+        <!-- Spring -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
         </dependency>
     </dependencies>
 

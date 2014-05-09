@@ -44,6 +44,7 @@
         <module>ontrack-test-utils</module>
         <module>ontrack-service</module>
         <module>ontrack-service-impl</module>
+        <module>ontrack-it-utils</module>
     </modules>
 
     <dependencyManagement>
