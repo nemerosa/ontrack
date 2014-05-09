@@ -14,9 +14,13 @@ import static net.nemerosa.ontrack.json.JsonUtils.object;
 
 public class ResourceTest {
 
+    public static Project project() {
+        return new Project("1", "PRJ", "Project");
+    }
+
     @Test
     public void to_json_only_data() throws JsonProcessingException {
-        Branch branch = new Branch("b", "B1", "Branche 1");
+        Branch branch = new Branch("b", "B1", "Branche 1", project());
         TestUtils.assertJsonWrite(
                 object()
                         .with("id", "b")
@@ -29,7 +33,7 @@ public class ResourceTest {
 
     @Test
     public void to_json_self_link() throws JsonProcessingException {
-        Branch branch = new Branch("b", "B1", "Branche 1");
+        Branch branch = new Branch("b", "B1", "Branche 1", project());
         TestUtils.assertJsonWrite(
                 object()
                         .with("id", "b")
@@ -43,7 +47,7 @@ public class ResourceTest {
 
     @Test
     public void to_json_other_link() throws JsonProcessingException {
-        Branch branch = new Branch("b", "B1", "Branche 1");
+        Branch branch = new Branch("b", "B1", "Branche 1", project());
         TestUtils.assertJsonWrite(
                 object()
                         .with("id", "b")
@@ -63,7 +67,7 @@ public class ResourceTest {
 
     @Test
     public void to_json_link_with_supplier() throws JsonProcessingException {
-        Branch branch = new Branch("b", "B1", "Branche 1");
+        Branch branch = new Branch("b", "B1", "Branche 1", project());
         TestUtils.assertJsonWrite(
                 object()
                         .with("id", "b")
@@ -83,7 +87,7 @@ public class ResourceTest {
 
     @Test
     public void to_json_link_with_simple_resource() throws JsonProcessingException {
-        Branch branch = new Branch("b", "B1", "Branche 1");
+        Branch branch = new Branch("b", "B1", "Branche 1", project());
         TestUtils.assertJsonWrite(
                 object()
                         .with("id", "b")
@@ -103,7 +107,7 @@ public class ResourceTest {
 
     @Test
     public void to_json_link_with_resource() throws JsonProcessingException {
-        Branch branch = new Branch("b", "B1", "Branche 1");
+        Branch branch = new Branch("b", "B1", "Branche 1", project());
         TestUtils.assertJsonWrite(
                 object()
                         .with("id", "b")
@@ -131,7 +135,7 @@ public class ResourceTest {
 
     @Test
     public void to_json_link_with_resource_list() throws JsonProcessingException {
-        Branch branch = new Branch("b", "B1", "Branche 1");
+        Branch branch = new Branch("b", "B1", "Branche 1", project());
         TestUtils.assertJsonWrite(
                 object()
                         .with("id", "b")
@@ -179,10 +183,10 @@ public class ResourceTest {
                                 "http://host/branches/b/builds",
                                 Resource.of(
                                         Arrays.asList(
-                                                Resource.of(new Build("b11", "11", "Build 11"))
+                                                Resource.of(new Build("b11", "11", "Build 11", null, null))
                                                         .link("self", "http://host/builds/b11")
                                                         .link("branch", "http://host/branches/b"),
-                                                Resource.of(new Build("b12", "12", "Build 12"))
+                                                Resource.of(new Build("b12", "12", "Build 12", null, null))
                                                         .link("self", "http://host/builds/b12")
                                                         .link("branch", "http://host/branches/b")
                                         )

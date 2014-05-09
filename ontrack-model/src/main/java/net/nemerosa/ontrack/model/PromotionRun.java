@@ -9,5 +9,6 @@ public class PromotionRun {
     private final String name;
     private final String description;
     private final Signature signature;
+    private final PromotionLevel promotionLevel;
 
 }

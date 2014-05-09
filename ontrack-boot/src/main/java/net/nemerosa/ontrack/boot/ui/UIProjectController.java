@@ -62,7 +62,7 @@ public class UIProjectController implements UIProject {
      */
     @RequestMapping(value = "/branches/{id}", method = RequestMethod.GET)
     public Resource<Branch> getBranch(@PathVariable String id) {
-        Branch branch = new Branch(id, id, id);
+        Branch branch = new Branch(id, id, id, null);
         return resourceAssembler.toBranchResource(branch);
     }
 
