@@ -16,6 +16,17 @@
     <name>ontrack Model</name>
 
     <dependencies>
+        <!-- ontrack -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ontrack-json</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- Commons -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
         <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
