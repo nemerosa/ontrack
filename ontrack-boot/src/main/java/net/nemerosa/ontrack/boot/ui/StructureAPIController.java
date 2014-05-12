@@ -25,14 +25,14 @@ public class StructureAPIController extends AbstractResourceController implement
     }
 
     @Override
-    @RequestMapping(value = "", method = RequestMethod.GET)
+    @RequestMapping(value = "projects", method = RequestMethod.GET)
     public List<Project> getProjectList() {
         return structureRepository.getProjectList();
         // TODO Create link
     }
 
     @Override
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @RequestMapping(value = "projects/create", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public Resource<Project> newProject(NameDescription nameDescription) {
         // Creates a new project instance
@@ -44,7 +44,7 @@ public class StructureAPIController extends AbstractResourceController implement
     }
 
     @Override
-    @RequestMapping(value = "/{projectId}", method = RequestMethod.GET)
+    @RequestMapping(value = "projects/{projectId}", method = RequestMethod.GET)
     public Resource<Project> getProject(@PathVariable ID projectId) {
         // Gets from the repository
         Project project = structureRepository.getProject(projectId);
