@@ -7,28 +7,32 @@ import net.nemerosa.ontrack.model.structure.StructureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import java.util.List;
 
 @Path("/structure")
 @Component
-public class UIStructureResource implements UIStructure {
+public class StructureAPIController implements StructureAPI {
 
     private final StructureFactory structureFactory;
     private final StructureRepository structureRepository;
 
     @Autowired
-    public UIStructureResource(StructureFactory structureFactory, StructureRepository structureRepository) {
+    public StructureAPIController(StructureFactory structureFactory, StructureRepository structureRepository) {
         this.structureFactory = structureFactory;
         this.structureRepository = structureRepository;
     }
 
     @Override
+    @GET
     public List<Project> getProjectList() {
         return structureRepository.getProjectList();
     }
 
     @Override
+    @POST
     public Project newProject(NameDescription nameDescription) {
         // Creates a new project instance
         Project project = structureFactory.newProject(nameDescription);

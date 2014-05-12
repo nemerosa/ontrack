@@ -8,10 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.*;
 
-public class UIStructureTest extends AbstractITTestSupport {
+public class StructureAPITest extends AbstractITTestSupport {
 
     @Autowired
-    private UIStructure structure;
+    private StructureAPI structure;
 
     @Test
     public void createProject() {

@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.model.structure.Project;
 
 import java.util.List;
 
-public interface UIStructure {
+public interface StructureAPI {
 
     List<Project> getProjectList();
 
