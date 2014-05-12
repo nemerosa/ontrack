@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
@@ -64,6 +65,13 @@ public final class TestUtils {
         assertEquals(
                 expectedResult,
                 mapper.treeToValue(jsonToRead, type)
+        );
+    }
+    
+    public static void assertJsonEquals(TreeNode o1, TreeNode o2) throws JsonProcessingException {
+        assertEquals(
+                mapper.writeValueAsString(o1),
+                mapper.writeValueAsString(o2)
         );
     }
 }

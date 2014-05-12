@@ -20,6 +20,12 @@
             <artifactId>ontrack-model</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ontrack-test-utils</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
         <!-- Commons -->
         <dependency>
             <groupId>org.apache.commons</groupId>
