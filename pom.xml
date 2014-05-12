@@ -47,6 +47,7 @@
         <module>ontrack-service</module>
         <module>ontrack-it-utils</module>
         <module>ontrack-repository</module>
+        <module>ontrack-ui-support</module>
     </modules>
 
     <dependencyManagement>
