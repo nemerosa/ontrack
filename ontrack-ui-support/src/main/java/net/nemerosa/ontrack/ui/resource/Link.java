@@ -10,6 +10,8 @@ import java.net.URI;
 @Data
 public class Link {
 
+    public static final String CREATE = "create";
+
     private final String name;
     private final URI uri;
 

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
+import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.ResourceCollection;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ public class StructureAPIController extends AbstractResourceController implement
         return ResourceCollection.of(
                 structureRepository.getProjectList().stream().map(this::toProjectResource),
                 uri(on(StructureAPIController.class).getProjectList())
-        );
+        ).with(Link.CREATE, uri(on(StructureAPIController.class).newProject(null)));
     }
 
     @Override
