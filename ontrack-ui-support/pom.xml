@@ -17,6 +17,11 @@
         <!-- ontrack -->
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>ontrack-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>ontrack-model</artifactId>
             <version>${project.version}</version>
         </dependency>

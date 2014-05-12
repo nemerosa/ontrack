@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.boot.ui;
 
-import net.nemerosa.ontrack.it.AbstractITTestSupport;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.ui.resource.Resource;
@@ -9,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.*;
 
-public class StructureAPITest extends AbstractITTestSupport {
+public class StructureAPITest extends AbstractWebTestSupport {
 
     @Autowired
     private StructureAPI structure;
