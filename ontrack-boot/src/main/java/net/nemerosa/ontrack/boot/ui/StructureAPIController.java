@@ -34,7 +34,7 @@ public class StructureAPIController extends AbstractResourceController implement
     @Override
     @RequestMapping(value = "projects/create", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public Resource<Project> newProject(NameDescription nameDescription) {
+    public Resource<Project> newProject(@RequestBody NameDescription nameDescription) {
         // Creates a new project instance
         Project project = structureFactory.newProject(nameDescription);
         // Saves it into the repository
