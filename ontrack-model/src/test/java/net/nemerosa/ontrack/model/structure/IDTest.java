@@ -14,46 +14,41 @@ public class IDTest {
         ID id = ID.NONE;
         assertNotNull(id);
         assertFalse(id.isSet());
-        assertNull(id.getValue());
-        assertNull(id.toString());
+        assertEquals(0, id.getValue());
+        assertEquals("0", id.toString());
     }
 
     @Test
     public void set() {
-        ID id = ID.of("test");
+        ID id = ID.of(1);
         assertNotNull(id);
         assertTrue(id.isSet());
-        assertEquals("test", id.getValue());
-        assertEquals("test", id.toString());
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void not_null() {
-        ID.of(null);
+        assertEquals(1, id.getValue());
+        assertEquals("1", id.toString());
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void not_empty() {
-        ID.of("");
+    public void not_zero() {
+        ID.of(0);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void not_blank() {
-        ID.of("  ");
+    public void not_negative() {
+        ID.of(-1);
     }
 
     @Test
     public void set_to_json() throws JsonProcessingException {
         assertJsonWrite(
-                JsonUtils.text("test"),
-                ID.of("test")
+                JsonUtils.number(12),
+                ID.of(12)
         );
     }
 
     @Test
     public void unset_to_json() throws JsonProcessingException {
         assertJsonWrite(
-                JsonUtils.text(""),
+                JsonUtils.number(0),
                 ID.NONE
         );
     }

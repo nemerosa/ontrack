@@ -44,6 +44,6 @@ public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSuppor
     }
 
     protected ID id(int id) {
-        return ID.of(String.valueOf(id));
+        return ID.of(id);
     }
 }

@@ -11,11 +11,7 @@ public class IDJsonSerializer extends JsonSerializer<ID> {
     @Override
     public void serialize(ID value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
         if (value != null) {
-            if (value.isSet()) {
-                jgen.writeString(value.getValue());
-            } else {
-                jgen.writeString("");
-            }
+            jgen.writeNumber(value.getValue());
         } else {
             jgen.writeNull();
         }

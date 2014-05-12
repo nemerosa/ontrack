@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.Path;
+import java.util.List;
 
 @Path("/structure")
 @Component
@@ -20,6 +21,11 @@ public class UIStructureResource implements UIStructure {
     public UIStructureResource(StructureFactory structureFactory, StructureRepository structureRepository) {
         this.structureFactory = structureFactory;
         this.structureRepository = structureRepository;
+    }
+
+    @Override
+    public List<Project> getProjectList() {
+        return structureRepository.getProjectList();
     }
 
     @Override

@@ -12,22 +12,22 @@ import org.apache.commons.lang3.Validate;
 @JsonSerialize(using = IDJsonSerializer.class)
 public final class ID {
 
-    public static ID NONE = new ID(null);
+    public static ID NONE = new ID(0);
 
-    public static ID of(String value) {
-        Validate.notBlank(value, "ID value must not be blank");
+    public static ID of(int value) {
+        Validate.isTrue(value > 0, "ID value must be greater than zero.");
         return new ID(value);
     }
 
-    private final String value;
+    private final int value;
 
     @Override
     public String toString() {
-        return value;
+        return String.valueOf(value);
     }
 
     public boolean isSet() {
-        return value != null && value.length() > 0;
+        return value > 0;
     }
 
 }
