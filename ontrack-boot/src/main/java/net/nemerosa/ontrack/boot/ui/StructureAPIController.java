@@ -3,11 +3,10 @@ package net.nemerosa.ontrack.boot.ui;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Resource;
+import net.nemerosa.ontrack.ui.resource.ResourceCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -26,9 +25,11 @@ public class StructureAPIController extends AbstractResourceController implement
 
     @Override
     @RequestMapping(value = "projects", method = RequestMethod.GET)
-    public List<Project> getProjectList() {
-        return structureRepository.getProjectList();
-        // TODO Create link
+    public ResourceCollection<Project> getProjectList() {
+        return ResourceCollection.of(
+                structureRepository.getProjectList().stream().map(this::toProjectResource),
+                uri(on(StructureAPIController.class).getProjectList())
+        );
     }
 
     @Override

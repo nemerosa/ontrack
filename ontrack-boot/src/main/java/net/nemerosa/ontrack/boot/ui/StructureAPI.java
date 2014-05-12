@@ -4,12 +4,11 @@ import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.ui.resource.Resource;
-
-import java.util.List;
+import net.nemerosa.ontrack.ui.resource.ResourceCollection;
 
 public interface StructureAPI {
 
-    List<Project> getProjectList();
+    ResourceCollection<Project> getProjectList();
 
     Resource<Project> newProject(NameDescription nameDescription);
 
