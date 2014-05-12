@@ -4,17 +4,15 @@ import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Response;
 import java.util.List;
 
-@Path("/structure")
-@Component
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+
+@RestController
+@RequestMapping("/structure")
 public class StructureAPIController extends AbstractResourceController implements StructureAPI {
 
     private final StructureFactory structureFactory;
@@ -27,38 +25,40 @@ public class StructureAPIController extends AbstractResourceController implement
     }
 
     @Override
-    @GET
+    @RequestMapping(value = "", method = RequestMethod.GET)
     public List<Project> getProjectList() {
         return structureRepository.getProjectList();
         // TODO Create link
     }
 
     @Override
-    @Path("create")
-    @POST
-    public Response newProject(NameDescription nameDescription) {
+    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
+    public Resource<Project> newProject(NameDescription nameDescription) {
         // Creates a new project instance
         Project project = structureFactory.newProject(nameDescription);
         // Saves it into the repository
         project = structureRepository.newProject(project);
         // OK
-        return Response.created(uriBuilder("getProject").build(project.getId());
+        return toProjectResource(project);
     }
 
     @Override
-    @Path("{projectId}")
-    @GET
-    public Resource<Project> getProject(@PathParam("projectId") ID projectId) {
+    @RequestMapping(value = "/{projectId}", method = RequestMethod.GET)
+    public Resource<Project> getProject(@PathVariable ID projectId) {
         // Gets from the repository
         Project project = structureRepository.getProject(projectId);
         // As resource
+        return toProjectResource(project);
+    }
+
+    private Resource<Project> toProjectResource(Project project) {
         return Resource.of(
                 project,
-                uriBuilder("getProject").build(projectId)
-        )
-                // TODO Update link
-                // TODO Delete link
-                // TODO View link
-                ;
+                uri(on(StructureAPIController.class).getProject(project.getId()))
+        );
+        // TODO Update link
+        // TODO Delete link
+        // TODO View link
     }
 }

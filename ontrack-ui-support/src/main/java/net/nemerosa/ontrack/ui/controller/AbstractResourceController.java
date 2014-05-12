@@ -1,27 +1,16 @@
 package net.nemerosa.ontrack.ui.controller;
 
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
+
+import java.net.URI;
 
 public abstract class AbstractResourceController {
 
-    @Context
-    protected UriInfo uriInfo;
-
-    protected UriBuilder uriBuilder() {
-        return uriBuilder(getClass());
+    /**
+     * @see org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder#fromMethodCall(Object)
+     */
+    protected URI uri(Object methodInvocation) {
+        return MvcUriComponentsBuilder.fromMethodCall(methodInvocation).build().toUri();
     }
 
-    protected UriBuilder uriBuilder(String method) {
-        return uriBuilder(getClass(), method);
-    }
-
-    protected UriBuilder uriBuilder(Class<?> clz) {
-        return UriBuilder.fromUri(uriInfo.getBaseUri()).path(clz);
-    }
-
-    protected UriBuilder uriBuilder(Class<?> clz, String method) {
-        return UriBuilder.fromUri(uriInfo.getBaseUri()).path(clz, method);
-    }
 }
