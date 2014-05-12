@@ -7,4 +7,6 @@ public interface StructureRepository {
     Project newProject(Project project);
 
     List<Project> getProjectList();
+
+    Project getProject(ID projectId);
 }

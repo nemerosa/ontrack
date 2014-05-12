@@ -1,15 +1,14 @@
 package net.nemerosa.ontrack.repository;
 
 import net.nemerosa.ontrack.model.exceptions.ProjectNameAlreadyDefinedException;
-import net.nemerosa.ontrack.model.structure.NameDescription;
-import net.nemerosa.ontrack.model.structure.Project;
-import net.nemerosa.ontrack.model.structure.StructureFactory;
-import net.nemerosa.ontrack.model.structure.StructureRepository;
+import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import static org.apache.commons.lang3.Validate.isTrue;
@@ -48,11 +47,24 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     public List<Project> getProjectList() {
         return getJdbcTemplate().query(
                 "SELECT * FROM PROJECTS ORDER BY NAME",
-                (rs, rowNum) -> structureFactory.newProject(new NameDescription(
-                        rs.getString("name"),
-                        rs.getString("description")
-                )).withId(id(rs.getInt("id")))
+                (rs, rowNum) -> toProject(rs)
         );
+    }
+
+    @Override
+    public Project getProject(ID projectId) {
+        return getNamedParameterJdbcTemplate().queryForObject(
+                "SELECT * FROM PROJECTS WHERE ID = :id",
+                params("id", projectId.getValue()),
+                (rs, rowNum) -> toProject(rs)
+        );
+    }
+
+    private Project toProject(ResultSet rs) throws SQLException {
+        return structureFactory.newProject(new NameDescription(
+                rs.getString("name"),
+                rs.getString("description")
+        )).withId(id(rs.getInt("id")));
     }
 
 }
