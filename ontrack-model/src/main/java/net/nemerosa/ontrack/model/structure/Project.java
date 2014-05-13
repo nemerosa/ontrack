@@ -12,4 +12,8 @@ public class Project {
     public Project withId(ID id) {
         return new Project(id, name, description);
     }
+
+    public static Project of(NameDescription nameDescription) {
+        return new Project(ID.NONE, nameDescription.getName(), nameDescription.getDescription());
+    }
 }

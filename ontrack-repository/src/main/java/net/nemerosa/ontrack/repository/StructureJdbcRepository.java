@@ -17,12 +17,9 @@ import static org.apache.commons.lang3.Validate.notNull;
 @Repository
 public class StructureJdbcRepository extends AbstractJdbcRepository implements StructureRepository {
 
-    private final StructureFactory structureFactory;
-
     @Autowired
-    public StructureJdbcRepository(DataSource dataSource, StructureFactory structureFactory) {
+    public StructureJdbcRepository(DataSource dataSource) {
         super(dataSource);
-        this.structureFactory = structureFactory;
     }
 
     @Override
@@ -61,7 +58,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     private Project toProject(ResultSet rs) throws SQLException {
-        return structureFactory.newProject(new NameDescription(
+        return Project.of(new NameDescription(
                 rs.getString("name"),
                 rs.getString("description")
         )).withId(id(rs.getInt("id")));

@@ -1,6 +1,9 @@
 package net.nemerosa.ontrack.boot.ui;
 
-import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.model.structure.ID;
+import net.nemerosa.ontrack.model.structure.NameDescription;
+import net.nemerosa.ontrack.model.structure.Project;
+import net.nemerosa.ontrack.model.structure.StructureRepository;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
@@ -15,12 +18,10 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 @RequestMapping("/structure")
 public class StructureAPIController extends AbstractResourceController implements StructureAPI {
 
-    private final StructureFactory structureFactory;
     private final StructureRepository structureRepository;
 
     @Autowired
-    public StructureAPIController(StructureFactory structureFactory, StructureRepository structureRepository) {
-        this.structureFactory = structureFactory;
+    public StructureAPIController(StructureRepository structureRepository) {
         this.structureRepository = structureRepository;
     }
 
@@ -38,7 +39,7 @@ public class StructureAPIController extends AbstractResourceController implement
     @ResponseStatus(HttpStatus.CREATED)
     public Resource<Project> newProject(@RequestBody NameDescription nameDescription) {
         // Creates a new project instance
-        Project project = structureFactory.newProject(nameDescription);
+        Project project = Project.of(nameDescription);
         // Saves it into the repository
         project = structureRepository.newProject(project);
         // OK
