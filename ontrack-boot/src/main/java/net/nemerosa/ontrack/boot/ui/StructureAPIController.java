@@ -31,7 +31,9 @@ public class StructureAPIController extends AbstractResourceController implement
         return ResourceCollection.of(
                 structureRepository.getProjectList().stream().map(this::toProjectResource),
                 uri(on(StructureAPIController.class).getProjectList())
-        ).with(Link.CREATE, uri(on(StructureAPIController.class).newProject(null)));
+        )
+                // TODO Authorization
+                .with(Link.CREATE, uri(on(StructureAPIController.class).newProject(null)));
     }
 
     @Override
