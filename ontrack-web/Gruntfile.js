@@ -50,6 +50,19 @@ module.exports = function (grunt) {
                 ]
             },
             /**
+             * Copy of templates
+             */
+            dev_templates: {
+                files: [
+                    {
+                        src: [ '**/*.tpl.html' ],
+                        dest: 'target/dev',
+                        cwd: 'src',
+                        expand: true
+                    }
+                ]
+            },
+            /**
              * Copy of application assets
              */
             dev_assets: {
@@ -179,6 +192,31 @@ module.exports = function (grunt) {
                 eqnull: true
             },
             globals: {}
+        },
+
+        /**
+         * HTML2JS is a Grunt plugin that takes all of your template files and
+         * places them into JavaScript files as strings that are added to
+         * AngularJS's template cache. This means that the templates too become
+         * part of the initial payload as one JavaScript file. Neat!
+         */
+        html2js: {
+            dev: {
+                options: {
+                    base: 'src',
+                    module: 'ontrack.templates'
+                },
+                src: [ 'src/**/*.tpl.html' ],
+                dest: 'target/dev/app/ontrack.templates.js'
+            },
+            prod: {
+                options: {
+                    base: 'src',
+                    module: 'iteach.templates'
+                },
+                src: [ 'src/**/*.tpl.html' ],
+                dest: 'target/include/ontrack.templates.js'
+            }
         },
 
         /**
@@ -328,8 +366,8 @@ module.exports = function (grunt) {
             tpls: {
                 files: [
                     'src/**/*.tpl.html'
-                ]
-                // FIXME tasks: [ 'copy:dev_apptpl', 'html2js:dev' ]
+                ],
+                tasks: [ 'copy:dev_templates', 'html2js:dev' ]
             },
 
             /**
@@ -386,10 +424,10 @@ module.exports = function (grunt) {
         'less:dev',
         'copy:dev_assets',
         'copy:dev_js',
-        // TODO 'copy:dev_apptpl',
+        'copy:dev_templates',
         'copy:dev_vendor_js',
         'copy:dev_vendor_fonts',
-        // TODO 'html2js:dev',
+        'html2js:dev',
         'includeSource:dev'
     ]);
 
@@ -401,7 +439,7 @@ module.exports = function (grunt) {
         'clean',
         'less:prod',
         'copy:prod_assets',
-        // TODO 'html2js:prod',
+        'html2js:prod',
         'copy:prod_vendor_fonts',
         'ngmin:prod',
         'copy:prod_vendor_js',

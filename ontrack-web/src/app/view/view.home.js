@@ -4,7 +4,7 @@ angular.module('ot.view.home', [
     .config(function ($stateProvider) {
         $stateProvider.state('home', {
             url: '/home',
-            templateUrl: 'view/view.home.tpl.html'
+            templateUrl: 'app/view/view.home.tpl.html'
         });
     })
 ;
