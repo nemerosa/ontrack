@@ -15,7 +15,9 @@ public interface StructureAPI {
 
     Form newProjectForm();
 
-    Resource<Project> saveProject(ID id, NameDescription nameDescription);
-
     Resource<Project> getProject(ID id);
+
+    Form saveProjectForm(ID id);
+
+    Resource<Project> saveProject(ID id, NameDescription nameDescription);
 }

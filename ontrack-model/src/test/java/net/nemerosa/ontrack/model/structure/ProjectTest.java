@@ -28,18 +28,45 @@ public class ProjectTest {
                                 .with(object()
                                         .with("name", "name")
                                         .with("label", "Name")
+                                        .with("value", (String) null)
                                         .with("length", 40)
                                         .with("regex", "[A-Za-z0-9_\\.\\-]+")
                                         .end())
                                 .with(object()
                                         .with("name", "description")
                                         .with("label", "Description")
+                                        .with("value", (String) null)
                                         .with("length", 500)
                                         .with("rows", 3)
                                         .end())
                                 .end())
                         .end(),
                 Project.form()
+        );
+    }
+
+    @Test
+    public void save_form() throws JsonProcessingException {
+        assertJsonWrite(
+                object()
+                        .with("fields", array()
+                                .with(object()
+                                        .with("name", "name")
+                                        .with("label", "Name")
+                                        .with("value", "Name")
+                                        .with("length", 40)
+                                        .with("regex", "[A-Za-z0-9_\\.\\-]+")
+                                        .end())
+                                .with(object()
+                                        .with("name", "description")
+                                        .with("label", "Description")
+                                        .with("value", "Description")
+                                        .with("length", 500)
+                                        .with("rows", 3)
+                                        .end())
+                                .end())
+                        .end(),
+                Project.of(new NameDescription("Name", "Description")).asForm()
         );
     }
 

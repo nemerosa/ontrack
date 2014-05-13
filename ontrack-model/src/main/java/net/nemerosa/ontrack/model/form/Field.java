@@ -6,4 +6,5 @@ public interface Field {
 
     String getLabel();
 
+    Field value(Object value);
 }

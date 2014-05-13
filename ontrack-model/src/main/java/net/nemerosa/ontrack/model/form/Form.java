@@ -36,4 +36,21 @@ public class Form {
         return fields.values();
     }
 
+    public Form name(String value) {
+        return fill("name", value);
+    }
+
+    public Form description(String value) {
+        return fill("description", value);
+    }
+
+    public Form fill(String name, Object value) {
+        Field field = fields.get(name);
+        if (field != null) {
+            field = field.value(value);
+        } else {
+            throw new FormFieldNotFoundException(name);
+        }
+        return this;
+    }
 }

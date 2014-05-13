@@ -25,4 +25,8 @@ public class Project {
     public Project update(NameDescription nameDescription) {
         return of(nameDescription).withId(id);
     }
+
+    public Form asForm() {
+        return form().name(name).description(description);
+    }
 }

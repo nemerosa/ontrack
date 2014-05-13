@@ -65,6 +65,12 @@ public class StructureAPIController extends AbstractResourceController implement
     }
 
     @Override
+    @RequestMapping(value = "projects/{projectId}/update", method = RequestMethod.GET)
+    public Form saveProjectForm(@PathVariable ID projectId) {
+        return structureRepository.getProject(projectId).asForm();
+    }
+
+    @Override
     @RequestMapping(value = "projects/{projectId}/update", method = RequestMethod.PUT)
     public Resource<Project> saveProject(@PathVariable ID projectId, @RequestBody NameDescription nameDescription) {
         // Gets from the repository
