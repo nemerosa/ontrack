@@ -10,11 +10,18 @@
     <!-- CSS includes -->
     <!-- include: "type": "css", "files": "**/*.css" -->
 
+    <!-- JS includes -->
+    <!-- TODO Preserve the order of sources -->
+    <!-- include: "type": "js", "files": "vendor/jquery/dist/*.js" -->
+    <!-- include: "type": "js", "files": "vendor/angular/*.js" -->
+    <!-- include: "type": "js", "files": "vendor/angular-ui-router/release/*.js" -->
+    <!-- include: "type": "js", "files": "vendor/angular-sanitize/*.js" -->
+    <!-- include: "type": "js", "files": "vendor/angular-bootstrap/*.js" -->
+    <!-- include: "type": "js", "files": "app/**/*.js" -->
+    <!-- include: "type": "js", "files": "assets/**/*.js" -->
+
 </head>
 <body>
-
-<!-- JS includes -->
-<!-- include: "type": "js", "files": "**/*.js" -->
 
 <div>
 
@@ -28,7 +35,7 @@
     </nav>
 
     <!-- View container -->
-    <div id="ontrack-view" ng-view>
+    <div id="ontrack-view" ui-view>
     </div>
 
 </div>
