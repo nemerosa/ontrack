@@ -61,11 +61,11 @@ public class StructureAPIController extends AbstractResourceController implement
         // Gets from the repository
         Project project = structureRepository.getProject(projectId);
         // As resource
-        return toProjectResource(project);
+        return toProjectResourceWithActions(project);
     }
 
     @Override
-    @RequestMapping(value = "projects/{projectId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "projects/{projectId}/update", method = RequestMethod.PUT)
     public Resource<Project> saveProject(@PathVariable ID projectId, @RequestBody NameDescription nameDescription) {
         // Gets from the repository
         Project project = structureRepository.getProject(projectId);
@@ -77,13 +77,19 @@ public class StructureAPIController extends AbstractResourceController implement
         return toProjectResource(project);
     }
 
+    private Resource<Project> toProjectResourceWithActions(Project project) {
+        return toProjectResource(project)
+                // TODO Update link (authorization)
+                .with(Link.UPDATE, uri(on(StructureAPIController.class).saveProject(project.getId(), null)))
+                ;
+        // TODO Delete link
+        // TODO View link
+    }
+
     private Resource<Project> toProjectResource(Project project) {
         return Resource.of(
                 project,
                 uri(on(StructureAPIController.class).getProject(project.getId()))
         );
-        // TODO Update link
-        // TODO Delete link
-        // TODO View link
     }
 }

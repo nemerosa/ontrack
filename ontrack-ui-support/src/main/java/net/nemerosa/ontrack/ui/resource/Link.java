@@ -11,6 +11,7 @@ import java.net.URI;
 public class Link {
 
     public static final String CREATE = "create";
+    public static final String UPDATE = "update";
 
     private final String name;
     private final URI uri;
@@ -18,4 +19,5 @@ public class Link {
     public static Link of(String name, URI uri) {
         return new Link(name, uri);
     }
+
 }
