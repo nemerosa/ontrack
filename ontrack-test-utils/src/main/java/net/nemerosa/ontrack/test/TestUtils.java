@@ -62,6 +62,13 @@ public final class TestUtils {
         );
     }
 
+    public static void assertJsonWrite(JsonNode expectedJson, Object objectToWrite, Class<?> viewClass) throws JsonProcessingException {
+        assertEquals(
+                mapper.writeValueAsString(expectedJson),
+                mapper.writerWithView(viewClass).writeValueAsString(objectToWrite)
+        );
+    }
+
     public static <T> void assertJsonRead(T expectedResult, JsonNode jsonToRead, Class<T> type) throws JsonProcessingException {
         assertEquals(
                 expectedResult,

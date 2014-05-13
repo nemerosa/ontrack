@@ -1,8 +1,6 @@
-package net.nemerosa.ontrack.model.view;
+package net.nemerosa.ontrack.model.structure;
 
 import lombok.Data;
-import net.nemerosa.ontrack.model.structure.Branch;
-import net.nemerosa.ontrack.model.structure.Build;
 
 import java.util.List;
 
@@ -10,7 +8,7 @@ import java.util.List;
  * Branch with a link to the last available build, and to each promotion view.
  */
 @Data
-public class BranchStatusView {
+public class BranchStatusView implements View {
 
     private final Branch branch;
     private final Build latestBuild;

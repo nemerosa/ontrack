@@ -41,7 +41,8 @@ public class PromotionViewTest {
                         .with("promotedBuild", (String) null)
                         .with("promotionRun", (String) null)
                         .end(),
-                view
+                view,
+                PromotionView.class
         );
     }
 
@@ -96,7 +97,8 @@ public class PromotionViewTest {
                                         // Promotion level skipped
                                 .end())
                         .end(),
-                view
+                view,
+                PromotionView.class
         );
     }
 
