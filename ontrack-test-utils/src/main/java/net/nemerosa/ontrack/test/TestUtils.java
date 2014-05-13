@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
@@ -67,11 +68,20 @@ public final class TestUtils {
                 mapper.treeToValue(jsonToRead, type)
         );
     }
-    
+
     public static void assertJsonEquals(TreeNode o1, TreeNode o2) throws JsonProcessingException {
         assertEquals(
                 mapper.writeValueAsString(o1),
                 mapper.writeValueAsString(o2)
         );
     }
+
+    public static LocalDateTime dateTime() {
+        return LocalDateTime.of(2014, 5, 13, 20, 11);
+    }
+
+    public static String dateTimeJson() {
+        return "2014-05-13T20:11:00Z";
+    }
+
 }
