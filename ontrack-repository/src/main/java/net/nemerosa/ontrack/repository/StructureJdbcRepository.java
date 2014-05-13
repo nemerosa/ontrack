@@ -1,7 +1,10 @@
 package net.nemerosa.ontrack.repository;
 
 import net.nemerosa.ontrack.model.exceptions.ProjectNameAlreadyDefinedException;
-import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.model.structure.ID;
+import net.nemerosa.ontrack.model.structure.NameDescription;
+import net.nemerosa.ontrack.model.structure.Project;
+import net.nemerosa.ontrack.model.structure.StructureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
@@ -54,6 +57,18 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 "SELECT * FROM PROJECTS WHERE ID = :id",
                 params("id", projectId.getValue()),
                 (rs, rowNum) -> toProject(rs)
+        );
+    }
+
+    @Override
+    public void saveProject(Project project) {
+        notNull(project, "Project must be defined");
+        isTrue(project.getId() != null && project.getId().isSet(), "Project ID must be defined");
+        getNamedParameterJdbcTemplate().update(
+                "UPDATE PROJECTS SET NAME = :name, DESCRIPTION = :description WHERE ID = :id",
+                params("name", project.getName())
+                        .addValue("description", project.getDescription())
+                        .addValue("id", project.getId().getValue())
         );
     }
 

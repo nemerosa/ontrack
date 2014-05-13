@@ -64,6 +64,19 @@ public class StructureAPIController extends AbstractResourceController implement
         return toProjectResource(project);
     }
 
+    @Override
+    @RequestMapping(value = "projects/{projectId}", method = RequestMethod.PUT)
+    public Resource<Project> saveProject(@PathVariable ID projectId, @RequestBody NameDescription nameDescription) {
+        // Gets from the repository
+        Project project = structureRepository.getProject(projectId);
+        // Updates
+        project = project.update(nameDescription);
+        // Saves in repository
+        structureRepository.saveProject(project);
+        // As resource
+        return toProjectResource(project);
+    }
+
     private Resource<Project> toProjectResource(Project project) {
         return Resource.of(
                 project,

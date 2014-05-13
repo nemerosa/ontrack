@@ -9,4 +9,6 @@ public interface StructureRepository {
     List<Project> getProjectList();
 
     Project getProject(ID projectId);
+
+    void saveProject(Project project);
 }

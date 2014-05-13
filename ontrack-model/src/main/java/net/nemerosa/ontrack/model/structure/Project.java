@@ -21,4 +21,8 @@ public class Project {
     public static Form form() {
         return Form.nameAndDescription();
     }
+
+    public Project update(NameDescription nameDescription) {
+        return of(nameDescription).withId(id);
+    }
 }
