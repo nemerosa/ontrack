@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.model.structure.Project;
@@ -34,6 +35,12 @@ public class StructureAPIController extends AbstractResourceController implement
         )
                 // TODO Authorization
                 .with(Link.CREATE, uri(on(StructureAPIController.class).newProject(null)));
+    }
+
+    @Override
+    @RequestMapping(value = "projects/create", method = RequestMethod.GET)
+    public Form newProjectForm() {
+        return Project.form();
     }
 
     @Override

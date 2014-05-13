@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.model.structure.Project;
@@ -11,6 +12,8 @@ public interface StructureAPI {
     ResourceCollection<Project> getProjectList();
 
     Resource<Project> newProject(NameDescription nameDescription);
+
+    Form newProjectForm();
 
     Resource<Project> getProject(ID id);
 }
