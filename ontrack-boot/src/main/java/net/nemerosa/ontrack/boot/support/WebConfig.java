@@ -1,10 +1,8 @@
 package net.nemerosa.ontrack.boot.support;
 
-import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
@@ -27,9 +25,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
         // Plain text
         converters.add(new StringHttpMessageConverter());
         // JSON
-        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-        converter.setObjectMapper(ObjectMapperFactory.create());
-        converters.add(converter);
+        converters.add(new ViewAwareMappingJackson2HttpMessageConverter());
     }
 
 }
