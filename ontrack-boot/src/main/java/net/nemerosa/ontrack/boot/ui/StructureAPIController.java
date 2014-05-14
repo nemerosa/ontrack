@@ -86,15 +86,31 @@ public class StructureAPIController extends AbstractResourceController implement
         return ResourceCollection.of(
                 structureRepository.getBranchesForProject(projectId).stream().map(this::toBranchResource),
                 uri(on(StructureAPIController.class).getBranchListForProject(projectId))
-        );
-        // TODO Authorization
-        // TODO .with(Link.CREATE, uri(on(StructureAPIController.class).newBranch(null)));
+        )
+                // TODO Create (authorization)
+                .with(Link.CREATE, uri(on(StructureAPIController.class).newBranch(projectId, null)))
+                ;
+    }
+
+    @Override
+    @RequestMapping(value = "projects/{projectId}/branches/create", method = RequestMethod.GET)
+    public Resource<Branch> newBranch(@PathVariable ID projectId, @RequestBody NameDescription nameDescription) {
+        // Gets the project
+        Project project = structureRepository.getProject(projectId);
+        // Creates a new branch instance
+        Branch branch = Branch.of(project, nameDescription);
+        // Saves it into the repository
+        branch = structureRepository.newBranch(branch);
+        // OK
+        return toBranchResource(branch);
     }
 
     @Override
     @RequestMapping(value = "branches/{branchId}", method = RequestMethod.GET)
-    public Branch getBranch(@PathVariable ID branchId) {
-        return structureRepository.getBranch(branchId);
+    public Resource<Branch> getBranch(@PathVariable ID branchId) {
+        return toBranchResourceWithActions(
+                structureRepository.getBranch(branchId)
+        );
     }
 
     // Resource assemblers
@@ -103,7 +119,7 @@ public class StructureAPIController extends AbstractResourceController implement
         return toProjectResource(project)
                 // TODO Update link (authorization)
                 .with(Link.UPDATE, uri(on(StructureAPIController.class).saveProject(project.getId(), null)))
-                // Branch list
+                        // Branch list
                 .with("branches", uri(on(StructureAPIController.class).getBranchListForProject(project.getId())))
                 ;
         // TODO Delete link
@@ -115,6 +131,14 @@ public class StructureAPIController extends AbstractResourceController implement
                 project,
                 uri(on(StructureAPIController.class).getProject(project.getId()))
         );
+    }
+
+    private Resource<Branch> toBranchResourceWithActions(Branch branch) {
+        return toBranchResource(branch);
+        // TODO Update link
+        // TODO Delete link
+        // TODO View link
+        // TODO Builds link
     }
 
     private Resource<Branch> toBranchResource(Branch branch) {

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.model.structure.Project;
@@ -38,6 +39,15 @@ public class StructureAPITest extends AbstractWebTestSupport {
         checkProjectResource(resource, nameDescription);
     }
 
+    @Test
+    public void createBranch() {
+        // Project
+        Resource<Project> project = structure.newProject(nameDescription());
+        // Branch
+        NameDescription nameDescription = nameDescription();
+        Resource<Branch> resource = structure.newBranch(project.getData().getId(), nameDescription);
+    }
+
     private void checkProjectResource(Resource<Project> resource, NameDescription nameDescription) {
         assertNotNull("Resource not null", resource);
         Project project = resource.getData();
@@ -46,6 +56,16 @@ public class StructureAPITest extends AbstractWebTestSupport {
         assertTrue("Project ID set", project.getId().isSet());
         assertEquals("Project name", nameDescription.getName(), project.getName());
         assertEquals("Project description", nameDescription.getDescription(), project.getDescription());
+    }
+
+    private void checkBranchResource(Resource<Branch> resource, NameDescription nameDescription) {
+        assertNotNull("Resource not null", resource);
+        Branch branch = resource.getData();
+        assertNotNull("Branch not null", branch);
+        assertNotNull("Branch ID not null", branch.getId());
+        assertTrue("Branch ID set", branch.getId().isSet());
+        assertEquals("Branch name", nameDescription.getName(), branch.getName());
+        assertEquals("Branch description", nameDescription.getDescription(), branch.getDescription());
     }
 
 }
