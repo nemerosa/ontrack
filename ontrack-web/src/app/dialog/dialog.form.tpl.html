@@ -4,6 +4,14 @@
 <form name="thisForm" class="form-horizontal" ng-submit="submit(thisForm.$valid)" novalidate="novalidate">
     <div class="modal-body">
 
+        <div ng-repeat="field in config.form.fields" class="form-group" ng-class="{ 'has-error' : thisForm[field.name].$invalid && !thisForm[field.name].$pristine }">
+            <label class="control-label col-md-3">{{field.label}}</label>
+            <div class="col-md-9">
+                <input ng-model="data[field.name]" name="{{field.name}}" maxlength="{{field.maxlength}}" type="text" class="form-control" ng-required="field.required" />
+                <p ng-show="thisForm[field.name].$invalid && !thisForm[field.name].$pristine" class="help-block">{{field.validation}}</p>
+            </div>
+        </div>
+
     </div>
     <div class="modal-footer">
 
