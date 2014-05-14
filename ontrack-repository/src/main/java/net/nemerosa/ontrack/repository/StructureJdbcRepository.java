@@ -10,6 +10,7 @@ import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.function.Function;
 
 import static org.apache.commons.lang3.Validate.isTrue;
 import static org.apache.commons.lang3.Validate.notNull;
@@ -74,22 +75,23 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         return getNamedParameterJdbcTemplate().queryForObject(
                 "SELECT * FROM BRANCHES WHERE ID = :id",
                 params("id", branchId.getValue()),
-                (rs, rowNum) -> toBranch(rs, true)
+                (rs, rowNum) -> toBranch(rs, this::getProject)
         );
     }
 
     @Override
     public List<Branch> getBranchesForProject(ID projectId) {
+        Project project = getProject(projectId);
         return getNamedParameterJdbcTemplate().query(
                 "SELECT * FROM BRANCHES WHERE PROJECTID = :projectId ORDER BY NAME",
                 params("projectId", projectId.getValue()),
-                (rs, rowNum) -> toBranch(rs, false)
+                (rs, rowNum) -> toBranch(rs, id -> project)
         );
     }
 
-    protected Branch toBranch(ResultSet rs, boolean withProject) throws SQLException {
+    protected Branch toBranch(ResultSet rs, Function<ID, Project> projectSupplier) throws SQLException {
         return Branch.of(
-                withProject ? getProject(id(rs, "projectId")) : null,
+                projectSupplier.apply(id(rs, "projectId")),
                 new NameDescription(
                         rs.getString("name"),
                         rs.getString("description")
