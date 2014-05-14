@@ -9,11 +9,13 @@ angular.module('ot.view.home', [
             controller: 'HomeCtrl'
         });
     })
-    .controller('HomeCtrl', function ($scope, otStructureService) {
-        // TODO Breadcrumbs
-        // TODO Title
-        // TODO Commands
-        // TODO Loading the projects
+    .controller('HomeCtrl', function ($rootScope, $scope, otStructureService) {
+        $rootScope.view = {
+            // TODO Breadcrumbs
+            // Title
+            title: 'Home'
+            // TODO Commands
+        };
         otStructureService.getProjects().then(function (projectCollection) {
             $scope.projectCollection = projectCollection;
             // TODO Loading the projects' views
