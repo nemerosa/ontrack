@@ -24,7 +24,7 @@ public class Form {
     }
 
     private Form description() {
-        return with(Memo.of("description").label("Description").length(500).rows(3));
+        return with(Memo.of("description").label("Description").optional().length(500).rows(3));
     }
 
     public Form with(Field field) {
