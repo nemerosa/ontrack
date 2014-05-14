@@ -13,17 +13,24 @@ angular.module('ot.service.structure', [
         };
 
         /**
-         * Creating a project
-         * @param href URI to the creation URL
+         * Creating from a form, using POST
          */
-        self.createProject = function (href) {
+        self.create = function (uri, title) {
             return otFormService.display({
-                uri: href,
-                title: 'New project',
+                uri: uri,
+                title: title,
                 submit: function (data) {
-                    return ot.call($http.post(href, data));
+                    return ot.call($http.post(uri, data));
                 }
             });
+        };
+
+        /**
+         * Creating a project
+         * @param uri URI to the creation URL
+         */
+        self.createProject = function (uri) {
+            return self.create(uri, 'New project');
         };
 
         /**
@@ -42,6 +49,13 @@ angular.module('ot.service.structure', [
                     $interpolate('structure/projects/{{projectId}}/branches')({projectId: projectId})
                 )
             );
+        };
+
+        /**
+         * Creating a branch
+         */
+        self.createBranch = function (uri) {
+            return self.create(uri, 'New branch');
         };
 
         return self;

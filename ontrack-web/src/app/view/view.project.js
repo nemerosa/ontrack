@@ -27,7 +27,7 @@ angular.module('ot.view.project', [
                         name: "Create branch",
                         cls: 'ot-command-branch-new',
                         action: function () {
-                            alert('Create branch');
+                            otStructureService.createBranch(branchCollection.create.href).then(loadBranches);
                         }
                     },
                     ot.viewCloseCommand('/home')
