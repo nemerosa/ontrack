@@ -65,7 +65,7 @@ public class IDTest {
 
     @Test
     public void is_defined_set() {
-        assertFalse(ID.isDefined(ID.of(1)));
+        assertTrue(ID.isDefined(ID.of(1)));
     }
 
 }
