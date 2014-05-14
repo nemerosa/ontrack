@@ -129,27 +129,40 @@ div.ot-view {
  * Entities
  */
 
-.ot-home-project-row {
+.ot-entity-row {
   .row;
   margin-left: 0;
   margin-right: 0;
   padding-bottom: 0.5em;
 }
 
-.ot-home-project-label {
+.ot-entity-label {
   .bg-primary;
+  display: inline-block;
   font-weight: bold;
   width: 12em;
   padding: 2em;
-}
-
-a.ot-home-project-label {
-  display: inline-block;
   text-decoration: none;
   cursor: pointer;
   &:hover {
     color: white;
   }
+}
+
+.ot-home-project-row {
+  .ot-entity-row;
+}
+
+.ot-home-project-label {
+  .ot-entity-label;
+}
+
+.ot-project-branch-row {
+  .ot-entity-row;
+}
+
+.ot-project-branch-label {
+  .ot-entity-label;
 }
 
 /**

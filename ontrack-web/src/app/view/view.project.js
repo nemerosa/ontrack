@@ -17,6 +17,7 @@ angular.module('ot.view.project', [
         // Loading the branches
         function loadBranches() {
             otStructureService.getProjectBranches(projectId).then(function (branchCollection) {
+                $scope.branchCollection = branchCollection;
                 // View commands
                 view.commands = [
                     {
