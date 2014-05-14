@@ -19,16 +19,17 @@ angular.module('ot.view.project', [
             otStructureService.getProjectBranches(projectId).then(function (branchCollection) {
                 // View commands
                 view.commands = [
-                    /*
-                     {
-                     condition: projectResource.branches.create,
-                     id: 'createBranch',
-                     name: "Create branch",
-                     cls: 'ot-command-branch-new',
-                     action: function () {
-                     alert('Create branch');
-                     }
-                     },*/
+                    {
+                        condition: function () {
+                            return branchCollection.create;
+                        },
+                        id: 'createBranch',
+                        name: "Create branch",
+                        cls: 'ot-command-branch-new',
+                        action: function () {
+                            alert('Create branch');
+                        }
+                    },
                     ot.viewCloseCommand('/home')
                 ];
             });
