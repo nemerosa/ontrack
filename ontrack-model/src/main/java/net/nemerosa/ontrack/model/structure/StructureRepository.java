@@ -19,4 +19,7 @@ public interface StructureRepository {
     Branch getBranch(ID branchId);
 
     List<Branch> getBranchesForProject(ID projectId);
+
+    Branch newBranch(Branch branch);
+
 }

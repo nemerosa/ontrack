@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Data;
 
 @Data
-public class Branch {
+public class Branch implements Entity {
 
     private final ID id;
     private final String name;

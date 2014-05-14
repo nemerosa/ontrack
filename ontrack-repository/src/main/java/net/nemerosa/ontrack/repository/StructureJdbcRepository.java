@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.repository;
 
+import net.nemerosa.ontrack.model.exceptions.BranchNameAlreadyDefinedException;
 import net.nemerosa.ontrack.model.exceptions.ProjectNameAlreadyDefinedException;
 import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +13,8 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.function.Function;
 
-import static org.apache.commons.lang3.Validate.isTrue;
-import static org.apache.commons.lang3.Validate.notNull;
+import static net.nemerosa.ontrack.model.structure.Entity.isEntityDefined;
+import static net.nemerosa.ontrack.model.structure.Entity.isEntityNew;
 
 @Repository
 public class StructureJdbcRepository extends AbstractJdbcRepository implements StructureRepository {
@@ -26,8 +27,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     @Override
     public Project newProject(Project project) {
         // Validation
-        notNull(project, "Project must be defined");
-        isTrue(project.getId() == null || !project.getId().isSet(), "Project ID must not be defined");
+        isEntityNew(project, "Project must be defined");
         // Creation
         try {
             int id = dbCreate(
@@ -60,8 +60,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
 
     @Override
     public void saveProject(Project project) {
-        notNull(project, "Project must be defined");
-        isTrue(project.getId() != null && project.getId().isSet(), "Project ID must be defined");
+        isEntityDefined(project, "Project must be defined");
         getNamedParameterJdbcTemplate().update(
                 "UPDATE PROJECTS SET NAME = :name, DESCRIPTION = :description WHERE ID = :id",
                 params("name", project.getName())
@@ -87,6 +86,26 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 params("projectId", projectId.getValue()),
                 (rs, rowNum) -> toBranch(rs, id -> project)
         );
+    }
+
+    @Override
+    public Branch newBranch(Branch branch) {
+        // Validation
+        isEntityNew(branch, "Branch must be defined");
+        isEntityDefined(branch.getProject(), "Project must be defined");
+        // Creation
+        try {
+            int id = dbCreate(
+                    "INSERT INTO BRANCHES(PROJECTID, NAME, DESCRIPTION) VALUES (:projectId, :name, :description)",
+                    params("name", branch.getName())
+                            .addValue("description", branch.getDescription())
+                            .addValue("projectId", branch.getProject().id())
+            );
+            // Returns with ID
+            return branch.withId(id(id));
+        } catch (DuplicateKeyException ex) {
+            throw new BranchNameAlreadyDefinedException(branch.getName());
+        }
     }
 
     protected Branch toBranch(ResultSet rs, Function<ID, Project> projectSupplier) throws SQLException {

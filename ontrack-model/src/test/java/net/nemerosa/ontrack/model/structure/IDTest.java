@@ -53,4 +53,19 @@ public class IDTest {
         );
     }
 
+    @Test
+    public void is_defined_null() {
+        assertFalse(ID.isDefined(null));
+    }
+
+    @Test
+    public void is_defined_none() {
+        assertFalse(ID.isDefined(ID.NONE));
+    }
+
+    @Test
+    public void is_defined_set() {
+        assertFalse(ID.isDefined(ID.of(1)));
+    }
+
 }

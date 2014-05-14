@@ -30,4 +30,7 @@ public final class ID {
         return value > 0;
     }
 
+    public static boolean isDefined(ID id) {
+        return id != null && id.isSet();
+    }
 }

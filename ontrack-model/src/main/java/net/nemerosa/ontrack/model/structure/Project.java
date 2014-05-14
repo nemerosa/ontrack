@@ -4,7 +4,7 @@ import lombok.Data;
 import net.nemerosa.ontrack.model.form.Form;
 
 @Data
-public class Project {
+public class Project implements Entity {
 
     private final ID id;
     private final String name;
