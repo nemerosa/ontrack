@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.model.view;
+package net.nemerosa.ontrack.model.structure;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import net.nemerosa.ontrack.model.structure.*;

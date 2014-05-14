@@ -3,18 +3,20 @@ package net.nemerosa.ontrack.ui.resource;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import net.nemerosa.ontrack.model.structure.Container;
 import net.nemerosa.ontrack.ui.support.ResourceCollectionJsonSerializer;
 
 import java.beans.ConstructorProperties;
 import java.net.URI;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @EqualsAndHashCode(callSuper = false)
 @Data
 @JsonSerialize(using = ResourceCollectionJsonSerializer.class)
-public class ResourceCollection<T> extends LinkContainer<ResourceCollection<T>> {
+public class ResourceCollection<T> extends LinkContainer<ResourceCollection<T>> implements Container<Resource<T>> {
 
     private final Pagination pagination;
     private final Collection<Resource<T>> resources;
@@ -24,6 +26,11 @@ public class ResourceCollection<T> extends LinkContainer<ResourceCollection<T>> 
         super(href);
         this.pagination = pagination;
         this.resources = resources;
+    }
+
+    @Override
+    public Optional<Resource<T>> first() {
+        return resources.stream().findFirst();
     }
 
     public static <R> ResourceCollection<R> of(Stream<Resource<R>> resources, URI href) {

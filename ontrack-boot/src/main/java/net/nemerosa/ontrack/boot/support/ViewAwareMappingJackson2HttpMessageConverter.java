@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
-import net.nemerosa.ontrack.model.structure.View;
+import net.nemerosa.ontrack.model.support.JsonViewClass;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -52,15 +52,15 @@ class ViewAwareMappingJackson2HttpMessageConverter extends MappingJackson2HttpMe
             if (this.jsonPrefix != null) {
                 jsonGenerator.writeRaw(this.jsonPrefix);
             }
-            ObjectWriter writer;
-            if (object instanceof View) {
-                writer = getObjectMapper().writerWithView(object.getClass());
-            } else {
-                writer = getObjectMapper().writer();
-            }
+            Class<?> viewClass = getViewClass(object);
+            ObjectWriter writer = getObjectMapper().writerWithView(viewClass);
             writer.writeValue(jsonGenerator, object);
         } catch (JsonProcessingException ex) {
             throw new HttpMessageNotWritableException("Could not write JSON: " + ex.getMessage(), ex);
         }
+    }
+
+    protected Class<?> getViewClass(Object object) {
+        return JsonViewClass.getViewClass(object);
     }
 }
