@@ -6,6 +6,9 @@ angular.module('ot.dialog.form', [])
         $scope.data = {};
         angular.forEach(config.form.fields, function (field) {
             $scope.data[field.name] = field.value;
+            if (field.regex) {
+                field.pattern = new RegExp(field.regex);
+            }
         });
         // Cancelling the dialog
         $scope.cancel = function () {
