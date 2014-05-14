@@ -28,6 +28,8 @@ public interface StructureAPI {
 
     ResourceCollection<Branch> getBranchListForProject(ID projectId);
 
+    Form newBranchForm();
+
     Resource<Branch> newBranch(ID projectId, NameDescription nameDescription);
 
     Resource<Branch> getBranch(ID branchId);

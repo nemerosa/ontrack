@@ -94,6 +94,12 @@ public class StructureAPIController extends AbstractResourceController implement
 
     @Override
     @RequestMapping(value = "projects/{projectId}/branches/create", method = RequestMethod.GET)
+    public Form newBranchForm() {
+        return Branch.form();
+    }
+
+    @Override
+    @RequestMapping(value = "projects/{projectId}/branches/create", method = RequestMethod.POST)
     public Resource<Branch> newBranch(@PathVariable ID projectId, @RequestBody NameDescription nameDescription) {
         // Gets the project
         Project project = structureRepository.getProject(projectId);
@@ -134,11 +140,12 @@ public class StructureAPIController extends AbstractResourceController implement
     }
 
     private Resource<Branch> toBranchResourceWithActions(Branch branch) {
-        return toBranchResource(branch);
-        // TODO Update link
-        // TODO Delete link
-        // TODO View link
-        // TODO Builds link
+        return toBranchResource(branch)
+                // TODO Update link (with authorisation)
+                // TODO Delete link
+                // TODO View link
+                // TODO Builds link
+                ;
     }
 
     private Resource<Branch> toBranchResource(Branch branch) {

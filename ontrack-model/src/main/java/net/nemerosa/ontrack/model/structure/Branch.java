@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.model.structure;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Data;
+import net.nemerosa.ontrack.model.form.Form;
 
 @Data
 public class Branch implements Entity {
@@ -25,4 +26,7 @@ public class Branch implements Entity {
         return new Branch(id, name, description, project);
     }
 
+    public static Form form() {
+        return Form.nameAndDescription();
+    }
 }
