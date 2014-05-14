@@ -26,8 +26,14 @@ angular.module('ot.service.form', [
                             };
                         }
                     }
-                });
-                // TODO Modal promise
+                }).result.then(
+                    function success() {
+                        d.resolve();
+                    },
+                    function error() {
+                        d.reject();
+                    }
+                );
             });
 
             return d.promise;

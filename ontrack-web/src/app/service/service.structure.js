@@ -19,8 +19,10 @@ angular.module('ot.service.structure', [
         self.createProject = function (href) {
             return otFormService.display({
                 uri: href,
-                title: 'New project'
-                // TODO Creation of the form for the submission
+                title: 'New project',
+                submit: function (data) {
+                    return ot.call($http.post(href, data));
+                }
             });
         };
 

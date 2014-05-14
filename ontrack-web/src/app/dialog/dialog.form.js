@@ -14,5 +14,17 @@ angular.module('ot.dialog.form', [])
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
         };
+        // Submitting the dialog
+        $scope.submit = function (isValid) {
+            if (isValid) {
+                config.formConfig.submit($scope.data).then(
+                    function success() {
+                        $modalInstance.close('ok');
+                    },
+                    function error(message) {
+                        $scope.message = message;
+                    });
+            }
+        };
     })
 ;
