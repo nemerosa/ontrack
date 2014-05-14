@@ -4,7 +4,8 @@ var ontrack = angular.module('ontrack', [
         'ngSanitize',
         // Templates as JS
         'ot.templates',
-        // TODO Directives
+        // Directives
+        'ot.directive.view',
         // Views
         'ot.view.home'
     ])

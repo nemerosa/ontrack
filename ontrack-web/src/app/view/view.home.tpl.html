@@ -1,11 +1,9 @@
-<div class="ot-view container">
-    <div class="row">
-        <div class="ot-home-project-list">
-            <div ng-repeat="project in projectCollection.resources" class="ot-home-project-row">
-                <a class="ot-home-project-label" href="#/project/{{project.name}}">
-                    {{project.name}}
-                </a>
-            </div>
+<ot-view>
+    <div class="ot-home-project-list">
+        <div ng-repeat="project in projectCollection.resources" class="ot-home-project-row">
+            <a class="ot-home-project-label" href="#/project/{{project.name}}">
+                {{project.name}}
+            </a>
         </div>
     </div>
-</div>
+</ot-view>
