@@ -11,4 +11,11 @@ angular.module('ot.directive.misc', [
             }
         };
     })
+    .directive('otSectionTitle', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'app/directive/directive.sectionTitle.tpl.html',
+            transclude: true
+        };
+    })
 ;
