@@ -7,7 +7,14 @@
         <div ng-repeat="field in config.form.fields" class="form-group" ng-class="{ 'has-error' : thisForm[field.name].$invalid && !thisForm[field.name].$pristine }">
             <label class="control-label col-md-3">{{field.label}}</label>
             <div class="col-md-9">
-                <input ng-model="data[field.name]" name="{{field.name}}" maxlength="{{field.maxlength}}" type="text" class="form-control" ng-required="field.required" />
+
+                <!-- Type: text -->
+                <input ng-if="field.type == 'text'" ng-model="data[field.name]" name="{{field.name}}" maxlength="{{field.maxlength}}" type="text" class="form-control" ng-required="field.required" />
+
+                <!-- Type: memo -->
+                <textarea ng-if="field.type == 'memo'" ng-model="data[field.name]" class="form-control" rows="{{field.rows}}" ng-required="field.required" maxlength="{{field.maxlength}}"></textarea>
+
+                <!-- Validation message -->
                 <p ng-show="thisForm[field.name].$invalid && !thisForm[field.name].$pristine" class="help-block">{{field.validation}}</p>
             </div>
         </div>
