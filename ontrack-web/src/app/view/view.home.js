@@ -18,20 +18,24 @@ angular.module('ot.view.home', [
             commands: []
         };
         // Loading the project list
-        otStructureService.getProjects().then(function (projectCollection) {
-            $scope.projectCollection = projectCollection;
-            // TODO Loading the projects' views
-            // TODO Creating a project
-            if (projectCollection.create) {
-                $rootScope.view.commands.push({
-                    id: 'createProject',
-                    name: 'Create project',
-                    cls: 'ot-command-project-new',
-                    action: function () {
-                        alert('Creating a project!');
-                    }
-                });
-            }
-        });
+        function loadProjects() {
+            otStructureService.getProjects().then(function (projectCollection) {
+                $scope.projectCollection = projectCollection;
+                // TODO Loading the projects' views
+                // TODO Creating a project
+                if (projectCollection.create) {
+                    $rootScope.view.commands.push({
+                        id: 'createProject',
+                        name: 'Create project',
+                        cls: 'ot-command-project-new',
+                        action: function () {
+                            otStructureService.createProject(projectCollection.create.href).then(loadProjects);
+                        }
+                    });
+                }
+            });
+        }
+
+        loadProjects();
     })
 ;
