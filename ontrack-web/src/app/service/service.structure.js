@@ -26,6 +26,13 @@ angular.module('ot.service.structure', [
             });
         };
 
+        /**
+         * Getting a project
+         */
+        self.getProject = function (id) {
+            return ot.call($http.get('structure/projects/' + id));
+        };
+
         return self;
     })
 ;

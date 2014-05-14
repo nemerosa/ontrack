@@ -3,8 +3,19 @@ angular.module('ot.service.core', [
 /**
  * Basic services
  */
-    .service('ot', function ($q, $log, $interpolate) {
+    .service('ot', function ($q, $rootScope, $log, $interpolate) {
         var self = {};
+
+        /**
+         * Initial view
+         */
+        self.view = function () {
+            $rootScope.view = {
+                title: '',
+                commands: []
+            };
+            return $rootScope.view;
+        };
 
         /**
          * Wraps a HTTP call into a promise.
