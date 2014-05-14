@@ -18,6 +18,18 @@ angular.module('ot.service.core', [
         };
 
         /**
+         * Default close command
+         */
+        self.viewCloseCommand = function (link) {
+            return {
+                id: 'close',
+                name: "Close",
+                cls: 'ot-command-close',
+                link: link
+            };
+        };
+
+        /**
          * Wraps a HTTP call into a promise.
          */
         self.call = function (httpCall) {

@@ -5,9 +5,15 @@
         </div>
         <div class="col-md-8">
             <div class="ot-view-commands">
-                <span ng-repeat="command in view.commands" id="{{command.id}}" class="ot-view-command" ng-click="command.action()">
-                    <span class="{{command.cls}}"></span>
-                    {{command.name}}
+                <span ng-repeat="command in view.commands" id="{{command.id}}" class="ot-view-command">
+                    <span ng-if="command.action" ng-click="command.action()">
+                        <span class="{{command.cls}}"></span>
+                        {{command.name}}
+                    </span>
+                    <a ng-if="command.link" href="#{{command.link}}">
+                        <span class="{{command.cls}}"></span>
+                        {{command.name}}
+                    </a>
                 </span>
             </div>
         </div>

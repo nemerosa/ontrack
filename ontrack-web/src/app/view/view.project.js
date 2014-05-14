@@ -20,6 +20,10 @@ angular.module('ot.view.project', [
                 $scope.project = projectResource;
                 // View settings
                 view.title = projectResource.name;
+                // View commands
+                view.commands = [
+                    ot.viewCloseCommand('/home')
+                ];
             });
         }
 
