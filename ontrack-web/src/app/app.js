@@ -6,6 +6,7 @@ var ontrack = angular.module('ontrack', [
         'ot.templates',
         // Directives
         'ot.directive.view',
+        'ot.directive.misc',
         // Views
         'ot.view.home',
         'ot.view.project'

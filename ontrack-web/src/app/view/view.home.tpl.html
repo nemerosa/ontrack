@@ -1,5 +1,8 @@
 <ot-view>
     <div class="ot-home-project-list">
+        <ot-noentry list="projectCollection.resources">
+            No project has been created yet.
+        </ot-noentry>
         <div ng-repeat="project in projectCollection.resources" class="ot-home-project-row">
             <div class="col-md-12">
                 <a class="ot-home-project-label" href="#/project/{{project.id}}">
