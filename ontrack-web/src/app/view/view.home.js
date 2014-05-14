@@ -22,7 +22,9 @@ angular.module('ot.view.home', [
             otStructureService.getProjects().then(function (projectCollection) {
                 $scope.projectCollection = projectCollection;
                 // TODO Loading the projects' views
-                // TODO Creating a project
+                // Commands
+                $rootScope.view.commands = [];
+                // Creating a project
                 if (projectCollection.create) {
                     $rootScope.view.commands.push({
                         id: 'createProject',
