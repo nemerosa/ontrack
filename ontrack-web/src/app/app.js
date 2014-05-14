@@ -2,7 +2,9 @@ var ontrack = angular.module('ontrack', [
         'ui.bootstrap',
         'ui.router',
         'ngSanitize',
-        // TODO Templates as JS
+        // Templates as JS
+        'ot.templates',
+        // TODO Directives
         // Views
         'ot.view.home'
     ])

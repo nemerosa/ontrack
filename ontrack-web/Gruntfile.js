@@ -204,18 +204,18 @@ module.exports = function (grunt) {
             dev: {
                 options: {
                     base: 'src',
-                    module: 'ontrack.templates'
+                    module: 'ot.templates'
                 },
                 src: [ 'src/**/*.tpl.html' ],
-                dest: 'target/dev/app/ontrack.templates.js'
+                dest: 'target/dev/app/ot.templates.js'
             },
             prod: {
                 options: {
                     base: 'src',
-                    module: 'iteach.templates'
+                    module: 'ot.templates'
                 },
                 src: [ 'src/**/*.tpl.html' ],
-                dest: 'target/include/ontrack.templates.js'
+                dest: 'target/include/ot.templates.js'
             }
         },
 
