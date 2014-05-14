@@ -2,6 +2,9 @@
     <div class="row">
         <div class="col-md-4 ot-view-title">
             {{view.title}}
+            <div ng-show="view.description" class="ot-description">
+                {{view.description}}
+            </div>
         </div>
         <div class="col-md-8">
             <div class="ot-view-commands">

@@ -42,6 +42,7 @@ angular.module('ot.view.project', [
                 $scope.project = projectResource;
                 // View settings
                 view.title = projectResource.name;
+                view.description = projectResource.description;
                 // Loads the branches
                 loadBranches();
             });
