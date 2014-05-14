@@ -3,8 +3,30 @@ angular.module('ot.service.core', [
 /**
  * Basic services
  */
-    .service('ot', function ($q) {
+    .service('ot', function ($q, $log, $interpolate) {
         var self = {};
+
+        /**
+         * Error message for a HTTP call
+         */
+        self.error = function (response) {
+            if (response.status == 400) {
+                return {
+                    type: 'error',
+                    content: response.message
+                };
+            } else if (status == 401 || status == 403) {
+                return {
+                    type: 'error',
+                    content: 'Not authorized.'
+                };
+            } else {
+                return {
+                    type: 'error',
+                    content: response.error
+                };
+            }
+        };
 
         /**
          * Wraps a HTTP call into a promise.
@@ -16,7 +38,10 @@ angular.module('ot.service.core', [
                     d.resolve(result);
                 })
                 .error(function (response) {
-                    d.reject(response);
+                    var errorMessage = self.error(response);
+                    if (errorMessage) {
+                        d.reject(errorMessage);
+                    }
                 });
             return d.promise;
         };
