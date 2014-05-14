@@ -1,14 +1,16 @@
 package net.nemerosa.ontrack.model.form;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = false)
 @Data
 public class Text extends AbstractText<Text> {
 
     private String regex;
 
     protected Text(String name) {
-        super(name);
+        super("text", name);
     }
 
     public static Text of(String name) {

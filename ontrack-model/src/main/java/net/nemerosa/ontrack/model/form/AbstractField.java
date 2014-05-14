@@ -5,13 +5,15 @@ import lombok.Data;
 @Data
 public abstract class AbstractField<F extends AbstractField<F>> implements Field {
 
+    private final String type;
     private final String name;
     private String label;
     private boolean required = true;
     private String validation;
     private Object value;
 
-    protected AbstractField(String name) {
+    protected AbstractField(String type, String name) {
+        this.type = type;
         this.name = name;
         this.label = name;
     }
