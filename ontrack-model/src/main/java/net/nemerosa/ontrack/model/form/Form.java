@@ -20,11 +20,23 @@ public class Form {
     private final Map<String, Field> fields = new LinkedHashMap<>();
 
     public Form name() {
-        return with(Text.of("name").label("Name").length(40).regex("[A-Za-z0-9_\\.\\-]+"));
+        return with(
+                Text.of("name")
+                        .label("Name")
+                        .length(40)
+                        .regex("[A-Za-z0-9_\\.\\-]+")
+                        .validation("Name is required and must contain only alpha-numeric characters, underscores, points or dashes.")
+        );
     }
 
     private Form description() {
-        return with(Memo.of("description").label("Description").optional().length(500).rows(3));
+        return with(
+                Memo.of("description")
+                        .label("Description")
+                        .optional()
+                        .length(500)
+                        .rows(3)
+        );
     }
 
     public Form with(Field field) {
@@ -48,6 +60,7 @@ public class Form {
         Field field = fields.get(name);
         if (field != null) {
             field = field.value(value);
+            fields.put(name, field);
         } else {
             throw new FormFieldNotFoundException(name);
         }
