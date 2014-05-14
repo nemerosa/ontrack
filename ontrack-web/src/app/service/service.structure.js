@@ -2,7 +2,7 @@ angular.module('ot.service.structure', [
     'ot.service.core',
     'ot.service.form'
 ])
-    .service('otStructureService', function (ot, $http, otFormService) {
+    .service('otStructureService', function (ot, $interpolate, $http, otFormService) {
         var self = {};
 
         /**
@@ -31,6 +31,17 @@ angular.module('ot.service.structure', [
          */
         self.getProject = function (id) {
             return ot.call($http.get('structure/projects/' + id));
+        };
+
+        /**
+         * Getting the branches for a project
+         */
+        self.getProjectBranches = function (projectId) {
+            return ot.call(
+                $http.get(
+                    $interpolate('structure/projects/{{projectId}}/branches')({projectId: projectId})
+                )
+            );
         };
 
         return self;
