@@ -14,19 +14,38 @@ angular.module('ot.view.project', [
         var view = ot.view();
         // Project's id
         var projectId = $stateParams.projectId;
+        // Loading the branches
+        function loadBranches() {
+            otStructureService.getProjectBranches(projectId).then(function (branchCollection) {
+                // View commands
+                view.commands = [
+                    /*
+                     {
+                     condition: projectResource.branches.create,
+                     id: 'createBranch',
+                     name: "Create branch",
+                     cls: 'ot-command-branch-new',
+                     action: function () {
+                     alert('Create branch');
+                     }
+                     },*/
+                    ot.viewCloseCommand('/home')
+                ];
+            });
+        }
+
         // Loading the project
         function loadProject() {
             otStructureService.getProject(projectId).then(function (projectResource) {
                 $scope.project = projectResource;
                 // View settings
                 view.title = projectResource.name;
-                // View commands
-                view.commands = [
-                    ot.viewCloseCommand('/home')
-                ];
+                // Loads the branches
+                loadBranches();
             });
         }
 
+        // Initialization
         loadProject();
         // TODO Loading the project's view
         // TODO Project commands
