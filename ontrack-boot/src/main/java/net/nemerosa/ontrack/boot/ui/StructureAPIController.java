@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.structure.ID;
-import net.nemerosa.ontrack.model.structure.NameDescription;
-import net.nemerosa.ontrack.model.structure.Project;
-import net.nemerosa.ontrack.model.structure.StructureRepository;
+import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
@@ -83,10 +80,31 @@ public class StructureAPIController extends AbstractResourceController implement
         return toProjectResource(project);
     }
 
+    @Override
+    @RequestMapping(value = "projects/{projectId}/branches", method = RequestMethod.GET)
+    public ResourceCollection<Branch> getBranchListForProject(@PathVariable ID projectId) {
+        return ResourceCollection.of(
+                structureRepository.getBranchesForProject(projectId).stream().map(this::toBranchResource),
+                uri(on(StructureAPIController.class).getBranchListForProject(projectId))
+        );
+        // TODO Authorization
+        // TODO .with(Link.CREATE, uri(on(StructureAPIController.class).newBranch(null)));
+    }
+
+    @Override
+    @RequestMapping(value = "branches/{branchId}", method = RequestMethod.GET)
+    public Branch getBranch(@PathVariable ID branchId) {
+        return structureRepository.getBranch(branchId);
+    }
+
+    // Resource assemblers
+
     private Resource<Project> toProjectResourceWithActions(Project project) {
         return toProjectResource(project)
                 // TODO Update link (authorization)
                 .with(Link.UPDATE, uri(on(StructureAPIController.class).saveProject(project.getId(), null)))
+                // Branch list
+                .with("branches", uri(on(StructureAPIController.class).getBranchListForProject(project.getId())))
                 ;
         // TODO Delete link
         // TODO View link
@@ -96,6 +114,14 @@ public class StructureAPIController extends AbstractResourceController implement
         return Resource.of(
                 project,
                 uri(on(StructureAPIController.class).getProject(project.getId()))
+        );
+    }
+
+    private Resource<Branch> toBranchResource(Branch branch) {
+        return Resource.of(
+                branch,
+                uri(on(StructureAPIController.class).getBranch(branch.getId()))
+                // TODO Branch's project
         );
     }
 }

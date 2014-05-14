@@ -7,6 +7,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 
 import javax.sql.DataSource;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSupport {
@@ -41,6 +43,14 @@ public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSuppor
         } else {
             return items.get(0);
         }
+    }
+
+    protected ID id(ResultSet rs) throws SQLException {
+        return id(rs, "id");
+    }
+
+    protected ID id(ResultSet rs, String idColumn) throws SQLException {
+        return id(rs.getInt(idColumn));
     }
 
     protected ID id(int id) {

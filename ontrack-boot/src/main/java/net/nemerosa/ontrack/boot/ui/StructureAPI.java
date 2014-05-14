@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.model.structure.Project;
@@ -8,6 +9,8 @@ import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.ResourceCollection;
 
 public interface StructureAPI {
+
+    // Projects
 
     ResourceCollection<Project> getProjectList();
 
@@ -20,4 +23,11 @@ public interface StructureAPI {
     Form saveProjectForm(ID id);
 
     Resource<Project> saveProject(ID id, NameDescription nameDescription);
+
+    // Branches
+
+    ResourceCollection<Branch> getBranchListForProject(ID projectId);
+
+    Branch getBranch(ID branchId);
+
 }

@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.repository;
 
 import net.nemerosa.ontrack.model.exceptions.ProjectNameAlreadyDefinedException;
-import net.nemerosa.ontrack.model.structure.ID;
-import net.nemerosa.ontrack.model.structure.NameDescription;
-import net.nemerosa.ontrack.model.structure.Project;
-import net.nemerosa.ontrack.model.structure.StructureRepository;
+import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
@@ -72,7 +69,34 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         );
     }
 
-    private Project toProject(ResultSet rs) throws SQLException {
+    @Override
+    public Branch getBranch(ID branchId) {
+        return getNamedParameterJdbcTemplate().queryForObject(
+                "SELECT * FROM BRANCHES WHERE ID = :id",
+                params("id", branchId.getValue()),
+                (rs, rowNum) -> toBranch(rs, true)
+        );
+    }
+
+    @Override
+    public List<Branch> getBranchesForProject(ID projectId) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT * FROM BRANCHES WHERE PROJECTID = :projectId ORDER BY NAME",
+                (rs, rowNum) -> toBranch(rs, false)
+        );
+    }
+
+    protected Branch toBranch(ResultSet rs, boolean withProject) throws SQLException {
+        return Branch.of(
+                withProject ? getProject(id(rs, "projectId")) : null,
+                new NameDescription(
+                        rs.getString("name"),
+                        rs.getString("description")
+                )
+        ).withId(id(rs));
+    }
+
+    protected Project toProject(ResultSet rs) throws SQLException {
         return Project.of(new NameDescription(
                 rs.getString("name"),
                 rs.getString("description")
