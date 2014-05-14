@@ -3,14 +3,13 @@
         <div class="col-md-4 ot-view-title">
             {{view.title}}
         </div>
-        <div class="col-md-8 ot-view-commands">
-            <ul class="ot-view-commands">
-                <li ng-repeat="command in view.commands">
-                <span id="{{command.id}}" class="ot-view-command {{command.cls}}">
+        <div class="col-md-8">
+            <div class="ot-view-commands">
+                <span ng-repeat="command in view.commands" id="{{command.id}}" class="ot-view-command">
+                    <span class="{{command.cls}}"></span>
                     {{command.name}}
                 </span>
-                </li>
-            </ul>
+            </div>
         </div>
     </div>
     <div class="row" ng-transclude>
