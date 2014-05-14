@@ -101,8 +101,13 @@ img.ot-icon {
 
 div.ot-view {
   margin-top: 1em;
-  h1 {
+  .ot-view-title {
+    font-size: 150%;
+    font-weight: bold;
     margin: 0px 0px 0.5em;
+  }
+  .ot-view-commands {
+    .pull-right;
   }
 }
 
@@ -131,4 +136,21 @@ a.ot-home-project-label {
   &:hover {
     color: white;
   }
+}
+
+/**
+ * Commands
+ */
+
+ul.ot-view-commands {
+  list-style-type: none;
+}
+
+span.ot-view-command {
+  cursor: pointer;
+}
+
+.ot-command-project-new {
+  .glyphicon;
+  .glyphicon-star;
 }

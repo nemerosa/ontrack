@@ -30,6 +30,7 @@ public class DevWebConfig extends WebMvcConfigurerAdapter {
         String prefix = "file:";
         registry.addResourceHandler("/app/**").addResourceLocations(prefix + staticDir + "/app/");
         registry.addResourceHandler("/assets/**").addResourceLocations(prefix + staticDir + "/assets/");
+        registry.addResourceHandler("/fonts/**").addResourceLocations(prefix + staticDir + "/fonts/");
         registry.addResourceHandler("/vendor/**").addResourceLocations(prefix + staticDir + "/vendor/");
         registry.addResourceHandler("index.html").addResourceLocations(prefix + staticDir + "/index.html");
     }

@@ -13,13 +13,25 @@ angular.module('ot.view.home', [
         $rootScope.view = {
             // TODO Breadcrumbs
             // Title
-            title: 'Home'
-            // TODO Commands
+            title: 'Home',
+            // Commands
+            commands: []
         };
+        // Loading the project list
         otStructureService.getProjects().then(function (projectCollection) {
             $scope.projectCollection = projectCollection;
             // TODO Loading the projects' views
             // TODO Creating a project
+            if (projectCollection.create) {
+                $rootScope.view.commands.push({
+                    id: 'createProject',
+                    name: 'Create project',
+                    cls: 'ot-command-project-new',
+                    action: function () {
+                        alert('Creating a project!');
+                    }
+                });
+            }
         });
     })
 ;

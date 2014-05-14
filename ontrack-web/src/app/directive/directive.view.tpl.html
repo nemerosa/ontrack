@@ -1,6 +1,18 @@
 <div class="ot-view container">
-    <h1>{{view.title}}</h1>
-
+    <div class="row">
+        <div class="col-md-4 ot-view-title">
+            {{view.title}}
+        </div>
+        <div class="col-md-8 ot-view-commands">
+            <ul class="ot-view-commands">
+                <li ng-repeat="command in view.commands">
+                <span id="{{command.id}}" class="ot-view-command {{command.cls}}">
+                    {{command.name}}
+                </span>
+                </li>
+            </ul>
+        </div>
+    </div>
     <div class="row" ng-transclude>
     </div>
 </div>

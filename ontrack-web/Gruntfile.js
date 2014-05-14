@@ -95,7 +95,7 @@ module.exports = function (grunt) {
                 files: [
                     {
                         src: vendor.fonts,
-                        dest: 'target/dev/app/fonts',
+                        dest: 'target/dev/fonts',
                         cwd: '.',
                         expand: true,
                         flatten: true
