@@ -12,11 +12,11 @@ public class Build {
     private final ID id;
     private final String name;
     private final String description;
-    @JsonView({})
+    @JsonView({Build.class})
     private final Branch branch;
-    @JsonView({})
+    @JsonView({Build.class})
     private final List<PromotionRun> promotionRuns;
-    @JsonView({})
+    @JsonView({Build.class})
     private final List<ValidationRun> validationRuns;
 
     public static Build of(ID id, String name, String description, Branch branch) {

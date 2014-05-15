@@ -8,7 +8,7 @@ public class PromotionRun {
 
     private final String description;
     private final Signature signature;
-    @JsonView({})
+    @JsonView({Build.class})
     private final PromotionLevel promotionLevel;
 
 }

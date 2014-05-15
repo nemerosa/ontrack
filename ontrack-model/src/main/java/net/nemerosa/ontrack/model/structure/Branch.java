@@ -10,7 +10,7 @@ public class Branch implements Entity {
     private final ID id;
     private final String name;
     private final String description;
-    @JsonView({PromotionView.class, Branch.class})
+    @JsonView({PromotionView.class, Branch.class, Build.class})
     private final Project project;
 
     public static Branch of(Project project, NameDescription nameDescription) {
