@@ -9,7 +9,8 @@ var ontrack = angular.module('ontrack', [
         'ot.directive.misc',
         // Views
         'ot.view.home',
-        'ot.view.project'
+        'ot.view.project',
+        'ot.view.branch'
     ])
         // TODO HTTP configuration
         // TODO Runs the initial security service (in case of refresh)

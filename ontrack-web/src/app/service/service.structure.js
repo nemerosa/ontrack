@@ -58,6 +58,13 @@ angular.module('ot.service.structure', [
             return self.create(uri, 'New branch');
         };
 
+        /**
+         * Getting a branch
+         */
+        self.getBranch = function (id) {
+            return ot.call($http.get('structure/branches/' + id));
+        };
+
         return self;
     })
 ;
