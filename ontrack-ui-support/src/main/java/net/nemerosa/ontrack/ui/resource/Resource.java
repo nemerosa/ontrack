@@ -2,11 +2,9 @@ package net.nemerosa.ontrack.ui.resource;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.nemerosa.ontrack.model.structure.Container;
-import net.nemerosa.ontrack.ui.support.ResourceJsonSerializer;
 
 import java.beans.ConstructorProperties;
 import java.net.URI;

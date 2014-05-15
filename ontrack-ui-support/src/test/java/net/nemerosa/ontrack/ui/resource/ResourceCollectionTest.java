@@ -55,23 +55,26 @@ public class ResourceCollectionTest {
         );
         ResourceCollection<Branch> resourceCollection = ResourceCollection.of(
                 branches.stream()
-                        .map(b -> Resource.of(b, URI.create("urn:branch:" + b.getId())))
+                        .map(b -> Resource.of(b, URI.create("urn:branch:" + b.getName())))
                         .collect(Collectors.toList()),
                 URI.create("urn:branch")
         );
 
         assertJsonWrite(
                 object()
+                        .with("href", "urn:branch")
                         .with("resources", array()
                                 .with(object()
                                         .with("id", 0)
                                         .with("name", "B1")
                                         .with("description", "Branch 1")
+                                        .with("href", "urn:branch:B1")
                                         .end())
                                 .with(object()
                                         .with("id", 0)
                                         .with("name", "B2")
                                         .with("description", "Branch 2")
+                                        .with("href", "urn:branch:B2")
                                         .end())
                                 .end())
                         .end(),
