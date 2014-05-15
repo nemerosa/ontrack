@@ -22,6 +22,10 @@ angular.module('ot.view.branch', [
                 // View settings
                 view.title = branchResource.name;
                 view.description = branchResource.description;
+                // Branch commands
+                view.commands = [
+                    ot.viewCloseCommand('/project/' + branchResource.project.id)
+                ];
                 // TODO Loads the build view
                 // TODO Loads the promotion levels
                 // TODO Loads the validation stamps
