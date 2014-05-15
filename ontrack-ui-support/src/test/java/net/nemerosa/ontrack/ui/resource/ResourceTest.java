@@ -8,11 +8,9 @@ import net.nemerosa.ontrack.test.TestUtils;
 import org.junit.Test;
 
 import java.net.URI;
-import java.util.Optional;
 
 import static net.nemerosa.ontrack.json.JsonUtils.object;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 
 public class ResourceTest {
 
@@ -34,16 +32,14 @@ public class ResourceTest {
         );
     }
 
-    @Test
-    public void container_first_null() {
-        Optional<String> o = Resource.<String>of(null, URI.create("")).first();
-        assertFalse(o.isPresent());
+    @Test(expected = NullPointerException.class)
+    public void resource_not_null() {
+        Resource.<String>of(null, URI.create(""));
     }
 
     @Test
     public void container_first() {
-        Optional<String> o = Resource.of("Test", URI.create("")).first();
-        assertEquals("Test", o.get());
+        assertEquals(String.class, Resource.of("Test", URI.create("")).getType());
     }
 
 }
