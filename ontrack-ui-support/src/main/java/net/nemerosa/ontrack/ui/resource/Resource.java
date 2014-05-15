@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.ui.resource;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,9 +14,10 @@ import java.util.Optional;
 
 @EqualsAndHashCode(callSuper = false)
 @Data
-@JsonSerialize(using = ResourceJsonSerializer.class)
+@JsonPropertyOrder(alphabetic = true)
 public class Resource<T> extends LinkContainer<Resource<T>> implements Container<T> {
 
+    @JsonUnwrapped
     private final T data;
 
     @ConstructorProperties({"data", "href"})

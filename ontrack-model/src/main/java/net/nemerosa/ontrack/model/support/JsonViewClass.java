@@ -12,9 +12,14 @@ public final class JsonViewClass {
 
     public static Class<?> getViewClass(Object any) {
         if (any instanceof Container<?>) {
-            return getViewClassForOptional(((Container<?>) any).first());
+            Optional<?> first = ((Container<?>) any).first();
+            if (first.isPresent()) {
+                return getViewClass(first.get());
+            } else {
+                return Object.class;
+            }
         } else if (any instanceof Collection<?>) {
-            return getViewClassForOptional(((Collection<?>) any).stream().findFirst());
+            return Object.class;
         } else if (any != null) {
             return any.getClass();
         } else {
@@ -22,11 +27,4 @@ public final class JsonViewClass {
         }
     }
 
-    private static Class<?> getViewClassForOptional(Optional<?> first) {
-        if (first.isPresent()) {
-            return getViewClass(first.get());
-        } else {
-            return Object.class;
-        }
-    }
 }

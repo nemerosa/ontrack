@@ -25,6 +25,10 @@ public final class ObjectMapperFactory {
         return mapper.setAnnotationIntrospector(pair);
     }
 
+    public static ObjectMapper create(Class<?> viewClass) {
+        return new CustomObjectMapper(viewClass);
+    }
+
     private static void jdkTime(ObjectMapper mapper) {
         SimpleModule jdkTimeModule = new SimpleModule(
                 "JDKTimeModule",
@@ -44,6 +48,14 @@ public final class ObjectMapperFactory {
     }
 
     private ObjectMapperFactory() {
+    }
+
+    private static class CustomObjectMapper extends ObjectMapper {
+
+        public CustomObjectMapper(Class<?> viewClass) {
+            super();
+            this._serializationConfig = this._serializationConfig.withView(viewClass);
+        }
     }
 
 }

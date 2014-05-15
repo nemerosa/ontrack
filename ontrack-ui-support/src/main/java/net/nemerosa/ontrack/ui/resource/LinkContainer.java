@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.ui.resource;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import lombok.Data;
 
 import java.net.URI;
@@ -20,6 +21,11 @@ public abstract class LinkContainer<L extends LinkContainer<L>> {
         links.put(link.getName(), link);
         //noinspection unchecked
         return (L) this;
+    }
+
+    @JsonAnyGetter
+    public Map<String, Link> getLinks() {
+        return links;
     }
 
 }

@@ -14,6 +14,7 @@ import net.nemerosa.ontrack.ui.resource.ResourceCollection;
 import java.io.IOException;
 import java.util.Collection;
 
+@Deprecated
 public class ResourceCollectionJsonSerializer extends JsonSerializer<ResourceCollection<?>> {
 
     @Override
@@ -29,7 +30,7 @@ public class ResourceCollectionJsonSerializer extends JsonSerializer<ResourceCol
             node.put(
                     link.getName(),
                     JsonUtils.object()
-                            .with("href", link.getUri().toASCIIString())
+                            .with("href", link.getHref().toASCIIString())
                             .end()
             );
         }
