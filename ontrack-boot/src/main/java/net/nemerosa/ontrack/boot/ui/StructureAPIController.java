@@ -176,6 +176,8 @@ public class StructureAPIController extends AbstractResourceController implement
                 // TODO Delete link
                 // TODO View link
                 // TODO Builds link
+                // TODO Build creation (authorization missing)
+                .with("createBuild", uri(on(StructureAPIController.class).newBuild(branch.getId(), null)))
                 ;
     }
 
