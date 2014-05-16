@@ -14,7 +14,7 @@ public class DefaultSecurityService implements SecurityService {
     @Override
     public void checkGlobalFunction(Class<? extends GlobalFunction> fn) {
         if (!isGlobalFunctionGranted(fn)) {
-            throw new AccessDeniedException(format("Global function %s is not granted.", fn));
+            throw new AccessDeniedException(format("Global function '%s' is not granted.", fn.getSimpleName()));
         }
     }
 
