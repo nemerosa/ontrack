@@ -81,6 +81,12 @@ public class PromotionViewTest {
                                 .with("id", 0)
                                 .with("name", "11")
                                 .with("description", "Build 11")
+                                .with("signature", object()
+                                        .with("time", dateTimeJson())
+                                        .with("user", object()
+                                                .with("name", "User")
+                                                .end())
+                                        .end())
                                         // Branch skipped
                                 .end())
                         .with("promotionRun", object()
