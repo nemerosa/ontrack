@@ -22,4 +22,9 @@ public interface StructureRepository {
 
     Branch newBranch(Branch branch);
 
+    // Builds
+
+    Build newBuild(Build build);
+
+    Build saveBuild(Build build);
 }

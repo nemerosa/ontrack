@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.repository;
 
 import net.nemerosa.ontrack.model.exceptions.BranchNameAlreadyDefinedException;
+import net.nemerosa.ontrack.model.exceptions.BuildNameAlreadyDefinedException;
 import net.nemerosa.ontrack.model.exceptions.ProjectNameAlreadyDefinedException;
 import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,7 +92,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     @Override
     public Branch newBranch(Branch branch) {
         // Validation
-        isEntityNew(branch, "Branch must be defined");
+        isEntityNew(branch, "Branch must be new");
         isEntityDefined(branch.getProject(), "Project must be defined");
         // Creation
         try {
@@ -105,6 +106,46 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
             return branch.withId(id(id));
         } catch (DuplicateKeyException ex) {
             throw new BranchNameAlreadyDefinedException(branch.getName());
+        }
+    }
+
+    @Override
+    public Build newBuild(Build build) {
+        // Validation
+        isEntityNew(build, "Build must be new");
+        isEntityDefined(build.getBranch(), "Branch must be defined");
+        // Creation
+        try {
+            int id = dbCreate(
+                    "INSERT INTO BUILDS(BRANCHID, NAME, DESCRIPTION, CREATION, CREATOR) VALUES (:branchId, :name, :description, :creation, :creator)",
+                    params("name", build.getName())
+                            .addValue("description", build.getDescription())
+                            .addValue("branchId", build.getBranch().id())
+                            .addValue("creation", dateTimeForDB(build.getSignature().getTime()))
+                            .addValue("creator", build.getSignature().getUser().getName())
+            );
+            return build.withId(id(id));
+        } catch (DuplicateKeyException ex) {
+            throw new BuildNameAlreadyDefinedException(build.getName());
+        }
+    }
+
+    @Override
+    public Build saveBuild(Build build) {
+        // Validation
+        isEntityDefined(build, "Build must be defined");
+        isEntityDefined(build.getBranch(), "Branch must be defined");
+        // Update
+        try {
+            getNamedParameterJdbcTemplate().update(
+                    "UPDATE BUILDS SET NAME = :name, DESCRIPTION = :description WHERE ID = :id",
+                    params("name", build.getName())
+                            .addValue("description", build.getDescription())
+                            .addValue("id", build.id())
+            );
+            return build;
+        } catch (DuplicateKeyException ex) {
+            throw new BuildNameAlreadyDefinedException(build.getName());
         }
     }
 

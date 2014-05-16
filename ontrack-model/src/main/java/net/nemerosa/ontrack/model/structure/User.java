@@ -7,4 +7,8 @@ public class User {
 
     private final String name;
 
+    public static User of(String name) {
+        return new User(name);
+    }
+
 }

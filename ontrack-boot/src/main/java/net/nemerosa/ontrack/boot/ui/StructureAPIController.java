@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
@@ -119,6 +121,29 @@ public class StructureAPIController extends AbstractResourceController implement
         );
     }
 
+    // Builds
+
+    @Override
+    @RequestMapping(value = "branches/{branchId}/builds/create", method = RequestMethod.GET)
+    public Form newBuildForm() {
+        return Build.form();
+    }
+
+    @Override
+    @RequestMapping(value = "branches/{branchId}/builds/create", method = RequestMethod.POST)
+    public Resource<Build> newBuild(@PathVariable ID branchId, @RequestBody NameDescription nameDescription) {
+        // Gets the holding branch
+        Branch branch = structureRepository.getBranch(branchId);
+        // TODO Build signature
+        Signature signature = Signature.of("TODO User");
+        // Creates a new build
+        Build build = Build.of(branch, nameDescription, signature);
+        // Saves it into the repository
+        build = structureRepository.newBuild(build);
+        // OK
+        return toBuildResource(build);
+    }
+
     // Resource assemblers
 
     private Resource<Project> toProjectResourceWithActions(Project project) {
@@ -153,6 +178,14 @@ public class StructureAPIController extends AbstractResourceController implement
                 branch,
                 uri(on(StructureAPIController.class).getBranch(branch.getId()))
                 // TODO Branch's project
+        );
+    }
+
+    private Resource<Build> toBuildResource(Build build) {
+        return Resource.of(
+                build,
+                // TODO Build link
+                URI.create("urn:build")
         );
     }
 }

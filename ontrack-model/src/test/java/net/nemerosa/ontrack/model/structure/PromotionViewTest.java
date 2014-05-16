@@ -1,13 +1,10 @@
 package net.nemerosa.ontrack.model.structure;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.test.TestUtils;
 import org.junit.Test;
 
 import static net.nemerosa.ontrack.json.JsonUtils.object;
-import static net.nemerosa.ontrack.test.TestUtils.assertJsonWrite;
-import static net.nemerosa.ontrack.test.TestUtils.dateTimeJson;
+import static net.nemerosa.ontrack.test.TestUtils.*;
 
 public class PromotionViewTest {
 
@@ -53,11 +50,11 @@ public class PromotionViewTest {
         PromotionLevel promotionLevel = new PromotionLevel(ID.NONE, "PL", "Promotion level", branch);
         PromotionView view = new PromotionView(
                 promotionLevel,
-                Build.of(ID.NONE, "11", "Build 11", branch),
+                Build.of(branch, new NameDescription("11", "Build 11"), Signature.of(dateTime(), "User")),
                 new PromotionRun(
                         "Promotion",
                         new Signature(
-                                TestUtils.dateTime(),
+                                dateTime(),
                                 new User("user")
                         ),
                         promotionLevel

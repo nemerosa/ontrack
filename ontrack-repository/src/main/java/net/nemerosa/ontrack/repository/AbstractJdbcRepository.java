@@ -9,6 +9,8 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSupport {
@@ -55,5 +57,13 @@ public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSuppor
 
     protected ID id(int id) {
         return ID.of(id);
+    }
+
+    protected String dateTimeForDB(LocalDateTime time) {
+        if (time == null) {
+            return null;
+        } else {
+            return time.format(DateTimeFormatter.ISO_DATE_TIME);
+        }
     }
 }
