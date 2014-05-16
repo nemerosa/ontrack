@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.repository;
 
-import net.nemerosa.ontrack.model.annotations.GlobalGrant;
-import net.nemerosa.ontrack.model.annotations.ProjectCreation;
+import net.nemerosa.ontrack.model.annotations.*;
 import net.nemerosa.ontrack.model.exceptions.*;
 import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +44,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    @GlobalGrant(ProjectList.class)
     public List<Project> getProjectList() {
         return getJdbcTemplate().query(
                 "SELECT * FROM PROJECTS ORDER BY NAME",
@@ -53,6 +53,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    @ProjectGrant(fn = ProjectView.class, before = "id")
     public Project getProject(ID projectId) {
         try {
             return getNamedParameterJdbcTemplate().queryForObject(
@@ -66,7 +67,8 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
-    public void saveProject(Project project) {
+    @ProjectGrant(fn = ProjectEdit.class, before = "id")
+    public void saveProject(@ProjectGrantTarget Project project) {
         isEntityDefined(project, "Project must be defined");
         getNamedParameterJdbcTemplate().update(
                 "UPDATE PROJECTS SET NAME = :name, DESCRIPTION = :description WHERE ID = :id",
@@ -77,6 +79,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    @ProjectGrant(fn = ProjectView.class, after = "project.id")
     public Branch getBranch(ID branchId) {
         try {
             return getNamedParameterJdbcTemplate().queryForObject(
@@ -90,7 +93,8 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
-    public List<Branch> getBranchesForProject(ID projectId) {
+    @ProjectGrant(fn = ProjectView.class, before = "")
+    public List<Branch> getBranchesForProject(@ProjectGrantTarget ID projectId) {
         Project project = getProject(projectId);
         return getNamedParameterJdbcTemplate().query(
                 "SELECT * FROM BRANCHES WHERE PROJECTID = :projectId ORDER BY NAME",
@@ -100,7 +104,8 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
-    public Branch newBranch(Branch branch) {
+    @ProjectGrant(fn = ProjectEdit.class, before = "project.id")
+    public Branch newBranch(@ProjectGrantTarget Branch branch) {
         // Validation
         isEntityNew(branch, "Branch must be new");
         isEntityDefined(branch.getProject(), "Project must be defined");
@@ -120,7 +125,8 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
-    public Build newBuild(Build build) {
+    @ProjectGrant(fn = ProjectBuild.class, before = "branch.project.id")
+    public Build newBuild(@ProjectGrantTarget Build build) {
         // Validation
         isEntityNew(build, "Build must be new");
         isEntityDefined(build.getBranch(), "Branch must be defined");
@@ -141,7 +147,8 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
-    public Build saveBuild(Build build) {
+    @ProjectGrant(fn = ProjectEdit.class, before = "branch.project.id")
+    public Build saveBuild(@ProjectGrantTarget Build build) {
         // Validation
         isEntityDefined(build, "Build must be defined");
         isEntityDefined(build.getBranch(), "Branch must be defined");

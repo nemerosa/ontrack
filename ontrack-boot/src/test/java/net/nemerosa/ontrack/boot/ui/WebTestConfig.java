@@ -7,7 +7,7 @@ import org.springframework.core.convert.converter.ConverterRegistry;
 import org.springframework.core.convert.support.DefaultConversionService;
 
 @Configuration
-@EnableAspectJAutoProxy
+@EnableAspectJAutoProxy(proxyTargetClass = true) // Aligned with application.properties
 public class WebTestConfig {
 
     @Bean
