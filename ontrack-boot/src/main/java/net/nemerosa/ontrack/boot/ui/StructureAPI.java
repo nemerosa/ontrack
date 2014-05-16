@@ -25,7 +25,7 @@ public interface StructureAPI {
 
     ResourceCollection<Branch> getBranchListForProject(ID projectId);
 
-    Form newBranchForm();
+    Form newBranchForm(ID projectId);
 
     Resource<Branch> newBranch(ID projectId, NameDescription nameDescription);
 
@@ -33,7 +33,7 @@ public interface StructureAPI {
 
     // Builds
 
-    Form newBuildForm();
+    Form newBuildForm(ID branchId);
 
     Resource<Build> newBuild(ID branchId, NameDescription nameDescription);
 

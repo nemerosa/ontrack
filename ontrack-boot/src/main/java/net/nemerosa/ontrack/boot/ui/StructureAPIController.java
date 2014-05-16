@@ -96,7 +96,10 @@ public class StructureAPIController extends AbstractResourceController implement
 
     @Override
     @RequestMapping(value = "projects/{projectId}/branches/create", method = RequestMethod.GET)
-    public Form newBranchForm() {
+    public Form newBranchForm(@PathVariable ID projectId) {
+        // Checks the project exists
+        structureRepository.getProject(projectId);
+        // Returns the form
         return Branch.form();
     }
 
@@ -125,7 +128,10 @@ public class StructureAPIController extends AbstractResourceController implement
 
     @Override
     @RequestMapping(value = "branches/{branchId}/builds/create", method = RequestMethod.GET)
-    public Form newBuildForm() {
+    public Form newBuildForm(@PathVariable ID branchId) {
+        // Checks the branch does exist
+        structureRepository.getBranch(branchId);
+        // Returns the form
         return Build.form();
     }
 

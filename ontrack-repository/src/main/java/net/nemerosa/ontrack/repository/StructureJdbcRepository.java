@@ -1,11 +1,10 @@
 package net.nemerosa.ontrack.repository;
 
-import net.nemerosa.ontrack.model.exceptions.BranchNameAlreadyDefinedException;
-import net.nemerosa.ontrack.model.exceptions.BuildNameAlreadyDefinedException;
-import net.nemerosa.ontrack.model.exceptions.ProjectNameAlreadyDefinedException;
+import net.nemerosa.ontrack.model.exceptions.*;
 import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -52,11 +51,15 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
 
     @Override
     public Project getProject(ID projectId) {
-        return getNamedParameterJdbcTemplate().queryForObject(
-                "SELECT * FROM PROJECTS WHERE ID = :id",
-                params("id", projectId.getValue()),
-                (rs, rowNum) -> toProject(rs)
-        );
+        try {
+            return getNamedParameterJdbcTemplate().queryForObject(
+                    "SELECT * FROM PROJECTS WHERE ID = :id",
+                    params("id", projectId.getValue()),
+                    (rs, rowNum) -> toProject(rs)
+            );
+        } catch (EmptyResultDataAccessException ex) {
+            throw new ProjectNotFoundException(projectId);
+        }
     }
 
     @Override
@@ -72,11 +75,15 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
 
     @Override
     public Branch getBranch(ID branchId) {
-        return getNamedParameterJdbcTemplate().queryForObject(
-                "SELECT * FROM BRANCHES WHERE ID = :id",
-                params("id", branchId.getValue()),
-                (rs, rowNum) -> toBranch(rs, this::getProject)
-        );
+        try {
+            return getNamedParameterJdbcTemplate().queryForObject(
+                    "SELECT * FROM BRANCHES WHERE ID = :id",
+                    params("id", branchId.getValue()),
+                    (rs, rowNum) -> toBranch(rs, this::getProject)
+            );
+        } catch (EmptyResultDataAccessException ex) {
+            throw new BranchNotFoundException(branchId);
+        }
     }
 
     @Override
