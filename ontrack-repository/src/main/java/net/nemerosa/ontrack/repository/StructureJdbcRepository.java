@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.repository;
 
+import net.nemerosa.ontrack.model.annotations.GlobalGrant;
+import net.nemerosa.ontrack.model.annotations.ProjectCreation;
 import net.nemerosa.ontrack.model.exceptions.*;
 import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    @GlobalGrant(ProjectCreation.class)
     public Project newProject(Project project) {
         // Validation
         isEntityNew(project, "Project must be defined");
