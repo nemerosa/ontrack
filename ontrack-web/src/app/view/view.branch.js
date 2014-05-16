@@ -15,6 +15,10 @@ angular.module('ot.view.branch', [
         // Branch's id
         var branchId = $stateParams.branchId;
 
+        // TODO Loading the build view
+        function loadBuildView() {
+        }
+
         // Loading the branch
         function loadBranch() {
             otStructureService.getBranch(branchId).then(function (branchResource) {
@@ -24,9 +28,21 @@ angular.module('ot.view.branch', [
                 view.description = branchResource.description;
                 // Branch commands
                 view.commands = [
+                    {
+                        condition: function () {
+                            return branchResource.createBuild;
+                        },
+                        id: 'createBuild',
+                        name: "Create build",
+                        cls: 'ot-command-build-new',
+                        action: function () {
+                            otStructureService.createBuild(branchResource.createBuild.href).then(loadBuildView);
+                        }
+                    },
                     ot.viewCloseCommand('/project/' + branchResource.project.id)
                 ];
-                // TODO Loads the build view
+                // Loads the build view
+                loadBuildView();
                 // TODO Loads the promotion levels
                 // TODO Loads the validation stamps
             });

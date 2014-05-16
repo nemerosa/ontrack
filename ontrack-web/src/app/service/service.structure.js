@@ -65,6 +65,13 @@ angular.module('ot.service.structure', [
             return ot.call($http.get('structure/branches/' + id));
         };
 
+        /**
+         * Creating a build
+         */
+        self.createBuild = function (uri) {
+            return self.create(uri, 'New build');
+        };
+
         return self;
     })
 ;
