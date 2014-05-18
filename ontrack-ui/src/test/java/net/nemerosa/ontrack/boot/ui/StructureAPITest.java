@@ -35,21 +35,21 @@ public class StructureAPITest extends AbstractWebTestSupport {
 
     @Test
     public void updateProject() throws Exception {
-        // FIXME ProjectEdit grant missing!
-        asUser().with(ProjectCreation.class).call(() -> {
-            // Creates the project
-            NameDescription initialNames = nameDescription();
-            Resource<Project> resource = structure.newProject(initialNames);
-            ID id = resource.getData().getId();
+        // Creates the project
+        NameDescription initialNames = nameDescription();
+        Resource<Project> resource = asUser().with(ProjectCreation.class).call(() -> structure.newProject(initialNames));
+        ID id = resource.getData().getId();
+        // Edition
+        asUser().with(id.getValue(), ProjectEdit.class).call(() -> {
             // Updates
             NameDescription nameDescription = nameDescription();
             assertNotEquals(initialNames, nameDescription);
-            resource = structure.saveProject(id, nameDescription);
+            Resource<Project> updated = structure.saveProject(id, nameDescription);
             // Checks
-            checkProjectResource(resource, nameDescription);
+            checkProjectResource(updated, nameDescription);
             // Gets the project back
-            resource = structure.getProject(id);
-            checkProjectResource(resource, nameDescription);
+            updated = structure.getProject(id);
+            checkProjectResource(updated, nameDescription);
             return null;
         });
     }

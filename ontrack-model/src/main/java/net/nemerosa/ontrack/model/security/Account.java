@@ -1,13 +1,75 @@
 package net.nemerosa.ontrack.model.security;
 
-public interface Account {
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
 
-    String getName();
+import java.util.HashSet;
+import java.util.Set;
 
-    SecurityRole getRole();
+@Data
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public class Account {
 
-    boolean isGranted(Class<? extends GlobalFunction> globalFunction);
+    public static Account of(String name, SecurityRole role) {
+        return new Account(
+                name,
+                role,
+                new HashSet<>(),
+                new HashSet<>(),
+                false
+        );
+    }
 
-    boolean isGranted(int projectId, Class<? extends ProjectFunction> fn);
-    
+    private final String name;
+    private final SecurityRole role;
+    @Getter(AccessLevel.PRIVATE)
+    private final Set<Class<? extends GlobalFunction>> globalFunctions;
+    @Getter(AccessLevel.PRIVATE)
+    private final Set<ProjectFn> projectFns;
+    @Getter(AccessLevel.PRIVATE)
+    private final boolean locked;
+
+
+    public boolean isGranted(Class<? extends GlobalFunction> fn) {
+        return (SecurityRole.ADMINISTRATOR == role)
+                || (globalFunctions.contains(fn));
+    }
+
+    public boolean isGranted(int projectId, Class<? extends ProjectFunction> fn) {
+        return (SecurityRole.ADMINISTRATOR == role)
+                // TODO Global implying project function? Like controller implying build_create?
+                || (projectFns.contains(new ProjectFn(projectId, fn)));
+    }
+
+    public Account with(Class<? extends GlobalFunction> fn) {
+        unlocked();
+        globalFunctions.add(fn);
+        return this;
+    }
+
+    public Account with(int projectId, Class<? extends ProjectFunction> fn) {
+        unlocked();
+        projectFns.add(new ProjectFn(projectId, fn));
+        return this;
+    }
+
+    public Account lock() {
+        return new Account(
+                name,
+                role,
+                globalFunctions,
+                projectFns,
+                true
+        );
+    }
+
+    private void unlocked() {
+        if (locked) {
+            throw new IllegalStateException("Account is locked");
+        }
+    }
+
+
 }

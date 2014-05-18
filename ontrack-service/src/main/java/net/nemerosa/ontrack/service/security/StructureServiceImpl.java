@@ -60,7 +60,7 @@ public class StructureServiceImpl implements StructureService {
 
     @Override
     public List<Branch> getBranchesForProject(ID projectId) {
-        securityService.checkProjectFunction(projectId.getValue(), ProjectEdit.class);
+        securityService.checkProjectFunction(projectId.getValue(), ProjectView.class);
         return structureRepository.getBranchesForProject(projectId);
     }
 
@@ -70,7 +70,7 @@ public class StructureServiceImpl implements StructureService {
         isEntityNew(branch, "Branch must be new");
         isEntityDefined(branch.getProject(), "Project must be defined");
         // Security
-        securityService.checkProjectFunction(branch.getProject().id(), ProjectEdit.class);
+        securityService.checkProjectFunction(branch.getProject().id(), BranchCreate.class);
         // OK
         return structureRepository.newBranch(branch);
     }
@@ -82,7 +82,7 @@ public class StructureServiceImpl implements StructureService {
         isEntityDefined(build.getBranch(), "Branch must be defined");
         isEntityDefined(build.getBranch().getProject(), "Project must be defined");
         // Security
-        securityService.checkProjectFunction(build.getBranch().getProject().id(), ProjectEdit.class);
+        securityService.checkProjectFunction(build.getBranch().getProject().id(), BuildCreate.class);
         // Repository
         return structureRepository.newBuild(build);
     }

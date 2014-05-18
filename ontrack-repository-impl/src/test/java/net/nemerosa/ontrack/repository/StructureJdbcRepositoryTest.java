@@ -23,14 +23,6 @@ public class StructureJdbcRepositoryTest extends AbstractITTestSupport {
         ));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void create_branch_branch_defined() {
-        repository.newBranch(Branch.of(
-                Project.of(nameDescription()).withId(ID.of(1)),
-                nameDescription()
-        ).withId(ID.of(11)));
-    }
-
     @Test
     public void create_branch() {
         // Creates a project

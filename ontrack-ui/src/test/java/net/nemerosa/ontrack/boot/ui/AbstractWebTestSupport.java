@@ -14,9 +14,6 @@ import org.springframework.security.core.context.SecurityContextImpl;
 
 import java.util.concurrent.Callable;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 @SpringApplicationConfiguration(classes = Application.class)
 public abstract class AbstractWebTestSupport extends AbstractITTestSupport {
 
@@ -53,9 +50,7 @@ public abstract class AbstractWebTestSupport extends AbstractITTestSupport {
         protected final Account account;
 
         public AccountCall(String name, SecurityRole role) {
-            account = mock(Account.class);
-            when(account.getName()).thenReturn(name);
-            when(account.getRole()).thenReturn(role);
+            account = Account.of(name, role);
         }
 
         @Override
@@ -79,12 +74,12 @@ public abstract class AbstractWebTestSupport extends AbstractITTestSupport {
         }
 
         public UserCall with(Class<? extends GlobalFunction> fn) {
-            when(account.isGranted(fn)).thenReturn(true);
+            account.with(fn);
             return this;
         }
 
         public UserCall with(int projectId, Class<? extends ProjectFunction> fn) {
-            when(account.isGranted(projectId, fn)).thenReturn(true);
+            account.with(projectId, fn);
             return this;
         }
 
