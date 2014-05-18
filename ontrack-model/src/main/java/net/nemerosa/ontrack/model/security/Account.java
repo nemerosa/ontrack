@@ -38,9 +38,8 @@ public class Account {
     }
 
     public boolean isGranted(int projectId, Class<? extends ProjectFunction> fn) {
-        return (SecurityRole.ADMINISTRATOR == role)
-                // TODO Global implying project function? Like controller implying build_create?
-                || (projectFns.contains(new ProjectFn(projectId, fn)));
+        return SecurityRole.ADMINISTRATOR == role
+                || projectFns.stream().anyMatch(acl -> acl.getId() == projectId && fn.isAssignableFrom(acl.getFn()));
     }
 
     public Account with(Class<? extends GlobalFunction> fn) {
