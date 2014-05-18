@@ -6,6 +6,9 @@ public interface SecurityService {
 
     boolean isGlobalFunctionGranted(Class<? extends GlobalFunction> fn);
 
-    Account getCurrentAccount();
+    void checkProjectFunction(int projectId, Class<? extends ProjectFunction> fn);
 
+    boolean isProjectFunctionGranted(int projectId, Class<? extends ProjectFunction> fn);
+
+    Account getCurrentAccount();
 }

@@ -2,8 +2,9 @@ package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.boot.Application;
 import net.nemerosa.ontrack.it.AbstractITTestSupport;
-import net.nemerosa.ontrack.model.security.GlobalFunction;
 import net.nemerosa.ontrack.model.security.Account;
+import net.nemerosa.ontrack.model.security.GlobalFunction;
+import net.nemerosa.ontrack.model.security.ProjectFunction;
 import net.nemerosa.ontrack.model.security.SecurityRole;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.security.authentication.TestingAuthenticationToken;
@@ -79,6 +80,11 @@ public abstract class AbstractWebTestSupport extends AbstractITTestSupport {
 
         public UserCall with(Class<? extends GlobalFunction> fn) {
             when(account.isGranted(fn)).thenReturn(true);
+            return this;
+        }
+
+        public UserCall with(int projectId, Class<? extends ProjectFunction> fn) {
+            when(account.isGranted(projectId, fn)).thenReturn(true);
             return this;
         }
 

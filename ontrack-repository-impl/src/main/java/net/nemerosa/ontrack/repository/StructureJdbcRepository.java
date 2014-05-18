@@ -98,9 +98,6 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
 
     @Override
     public Branch newBranch(Branch branch) {
-        // Validation
-        isEntityNew(branch, "Branch must be new");
-        isEntityDefined(branch.getProject(), "Project must be defined");
         // Creation
         try {
             int id = dbCreate(

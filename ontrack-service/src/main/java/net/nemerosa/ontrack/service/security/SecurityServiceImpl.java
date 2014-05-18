@@ -1,7 +1,8 @@
 package net.nemerosa.ontrack.service.security;
 
-import net.nemerosa.ontrack.model.security.GlobalFunction;
 import net.nemerosa.ontrack.model.security.Account;
+import net.nemerosa.ontrack.model.security.GlobalFunction;
+import net.nemerosa.ontrack.model.security.ProjectFunction;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Component;
 import static java.lang.String.format;
 
 @Component
-public class DefaultSecurityService implements SecurityService {
+public class SecurityServiceImpl implements SecurityService {
 
     @Override
     public void checkGlobalFunction(Class<? extends GlobalFunction> fn) {
@@ -27,6 +28,21 @@ public class DefaultSecurityService implements SecurityService {
         Account user = getCurrentAccount();
         // Checks
         return user != null && user.isGranted(fn);
+    }
+
+    @Override
+    public void checkProjectFunction(int projectId, Class<? extends ProjectFunction> fn) {
+        if (!isProjectFunctionGranted(projectId, fn)) {
+            throw new AccessDeniedException(format("Project function '%s' is not granted", fn.getSimpleName()));
+        }
+    }
+
+    @Override
+    public boolean isProjectFunctionGranted(int projectId, Class<? extends ProjectFunction> fn) {
+        // Gets the user
+        Account user = getCurrentAccount();
+        // Checks
+        return user != null && user.isGranted(projectId, fn);
     }
 
     @Override

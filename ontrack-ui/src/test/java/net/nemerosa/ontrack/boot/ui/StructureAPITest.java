@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.model.security.ProjectCreation;
+import net.nemerosa.ontrack.model.security.ProjectEdit;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.NameDescription;
@@ -54,13 +55,14 @@ public class StructureAPITest extends AbstractWebTestSupport {
     }
 
     @Test
-    public void createBranch() {
-        // TODO ProjectCreation & ProjectEdit
+    public void createBranch() throws Exception {
         // Project
-        Resource<Project> project = structure.newProject(nameDescription());
+        Resource<Project> project = asUser().with(ProjectCreation.class).call(() -> structure.newProject(nameDescription()));
         // Branch
         NameDescription nameDescription = nameDescription();
-        Resource<Branch> resource = structure.newBranch(project.getData().getId(), nameDescription);
+        Resource<Branch> resource = asUser()
+                .with(project.getData().id(), ProjectEdit.class)
+                .call(() -> structure.newBranch(project.getData().getId(), nameDescription));
         // Checks the branch
         checkBranchResource(resource, nameDescription);
     }
