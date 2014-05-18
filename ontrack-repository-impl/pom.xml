@@ -11,14 +11,14 @@
         <version>2.0.0.ALPHA-SNAPSHOT</version>
     </parent>
 
-    <artifactId>ontrack-repository</artifactId>
-    <name>ontrack Repository</name>
+    <artifactId>ontrack-repository-impl</artifactId>
+    <name>ontrack Repository JDBC Implementation</name>
 
     <dependencies>
         <!-- ontrack -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>ontrack-model</artifactId>
+            <artifactId>ontrack-repository</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

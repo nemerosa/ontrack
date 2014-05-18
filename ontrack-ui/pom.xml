@@ -9,7 +9,7 @@
         <version>2.0.0.ALPHA-SNAPSHOT</version>
     </parent>
 
-    <artifactId>ontrack-boot</artifactId>
+    <artifactId>ontrack-ui</artifactId>
 
     <name>ontrack Boot</name>
 
