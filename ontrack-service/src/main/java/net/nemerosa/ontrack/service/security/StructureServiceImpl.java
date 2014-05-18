@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.service.security;
 
-import net.nemerosa.ontrack.model.security.ProjectCreation;
-import net.nemerosa.ontrack.model.security.ProjectEdit;
-import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.repository.StructureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,36 +27,40 @@ public class StructureServiceImpl implements StructureService {
 
     @Override
     public Project newProject(Project project) {
+        isEntityNew(project, "Project must be defined");
         securityService.checkGlobalFunction(ProjectCreation.class);
         return structureRepository.newProject(project);
     }
 
     @Override
     public List<Project> getProjectList() {
+        securityService.checkGlobalFunction(ProjectList.class);
         return structureRepository.getProjectList();
     }
 
     @Override
     public Project getProject(ID projectId) {
-        // TODO Security
+        securityService.checkProjectFunction(projectId.getValue(), ProjectView.class);
         return structureRepository.getProject(projectId);
     }
 
     @Override
     public void saveProject(Project project) {
-        // TODO Security
+        isEntityDefined(project, "Project must be defined");
+        securityService.checkProjectFunction(project.id(), ProjectEdit.class);
         structureRepository.saveProject(project);
     }
 
     @Override
     public Branch getBranch(ID branchId) {
-        // TODO Security
-        return structureRepository.getBranch(branchId);
+        Branch branch = structureRepository.getBranch(branchId);
+        securityService.checkProjectFunction(branch.getProject().id(), ProjectView.class);
+        return branch;
     }
 
     @Override
     public List<Branch> getBranchesForProject(ID projectId) {
-        // TODO Security
+        securityService.checkProjectFunction(projectId.getValue(), ProjectEdit.class);
         return structureRepository.getBranchesForProject(projectId);
     }
 
@@ -75,13 +77,25 @@ public class StructureServiceImpl implements StructureService {
 
     @Override
     public Build newBuild(Build build) {
-        // TODO Security
+        // Validation
+        isEntityNew(build, "Build must be new");
+        isEntityDefined(build.getBranch(), "Branch must be defined");
+        isEntityDefined(build.getBranch().getProject(), "Project must be defined");
+        // Security
+        securityService.checkProjectFunction(build.getBranch().getProject().id(), ProjectEdit.class);
+        // Repository
         return structureRepository.newBuild(build);
     }
 
     @Override
     public Build saveBuild(Build build) {
-        // TODO Security
+        // Validation
+        isEntityDefined(build, "Build must be defined");
+        isEntityDefined(build.getBranch(), "Branch must be defined");
+        isEntityDefined(build.getBranch().getProject(), "Project must be defined");
+        // Security
+        securityService.checkProjectFunction(build.getBranch().getProject().id(), ProjectEdit.class);
+        // Repository
         return structureRepository.saveBuild(build);
     }
 }

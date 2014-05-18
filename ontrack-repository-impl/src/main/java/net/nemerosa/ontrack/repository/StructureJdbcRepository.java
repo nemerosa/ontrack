@@ -13,9 +13,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.function.Function;
 
-import static net.nemerosa.ontrack.model.structure.Entity.isEntityDefined;
-import static net.nemerosa.ontrack.model.structure.Entity.isEntityNew;
-
 @Repository
 public class StructureJdbcRepository extends AbstractJdbcRepository implements StructureRepository {
 
@@ -26,8 +23,6 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
 
     @Override
     public Project newProject(Project project) {
-        // Validation
-        isEntityNew(project, "Project must be defined");
         // Creation
         try {
             int id = dbCreate(
@@ -64,7 +59,6 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
 
     @Override
     public void saveProject(Project project) {
-        isEntityDefined(project, "Project must be defined");
         getNamedParameterJdbcTemplate().update(
                 "UPDATE PROJECTS SET NAME = :name, DESCRIPTION = :description WHERE ID = :id",
                 params("name", project.getName())
@@ -115,9 +109,6 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
 
     @Override
     public Build newBuild(Build build) {
-        // Validation
-        isEntityNew(build, "Build must be new");
-        isEntityDefined(build.getBranch(), "Branch must be defined");
         // Creation
         try {
             int id = dbCreate(
@@ -136,9 +127,6 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
 
     @Override
     public Build saveBuild(Build build) {
-        // Validation
-        isEntityDefined(build, "Build must be defined");
-        isEntityDefined(build.getBranch(), "Branch must be defined");
         // Update
         try {
             getNamedParameterJdbcTemplate().update(
