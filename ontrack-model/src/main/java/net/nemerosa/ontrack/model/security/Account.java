@@ -1,9 +1,10 @@
 package net.nemerosa.ontrack.model.security;
 
-import net.nemerosa.ontrack.model.annotations.GlobalFunction;
-
-public interface SecuredUser {
+public interface Account {
 
     boolean isGranted(Class<? extends GlobalFunction> globalFunction);
 
+    String getName();
+
+    SecurityRole getRole();
 }
