@@ -1,4 +1,9 @@
-package net.nemerosa.ontrack.model.structure;
+package net.nemerosa.ontrack.repository;
+
+import net.nemerosa.ontrack.model.structure.Branch;
+import net.nemerosa.ontrack.model.structure.Build;
+import net.nemerosa.ontrack.model.structure.ID;
+import net.nemerosa.ontrack.model.structure.Project;
 
 import java.util.List;
 

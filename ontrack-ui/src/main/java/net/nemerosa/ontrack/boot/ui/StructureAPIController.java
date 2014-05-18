@@ -18,18 +18,18 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 @RequestMapping("/structure")
 public class StructureAPIController extends AbstractResourceController implements StructureAPI {
 
-    private final StructureRepository structureRepository;
+    private final StructureService structureService;
 
     @Autowired
-    public StructureAPIController(StructureRepository structureRepository) {
-        this.structureRepository = structureRepository;
+    public StructureAPIController(StructureService structureService) {
+        this.structureService = structureService;
     }
 
     @Override
     @RequestMapping(value = "projects", method = RequestMethod.GET)
     public ResourceCollection<Project> getProjectList() {
         return ResourceCollection.of(
-                structureRepository.getProjectList().stream().map(this::toProjectResource),
+                structureService.getProjectList().stream().map(this::toProjectResource),
                 uri(on(StructureAPIController.class).getProjectList())
         )
                 // TODO Authorization
@@ -49,7 +49,7 @@ public class StructureAPIController extends AbstractResourceController implement
         // Creates a new project instance
         Project project = Project.of(nameDescription);
         // Saves it into the repository
-        project = structureRepository.newProject(project);
+        project = structureService.newProject(project);
         // OK
         return toProjectResource(project);
     }
@@ -58,7 +58,7 @@ public class StructureAPIController extends AbstractResourceController implement
     @RequestMapping(value = "projects/{projectId}", method = RequestMethod.GET)
     public Resource<Project> getProject(@PathVariable ID projectId) {
         // Gets from the repository
-        Project project = structureRepository.getProject(projectId);
+        Project project = structureService.getProject(projectId);
         // As resource
         return toProjectResourceWithActions(project);
     }
@@ -66,18 +66,18 @@ public class StructureAPIController extends AbstractResourceController implement
     @Override
     @RequestMapping(value = "projects/{projectId}/update", method = RequestMethod.GET)
     public Form saveProjectForm(@PathVariable ID projectId) {
-        return structureRepository.getProject(projectId).asForm();
+        return structureService.getProject(projectId).asForm();
     }
 
     @Override
     @RequestMapping(value = "projects/{projectId}/update", method = RequestMethod.PUT)
     public Resource<Project> saveProject(@PathVariable ID projectId, @RequestBody NameDescription nameDescription) {
         // Gets from the repository
-        Project project = structureRepository.getProject(projectId);
+        Project project = structureService.getProject(projectId);
         // Updates
         project = project.update(nameDescription);
         // Saves in repository
-        structureRepository.saveProject(project);
+        structureService.saveProject(project);
         // As resource
         return toProjectResource(project);
     }
@@ -86,7 +86,7 @@ public class StructureAPIController extends AbstractResourceController implement
     @RequestMapping(value = "projects/{projectId}/branches", method = RequestMethod.GET)
     public ResourceCollection<Branch> getBranchListForProject(@PathVariable ID projectId) {
         return ResourceCollection.of(
-                structureRepository.getBranchesForProject(projectId).stream().map(this::toBranchResource),
+                structureService.getBranchesForProject(projectId).stream().map(this::toBranchResource),
                 uri(on(StructureAPIController.class).getBranchListForProject(projectId))
         )
                 // TODO Create (authorization)
@@ -98,7 +98,7 @@ public class StructureAPIController extends AbstractResourceController implement
     @RequestMapping(value = "projects/{projectId}/branches/create", method = RequestMethod.GET)
     public Form newBranchForm(@PathVariable ID projectId) {
         // Checks the project exists
-        structureRepository.getProject(projectId);
+        structureService.getProject(projectId);
         // Returns the form
         return Branch.form();
     }
@@ -107,11 +107,11 @@ public class StructureAPIController extends AbstractResourceController implement
     @RequestMapping(value = "projects/{projectId}/branches/create", method = RequestMethod.POST)
     public Resource<Branch> newBranch(@PathVariable ID projectId, @RequestBody NameDescription nameDescription) {
         // Gets the project
-        Project project = structureRepository.getProject(projectId);
+        Project project = structureService.getProject(projectId);
         // Creates a new branch instance
         Branch branch = Branch.of(project, nameDescription);
         // Saves it into the repository
-        branch = structureRepository.newBranch(branch);
+        branch = structureService.newBranch(branch);
         // OK
         return toBranchResource(branch);
     }
@@ -120,7 +120,7 @@ public class StructureAPIController extends AbstractResourceController implement
     @RequestMapping(value = "branches/{branchId}", method = RequestMethod.GET)
     public Resource<Branch> getBranch(@PathVariable ID branchId) {
         return toBranchResourceWithActions(
-                structureRepository.getBranch(branchId)
+                structureService.getBranch(branchId)
         );
     }
 
@@ -130,7 +130,7 @@ public class StructureAPIController extends AbstractResourceController implement
     @RequestMapping(value = "branches/{branchId}/builds/create", method = RequestMethod.GET)
     public Form newBuildForm(@PathVariable ID branchId) {
         // Checks the branch does exist
-        structureRepository.getBranch(branchId);
+        structureService.getBranch(branchId);
         // Returns the form
         return Build.form();
     }
@@ -139,13 +139,13 @@ public class StructureAPIController extends AbstractResourceController implement
     @RequestMapping(value = "branches/{branchId}/builds/create", method = RequestMethod.POST)
     public Resource<Build> newBuild(@PathVariable ID branchId, @RequestBody NameDescription nameDescription) {
         // Gets the holding branch
-        Branch branch = structureRepository.getBranch(branchId);
+        Branch branch = structureService.getBranch(branchId);
         // TODO Build signature
         Signature signature = Signature.of("TODO User");
         // Creates a new build
         Build build = Build.of(branch, nameDescription, signature);
         // Saves it into the repository
-        build = structureRepository.newBuild(build);
+        build = structureService.newBuild(build);
         // OK
         return toBuildResource(build);
     }

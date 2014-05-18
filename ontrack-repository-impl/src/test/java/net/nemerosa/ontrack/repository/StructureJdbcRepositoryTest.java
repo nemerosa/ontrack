@@ -4,7 +4,6 @@ import net.nemerosa.ontrack.it.AbstractITTestSupport;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.Project;
-import net.nemerosa.ontrack.model.structure.StructureRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
