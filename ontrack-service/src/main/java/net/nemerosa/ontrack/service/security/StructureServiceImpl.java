@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static net.nemerosa.ontrack.model.structure.Entity.isEntityDefined;
 import static net.nemerosa.ontrack.model.structure.Entity.isEntityNew;
@@ -34,8 +35,14 @@ public class StructureServiceImpl implements StructureService {
 
     @Override
     public List<Project> getProjectList() {
-        securityService.checkGlobalFunction(ProjectList.class);
-        return structureRepository.getProjectList();
+        List<Project> list = structureRepository.getProjectList();
+        if (securityService.isGlobalFunctionGranted(ProjectList.class)) {
+            return list;
+        } else {
+            return list.stream()
+                    .filter(p -> securityService.isProjectFunctionGranted(p.id(), ProjectView.class))
+                    .collect(Collectors.toList());
+        }
     }
 
     @Override
