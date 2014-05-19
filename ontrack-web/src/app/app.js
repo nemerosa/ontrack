@@ -14,7 +14,11 @@ var ontrack = angular.module('ontrack', [
         'ot.view.project',
         'ot.view.branch'
     ])
-        // TODO HTTP configuration
+        //HTTP configuration
+        .config(function ($httpProvider) {
+            // Authentication using cookies and CORS protection
+            $httpProvider.defaults.withCredentials = true;
+        })
         // TODO Runs the initial security service (in case of refresh)
         // TODO HTTP error interceptor
         // Routing configuration

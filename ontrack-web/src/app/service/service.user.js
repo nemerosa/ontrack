@@ -54,7 +54,15 @@ angular.module('ot.service.user', [
                 uri: $rootScope.user.login.href,
                 title: "Sign in",
                 submit: function (data) {
-                    return ot.call($http.post($rootScope.user.login.href, data));
+                    return ot.call($http.post(
+                        $rootScope.user.login.href,
+                        {},
+                        {
+                            headers: {
+                                'Authorization': 'Basic ' + window.btoa(data.name + ':' + data.password)
+                            }
+                        }
+                    ));
                 }
             });
         };
