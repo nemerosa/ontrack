@@ -13,6 +13,15 @@ public abstract class LinkContainer<L extends LinkContainer<L>> {
     private final URI href;
     private final Map<String, Link> links = new LinkedHashMap<>();
 
+    public L with(String name, URI uri, boolean authorized) {
+        if (authorized) {
+            return with(Link.of(name, uri));
+        } else {
+            //noinspection unchecked
+            return (L) this;
+        }
+    }
+
     public L with(String name, URI uri) {
         return with(Link.of(name, uri));
     }

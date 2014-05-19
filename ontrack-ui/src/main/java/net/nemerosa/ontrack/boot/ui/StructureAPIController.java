@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Link;
@@ -19,10 +20,12 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 public class StructureAPIController extends AbstractResourceController implements StructureAPI {
 
     private final StructureService structureService;
+    private final SecurityService securityService;
 
     @Autowired
-    public StructureAPIController(StructureService structureService) {
+    public StructureAPIController(StructureService structureService, SecurityService securityService) {
         this.structureService = structureService;
+        this.securityService = securityService;
     }
 
     @Override
@@ -32,8 +35,7 @@ public class StructureAPIController extends AbstractResourceController implement
                 structureService.getProjectList().stream().map(this::toProjectResource),
                 uri(on(StructureAPIController.class).getProjectList())
         )
-                // TODO Authorization
-                .with(Link.CREATE, uri(on(StructureAPIController.class).newProject(null)));
+                .with(Link.CREATE, uri(on(StructureAPIController.class).newProject(null)), securityService.isGlobalFunctionGranted(ProjectCreation.class));
     }
 
     @Override
@@ -89,8 +91,12 @@ public class StructureAPIController extends AbstractResourceController implement
                 structureService.getBranchesForProject(projectId).stream().map(this::toBranchResource),
                 uri(on(StructureAPIController.class).getBranchListForProject(projectId))
         )
-                // TODO Create (authorization)
-                .with(Link.CREATE, uri(on(StructureAPIController.class).newBranch(projectId, null)))
+                // Create
+                .with(
+                        Link.CREATE,
+                        uri(on(StructureAPIController.class).newBranch(projectId, null)),
+                        securityService.isProjectFunctionGranted(projectId.getValue(), BranchCreate.class)
+                )
                 ;
     }
 
@@ -154,8 +160,12 @@ public class StructureAPIController extends AbstractResourceController implement
 
     private Resource<Project> toProjectResourceWithActions(Project project) {
         return toProjectResource(project)
-                // TODO Update link (authorization)
-                .with(Link.UPDATE, uri(on(StructureAPIController.class).saveProject(project.getId(), null)))
+                // Update
+                .with(
+                        Link.UPDATE,
+                        uri(on(StructureAPIController.class).saveProject(project.getId(), null)),
+                        securityService.isProjectFunctionGranted(project.id(), ProjectEdit.class)
+                )
                         // Branch list
                 .with("branches", uri(on(StructureAPIController.class).getBranchListForProject(project.getId())))
                 ;
@@ -176,8 +186,12 @@ public class StructureAPIController extends AbstractResourceController implement
                 // TODO Delete link
                 // TODO View link
                 // TODO Builds link
-                // TODO Build creation (authorization missing)
-                .with("createBuild", uri(on(StructureAPIController.class).newBuild(branch.getId(), null)))
+                // Build creation
+                .with(
+                        "createBuild",
+                        uri(on(StructureAPIController.class).newBuild(branch.getId(), null)),
+                        securityService.isProjectFunctionGranted(branch.getProject().id(), BuildCreate.class)
+                )
                 ;
     }
 
