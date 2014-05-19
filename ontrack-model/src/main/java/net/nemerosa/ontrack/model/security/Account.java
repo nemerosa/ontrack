@@ -4,16 +4,19 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import net.nemerosa.ontrack.model.structure.Entity;
+import net.nemerosa.ontrack.model.structure.ID;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Account {
+public class Account implements Entity {
 
     public static Account of(String name, SecurityRole role) {
         return new Account(
+                ID.NONE,
                 name,
                 role,
                 new HashSet<>(),
@@ -22,6 +25,7 @@ public class Account {
         );
     }
 
+    private final ID id;
     private final String name;
     private final SecurityRole role;
     @Getter(AccessLevel.PRIVATE)
@@ -54,8 +58,21 @@ public class Account {
         return this;
     }
 
+    public Account withId(ID id) {
+        unlocked();
+        return new Account(
+                id,
+                name,
+                role,
+                globalFunctions,
+                projectFns,
+                locked
+        );
+    }
+
     public Account lock() {
         return new Account(
+                id,
                 name,
                 role,
                 globalFunctions,

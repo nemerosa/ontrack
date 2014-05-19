@@ -66,4 +66,13 @@ public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSuppor
             return time.format(DateTimeFormatter.ISO_DATE_TIME);
         }
     }
+
+    protected <E extends Enum<E>> E getEnum(Class<E> enumClass, ResultSet rs, String columnName) throws SQLException {
+        String value = rs.getString(columnName);
+        if (value == null) {
+            return null;
+        } else {
+            return Enum.valueOf(enumClass, value);
+        }
+    }
 }
