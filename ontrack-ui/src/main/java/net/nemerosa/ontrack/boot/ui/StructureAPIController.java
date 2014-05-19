@@ -10,7 +10,10 @@ import net.nemerosa.ontrack.ui.resource.ResourceCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.net.URI;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -203,6 +206,43 @@ public class StructureAPIController extends AbstractResourceController implement
         );
     }
 
+    @RequestMapping(value = "promotionLevels/{promotionLevelId}/image", method = RequestMethod.GET)
+    public void getPromotionLevelImage(@PathVariable ID promotionLevelId, HttpServletResponse response) throws IOException {
+        // Gets the file
+        Document file = getPromotionLevelImage(promotionLevelId);
+        if (file == null) {
+            response.sendError(HttpServletResponse.SC_NO_CONTENT);
+            return;
+        }
+        // Writes as a file
+        response.setContentType(file.getType());
+        // Outputs a file
+        response.getOutputStream().write(file.getContent());
+        response.getOutputStream().flush();
+    }
+
+    @RequestMapping(value = "promotionLevels/{promotionLevelId}/image", method = RequestMethod.PUT)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void setPromotionLevelImage(@PathVariable ID promotionLevelId, @RequestParam MultipartFile file) throws IOException {
+        setPromotionLevelImage(
+                promotionLevelId,
+                new Document(
+                        file.getContentType(),
+                        file.getBytes()
+                )
+        );
+    }
+
+    @Override
+    public Document getPromotionLevelImage(ID promotionLevelId) {
+        return structureService.getPromotionLevelImage(promotionLevelId);
+    }
+
+    @Override
+    public void setPromotionLevelImage(ID promotionLevelId, Document document) {
+        structureService.setPromotionLevelImage(promotionLevelId, document);
+    }
+
     // Resource assemblers
 
     private Resource<Project> toProjectResourceWithActions(Project project) {
@@ -288,7 +328,8 @@ public class StructureAPIController extends AbstractResourceController implement
                 .with("branchLink", uri(on(StructureAPIController.class).getBranch(promotionLevel.getBranch().getId())))
                         // Project link
                 .with("projectLink", uri(on(StructureAPIController.class).getProject(promotionLevel.getBranch().getProject().getId())))
-                // TODO Image link
+                        // Image link
+                .with("image", uri(on(StructureAPIController.class).getPromotionLevelImage(promotionLevel.getId())))
                 ;
     }
 }

@@ -1,8 +1,11 @@
 package net.nemerosa.ontrack.service.security;
 
+import net.nemerosa.ontrack.model.exceptions.ImageFileSizeException;
+import net.nemerosa.ontrack.model.exceptions.ImageTypeNotAcceptedException;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.repository.StructureRepository;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +19,14 @@ import static net.nemerosa.ontrack.model.structure.Entity.isEntityNew;
 @Service
 @Transactional
 public class StructureServiceImpl implements StructureService {
+
+    private static final long ICON_IMAGE_SIZE_MAX = 16 * 1000L;
+
+    private static final String[] ACCEPTED_IMAGE_TYPES = {
+            "image/jpeg",
+            "image/png",
+            "image/gif"
+    };
 
     private final SecurityService securityService;
     private final StructureRepository structureRepository;
@@ -130,5 +141,30 @@ public class StructureServiceImpl implements StructureService {
         PromotionLevel promotionLevel = structureRepository.getPromotionLevel(promotionLevelId);
         securityService.checkProjectFunction(promotionLevel.getBranch().getProject().id(), ProjectView.class);
         return promotionLevel;
+    }
+
+    @Override
+    public Document getPromotionLevelImage(ID promotionLevelId) {
+        // Checks access
+        getPromotionLevel(promotionLevelId);
+        // Repository access
+        return structureRepository.getPromotionLevelImage(promotionLevelId);
+    }
+
+    @Override
+    public void setPromotionLevelImage(ID promotionLevelId, Document document) {
+        // Checks access
+        getPromotionLevel(promotionLevelId);
+        // Checks the image type
+        if (!ArrayUtils.contains(ACCEPTED_IMAGE_TYPES, document.getType())) {
+            throw new ImageTypeNotAcceptedException(document.getType(), ACCEPTED_IMAGE_TYPES);
+        }
+        // Checks the image length
+        int size = document.getContent().length;
+        if (size > ICON_IMAGE_SIZE_MAX) {
+            throw new ImageFileSizeException(size, ICON_IMAGE_SIZE_MAX);
+        }
+        // Repository
+        structureRepository.setPromotionLevelImage(promotionLevelId, document);
     }
 }

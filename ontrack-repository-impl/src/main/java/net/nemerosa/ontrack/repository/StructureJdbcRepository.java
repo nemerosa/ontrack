@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.repository;
 
 import net.nemerosa.ontrack.model.exceptions.*;
 import net.nemerosa.ontrack.model.structure.*;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -189,6 +190,25 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         }
     }
 
+    @Override
+    public Document getPromotionLevelImage(ID promotionLevelId) {
+        return getFirstItem(
+                "SELECT IMAGETYPE, IMAGEBYTES FROM PROMOTION_LEVELS WHERE ID = :id",
+                params("id", promotionLevelId),
+                (rs, rowNum) -> toDocument(rs)
+        );
+    }
+
+    @Override
+    public void setPromotionLevelImage(ID promotionLevelId, Document document) {
+        getNamedParameterJdbcTemplate().update(
+                "UPDATE PROMOTION_LEVELS SET IMAGETYPE = :type, IMAGEBYTES = :content WHERE ID = :id",
+                params("id", promotionLevelId)
+                        .addValue("type", document.getType())
+                        .addValue("content", document.getContent())
+        );
+    }
+
     protected PromotionLevel toPromotionLevel(ResultSet rs, Function<ID, Branch> branchSupplier) throws SQLException {
         return PromotionLevel.of(
                 branchSupplier.apply(id(rs, "branchId")),
@@ -214,6 +234,16 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 rs.getString("name"),
                 rs.getString("description")
         )).withId(id(rs.getInt("id")));
+    }
+
+    protected Document toDocument(ResultSet rs) throws SQLException {
+        String type = rs.getString("imagetype");
+        byte[] bytes = rs.getBytes("imagebytes");
+        if (StringUtils.isNotBlank(type) && bytes != null && bytes.length > 0) {
+            return new Document(type, bytes);
+        } else {
+            return null;
+        }
     }
 
 }

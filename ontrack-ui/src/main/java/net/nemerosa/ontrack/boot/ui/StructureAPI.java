@@ -47,4 +47,8 @@ public interface StructureAPI {
 
     Resource<PromotionLevel> getPromotionLevel(ID promotionLevelId);
 
+    Document getPromotionLevelImage(ID promotionLevelId);
+
+    void setPromotionLevelImage(ID promotionLevelId, Document document);
+
 }

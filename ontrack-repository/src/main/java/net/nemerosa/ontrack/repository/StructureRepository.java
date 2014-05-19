@@ -37,4 +37,8 @@ public interface StructureRepository {
     PromotionLevel newPromotionLevel(PromotionLevel promotionLevel);
 
     PromotionLevel getPromotionLevel(ID promotionLevelId);
+
+    Document getPromotionLevelImage(ID promotionLevelId);
+
+    void setPromotionLevelImage(ID promotionLevelId, Document document);
 }
