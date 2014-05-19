@@ -47,8 +47,8 @@ public class SecurityServiceImpl implements SecurityService {
     public Account getCurrentAccount() {
         SecurityContext context = SecurityContextHolder.getContext();
         Authentication authentication = context.getAuthentication();
-        if (authentication != null && authentication.isAuthenticated() && (authentication.getDetails() instanceof AccountHolder)) {
-            return ((AccountHolder) authentication.getDetails()).getAccount();
+        if (authentication != null && authentication.isAuthenticated() && (authentication.getPrincipal() instanceof AccountHolder)) {
+            return ((AccountHolder) authentication.getPrincipal()).getAccount();
         } else {
             return null;
         }

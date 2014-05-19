@@ -81,11 +81,10 @@ public abstract class AbstractITTestSupport extends AbstractJUnit4SpringContextT
         protected void contextSetup() {
             SecurityContext context = new SecurityContextImpl();
             TestingAuthenticationToken authentication = new TestingAuthenticationToken(
-                    account.getName(),
+                    (AccountHolder) () -> account,
                     "",
                     account.getRole().name()
             );
-            authentication.setDetails((AccountHolder) () -> account);
             context.setAuthentication(authentication);
             SecurityContextHolder.setContext(context);
         }
