@@ -72,6 +72,13 @@ angular.module('ot.service.structure', [
             return self.create(uri, 'New build');
         };
 
+        /**
+         * Creating a promotion level
+         */
+        self.createPromotionLevel = function (uri) {
+            return self.create(uri, 'New promotion level');
+        };
+
         return self;
     })
 ;

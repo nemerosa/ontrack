@@ -156,11 +156,12 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         // Creation
         try {
             // Order nb = max + 1
-            int orderNb = getFirstItem(
+            Integer orderNbValue = getFirstItem(
                     "SELECT MAX(ORDERNB) FROM promotion_levels WHERE BRANCHID = :branchId",
                     params("branchId", promotionLevel.getBranch().id()),
-                    int.class
-            ) + 1;
+                    Integer.class
+            );
+            int orderNb = orderNbValue != null ? orderNbValue + 1 : 0;
             // Insertion
             int id = dbCreate(
                     "INSERT INTO PROMOTION_LEVELS(BRANCHID, NAME, DESCRIPTION, ORDERNB) VALUES (:branchId, :name, :description, :orderNb)",
