@@ -136,6 +136,21 @@ div.ot-view {
   color: @headings-small-color;
 }
 
+.ot-notification {
+  .alert;
+  .alert-dismissable;
+  position: absolute;
+  width: 40%;
+  z-index: 200;
+  top: 3em;
+  right: 2em;
+}
+
+.ot-notification-error {
+  .ot-notification;
+  .alert-danger;
+}
+
 /**
  * Entities
  */

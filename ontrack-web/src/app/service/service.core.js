@@ -58,7 +58,7 @@ angular.module('ot.service.core', [
         };
 
         self.display = function (type, message) {
-            $rootScope.message = {
+            $rootScope.notification = {
                 type: type,
                 content: message
             };

@@ -25,6 +25,8 @@
 
 <div>
 
+    <!-- Header and menu -->
+
     <nav class="navbar navbar-default navbar-inverse" role="navigation">
         <div class="navbar-header">
             <a class="navbar-brand" href="#/">
@@ -34,7 +36,17 @@
         </div>
     </nav>
 
+    <!-- Notification section -->
+
+    <div class="container" ng-if="hasNotification()">
+        <div class="ot-notification-{{notificationType()}}">
+            <button type="button" class="close" ng-click="closeNotification()">&times;</button>
+            <span>{{notificationContent()}}</span>
+        </div>
+    </div>
+
     <!-- View container -->
+
     <div id="ontrack-view" ui-view>
     </div>
 

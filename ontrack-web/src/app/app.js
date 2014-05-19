@@ -23,7 +23,23 @@ var ontrack = angular.module('ontrack', [
             $urlRouterProvider.otherwise("/home");
         })
         // Main controller
-        .controller('AppCtrl', function (otUserService) {
+        .controller('AppCtrl', function ($scope, $rootScope, otUserService) {
+            // User heart beat
             otUserService.init();
+
+            // Notification
+
+            $scope.hasNotification = function () {
+                return angular.isDefined($rootScope.notification);
+            };
+            $scope.notificationContent = function () {
+                return $rootScope.notification.content;
+            };
+            $scope.notificationType = function () {
+                return $rootScope.notification.type;
+            };
+            $scope.closeNotification = function () {
+                $rootScope.notification = undefined;
+            };
         })
     ;
