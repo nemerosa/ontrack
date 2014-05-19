@@ -10,13 +10,21 @@ angular.module('ot.view.branch', [
             controller: 'BranchCtrl'
         });
     })
-    .controller('BranchCtrl', function ($scope, $stateParams, ot, otStructureService) {
+    .controller('BranchCtrl', function ($scope, $stateParams, $http, ot, otStructureService) {
         var view = ot.view();
         // Branch's id
         var branchId = $stateParams.branchId;
 
         // TODO Loading the build view
         function loadBuildView() {
+        }
+
+        // Loading the promotion levels
+        function loadPromotionLevels() {
+            ot.call($http.get($scope.branch.promotionLevels.href)).then(function (collection) {
+                $scope.promotionLevelCollection = collection;
+            });
+
         }
 
         // Loading the branch
@@ -43,7 +51,8 @@ angular.module('ot.view.branch', [
                 ];
                 // Loads the build view
                 loadBuildView();
-                // TODO Loads the promotion levels
+                // Loads the promotion levels
+                loadPromotionLevels();
                 // TODO Loads the validation stamps
             });
         }

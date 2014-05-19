@@ -11,7 +11,18 @@
             <ot-noentry list="promotionLevelCollection.resources">
                 No promotion level has been created yet.
             </ot-noentry>
-            <button ng-if="branch.createPromotionLevel" type="button" class="btn btn-default" ng-click="createPromotionLevel()">New promotion level</button>
+            <table class="ot-promotionLevel-table">
+                <tr ng-repeat="promotionLevel in promotionLevelCollection.resources">
+                    <td>
+                        <a href="#/promotionLevel/{{promotionLevel.id}}">
+                            {{promotionLevel.name}}
+                        </a>
+                    </td>
+                </tr>
+            </table>
+            <button ng-if="branch.createPromotionLevel" type="button" class="btn btn-default"
+                    ng-click="createPromotionLevel()">New promotion level
+            </button>
         </div>
         <div class="col-md-7">
             <ot-section-title>Validation stamps</ot-section-title>
