@@ -19,10 +19,15 @@ angular.module('ot.service.user', [
         self.loadUser = function () {
             ot.call($http.get('user')).then(
                 function success(userResource) {
-                    // TODO Saves the user in the root scope
+                    $log.debug('[user] load user: ', userResource);
+                    $log.debug('[user] logged: ', userResource.present);
+                    // Saves the user in the root scope
+                    $rootScope.user = userResource;
+                    // Clears the error
+                    otNotificationService.clear();
                 },
                 function error(message) {
-                    $log.debug('[user] init - no user', message);
+                    $log.debug('[user] load - no user', message);
                     // Displays a general error
                     otNotificationService.error('Cannot connect. Please try later');
                 }

@@ -64,6 +64,10 @@ angular.module('ot.service.core', [
             };
         };
 
+        self.clear = function () {
+            $rootScope.notification = undefined;
+        };
+
         return self;
     })
 ;
