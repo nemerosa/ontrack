@@ -43,7 +43,7 @@ angular.module('ot.service.user', [
          * User logged?
          */
         self.logged = function () {
-            return $rootScope.user && $rootScope.user.present;
+            return $rootScope.user && $rootScope.user.account;
         };
 
         /**
