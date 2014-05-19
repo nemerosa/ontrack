@@ -10,18 +10,20 @@ import org.apache.commons.lang3.StringUtils;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static org.junit.Assert.assertEquals;
 
 public final class TestUtils {
 
     private static final ObjectMapper mapper = ObjectMapperFactory.create();
+    private static final AtomicLong counter = new AtomicLong();
 
     private TestUtils() {
     }
 
     public static String uid(String prefix) {
-        return prefix + new SimpleDateFormat("mmssSSS").format(new Date());
+        return prefix + new SimpleDateFormat("mmssSSS").format(new Date()) + counter.incrementAndGet();
     }
 
     public static String getEnvIfPresent(String systemProperty, String envProperty, String defaulValue) {

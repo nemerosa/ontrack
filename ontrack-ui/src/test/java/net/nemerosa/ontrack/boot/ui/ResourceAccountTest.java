@@ -23,13 +23,15 @@ public class ResourceAccountTest {
                         .with("account", object()
                                 .with("id", 1)
                                 .with("name", "admin")
+                                .with("fullName", "Administrator")
+                                .with("email", "")
                                 .with("role", "ADMINISTRATOR")
                                 .end())
                         .with("href", "urn:user")
                         .end(),
                 Resource.of(
                         ConnectedAccount.of(
-                                Account.of("admin", SecurityRole.ADMINISTRATOR)
+                                Account.of("admin", "Administrator", "", SecurityRole.ADMINISTRATOR)
                                         .with(ProjectCreation.class)
                                         .withId(ID.of(1))
                                         .lock()

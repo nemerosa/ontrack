@@ -42,6 +42,8 @@ public class AccountJdbcRepository extends AbstractJdbcRepository implements Acc
                 params("name", username).addValue("mode", mode),
                 (rs, rowNum) -> Account.of(
                         rs.getString("name"),
+                        rs.getString("fullName"),
+                        rs.getString("email"),
                         getEnum(SecurityRole.class, rs, "role")
                 ).withId(id(rs))
         );

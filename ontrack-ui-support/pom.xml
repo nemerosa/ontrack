@@ -12,6 +12,7 @@
     </parent>
 
     <artifactId>ontrack-ui-support</artifactId>
+    <name>ontrack UI Support</name>
 
     <dependencies>
         <!-- ontrack -->

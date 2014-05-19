@@ -14,10 +14,12 @@ import java.util.Set;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Account implements Entity {
 
-    public static Account of(String name, SecurityRole role) {
+    public static Account of(String name, String fullName, String email, SecurityRole role) {
         return new Account(
                 ID.NONE,
                 name,
+                fullName,
+                email,
                 role,
                 new HashSet<>(),
                 new HashSet<>(),
@@ -27,6 +29,8 @@ public class Account implements Entity {
 
     private final ID id;
     private final String name;
+    private final String fullName;
+    private final String email;
     private final SecurityRole role;
     @Getter(AccessLevel.PRIVATE)
     private final Set<Class<? extends GlobalFunction>> globalFunctions;
@@ -63,6 +67,8 @@ public class Account implements Entity {
         return new Account(
                 id,
                 name,
+                fullName,
+                email,
                 role,
                 globalFunctions,
                 projectFns,
@@ -74,6 +80,8 @@ public class Account implements Entity {
         return new Account(
                 id,
                 name,
+                fullName,
+                email,
                 role,
                 globalFunctions,
                 projectFns,

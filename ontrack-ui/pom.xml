@@ -11,7 +11,7 @@
 
     <artifactId>ontrack-ui</artifactId>
 
-    <name>ontrack Boot</name>
+    <name>ontrack UI</name>
 
     <!-- Add typical dependencies for a web application -->
     <dependencies>
