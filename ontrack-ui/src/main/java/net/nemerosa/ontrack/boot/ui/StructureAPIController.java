@@ -257,8 +257,10 @@ public class StructureAPIController extends AbstractResourceController implement
         return Resource.of(
                 branch,
                 uri(on(StructureAPIController.class).getBranch(branch.getId()))
-                // TODO Branch's project
-        );
+        )
+                // Branch's project
+                .with("projectLink", uri(on(StructureAPIController.class).getProject(branch.getProject().getId())))
+                ;
     }
 
     private Resource<Build> toBuildResource(Build build) {
@@ -282,8 +284,10 @@ public class StructureAPIController extends AbstractResourceController implement
                 promotionLevel,
                 uri(on(StructureAPIController.class).getPromotionLevel(promotionLevel.getId()))
         )
-                // TODO Branch link
-                // TODO Project link
+                // Branch link
+                .with("branchLink", uri(on(StructureAPIController.class).getBranch(promotionLevel.getBranch().getId())))
+                        // Project link
+                .with("projectLink", uri(on(StructureAPIController.class).getProject(promotionLevel.getBranch().getProject().getId())))
                 // TODO Image link
                 ;
     }
