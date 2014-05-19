@@ -38,7 +38,7 @@ public class AccountJdbcRepository extends AbstractJdbcRepository implements Acc
     @Override
     public Account findUserByNameAndMode(String username, String mode) {
         Account account = getFirstItem(
-                "SELECT * FROM ACCOUNT WHERE MODE = ':mode' AND NAME = :name",
+                "SELECT * FROM ACCOUNTS WHERE MODE = :mode AND NAME = :name",
                 params("name", username).addValue("mode", mode),
                 (rs, rowNum) -> Account.of(
                         rs.getString("name"),
