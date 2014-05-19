@@ -12,15 +12,14 @@ var ontrack = angular.module('ontrack', [
         // Views
         'ot.view.home',
         'ot.view.project',
-        'ot.view.branch'
+        'ot.view.branch',
+        'ot.view.promotionLevel'
     ])
         //HTTP configuration
         .config(function ($httpProvider) {
             // Authentication using cookies and CORS protection
             $httpProvider.defaults.withCredentials = true;
         })
-        // TODO Runs the initial security service (in case of refresh)
-        // TODO HTTP error interceptor
         // Routing configuration
         .config(function ($stateProvider, $urlRouterProvider) {
             // For any unmatched url, redirect to /state1
@@ -56,6 +55,7 @@ var ontrack = angular.module('ontrack', [
                 otUserService.logout().then(
                     function success() {
                         $log.debug('[app] Reloading after signing out.');
+                        // FIXME Goes back to the home page & reload
                         location.reload();
                     }
                 );

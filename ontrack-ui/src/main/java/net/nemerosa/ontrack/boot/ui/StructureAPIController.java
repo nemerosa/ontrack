@@ -196,7 +196,7 @@ public class StructureAPIController extends AbstractResourceController implement
     }
 
     @Override
-    @RequestMapping(value = "promotionLevels/{promotionLevelId}", method = RequestMethod.POST)
+    @RequestMapping(value = "promotionLevels/{promotionLevelId}", method = RequestMethod.GET)
     public Resource<PromotionLevel> getPromotionLevel(@PathVariable ID promotionLevelId) {
         return toPromotionLevelResourceWithActions(
                 structureService.getPromotionLevel(promotionLevelId)
