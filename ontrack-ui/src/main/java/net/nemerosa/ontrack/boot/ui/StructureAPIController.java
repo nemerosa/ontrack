@@ -156,6 +156,53 @@ public class StructureAPIController extends AbstractResourceController implement
         return toBuildResource(build);
     }
 
+    // Promotion levels
+
+    @RequestMapping(value = "branches/{branchId}/promotionLevels", method = RequestMethod.GET)
+    @Override
+    public ResourceCollection<PromotionLevel> getPromotionLevelListForBranch(@PathVariable ID branchId) {
+        Branch branch = structureService.getBranch(branchId);
+        return ResourceCollection.of(
+                structureService.getPromotionLevelListForBranch(branchId).stream().map(this::toPromotionLevelResource),
+                uri(on(StructureAPIController.class).getPromotionLevelListForBranch(branchId))
+        )
+                // Create
+                .with(
+                        Link.CREATE,
+                        uri(on(StructureAPIController.class).newPromotionLevelForm(branchId)),
+                        securityService.isProjectFunctionGranted(branch.getProject().id(), PromotionLevelCreate.class)
+                )
+                ;
+    }
+
+    @Override
+    @RequestMapping(value = "branches/{branchId}/promotionLevels/create", method = RequestMethod.GET)
+    public Form newPromotionLevelForm(@PathVariable ID branchId) {
+        structureService.getBranch(branchId);
+        return PromotionLevel.form();
+    }
+
+    @Override
+    @RequestMapping(value = "branches/{branchId}/promotionLevels/create", method = RequestMethod.POST)
+    public Resource<PromotionLevel> newPromotionLevel(@PathVariable ID branchId, @RequestBody NameDescription nameDescription) {
+        // Gets the holding branch
+        Branch branch = structureService.getBranch(branchId);
+        // Creates a new promotion level
+        PromotionLevel promotionLevel = PromotionLevel.of(branch, nameDescription);
+        // Saves it into the repository
+        promotionLevel = structureService.newPromotionLevel(promotionLevel);
+        // OK
+        return toPromotionLevelResource(promotionLevel);
+    }
+
+    @Override
+    @RequestMapping(value = "promotionLevels/{promotionLevelId}", method = RequestMethod.POST)
+    public Resource<PromotionLevel> getPromotionLevel(@PathVariable ID promotionLevelId) {
+        return toPromotionLevelResourceWithActions(
+                structureService.getPromotionLevel(promotionLevelId)
+        );
+    }
+
     // Resource assemblers
 
     private Resource<Project> toProjectResourceWithActions(Project project) {
@@ -192,6 +239,17 @@ public class StructureAPIController extends AbstractResourceController implement
                         uri(on(StructureAPIController.class).newBuild(branch.getId(), null)),
                         securityService.isProjectFunctionGranted(branch.getProject().id(), BuildCreate.class)
                 )
+                        // Promotion level creation
+                .with(
+                        "createPromotionLevel",
+                        uri(on(StructureAPIController.class).newPromotionLevelForm(branch.getId())),
+                        securityService.isProjectFunctionGranted(branch.getProject().id(), PromotionLevelCreate.class)
+                )
+                        // Promotion level list
+                .with(
+                        "promotionLevels",
+                        uri(on(StructureAPIController.class).getPromotionLevelListForBranch(branch.getId()))
+                )
                 ;
     }
 
@@ -209,5 +267,19 @@ public class StructureAPIController extends AbstractResourceController implement
                 // TODO Build link
                 URI.create("urn:build")
         );
+    }
+
+    private Resource<PromotionLevel> toPromotionLevelResourceWithActions(PromotionLevel promotionLevel) {
+        return toPromotionLevelResource(promotionLevel);
+        // TODO Update
+        // TODO Delete
+    }
+
+    private Resource<PromotionLevel> toPromotionLevelResource(PromotionLevel promotionLevel) {
+        return Resource.of(
+                promotionLevel,
+                uri(on(StructureAPIController.class).getPromotionLevel(promotionLevel.getId()))
+        );
+        // TODO Image link
     }
 }

@@ -27,4 +27,12 @@ public interface StructureService {
     Build newBuild(Build build);
 
     Build saveBuild(Build build);
+
+    // Promotion levels
+
+    List<PromotionLevel> getPromotionLevelListForBranch(ID branchId);
+
+    PromotionLevel newPromotionLevel(PromotionLevel promotionLevel);
+
+    PromotionLevel getPromotionLevel(ID promotionLevelId);
 }

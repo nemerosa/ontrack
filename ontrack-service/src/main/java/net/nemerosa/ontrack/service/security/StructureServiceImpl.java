@@ -105,4 +105,30 @@ public class StructureServiceImpl implements StructureService {
         // Repository
         return structureRepository.saveBuild(build);
     }
+
+    @Override
+    public List<PromotionLevel> getPromotionLevelListForBranch(ID branchId) {
+        Branch branch = getBranch(branchId);
+        securityService.checkProjectFunction(branch.getProject().id(), ProjectView.class);
+        return structureRepository.getPromotionLevelListForBranch(branchId);
+    }
+
+    @Override
+    public PromotionLevel newPromotionLevel(PromotionLevel promotionLevel) {
+        // Validation
+        isEntityNew(promotionLevel, "Promotion level must be new");
+        isEntityDefined(promotionLevel.getBranch(), "Branch must be defined");
+        isEntityDefined(promotionLevel.getBranch().getProject(), "Project must be defined");
+        // Security
+        securityService.checkProjectFunction(promotionLevel.getBranch().getProject().id(), PromotionLevelCreate.class);
+        // Repository
+        return structureRepository.newPromotionLevel(promotionLevel);
+    }
+
+    @Override
+    public PromotionLevel getPromotionLevel(ID promotionLevelId) {
+        PromotionLevel promotionLevel = structureRepository.getPromotionLevel(promotionLevelId);
+        securityService.checkProjectFunction(promotionLevel.getBranch().getProject().id(), ProjectView.class);
+        return promotionLevel;
+    }
 }

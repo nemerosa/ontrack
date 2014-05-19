@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.repository;
 
-import net.nemerosa.ontrack.model.structure.Branch;
-import net.nemerosa.ontrack.model.structure.Build;
-import net.nemerosa.ontrack.model.structure.ID;
-import net.nemerosa.ontrack.model.structure.Project;
+import net.nemerosa.ontrack.model.structure.*;
 
 import java.util.List;
 
@@ -32,4 +29,12 @@ public interface StructureRepository {
     Build newBuild(Build build);
 
     Build saveBuild(Build build);
+
+    // Promotion levels
+
+    List<PromotionLevel> getPromotionLevelListForBranch(ID branchId);
+
+    PromotionLevel newPromotionLevel(PromotionLevel promotionLevel);
+
+    PromotionLevel getPromotionLevel(ID promotionLevelId);
 }

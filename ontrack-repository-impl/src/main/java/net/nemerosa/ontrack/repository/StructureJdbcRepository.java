@@ -141,6 +141,63 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         }
     }
 
+    @Override
+    public List<PromotionLevel> getPromotionLevelListForBranch(ID branchId) {
+        Branch branch = getBranch(branchId);
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT * FROM PROMOTION_LEVELS WHERE BRANCHID = :branchId ORDER BY ORDERNB",
+                params("branchId", branchId.getValue()),
+                (rs, rowNum) -> toPromotionLevel(rs, id -> branch)
+        );
+    }
+
+    @Override
+    public PromotionLevel newPromotionLevel(PromotionLevel promotionLevel) {
+        // Creation
+        try {
+            // Order nb = max + 1
+            int orderNb = getFirstItem(
+                    "SELECT MAX(ORDERNB) FROM promotion_levels WHERE BRANCHID = :branchId",
+                    params("branchId", promotionLevel.getBranch().id()),
+                    int.class
+            ) + 1;
+            // Insertion
+            int id = dbCreate(
+                    "INSERT INTO PROMOTION_LEVELS(BRANCHID, NAME, DESCRIPTION, ORDERNB) VALUES (:branchId, :name, :description, :orderNb)",
+                    params("name", promotionLevel.getName())
+                            .addValue("description", promotionLevel.getDescription())
+                            .addValue("branchId", promotionLevel.getBranch().id())
+                            .addValue("orderNb", orderNb)
+            );
+            return promotionLevel.withId(id(id));
+        } catch (DuplicateKeyException ex) {
+            throw new PromotionLevelNameAlreadyDefinedException(promotionLevel.getName());
+        }
+    }
+
+    @Override
+    public PromotionLevel getPromotionLevel(ID promotionLevelId) {
+        try {
+            return getNamedParameterJdbcTemplate().queryForObject(
+                    "SELECT * FROM PROMOTION_LEVELS WHERE ID = :id",
+                    params("id", promotionLevelId.getValue()),
+                    (rs, rowNum) -> toPromotionLevel(rs, this::getBranch)
+            );
+        } catch (EmptyResultDataAccessException ex) {
+            throw new PromotionLevelNotFoundException(promotionLevelId);
+        }
+    }
+
+    protected PromotionLevel toPromotionLevel(ResultSet rs, Function<ID, Branch> branchSupplier) throws SQLException {
+        return PromotionLevel.of(
+                branchSupplier.apply(id(rs, "branchId")),
+                new NameDescription(
+                        rs.getString("name"),
+                        rs.getString("description")
+                )
+        ).withId(id(rs));
+    }
+
     protected Branch toBranch(ResultSet rs, Function<ID, Project> projectSupplier) throws SQLException {
         return Branch.of(
                 projectSupplier.apply(id(rs, "projectId")),
