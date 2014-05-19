@@ -1,9 +1,10 @@
 var HEART_BEAT = 30000; // 30 seconds
 
 angular.module('ot.service.user', [
-    'ot.service.core'
+    'ot.service.core',
+    'ot.service.form'
 ])
-    .service('otUserService', function (ot, $log, $interval, $http, $rootScope, otNotificationService) {
+    .service('otUserService', function (ot, $log, $interval, $http, $rootScope, otNotificationService, otFormService) {
         var self = {};
 
         /**
@@ -43,6 +44,19 @@ angular.module('ot.service.user', [
          */
         self.logged = function () {
             return $rootScope.user && $rootScope.user.present;
+        };
+
+        /**
+         * Login
+         */
+        self.login = function () {
+            return otFormService.display({
+                uri: $rootScope.user.login.href,
+                title: "Sign in",
+                submit: function (data) {
+                    return ot.call($http.post($rootScope.user.login.href, data));
+                }
+            });
         };
 
         return self;

@@ -29,7 +29,7 @@ var ontrack = angular.module('ontrack', [
              * User mgt
              */
 
-            // User heart beat initialisation at startup
+                // User heart beat initialisation at startup
             otUserService.init();
 
             // User status
@@ -37,11 +37,20 @@ var ontrack = angular.module('ontrack', [
                 return otUserService.logged();
             };
 
+            // Login
+            $scope.login = function () {
+                otUserService.login().then(
+                    function success() {
+                        location.reload();
+                    }
+                );
+            };
+
             /**
              * Scope methods
              */
 
-            // Notification
+                // Notification
 
             $scope.hasNotification = function () {
                 return angular.isDefined($rootScope.notification);

@@ -11,6 +11,9 @@
                 <!-- Type: text -->
                 <input ng-if="field.type == 'text'" ng-model="data[field.name]" name="{{field.name}}" maxlength="{{field.maxlength}}" type="text" class="form-control" ng-required="field.required" ng-pattern="field.pattern" />
 
+                <!-- Type: password -->
+                <input ng-if="field.type == 'password'" ng-model="data[field.name]" name="{{field.name}}" maxlength="{{field.maxlength}}" type="password" class="form-control" ng-required="field.required" />
+
                 <!-- Type: memo -->
                 <textarea ng-if="field.type == 'memo'" ng-model="data[field.name]" class="form-control" rows="{{field.rows}}" ng-required="field.required" maxlength="{{field.maxlength}}"></textarea>
 

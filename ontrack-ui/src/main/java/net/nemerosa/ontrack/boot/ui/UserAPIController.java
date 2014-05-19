@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.Account;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
@@ -42,6 +43,14 @@ public class UserAPIController extends AbstractResourceController implements Use
 
     @Override
     @RequestMapping(value = "login", method = RequestMethod.GET)
+    public Form loginForm() {
+        return Form.create()
+                .name()
+                .password();
+    }
+
+    @Override
+    @RequestMapping(value = "login", method = RequestMethod.POST)
     public Resource<Optional<Account>> login() {
         // Gets the current account
         Account account = securityService.getCurrentAccount();
@@ -62,7 +71,7 @@ public class UserAPIController extends AbstractResourceController implements Use
                 Optional.<Account>ofNullable(null),
                 uri(on(UserAPIController.class).getCurrentUser())
         )
-                .with("login", uri(on(UserAPIController.class).login()))
+                .with("login", uri(on(UserAPIController.class).loginForm()))
                 ;
     }
 

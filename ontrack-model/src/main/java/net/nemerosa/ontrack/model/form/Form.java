@@ -29,7 +29,16 @@ public class Form {
         );
     }
 
-    private Form description() {
+    public Form password() {
+        return with(
+                Password.of("password")
+                        .label("Password")
+                        .length(40)
+                        .validation("Password is required.")
+        );
+    }
+
+    public Form description() {
         return with(
                 Memo.of("description")
                         .label("Description")
