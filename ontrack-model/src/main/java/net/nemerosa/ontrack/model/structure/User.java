@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.model.structure;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 @Data
@@ -17,6 +18,7 @@ public class User {
         return new User(name);
     }
 
+    @JsonIgnore
     public boolean isAnonymous() {
         return ANONYMOUS.equals(name);
     }
