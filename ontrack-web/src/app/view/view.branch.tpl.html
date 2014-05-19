@@ -6,12 +6,18 @@
 
     </div>
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-5">
             <ot-section-title>Promotion levels</ot-section-title>
+            <ot-noentry list="promotionLevelCollection.resources">
+                No promotion level has been created yet.
+            </ot-noentry>
             <button ng-if="branch.createPromotionLevel" type="button" class="btn btn-default" ng-click="createPromotionLevel()">New promotion level</button>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-7">
             <ot-section-title>Validation stamps</ot-section-title>
+            <ot-noentry list="validationStampCollection.resources">
+                No validation stamp has been created yet.
+            </ot-noentry>
         </div>
     </div>
 </ot-view>
