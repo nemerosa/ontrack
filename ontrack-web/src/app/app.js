@@ -7,6 +7,8 @@ var ontrack = angular.module('ontrack', [
         // Directives
         'ot.directive.view',
         'ot.directive.misc',
+        // Services
+        'ot.service.user',
         // Views
         'ot.view.home',
         'ot.view.project',
@@ -21,6 +23,7 @@ var ontrack = angular.module('ontrack', [
             $urlRouterProvider.otherwise("/home");
         })
         // Main controller
-        .controller('AppCtrl', function () {
+        .controller('AppCtrl', function (otUserService) {
+            otUserService.init();
         })
     ;

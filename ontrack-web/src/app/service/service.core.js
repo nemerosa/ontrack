@@ -40,6 +40,7 @@ angular.module('ot.service.core', [
                 })
                 .error(function (response) {
                     d.reject({
+                        status: response.status,
                         type: 'error',
                         content: response.message
                     });
