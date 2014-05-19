@@ -51,6 +51,16 @@ var ontrack = angular.module('ontrack', [
                 );
             };
 
+            // Logout
+            $scope.logout = function () {
+                otUserService.logout().then(
+                    function success() {
+                        $log.debug('[app] Reloading after signing out.');
+                        location.reload();
+                    }
+                );
+            };
+
             /**
              * Scope methods
              */

@@ -23,20 +23,27 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        // @formatter:off
         http.antMatcher("/**")
-                // Only BASIC authentication
-                .httpBasic()
+            // Only BASIC authentication
+            .httpBasic()
                 .authenticationEntryPoint(apiBasicAuthenticationEntryPoint)
                 .realmName("ontrack")
                 .and()
-                        // FIXME CSRF protection for a stateless API?
-                        //.csrf().requireCsrfProtectionMatcher(new CSRFRequestMatcher()).and()
-                .csrf().disable()
-                // Allows all at Web level
-                .authorizeRequests()
+            // Logout set-up
+            .logout()
+                .logoutUrl("/user/logout")
+                .logoutSuccessUrl("/user/logged-out")
+                .and()
+            // FIXME CSRF protection for a stateless API?
+            //.csrf().requireCsrfProtectionMatcher(new CSRFRequestMatcher()).and()
+            .csrf().disable()
+            // Allows all at Web level
+            .authorizeRequests()
                 .antMatchers("/**").permitAll()
                 .anyRequest().authenticated()
         ;
+        // @formatter:on
     }
 
     @Override

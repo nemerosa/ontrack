@@ -67,6 +67,13 @@ angular.module('ot.service.user', [
             });
         };
 
+        /**
+         * Logout
+         */
+        self.logout = function () {
+            return ot.call($http.post('user/logout', {}));
+        };
+
         return self;
     })
 ;
