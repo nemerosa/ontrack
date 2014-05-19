@@ -28,7 +28,7 @@ public class AccountJdbcRepository extends AbstractJdbcRepository implements Acc
     @Override
     public boolean checkPassword(int accountId, Predicate<String> check) {
         String encodedPassword = getFirstItem(
-                "SELECT PASSWORD FROM ACCOUNTS WHERE MODE = 'PASSWORD' AND ID = :id",
+                "SELECT PASSWORD FROM ACCOUNTS WHERE MODE = 'password' AND ID = :id",
                 params("id", accountId),
                 String.class
         );
