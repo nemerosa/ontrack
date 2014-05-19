@@ -1,7 +1,7 @@
 angular.module('ot.service.user', [
     'ot.service.core'
 ])
-    .service('otUserService', function (ot, $log, $interval, $http, $rootScope) {
+    .service('otUserService', function (ot, $log, $interval, $http, $rootScope, otNotificationService) {
         var self = {};
 
         /**
@@ -9,7 +9,7 @@ angular.module('ot.service.user', [
          */
         self.init = function () {
             $log.debug('[user] init');
-            $interval(self.loadUser, 2000, 0);
+            $interval(self.loadUser, 10000, 0);
             self.loadUser();
         };
 
@@ -23,7 +23,8 @@ angular.module('ot.service.user', [
                 },
                 function error(message) {
                     $log.debug('[user] init - no user', message);
-                    // TODO Displays a general error
+                    // Displays a general error
+                    otNotificationService.error('Cannot connect. Please try later');
                 }
             );
         };

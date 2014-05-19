@@ -50,4 +50,20 @@ angular.module('ot.service.core', [
 
         return self;
     })
+    .service('otNotificationService', function ($rootScope) {
+        var self = {};
+
+        self.error = function (message) {
+            self.display('error', message);
+        };
+
+        self.display = function (type, message) {
+            $rootScope.message = {
+                type: type,
+                content: message
+            };
+        };
+
+        return self;
+    })
 ;
