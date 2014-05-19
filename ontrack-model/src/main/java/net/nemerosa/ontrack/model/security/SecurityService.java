@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.model.security;
 
+import net.nemerosa.ontrack.model.structure.Signature;
+
 public interface SecurityService {
 
     void checkGlobalFunction(Class<? extends GlobalFunction> fn);
@@ -11,4 +13,6 @@ public interface SecurityService {
     boolean isProjectFunctionGranted(int projectId, Class<? extends ProjectFunction> fn);
 
     Account getCurrentAccount();
+
+    Signature getCurrentSignature();
 }

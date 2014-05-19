@@ -20,4 +20,11 @@ public class Signature {
                 User.of(name)
         );
     }
+
+    public static Signature none() {
+        return new Signature(
+                LocalDateTime.now(),
+                User.anonymous()
+        );
+    }
 }

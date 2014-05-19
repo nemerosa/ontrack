@@ -146,8 +146,8 @@ public class StructureAPIController extends AbstractResourceController implement
     public Resource<Build> newBuild(@PathVariable ID branchId, @RequestBody NameDescription nameDescription) {
         // Gets the holding branch
         Branch branch = structureService.getBranch(branchId);
-        // TODO Build signature
-        Signature signature = Signature.of("TODO User");
+        // Build signature
+        Signature signature = securityService.getCurrentSignature();
         // Creates a new build
         Build build = Build.of(branch, nameDescription, signature);
         // Saves it into the repository

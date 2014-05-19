@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.model.security.Account;
 import net.nemerosa.ontrack.model.security.GlobalFunction;
 import net.nemerosa.ontrack.model.security.ProjectFunction;
 import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.structure.Signature;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -53,6 +54,16 @@ public class SecurityServiceImpl implements SecurityService {
             return (Account) authentication.getDetails();
         } else {
             return null;
+        }
+    }
+
+    @Override
+    public Signature getCurrentSignature() {
+        Account account = getCurrentAccount();
+        if (account != null) {
+            return Signature.of(account.getName());
+        } else {
+            return Signature.none();
         }
     }
 }
