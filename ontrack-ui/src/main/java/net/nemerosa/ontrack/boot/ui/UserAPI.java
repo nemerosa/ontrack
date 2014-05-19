@@ -9,4 +9,6 @@ public interface UserAPI {
 
     Resource<Optional<Account>> getCurrentUser();
 
+    Resource<Optional<Account>> login();
+
 }
