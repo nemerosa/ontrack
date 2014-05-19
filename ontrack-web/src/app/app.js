@@ -24,8 +24,22 @@ var ontrack = angular.module('ontrack', [
         })
         // Main controller
         .controller('AppCtrl', function ($scope, $rootScope, otUserService) {
-            // User heart beat
+
+            /**
+             * User mgt
+             */
+
+            // User heart beat initialisation at startup
             otUserService.init();
+
+            // User status
+            $scope.logged = function () {
+                return otUserService.logged();
+            };
+
+            /**
+             * Scope methods
+             */
 
             // Notification
 
@@ -41,5 +55,7 @@ var ontrack = angular.module('ontrack', [
             $scope.closeNotification = function () {
                 $rootScope.notification = undefined;
             };
+
+
         })
     ;

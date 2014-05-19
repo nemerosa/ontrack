@@ -1,3 +1,5 @@
+var HEART_BEAT = 30000; // 30 seconds
+
 angular.module('ot.service.user', [
     'ot.service.core'
 ])
@@ -9,7 +11,7 @@ angular.module('ot.service.user', [
          */
         self.init = function () {
             $log.debug('[user] init');
-            $interval(self.loadUser, 10000, 0);
+            $interval(self.loadUser, HEART_BEAT, 0);
             self.loadUser();
         };
 
@@ -28,10 +30,19 @@ angular.module('ot.service.user', [
                 },
                 function error(message) {
                     $log.debug('[user] load - no user', message);
+                    // Removes the user from the scope
+                    $rootScope.user = undefined;
                     // Displays a general error
                     otNotificationService.error('Cannot connect. Please try later');
                 }
             );
+        };
+
+        /**
+         * User logged?
+         */
+        self.logged = function () {
+            return $rootScope.user && $rootScope.user.present;
         };
 
         return self;
