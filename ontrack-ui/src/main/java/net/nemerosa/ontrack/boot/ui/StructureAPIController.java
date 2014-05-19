@@ -273,13 +273,18 @@ public class StructureAPIController extends AbstractResourceController implement
         return toPromotionLevelResource(promotionLevel);
         // TODO Update
         // TODO Delete
+        // TODO Next promotion level
+        // TODO Previous promotion level
     }
 
     private Resource<PromotionLevel> toPromotionLevelResource(PromotionLevel promotionLevel) {
         return Resource.of(
                 promotionLevel,
                 uri(on(StructureAPIController.class).getPromotionLevel(promotionLevel.getId()))
-        );
-        // TODO Image link
+        )
+                // TODO Branch link
+                // TODO Project link
+                // TODO Image link
+                ;
     }
 }
