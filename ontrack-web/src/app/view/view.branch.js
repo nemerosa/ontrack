@@ -52,5 +52,11 @@ angular.module('ot.view.branch', [
         loadBranch();
         // TODO Loading the project's view
         // TODO Project commands
+
+        // Creation of a promotion level
+        $scope.createPromotionLevel = function () {
+            otStructureService.createPromotionLevel($scope.branch.createPromotionLevel.href).then(loadBranch);
+        };
+
     })
 ;
