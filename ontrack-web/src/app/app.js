@@ -27,7 +27,7 @@ var ontrack = angular.module('ontrack', [
             $urlRouterProvider.otherwise("/home");
         })
         // Main controller
-        .controller('AppCtrl', function ($scope, $rootScope, otUserService) {
+        .controller('AppCtrl', function ($log, $scope, $rootScope, otUserService) {
 
             /**
              * User mgt
@@ -45,6 +45,7 @@ var ontrack = angular.module('ontrack', [
             $scope.login = function () {
                 otUserService.login().then(
                     function success() {
+                        $log.debug('[app] Reloading after signing in.');
                         location.reload();
                     }
                 );
