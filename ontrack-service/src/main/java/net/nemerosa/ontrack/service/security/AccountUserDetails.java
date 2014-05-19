@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service.security;
 
 import lombok.Data;
 import net.nemerosa.ontrack.model.security.Account;
+import net.nemerosa.ontrack.model.security.AccountHolder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,7 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 
 @Data
-public class AccountUserDetails implements UserDetails {
+public class AccountUserDetails implements UserDetails, AccountHolder {
 
     private final Account account;
 

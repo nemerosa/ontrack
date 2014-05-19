@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.it;
 
 import net.nemerosa.ontrack.common.RunProfile;
-import net.nemerosa.ontrack.model.security.Account;
-import net.nemerosa.ontrack.model.security.GlobalFunction;
-import net.nemerosa.ontrack.model.security.ProjectFunction;
-import net.nemerosa.ontrack.model.security.SecurityRole;
+import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.test.TestUtils;
 import org.junit.runner.RunWith;
@@ -88,7 +85,7 @@ public abstract class AbstractITTestSupport extends AbstractJUnit4SpringContextT
                     "",
                     account.getRole().name()
             );
-            authentication.setDetails(account);
+            authentication.setDetails((AccountHolder) () -> account);
             context.setAuthentication(authentication);
             SecurityContextHolder.setContext(context);
         }

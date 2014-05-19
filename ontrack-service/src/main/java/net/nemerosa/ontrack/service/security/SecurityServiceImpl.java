@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.service.security;
 
-import net.nemerosa.ontrack.model.security.Account;
-import net.nemerosa.ontrack.model.security.GlobalFunction;
-import net.nemerosa.ontrack.model.security.ProjectFunction;
-import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.Signature;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
@@ -50,8 +47,8 @@ public class SecurityServiceImpl implements SecurityService {
     public Account getCurrentAccount() {
         SecurityContext context = SecurityContextHolder.getContext();
         Authentication authentication = context.getAuthentication();
-        if (authentication != null && authentication.isAuthenticated() && (authentication.getDetails() instanceof Account)) {
-            return (Account) authentication.getDetails();
+        if (authentication != null && authentication.isAuthenticated() && (authentication.getDetails() instanceof AccountHolder)) {
+            return ((AccountHolder) authentication.getDetails()).getAccount();
         } else {
             return null;
         }
