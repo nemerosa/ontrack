@@ -94,7 +94,18 @@ angular.module('ot.service.structure', [
                             title: 'Image for promotion level ' + promotionLevel.name,
                             image: {
                                 present: promotionLevel.image,
-                                href: promotionLevel.image.href
+                                href: promotionLevel.imageLink.href
+                            },
+                            submit: function (file) {
+                                var fd = new FormData();
+                                fd.append('file', file);
+                                return ot.call($http.put(
+                                    promotionLevel.imageLink.href,
+                                    fd, {
+                                        transformRequest: angular.identity,
+                                        headers: {'Content-Type': undefined}
+                                    }
+                                ));
                             }
                         };
                     }

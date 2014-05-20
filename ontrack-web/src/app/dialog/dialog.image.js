@@ -7,10 +7,9 @@ angular.module('ot.dialog.image', [])
             $modalInstance.dismiss('cancel');
         };
         // Submitting the dialog
-        $scope.submit = function (isValid) {
-            if (isValid) {
-                // TODO Validation
-                config.formConfig.submit($scope.data).then(
+        $scope.submit = function (file) {
+            if (file) {
+                config.submit(file).then(
                     function success() {
                         $modalInstance.close('ok');
                     },
