@@ -1,6 +1,7 @@
 angular.module('ot.view.home', [
     'ui.router',
-    'ot.service.structure'
+    'ot.service.structure',
+    'ot.service.core'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('home', {
@@ -9,7 +10,8 @@ angular.module('ot.view.home', [
             controller: 'HomeCtrl'
         });
     })
-    .controller('HomeCtrl', function ($rootScope, $scope, otStructureService) {
+    .controller('HomeCtrl', function ($rootScope, $location, $scope, otStructureService, otNotificationService) {
+        var code = $location.search().code;
         $rootScope.view = {
             // TODO Breadcrumbs
             // Title
@@ -37,8 +39,15 @@ angular.module('ot.view.home', [
                     }
                 ];
             });
+            // Any notification?
+            if (code) {
+                if (code == 403) {
+                    otNotificationService.error("Due to the access to an unauthorized page, you have been redirected to the home page.");
+                }
+            }
         }
 
         loadProjects();
+
     })
 ;

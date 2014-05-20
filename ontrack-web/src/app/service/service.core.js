@@ -39,11 +39,18 @@ angular.module('ot.service.core', [
                     d.resolve(result);
                 })
                 .error(function (response) {
-                    d.reject({
-                        status: response.status,
-                        type: 'error',
-                        content: response.message
-                    });
+                    if (response.status == 403) {
+                        // Goes back to the home back and refreshes with a status
+                        location.href = '#/home?code=403';
+                        // Rejects the current closure
+                        d.reject();
+                    } else {
+                        d.reject({
+                            status: response.status,
+                            type: 'error',
+                            content: response.message
+                        });
+                    }
                 });
             return d.promise;
         };
