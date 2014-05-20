@@ -13,6 +13,9 @@
             </ot-noentry>
             <table class="ot-promotionLevel-table">
                 <tr ng-repeat="promotionLevel in promotionLevelCollection.resources">
+                    <td class="ot-entity-image">
+                        <ot-entity-image entity="promotionLevel" link="#/promotionLevel/{{promotionLevel.id}}"></ot-entity-image>
+                    </td>
                     <td>
                         <a href="#/promotionLevel/{{promotionLevel.id}}">
                             {{promotionLevel.name}}
