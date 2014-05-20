@@ -1,24 +1,48 @@
 package net.nemerosa.ontrack.service.security;
 
 import net.nemerosa.ontrack.it.AbstractITTestSupport;
-import net.nemerosa.ontrack.model.security.ProjectCreation;
-import net.nemerosa.ontrack.model.security.ProjectEdit;
-import net.nemerosa.ontrack.model.security.ProjectList;
-import net.nemerosa.ontrack.model.security.ProjectView;
-import net.nemerosa.ontrack.model.structure.Project;
-import net.nemerosa.ontrack.model.structure.StructureService;
+import net.nemerosa.ontrack.model.security.*;
+import net.nemerosa.ontrack.model.structure.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
+@Transactional
 public class StructureServiceTest extends AbstractITTestSupport {
 
     @Autowired
     private StructureService structureService;
+
+    @Test(expected = IllegalArgumentException.class)
+    public void newProject_null() throws Exception {
+        structureService.newProject(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void newProject_existing() throws Exception {
+        structureService.newProject(Project.of(nameDescription()).withId(ID.of(1)));
+    }
+
+    @Test
+    public void newProject() throws Exception {
+        Project project = doCreateProject();
+        assertNotNull(project);
+        Entity.isEntityDefined(project, "Project must be defined");
+        Project p = asUser().with(project.id(), ProjectView.class).call(() -> structureService.getProject(project.getId()));
+        assertEquals(project, p);
+    }
+
+    @Test
+    public void newBranch() throws Exception {
+        Branch branch = doCreateBranch();
+        assertNotNull(branch);
+        Branch b = asUser().with(branch.getProject().id(), ProjectView.class).call(() -> structureService.getBranch(branch.getId()));
+        assertEquals(branch, b);
+    }
 
     @Test
     public void getProjectList_all() throws Exception {
@@ -49,6 +73,49 @@ public class StructureServiceTest extends AbstractITTestSupport {
         List<Project> list = asUser()
                 .call(structureService::getProjectList);
         assertEquals(0, list.size());
+    }
+
+    @Test
+    public void promotionLevel_image_none() throws Exception {
+        PromotionLevel promotionLevel = doCreatePromotionLevel();
+        Document image = structureService.getPromotionLevelImage(promotionLevel.getId());
+        assertNull("No image", image);
+    }
+
+    private PromotionLevel doCreatePromotionLevel() throws Exception {
+        Branch branch = doCreateBranch();
+        return doCreatePromotionLevel(branch, nameDescription());
+    }
+
+    private PromotionLevel doCreatePromotionLevel(Branch branch, NameDescription nameDescription) throws Exception {
+        return asUser().with(branch.getProject().id(), PromotionLevelCreate.class).call(() ->
+                        structureService.newPromotionLevel(
+                                PromotionLevel.of(
+                                        branch, nameDescription
+                                )
+                        )
+        );
+    }
+
+    private Branch doCreateBranch() throws Exception {
+        Project project = doCreateProject();
+        return doCreateBranch(project, nameDescription());
+    }
+
+    private Branch doCreateBranch(Project project, NameDescription nameDescription) throws Exception {
+        return asUser().with(project.id(), BranchCreate.class).call(() -> structureService.newBranch(
+                Branch.of(project, nameDescription)
+        ));
+    }
+
+    private Project doCreateProject() throws Exception {
+        return doCreateProject(nameDescription());
+    }
+
+    private Project doCreateProject(NameDescription nameDescription) throws Exception {
+        return asUser().with(ProjectCreation.class).call(() -> structureService.newProject(
+                Project.of(nameDescription)
+        ));
     }
 
     private int[] doCreateProjects() throws Exception {
