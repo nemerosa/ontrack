@@ -36,7 +36,7 @@ public class ITConfig {
     }
 
     @Bean
-    public PlatformTransactionManager txManager() throws IOException {
+    public PlatformTransactionManager transactionManager() throws IOException {
         return new DataSourceTransactionManager(dataSource());
     }
 }

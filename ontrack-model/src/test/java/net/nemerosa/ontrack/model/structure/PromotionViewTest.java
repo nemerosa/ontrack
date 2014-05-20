@@ -13,9 +13,9 @@ public class PromotionViewTest {
         PromotionView view = new PromotionView(
                 PromotionLevel.of(
                         Branch.of(
-                                Project.of(new NameDescription("P", "Project")),
+                                Project.of(new NameDescription("P", "Project")).withId(ID.of(1)),
                                 new NameDescription("B", "Branch")
-                        ),
+                        ).withId(ID.of(1)),
                         new NameDescription("PL", "Promotion level")
                 ),
                 null,
@@ -28,11 +28,11 @@ public class PromotionViewTest {
                                 .with("name", "PL")
                                 .with("description", "Promotion level")
                                 .with("branch", object()
-                                        .with("id", 0)
+                                        .with("id", 1)
                                         .with("name", "B")
                                         .with("description", "Branch")
                                         .with("project", object()
-                                                .with("id", 0)
+                                                .with("id", 1)
                                                 .with("name", "P")
                                                 .with("description", "Project")
                                                 .end())
@@ -48,8 +48,8 @@ public class PromotionViewTest {
 
     @Test
     public void build_json() throws JsonProcessingException {
-        Project project = Project.of(new NameDescription("P", "Project"));
-        Branch branch = Branch.of(project, new NameDescription("B", "Branch"));
+        Project project = Project.of(new NameDescription("P", "Project")).withId(ID.of(1));
+        Branch branch = Branch.of(project, new NameDescription("B", "Branch")).withId(ID.of(1));
         PromotionLevel promotionLevel = PromotionLevel.of(branch, new NameDescription("PL", "Promotion level"));
         PromotionView view = new PromotionView(
                 promotionLevel,
@@ -70,11 +70,11 @@ public class PromotionViewTest {
                                 .with("name", "PL")
                                 .with("description", "Promotion level")
                                 .with("branch", object()
-                                        .with("id", 0)
+                                        .with("id", 1)
                                         .with("name", "B")
                                         .with("description", "Branch")
                                         .with("project", object()
-                                                .with("id", 0)
+                                                .with("id", 1)
                                                 .with("name", "P")
                                                 .with("description", "Project")
                                                 .end())
