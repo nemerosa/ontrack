@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.ResourceCollection;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -214,10 +215,10 @@ public class StructureAPIController extends AbstractResourceController implement
         if (file == null) {
             return new ResponseEntity<>(new byte[0], HttpStatus.NO_CONTENT);
         } else {
-            ResponseEntity<byte[]> response = new ResponseEntity<>(file.getContent(), HttpStatus.OK);
-            response.getHeaders().setContentLength(file.getContent().length);
-            response.getHeaders().setContentType(MediaType.parseMediaType(file.getType()));
-            return response;
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.setContentLength(file.getContent().length);
+            responseHeaders.setContentType(MediaType.parseMediaType(file.getType()));
+            return new ResponseEntity<>(file.getContent(), responseHeaders, HttpStatus.OK);
         }
     }
 
