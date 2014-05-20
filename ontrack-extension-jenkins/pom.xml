@@ -11,20 +11,15 @@
         <version>2.0.0.ALPHA-SNAPSHOT</version>
     </parent>
 
-    <artifactId>ontrack-extension-support</artifactId>
-    <name>ontrack Extension Support</name>
+    <artifactId>ontrack-extension-jenkins</artifactId>
+    <name>ontrack Extension Jenkins</name>
 
     <dependencies>
         <!-- ontrack -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>ontrack-extension-api</artifactId>
+            <artifactId>ontrack-extension-support</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <!-- Spring -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
         </dependency>
         <!-- Lombok -->
         <dependency>

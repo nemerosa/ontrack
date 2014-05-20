@@ -51,6 +51,7 @@
         <module>ontrack-repository-impl</module>
         <module>ontrack-extension-api</module>
         <module>ontrack-extension-support</module>
+        <module>ontrack-extension-jenkins</module>
     </modules>
 
     <dependencyManagement>

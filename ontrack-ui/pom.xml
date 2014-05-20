@@ -130,6 +130,16 @@
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
         </dependency>
+
+        <!-- Extensions -->
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ontrack-extension-jenkins</artifactId>
+            <version>${project.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
     </dependencies>
 
     <!-- Package as an executable jar -->
