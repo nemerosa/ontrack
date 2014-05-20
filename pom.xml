@@ -49,6 +49,7 @@
         <module>ontrack-repository</module>
         <module>ontrack-ui-support</module>
         <module>ontrack-repository-impl</module>
+        <module>ontrack-extension-api</module>
     </modules>
 
     <dependencyManagement>
