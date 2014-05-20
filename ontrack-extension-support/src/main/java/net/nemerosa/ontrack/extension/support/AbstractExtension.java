@@ -1,31 +1,18 @@
 package net.nemerosa.ontrack.extension.support;
 
 import net.nemerosa.ontrack.extension.api.Extension;
+import net.nemerosa.ontrack.extension.api.ExtensionFeature;
 
 public abstract class AbstractExtension implements Extension {
 
-    private final String id;
-    private final String name;
-    private final String description;
+    private final ExtensionFeature extensionFeature;
 
-    public AbstractExtension(String id, String name, String description) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
+    public AbstractExtension(ExtensionFeature extensionFeature) {
+        this.extensionFeature = extensionFeature;
     }
 
     @Override
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
+    public ExtensionFeature getFeature() {
+        return extensionFeature;
     }
 }
