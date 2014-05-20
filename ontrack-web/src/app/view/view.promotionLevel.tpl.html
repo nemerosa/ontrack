@@ -7,7 +7,7 @@
                     <img ng-if="!promotionLevel.image" src="assets/default_promotion_level.png" class="ot-icon ot-entity-image-default" title="Default image"/>
                     <img ng-if="promotionLevel.image" ng-src="{{promotionLevel.imageLink.href}}" class="ot-icon"/>
                     <span ng-if="!promotionLevel.image" class="ot-entity-image-default">No image</span>
-                    <button type="button" class="btn btn-info btn-sm">Change image</button>
+                    <button type="button" class="btn btn-info btn-sm" ng-click="changeImage()">Change image</button>
                 </div>
             </div>
         </div>

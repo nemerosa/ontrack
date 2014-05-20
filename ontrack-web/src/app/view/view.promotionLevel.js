@@ -33,5 +33,10 @@ angular.module('ot.view.promotionLevel', [
         // Initialisation
         loadPromotionLevel();
 
+        // Changing the image
+        $scope.changeImage = function () {
+            otStructureService.changePromotionLevelImage($scope.promotionLevel).then(loadPromotionLevel);
+        };
+
     })
 ;

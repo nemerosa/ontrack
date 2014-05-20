@@ -1,8 +1,9 @@
 angular.module('ot.service.structure', [
     'ot.service.core',
-    'ot.service.form'
+    'ot.service.form',
+    'ot.dialog.image'
 ])
-    .service('otStructureService', function (ot, $interpolate, $http, otFormService) {
+    .service('otStructureService', function (ot, $q, $interpolate, $http, $modal, otFormService) {
         var self = {};
 
         /**
@@ -77,6 +78,36 @@ angular.module('ot.service.structure', [
          */
         self.createPromotionLevel = function (uri) {
             return self.create(uri, 'New promotion level');
+        };
+
+        /**
+         * Changing the image of a promotion level
+         */
+        self.changePromotionLevelImage = function (promotionLevel) {
+            var d = $q.defer();
+            $modal.open({
+                templateUrl: 'app/dialog/dialog.image.tpl.html',
+                controller: 'otDialogImage',
+                resolve: {
+                    config: function () {
+                        return {
+                            title: 'Image for promotion level ' + promotionLevel.name,
+                            image: {
+                                present: promotionLevel.image,
+                                href: promotionLevel.image.href
+                            }
+                        };
+                    }
+                }
+            }).result.then(
+                function success() {
+                    d.resolve();
+                },
+                function error() {
+                    d.reject();
+                }
+            );
+            return d.promise;
         };
 
         return self;
