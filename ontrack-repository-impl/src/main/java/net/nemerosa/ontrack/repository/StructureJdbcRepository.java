@@ -204,8 +204,8 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         getNamedParameterJdbcTemplate().update(
                 "UPDATE PROMOTION_LEVELS SET IMAGETYPE = :type, IMAGEBYTES = :content WHERE ID = :id",
                 params("id", promotionLevelId.getValue())
-                        .addValue("type", document.getType())
-                        .addValue("content", document.getContent())
+                        .addValue("type", document != null ? document.getType() : null)
+                        .addValue("content", document != null ? document.getContent() : null)
         );
     }
 

@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.service.security;
 
 import net.nemerosa.ontrack.it.AbstractITTestSupport;
+import net.nemerosa.ontrack.model.exceptions.ImageFileSizeException;
+import net.nemerosa.ontrack.model.exceptions.ImageTypeNotAcceptedException;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.test.TestUtils;
@@ -95,6 +97,43 @@ public class StructureServiceTest extends AbstractITTestSupport {
         Document d = view(promotionLevel, () -> structureService.getPromotionLevelImage(promotionLevel.getId()));
         // Checks
         assertEquals(image, d);
+    }
+
+    @Test(expected = ImageTypeNotAcceptedException.class)
+    public void promotionLevel_image_type_not_acceptable() throws Exception {
+        PromotionLevel promotionLevel = doCreatePromotionLevel();
+        // Gets an image
+        Document image = new Document("image/x", new byte[1]);
+        // Sets the image
+        structureService.setPromotionLevelImage(promotionLevel.getId(), image);
+    }
+
+    @Test(expected = ImageFileSizeException.class)
+    public void promotionLevel_image_size_not_acceptable() throws Exception {
+        PromotionLevel promotionLevel = doCreatePromotionLevel();
+        // Gets an image
+        Document image = new Document("image/png", new byte[16001]);
+        // Sets the image
+        structureService.setPromotionLevelImage(promotionLevel.getId(), image);
+    }
+
+    @Test
+    public void promotionLevel_image_null() throws Exception {
+        PromotionLevel promotionLevel = doCreatePromotionLevel();
+        // Gets an image
+        Document image = new Document("image/png", TestUtils.resourceBytes("/promotionLevelImage1.png"));
+        // Sets the image
+        asUser().with(promotionLevel.getBranch().getProject().id(), PromotionLevelEdit.class).call(() -> {
+            // New image
+            structureService.setPromotionLevelImage(promotionLevel.getId(), image);
+            // Removes the image
+            structureService.setPromotionLevelImage(promotionLevel.getId(), null);
+            return null;
+        });
+        // Gets the image
+        Document d = view(promotionLevel, () -> structureService.getPromotionLevelImage(promotionLevel.getId()));
+        // Checks
+        assertNull(d);
     }
 
     private PromotionLevel doCreatePromotionLevel() throws Exception {

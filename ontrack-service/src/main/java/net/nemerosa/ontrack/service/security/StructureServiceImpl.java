@@ -153,18 +153,18 @@ public class StructureServiceImpl implements StructureService {
 
     @Override
     public void setPromotionLevelImage(ID promotionLevelId, Document document) {
-        // Checks access
-        PromotionLevel promotionLevel = getPromotionLevel(promotionLevelId);
-        securityService.checkProjectFunction(promotionLevel.getBranch().getProject().id(), PromotionLevelEdit.class);
         // Checks the image type
-        if (!ArrayUtils.contains(ACCEPTED_IMAGE_TYPES, document.getType())) {
+        if (document != null && !ArrayUtils.contains(ACCEPTED_IMAGE_TYPES, document.getType())) {
             throw new ImageTypeNotAcceptedException(document.getType(), ACCEPTED_IMAGE_TYPES);
         }
         // Checks the image length
-        int size = document.getContent().length;
+        int size = document != null ? document.getContent().length : 0;
         if (size > ICON_IMAGE_SIZE_MAX) {
             throw new ImageFileSizeException(size, ICON_IMAGE_SIZE_MAX);
         }
+        // Checks access
+        PromotionLevel promotionLevel = getPromotionLevel(promotionLevelId);
+        securityService.checkProjectFunction(promotionLevel.getBranch().getProject().id(), PromotionLevelEdit.class);
         // Repository
         structureRepository.setPromotionLevelImage(promotionLevelId, document);
     }
