@@ -11,9 +11,12 @@ public class PromotionViewTest {
     @Test
     public void no_build_json() throws JsonProcessingException {
         PromotionView view = new PromotionView(
-                new PromotionLevel(ID.NONE, "PL", "Promotion level",
-                        new Branch(ID.NONE, "B", "Branch",
-                                new Project(ID.NONE, "P", "Project"))
+                PromotionLevel.of(
+                        Branch.of(
+                                Project.of(new NameDescription("P", "Project")),
+                                new NameDescription("B", "Branch")
+                        ),
+                        new NameDescription("PL", "Promotion level")
                 ),
                 null,
                 null
@@ -45,9 +48,9 @@ public class PromotionViewTest {
 
     @Test
     public void build_json() throws JsonProcessingException {
-        Project project = new Project(ID.NONE, "P", "Project");
-        Branch branch = new Branch(ID.NONE, "B", "Branch", project);
-        PromotionLevel promotionLevel = new PromotionLevel(ID.NONE, "PL", "Promotion level", branch);
+        Project project = Project.of(new NameDescription("P", "Project"));
+        Branch branch = Branch.of(project, new NameDescription("B", "Branch"));
+        PromotionLevel promotionLevel = PromotionLevel.of(branch, new NameDescription("PL", "Promotion level"));
         PromotionView view = new PromotionView(
                 promotionLevel,
                 Build.of(branch, new NameDescription("11", "Build 11"), Signature.of(dateTime(), "User")),

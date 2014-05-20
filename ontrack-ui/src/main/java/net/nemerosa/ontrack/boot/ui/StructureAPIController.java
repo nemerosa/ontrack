@@ -9,10 +9,11 @@ import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.ResourceCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 
@@ -207,18 +208,17 @@ public class StructureAPIController extends AbstractResourceController implement
     }
 
     @RequestMapping(value = "promotionLevels/{promotionLevelId}/image", method = RequestMethod.GET)
-    public void getPromotionLevelImage(@PathVariable ID promotionLevelId, HttpServletResponse response) throws IOException {
+    public ResponseEntity<byte[]> getPromotionLevelImage_(@PathVariable ID promotionLevelId) {
         // Gets the file
         Document file = getPromotionLevelImage(promotionLevelId);
         if (file == null) {
-            response.sendError(HttpServletResponse.SC_NO_CONTENT);
-            return;
+            return new ResponseEntity<>(new byte[0], HttpStatus.NO_CONTENT);
+        } else {
+            ResponseEntity<byte[]> response = new ResponseEntity<>(file.getContent(), HttpStatus.OK);
+            response.getHeaders().setContentLength(file.getContent().length);
+            response.getHeaders().setContentType(MediaType.parseMediaType(file.getType()));
+            return response;
         }
-        // Writes as a file
-        response.setContentType(file.getType());
-        // Outputs a file
-        response.getOutputStream().write(file.getContent());
-        response.getOutputStream().flush();
     }
 
     @RequestMapping(value = "promotionLevels/{promotionLevelId}/image", method = RequestMethod.PUT)
@@ -329,7 +329,7 @@ public class StructureAPIController extends AbstractResourceController implement
                         // Project link
                 .with("projectLink", uri(on(StructureAPIController.class).getProject(promotionLevel.getBranch().getProject().getId())))
                         // Image link
-                .with("image", uri(on(StructureAPIController.class).getPromotionLevelImage(promotionLevel.getId())))
+                .with("imageLink", uri(on(StructureAPIController.class).getPromotionLevelImage_(promotionLevel.getId())))
                 ;
     }
 }

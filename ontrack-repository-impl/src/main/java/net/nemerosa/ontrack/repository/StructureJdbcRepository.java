@@ -216,7 +216,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                         rs.getString("name"),
                         rs.getString("description")
                 )
-        ).withId(id(rs));
+        ).withId(id(rs)).withImage(StringUtils.isNotBlank(rs.getString("imagetype")));
     }
 
     protected Branch toBranch(ResultSet rs, Function<ID, Project> projectSupplier) throws SQLException {
