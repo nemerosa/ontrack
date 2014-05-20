@@ -16,4 +16,7 @@ public class Action {
         return new Action(id, name, String.format(uriFragment, parameters));
     }
 
+    public Action prepend(String path) {
+        return new Action(id, name, path + uriFragment);
+    }
 }
