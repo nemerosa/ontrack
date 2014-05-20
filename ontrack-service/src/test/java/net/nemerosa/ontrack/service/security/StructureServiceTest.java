@@ -5,13 +5,11 @@ import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 import static org.junit.Assert.*;
 
-@Transactional
 public class StructureServiceTest extends AbstractITTestSupport {
 
     @Autowired
@@ -78,7 +76,7 @@ public class StructureServiceTest extends AbstractITTestSupport {
     @Test
     public void promotionLevel_image_none() throws Exception {
         PromotionLevel promotionLevel = doCreatePromotionLevel();
-        Document image = structureService.getPromotionLevelImage(promotionLevel.getId());
+        Document image = view(promotionLevel, () -> structureService.getPromotionLevelImage(promotionLevel.getId()));
         assertNull("No image", image);
     }
 

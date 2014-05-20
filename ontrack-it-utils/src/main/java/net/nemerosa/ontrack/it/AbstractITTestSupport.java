@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.it;
 import net.nemerosa.ontrack.common.RunProfile;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.NameDescription;
+import net.nemerosa.ontrack.model.structure.PromotionLevel;
 import net.nemerosa.ontrack.test.TestUtils;
 import org.junit.runner.RunWith;
 import org.springframework.context.annotation.ComponentScan;
@@ -17,6 +18,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.Callable;
 
@@ -24,6 +26,7 @@ import java.util.concurrent.Callable;
 @ContextConfiguration(
         loader = AnnotationConfigContextLoader.class,
         classes = AbstractITTestSupport.AbstractIntegrationTestConfiguration.class)
+@Transactional
 @ActiveProfiles(profiles = {RunProfile.UNIT_TEST})
 public abstract class AbstractITTestSupport extends AbstractJUnit4SpringContextTests {
 
@@ -43,6 +46,10 @@ public abstract class AbstractITTestSupport extends AbstractJUnit4SpringContextT
 
     protected UserCall asUser() {
         return new UserCall();
+    }
+
+    protected <T> T view(PromotionLevel promotionLevel, Callable<T> callable) throws Exception {
+        return asUser().with(promotionLevel.getBranch().getProject().id(), ProjectView.class).call(callable);
     }
 
     protected static interface ContextCall {
