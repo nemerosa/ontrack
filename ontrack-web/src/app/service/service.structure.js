@@ -99,7 +99,7 @@ angular.module('ot.service.structure', [
                             submit: function (file) {
                                 var fd = new FormData();
                                 fd.append('file', file);
-                                return ot.call($http.put(
+                                return ot.call($http.post(
                                     promotionLevel.imageLink.href,
                                     fd, {
                                         transformRequest: angular.identity,

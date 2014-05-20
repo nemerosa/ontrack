@@ -221,7 +221,7 @@ public class StructureAPIController extends AbstractResourceController implement
         }
     }
 
-    @RequestMapping(value = "promotionLevels/{promotionLevelId}/image", method = RequestMethod.PUT)
+    @RequestMapping(value = "promotionLevels/{promotionLevelId}/image", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void setPromotionLevelImage(@PathVariable ID promotionLevelId, @RequestParam MultipartFile file) throws IOException {
         setPromotionLevelImage(
