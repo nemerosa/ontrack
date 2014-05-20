@@ -1,7 +1,15 @@
 <ot-view>
     <div class="row">
-        <div class="col-md-12">
-            <img ng-src="{{promotionLevel.image.href}}" />
+        <div class="col-md-5">
+            <div class="row">
+                <!-- TODO Factorises with validation stamp using a directive -->
+                <div class="col-md-12 ot-entity-image">
+                    <img ng-if="!promotionLevel.image" src="assets/default_promotion_level.png" class="ot-icon ot-entity-image-default" title="Default image"/>
+                    <img ng-if="promotionLevel.image" ng-src="{{promotionLevel.imageLink.href}}" class="ot-icon"/>
+                    <span ng-if="!promotionLevel.image" class="ot-entity-image-default">No image</span>
+                    <button type="button" class="btn btn-info btn-sm">Change image</button>
+                </div>
+            </div>
         </div>
     </div>
 </ot-view>
