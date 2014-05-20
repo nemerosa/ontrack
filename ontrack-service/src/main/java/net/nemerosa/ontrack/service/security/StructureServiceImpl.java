@@ -154,7 +154,8 @@ public class StructureServiceImpl implements StructureService {
     @Override
     public void setPromotionLevelImage(ID promotionLevelId, Document document) {
         // Checks access
-        getPromotionLevel(promotionLevelId);
+        PromotionLevel promotionLevel = getPromotionLevel(promotionLevelId);
+        securityService.checkProjectFunction(promotionLevel.getBranch().getProject().id(), PromotionLevelEdit.class);
         // Checks the image type
         if (!ArrayUtils.contains(ACCEPTED_IMAGE_TYPES, document.getType())) {
             throw new ImageTypeNotAcceptedException(document.getType(), ACCEPTED_IMAGE_TYPES);

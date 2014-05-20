@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.service.security;
 import net.nemerosa.ontrack.it.AbstractITTestSupport;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.test.TestUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -78,6 +79,22 @@ public class StructureServiceTest extends AbstractITTestSupport {
         PromotionLevel promotionLevel = doCreatePromotionLevel();
         Document image = view(promotionLevel, () -> structureService.getPromotionLevelImage(promotionLevel.getId()));
         assertNull("No image", image);
+    }
+
+    @Test
+    public void promotionLevel_image_add() throws Exception {
+        PromotionLevel promotionLevel = doCreatePromotionLevel();
+        // Gets an image
+        Document image = new Document("image/png", TestUtils.resourceBytes("/promotionLevelImage1.png"));
+        // Sets the image
+        asUser().with(promotionLevel.getBranch().getProject().id(), PromotionLevelEdit.class).call(() -> {
+            structureService.setPromotionLevelImage(promotionLevel.getId(), image);
+            return null;
+        });
+        // Gets the image
+        Document d = view(promotionLevel, () -> structureService.getPromotionLevelImage(promotionLevel.getId()));
+        // Checks
+        assertEquals(image, d);
     }
 
     private PromotionLevel doCreatePromotionLevel() throws Exception {

@@ -1,4 +1,4 @@
 package net.nemerosa.ontrack.model.security;
 
-public interface ProjectEdit extends ProjectView, BuildCreate {
+public interface ProjectEdit extends ProjectView, BuildCreate, PromotionLevelCreate, PromotionLevelEdit {
 }

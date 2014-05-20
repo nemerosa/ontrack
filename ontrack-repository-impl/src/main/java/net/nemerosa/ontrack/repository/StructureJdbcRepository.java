@@ -194,7 +194,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     public Document getPromotionLevelImage(ID promotionLevelId) {
         return getFirstItem(
                 "SELECT IMAGETYPE, IMAGEBYTES FROM PROMOTION_LEVELS WHERE ID = :id",
-                params("id", promotionLevelId),
+                params("id", promotionLevelId.getValue()),
                 (rs, rowNum) -> toDocument(rs)
         );
     }
@@ -203,7 +203,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     public void setPromotionLevelImage(ID promotionLevelId, Document document) {
         getNamedParameterJdbcTemplate().update(
                 "UPDATE PROMOTION_LEVELS SET IMAGETYPE = :type, IMAGEBYTES = :content WHERE ID = :id",
-                params("id", promotionLevelId)
+                params("id", promotionLevelId.getValue())
                         .addValue("type", document.getType())
                         .addValue("content", document.getContent())
         );

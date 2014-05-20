@@ -5,8 +5,10 @@ import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -93,4 +95,7 @@ public final class TestUtils {
         return "2014-05-13T20:11:00Z";
     }
 
+    public static byte[] resourceBytes(String path) throws IOException {
+        return IOUtils.toByteArray(TestUtils.class.getResource(path));
+    }
 }

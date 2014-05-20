@@ -77,6 +77,11 @@
                 <artifactId>commons-lang3</artifactId>
                 <version>3.2.1</version>
             </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.4</version>
+            </dependency>
             <!-- DBInit -->
             <dependency>
                 <groupId>net.sf.dbinit</groupId>
