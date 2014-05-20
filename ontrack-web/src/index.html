@@ -48,6 +48,10 @@
                         <b class="caret"></b>
                     </a>
                     <ul class="dropdown-menu" role="menu">
+                        <!-- All actions -->
+                        <li ng-repeat="action in user.actions">
+                            <a id="{{action.id}}" href="#{{action.uriFragment}}">{{action.name}}</a>
+                        </li>
                         <!-- Logout -->
                         <li>
                             <a id="user-logout" ng-click="logout()">Sign out</a>
