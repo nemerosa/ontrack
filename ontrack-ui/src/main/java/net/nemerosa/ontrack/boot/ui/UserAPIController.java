@@ -89,14 +89,14 @@ public class UserAPIController extends AbstractResourceController implements Use
     }
 
     private Resource<ConnectedAccount> toLoggedAccountResource(Account account) {
-        Resource<ConnectedAccount> user = Resource.of(
-                ConnectedAccount.of(account),
+        ConnectedAccount user = userMenu(ConnectedAccount.of(account));
+        return Resource.of(
+                user,
                 uri(on(UserAPIController.class).getCurrentUser())
         );
-        return userMenu(user);
     }
 
-    private Resource<ConnectedAccount> userMenu(Resource<ConnectedAccount> user) {
+    private ConnectedAccount userMenu(ConnectedAccount user) {
         // TODO Settings
         // TODO Profile
         // TODO Account management
@@ -107,7 +107,7 @@ public class UserAPIController extends AbstractResourceController implements Use
         return user;
     }
 
-    private Resource<ConnectedAccount> userMenuExtensions(Resource<ConnectedAccount> user) {
+    private ConnectedAccount userMenuExtensions(ConnectedAccount user) {
         // Gets the list of user menu extensions
         Collection<UserMenuExtension> extensions = extensionManager.getExtensions(UserMenuExtension.class);
         // For each extension
@@ -115,7 +115,8 @@ public class UserAPIController extends AbstractResourceController implements Use
             // Granted?
             Class<? extends GlobalFunction> fn = extension.getGlobalFunction();
             if (fn == null || securityService.isGlobalFunctionGranted(fn)) {
-                // FIXME Adds the menu entry
+                // Adds the menu entry
+                user.add(extension.getAction());
             }
         }
         // OK
