@@ -1,7 +1,23 @@
 <ot-view>
     <div class="row">
         <div class="col-md-12">
-
+            <ot-section-title>List of configurations</ot-section-title>
+            <ot-noentry list="settings.configurations">
+                No Jenkins configuration has been created yet.
+            </ot-noentry>
+            <table class="table">
+                <tr ng-repeat="configuration in settings.configurations">
+                    <td>
+                        {{configuration.name}}
+                    </td>
+                    <td>
+                        <span ng-if="configuration.user">
+                            {{configuration.user}} @
+                        </span>
+                        <a href="{{configuration.url}}" target="_blank">{{configuration.url}}</a>
+                    </td>
+                </tr>
+            </table>
         </div>
     </div>
 </ot-view>
