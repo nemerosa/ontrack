@@ -1,8 +1,10 @@
 package net.nemerosa.ontrack.repository;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.exceptions.JsonParsingException;
+import net.nemerosa.ontrack.model.exceptions.JsonWritingException;
 import net.nemerosa.ontrack.model.structure.ID;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
@@ -80,6 +82,14 @@ public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSuppor
             return null;
         } else {
             return Enum.valueOf(enumClass, value);
+        }
+    }
+
+    protected String writeJson(Object any) {
+        try {
+            return objectMapper.writeValueAsString(any);
+        } catch (JsonProcessingException e) {
+            throw new JsonWritingException(e);
         }
     }
 

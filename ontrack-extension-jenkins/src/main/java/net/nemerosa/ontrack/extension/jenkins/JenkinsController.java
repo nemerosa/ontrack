@@ -7,9 +7,7 @@ import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -44,6 +42,29 @@ public class JenkinsController extends AbstractExtensionController<JenkinsExtens
     @RequestMapping(value = "settings/configuration/create", method = RequestMethod.GET)
     public Form getConfigurationForm() {
         return JenkinsConfiguration.form();
+    }
+
+    /**
+     * Creating a configuration
+     */
+    @RequestMapping(value = "settings/configuration/create", method = RequestMethod.POST)
+    public Resource<JenkinsConfiguration> newConfiguration(@RequestBody JenkinsConfiguration configuration) {
+        return toConfigurationResource(jenkinsService.newConfiguration(configuration));
+    }
+
+    private Resource<JenkinsConfiguration> toConfigurationResource(JenkinsConfiguration configuration) {
+        return Resource.of(
+                configuration,
+                uri(on(getClass()).getConfiguration(configuration.getName()))
+        );
+    }
+
+    /**
+     * Gets one configuration
+     */
+    @RequestMapping(value = "settings/configuration/{name}", method = RequestMethod.GET)
+    public Resource<JenkinsConfiguration> getConfiguration(@PathVariable String name) {
+        return toConfigurationResource(jenkinsService.getConfiguration(name));
     }
 
 }

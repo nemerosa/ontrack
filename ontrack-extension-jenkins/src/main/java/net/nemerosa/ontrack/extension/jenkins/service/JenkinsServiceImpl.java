@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.jenkins.service;
 
 import net.nemerosa.ontrack.extension.jenkins.model.JenkinsConfiguration;
+import net.nemerosa.ontrack.extension.jenkins.model.JenkinsConfigurationNotFoundException;
 import net.nemerosa.ontrack.extension.jenkins.model.JenkinsService;
 import net.nemerosa.ontrack.extension.jenkins.model.JenkinsSettings;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
@@ -24,6 +25,18 @@ public class JenkinsServiceImpl implements JenkinsService {
         return new JenkinsSettings(
                 configurationRepository.list(JenkinsConfiguration.class)
         );
+    }
+
+    @Override
+    public JenkinsConfiguration newConfiguration(JenkinsConfiguration configuration) {
+        return configurationRepository.save(configuration);
+    }
+
+    @Override
+    public JenkinsConfiguration getConfiguration(String name) {
+        return configurationRepository
+                .find(JenkinsConfiguration.class, name)
+                .orElseThrow(() -> new JenkinsConfigurationNotFoundException(name));
     }
 
 }

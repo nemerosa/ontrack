@@ -4,4 +4,7 @@ public interface JenkinsService {
 
     JenkinsSettings getSettings();
 
+    JenkinsConfiguration newConfiguration(JenkinsConfiguration configuration);
+
+    JenkinsConfiguration getConfiguration(String name);
 }
