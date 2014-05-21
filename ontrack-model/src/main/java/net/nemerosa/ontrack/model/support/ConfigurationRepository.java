@@ -19,4 +19,10 @@ public interface ConfigurationRepository {
      * Saves or creates a configuration
      */
     <T extends Configuration> T save(T configuration);
+
+    /**
+     * Deletes a configuration
+     */
+    <T extends Configuration> void delete(Class<T> configurationClass, String name);
+
 }

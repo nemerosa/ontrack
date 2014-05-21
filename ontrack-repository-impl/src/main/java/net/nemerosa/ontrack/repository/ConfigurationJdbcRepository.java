@@ -62,4 +62,12 @@ public class ConfigurationJdbcRepository extends AbstractJdbcRepository implemen
         // OK
         return configuration;
     }
+
+    @Override
+    public <T extends Configuration> void delete(Class<T> configurationClass, String name) {
+        getNamedParameterJdbcTemplate().update(
+                "DELETE FROM CONFIGURATIONS WHERE TYPE = :type AND NAME = :name",
+                params("type", configurationClass.getName()).addValue("name", name)
+        );
+    }
 }

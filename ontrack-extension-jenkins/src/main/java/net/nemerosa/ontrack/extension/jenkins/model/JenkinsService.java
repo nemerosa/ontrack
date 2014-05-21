@@ -7,4 +7,6 @@ public interface JenkinsService {
     JenkinsConfiguration newConfiguration(JenkinsConfiguration configuration);
 
     JenkinsConfiguration getConfiguration(String name);
+
+    void deleteConfiguration(String name);
 }

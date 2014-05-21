@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -65,6 +66,15 @@ public class JenkinsController extends AbstractExtensionController<JenkinsExtens
     @RequestMapping(value = "settings/configuration/{name}", method = RequestMethod.GET)
     public Resource<JenkinsConfiguration> getConfiguration(@PathVariable String name) {
         return toConfigurationResource(jenkinsService.getConfiguration(name));
+    }
+
+    /**
+     * Deleting one configuration
+     */
+    @RequestMapping(value = "settings/configuration/{name}", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.GONE)
+    public void deleteConfiguration(@PathVariable String name) {
+        jenkinsService.deleteConfiguration(name);
     }
 
 }

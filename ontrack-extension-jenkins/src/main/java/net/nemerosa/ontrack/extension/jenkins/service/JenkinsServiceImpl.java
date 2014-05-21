@@ -39,4 +39,9 @@ public class JenkinsServiceImpl implements JenkinsService {
                 .orElseThrow(() -> new JenkinsConfigurationNotFoundException(name));
     }
 
+    @Override
+    public void deleteConfiguration(String name) {
+        configurationRepository.delete(JenkinsConfiguration.class, name);
+    }
+
 }
