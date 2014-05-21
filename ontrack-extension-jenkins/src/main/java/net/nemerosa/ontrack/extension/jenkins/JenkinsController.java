@@ -1,8 +1,10 @@
 package net.nemerosa.ontrack.extension.jenkins;
 
+import net.nemerosa.ontrack.extension.jenkins.model.JenkinsConfiguration;
 import net.nemerosa.ontrack.extension.jenkins.model.JenkinsService;
 import net.nemerosa.ontrack.extension.jenkins.model.JenkinsSettings;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
+import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,6 +34,14 @@ public class JenkinsController extends AbstractExtensionController<JenkinsExtens
                 jenkinsService.getSettings(),
                 uri(on(getClass()).getSettings())
         );
+    }
+
+    /**
+     * Form for a configuration
+     */
+    @RequestMapping(value = "settings/configuration/create", method = RequestMethod.GET)
+    public Form getConfigurationForm() {
+        return JenkinsConfiguration.form();
     }
 
 }

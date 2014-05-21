@@ -48,6 +48,10 @@ public class Form {
         );
     }
 
+    public Form url() {
+        return with(Url.of());
+    }
+
     public Form with(Field field) {
         fields.put(field.getName(), field);
         return this;
