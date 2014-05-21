@@ -1,12 +1,17 @@
 package net.nemerosa.ontrack.repository;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import net.nemerosa.ontrack.json.ObjectMapperFactory;
+import net.nemerosa.ontrack.model.exceptions.JsonParsingException;
 import net.nemerosa.ontrack.model.structure.ID;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 
 import javax.sql.DataSource;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -14,6 +19,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSupport {
+
+    private final ObjectMapper objectMapper = ObjectMapperFactory.create();
 
     protected AbstractJdbcRepository(DataSource dataSource) {
         setDataSource(dataSource);
@@ -75,4 +82,18 @@ public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSuppor
             return Enum.valueOf(enumClass, value);
         }
     }
+
+    protected <T> T readJson(Class<T> type, ResultSet rs, String column) throws SQLException {
+        String json = rs.getString(column);
+        try {
+            if (StringUtils.isBlank(json)) {
+                return null;
+            } else {
+                return objectMapper.readValue(json, type);
+            }
+        } catch (IOException ex) {
+            throw new JsonParsingException(json, ex);
+        }
+    }
+
 }
