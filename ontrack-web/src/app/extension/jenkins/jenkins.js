@@ -10,7 +10,7 @@ angular.module('ontrack.extension.jenkins', [
             controller: 'JenkinsSettingsCtrl'
         });
     })
-    .controller('JenkinsSettingsCtrl', function ($scope, ot) {
+    .controller('JenkinsSettingsCtrl', function ($scope, $http, ot) {
         var view = ot.view();
         view.title = 'Jenkins settings';
         view.description = 'Management of the Jenkins settings and configurations.';
@@ -18,9 +18,13 @@ angular.module('ontrack.extension.jenkins', [
             ot.viewCloseCommand('/home')
         ];
 
-        // TODO Loading the Jenkins configurations
-        function loadJenkinsConfigurations() {
+        // Loading the Jenkins settings
+        function loadJenkinsSettings() {
+            ot.call($http.get('extension/jenkins/settings')).then(function (settings) {
+                $scope.settings = settings;
+            });
         }
-        loadJenkinsConfigurations();
+
+        loadJenkinsSettings();
     })
 ;
