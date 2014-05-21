@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import java.net.URI;
 
+import static net.nemerosa.ontrack.json.JsonUtils.array;
 import static net.nemerosa.ontrack.json.JsonUtils.object;
 import static net.nemerosa.ontrack.test.TestUtils.assertJsonWrite;
 
@@ -27,6 +28,7 @@ public class ResourceAccountTest {
                                 .with("email", "")
                                 .with("role", "ADMINISTRATOR")
                                 .end())
+                        .with("actions", array().end())
                         .with("href", "urn:user")
                         .end(),
                 Resource.of(
@@ -46,6 +48,7 @@ public class ResourceAccountTest {
         assertJsonWrite(
                 object()
                         .with("account", (String) null)
+                        .with("actions", array().end())
                         .with("href", "urn:user")
                         .end(),
                 Resource.of(
