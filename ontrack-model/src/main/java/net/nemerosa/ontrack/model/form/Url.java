@@ -12,7 +12,7 @@ public class Url extends AbstractText<Url> {
     }
 
     public static Url of() {
-        return of("url");
+        return of("url").label("URL");
     }
 
     public static Url of(String name) {

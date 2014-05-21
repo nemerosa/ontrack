@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 @Data
 public class Text extends AbstractText<Text> {
 
-    private String regex;
+    private String regex = ".*";
 
     protected Text(String name) {
         super("text", name);

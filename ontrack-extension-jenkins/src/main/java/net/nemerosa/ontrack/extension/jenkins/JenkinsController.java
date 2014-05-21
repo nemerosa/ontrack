@@ -33,7 +33,9 @@ public class JenkinsController extends AbstractExtensionController<JenkinsExtens
         return Resource.of(
                 jenkinsService.getSettings(),
                 uri(on(getClass()).getSettings())
-        );
+        )
+                .with("createConfiguration", uri(on(getClass()).getConfigurationForm()))
+                ;
     }
 
     /**
