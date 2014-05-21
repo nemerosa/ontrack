@@ -5,6 +5,8 @@ import net.nemerosa.ontrack.extension.jenkins.model.JenkinsConfigurationNotFound
 import net.nemerosa.ontrack.extension.jenkins.model.JenkinsService;
 import net.nemerosa.ontrack.extension.jenkins.model.JenkinsSettings;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +44,12 @@ public class JenkinsServiceImpl implements JenkinsService {
     @Override
     public void deleteConfiguration(String name) {
         configurationRepository.delete(JenkinsConfiguration.class, name);
+    }
+
+    @Override
+    public void updateConfiguration(String name, JenkinsConfiguration configuration) {
+        Validate.isTrue(StringUtils.equals(name, configuration.getName()), "Configuration name must match");
+        configurationRepository.save(configuration);
     }
 
 }

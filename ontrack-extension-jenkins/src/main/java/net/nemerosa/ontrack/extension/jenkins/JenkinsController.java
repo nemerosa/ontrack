@@ -77,4 +77,13 @@ public class JenkinsController extends AbstractExtensionController<JenkinsExtens
         jenkinsService.deleteConfiguration(name);
     }
 
+    /**
+     * Updating one configuration
+     */
+    @RequestMapping(value = "settings/configuration/{name}", method = RequestMethod.PUT)
+    public Resource<JenkinsConfiguration> updateConfiguration(@PathVariable String name, @RequestBody JenkinsConfiguration configuration) {
+        jenkinsService.updateConfiguration(name, configuration);
+        return getConfiguration(name);
+    }
+
 }
