@@ -5,7 +5,7 @@ angular.module('ontrack.extension.jenkins', [
         // Jenkins management
         $stateProvider.state('jenkins-management', {
             url: '/extension/jenkins/management',
-            templateUrl: 'extension/jenkins/view.management.tpl.html',
+            templateUrl: 'app/extension/jenkins/management.tpl.html',
             controller: 'JenkinsManagementCtrl'
         });
     })
