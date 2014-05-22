@@ -146,7 +146,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                         rs.getString("description")
                 ),
                 readSignature(rs)
-        );
+        ).withId(id(rs));
     }
 
     @Override

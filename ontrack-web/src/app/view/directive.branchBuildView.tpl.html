@@ -1,2 +1,16 @@
-Branch build view.
-        {{view}}
+<table class="ot-branch-build-view">
+    <thead>
+    <!-- TODO Validation stamps -->
+    <!-- TODO Validation stamps decorations -->
+    </thead>
+    <tbody>
+    <tr ng-repeat="build in view.builds">
+        <td>
+            <!-- Build name and link -->
+            <a href="#/build/{{build.id}}" class="ot-branch-build-view-build-name">
+                {{build.name}}
+            </a>
+        </td>
+    </tr>
+    </tbody>
+</table>
