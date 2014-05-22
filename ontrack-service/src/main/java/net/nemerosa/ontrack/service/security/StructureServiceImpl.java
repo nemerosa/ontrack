@@ -6,11 +6,14 @@ import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.repository.StructureRepository;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static net.nemerosa.ontrack.model.structure.Entity.isEntityDefined;
@@ -115,6 +118,18 @@ public class StructureServiceImpl implements StructureService {
         securityService.checkProjectFunction(build.getBranch().getProject().id(), ProjectEdit.class);
         // Repository
         return structureRepository.saveBuild(build);
+    }
+
+    @Override
+    public BranchBuildView getBranchBuildView(ID branchId) {
+        // Gets the branch
+        Branch branch = getBranch(branchId);
+        // TODO Defines a filter
+        Predicate<Build> buildFilter = b -> true;
+        // TODO Collects the builds associated with this predicate
+        List<Build> builds = new ArrayList<>();
+        // OK
+        return new BranchBuildView(builds);
     }
 
     @Override

@@ -28,6 +28,12 @@ public interface StructureService {
 
     Build saveBuild(Build build);
 
+    /**
+     * Branch builds
+     */
+    // TODO Filter on builds
+    BranchBuildView getBranchBuildView(ID branchId);
+
     // Promotion levels
 
     List<PromotionLevel> getPromotionLevelListForBranch(ID branchId);
