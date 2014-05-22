@@ -1,16 +1,20 @@
 package net.nemerosa.ontrack.extension.jenkins;
 
+import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.jenkins.model.JenkinsConfiguration;
 import net.nemerosa.ontrack.extension.jenkins.model.JenkinsService;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.security.GlobalSettings;
+import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.ResourceCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import java.util.stream.Collectors;
 
@@ -21,11 +25,23 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 public class JenkinsController extends AbstractExtensionController<JenkinsExtensionFeature> {
 
     private final JenkinsService jenkinsService;
+    private final SecurityService securityService;
 
     @Autowired
-    public JenkinsController(JenkinsExtensionFeature feature, JenkinsService jenkinsService) {
+    public JenkinsController(JenkinsExtensionFeature feature, JenkinsService jenkinsService, SecurityService securityService) {
         super(feature);
         this.jenkinsService = jenkinsService;
+        this.securityService = securityService;
+    }
+
+    @RequestMapping(value = "", method = RequestMethod.GET)
+    public Resource<ExtensionFeatureDescription> getDescription() {
+        return Resource.of(
+                feature.getFeatureDescription(),
+                uri(MvcUriComponentsBuilder.on(getClass()).getDescription())
+        )
+                .with("configurations", uri(on(getClass()).getConfigurations()), securityService.isGlobalFunctionGranted(GlobalSettings.class))
+                ;
     }
 
     /**
