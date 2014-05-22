@@ -32,6 +32,18 @@
             <ot-noentry list="validationStampCollection.resources">
                 No validation stamp has been created yet.
             </ot-noentry>
+            <table class="ot-validationStamp-table">
+                <tr ng-repeat="validationStamp in validationStampCollection.resources">
+                    <td class="ot-entity-image">
+                        <ot-entity-image entity="validationStamp" link="#/validationStamp/{{validationStamp.id}}"></ot-entity-image>
+                    </td>
+                    <td>
+                        <a href="#/validationStamp/{{validationStamp.id}}">
+                            {{validationStamp.name}}
+                        </a>
+                    </td>
+                </tr>
+            </table>
             <button ng-if="branch.createValidationStamp" type="button" class="btn btn-default"
                     ng-click="createValidationStamp()">New validation stamp
             </button>
