@@ -1,15 +1,15 @@
 package net.nemerosa.ontrack.extension.jenkins.model;
 
 import lombok.Data;
+import net.nemerosa.ontrack.extension.support.configurations.UserPasswordConfiguration;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Password;
 import net.nemerosa.ontrack.model.form.Text;
-import net.nemerosa.ontrack.model.support.Configuration;
 
 import static net.nemerosa.ontrack.model.form.Form.defaultText;
 
 @Data
-public class JenkinsConfiguration implements Configuration<JenkinsConfiguration> {
+public class JenkinsConfiguration implements UserPasswordConfiguration<JenkinsConfiguration> {
 
     private final String name;
     private final String url;
@@ -42,6 +42,7 @@ public class JenkinsConfiguration implements Configuration<JenkinsConfiguration>
                 .fill("password", "");
     }
 
+    @Override
     public JenkinsConfiguration withPassword(String password) {
         return new JenkinsConfiguration(
                 name,
