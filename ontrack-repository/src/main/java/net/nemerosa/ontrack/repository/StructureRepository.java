@@ -30,6 +30,8 @@ public interface StructureRepository {
 
     Build saveBuild(Build build);
 
+    List<Build> builds(Branch branch, BuildFilter buildFilter);
+
     // Promotion levels
 
     List<PromotionLevel> getPromotionLevelListForBranch(ID branchId);

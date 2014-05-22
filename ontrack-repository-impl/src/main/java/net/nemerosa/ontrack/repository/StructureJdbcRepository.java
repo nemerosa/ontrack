@@ -11,8 +11,10 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 @Repository
 public class StructureJdbcRepository extends AbstractJdbcRepository implements StructureRepository {
@@ -106,6 +108,45 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         } catch (DuplicateKeyException ex) {
             throw new BranchNameAlreadyDefinedException(branch.getName());
         }
+    }
+
+    @Override
+    public List<Build> builds(Branch branch, BuildFilter buildFilter) {
+        // TODO The filter could contribute to the SQL to accelerate the search
+        return getNamedParameterJdbcTemplate().execute(
+                "SELECT * FROM BUILDS WHERE BRANCHID = :branchId ORDER BY ID DESC",
+                params("branchId", branch.id()),
+                ps -> {
+                    ResultSet rs = ps.executeQuery();
+                    List<Build> builds = new ArrayList<>();
+                    while (rs.next()) {
+                        Build build = toBuild(
+                                rs,
+                                () -> branch
+                        );
+                        // TODO Filter on number of builds
+                        // TODO Prefiltering without the promotions & validations
+                        // TODO Promotion runs
+                        // TODO Validation runs
+                        // TODO Final filtering
+                        // OK
+                        builds.add(build);
+                    }
+                    // List
+                    return builds;
+                }
+        );
+    }
+
+    protected Build toBuild(ResultSet rs, Supplier<Branch> branchSupplier) throws SQLException {
+        return Build.of(
+                branchSupplier.get(),
+                new NameDescription(
+                        rs.getString("name"),
+                        rs.getString("description")
+                ),
+                readSignature(rs)
+        );
     }
 
     @Override

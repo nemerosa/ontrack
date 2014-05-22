@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.exceptions.JsonParsingException;
 import net.nemerosa.ontrack.model.exceptions.JsonWritingException;
 import net.nemerosa.ontrack.model.structure.ID;
+import net.nemerosa.ontrack.model.structure.Signature;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -74,6 +75,25 @@ public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSuppor
         } else {
             return time.format(DateTimeFormatter.ISO_DATE_TIME);
         }
+    }
+
+    protected LocalDateTime dateTimeFromDB(String value) {
+        if (StringUtils.isBlank(value)) {
+            return null;
+        } else {
+            return LocalDateTime.parse(value, DateTimeFormatter.ISO_DATE_TIME);
+        }
+    }
+
+    protected Signature readSignature(ResultSet rs) throws SQLException {
+        return readSignature(rs, "creation", "creator");
+    }
+
+    protected Signature readSignature(ResultSet rs, String creationColumn, String creatorColumn) throws SQLException {
+        return Signature.of(
+                dateTimeFromDB(rs.getString(creationColumn)),
+                rs.getString(creatorColumn)
+        );
     }
 
     protected <E extends Enum<E>> E getEnum(Class<E> enumClass, ResultSet rs, String columnName) throws SQLException {
