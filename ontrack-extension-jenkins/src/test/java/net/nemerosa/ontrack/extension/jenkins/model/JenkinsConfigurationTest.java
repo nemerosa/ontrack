@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.jenkins.model;
 
+import net.nemerosa.ontrack.extension.jenkins.JenkinsConfiguration;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

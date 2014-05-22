@@ -1,7 +1,5 @@
-package net.nemerosa.ontrack.extension.jenkins.service;
+package net.nemerosa.ontrack.extension.jenkins;
 
-import net.nemerosa.ontrack.extension.jenkins.model.JenkinsConfiguration;
-import net.nemerosa.ontrack.extension.jenkins.model.JenkinsService;
 import net.nemerosa.ontrack.extension.support.configurations.AbstractConfigurationService;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
@@ -11,10 +9,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-public class JenkinsServiceImpl extends AbstractConfigurationService<JenkinsConfiguration> implements JenkinsService {
+public class JenkinsConfigurationServiceImpl extends AbstractConfigurationService<JenkinsConfiguration> implements JenkinsConfigurationService {
 
     @Autowired
-    public JenkinsServiceImpl(ConfigurationRepository configurationRepository, SecurityService securityService) {
+    public JenkinsConfigurationServiceImpl(ConfigurationRepository configurationRepository, SecurityService securityService) {
         super(JenkinsConfiguration.class, configurationRepository, securityService);
     }
 

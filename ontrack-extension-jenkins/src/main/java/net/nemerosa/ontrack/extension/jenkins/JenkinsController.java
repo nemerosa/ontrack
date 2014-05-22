@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.extension.jenkins;
 
 import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
-import net.nemerosa.ontrack.extension.jenkins.model.JenkinsConfiguration;
-import net.nemerosa.ontrack.extension.jenkins.model.JenkinsService;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
@@ -24,11 +22,11 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 @RestController
 public class JenkinsController extends AbstractExtensionController<JenkinsExtensionFeature> {
 
-    private final JenkinsService jenkinsService;
+    private final JenkinsConfigurationService jenkinsService;
     private final SecurityService securityService;
 
     @Autowired
-    public JenkinsController(JenkinsExtensionFeature feature, JenkinsService jenkinsService, SecurityService securityService) {
+    public JenkinsController(JenkinsExtensionFeature feature, JenkinsConfigurationService jenkinsService, SecurityService securityService) {
         super(feature);
         this.jenkinsService = jenkinsService;
         this.securityService = securityService;
@@ -57,7 +55,7 @@ public class JenkinsController extends AbstractExtensionController<JenkinsExtens
                         .collect(Collectors.toList()),
                 uri(on(getClass()).getConfigurations())
         )
-                .with("createConfiguration", uri(on(getClass()).getConfigurationForm()))
+                .with(Link.CREATE, uri(on(getClass()).getConfigurationForm()))
                 ;
     }
 

@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.jenkins.model;
+package net.nemerosa.ontrack.extension.svn;
 
 import lombok.Data;
 import net.nemerosa.ontrack.extension.support.configurations.UserPasswordConfiguration;
@@ -9,7 +9,7 @@ import net.nemerosa.ontrack.model.form.Text;
 import static net.nemerosa.ontrack.model.form.Form.defaultText;
 
 @Data
-public class JenkinsConfiguration implements UserPasswordConfiguration<JenkinsConfiguration> {
+public class SVNConfiguration implements UserPasswordConfiguration<SVNConfiguration> {
 
     private final String name;
     private final String url;
@@ -25,8 +25,8 @@ public class JenkinsConfiguration implements UserPasswordConfiguration<JenkinsCo
     }
 
     @Override
-    public JenkinsConfiguration obfuscate() {
-        return new JenkinsConfiguration(
+    public SVNConfiguration obfuscate() {
+        return new SVNConfiguration(
                 name,
                 url,
                 user,
@@ -43,8 +43,8 @@ public class JenkinsConfiguration implements UserPasswordConfiguration<JenkinsCo
     }
 
     @Override
-    public JenkinsConfiguration withPassword(String password) {
-        return new JenkinsConfiguration(
+    public SVNConfiguration withPassword(String password) {
+        return new SVNConfiguration(
                 name,
                 url,
                 user,
