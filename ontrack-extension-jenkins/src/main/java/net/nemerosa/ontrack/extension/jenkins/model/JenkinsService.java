@@ -1,8 +1,10 @@
 package net.nemerosa.ontrack.extension.jenkins.model;
 
+import java.util.Collection;
+
 public interface JenkinsService {
 
-    JenkinsSettings getSettings();
+    Collection<JenkinsConfiguration> getConfigurations();
 
     JenkinsConfiguration newConfiguration(JenkinsConfiguration configuration);
 

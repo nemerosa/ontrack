@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.jenkins.service;
 import net.nemerosa.ontrack.extension.jenkins.model.JenkinsConfiguration;
 import net.nemerosa.ontrack.extension.jenkins.model.JenkinsConfigurationNotFoundException;
 import net.nemerosa.ontrack.extension.jenkins.model.JenkinsService;
-import net.nemerosa.ontrack.extension.jenkins.model.JenkinsSettings;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
@@ -13,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.stream.Collectors;
+import java.util.Collection;
 
 @Service
 @Transactional
@@ -29,14 +28,9 @@ public class JenkinsServiceImpl implements JenkinsService {
     }
 
     @Override
-    public JenkinsSettings getSettings() {
+    public Collection<JenkinsConfiguration> getConfigurations() {
         securityService.checkGlobalFunction(GlobalSettings.class);
-        return new JenkinsSettings(
-                configurationRepository.list(JenkinsConfiguration.class)
-                        .stream()
-                        .map(JenkinsConfiguration::obfuscate)
-                        .collect(Collectors.toList())
-        );
+        return configurationRepository.list(JenkinsConfiguration.class);
     }
 
     @Override

@@ -31,4 +31,9 @@ public class JenkinsConfiguration implements Configuration<JenkinsConfiguration>
                 ""
         );
     }
+
+    public Form asForm() {
+        return form().name(name).fill("url", url).fill("user", user).fill("password", "");
+    }
+    
 }
