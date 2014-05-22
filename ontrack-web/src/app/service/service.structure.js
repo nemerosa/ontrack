@@ -81,9 +81,10 @@ angular.module('ot.service.structure', [
         };
 
         /**
-         * Changing the image of a promotion level
+         * Changing the image
+         * @param config.title Title for the dialog
          */
-        self.changePromotionLevelImage = function (promotionLevel) {
+        self.changeImage = function (entity, config) {
             var d = $q.defer();
             $modal.open({
                 templateUrl: 'app/dialog/dialog.image.tpl.html',
@@ -91,16 +92,16 @@ angular.module('ot.service.structure', [
                 resolve: {
                     config: function () {
                         return {
-                            title: 'Image for promotion level ' + promotionLevel.name,
+                            title: config.title,
                             image: {
-                                present: promotionLevel.image,
-                                href: promotionLevel.imageLink.href
+                                present: entity.image,
+                                href: entity.imageLink.href
                             },
                             submit: function (file) {
                                 var fd = new FormData();
                                 fd.append('file', file);
                                 return ot.call($http.post(
-                                    promotionLevel.imageLink.href,
+                                    entity.imageLink.href,
                                     fd, {
                                         transformRequest: angular.identity,
                                         headers: {'Content-Type': undefined}
@@ -119,6 +120,24 @@ angular.module('ot.service.structure', [
                 }
             );
             return d.promise;
+        };
+
+        /**
+         * Changing the image of a promotion level
+         */
+        self.changePromotionLevelImage = function (promotionLevel) {
+            return self.changeImage(promotionLevel, {
+                title: 'Image for promotion level ' + promotionLevel.name
+            });
+        };
+
+        /**
+         * Changing the image of a validation stamp
+         */
+        self.changeValidationStampImage = function (validationStamp) {
+            return self.changeImage(validationStamp, {
+                title: 'Image for validation stamp ' + validationStamp.name
+            });
         };
 
         return self;
