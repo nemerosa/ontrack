@@ -9,6 +9,7 @@ public abstract class AbstractField<F extends AbstractField<F>> implements Field
     private final String name;
     private String label;
     private boolean required = true;
+    private boolean readOnly = false;
     private String validation;
     private Object value;
 
@@ -20,6 +21,12 @@ public abstract class AbstractField<F extends AbstractField<F>> implements Field
 
     public F optional() {
         this.required = false;
+        //noinspection unchecked
+        return (F) this;
+    }
+
+    public F readOnly() {
+        this.readOnly = true;
         //noinspection unchecked
         return (F) this;
     }

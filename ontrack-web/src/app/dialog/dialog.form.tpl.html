@@ -9,16 +9,16 @@
             <div class="col-md-9">
 
                 <!-- Type: text -->
-                <input ng-if="field.type == 'text'" ng-model="data[field.name]" name="{{field.name}}" maxlength="{{field.maxlength}}" type="text" class="form-control" ng-required="field.required" ng-pattern="field.pattern" />
+                <input ng-if="field.type == 'text'" ng-model="data[field.name]" name="{{field.name}}" maxlength="{{field.maxlength}}" type="text" class="form-control" ng-required="field.required" ng-readonly="field.readOnly" ng-pattern="field.pattern" />
 
                 <!-- Type: url -->
-                <input ng-if="field.type == 'url'" ng-model="data[field.name]" name="{{field.name}}" maxlength="{{field.maxlength}}" type="url" class="form-control" ng-required="field.required" />
+                <input ng-if="field.type == 'url'" ng-model="data[field.name]" name="{{field.name}}" maxlength="{{field.maxlength}}" type="url" class="form-control" ng-required="field.required" ng-readonly="field.readOnly" />
 
                 <!-- Type: password -->
-                <input ng-if="field.type == 'password'" ng-model="data[field.name]" name="{{field.name}}" maxlength="{{field.maxlength}}" type="password" class="form-control" ng-required="field.required" />
+                <input ng-if="field.type == 'password'" ng-model="data[field.name]" name="{{field.name}}" maxlength="{{field.maxlength}}" type="password" class="form-control" ng-required="field.required" ng-readonly="field.readOnly" />
 
                 <!-- Type: memo -->
-                <textarea ng-if="field.type == 'memo'" ng-model="data[field.name]" class="form-control" rows="{{field.rows}}" ng-required="field.required" maxlength="{{field.maxlength}}"></textarea>
+                <textarea ng-if="field.type == 'memo'" ng-model="data[field.name]" class="form-control" rows="{{field.rows}}" ng-required="field.required" maxlength="{{field.maxlength}}" ng-readonly="field.readOnly"></textarea>
 
                 <!-- Validation message -->
                 <p ng-show="thisForm[field.name].$invalid && !thisForm[field.name].$pristine" class="help-block">{{field.validation}}</p>

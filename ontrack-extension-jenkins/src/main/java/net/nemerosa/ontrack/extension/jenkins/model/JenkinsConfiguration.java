@@ -6,6 +6,8 @@ import net.nemerosa.ontrack.model.form.Password;
 import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.support.Configuration;
 
+import static net.nemerosa.ontrack.model.form.Form.defaultText;
+
 @Data
 public class JenkinsConfiguration implements Configuration<JenkinsConfiguration> {
 
@@ -16,7 +18,7 @@ public class JenkinsConfiguration implements Configuration<JenkinsConfiguration>
 
     public static Form form() {
         return Form.create()
-                .name()
+                .with(defaultText())
                 .url()
                 .with(Text.of("user").label("User").length(16).optional())
                 .with(Password.of("password").label("Password").length(40).optional());
@@ -33,7 +35,11 @@ public class JenkinsConfiguration implements Configuration<JenkinsConfiguration>
     }
 
     public Form asForm() {
-        return form().name(name).fill("url", url).fill("user", user).fill("password", "");
+        return form()
+                .with(defaultText().readOnly().value(name))
+                .fill("url", url)
+                .fill("user", user)
+                .fill("password", "");
     }
-    
+
 }
