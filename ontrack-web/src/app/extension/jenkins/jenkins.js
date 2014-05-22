@@ -44,5 +44,10 @@ angular.module('ontrack.extension.jenkins', [
                 }
             }).then(loadJenkinsConfigurations);
         };
+
+        // Deleting a configuration
+        $scope.deleteConfiguration = function (configuration) {
+            alert('Deleting');
+        };
     })
 ;

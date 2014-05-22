@@ -216,7 +216,7 @@ td.ot-entity-image {
  * Commands
  */
 
-span.ot-view-command {
+.ot-command {
   cursor: pointer;
   opacity: 0.35;
   &:hover {
@@ -226,6 +226,20 @@ span.ot-view-command {
     text-decoration: none;
     color: @text-color;
   }
+}
+
+span.ot-view-command {
+  .ot-command;
+}
+
+.ot-command-delete {
+  .glyphicon;
+  .glyphicon-trash;
+}
+
+.ot-command-update{
+  .glyphicon;
+  .glyphicon-pencil;
 }
 
 .ot-command-close {
