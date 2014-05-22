@@ -19,7 +19,7 @@ public class ConfigurationJdbcRepository extends AbstractJdbcRepository implemen
     }
 
     @Override
-    public <T extends Configuration> Collection<T> list(Class<T> configurationClass) {
+    public <T extends Configuration<T>> Collection<T> list(Class<T> configurationClass) {
         return getNamedParameterJdbcTemplate().query(
                 "SELECT * FROM CONFIGURATIONS WHERE TYPE = :type ORDER BY NAME",
                 params("type", configurationClass.getName()),
@@ -28,7 +28,7 @@ public class ConfigurationJdbcRepository extends AbstractJdbcRepository implemen
     }
 
     @Override
-    public <T extends Configuration> Optional<T> find(Class<T> configurationClass, String name) {
+    public <T extends Configuration<T>> Optional<T> find(Class<T> configurationClass, String name) {
         return Optional.ofNullable(
                 getFirstItem(
                         "SELECT * FROM CONFIGURATIONS WHERE TYPE = :type AND NAME = :name",
@@ -39,7 +39,7 @@ public class ConfigurationJdbcRepository extends AbstractJdbcRepository implemen
     }
 
     @Override
-    public <T extends Configuration> T save(T configuration) {
+    public <T extends Configuration<T>> T save(T configuration) {
         MapSqlParameterSource params = params("type", configuration.getClass().getName()).addValue("name", configuration.getName());
         Integer id = getFirstItem(
                 "SELECT ID FROM CONFIGURATIONS WHERE TYPE = :type AND NAME = :name",
@@ -64,7 +64,7 @@ public class ConfigurationJdbcRepository extends AbstractJdbcRepository implemen
     }
 
     @Override
-    public <T extends Configuration> void delete(Class<T> configurationClass, String name) {
+    public <T extends Configuration<T>> void delete(Class<T> configurationClass, String name) {
         getNamedParameterJdbcTemplate().update(
                 "DELETE FROM CONFIGURATIONS WHERE TYPE = :type AND NAME = :name",
                 params("type", configurationClass.getName()).addValue("name", name)

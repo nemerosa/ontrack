@@ -55,7 +55,7 @@ public class JenkinsController extends AbstractExtensionController<JenkinsExtens
 
     private Resource<JenkinsConfiguration> toConfigurationResource(JenkinsConfiguration configuration) {
         return Resource.of(
-                configuration,
+                configuration.obfuscate(),
                 uri(on(getClass()).getConfiguration(configuration.getName()))
         );
     }

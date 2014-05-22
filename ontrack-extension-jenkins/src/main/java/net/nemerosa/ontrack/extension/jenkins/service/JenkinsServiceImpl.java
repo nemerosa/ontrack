@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.stream.Collectors;
+
 @Service
 @Transactional
 public class JenkinsServiceImpl implements JenkinsService {
@@ -31,6 +33,9 @@ public class JenkinsServiceImpl implements JenkinsService {
         securityService.checkGlobalFunction(GlobalSettings.class);
         return new JenkinsSettings(
                 configurationRepository.list(JenkinsConfiguration.class)
+                        .stream()
+                        .map(JenkinsConfiguration::obfuscate)
+                        .collect(Collectors.toList())
         );
     }
 

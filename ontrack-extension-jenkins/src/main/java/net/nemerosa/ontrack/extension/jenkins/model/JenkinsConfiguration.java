@@ -7,7 +7,7 @@ import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.support.Configuration;
 
 @Data
-public class JenkinsConfiguration implements Configuration {
+public class JenkinsConfiguration implements Configuration<JenkinsConfiguration> {
 
     private final String name;
     private final String url;
@@ -20,5 +20,15 @@ public class JenkinsConfiguration implements Configuration {
                 .url()
                 .with(Text.of("user").label("User").length(16).optional())
                 .with(Password.of("password").label("Password").length(40).optional());
+    }
+
+    @Override
+    public JenkinsConfiguration obfuscate() {
+        return new JenkinsConfiguration(
+                name,
+                url,
+                user,
+                ""
+        );
     }
 }
