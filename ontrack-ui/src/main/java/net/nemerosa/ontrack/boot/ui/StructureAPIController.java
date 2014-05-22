@@ -244,6 +244,89 @@ public class StructureAPIController extends AbstractResourceController implement
         structureService.setPromotionLevelImage(promotionLevelId, document);
     }
 
+    // Validation stamps
+
+    @RequestMapping(value = "branches/{branchId}/validationStamps", method = RequestMethod.GET)
+    @Override
+    public ResourceCollection<ValidationStamp> getValidationStampListForBranch(@PathVariable ID branchId) {
+        Branch branch = structureService.getBranch(branchId);
+        return ResourceCollection.of(
+                structureService.getValidationStampListForBranch(branchId).stream().map(this::toValidationStampResource),
+                uri(on(StructureAPIController.class).getValidationStampListForBranch(branchId))
+        )
+                // Create
+                .with(
+                        Link.CREATE,
+                        uri(on(StructureAPIController.class).newValidationStampForm(branchId)),
+                        securityService.isProjectFunctionGranted(branch.getProject().id(), ValidationStampCreate.class)
+                )
+                ;
+    }
+
+    @Override
+    @RequestMapping(value = "branches/{branchId}/validationStamps/create", method = RequestMethod.GET)
+    public Form newValidationStampForm(@PathVariable ID branchId) {
+        structureService.getBranch(branchId);
+        return ValidationStamp.form();
+    }
+
+    @Override
+    @RequestMapping(value = "branches/{branchId}/validationStamps/create", method = RequestMethod.POST)
+    public Resource<ValidationStamp> newValidationStamp(@PathVariable ID branchId, @RequestBody NameDescription nameDescription) {
+        // Gets the holding branch
+        Branch branch = structureService.getBranch(branchId);
+        // Creates a new promotion level
+        ValidationStamp validationStamp = ValidationStamp.of(branch, nameDescription);
+        // Saves it into the repository
+        validationStamp = structureService.newValidationStamp(validationStamp);
+        // OK
+        return toValidationStampResource(validationStamp);
+    }
+
+    @Override
+    @RequestMapping(value = "validationStamps/{validationStampId}", method = RequestMethod.GET)
+    public Resource<ValidationStamp> getValidationStamp(@PathVariable ID validationStampId) {
+        return toValidationStampResourceWithActions(
+                structureService.getValidationStamp(validationStampId)
+        );
+    }
+
+    @RequestMapping(value = "validationStamps/{validationStampId}/image", method = RequestMethod.GET)
+    public ResponseEntity<byte[]> getValidationStampImage_(@PathVariable ID validationStampId) {
+        // Gets the file
+        Document file = getValidationStampImage(validationStampId);
+        if (file == null) {
+            return new ResponseEntity<>(new byte[0], HttpStatus.NO_CONTENT);
+        } else {
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.setContentLength(file.getContent().length);
+            responseHeaders.setContentType(MediaType.parseMediaType(file.getType()));
+            return new ResponseEntity<>(file.getContent(), responseHeaders, HttpStatus.OK);
+        }
+    }
+
+    @RequestMapping(value = "validationStamps/{validationStampId}/image", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void setValidationStampImage(@PathVariable ID validationStampId, @RequestParam MultipartFile file) throws IOException {
+        setValidationStampImage(
+                validationStampId,
+                new Document(
+                        file.getContentType(),
+                        file.getBytes()
+                )
+        );
+    }
+
+    @Override
+    public Document getValidationStampImage(ID validationStampId) {
+        return structureService.getValidationStampImage(validationStampId);
+    }
+
+    @Override
+    public void setValidationStampImage(ID validationStampId, Document document) {
+        structureService.setValidationStampImage(validationStampId, document);
+    }
+
     // Resource assemblers
 
     private Resource<Project> toProjectResourceWithActions(Project project) {
@@ -291,6 +374,17 @@ public class StructureAPIController extends AbstractResourceController implement
                         "promotionLevels",
                         uri(on(StructureAPIController.class).getPromotionLevelListForBranch(branch.getId()))
                 )
+                        // Validation stamp creation
+                .with(
+                        "createValidationStamp",
+                        uri(on(StructureAPIController.class).newValidationStampForm(branch.getId())),
+                        securityService.isProjectFunctionGranted(branch.getProject().id(), ValidationStampCreate.class)
+                )
+                        // Validation stamp list
+                .with(
+                        "validationStamps",
+                        uri(on(StructureAPIController.class).getValidationStampListForBranch(branch.getId()))
+                )
                 ;
     }
 
@@ -331,6 +425,28 @@ public class StructureAPIController extends AbstractResourceController implement
                 .with("projectLink", uri(on(StructureAPIController.class).getProject(promotionLevel.getBranch().getProject().getId())))
                         // Image link
                 .with("imageLink", uri(on(StructureAPIController.class).getPromotionLevelImage_(promotionLevel.getId())))
+                ;
+    }
+
+    private Resource<ValidationStamp> toValidationStampResourceWithActions(ValidationStamp validationStamp) {
+        return toValidationStampResource(validationStamp);
+        // TODO Update
+        // TODO Delete
+        // TODO Next validation stamp
+        // TODO Previous validation stamp
+    }
+
+    private Resource<ValidationStamp> toValidationStampResource(ValidationStamp validationStamp) {
+        return Resource.of(
+                validationStamp,
+                uri(on(StructureAPIController.class).getValidationStamp(validationStamp.getId()))
+        )
+                // Branch link
+                .with("branchLink", uri(on(StructureAPIController.class).getBranch(validationStamp.getBranch().getId())))
+                        // Project link
+                .with("projectLink", uri(on(StructureAPIController.class).getProject(validationStamp.getBranch().getProject().getId())))
+                        // Image link
+                .with("imageLink", uri(on(StructureAPIController.class).getValidationStampImage_(validationStamp.getId())))
                 ;
     }
 }

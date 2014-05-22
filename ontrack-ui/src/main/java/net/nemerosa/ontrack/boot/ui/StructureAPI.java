@@ -51,4 +51,18 @@ public interface StructureAPI {
 
     void setPromotionLevelImage(ID promotionLevelId, Document document);
 
+    // Validation stamps
+
+    ResourceCollection<ValidationStamp> getValidationStampListForBranch(ID branchId);
+
+    Form newValidationStampForm(ID branchId);
+
+    Resource<ValidationStamp> newValidationStamp(ID branchId, NameDescription nameDescription);
+
+    Resource<ValidationStamp> getValidationStamp(ID validationStampId);
+
+    Document getValidationStampImage(ID validationStampId);
+
+    void setValidationStampImage(ID validationStampId, Document document);
+
 }
