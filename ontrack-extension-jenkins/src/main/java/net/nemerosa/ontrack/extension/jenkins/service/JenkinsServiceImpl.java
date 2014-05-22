@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 
+// TODO This can be a generic service, parameterized only by the configuration class
 @Service
 @Transactional
 public class JenkinsServiceImpl implements JenkinsService {
@@ -53,6 +54,10 @@ public class JenkinsServiceImpl implements JenkinsService {
         configurationRepository.delete(JenkinsConfiguration.class, name);
     }
 
+    /**
+     * Gets the former password if new password is blank for the same user. For a new user,
+     * a blank password can be accepted.
+     */
     @Override
     public void updateConfiguration(String name, JenkinsConfiguration configuration) {
         securityService.checkGlobalFunction(GlobalSettings.class);
@@ -60,7 +65,11 @@ public class JenkinsServiceImpl implements JenkinsService {
         JenkinsConfiguration configToSave;
         if (StringUtils.isBlank(configuration.getPassword())) {
             JenkinsConfiguration oldConfig = getConfiguration(name);
-            configToSave = configuration.withPassword(oldConfig.getPassword());
+            if (StringUtils.equals(oldConfig.getUser(), configuration.getUser())) {
+                configToSave = configuration.withPassword(oldConfig.getPassword());
+            } else {
+                configToSave = configuration;
+            }
         } else {
             configToSave = configuration;
         }
