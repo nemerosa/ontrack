@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.jenkins;
 import net.nemerosa.ontrack.extension.jenkins.model.JenkinsConfiguration;
 import net.nemerosa.ontrack.extension.jenkins.model.JenkinsService;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
@@ -30,7 +31,7 @@ public class JenkinsController extends AbstractExtensionController<JenkinsExtens
     /**
      * Gets the Jenkins settings
      */
-    @RequestMapping(value = "settings", method = RequestMethod.GET)
+    @RequestMapping(value = "configurations", method = RequestMethod.GET)
     public ResourceCollection<JenkinsConfiguration> getConfigurations() {
         return ResourceCollection.of(
                 jenkinsService.getConfigurations()
@@ -46,7 +47,7 @@ public class JenkinsController extends AbstractExtensionController<JenkinsExtens
     /**
      * Form for a configuration
      */
-    @RequestMapping(value = "settings/configuration/create", method = RequestMethod.GET)
+    @RequestMapping(value = "configurations/create", method = RequestMethod.GET)
     public Form getConfigurationForm() {
         return JenkinsConfiguration.form();
     }
@@ -54,7 +55,7 @@ public class JenkinsController extends AbstractExtensionController<JenkinsExtens
     /**
      * Creating a configuration
      */
-    @RequestMapping(value = "settings/configuration/create", method = RequestMethod.POST)
+    @RequestMapping(value = "configurations/create", method = RequestMethod.POST)
     public Resource<JenkinsConfiguration> newConfiguration(@RequestBody JenkinsConfiguration configuration) {
         return toConfigurationResource(jenkinsService.newConfiguration(configuration));
     }
@@ -62,7 +63,7 @@ public class JenkinsController extends AbstractExtensionController<JenkinsExtens
     /**
      * Gets one configuration
      */
-    @RequestMapping(value = "settings/configuration/{name}", method = RequestMethod.GET)
+    @RequestMapping(value = "configurations/{name}", method = RequestMethod.GET)
     public Resource<JenkinsConfiguration> getConfiguration(@PathVariable String name) {
         return toConfigurationResource(jenkinsService.getConfiguration(name));
     }
@@ -70,17 +71,17 @@ public class JenkinsController extends AbstractExtensionController<JenkinsExtens
     /**
      * Deleting one configuration
      */
-    @RequestMapping(value = "settings/configuration/{name}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "configurations/{name}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.GONE)
-    public boolean deleteConfiguration(@PathVariable String name) {
+    public Ack deleteConfiguration(@PathVariable String name) {
         jenkinsService.deleteConfiguration(name);
-        return true;
+        return Ack.OK;
     }
 
     /**
      * Update form
      */
-    @RequestMapping(value = "settings/configuration/{name}/update", method = RequestMethod.GET)
+    @RequestMapping(value = "configurations/{name}/update", method = RequestMethod.GET)
     public Form updateConfigurationForm(@PathVariable String name) {
         return jenkinsService.getConfiguration(name).asForm();
     }
@@ -88,7 +89,7 @@ public class JenkinsController extends AbstractExtensionController<JenkinsExtens
     /**
      * Updating one configuration
      */
-    @RequestMapping(value = "settings/configuration/{name}/update", method = RequestMethod.PUT)
+    @RequestMapping(value = "configurations/{name}/update", method = RequestMethod.PUT)
     public Resource<JenkinsConfiguration> updateConfiguration(@PathVariable String name, @RequestBody JenkinsConfiguration configuration) {
         jenkinsService.updateConfiguration(name, configuration);
         return getConfiguration(name);

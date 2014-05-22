@@ -23,6 +23,6 @@ public class JenkinsUserMenuExtension extends AbstractExtension implements UserM
 
     @Override
     public Action getAction() {
-        return Action.of("jenkins-settings", "Jenkins settings", "settings");
+        return Action.of("jenkins-configurations", "Jenkins configurations", "configurations");
     }
 }

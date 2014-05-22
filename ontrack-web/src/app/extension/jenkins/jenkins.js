@@ -4,22 +4,22 @@ angular.module('ontrack.extension.jenkins', [
     'ot.service.form'
 ])
     .config(function ($stateProvider) {
-        // Jenkins settings
-        $stateProvider.state('jenkins-settings', {
-            url: '/extension/jenkins/settings',
-            templateUrl: 'app/extension/jenkins/jenkins.settings.tpl.html',
-            controller: 'JenkinsSettingsCtrl'
+        // Jenkins configurations
+        $stateProvider.state('jenkins-configurations', {
+            url: '/extension/jenkins/configurations',
+            templateUrl: 'app/extension/jenkins/jenkins.configurations.tpl.html',
+            controller: 'JenkinsConfigurationsCtrl'
         });
     })
-    .controller('JenkinsSettingsCtrl', function ($scope, $http, ot, otFormService) {
+    .controller('JenkinsConfigurationsCtrl', function ($scope, $http, ot, otFormService) {
         var view = ot.view();
-        view.title = 'Jenkins settings';
-        view.description = 'Management of the Jenkins settings and configurations.';
+        view.title = 'Jenkins configurations';
+        view.description = 'Management of the Jenkins configurations.';
 
-        // Loading the Jenkins settings
-        function loadJenkinsSettings() {
-            ot.call($http.get('extension/jenkins/settings')).then(function (settings) {
-                $scope.settings = settings;
+        // Loading the Jenkins configurations
+        function loadJenkinsConfigurations() {
+            ot.call($http.get('extension/jenkins/configurations')).then(function (configurations) {
+                $scope.configurations = configurations;
                 view.commands = [
                     {
                         id: 'jenkins-configuration-create',
@@ -32,17 +32,17 @@ angular.module('ontrack.extension.jenkins', [
             });
         }
 
-        loadJenkinsSettings();
+        loadJenkinsConfigurations();
 
         // Creating a configuration
         $scope.createConfiguration = function () {
             otFormService.display({
-                uri: $scope.settings.createConfiguration.href,
+                uri: $scope.configurations.createConfiguration.href,
                 title: "Jenkins configuration",
                 submit: function (data) {
-                    return ot.call($http.post($scope.settings.createConfiguration.href, data));
+                    return ot.call($http.post($scope.configurations.createConfiguration.href, data));
                 }
-            });
+            }).then(loadJenkinsConfigurations);
         };
     })
 ;

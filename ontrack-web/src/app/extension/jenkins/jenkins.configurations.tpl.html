@@ -2,11 +2,11 @@
     <div class="row">
         <div class="col-md-12">
             <ot-section-title>List of configurations</ot-section-title>
-            <ot-noentry list="settings.configurations">
+            <ot-noentry list="configurations.resources">
                 No Jenkins configuration has been created yet.
             </ot-noentry>
             <table class="table">
-                <tr ng-repeat="configuration in settings.configurations">
+                <tr ng-repeat="configuration in configurations.resources">
                     <td>
                         {{configuration.name}}
                     </td>
