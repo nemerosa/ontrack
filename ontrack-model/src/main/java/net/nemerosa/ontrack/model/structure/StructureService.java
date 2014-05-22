@@ -39,4 +39,16 @@ public interface StructureService {
     Document getPromotionLevelImage(ID promotionLevelId);
 
     void setPromotionLevelImage(ID promotionLevelId, Document document);
+
+    // Validation stamps
+
+    List<ValidationStamp> getValidationStampListForBranch(ID branchId);
+
+    ValidationStamp newValidationStamp(ValidationStamp validationStamp);
+
+    ValidationStamp getValidationStamp(ID validationStampId);
+
+    Document getValidationStampImage(ID validationStampId);
+
+    void setValidationStampImage(ID validationStampId, Document document);
 }

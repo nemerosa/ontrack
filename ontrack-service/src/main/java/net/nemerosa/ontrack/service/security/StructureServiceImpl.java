@@ -153,6 +153,61 @@ public class StructureServiceImpl implements StructureService {
 
     @Override
     public void setPromotionLevelImage(ID promotionLevelId, Document document) {
+        checkImage(document);
+
+        // Checks access
+        PromotionLevel promotionLevel = getPromotionLevel(promotionLevelId);
+        securityService.checkProjectFunction(promotionLevel.getBranch().getProject().id(), PromotionLevelEdit.class);
+        // Repository
+        structureRepository.setPromotionLevelImage(promotionLevelId, document);
+    }
+
+    @Override
+    public List<ValidationStamp> getValidationStampListForBranch(ID branchId) {
+        Branch branch = getBranch(branchId);
+        securityService.checkProjectFunction(branch.getProject().id(), ProjectView.class);
+        return structureRepository.getValidationStampListForBranch(branchId);
+    }
+
+    @Override
+    public ValidationStamp newValidationStamp(ValidationStamp validationStamp) {
+        // Validation
+        isEntityNew(validationStamp, "Validation stamp must be new");
+        isEntityDefined(validationStamp.getBranch(), "Branch must be defined");
+        isEntityDefined(validationStamp.getBranch().getProject(), "Project must be defined");
+        // Security
+        securityService.checkProjectFunction(validationStamp.getBranch().getProject().id(), ValidationStampCreate.class);
+        // Repository
+        return structureRepository.newValidationStamp(validationStamp);
+    }
+
+    @Override
+    public ValidationStamp getValidationStamp(ID validationStampId) {
+        ValidationStamp validationStamp = structureRepository.getValidationStamp(validationStampId);
+        securityService.checkProjectFunction(validationStamp.getBranch().getProject().id(), ProjectView.class);
+        return validationStamp;
+    }
+
+    @Override
+    public Document getValidationStampImage(ID validationStampId) {
+        // Checks access
+        getValidationStamp(validationStampId);
+        // Repository access
+        return structureRepository.getValidationStampImage(validationStampId);
+    }
+
+    @Override
+    public void setValidationStampImage(ID validationStampId, Document document) {
+        // Checks the image type
+        checkImage(document);
+        // Checks access
+        ValidationStamp validationStamp = getValidationStamp(validationStampId);
+        securityService.checkProjectFunction(validationStamp.getBranch().getProject().id(), ValidationStampEdit.class);
+        // Repository
+        structureRepository.setValidationStampImage(validationStampId, document);
+    }
+
+    protected void checkImage(Document document) {
         // Checks the image type
         if (document != null && !ArrayUtils.contains(ACCEPTED_IMAGE_TYPES, document.getType())) {
             throw new ImageTypeNotAcceptedException(document.getType(), ACCEPTED_IMAGE_TYPES);
@@ -162,10 +217,5 @@ public class StructureServiceImpl implements StructureService {
         if (size > ICON_IMAGE_SIZE_MAX) {
             throw new ImageFileSizeException(size, ICON_IMAGE_SIZE_MAX);
         }
-        // Checks access
-        PromotionLevel promotionLevel = getPromotionLevel(promotionLevelId);
-        securityService.checkProjectFunction(promotionLevel.getBranch().getProject().id(), PromotionLevelEdit.class);
-        // Repository
-        structureRepository.setPromotionLevelImage(promotionLevelId, document);
     }
 }

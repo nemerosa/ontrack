@@ -209,8 +209,85 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         );
     }
 
+    @Override
+    public List<ValidationStamp> getValidationStampListForBranch(ID branchId) {
+        Branch branch = getBranch(branchId);
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT * FROM PROMOTION_LEVELS WHERE BRANCHID = :branchId ORDER BY ORDERNB",
+                params("branchId", branchId.getValue()),
+                (rs, rowNum) -> toValidationStamp(rs, id -> branch)
+        );
+    }
+
+    @Override
+    public ValidationStamp newValidationStamp(ValidationStamp validationStamp) {
+        // Creation
+        try {
+            // Order nb = max + 1
+            Integer orderNbValue = getFirstItem(
+                    "SELECT MAX(ORDERNB) FROM promotion_levels WHERE BRANCHID = :branchId",
+                    params("branchId", validationStamp.getBranch().id()),
+                    Integer.class
+            );
+            int orderNb = orderNbValue != null ? orderNbValue + 1 : 0;
+            // Insertion
+            int id = dbCreate(
+                    "INSERT INTO PROMOTION_LEVELS(BRANCHID, NAME, DESCRIPTION, ORDERNB) VALUES (:branchId, :name, :description, :orderNb)",
+                    params("name", validationStamp.getName())
+                            .addValue("description", validationStamp.getDescription())
+                            .addValue("branchId", validationStamp.getBranch().id())
+                            .addValue("orderNb", orderNb)
+            );
+            return validationStamp.withId(id(id));
+        } catch (DuplicateKeyException ex) {
+            throw new ValidationStampNameAlreadyDefinedException(validationStamp.getName());
+        }
+    }
+
+    @Override
+    public ValidationStamp getValidationStamp(ID validationStampId) {
+        try {
+            return getNamedParameterJdbcTemplate().queryForObject(
+                    "SELECT * FROM PROMOTION_LEVELS WHERE ID = :id",
+                    params("id", validationStampId.getValue()),
+                    (rs, rowNum) -> toValidationStamp(rs, this::getBranch)
+            );
+        } catch (EmptyResultDataAccessException ex) {
+            throw new ValidationStampNotFoundException(validationStampId);
+        }
+    }
+
+    @Override
+    public Document getValidationStampImage(ID validationStampId) {
+        return getFirstItem(
+                "SELECT IMAGETYPE, IMAGEBYTES FROM PROMOTION_LEVELS WHERE ID = :id",
+                params("id", validationStampId.getValue()),
+                (rs, rowNum) -> toDocument(rs)
+        );
+    }
+
+    @Override
+    public void setValidationStampImage(ID validationStampId, Document document) {
+        getNamedParameterJdbcTemplate().update(
+                "UPDATE PROMOTION_LEVELS SET IMAGETYPE = :type, IMAGEBYTES = :content WHERE ID = :id",
+                params("id", validationStampId.getValue())
+                        .addValue("type", document != null ? document.getType() : null)
+                        .addValue("content", document != null ? document.getContent() : null)
+        );
+    }
+
     protected PromotionLevel toPromotionLevel(ResultSet rs, Function<ID, Branch> branchSupplier) throws SQLException {
         return PromotionLevel.of(
+                branchSupplier.apply(id(rs, "branchId")),
+                new NameDescription(
+                        rs.getString("name"),
+                        rs.getString("description")
+                )
+        ).withId(id(rs)).withImage(StringUtils.isNotBlank(rs.getString("imagetype")));
+    }
+
+    protected ValidationStamp toValidationStamp(ResultSet rs, Function<ID, Branch> branchSupplier) throws SQLException {
+        return ValidationStamp.of(
                 branchSupplier.apply(id(rs, "branchId")),
                 new NameDescription(
                         rs.getString("name"),
