@@ -16,9 +16,9 @@ public class Build implements Entity {
     private final Signature signature;
     @JsonView({Build.class})
     private final Branch branch;
-    @JsonView({Build.class})
+    @JsonView({Build.class, BranchBuildView.class})
     private final List<PromotionRun> promotionRuns;
-    @JsonView({Build.class})
+    @JsonView({Build.class, BranchBuildView.class})
     private final List<ValidationRun> validationRuns;
 
     public static Build of(Branch branch, NameDescription nameDescription, Signature signature) {
