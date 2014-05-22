@@ -24,7 +24,13 @@ angular.module('ot.view.branch', [
             ot.call($http.get($scope.branch.promotionLevels.href)).then(function (collection) {
                 $scope.promotionLevelCollection = collection;
             });
+        }
 
+        // Loading the validation stamps
+        function loadValidationStamps() {
+            ot.call($http.get($scope.branch.validationStamps.href)).then(function (collection) {
+                $scope.validationStampCollection = collection;
+            });
         }
 
         // Loading the branch
@@ -53,7 +59,8 @@ angular.module('ot.view.branch', [
                 loadBuildView();
                 // Loads the promotion levels
                 loadPromotionLevels();
-                // TODO Loads the validation stamps
+                // Loads the validation stamps
+                loadValidationStamps();
             });
         }
 

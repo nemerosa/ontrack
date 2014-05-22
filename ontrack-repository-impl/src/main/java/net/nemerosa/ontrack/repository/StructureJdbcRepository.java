@@ -213,7 +213,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     public List<ValidationStamp> getValidationStampListForBranch(ID branchId) {
         Branch branch = getBranch(branchId);
         return getNamedParameterJdbcTemplate().query(
-                "SELECT * FROM PROMOTION_LEVELS WHERE BRANCHID = :branchId ORDER BY ORDERNB",
+                "SELECT * FROM VALIDATION_STAMPS WHERE BRANCHID = :branchId ORDER BY ORDERNB",
                 params("branchId", branchId.getValue()),
                 (rs, rowNum) -> toValidationStamp(rs, id -> branch)
         );
@@ -225,14 +225,14 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         try {
             // Order nb = max + 1
             Integer orderNbValue = getFirstItem(
-                    "SELECT MAX(ORDERNB) FROM promotion_levels WHERE BRANCHID = :branchId",
+                    "SELECT MAX(ORDERNB) FROM VALIDATION_STAMPS WHERE BRANCHID = :branchId",
                     params("branchId", validationStamp.getBranch().id()),
                     Integer.class
             );
             int orderNb = orderNbValue != null ? orderNbValue + 1 : 0;
             // Insertion
             int id = dbCreate(
-                    "INSERT INTO PROMOTION_LEVELS(BRANCHID, NAME, DESCRIPTION, ORDERNB) VALUES (:branchId, :name, :description, :orderNb)",
+                    "INSERT INTO VALIDATION_STAMPS(BRANCHID, NAME, DESCRIPTION, ORDERNB) VALUES (:branchId, :name, :description, :orderNb)",
                     params("name", validationStamp.getName())
                             .addValue("description", validationStamp.getDescription())
                             .addValue("branchId", validationStamp.getBranch().id())
@@ -248,7 +248,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     public ValidationStamp getValidationStamp(ID validationStampId) {
         try {
             return getNamedParameterJdbcTemplate().queryForObject(
-                    "SELECT * FROM PROMOTION_LEVELS WHERE ID = :id",
+                    "SELECT * FROM VALIDATION_STAMPS WHERE ID = :id",
                     params("id", validationStampId.getValue()),
                     (rs, rowNum) -> toValidationStamp(rs, this::getBranch)
             );
@@ -260,7 +260,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     @Override
     public Document getValidationStampImage(ID validationStampId) {
         return getFirstItem(
-                "SELECT IMAGETYPE, IMAGEBYTES FROM PROMOTION_LEVELS WHERE ID = :id",
+                "SELECT IMAGETYPE, IMAGEBYTES FROM VALIDATION_STAMPS WHERE ID = :id",
                 params("id", validationStampId.getValue()),
                 (rs, rowNum) -> toDocument(rs)
         );
@@ -269,7 +269,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     @Override
     public void setValidationStampImage(ID validationStampId, Document document) {
         getNamedParameterJdbcTemplate().update(
-                "UPDATE PROMOTION_LEVELS SET IMAGETYPE = :type, IMAGEBYTES = :content WHERE ID = :id",
+                "UPDATE VALIDATION_STAMPS SET IMAGETYPE = :type, IMAGEBYTES = :content WHERE ID = :id",
                 params("id", validationStampId.getValue())
                         .addValue("type", document != null ? document.getType() : null)
                         .addValue("content", document != null ? document.getContent() : null)
