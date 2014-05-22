@@ -16,7 +16,8 @@ var ontrack = angular.module('ontrack', [
         'ot.view.branch',
         'ot.view.promotionLevel',
         // Extensions
-        'ontrack.extension.jenkins'
+        'ontrack.extension.jenkins',
+        'ontrack.extension.svn'
     ])
         //HTTP configuration
         .config(function ($httpProvider) {
