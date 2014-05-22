@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Resource;
 
+// TODO Interceptor to check the feature activation
 public abstract class AbstractExtensionController<F extends ExtensionFeature> extends AbstractResourceController {
 
     protected final F feature;
