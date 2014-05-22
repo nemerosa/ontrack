@@ -57,7 +57,14 @@ public class JenkinsServiceImpl implements JenkinsService {
     public void updateConfiguration(String name, JenkinsConfiguration configuration) {
         securityService.checkGlobalFunction(GlobalSettings.class);
         Validate.isTrue(StringUtils.equals(name, configuration.getName()), "Configuration name must match");
-        configurationRepository.save(configuration);
+        JenkinsConfiguration configToSave;
+        if (StringUtils.isBlank(configuration.getPassword())) {
+            JenkinsConfiguration oldConfig = getConfiguration(name);
+            configToSave = configuration.withPassword(oldConfig.getPassword());
+        } else {
+            configToSave = configuration;
+        }
+        configurationRepository.save(configToSave);
     }
 
 }

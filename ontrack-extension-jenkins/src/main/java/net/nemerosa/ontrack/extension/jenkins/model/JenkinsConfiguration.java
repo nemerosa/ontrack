@@ -42,4 +42,12 @@ public class JenkinsConfiguration implements Configuration<JenkinsConfiguration>
                 .fill("password", "");
     }
 
+    public JenkinsConfiguration withPassword(String password) {
+        return new JenkinsConfiguration(
+                name,
+                url,
+                user,
+                password
+        );
+    }
 }
