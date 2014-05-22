@@ -135,6 +135,13 @@ public class StructureAPIController extends AbstractResourceController implement
         );
     }
 
+    @Override
+    @RequestMapping(value = "branches/{branchId}/view", method = RequestMethod.GET)
+    public BranchBuildView buildView(@PathVariable ID branchId) {
+        // TODO Defines the filter for the service
+        return structureService.getBranchBuildView(branchId);
+    }
+
     // Builds
 
     @Override

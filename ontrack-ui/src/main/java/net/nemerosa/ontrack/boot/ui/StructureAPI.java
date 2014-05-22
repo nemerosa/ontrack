@@ -31,6 +31,9 @@ public interface StructureAPI {
 
     Resource<Branch> getBranch(ID branchId);
 
+    // TODO Filter form/id
+    BranchBuildView buildView(ID branchId);
+
     // Builds
 
     Form newBuildForm(ID branchId);
