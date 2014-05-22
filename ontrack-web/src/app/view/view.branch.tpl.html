@@ -32,6 +32,9 @@
             <ot-noentry list="validationStampCollection.resources">
                 No validation stamp has been created yet.
             </ot-noentry>
+            <button ng-if="branch.createValidationStamp" type="button" class="btn btn-default"
+                    ng-click="createValidationStamp()">New validation stamp
+            </button>
         </div>
     </div>
 </ot-view>

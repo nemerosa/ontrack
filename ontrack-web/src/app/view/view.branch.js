@@ -61,17 +61,21 @@ angular.module('ot.view.branch', [
                 loadPromotionLevels();
                 // Loads the validation stamps
                 loadValidationStamps();
+                // TODO Branch commands
             });
         }
 
         // Initialization
         loadBranch();
-        // TODO Loading the project's view
-        // TODO Project commands
 
         // Creation of a promotion level
         $scope.createPromotionLevel = function () {
             otStructureService.createPromotionLevel($scope.branch.createPromotionLevel.href).then(loadBranch);
+        };
+
+        // Creation of a validation stamp
+        $scope.createValidationStamp = function () {
+            otStructureService.create($scope.branch.createValidationStamp.href, 'New validation stamp').then(loadBranch);
         };
 
     })
