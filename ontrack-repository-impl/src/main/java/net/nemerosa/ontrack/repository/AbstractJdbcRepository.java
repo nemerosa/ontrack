@@ -23,6 +23,7 @@ import java.util.List;
 
 public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSupport {
 
+    public static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
     private final ObjectMapper objectMapper = ObjectMapperFactory.create();
 
     protected AbstractJdbcRepository(DataSource dataSource) {
@@ -69,15 +70,15 @@ public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSuppor
         return ID.of(id);
     }
 
-    protected String dateTimeForDB(LocalDateTime time) {
+    protected static String dateTimeForDB(LocalDateTime time) {
         if (time == null) {
             return null;
         } else {
-            return time.format(DateTimeFormatter.ISO_DATE_TIME);
+            return time.format(DATE_TIME_FORMAT);
         }
     }
 
-    protected LocalDateTime dateTimeFromDB(String value) {
+    protected static LocalDateTime dateTimeFromDB(String value) {
         if (StringUtils.isBlank(value)) {
             return null;
         } else {

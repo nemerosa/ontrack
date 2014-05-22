@@ -15,8 +15,17 @@ angular.module('ot.view.branch', [
         // Branch's id
         var branchId = $stateParams.branchId;
 
-        // TODO Loading the build view
+        // Loading the build view
         function loadBuildView() {
+            // TODO Use links from the branch
+            // TODO Adds the filter parameters
+            ot.call(
+                $http.get('structure/branches/' + branchId + '/view')
+            ).then(
+                function success(branchBuildView) {
+                    $scope.branchBuildView = branchBuildView;
+                }
+            );
         }
 
         // Loading the promotion levels
