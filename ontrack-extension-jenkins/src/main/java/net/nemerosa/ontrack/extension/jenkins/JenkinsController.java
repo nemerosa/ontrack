@@ -72,7 +72,7 @@ public class JenkinsController extends AbstractExtensionController<JenkinsExtens
      * Deleting one configuration
      */
     @RequestMapping(value = "configurations/{name}", method = RequestMethod.DELETE)
-    @ResponseStatus(HttpStatus.GONE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public Ack deleteConfiguration(@PathVariable String name) {
         jenkinsService.deleteConfiguration(name);
         return Ack.OK;

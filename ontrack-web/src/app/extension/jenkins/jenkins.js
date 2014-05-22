@@ -11,7 +11,7 @@ angular.module('ontrack.extension.jenkins', [
             controller: 'JenkinsConfigurationsCtrl'
         });
     })
-    .controller('JenkinsConfigurationsCtrl', function ($scope, $http, ot, otFormService) {
+    .controller('JenkinsConfigurationsCtrl', function ($scope, $http, ot, otFormService, otAlertService) {
         var view = ot.view();
         view.title = 'Jenkins configurations';
         view.description = 'Management of the Jenkins configurations.';
@@ -47,7 +47,14 @@ angular.module('ontrack.extension.jenkins', [
 
         // Deleting a configuration
         $scope.deleteConfiguration = function (configuration) {
-            alert('Deleting');
+            otAlertService.confirm({
+                title: 'Deleting configuration',
+                message: "Do you really want to delete this Jenkins configuration? Some projects may still refer to it."
+            }).then(
+                function success() {
+                    ot.call($http.delete(configuration.delete.href)).then(loadJenkinsConfigurations);
+                }
+            );
         };
     })
 ;

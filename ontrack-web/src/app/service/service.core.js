@@ -1,4 +1,5 @@
 angular.module('ot.service.core', [
+    'ot.alert.confirm'
 ])
 /**
  * Basic services
@@ -75,6 +76,28 @@ angular.module('ot.service.core', [
             $rootScope.notification = undefined;
         };
 
+        return self;
+    })
+    .service('otAlertService', function ($modal) {
+        var self = {};
+        /**
+         * Displays a confirmation box.
+         * @param config.title Title for the alert
+         * @param config.message Message content for the alert
+         * @returns Promise on the confirmation result.
+         */
+        self.confirm = function (config) {
+            //noinspection JSUnusedGlobalSymbols
+            return $modal.open({
+                templateUrl: 'app/dialog/alert.confirm.tpl.html',
+                controller: 'otAlertConfirm',
+                resolve: {
+                    alertConfig: function () {
+                        return config;
+                    }
+                }
+            }).result;
+        };
         return self;
     })
 ;
