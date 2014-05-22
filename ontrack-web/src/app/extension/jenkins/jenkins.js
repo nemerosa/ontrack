@@ -37,10 +37,10 @@ angular.module('ontrack.extension.jenkins', [
         // Creating a configuration
         $scope.createConfiguration = function () {
             otFormService.display({
-                uri: $scope.configurations.createConfiguration.href,
+                uri: $scope.configurations.create.href,
                 title: "Jenkins configuration",
                 submit: function (data) {
-                    return ot.call($http.post($scope.configurations.createConfiguration.href, data));
+                    return ot.call($http.post($scope.configurations.create.href, data));
                 }
             }).then(loadJenkinsConfigurations);
         };
