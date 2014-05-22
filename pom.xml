@@ -53,6 +53,7 @@
         <module>ontrack-extension-support</module>
         <module>ontrack-extension-jenkins</module>
         <module>ontrack-repository-support</module>
+        <module>ontrack-extension-svn</module>
     </modules>
 
     <dependencyManagement>
