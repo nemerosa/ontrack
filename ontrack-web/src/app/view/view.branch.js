@@ -88,4 +88,13 @@ angular.module('ot.view.branch', [
         };
 
     })
+    .directive('otBranchBuildView', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'app/view/directive.branchBuildView.tpl.html',
+            scope: {
+                view: '='
+            }
+        };
+    })
 ;
