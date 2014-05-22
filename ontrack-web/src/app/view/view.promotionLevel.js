@@ -22,7 +22,6 @@ angular.module('ot.view.promotionLevel', [
                 // View title
                 view.title = $scope.promotionLevel.name;
                 view.description = $scope.promotionLevel.description;
-                // TODO Image link
                 // Commands
                 view.commands = [
                     ot.viewCloseCommand('/branch/' + $scope.promotionLevel.branch.id)

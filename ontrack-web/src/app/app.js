@@ -15,6 +15,7 @@ var ontrack = angular.module('ontrack', [
         'ot.view.project',
         'ot.view.branch',
         'ot.view.promotionLevel',
+        'ot.view.validationStamp',
         // Extensions
         'ontrack.extension.jenkins',
         'ontrack.extension.svn'
