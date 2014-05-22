@@ -56,5 +56,16 @@ angular.module('ontrack.extension.jenkins', [
                 }
             );
         };
+
+        // Updating a configuration
+        $scope.updateConfiguration = function (configuration) {
+            otFormService.display({
+                uri: configuration.update.href,
+                title: "Jenkins configuration",
+                submit: function (data) {
+                    return ot.call($http.put(configuration.update.href, data));
+                }
+            }).then(loadJenkinsConfigurations);
+        };
     })
 ;

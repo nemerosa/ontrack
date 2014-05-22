@@ -34,6 +34,7 @@ public class JenkinsController extends AbstractExtensionController<JenkinsExtens
         this.securityService = securityService;
     }
 
+    @Override
     @RequestMapping(value = "", method = RequestMethod.GET)
     public Resource<ExtensionFeatureDescription> getDescription() {
         return Resource.of(
