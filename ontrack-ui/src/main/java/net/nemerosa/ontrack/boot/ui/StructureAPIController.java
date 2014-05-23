@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.net.URI;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -172,7 +171,7 @@ public class StructureAPIController extends AbstractResourceController implement
     @RequestMapping(value = "builds/{buildId}", method = RequestMethod.GET)
     public Resource<Build> getBuild(@PathVariable ID buildId) {
         return toBuildResourceWithActions(
-            structureService.getBuild(buildId)
+                structureService.getBuild(buildId)
         );
     }
 
@@ -416,8 +415,7 @@ public class StructureAPIController extends AbstractResourceController implement
     private Resource<Build> toBuildResource(Build build) {
         return Resource.of(
                 build,
-                // TODO Build link
-                URI.create("urn:build")
+                uri(on(getClass()).getBuild(build.getId()))
         );
     }
 
