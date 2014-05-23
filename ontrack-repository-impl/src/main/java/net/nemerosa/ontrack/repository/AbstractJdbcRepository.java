@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.exceptions.JsonParsingException;
 import net.nemerosa.ontrack.model.exceptions.JsonWritingException;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.Signature;
+import net.nemerosa.ontrack.model.support.Time;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -18,12 +19,10 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSupport {
 
-    public static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
     private final ObjectMapper objectMapper = ObjectMapperFactory.create();
 
     protected AbstractJdbcRepository(DataSource dataSource) {
@@ -71,19 +70,11 @@ public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSuppor
     }
 
     protected static String dateTimeForDB(LocalDateTime time) {
-        if (time == null) {
-            return null;
-        } else {
-            return time.format(DATE_TIME_FORMAT);
-        }
+        return Time.forStorage(time);
     }
 
     protected static LocalDateTime dateTimeFromDB(String value) {
-        if (StringUtils.isBlank(value)) {
-            return null;
-        } else {
-            return LocalDateTime.parse(value, DateTimeFormatter.ISO_DATE_TIME);
-        }
+        return Time.fromStorage(value);
     }
 
     protected Signature readSignature(ResultSet rs) throws SQLException {
