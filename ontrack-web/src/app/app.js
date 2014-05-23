@@ -14,6 +14,7 @@ var ontrack = angular.module('ontrack', [
         'ot.view.home',
         'ot.view.project',
         'ot.view.branch',
+        'ot.view.build',
         'ot.view.promotionLevel',
         'ot.view.validationStamp',
         // Extensions

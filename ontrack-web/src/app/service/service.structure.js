@@ -74,6 +74,13 @@ angular.module('ot.service.structure', [
         };
 
         /**
+         * Getting a build
+         */
+        self.getBuild = function (id) {
+            return ot.call($http.get('structure/builds/' + id));
+        };
+
+        /**
          * Creating a promotion level
          */
         self.createPromotionLevel = function (uri) {
