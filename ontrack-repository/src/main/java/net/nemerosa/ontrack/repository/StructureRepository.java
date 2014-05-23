@@ -30,6 +30,8 @@ public interface StructureRepository {
 
     Build saveBuild(Build build);
 
+    Build getBuild(ID buildId);
+
     List<Build> builds(Branch branch, BuildFilter buildFilter);
 
     // Promotion levels
@@ -55,5 +57,4 @@ public interface StructureRepository {
     Document getValidationStampImage(ID validationStampId);
 
     void setValidationStampImage(ID validationStampId, Document document);
-
 }

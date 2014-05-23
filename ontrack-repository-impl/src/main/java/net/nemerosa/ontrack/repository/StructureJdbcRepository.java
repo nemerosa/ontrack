@@ -14,7 +14,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 @Repository
 public class StructureJdbcRepository extends AbstractJdbcRepository implements StructureRepository {
@@ -122,7 +121,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                     while (rs.next()) {
                         Build build = toBuild(
                                 rs,
-                                () -> branch
+                                id -> branch
                         );
                         // TODO Filter on number of builds
                         // TODO Prefiltering without the promotions & validations
@@ -138,9 +137,9 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         );
     }
 
-    protected Build toBuild(ResultSet rs, Supplier<Branch> branchSupplier) throws SQLException {
+    protected Build toBuild(ResultSet rs, Function<ID, Branch> branchSupplier) throws SQLException {
         return Build.of(
-                branchSupplier.get(),
+                branchSupplier.apply(id(rs, "branchId")),
                 new NameDescription(
                         rs.getString("name"),
                         rs.getString("description")
@@ -180,6 +179,19 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
             return build;
         } catch (DuplicateKeyException ex) {
             throw new BuildNameAlreadyDefinedException(build.getName());
+        }
+    }
+
+    @Override
+    public Build getBuild(ID buildId) {
+        try {
+            return getNamedParameterJdbcTemplate().queryForObject(
+                    "SELECT * FROM BUILDS WHERE ID = :id",
+                    params("id", buildId.getValue()),
+                    (rs, rowNum) -> toBuild(rs, this::getBranch)
+            );
+        } catch (EmptyResultDataAccessException ex) {
+            throw new BuildNotFoundException(buildId);
         }
     }
 

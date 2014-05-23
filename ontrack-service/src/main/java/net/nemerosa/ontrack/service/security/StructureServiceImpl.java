@@ -118,6 +118,13 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public Build getBuild(ID buildId) {
+        Build build = structureRepository.getBuild(buildId);
+        securityService.checkProjectFunction(build.getBranch().getProject().id(), ProjectView.class);
+        return build;
+    }
+
+    @Override
     public BranchBuildView getBranchBuildView(ID branchId) {
         // Gets the branch
         Branch branch = getBranch(branchId);

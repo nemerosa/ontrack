@@ -28,6 +28,8 @@ public interface StructureService {
 
     Build saveBuild(Build build);
 
+    Build getBuild(ID buildId);
+
     /**
      * Branch builds
      */

@@ -40,6 +40,8 @@ public interface StructureAPI {
 
     Resource<Build> newBuild(ID branchId, NameDescription nameDescription);
 
+    Resource<Build> getBuild(ID buildId);
+
     // Promotion levels
 
     ResourceCollection<PromotionLevel> getPromotionLevelListForBranch(ID branchId);

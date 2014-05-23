@@ -168,6 +168,14 @@ public class StructureAPIController extends AbstractResourceController implement
         return toBuildResource(build);
     }
 
+    @Override
+    @RequestMapping(value = "builds/{buildId}", method = RequestMethod.GET)
+    public Resource<Build> getBuild(@PathVariable ID buildId) {
+        return toBuildResourceWithActions(
+            structureService.getBuild(buildId)
+        );
+    }
+
     // Promotion levels
 
     @RequestMapping(value = "branches/{branchId}/promotionLevels", method = RequestMethod.GET)
@@ -411,6 +419,13 @@ public class StructureAPIController extends AbstractResourceController implement
                 // TODO Build link
                 URI.create("urn:build")
         );
+    }
+
+    private Resource<Build> toBuildResourceWithActions(Build build) {
+        return toBuildResource(build)
+                // TODO Update
+                // TODO Delete
+                ;
     }
 
     private Resource<PromotionLevel> toPromotionLevelResourceWithActions(PromotionLevel promotionLevel) {
