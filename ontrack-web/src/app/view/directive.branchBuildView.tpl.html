@@ -1,6 +1,15 @@
 <table class="ot-branch-build-view">
     <thead>
-    <!-- TODO Validation stamps -->
+    <!-- Validation stamps -->
+    <tr>
+        <th>
+            <!-- Place holder for builds & promotions -->
+        </th>
+        <!-- All validation stamps -->
+        <th ng-repeat="validationStamp in validationStamps">
+            <ot-entity-image entity="validationStamp" link="#/validationStamp/{{validationStamp.id}}"></ot-entity-image>
+        </th>
+    </tr>
     <!-- TODO Validation stamps decorations -->
     </thead>
     <tbody>
@@ -9,6 +18,7 @@
             <!-- Build name and link -->
             <a href="#/build/{{build.id}}" class="ot-branch-build-view-build-name">
                 {{build.name}}
+                <!-- TODO Build decorations -->
             </a>
             <!-- Signature, without the creator in the overview -->
             <div class="ot-branch-build-view-build-signature">
@@ -16,6 +26,7 @@
                 {{build.signature.time | date:'shortTime'}}
             </div>
         </td>
+        <!-- TODO Validation runs -->
     </tr>
     </tbody>
     <tfoot>

@@ -1,5 +1,5 @@
 <a href="{{link}}">
-    <img ng-if="!entity.image" src="assets/default_entity_image.png" class="ot-icon" title="Default image"/>
-    <img ng-if="entity.image" ng-src="{{entity.imageLink.href}}" class="ot-icon"/>
+    <img ng-if="!entity.image" src="assets/default_entity_image.png" class="ot-icon" title="{{entity.name}}"/>
+    <img ng-if="entity.image" ng-src="{{entity.imageLink.href}}" class="ot-icon" title="{{entity.name}}"/>
     <span ng-transclude></span>
 </a>

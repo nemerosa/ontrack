@@ -93,7 +93,8 @@ angular.module('ot.view.branch', [
             restrict: 'E',
             templateUrl: 'app/view/directive.branchBuildView.tpl.html',
             scope: {
-                view: '='
+                view: '=',
+                validationStamps: '='
             }
         };
     })
