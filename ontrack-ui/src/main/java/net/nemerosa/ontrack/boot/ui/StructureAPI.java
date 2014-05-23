@@ -1,10 +1,14 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import net.nemerosa.ontrack.boot.resource.BuildResource;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.ResourceCollection;
+import org.springframework.web.bind.annotation.PathVariable;
 
+// TODO Split in several controllers, one per resource type
+// TODO The API interface is not needed
 public interface StructureAPI {
 
     // Projects
@@ -40,7 +44,7 @@ public interface StructureAPI {
 
     Resource<Build> newBuild(ID branchId, NameDescription nameDescription);
 
-    Resource<Build> getBuild(ID buildId);
+    BuildResource getBuild(ID buildId);
 
     // Promotion levels
 
@@ -69,5 +73,9 @@ public interface StructureAPI {
     Document getValidationStampImage(ID validationStampId);
 
     void setValidationStampImage(ID validationStampId, Document document);
+
+    // Promoted runs
+
+    Form newPromotedRun(@PathVariable ID buildId);
 
 }

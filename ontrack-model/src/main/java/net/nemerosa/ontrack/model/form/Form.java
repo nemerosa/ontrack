@@ -44,6 +44,13 @@ public class Form {
         );
     }
 
+    public Form dateTime() {
+        return with(
+                DateTime.of("dateTime")
+                        .label("Date/time")
+        );
+    }
+
     public Form url() {
         return with(Url.of());
     }
