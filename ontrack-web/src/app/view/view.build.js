@@ -24,10 +24,25 @@ angular.module('ot.view.build', [
                 view.description = build.description;
                 // Commands
                 view.commands = [
+                    {
+                        condition: function () {
+                            return build.promote;
+                        },
+                        id: 'promote',
+                        name: "Promote",
+                        cls: 'ot-command-promote',
+                        action: promote
+                    },
                     ot.viewCloseCommand('/branch/' + build.branch.id)
                 ];
             });
         }
+
         loadBuild();
+
+        // Promotion
+        function promote() {
+
+        }
     })
 ;
