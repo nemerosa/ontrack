@@ -10,7 +10,16 @@
             <a href="#/build/{{build.id}}" class="ot-branch-build-view-build-name">
                 {{build.name}}
             </a>
+            <!-- Signature, without the creator in the overview -->
+            <div class="ot-branch-build-view-build-signature">
+                {{build.signature.time | date:'mediumDate'}}
+                {{build.signature.time | date:'shortTime'}}
+            </div>
         </td>
     </tr>
     </tbody>
+    <tfoot>
+    <!-- TODO Filter command -->
+    <!-- TODO Build diff extension commands -->
+    </tfoot>
 </table>
