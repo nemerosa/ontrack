@@ -92,7 +92,7 @@ public class ProjectController extends AbstractResourceController {
                         securityService.isProjectFunctionGranted(project.id(), ProjectEdit.class)
                 )
                         // Branch list
-                .with("branches", uri(on(StructureAPIController.class).getBranchListForProject(project.getId())))
+                .with("branches", uri(on(BranchController.class).getBranchListForProject(project.getId())))
                 ;
         // TODO Delete link
         // TODO View link

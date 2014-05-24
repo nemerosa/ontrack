@@ -85,30 +85,30 @@ public class BranchController extends AbstractResourceController {
                 // Build creation
                 .with(
                         "createBuild",
-                        uri(on(StructureAPIController.class).newBuild(branch.getId(), null)),
+                        uri(on(BuildController.class).newBuild(branch.getId(), null)),
                         securityService.isProjectFunctionGranted(branch.getProject().id(), BuildCreate.class)
                 )
                         // Promotion level creation
                 .with(
                         "createPromotionLevel",
-                        uri(on(StructureAPIController.class).newPromotionLevelForm(branch.getId())),
+                        uri(on(PromotionLevelController.class).newPromotionLevelForm(branch.getId())),
                         securityService.isProjectFunctionGranted(branch.getProject().id(), PromotionLevelCreate.class)
                 )
                         // Promotion level list
                 .with(
                         "promotionLevels",
-                        uri(on(StructureAPIController.class).getPromotionLevelListForBranch(branch.getId()))
+                        uri(on(PromotionLevelController.class).getPromotionLevelListForBranch(branch.getId()))
                 )
                         // Validation stamp creation
                 .with(
                         "createValidationStamp",
-                        uri(on(StructureAPIController.class).newValidationStampForm(branch.getId())),
+                        uri(on(ValidationStampController.class).newValidationStampForm(branch.getId())),
                         securityService.isProjectFunctionGranted(branch.getProject().id(), ValidationStampCreate.class)
                 )
                         // Validation stamp list
                 .with(
                         "validationStamps",
-                        uri(on(StructureAPIController.class).getValidationStampListForBranch(branch.getId()))
+                        uri(on(ValidationStampController.class).getValidationStampListForBranch(branch.getId()))
                 )
                 ;
     }
