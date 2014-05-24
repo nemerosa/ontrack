@@ -35,56 +35,6 @@ public class StructureAPIController extends AbstractResourceController {
         this.securityService = securityService;
     }
 
-    @RequestMapping(value = "projects", method = RequestMethod.GET)
-    public ResourceCollection<Project> getProjectList() {
-        return ResourceCollection.of(
-                structureService.getProjectList().stream().map(this::toProjectResource),
-                uri(on(StructureAPIController.class).getProjectList())
-        )
-                .with(Link.CREATE, uri(on(StructureAPIController.class).newProject(null)), securityService.isGlobalFunctionGranted(ProjectCreation.class));
-    }
-
-    @RequestMapping(value = "projects/create", method = RequestMethod.GET)
-    public Form newProjectForm() {
-        return Project.form();
-    }
-
-    @RequestMapping(value = "projects/create", method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.CREATED)
-    public Resource<Project> newProject(@RequestBody NameDescription nameDescription) {
-        // Creates a new project instance
-        Project project = Project.of(nameDescription);
-        // Saves it into the repository
-        project = structureService.newProject(project);
-        // OK
-        return toProjectResource(project);
-    }
-
-    @RequestMapping(value = "projects/{projectId}", method = RequestMethod.GET)
-    public Resource<Project> getProject(@PathVariable ID projectId) {
-        // Gets from the repository
-        Project project = structureService.getProject(projectId);
-        // As resource
-        return toProjectResourceWithActions(project);
-    }
-
-    @RequestMapping(value = "projects/{projectId}/update", method = RequestMethod.GET)
-    public Form saveProjectForm(@PathVariable ID projectId) {
-        return structureService.getProject(projectId).asForm();
-    }
-
-    @RequestMapping(value = "projects/{projectId}/update", method = RequestMethod.PUT)
-    public Resource<Project> saveProject(@PathVariable ID projectId, @RequestBody NameDescription nameDescription) {
-        // Gets from the repository
-        Project project = structureService.getProject(projectId);
-        // Updates
-        project = project.update(nameDescription);
-        // Saves in repository
-        structureService.saveProject(project);
-        // As resource
-        return toProjectResource(project);
-    }
-
     @RequestMapping(value = "projects/{projectId}/branches", method = RequestMethod.GET)
     public ResourceCollection<Branch> getBranchListForProject(@PathVariable ID projectId) {
         return ResourceCollection.of(
@@ -317,28 +267,6 @@ public class StructureAPIController extends AbstractResourceController {
 
     // Resource assemblers
 
-    private Resource<Project> toProjectResourceWithActions(Project project) {
-        return toProjectResource(project)
-                // Update
-                .with(
-                        Link.UPDATE,
-                        uri(on(StructureAPIController.class).saveProject(project.getId(), null)),
-                        securityService.isProjectFunctionGranted(project.id(), ProjectEdit.class)
-                )
-                        // Branch list
-                .with("branches", uri(on(StructureAPIController.class).getBranchListForProject(project.getId())))
-                ;
-        // TODO Delete link
-        // TODO View link
-    }
-
-    private Resource<Project> toProjectResource(Project project) {
-        return Resource.of(
-                project,
-                uri(on(StructureAPIController.class).getProject(project.getId()))
-        );
-    }
-
     private Resource<Branch> toBranchResourceWithActions(Branch branch) {
         return toBranchResource(branch)
                 // TODO Update link (with authorisation)
@@ -382,7 +310,7 @@ public class StructureAPIController extends AbstractResourceController {
                 uri(on(StructureAPIController.class).getBranch(branch.getId()))
         )
                 // Branch's project
-                .with("projectLink", uri(on(StructureAPIController.class).getProject(branch.getProject().getId())))
+                .with("projectLink", uri(on(ProjectController.class).getProject(branch.getProject().getId())))
                 ;
     }
 
@@ -422,7 +350,7 @@ public class StructureAPIController extends AbstractResourceController {
                 // Branch link
                 .with("branchLink", uri(on(StructureAPIController.class).getBranch(promotionLevel.getBranch().getId())))
                         // Project link
-                .with("projectLink", uri(on(StructureAPIController.class).getProject(promotionLevel.getBranch().getProject().getId())))
+                .with("projectLink", uri(on(ProjectController.class).getProject(promotionLevel.getBranch().getProject().getId())))
                         // Image link
                 .with("imageLink", uri(on(StructureAPIController.class).getPromotionLevelImage_(promotionLevel.getId())))
                 ;
@@ -444,7 +372,7 @@ public class StructureAPIController extends AbstractResourceController {
                 // Branch link
                 .with("branchLink", uri(on(StructureAPIController.class).getBranch(validationStamp.getBranch().getId())))
                         // Project link
-                .with("projectLink", uri(on(StructureAPIController.class).getProject(validationStamp.getBranch().getProject().getId())))
+                .with("projectLink", uri(on(ProjectController.class).getProject(validationStamp.getBranch().getProject().getId())))
                         // Image link
                 .with("imageLink", uri(on(StructureAPIController.class).getValidationStampImage_(validationStamp.getId())))
                 ;
