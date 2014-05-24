@@ -20,6 +20,12 @@
                 <!-- Type: memo -->
                 <textarea ng-if="field.type == 'memo'" ng-model="data[field.name]" class="form-control" rows="{{field.rows}}" ng-required="field.required" maxlength="{{field.maxlength}}" ng-readonly="field.readOnly"></textarea>
 
+                <!-- Type selection -->
+                <select ng-if="field.type == 'selection'" ng-model="data[field.name]" class="form-control"
+                        ng-options="item['id'] as item['name'] for item in field.items">
+                    <option ng-if="!field.required" value="">&nbsp;</option>
+                </select>
+
                 <!-- Validation message -->
                 <p ng-show="thisForm[field.name].$invalid && !thisForm[field.name].$pristine" class="help-block">{{field.validation}}</p>
             </div>
