@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.boot.ui;
 import net.nemerosa.ontrack.model.form.DateTime;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Selection;
-import net.nemerosa.ontrack.model.security.PromotionLevelCreate;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.security.ValidationStampCreate;
 import net.nemerosa.ontrack.model.structure.*;
@@ -34,72 +33,6 @@ public class StructureAPIController extends AbstractResourceController {
     public StructureAPIController(StructureService structureService, SecurityService securityService) {
         this.structureService = structureService;
         this.securityService = securityService;
-    }
-
-    // Promotion levels
-
-    @RequestMapping(value = "branches/{branchId}/promotionLevels", method = RequestMethod.GET)
-    public ResourceCollection<PromotionLevel> getPromotionLevelListForBranch(@PathVariable ID branchId) {
-        Branch branch = structureService.getBranch(branchId);
-        return ResourceCollection.of(
-                structureService.getPromotionLevelListForBranch(branchId).stream().map(this::toPromotionLevelResource),
-                uri(on(StructureAPIController.class).getPromotionLevelListForBranch(branchId))
-        )
-                // Create
-                .with(
-                        Link.CREATE,
-                        uri(on(StructureAPIController.class).newPromotionLevelForm(branchId)),
-                        securityService.isProjectFunctionGranted(branch.getProject().id(), PromotionLevelCreate.class)
-                )
-                ;
-    }
-
-    @RequestMapping(value = "branches/{branchId}/promotionLevels/create", method = RequestMethod.GET)
-    public Form newPromotionLevelForm(@PathVariable ID branchId) {
-        structureService.getBranch(branchId);
-        return PromotionLevel.form();
-    }
-
-    @RequestMapping(value = "branches/{branchId}/promotionLevels/create", method = RequestMethod.POST)
-    public Resource<PromotionLevel> newPromotionLevel(@PathVariable ID branchId, @RequestBody NameDescription nameDescription) {
-        // Gets the holding branch
-        Branch branch = structureService.getBranch(branchId);
-        // Creates a new promotion level
-        PromotionLevel promotionLevel = PromotionLevel.of(branch, nameDescription);
-        // Saves it into the repository
-        promotionLevel = structureService.newPromotionLevel(promotionLevel);
-        // OK
-        return toPromotionLevelResource(promotionLevel);
-    }
-
-    @RequestMapping(value = "promotionLevels/{promotionLevelId}", method = RequestMethod.GET)
-    public Resource<PromotionLevel> getPromotionLevel(@PathVariable ID promotionLevelId) {
-        return toPromotionLevelResourceWithActions(
-                structureService.getPromotionLevel(promotionLevelId)
-        );
-    }
-
-    @RequestMapping(value = "promotionLevels/{promotionLevelId}/image", method = RequestMethod.GET)
-    public ResponseEntity<byte[]> getPromotionLevelImage_(@PathVariable ID promotionLevelId) {
-        // Gets the file
-        Document file = structureService.getPromotionLevelImage(promotionLevelId);
-        if (file == null) {
-            return new ResponseEntity<>(new byte[0], HttpStatus.NO_CONTENT);
-        } else {
-            HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.setContentLength(file.getContent().length);
-            responseHeaders.setContentType(MediaType.parseMediaType(file.getType()));
-            return new ResponseEntity<>(file.getContent(), responseHeaders, HttpStatus.OK);
-        }
-    }
-
-    @RequestMapping(value = "promotionLevels/{promotionLevelId}/image", method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public void setPromotionLevelImage(@PathVariable ID promotionLevelId, @RequestParam MultipartFile file) throws IOException {
-        structureService.setPromotionLevelImage(promotionLevelId, new Document(
-                file.getContentType(),
-                file.getBytes()
-        ));
     }
 
     // Validation stamps
@@ -187,28 +120,6 @@ public class StructureAPIController extends AbstractResourceController {
     }
 
     // Resource assemblers
-
-    private Resource<PromotionLevel> toPromotionLevelResourceWithActions(PromotionLevel promotionLevel) {
-        return toPromotionLevelResource(promotionLevel);
-        // TODO Update
-        // TODO Delete
-        // TODO Next promotion level
-        // TODO Previous promotion level
-    }
-
-    private Resource<PromotionLevel> toPromotionLevelResource(PromotionLevel promotionLevel) {
-        return Resource.of(
-                promotionLevel,
-                uri(on(StructureAPIController.class).getPromotionLevel(promotionLevel.getId()))
-        )
-                // Branch link
-                .with("branchLink", uri(on(BranchController.class).getBranch(promotionLevel.getBranch().getId())))
-                        // Project link
-                .with("projectLink", uri(on(ProjectController.class).getProject(promotionLevel.getBranch().getProject().getId())))
-                        // Image link
-                .with("imageLink", uri(on(StructureAPIController.class).getPromotionLevelImage_(promotionLevel.getId())))
-                ;
-    }
 
     private Resource<ValidationStamp> toValidationStampResourceWithActions(ValidationStamp validationStamp) {
         return toValidationStampResource(validationStamp);
