@@ -39,7 +39,7 @@
                 <!-- Date time -->
                 <span ng-if="field.type == 'dateTime'">
                     <input ng-model="dates[field.name]" name="{{field.name}}-date" type="text" class="form-control"
-                           datepicker-popup
+                           datepicker-popup="EEE dd MMM yyyy"
                            is-open="opened"
                            />
                     <div class="ot-timepicker" ng-model="times[field.name]">
