@@ -42,7 +42,7 @@ angular.module('ot.view.build', [
 
         // Promotion
         function promote() {
-
+            otStructureService.create($scope.build.promote.href, 'Promotion for the build').then(loadBuild);
         }
     })
 ;
