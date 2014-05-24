@@ -24,7 +24,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 @RestController
 @RequestMapping("/structure")
-public class StructureAPIController extends AbstractResourceController implements StructureAPI {
+public class StructureAPIController extends AbstractResourceController {
 
     private final StructureService structureService;
     private final SecurityService securityService;
@@ -35,7 +35,6 @@ public class StructureAPIController extends AbstractResourceController implement
         this.securityService = securityService;
     }
 
-    @Override
     @RequestMapping(value = "projects", method = RequestMethod.GET)
     public ResourceCollection<Project> getProjectList() {
         return ResourceCollection.of(
@@ -45,13 +44,11 @@ public class StructureAPIController extends AbstractResourceController implement
                 .with(Link.CREATE, uri(on(StructureAPIController.class).newProject(null)), securityService.isGlobalFunctionGranted(ProjectCreation.class));
     }
 
-    @Override
     @RequestMapping(value = "projects/create", method = RequestMethod.GET)
     public Form newProjectForm() {
         return Project.form();
     }
 
-    @Override
     @RequestMapping(value = "projects/create", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public Resource<Project> newProject(@RequestBody NameDescription nameDescription) {
@@ -63,7 +60,6 @@ public class StructureAPIController extends AbstractResourceController implement
         return toProjectResource(project);
     }
 
-    @Override
     @RequestMapping(value = "projects/{projectId}", method = RequestMethod.GET)
     public Resource<Project> getProject(@PathVariable ID projectId) {
         // Gets from the repository
@@ -72,13 +68,11 @@ public class StructureAPIController extends AbstractResourceController implement
         return toProjectResourceWithActions(project);
     }
 
-    @Override
     @RequestMapping(value = "projects/{projectId}/update", method = RequestMethod.GET)
     public Form saveProjectForm(@PathVariable ID projectId) {
         return structureService.getProject(projectId).asForm();
     }
 
-    @Override
     @RequestMapping(value = "projects/{projectId}/update", method = RequestMethod.PUT)
     public Resource<Project> saveProject(@PathVariable ID projectId, @RequestBody NameDescription nameDescription) {
         // Gets from the repository
@@ -91,7 +85,6 @@ public class StructureAPIController extends AbstractResourceController implement
         return toProjectResource(project);
     }
 
-    @Override
     @RequestMapping(value = "projects/{projectId}/branches", method = RequestMethod.GET)
     public ResourceCollection<Branch> getBranchListForProject(@PathVariable ID projectId) {
         return ResourceCollection.of(
@@ -107,7 +100,6 @@ public class StructureAPIController extends AbstractResourceController implement
                 ;
     }
 
-    @Override
     @RequestMapping(value = "projects/{projectId}/branches/create", method = RequestMethod.GET)
     public Form newBranchForm(@PathVariable ID projectId) {
         // Checks the project exists
@@ -116,7 +108,6 @@ public class StructureAPIController extends AbstractResourceController implement
         return Branch.form();
     }
 
-    @Override
     @RequestMapping(value = "projects/{projectId}/branches/create", method = RequestMethod.POST)
     public Resource<Branch> newBranch(@PathVariable ID projectId, @RequestBody NameDescription nameDescription) {
         // Gets the project
@@ -129,7 +120,6 @@ public class StructureAPIController extends AbstractResourceController implement
         return toBranchResource(branch);
     }
 
-    @Override
     @RequestMapping(value = "branches/{branchId}", method = RequestMethod.GET)
     public Resource<Branch> getBranch(@PathVariable ID branchId) {
         return toBranchResourceWithActions(
@@ -137,8 +127,8 @@ public class StructureAPIController extends AbstractResourceController implement
         );
     }
 
-    @Override
     @RequestMapping(value = "branches/{branchId}/view", method = RequestMethod.GET)
+    // TODO Filter
     public BranchBuildView buildView(@PathVariable ID branchId) {
         // TODO Defines the filter for the service
         return structureService.getBranchBuildView(branchId);
@@ -146,7 +136,6 @@ public class StructureAPIController extends AbstractResourceController implement
 
     // Builds
 
-    @Override
     @RequestMapping(value = "branches/{branchId}/builds/create", method = RequestMethod.GET)
     public Form newBuildForm(@PathVariable ID branchId) {
         // Checks the branch does exist
@@ -155,7 +144,6 @@ public class StructureAPIController extends AbstractResourceController implement
         return Build.form();
     }
 
-    @Override
     @RequestMapping(value = "branches/{branchId}/builds/create", method = RequestMethod.POST)
     public Resource<Build> newBuild(@PathVariable ID branchId, @RequestBody NameDescription nameDescription) {
         // Gets the holding branch
@@ -170,7 +158,6 @@ public class StructureAPIController extends AbstractResourceController implement
         return toBuildResource(build);
     }
 
-    @Override
     @RequestMapping(value = "builds/{buildId}", method = RequestMethod.GET)
     public BuildResource getBuild(@PathVariable ID buildId) {
         return toBuildResourceWithActions(
@@ -181,7 +168,6 @@ public class StructureAPIController extends AbstractResourceController implement
     // Promotion levels
 
     @RequestMapping(value = "branches/{branchId}/promotionLevels", method = RequestMethod.GET)
-    @Override
     public ResourceCollection<PromotionLevel> getPromotionLevelListForBranch(@PathVariable ID branchId) {
         Branch branch = structureService.getBranch(branchId);
         return ResourceCollection.of(
@@ -197,14 +183,12 @@ public class StructureAPIController extends AbstractResourceController implement
                 ;
     }
 
-    @Override
     @RequestMapping(value = "branches/{branchId}/promotionLevels/create", method = RequestMethod.GET)
     public Form newPromotionLevelForm(@PathVariable ID branchId) {
         structureService.getBranch(branchId);
         return PromotionLevel.form();
     }
 
-    @Override
     @RequestMapping(value = "branches/{branchId}/promotionLevels/create", method = RequestMethod.POST)
     public Resource<PromotionLevel> newPromotionLevel(@PathVariable ID branchId, @RequestBody NameDescription nameDescription) {
         // Gets the holding branch
@@ -217,7 +201,6 @@ public class StructureAPIController extends AbstractResourceController implement
         return toPromotionLevelResource(promotionLevel);
     }
 
-    @Override
     @RequestMapping(value = "promotionLevels/{promotionLevelId}", method = RequestMethod.GET)
     public Resource<PromotionLevel> getPromotionLevel(@PathVariable ID promotionLevelId) {
         return toPromotionLevelResourceWithActions(
@@ -228,7 +211,7 @@ public class StructureAPIController extends AbstractResourceController implement
     @RequestMapping(value = "promotionLevels/{promotionLevelId}/image", method = RequestMethod.GET)
     public ResponseEntity<byte[]> getPromotionLevelImage_(@PathVariable ID promotionLevelId) {
         // Gets the file
-        Document file = getPromotionLevelImage(promotionLevelId);
+        Document file = structureService.getPromotionLevelImage(promotionLevelId);
         if (file == null) {
             return new ResponseEntity<>(new byte[0], HttpStatus.NO_CONTENT);
         } else {
@@ -242,29 +225,15 @@ public class StructureAPIController extends AbstractResourceController implement
     @RequestMapping(value = "promotionLevels/{promotionLevelId}/image", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void setPromotionLevelImage(@PathVariable ID promotionLevelId, @RequestParam MultipartFile file) throws IOException {
-        setPromotionLevelImage(
-                promotionLevelId,
-                new Document(
-                        file.getContentType(),
-                        file.getBytes()
-                )
-        );
-    }
-
-    @Override
-    public Document getPromotionLevelImage(ID promotionLevelId) {
-        return structureService.getPromotionLevelImage(promotionLevelId);
-    }
-
-    @Override
-    public void setPromotionLevelImage(ID promotionLevelId, Document document) {
-        structureService.setPromotionLevelImage(promotionLevelId, document);
+        structureService.setPromotionLevelImage(promotionLevelId, new Document(
+                file.getContentType(),
+                file.getBytes()
+        ));
     }
 
     // Validation stamps
 
     @RequestMapping(value = "branches/{branchId}/validationStamps", method = RequestMethod.GET)
-    @Override
     public ResourceCollection<ValidationStamp> getValidationStampListForBranch(@PathVariable ID branchId) {
         Branch branch = structureService.getBranch(branchId);
         return ResourceCollection.of(
@@ -280,14 +249,12 @@ public class StructureAPIController extends AbstractResourceController implement
                 ;
     }
 
-    @Override
     @RequestMapping(value = "branches/{branchId}/validationStamps/create", method = RequestMethod.GET)
     public Form newValidationStampForm(@PathVariable ID branchId) {
         structureService.getBranch(branchId);
         return ValidationStamp.form();
     }
 
-    @Override
     @RequestMapping(value = "branches/{branchId}/validationStamps/create", method = RequestMethod.POST)
     public Resource<ValidationStamp> newValidationStamp(@PathVariable ID branchId, @RequestBody NameDescription nameDescription) {
         // Gets the holding branch
@@ -300,7 +267,6 @@ public class StructureAPIController extends AbstractResourceController implement
         return toValidationStampResource(validationStamp);
     }
 
-    @Override
     @RequestMapping(value = "validationStamps/{validationStampId}", method = RequestMethod.GET)
     public Resource<ValidationStamp> getValidationStamp(@PathVariable ID validationStampId) {
         return toValidationStampResourceWithActions(
@@ -311,7 +277,7 @@ public class StructureAPIController extends AbstractResourceController implement
     @RequestMapping(value = "validationStamps/{validationStampId}/image", method = RequestMethod.GET)
     public ResponseEntity<byte[]> getValidationStampImage_(@PathVariable ID validationStampId) {
         // Gets the file
-        Document file = getValidationStampImage(validationStampId);
+        Document file = structureService.getValidationStampImage(validationStampId);
         if (file == null) {
             return new ResponseEntity<>(new byte[0], HttpStatus.NO_CONTENT);
         } else {
@@ -325,28 +291,14 @@ public class StructureAPIController extends AbstractResourceController implement
     @RequestMapping(value = "validationStamps/{validationStampId}/image", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void setValidationStampImage(@PathVariable ID validationStampId, @RequestParam MultipartFile file) throws IOException {
-        setValidationStampImage(
-                validationStampId,
-                new Document(
-                        file.getContentType(),
-                        file.getBytes()
-                )
-        );
-    }
-
-    @Override
-    public Document getValidationStampImage(ID validationStampId) {
-        return structureService.getValidationStampImage(validationStampId);
-    }
-
-    @Override
-    public void setValidationStampImage(ID validationStampId, Document document) {
-        structureService.setValidationStampImage(validationStampId, document);
+        structureService.setValidationStampImage(validationStampId, new Document(
+                file.getContentType(),
+                file.getBytes()
+        ));
     }
 
     // Promoted runs
 
-    @Override
     @RequestMapping(value = "builds/{buildId}/promotedRun/create", method = RequestMethod.GET)
     public Form newPromotedRun(@PathVariable ID buildId) {
         Build build = structureService.getBuild(buildId);
