@@ -15,6 +15,8 @@ public class Selection extends AbstractField<Selection> {
     }
 
     private List<?> items = new ArrayList<>();
+    private String itemId = "id";
+    private String itemName = "name";
 
     protected Selection(String name) {
         super("selection", name);
@@ -22,6 +24,16 @@ public class Selection extends AbstractField<Selection> {
 
     public Selection items(List<?> values) {
         this.items = values;
+        return this;
+    }
+
+    public Selection itemId(String value) {
+        this.itemId = value;
+        return this;
+    }
+
+    public Selection itemName(String value) {
+        this.itemName = value;
         return this;
     }
 }
