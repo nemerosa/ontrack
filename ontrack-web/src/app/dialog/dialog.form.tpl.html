@@ -42,6 +42,9 @@
                            datepicker-popup
                            is-open="opened"
                            />
+                    <div class="ot-timepicker" ng-model="times[field.name]">
+                        <timepicker show-meridian="false" minute-step="field.minuteStep" />
+                    </div>
                 </span>
 
                 <!-- Validation message -->

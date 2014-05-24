@@ -1,7 +1,11 @@
 package net.nemerosa.ontrack.model.form;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.Validate;
 
+@EqualsAndHashCode(callSuper = false)
+@Data
 public class DateTime extends AbstractField<DateTime> {
 
     public static DateTime of(String name) {

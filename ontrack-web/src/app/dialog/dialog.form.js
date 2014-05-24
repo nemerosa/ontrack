@@ -5,6 +5,7 @@ angular.module('ot.dialog.form', [])
         // Form data
         $scope.data = {};
         $scope.dates = {};
+        $scope.times = {};
         angular.forEach(config.form.fields, function (field) {
             $scope.data[field.name] = field.value;
             if (field.regex) {
@@ -13,7 +14,9 @@ angular.module('ot.dialog.form', [])
             // Date-time handling
             if (field.type == 'dateTime') {
                 if (field.value) {
-                    $scope.dates[field.name] = new Date(field.value);
+                    var dateTime = new Date(field.value);
+                    $scope.dates[field.name] = dateTime;
+                    $scope.times[field.name] = dateTime;
                 }
             }
         });
