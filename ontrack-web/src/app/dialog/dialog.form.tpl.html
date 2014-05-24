@@ -38,7 +38,10 @@
 
                 <!-- Date time -->
                 <span ng-if="field.type == 'dateTime'">
-                    <input ng-model="data[field.name]" name="dateTime" type="datetime-local" class="form-control"/>
+                    <input ng-model="dates[field.name]" name="{{field.name}}-date" type="text" class="form-control"
+                           datepicker-popup
+                           is-open="opened"
+                           />
                 </span>
 
                 <!-- Validation message -->

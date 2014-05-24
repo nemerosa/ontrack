@@ -4,10 +4,17 @@ angular.module('ot.dialog.form', [])
         $scope.config = config;
         // Form data
         $scope.data = {};
+        $scope.dates = {};
         angular.forEach(config.form.fields, function (field) {
             $scope.data[field.name] = field.value;
             if (field.regex) {
                 field.pattern = new RegExp(field.regex);
+            }
+            // Date-time handling
+            if (field.type == 'dateTime') {
+                if (field.value) {
+                    $scope.dates[field.name] = new Date(field.value);
+                }
             }
         });
         // Cancelling the dialog
