@@ -4,21 +4,31 @@
 <form name="thisForm" class="form-horizontal" ng-submit="submit(thisForm.$valid)" novalidate="novalidate">
     <div class="modal-body">
 
-        <div ng-repeat="field in config.form.fields" class="form-group" ng-class="{ 'has-error' : thisForm[field.name].$invalid && !thisForm[field.name].$pristine }">
+        <div ng-repeat="field in config.form.fields" class="form-group"
+             ng-class="{ 'has-error' : thisForm[field.name].$invalid && !thisForm[field.name].$pristine }">
             <label class="control-label col-md-3">{{field.label}}</label>
+
             <div class="col-md-9">
 
                 <!-- Type: text -->
-                <input ng-if="field.type == 'text'" ng-model="data[field.name]" name="{{field.name}}" maxlength="{{field.maxlength}}" type="text" class="form-control" ng-required="field.required" ng-readonly="field.readOnly" ng-pattern="field.pattern" />
+                <input ng-if="field.type == 'text'" ng-model="data[field.name]" name="{{field.name}}"
+                       maxlength="{{field.maxlength}}" type="text" class="form-control" ng-required="field.required"
+                       ng-readonly="field.readOnly" ng-pattern="field.pattern"/>
 
                 <!-- Type: url -->
-                <input ng-if="field.type == 'url'" ng-model="data[field.name]" name="{{field.name}}" maxlength="{{field.maxlength}}" type="url" class="form-control" ng-required="field.required" ng-readonly="field.readOnly" />
+                <input ng-if="field.type == 'url'" ng-model="data[field.name]" name="{{field.name}}"
+                       maxlength="{{field.maxlength}}" type="url" class="form-control" ng-required="field.required"
+                       ng-readonly="field.readOnly"/>
 
                 <!-- Type: password -->
-                <input ng-if="field.type == 'password'" ng-model="data[field.name]" name="{{field.name}}" maxlength="{{field.maxlength}}" type="password" class="form-control" ng-required="field.required" ng-readonly="field.readOnly" />
+                <input ng-if="field.type == 'password'" ng-model="data[field.name]" name="{{field.name}}"
+                       maxlength="{{field.maxlength}}" type="password" class="form-control" ng-required="field.required"
+                       ng-readonly="field.readOnly"/>
 
                 <!-- Type: memo -->
-                <textarea ng-if="field.type == 'memo'" ng-model="data[field.name]" class="form-control" rows="{{field.rows}}" ng-required="field.required" maxlength="{{field.maxlength}}" ng-readonly="field.readOnly"></textarea>
+                <textarea ng-if="field.type == 'memo'" ng-model="data[field.name]" class="form-control"
+                          rows="{{field.rows}}" ng-required="field.required" maxlength="{{field.maxlength}}"
+                          ng-readonly="field.readOnly"></textarea>
 
                 <!-- Type selection -->
                 <select ng-if="field.type == 'selection'" ng-model="data[field.name]" class="form-control"
@@ -26,8 +36,14 @@
                     <option ng-if="!field.required" value="">&nbsp;</option>
                 </select>
 
+                <!-- Date time -->
+                <span ng-if="field.type == 'dateTime'">
+                    <input ng-model="data[field.name]" name="dateTime" type="datetime-local" class="form-control"/>
+                </span>
+
                 <!-- Validation message -->
-                <p ng-show="thisForm[field.name].$invalid && !thisForm[field.name].$pristine" class="help-block">{{field.validation}}</p>
+                <p ng-show="thisForm[field.name].$invalid && !thisForm[field.name].$pristine" class="help-block">
+                    {{field.validation}}</p>
             </div>
         </div>
 
