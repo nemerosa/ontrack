@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.form.Selection;
 import net.nemerosa.ontrack.model.security.PromotionRunCreate;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.model.support.Time;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,16 +62,18 @@ public class BuildController extends AbstractResourceController {
     // Promoted runs
 
     @RequestMapping(value = "builds/{buildId}/promotedRun/create", method = RequestMethod.GET)
-    public Form newPromotedRun(@PathVariable ID buildId) {
+    public Form newPromotedRunForm(@PathVariable ID buildId) {
         Build build = structureService.getBuild(buildId);
         return Form.create()
                 .with(
                         Selection.of("promotionLevel")
+                                .label("Promotion level")
                                 .items(structureService.getPromotionLevelListForBranch(build.getBranch().getId()))
                 )
                 .with(
                         DateTime.of("dateTime")
                                 .label("Date/time")
+                                .value(Time.now())
                                 .minuteStep(15)
                 )
                 .description();
@@ -90,7 +93,7 @@ public class BuildController extends AbstractResourceController {
         // Creation of a promoted run
         resource.with(
                 "promote",
-                uri(on(BuildController.class).newPromotedRun(build.getId())),
+                uri(on(BuildController.class).newPromotedRunForm(build.getId())),
                 securityService.isProjectFunctionGranted(build.getBranch().getProject().id(), PromotionRunCreate.class)
         );
         // TODO Update

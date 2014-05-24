@@ -44,8 +44,9 @@ public abstract class AbstractField<F extends AbstractField<F>> implements Field
     }
 
     @Override
-    public Field value(Object value) {
+    public F value(Object value) {
         this.value = value;
-        return this;
+        //noinspection unchecked
+        return (F) this;
     }
 }
