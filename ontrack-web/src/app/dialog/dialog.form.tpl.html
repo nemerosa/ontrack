@@ -32,18 +32,23 @@
 
                 <!-- Type selection -->
                 <select ng-if="field.type == 'selection'" ng-model="data[field.name]" class="form-control"
+                        ng-required="field.required"
                         ng-options="item[field.itemId] as item[field.itemName] for item in field.items">
-                    <option ng-if="!field.required" value="">&nbsp;</option>
+                    <option value="">&nbsp;</option>
                 </select>
 
                 <!-- Date time -->
                 <span ng-if="field.type == 'dateTime'">
-                    <input ng-model="dates[field.name]" name="{{field.name}}-date" type="text" class="form-control"
-                           datepicker-popup="EEE dd MMM yyyy"
-                           is-open="opened"
-                           />
-                    <div class="ot-timepicker" ng-model="times[field.name]">
-                        <timepicker show-meridian="false" minute-step="field.minuteStep" />
+                    <div class="row">
+                        <div class="col-md-7" style="vertical-align: middle">
+                            <input ng-model="dates[field.name]" name="{{field.name}}-date" type="text" class="form-control"
+                                   datepicker-popup="EEE dd MMM yyyy"
+                                   is-open="opened"
+                                    />
+                        </div>
+                        <div class="col-md-5 ot-timepicker" ng-model="times[field.name]">
+                            <timepicker show-meridian="false" minute-step="field.minuteStep" />
+                        </div>
                     </div>
                 </span>
 
