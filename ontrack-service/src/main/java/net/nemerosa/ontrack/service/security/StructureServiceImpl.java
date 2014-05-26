@@ -204,6 +204,13 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public List<PromotionRun> getLastPromotionRunsForBuild(ID buildId) {
+        Build build = getBuild(buildId);
+        securityService.checkProjectFunction(build.getBranch().getProject().id(), ProjectView.class);
+        return structureRepository.getLastPromotionRunsForBuild(build);
+    }
+
+    @Override
     public List<ValidationStamp> getValidationStampListForBranch(ID branchId) {
         Branch branch = getBranch(branchId);
         securityService.checkProjectFunction(branch.getProject().id(), ProjectView.class);

@@ -52,6 +52,8 @@ public interface StructureRepository {
 
     PromotionRun getPromotionRun(ID promotionRunId);
 
+    List<PromotionRun> getLastPromotionRunsForBuild(Build build);
+
     // Validation stamps
 
     List<ValidationStamp> getValidationStampListForBranch(ID branchId);

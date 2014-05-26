@@ -10,9 +10,12 @@ import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.Time;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Resource;
+import net.nemerosa.ontrack.ui.resource.ResourceCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.stream.Collectors;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -62,8 +65,19 @@ public class BuildController extends AbstractResourceController {
 
     // Promoted runs
 
-    @RequestMapping(value = "builds/{buildId}/promotedRun/create", method = RequestMethod.GET)
-    public Form newPromotedRunForm(@PathVariable ID buildId) {
+    @RequestMapping(value = "builds/{buildId}/promotionRun", method = RequestMethod.GET)
+    public ResourceCollection<PromotionRun> getPromotionRuns(@PathVariable ID buildId) {
+        return ResourceCollection.of(
+                structureService.getLastPromotionRunsForBuild(buildId)
+                        .stream()
+                        .map(this::toPromotionRunResource)
+                        .collect(Collectors.toList()),
+                uri(on(getClass()).getPromotionRuns(buildId))
+        );
+    }
+
+    @RequestMapping(value = "builds/{buildId}/promotionRun/create", method = RequestMethod.GET)
+    public Form newPromotionRunForm(@PathVariable ID buildId) {
         Build build = structureService.getBuild(buildId);
         return Form.create()
                 .with(
@@ -80,9 +94,9 @@ public class BuildController extends AbstractResourceController {
                 .description();
     }
 
-    @RequestMapping(value = "builds/{buildId}/promotedRun/create", method = RequestMethod.POST)
+    @RequestMapping(value = "builds/{buildId}/promotionRun/create", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public Resource<PromotionRun> newPromotedRun(@PathVariable ID buildId, @RequestBody PromotionRunRequest promotionRunRequest) {
+    public Resource<PromotionRun> newPromotionRun(@PathVariable ID buildId, @RequestBody PromotionRunRequest promotionRunRequest) {
         // Gets the build
         Build build = structureService.getBuild(buildId);
         // Gets the promotion level
@@ -119,7 +133,7 @@ public class BuildController extends AbstractResourceController {
         // Creation of a promoted run
         resource.with(
                 "promote",
-                uri(on(BuildController.class).newPromotedRunForm(build.getId())),
+                uri(on(BuildController.class).newPromotionRunForm(build.getId())),
                 securityService.isProjectFunctionGranted(build.getBranch().getProject().id(), PromotionRunCreate.class)
         );
         // TODO Update

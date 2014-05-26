@@ -54,6 +54,8 @@ public interface StructureService {
 
     PromotionRun getPromotionRun(ID promotionRunId);
 
+    List<PromotionRun> getLastPromotionRunsForBuild(ID buildId);
+
     // Validation stamps
 
     List<ValidationStamp> getValidationStampListForBranch(ID branchId);

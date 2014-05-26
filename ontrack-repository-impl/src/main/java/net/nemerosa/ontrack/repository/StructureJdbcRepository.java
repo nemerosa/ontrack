@@ -13,7 +13,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Repository
 public class StructureJdbcRepository extends AbstractJdbcRepository implements StructureRepository {
@@ -287,6 +289,33 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                         rs,
                         this::getBuild,
                         this::getPromotionLevel
+                )
+        );
+    }
+
+    @Override
+    public List<PromotionRun> getLastPromotionRunsForBuild(Build build) {
+        // Branch
+        Branch branch = build.getBranch();
+        // Promotion levels for the branch
+        List<PromotionLevel> promotionLevels = getPromotionLevelListForBranch(branch.getId());
+        // Gets the last promotion run for each promotion level
+        return promotionLevels.stream()
+                .map(promotionLevel -> getLastPromotionRun(build, promotionLevel))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+    }
+
+    protected Optional<PromotionRun> getLastPromotionRun(Build build, PromotionLevel promotionLevel) {
+        return Optional.ofNullable(
+                getFirstItem(
+                        "SELECT * FROM PROMOTION_RUNS WHERE BUILDID = :buildId AND PROMOTIONLEVELID = :promotionLevelId ORDER BY CREATION DESC LIMIT 1",
+                        params("buildId", build.id()).addValue("promotionLevelId", promotionLevel.id()),
+                        (rs, rowNum) -> toPromotionRun(rs,
+                                (id) -> build,
+                                (id) -> promotionLevel
+                        )
                 )
         );
     }
