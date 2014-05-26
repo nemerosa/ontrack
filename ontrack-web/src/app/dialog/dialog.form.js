@@ -27,6 +27,19 @@ angular.module('ot.dialog.form', [])
         // Submitting the dialog
         $scope.submit = function (isValid) {
             if (isValid) {
+                // Processing before submit
+                angular.forEach(config.form.fields, function (field) {
+                    // Date-time handling
+                    if (field.type == 'dateTime') {
+                        var date = $scope.dates[field.name];
+                        var time = $scope.times[field.name];
+                        var dateTime = date;
+                        dateTime.setHours(time.getHours());
+                        dateTime.setMinutes(time.getMinutes());
+                        $scope.data[field.name] = dateTime;
+                    }
+                });
+                // Submit
                 config.formConfig.submit($scope.data).then(
                     function success() {
                         $modalInstance.close('ok');
