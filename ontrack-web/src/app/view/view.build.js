@@ -46,6 +46,9 @@ angular.module('ot.view.build', [
         // Loads the promotion runs
         function loadPromotionRuns() {
             ot.call($http.get($scope.build.lastPromotionRuns.href)).then(function (promotionRunCollection) {
+                angular.forEach(promotionRunCollection.resources, function (promotionRun) {
+                    promotionRun.image = promotionRun.promotionLevel.image;
+                });
                 $scope.promotionRunCollection = promotionRunCollection;
             });
         }

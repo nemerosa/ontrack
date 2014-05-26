@@ -2,10 +2,10 @@
     <div class="row">
         <div class="col-md-12">
             <ot-section-title>Promotions</ot-section-title>
-            <b>TODO Missing images</b>
             <p ng-repeat="promotionRun in promotionRunCollection.resources">
-
-                {{promotionRun.promotionLevel.name}}
+                <ot-entity-image entity="promotionRun" link="#/promotionLevel/{{promotionRun.promotionLevel.id}}">
+                    {{promotionRun.promotionLevel.name}}
+                </ot-entity-image>
             </p>
         </div>
     </div>
