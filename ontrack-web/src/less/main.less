@@ -144,6 +144,12 @@ div.ot-view {
   }
 }
 
+.ot-signature {
+  font-style: italic;
+  font-size: 75%;
+  color: #808080;
+}
+
 .ot-section-title {
   font-size: 120%;
   font-weight: bold;
@@ -232,6 +238,15 @@ td.ot-entity-image {
   width: @otIconSize + 3;
 }
 
+.ot-promotion-run {
+  display: inline-block;
+  margin-right: 1em;
+  .ot-promotion-run-signature {
+    .ot-signature;
+    display: block;
+  }
+}
+
 /**
  * Commands
  */
@@ -304,7 +319,5 @@ table.ot-branch-build-view {
 }
 
 div.ot-branch-build-view-build-signature {
-  font-style: italic;
-  font-size: 75%;
-  color: #808080;
+  .ot-signature;
 }

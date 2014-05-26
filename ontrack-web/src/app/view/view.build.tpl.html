@@ -2,10 +2,14 @@
     <div class="row">
         <div class="col-md-12">
             <ot-section-title>Promotions</ot-section-title>
-            <p ng-repeat="promotionRun in promotionRunCollection.resources">
+            <p ng-repeat="promotionRun in promotionRunCollection.resources" class="ot-promotion-run">
                 <ot-entity-image entity="promotionRun" link="#/promotionLevel/{{promotionRun.promotionLevel.id}}">
                     {{promotionRun.promotionLevel.name}}
                 </ot-entity-image>
+                <span class="ot-promotion-run-signature">
+                    {{promotionRun.signature.time | date:'mediumDate'}}
+                    {{promotionRun.signature.time | date:'shortTime'}}
+                </span>
             </p>
         </div>
     </div>
