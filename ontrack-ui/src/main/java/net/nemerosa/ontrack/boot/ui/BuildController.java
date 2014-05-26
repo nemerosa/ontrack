@@ -143,6 +143,8 @@ public class BuildController extends AbstractResourceController {
         return Resource.of(
                 promotionRun,
                 uri(on(getClass()).getPromotionRun(promotionRun.getId()))
-        );
+        )
+                .with("imageLink", uri(on(PromotionLevelController.class).getPromotionLevelImage_(promotionRun.getPromotionLevel().getId())))
+                ;
     }
 }
