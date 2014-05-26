@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.model.support.Time;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -79,6 +80,31 @@ public class BuildController extends AbstractResourceController {
                 .description();
     }
 
+    @RequestMapping(value = "builds/{buildId}/promotedRun/create", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
+    public Resource<PromotionRun> newPromotedRun(@PathVariable ID buildId, @RequestBody PromotionRunRequest promotionRunRequest) {
+        // Gets the build
+        Build build = structureService.getBuild(buildId);
+        // Gets the promotion level
+        PromotionLevel promotionLevel = structureService.getPromotionLevel(ID.of(promotionRunRequest.getPromotionLevel()));
+        // Promotion run to create
+        PromotionRun promotionRun = PromotionRun.of(
+                build,
+                promotionLevel,
+                securityService.getCurrentSignature().withTime(promotionRunRequest.getDateTime()),
+                promotionRunRequest.getDescription()
+        );
+        // Creation
+        promotionRun = structureService.newPromotionRun(promotionRun);
+        // OK
+        return toPromotionRunResource(promotionRun);
+    }
+
+    @RequestMapping(value = "promotionRuns/{promotionRunId}", method = RequestMethod.GET)
+    public Resource<PromotionRun> getPromotionRun(@PathVariable ID promotionRunId) {
+        return toPromotionRunResource(structureService.getPromotionRun(promotionRunId));
+    }
+
     // Resource assemblers
 
     private BuildResource toBuildResource(Build build) {
@@ -99,5 +125,12 @@ public class BuildController extends AbstractResourceController {
         // TODO Update
         // TODO Delete
         return resource;
+    }
+
+    private Resource<PromotionRun> toPromotionRunResource(PromotionRun promotionRun) {
+        return Resource.of(
+                promotionRun,
+                uri(on(getClass()).getPromotionRun(promotionRun.getId()))
+        );
     }
 }

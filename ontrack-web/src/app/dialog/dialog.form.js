@@ -36,6 +36,8 @@ angular.module('ot.dialog.form', [])
                         var dateTime = date;
                         dateTime.setHours(time.getHours());
                         dateTime.setMinutes(time.getMinutes());
+                        dateTime.setSeconds(0);
+                        dateTime.setMilliseconds(0);
                         $scope.data[field.name] = dateTime;
                     }
                 });

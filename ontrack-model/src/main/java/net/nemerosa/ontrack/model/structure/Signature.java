@@ -28,4 +28,8 @@ public class Signature {
                 User.anonymous()
         );
     }
+
+    public Signature withTime(LocalDateTime dateTime) {
+        return new Signature(dateTime, user);
+    }
 }

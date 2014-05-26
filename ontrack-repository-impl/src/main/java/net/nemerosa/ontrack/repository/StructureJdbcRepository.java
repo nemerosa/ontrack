@@ -263,6 +263,46 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    public PromotionRun newPromotionRun(PromotionRun promotionRun) {
+        return promotionRun.withId(
+                id(
+                        dbCreate(
+                                "INSERT INTO PROMOTION_RUNS(BUILDID, PROMOTIONLEVELID, CREATION, CREATOR, DESCRIPTION) VALUES (:buildId, :promotionLevelId, :creation, :creator, :description)",
+                                params("buildId", promotionRun.getBuild().id())
+                                        .addValue("promotionLevelId", promotionRun.getPromotionLevel().id())
+                                        .addValue("description", promotionRun.getDescription())
+                                        .addValue("creation", dateTimeForDB(promotionRun.getSignature().getTime()))
+                                        .addValue("creator", promotionRun.getSignature().getUser().getName())
+                        )
+                )
+        );
+    }
+
+    @Override
+    public PromotionRun getPromotionRun(ID promotionRunId) {
+        return getNamedParameterJdbcTemplate().queryForObject(
+                "SELECT * FROM PROMOTION_RUNS WHERE ID = :id",
+                params("id", promotionRunId.getValue()),
+                (rs, rowNum) -> toPromotionRun(
+                        rs,
+                        this::getBuild,
+                        this::getPromotionLevel
+                )
+        );
+    }
+
+    protected PromotionRun toPromotionRun(ResultSet rs,
+                                          Function<ID, Build> buildLoader,
+                                          Function<ID, PromotionLevel> promotionLevelLoader) throws SQLException {
+        return PromotionRun.of(
+                buildLoader.apply(id(rs, "buildId")),
+                promotionLevelLoader.apply(id(rs, "promotionLevelId")),
+                readSignature(rs),
+                rs.getString("description")
+        );
+    }
+
+    @Override
     public List<ValidationStamp> getValidationStampListForBranch(ID branchId) {
         Branch branch = getBranch(branchId);
         return getNamedParameterJdbcTemplate().query(

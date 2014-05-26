@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.repository.StructureRepository;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -174,12 +175,32 @@ public class StructureServiceImpl implements StructureService {
     @Override
     public void setPromotionLevelImage(ID promotionLevelId, Document document) {
         checkImage(document);
-
         // Checks access
         PromotionLevel promotionLevel = getPromotionLevel(promotionLevelId);
         securityService.checkProjectFunction(promotionLevel.getBranch().getProject().id(), PromotionLevelEdit.class);
         // Repository
         structureRepository.setPromotionLevelImage(promotionLevelId, document);
+    }
+
+    @Override
+    public PromotionRun newPromotionRun(PromotionRun promotionRun) {
+        // Validation
+        isEntityNew(promotionRun, "Promotion run must be new");
+        isEntityDefined(promotionRun.getBuild(), "Build must be defined");
+        isEntityDefined(promotionRun.getPromotionLevel(), "Promotion level must be defined");
+        Validate.isTrue(promotionRun.getPromotionLevel().getBranch().id() == promotionRun.getBuild().getBranch().id(),
+                "Promotion for a promotion level can be done only on the same branch than the build.");
+        // Checks the authorization
+        securityService.checkProjectFunction(promotionRun.getBuild().getBranch().getProject().id(), PromotionRunCreate.class);
+        // Actual creation
+        return structureRepository.newPromotionRun(promotionRun);
+    }
+
+    @Override
+    public PromotionRun getPromotionRun(ID promotionRunId) {
+        PromotionRun promotionRun = structureRepository.getPromotionRun(promotionRunId);
+        securityService.checkProjectFunction(promotionRun.getBuild().getBranch().getProject().id(), ProjectView.class);
+        return promotionRun;
     }
 
     @Override

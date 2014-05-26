@@ -52,16 +52,18 @@ public class PromotionViewTest {
         Project project = Project.of(new NameDescription("P", "Project")).withId(ID.of(1));
         Branch branch = Branch.of(project, new NameDescription("B", "Branch")).withId(ID.of(1));
         PromotionLevel promotionLevel = PromotionLevel.of(branch, new NameDescription("PL", "Promotion level"));
+        Build build = Build.of(branch, new NameDescription("11", "Build 11"), Signature.of(dateTime(), "User"));
         PromotionView view = new PromotionView(
                 promotionLevel,
-                Build.of(branch, new NameDescription("11", "Build 11"), Signature.of(dateTime(), "User")),
-                new PromotionRun(
-                        "Promotion",
+                build,
+                PromotionRun.of(
+                        build,
+                        promotionLevel,
                         new Signature(
                                 dateTime(),
                                 new User("user")
                         ),
-                        promotionLevel
+                        "Promotion"
                 )
         );
         assertJsonWrite(
@@ -95,14 +97,16 @@ public class PromotionViewTest {
                                         // Branch skipped
                                 .end())
                         .with("promotionRun", object()
-                                .with("description", "Promotion")
+                                .with("id", 0)
+                                        // Promotion level skipped
+                                        // Build skipped
                                 .with("signature", object()
                                         .with("time", dateTimeJson())
                                         .with("user", object()
                                                 .with("name", "user")
                                                 .end())
                                         .end())
-                                        // Promotion level skipped
+                                .with("description", "Promotion")
                                 .end())
                         .end(),
                 view,

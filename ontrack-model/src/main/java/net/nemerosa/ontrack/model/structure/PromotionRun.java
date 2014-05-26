@@ -1,14 +1,40 @@
 package net.nemerosa.ontrack.model.structure;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-public class PromotionRun {
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+public class PromotionRun implements Entity {
 
-    private final String description;
-    private final Signature signature;
-    @JsonView({Build.class, BranchBuildView.class})
+    private final ID id;
+    @JsonView({PromotionRun.class})
+    private final Build build;
+    @JsonView({PromotionRun.class})
     private final PromotionLevel promotionLevel;
+    private final Signature signature;
+    private final String description;
+
+    public static PromotionRun of(Build build, PromotionLevel promotionLevel, Signature signature, String description) {
+        return new PromotionRun(
+                ID.NONE,
+                build,
+                promotionLevel,
+                signature,
+                description
+        );
+    }
+
+    public PromotionRun withId(ID id) {
+        return new PromotionRun(
+                id,
+                build,
+                promotionLevel,
+                signature,
+                description
+        );
+    }
 
 }

@@ -46,6 +46,12 @@ public interface StructureRepository {
 
     void setPromotionLevelImage(ID promotionLevelId, Document document);
 
+    // Promotion runs
+
+    PromotionRun newPromotionRun(PromotionRun promotionRun);
+
+    PromotionRun getPromotionRun(ID promotionRunId);
+
     // Validation stamps
 
     List<ValidationStamp> getValidationStampListForBranch(ID branchId);
