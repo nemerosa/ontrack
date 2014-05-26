@@ -22,6 +22,8 @@ angular.module('ot.view.build', [
                 // View configuration
                 view.title = "Build " + build.name;
                 view.description = build.description;
+                // Loads the promotion runs
+                loadPromotionRuns();
                 // Commands
                 view.commands = [
                     {
@@ -38,7 +40,15 @@ angular.module('ot.view.build', [
             });
         }
 
+        // Page initialisation
         loadBuild();
+
+        // Loads the promotion runs
+        function loadPromotionRuns() {
+            ot.call($http.get($scope.build.lastPromotionRuns.href)).then(function (promotionRunCollection) {
+                $scope.promotionRunCollection = promotionRunCollection;
+            });
+        }
 
         // Promotion
         function promote() {

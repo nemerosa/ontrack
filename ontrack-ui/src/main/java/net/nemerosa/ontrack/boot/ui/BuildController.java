@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.boot.ui;
 
-import net.nemerosa.ontrack.boot.resource.BuildResource;
 import net.nemerosa.ontrack.model.form.DateTime;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Selection;
@@ -57,7 +56,7 @@ public class BuildController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "builds/{buildId}", method = RequestMethod.GET)
-    public BuildResource getBuild(@PathVariable ID buildId) {
+    public Resource<Build> getBuild(@PathVariable ID buildId) {
         return toBuildResourceWithActions(
                 structureService.getBuild(buildId)
         );
@@ -65,14 +64,14 @@ public class BuildController extends AbstractResourceController {
 
     // Promoted runs
 
-    @RequestMapping(value = "builds/{buildId}/promotionRun", method = RequestMethod.GET)
-    public ResourceCollection<PromotionRun> getPromotionRuns(@PathVariable ID buildId) {
+    @RequestMapping(value = "builds/{buildId}/promotionRun/last", method = RequestMethod.GET)
+    public ResourceCollection<PromotionRun> getLastPromotionRuns(@PathVariable ID buildId) {
         return ResourceCollection.of(
                 structureService.getLastPromotionRunsForBuild(buildId)
                         .stream()
                         .map(this::toPromotionRunResource)
                         .collect(Collectors.toList()),
-                uri(on(getClass()).getPromotionRuns(buildId))
+                uri(on(getClass()).getLastPromotionRuns(buildId))
         );
     }
 
@@ -121,24 +120,23 @@ public class BuildController extends AbstractResourceController {
 
     // Resource assemblers
 
-    private BuildResource toBuildResource(Build build) {
-        return new BuildResource(
+    private Resource<Build> toBuildResource(Build build) {
+        return Resource.of(
                 build,
                 uri(on(getClass()).getBuild(build.getId()))
-        );
+        ).with("lastPromotionRuns", uri(on(getClass()).getLastPromotionRuns(build.getId())));
     }
 
-    private BuildResource toBuildResourceWithActions(Build build) {
-        BuildResource resource = toBuildResource(build);
-        // Creation of a promoted run
-        resource.with(
-                "promote",
-                uri(on(BuildController.class).newPromotionRunForm(build.getId())),
-                securityService.isProjectFunctionGranted(build.getBranch().getProject().id(), PromotionRunCreate.class)
-        );
+    private Resource<Build> toBuildResourceWithActions(Build build) {
+        return toBuildResource(build)
+                // Creation of a promoted run
+                .with(
+                        "promote",
+                        uri(on(BuildController.class).newPromotionRunForm(build.getId())),
+                        securityService.isProjectFunctionGranted(build.getBranch().getProject().id(), PromotionRunCreate.class)
+                );
         // TODO Update
         // TODO Delete
-        return resource;
     }
 
     private Resource<PromotionRun> toPromotionRunResource(PromotionRun promotionRun) {
