@@ -12,7 +12,6 @@ public class PromotionRun implements Entity {
     private final ID id;
     @JsonView({PromotionRun.class})
     private final Build build;
-    @JsonView({PromotionRun.class})
     private final PromotionLevel promotionLevel;
     private final Signature signature;
     private final String description;
