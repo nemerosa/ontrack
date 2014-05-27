@@ -12,4 +12,13 @@ angular.module('ot.directive.entity', [
             }
         };
     })
+    .directive('otValidationRunStatus', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'app/directive/directive.validationRunStatus.tpl.html',
+            scope: {
+                status: '='
+            }
+        };
+    })
 ;
