@@ -25,7 +25,7 @@
                     <p class="ot-description">List of validations that have run and passed.</p>
                     <div class="well">
                         <table class="ot-validation-runs">
-                            <tr ng-repeat="validationRun in validationRunCollection.resources">
+                            <tr ng-repeat="validationRun in validationRunCollection.resources" ng-if="validationRun.passed">
                                 <td>
                                     <ot-entity-image entity="validationRun" link="#/validationStamp/{{validationRun.validationStamp.id}}">
                                         {{validationRun.validationStamp.name}}
@@ -43,10 +43,29 @@
                 <div class="col-md-4">
                     <ot-subsection-title>Run &amp; failed</ot-subsection-title>
                     <p class="ot-description">List of validations that have run and failed.</p>
+                    <div class="well">
+                        <table class="ot-validation-runs">
+                            <tr ng-repeat="validationRun in validationRunCollection.resources" ng-if="!validationRun.passed">
+                                <td>
+                                    <ot-entity-image entity="validationRun" link="#/validationStamp/{{validationRun.validationStamp.id}}">
+                                        {{validationRun.validationStamp.name}}
+                                    </ot-entity-image>
+                                </td>
+                                <td>
+                                    <span ng-repeat="status in validationRun.validationRunStatuses">
+                                        {{status.statusID.id}}
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
                 <div class="col-md-4">
                     <ot-subsection-title>Not run</ot-subsection-title>
                     <p class="ot-description">List of validations that have not run.</p>
+                    <div class="well">
+                        TODO
+                    </div>
                 </div>
             </div>
         </div>
