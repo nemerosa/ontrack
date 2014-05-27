@@ -25,6 +25,8 @@ angular.module('ot.view.build', [
                 view.breadcrumbs = ot.branchBreadcrumbs(build.branch);
                 // Loads the promotion runs
                 loadPromotionRuns();
+                // Loads the validation runs
+                loadValidationRuns();
                 // Commands
                 view.commands = [
                     {
@@ -60,6 +62,13 @@ angular.module('ot.view.build', [
                     promotionRun.image = promotionRun.promotionLevel.image;
                 });
                 $scope.promotionRunCollection = promotionRunCollection;
+            });
+        }
+
+        // Loads the validation runs
+        function loadValidationRuns() {
+            ot.call($http.get($scope.build.validationRuns.href)).then(function (validationRunCollection) {
+
             });
         }
 

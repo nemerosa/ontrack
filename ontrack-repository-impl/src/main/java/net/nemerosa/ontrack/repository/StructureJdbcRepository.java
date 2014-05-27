@@ -443,7 +443,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     @Override
     public List<ValidationRun> getValidationRunsForBuild(Build build) {
         return getNamedParameterJdbcTemplate().query(
-                "SELECT * FORM VALIDATION_RUNS WHERE BUILDID = :buildId",
+                "SELECT * FROM VALIDATION_RUNS WHERE BUILDID = :buildId",
                 params("buildId", build.id()),
                 (rs, rowNum) -> toValidationRun(
                         rs,

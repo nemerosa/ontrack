@@ -188,7 +188,9 @@ public class BuildController extends AbstractResourceController {
         return Resource.of(
                 build,
                 uri(on(getClass()).getBuild(build.getId()))
-        ).with("lastPromotionRuns", uri(on(getClass()).getLastPromotionRuns(build.getId())));
+        )
+                .with("lastPromotionRuns", uri(on(getClass()).getLastPromotionRuns(build.getId())))
+                .with("validationRuns", uri(on(getClass()).getValidationRuns(build.getId())));
     }
 
     private Resource<Build> toBuildResourceWithActions(Build build) {
