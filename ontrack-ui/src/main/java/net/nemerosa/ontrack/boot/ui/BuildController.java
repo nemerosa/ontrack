@@ -76,7 +76,7 @@ public class BuildController extends AbstractResourceController {
                         .map(this::toPromotionRunResource)
                         .collect(Collectors.toList()),
                 uri(on(getClass()).getLastPromotionRuns(buildId))
-        ).forView(BuildPromotionView.class);
+        ).forView(Build.class);
     }
 
     @RequestMapping(value = "builds/{buildId}/promotionRun/create", method = RequestMethod.GET)
@@ -132,7 +132,7 @@ public class BuildController extends AbstractResourceController {
                         .map(this::toValidationRunResource)
                         .collect(Collectors.toList()),
                 uri(on(getClass()).getLastPromotionRuns(buildId))
-        ).forView(BuildPromotionView.class);
+        ).forView(Build.class);
     }
 
     @RequestMapping(value = "builds/{buildId}/validationRuns/create", method = RequestMethod.GET)

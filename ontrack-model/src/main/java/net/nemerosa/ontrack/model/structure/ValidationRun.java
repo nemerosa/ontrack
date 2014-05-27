@@ -15,13 +15,13 @@ public class ValidationRun implements Entity {
     private final ID id;
     @JsonView({ValidationRun.class})
     private final Build build;
-    @JsonView({ValidationRun.class, BranchBuildView.class, BuildPromotionView.class})
+    @JsonView({ValidationRun.class, BranchBuildView.class, Build.class})
     private final ValidationStamp validationStamp;
 
     /**
      * Must always contain at least one validation run status at creation time.
      */
-    @JsonView({ValidationRun.class, BranchBuildView.class, BuildPromotionView.class})
+    @JsonView({ValidationRun.class, BranchBuildView.class, Build.class})
     private final List<ValidationRunStatus> validationRunStatuses;
 
     public static ValidationRun of(
