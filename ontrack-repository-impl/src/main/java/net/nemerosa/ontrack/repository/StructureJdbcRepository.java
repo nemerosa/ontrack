@@ -20,9 +20,12 @@ import java.util.stream.Collectors;
 @Repository
 public class StructureJdbcRepository extends AbstractJdbcRepository implements StructureRepository {
 
+    private final ValidationRunStatusService validationRunStatusService;
+
     @Autowired
-    public StructureJdbcRepository(DataSource dataSource) {
+    public StructureJdbcRepository(DataSource dataSource, ValidationRunStatusService validationRunStatusService) {
         super(dataSource);
+        this.validationRunStatusService = validationRunStatusService;
     }
 
     @Override
@@ -422,6 +425,52 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         }
 
         return validationRun.withId(ID.of(id));
+    }
+
+    @Override
+    public ValidationRun getValidationRun(ID validationRunId) {
+        return getNamedParameterJdbcTemplate().queryForObject(
+                "SELECT * FROM VALIDATION_RUNS WHERE ID = :id",
+                params("id", validationRunId.getValue()),
+                (rs, rowNum) -> toValidationRun(
+                        rs,
+                        this::getBuild,
+                        this::getValidationStamp
+                )
+        );
+    }
+
+    @Override
+    public List<ValidationRun> getValidationRunsForBuild(Build build) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT * FORM VALIDATION_RUNS WHERE BUILDID = :buildId",
+                params("buildId", build.id()),
+                (rs, rowNum) -> toValidationRun(
+                        rs,
+                        id -> build,
+                        this::getValidationStamp
+                )
+        );
+    }
+
+    protected ValidationRun toValidationRun(ResultSet rs, Function<ID, Build> buildSupplier, Function<ID, ValidationStamp> validationStampSupplier) throws SQLException {
+        int id = rs.getInt("id");
+        // Statuses
+        List<ValidationRunStatus> statuses = getNamedParameterJdbcTemplate().query(
+                "SELECT * FROM VALIDATION_RUN_STATUSES WHERE VALIDATIONRUNID = :validationRunId ORDER BY CREATION ASC",
+                params("validationRunId", id),
+                (rs1, rowNum) -> ValidationRunStatus.of(
+                        readSignature(rs1),
+                        validationRunStatusService.getValidationRunStatus(rs1.getString("validationRunStatusId")),
+                        rs1.getString("description")
+                )
+        );
+        // Run itself
+        return ValidationRun.of(
+                buildSupplier.apply(id(rs, "buildId")),
+                validationStampSupplier.apply(id(rs, "validationStampId")),
+                statuses
+        ).withId(ID.of(id));
     }
 
     protected PromotionLevel toPromotionLevel(ResultSet rs, Function<ID, Branch> branchSupplier) throws SQLException {

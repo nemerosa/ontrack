@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.stream.Collectors;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -125,7 +124,18 @@ public class BuildController extends AbstractResourceController {
 
     // Validation runs
 
-    @RequestMapping(value = "builds/{buildId}/validationRun/create", method = RequestMethod.GET)
+    @RequestMapping(value = "builds/{buildId}/validationRuns", method = RequestMethod.GET)
+    public ResourceCollection<ValidationRun> getValidationRuns(@PathVariable ID buildId) {
+        return ResourceCollection.of(
+                structureService.getValidationRunsForBuild(buildId)
+                        .stream()
+                        .map(this::toValidationRunResource)
+                        .collect(Collectors.toList()),
+                uri(on(getClass()).getLastPromotionRuns(buildId))
+        ).forView(BuildPromotionView.class);
+    }
+
+    @RequestMapping(value = "builds/{buildId}/validationRuns/create", method = RequestMethod.GET)
     public Form newValidationRunForm(@PathVariable ID buildId) {
         Build build = structureService.getBuild(buildId);
         return Form.create()
@@ -144,7 +154,7 @@ public class BuildController extends AbstractResourceController {
                 .description();
     }
 
-    @RequestMapping(value = "builds/{buildId}/validationRun/create", method = RequestMethod.POST)
+    @RequestMapping(value = "builds/{buildId}/validationRuns/create", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public Resource<ValidationRun> newValidationRun(@PathVariable ID buildId, @RequestBody ValidationRunRequest validationRunRequest) {
         // Gets the build
@@ -165,6 +175,11 @@ public class BuildController extends AbstractResourceController {
         validationRun = structureService.newValidationRun(validationRun);
         // OK
         return toValidationRunResource(validationRun);
+    }
+
+    @RequestMapping(value = "validationRuns/{validationRunId}", method = RequestMethod.GET)
+    public Resource<ValidationRun> getValidationRun(@PathVariable ID validationRunId) {
+        return toValidationRunResource(structureService.getValidationRun(validationRunId));
     }
 
     // Resource assemblers
@@ -207,8 +222,7 @@ public class BuildController extends AbstractResourceController {
     private Resource<ValidationRun> toValidationRunResource(ValidationRun validationRun) {
         return Resource.of(
                 validationRun,
-                // TODO Link to the validation run
-                URI.create("uri:todo:validationRun")
+                uri(on(getClass()).getValidationRun(validationRun.getId()))
         ).with(
                 Link.IMAGE_LINK, uri(on(ValidationStampController.class).getValidationStampImage_(validationRun.getValidationStamp().getId()))
         );

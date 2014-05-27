@@ -269,6 +269,20 @@ public class StructureServiceImpl implements StructureService {
         return structureRepository.newValidationRun(validationRun);
     }
 
+    @Override
+    public ValidationRun getValidationRun(ID validationRunId) {
+        ValidationRun validationRun = structureRepository.getValidationRun(validationRunId);
+        securityService.checkProjectFunction(validationRun.getBuild().getBranch().getProject().id(), ProjectView.class);
+        return validationRun;
+    }
+
+    @Override
+    public List<ValidationRun> getValidationRunsForBuild(ID buildId) {
+        Build build = getBuild(buildId);
+        securityService.checkProjectFunction(build.getBranch().getProject().id(), ProjectView.class);
+        return structureRepository.getValidationRunsForBuild(build);
+    }
+
     protected void checkImage(Document document) {
         // Checks the image type
         if (document != null && !ArrayUtils.contains(ACCEPTED_IMAGE_TYPES, document.getType())) {

@@ -30,17 +30,22 @@ public class ValidationRun implements Entity {
             Signature signature,
             ValidationRunStatusID validationRunStatusID,
             String description) {
+        List<ValidationRunStatus> statuses = Arrays.asList(
+                ValidationRunStatus.of(
+                        signature,
+                        validationRunStatusID,
+                        description
+                )
+        );
+        return of(build, validationStamp, statuses);
+    }
+
+    public static ValidationRun of(Build build, ValidationStamp validationStamp, List<ValidationRunStatus> statuses) {
         return new ValidationRun(
                 ID.NONE,
                 build,
                 validationStamp,
-                Arrays.asList(
-                        ValidationRunStatus.of(
-                                signature,
-                                validationRunStatusID,
-                                description
-                        )
-                )
+                statuses
         );
     }
 
