@@ -8,6 +8,7 @@ import java.util.*;
 public class ValidationRunStatusID {
 
     private final String id;
+    // TODO Status name
     private final Collection<String> followingStatuses;
 
     public boolean isRoot() {

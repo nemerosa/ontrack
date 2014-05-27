@@ -4,5 +4,6 @@ public interface ProjectEdit extends ProjectView,
         BuildCreate,
         PromotionLevelCreate, PromotionLevelEdit,
         ValidationStampCreate, ValidationStampEdit,
-        PromotionRunCreate {
+        PromotionRunCreate,
+        ValidationRunCreate {
 }

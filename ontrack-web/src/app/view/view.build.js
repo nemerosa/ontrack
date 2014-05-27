@@ -36,6 +36,15 @@ angular.module('ot.view.build', [
                         cls: 'ot-command-promote',
                         action: promote
                     },
+                    {
+                        condition: function () {
+                            return build.validate;
+                        },
+                        id: 'validate',
+                        name: "Validation run",
+                        cls: 'ot-command-validate',
+                        action: validate
+                    },
                     ot.viewCloseCommand('/branch/' + build.branch.id)
                 ];
             });
@@ -57,6 +66,11 @@ angular.module('ot.view.build', [
         // Promotion
         function promote() {
             otStructureService.create($scope.build.promote.href, 'Promotion for the build').then(loadPromotionRuns);
+        }
+
+        // Validation
+        function validate() {
+            otStructureService.create($scope.build.validate.href, 'Validation for the build').then(loadBuild);
         }
     })
 ;

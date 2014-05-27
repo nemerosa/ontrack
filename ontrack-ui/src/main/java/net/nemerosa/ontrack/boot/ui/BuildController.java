@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Selection;
 import net.nemerosa.ontrack.model.security.PromotionRunCreate;
 import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.security.ValidationRunCreate;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.Time;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
@@ -23,11 +24,13 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 public class BuildController extends AbstractResourceController {
 
     private final StructureService structureService;
+    private final ValidationRunStatusService validationRunStatusService;
     private final SecurityService securityService;
 
     @Autowired
-    public BuildController(StructureService structureService, SecurityService securityService) {
+    public BuildController(StructureService structureService, ValidationRunStatusService validationRunStatusService, SecurityService securityService) {
         this.structureService = structureService;
+        this.validationRunStatusService = validationRunStatusService;
         this.securityService = securityService;
     }
 
@@ -118,6 +121,27 @@ public class BuildController extends AbstractResourceController {
         return toPromotionRunResource(structureService.getPromotionRun(promotionRunId));
     }
 
+    // Validation runs
+
+    @RequestMapping(value = "builds/{buildId}/validationRun/create", method = RequestMethod.GET)
+    public Form newValidationRunForm(@PathVariable ID buildId) {
+        Build build = structureService.getBuild(buildId);
+        return Form.create()
+                .with(
+                        Selection.of("validationStamp")
+                                .label("Validation stamp")
+                                .items(structureService.getValidationStampListForBranch(build.getBranch().getId()))
+                )
+                .with(
+                        Selection.of("validationRunStatusId")
+                                .label("Status")
+                                .items(validationRunStatusService.getValidationRunStatusRoots())
+                                        // TODO Status name
+                                .itemName("id")
+                )
+                .description();
+    }
+
     // Resource assemblers
 
     private Resource<Build> toBuildResource(Build build) {
@@ -134,7 +158,14 @@ public class BuildController extends AbstractResourceController {
                         "promote",
                         uri(on(BuildController.class).newPromotionRunForm(build.getId())),
                         securityService.isProjectFunctionGranted(build.getBranch().getProject().id(), PromotionRunCreate.class)
-                );
+                )
+                        // Creation of a validation run
+                .with(
+                        "validate",
+                        uri(on(BuildController.class).newValidationRunForm(build.getId())),
+                        securityService.isProjectFunctionGranted(build.getBranch().getProject().id(), ValidationRunCreate.class)
+                )
+                ;
         // TODO Update
         // TODO Delete
     }
