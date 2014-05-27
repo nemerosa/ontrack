@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service;
 
+import net.nemerosa.ontrack.model.exceptions.ValidationRunStatusNotFoundException;
 import net.nemerosa.ontrack.model.exceptions.ValidationRunStatusUnknownDependencyException;
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID;
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusService;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ValidationRunStatusServiceImpl implements ValidationRunStatusService, StartupService {
@@ -33,8 +35,15 @@ public class ValidationRunStatusServiceImpl implements ValidationRunStatusServic
     }
 
     @Override
-    public Optional<ValidationRunStatusID> getValidationRunStatus(String id) {
-        return Optional.ofNullable(statuses.get(id));
+    public ValidationRunStatusID getValidationRunStatus(String id) {
+        return Optional.ofNullable(statuses.get(id)).orElseThrow(() -> new ValidationRunStatusNotFoundException(id));
+    }
+
+    @Override
+    public Collection<ValidationRunStatusID> getNextValidationRunStatusList(String id) {
+        return getValidationRunStatus(id).getFollowingStatuses().stream()
+                .map(this::getValidationRunStatus)
+                .collect(Collectors.toList());
     }
 
     @Override
