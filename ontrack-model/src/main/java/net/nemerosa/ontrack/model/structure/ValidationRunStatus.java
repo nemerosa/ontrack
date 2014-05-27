@@ -19,4 +19,8 @@ public class ValidationRunStatus {
                 description
         );
     }
+
+    public boolean isPassed() {
+        return statusID.isPassed();
+    }
 }

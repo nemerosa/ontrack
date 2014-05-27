@@ -147,7 +147,7 @@ public class StructureServiceTest extends AbstractITTestSupport {
         ValidationStamp stamp = doCreateValidationStamp(branch, nameDescription());
         Build build = doCreateBuild(branch, nameDescription());
         // Status id
-        ValidationRunStatusID passed = validationRunStatusService.getValidationRunStatus(ValidationRunStatusService.PASSED);
+        ValidationRunStatusID passed = validationRunStatusService.getValidationRunStatus(ValidationRunStatusID.PASSED);
         // Creation of the run
         structureService.newValidationRun(
                 ValidationRun.of(
@@ -167,7 +167,7 @@ public class StructureServiceTest extends AbstractITTestSupport {
         ValidationStamp stamp = doCreateValidationStamp(branch, nameDescription());
         Build build = doCreateBuild(branch, nameDescription());
         // Status id
-        ValidationRunStatusID passed = validationRunStatusService.getValidationRunStatus(ValidationRunStatusService.PASSED);
+        ValidationRunStatusID passed = validationRunStatusService.getValidationRunStatus(ValidationRunStatusID.PASSED);
         // Creation of the run
         ValidationRun run = asUser().with(branch.getProject().id(), ValidationRunCreate.class).call(() ->
                         structureService.newValidationRun(

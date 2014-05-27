@@ -52,14 +52,14 @@ public class ValidationRunStatusServiceImpl implements ValidationRunStatusServic
      */
     @Override
     public void start() {
-        register(PASSED);
-        register(WARNING);
-        register(FIXED);
-        register(DEFECTIVE);
-        register(EXPLAINED, FIXED);
-        register(INVESTIGATING, DEFECTIVE, EXPLAINED, FIXED);
-        register(INTERRUPTED, INVESTIGATING, FIXED);
-        register(FAILED, INTERRUPTED, INVESTIGATING, EXPLAINED, DEFECTIVE);
+        register(ValidationRunStatusID.PASSED);
+        register(ValidationRunStatusID.WARNING);
+        register(ValidationRunStatusID.FIXED);
+        register(ValidationRunStatusID.DEFECTIVE);
+        register(ValidationRunStatusID.EXPLAINED, ValidationRunStatusID.FIXED);
+        register(ValidationRunStatusID.INVESTIGATING, ValidationRunStatusID.DEFECTIVE, ValidationRunStatusID.EXPLAINED, ValidationRunStatusID.FIXED);
+        register(ValidationRunStatusID.INTERRUPTED, ValidationRunStatusID.INVESTIGATING, ValidationRunStatusID.FIXED);
+        register(ValidationRunStatusID.FAILED, ValidationRunStatusID.INTERRUPTED, ValidationRunStatusID.INVESTIGATING, ValidationRunStatusID.EXPLAINED, ValidationRunStatusID.DEFECTIVE);
         // TODO Participation from extensions
         // Checks the tree
         for (ValidationRunStatusID statusID : statuses.values()) {
