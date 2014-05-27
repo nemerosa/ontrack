@@ -13,7 +13,8 @@ angular.module('ot.service.core', [
         self.view = function () {
             $rootScope.view = {
                 title: '',
-                commands: []
+                commands: [],
+                breadcrumbs: self.homeBreadcrumbs()
             };
             return $rootScope.view;
         };
@@ -31,12 +32,21 @@ angular.module('ot.service.core', [
         };
 
         /**
+         * Breadcrumbs for a link to the home page
+         */
+        self.homeBreadcrumbs = function () {
+            return [
+                ['home', '#/home']
+            ];
+        };
+
+        /**
          * Breadcrumbs for a project
          */
         self.projectBreadcrumbs = function (project) {
-            return [
-                [project.name, '#/project/' + project.id]
-            ];
+            var bc = self.homeBreadcrumbs();
+            bc.push([project.name, '#/project/' + project.id]);
+            return bc;
         };
 
         /**

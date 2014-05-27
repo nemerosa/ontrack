@@ -13,7 +13,6 @@ angular.module('ot.view.home', [
     .controller('HomeCtrl', function ($rootScope, $location, $scope, otStructureService, otNotificationService) {
         var code = $location.search().code;
         $rootScope.view = {
-            // TODO Breadcrumbs
             // Title
             title: 'Home',
             // Commands
