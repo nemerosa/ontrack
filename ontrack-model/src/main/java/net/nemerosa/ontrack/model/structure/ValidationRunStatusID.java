@@ -21,4 +21,7 @@ public class ValidationRunStatusID {
         return new ValidationRunStatusID(id, Collections.unmodifiableList(dependencies));
     }
 
+    public static ValidationRunStatusID of(String id) {
+        return new ValidationRunStatusID(id, Collections.emptyList());
+    }
 }

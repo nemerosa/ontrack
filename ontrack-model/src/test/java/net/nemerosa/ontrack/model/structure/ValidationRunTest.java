@@ -1,0 +1,38 @@
+package net.nemerosa.ontrack.model.structure;
+
+import org.junit.Test;
+
+import java.util.List;
+
+import static org.junit.Assert.*;
+
+public class ValidationRunTest {
+
+    @Test
+    public void of() {
+        Project project = Project.of(new NameDescription("P", "Project")).withId(ID.of(1));
+        Branch branch = Branch.of(project, new NameDescription("B", "Branch")).withId(ID.of(1));
+        Build build = Build.of(branch, new NameDescription("1", "Build 1"), Signature.of("user")).withId(ID.of(1));
+        ValidationStamp stamp = ValidationStamp.of(branch, new NameDescription("S", "Stamp")).withId(ID.of(1));
+        ValidationRunStatusID statusId = ValidationRunStatusID.of("PASSED");
+        ValidationRun run = ValidationRun.of(
+                build,
+                stamp,
+                Signature.of("validator"),
+                statusId,
+                "Some validation"
+        );
+        // Checks
+        Entity.isEntityNew(run, "Validation run must be new");
+        assertSame(build, run.getBuild());
+        assertSame(stamp, run.getValidationStamp());
+        List<ValidationRunStatus> statuses = run.getValidationRunStatuses();
+        assertNotNull(statuses);
+        assertEquals(1, statuses.size());
+        ValidationRunStatus status = statuses.get(0);
+        assertSame(statusId, status.getStatusID());
+        assertEquals("Some validation", status.getDescription());
+        assertEquals("validator", status.getSignature().getUser().getName());
+    }
+
+}
