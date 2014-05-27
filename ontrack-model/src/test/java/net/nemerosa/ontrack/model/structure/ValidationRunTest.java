@@ -14,7 +14,7 @@ public class ValidationRunTest {
         Branch branch = Branch.of(project, new NameDescription("B", "Branch")).withId(ID.of(1));
         Build build = Build.of(branch, new NameDescription("1", "Build 1"), Signature.of("user")).withId(ID.of(1));
         ValidationStamp stamp = ValidationStamp.of(branch, new NameDescription("S", "Stamp")).withId(ID.of(1));
-        ValidationRunStatusID statusId = ValidationRunStatusID.of("PASSED");
+        ValidationRunStatusID statusId = ValidationRunStatusID.of(ValidationRunStatusID.PASSED, "Passed", true, true);
         ValidationRun run = ValidationRun.of(
                 build,
                 stamp,

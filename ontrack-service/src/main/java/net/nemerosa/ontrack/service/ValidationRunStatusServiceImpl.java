@@ -10,8 +10,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static net.nemerosa.ontrack.model.structure.ValidationRunStatusID.*;
 
 @Service
 public class ValidationRunStatusServiceImpl implements ValidationRunStatusService, StartupService {
@@ -52,14 +57,14 @@ public class ValidationRunStatusServiceImpl implements ValidationRunStatusServic
      */
     @Override
     public void start() {
-        register(ValidationRunStatusID.PASSED);
-        register(ValidationRunStatusID.WARNING);
-        register(ValidationRunStatusID.FIXED);
-        register(ValidationRunStatusID.DEFECTIVE);
-        register(ValidationRunStatusID.EXPLAINED, ValidationRunStatusID.FIXED);
-        register(ValidationRunStatusID.INVESTIGATING, ValidationRunStatusID.DEFECTIVE, ValidationRunStatusID.EXPLAINED, ValidationRunStatusID.FIXED);
-        register(ValidationRunStatusID.INTERRUPTED, ValidationRunStatusID.INVESTIGATING, ValidationRunStatusID.FIXED);
-        register(ValidationRunStatusID.FAILED, ValidationRunStatusID.INTERRUPTED, ValidationRunStatusID.INVESTIGATING, ValidationRunStatusID.EXPLAINED, ValidationRunStatusID.DEFECTIVE);
+        register(ValidationRunStatusID.of(PASSED, "Passed", true, true));
+        register(ValidationRunStatusID.of(WARNING, "Warning", true, true));
+        register(ValidationRunStatusID.of(FIXED, "Fixed", false, true));
+        register(ValidationRunStatusID.of(DEFECTIVE, "Defective", false, false));
+        register(ValidationRunStatusID.of(EXPLAINED, "Explained", false, false), FIXED);
+        register(ValidationRunStatusID.of(INVESTIGATING, "Investigating", true, false), DEFECTIVE, EXPLAINED, FIXED);
+        register(ValidationRunStatusID.of(INTERRUPTED, "Interrupted", true, false), INVESTIGATING, FIXED);
+        register(ValidationRunStatusID.of(FAILED, "Failed", true, false), INTERRUPTED, INVESTIGATING, EXPLAINED, DEFECTIVE);
         // TODO Participation from extensions
         // Checks the tree
         for (ValidationRunStatusID statusID : statuses.values()) {
@@ -79,13 +84,8 @@ public class ValidationRunStatusServiceImpl implements ValidationRunStatusServic
         }
     }
 
-    private void register(String status, String... followingStatuses) {
-        if (statuses.containsKey(status)) {
-            ValidationRunStatusID statusID = statuses.get(status);
-            statuses.put(status, statusID.addDependencies(followingStatuses));
-        } else {
-            statuses.put(status, new ValidationRunStatusID(status, Arrays.asList(followingStatuses)));
-        }
+    private void register(ValidationRunStatusID statusID, String... next) {
+        statuses.put(statusID.getId(), statusID.addDependencies(next));
     }
 
 }

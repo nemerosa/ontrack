@@ -17,24 +17,19 @@ public class ValidationRunStatusID {
     public static final String WARNING = "WARNING";
 
     private final String id;
-    // TODO Status name
+    private final String name;
+    private final boolean root;
+    private final boolean passed;
     private final Collection<String> followingStatuses;
-
-    public boolean isRoot() {
-        return followingStatuses.isEmpty();
-    }
 
     public ValidationRunStatusID addDependencies(String... followingStatuses) {
         List<String> dependencies = new ArrayList<>(this.followingStatuses);
         dependencies.addAll(Arrays.asList(followingStatuses));
-        return new ValidationRunStatusID(id, Collections.unmodifiableList(dependencies));
+        return new ValidationRunStatusID(id, name, root, passed, Collections.unmodifiableList(dependencies));
     }
 
-    public static ValidationRunStatusID of(String id) {
-        return new ValidationRunStatusID(id, Collections.emptyList());
+    public static ValidationRunStatusID of(String id, String name, boolean root, boolean passed) {
+        return new ValidationRunStatusID(id, name, root, passed, Collections.emptyList());
     }
 
-    public boolean isPassed() {
-        return PASSED.equals(id) || FIXED.equals(id);
-    }
 }
