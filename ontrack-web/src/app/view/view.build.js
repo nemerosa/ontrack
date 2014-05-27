@@ -71,7 +71,7 @@ angular.module('ot.view.build', [
                 angular.forEach(validationStampRunViewCollection.resources, function (validationStampRunView) {
                     validationStampRunView.image = validationStampRunView.validationStamp.image;
                 });
-                $scope.validationRunCollection = validationStampRunViewCollection;
+                $scope.validationStampRunViewCollection = validationStampRunViewCollection;
             });
         }
 

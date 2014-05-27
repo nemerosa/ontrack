@@ -14,4 +14,12 @@ public class ValidationStampRunView implements View {
     private final ValidationStamp validationStamp;
     private final List<ValidationRun> validationRun;
 
+    public boolean isPassed() {
+        return !validationRun.isEmpty() && validationRun.get(validationRun.size() - 1).isPassed();
+    }
+
+    public boolean isRun() {
+        return !validationRun.isEmpty();
+    }
+
 }
