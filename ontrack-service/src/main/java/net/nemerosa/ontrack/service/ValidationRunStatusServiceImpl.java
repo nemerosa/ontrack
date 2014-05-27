@@ -18,15 +18,6 @@ public class ValidationRunStatusServiceImpl implements ValidationRunStatusServic
 
     private final Logger logger = LoggerFactory.getLogger(ValidationRunStatusService.class);
 
-    public static final String DEFECTIVE = "DEFECTIVE";
-    public static final String EXPLAINED = "EXPLAINED";
-    public static final String FAILED = "FAILED";
-    public static final String FIXED = "FIXED";
-    public static final String INTERRUPTED = "INTERRUPTED";
-    public static final String INVESTIGATING = "INVESTIGATING";
-    public static final String PASSED = "PASSED";
-    public static final String WARNING = "WARNING";
-
     private final Map<String, ValidationRunStatusID> statuses = new LinkedHashMap<>();
 
     @Override

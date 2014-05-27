@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.test.TestUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.List;
 
@@ -17,6 +18,9 @@ public class StructureServiceTest extends AbstractITTestSupport {
 
     @Autowired
     private StructureService structureService;
+
+    @Autowired
+    private ValidationRunStatusService validationRunStatusService;
 
     @Test(expected = IllegalArgumentException.class)
     public void newProject_null() throws Exception {
@@ -134,6 +138,73 @@ public class StructureServiceTest extends AbstractITTestSupport {
         Document d = view(promotionLevel, () -> structureService.getPromotionLevelImage(promotionLevel.getId()));
         // Checks
         assertNull(d);
+    }
+
+    @Test(expected = AccessDeniedException.class)
+    public void validationRun_create_grant_check() throws Exception {
+        // Prerequisites
+        Branch branch = doCreateBranch();
+        ValidationStamp stamp = doCreateValidationStamp(branch, nameDescription());
+        Build build = doCreateBuild(branch, nameDescription());
+        // Status id
+        ValidationRunStatusID passed = validationRunStatusService.getValidationRunStatus(ValidationRunStatusService.PASSED);
+        // Creation of the run
+        structureService.newValidationRun(
+                ValidationRun.of(
+                        build,
+                        stamp,
+                        Signature.of("user"),
+                        passed,
+                        "Passed test"
+                )
+        );
+    }
+
+    @Test
+    public void validationRun_create() throws Exception {
+        // Prerequisites
+        Branch branch = doCreateBranch();
+        ValidationStamp stamp = doCreateValidationStamp(branch, nameDescription());
+        Build build = doCreateBuild(branch, nameDescription());
+        // Status id
+        ValidationRunStatusID passed = validationRunStatusService.getValidationRunStatus(ValidationRunStatusService.PASSED);
+        // Creation of the run
+        ValidationRun run = asUser().with(branch.getProject().id(), ValidationRunCreate.class).call(() ->
+                        structureService.newValidationRun(
+                                ValidationRun.of(
+                                        build,
+                                        stamp,
+                                        Signature.of("user"),
+                                        passed,
+                                        "Passed test"
+                                )
+                        )
+        );
+        Entity.isEntityDefined(run, "Validation run is defined");
+        // TODO Loads the run again and chekcks its statuses
+    }
+
+    private Build doCreateBuild(Branch branch, NameDescription nameDescription) throws Exception {
+        return asUser().with(branch.getProject().id(), BuildCreate.class).call(() ->
+                        structureService.newBuild(
+                                Build.of(
+                                        branch,
+                                        nameDescription,
+                                        Signature.of("user")
+                                )
+                        )
+        );
+    }
+
+    private ValidationStamp doCreateValidationStamp(Branch branch, NameDescription nameDescription) throws Exception {
+        return asUser().with(branch.getProject().id(), ValidationStampCreate.class).call(() ->
+                        structureService.newValidationStamp(
+                                ValidationStamp.of(
+                                        branch,
+                                        nameDescription
+                                )
+                        )
+        );
     }
 
     private PromotionLevel doCreatePromotionLevel() throws Exception {
