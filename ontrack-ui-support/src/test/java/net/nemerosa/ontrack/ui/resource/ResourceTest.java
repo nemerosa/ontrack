@@ -39,7 +39,7 @@ public class ResourceTest {
 
     @Test
     public void container_first() {
-        assertEquals(String.class, Resource.of("Test", URI.create("")).getType());
+        assertEquals(String.class, Resource.of("Test", URI.create("")).getViewType());
     }
 
 }

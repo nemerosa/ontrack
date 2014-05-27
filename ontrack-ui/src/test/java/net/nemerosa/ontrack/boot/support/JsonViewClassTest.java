@@ -46,7 +46,7 @@ public class JsonViewClassTest {
 
     @Test
     public void view_class_resource_collection_empty() {
-        assertEquals(ResourceCollection.class, getViewClass(ResourceCollection.of(
+        assertEquals(Object.class, getViewClass(ResourceCollection.of(
                 Collections.emptyList(),
                 URI.create("urn:projects")
         )));
@@ -54,12 +54,30 @@ public class JsonViewClassTest {
 
     @Test
     public void view_class_resource_collection() {
-        assertEquals(ResourceCollection.class, getViewClass(ResourceCollection.of(
+        assertEquals(Object.class, getViewClass(ResourceCollection.of(
                 Arrays.asList(
                         Resource.of(project(), URI.create("urn:project"))
                 ),
                 URI.create("urn:projects")
         )));
+    }
+
+    @Test
+    public void view_class_resource_collection_view_empty() {
+        assertEquals(Project.class, getViewClass(ResourceCollection.of(
+                Collections.emptyList(),
+                URI.create("urn:projects")
+        ).forView(Project.class)));
+    }
+
+    @Test
+    public void view_class_resource_collection_view() {
+        assertEquals(Project.class, getViewClass(ResourceCollection.of(
+                Arrays.asList(
+                        Resource.of(project(), URI.create("urn:project"))
+                ),
+                URI.create("urn:projects")
+        ).forView(Project.class)));
     }
 
 }
