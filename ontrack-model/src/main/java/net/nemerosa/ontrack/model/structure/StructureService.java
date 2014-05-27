@@ -67,4 +67,8 @@ public interface StructureService {
     Document getValidationStampImage(ID validationStampId);
 
     void setValidationStampImage(ID validationStampId, Document document);
+
+    // Validation runs
+
+    ValidationRun newValidationRun(ValidationRun validationRun);
 }

@@ -9,12 +9,14 @@ import net.nemerosa.ontrack.model.security.ValidationRunCreate;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.Time;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
+import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.ResourceCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.stream.Collectors;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -142,6 +144,29 @@ public class BuildController extends AbstractResourceController {
                 .description();
     }
 
+    @RequestMapping(value = "builds/{buildId}/validationRun/create", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
+    public Resource<ValidationRun> newValidationRun(@PathVariable ID buildId, @RequestBody ValidationRunRequest validationRunRequest) {
+        // Gets the build
+        Build build = structureService.getBuild(buildId);
+        // Gets the validation stamp
+        ValidationStamp validationStamp = structureService.getValidationStamp(ID.of(validationRunRequest.getValidationStamp()));
+        // Gets the validation run status
+        ValidationRunStatusID validationRunStatusID = validationRunStatusService.getValidationRunStatus(validationRunRequest.getValidationRunStatusId());
+        // Validation run to create
+        ValidationRun validationRun = ValidationRun.of(
+                build,
+                validationStamp,
+                securityService.getCurrentSignature(),
+                validationRunStatusID,
+                validationRunRequest.getDescription()
+        );
+        // Creation
+        validationRun = structureService.newValidationRun(validationRun);
+        // OK
+        return toValidationRunResource(validationRun);
+    }
+
     // Resource assemblers
 
     private Resource<Build> toBuildResource(Build build) {
@@ -175,7 +200,17 @@ public class BuildController extends AbstractResourceController {
                 promotionRun,
                 uri(on(getClass()).getPromotionRun(promotionRun.getId()))
         )
-                .with("imageLink", uri(on(PromotionLevelController.class).getPromotionLevelImage_(promotionRun.getPromotionLevel().getId())))
+                .with(Link.IMAGE_LINK, uri(on(PromotionLevelController.class).getPromotionLevelImage_(promotionRun.getPromotionLevel().getId())))
                 ;
+    }
+
+    private Resource<ValidationRun> toValidationRunResource(ValidationRun validationRun) {
+        return Resource.of(
+                validationRun,
+                // TODO Link to the validation run
+                URI.create("uri:todo:validationRun")
+        ).with(
+                Link.IMAGE_LINK, uri(on(ValidationStampController.class).getValidationStampImage_(validationRun.getValidationStamp().getId()))
+        );
     }
 }

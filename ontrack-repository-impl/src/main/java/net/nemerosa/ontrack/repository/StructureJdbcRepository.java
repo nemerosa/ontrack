@@ -398,6 +398,32 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         );
     }
 
+    @Override
+    public ValidationRun newValidationRun(ValidationRun validationRun) {
+
+        // Validation run itself (parent)
+        int id = dbCreate(
+                "INSERT INTO VALIDATION_RUNS(BUILDID, VALIDATIONSTAMPID) VALUES (:buildId, :validationStampId)",
+                params("buildId", validationRun.getBuild().id())
+                        .addValue("validationStampId", validationRun.getValidationStamp().id())
+        );
+
+        // Statuses
+        for (ValidationRunStatus validationRunStatus : validationRun.getValidationRunStatuses()) {
+            dbCreate(
+                    "INSERT INTO VALIDATION_RUN_STATUSES(VALIDATIONRUNID, VALIDATIONRUNSTATUSID, CREATION, CREATOR, DESCRIPTION) " +
+                            "VALUES (:validationRunId, :validationRunStatusId, :creation, :creator, :description)",
+                    params("validationRunId", id)
+                            .addValue("validationRunStatusId", validationRunStatus.getStatusID().getId())
+                            .addValue("description", validationRunStatus.getDescription())
+                            .addValue("creation", dateTimeForDB(validationRunStatus.getSignature().getTime()))
+                            .addValue("creator", validationRunStatus.getSignature().getUser().getName())
+            );
+        }
+
+        return validationRun.withId(ID.of(id));
+    }
+
     protected PromotionLevel toPromotionLevel(ResultSet rs, Function<ID, Branch> branchSupplier) throws SQLException {
         return PromotionLevel.of(
                 branchSupplier.apply(id(rs, "branchId")),

@@ -255,6 +255,20 @@ public class StructureServiceImpl implements StructureService {
         structureRepository.setValidationStampImage(validationStampId, document);
     }
 
+    @Override
+    public ValidationRun newValidationRun(ValidationRun validationRun) {
+        // Validation
+        isEntityNew(validationRun, "Validation run must be new");
+        isEntityDefined(validationRun.getBuild(), "Build must be defined");
+        isEntityDefined(validationRun.getValidationStamp(), "Validation stamp must be defined");
+        Validate.isTrue(validationRun.getValidationStamp().getBranch().id() == validationRun.getBuild().getBranch().id(),
+                "Validation run for a validation stamp can be done only on the same branch than the build.");
+        // Checks the authorization
+        securityService.checkProjectFunction(validationRun.getBuild().getBranch().getProject().id(), ValidationRunCreate.class);
+        // Actual creation
+        return structureRepository.newValidationRun(validationRun);
+    }
+
     protected void checkImage(Document document) {
         // Checks the image type
         if (document != null && !ArrayUtils.contains(ACCEPTED_IMAGE_TYPES, document.getType())) {
