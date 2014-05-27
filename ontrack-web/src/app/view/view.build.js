@@ -22,6 +22,7 @@ angular.module('ot.view.build', [
                 // View configuration
                 view.title = "Build " + build.name;
                 view.description = build.description;
+                view.breadcrumbs = ot.branchBreadcrumbs(build.branch);
                 // Loads the promotion runs
                 loadPromotionRuns();
                 // Commands

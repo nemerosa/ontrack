@@ -22,6 +22,7 @@ angular.module('ot.view.validationStamp', [
                 // View title
                 view.title = $scope.validationStamp.name;
                 view.description = $scope.validationStamp.description;
+                view.breadcrumbs = ot.branchBreadcrumbs(validationStamp.branch);
                 // Commands
                 view.commands = [
                     ot.viewCloseCommand('/branch/' + $scope.validationStamp.branch.id)

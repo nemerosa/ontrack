@@ -22,6 +22,7 @@ angular.module('ot.view.promotionLevel', [
                 // View title
                 view.title = $scope.promotionLevel.name;
                 view.description = $scope.promotionLevel.description;
+                view.breadcrumbs = ot.branchBreadcrumbs(promotionLevel.branch);
                 // Commands
                 view.commands = [
                     ot.viewCloseCommand('/branch/' + $scope.promotionLevel.branch.id)

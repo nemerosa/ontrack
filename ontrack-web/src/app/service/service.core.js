@@ -31,6 +31,24 @@ angular.module('ot.service.core', [
         };
 
         /**
+         * Breadcrumbs for a project
+         */
+        self.projectBreadcrumbs = function (project) {
+            return [
+                [project.name, '#/project/' + project.id]
+            ];
+        };
+
+        /**
+         * Breadcrumbs for a branch
+         */
+        self.branchBreadcrumbs = function (branch) {
+            var bc = self.projectBreadcrumbs(branch.project);
+            bc.push([branch.name, '#/branch/' + branch.id]);
+            return bc;
+        };
+
+        /**
          * Wraps a HTTP call into a promise.
          */
         self.call = function (httpCall) {
