@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.service.security;
+package net.nemerosa.ontrack.service;
 
 import net.nemerosa.ontrack.model.exceptions.ImageFileSizeException;
 import net.nemerosa.ontrack.model.exceptions.ImageTypeNotAcceptedException;
