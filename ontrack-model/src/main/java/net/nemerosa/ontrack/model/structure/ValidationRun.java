@@ -59,6 +59,10 @@ public class ValidationRun implements Entity {
     }
 
     public boolean isPassed() {
-        return validationRunStatuses.get(validationRunStatuses.size() - 1).isPassed();
+        return getLastStatus().isPassed();
+    }
+
+    protected ValidationRunStatus getLastStatus() {
+        return validationRunStatuses.get(validationRunStatuses.size() - 1);
     }
 }

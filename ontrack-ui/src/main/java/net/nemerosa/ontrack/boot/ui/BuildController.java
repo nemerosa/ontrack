@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -124,6 +126,34 @@ public class BuildController extends AbstractResourceController {
 
     // Validation runs
 
+    @RequestMapping(value = "builds/{buildId}/validationRuns/view", method = RequestMethod.GET)
+    public ResourceCollection<ValidationStampRunView> getValidationStampRunViews(@PathVariable ID buildId) {
+        // Build
+        Build build = structureService.getBuild(buildId);
+        // Gets all validation stamps
+        List<ValidationStamp> stamps = structureService.getValidationStampListForBranch(build.getBranch().getId());
+        // Gets all runs for this build
+        List<ValidationRun> runs = structureService.getValidationRunsForBuild(buildId);
+        // Converts into a view
+        URI uri = uri(on(getClass()).getValidationStampRunViews(buildId));
+        return ResourceCollection.of(
+                stamps.stream()
+                        .map(stamp ->
+                                        new ValidationStampRunView(
+                                                stamp,
+                                                runs.stream()
+                                                        .filter(run -> run.getValidationStamp().id() == stamp.id())
+                                                        .collect(Collectors.toList())
+                                        )
+                        )
+                        .map(view -> Resource.of(view, uri)
+                                        .with(Link.IMAGE_LINK, uri(on(ValidationStampController.class).getValidationStampImage_(view.getValidationStamp().getId())))
+                        )
+                        .collect(Collectors.toList()),
+                uri
+        ).forView(ValidationStampRunView.class);
+    }
+
     @RequestMapping(value = "builds/{buildId}/validationRuns", method = RequestMethod.GET)
     public ResourceCollection<ValidationRun> getValidationRuns(@PathVariable ID buildId) {
         return ResourceCollection.of(
@@ -190,7 +220,8 @@ public class BuildController extends AbstractResourceController {
                 uri(on(getClass()).getBuild(build.getId()))
         )
                 .with("lastPromotionRuns", uri(on(getClass()).getLastPromotionRuns(build.getId())))
-                .with("validationRuns", uri(on(getClass()).getValidationRuns(build.getId())));
+                .with("validationRuns", uri(on(getClass()).getValidationRuns(build.getId())))
+                .with("validationStampRunViews", uri(on(getClass()).getValidationStampRunViews(build.getId())));
     }
 
     private Resource<Build> toBuildResourceWithActions(Build build) {

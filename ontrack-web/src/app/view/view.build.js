@@ -67,11 +67,11 @@ angular.module('ot.view.build', [
 
         // Loads the validation runs
         function loadValidationRuns() {
-            ot.call($http.get($scope.build.validationRuns.href)).then(function (validationRunCollection) {
-                angular.forEach(validationRunCollection.resources, function (validationRun) {
-                    validationRun.image = validationRun.validationStamp.image;
+            ot.call($http.get($scope.build.validationStampRunViews.href)).then(function (validationStampRunViewCollection) {
+                angular.forEach(validationStampRunViewCollection.resources, function (validationStampRunView) {
+                    validationStampRunView.image = validationStampRunView.validationStamp.image;
                 });
-                $scope.validationRunCollection = validationRunCollection;
+                $scope.validationRunCollection = validationStampRunViewCollection;
             });
         }
 
