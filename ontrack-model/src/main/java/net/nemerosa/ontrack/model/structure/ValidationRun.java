@@ -75,7 +75,11 @@ public class ValidationRun implements Entity {
         return getLastStatus().isPassed();
     }
 
+    /**
+     * The last status ("last" from a business point of view) is actually the first one in the list of statuses because
+     * statuses are sorted from the most recent one to the least recent one.
+     */
     public ValidationRunStatus getLastStatus() {
-        return validationRunStatuses.get(validationRunStatuses.size() - 1);
+        return validationRunStatuses.get(0);
     }
 }
