@@ -23,6 +23,10 @@ angular.module('ot.view.validationRun', [
                 view.title = validationRunResource.validationStamp.name + " run";
                 view.description = validationRunResource.lastStatus.description;
                 view.breadcrumbs = ot.buildBreadcrumbs(validationRunResource.build);
+                // Commands
+                view.commands = [
+                    ot.viewCloseCommand('/build/' + validationRunResource.build.id)
+                ];
             });
         }
 
