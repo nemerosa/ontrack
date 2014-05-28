@@ -85,8 +85,6 @@ public class ValidationRunController extends AbstractResourceController {
                         Selection.of("validationRunStatusId")
                                 .label("Status")
                                 .items(validationRunStatusService.getValidationRunStatusRoots())
-                                        // TODO Status name
-                                .itemName("id")
                 )
                 .description();
     }
