@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.service;
+package net.nemerosa.ontrack.ref;
 
 import net.nemerosa.ontrack.model.exceptions.ValidationRunStatusNotFoundException;
 import net.nemerosa.ontrack.model.exceptions.ValidationRunStatusUnknownDependencyException;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 import static net.nemerosa.ontrack.model.structure.ValidationRunStatusID.*;
 
 @Service
-public class ValidationRunStatusServiceImpl implements ValidationRunStatusService, StartupService {
+public class ValidationRunStatusServiceRef implements ValidationRunStatusService, StartupService {
 
     private final Logger logger = LoggerFactory.getLogger(ValidationRunStatusService.class);
 

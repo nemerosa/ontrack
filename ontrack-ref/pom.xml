@@ -11,46 +11,42 @@
         <version>2.0.0.ALPHA-SNAPSHOT</version>
     </parent>
 
-    <artifactId>ontrack-repository-impl</artifactId>
-    <name>ontrack Repository JDBC Implementation</name>
+    <artifactId>ontrack-ref</artifactId>
+    <name>ontrack Reference</name>
+    <description>
+        This module contains reference services for use by both
+        the service layer and the repository layer.
+    </description>
 
     <dependencies>
         <!-- ontrack -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>ontrack-ref</artifactId>
+            <artifactId>ontrack-model</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>ontrack-repository</artifactId>
+            <artifactId>ontrack-extension-api</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>ontrack-repository-support</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>ontrack-it-utils</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- DB init -->
-        <dependency>
-            <groupId>net.sf.dbinit</groupId>
-            <artifactId>dbinit</artifactId>
         </dependency>
         <!-- Spring -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
         </dependency>
+        <!-- Logging -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jdbc</artifactId>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
+
 
 </project>
