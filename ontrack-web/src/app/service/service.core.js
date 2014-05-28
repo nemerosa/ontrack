@@ -59,6 +59,15 @@ angular.module('ot.service.core', [
         };
 
         /**
+         * Breadcrumbs for a build
+         */
+        self.buildBreadcrumbs = function (build) {
+            var bc = self.branchBreadcrumbs(build.branch);
+            bc.push([build.name, '#/build/' + build.id]);
+            return bc;
+        };
+
+        /**
          * Wraps a HTTP call into a promise.
          */
         self.call = function (httpCall) {
