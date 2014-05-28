@@ -10,7 +10,7 @@ public interface ValidationRunStatusService {
 
     ValidationRunStatusID getValidationRunStatus(String id);
 
-    Collection<ValidationRunStatusID> getNextValidationRunStatusList(String id);
+    List<ValidationRunStatusID> getNextValidationRunStatusList(String id);
 
     default List<ValidationRunStatusID> getValidationRunStatusRoots() {
         return getValidationRunStatusList().stream()

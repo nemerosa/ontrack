@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.boot.ui;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Selection;
 import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.security.ValidationRunStatusChange;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Link;
@@ -117,6 +118,23 @@ public class ValidationRunController extends AbstractResourceController {
         return toValidationRunResource(structureService.getValidationRun(validationRunId));
     }
 
+    // Validation run status
+
+    @RequestMapping(value = "validationRuns/{validationRunId}/status/change", method = RequestMethod.GET)
+    public Form getValidationRunStatusChangeForm(@PathVariable ID validationRunId) {
+        ValidationRun validationRun = structureService.getValidationRun(validationRunId);
+        return Form.create()
+                .with(
+                        Selection.of("validationRunStatusId")
+                                .label("Status")
+                                .items(
+                                        validationRunStatusService.getNextValidationRunStatusList(validationRun.getLastStatus().getStatusID().getId())
+                                )
+                )
+                .description()
+                ;
+    }
+
     // Resource assemblers
 
     private Resource<ValidationRun> toValidationRunResource(ValidationRun validationRun) {
@@ -127,6 +145,13 @@ public class ValidationRunController extends AbstractResourceController {
                 Link.IMAGE_LINK, uri(on(ValidationStampController.class).getValidationStampImage_(validationRun.getValidationStamp().getId()))
         ).with(
                 "validationStampLink", uri(on(ValidationStampController.class).getValidationStamp(validationRun.getValidationStamp().getId()))
+        ).with(
+                "validationRunStatusChange",
+                uri(on(ValidationRunController.class).getValidationRunStatusChangeForm(validationRun.getId())),
+                securityService.isProjectFunctionGranted(
+                        validationRun.getBuild().getBranch().getProject().id(),
+                        ValidationRunStatusChange.class
+                )
         );
     }
 }

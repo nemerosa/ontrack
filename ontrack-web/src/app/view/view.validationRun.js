@@ -40,5 +40,12 @@ angular.module('ot.view.validationRun', [
         // Initialisation
         loadValidationRun();
 
+        // Changing the validation run status
+        $scope.validationRunStatusChange = function () {
+            otStructureService.create(
+                $scope.validationRun.validationRunStatusChange.href,
+                'Status').then(loadValidationRun);
+        };
+
     })
 ;

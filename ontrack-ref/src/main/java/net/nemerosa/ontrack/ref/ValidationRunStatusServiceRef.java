@@ -10,10 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static net.nemerosa.ontrack.model.structure.ValidationRunStatusID.*;
@@ -36,7 +33,7 @@ public class ValidationRunStatusServiceRef implements ValidationRunStatusService
     }
 
     @Override
-    public Collection<ValidationRunStatusID> getNextValidationRunStatusList(String id) {
+    public List<ValidationRunStatusID> getNextValidationRunStatusList(String id) {
         return getValidationRunStatus(id).getFollowingStatuses().stream()
                 .map(this::getValidationRunStatus)
                 .collect(Collectors.toList());
