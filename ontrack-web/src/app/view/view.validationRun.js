@@ -20,8 +20,8 @@ angular.module('ot.view.validationRun', [
             ot.call($http.get('structure/validationRuns/' + validationRunId)).then(function (validationRunResource) {
                 $scope.validationRun = validationRunResource;
                 // View configuration
+                // TODO Title with HTML (validation stamp image + link)
                 view.title = validationRunResource.validationStamp.name + " run";
-                view.description = validationRunResource.lastStatus.description;
                 view.breadcrumbs = ot.buildBreadcrumbs(validationRunResource.build);
                 // Commands
                 view.commands = [
