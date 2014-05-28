@@ -23,7 +23,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 @RestController
 @RequestMapping("/user")
-public class UserAPIController extends AbstractResourceController implements UserAPI {
+public class UserAPIController extends AbstractResourceController {
 
     private final SecurityService securityService;
     private final ExtensionManager extensionManager;
@@ -34,7 +34,6 @@ public class UserAPIController extends AbstractResourceController implements Use
         this.extensionManager = extensionManager;
     }
 
-    @Override
     @RequestMapping(value = "", method = RequestMethod.GET)
     public Resource<ConnectedAccount> getCurrentUser() {
         // Gets the current account
@@ -49,7 +48,6 @@ public class UserAPIController extends AbstractResourceController implements Use
         }
     }
 
-    @Override
     @RequestMapping(value = "login", method = RequestMethod.GET)
     public Form loginForm() {
         return Form.create()
@@ -57,7 +55,6 @@ public class UserAPIController extends AbstractResourceController implements Use
                 .password();
     }
 
-    @Override
     @RequestMapping(value = "login", method = RequestMethod.POST)
     public Resource<ConnectedAccount> login() {
         // Gets the current account
