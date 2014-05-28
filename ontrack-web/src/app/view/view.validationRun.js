@@ -15,14 +15,21 @@ angular.module('ot.view.validationRun', [
         // Validation run's id
         var validationRunId = $stateParams.validationRunId;
 
+        // Loads the validation stamp for the run
+        function loadValidationStamp() {
+            ot.call($http.get($scope.validationRun.validationStampLink.href)).then(function (validationStampResource) {
+                $scope.validationStamp = validationStampResource;
+            });
+        }
+
         // Loads the validation run
         function loadValidationRun() {
             ot.call($http.get('structure/validationRuns/' + validationRunId)).then(function (validationRunResource) {
                 $scope.validationRun = validationRunResource;
                 // View configuration
-                // TODO Title with HTML (validation stamp image + link)
-                view.title = validationRunResource.validationStamp.name + " run";
                 view.breadcrumbs = ot.buildBreadcrumbs(validationRunResource.build);
+                // Loads the validation stamp
+                loadValidationStamp();
                 // Commands
                 view.commands = [
                     ot.viewCloseCommand('/build/' + validationRunResource.build.id)

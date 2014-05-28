@@ -258,6 +258,8 @@ public class BuildController extends AbstractResourceController {
                 uri(on(getClass()).getValidationRun(validationRun.getId()))
         ).with(
                 Link.IMAGE_LINK, uri(on(ValidationStampController.class).getValidationStampImage_(validationRun.getValidationStamp().getId()))
+        ).with(
+                "validationStampLink", uri(on(ValidationStampController.class).getValidationStamp(validationRun.getValidationStamp().getId()))
         );
     }
 }
