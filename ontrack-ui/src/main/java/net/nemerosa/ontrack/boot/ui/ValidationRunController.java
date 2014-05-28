@@ -165,6 +165,7 @@ public class ValidationRunController extends AbstractResourceController {
         ).with(
                 "validationRunStatusChange",
                 uri(on(ValidationRunController.class).getValidationRunStatusChangeForm(validationRun.getId())),
+                // TODO Only if transition possible
                 securityService.isProjectFunctionGranted(
                         validationRun.getBuild().getBranch().getProject().id(),
                         ValidationRunStatusChange.class
