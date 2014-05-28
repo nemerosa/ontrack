@@ -38,7 +38,9 @@
                                 </td>
                                 <td>
                                     <span ng-repeat="validationRun in validationStampRunView.validationRun">
-                                        <ot-validation-run-status status="validationRun.lastStatus"></ot-validation-run-status>
+                                        <a href="#/validationRun/{{validationRun.id}}">
+                                            <ot-validation-run-status status="validationRun.lastStatus"></ot-validation-run-status>
+                                        </a>
                                     </span>
                                 </td>
                             </tr>
@@ -61,7 +63,9 @@
                                 </td>
                                 <td>
                                     <span ng-repeat="validationRun in validationStampRunView.validationRun" class="ot-validation-run-status-horizontal">
-                                        <ot-validation-run-status status="validationRun.lastStatus"></ot-validation-run-status>
+                                        <a href="#/validationRun/{{validationRun.id}}">
+                                            <ot-validation-run-status status="validationRun.lastStatus"></ot-validation-run-status>
+                                        </a>
                                     </span>
                                 </td>
                             </tr>
