@@ -3,10 +3,7 @@ package net.nemerosa.ontrack.boot.ui;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.extension.api.UserMenuExtension;
 import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.security.Account;
-import net.nemerosa.ontrack.model.security.ConnectedAccount;
-import net.nemerosa.ontrack.model.security.GlobalFunction;
-import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,7 +91,10 @@ public class UserAPIController extends AbstractResourceController {
     }
 
     private ConnectedAccount userMenu(ConnectedAccount user) {
-        // TODO Settings
+        // Settings
+        if (securityService.isGlobalFunctionGranted(GlobalSettings.class)) {
+            user.add(Action.of("settings", "Settings", "settings"));
+        }
         // TODO Profile
         // TODO Account management
         // TODO Extension management
