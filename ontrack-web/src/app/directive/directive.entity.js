@@ -21,4 +21,15 @@ angular.module('ot.directive.entity', [
             }
         };
     })
+    .directive('otSignature', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'app/directive/directive.signature.tpl.html',
+            scope: {
+                value: '=',
+                user: '=',
+                time: '='
+            }
+        };
+    })
 ;

@@ -12,6 +12,10 @@
     <!-- Last status -->
     <div class="row">
         <div class="col-md-7 well">
+            <ot-validation-run-status status="validationRun.lastStatus"></ot-validation-run-status>
+            {{validationRun.lastStatus.statusID.name}}
+            <ot-signature value="validationRun.lastStatus.signature" user="true" time="true"></ot-signature>
+
             <button ng-if="validationRun.validationRunStatusChange"
                     ng-click="validationRunStatusChange()"
                     class="btn btn-info pull-right">Change status</button>
