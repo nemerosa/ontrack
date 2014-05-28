@@ -22,6 +22,9 @@
                 <button ng-if="validationRun.validationRunStatusChange && $first"
                         ng-click="validationRunStatusChange()"
                         class="btn btn-info pull-right">Change status</button>
+                <button ng-if="!validationRun.validationRunStatusChange && $first"
+                        disabled="disabled"
+                        class="btn btn-default pull-right">Status change not possible</button>
             </td>
         </tr>
     </table>
