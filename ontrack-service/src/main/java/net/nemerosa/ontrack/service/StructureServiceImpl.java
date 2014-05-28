@@ -30,11 +30,13 @@ public class StructureServiceImpl implements StructureService {
     };
 
     private final SecurityService securityService;
+    private final ValidationRunStatusService validationRunStatusService;
     private final StructureRepository structureRepository;
 
     @Autowired
-    public StructureServiceImpl(SecurityService securityService, StructureRepository structureRepository) {
+    public StructureServiceImpl(SecurityService securityService, ValidationRunStatusService validationRunStatusService, StructureRepository structureRepository) {
         this.securityService = securityService;
+        this.validationRunStatusService = validationRunStatusService;
         this.structureRepository = structureRepository;
     }
 
@@ -281,6 +283,18 @@ public class StructureServiceImpl implements StructureService {
         Build build = getBuild(buildId);
         securityService.checkProjectFunction(build.getBranch().getProject().id(), ProjectView.class);
         return structureRepository.getValidationRunsForBuild(build);
+    }
+
+    @Override
+    public ValidationRun newValidationRunStatus(ValidationRun validationRun, ValidationRunStatus runStatus) {
+        // Entity check
+        Entity.isEntityDefined(validationRun, "Validation run must be defined");
+        // Security check
+        securityService.checkProjectFunction(validationRun.getBuild().getBranch().getProject().id(), ValidationRunStatusChange.class);
+        // Transition check
+        validationRunStatusService.checkTransition(validationRun.getLastStatus().getStatusID(), runStatus.getStatusID());
+        // OK
+        return structureRepository.newValidationRunStatus(validationRun, runStatus);
     }
 
     protected void checkImage(Document document) {

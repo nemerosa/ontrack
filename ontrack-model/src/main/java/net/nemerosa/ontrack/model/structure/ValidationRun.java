@@ -5,7 +5,9 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Data
@@ -23,6 +25,17 @@ public class ValidationRun implements Entity {
      */
     @JsonView({ValidationRun.class, BranchBuildView.class, Build.class})
     private final List<ValidationRunStatus> validationRunStatuses;
+
+    public ValidationRun add(ValidationRunStatus status) {
+        List<ValidationRunStatus> statuses = new ArrayList<>(validationRunStatuses);
+        statuses.add(0, status);
+        return new ValidationRun(
+                id,
+                build,
+                validationStamp,
+                Collections.unmodifiableList(statuses)
+        );
+    }
 
     public static ValidationRun of(
             Build build,

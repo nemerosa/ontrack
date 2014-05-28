@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.ref;
 
+import net.nemerosa.ontrack.model.exceptions.ValidationRunStatusChangeForbiddenException;
 import net.nemerosa.ontrack.model.exceptions.ValidationRunStatusNotFoundException;
 import net.nemerosa.ontrack.model.exceptions.ValidationRunStatusUnknownDependencyException;
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID;
@@ -37,6 +38,13 @@ public class ValidationRunStatusServiceRef implements ValidationRunStatusService
         return getValidationRunStatus(id).getFollowingStatuses().stream()
                 .map(this::getValidationRunStatus)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void checkTransition(ValidationRunStatusID from, ValidationRunStatusID to) {
+        if (!from.getFollowingStatuses().contains(to.getId())) {
+            throw new ValidationRunStatusChangeForbiddenException(from.getId(), to.getId());
+        }
     }
 
     @Override

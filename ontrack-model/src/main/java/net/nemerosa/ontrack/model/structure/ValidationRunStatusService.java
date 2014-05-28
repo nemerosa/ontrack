@@ -18,4 +18,5 @@ public interface ValidationRunStatusService {
                 .collect(Collectors.toList());
     }
 
+    void checkTransition(ValidationRunStatusID from, ValidationRunStatusID to);
 }

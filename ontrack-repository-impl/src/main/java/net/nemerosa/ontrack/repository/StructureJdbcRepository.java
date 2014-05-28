@@ -412,17 +412,8 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         );
 
         // Statuses
-        for (ValidationRunStatus validationRunStatus : validationRun.getValidationRunStatuses()) {
-            dbCreate(
-                    "INSERT INTO VALIDATION_RUN_STATUSES(VALIDATIONRUNID, VALIDATIONRUNSTATUSID, CREATION, CREATOR, DESCRIPTION) " +
-                            "VALUES (:validationRunId, :validationRunStatusId, :creation, :creator, :description)",
-                    params("validationRunId", id)
-                            .addValue("validationRunStatusId", validationRunStatus.getStatusID().getId())
-                            .addValue("description", validationRunStatus.getDescription())
-                            .addValue("creation", dateTimeForDB(validationRunStatus.getSignature().getTime()))
-                            .addValue("creator", validationRunStatus.getSignature().getUser().getName())
-            );
-        }
+        validationRun.getValidationRunStatuses().stream()
+                .forEach(validationRunStatus -> newValidationRunStatus(id, validationRunStatus));
 
         return validationRun.withId(ID.of(id));
     }
@@ -450,6 +441,26 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                         id -> build,
                         this::getValidationStamp
                 )
+        );
+    }
+
+    @Override
+    public ValidationRun newValidationRunStatus(ValidationRun validationRun, ValidationRunStatus runStatus) {
+        // Saves the new status
+        newValidationRunStatus(validationRun.id(), runStatus);
+        // OK
+        return validationRun.add(runStatus);
+    }
+
+    protected void newValidationRunStatus(int validationRunId, ValidationRunStatus validationRunStatus) {
+        dbCreate(
+                "INSERT INTO VALIDATION_RUN_STATUSES(VALIDATIONRUNID, VALIDATIONRUNSTATUSID, CREATION, CREATOR, DESCRIPTION) " +
+                        "VALUES (:validationRunId, :validationRunStatusId, :creation, :creator, :description)",
+                params("validationRunId", validationRunId)
+                        .addValue("validationRunStatusId", validationRunStatus.getStatusID().getId())
+                        .addValue("description", validationRunStatus.getDescription())
+                        .addValue("creation", dateTimeForDB(validationRunStatus.getSignature().getTime()))
+                        .addValue("creator", validationRunStatus.getSignature().getUser().getName())
         );
     }
 

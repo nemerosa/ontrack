@@ -75,4 +75,6 @@ public interface StructureService {
     ValidationRun getValidationRun(ID validationRunId);
 
     List<ValidationRun> getValidationRunsForBuild(ID buildId);
+
+    ValidationRun newValidationRunStatus(ValidationRun validationRun, ValidationRunStatus runStatus);
 }

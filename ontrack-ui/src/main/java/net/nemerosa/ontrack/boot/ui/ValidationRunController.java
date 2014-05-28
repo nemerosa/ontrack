@@ -135,6 +135,23 @@ public class ValidationRunController extends AbstractResourceController {
                 ;
     }
 
+    @RequestMapping(value = "validationRuns/{validationRunId}/status/change", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
+    public Resource<ValidationRun> validationRunStatusChange(@PathVariable ID validationRunId, @RequestBody ValidationRunStatusChangeRequest request) {
+        // Gets the current run
+        ValidationRun run = structureService.getValidationRun(validationRunId);
+        // Gets the new validation run status
+        ValidationRunStatus runStatus = ValidationRunStatus.of(
+                securityService.getCurrentSignature(),
+                validationRunStatusService.getValidationRunStatus(request.getValidationRunStatusId()),
+                request.getDescription()
+        );
+        // Updates the validation run
+        ValidationRun updatedRun = structureService.newValidationRunStatus(run, runStatus);
+        // OK
+        return toValidationRunResource(updatedRun);
+    }
+
     // Resource assemblers
 
     private Resource<ValidationRun> toValidationRunResource(ValidationRun validationRun) {

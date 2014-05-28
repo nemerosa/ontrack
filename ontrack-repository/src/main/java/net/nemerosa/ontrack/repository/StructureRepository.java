@@ -73,4 +73,6 @@ public interface StructureRepository {
     ValidationRun getValidationRun(ID validationRunId);
 
     List<ValidationRun> getValidationRunsForBuild(Build build);
+
+    ValidationRun newValidationRunStatus(ValidationRun validationRun, ValidationRunStatus runStatus);
 }
