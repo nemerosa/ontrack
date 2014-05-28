@@ -3,12 +3,10 @@
  * stylesheets used throughout the application as this is the only stylesheet in
  * the Grunt configuration that is automatically processed.
  */
-
 /**
  * First, we include the Twitter Bootstrap LESS files. Only the ones used in the
  * project should be imported as the rest are just wasting space.
  */
-
 @import '../../vendor/bootstrap/less/alerts';
 @import '../../vendor/bootstrap/less/badges';
 @import '../../vendor/bootstrap/less/breadcrumbs';
@@ -39,11 +37,11 @@
 @import '../../vendor/bootstrap/less/type';
 @import '../../vendor/bootstrap/less/utilities';
 @import '../../vendor/bootstrap/less/wells';
-  /**
-   * This is our main variables file. It in turn imports the `variables` file from
-   * Twitter Bootstrap. We must include it last so we can overwrite any variable
-   * definitions in our imported stylesheets.
-   */
+/**
+ * This is our main variables file. It in turn imports the `variables` file from
+ * Twitter Bootstrap. We must include it last so we can overwrite any variable
+ * definitions in our imported stylesheets.
+ */
 @import 'variables.less';
 
 /**
@@ -266,6 +264,33 @@ td.ot-entity-image {
   opacity: 0.5;
 }
 
+table.ot-validation-runs {
+  width: 100%;
+  table-layout: fixed;
+  tr {
+    &:hover {
+      background-color: white;
+    }
+    td {
+      &:first-child {
+        width: 30%;
+      }
+      padding-bottom: 0.5em;
+      padding-top: 0.5em;
+    }
+  }
+}
+
+.ot-validation-run-status-horizontal {
+  display: inline-block;
+  a {
+    text-decoration: none;
+  }
+  img.ot-validation-run-status {
+    padding-left: 0.5em;
+  }
+}
+
 /**
  * Commands
  */
@@ -291,7 +316,7 @@ span.ot-view-command {
   .glyphicon-trash;
 }
 
-.ot-command-update{
+.ot-command-update {
   .glyphicon;
   .glyphicon-pencil;
 }

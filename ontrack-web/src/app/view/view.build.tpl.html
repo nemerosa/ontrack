@@ -37,7 +37,7 @@
                                     </ot-entity-image>
                                 </td>
                                 <td>
-                                    <span ng-repeat="validationRun in validationStampRunView.validationRun">
+                                    <span ng-repeat="validationRun in validationStampRunView.validationRun" class="ot-validation-run-status-horizontal">
                                         <a href="#/validationRun/{{validationRun.id}}">
                                             <ot-validation-run-status status="validationRun.lastStatus"></ot-validation-run-status>
                                         </a>
