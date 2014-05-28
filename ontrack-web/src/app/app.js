@@ -12,6 +12,7 @@ var ontrack = angular.module('ontrack', [
         'ot.service.user',
         // Views
         'ot.view.home',
+        'ot.view.settings',
         'ot.view.project',
         'ot.view.branch',
         'ot.view.build',
