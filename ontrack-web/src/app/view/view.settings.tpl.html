@@ -5,7 +5,7 @@
             <form name="{{form.id}}" role="form" ng-submit="submit(forms[form.id].$valid)" novalidate="novalidate">
                 <div class="form-group" ng-repeat="field in form.form.fields">
                     <label>{{field.label}}</label>
-                    <ot-field field="field"></ot-field>
+                    <ot-field data="form.data" field="field"></ot-field>
                 </div>
             </form>
         </div>
