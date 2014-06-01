@@ -55,6 +55,10 @@
                 <!-- Validation message -->
                 <p ng-show="thisForm[field.name].$invalid && !thisForm[field.name].$pristine" class="help-block">
                     {{field.validation}}</p>
+
+                <!-- Help message -->
+                <span class="help-block" ng-if="field.help">{{field.help}}</span>
+
             </div>
         </div>
 
