@@ -10,54 +10,7 @@
 
             <div class="col-md-9">
 
-                <!-- Type: text -->
-                <input ng-if="field.type == 'text'" ng-model="data[field.name]" name="{{field.name}}"
-                       maxlength="{{field.maxlength}}" type="text" class="form-control" ng-required="field.required"
-                       ng-readonly="field.readOnly" ng-pattern="field.pattern"/>
-
-                <!-- Type: url -->
-                <input ng-if="field.type == 'url'" ng-model="data[field.name]" name="{{field.name}}"
-                       maxlength="{{field.maxlength}}" type="url" class="form-control" ng-required="field.required"
-                       ng-readonly="field.readOnly"/>
-
-                <!-- Type: password -->
-                <input ng-if="field.type == 'password'" ng-model="data[field.name]" name="{{field.name}}"
-                       maxlength="{{field.maxlength}}" type="password" class="form-control" ng-required="field.required"
-                       ng-readonly="field.readOnly"/>
-
-                <!-- Type: memo -->
-                <textarea ng-if="field.type == 'memo'" ng-model="data[field.name]" class="form-control"
-                          rows="{{field.rows}}" ng-required="field.required" maxlength="{{field.maxlength}}"
-                          ng-readonly="field.readOnly"></textarea>
-
-                <!-- Type selection -->
-                <select ng-if="field.type == 'selection'" ng-model="data[field.name]" class="form-control"
-                        ng-required="field.required"
-                        ng-options="item[field.itemId] as item[field.itemName] for item in field.items">
-                    <option value="">&nbsp;</option>
-                </select>
-
-                <!-- Date time -->
-                <span ng-if="field.type == 'dateTime'">
-                    <div class="row">
-                        <div class="col-md-7" style="vertical-align: middle">
-                            <input ng-model="dates[field.name]" name="{{field.name}}-date" type="text" class="form-control"
-                                   datepicker-popup="EEE dd MMM yyyy"
-                                   is-open="opened"
-                                    />
-                        </div>
-                        <div class="col-md-5 ot-timepicker" ng-model="times[field.name]">
-                            <timepicker show-meridian="false" minute-step="field.minuteStep" />
-                        </div>
-                    </div>
-                </span>
-
-                <!-- Validation message -->
-                <p ng-show="thisForm[field.name].$invalid && !thisForm[field.name].$pristine" class="help-block">
-                    {{field.validation}}</p>
-
-                <!-- Help message -->
-                <span class="help-block" ng-if="field.help">{{field.help}}</span>
+                <ot-field data="data" field="field"></ot-field>
 
             </div>
         </div>

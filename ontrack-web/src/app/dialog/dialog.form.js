@@ -3,9 +3,10 @@ angular.module('ot.dialog.form', [])
         // General configuration
         $scope.config = config;
         // Form data
-        $scope.data = {};
-        $scope.dates = {};
-        $scope.times = {};
+        $scope.data = {
+            dates: {},
+            times: {}
+        };
         angular.forEach(config.form.fields, function (field) {
             $scope.data[field.name] = field.value;
             if (field.regex) {
@@ -15,8 +16,8 @@ angular.module('ot.dialog.form', [])
             if (field.type == 'dateTime') {
                 if (field.value) {
                     var dateTime = new Date(field.value);
-                    $scope.dates[field.name] = dateTime;
-                    $scope.times[field.name] = dateTime;
+                    $scope.data.dates[field.name] = dateTime;
+                    $scope.data.times[field.name] = dateTime;
                 }
             }
         });
@@ -31,8 +32,8 @@ angular.module('ot.dialog.form', [])
                 angular.forEach(config.form.fields, function (field) {
                     // Date-time handling
                     if (field.type == 'dateTime') {
-                        var date = $scope.dates[field.name];
-                        var time = $scope.times[field.name];
+                        var date = $scope.data.dates[field.name];
+                        var time = $scope.data.times[field.name];
                         var dateTime = date;
                         dateTime.setHours(time.getHours());
                         dateTime.setMinutes(time.getMinutes());
@@ -41,6 +42,9 @@ angular.module('ot.dialog.form', [])
                         $scope.data[field.name] = dateTime;
                     }
                 });
+                // Cleaning of pseudo fields
+                delete $scope.data.dates;
+                delete $scope.data.times;
                 // Submit
                 config.formConfig.submit($scope.data).then(
                     function success() {
