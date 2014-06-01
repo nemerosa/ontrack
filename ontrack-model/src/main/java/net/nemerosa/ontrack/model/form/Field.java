@@ -8,5 +8,7 @@ public interface Field {
 
     String getLabel();
 
+    String getHelp();
+
     Field value(Object value);
 }

@@ -11,6 +11,7 @@ public abstract class AbstractField<F extends AbstractField<F>> implements Field
     private boolean required = true;
     private boolean readOnly = false;
     private String validation;
+    private String help = "";
     private Object value;
 
     protected AbstractField(String type, String name) {
@@ -39,6 +40,12 @@ public abstract class AbstractField<F extends AbstractField<F>> implements Field
 
     public F validation(String value) {
         this.validation = value;
+        //noinspection unchecked
+        return (F) this;
+    }
+
+    public F help(String value) {
+        this.help = value;
         //noinspection unchecked
         return (F) this;
     }
