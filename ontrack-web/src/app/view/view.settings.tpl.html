@@ -1,3 +1,13 @@
 <ot-view>
-    Settings
+    <div class="row" ng-repeat="form in forms">
+        <div class="col-md-12">
+            <ot-section-title>{{form.title}}</ot-section-title>
+            <form name="{{form.id}}" role="form" ng-submit="submit(forms[form.id].$valid)" novalidate="novalidate">
+                <div class="form-group" ng-repeat="field in form.form.fields">
+                    <label>{{field.label}}</label>
+                    <ot-field field="field"></ot-field>
+                </div>
+            </form>
+        </div>
+    </div>
 </ot-view>

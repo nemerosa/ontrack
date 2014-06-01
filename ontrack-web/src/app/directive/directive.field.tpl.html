@@ -35,9 +35,15 @@
                     />
         </div>
         <div class="col-md-5 ot-timepicker" ng-model="data.times[field.name]">
-            <timepicker show-meridian="false" minute-step="field.minuteStep" />
+            <timepicker show-meridian="false" minute-step="field.minuteStep"/>
         </div>
     </div>
+</span>
+
+<!-- Yes/no -->
+<span ng-if="field.type == 'yesno'">
+    <label class="radio-inline"><input type="radio" name="{{field.name}}" value="true" ng-model="data[field.name]"/> Yes</label>
+    <label class="radio-inline"><input type="radio" name="{{field.name}}" value="false" ng-model="data[field.name]"/> No</label>
 </span>
 
 <!-- Validation message -->
