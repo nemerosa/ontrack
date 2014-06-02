@@ -42,8 +42,8 @@
 
 <!-- Yes/no -->
 <span ng-if="field.type == 'yesno'">
-    <label class="radio-inline"><input type="radio" name="{{field.name}}" value="true" ng-model="data[field.name]"/> Yes</label>
-    <label class="radio-inline"><input type="radio" name="{{field.name}}" value="false" ng-model="data[field.name]"/> No</label>
+    <label class="radio-inline"><input type="radio" name="{{field.name}}" ng-value="true" ng-model="data[field.name]"/> Yes</label>
+    <label class="radio-inline"><input type="radio" name="{{field.name}}" ng-value="false" ng-model="data[field.name]"/> No</label>
 </span>
 
 <!-- Validation message -->
