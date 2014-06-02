@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.service.security;
 
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.Signature;
+import net.nemerosa.ontrack.service.support.SettingsInternalService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -12,6 +14,13 @@ import static java.lang.String.format;
 
 @Component
 public class SecurityServiceImpl implements SecurityService {
+
+    private final SettingsInternalService settingsInternalService;
+
+    @Autowired
+    public SecurityServiceImpl(SettingsInternalService settingsInternalService) {
+        this.settingsInternalService = settingsInternalService;
+    }
 
     @Override
     public void checkGlobalFunction(Class<? extends GlobalFunction> fn) {

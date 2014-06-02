@@ -4,39 +4,41 @@ import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.settings.SecuritySettings;
 import net.nemerosa.ontrack.model.settings.SettingsService;
-import net.nemerosa.ontrack.repository.SettingsRepository;
 import net.nemerosa.ontrack.service.Caches;
+import net.nemerosa.ontrack.service.support.SettingsInternalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+/**
+ * This service delegates to an internal cached service in order to avoid the cyclic
+ * dependency SecurityService &lt;--&gt; SettingsService. We now have
+ * SecurityService --&gt; SettingsInternalService and SettingsService --&gt; SecurityService
+ * and SettingsService --&gt; SettingsInternalService
+ */
 @Service
 public class SettingsServiceImpl implements SettingsService {
 
     private final SecurityService securityService;
-    private final SettingsRepository settingsRepository;
+    private final SettingsInternalService settingsInternalService;
 
     @Autowired
-    public SettingsServiceImpl(SecurityService securityService, SettingsRepository settingsRepository) {
+    public SettingsServiceImpl(SecurityService securityService, SettingsInternalService settingsInternalService) {
         this.securityService = securityService;
-        this.settingsRepository = settingsRepository;
+        this.settingsInternalService = settingsInternalService;
     }
 
     @Override
-    @Cacheable(value = Caches.SECURITY_SETTINGS, key = "0")
     public SecuritySettings getSecuritySettings() {
         securityService.checkGlobalFunction(GlobalSettings.class);
-        return new SecuritySettings(
-                settingsRepository.getBoolean(SecuritySettings.class, "grantProjectViewToAll", false)
-        );
+        return settingsInternalService.getSecuritySettings();
     }
 
     @Override
     @CacheEvict(value = Caches.SECURITY_SETTINGS, allEntries = true)
     public void saveSecuritySettings(SecuritySettings securitySettings) {
         securityService.checkGlobalFunction(GlobalSettings.class);
-        settingsRepository.setBoolean(SecuritySettings.class, "grantProjectViewToAll", securitySettings.isGrantProjectViewToAll());
+        settingsInternalService.saveSecuritySettings(securitySettings);
     }
 
 }
