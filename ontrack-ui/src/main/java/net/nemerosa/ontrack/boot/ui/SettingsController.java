@@ -70,7 +70,7 @@ public class SettingsController extends AbstractResourceController {
                 Form.create()
                         .with(
                                 YesNo.of("grantProjectViewToAll")
-                                        .label("Grand project view to all")
+                                        .label("Grants project view to all")
                                         .help("Unless disabled at project level, this would enable any user (even anonymous) " +
                                                 "to view the content of all projects.")
                                                 // TODO Gets the value from the settings
