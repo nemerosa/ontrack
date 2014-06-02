@@ -4,9 +4,8 @@ import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.extension.api.GlobalSettingsExtension;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.DescribedForm;
-import net.nemerosa.ontrack.model.security.GlobalSettings;
-import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.settings.SecuritySettings;
+import net.nemerosa.ontrack.model.settings.SettingsService;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,13 +24,13 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 @RequestMapping("/settings")
 public class SettingsController extends AbstractResourceController {
 
+    private final SettingsService settingsService;
     private final ExtensionManager extensionManager;
-    private final SecurityService securityService;
 
     @Autowired
-    public SettingsController(ExtensionManager extensionManager, SecurityService securityService) {
+    public SettingsController(SettingsService settingsService, ExtensionManager extensionManager) {
+        this.settingsService = settingsService;
         this.extensionManager = extensionManager;
-        this.securityService = securityService;
     }
 
     /**
@@ -39,7 +38,6 @@ public class SettingsController extends AbstractResourceController {
      */
     @RequestMapping(value = "", method = RequestMethod.GET)
     public List<DescribedForm> configuration() {
-        securityService.checkGlobalFunction(GlobalSettings.class);
         List<DescribedForm> forms = new ArrayList<>();
         // Security settings
         forms.add(getSecuritySettingsForm());
@@ -58,17 +56,14 @@ public class SettingsController extends AbstractResourceController {
      */
     @RequestMapping(value = "security", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    // TODO Security settings
     public Ack updateSecurity(@RequestBody SecuritySettings securitySettings) {
-        securityService.checkGlobalFunction(GlobalSettings.class);
+        settingsService.saveSecuritySettings(securitySettings);
         return Ack.OK;
     }
 
 
     private DescribedForm getSecuritySettingsForm() {
-        securityService.checkGlobalFunction(GlobalSettings.class);
-        // TODO Gets the security settings
-        SecuritySettings securitySettings = SecuritySettings.of();
+        SecuritySettings securitySettings = settingsService.getSecuritySettings();
         return DescribedForm.create(
                 "security",
                 securitySettings.form()

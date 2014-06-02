@@ -1,21 +1,16 @@
 package net.nemerosa.ontrack.model.settings;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.experimental.Builder;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.YesNo;
 
 @Data
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
 public class SecuritySettings {
 
     private final boolean grantProjectViewToAll;
 
     public static SecuritySettings of() {
-        return builder().grantProjectViewToAll(false).build();
+        return new SecuritySettings(false);
     }
 
     public Form form() {
