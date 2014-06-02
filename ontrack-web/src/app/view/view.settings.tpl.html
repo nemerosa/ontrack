@@ -2,12 +2,27 @@
     <div class="row" ng-repeat="form in forms">
         <div class="col-md-12">
             <ot-section-title>{{form.title}}</ot-section-title>
-            <form name="{{form.id}}" role="form" ng-submit="submit(forms[form.id].$valid)" novalidate="novalidate">
-                <div class="form-group" ng-repeat="field in form.form.fields">
-                    <label>{{field.label}}</label>
-                    <ot-field data="form.data" field="field"></ot-field>
-                </div>
-            </form>
+            <div class="well">
+                <table class="ot-form-view">
+                    <tbody>
+                    <tr ng-repeat="field in form.form.fields">
+                        <td>
+                            {{field.label}}
+                        </td>
+                        <td>
+                            <ot-field-value field="field"></ot-field-value>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td colspan="2">
+                            <button type="button" class="btn btn-info" ng-click="editSettings(form)">Edit</button>
+                        </td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
         </div>
     </div>
 </ot-view>

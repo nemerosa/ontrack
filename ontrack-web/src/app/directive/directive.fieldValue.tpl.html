@@ -1,0 +1,23 @@
+<!-- Type: text -->
+<span ng-if="field.type == 'text'" class="ot-field-value">{{field.value}}</span>
+
+<!-- Type: url -->
+<span ng-if="field.type == 'url'" class="ot-field-value"><a href="{{field.value}}" target="_blank">{{field.value}}</a></span>
+
+<!-- Type: password -->
+<span ng-if="field.type == 'password'" class="ot-field-value">***</span>
+
+<!-- Type: memo -->
+<span ng-if="field.type == 'memo'" class="ot-field-value">{{field.value}}</span>
+
+<!-- Type selection -->
+<span ng-if="field.type == 'selection'" class="ot-field-value">{{field.value}}</span>
+
+<!-- Date time -->
+<span ng-if="field.type == 'dateTime'" class="ot-field-value">{{field.value | date:'mediumDate'}} {{field.value | date:'smallTime'}}</span>
+
+<!-- Yes/no -->
+<span ng-if="field.type == 'yesno'" class="ot-field-value">
+    <span ng-if="field.value">Yes</span>
+    <span ng-if="!field.value">No</span>
+</span>

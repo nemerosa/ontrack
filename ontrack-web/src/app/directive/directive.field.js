@@ -12,4 +12,14 @@ angular.module('ot.directive.field', [
             }
         };
     })
+    .directive('otFieldValue', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'app/directive/directive.fieldValue.tpl.html',
+            transclude: true,
+            scope: {
+                field: '='
+            }
+        };
+    })
 ;
