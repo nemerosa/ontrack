@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.security;
 
 import net.nemerosa.ontrack.model.security.*;
+import net.nemerosa.ontrack.model.settings.SecuritySettings;
 import net.nemerosa.ontrack.model.structure.Signature;
 import net.nemerosa.ontrack.service.support.SettingsInternalService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,12 @@ public class SecurityServiceImpl implements SecurityService {
         // Gets the user
         Account user = getCurrentAccount();
         // Checks
-        return user != null && user.isGranted(projectId, fn);
+        return (user != null && user.isGranted(projectId, fn)) || isGlobalGrant(fn);
+    }
+
+    protected boolean isGlobalGrant(Class<? extends ProjectFunction> fn) {
+        SecuritySettings settings = settingsInternalService.getSecuritySettings();
+        return settings.isGrantProjectViewToAll() && ProjectView.class.isAssignableFrom(fn);
     }
 
     @Override

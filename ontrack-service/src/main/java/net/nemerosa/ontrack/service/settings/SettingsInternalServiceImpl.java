@@ -22,9 +22,8 @@ public class SettingsInternalServiceImpl implements SettingsInternalService {
     @Override
     @Cacheable(value = Caches.SECURITY_SETTINGS, key = "0")
     public SecuritySettings getSecuritySettings() {
-        return new SecuritySettings(
-                settingsRepository.getBoolean(SecuritySettings.class, "grantProjectViewToAll", false)
-        );
+        return SecuritySettings.of()
+                .withGrantProjectViewToAll(settingsRepository.getBoolean(SecuritySettings.class, "grantProjectViewToAll", false));
     }
 
     @Override
