@@ -2,7 +2,7 @@
     <thead>
     <!-- Validation stamps -->
     <tr>
-        <th>
+        <th colspan="2">
             <!-- Place holder for builds & promotions -->
         </th>
         <!-- All validation stamps -->
@@ -25,6 +25,20 @@
                 {{buildView.build.signature.time | date:'mediumDate'}}
                 {{buildView.build.signature.time | date:'shortTime'}}
             </div>
+        </td>
+        <!-- Promotion runs -->
+        <td>
+            <span ng-repeat="promotionRun in buildView.promotionRuns">
+                <span class="ot-promotion-run">
+                    <ot-entity-image entity="promotionRun" link="#/promotionLevel/{{promotionRun.promotionLevel.id}}">
+                        {{promotionRun.promotionLevel.name}}
+                    </ot-entity-image>
+                    <span class="ot-promotion-run-signature">
+                        {{promotionRun.signature.time | date:'shortDate'}}
+                    </span>
+                </span>
+                <span ng-if="!$last" class="ot-promotion-run-separator"></span>
+            </span>
         </td>
         <!-- TODO Validation runs -->
     </tr>
