@@ -66,6 +66,11 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
         </dependency>
+        <!-- Guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
         <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>

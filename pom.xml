@@ -66,6 +66,12 @@
                 <version>${lombokVersion}</version>
                 <scope>provided</scope>
             </dependency>
+            <!-- Guava -->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>17.0</version>
+            </dependency>
             <!-- Validation API -->
             <dependency>
                 <groupId>javax.validation</groupId>
