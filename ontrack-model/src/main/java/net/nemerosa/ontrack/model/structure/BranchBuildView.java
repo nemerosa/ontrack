@@ -12,8 +12,8 @@ import java.util.List;
 public class BranchBuildView implements View {
 
     /**
-     * Filtered list of builds (the filter is not managed by the view itself)
+     * Filtered list of build views (the filter is not managed by the view itself)
      */
-    private final List<Build> builds;
+    private final List<BuildView> buildViews;
 
 }

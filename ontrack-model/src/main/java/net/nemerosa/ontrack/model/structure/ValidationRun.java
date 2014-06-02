@@ -17,7 +17,7 @@ public class ValidationRun implements Entity {
     private final ID id;
     @JsonView({ValidationRun.class})
     private final Build build;
-    @JsonView({ValidationRun.class, BranchBuildView.class, Build.class})
+    @JsonView({ValidationRun.class, Build.class})
     private final ValidationStamp validationStamp;
 
     /**

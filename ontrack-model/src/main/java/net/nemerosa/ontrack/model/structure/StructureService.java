@@ -34,7 +34,9 @@ public interface StructureService {
      * Branch builds
      */
     // TODO Filter on builds
-    BranchBuildView getBranchBuildView(ID branchId);
+    List<Build> getFilteredBuilds(ID branchId);
+
+    List<ValidationStampRunView> getValidationStampRunViewsForBuild(Build build);
 
     // Promotion levels
 

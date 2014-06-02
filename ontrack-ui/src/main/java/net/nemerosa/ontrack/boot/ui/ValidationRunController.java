@@ -38,22 +38,12 @@ public class ValidationRunController extends AbstractResourceController {
     public ResourceCollection<ValidationStampRunView> getValidationStampRunViews(@PathVariable ID buildId) {
         // Build
         Build build = structureService.getBuild(buildId);
-        // Gets all validation stamps
-        List<ValidationStamp> stamps = structureService.getValidationStampListForBranch(build.getBranch().getId());
-        // Gets all runs for this build
-        List<ValidationRun> runs = structureService.getValidationRunsForBuild(buildId);
+        // Gets the views
+        List<ValidationStampRunView> views = structureService.getValidationStampRunViewsForBuild(build);
         // Converts into a view
         URI uri = uri(on(getClass()).getValidationStampRunViews(buildId));
         return ResourceCollection.of(
-                stamps.stream()
-                        .map(stamp ->
-                                        new ValidationStampRunView(
-                                                stamp,
-                                                runs.stream()
-                                                        .filter(run -> run.getValidationStamp().id() == stamp.id())
-                                                        .collect(Collectors.toList())
-                                        )
-                        )
+                views.stream()
                         .map(view -> Resource.of(view, uri)
                                         .with(Link.IMAGE_LINK, uri(on(ValidationStampController.class).getValidationStampImage_(view.getValidationStamp().getId())))
                         )

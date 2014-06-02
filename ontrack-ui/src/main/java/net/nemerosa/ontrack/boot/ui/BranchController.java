@@ -10,6 +10,9 @@ import net.nemerosa.ontrack.ui.resource.ResourceCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
@@ -71,7 +74,22 @@ public class BranchController extends AbstractResourceController {
     // TODO Filter
     public BranchBuildView buildView(@PathVariable ID branchId) {
         // TODO Defines the filter for the service
-        return structureService.getBranchBuildView(branchId);
+        // Gets the list of builds
+        List<Build> builds = structureService.getFilteredBuilds(branchId);
+        // Gets the views for each build
+        return new BranchBuildView(
+                builds.stream()
+                        .map(this::toBuildView)
+                        .collect(Collectors.toList())
+        );
+    }
+
+    private BuildView toBuildView(Build build) {
+        return new BuildView(
+                build,
+                structureService.getLastPromotionRunsForBuild(build.getId()),
+                structureService.getValidationStampRunViewsForBuild(build)
+        );
     }
 
     // Resource assemblers

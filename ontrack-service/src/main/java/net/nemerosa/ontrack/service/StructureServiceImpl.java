@@ -128,16 +128,35 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
-    public BranchBuildView getBranchBuildView(ID branchId) {
+    public List<Build> getFilteredBuilds(ID branchId) {
         // Gets the branch
         Branch branch = getBranch(branchId);
         // TODO Defines a filter
         BuildFilter buildFilter = new BuildFilter() {
         };
         // Collects the builds associated with this predicate
-        List<Build> builds = structureRepository.builds(branch, buildFilter);
-        // OK
-        return new BranchBuildView(builds);
+        return structureRepository.builds(branch, buildFilter);
+    }
+
+    @Override
+    public List<ValidationStampRunView> getValidationStampRunViewsForBuild(Build build) {
+        // Gets all validation stamps
+        List<ValidationStamp> stamps = getValidationStampListForBranch(build.getBranch().getId());
+        // Gets all runs for this build
+        List<ValidationRun> runs = getValidationRunsForBuild(build.getId());
+        // Gets the validation stamp run views
+        return stamps.stream()
+                .map(stamp -> getValidationStampRunView(runs, stamp))
+                .collect(Collectors.toList());
+    }
+
+    protected ValidationStampRunView getValidationStampRunView(List<ValidationRun> runs, ValidationStamp stamp) {
+        return new ValidationStampRunView(
+                stamp,
+                runs.stream()
+                        .filter(run -> run.getValidationStamp().id() == stamp.id())
+                        .collect(Collectors.toList())
+        );
     }
 
     @Override
