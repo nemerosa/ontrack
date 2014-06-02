@@ -42,7 +42,7 @@ angular.module('ot.view.settings', [
                 submit: function (data) {
                     return ot.call($http.put(describedForm.uri, data));
                 }
-            });
+            }).then(loadSettings);
         };
     })
 ;
