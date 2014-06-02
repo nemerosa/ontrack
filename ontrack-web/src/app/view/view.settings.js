@@ -32,5 +32,17 @@ angular.module('ot.view.settings', [
 
         // Initialisation
         loadSettings();
+
+        // Editing some settings
+        $scope.editSettings = function (describedForm) {
+            otFormService.display({
+                form: describedForm.form,
+                title: describedForm.title,
+                description: describedForm.description,
+                submit: function (data) {
+                    return ot.call($http.put(describedForm.uri, data));
+                }
+            });
+        };
     })
 ;

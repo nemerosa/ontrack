@@ -1,11 +1,27 @@
 angular.module('ot.service.form', [
-    'ot.dialog.form'
+    'ot.dialog.form',
+    'ot.service.core'
 ])
 /**
  * Form service
  */
-    .service('otFormService', function ($q, $http, $modal) {
+    .service('otFormService', function ($q, $http, $modal, ot) {
         var self = {};
+
+        /**
+         * Getting the form content from its configuration
+         */
+        self.getForm = function (formConfig) {
+            if (formConfig.form) {
+                var d = $q.defer();
+                d.resolve(formConfig.form);
+                return d.promise;
+            } else if (formConfig.uri) {
+                return ot.call($http.get(formConfig.uri));
+            } else {
+                throw "Neither `uri` or `form` is set for the form config.";
+            }
+        };
 
         /**
          * Gets a form description and displays it
@@ -13,8 +29,7 @@ angular.module('ot.service.form', [
         self.display = function (formConfig) {
             var d = $q.defer();
 
-            // Loading the form
-            $http.get(formConfig.uri).success(function (form) {
+            self.getForm(formConfig).then(function (form) {
                 $modal.open({
                     templateUrl: 'app/dialog/dialog.form.tpl.html',
                     controller: 'otDialogForm',
