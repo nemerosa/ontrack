@@ -30,7 +30,7 @@
         <td>
             <span ng-repeat="promotionRun in buildView.promotionRuns">
                 <span class="ot-promotion-run">
-                    <ot-entity-image entity="promotionRun" link="#/promotionLevel/{{promotionRun.promotionLevel.id}}">
+                    <ot-entity-image entity="promotionRun.promotionLevel" link="#/promotionLevel/{{promotionRun.promotionLevel.id}}">
                         {{promotionRun.promotionLevel.name}}
                     </ot-entity-image>
                     <span class="ot-promotion-run-signature">

@@ -23,15 +23,6 @@ angular.module('ot.view.branch', [
                 $http.get('structure/branches/' + branchId + '/view')
             ).then(
                 function success(branchBuildView) {
-                    // Pre treatment
-                    angular.forEach(branchBuildView.buildViews, function (buildView) {
-                        // Promotion run images
-                        angular.forEach(buildView.promotionRuns, function (promotionRun) {
-                            promotionRun.image = promotionRun.promotionLevel.image;
-                            // TODO Image link not part of the promotion run...
-                        });
-                    });
-                    // OK
                     $scope.branchBuildView = branchBuildView;
                 }
             );
