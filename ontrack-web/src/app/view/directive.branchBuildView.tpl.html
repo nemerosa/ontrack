@@ -13,17 +13,17 @@
     <!-- TODO Validation stamps decorations -->
     </thead>
     <tbody>
-    <tr ng-repeat="build in view.builds">
+    <tr ng-repeat="buildView in view.buildViews">
         <td>
             <!-- Build name and link -->
-            <a href="#/build/{{build.id}}" class="ot-branch-build-view-build-name">
-                {{build.name}}
+            <a href="#/build/{{buildView.build.id}}" class="ot-branch-build-view-build-name">
+                {{buildView.build.name}}
                 <!-- TODO Build decorations -->
             </a>
             <!-- Signature, without the creator in the overview -->
             <div class="ot-branch-build-view-build-signature">
-                {{build.signature.time | date:'mediumDate'}}
-                {{build.signature.time | date:'shortTime'}}
+                {{buildView.build.signature.time | date:'mediumDate'}}
+                {{buildView.build.signature.time | date:'shortTime'}}
             </div>
         </td>
         <!-- TODO Validation runs -->
