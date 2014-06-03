@@ -48,6 +48,32 @@ public class CoreResourceModuleTest {
                         .with("_update", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#saveProject:1,")
                         .end(),
                 p,
+                Project.class
+        );
+    }
+
+    @Test
+    public void branch_no_grant() throws JsonProcessingException {
+        // Objects
+        Project p = Project.of(new NameDescription("P", "Project")).withId(ID.of(1));
+        Branch b = Branch.of(p, new NameDescription("B", "Branch")).withId(ID.of(1));
+        // Serialization
+        assertJsonWrite(
+                mapper, object()
+                        .with("id", 1)
+                        .with("name", "B")
+                        .with("description", "Branch")
+                        .with("project", object()
+                                .with("id", 1)
+                                .with("name", "P")
+                                .with("description", "Project")
+                                .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
+                                .with("_branches", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranchListForProject:1")
+                                .end())
+                        .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranch:1")
+                        .with("_project", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
+                        .end(),
+                b,
                 Branch.class
         );
     }
@@ -84,9 +110,9 @@ public class CoreResourceModuleTest {
                         .with("description", "Promotion level")
                         .with("image", false)
                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionLevel:1")
-                        .with("_branchLink", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranch:1")
-                        .with("_projectLink", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
-                        .with("_imageLink", "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionLevelImage_:1")
+                        .with("_branch", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranch:1")
+                        .with("_project", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
+                        .with("_image", "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionLevelImage_:1")
                         .end(),
                 pl,
                 Branch.class
@@ -119,12 +145,12 @@ public class CoreResourceModuleTest {
                                         .with("_branches", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranchListForProject:1")
                                         .end())
                                 .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranch:1")
-                                .with("_projectLink", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
+                                .with("_project", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
                                 .end())
                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionLevel:1")
-                        .with("_branchLink", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranch:1")
-                        .with("_projectLink", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
-                        .with("_imageLink", "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionLevelImage_:1")
+                        .with("_branch", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranch:1")
+                        .with("_project", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
+                        .with("_image", "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionLevelImage_:1")
                         .end(),
                 pl,
                 PromotionLevel.class

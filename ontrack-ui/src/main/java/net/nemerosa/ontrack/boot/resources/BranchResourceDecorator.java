@@ -22,7 +22,7 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
     public List<Link> links(Branch branch, ResourceContext resourceContext) {
         return Arrays.asList(
                 Link.of(Link.SELF, resourceContext.uri(on(BranchController.class).getBranch(branch.getId()))),
-                Link.of("_projectLink", resourceContext.uri(on(ProjectController.class).getProject(branch.getProject().getId())))
+                Link.of("_project", resourceContext.uri(on(ProjectController.class).getProject(branch.getProject().getId())))
                 // TODO Actions?
         );
     }
