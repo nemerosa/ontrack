@@ -37,10 +37,10 @@ angular.module('ontrack.extension.svn', [
         // Creating a configuration
         $scope.createConfiguration = function () {
             otFormService.display({
-                uri: $scope.configurations.create.href,
+                uri: $scope.configurations._create,
                 title: "SVN configuration",
                 submit: function (data) {
-                    return ot.call($http.post($scope.configurations.create.href, data));
+                    return ot.call($http.post($scope.configurations._create, data));
                 }
             }).then(loadSVNConfigurations);
         };
@@ -52,7 +52,7 @@ angular.module('ontrack.extension.svn', [
                 message: "Do you really want to delete this SVN configuration? Some projects may still refer to it."
             }).then(
                 function success() {
-                    ot.call($http.delete(configuration.delete.href)).then(loadSVNConfigurations);
+                    ot.call($http.delete(configuration._delete)).then(loadSVNConfigurations);
                 }
             );
         };
@@ -60,10 +60,10 @@ angular.module('ontrack.extension.svn', [
         // Updating a configuration
         $scope.updateConfiguration = function (configuration) {
             otFormService.display({
-                uri: configuration.update.href,
+                uri: configuration._update,
                 title: "SVN configuration",
                 submit: function (data) {
-                    return ot.call($http.put(configuration.update.href, data));
+                    return ot.call($http.put(configuration._update, data));
                 }
             }).then(loadSVNConfigurations);
         };

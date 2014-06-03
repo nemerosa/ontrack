@@ -37,10 +37,10 @@ angular.module('ontrack.extension.jenkins', [
         // Creating a configuration
         $scope.createConfiguration = function () {
             otFormService.display({
-                uri: $scope.configurations.create.href,
+                uri: $scope.configurations._create,
                 title: "Jenkins configuration",
                 submit: function (data) {
-                    return ot.call($http.post($scope.configurations.create.href, data));
+                    return ot.call($http.post($scope.configurations._create, data));
                 }
             }).then(loadJenkinsConfigurations);
         };
@@ -52,7 +52,7 @@ angular.module('ontrack.extension.jenkins', [
                 message: "Do you really want to delete this Jenkins configuration? Some projects may still refer to it."
             }).then(
                 function success() {
-                    ot.call($http.delete(configuration.delete.href)).then(loadJenkinsConfigurations);
+                    ot.call($http.delete(configuration._delete)).then(loadJenkinsConfigurations);
                 }
             );
         };
@@ -60,10 +60,10 @@ angular.module('ontrack.extension.jenkins', [
         // Updating a configuration
         $scope.updateConfiguration = function (configuration) {
             otFormService.display({
-                uri: configuration.update.href,
+                uri: configuration._update,
                 title: "Jenkins configuration",
                 submit: function (data) {
-                    return ot.call($http.put(configuration.update.href, data));
+                    return ot.call($http.put(configuration._update, data));
                 }
             }).then(loadJenkinsConfigurations);
         };
