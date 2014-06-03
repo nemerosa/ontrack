@@ -69,6 +69,8 @@ public class ResourceModuleTest {
                                         .with("name", "P")
                                         .with("description", "Project")
                                         .end())
+                                .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranch:1")
+                                .with("_projectLink", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
                                 .end())
                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionLevel:1")
                         .with("_branchLink", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranch:1")

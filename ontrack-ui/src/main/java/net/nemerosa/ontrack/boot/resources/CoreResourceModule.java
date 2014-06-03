@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.fasterxml.jackson.databind.ser.std.BeanSerializerBase;
+import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.PromotionLevel;
 import net.nemerosa.ontrack.ui.resource.ResourceContext;
 
@@ -29,6 +30,19 @@ public class CoreResourceModule extends SimpleModule {
                     JsonSerializer<?> serializer) {
                 if (PromotionLevel.class.isAssignableFrom(beanDesc.getBeanClass())) {
                     return new PromotionLevelResource((BeanSerializerBase) serializer, resourceContext);
+                } else {
+                    return super.modifySerializer(config, beanDesc, serializer);
+                }
+            }
+        });
+        context.addBeanSerializerModifier(new BeanSerializerModifier() {
+
+            public JsonSerializer<?> modifySerializer(
+                    SerializationConfig config,
+                    BeanDescription beanDesc,
+                    JsonSerializer<?> serializer) {
+                if (Branch.class.isAssignableFrom(beanDesc.getBeanClass())) {
+                    return new BranchResource((BeanSerializerBase) serializer, resourceContext);
                 } else {
                     return super.modifySerializer(config, beanDesc, serializer);
                 }
