@@ -10,25 +10,25 @@ angular.module('ot.view.project', [
             controller: 'ProjectCtrl'
         });
     })
-    .controller('ProjectCtrl', function ($scope, $stateParams, ot, otStructureService) {
+    .controller('ProjectCtrl', function ($scope, $stateParams, $http, ot, otStructureService) {
         var view = ot.view();
         // Project's id
         var projectId = $stateParams.projectId;
         // Loading the branches
         function loadBranches() {
-            otStructureService.getProjectBranches(projectId).then(function (branchCollection) {
+            ot.call($http.get($scope.project._branches)).then(function (branchCollection) {
                 $scope.branchCollection = branchCollection;
                 // View commands
                 view.commands = [
                     {
                         condition: function () {
-                            return branchCollection.create;
+                            return branchCollection._create;
                         },
                         id: 'createBranch',
                         name: "Create branch",
                         cls: 'ot-command-branch-new',
                         action: function () {
-                            otStructureService.createBranch(branchCollection.create.href).then(loadBranches);
+                            otStructureService.create(branchCollection._create, "New branch").then(loadBranches);
                         }
                     },
                     ot.viewCloseCommand('/home')

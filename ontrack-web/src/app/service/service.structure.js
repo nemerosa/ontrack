@@ -42,24 +42,6 @@ angular.module('ot.service.structure', [
         };
 
         /**
-         * Getting the branches for a project
-         */
-        self.getProjectBranches = function (projectId) {
-            return ot.call(
-                $http.get(
-                    $interpolate('structure/projects/{{projectId}}/branches')({projectId: projectId})
-                )
-            );
-        };
-
-        /**
-         * Creating a branch
-         */
-        self.createBranch = function (uri) {
-            return self.create(uri, 'New branch');
-        };
-
-        /**
          * Getting a branch
          */
         self.getBranch = function (id) {
