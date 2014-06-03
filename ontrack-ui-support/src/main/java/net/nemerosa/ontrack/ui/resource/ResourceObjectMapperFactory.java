@@ -1,10 +1,7 @@
-package net.nemerosa.ontrack.boot.resources;
+package net.nemerosa.ontrack.ui.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
-import net.nemerosa.ontrack.ui.resource.JSONResourceModule;
-import net.nemerosa.ontrack.ui.resource.ResourceContext;
-import net.nemerosa.ontrack.ui.resource.ResourceModule;
 
 import java.util.List;
 

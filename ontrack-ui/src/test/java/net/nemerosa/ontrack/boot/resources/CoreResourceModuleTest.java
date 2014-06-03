@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.MockURIBuilder;
 import net.nemerosa.ontrack.ui.resource.DefaultResourceContext;
+import net.nemerosa.ontrack.ui.resource.ResourceObjectMapperFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;

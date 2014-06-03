@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import net.nemerosa.ontrack.boot.resources.CoreResourceModule;
-import net.nemerosa.ontrack.boot.resources.ResourceObjectMapperFactory;
+import net.nemerosa.ontrack.ui.resource.ResourceObjectMapperFactory;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.JsonViewClass;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
