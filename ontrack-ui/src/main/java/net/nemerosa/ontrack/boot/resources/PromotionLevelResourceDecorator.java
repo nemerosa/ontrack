@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.ResourceContext;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -21,13 +20,16 @@ public class PromotionLevelResourceDecorator extends AbstractResourceDecorator<P
 
     @Override
     public List<Link> links(PromotionLevel promotionLevel, ResourceContext resourceContext) {
-        return Arrays.asList(
-                Link.of(Link.SELF, resourceContext.uri(on(PromotionLevelController.class).getPromotionLevel(promotionLevel.getId()))),
-                Link.of("_branch", resourceContext.uri(on(BranchController.class).getBranch(promotionLevel.getBranch().getId()))),
-                Link.of("_project", resourceContext.uri(on(ProjectController.class).getProject(promotionLevel.getBranch().getProject().getId()))),
-                Link.of(Link.IMAGE_LINK, resourceContext.uri(on(PromotionLevelController.class).getPromotionLevelImage_(promotionLevel.getId())))
-                // TODO Actions?
-        );
+        return resourceContext.links()
+                .self(on(PromotionLevelController.class).getPromotionLevel(promotionLevel.getId()))
+                .link("_branch", on(BranchController.class).getBranch(promotionLevel.getBranch().getId()))
+                .link("_project", on(ProjectController.class).getProject(promotionLevel.getBranch().getProject().getId()))
+                .link(Link.IMAGE_LINK, on(PromotionLevelController.class).getPromotionLevelImage_(promotionLevel.getId()))
+                        // TODO Update
+                        // TODO Delete
+                        // TODO Next promotion level
+                        // TODO Previous promotion level
+                .build();
     }
 
 }

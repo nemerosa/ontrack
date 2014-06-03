@@ -6,8 +6,7 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Link;
-import net.nemerosa.ontrack.ui.resource.Resource;
-import net.nemerosa.ontrack.ui.resource.ResourceCollection;
+import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -36,10 +35,10 @@ public class PromotionLevelController extends AbstractResourceController {
     // Promotion levels
 
     @RequestMapping(value = "branches/{branchId}/promotionLevels", method = RequestMethod.GET)
-    public ResourceCollection<PromotionLevel> getPromotionLevelListForBranch(@PathVariable ID branchId) {
+    public Resources<PromotionLevel> getPromotionLevelListForBranch(@PathVariable ID branchId) {
         Branch branch = structureService.getBranch(branchId);
-        return ResourceCollection.of(
-                structureService.getPromotionLevelListForBranch(branchId).stream().map(this::toPromotionLevelResource),
+        return Resources.of(
+                structureService.getPromotionLevelListForBranch(branchId),
                 uri(on(PromotionLevelController.class).getPromotionLevelListForBranch(branchId))
         )
                 // Create
@@ -58,7 +57,7 @@ public class PromotionLevelController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "branches/{branchId}/promotionLevels/create", method = RequestMethod.POST)
-    public Resource<PromotionLevel> newPromotionLevel(@PathVariable ID branchId, @RequestBody NameDescription nameDescription) {
+    public PromotionLevel newPromotionLevel(@PathVariable ID branchId, @RequestBody NameDescription nameDescription) {
         // Gets the holding branch
         Branch branch = structureService.getBranch(branchId);
         // Creates a new promotion level
@@ -66,14 +65,12 @@ public class PromotionLevelController extends AbstractResourceController {
         // Saves it into the repository
         promotionLevel = structureService.newPromotionLevel(promotionLevel);
         // OK
-        return toPromotionLevelResource(promotionLevel);
+        return promotionLevel;
     }
 
     @RequestMapping(value = "promotionLevels/{promotionLevelId}", method = RequestMethod.GET)
-    public Resource<PromotionLevel> getPromotionLevel(@PathVariable ID promotionLevelId) {
-        return toPromotionLevelResourceWithActions(
-                structureService.getPromotionLevel(promotionLevelId)
-        );
+    public PromotionLevel getPromotionLevel(@PathVariable ID promotionLevelId) {
+        return structureService.getPromotionLevel(promotionLevelId);
     }
 
     @RequestMapping(value = "promotionLevels/{promotionLevelId}/image", method = RequestMethod.GET)
@@ -99,27 +96,4 @@ public class PromotionLevelController extends AbstractResourceController {
         ));
     }
 
-    // Resource assemblers
-
-    private Resource<PromotionLevel> toPromotionLevelResourceWithActions(PromotionLevel promotionLevel) {
-        return toPromotionLevelResource(promotionLevel);
-        // TODO Update
-        // TODO Delete
-        // TODO Next promotion level
-        // TODO Previous promotion level
-    }
-
-    private Resource<PromotionLevel> toPromotionLevelResource(PromotionLevel promotionLevel) {
-        return Resource.of(
-                promotionLevel,
-                uri(on(PromotionLevelController.class).getPromotionLevel(promotionLevel.getId()))
-        )
-                // Branch link
-                .with("branchLink", uri(on(BranchController.class).getBranch(promotionLevel.getBranch().getId())))
-                        // Project link
-                .with("projectLink", uri(on(ProjectController.class).getProject(promotionLevel.getBranch().getProject().getId())))
-                        // Image link
-                .with("imageLink", uri(on(PromotionLevelController.class).getPromotionLevelImage_(promotionLevel.getId())))
-                ;
-    }
 }
