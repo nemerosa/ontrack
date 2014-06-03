@@ -1,30 +1,19 @@
 package net.nemerosa.ontrack.boot.resources;
 
-import net.nemerosa.ontrack.model.structure.Branch;
-import net.nemerosa.ontrack.model.structure.Project;
-import net.nemerosa.ontrack.model.structure.PromotionLevel;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceModule;
-import net.nemerosa.ontrack.ui.resource.ResourceContext;
+import net.nemerosa.ontrack.ui.resource.ResourceDecorator;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 public class CoreResourceModule extends AbstractResourceModule {
 
-    public CoreResourceModule(ResourceContext resourceContext) {
-        super("ontrack", resourceContext);
-    }
-
     @Override
-    protected void setupResources() {
-        register(
-                Project.class,
-                ProjectResource::new
-        );
-        register(
-                Branch.class,
-                BranchResource::new
-        );
-        register(
-                PromotionLevel.class,
-                PromotionLevelResource::new
+    public Collection<ResourceDecorator<?>> decorators() {
+        return Arrays.asList(
+                new ProjectResourceDecorator(),
+                new BranchResourceDecorator(),
+                new PromotionLevelResourceDecorator()
         );
     }
 }

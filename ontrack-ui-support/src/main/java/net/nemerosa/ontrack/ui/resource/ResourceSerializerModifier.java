@@ -5,31 +5,23 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.fasterxml.jackson.databind.ser.std.BeanSerializerBase;
-import net.nemerosa.ontrack.ui.resource.ResourceContext;
-
-import java.util.function.BiFunction;
 
 public class ResourceSerializerModifier<T> extends BeanSerializerModifier {
 
     private final ResourceContext resourceContext;
-    private final Class<T> resourceClass;
-    private final BiFunction<BeanSerializerBase, ResourceContext, JsonSerializer<?>> resourceSerializerFactory;
+    private final ResourceDecorator<T> resourceDecorator;
 
-    public ResourceSerializerModifier(
-            ResourceContext resourceContext,
-            Class<T> resourceClass,
-            BiFunction<BeanSerializerBase, ResourceContext, JsonSerializer<?>> resourceSerializerFactory) {
+    public ResourceSerializerModifier(ResourceContext resourceContext, ResourceDecorator<T> resourceDecorator) {
         this.resourceContext = resourceContext;
-        this.resourceClass = resourceClass;
-        this.resourceSerializerFactory = resourceSerializerFactory;
+        this.resourceDecorator = resourceDecorator;
     }
 
     public JsonSerializer<?> modifySerializer(
             SerializationConfig config,
             BeanDescription beanDesc,
             JsonSerializer<?> serializer) {
-        if (resourceClass.isAssignableFrom(beanDesc.getBeanClass())) {
-            return resourceSerializerFactory.apply((BeanSerializerBase) serializer, resourceContext);
+        if (resourceDecorator.appliesFor(beanDesc.getBeanClass())) {
+            return new ResourceDecoratorSerializer<>((BeanSerializerBase) serializer, resourceDecorator, resourceContext);
         } else {
             return super.modifySerializer(config, beanDesc, serializer);
         }

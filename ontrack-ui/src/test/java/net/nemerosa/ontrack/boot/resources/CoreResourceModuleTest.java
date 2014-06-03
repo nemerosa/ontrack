@@ -2,12 +2,13 @@ package net.nemerosa.ontrack.boot.resources;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.MockURIBuilder;
 import net.nemerosa.ontrack.ui.resource.DefaultResourceContext;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Arrays;
 
 import static net.nemerosa.ontrack.json.JsonUtils.object;
 import static net.nemerosa.ontrack.test.TestUtils.assertJsonWrite;
@@ -18,8 +19,12 @@ public class CoreResourceModuleTest {
 
     @Before
     public void before() {
-        mapper = ObjectMapperFactory.create();
-        mapper.registerModule(new CoreResourceModule(new DefaultResourceContext(new MockURIBuilder())));
+        mapper = new ResourceObjectMapperFactory().resourceObjectMapper(
+                Arrays.asList(
+                        new CoreResourceModule()
+                ),
+                new DefaultResourceContext(new MockURIBuilder())
+        );
     }
 
     @Test
