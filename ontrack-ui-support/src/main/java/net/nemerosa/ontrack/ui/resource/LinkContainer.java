@@ -10,30 +10,30 @@ import java.util.Map;
 @Data
 public abstract class LinkContainer<L extends LinkContainer<L>> {
 
-    private final URI href;
-    private final Map<String, Link> links = new LinkedHashMap<>();
+    private final URI _self;
+    private final Map<String, URI> links = new LinkedHashMap<>();
 
     public L with(String name, URI uri, boolean authorized) {
         if (authorized) {
-            return with(Link.of(name, uri));
+            return with(name, uri);
         } else {
             //noinspection unchecked
             return (L) this;
         }
     }
 
-    public L with(String name, URI uri) {
-        return with(Link.of(name, uri));
+    private L with(Link link) {
+        return with(link.getName(), link.getHref());
     }
 
-    private L with(Link link) {
-        links.put(link.getName(), link);
+    public L with(String name, URI uri) {
+        links.put(name, uri);
         //noinspection unchecked
         return (L) this;
     }
 
     @JsonAnyGetter
-    public Map<String, Link> getLinks() {
+    public Map<String, URI> getLinks() {
         return links;
     }
 

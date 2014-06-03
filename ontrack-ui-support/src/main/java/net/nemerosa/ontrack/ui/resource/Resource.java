@@ -21,17 +21,17 @@ public class Resource<T> extends LinkContainer<Resource<T>> implements ViewSuppl
     @JsonIgnore
     private final Class<T> viewType;
 
-    @ConstructorProperties({"data", "href"})
-    protected Resource(T data, URI href) {
-        super(href);
+    @ConstructorProperties({"data", "_self"})
+    protected Resource(T data, URI self) {
+        super(self);
         Validate.notNull(data, "Null data is not acceptable for a resource");
         this.data = data;
         //noinspection unchecked
         this.viewType = (Class<T>) data.getClass();
     }
 
-    public static <R> Resource<R> of(R data, URI uri) {
-        return new Resource<>(data, uri);
+    public static <R> Resource<R> of(R data, URI self) {
+        return new Resource<>(data, self);
     }
 
 }

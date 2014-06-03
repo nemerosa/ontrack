@@ -30,15 +30,15 @@ public class ResourceCollectionTest {
         );
         TestUtils.assertJsonEquals(
                 object()
-                        .with("href", "http://host/dummy")
+                        .with("_self", "http://host/dummy")
                         .with("resources", array()
                                 .with(object()
+                                        .with("_self", "http://host/dummy/1")
                                         .with("version", "1")
-                                        .with("href", "http://host/dummy/1")
                                         .end())
                                 .with(object()
+                                        .with("_self", "http://host/dummy/2")
                                         .with("version", "2")
-                                        .with("href", "http://host/dummy/2")
                                         .end())
                                 .end())
                         .end(),
@@ -62,19 +62,19 @@ public class ResourceCollectionTest {
 
         assertJsonWrite(
                 object()
-                        .with("href", "urn:branch")
+                        .with("_self", "urn:branch")
                         .with("resources", array()
                                 .with(object()
+                                        .with("_self", "urn:branch:B1")
                                         .with("id", 0)
                                         .with("name", "B1")
                                         .with("description", "Branch 1")
-                                        .with("href", "urn:branch:B1")
                                         .end())
                                 .with(object()
+                                        .with("_self", "urn:branch:B2")
                                         .with("id", 0)
                                         .with("name", "B2")
                                         .with("description", "Branch 2")
-                                        .with("href", "urn:branch:B2")
                                         .end())
                                 .end())
                         .end(),

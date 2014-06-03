@@ -21,6 +21,7 @@ public class ResourceAccountTest {
     public void logged_to_json() throws JsonProcessingException {
         assertJsonWrite(
                 object()
+                        .with("_self", "urn:user")
                         .with("account", object()
                                 .with("id", 1)
                                 .with("name", "admin")
@@ -29,7 +30,6 @@ public class ResourceAccountTest {
                                 .with("role", "ADMINISTRATOR")
                                 .end())
                         .with("actions", array().end())
-                        .with("href", "urn:user")
                         .end(),
                 Resource.of(
                         ConnectedAccount.of(
@@ -47,9 +47,9 @@ public class ResourceAccountTest {
     public void not_logged_to_json() throws JsonProcessingException {
         assertJsonWrite(
                 object()
+                        .with("_self", "urn:user")
                         .with("account", (String) null)
                         .with("actions", array().end())
-                        .with("href", "urn:user")
                         .end(),
                 Resource.of(
                         ConnectedAccount.none(),

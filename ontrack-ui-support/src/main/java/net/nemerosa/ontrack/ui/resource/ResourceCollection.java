@@ -21,15 +21,15 @@ public class ResourceCollection<T> extends LinkContainer<ResourceCollection<T>> 
     @JsonIgnore
     private final Class<?> viewType;
 
-    protected ResourceCollection(Collection<Resource<T>> resources, URI href, Pagination pagination, Class<?> viewType) {
-        super(href);
+    protected ResourceCollection(Collection<Resource<T>> resources, URI self, Pagination pagination, Class<?> viewType) {
+        super(self);
         this.pagination = pagination;
         this.resources = resources;
         this.viewType = viewType;
     }
 
     public ResourceCollection<T> forView(Class<?> viewType) {
-        return new ResourceCollection<>(resources, getHref(), pagination, viewType);
+        return new ResourceCollection<>(resources, get_self(), pagination, viewType);
     }
 
     public static <R> ResourceCollection<R> of(Stream<Resource<R>> resources, URI href) {

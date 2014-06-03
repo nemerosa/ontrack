@@ -22,11 +22,9 @@ public class ResourceTest {
         JsonNode node = mapper.valueToTree(resource);
         TestUtils.assertJsonEquals(
                 object()
+                        .with("_self", "http://host/dummy")
                         .with("version", "1.0.0")
-                        .with("href", "http://host/dummy")
-                        .with("connectors", object()
-                                .with("href", "http://host/dummy/test")
-                                .end())
+                        .with("connectors", "http://host/dummy/test")
                         .end(),
                 node
         );
