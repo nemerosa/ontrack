@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import net.nemerosa.ontrack.boot.resources.CoreResourceModule;
+import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import net.nemerosa.ontrack.ui.resource.*;
@@ -30,16 +31,14 @@ class ResourceHttpMessageConverter extends MappingJackson2HttpMessageConverter {
                 new CoreResourceModule()
                 // TODO Takes extensions into account
         );
+        // Object mapper
+        ObjectMapper mapper = ObjectMapperFactory.create();
+        setObjectMapper(mapper);
         // Resource mapper
-        resourceObjectMapper = new ResourceObjectMapperFactory().resourceObjectMapper(
+        resourceObjectMapper = new ResourceObjectMapperFactory(mapper).resourceObjectMapper(
                 resourceModules,
                 resourceContext
         );
-    }
-
-    @Override
-    public ObjectMapper getObjectMapper() {
-        return resourceObjectMapper.getObjectMapper();
     }
 
     @Override
