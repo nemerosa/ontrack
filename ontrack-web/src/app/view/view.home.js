@@ -30,10 +30,10 @@ angular.module('ot.view.home', [
                         name: 'Create project',
                         cls: 'ot-command-project-new',
                         condition: function () {
-                            return projectCollection.create;
+                            return projectCollection._create;
                         },
                         action: function () {
-                            otStructureService.createProject(projectCollection.create.href).then(loadProjects);
+                            otStructureService.createProject(projectCollection._create).then(loadProjects);
                         }
                     }
                 ];
