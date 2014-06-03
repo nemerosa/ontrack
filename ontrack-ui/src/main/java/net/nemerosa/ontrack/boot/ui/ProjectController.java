@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.ProjectCreation;
-import net.nemerosa.ontrack.model.security.ProjectEdit;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.NameDescription;
@@ -10,8 +9,7 @@ import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.StructureService;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Link;
-import net.nemerosa.ontrack.ui.resource.Resource;
-import net.nemerosa.ontrack.ui.resource.ResourceCollection;
+import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -32,9 +30,9 @@ public class ProjectController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public ResourceCollection<Project> getProjectList() {
-        return ResourceCollection.of(
-                structureService.getProjectList().stream().map(this::toProjectResource),
+    public Resources<Project> getProjectList() {
+        return Resources.of(
+                structureService.getProjectList(),
                 uri(on(ProjectController.class).getProjectList())
         )
                 .with(Link.CREATE, uri(on(ProjectController.class).newProject(null)), securityService.isGlobalFunctionGranted(ProjectCreation.class));
@@ -47,21 +45,18 @@ public class ProjectController extends AbstractResourceController {
 
     @RequestMapping(value = "create", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public Resource<Project> newProject(@RequestBody NameDescription nameDescription) {
+    public Project newProject(@RequestBody NameDescription nameDescription) {
         // Creates a new project instance
         Project project = Project.of(nameDescription);
         // Saves it into the repository
         project = structureService.newProject(project);
         // OK
-        return toProjectResource(project);
+        return project;
     }
 
     @RequestMapping(value = "{projectId}", method = RequestMethod.GET)
-    public Resource<Project> getProject(@PathVariable ID projectId) {
-        // Gets from the repository
-        Project project = structureService.getProject(projectId);
-        // As resource
-        return toProjectResourceWithActions(project);
+    public Project getProject(@PathVariable ID projectId) {
+        return structureService.getProject(projectId);
     }
 
     @RequestMapping(value = "{projectId}/update", method = RequestMethod.GET)
@@ -70,7 +65,7 @@ public class ProjectController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "{projectId}/update", method = RequestMethod.PUT)
-    public Resource<Project> saveProject(@PathVariable ID projectId, @RequestBody NameDescription nameDescription) {
+    public Project saveProject(@PathVariable ID projectId, @RequestBody NameDescription nameDescription) {
         // Gets from the repository
         Project project = structureService.getProject(projectId);
         // Updates
@@ -78,30 +73,7 @@ public class ProjectController extends AbstractResourceController {
         // Saves in repository
         structureService.saveProject(project);
         // As resource
-        return toProjectResource(project);
+        return project;
     }
 
-    // Resource assemblers
-
-    private Resource<Project> toProjectResourceWithActions(Project project) {
-        return toProjectResource(project)
-                // Update
-                .with(
-                        Link.UPDATE,
-                        uri(on(ProjectController.class).saveProject(project.getId(), null)),
-                        securityService.isProjectFunctionGranted(project.id(), ProjectEdit.class)
-                )
-                        // Branch list
-                .with("branches", uri(on(BranchController.class).getBranchListForProject(project.getId())))
-                ;
-        // TODO Delete link
-        // TODO View link
-    }
-
-    private Resource<Project> toProjectResource(Project project) {
-        return Resource.of(
-                project,
-                uri(on(ProjectController.class).getProject(project.getId()))
-        );
-    }
 }

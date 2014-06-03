@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.model.security.ProjectEdit;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.model.structure.Project;
-import net.nemerosa.ontrack.ui.resource.Resource;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
@@ -21,8 +20,8 @@ public class ProjectControllerTest extends AbstractWebTestSupport {
     public void createProject() throws Exception {
         asUser().with(ProjectCreation.class).call(() -> {
             NameDescription nameDescription = nameDescription();
-            Resource<Project> resource = controller.newProject(nameDescription);
-            checkProjectResource(resource, nameDescription);
+            Project resource = controller.newProject(nameDescription);
+            checkProject(resource, nameDescription);
             return null;
         });
     }
@@ -36,26 +35,24 @@ public class ProjectControllerTest extends AbstractWebTestSupport {
     public void updateProject() throws Exception {
         // Creates the project
         NameDescription initialNames = nameDescription();
-        Resource<Project> resource = asUser().with(ProjectCreation.class).call(() -> controller.newProject(initialNames));
-        ID id = resource.getData().getId();
+        Project project = asUser().with(ProjectCreation.class).call(() -> controller.newProject(initialNames));
+        ID id = project.getId();
         // Edition
         asUser().with(id.getValue(), ProjectEdit.class).call(() -> {
             // Updates
             NameDescription nameDescription = nameDescription();
             assertNotEquals(initialNames, nameDescription);
-            Resource<Project> updated = controller.saveProject(id, nameDescription);
+            Project updated = controller.saveProject(id, nameDescription);
             // Checks
-            checkProjectResource(updated, nameDescription);
+            checkProject(updated, nameDescription);
             // Gets the project back
             updated = controller.getProject(id);
-            checkProjectResource(updated, nameDescription);
+            checkProject(updated, nameDescription);
             return null;
         });
     }
 
-    private void checkProjectResource(Resource<Project> resource, NameDescription nameDescription) {
-        assertNotNull("Resource not null", resource);
-        Project project = resource.getData();
+    private void checkProject(Project project, NameDescription nameDescription) {
         assertNotNull("Project not null", project);
         assertNotNull("Project ID not null", project.getId());
         assertTrue("Project ID set", project.getId().isSet());

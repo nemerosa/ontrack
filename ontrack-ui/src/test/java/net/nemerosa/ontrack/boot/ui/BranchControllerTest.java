@@ -22,12 +22,12 @@ public class BranchControllerTest extends AbstractWebTestSupport {
     @Test
     public void createBranch() throws Exception {
         // Project
-        Resource<Project> project = asUser().with(ProjectCreation.class).call(() -> projectController.newProject(nameDescription()));
+        Project project = asUser().with(ProjectCreation.class).call(() -> projectController.newProject(nameDescription()));
         // Branch
         NameDescription nameDescription = nameDescription();
         Resource<Branch> resource = asUser()
-                .with(project.getData().id(), BranchCreate.class)
-                .call(() -> controller.newBranch(project.getData().getId(), nameDescription));
+                .with(project.id(), BranchCreate.class)
+                .call(() -> controller.newBranch(project.getId(), nameDescription));
         // Checks the branch
         checkBranchResource(resource, nameDescription);
     }
@@ -35,9 +35,9 @@ public class BranchControllerTest extends AbstractWebTestSupport {
     @Test(expected = AccessDeniedException.class)
     public void createBranch_denied() throws Exception {
         // Project
-        Resource<Project> project = asUser().with(ProjectCreation.class).call(() -> projectController.newProject(nameDescription()));
+        Project project = asUser().with(ProjectCreation.class).call(() -> projectController.newProject(nameDescription()));
         // Branch
-        asUser().call(() -> controller.newBranch(project.getData().getId(), nameDescription()));
+        asUser().call(() -> controller.newBranch(project.getId(), nameDescription()));
     }
 
     private void checkBranchResource(Resource<Branch> resource, NameDescription nameDescription) {
