@@ -30,14 +30,14 @@ angular.module('ot.view.branch', [
 
         // Loading the promotion levels
         function loadPromotionLevels() {
-            ot.call($http.get($scope.branch.promotionLevels.href)).then(function (collection) {
+            ot.call($http.get($scope.branch._promotionLevels)).then(function (collection) {
                 $scope.promotionLevelCollection = collection;
             });
         }
 
         // Loading the validation stamps
         function loadValidationStamps() {
-            ot.call($http.get($scope.branch.validationStamps.href)).then(function (collection) {
+            ot.call($http.get($scope.branch._validationStamps)).then(function (collection) {
                 $scope.validationStampCollection = collection;
             });
         }
@@ -54,13 +54,13 @@ angular.module('ot.view.branch', [
                 view.commands = [
                     {
                         condition: function () {
-                            return branchResource.createBuild;
+                            return branchResource._createBuild;
                         },
                         id: 'createBuild',
                         name: "Create build",
                         cls: 'ot-command-build-new',
                         action: function () {
-                            otStructureService.createBuild(branchResource.createBuild.href).then(loadBuildView);
+                            otStructureService.createBuild(branchResource._createBuild).then(loadBuildView);
                         }
                     },
                     ot.viewCloseCommand('/project/' + branchResource.project.id)
@@ -80,12 +80,12 @@ angular.module('ot.view.branch', [
 
         // Creation of a promotion level
         $scope.createPromotionLevel = function () {
-            otStructureService.createPromotionLevel($scope.branch.createPromotionLevel.href).then(loadBranch);
+            otStructureService.create($scope.branch._createPromotionLevel, "New promotion level").then(loadBranch);
         };
 
         // Creation of a validation stamp
         $scope.createValidationStamp = function () {
-            otStructureService.create($scope.branch.createValidationStamp.href, 'New validation stamp').then(loadBranch);
+            otStructureService.create($scope.branch._createValidationStamp, 'New validation stamp').then(loadBranch);
         };
 
     })

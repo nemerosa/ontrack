@@ -63,13 +63,6 @@ angular.module('ot.service.structure', [
         };
 
         /**
-         * Creating a promotion level
-         */
-        self.createPromotionLevel = function (uri) {
-            return self.create(uri, 'New promotion level');
-        };
-
-        /**
          * Changing the image
          * @param config.title Title for the dialog
          */
