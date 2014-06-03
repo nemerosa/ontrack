@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.model.structure.Project;
-import net.nemerosa.ontrack.test.TestUtils;
 import org.junit.Test;
 
 import java.net.URI;
@@ -15,9 +14,8 @@ import java.util.stream.Collectors;
 
 import static net.nemerosa.ontrack.json.JsonUtils.array;
 import static net.nemerosa.ontrack.json.JsonUtils.object;
-import static net.nemerosa.ontrack.test.TestUtils.assertJsonWrite;
 
-public class ResourceCollectionTest {
+public class ResourceCollectionTest extends AbstractResourceTest {
 
     @Test
     public void to_json() throws JsonProcessingException {
@@ -28,7 +26,8 @@ public class ResourceCollectionTest {
                 ),
                 URI.create("http://host/dummy")
         );
-        TestUtils.assertJsonEquals(
+        assertResourceJson(
+                mapper,
                 object()
                         .with("_self", "http://host/dummy")
                         .with("resources", array()
@@ -60,7 +59,8 @@ public class ResourceCollectionTest {
                 URI.create("urn:branch")
         );
 
-        assertJsonWrite(
+        assertResourceJson(
+                mapper,
                 object()
                         .with("_self", "urn:branch")
                         .with("resources", array()
