@@ -78,7 +78,8 @@ public class CoreResourceModuleTest {
         Branch b = Branch.of(p, new NameDescription("B", "Branch")).withId(ID.of(1));
         // Serialization
         assertResourceJson(
-                mapper, object()
+                mapper,
+                object()
                         .with("id", 1)
                         .with("name", "B")
                         .with("description", "Branch")
@@ -88,7 +89,8 @@ public class CoreResourceModuleTest {
                                 .with("description", "Project")
                                 .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
                                 .with("_branches", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranchListForProject:1")
-                                .end())
+                                .end()
+                        )
                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranch:1")
                         .with("_project", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
                         .with("_promotionLevels", "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionLevelListForBranch:1")

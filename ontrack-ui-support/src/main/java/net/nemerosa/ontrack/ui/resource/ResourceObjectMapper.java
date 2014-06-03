@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.io.OutputStream;
 
 public interface ResourceObjectMapper {
 
@@ -16,6 +17,10 @@ public interface ResourceObjectMapper {
     String write(Object o) throws JsonProcessingException;
 
     void write(JsonGenerator jgen, Object o) throws IOException;
+
+    void write(OutputStream out, Object o) throws IOException;
+
+    void write(OutputStream out, Object o, Class<?> view) throws IOException;
 
     String write(Object o, Class<?> view) throws JsonProcessingException;
 

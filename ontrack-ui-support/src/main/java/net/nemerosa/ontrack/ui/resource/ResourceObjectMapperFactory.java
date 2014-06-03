@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.support.JsonViewClass;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
 public class ResourceObjectMapperFactory {
@@ -60,6 +61,16 @@ public class ResourceObjectMapperFactory {
         @Override
         public void write(JsonGenerator jgen, Object o) throws IOException {
             write(jgen, o, JsonViewClass.getViewClass(o));
+        }
+
+        @Override
+        public void write(OutputStream out, Object o) throws IOException {
+            write(out, o, JsonViewClass.getViewClass(o));
+        }
+
+        @Override
+        public void write(OutputStream out, Object o, Class<?> view) throws IOException {
+            getObjectWriter(view).writeValue(out, o);
         }
 
         protected ObjectWriter getObjectWriter(Class<?> view) {
