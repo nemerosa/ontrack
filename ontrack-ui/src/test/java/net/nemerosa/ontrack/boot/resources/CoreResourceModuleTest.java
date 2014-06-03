@@ -1,12 +1,13 @@
 package net.nemerosa.ontrack.boot.resources;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.model.security.ProjectEdit;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.MockURIBuilder;
 import net.nemerosa.ontrack.ui.resource.DefaultResourceContext;
+import net.nemerosa.ontrack.ui.resource.ResourceObjectMapper;
 import net.nemerosa.ontrack.ui.resource.ResourceObjectMapperFactory;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,12 +16,12 @@ import org.mockito.Mockito;
 import java.util.Arrays;
 
 import static net.nemerosa.ontrack.json.JsonUtils.object;
-import static net.nemerosa.ontrack.test.TestUtils.assertJsonWrite;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 public class CoreResourceModuleTest {
 
-    private ObjectMapper mapper;
+    private ResourceObjectMapper mapper;
     private SecurityService securityService;
 
     @Before
@@ -31,14 +32,28 @@ public class CoreResourceModuleTest {
                         new CoreResourceModule()
                 ),
                 new DefaultResourceContext(new MockURIBuilder(), securityService)
-        ).getObjectMapper();
+        );
+    }
+
+    public static void assertResourceJson(ResourceObjectMapper mapper, JsonNode expectedJson, Object o) throws JsonProcessingException {
+        assertEquals(
+                mapper.getObjectMapper().writeValueAsString(expectedJson),
+                mapper.write(o)
+        );
+    }
+
+    public static void assertResourceJson(ResourceObjectMapper mapper, JsonNode expectedJson, Object o, Class<?> view) throws JsonProcessingException {
+        assertEquals(
+                mapper.getObjectMapper().writeValueAsString(expectedJson),
+                mapper.write(o, view)
+        );
     }
 
     @Test
     public void project_granted_for_update() throws JsonProcessingException {
         Project p = Project.of(new NameDescription("P", "Project")).withId(ID.of(1));
         when(securityService.isProjectFunctionGranted(1, ProjectEdit.class)).thenReturn(true);
-        assertJsonWrite(
+        assertResourceJson(
                 mapper,
                 object()
                         .with("id", 1)
@@ -48,8 +63,7 @@ public class CoreResourceModuleTest {
                         .with("_branches", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranchListForProject:1")
                         .with("_update", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#saveProject:1,")
                         .end(),
-                p,
-                Project.class
+                p
         );
     }
 
@@ -59,7 +73,7 @@ public class CoreResourceModuleTest {
         Project p = Project.of(new NameDescription("P", "Project")).withId(ID.of(1));
         Branch b = Branch.of(p, new NameDescription("B", "Branch")).withId(ID.of(1));
         // Serialization
-        assertJsonWrite(
+        assertResourceJson(
                 mapper, object()
                         .with("id", 1)
                         .with("name", "B")
@@ -76,15 +90,14 @@ public class CoreResourceModuleTest {
                         .with("_promotionLevels", "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionLevelListForBranch:1")
                         .with("_validationStamps", "urn:test:net.nemerosa.ontrack.boot.ui.ValidationStampController#getValidationStampListForBranch:1")
                         .end(),
-                b,
-                Branch.class
+                b
         );
     }
 
     @Test
     public void project_not_granted_for_update() throws JsonProcessingException {
         Project p = Project.of(new NameDescription("P", "Project")).withId(ID.of(1));
-        assertJsonWrite(
+        assertResourceJson(
                 mapper,
                 object()
                         .with("id", 1)
@@ -93,8 +106,7 @@ public class CoreResourceModuleTest {
                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
                         .with("_branches", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranchListForProject:1")
                         .end(),
-                p,
-                Branch.class
+                p
         );
     }
 
@@ -105,7 +117,7 @@ public class CoreResourceModuleTest {
         Branch b = Branch.of(p, new NameDescription("B", "Branch")).withId(ID.of(1));
         PromotionLevel pl = PromotionLevel.of(b, new NameDescription("PL", "Promotion level")).withId(ID.of(1));
         // Serialization
-        assertJsonWrite(
+        assertResourceJson(
                 mapper,
                 object()
                         .with("id", 1)
@@ -129,7 +141,7 @@ public class CoreResourceModuleTest {
         Branch b = Branch.of(p, new NameDescription("B", "Branch")).withId(ID.of(1));
         PromotionLevel pl = PromotionLevel.of(b, new NameDescription("PL", "Promotion level")).withId(ID.of(1));
         // Serialization
-        assertJsonWrite(
+        assertResourceJson(
                 mapper,
                 object()
                         .with("id", 1)
@@ -157,8 +169,7 @@ public class CoreResourceModuleTest {
                         .with("_project", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
                         .with("_image", "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionLevelImage_:1")
                         .end(),
-                pl,
-                PromotionLevel.class
+                pl
         );
     }
 

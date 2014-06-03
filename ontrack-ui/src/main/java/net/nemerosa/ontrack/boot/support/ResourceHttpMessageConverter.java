@@ -4,11 +4,9 @@ import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import net.nemerosa.ontrack.boot.resources.CoreResourceModule;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.support.JsonViewClass;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import net.nemerosa.ontrack.ui.resource.*;
 import org.springframework.http.HttpOutputMessage;
@@ -59,9 +57,6 @@ class ResourceHttpMessageConverter extends MappingJackson2HttpMessageConverter {
     @Override
     protected void writeInternal(Object object, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
 
-        // TODO Sets the view in the resource context
-        // TODO Normal call
-
         JsonEncoding encoding = getJsonEncoding(outputMessage.getHeaders().getContentType());
         // The following has been deprecated as late as Jackson 2.2 (April 2013);
         // preserved for the time being, for Jackson 2.0/2.1 compatibility.
@@ -78,15 +73,10 @@ class ResourceHttpMessageConverter extends MappingJackson2HttpMessageConverter {
             if (this.jsonPrefix != null) {
                 jsonGenerator.writeRaw(this.jsonPrefix);
             }
-            Class<?> viewClass = getViewClass(object);
-            ObjectWriter writer = getObjectMapper().writerWithView(viewClass);
-            writer.writeValue(jsonGenerator, object);
+            resourceObjectMapper.write(jsonGenerator, object);
         } catch (JsonProcessingException ex) {
             throw new HttpMessageNotWritableException("Could not write JSON: " + ex.getMessage(), ex);
         }
     }
 
-    protected Class<?> getViewClass(Object object) {
-        return JsonViewClass.getViewClass(object);
-    }
 }
