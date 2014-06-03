@@ -31,7 +31,7 @@ public class CoreResourceModuleTest {
                         new CoreResourceModule()
                 ),
                 new DefaultResourceContext(new MockURIBuilder(), securityService)
-        );
+        ).getObjectMapper();
     }
 
     @Test

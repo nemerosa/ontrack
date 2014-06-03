@@ -7,13 +7,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import net.nemerosa.ontrack.boot.resources.CoreResourceModule;
-import net.nemerosa.ontrack.ui.resource.ResourceObjectMapperFactory;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.JsonViewClass;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
-import net.nemerosa.ontrack.ui.resource.DefaultResourceContext;
-import net.nemerosa.ontrack.ui.resource.ResourceContext;
-import net.nemerosa.ontrack.ui.resource.ResourceModule;
+import net.nemerosa.ontrack.ui.resource.*;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -24,6 +21,7 @@ import java.util.List;
 
 class ViewAwareMappingJackson2HttpMessageConverter extends MappingJackson2HttpMessageConverter {
 
+    private final ResourceObjectMapper resourceObjectMapper;
     private String jsonPrefix;
 
     public ViewAwareMappingJackson2HttpMessageConverter(URIBuilder uriBuilder, SecurityService securityService) {
@@ -35,12 +33,15 @@ class ViewAwareMappingJackson2HttpMessageConverter extends MappingJackson2HttpMe
                 // TODO Takes extensions into account
         );
         // Resource mapper
-        ObjectMapper mapper = new ResourceObjectMapperFactory().resourceObjectMapper(
+        resourceObjectMapper = new ResourceObjectMapperFactory().resourceObjectMapper(
                 resourceModules,
                 resourceContext
         );
-        // OK
-        setObjectMapper(mapper);
+    }
+
+    @Override
+    public ObjectMapper getObjectMapper() {
+        return resourceObjectMapper.getObjectMapper();
     }
 
     @Override
