@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.ui.resource;
 
+import net.nemerosa.ontrack.model.security.GlobalFunction;
 import net.nemerosa.ontrack.model.security.ProjectFunction;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
@@ -56,12 +57,26 @@ public class DefaultResourceContext implements ResourceContext {
         }
 
         @Override
-        public LinksBuilder update(Object methodInvocation, Class<? extends ProjectFunction> fn, int projectId) {
-            if (securityService.isProjectFunctionGranted(projectId, fn)) {
-                return link(Link.UPDATE, methodInvocation);
+        public LinksBuilder link(String name, Object methodInvocation, Class<? extends GlobalFunction> fn) {
+            if (securityService.isGlobalFunctionGranted(fn)) {
+                return link(name, methodInvocation);
             } else {
                 return this;
             }
+        }
+
+        @Override
+        public LinksBuilder link(String name, Object methodInvocation, Class<? extends ProjectFunction> fn, int projectId) {
+            if (securityService.isProjectFunctionGranted(projectId, fn)) {
+                return link(name, methodInvocation);
+            } else {
+                return this;
+            }
+        }
+
+        @Override
+        public LinksBuilder update(Object methodInvocation, Class<? extends ProjectFunction> fn, int projectId) {
+            return link(Link.UPDATE, methodInvocation, fn, projectId);
         }
 
         @Override
