@@ -34,7 +34,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
         // Plain text
         converters.add(new StringHttpMessageConverter());
         // JSON
-        converters.add(new ViewAwareMappingJackson2HttpMessageConverter(uriBuilder, securityService));
+        converters.add(new ResourceHttpMessageConverter(uriBuilder, securityService));
     }
 
 }

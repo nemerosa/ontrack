@@ -19,12 +19,12 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-class ViewAwareMappingJackson2HttpMessageConverter extends MappingJackson2HttpMessageConverter {
+class ResourceHttpMessageConverter extends MappingJackson2HttpMessageConverter {
 
     private final ResourceObjectMapper resourceObjectMapper;
     private String jsonPrefix;
 
-    public ViewAwareMappingJackson2HttpMessageConverter(URIBuilder uriBuilder, SecurityService securityService) {
+    public ResourceHttpMessageConverter(URIBuilder uriBuilder, SecurityService securityService) {
         // Resource context
         ResourceContext resourceContext = new DefaultResourceContext(uriBuilder, securityService);
         // Registration of modules
