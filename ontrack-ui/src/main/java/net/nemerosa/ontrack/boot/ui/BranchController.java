@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.security.*;
+import net.nemerosa.ontrack.model.security.BranchCreate;
+import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Link;
-import net.nemerosa.ontrack.ui.resource.Resource;
-import net.nemerosa.ontrack.ui.resource.ResourceCollection;
+import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,9 +29,9 @@ public class BranchController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "projects/{projectId}/branches", method = RequestMethod.GET)
-    public ResourceCollection<Branch> getBranchListForProject(@PathVariable ID projectId) {
-        return ResourceCollection.of(
-                structureService.getBranchesForProject(projectId).stream().map(this::toBranchResource),
+    public Resources<Branch> getBranchListForProject(@PathVariable ID projectId) {
+        return Resources.of(
+                structureService.getBranchesForProject(projectId),
                 uri(on(BranchController.class).getBranchListForProject(projectId))
         )
                 // Create
@@ -52,7 +52,7 @@ public class BranchController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "projects/{projectId}/branches/create", method = RequestMethod.POST)
-    public Resource<Branch> newBranch(@PathVariable ID projectId, @RequestBody NameDescription nameDescription) {
+    public Branch newBranch(@PathVariable ID projectId, @RequestBody NameDescription nameDescription) {
         // Gets the project
         Project project = structureService.getProject(projectId);
         // Creates a new branch instance
@@ -60,14 +60,12 @@ public class BranchController extends AbstractResourceController {
         // Saves it into the repository
         branch = structureService.newBranch(branch);
         // OK
-        return toBranchResource(branch);
+        return branch;
     }
 
     @RequestMapping(value = "branches/{branchId}", method = RequestMethod.GET)
-    public Resource<Branch> getBranch(@PathVariable ID branchId) {
-        return toBranchResourceWithActions(
-                structureService.getBranch(branchId)
-        );
+    public Branch getBranch(@PathVariable ID branchId) {
+        return structureService.getBranch(branchId);
     }
 
     @RequestMapping(value = "branches/{branchId}/view", method = RequestMethod.GET)
@@ -90,54 +88,5 @@ public class BranchController extends AbstractResourceController {
                 structureService.getLastPromotionRunsForBuild(build.getId()),
                 structureService.getValidationStampRunViewsForBuild(build)
         );
-    }
-
-    // Resource assemblers
-
-    private Resource<Branch> toBranchResourceWithActions(Branch branch) {
-        return toBranchResource(branch)
-                // TODO Update link (with authorisation)
-                // TODO Delete link
-                // TODO View link
-                // TODO Builds link
-                // Build creation
-                .with(
-                        "createBuild",
-                        uri(on(BuildController.class).newBuild(branch.getId(), null)),
-                        securityService.isProjectFunctionGranted(branch.getProject().id(), BuildCreate.class)
-                )
-                        // Promotion level creation
-                .with(
-                        "createPromotionLevel",
-                        uri(on(PromotionLevelController.class).newPromotionLevelForm(branch.getId())),
-                        securityService.isProjectFunctionGranted(branch.getProject().id(), PromotionLevelCreate.class)
-                )
-                        // Promotion level list
-                .with(
-                        "promotionLevels",
-                        uri(on(PromotionLevelController.class).getPromotionLevelListForBranch(branch.getId()))
-                )
-                        // Validation stamp creation
-                .with(
-                        "createValidationStamp",
-                        uri(on(ValidationStampController.class).newValidationStampForm(branch.getId())),
-                        securityService.isProjectFunctionGranted(branch.getProject().id(), ValidationStampCreate.class)
-                )
-                        // Validation stamp list
-                .with(
-                        "validationStamps",
-                        uri(on(ValidationStampController.class).getValidationStampListForBranch(branch.getId()))
-                )
-                ;
-    }
-
-    private Resource<Branch> toBranchResource(Branch branch) {
-        return Resource.of(
-                branch,
-                uri(on(BranchController.class).getBranch(branch.getId()))
-        )
-                // Branch's project
-                .with("projectLink", uri(on(ProjectController.class).getProject(branch.getProject().getId())))
-                ;
     }
 }
