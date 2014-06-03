@@ -56,15 +56,17 @@ class ResourceHttpMessageConverter extends MappingJackson2HttpMessageConverter {
     @Override
     protected void writeInternal(Object object, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
 
+        ObjectMapper mapper = resourceObjectMapper.getObjectMapper();
+
         JsonEncoding encoding = getJsonEncoding(outputMessage.getHeaders().getContentType());
         // The following has been deprecated as late as Jackson 2.2 (April 2013);
         // preserved for the time being, for Jackson 2.0/2.1 compatibility.
         @SuppressWarnings("deprecation")
-        JsonGenerator jsonGenerator = getObjectMapper().getJsonFactory().createJsonGenerator(outputMessage.getBody(), encoding);
+        JsonGenerator jsonGenerator = mapper.getJsonFactory().createJsonGenerator(outputMessage.getBody(), encoding);
 
         // A workaround for JsonGenerators not applying serialization features
         // https://github.com/FasterXML/jackson-databind/issues/12
-        if (getObjectMapper().isEnabled(SerializationFeature.INDENT_OUTPUT)) {
+        if (mapper.isEnabled(SerializationFeature.INDENT_OUTPUT)) {
             jsonGenerator.useDefaultPrettyPrinter();
         }
 
