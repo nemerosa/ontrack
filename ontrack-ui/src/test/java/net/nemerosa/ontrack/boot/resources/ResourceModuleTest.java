@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.MockURIBuilder;
+import net.nemerosa.ontrack.ui.resource.DefaultResourceContext;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,7 +19,7 @@ public class ResourceModuleTest {
     @Before
     public void before() {
         mapper = ObjectMapperFactory.create();
-        mapper.registerModule(new CoreResourceModule(new MockURIBuilder()));
+        mapper.registerModule(new CoreResourceModule(new DefaultResourceContext(new MockURIBuilder())));
     }
 
     @Test
@@ -35,7 +36,10 @@ public class ResourceModuleTest {
                         .with("name", "PL")
                         .with("description", "Promotion level")
                         .with("image", false)
-                        .with("imageLink", "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionLevelImage_:1")
+                        .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionLevel:1")
+                        .with("_branchLink", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranch:1")
+                        .with("_projectLink", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
+                        .with("_imageLink", "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionLevelImage_:1")
                         .end(),
                 pl,
                 Branch.class
@@ -66,7 +70,10 @@ public class ResourceModuleTest {
                                         .with("description", "Project")
                                         .end())
                                 .end())
-                        .with("imageLink", "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionLevelImage_:1")
+                        .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionLevel:1")
+                        .with("_branchLink", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranch:1")
+                        .with("_projectLink", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
+                        .with("_imageLink", "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionLevelImage_:1")
                         .end(),
                 pl,
                 PromotionLevel.class

@@ -7,15 +7,15 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.fasterxml.jackson.databind.ser.std.BeanSerializerBase;
 import net.nemerosa.ontrack.model.structure.PromotionLevel;
-import net.nemerosa.ontrack.ui.controller.URIBuilder;
+import net.nemerosa.ontrack.ui.resource.ResourceContext;
 
 public class CoreResourceModule extends SimpleModule {
 
-    private final URIBuilder uriBuilder;
+    private final ResourceContext resourceContext;
 
-    public CoreResourceModule(URIBuilder uriBuilder) {
+    public CoreResourceModule(ResourceContext resourceContext) {
         super("ontrack");
-        this.uriBuilder = uriBuilder;
+        this.resourceContext = resourceContext;
     }
 
     @Override
@@ -28,7 +28,7 @@ public class CoreResourceModule extends SimpleModule {
                     BeanDescription beanDesc,
                     JsonSerializer<?> serializer) {
                 if (PromotionLevel.class.isAssignableFrom(beanDesc.getBeanClass())) {
-                    return new PromotionLevelResource((BeanSerializerBase) serializer, uriBuilder);
+                    return new PromotionLevelResource((BeanSerializerBase) serializer, resourceContext);
                 } else {
                     return super.modifySerializer(config, beanDesc, serializer);
                 }

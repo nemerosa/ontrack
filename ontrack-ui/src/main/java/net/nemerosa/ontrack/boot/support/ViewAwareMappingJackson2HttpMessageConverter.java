@@ -10,6 +10,8 @@ import net.nemerosa.ontrack.boot.resources.CoreResourceModule;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.support.JsonViewClass;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
+import net.nemerosa.ontrack.ui.resource.DefaultResourceContext;
+import net.nemerosa.ontrack.ui.resource.ResourceContext;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -21,8 +23,14 @@ class ViewAwareMappingJackson2HttpMessageConverter extends MappingJackson2HttpMe
     private String jsonPrefix;
 
     public ViewAwareMappingJackson2HttpMessageConverter(URIBuilder uriBuilder) {
+        // Resource context
+        ResourceContext resourceContext = new DefaultResourceContext(uriBuilder);
+        // Mapper
         ObjectMapper mapper = ObjectMapperFactory.create();
-        mapper.registerModule(new CoreResourceModule(uriBuilder));
+        // Registration of modules
+        // TODO Takes extensions into account
+        mapper.registerModule(new CoreResourceModule(resourceContext));
+        // OK
         setObjectMapper(mapper);
     }
 

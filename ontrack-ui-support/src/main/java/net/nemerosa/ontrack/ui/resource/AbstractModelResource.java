@@ -4,18 +4,17 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.impl.ObjectIdWriter;
 import com.fasterxml.jackson.databind.ser.std.BeanSerializerBase;
-import net.nemerosa.ontrack.ui.controller.URIBuilder;
 
 import java.io.IOException;
 import java.net.URI;
 
 public abstract class AbstractModelResource<T> extends BeanSerializerBase {
 
-    private final URIBuilder uriBuilder;
+    private final ResourceContext resourceContext;
 
-    protected AbstractModelResource(BeanSerializerBase src, URIBuilder uriBuilder) {
+    protected AbstractModelResource(BeanSerializerBase src, ResourceContext resourceContext) {
         super(src);
-        this.uriBuilder = uriBuilder;
+        this.resourceContext = resourceContext;
     }
 
     @Override
@@ -52,7 +51,7 @@ public abstract class AbstractModelResource<T> extends BeanSerializerBase {
      * @see org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder#fromMethodCall(Object)
      */
     protected URI uri(Object methodInvocation) {
-        return uriBuilder.build(methodInvocation);
+        return resourceContext.uri(methodInvocation);
     }
 
 }

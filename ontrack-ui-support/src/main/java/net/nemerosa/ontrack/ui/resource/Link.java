@@ -11,11 +11,11 @@ import java.net.URI;
 @Data
 public class Link {
 
-    public static final String SELF = "self";
-    public static final String CREATE = "create";
-    public static final String UPDATE = "update";
-    public static final String DELETE = "delete";
-    public static final String IMAGE_LINK = "imageLink";
+    public static final String SELF = "_self";
+    public static final String CREATE = "_create";
+    public static final String UPDATE = "_update";
+    public static final String DELETE = "_delete";
+    public static final String IMAGE_LINK = "_imageLink";
 
     @JsonIgnore
     private final String name;
