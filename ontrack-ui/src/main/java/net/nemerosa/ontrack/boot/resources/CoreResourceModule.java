@@ -9,11 +9,11 @@ import com.fasterxml.jackson.databind.ser.std.BeanSerializerBase;
 import net.nemerosa.ontrack.model.structure.PromotionLevel;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
 
-public class ResourceModule extends SimpleModule {
+public class CoreResourceModule extends SimpleModule {
 
     private final URIBuilder uriBuilder;
 
-    public ResourceModule(URIBuilder uriBuilder) {
+    public CoreResourceModule(URIBuilder uriBuilder) {
         super("ontrack");
         this.uriBuilder = uriBuilder;
     }

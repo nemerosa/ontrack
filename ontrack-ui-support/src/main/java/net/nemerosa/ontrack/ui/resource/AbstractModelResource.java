@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.boot.resources;
+package net.nemerosa.ontrack.ui.resource;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;

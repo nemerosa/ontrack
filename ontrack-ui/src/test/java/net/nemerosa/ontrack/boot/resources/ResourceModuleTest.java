@@ -18,7 +18,7 @@ public class ResourceModuleTest {
     @Before
     public void before() {
         mapper = ObjectMapperFactory.create();
-        mapper.registerModule(new ResourceModule(new MockURIBuilder()));
+        mapper.registerModule(new CoreResourceModule(new MockURIBuilder()));
     }
 
     @Test

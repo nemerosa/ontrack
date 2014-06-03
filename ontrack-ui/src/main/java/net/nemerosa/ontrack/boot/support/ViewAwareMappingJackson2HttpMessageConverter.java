@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import net.nemerosa.ontrack.boot.resources.ResourceModule;
+import net.nemerosa.ontrack.boot.resources.CoreResourceModule;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.support.JsonViewClass;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
@@ -22,7 +22,7 @@ class ViewAwareMappingJackson2HttpMessageConverter extends MappingJackson2HttpMe
 
     public ViewAwareMappingJackson2HttpMessageConverter(URIBuilder uriBuilder) {
         ObjectMapper mapper = ObjectMapperFactory.create();
-        mapper.registerModule(new ResourceModule(uriBuilder));
+        mapper.registerModule(new CoreResourceModule(uriBuilder));
         setObjectMapper(mapper);
     }
 

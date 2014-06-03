@@ -11,6 +11,7 @@ import java.net.URI;
 @Data
 public class Link {
 
+    public static final String SELF = "self";
     public static final String CREATE = "create";
     public static final String UPDATE = "update";
     public static final String DELETE = "delete";
