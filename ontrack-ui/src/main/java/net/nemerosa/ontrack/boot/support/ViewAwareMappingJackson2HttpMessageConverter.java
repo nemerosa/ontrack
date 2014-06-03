@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import net.nemerosa.ontrack.boot.resources.CoreResourceModule;
 import net.nemerosa.ontrack.boot.resources.ResourceObjectMapperFactory;
+import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.JsonViewClass;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import net.nemerosa.ontrack.ui.resource.DefaultResourceContext;
@@ -25,9 +26,9 @@ class ViewAwareMappingJackson2HttpMessageConverter extends MappingJackson2HttpMe
 
     private String jsonPrefix;
 
-    public ViewAwareMappingJackson2HttpMessageConverter(URIBuilder uriBuilder) {
+    public ViewAwareMappingJackson2HttpMessageConverter(URIBuilder uriBuilder, SecurityService securityService) {
         // Resource context
-        ResourceContext resourceContext = new DefaultResourceContext(uriBuilder);
+        ResourceContext resourceContext = new DefaultResourceContext(uriBuilder, securityService);
         // Registration of modules
         List<ResourceModule> resourceModules = Arrays.asList(
                 new CoreResourceModule()
@@ -56,6 +57,9 @@ class ViewAwareMappingJackson2HttpMessageConverter extends MappingJackson2HttpMe
 
     @Override
     protected void writeInternal(Object object, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
+
+        // TODO Sets the view in the resource context
+        // TODO Normal call
 
         JsonEncoding encoding = getJsonEncoding(outputMessage.getHeaders().getContentType());
         // The following has been deprecated as late as Jackson 2.2 (April 2013);

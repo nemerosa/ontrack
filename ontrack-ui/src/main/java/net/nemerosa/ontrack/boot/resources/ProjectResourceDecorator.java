@@ -1,12 +1,13 @@
 package net.nemerosa.ontrack.boot.resources;
 
+import net.nemerosa.ontrack.boot.ui.BranchController;
 import net.nemerosa.ontrack.boot.ui.ProjectController;
+import net.nemerosa.ontrack.model.security.ProjectEdit;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.ResourceContext;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -19,8 +20,14 @@ public class ProjectResourceDecorator extends AbstractResourceDecorator<Project>
 
     @Override
     public List<Link> links(Project project, ResourceContext resourceContext) {
-        return Arrays.asList(
-                Link.of(Link.SELF, resourceContext.uri(on(ProjectController.class).getProject(project.getId())))
-        );
+        return resourceContext.links()
+                .self(on(ProjectController.class).getProject(project.getId()))
+                        // List of branches for this project
+                .link("_branches", on(BranchController.class).getBranchListForProject(project.getId()))
+                        // Updating the project
+                .update(on(ProjectController.class).saveProject(project.getId(), null), ProjectEdit.class, project.id())
+                        // TODO Delete link
+                        // TODO View link
+                .build();
     }
 }

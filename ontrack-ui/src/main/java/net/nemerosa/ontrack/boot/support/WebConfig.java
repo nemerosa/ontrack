@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.support;
 
+import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +17,9 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     @Autowired
     private URIBuilder uriBuilder;
 
+    @Autowired
+    private SecurityService securityService;
+
     /**
      * Uses the HTTP header for content negociation.
      */
@@ -30,7 +34,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
         // Plain text
         converters.add(new StringHttpMessageConverter());
         // JSON
-        converters.add(new ViewAwareMappingJackson2HttpMessageConverter(uriBuilder));
+        converters.add(new ViewAwareMappingJackson2HttpMessageConverter(uriBuilder, securityService));
     }
 
 }
