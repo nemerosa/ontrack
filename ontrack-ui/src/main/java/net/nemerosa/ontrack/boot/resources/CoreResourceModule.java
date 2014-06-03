@@ -1,38 +1,30 @@
 package net.nemerosa.ontrack.boot.resources;
 
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.PromotionLevel;
+import net.nemerosa.ontrack.ui.resource.AbstractResourceModule;
 import net.nemerosa.ontrack.ui.resource.ResourceContext;
-import net.nemerosa.ontrack.ui.resource.ResourceSerializerModifier;
 
-public class CoreResourceModule extends SimpleModule {
-
-    private final ResourceContext resourceContext;
+public class CoreResourceModule extends AbstractResourceModule {
 
     public CoreResourceModule(ResourceContext resourceContext) {
-        super("ontrack");
-        this.resourceContext = resourceContext;
+        super("ontrack", resourceContext);
     }
 
     @Override
-    public void setupModule(SetupContext context) {
-        super.setupModule(context);
-        context.addBeanSerializerModifier(new ResourceSerializerModifier<>(
-                resourceContext,
+    protected void setupResources() {
+        register(
                 Project.class,
                 ProjectResource::new
-        ));
-        context.addBeanSerializerModifier(new ResourceSerializerModifier<>(
-                resourceContext,
+        );
+        register(
                 Branch.class,
                 BranchResource::new
-        ));
-        context.addBeanSerializerModifier(new ResourceSerializerModifier<>(
-                resourceContext,
+        );
+        register(
                 PromotionLevel.class,
                 PromotionLevelResource::new
-        ));
+        );
     }
 }

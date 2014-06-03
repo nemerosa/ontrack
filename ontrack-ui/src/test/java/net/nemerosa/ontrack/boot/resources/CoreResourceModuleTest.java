@@ -12,7 +12,7 @@ import org.junit.Test;
 import static net.nemerosa.ontrack.json.JsonUtils.object;
 import static net.nemerosa.ontrack.test.TestUtils.assertJsonWrite;
 
-public class ResourceModuleTest {
+public class CoreResourceModuleTest {
 
     private ObjectMapper mapper;
 
