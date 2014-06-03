@@ -14,6 +14,7 @@ import java.net.URI;
 @EqualsAndHashCode(callSuper = false)
 @Data
 @JsonPropertyOrder(alphabetic = true)
+@Deprecated
 public class Resource<T> extends LinkContainer<Resource<T>> implements ViewSupplier {
 
     @JsonUnwrapped

@@ -9,12 +9,16 @@ import net.nemerosa.ontrack.ui.controller.MockURIBuilder;
 import net.nemerosa.ontrack.ui.resource.DefaultResourceContext;
 import net.nemerosa.ontrack.ui.resource.ResourceObjectMapper;
 import net.nemerosa.ontrack.ui.resource.ResourceObjectMapperFactory;
+import net.nemerosa.ontrack.ui.resource.Resources;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import java.net.URI;
 import java.util.Arrays;
+import java.util.List;
 
+import static net.nemerosa.ontrack.json.JsonUtils.array;
 import static net.nemerosa.ontrack.json.JsonUtils.object;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
@@ -170,6 +174,47 @@ public class CoreResourceModuleTest {
                         .with("_image", "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionLevelImage_:1")
                         .end(),
                 pl
+        );
+    }
+
+    @Test
+    public void resource_collection_with_filtering() throws JsonProcessingException {
+        Project project = Project.of(new NameDescription("PRJ", "Project")).withId(ID.of(1));
+        List<Branch> branches = Arrays.asList(
+                Branch.of(project, new NameDescription("B1", "Branch 1")).withId(ID.of(1)),
+                Branch.of(project, new NameDescription("B2", "Branch 2")).withId(ID.of(2))
+        );
+        Resources<Branch> resourceCollection = Resources.of(
+                branches,
+                URI.create("urn:branch")
+        );
+
+        assertResourceJson(
+                mapper,
+                object()
+                        .with("_self", "urn:branch")
+                        .with("resources", array()
+                                .with(object()
+                                        .with("id", 1)
+                                        .with("name", "B1")
+                                        .with("description", "Branch 1")
+                                        .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranch:1")
+                                        .with("_project", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
+                                        .with("_promotionLevels", "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionLevelListForBranch:1")
+                                        .with("_validationStamps", "urn:test:net.nemerosa.ontrack.boot.ui.ValidationStampController#getValidationStampListForBranch:1")
+                                        .end())
+                                .with(object()
+                                        .with("id", 2)
+                                        .with("name", "B2")
+                                        .with("description", "Branch 2")
+                                        .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranch:2")
+                                        .with("_project", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
+                                        .with("_promotionLevels", "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionLevelListForBranch:2")
+                                        .with("_validationStamps", "urn:test:net.nemerosa.ontrack.boot.ui.ValidationStampController#getValidationStampListForBranch:2")
+                                        .end())
+                                .end())
+                        .end(),
+                resourceCollection
         );
     }
 

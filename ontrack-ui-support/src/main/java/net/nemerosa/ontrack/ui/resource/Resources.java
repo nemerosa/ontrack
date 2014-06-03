@@ -13,31 +13,30 @@ import java.util.stream.Stream;
 
 @EqualsAndHashCode(callSuper = false)
 @Data
-@Deprecated
-public class ResourceCollection<T> extends LinkContainer<ResourceCollection<T>> implements ViewSupplier {
+public class Resources<T> extends LinkContainer<Resources<T>> implements ViewSupplier {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final Pagination pagination;
-    private final Collection<Resource<T>> resources;
+    private final Collection<T> resources;
     @JsonIgnore
     private final Class<?> viewType;
 
-    protected ResourceCollection(Collection<Resource<T>> resources, URI self, Pagination pagination, Class<?> viewType) {
+    protected Resources(Collection<T> resources, URI self, Pagination pagination, Class<?> viewType) {
         super(self);
         this.pagination = pagination;
         this.resources = resources;
         this.viewType = viewType;
     }
 
-    public ResourceCollection<T> forView(Class<?> viewType) {
-        return new ResourceCollection<>(resources, get_self(), pagination, viewType);
+    public Resources<T> forView(Class<?> viewType) {
+        return new Resources<>(resources, get_self(), pagination, viewType);
     }
 
-    public static <R> ResourceCollection<R> of(Stream<Resource<R>> resources, URI href) {
+    public static <R> Resources<R> of(Stream<R> resources, URI href) {
         return of(resources.collect(Collectors.toList()), href);
     }
 
-    public static <R> ResourceCollection<R> of(Collection<Resource<R>> resources, URI href) {
-        return new ResourceCollection<>(resources, href, Pagination.NONE, Object.class);
+    public static <R> Resources<R> of(Collection<R> resources, URI href) {
+        return new Resources<>(resources, href, Pagination.NONE, Object.class);
     }
 }
