@@ -51,11 +51,11 @@ angular.module('ot.service.user', [
          */
         self.login = function () {
             return otFormService.display({
-                uri: $rootScope.user.login.href,
+                uri: $rootScope.user.login,
                 title: "Sign in",
                 submit: function (data) {
                     return ot.call($http.post(
-                        $rootScope.user.login.href,
+                        $rootScope.user.login,
                         {},
                         {
                             headers: {
