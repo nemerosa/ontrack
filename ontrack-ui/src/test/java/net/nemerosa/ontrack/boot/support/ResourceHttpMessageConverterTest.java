@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.boot.support;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.boot.resources.CoreResourceModule;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.Branch;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpOutputMessage;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 import static net.nemerosa.ontrack.json.JsonUtils.object;
 import static org.mockito.Mockito.mock;
@@ -28,7 +30,8 @@ public class ResourceHttpMessageConverterTest {
     public void before() {
         SecurityService securityService = mock(SecurityService.class);
         converter = new ResourceHttpMessageConverter(
-                new MockURIBuilder(), securityService
+                new MockURIBuilder(), securityService,
+                Arrays.asList(new CoreResourceModule())
         );
     }
 
