@@ -48,7 +48,7 @@ public class JenkinsController extends AbstractExtensionController<JenkinsExtens
     @RequestMapping(value = "configurations", method = RequestMethod.GET)
     public Resources<JenkinsConfiguration> getConfigurations() {
         return Resources.of(
-                jenkinsService.getConfigurations().stream().map(JenkinsConfiguration::obfuscate),
+                jenkinsService.getConfigurations(),
                 uri(on(getClass()).getConfigurations())
         )
                 .with(Link.CREATE, uri(on(getClass()).getConfigurationForm()))

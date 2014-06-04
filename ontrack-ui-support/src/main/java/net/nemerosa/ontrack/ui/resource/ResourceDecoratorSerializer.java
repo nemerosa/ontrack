@@ -80,11 +80,14 @@ public class ResourceDecoratorSerializer<T> extends BeanSerializerBase {
         // Starting the serialization
         jgen.writeStartObject();
 
+        // Decorating the bean itself before serialization
+        T decoratedBean = resourceDecorator.decorateBeforeSerialization(t);
+
         // Default fields
-        serializeFields(bean, jgen, provider);
+        serializeFields(decoratedBean, jgen, provider);
 
         // Decorations
-        for (Link link : resourceDecorator.links(t, resourceContext)) {
+        for (Link link : resourceDecorator.links(decoratedBean, resourceContext)) {
             jgen.writeObjectField(link.getName(), link.getHref());
         }
 

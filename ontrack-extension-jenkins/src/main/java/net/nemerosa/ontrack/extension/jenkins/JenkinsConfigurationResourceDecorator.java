@@ -14,7 +14,13 @@ public class JenkinsConfigurationResourceDecorator extends AbstractResourceDecor
         super(JenkinsConfiguration.class);
     }
 
-    // TODO Obfuscation at decoration level
+    /**
+     * Obfuscates the password
+     */
+    @Override
+    public JenkinsConfiguration decorateBeforeSerialization(JenkinsConfiguration bean) {
+        return bean.obfuscate();
+    }
 
     @Override
     public List<Link> links(JenkinsConfiguration configuration, ResourceContext resourceContext) {
