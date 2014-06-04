@@ -7,14 +7,10 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.Time;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
-import net.nemerosa.ontrack.ui.resource.Link;
-import net.nemerosa.ontrack.ui.resource.Resource;
-import net.nemerosa.ontrack.ui.resource.ResourceCollection;
+import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.stream.Collectors;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -61,12 +57,9 @@ public class BuildController extends AbstractResourceController {
     // Promoted runs
 
     @RequestMapping(value = "builds/{buildId}/promotionRun/last", method = RequestMethod.GET)
-    public ResourceCollection<PromotionRun> getLastPromotionRuns(@PathVariable ID buildId) {
-        return ResourceCollection.of(
-                structureService.getLastPromotionRunsForBuild(buildId)
-                        .stream()
-                        .map(this::toPromotionRunResource)
-                        .collect(Collectors.toList()),
+    public Resources<PromotionRun> getLastPromotionRuns(@PathVariable ID buildId) {
+        return Resources.of(
+                structureService.getLastPromotionRunsForBuild(buildId),
                 uri(on(getClass()).getLastPromotionRuns(buildId))
         ).forView(Build.class);
     }
@@ -91,7 +84,7 @@ public class BuildController extends AbstractResourceController {
 
     @RequestMapping(value = "builds/{buildId}/promotionRun/create", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public Resource<PromotionRun> newPromotionRun(@PathVariable ID buildId, @RequestBody PromotionRunRequest promotionRunRequest) {
+    public PromotionRun newPromotionRun(@PathVariable ID buildId, @RequestBody PromotionRunRequest promotionRunRequest) {
         // Gets the build
         Build build = structureService.getBuild(buildId);
         // Gets the promotion level
@@ -104,24 +97,12 @@ public class BuildController extends AbstractResourceController {
                 promotionRunRequest.getDescription()
         );
         // Creation
-        promotionRun = structureService.newPromotionRun(promotionRun);
-        // OK
-        return toPromotionRunResource(promotionRun);
+        return structureService.newPromotionRun(promotionRun);
     }
 
     @RequestMapping(value = "promotionRuns/{promotionRunId}", method = RequestMethod.GET)
-    public Resource<PromotionRun> getPromotionRun(@PathVariable ID promotionRunId) {
-        return toPromotionRunResource(structureService.getPromotionRun(promotionRunId));
+    public PromotionRun getPromotionRun(@PathVariable ID promotionRunId) {
+        return structureService.getPromotionRun(promotionRunId);
     }
 
-    // Validation runs
-
-    private Resource<PromotionRun> toPromotionRunResource(PromotionRun promotionRun) {
-        return Resource.of(
-                promotionRun,
-                uri(on(getClass()).getPromotionRun(promotionRun.getId()))
-        )
-                .with(Link.IMAGE_LINK, uri(on(PromotionLevelController.class).getPromotionLevelImage_(promotionRun.getPromotionLevel().getId())))
-                ;
-    }
 }
