@@ -31,7 +31,7 @@ angular.module('ot.view.build', [
                 view.commands = [
                     {
                         condition: function () {
-                            return build.promote;
+                            return build._promote;
                         },
                         id: 'promote',
                         name: "Promote",
@@ -40,7 +40,7 @@ angular.module('ot.view.build', [
                     },
                     {
                         condition: function () {
-                            return build.validate;
+                            return build._validate;
                         },
                         id: 'validate',
                         name: "Validation run",
@@ -57,7 +57,7 @@ angular.module('ot.view.build', [
 
         // Loads the promotion runs
         function loadPromotionRuns() {
-            ot.call($http.get($scope.build.lastPromotionRuns.href)).then(function (promotionRunCollection) {
+            ot.call($http.get($scope.build._lastPromotionRuns)).then(function (promotionRunCollection) {
                 angular.forEach(promotionRunCollection.resources, function (promotionRun) {
                     promotionRun.image = promotionRun.promotionLevel.image;
                 });
@@ -67,7 +67,7 @@ angular.module('ot.view.build', [
 
         // Loads the validation runs
         function loadValidationRuns() {
-            ot.call($http.get($scope.build.validationStampRunViews.href)).then(function (validationStampRunViewCollection) {
+            ot.call($http.get($scope.build._validationStampRunViews)).then(function (validationStampRunViewCollection) {
                 angular.forEach(validationStampRunViewCollection.resources, function (validationStampRunView) {
                     validationStampRunView.image = validationStampRunView.validationStamp.image;
                 });
@@ -77,12 +77,12 @@ angular.module('ot.view.build', [
 
         // Promotion
         function promote() {
-            otStructureService.create($scope.build.promote.href, 'Promotion for the build').then(loadPromotionRuns);
+            otStructureService.create($scope.build._promote, 'Promotion for the build').then(loadPromotionRuns);
         }
 
         // Validation
         function validate() {
-            otStructureService.create($scope.build.validate.href, 'Validation for the build').then(loadBuild);
+            otStructureService.create($scope.build._validate, 'Validation for the build').then(loadBuild);
         }
     })
 ;

@@ -5,7 +5,7 @@
             <div class="well">
                 <span ng-repeat="promotionRun in promotionRunCollection.resources">
                     <span class="ot-promotion-run">
-                        <ot-entity-image entity="promotionRun" link="#/promotionLevel/{{promotionRun.promotionLevel.id}}">
+                        <ot-entity-image entity="promotionRun.promotionLevel" link="#/promotionLevel/{{promotionRun.promotionLevel.id}}">
                             {{promotionRun.promotionLevel.name}}
                         </ot-entity-image>
                         <span class="ot-promotion-run-signature">
@@ -31,7 +31,7 @@
                             <tr ng-repeat="validationStampRunView in validationStampRunViewCollection.resources"
                                 ng-if="validationStampRunView.run && validationStampRunView.passed">
                                 <td>
-                                    <ot-entity-image entity="validationStampRunView"
+                                    <ot-entity-image entity="validationStampRunView.validationStamp"
                                                      link="#/validationStamp/{{validationStampRunView.validationStamp.id}}">
                                         {{validationStampRunView.validationStamp.name}}
                                     </ot-entity-image>
@@ -56,7 +56,7 @@
                             <tr ng-repeat="validationStampRunView in validationStampRunViewCollection.resources"
                                 ng-if="validationStampRunView.run && !validationStampRunView.passed">
                                 <td>
-                                    <ot-entity-image entity="validationStampRunView"
+                                    <ot-entity-image entity="validationStampRunView.validationStamp"
                                                      link="#/validationStamp/{{validationStampRunView.validationStamp.id}}">
                                         {{validationStampRunView.validationStamp.name}}
                                     </ot-entity-image>
@@ -81,7 +81,7 @@
                             <tr ng-repeat="validationStampRunView in validationStampRunViewCollection.resources"
                                 ng-if="!validationStampRunView.run">
                                 <td>
-                                    <ot-entity-image entity="validationStampRunView"
+                                    <ot-entity-image entity="validationStampRunView.validationStamp"
                                                      link="#/validationStamp/{{validationStampRunView.validationStamp.id}}">
                                         {{validationStampRunView.validationStamp.name}}
                                     </ot-entity-image>
