@@ -31,6 +31,11 @@ public class DefaultResourceContext implements ResourceContext {
         return new DefaultLinksBuilder();
     }
 
+    @Override
+    public boolean isProjectFunctionGranted(int projectId, Class<? extends ProjectFunction> fn) {
+        return securityService.isProjectFunctionGranted(projectId, fn);
+    }
+
     protected class DefaultLinksBuilder implements LinksBuilder {
 
         private final Map<String, Link> links = new LinkedHashMap<>();
@@ -57,8 +62,8 @@ public class DefaultResourceContext implements ResourceContext {
         }
 
         @Override
-        public LinksBuilder link(String name, Object methodInvocation, Class<? extends GlobalFunction> fn) {
-            if (securityService.isGlobalFunctionGranted(fn)) {
+        public LinksBuilder link(String name, Object methodInvocation, boolean test) {
+            if (test) {
                 return link(name, methodInvocation);
             } else {
                 return this;
@@ -66,12 +71,13 @@ public class DefaultResourceContext implements ResourceContext {
         }
 
         @Override
+        public LinksBuilder link(String name, Object methodInvocation, Class<? extends GlobalFunction> fn) {
+            return link(name, methodInvocation, securityService.isGlobalFunctionGranted(fn));
+        }
+
+        @Override
         public LinksBuilder link(String name, Object methodInvocation, Class<? extends ProjectFunction> fn, int projectId) {
-            if (securityService.isProjectFunctionGranted(projectId, fn)) {
-                return link(name, methodInvocation);
-            } else {
-                return this;
-            }
+            return link(name, methodInvocation, securityService.isProjectFunctionGranted(projectId, fn));
         }
 
         @Override

@@ -3,19 +3,15 @@ package net.nemerosa.ontrack.boot.ui;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Selection;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.security.ValidationRunStatusChange;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
-import net.nemerosa.ontrack.ui.resource.Link;
-import net.nemerosa.ontrack.ui.resource.Resource;
-import net.nemerosa.ontrack.ui.resource.ResourceCollection;
+import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -35,30 +31,23 @@ public class ValidationRunController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "builds/{buildId}/validationRuns/view", method = RequestMethod.GET)
-    public ResourceCollection<ValidationStampRunView> getValidationStampRunViews(@PathVariable ID buildId) {
+    public Resources<ValidationStampRunView> getValidationStampRunViews(@PathVariable ID buildId) {
         // Build
         Build build = structureService.getBuild(buildId);
         // Gets the views
         List<ValidationStampRunView> views = structureService.getValidationStampRunViewsForBuild(build);
         // Converts into a view
         URI uri = uri(on(getClass()).getValidationStampRunViews(buildId));
-        return ResourceCollection.of(
-                views.stream()
-                        .map(view -> Resource.of(view, uri)
-                                        .with(Link.IMAGE_LINK, uri(on(ValidationStampController.class).getValidationStampImage_(view.getValidationStamp().getId())))
-                        )
-                        .collect(Collectors.toList()),
+        return Resources.of(
+                views,
                 uri
         ).forView(ValidationStampRunView.class);
     }
 
     @RequestMapping(value = "builds/{buildId}/validationRuns", method = RequestMethod.GET)
-    public ResourceCollection<ValidationRun> getValidationRuns(@PathVariable ID buildId) {
-        return ResourceCollection.of(
-                structureService.getValidationRunsForBuild(buildId)
-                        .stream()
-                        .map(this::toValidationRunResource)
-                        .collect(Collectors.toList()),
+    public Resources<ValidationRun> getValidationRuns(@PathVariable ID buildId) {
+        return Resources.of(
+                structureService.getValidationRunsForBuild(buildId),
                 uri(on(BuildController.class).getLastPromotionRuns(buildId))
         ).forView(Build.class);
     }
@@ -82,7 +71,7 @@ public class ValidationRunController extends AbstractResourceController {
 
     @RequestMapping(value = "builds/{buildId}/validationRuns/create", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public Resource<ValidationRun> newValidationRun(@PathVariable ID buildId, @RequestBody ValidationRunRequest validationRunRequest) {
+    public ValidationRun newValidationRun(@PathVariable ID buildId, @RequestBody ValidationRunRequest validationRunRequest) {
         // Gets the build
         Build build = structureService.getBuild(buildId);
         // Gets the validation stamp
@@ -98,14 +87,12 @@ public class ValidationRunController extends AbstractResourceController {
                 validationRunRequest.getDescription()
         );
         // Creation
-        validationRun = structureService.newValidationRun(validationRun);
-        // OK
-        return toValidationRunResource(validationRun);
+        return structureService.newValidationRun(validationRun);
     }
 
     @RequestMapping(value = "validationRuns/{validationRunId}", method = RequestMethod.GET)
-    public Resource<ValidationRun> getValidationRun(@PathVariable ID validationRunId) {
-        return toValidationRunResource(structureService.getValidationRun(validationRunId));
+    public ValidationRun getValidationRun(@PathVariable ID validationRunId) {
+        return structureService.getValidationRun(validationRunId);
     }
 
     // Validation run status
@@ -127,7 +114,7 @@ public class ValidationRunController extends AbstractResourceController {
 
     @RequestMapping(value = "validationRuns/{validationRunId}/status/change", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public Resource<ValidationRun> validationRunStatusChange(@PathVariable ID validationRunId, @RequestBody ValidationRunStatusChangeRequest request) {
+    public ValidationRun validationRunStatusChange(@PathVariable ID validationRunId, @RequestBody ValidationRunStatusChangeRequest request) {
         // Gets the current run
         ValidationRun run = structureService.getValidationRun(validationRunId);
         // Gets the new validation run status
@@ -137,29 +124,7 @@ public class ValidationRunController extends AbstractResourceController {
                 request.getDescription()
         );
         // Updates the validation run
-        ValidationRun updatedRun = structureService.newValidationRunStatus(run, runStatus);
-        // OK
-        return toValidationRunResource(updatedRun);
+        return structureService.newValidationRunStatus(run, runStatus);
     }
 
-    // Resource assemblers
-
-    private Resource<ValidationRun> toValidationRunResource(ValidationRun validationRun) {
-        return Resource.of(
-                validationRun,
-                uri(on(getClass()).getValidationRun(validationRun.getId()))
-        ).with(
-                Link.IMAGE_LINK, uri(on(ValidationStampController.class).getValidationStampImage_(validationRun.getValidationStamp().getId()))
-        ).with(
-                "validationStampLink", uri(on(ValidationStampController.class).getValidationStamp(validationRun.getValidationStamp().getId()))
-        ).with(
-                "validationRunStatusChange",
-                uri(on(ValidationRunController.class).getValidationRunStatusChangeForm(validationRun.getId())),
-                // Only if transition possible
-                securityService.isProjectFunctionGranted(
-                        validationRun.getBuild().getBranch().getProject().id(),
-                        ValidationRunStatusChange.class
-                ) && !validationRun.getLastStatus().getStatusID().getFollowingStatuses().isEmpty()
-        );
-    }
 }

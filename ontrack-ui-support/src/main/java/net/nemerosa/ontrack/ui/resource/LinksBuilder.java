@@ -19,6 +19,8 @@ public interface LinksBuilder {
 
     LinksBuilder link(String name, Object methodInvocation);
 
+    LinksBuilder link(String name, Object methodInvocation, boolean test);
+
     LinksBuilder link(String name, Object methodInvocation, Class<? extends GlobalFunction> fn);
 
     LinksBuilder link(String name, Object methodInvocation, Class<? extends ProjectFunction> fn, int projectId);
