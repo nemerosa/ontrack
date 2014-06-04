@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service;
 
+import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.Entity;
 import net.nemerosa.ontrack.model.structure.Property;
@@ -16,11 +17,13 @@ public class PropertyServiceImpl implements PropertyService {
 
     private final PropertyRepository propertyRepository;
     private final SecurityService securityService;
+    private final ExtensionManager extensionManager;
 
     @Autowired
-    public PropertyServiceImpl(PropertyRepository propertyRepository, SecurityService securityService) {
+    public PropertyServiceImpl(PropertyRepository propertyRepository, SecurityService securityService, ExtensionManager extensionManager) {
         this.propertyRepository = propertyRepository;
         this.securityService = securityService;
+        this.extensionManager = extensionManager;
     }
 
     @Override
