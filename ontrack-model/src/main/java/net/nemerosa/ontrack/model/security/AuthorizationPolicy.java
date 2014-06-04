@@ -12,6 +12,7 @@ import java.util.Set;
  */
 @Data
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Deprecated
 public class AuthorizationPolicy {
 
     public static final AuthorizationPolicy LOGGED = new AuthorizationPolicy(false, true, null, null);

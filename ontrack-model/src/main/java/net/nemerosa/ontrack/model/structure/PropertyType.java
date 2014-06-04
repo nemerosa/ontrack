@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.model.structure;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.security.AuthorizationPolicy;
+import net.nemerosa.ontrack.model.security.SecurityService;
 
 import java.util.Optional;
 
@@ -49,18 +49,25 @@ public interface PropertyType<T> {
     boolean applies(Class<? extends Entity> entityClass);
 
     /**
+     * Edition policy.
+     * <p/>
      * Can this property be directly edited by a used on the given
      * associated entity.
      *
-     * @param entity Entity where to edit the property
+     * @param entity          Entity where to edit the property
+     * @param securityService The access to the security layer
      * @return Authorization policy for this entity
      */
-    AuthorizationPolicy getEditingAuthorizationPolicy(Entity entity);
+    boolean canEdit(Entity entity, SecurityService securityService);
 
     /**
      * Defines the authorization policy for viewing this property.
+     *
+     * @param entity          Entity where to view the property
+     * @param securityService The access to the security layer
+     * @return Authorization policy for this entity
      */
-    AuthorizationPolicy getViewingAuthorizationPolicy(Entity entity);
+    boolean canView(Entity entity, SecurityService securityService);
 
     /**
      * TODO Obfuscates any sensitive value from the property value before it is sent at client side.
