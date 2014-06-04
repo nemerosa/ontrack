@@ -15,12 +15,16 @@ public class PropertyTypeDescriptor {
         return new PropertyTypeDescriptor(
                 type.getClass().getName(),
                 type.getName(),
-                type.getIconPath()
+                type.getIconPath(),
+                type.getShortTemplatePath(),
+                type.getFullTemplatePath()
         );
     }
 
     private final String typeName;
     private final String name;
     private final String iconPath;
+    private final String shortTemplatePath;
+    private final String fullTemplatePath;
 
 }
