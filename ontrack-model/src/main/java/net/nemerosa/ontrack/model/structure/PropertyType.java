@@ -30,6 +30,19 @@ public interface PropertyType<T> {
     String getIconPath();
 
     /**
+     * Template path for the short representation. It is mainly used for short lists.
+     * See {@link #getFullTemplatePath()} for an explanation.
+     */
+    String getShortTemplatePath();
+
+    /**
+     * Template path for the full representation. It is used for the full representation of the property value.
+     * <p/>
+     * This path is relative to the Web root and is merged with the property raw value.
+     */
+    String getFullTemplatePath();
+
+    /**
      * Form to create/update this property.
      *
      * @param value Value to update if set. If not set, this means the creation of a new property.
