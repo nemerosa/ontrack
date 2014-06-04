@@ -13,7 +13,8 @@ public class CoreResourceModule extends AbstractResourceModule {
         return Arrays.asList(
                 new ProjectResourceDecorator(),
                 new BranchResourceDecorator(),
-                new PromotionLevelResourceDecorator()
+                new PromotionLevelResourceDecorator(),
+                new ValidationStampResourceDecorator()
         );
     }
 }

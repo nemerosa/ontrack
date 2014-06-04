@@ -6,8 +6,7 @@ import net.nemerosa.ontrack.model.security.ValidationStampCreate;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Link;
-import net.nemerosa.ontrack.ui.resource.Resource;
-import net.nemerosa.ontrack.ui.resource.ResourceCollection;
+import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -36,10 +35,10 @@ public class ValidationStampController extends AbstractResourceController {
     // Validation stamps
 
     @RequestMapping(value = "branches/{branchId}/validationStamps", method = RequestMethod.GET)
-    public ResourceCollection<ValidationStamp> getValidationStampListForBranch(@PathVariable ID branchId) {
+    public Resources<ValidationStamp> getValidationStampListForBranch(@PathVariable ID branchId) {
         Branch branch = structureService.getBranch(branchId);
-        return ResourceCollection.of(
-                structureService.getValidationStampListForBranch(branchId).stream().map(this::toValidationStampResource),
+        return Resources.of(
+                structureService.getValidationStampListForBranch(branchId),
                 uri(on(ValidationStampController.class).getValidationStampListForBranch(branchId))
         )
                 // Create
@@ -58,22 +57,18 @@ public class ValidationStampController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "branches/{branchId}/validationStamps/create", method = RequestMethod.POST)
-    public Resource<ValidationStamp> newValidationStamp(@PathVariable ID branchId, @RequestBody NameDescription nameDescription) {
+    public ValidationStamp newValidationStamp(@PathVariable ID branchId, @RequestBody NameDescription nameDescription) {
         // Gets the holding branch
         Branch branch = structureService.getBranch(branchId);
         // Creates a new promotion level
         ValidationStamp validationStamp = ValidationStamp.of(branch, nameDescription);
         // Saves it into the repository
-        validationStamp = structureService.newValidationStamp(validationStamp);
-        // OK
-        return toValidationStampResource(validationStamp);
+        return structureService.newValidationStamp(validationStamp);
     }
 
     @RequestMapping(value = "validationStamps/{validationStampId}", method = RequestMethod.GET)
-    public Resource<ValidationStamp> getValidationStamp(@PathVariable ID validationStampId) {
-        return toValidationStampResourceWithActions(
-                structureService.getValidationStamp(validationStampId)
-        );
+    public ValidationStamp getValidationStamp(@PathVariable ID validationStampId) {
+        return structureService.getValidationStamp(validationStampId);
     }
 
     @RequestMapping(value = "validationStamps/{validationStampId}/image", method = RequestMethod.GET)
@@ -99,27 +94,4 @@ public class ValidationStampController extends AbstractResourceController {
         ));
     }
 
-    // Resource assemblers
-
-    private Resource<ValidationStamp> toValidationStampResourceWithActions(ValidationStamp validationStamp) {
-        return toValidationStampResource(validationStamp);
-        // TODO Update
-        // TODO Delete
-        // TODO Next validation stamp
-        // TODO Previous validation stamp
-    }
-
-    private Resource<ValidationStamp> toValidationStampResource(ValidationStamp validationStamp) {
-        return Resource.of(
-                validationStamp,
-                uri(on(ValidationStampController.class).getValidationStamp(validationStamp.getId()))
-        )
-                // Branch link
-                .with("branchLink", uri(on(BranchController.class).getBranch(validationStamp.getBranch().getId())))
-                        // Project link
-                .with("projectLink", uri(on(ProjectController.class).getProject(validationStamp.getBranch().getProject().getId())))
-                        // Image link
-                .with("imageLink", uri(on(ValidationStampController.class).getValidationStampImage_(validationStamp.getId())))
-                ;
-    }
 }
