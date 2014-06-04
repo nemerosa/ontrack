@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.boot.support;
 import net.nemerosa.ontrack.it.AbstractITTestSupport;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.ui.resource.Resource;
-import net.nemerosa.ontrack.ui.resource.ResourceCollection;
+import net.nemerosa.ontrack.ui.resource.Resources;
 import org.junit.Test;
 
 import java.net.URI;
@@ -46,7 +46,7 @@ public class JsonViewClassTest {
 
     @Test
     public void view_class_resource_collection_empty() {
-        assertEquals(Object.class, getViewClass(ResourceCollection.of(
+        assertEquals(Object.class, getViewClass(Resources.of(
                 Collections.emptyList(),
                 URI.create("urn:projects")
         )));
@@ -54,7 +54,7 @@ public class JsonViewClassTest {
 
     @Test
     public void view_class_resource_collection() {
-        assertEquals(Object.class, getViewClass(ResourceCollection.of(
+        assertEquals(Object.class, getViewClass(Resources.of(
                 Arrays.asList(
                         Resource.of(project(), URI.create("urn:project"))
                 ),
@@ -64,7 +64,7 @@ public class JsonViewClassTest {
 
     @Test
     public void view_class_resource_collection_view_empty() {
-        assertEquals(Project.class, getViewClass(ResourceCollection.of(
+        assertEquals(Project.class, getViewClass(Resources.of(
                 Collections.emptyList(),
                 URI.create("urn:projects")
         ).forView(Project.class)));
@@ -72,7 +72,7 @@ public class JsonViewClassTest {
 
     @Test
     public void view_class_resource_collection_view() {
-        assertEquals(Project.class, getViewClass(ResourceCollection.of(
+        assertEquals(Project.class, getViewClass(Resources.of(
                 Arrays.asList(
                         Resource.of(project(), URI.create("urn:project"))
                 ),

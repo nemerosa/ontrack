@@ -8,13 +8,11 @@ import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
-import net.nemerosa.ontrack.ui.resource.ResourceCollection;
+import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
-
-import java.util.stream.Collectors;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -47,12 +45,9 @@ public class JenkinsController extends AbstractExtensionController<JenkinsExtens
      * Gets the Jenkins settings
      */
     @RequestMapping(value = "configurations", method = RequestMethod.GET)
-    public ResourceCollection<JenkinsConfiguration> getConfigurations() {
-        return ResourceCollection.of(
-                jenkinsService.getConfigurations()
-                        .stream()
-                        .map(this::toConfigurationResource)
-                        .collect(Collectors.toList()),
+    public Resources<JenkinsConfiguration> getConfigurations() {
+        return Resources.of(
+                jenkinsService.getConfigurations().stream().map(JenkinsConfiguration::obfuscate),
                 uri(on(getClass()).getConfigurations())
         )
                 .with(Link.CREATE, uri(on(getClass()).getConfigurationForm()))

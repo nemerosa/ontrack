@@ -8,13 +8,11 @@ import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
-import net.nemerosa.ontrack.ui.resource.ResourceCollection;
+import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
-
-import java.util.stream.Collectors;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -47,12 +45,9 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
      * Gets the configurations
      */
     @RequestMapping(value = "configurations", method = RequestMethod.GET)
-    public ResourceCollection<SVNConfiguration> getConfigurations() {
-        return ResourceCollection.of(
-                svnConfigurationService.getConfigurations()
-                        .stream()
-                        .map(this::toConfigurationResource)
-                        .collect(Collectors.toList()),
+    public Resources<SVNConfiguration> getConfigurations() {
+        return Resources.of(
+                svnConfigurationService.getConfigurations().stream().map(SVNConfiguration::obfuscate),
                 uri(on(getClass()).getConfigurations())
         )
                 .with(Link.CREATE, uri(on(getClass()).getConfigurationForm()))
