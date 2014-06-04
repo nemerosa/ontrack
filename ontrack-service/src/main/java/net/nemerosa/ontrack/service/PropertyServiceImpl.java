@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service;
 
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
+import net.nemerosa.ontrack.extension.api.PropertyTypeExtension;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.repository.PropertyRepository;
@@ -26,8 +27,10 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     public List<PropertyType<?>> getPropertyTypes() {
-        // FIXME Method net.nemerosa.ontrack.service.PropertyServiceImpl.getPropertyTypes
-        return null;
+        return extensionManager.getExtensions(PropertyTypeExtension.class)
+                .stream()
+                .map(PropertyTypeExtension::getPropertyType)
+                .collect(Collectors.toList());
     }
 
     @Override
