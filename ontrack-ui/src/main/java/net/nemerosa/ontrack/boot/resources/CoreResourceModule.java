@@ -13,6 +13,7 @@ public class CoreResourceModule extends AbstractResourceModule {
     @Override
     public Collection<ResourceDecorator<?>> decorators() {
         return Arrays.asList(
+                new ConnectedAccountResourceDecorator(),
                 new ProjectResourceDecorator(),
                 new BranchResourceDecorator(),
                 new PromotionLevelResourceDecorator(),

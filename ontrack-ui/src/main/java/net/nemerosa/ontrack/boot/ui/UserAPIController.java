@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.extension.api.UserMenuExtension;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
-import net.nemerosa.ontrack.ui.resource.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
@@ -15,8 +14,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
-
-import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
 @RequestMapping("/user")
@@ -32,16 +29,16 @@ public class UserAPIController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public Resource<ConnectedAccount> getCurrentUser() {
+    public ConnectedAccount getCurrentUser() {
         // Gets the current account
         Account account = securityService.getCurrentAccount();
         // Account present
         if (account != null) {
-            return toLoggedAccountResource(account);
+            return toLoggedAccount(account);
         }
         // Not logged
         else {
-            return toAnonymousResource();
+            return toAnonymousAccount();
         }
     }
 
@@ -53,7 +50,7 @@ public class UserAPIController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "login", method = RequestMethod.POST)
-    public Resource<ConnectedAccount> login() {
+    public ConnectedAccount login() {
         // Gets the current account
         Account account = securityService.getCurrentAccount();
         // If not logged, rejects
@@ -62,7 +59,7 @@ public class UserAPIController extends AbstractResourceController {
         }
         // Already logged
         else {
-            return toLoggedAccountResource(account);
+            return toLoggedAccount(account);
         }
     }
 
@@ -73,21 +70,12 @@ public class UserAPIController extends AbstractResourceController {
 
     // Resource assemblers
 
-    private Resource<ConnectedAccount> toAnonymousResource() {
-        return Resource.of(
-                ConnectedAccount.none(),
-                uri(on(UserAPIController.class).getCurrentUser())
-        )
-                .with("login", uri(on(UserAPIController.class).loginForm()))
-                ;
+    private ConnectedAccount toAnonymousAccount() {
+        return ConnectedAccount.none();
     }
 
-    private Resource<ConnectedAccount> toLoggedAccountResource(Account account) {
-        ConnectedAccount user = userMenu(ConnectedAccount.of(account));
-        return Resource.of(
-                user,
-                uri(on(UserAPIController.class).getCurrentUser())
-        );
+    private ConnectedAccount toLoggedAccount(Account account) {
+        return userMenu(ConnectedAccount.of(account));
     }
 
     private ConnectedAccount userMenu(ConnectedAccount user) {

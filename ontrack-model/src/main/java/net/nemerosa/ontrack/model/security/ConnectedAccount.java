@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class ConnectedAccount {
 
     private final Account account;
@@ -22,6 +22,10 @@ public class ConnectedAccount {
     public static ConnectedAccount of(Account account) {
         Entity.isEntityDefined(account, "Account must be defined");
         return new ConnectedAccount(account);
+    }
+
+    public boolean isLogged() {
+        return account != null;
     }
 
     public ConnectedAccount add(Action action) {
