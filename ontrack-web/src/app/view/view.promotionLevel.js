@@ -17,7 +17,7 @@ angular.module('ot.view.promotionLevel', [
 
         // Loading the promotion level
         function loadPromotionLevel() {
-            ot.call($http.get('structure/promotionLevels/' + promotionLevelId)).then(function (promotionLevel) {
+            otStructureService.getPromotionLevel(promotionLevelId).then(function (promotionLevel) {
                 $scope.promotionLevel = promotionLevel;
                 // View title
                 view.title = $scope.promotionLevel.name;

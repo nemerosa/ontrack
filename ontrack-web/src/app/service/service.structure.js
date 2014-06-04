@@ -49,6 +49,13 @@ angular.module('ot.service.structure', [
         };
 
         /**
+         * Getting a promotion level
+         */
+        self.getPromotionLevel = function (id) {
+            return ot.call($http.get('structure/promotionLevels/' + id));
+        };
+
+        /**
          * Creating a build
          */
         self.createBuild = function (uri) {
@@ -77,13 +84,13 @@ angular.module('ot.service.structure', [
                             title: config.title,
                             image: {
                                 present: entity.image,
-                                href: entity.imageLink.href
+                                href: entity._image
                             },
                             submit: function (file) {
                                 var fd = new FormData();
                                 fd.append('file', file);
                                 return ot.call($http.post(
-                                    entity.imageLink.href,
+                                    entity._image,
                                     fd, {
                                         transformRequest: angular.identity,
                                         headers: {'Content-Type': undefined}
