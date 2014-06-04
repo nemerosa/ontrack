@@ -17,7 +17,7 @@ angular.module('ot.view.validationStamp', [
 
         // Loading the promotion level
         function loadValidationStamp() {
-            ot.call($http.get('structure/validationStamps/' + validationStampId)).then(function (validationStamp) {
+            otStructureService.getValidationStamp(validationStampId).then(function (validationStamp) {
                 $scope.validationStamp = validationStamp;
                 // View title
                 view.title = $scope.validationStamp.name;

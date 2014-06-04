@@ -56,6 +56,13 @@ angular.module('ot.service.structure', [
         };
 
         /**
+         * Getting a validation stamp
+         */
+        self.getValidationStamp = function (id) {
+            return ot.call($http.get('structure/validationStamps/' + id));
+        };
+
+        /**
          * Creating a build
          */
         self.createBuild = function (uri) {
