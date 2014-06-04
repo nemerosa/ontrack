@@ -6,7 +6,7 @@
             <!-- Place holder for builds & promotions -->
         </th>
         <!-- All validation stamps -->
-        <th ng-repeat="validationStamp in validationStamps">
+        <th ng-repeat="validationStamp in validationStamps" class="ot-branch-build-view-validation">
             <ot-entity-image entity="validationStamp" link="#/validationStamp/{{validationStamp.id}}"></ot-entity-image>
         </th>
     </tr>
@@ -40,7 +40,12 @@
                 <span ng-if="!$last" class="ot-promotion-run-separator"></span>
             </span>
         </td>
-        <!-- TODO Validation runs -->
+        <!-- Validation runs -->
+        <td ng-repeat="validationStampRunView in buildView.validationStampRunViews" class="ot-branch-build-view-validation">
+            <!-- Not run -->
+            <span ng-if="!validationStampRunView.run"><ot-validation-run-status-none></ot-validation-run-status-none></span>
+            <!-- Last status -->
+        </td>
     </tr>
     </tbody>
     <tfoot>

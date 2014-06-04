@@ -21,6 +21,12 @@ angular.module('ot.directive.entity', [
             }
         };
     })
+    .directive('otValidationRunStatusNone', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'app/directive/directive.validationRunStatusNone.tpl.html'
+        };
+    })
     .directive('otSignature', function () {
         return {
             restrict: 'E',
