@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.model.structure;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.security.AuthorizationPolicy;
 
 import java.util.Optional;
 
@@ -41,6 +42,29 @@ public interface PropertyType<T> {
      * This path is relative to the Web root and is merged with the property raw value.
      */
     String getFullTemplatePath();
+
+    /**
+     * Does this property apply to the given entity type?
+     */
+    boolean applies(Class<? extends Entity> entityClass);
+
+    /**
+     * Can this property be directly edited by a used on the given
+     * associated entity.
+     *
+     * @param entity Entity where to edit the property
+     * @return Authorization policy for this entity
+     */
+    AuthorizationPolicy getEditingAuthorizationPolicy(Entity entity);
+
+    /**
+     * Defines the authorization policy for viewing this property.
+     */
+    AuthorizationPolicy getViewingAuthorizationPolicy(Entity entity);
+
+    /**
+     * TODO Obfuscates any sensitive value from the property value before it is sent at client side.
+     */
 
     /**
      * Form to create/update this property.
