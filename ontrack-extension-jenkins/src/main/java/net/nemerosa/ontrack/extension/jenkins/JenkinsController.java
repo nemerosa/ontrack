@@ -33,6 +33,7 @@ public class JenkinsController extends AbstractExtensionController<JenkinsExtens
     @Override
     @RequestMapping(value = "", method = RequestMethod.GET)
     public Resource<ExtensionFeatureDescription> getDescription() {
+        // TODO ExtensionFeatureDescription must be decorated according to the Jenkins controller
         return Resource.of(
                 feature.getFeatureDescription(),
                 uri(MvcUriComponentsBuilder.on(getClass()).getDescription())
@@ -66,16 +67,16 @@ public class JenkinsController extends AbstractExtensionController<JenkinsExtens
      * Creating a configuration
      */
     @RequestMapping(value = "configurations/create", method = RequestMethod.POST)
-    public Resource<JenkinsConfiguration> newConfiguration(@RequestBody JenkinsConfiguration configuration) {
-        return toConfigurationResource(jenkinsService.newConfiguration(configuration));
+    public JenkinsConfiguration newConfiguration(@RequestBody JenkinsConfiguration configuration) {
+        return jenkinsService.newConfiguration(configuration);
     }
 
     /**
      * Gets one configuration
      */
     @RequestMapping(value = "configurations/{name}", method = RequestMethod.GET)
-    public Resource<JenkinsConfiguration> getConfiguration(@PathVariable String name) {
-        return toConfigurationResource(jenkinsService.getConfiguration(name));
+    public JenkinsConfiguration getConfiguration(@PathVariable String name) {
+        return jenkinsService.getConfiguration(name);
     }
 
     /**
@@ -100,21 +101,9 @@ public class JenkinsController extends AbstractExtensionController<JenkinsExtens
      * Updating one configuration
      */
     @RequestMapping(value = "configurations/{name}/update", method = RequestMethod.PUT)
-    public Resource<JenkinsConfiguration> updateConfiguration(@PathVariable String name, @RequestBody JenkinsConfiguration configuration) {
+    public JenkinsConfiguration updateConfiguration(@PathVariable String name, @RequestBody JenkinsConfiguration configuration) {
         jenkinsService.updateConfiguration(name, configuration);
         return getConfiguration(name);
-    }
-
-    // Resource assemblers
-
-    private Resource<JenkinsConfiguration> toConfigurationResource(JenkinsConfiguration configuration) {
-        return Resource.of(
-                configuration.obfuscate(),
-                uri(on(getClass()).getConfiguration(configuration.getName()))
-        )
-                .with(Link.UPDATE, uri(on(getClass()).updateConfigurationForm(configuration.getName())))
-                .with(Link.DELETE, uri(on(getClass()).deleteConfiguration(configuration.getName())))
-                ;
     }
 
 }
