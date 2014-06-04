@@ -14,7 +14,8 @@ public class CoreResourceModule extends AbstractResourceModule {
                 new ProjectResourceDecorator(),
                 new BranchResourceDecorator(),
                 new PromotionLevelResourceDecorator(),
-                new ValidationStampResourceDecorator()
+                new ValidationStampResourceDecorator(),
+                new BuildResourceDecorator()
         );
     }
 }

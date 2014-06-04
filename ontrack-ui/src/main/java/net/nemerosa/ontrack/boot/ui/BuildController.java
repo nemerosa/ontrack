@@ -3,9 +3,7 @@ package net.nemerosa.ontrack.boot.ui;
 import net.nemerosa.ontrack.model.form.DateTime;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Selection;
-import net.nemerosa.ontrack.model.security.PromotionRunCreate;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.security.ValidationRunCreate;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.Time;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
@@ -44,7 +42,7 @@ public class BuildController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "branches/{branchId}/builds/create", method = RequestMethod.POST)
-    public Resource<Build> newBuild(@PathVariable ID branchId, @RequestBody NameDescription nameDescription) {
+    public Build newBuild(@PathVariable ID branchId, @RequestBody NameDescription nameDescription) {
         // Gets the holding branch
         Branch branch = structureService.getBranch(branchId);
         // Build signature
@@ -52,16 +50,12 @@ public class BuildController extends AbstractResourceController {
         // Creates a new build
         Build build = Build.of(branch, nameDescription, signature);
         // Saves it into the repository
-        build = structureService.newBuild(build);
-        // OK
-        return toBuildResource(build);
+        return structureService.newBuild(build);
     }
 
     @RequestMapping(value = "builds/{buildId}", method = RequestMethod.GET)
-    public Resource<Build> getBuild(@PathVariable ID buildId) {
-        return toBuildResourceWithActions(
-                structureService.getBuild(buildId)
-        );
+    public Build getBuild(@PathVariable ID buildId) {
+        return structureService.getBuild(buildId);
     }
 
     // Promoted runs
@@ -121,35 +115,6 @@ public class BuildController extends AbstractResourceController {
     }
 
     // Validation runs
-
-    private Resource<Build> toBuildResource(Build build) {
-        return Resource.of(
-                build,
-                uri(on(getClass()).getBuild(build.getId()))
-        )
-                .with("lastPromotionRuns", uri(on(getClass()).getLastPromotionRuns(build.getId())))
-                .with("validationRuns", uri(on(ValidationRunController.class).getValidationRuns(build.getId())))
-                .with("validationStampRunViews", uri(on(ValidationRunController.class).getValidationStampRunViews(build.getId())));
-    }
-
-    private Resource<Build> toBuildResourceWithActions(Build build) {
-        return toBuildResource(build)
-                // Creation of a promoted run
-                .with(
-                        "promote",
-                        uri(on(BuildController.class).newPromotionRunForm(build.getId())),
-                        securityService.isProjectFunctionGranted(build.getBranch().getProject().id(), PromotionRunCreate.class)
-                )
-                        // Creation of a validation run
-                .with(
-                        "validate",
-                        uri(on(ValidationRunController.class).newValidationRunForm(build.getId())),
-                        securityService.isProjectFunctionGranted(build.getBranch().getProject().id(), ValidationRunCreate.class)
-                )
-                ;
-        // TODO Update
-        // TODO Delete
-    }
 
     private Resource<PromotionRun> toPromotionRunResource(PromotionRun promotionRun) {
         return Resource.of(
