@@ -33,6 +33,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     @Override
     @RequestMapping(value = "", method = RequestMethod.GET)
     public Resource<ExtensionFeatureDescription> getDescription() {
+        // TODO ExtensionFeatureDescription must be decorated according to the Jenkins controller
         return Resource.of(
                 feature.getFeatureDescription(),
                 uri(MvcUriComponentsBuilder.on(getClass()).getDescription())
@@ -47,7 +48,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     @RequestMapping(value = "configurations", method = RequestMethod.GET)
     public Resources<SVNConfiguration> getConfigurations() {
         return Resources.of(
-                svnConfigurationService.getConfigurations().stream().map(SVNConfiguration::obfuscate),
+                svnConfigurationService.getConfigurations(),
                 uri(on(getClass()).getConfigurations())
         )
                 .with(Link.CREATE, uri(on(getClass()).getConfigurationForm()))
@@ -66,16 +67,16 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
      * Creating a configuration
      */
     @RequestMapping(value = "configurations/create", method = RequestMethod.POST)
-    public Resource<SVNConfiguration> newConfiguration(@RequestBody SVNConfiguration configuration) {
-        return toConfigurationResource(svnConfigurationService.newConfiguration(configuration));
+    public SVNConfiguration newConfiguration(@RequestBody SVNConfiguration configuration) {
+        return svnConfigurationService.newConfiguration(configuration);
     }
 
     /**
      * Gets one configuration
      */
     @RequestMapping(value = "configurations/{name}", method = RequestMethod.GET)
-    public Resource<SVNConfiguration> getConfiguration(@PathVariable String name) {
-        return toConfigurationResource(svnConfigurationService.getConfiguration(name));
+    public SVNConfiguration getConfiguration(@PathVariable String name) {
+        return svnConfigurationService.getConfiguration(name);
     }
 
     /**
@@ -100,21 +101,9 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
      * Updating one configuration
      */
     @RequestMapping(value = "configurations/{name}/update", method = RequestMethod.PUT)
-    public Resource<SVNConfiguration> updateConfiguration(@PathVariable String name, @RequestBody SVNConfiguration configuration) {
+    public SVNConfiguration updateConfiguration(@PathVariable String name, @RequestBody SVNConfiguration configuration) {
         svnConfigurationService.updateConfiguration(name, configuration);
         return getConfiguration(name);
-    }
-
-    // Resource assemblers
-
-    private Resource<SVNConfiguration> toConfigurationResource(SVNConfiguration configuration) {
-        return Resource.of(
-                configuration.obfuscate(),
-                uri(on(getClass()).getConfiguration(configuration.getName()))
-        )
-                .with(Link.UPDATE, uri(on(getClass()).updateConfigurationForm(configuration.getName())))
-                .with(Link.DELETE, uri(on(getClass()).deleteConfiguration(configuration.getName())))
-                ;
     }
 
 }
