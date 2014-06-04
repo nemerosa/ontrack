@@ -11,10 +11,19 @@ import org.apache.commons.lang3.Validate;
 import java.beans.ConstructorProperties;
 import java.net.URI;
 
+/**
+ * The resource wrapper class might be used for UI return types whenever:
+ * <ul>
+ * <li>a model object is not applicable, when describing an API for example</li>
+ * <li>the links cannot be derived from the model object because the resource
+ * maybe served by different controllers</li>
+ * </ul>
+ *
+ * @param <T> Type of data to wrap into the resource
+ */
 @EqualsAndHashCode(callSuper = false)
 @Data
 @JsonPropertyOrder(alphabetic = true)
-@Deprecated
 public class Resource<T> extends LinkContainer<Resource<T>> implements ViewSupplier {
 
     @JsonUnwrapped
