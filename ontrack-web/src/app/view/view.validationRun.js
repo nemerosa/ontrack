@@ -17,7 +17,7 @@ angular.module('ot.view.validationRun', [
 
         // Loads the validation stamp for the run
         function loadValidationStamp() {
-            ot.call($http.get($scope.validationRun.validationStampLink.href)).then(function (validationStampResource) {
+            ot.call($http.get($scope.validationRun._validationStampLink)).then(function (validationStampResource) {
                 $scope.validationStamp = validationStampResource;
             });
         }
@@ -43,7 +43,7 @@ angular.module('ot.view.validationRun', [
         // Changing the validation run status
         $scope.validationRunStatusChange = function () {
             otStructureService.create(
-                $scope.validationRun.validationRunStatusChange.href,
+                $scope.validationRun._validationRunStatusChange,
                 'Status').then(loadValidationRun);
         };
 

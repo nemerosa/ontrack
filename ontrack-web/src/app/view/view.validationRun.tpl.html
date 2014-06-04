@@ -19,10 +19,10 @@
                 <ot-signature value="validationRunStatus.signature" user="true" time="true"></ot-signature>
             </td>
             <td>
-                <button ng-if="validationRun.validationRunStatusChange && $first"
+                <button ng-if="validationRun._validationRunStatusChange && $first"
                         ng-click="validationRunStatusChange()"
                         class="btn btn-info pull-right">Change status</button>
-                <button ng-if="!validationRun.validationRunStatusChange && $first"
+                <button ng-if="!validationRun._validationRunStatusChange && $first"
                         disabled="disabled"
                         class="btn btn-default pull-right">Status change not possible</button>
             </td>
