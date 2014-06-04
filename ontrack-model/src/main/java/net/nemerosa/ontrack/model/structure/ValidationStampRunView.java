@@ -22,4 +22,27 @@ public class ValidationStampRunView implements View {
         return !validationRun.isEmpty();
     }
 
+    /**
+     * Gets the last validation run.
+     */
+    public ValidationRun getLastRun() {
+        if (validationRun.isEmpty()) {
+            return null;
+        } else {
+            return validationRun.get(validationRun.size() - 1);
+        }
+    }
+
+    /**
+     * Gets the last status of the last run, or <code>null</code> if no run has been performed.
+     */
+    public ValidationRunStatus getLastStatus() {
+        ValidationRun run = getLastRun();
+        if (run == null) {
+            return null;
+        } else {
+            return run.getLastStatus();
+        }
+    }
+
 }

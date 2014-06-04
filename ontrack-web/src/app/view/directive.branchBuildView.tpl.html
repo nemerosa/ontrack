@@ -45,6 +45,11 @@
             <!-- Not run -->
             <span ng-if="!validationStampRunView.run"><ot-validation-run-status-none></ot-validation-run-status-none></span>
             <!-- Last status -->
+            <span ng-if="validationStampRunView.run">
+                <a href="#/validationRun/{{validationStampRunView.lastRun.id}}">
+                    <ot-validation-run-status status="validationStampRunView.lastStatus"></ot-validation-run-status>
+                </a>
+            </span>
         </td>
     </tr>
     </tbody>
