@@ -1,12 +1,15 @@
 package net.nemerosa.ontrack.model.structure;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
  * Property value, associated with its type.
  */
 @Data
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class Property<T> {
 
     /**
@@ -27,4 +30,7 @@ public class Property<T> {
         return PropertyTypeDescriptor.of(type);
     }
 
+    public static <T> Property<T> of(PropertyType<T> type, T value) {
+        return new Property<>(type, value);
+    }
 }

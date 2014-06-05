@@ -8,6 +8,8 @@ import net.nemerosa.ontrack.repository.PropertyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,10 +29,14 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     public List<PropertyType<?>> getPropertyTypes() {
-        return extensionManager.getExtensions(PropertyTypeExtension.class)
-                .stream()
-                .map(PropertyTypeExtension::getPropertyType)
-                .collect(Collectors.toList());
+        Collection<PropertyTypeExtension> extensions = extensionManager.getExtensions(PropertyTypeExtension.class);
+        List<PropertyType<?>> propertyTypes = new ArrayList<>();
+        for (PropertyTypeExtension extension : extensions) {
+            propertyTypes.add(
+                    extension.getPropertyType()
+            );
+        }
+        return propertyTypes;
     }
 
     @Override
