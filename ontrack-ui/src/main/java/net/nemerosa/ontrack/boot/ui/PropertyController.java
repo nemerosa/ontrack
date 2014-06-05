@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -41,12 +43,21 @@ public class PropertyController extends AbstractResourceController {
      * @return List of properties
      */
     @RequestMapping(value = "{entityType}/{id}/view", method = RequestMethod.GET)
-    public Resources<Property<?>> getProperties(@PathVariable ProjectEntityType entityType, @PathVariable ID id) {
+    public Resources<Resource<Property<?>>> getProperties(@PathVariable ProjectEntityType entityType, @PathVariable ID id) {
         ProjectEntity entity = getEntity(entityType, id);
+        List<Property<?>> properties = propertyService.getProperties(entity);
+        List<Resource<Property<?>>> resources = new ArrayList<>();
+        for (Property<?> property : properties) {
+            Resource<Property<?>> resource = Resource.of(
+                    property,
+                    uri(on(getClass()).getPropertyValue(entity.getProjectEntityType(), entity.getId(), property.getType().getClass().getName()))
+            );
+            // TODO Obfuscation of sensitive data
+            // TODO Resource: link: update
+            resources.add(resource);
+        }
         return Resources.of(
-                // TODO Obfuscation of sensitive data
-                // TODO Resource: link: update
-                propertyService.getProperties(entity),
+                resources,
                 uri(on(getClass()).getProperties(entityType, id))
         );
     }
@@ -68,6 +79,26 @@ public class PropertyController extends AbstractResourceController {
                         .map(p -> toEditablePropertyResource(p, entity))
                         .collect(Collectors.toList()),
                 uri(on(getClass()).getEditableProperties(entityType, id))
+        );
+    }
+
+    /**
+     * Gets the value for a given property for an entity. If the property is not set, a non-null
+     * {@link net.nemerosa.ontrack.model.structure.Property} is returned but is marked as
+     * {@linkplain net.nemerosa.ontrack.model.structure.Property#isEmpty() empty}.
+     * If the property is not opened for viewing, the call could be rejected with an
+     * authorization exception.
+     *
+     * @param entityType       Type of the entity to get the edition form for
+     * @param id               ID of the entity to get the edition form for
+     * @param propertyTypeName Fully qualified name of the property to get the form for
+     * @return A response that defines the property
+     */
+    @RequestMapping(value = "{entityType}/{id}/{propertyTypeName}/view", method = RequestMethod.GET)
+    public Resource<Property<?>> getPropertyValue(@PathVariable ProjectEntityType entityType, @PathVariable ID id, @PathVariable String propertyTypeName) {
+        return Resource.of(
+                propertyService.getProperty(getEntity(entityType, id), propertyTypeName),
+                uri(on(getClass()).getPropertyValue(entityType, id, propertyTypeName))
         );
     }
 

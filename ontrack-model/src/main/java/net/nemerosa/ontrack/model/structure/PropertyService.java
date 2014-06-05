@@ -40,4 +40,17 @@ public interface PropertyService {
      * @return An edition form to be used by the client
      */
     Form getPropertyEditionForm(ProjectEntity entity, String propertyTypeName);
+
+    /**
+     * Gets the value for a given property for an entity. If the property is not set, a non-null
+     * {@link net.nemerosa.ontrack.model.structure.Property} is returned but is marked as
+     * {@linkplain net.nemerosa.ontrack.model.structure.Property#isEmpty() empty}.
+     * If the property is not opened for viewing, the call could be rejected with an
+     * authorization exception.
+     *
+     * @param entity           Entity to get the edition form for
+     * @param propertyTypeName Fully qualified name of the property to get the form for
+     * @return A response that defines the property
+     */
+    <T> Property<T> getProperty(ProjectEntity entity, String propertyTypeName);
 }

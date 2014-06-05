@@ -62,19 +62,31 @@ public class PropertyServiceImpl implements PropertyService {
                         // ... filters them by access right
                 .filter(type -> type.canView(entity, securityService))
                         // ... loads them from the store
-                .map(type -> loadProperty(type, entity))
+                .map(type -> getProperty(type, entity))
                         // ... removes the null values
                 .filter(prop -> prop != null)
                         // ... and returns them
                 .collect(Collectors.toList());
     }
 
-    protected <T> Property<T> loadProperty(PropertyType<T> type, ProjectEntity entity) {
+    @Override
+    public <T> Property<T> getProperty(ProjectEntity entity, String propertyTypeName) {
+        // Gets the property using its fully qualified type name
+        PropertyType<T> propertyType = getPropertyTypeByName(propertyTypeName);
+        // Access
+        return getProperty(propertyType, entity);
+    }
+
+    protected <T> Property<T> getProperty(PropertyType<T> type, ProjectEntity entity) {
         T value = getPropertyValue(type, entity);
         return value != null ? Property.of(type, value) : null;
     }
 
     protected <T> T getPropertyValue(PropertyType<T> type, ProjectEntity entity) {
+        // Checks for edition
+        if (!type.canView(entity, securityService)) {
+            throw new AccessDeniedException("Property is not opened for viewing.");
+        }
         // Gets the raw information from the repository
         TProperty t = propertyRepository.loadProperty(
                 type.getClass().getName(),

@@ -30,6 +30,17 @@ public class Property<T> {
         return PropertyTypeDescriptor.of(type);
     }
 
+    /**
+     * Empty indicator
+     */
+    public boolean isEmpty() {
+        return value == null;
+    }
+
+    public static <T> Property<T> empty(PropertyType<T> type) {
+        return new Property<>(type, null);
+    }
+
     public static <T> Property<T> of(PropertyType<T> type, T value) {
         return new Property<>(type, value);
     }
