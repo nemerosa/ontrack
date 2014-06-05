@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.ProjectCreation;
 import net.nemerosa.ontrack.model.security.ProjectView;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class PropertyControllerTest extends AbstractWebTestSupport {
         ));
         Entity.isEntityDefined(project, "Project is defined");
         // Gets the editable properties for this project
-        Resources<PropertyTypeDescriptor> properties = asUser().with(project.id(), ProjectConfig.class).call(() ->
+        Resources<Resource<PropertyTypeDescriptor>> properties = asUser().with(project.id(), ProjectConfig.class).call(() ->
                         controller.getEditableProperties(ProjectEntityType.PROJECT, project.getId())
         );
         // Checks there is at least the Jenkins Job property
@@ -39,6 +40,7 @@ public class PropertyControllerTest extends AbstractWebTestSupport {
         assertTrue(
                 "At least the Jenkins Job property should have been found",
                 properties.getResources().stream()
+                        .map(Resource::getData)
                         .filter(p -> "Jenkins Job".equals(p.getName()))
                         .findFirst().isPresent()
         );
@@ -54,7 +56,7 @@ public class PropertyControllerTest extends AbstractWebTestSupport {
         ));
         Entity.isEntityDefined(project, "Project is defined");
         // Gets the editable properties for this project
-        Resources<PropertyTypeDescriptor> properties = asUser().with(project.id(), ProjectView.class).call(() ->
+        Resources<Resource<PropertyTypeDescriptor>> properties = asUser().with(project.id(), ProjectView.class).call(() ->
                         controller.getEditableProperties(ProjectEntityType.PROJECT, project.getId())
         );
         // Checks there is at least the Jenkins Job property
@@ -62,6 +64,7 @@ public class PropertyControllerTest extends AbstractWebTestSupport {
         assertFalse(
                 "The Jenkins Job property should not have been found since the user is not authorized",
                 properties.getResources().stream()
+                        .map(Resource::getData)
                         .filter(p -> "Jenkins Job".equals(p.getName()))
                         .findFirst().isPresent()
         );
