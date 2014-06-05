@@ -15,6 +15,10 @@ angular.module('ot.directive.properties', [
                         // Loading the editable properties
                         ot.call($http.get(scope.entity._editableProperties)).then(function (propertyTypeDescriptors) {
                             scope.propertyTypeDescriptors = propertyTypeDescriptors;
+                            // Edition of properties
+                            scope.editProperties = function () {
+                                alert('Editing the properties');
+                            };
                         });
                     }
                 });
