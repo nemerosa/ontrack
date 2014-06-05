@@ -3,10 +3,9 @@ package net.nemerosa.ontrack.boot.ui;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.ProjectCreation;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.ui.resource.Resources;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -32,14 +31,14 @@ public class PropertyControllerTest extends AbstractWebTestSupport {
         ));
         Entity.isEntityDefined(project, "Project is defined");
         // Gets the editable properties for this project
-        List<PropertyTypeDescriptor> properties = asUser().with(project.id(), ProjectConfig.class).call(() ->
+        Resources<PropertyTypeDescriptor> properties = asUser().with(project.id(), ProjectConfig.class).call(() ->
                         controller.getEditableProperties(ProjectEntityType.PROJECT, project.getId())
         );
         // Checks there is at least the Jenkins Job property
         assertNotNull("Editable properties should not be null", properties);
         assertTrue(
                 "At least the Jenkins Job property should have been found",
-                properties.stream()
+                properties.getResources().stream()
                         .filter(p -> "Jenkins Job".equals(p.getName()))
                         .findFirst().isPresent()
         );
