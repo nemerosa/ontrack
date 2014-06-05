@@ -30,6 +30,7 @@ public class ResourceAccountTest {
                                 .with("role", "ADMINISTRATOR")
                                 .end())
                         .with("actions", array().end())
+                        .with("logged", true)
                         .end(),
                 Resource.of(
                         ConnectedAccount.of(
@@ -50,6 +51,7 @@ public class ResourceAccountTest {
                         .with("_self", "urn:user")
                         .with("account", (String) null)
                         .with("actions", array().end())
+                        .with("logged", false)
                         .end(),
                 Resource.of(
                         ConnectedAccount.none(),
