@@ -41,7 +41,22 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     public List<Property<?>> getProperties(ProjectEntity entity) {
-        // FIXME Method net.nemerosa.ontrack.service.PropertyServiceImpl.getProperties
+        // With all the existing properties...
+        return getPropertyTypes().stream()
+                // ... filters them by entity
+                .filter(type -> type.applies(entity.getClass()))
+                        // ... filters them by access right
+                .filter(type -> type.canView(entity, securityService))
+                        // ... loads them from the store
+                .map(type -> loadProperty(type, entity))
+                        // ... removes the null values
+                .filter(prop -> prop != null)
+                        // ... and returns them
+                .collect(Collectors.toList());
+    }
+
+    protected <T> Property<T> loadProperty(PropertyType<T> type, ProjectEntity entity) {
+        // FIXME Method net.nemerosa.ontrack.service.PropertyServiceImpl.loadProperty
         return null;
     }
 

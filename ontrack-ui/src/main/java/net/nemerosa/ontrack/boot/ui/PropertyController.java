@@ -27,6 +27,19 @@ public class PropertyController extends AbstractResourceController {
     }
 
     /**
+     * Gets the list of properties for a given entity and for the current user.
+     *
+     * @param entityType Entity type
+     * @param id         Entity ID
+     * @return List of properties
+     */
+    @RequestMapping(value = "{entityType}/{id}/view", method = RequestMethod.GET)
+    public List<Property<?>> getProperties(@PathVariable PropertyEntity entityType, @PathVariable ID id) {
+        ProjectEntity entity = getEntity(entityType, id);
+        return propertyService.getProperties(entity);
+    }
+
+    /**
      * Gets the list of editable properties for a given entity and for the current user.
      *
      * @param entityType Entity type
