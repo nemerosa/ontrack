@@ -2,12 +2,14 @@ package net.nemerosa.ontrack.extension.support.configurations;
 
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.support.Configuration;
+import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class AbstractConfigurationService<T extends UserPasswordConfiguration<T>> implements ConfigurationService<T> {
 
@@ -32,6 +34,15 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
     public List<T> getConfigurations() {
         checkAccess();
         return configurationRepository.list(configurationClass);
+    }
+
+    @Override
+    public List<ConfigurationDescriptor> getConfigurationDescriptors() {
+        return securityService.runAsAdmin(
+                () -> getConfigurations().stream()
+                        .map(Configuration::getDescriptor)
+                        .collect(Collectors.toList())
+        ).get();
     }
 
     @Override

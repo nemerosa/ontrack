@@ -1,10 +1,14 @@
 package net.nemerosa.ontrack.extension.support.configurations;
 
+import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
+
 import java.util.List;
 
 public interface ConfigurationService<T extends UserPasswordConfiguration> {
 
     List<T> getConfigurations();
+
+    List<ConfigurationDescriptor> getConfigurationDescriptors();
 
     T newConfiguration(T configuration);
 

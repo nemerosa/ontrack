@@ -1,12 +1,14 @@
 package net.nemerosa.ontrack.service.security;
 
 import net.nemerosa.ontrack.model.security.ProjectConfig;
+import net.nemerosa.ontrack.model.security.ProjectCreation;
 import net.nemerosa.ontrack.model.security.ProjectEdit;
 import net.nemerosa.ontrack.model.security.ProjectView;
 import net.nemerosa.ontrack.model.settings.SecuritySettings;
 import net.nemerosa.ontrack.service.support.SettingsInternalService;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.security.access.AccessDeniedException;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -82,6 +84,21 @@ public class SecurityServiceUnitTest {
                 "Project view is granted for anonymous users when set explicitely",
                 securityService.isProjectFunctionGranted(1, ProjectView.class)
         );
+    }
+
+    protected boolean protectedCall() {
+        securityService.checkGlobalFunction(ProjectCreation.class);
+        return true;
+    }
+
+    @Test(expected = AccessDeniedException.class)
+    public void run_as_admin_not_applied() {
+        protectedCall();
+    }
+
+    @Test
+    public void run_as_admin() {
+        assertTrue(securityService.runAsAdmin(this::protectedCall).get());
     }
 
 }

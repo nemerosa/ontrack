@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.support.configurations.UserPasswordConfigu
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Password;
 import net.nemerosa.ontrack.model.form.Text;
+import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 
 import static net.nemerosa.ontrack.model.form.Form.defaultText;
 
@@ -50,5 +51,10 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
                 user,
                 password
         );
+    }
+
+    @Override
+    public ConfigurationDescriptor getDescriptor() {
+        return new ConfigurationDescriptor(name, name);
     }
 }

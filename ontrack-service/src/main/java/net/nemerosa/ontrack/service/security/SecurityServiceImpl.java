@@ -9,7 +9,10 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.stereotype.Component;
+
+import java.util.function.Supplier;
 
 import static java.lang.String.format;
 
@@ -77,5 +80,38 @@ public class SecurityServiceImpl implements SecurityService {
         } else {
             return Signature.none();
         }
+    }
+
+    @Override
+    public <T> Supplier<T> runAsAdmin(Supplier<T> supplier) {
+        // Gets the current account (if any)
+        Account account = getCurrentAccount();
+        // Creates a temporary admin context
+        SecurityContextImpl adminContext = new SecurityContextImpl();
+        adminContext.setAuthentication(new RunAsAdminAuthentication(account));
+        // Returns a callable that sets the context before running the target callable
+        return withSecurityContext(supplier, adminContext);
+    }
+
+    @Override
+    public <T> Supplier<T> runner(Supplier<T> supplier) {
+        // Current context
+        SecurityContext context = SecurityContextHolder.getContext();
+        // Uses it
+        return withSecurityContext(supplier, context);
+    }
+
+    protected <T> Supplier<T> withSecurityContext(final Supplier<T> supplier, final SecurityContext context) {
+        // Returns a callable that sets the context before running the target callable
+        return () -> {
+            SecurityContext oldContext = SecurityContextHolder.getContext();
+            try {
+                SecurityContextHolder.setContext(context);
+                // Result
+                return supplier.get();
+            } finally {
+                SecurityContextHolder.setContext(oldContext);
+            }
+        };
     }
 }
