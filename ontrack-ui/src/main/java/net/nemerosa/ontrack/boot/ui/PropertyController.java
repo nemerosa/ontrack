@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.boot.ui;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
+import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
 import java.util.stream.Collectors;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -43,6 +45,7 @@ public class PropertyController extends AbstractResourceController {
         ProjectEntity entity = getEntity(entityType, id);
         return Resources.of(
                 // TODO Obfuscation of sensitive data
+                // TODO Resource: link: update
                 propertyService.getProperties(entity),
                 uri(on(getClass()).getProperties(entityType, id))
         );
@@ -87,10 +90,12 @@ public class PropertyController extends AbstractResourceController {
     }
 
     protected Resource<PropertyTypeDescriptor> toEditablePropertyResource(PropertyTypeDescriptor propertyTypeDescriptor, ProjectEntity entity) {
+        URI updateURI = uri(on(getClass()).getPropertyEditionForm(entity.getProjectEntityType(), entity.getId(), propertyTypeDescriptor.getTypeName()));
         return Resource.of(
                 propertyTypeDescriptor,
-                uri(on(getClass()).getPropertyEditionForm(entity.getProjectEntityType(), entity.getId(), propertyTypeDescriptor.getTypeName()))
-        );
+                // Same link than the update
+                updateURI
+        ).with(Link.UPDATE, updateURI);
     }
 
     protected ProjectEntity getEntity(ProjectEntityType entityType, ID id) {
