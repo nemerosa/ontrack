@@ -20,7 +20,7 @@ public abstract class AbstractPropertyType<T> implements PropertyType<T> {
 
     @Override
     public JsonNode forStorage(T value) {
-        return mapper.valueToTree(value);
+        return format(value);
     }
 
     protected abstract void validate(T value);
@@ -31,5 +31,9 @@ public abstract class AbstractPropertyType<T> implements PropertyType<T> {
         } catch (JsonProcessingException e) {
             throw new PropertyTypeStorageReadException(type, e);
         }
+    }
+
+    protected static JsonNode format(Object value) {
+        return mapper.valueToTree(value);
     }
 }

@@ -21,7 +21,7 @@ public interface ProjectEntity extends Entity {
     default int projectId() {
         ID id = getProjectId();
         isTrue(ID.isDefined(id), "Project ID must be defined");
-        return getId().getValue();
+        return id.getValue();
     }
 
 }

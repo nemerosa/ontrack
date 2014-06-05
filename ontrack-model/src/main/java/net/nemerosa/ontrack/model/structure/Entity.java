@@ -25,7 +25,7 @@ public interface Entity {
     default int id() {
         ID id = getId();
         isTrue(ID.isDefined(id), "ID must be defined");
-        return getId().getValue();
+        return id.getValue();
     }
 
 }

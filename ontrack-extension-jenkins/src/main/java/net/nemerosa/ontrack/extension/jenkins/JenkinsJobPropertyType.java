@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.jenkins;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.common.MapBuilder;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -12,6 +13,12 @@ import net.nemerosa.ontrack.model.structure.ValidationStamp;
 import java.util.Optional;
 
 public class JenkinsJobPropertyType extends AbstractJenkinsPropertyType<JenkinsJobProperty> {
+
+    private final JenkinsConfigurationService configurationService;
+
+    public JenkinsJobPropertyType(JenkinsConfigurationService configurationService) {
+        this.configurationService = configurationService;
+    }
 
     @Override
     public String getName() {
@@ -74,7 +81,23 @@ public class JenkinsJobPropertyType extends AbstractJenkinsPropertyType<JenkinsJ
     }
 
     @Override
+    public JsonNode forStorage(JenkinsJobProperty value) {
+        return format(
+                MapBuilder.params()
+                        .with("configuration", value.getConfiguration().getName())
+                        .with("job", value.getJob())
+                        .get()
+        );
+    }
+
+    @Override
     public JenkinsJobProperty fromStorage(JsonNode node) {
-        return parse(node, JenkinsJobProperty.class);
+        String configurationName = node.path("configuration").asText();
+        String job = node.path("job").asText();
+        JenkinsConfiguration configuration = configurationService.getConfiguration(configurationName);
+        return new JenkinsJobProperty(
+                configuration,
+                job
+        );
     }
 }
