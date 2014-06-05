@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.repository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.exceptions.JsonParsingException;
@@ -102,6 +103,19 @@ public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSuppor
             return objectMapper.writeValueAsString(any);
         } catch (JsonProcessingException e) {
             throw new JsonWritingException(e);
+        }
+    }
+
+    protected JsonNode readJson(ResultSet rs, String column) throws SQLException {
+        String json = rs.getString(column);
+        try {
+            if (StringUtils.isBlank(json)) {
+                return null;
+            } else {
+                return objectMapper.readTree(json);
+            }
+        } catch (IOException ex) {
+            throw new JsonParsingException(json, ex);
         }
     }
 

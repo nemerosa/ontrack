@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.api.PropertyTypeExtension;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.repository.PropertyRepository;
+import net.nemerosa.ontrack.repository.TProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -56,8 +57,19 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     protected <T> Property<T> loadProperty(PropertyType<T> type, ProjectEntity entity) {
-        // FIXME Method net.nemerosa.ontrack.service.PropertyServiceImpl.loadProperty
-        return null;
+        // Gets the raw information from the repository
+        TProperty t = propertyRepository.loadProperty(
+                type.getClass().getName(),
+                entity.getProjectEntityType(),
+                entity.getId());
+        // If null, returns null
+        if (t == null) {
+            return null;
+        }
+        // Converts the stored value into an actual value
+        T value = type.fromStorage(t.getJson());
+        // OK
+        return Property.of(type, value);
     }
 
     @Override
