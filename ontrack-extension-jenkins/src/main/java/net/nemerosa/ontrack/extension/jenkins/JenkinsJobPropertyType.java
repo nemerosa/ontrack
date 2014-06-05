@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.jenkins;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Project;
@@ -44,16 +45,20 @@ public class JenkinsJobPropertyType extends AbstractJenkinsPropertyType<JenkinsJ
                 || entityClass.isAssignableFrom(ValidationStamp.class);
     }
 
+    /**
+     * Only granted for project configurators.
+     */
     @Override
     public boolean canEdit(ProjectEntity entity, SecurityService securityService) {
-        // FIXME Needs access to the project for the authorizations
-        return false;
+        return securityService.isProjectFunctionGranted(entity.projectId(), ProjectConfig.class);
     }
 
+    /**
+     * Everybody can see the property value.
+     */
     @Override
     public boolean canView(ProjectEntity entity, SecurityService securityService) {
-        // FIXME Needs access to the project for the authorizations
-        return false;
+        return true;
     }
 
     @Override
