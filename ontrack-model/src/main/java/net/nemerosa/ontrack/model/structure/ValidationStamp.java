@@ -8,7 +8,7 @@ import net.nemerosa.ontrack.model.form.Form;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class ValidationStamp implements Entity {
+public class ValidationStamp implements ProjectEntity {
 
     public static ValidationStamp of(Branch branch, NameDescription nameDescription) {
         Entity.isEntityDefined(branch, "Branch must be defined");
@@ -23,6 +23,11 @@ public class ValidationStamp implements Entity {
     private final Branch branch;
     private final User owner;
     private final Boolean image;
+
+    @Override
+    public ID getProjectId() {
+        return getBranch().getProjectId();
+    }
 
     public ValidationStamp withId(ID id) {
         return new ValidationStamp(id, name, description, branch, owner, image);

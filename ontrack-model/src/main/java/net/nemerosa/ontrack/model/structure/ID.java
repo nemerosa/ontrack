@@ -12,8 +12,20 @@ import org.apache.commons.lang3.Validate;
 @JsonSerialize(using = IDJsonSerializer.class)
 public final class ID {
 
+    /**
+     * Undefined ID.
+     * <p/>
+     * Its integer value is <code>0</code> and a call to {@link #isSet()} returns <code>false</code>.
+     */
     public static ID NONE = new ID(0);
 
+    /**
+     * Builds a <i>defined</i> ID. The given <code>value</code> must be an integer greater than 0.
+     *
+     * @param value The concrete ID value
+     * @return A defined ID.
+     * @throws java.lang.IllegalArgumentException If <code>value</code> is less or equal than 0.
+     */
     public static ID of(int value) {
         Validate.isTrue(value > 0, "ID value must be greater than zero.");
         return new ID(value);

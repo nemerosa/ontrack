@@ -4,7 +4,7 @@ import lombok.Data;
 import net.nemerosa.ontrack.model.form.Form;
 
 @Data
-public class Project implements Entity {
+public class Project implements ProjectEntity {
 
     private final ID id;
     private final String name;
@@ -16,6 +16,11 @@ public class Project implements Entity {
 
     public static Project of(NameDescription nameDescription) {
         return new Project(ID.NONE, nameDescription.getName(), nameDescription.getDescription());
+    }
+
+    @Override
+    public ID getProjectId() {
+        return id;
     }
 
     public static Form form() {

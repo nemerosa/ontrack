@@ -8,7 +8,7 @@ import net.nemerosa.ontrack.model.form.Form;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class PromotionLevel implements Entity {
+public class PromotionLevel implements ProjectEntity {
 
     public static PromotionLevel of(Branch branch, NameDescription nameDescription) {
         Entity.isEntityDefined(branch, "Branch must be defined");
@@ -22,6 +22,11 @@ public class PromotionLevel implements Entity {
     @JsonView({PromotionLevel.class, PromotionView.class})
     private final Branch branch;
     private final Boolean image;
+
+    @Override
+    public ID getProjectId() {
+        return getBranch().getProjectId();
+    }
 
     public PromotionLevel withId(ID id) {
         return new PromotionLevel(id, name, description, branch, image);

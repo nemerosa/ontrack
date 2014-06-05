@@ -12,7 +12,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class ValidationRun implements Entity {
+public class ValidationRun implements ProjectEntity {
 
     private final ID id;
     @JsonView({ValidationRun.class})
@@ -35,6 +35,11 @@ public class ValidationRun implements Entity {
                 validationStamp,
                 Collections.unmodifiableList(statuses)
         );
+    }
+
+    @Override
+    public ID getProjectId() {
+        return getBuild().getProjectId();
     }
 
     public static ValidationRun of(

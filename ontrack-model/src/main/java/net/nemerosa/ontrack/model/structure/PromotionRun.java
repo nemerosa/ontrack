@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class PromotionRun implements Entity {
+public class PromotionRun implements ProjectEntity {
 
     private final ID id;
     @JsonView({PromotionRun.class})
@@ -25,6 +25,11 @@ public class PromotionRun implements Entity {
                 signature,
                 description
         );
+    }
+
+    @Override
+    public ID getProjectId() {
+        return getBuild().getProjectId();
     }
 
     public PromotionRun withId(ID id) {

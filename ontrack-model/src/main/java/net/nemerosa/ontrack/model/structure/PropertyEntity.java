@@ -17,13 +17,13 @@ public enum PropertyEntity {
 
     VALIDATION_RUN(StructureService::getValidationRun);
 
-    private final BiFunction<StructureService, ID, Entity> entityFn;
+    private final BiFunction<StructureService, ID, ProjectEntity> entityFn;
 
-    PropertyEntity(BiFunction<StructureService, ID, Entity> entityFn) {
+    PropertyEntity(BiFunction<StructureService, ID, ProjectEntity> entityFn) {
         this.entityFn = entityFn;
     }
 
-    public Function<ID, Entity> getEntityFn(StructureService structureService) {
+    public Function<ID, ProjectEntity> getEntityFn(StructureService structureService) {
         return id -> entityFn.apply(structureService, id);
     }
 }

@@ -5,7 +5,7 @@ import lombok.Data;
 import net.nemerosa.ontrack.model.form.Form;
 
 @Data
-public class Build implements Entity {
+public class Build implements ProjectEntity {
 
     private final ID id;
     private final String name;
@@ -22,6 +22,11 @@ public class Build implements Entity {
                 signature,
                 branch
         );
+    }
+
+    @Override
+    public ID getProjectId() {
+        return getBranch().getProjectId();
     }
 
     public Build withId(ID id) {
