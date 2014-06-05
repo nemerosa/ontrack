@@ -32,6 +32,11 @@ public class PromotionRun implements ProjectEntity {
         return getBuild().getProjectId();
     }
 
+    @Override
+    public ProjectEntityType getProjectEntityType() {
+        return ProjectEntityType.PROMOTION_RUN;
+    }
+
     public PromotionRun withId(ID id) {
         return new PromotionRun(
                 id,

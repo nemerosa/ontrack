@@ -19,6 +19,8 @@ public enum ProjectEntityType {
 
     BUILD(StructureService::getBuild),
 
+    PROMOTION_RUN(StructureService::getPromotionRun),
+
     VALIDATION_RUN(StructureService::getValidationRun);
 
     private final BiFunction<StructureService, ID, ProjectEntity> entityFn;

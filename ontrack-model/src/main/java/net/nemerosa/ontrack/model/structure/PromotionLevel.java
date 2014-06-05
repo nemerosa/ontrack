@@ -28,6 +28,11 @@ public class PromotionLevel implements ProjectEntity {
         return getBranch().getProjectId();
     }
 
+    @Override
+    public ProjectEntityType getProjectEntityType() {
+        return ProjectEntityType.PROMOTION_LEVEL;
+    }
+
     public PromotionLevel withId(ID id) {
         return new PromotionLevel(id, name, description, branch, image);
     }

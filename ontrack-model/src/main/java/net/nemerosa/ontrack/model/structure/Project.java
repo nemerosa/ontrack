@@ -23,6 +23,11 @@ public class Project implements ProjectEntity {
         return id;
     }
 
+    @Override
+    public ProjectEntityType getProjectEntityType() {
+        return ProjectEntityType.PROJECT;
+    }
+
     public static Form form() {
         return Form.nameAndDescription();
     }

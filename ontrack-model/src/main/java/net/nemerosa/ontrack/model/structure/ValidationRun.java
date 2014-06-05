@@ -42,6 +42,11 @@ public class ValidationRun implements ProjectEntity {
         return getBuild().getProjectId();
     }
 
+    @Override
+    public ProjectEntityType getProjectEntityType() {
+        return ProjectEntityType.VALIDATION_RUN;
+    }
+
     public static ValidationRun of(
             Build build,
             ValidationStamp validationStamp,

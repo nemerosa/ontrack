@@ -27,4 +27,10 @@ public interface ProjectEntity extends Entity {
         return id.getValue();
     }
 
+    /**
+     * Gets the type of entity as an enum.
+     */
+    @JsonIgnore
+    ProjectEntityType getProjectEntityType();
+
 }

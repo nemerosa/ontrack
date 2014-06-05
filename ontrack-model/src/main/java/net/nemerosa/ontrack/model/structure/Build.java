@@ -29,6 +29,11 @@ public class Build implements ProjectEntity {
         return getBranch().getProjectId();
     }
 
+    @Override
+    public ProjectEntityType getProjectEntityType() {
+        return ProjectEntityType.BUILD;
+    }
+
     public Build withId(ID id) {
         return new Build(id, name, description, signature, branch);
     }

@@ -30,6 +30,11 @@ public class Branch implements ProjectEntity {
         return getProject().getId();
     }
 
+    @Override
+    public ProjectEntityType getProjectEntityType() {
+        return ProjectEntityType.BRANCH;
+    }
+
     public Branch withId(ID id) {
         return new Branch(id, name, description, project);
     }
