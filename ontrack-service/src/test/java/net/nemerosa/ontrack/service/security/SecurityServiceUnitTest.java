@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service.security;
 
+import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.ProjectEdit;
 import net.nemerosa.ontrack.model.security.ProjectView;
 import net.nemerosa.ontrack.model.settings.SecuritySettings;
@@ -32,7 +33,7 @@ public class SecurityServiceUnitTest {
     }
 
     @Test
-    public void is_global_grant_project_view_granted_to_all_with_project_view() {
+    public void is_global_grant_project_view_granted_to_all_for_project_view() {
         when(settingsInternalService.getSecuritySettings()).thenReturn(
                 SecuritySettings.of().withGrantProjectViewToAll(true)
         );
@@ -40,13 +41,24 @@ public class SecurityServiceUnitTest {
     }
 
     @Test
-    public void is_global_grant_project_view_granted_to_all_with_project_edit() {
+    public void is_global_grant_project_view_granted_to_all_does_not_work_for_project_edit() {
         when(settingsInternalService.getSecuritySettings()).thenReturn(
                 SecuritySettings.of().withGrantProjectViewToAll(true)
         );
-        assertTrue(
-                "Global grant for the project view through the project edit function",
+        assertFalse(
+                "Global grant for the project view does not grant the project edit function",
                 securityService.isGlobalGrant(ProjectEdit.class)
+        );
+    }
+
+    @Test
+    public void is_global_grant_project_view_granted_to_all_does_not_work_for_project_config() {
+        when(settingsInternalService.getSecuritySettings()).thenReturn(
+                SecuritySettings.of().withGrantProjectViewToAll(true)
+        );
+        assertFalse(
+                "Global grant for the project view does not grant the project config function",
+                securityService.isGlobalGrant(ProjectConfig.class)
         );
     }
 

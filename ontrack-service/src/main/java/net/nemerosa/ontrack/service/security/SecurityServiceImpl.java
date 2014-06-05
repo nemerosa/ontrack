@@ -55,7 +55,7 @@ public class SecurityServiceImpl implements SecurityService {
 
     protected boolean isGlobalGrant(Class<? extends ProjectFunction> fn) {
         SecuritySettings settings = settingsInternalService.getSecuritySettings();
-        return settings.isGrantProjectViewToAll() && ProjectView.class.isAssignableFrom(fn);
+        return settings.isGrantProjectViewToAll() && fn.isAssignableFrom(ProjectView.class);
     }
 
     @Override
