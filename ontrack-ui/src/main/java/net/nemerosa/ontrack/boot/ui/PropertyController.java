@@ -12,10 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -42,7 +40,7 @@ public class PropertyController extends AbstractResourceController {
      * @param id         Entity ID
      * @return List of properties
      */
-    @RequestMapping(value = "{entityType}/{id}/view", method = RequestMethod.GET)
+    @RequestMapping(value = "{entityType}/{id}", method = RequestMethod.GET)
     public Resources<Resource<Property<?>>> getProperties(@PathVariable ProjectEntityType entityType, @PathVariable ID id) {
         ProjectEntity entity = getEntity(entityType, id);
         List<Property<?>> properties = propertyService.getProperties(entity);
@@ -53,32 +51,16 @@ public class PropertyController extends AbstractResourceController {
                     uri(on(getClass()).getPropertyValue(entity.getProjectEntityType(), entity.getId(), property.getType().getClass().getName()))
             );
             // TODO Obfuscation of sensitive data
-            // TODO Resource: link: update
+            // Update
+            resource = resource.with(
+                    Link.UPDATE,
+                    uri(on(getClass()).getPropertyEditionForm(entity.getProjectEntityType(), entity.getId(), property.getType().getClass().getName())));
+            // OK
             resources.add(resource);
         }
         return Resources.of(
                 resources,
                 uri(on(getClass()).getProperties(entityType, id))
-        );
-    }
-
-    /**
-     * Gets the list of editable properties for a given entity and for the current user.
-     * <p/>
-     * Each property entry is associated with its link to the form.
-     *
-     * @param entityType Entity type
-     * @param id         Entity ID
-     * @return List of editable properties
-     */
-    @RequestMapping(value = "{entityType}/{id}/editable", method = RequestMethod.GET)
-    public Resources<Resource<PropertyTypeDescriptor>> getEditableProperties(@PathVariable ProjectEntityType entityType, @PathVariable ID id) {
-        ProjectEntity entity = getEntity(entityType, id);
-        return Resources.of(
-                propertyService.getEditableProperties(entity).stream()
-                        .map(p -> toEditablePropertyResource(p, entity))
-                        .collect(Collectors.toList()),
-                uri(on(getClass()).getEditableProperties(entityType, id))
         );
     }
 
@@ -118,15 +100,6 @@ public class PropertyController extends AbstractResourceController {
                 getEntity(entityType, id),
                 propertyTypeName
         );
-    }
-
-    protected Resource<PropertyTypeDescriptor> toEditablePropertyResource(PropertyTypeDescriptor propertyTypeDescriptor, ProjectEntity entity) {
-        URI updateURI = uri(on(getClass()).getPropertyEditionForm(entity.getProjectEntityType(), entity.getId(), propertyTypeDescriptor.getTypeName()));
-        return Resource.of(
-                propertyTypeDescriptor,
-                // Same link than the update
-                updateURI
-        ).with(Link.UPDATE, updateURI);
     }
 
     protected ProjectEntity getEntity(ProjectEntityType entityType, ID id) {

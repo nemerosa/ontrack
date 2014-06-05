@@ -5,7 +5,10 @@ import net.nemerosa.ontrack.extension.api.PropertyTypeExtension;
 import net.nemerosa.ontrack.model.exceptions.PropertyTypeNotFoundException;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.model.structure.ProjectEntity;
+import net.nemerosa.ontrack.model.structure.Property;
+import net.nemerosa.ontrack.model.structure.PropertyService;
+import net.nemerosa.ontrack.model.structure.PropertyType;
 import net.nemerosa.ontrack.repository.PropertyRepository;
 import net.nemerosa.ontrack.repository.TProperty;
 import org.apache.commons.lang3.StringUtils;
@@ -63,8 +66,8 @@ public class PropertyServiceImpl implements PropertyService {
                 .filter(type -> type.canView(entity, securityService))
                         // ... loads them from the store
                 .map(type -> getProperty(type, entity))
-                        // ... removes the null values
-                .filter(prop -> prop != null)
+                        // .. flags with editionrights
+                .map(prop -> prop.editable(prop.getType().canEdit(entity, securityService)))
                         // ... and returns them
                 .collect(Collectors.toList());
     }
@@ -79,7 +82,7 @@ public class PropertyServiceImpl implements PropertyService {
 
     protected <T> Property<T> getProperty(PropertyType<T> type, ProjectEntity entity) {
         T value = getPropertyValue(type, entity);
-        return value != null ? Property.of(type, value) : null;
+        return value != null ? Property.of(type, value) : Property.empty(type);
     }
 
     protected <T> T getPropertyValue(PropertyType<T> type, ProjectEntity entity) {
@@ -98,16 +101,6 @@ public class PropertyServiceImpl implements PropertyService {
         }
         // Converts the stored value into an actual value
         return type.fromStorage(t.getJson());
-    }
-
-    @Override
-    public List<PropertyTypeDescriptor> getEditableProperties(ProjectEntity entity) {
-        //noinspection Convert2MethodRef
-        return getPropertyTypes().stream()
-                .filter(p -> p.applies(entity.getClass()))
-                .filter(p -> p.canEdit(entity, securityService))
-                .map(p -> PropertyTypeDescriptor.of(p))
-                .collect(Collectors.toList());
     }
 
     @Override

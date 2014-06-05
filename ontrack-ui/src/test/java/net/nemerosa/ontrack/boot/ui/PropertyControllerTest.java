@@ -9,6 +9,8 @@ import net.nemerosa.ontrack.ui.resource.Resources;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Optional;
+
 import static org.junit.Assert.*;
 
 /**
@@ -26,24 +28,23 @@ public class PropertyControllerTest extends AbstractWebTestSupport {
      * List of editable properties for a project.
      */
     @Test
-    public void project_properties() throws Exception {
+    public void project_properties_with_edition_allowed() throws Exception {
         Project project = asUser().with(ProjectCreation.class).call(() -> structureService.newProject(
                 Project.of(nameDescription())
         ));
         Entity.isEntityDefined(project, "Project is defined");
-        // Gets the editable properties for this project
-        Resources<Resource<PropertyTypeDescriptor>> properties = asUser().with(project.id(), ProjectConfig.class).call(() ->
-                        controller.getEditableProperties(ProjectEntityType.PROJECT, project.getId())
+        // Gets the properties for this project
+        Resources<Resource<Property<?>>> properties = asUser().with(project.id(), ProjectConfig.class).call(() ->
+                        controller.getProperties(ProjectEntityType.PROJECT, project.getId())
         );
         // Checks there is at least the Jenkins Job property
-        assertNotNull("Editable properties should not be null", properties);
-        assertTrue(
-                "At least the Jenkins Job property should have been found",
-                properties.getResources().stream()
-                        .map(Resource::getData)
-                        .filter(p -> "Jenkins Job".equals(p.getName()))
-                        .findFirst().isPresent()
-        );
+        assertNotNull("Properties should not be null", properties);
+        Optional<Property<?>> property = properties.getResources().stream()
+                .map(Resource::getData)
+                .filter(p -> "Jenkins Job".equals(p.getType().getName()))
+                .findFirst();
+        assertTrue("At least the Jenkins Job property should have been found", property.isPresent());
+        assertTrue("The Jenkins Job property should be editable", property.get().isEditable());
     }
 
     /**
@@ -55,19 +56,18 @@ public class PropertyControllerTest extends AbstractWebTestSupport {
                 Project.of(nameDescription())
         ));
         Entity.isEntityDefined(project, "Project is defined");
-        // Gets the editable properties for this project
-        Resources<Resource<PropertyTypeDescriptor>> properties = asUser().with(project.id(), ProjectView.class).call(() ->
-                        controller.getEditableProperties(ProjectEntityType.PROJECT, project.getId())
+        // Gets the properties for this project
+        Resources<Resource<Property<?>>> properties = asUser().with(project.id(), ProjectView.class).call(() ->
+                        controller.getProperties(ProjectEntityType.PROJECT, project.getId())
         );
         // Checks there is at least the Jenkins Job property
-        assertNotNull("Editable properties should not be null", properties);
-        assertFalse(
-                "The Jenkins Job property should not have been found since the user is not authorized",
-                properties.getResources().stream()
-                        .map(Resource::getData)
-                        .filter(p -> "Jenkins Job".equals(p.getName()))
-                        .findFirst().isPresent()
-        );
+        assertNotNull("Properties should not be null", properties);
+        Optional<Property<?>> property = properties.getResources().stream()
+                .map(Resource::getData)
+                .filter(p -> "Jenkins Job".equals(p.getType().getName()))
+                .findFirst();
+        assertTrue("At least the Jenkins Job property should have been found", property.isPresent());
+        assertFalse("The Jenkins Job property should not be editable", property.get().isEditable());
     }
 
 }

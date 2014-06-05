@@ -26,8 +26,6 @@ public class ProjectResourceDecorator extends AbstractResourceDecorator<Project>
                 .self(on(ProjectController.class).getProject(project.getId()))
                         // List of branches for this project
                 .link("_branches", on(BranchController.class).getBranchListForProject(project.getId()))
-                        // List of editable properties for this project
-                .link("_editableProperties", on(PropertyController.class).getEditableProperties(ProjectEntityType.PROJECT, project.getId()))
                         // Actual properties for this project
                 .link("_properties", on(PropertyController.class).getProperties(ProjectEntityType.PROJECT, project.getId()))
                         // Updating the project
