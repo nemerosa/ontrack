@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.model.structure;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import static org.apache.commons.lang3.Validate.isTrue;
 
 /**
@@ -11,6 +13,7 @@ public interface ProjectEntity extends Entity {
      * Returns the ID of the project that contains this entity. This method won't return <code>null</code>
      * but the ID could be {@linkplain ID#NONE undefined}.
      */
+    @JsonIgnore
     ID getProjectId();
 
     /**
