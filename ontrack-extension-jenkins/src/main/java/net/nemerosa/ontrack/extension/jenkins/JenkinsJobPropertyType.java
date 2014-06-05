@@ -74,14 +74,7 @@ public class JenkinsJobPropertyType extends AbstractJenkinsPropertyType<JenkinsJ
     }
 
     @Override
-    public JsonNode forStorage(JenkinsJobProperty value) {
-        // FIXME Method net.nemerosa.ontrack.extension.jenkins.JenkinsJobPropertyType.forStorage
-        return null;
-    }
-
-    @Override
     public JenkinsJobProperty fromStorage(JsonNode node) {
-        // FIXME Method net.nemerosa.ontrack.extension.jenkins.JenkinsJobPropertyType.fromStorage
-        return null;
+        return parse(node, JenkinsJobProperty.class);
     }
 }
