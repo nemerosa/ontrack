@@ -33,7 +33,7 @@ public class PropertyControllerTest extends AbstractWebTestSupport {
         Entity.isEntityDefined(project, "Project is defined");
         // Gets the editable properties for this project
         List<PropertyTypeDescriptor> properties = asUser().with(project.id(), ProjectConfig.class).call(() ->
-                        controller.getEditableProperties(PropertyEntity.PROJECT, project.getId())
+                        controller.getEditableProperties(ProjectEntityType.PROJECT, project.getId())
         );
         // Checks there is at least the Jenkins Job property
         assertNotNull("Editable properties should not be null", properties);

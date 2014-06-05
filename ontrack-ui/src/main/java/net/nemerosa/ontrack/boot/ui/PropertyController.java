@@ -34,7 +34,7 @@ public class PropertyController extends AbstractResourceController {
      * @return List of properties
      */
     @RequestMapping(value = "{entityType}/{id}/view", method = RequestMethod.GET)
-    public List<Property<?>> getProperties(@PathVariable PropertyEntity entityType, @PathVariable ID id) {
+    public List<Property<?>> getProperties(@PathVariable ProjectEntityType entityType, @PathVariable ID id) {
         ProjectEntity entity = getEntity(entityType, id);
         return propertyService.getProperties(entity);
     }
@@ -47,12 +47,12 @@ public class PropertyController extends AbstractResourceController {
      * @return List of editable properties
      */
     @RequestMapping(value = "{entityType}/{id}/editable", method = RequestMethod.GET)
-    public List<PropertyTypeDescriptor> getEditableProperties(@PathVariable PropertyEntity entityType, @PathVariable ID id) {
+    public List<PropertyTypeDescriptor> getEditableProperties(@PathVariable ProjectEntityType entityType, @PathVariable ID id) {
         ProjectEntity entity = getEntity(entityType, id);
         return propertyService.getEditableProperties(entity);
     }
 
-    protected ProjectEntity getEntity(PropertyEntity entityType, ID id) {
+    protected ProjectEntity getEntity(ProjectEntityType entityType, ID id) {
         return entityType.getEntityFn(structureService).apply(id);
     }
 }

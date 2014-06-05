@@ -3,7 +3,11 @@ package net.nemerosa.ontrack.model.structure;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public enum PropertyEntity {
+/**
+ * Enumeration of all {@link net.nemerosa.ontrack.model.structure.ProjectEntity} types together
+ * with the way to load them from the {@link net.nemerosa.ontrack.model.structure.StructureService} service.
+ */
+public enum ProjectEntityType {
 
     PROJECT(StructureService::getProject),
 
@@ -19,7 +23,7 @@ public enum PropertyEntity {
 
     private final BiFunction<StructureService, ID, ProjectEntity> entityFn;
 
-    PropertyEntity(BiFunction<StructureService, ID, ProjectEntity> entityFn) {
+    ProjectEntityType(BiFunction<StructureService, ID, ProjectEntity> entityFn) {
         this.entityFn = entityFn;
     }
 
