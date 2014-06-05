@@ -15,13 +15,20 @@ angular.module('ot.directive.properties', [
                 function loadProperties() {
                     ot.call($http.get(scope.entity._properties)).then(function (properties) {
                         scope.properties = properties;
-                        // At least one property editable and not set?
-                        var addition = false;
+                        // List of properties that could be added
+                        var additions = [];
                         angular.forEach(properties.resources, function (property) {
-                            addition = addition || (property.editable && property.empty);
+                            if (property.editable && property.empty) {
+                                additions.push(property);
+                            }
                         });
-                        scope.addition = addition;
+                        scope.additions = additions;
                     });
+
+                    // Adding a property
+                    scope.addProperty = function (property) {
+                        alert('Adding ' + property.typeDescriptor.name);
+                    };
                 }
 
                 scope.$watch('entity', loadProperties);

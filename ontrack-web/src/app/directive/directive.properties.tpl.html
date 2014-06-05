@@ -1,9 +1,11 @@
 List of all properties for {{entityType}}#{{entity.id}}.
-<div class="row" ng-if="addition">
+<div class="row" ng-if="additions">
     <div class="col-md-12">
-        <button class="btn btn-link" ng-click="editProperties()">
+        <select class="input-sm" ng-model="propertyToAdd" ng-options="property as property.typeDescriptor.name for property in additions">
+            <option value="">Add a property...</option>
+        </select>
+        <button class="btn btn-link" ng-click="addProperty(propertyToAdd)" ng-show="propertyToAdd">
             <span class="glyphicon glyphicon-plus"></span>
-            Add property
         </button>
     </div>
 </div>
