@@ -18,7 +18,7 @@ public interface PropertyService {
      * @param entity Entity
      * @return List of properties for this entity
      */
-    List<Property<?>> getProperties(Entity entity);
+    List<Property<?>> getProperties(ProjectEntity entity);
 
     /**
      * Gets the list of editable properties for a given entity and for the current user.
@@ -26,5 +26,5 @@ public interface PropertyService {
      * @param entity Entity
      * @return List of editable properties for this entity
      */
-    List<PropertyTypeDescriptor> getEditableProperties(Entity entity);
+    List<PropertyTypeDescriptor> getEditableProperties(ProjectEntity entity);
 }

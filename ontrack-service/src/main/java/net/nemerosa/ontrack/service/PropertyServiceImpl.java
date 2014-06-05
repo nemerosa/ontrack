@@ -40,13 +40,13 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public List<Property<?>> getProperties(Entity entity) {
+    public List<Property<?>> getProperties(ProjectEntity entity) {
         // FIXME Method net.nemerosa.ontrack.service.PropertyServiceImpl.getProperties
         return null;
     }
 
     @Override
-    public List<PropertyTypeDescriptor> getEditableProperties(Entity entity) {
+    public List<PropertyTypeDescriptor> getEditableProperties(ProjectEntity entity) {
         //noinspection Convert2MethodRef
         return getPropertyTypes().stream()
                 .filter(p -> p.applies(entity.getClass()))

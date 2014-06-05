@@ -46,7 +46,7 @@ public interface PropertyType<T> {
     /**
      * Does this property apply to the given entity type?
      */
-    boolean applies(Class<? extends Entity> entityClass);
+    boolean applies(Class<? extends ProjectEntity> entityClass);
 
     /**
      * Edition policy.
@@ -58,7 +58,7 @@ public interface PropertyType<T> {
      * @param securityService The access to the security layer
      * @return Authorization policy for this entity
      */
-    boolean canEdit(Entity entity, SecurityService securityService);
+    boolean canEdit(ProjectEntity entity, SecurityService securityService);
 
     /**
      * Defines the authorization policy for viewing this property.
@@ -67,7 +67,7 @@ public interface PropertyType<T> {
      * @param securityService The access to the security layer
      * @return Authorization policy for this entity
      */
-    boolean canView(Entity entity, SecurityService securityService);
+    boolean canView(ProjectEntity entity, SecurityService securityService);
 
     /**
      * TODO Obfuscates any sensitive value from the property value before it is sent at client side.
