@@ -1,14 +1,30 @@
 <ot-view>
+
     <div class="row">
-        <ot-noentry list="branchCollection.resources">
-            No branch has been created yet.
-        </ot-noentry>
-        <div ng-repeat="branch in branchCollection.resources" class="ot-project-branch-row">
-            <div class="col-md-12">
-                <a class="ot-project-branch-label" href="#/branch/{{branch.id}}">
-                    {{branch.name}}
-                </a>
+        <div class="col-md-9">
+            <ot-section-title>Branches</ot-section-title>
+            <div class="row">
+                <ot-noentry list="branchCollection.resources">
+                    No branch has been created yet.
+                </ot-noentry>
+                <div ng-repeat="branch in branchCollection.resources" class="ot-project-branch-row">
+                    <div class="col-md-12">
+                        <a class="ot-project-branch-label" href="#/branch/{{branch.id}}">
+                            {{branch.name}}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 panel">
+            <ot-section-title>Properties</ot-section-title>
+            <div class="row">
+                <div class="col-md-12">
+                    <ot-entity-properties entity="PROJECT" entity-id="{{project.id}}"></ot-entity-properties>
+                </div>
             </div>
         </div>
     </div>
+
+
 </ot-view>

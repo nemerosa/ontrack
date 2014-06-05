@@ -9,6 +9,7 @@ var ontrack = angular.module('ontrack', [
         'ot.directive.misc',
         'ot.directive.entity',
         'ot.directive.field',
+        'ot.directive.properties',
         // Services
         'ot.service.user',
         // Views
