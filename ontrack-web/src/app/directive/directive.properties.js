@@ -10,18 +10,15 @@ angular.module('ot.directive.properties', [
                 entity: '='
             },
             link: function (scope) {
-                scope.$watch('entity', function () {
-                    if (scope.entity) {
-                        // Loading the editable properties
-                        ot.call($http.get(scope.entity._editableProperties)).then(function (propertyTypeDescriptors) {
-                            scope.propertyTypeDescriptors = propertyTypeDescriptors;
-                            // Edition of properties
-                            scope.editProperties = function () {
-                                alert('Editing the properties');
-                            };
-                        });
-                    }
-                });
+
+                // Loading the editable properties
+                function loadProperties() {
+                    ot.call($http.get(scope.entity._editableProperties)).then(function (propertyTypeDescriptors) {
+                        scope.propertyTypeDescriptors = propertyTypeDescriptors;
+                    });
+                }
+
+                scope.$watch('entity', loadProperties);
             }
         };
     })
