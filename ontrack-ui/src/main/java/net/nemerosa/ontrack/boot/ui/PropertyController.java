@@ -33,7 +33,7 @@ public class PropertyController extends AbstractResourceController {
      * @param id         Entity ID
      * @return List of editable properties
      */
-    @RequestMapping(value = "{entityType}/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "{entityType}/{id}/editable", method = RequestMethod.GET)
     public List<PropertyTypeDescriptor> getEditableProperties(@PathVariable PropertyEntity entityType, @PathVariable ID id) {
         ProjectEntity entity = getEntity(entityType, id);
         return propertyService.getEditableProperties(entity);

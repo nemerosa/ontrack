@@ -2,8 +2,10 @@ package net.nemerosa.ontrack.boot.resources;
 
 import net.nemerosa.ontrack.boot.ui.BranchController;
 import net.nemerosa.ontrack.boot.ui.ProjectController;
+import net.nemerosa.ontrack.boot.ui.PropertyController;
 import net.nemerosa.ontrack.model.security.ProjectEdit;
 import net.nemerosa.ontrack.model.structure.Project;
+import net.nemerosa.ontrack.model.structure.PropertyEntity;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.ResourceContext;
@@ -24,6 +26,9 @@ public class ProjectResourceDecorator extends AbstractResourceDecorator<Project>
                 .self(on(ProjectController.class).getProject(project.getId()))
                         // List of branches for this project
                 .link("_branches", on(BranchController.class).getBranchListForProject(project.getId()))
+                        // List of editable properties for this project
+                .link("_editableProperties", on(PropertyController.class).getEditableProperties(PropertyEntity.PROJECT, project.getId()))
+                        // TODO Actual properties for this project
                         // Updating the project
                 .update(on(ProjectController.class).saveProject(project.getId(), null), ProjectEdit.class, project.id())
                         // TODO Delete link
