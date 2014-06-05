@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
 import java.util.Collection;
+import java.util.List;
 
 public abstract class AbstractConfigurationService<T extends UserPasswordConfiguration<T>> implements ConfigurationService<T> {
 
@@ -28,7 +29,7 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
     }
 
     @Override
-    public Collection<T> getConfigurations() {
+    public List<T> getConfigurations() {
         checkAccess();
         return configurationRepository.list(configurationClass);
     }

@@ -7,7 +7,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -19,7 +19,7 @@ public class ConfigurationJdbcRepository extends AbstractJdbcRepository implemen
     }
 
     @Override
-    public <T extends Configuration<T>> Collection<T> list(Class<T> configurationClass) {
+    public <T extends Configuration<T>> List<T> list(Class<T> configurationClass) {
         return getNamedParameterJdbcTemplate().query(
                 "SELECT * FROM CONFIGURATIONS WHERE TYPE = :type ORDER BY NAME",
                 params("type", configurationClass.getName()),

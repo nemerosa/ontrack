@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.jenkins;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.common.MapBuilder;
 import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.Branch;
@@ -14,10 +15,8 @@ import java.util.Optional;
 
 public class JenkinsJobPropertyType extends AbstractJenkinsPropertyType<JenkinsJobProperty> {
 
-    private final JenkinsConfigurationService configurationService;
-
     public JenkinsJobPropertyType(JenkinsConfigurationService configurationService) {
-        this.configurationService = configurationService;
+        super(configurationService);
     }
 
     @Override
@@ -70,8 +69,14 @@ public class JenkinsJobPropertyType extends AbstractJenkinsPropertyType<JenkinsJ
 
     @Override
     public Form getEditionForm(Optional<JenkinsJobProperty> value) {
-        // FIXME Method net.nemerosa.ontrack.extension.jenkins.JenkinsJobPropertyType.getEditionForm
-        return null;
+        return super.getEditionForm(value)
+                .with(
+                        Text.of("job")
+                                .label("Job name")
+                                .length(120)
+                                .help("Name of Jenkins Job")
+                                .value(value.orElse(null))
+                );
     }
 
     @Override
