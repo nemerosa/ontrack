@@ -5,11 +5,15 @@
         </ot-noentry>
         <table class="table table-condensed table-hover">
             <tr ng-repeat="property in valueProperties">
+                <!-- TODO Panel with title and content -->
+                <!-- TODO Header for the property name and icon -->
+                <!-- TODO Header contains also the edit and delete actions -->
+                <!-- TODO Edit -->
+                <!-- TODO Delete -->
+                <!-- TODO Description as tooltip -->
                 <td>
                     <ng-include src="property.typeDescriptor.shortTemplatePath"></ng-include>
                 </td>
-                <!-- TODO Edit -->
-                <!-- TODO Delete -->
             </tr>
         </table>
     </div>
