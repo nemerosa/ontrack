@@ -3,21 +3,26 @@
         <ot-noentry list="valueProperties">
             No property.
         </ot-noentry>
-        <!-- TODO Panel with title and content -->
-        <!-- TODO Header for the property name and icon -->
+        <!-- TODO Header for and icon -->
         <!-- TODO Header contains also the edit and delete actions -->
         <!-- TODO Edit -->
         <!-- TODO Delete -->
-        <div ng-repeat="property in valueProperties" title="{{property.typeDescriptor.description}}">
+        <div ng-repeat="property in valueProperties">
             <div class="col-md-12">
-                <ng-include src="property.typeDescriptor.shortTemplatePath"></ng-include>
+                <div class="panel panel-default" title="{{property.typeDescriptor.description}}">
+                    <div class="panel-heading">{{property.typeDescriptor.name}}</div>
+                    <div class="panel-body">
+                        <ng-include src="property.typeDescriptor.shortTemplatePath"></ng-include>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 <div class="row" ng-if="additions">
     <div class="col-md-12">
-        <select class="input-sm" ng-model="propertyToAdd" ng-options="property as property.typeDescriptor.name for property in additions">
+        <select class="input-sm" ng-model="propertyToAdd"
+                ng-options="property as property.typeDescriptor.name for property in additions">
             <option value="">Add a property...</option>
         </select>
         <button class="btn btn-link" ng-click="addProperty(propertyToAdd)" ng-show="propertyToAdd">
