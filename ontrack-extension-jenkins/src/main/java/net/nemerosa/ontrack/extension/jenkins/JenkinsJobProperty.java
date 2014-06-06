@@ -21,7 +21,7 @@ public class JenkinsJobProperty extends AbstractJenkinsProperty {
      * Derived property: the full URL to the Jenkins job.
      */
     public String getUrl() {
-        return String.format("%s/jobs/%s", getConfiguration().getUrl(), job);
+        return String.format("%s/job/%s", getConfiguration().getUrl(), job);
     }
 
 }

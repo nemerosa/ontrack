@@ -123,7 +123,7 @@ public class PropertyControllerTest extends AbstractWebTestSupport {
                             // Checks the property content
                             assertEquals("MyJob", value.getJob());
                             assertEquals(configurationName, value.getConfiguration().getName());
-                            assertEquals("http://jenkins/jobs/MyJob", value.getUrl());
+                            assertEquals("http://jenkins/job/MyJob", value.getUrl());
                             // Gets the edition form
                             Form form = controller.getPropertyEditionForm(ProjectEntityType.PROJECT, project.getId(), JenkinsJobPropertyType.class.getName());
                             assertEquals(2, form.getFields().size());
