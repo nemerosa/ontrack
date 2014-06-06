@@ -33,7 +33,16 @@ angular.module('ot.directive.properties', [
 
                     // Adding a property
                     scope.addProperty = function (property) {
-                        otPropertiesService.addProperty(scope.entity, property);
+                        otPropertiesService.addProperty(property).then(loadProperties);
+                    };
+
+                    /**
+                     * Editing a property.
+                     *
+                     * Note that editing a property is equivalent to create it.
+                     */
+                    scope.editProperty = function (property) {
+                        scope.addProperty(property);
                     };
                 }
 

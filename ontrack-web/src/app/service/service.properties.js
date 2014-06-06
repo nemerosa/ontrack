@@ -5,7 +5,7 @@ angular.module('ot.service.properties', [
     .service('otPropertiesService', function ($q, $http, ot, otFormService) {
         var self = {};
 
-        self.addProperty = function (entity, property) {
+        self.addProperty = function (property) {
             return otFormService.display({
                 uri: property._update,
                 title: property.typeDescriptor.name,

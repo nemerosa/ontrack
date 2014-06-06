@@ -13,7 +13,7 @@
                         <img ng-src="{{property.typeDescriptor.iconPath}}" class="ot-icon"/>
                         {{property.typeDescriptor.name}}
                         <p class="pull-right" ng-if="property.editable">
-                            <span class="ot-command ot-command-update" title="Update the property"></span>
+                            <span class="ot-command ot-command-update" title="Update the property" ng-click="editProperty(property)"></span>
                             <span class="ot-command ot-command-delete" title="Delete the property"></span>
                         </p>
                     </div>
