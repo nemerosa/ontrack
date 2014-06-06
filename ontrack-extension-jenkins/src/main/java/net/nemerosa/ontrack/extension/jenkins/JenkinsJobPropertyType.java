@@ -80,12 +80,6 @@ public class JenkinsJobPropertyType extends AbstractJenkinsPropertyType<JenkinsJ
     }
 
     @Override
-    protected void validate(JenkinsJobProperty value) {
-        // FIXME Method net.nemerosa.ontrack.extension.jenkins.JenkinsJobPropertyType.validate
-
-    }
-
-    @Override
     public JsonNode forStorage(JenkinsJobProperty value) {
         return format(
                 MapBuilder.params()
@@ -96,13 +90,27 @@ public class JenkinsJobPropertyType extends AbstractJenkinsPropertyType<JenkinsJ
     }
 
     @Override
+    public JenkinsJobProperty fromClient(JsonNode node) {
+        return fromStorage(node);
+    }
+
+    @Override
     public JenkinsJobProperty fromStorage(JsonNode node) {
         String configurationName = node.path("configuration").asText();
         String job = node.path("job").asText();
+        // Looks the configuration up
         JenkinsConfiguration configuration = configurationService.getConfiguration(configurationName);
+        // Validates the job name
+        validateNotBlank(job, "The Jenkins Job name must not be empty");
+        // OK
         return new JenkinsJobProperty(
                 configuration,
                 job
         );
+    }
+
+    @Override
+    public String getSearchKey(JenkinsJobProperty value) {
+        return value.getJob();
     }
 }

@@ -99,12 +99,15 @@ public class PropertyServiceImpl implements PropertyService {
         T value = propertyType.fromClient(data);
         // Gets the JSON for the storage
         JsonNode storage = propertyType.forStorage(value);
+        // Search key
+        String searchKey = propertyType.getSearchKey(value);
         // Stores the property
         propertyRepository.saveProperty(
                 propertyType.getClass().getName(),
                 entity.getProjectEntityType(),
                 entity.getId(),
-                storage
+                storage,
+                searchKey
         );
         // OK
         return Ack.OK;

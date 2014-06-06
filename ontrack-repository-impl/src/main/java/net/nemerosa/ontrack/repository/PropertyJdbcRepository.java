@@ -32,7 +32,7 @@ public class PropertyJdbcRepository extends AbstractJdbcRepository implements Pr
     }
 
     @Override
-    public void saveProperty(String typeName, ProjectEntityType entityType, ID entityId, JsonNode data) {
+    public void saveProperty(String typeName, ProjectEntityType entityType, ID entityId, JsonNode data, String searchKey) {
         MapSqlParameterSource params = params("type", typeName).addValue("entityId", entityId.getValue());
         // Any previous value?
         Integer propertyId = getFirstItem(
@@ -46,8 +46,7 @@ public class PropertyJdbcRepository extends AbstractJdbcRepository implements Pr
         // Data parameters
         params
                 .addValue("json", writeJson(data))
-                        // FIXME Search key
-                .addValue("searchKey", "TODO");
+                .addValue("searchKey", searchKey);
         // Update
         if (propertyId != null) {
             getNamedParameterJdbcTemplate().update(

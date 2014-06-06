@@ -11,6 +11,6 @@ public interface PropertyRepository {
 
     TProperty loadProperty(String typeName, ProjectEntityType entityType, ID entityId);
 
-    void saveProperty(String typeName, ProjectEntityType entityType, ID entityId, JsonNode data);
+    void saveProperty(String typeName, ProjectEntityType entityType, ID entityId, JsonNode data, String searchKey);
 
 }

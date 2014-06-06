@@ -113,4 +113,13 @@ public interface PropertyType<T> {
         return of(fromStorage(node));
     }
 
+    /**
+     * Given the value of a property, computes some text that can be used as a hint to search among all
+     * the properties when looking for a key word. Typically, in a database store, the resulting value
+     * will be stored in an indexed column.
+     *
+     * @param value Value to index
+     * @return Index value
+     */
+    String getSearchKey(T value);
 }
