@@ -65,7 +65,6 @@ public class CoreResourceModuleTest {
                         .with("description", "Project")
                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
                         .with("_branches", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranchListForProject:1")
-                        .with("_editableProperties", "urn:test:net.nemerosa.ontrack.boot.ui.PropertyController#getEditableProperties:PROJECT,1")
                         .with("_properties", "urn:test:net.nemerosa.ontrack.boot.ui.PropertyController#getProperties:PROJECT,1")
                         .with("_update", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#saveProject:1,")
                         .end(),
@@ -91,7 +90,6 @@ public class CoreResourceModuleTest {
                                         .with("description", "Project")
                                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
                                         .with("_branches", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranchListForProject:1")
-                                        .with("_editableProperties", "urn:test:net.nemerosa.ontrack.boot.ui.PropertyController#getEditableProperties:PROJECT,1")
                                         .with("_properties", "urn:test:net.nemerosa.ontrack.boot.ui.PropertyController#getProperties:PROJECT,1")
                                         .end()
                         )
@@ -115,7 +113,6 @@ public class CoreResourceModuleTest {
                         .with("description", "Project")
                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
                         .with("_branches", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranchListForProject:1")
-                        .with("_editableProperties", "urn:test:net.nemerosa.ontrack.boot.ui.PropertyController#getEditableProperties:PROJECT,1")
                         .with("_properties", "urn:test:net.nemerosa.ontrack.boot.ui.PropertyController#getProperties:PROJECT,1")
                         .end(),
                 p
@@ -170,7 +167,6 @@ public class CoreResourceModuleTest {
                                         .with("description", "Project")
                                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
                                         .with("_branches", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranchListForProject:1")
-                                        .with("_editableProperties", "urn:test:net.nemerosa.ontrack.boot.ui.PropertyController#getEditableProperties:PROJECT,1")
                                         .with("_properties", "urn:test:net.nemerosa.ontrack.boot.ui.PropertyController#getProperties:PROJECT,1")
                                         .end())
                                 .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranch:1")
