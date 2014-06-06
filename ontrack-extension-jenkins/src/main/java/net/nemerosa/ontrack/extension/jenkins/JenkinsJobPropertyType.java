@@ -36,12 +36,12 @@ public class JenkinsJobPropertyType extends AbstractJenkinsPropertyType<JenkinsJ
 
     @Override
     public String getShortTemplatePath() {
-        return "app/extension/jenkins/jenkins-job-property-short.html";
+        return "app/extension/jenkins/jenkins-job-property-short.tpl.html";
     }
 
     @Override
     public String getFullTemplatePath() {
-        return "app/extension/jenkins/jenkins-job-property-full.html";
+        return "app/extension/jenkins/jenkins-job-property-full.tpl.html";
     }
 
     @Override

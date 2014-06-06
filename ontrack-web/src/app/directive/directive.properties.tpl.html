@@ -6,7 +6,7 @@
         <table class="table table-condensed table-hover">
             <tr ng-repeat="property in valueProperties">
                 <td>
-                    {{property.value}}
+                    <ng-include src="property.typeDescriptor.shortTemplatePath"></ng-include>
                 </td>
                 <!-- TODO Edit -->
                 <!-- TODO Delete -->
