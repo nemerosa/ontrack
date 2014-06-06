@@ -3,14 +3,16 @@
         <ot-noentry list="valueProperties">
             No property.
         </ot-noentry>
-        <!-- TODO Header for and icon -->
         <!-- TODO Header contains also the edit and delete actions -->
         <!-- TODO Edit -->
         <!-- TODO Delete -->
         <div ng-repeat="property in valueProperties">
             <div class="col-md-12">
                 <div class="panel panel-default" title="{{property.typeDescriptor.description}}">
-                    <div class="panel-heading">{{property.typeDescriptor.name}}</div>
+                    <div class="panel-heading">
+                        <img ng-src="{{property.typeDescriptor.iconPath}}"/>
+                        {{property.typeDescriptor.name}}
+                    </div>
                     <div class="panel-body">
                         <ng-include src="property.typeDescriptor.shortTemplatePath"></ng-include>
                     </div>
