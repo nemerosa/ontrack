@@ -37,7 +37,11 @@ angular.module('ot.directive.properties', [
                     };
                 }
 
-                scope.$watch('entity', loadProperties);
+                scope.$watch('entity', function () {
+                    if (scope.entity) {
+                        loadProperties();
+                    }
+                });
             }
         };
     })
