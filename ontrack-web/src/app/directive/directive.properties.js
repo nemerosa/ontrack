@@ -27,7 +27,7 @@ angular.module('ot.directive.properties', [
 
                     // Adding a property
                     scope.addProperty = function (property) {
-                        alert('Adding ' + property.typeDescriptor.name);
+                        otPropertiesService.addProperty(scope.entity, property);
                     };
                 }
 
