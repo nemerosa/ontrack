@@ -8,8 +8,7 @@
         <!-- TODO Header contains also the edit and delete actions -->
         <!-- TODO Edit -->
         <!-- TODO Delete -->
-        <!-- TODO Description as tooltip -->
-        <div ng-repeat="property in valueProperties">
+        <div ng-repeat="property in valueProperties" title="{{property.typeDescriptor.description}}">
             <div class="col-md-12">
                 <ng-include src="property.typeDescriptor.shortTemplatePath"></ng-include>
             </div>
