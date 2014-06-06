@@ -82,4 +82,11 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
         }
         configurationRepository.save(configToSave);
     }
+
+    @Override
+    public T getObfuscatedConfiguration(String configurationName) {
+        return securityService.runAsAdmin(
+                () -> getConfiguration(configurationName)
+        ).get().obfuscate();
+    }
 }

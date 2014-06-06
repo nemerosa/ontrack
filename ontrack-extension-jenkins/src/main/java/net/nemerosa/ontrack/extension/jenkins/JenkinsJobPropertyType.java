@@ -99,7 +99,7 @@ public class JenkinsJobPropertyType extends AbstractJenkinsPropertyType<JenkinsJ
         String configurationName = node.path("configuration").asText();
         String job = node.path("job").asText();
         // Looks the configuration up
-        JenkinsConfiguration configuration = configurationService.getConfiguration(configurationName);
+        JenkinsConfiguration configuration = loadConfiguration(configurationName);
         // Validates the job name
         validateNotBlank(job, "The Jenkins Job name must not be empty");
         // OK

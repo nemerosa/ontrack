@@ -25,4 +25,9 @@ public abstract class AbstractJenkinsPropertyType<T extends AbstractJenkinsPrope
                                 .itemId("name")
                 );
     }
+
+
+    protected JenkinsConfiguration loadConfiguration(String configurationName) {
+        return configurationService.getObfuscatedConfiguration(configurationName);
+    }
 }

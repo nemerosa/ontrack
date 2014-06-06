@@ -21,4 +21,9 @@ public interface ConfigurationService<T extends UserPasswordConfiguration> {
      * a blank password can be accepted.
      */
     void updateConfiguration(String name, T configuration);
+
+    /**
+     * Loads the obfuscated version of a configuration
+     */
+    T getObfuscatedConfiguration(String configurationName);
 }
