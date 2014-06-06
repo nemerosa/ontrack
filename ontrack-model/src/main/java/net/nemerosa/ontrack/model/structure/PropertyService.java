@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.model.structure;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 
 import java.util.List;
@@ -45,4 +47,13 @@ public interface PropertyService {
      * @return A response that defines the property
      */
     <T> Property<T> getProperty(ProjectEntity entity, String propertyTypeName);
+
+    /**
+     * Edits the value of a property.
+     *
+     * @param entity           Entity to edit
+     * @param propertyTypeName Fully qualified name of the property to edit
+     * @param data             Raw JSON data for the property value
+     */
+    Ack editProperty(ProjectEntity entity, String propertyTypeName, JsonNode data);
 }

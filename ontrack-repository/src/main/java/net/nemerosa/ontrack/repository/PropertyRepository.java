@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.repository;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
-import net.nemerosa.ontrack.model.structure.PropertyType;
 
 /**
  * Repository to access the properties.
@@ -10,5 +10,7 @@ import net.nemerosa.ontrack.model.structure.PropertyType;
 public interface PropertyRepository {
 
     TProperty loadProperty(String typeName, ProjectEntityType entityType, ID entityId);
+
+    void saveProperty(String typeName, ProjectEntityType entityType, ID entityId, JsonNode data);
 
 }

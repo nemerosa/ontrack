@@ -91,7 +91,15 @@ public interface PropertyType<T> {
     JsonNode forStorage(T value);
 
     /**
-     * Parses the JSON representation for a property value.
+     * Parses the client JSON representation for a property value. This method
+     * <i>MUST</i> perform validation before accepting the value.
+     *
+     * @see #getEditionForm(java.util.Optional)
+     */
+    T fromClient(JsonNode node);
+
+    /**
+     * Parses the storage JSON representation for a property value.
      */
     T fromStorage(JsonNode node);
 

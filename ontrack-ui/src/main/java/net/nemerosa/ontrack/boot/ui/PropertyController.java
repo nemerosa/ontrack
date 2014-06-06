@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
@@ -7,10 +9,8 @@ import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,6 +99,24 @@ public class PropertyController extends AbstractResourceController {
         return propertyService.getPropertyEditionForm(
                 getEntity(entityType, id),
                 propertyTypeName
+        );
+    }
+
+    /**
+     * Edits the value of a property.
+     *
+     * @param entityType       Type of the entity to edit
+     * @param id               ID of the entity to edit
+     * @param propertyTypeName Fully qualified name of the property to edit
+     * @param data             Raw JSON data for the property value
+     */
+    @RequestMapping(value = "{entityType}/{id}/{propertyTypeName}/edit", method = RequestMethod.PUT)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public Ack editProperty(@PathVariable ProjectEntityType entityType, @PathVariable ID id, @PathVariable String propertyTypeName, @RequestBody JsonNode data) {
+        return propertyService.editProperty(
+                getEntity(entityType, id),
+                propertyTypeName,
+                data
         );
     }
 

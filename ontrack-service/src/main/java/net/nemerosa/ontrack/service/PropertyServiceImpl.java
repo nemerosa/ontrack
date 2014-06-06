@@ -1,7 +1,9 @@
 package net.nemerosa.ontrack.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.extension.api.PropertyTypeExtension;
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.exceptions.PropertyTypeNotFoundException;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -80,13 +82,41 @@ public class PropertyServiceImpl implements PropertyService {
         return getProperty(propertyType, entity);
     }
 
+    @Override
+    public Ack editProperty(ProjectEntity entity, String propertyTypeName, JsonNode data) {
+        // Gets the property using its fully qualified type name
+        PropertyType<?> propertyType = getPropertyTypeByName(propertyTypeName);
+        // Edits the property
+        return editProperty(entity, propertyType, data);
+    }
+
+    private <T> Ack editProperty(ProjectEntity entity, PropertyType<T> propertyType, JsonNode data) {
+        // Checks for edition
+        if (!propertyType.canEdit(entity, securityService)) {
+            throw new AccessDeniedException("Property is not opened for viewing.");
+        }
+        // Gets the value and validates it
+        T value = propertyType.fromClient(data);
+        // Gets the JSON for the storage
+        JsonNode storage = propertyType.forStorage(value);
+        // Stores the property
+        propertyRepository.saveProperty(
+                propertyType.getClass().getName(),
+                entity.getProjectEntityType(),
+                entity.getId(),
+                storage
+        );
+        // OK
+        return Ack.OK;
+    }
+
     protected <T> Property<T> getProperty(PropertyType<T> type, ProjectEntity entity) {
         T value = getPropertyValue(type, entity);
         return value != null ? Property.of(type, value) : Property.empty(type);
     }
 
     protected <T> T getPropertyValue(PropertyType<T> type, ProjectEntity entity) {
-        // Checks for edition
+        // Checks for viewing
         if (!type.canView(entity, securityService)) {
             throw new AccessDeniedException("Property is not opened for viewing.");
         }
