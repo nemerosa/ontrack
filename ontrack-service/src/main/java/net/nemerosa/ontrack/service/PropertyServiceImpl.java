@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -152,6 +151,6 @@ public class PropertyServiceImpl implements PropertyService {
         // Gets the value for this property
         T value = getPropertyValue(propertyType, entity);
         // Gets the form
-        return propertyType.getEditionForm(Optional.ofNullable(value));
+        return propertyType.getEditionForm(value);
     }
 }

@@ -6,6 +6,8 @@ import net.nemerosa.ontrack.extension.jenkins.JenkinsConfiguration;
 import net.nemerosa.ontrack.extension.jenkins.JenkinsConfigurationService;
 import net.nemerosa.ontrack.extension.jenkins.JenkinsJobProperty;
 import net.nemerosa.ontrack.extension.jenkins.JenkinsJobPropertyType;
+import net.nemerosa.ontrack.model.form.Field;
+import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
@@ -107,6 +109,48 @@ public class JenkinsJobPropertyTypeTest {
                 ),
                 type.fromStorage(node)
         );
+    }
+
+    @Test
+    public void editionForm_for_new() {
+        Form form = type.getEditionForm(null);
+        assertEquals(2, form.getFields().size());
+        {
+            Field f = form.getField("configuration");
+            assertNotNull(f);
+            assertNull(f.getValue());
+        }
+        {
+            Field f = form.getField("job");
+            assertNotNull(f);
+            assertNull(f.getValue());
+        }
+    }
+
+    @Test
+    public void editionForm_for_update() {
+        JenkinsConfiguration configuration = new JenkinsConfiguration(
+                "MyConfig",
+                "http://jenkins",
+                "user",
+                "secret"
+        );
+        JenkinsJobProperty property = new JenkinsJobProperty(
+                configuration,
+                "MyJob"
+        );
+        Form form = type.getEditionForm(property);
+        assertEquals(2, form.getFields().size());
+        {
+            Field f = form.getField("configuration");
+            assertNotNull(f);
+            assertEquals("MyConfig", f.getValue());
+        }
+        {
+            Field f = form.getField("job");
+            assertNotNull(f);
+            assertEquals("MyJob", f.getValue());
+        }
     }
 
 }

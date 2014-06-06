@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.SecurityService;
 
-import java.util.Optional;
-
 /**
  * Defines the type for a property.
  *
@@ -78,7 +76,7 @@ public interface PropertyType<T> {
      *
      * @param value Value to update if set. If not set, this means the creation of a new property.
      */
-    Form getEditionForm(Optional<T> value);
+    Form getEditionForm(T value);
 
     /**
      * Creation of a property value from a value. Should perform validation.
@@ -94,7 +92,7 @@ public interface PropertyType<T> {
      * Parses the client JSON representation for a property value. This method
      * <i>MUST</i> perform validation before accepting the value.
      *
-     * @see #getEditionForm(java.util.Optional)
+     * @see #getEditionForm(Object)
      */
     T fromClient(JsonNode node);
 

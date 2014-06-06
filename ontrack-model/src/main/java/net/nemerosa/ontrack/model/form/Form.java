@@ -60,6 +60,10 @@ public class Form {
         return this;
     }
 
+    public Field getField(String name) {
+        return fields.get(name);
+    }
+
     public Collection<? extends Field> getFields() {
         return fields.values();
     }

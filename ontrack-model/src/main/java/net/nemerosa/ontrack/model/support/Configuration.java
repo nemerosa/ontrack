@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.model.support;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public interface Configuration<T extends Configuration<T>> {
 
     String getName();
@@ -7,6 +9,7 @@ public interface Configuration<T extends Configuration<T>> {
     /**
      * Gets the descriptor for this configuration
      */
+    @JsonIgnore
     ConfigurationDescriptor getDescriptor();
 
     /**

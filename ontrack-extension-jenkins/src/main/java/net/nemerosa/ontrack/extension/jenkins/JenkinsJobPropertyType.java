@@ -11,8 +11,6 @@ import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ValidationStamp;
 
-import java.util.Optional;
-
 public class JenkinsJobPropertyType extends AbstractJenkinsPropertyType<JenkinsJobProperty> {
 
     public JenkinsJobPropertyType(JenkinsConfigurationService configurationService) {
@@ -68,14 +66,14 @@ public class JenkinsJobPropertyType extends AbstractJenkinsPropertyType<JenkinsJ
     }
 
     @Override
-    public Form getEditionForm(Optional<JenkinsJobProperty> value) {
+    public Form getEditionForm(JenkinsJobProperty value) {
         return super.getEditionForm(value)
                 .with(
                         Text.of("job")
                                 .label("Job name")
                                 .length(120)
                                 .help("Name of Jenkins Job")
-                                .value(value.orElse(null))
+                                .value(value != null ? value.getJob() : null)
                 );
     }
 

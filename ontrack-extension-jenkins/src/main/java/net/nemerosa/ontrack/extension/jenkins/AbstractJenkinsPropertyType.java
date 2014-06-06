@@ -4,8 +4,6 @@ import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Selection;
 
-import java.util.Optional;
-
 public abstract class AbstractJenkinsPropertyType<T extends AbstractJenkinsProperty> extends AbstractPropertyType<T> {
 
     protected final JenkinsConfigurationService configurationService;
@@ -15,14 +13,14 @@ public abstract class AbstractJenkinsPropertyType<T extends AbstractJenkinsPrope
     }
 
     @Override
-    public Form getEditionForm(Optional<T> value) {
+    public Form getEditionForm(T value) {
         return Form.create()
                 .with(
                         Selection.of("configuration")
                                 .label("Configuration")
                                 .help("Jenkins configuration to use when connecting")
-                                .items(configurationService.getConfigurations())
-                                .itemId("name")
+                                .items(configurationService.getConfigurationDescriptors())
+                                .value(value != null ? value.getConfiguration().getName() : null)
                 );
     }
 

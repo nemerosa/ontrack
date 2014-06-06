@@ -10,5 +10,7 @@ public interface Field {
 
     String getHelp();
 
+    Object getValue();
+
     Field value(Object value);
 }
