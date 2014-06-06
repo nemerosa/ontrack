@@ -1,4 +1,19 @@
-List of all properties for {{entityType}}#{{entity.id}}.
+<div class="row">
+    <div class="col-md-12">
+        <ot-noentry list="valueProperties">
+            No property.
+        </ot-noentry>
+        <table class="table table-condensed table-hover">
+            <tr ng-repeat="property in valueProperties">
+                <td>
+                    {{property.value}}
+                </td>
+                <!-- TODO Edit -->
+                <!-- TODO Delete -->
+            </tr>
+        </table>
+    </div>
+</div>
 <div class="row" ng-if="additions">
     <div class="col-md-12">
         <select class="input-sm" ng-model="propertyToAdd" ng-options="property as property.typeDescriptor.name for property in additions">
