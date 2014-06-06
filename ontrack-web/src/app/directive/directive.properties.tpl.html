@@ -8,10 +8,14 @@
         <!-- TODO Delete -->
         <div ng-repeat="property in valueProperties">
             <div class="col-md-12">
-                <div class="panel panel-default" title="{{property.typeDescriptor.description}}">
+                <div class="ot-property-panel" title="{{property.typeDescriptor.description}}">
                     <div class="panel-heading">
-                        <img ng-src="{{property.typeDescriptor.iconPath}}"/>
+                        <img ng-src="{{property.typeDescriptor.iconPath}}" class="ot-icon"/>
                         {{property.typeDescriptor.name}}
+                        <p class="pull-right" ng-if="property.editable">
+                            <span class="ot-command ot-command-update" title="Update the property"></span>
+                            <span class="ot-command ot-command-delete" title="Delete the property"></span>
+                        </p>
                     </div>
                     <div class="panel-body">
                         <ng-include src="property.typeDescriptor.shortTemplatePath"></ng-include>
