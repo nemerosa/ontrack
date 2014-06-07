@@ -56,4 +56,12 @@ public interface PropertyService {
      * @param data             Raw JSON data for the property value
      */
     Ack editProperty(ProjectEntity entity, String propertyTypeName, JsonNode data);
+
+    /**
+     * Deletes the value of a property.
+     *
+     * @param entity Type      of the entity to edit
+     * @param propertyTypeName Fully qualified name of the property to delete
+     */
+    Ack deleteProperty(ProjectEntity entity, String propertyTypeName);
 }

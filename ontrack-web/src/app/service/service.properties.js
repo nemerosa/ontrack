@@ -15,6 +15,10 @@ angular.module('ot.service.properties', [
             });
         };
 
+        self.deleteProperty = function (property) {
+            return ot.call($http.delete(property._update));
+        };
+
         return self;
     })
 ;

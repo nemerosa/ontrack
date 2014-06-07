@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.repository;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +66,19 @@ public class PropertyJdbcRepository extends AbstractJdbcRepository implements Pr
                     params
             );
         }
+    }
+
+    @Override
+    public Ack deleteProperty(String typeName, ProjectEntityType entityType, ID entityId) {
+        return Ack.one(
+                getNamedParameterJdbcTemplate().update(
+                        String.format(
+                                "DELETE FROM PROPERTIES WHERE TYPE = :type AND %s = :entityId",
+                                entityType.name()
+                        ),
+                        params("type", typeName).addValue("entityId", entityId.getValue())
+                )
+        );
     }
 
     private TProperty toProperty(ResultSet rs) throws SQLException {

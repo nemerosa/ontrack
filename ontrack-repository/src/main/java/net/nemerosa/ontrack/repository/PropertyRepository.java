@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.repository;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 
@@ -13,4 +14,5 @@ public interface PropertyRepository {
 
     void saveProperty(String typeName, ProjectEntityType entityType, ID entityId, JsonNode data, String searchKey);
 
+    Ack deleteProperty(String typeName, ProjectEntityType entityType, ID entityId);
 }

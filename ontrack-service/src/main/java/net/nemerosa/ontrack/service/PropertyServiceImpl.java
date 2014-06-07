@@ -90,6 +90,29 @@ public class PropertyServiceImpl implements PropertyService {
         return editProperty(entity, propertyType, data);
     }
 
+    @Override
+    public Ack deleteProperty(ProjectEntity entity, String propertyTypeName) {
+        // Gets the property using its fully qualified type name
+        PropertyType<?> propertyType = getPropertyTypeByName(propertyTypeName);
+        // Deletes the property
+        return deleteProperty(entity, propertyType);
+    }
+
+    private <T> Ack deleteProperty(ProjectEntity entity, PropertyType<T> propertyType) {
+        // Checks for edition
+        if (!propertyType.canEdit(entity, securityService)) {
+            throw new AccessDeniedException("Property is not opened for viewing.");
+        }
+        // Gets the existing value
+        T value = getPropertyValue(propertyType, entity);
+        // If existing, deletes it
+        if (value != null) {
+            return propertyRepository.deleteProperty(propertyType.getClass().getName(), entity.getProjectEntityType(), entity.getId());
+        } else {
+            return Ack.NOK;
+        }
+    }
+
     private <T> Ack editProperty(ProjectEntity entity, PropertyType<T> propertyType, JsonNode data) {
         // Checks for edition
         if (!propertyType.canEdit(entity, securityService)) {

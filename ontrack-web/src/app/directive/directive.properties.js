@@ -44,6 +44,13 @@ angular.module('ot.directive.properties', [
                     scope.editProperty = function (property) {
                         scope.addProperty(property);
                     };
+
+                    /**
+                     * Deleting a property.
+                     */
+                    scope.deleteProperty = function (property) {
+                        otPropertiesService.deleteProperty(property).then(loadProperties);
+                    };
                 }
 
                 scope.$watch('entity', function () {

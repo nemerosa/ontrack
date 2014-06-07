@@ -120,6 +120,22 @@ public class PropertyController extends AbstractResourceController {
         );
     }
 
+    /**
+     * Deletes the value of a property.
+     *
+     * @param entityType       Type of the entity to edit
+     * @param id               ID of the entity to edit
+     * @param propertyTypeName Fully qualified name of the property to delete
+     */
+    @RequestMapping(value = "{entityType}/{id}/{propertyTypeName}/edit", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public Ack deleteProperty(@PathVariable ProjectEntityType entityType, @PathVariable ID id, @PathVariable String propertyTypeName) {
+        return propertyService.deleteProperty(
+                getEntity(entityType, id),
+                propertyTypeName
+        );
+    }
+
     protected ProjectEntity getEntity(ProjectEntityType entityType, ID id) {
         return entityType.getEntityFn(structureService).apply(id);
     }
