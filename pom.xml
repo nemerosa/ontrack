@@ -55,6 +55,8 @@
         <module>ontrack-repository-support</module>
         <module>ontrack-extension-svn</module>
         <module>ontrack-ref</module>
+        <module>ontrack-extension-issues</module>
+        <module>ontrack-extension-jira</module>
     </modules>
 
     <dependencyManagement>
