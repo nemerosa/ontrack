@@ -23,7 +23,8 @@ var ontrack = angular.module('ontrack', [
         'ot.view.validationRun',
         // Extensions
         'ontrack.extension.jenkins',
-        'ontrack.extension.svn'
+        'ontrack.extension.svn',
+        'ontrack.extension.jira'
     ])
         //HTTP configuration
         .config(function ($httpProvider) {
