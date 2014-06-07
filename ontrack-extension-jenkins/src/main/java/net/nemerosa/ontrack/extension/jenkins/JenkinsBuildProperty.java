@@ -16,4 +16,11 @@ public class JenkinsBuildProperty extends JenkinsJobProperty {
         super(configuration, job);
         this.build = build;
     }
+
+    /**
+     * Derived property: the full URL to the Jenkins build.
+     */
+    public String getUrl() {
+        return super.getUrl() + "/" + build;
+    }
 }
