@@ -46,6 +46,11 @@
     <label class="radio-inline"><input type="radio" name="{{field.name}}" ng-value="false" ng-model="data[field.name]"/> No</label>
 </span>
 
+<!-- Type: int -->
+<input ng-if="field.type == 'int'" ng-model="data[field.name]" name="{{field.name}}"
+       type="number" class="form-control" ng-required="field.required"
+       ng-readonly="field.readOnly" min="{{field.min}}" min="{{field.max}}" step="{{field.step}}"/>
+
 <!-- Validation message -->
 <p ng-show="thisForm[field.name].$invalid && !thisForm[field.name].$pristine" class="help-block">
     {{field.validation}}</p>
