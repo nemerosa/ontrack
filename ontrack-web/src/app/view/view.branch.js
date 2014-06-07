@@ -1,7 +1,8 @@
 angular.module('ot.view.branch', [
     'ui.router',
     'ot.service.core',
-    'ot.service.structure'
+    'ot.service.structure',
+    'ot.dialog.validationStampRunView'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('branch', {
@@ -89,13 +90,37 @@ angular.module('ot.view.branch', [
         };
 
     })
-    .directive('otBranchBuildView', function () {
+    .directive('otBranchBuildView', function ($modal) {
         return {
             restrict: 'E',
-            templateUrl: 'app/view/directive.branchBuildView.tpl.html',
+            templateUrl: 'app/view/view.branchBuildView.tpl.html',
             scope: {
                 view: '=',
                 validationStamps: '='
+            },
+            link: function (scope) {
+                scope.$watch('view', function () {
+                    if (scope.view) {
+                        scope.displayValidationRuns = function (validationStampRunView) {
+                            $modal.open({
+                                templateUrl: 'app/dialog/dialog.validationStampRunView.tpl.html',
+                                controller: 'otDialogValidationStampRunView',
+                                resolve: {
+                                    config: function () {
+                                        return {
+                                            validationStampRunView: validationStampRunView
+                                        };
+                                    }
+                                }
+                            }).result.then(
+                                function success() {
+                                },
+                                function error() {
+                                }
+                            );
+                        };
+                    }
+                });
             }
         };
     })

@@ -308,8 +308,12 @@ table.ot-validation-runs {
  * Commands
  */
 
-.ot-command {
+.ot-action {
   cursor: pointer;
+}
+
+.ot-command {
+  .ot-action;
   opacity: 0.35;
   &:hover {
     opacity: 1.0;
