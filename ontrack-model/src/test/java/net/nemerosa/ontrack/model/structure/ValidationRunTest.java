@@ -18,6 +18,7 @@ public class ValidationRunTest {
         ValidationRun run = ValidationRun.of(
                 build,
                 stamp,
+                1,
                 Signature.of("validator"),
                 statusId,
                 "Some validation"
@@ -26,6 +27,7 @@ public class ValidationRunTest {
         Entity.isEntityNew(run, "Validation run must be new");
         assertSame(build, run.getBuild());
         assertSame(stamp, run.getValidationStamp());
+        assertEquals(1, run.getRunOrder());
         List<ValidationRunStatus> statuses = run.getValidationRunStatuses();
         assertNotNull(statuses);
         assertEquals(1, statuses.size());

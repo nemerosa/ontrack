@@ -84,6 +84,7 @@ public class ValidationRunController extends AbstractResourceController {
         ValidationRun validationRun = ValidationRun.of(
                 build,
                 validationStamp,
+                0,
                 securityService.getCurrentSignature(),
                 validationRunStatusID,
                 validationRunRequest.getDescription()

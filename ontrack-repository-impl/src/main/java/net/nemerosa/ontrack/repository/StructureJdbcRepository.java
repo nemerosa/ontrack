@@ -415,7 +415,8 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         validationRun.getValidationRunStatuses().stream()
                 .forEach(validationRunStatus -> newValidationRunStatus(id, validationRunStatus));
 
-        return validationRun.withId(ID.of(id));
+        // Reloads the run
+        return getValidationRun(ID.of(id));
     }
 
     @Override
@@ -476,10 +477,20 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                         rs1.getString("description")
                 )
         );
+        // Build & validation stamp
+        ID buildId = id(rs, "buildId");
+        ID validationStampId = id(rs, "validationStampId");
+        // Run order
+        int runOrder = getNamedParameterJdbcTemplate().queryForObject(
+                "SELECT COUNT(*) FROM VALIDATION_RUNS WHERE BUILDID=:buildId AND VALIDATIONSTAMPID=:validationStampId AND ID <= :id",
+                params("id", id).addValue("buildId", buildId.getValue()).addValue("validationStampId", validationStampId.getValue()),
+                Integer.class
+        );
         // Run itself
         return ValidationRun.of(
-                buildSupplier.apply(id(rs, "buildId")),
-                validationStampSupplier.apply(id(rs, "validationStampId")),
+                buildSupplier.apply(buildId),
+                validationStampSupplier.apply(validationStampId),
+                runOrder,
                 statuses
         ).withId(ID.of(id));
     }

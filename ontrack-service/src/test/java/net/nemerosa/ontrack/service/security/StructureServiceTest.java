@@ -153,6 +153,7 @@ public class StructureServiceTest extends AbstractITTestSupport {
                 ValidationRun.of(
                         build,
                         stamp,
+                        0,
                         Signature.of("user"),
                         passed,
                         "Passed test"
@@ -174,6 +175,7 @@ public class StructureServiceTest extends AbstractITTestSupport {
                                 ValidationRun.of(
                                         build,
                                         stamp,
+                                        0,
                                         Signature.of("user"),
                                         passed,
                                         "Passed test"
@@ -181,7 +183,7 @@ public class StructureServiceTest extends AbstractITTestSupport {
                         )
         );
         Entity.isEntityDefined(run, "Validation run is defined");
-        // TODO Loads the run again and chekcks its statuses
+        assertEquals("Validation run order must be 1", 1, run.getRunOrder());
     }
 
     private Build doCreateBuild(Branch branch, NameDescription nameDescription) throws Exception {

@@ -19,6 +19,10 @@ public class ValidationRun implements ProjectEntity {
     private final Build build;
     @JsonView({ValidationRun.class, Build.class})
     private final ValidationStamp validationStamp;
+    /**
+     * The run order is the order of run for the build. It starts with 1 for the first run.
+     */
+    private final int runOrder;
 
     /**
      * Must always contain at least one validation run status at creation time.
@@ -33,6 +37,7 @@ public class ValidationRun implements ProjectEntity {
                 id,
                 build,
                 validationStamp,
+                runOrder,
                 Collections.unmodifiableList(statuses)
         );
     }
@@ -50,6 +55,7 @@ public class ValidationRun implements ProjectEntity {
     public static ValidationRun of(
             Build build,
             ValidationStamp validationStamp,
+            int runOrder,
             Signature signature,
             ValidationRunStatusID validationRunStatusID,
             String description) {
@@ -60,14 +66,15 @@ public class ValidationRun implements ProjectEntity {
                         description
                 )
         );
-        return of(build, validationStamp, statuses);
+        return of(build, validationStamp, runOrder, statuses);
     }
 
-    public static ValidationRun of(Build build, ValidationStamp validationStamp, List<ValidationRunStatus> statuses) {
+    public static ValidationRun of(Build build, ValidationStamp validationStamp, int runOrder, List<ValidationRunStatus> statuses) {
         return new ValidationRun(
                 ID.NONE,
                 build,
                 validationStamp,
+                runOrder,
                 statuses
         );
     }
@@ -77,6 +84,7 @@ public class ValidationRun implements ProjectEntity {
                 id,
                 build,
                 validationStamp,
+                runOrder,
                 validationRunStatuses
         );
     }
