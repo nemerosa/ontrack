@@ -21,12 +21,14 @@ public class ValidationRunController extends AbstractResourceController {
 
     private final StructureService structureService;
     private final ValidationRunStatusService validationRunStatusService;
+    private final PropertyService propertyService;
     private final SecurityService securityService;
 
     @Autowired
-    public ValidationRunController(StructureService structureService, ValidationRunStatusService validationRunStatusService, SecurityService securityService) {
+    public ValidationRunController(StructureService structureService, ValidationRunStatusService validationRunStatusService, PropertyService propertyService, SecurityService securityService) {
         this.structureService = structureService;
         this.validationRunStatusService = validationRunStatusService;
+        this.propertyService = propertyService;
         this.securityService = securityService;
     }
 
@@ -87,7 +89,17 @@ public class ValidationRunController extends AbstractResourceController {
                 validationRunRequest.getDescription()
         );
         // Creation
-        return structureService.newValidationRun(validationRun);
+        validationRun = structureService.newValidationRun(validationRun);
+        // Saves the properties
+        for (PropertyCreationRequest propertyCreationRequest : validationRunRequest.getProperties()) {
+            propertyService.editProperty(
+                    validationRun,
+                    propertyCreationRequest.getPropertyTypeName(),
+                    propertyCreationRequest.getPropertyData()
+            );
+        }
+        // OK
+        return validationRun;
     }
 
     @RequestMapping(value = "validationRuns/{validationRunId}", method = RequestMethod.GET)
