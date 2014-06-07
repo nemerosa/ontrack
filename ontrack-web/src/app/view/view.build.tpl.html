@@ -5,7 +5,8 @@
             <div class="well">
                 <span ng-repeat="promotionRun in promotionRunCollection.resources">
                     <span class="ot-promotion-run">
-                        <ot-entity-image entity="promotionRun.promotionLevel" link="#/promotionLevel/{{promotionRun.promotionLevel.id}}">
+                        <ot-entity-image entity="promotionRun.promotionLevel"
+                                         link="#/promotionLevel/{{promotionRun.promotionLevel.id}}">
                             {{promotionRun.promotionLevel.name}}
                         </ot-entity-image>
                         <span class="ot-promotion-run-signature">
@@ -37,9 +38,11 @@
                                     </ot-entity-image>
                                 </td>
                                 <td>
-                                    <span ng-repeat="validationRun in validationStampRunView.validationRun" class="ot-validation-run-status-horizontal">
+                                    <span ng-repeat="validationRun in validationStampRunView.validationRun"
+                                          class="ot-validation-run-status-horizontal">
                                         <a href="#/validationRun/{{validationRun.id}}">
-                                            <ot-validation-run-status status="validationRun.lastStatus"></ot-validation-run-status>
+                                            <ot-validation-run-status
+                                                    status="validationRun.lastStatus"></ot-validation-run-status>
                                         </a>
                                     </span>
                                 </td>
@@ -62,9 +65,11 @@
                                     </ot-entity-image>
                                 </td>
                                 <td>
-                                    <span ng-repeat="validationRun in validationStampRunView.validationRun" class="ot-validation-run-status-horizontal">
+                                    <span ng-repeat="validationRun in validationStampRunView.validationRun"
+                                          class="ot-validation-run-status-horizontal">
                                         <a href="#/validationRun/{{validationRun.id}}">
-                                            <ot-validation-run-status status="validationRun.lastStatus"></ot-validation-run-status>
+                                            <ot-validation-run-status
+                                                    status="validationRun.lastStatus"></ot-validation-run-status>
                                         </a>
                                     </span>
                                 </td>
@@ -89,6 +94,16 @@
                             </tr>
                         </table>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <ot-section-title>Properties</ot-section-title>
+            <div class="row">
+                <div class="col-md-12">
+                    <ot-entity-properties entity="build"></ot-entity-properties>
                 </div>
             </div>
         </div>

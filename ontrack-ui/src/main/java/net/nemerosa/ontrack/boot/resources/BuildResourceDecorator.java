@@ -1,10 +1,12 @@
 package net.nemerosa.ontrack.boot.resources;
 
 import net.nemerosa.ontrack.boot.ui.BuildController;
+import net.nemerosa.ontrack.boot.ui.PropertyController;
 import net.nemerosa.ontrack.boot.ui.ValidationRunController;
 import net.nemerosa.ontrack.model.security.PromotionRunCreate;
 import net.nemerosa.ontrack.model.security.ValidationRunCreate;
 import net.nemerosa.ontrack.model.structure.Build;
+import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.ResourceContext;
@@ -39,6 +41,8 @@ public class BuildResourceDecorator extends AbstractResourceDecorator<Build> {
                         on(ValidationRunController.class).newValidationRunForm(build.getId()),
                         ValidationRunCreate.class, build.getBranch().getProject().id()
                 )
+                        // Actual properties for this build
+                .link("_properties", on(PropertyController.class).getProperties(ProjectEntityType.BUILD, build.getId()))
                         // TODO Update
                         // TODO Delete
                         // OK

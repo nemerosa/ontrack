@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.common.MapBuilder;
 import net.nemerosa.ontrack.model.exceptions.PropertyUnsupportedEntityTypeException;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Int;
+import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.security.BuildCreate;
 import net.nemerosa.ontrack.model.security.PromotionRunCreate;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -83,6 +84,13 @@ public class JenkinsBuildPropertyType extends AbstractJenkinsPropertyType<Jenkin
     @Override
     public Form getEditionForm(JenkinsBuildProperty value) {
         return super.getEditionForm(value)
+                .with(
+                        Text.of("job")
+                                .label("Job name")
+                                .length(120)
+                                .help("Name of Jenkins Job")
+                                .value(value != null ? value.getJob() : null)
+                )
                 .with(
                         Int.of("build")
                                 .label("Build number")
