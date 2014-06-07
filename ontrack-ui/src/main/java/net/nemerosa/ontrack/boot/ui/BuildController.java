@@ -109,7 +109,17 @@ public class BuildController extends AbstractResourceController {
                 promotionRunRequest.getDescription()
         );
         // Creation
-        return structureService.newPromotionRun(promotionRun);
+        promotionRun = structureService.newPromotionRun(promotionRun);
+        // Saves the properties
+        for (PropertyCreationRequest propertyCreationRequest : promotionRunRequest.getProperties()) {
+            propertyService.editProperty(
+                    promotionRun,
+                    propertyCreationRequest.getPropertyTypeName(),
+                    propertyCreationRequest.getPropertyData()
+            );
+        }
+        // OK
+        return promotionRun;
     }
 
     @RequestMapping(value = "promotionRuns/{promotionRunId}", method = RequestMethod.GET)
