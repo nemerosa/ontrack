@@ -29,21 +29,6 @@ public class JenkinsJobPropertyType extends AbstractJenkinsPropertyType<JenkinsJ
     }
 
     @Override
-    public String getIconPath() {
-        return "assets/extension/jenkins/JenkinsJob.png";
-    }
-
-    @Override
-    public String getShortTemplatePath() {
-        return "app/extension/jenkins/jenkins-job-property-short.tpl.html";
-    }
-
-    @Override
-    public String getFullTemplatePath() {
-        return "app/extension/jenkins/jenkins-job-property-full.tpl.html";
-    }
-
-    @Override
     public Set<ProjectEntityType> getSupportedEntityTypes() {
         return EnumSet.of(
                 ProjectEntityType.PROJECT,

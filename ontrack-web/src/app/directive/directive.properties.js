@@ -31,6 +31,11 @@ angular.module('ot.directive.properties', [
                         scope.valueProperties = valueProperties;
                     });
 
+                    // Getting the path to a property's template
+                    scope.getTemplatePath = function (property) {
+                        return 'app/extension/property/' + property.typeDescriptor.typeName + '.tpl.html';
+                    };
+
                     // Adding a property
                     scope.addProperty = function (property) {
                         otPropertiesService.addProperty(property).then(loadProperties);

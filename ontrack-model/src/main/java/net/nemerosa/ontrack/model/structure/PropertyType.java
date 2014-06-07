@@ -24,26 +24,6 @@ public interface PropertyType<T> {
     String getDescription();
 
     /**
-     * Icon path.
-     * <p/>
-     * This path is relative to the Web root. It may be <code>null</code> if no icon is associated to this property.
-     */
-    String getIconPath();
-
-    /**
-     * Template path for the short representation. It is mainly used for short lists.
-     * See {@link #getFullTemplatePath()} for an explanation.
-     */
-    String getShortTemplatePath();
-
-    /**
-     * Template path for the full representation. It is used for the full representation of the property value.
-     * <p/>
-     * This path is relative to the Web root and is merged with the property raw value.
-     */
-    String getFullTemplatePath();
-
-    /**
      * List of entity types this property applies to.
      */
     Set<ProjectEntityType> getSupportedEntityTypes();

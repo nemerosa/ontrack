@@ -33,21 +33,6 @@ public class JenkinsBuildPropertyType extends AbstractJenkinsPropertyType<Jenkin
     }
 
     @Override
-    public String getIconPath() {
-        return "assets/extension/jenkins/JenkinsBuild.png";
-    }
-
-    @Override
-    public String getShortTemplatePath() {
-        return "app/extension/jenkins/jenkins-build-property-short.tpl.html";
-    }
-
-    @Override
-    public String getFullTemplatePath() {
-        return "app/extension/jenkins/jenkins-build-property-full.tpl.html";
-    }
-
-    @Override
     public Set<ProjectEntityType> getSupportedEntityTypes() {
         return EnumSet.of(
                 ProjectEntityType.BUILD,
