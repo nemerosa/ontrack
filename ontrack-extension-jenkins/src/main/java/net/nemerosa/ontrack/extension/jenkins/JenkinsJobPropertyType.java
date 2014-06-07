@@ -6,10 +6,11 @@ import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.structure.Branch;
-import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
-import net.nemerosa.ontrack.model.structure.ValidationStamp;
+import net.nemerosa.ontrack.model.structure.ProjectEntityType;
+
+import java.util.EnumSet;
+import java.util.Set;
 
 public class JenkinsJobPropertyType extends AbstractJenkinsPropertyType<JenkinsJobProperty> {
 
@@ -43,10 +44,13 @@ public class JenkinsJobPropertyType extends AbstractJenkinsPropertyType<JenkinsJ
     }
 
     @Override
-    public boolean applies(Class<? extends ProjectEntity> entityClass) {
-        return entityClass.isAssignableFrom(Project.class)
-                || entityClass.isAssignableFrom(Branch.class)
-                || entityClass.isAssignableFrom(ValidationStamp.class);
+    public Set<ProjectEntityType> getSupportedEntityTypes() {
+        return EnumSet.of(
+                ProjectEntityType.PROJECT,
+                ProjectEntityType.BRANCH,
+                ProjectEntityType.PROMOTION_LEVEL,
+                ProjectEntityType.VALIDATION_STAMP
+        );
     }
 
     /**

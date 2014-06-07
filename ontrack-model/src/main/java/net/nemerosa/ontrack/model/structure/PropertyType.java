@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.SecurityService;
 
+import java.util.Set;
+
 /**
  * Defines the type for a property.
  *
@@ -42,9 +44,9 @@ public interface PropertyType<T> {
     String getFullTemplatePath();
 
     /**
-     * Does this property apply to the given entity type?
+     * List of entity types this property applies to.
      */
-    boolean applies(Class<? extends ProjectEntity> entityClass);
+    Set<ProjectEntityType> getSupportedEntityTypes();
 
     /**
      * Edition policy.

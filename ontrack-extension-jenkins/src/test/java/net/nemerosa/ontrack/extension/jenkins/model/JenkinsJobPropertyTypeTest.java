@@ -14,6 +14,8 @@ import net.nemerosa.ontrack.model.structure.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Set;
+
 import static net.nemerosa.ontrack.json.JsonUtils.object;
 import static net.nemerosa.ontrack.test.TestUtils.assertJsonEquals;
 import static org.junit.Assert.*;
@@ -35,12 +37,14 @@ public class JenkinsJobPropertyTypeTest {
 
     @Test
     public void applies() {
-        assertTrue(type.applies(Project.class));
-        assertTrue(type.applies(Branch.class));
-        assertFalse(type.applies(PromotionLevel.class));
-        assertTrue(type.applies(ValidationStamp.class));
-        assertFalse(type.applies(Build.class));
-        assertFalse(type.applies(ValidationRun.class));
+        Set<ProjectEntityType> types = type.getSupportedEntityTypes();
+        assertTrue(types.contains(ProjectEntityType.PROJECT));
+        assertTrue(types.contains(ProjectEntityType.BRANCH));
+        assertTrue(types.contains(ProjectEntityType.PROMOTION_LEVEL));
+        assertTrue(types.contains(ProjectEntityType.VALIDATION_STAMP));
+        assertFalse(types.contains(ProjectEntityType.BUILD));
+        assertFalse(types.contains(ProjectEntityType.PROMOTION_RUN));
+        assertFalse(types.contains(ProjectEntityType.VALIDATION_RUN));
     }
 
     @Test

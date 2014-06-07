@@ -62,7 +62,7 @@ public class PropertyServiceImpl implements PropertyService {
         // With all the existing properties...
         return getPropertyTypes().stream()
                 // ... filters them by entity
-                .filter(type -> type.applies(entity.getClass()))
+                .filter(type -> type.getSupportedEntityTypes().contains(entity.getProjectEntityType()))
                         // ... filters them by access right
                 .filter(type -> type.canView(entity, securityService))
                         // ... loads them from the store
