@@ -19,11 +19,13 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 public class BuildController extends AbstractResourceController {
 
     private final StructureService structureService;
+    private final PropertyService propertyService;
     private final SecurityService securityService;
 
     @Autowired
-    public BuildController(StructureService structureService, SecurityService securityService) {
+    public BuildController(StructureService structureService, PropertyService propertyService, SecurityService securityService) {
         this.structureService = structureService;
+        this.propertyService = propertyService;
         this.securityService = securityService;
     }
 
@@ -38,15 +40,25 @@ public class BuildController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "branches/{branchId}/builds/create", method = RequestMethod.POST)
-    public Build newBuild(@PathVariable ID branchId, @RequestBody NameDescription nameDescription) {
+    public Build newBuild(@PathVariable ID branchId, @RequestBody BuildRequest request) {
         // Gets the holding branch
         Branch branch = structureService.getBranch(branchId);
         // Build signature
         Signature signature = securityService.getCurrentSignature();
         // Creates a new build
-        Build build = Build.of(branch, nameDescription, signature);
+        Build build = Build.of(branch, request.asNameDescription(), signature);
         // Saves it into the repository
-        return structureService.newBuild(build);
+        build = structureService.newBuild(build);
+        // Saves the properties
+        for (PropertyCreationRequest propertyCreationRequest : request.getProperties()) {
+            propertyService.editProperty(
+                    build,
+                    propertyCreationRequest.getPropertyTypeName(),
+                    propertyCreationRequest.getPropertyData()
+            );
+        }
+        // OK
+        return build;
     }
 
     @RequestMapping(value = "builds/{buildId}", method = RequestMethod.GET)

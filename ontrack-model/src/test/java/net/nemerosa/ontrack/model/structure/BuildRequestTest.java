@@ -9,8 +9,33 @@ import java.util.Collections;
 import static net.nemerosa.ontrack.json.JsonUtils.array;
 import static net.nemerosa.ontrack.json.JsonUtils.object;
 import static net.nemerosa.ontrack.test.TestUtils.assertJsonRead;
+import static org.junit.Assert.assertEquals;
 
 public class BuildRequestTest {
+
+    @Test
+    public void a_null_properties_list() {
+        assertEquals(
+                Collections.<PropertyCreationRequest>emptyList(),
+                new BuildRequest(
+                        "12",
+                        "Build 12",
+                        null
+                ).getProperties()
+        );
+    }
+
+    @Test
+    public void name_description() throws JsonProcessingException {
+        assertEquals(
+                new NameDescription("12", "Build 12"),
+                new BuildRequest(
+                        "12",
+                        "Build 12",
+                        Collections.emptyList()
+                ).asNameDescription()
+        );
+    }
 
     @Test
     public void from_json_without_properties() throws JsonProcessingException {

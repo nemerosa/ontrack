@@ -26,4 +26,8 @@ public class BuildRequest {
         this.description = description;
         this.properties = properties != null ? properties : Collections.emptyList();
     }
+
+    public NameDescription asNameDescription() {
+        return new NameDescription(name, description);
+    }
 }
