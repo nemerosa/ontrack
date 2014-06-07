@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.extension.api.PropertyTypeExtension;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.exceptions.PropertyTypeNotFoundException;
+import net.nemerosa.ontrack.model.exceptions.PropertyUnsupportedEntityTypeException;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
@@ -118,6 +119,10 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     protected <T> T getPropertyValue(PropertyType<T> type, ProjectEntity entity) {
+        // Supported entity?
+        if (!type.getSupportedEntityTypes().contains(entity.getProjectEntityType())) {
+            throw new PropertyUnsupportedEntityTypeException(type.getClass().getName(), entity.getProjectEntityType());
+        }
         // Checks for viewing
         if (!type.canView(entity, securityService)) {
             throw new AccessDeniedException("Property is not opened for viewing.");
