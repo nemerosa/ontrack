@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.model.security;
 
+import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.Signature;
 
 import java.util.function.Supplier;
@@ -13,6 +14,10 @@ public interface SecurityService {
     void checkProjectFunction(int projectId, Class<? extends ProjectFunction> fn);
 
     boolean isProjectFunctionGranted(int projectId, Class<? extends ProjectFunction> fn);
+
+    default boolean isProjectFunctionGranted(ProjectEntity entity, Class<? extends ProjectFunction> fn) {
+        return isProjectFunctionGranted(entity.projectId(), fn);
+    }
 
     Account getCurrentAccount();
 
