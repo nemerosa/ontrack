@@ -30,6 +30,11 @@ angular.module('ot.service.form', [
             var d = $q.defer();
 
             self.getForm(formConfig).then(function (form) {
+                // Post form treatment
+                if (formConfig.postForm) {
+                    form = formConfig.postForm(form);
+                }
+                // Dialog
                 $modal.open({
                     templateUrl: 'app/dialog/dialog.form.tpl.html',
                     controller: 'otDialogForm',
@@ -104,6 +109,18 @@ angular.module('ot.service.form', [
             delete data.times;
             // OK
             return data;
+        };
+
+        /**
+         * Updates the value for a field
+         */
+        self.updateFieldValue = function (form, fieldName, value) {
+            angular.forEach(form.fields, function (field) {
+                if (field.name == fieldName) {
+                    field.value = value;
+                }
+            });
+            return form;
         };
 
         return self;

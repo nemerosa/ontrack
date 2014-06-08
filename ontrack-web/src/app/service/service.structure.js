@@ -16,14 +16,18 @@ angular.module('ot.service.structure', [
         /**
          * Creating from a form, using POST
          */
-        self.create = function (uri, title) {
-            return otFormService.display({
+        self.create = function (uri, title, additionalFormConfig) {
+            var formConfig = {
                 uri: uri,
                 title: title,
                 submit: function (data) {
                     return ot.call($http.post(uri, data));
                 }
-            });
+            };
+            if (additionalFormConfig) {
+                angular.extend(formConfig, additionalFormConfig);
+            }
+            return otFormService.display(formConfig);
         };
 
         /**

@@ -1,6 +1,7 @@
 angular.module('ot.view.branch', [
     'ui.router',
     'ot.service.core',
+    'ot.service.form',
     'ot.service.structure',
     'ot.dialog.validationStampRunView'
 ])
@@ -90,7 +91,7 @@ angular.module('ot.view.branch', [
         };
 
     })
-    .directive('otBranchBuildView', function ($modal, otStructureService) {
+    .directive('otBranchBuildView', function ($modal, otFormService, otStructureService) {
         return {
             restrict: 'E',
             templateUrl: 'app/view/view.branchBuildView.tpl.html',
@@ -105,8 +106,15 @@ angular.module('ot.view.branch', [
                          * Creating a validation run
                          */
                         scope.createValidationRun = function (buildView, validationStampRunView) {
-                            // TODO Prefills the validation stamp
-                            otStructureService.create(buildView.build._validate, 'Validation for the build').then(
+                            otStructureService.create(
+                                buildView.build._validate,
+                                'Validation for the build',
+                                {
+                                    postForm: function (form) {
+                                        return otFormService.updateFieldValue(form, 'validationStamp', validationStampRunView.validationStamp.id);
+                                    }
+                                }
+                            ).then(
                                 function on_success() {
                                     // FIXME Reloads the branch build view
                                 }
@@ -127,12 +135,7 @@ angular.module('ot.view.branch', [
                                         };
                                     }
                                 }
-                            }).result.then(
-                                function success() {
-                                },
-                                function error() {
-                                }
-                            );
+                            });
                         };
                     }
                 });
