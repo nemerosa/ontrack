@@ -24,6 +24,7 @@ public class DecorationServiceImpl implements DecorationService {
     @Override
     public List<Decoration> getDecorations(ProjectEntity entity) {
         // Gets the list of decorators
+        // TODO Use parallelStream() with an extension to take into account the current security context
         return extensionManager.getExtensions(DecorationExtension.class).stream()
                 // ... and filters per entity
                 .filter(decorator -> decorator.getScope().contains(entity.getProjectEntityType()))

@@ -24,6 +24,8 @@ public class DecorationsController extends AbstractProjectEntityController {
 
     /**
      * Decorations for an entity.
+     * <p/>
+     * TODO Makes this call asynchronous since some decorations might take a long time to be resolved
      */
     @RequestMapping(value = "{entityType}/{id}", method = RequestMethod.GET)
     public Resources<Decoration> getDecorations(@PathVariable ProjectEntityType entityType, @PathVariable ID id) {
