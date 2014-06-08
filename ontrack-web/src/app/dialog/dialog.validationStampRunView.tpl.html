@@ -17,6 +17,10 @@
             <a href="#/validationRun/{{validationRun.id}}" ng-click="cancel()">
             Run #{{validationRun.runOrder}}
             </a>
+            <p class="ot-command pull-right" ng-if="validationRun._validationRunStatusChange" title="Change status"
+                    ng-click="changeStatus(validationRun)">
+                <span class="glyphicon glyphicon-comment"></span>
+            </p>
         </div>
         <ul class="list-group">
             <li class="list-group-item" ng-repeat="validationRunStatus in validationRun.validationRunStatuses">
