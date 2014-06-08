@@ -14,11 +14,18 @@
     <div class="panel panel-default"
          ng-repeat="validationRun in config.validationStampRunView.validationRun | orderBy:'id':true">
         <div class="panel-heading">
-            Run
-            #<a href="#/validationRun/{{validationRun.id}}" ng-click="cancel()">
-                {{validationRun.runOrder}}
+            <a href="#/validationRun/{{validationRun.id}}" ng-click="cancel()">
+            Run #{{validationRun.runOrder}}
             </a>
         </div>
+        <ul class="list-group">
+            <li class="list-group-item" ng-repeat="validationRunStatus in validationRun.validationRunStatuses">
+                <ot-validation-run-status status="validationRunStatus"></ot-validation-run-status>
+                {{validationRunStatus.statusID.name}}
+                <p class="pull-right"><ot-signature value="validationRunStatus.signature" user="true" time="true"></ot-signature></p>
+                <p ng-if="validationRunStatus.description" class="ot-description">{{validationRunStatus.description}}</p>
+            </li>
+        </ul>
     </div>
 </div>
 <div class="modal-footer">
