@@ -102,11 +102,7 @@ angular.module('ot.view.branch', [
                         return otFormService.updateFieldValue(form, 'validationStamp', validationStampRunView.validationStamp.id);
                     }
                 }
-            ).then(
-                function on_success() {
-                    // FIXME Reloads the branch build view
-                }
-            );
+            ).then(loadBuildView);
         };
 
         /**
