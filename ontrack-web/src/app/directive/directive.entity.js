@@ -1,5 +1,5 @@
 angular.module('ot.directive.entity', [
-
+    'ot.service.core'
 ])
     .directive('otEntityImage', function () {
         return {
@@ -9,6 +9,25 @@ angular.module('ot.directive.entity', [
             scope: {
                 entity: '=',
                 link: '@'
+            }
+        };
+    })
+    .directive('otEntityDecorations', function ($http, ot) {
+        return {
+            restrict: 'E',
+            templateUrl: 'app/directive/directive.entityDecorations.tpl.html',
+            transclude: true,
+            scope: {
+                entity: '='
+            },
+            link: function (scope) {
+                scope.$watch('entity', function () {
+                    if (scope.entity) {
+                        ot.call($http.get(scope.entity._decorations)).then(function (decorations) {
+                            scope.decorations = decorations;
+                        });
+                    }
+                });
             }
         };
     })

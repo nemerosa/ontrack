@@ -3,14 +3,24 @@
     <!-- Validation stamps -->
     <tr>
         <th colspan="2">
-            <!-- Place holder for builds & promotions -->
+            <!-- Place holder for builds and promotions -->
         </th>
         <!-- All validation stamps -->
         <th ng-repeat="validationStamp in validationStampCollection.resources" class="ot-branch-build-view-validation">
             <ot-entity-image entity="validationStamp" link="#/validationStamp/{{validationStamp.id}}"></ot-entity-image>
         </th>
     </tr>
-    <!-- TODO Validation stamps decorations -->
+    <!-- Validation stamps decorations -->
+    <tr>
+        <th colspan="2">
+            <!-- Place holder for builds and promotions -->
+        </th>
+        <!-- For each validation stamp -->
+        <th ng-repeat="validationStamp in validationStampCollection.resources" class="ot-branch-build-view-validation">
+            &nbsp;
+            <ot-entity-decorations entity="validationStamp"></ot-entity-decorations>
+        </th>
+    </tr>
     </thead>
     <tbody>
     <tr ng-repeat="buildView in branchBuildView.buildViews">
