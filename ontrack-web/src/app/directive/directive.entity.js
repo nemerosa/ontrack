@@ -28,6 +28,9 @@ angular.module('ot.directive.entity', [
                             scope.decorationImagePath = function (decoration) {
                                 return 'assets/extension/decoration/' + decoration.decorationType + '/' + decoration.id + '.png';
                             };
+                            scope.decorationClassName = function (decoration) {
+                                return (decoration.decorationType + '.' + decoration.id).replace(/\./g, '-');
+                            };
                         });
                     }
                 });

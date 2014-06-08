@@ -1,6 +1,6 @@
 <img
         ng-repeat="decoration in decorations.resources"
         ng-src="{{decorationImagePath(decoration)}}"
-        class="ot-icon"
+        class="ot-icon {{decorationClassName(decoration)}}"
         title="{{decoration.title}}"
         alt="{{decoration.id}}"/>
