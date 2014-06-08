@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
@@ -22,15 +21,14 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
  */
 @RestController
 @RequestMapping("/properties")
-public class PropertyController extends AbstractResourceController {
+public class PropertyController extends AbstractProjectEntityController {
 
     private final PropertyService propertyService;
-    private final StructureService structureService;
 
     @Autowired
     public PropertyController(PropertyService propertyService, StructureService structureService) {
+        super(structureService);
         this.propertyService = propertyService;
-        this.structureService = structureService;
     }
 
     /**
@@ -136,7 +134,4 @@ public class PropertyController extends AbstractResourceController {
         );
     }
 
-    protected ProjectEntity getEntity(ProjectEntityType entityType, ID id) {
-        return entityType.getEntityFn(structureService).apply(id);
-    }
 }
