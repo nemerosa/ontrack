@@ -11,6 +11,15 @@
     </h3>
 </div>
 <div class="modal-body">
+    <div class="panel panel-default"
+         ng-repeat="validationRun in config.validationStampRunView.validationRun | orderBy:'id':true">
+        <div class="panel-heading">
+            Run
+            #<a href="#/validationRun/{{validationRun.id}}" ng-click="cancel()">
+                {{validationRun.runOrder}}
+            </a>
+        </div>
+    </div>
 </div>
 <div class="modal-footer">
     <button class="btn btn-primary" type="submit" ng-click="cancel()">OK</button>
