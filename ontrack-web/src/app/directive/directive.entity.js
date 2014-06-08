@@ -25,6 +25,9 @@ angular.module('ot.directive.entity', [
                     if (scope.entity) {
                         ot.call($http.get(scope.entity._decorations)).then(function (decorations) {
                             scope.decorations = decorations;
+                            scope.decorationImagePath = function (decoration) {
+                                return 'assets/extension/decoration/' + decoration.decorationType + '/' + decoration.id + '.png';
+                            };
                         });
                     }
                 });

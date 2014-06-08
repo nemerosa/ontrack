@@ -49,23 +49,23 @@ public class ValidationStampWeatherDecorationExtension extends AbstractExtension
     }
 
     private Decoration sunny() {
-        return Decoration.of("sunny", "Sunny (0 failure in the last 5 builds)");
+        return Decoration.of(this, "sunny", "Sunny (0 failure in the last 5 builds)");
     }
 
     private Decoration sunAndClouds() {
-        return Decoration.of("sunAndClouds", "Sun and clouds (1 failure in the last 5 builds)");
+        return Decoration.of(this, "sunAndClouds", "Sun and clouds (1 failure in the last 5 builds)");
     }
 
     private Decoration clouds() {
-        return Decoration.of("clouds", "Clouds (2 failures in the last 5 builds)");
+        return Decoration.of(this, "clouds", "Clouds (2 failures in the last 5 builds)");
     }
 
     private Decoration rain() {
-        return Decoration.of("rain", "Rain (3 failures in the last 5 builds)");
+        return Decoration.of(this, "rain", "Rain (3 failures in the last 5 builds)");
     }
 
     private Decoration storm() {
-        return Decoration.of("storm", "Storm (4 failures or more in the last 5 builds)");
+        return Decoration.of(this, "storm", "Storm (4 failures or more in the last 5 builds)");
     }
 
 }
