@@ -6,14 +6,14 @@
             <!-- Place holder for builds & promotions -->
         </th>
         <!-- All validation stamps -->
-        <th ng-repeat="validationStamp in validationStamps" class="ot-branch-build-view-validation">
+        <th ng-repeat="validationStamp in validationStampCollection.resources" class="ot-branch-build-view-validation">
             <ot-entity-image entity="validationStamp" link="#/validationStamp/{{validationStamp.id}}"></ot-entity-image>
         </th>
     </tr>
     <!-- TODO Validation stamps decorations -->
     </thead>
     <tbody>
-    <tr ng-repeat="buildView in view.buildViews">
+    <tr ng-repeat="buildView in branchBuildView.buildViews">
         <td>
             <!-- Build name and link -->
             <a href="#/build/{{buildView.build.id}}" class="ot-branch-build-view-build-name">

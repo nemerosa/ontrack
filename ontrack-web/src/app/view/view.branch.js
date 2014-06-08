@@ -12,7 +12,7 @@ angular.module('ot.view.branch', [
             controller: 'BranchCtrl'
         });
     })
-    .controller('BranchCtrl', function ($scope, $stateParams, $http, ot, otStructureService) {
+    .controller('BranchCtrl', function ($scope, $stateParams, $http, $modal, ot, otFormService, otStructureService) {
         var view = ot.view();
         // Branch's id
         var branchId = $stateParams.branchId;
@@ -90,56 +90,42 @@ angular.module('ot.view.branch', [
             otStructureService.create($scope.branch._createValidationStamp, 'New validation stamp').then(loadBranch);
         };
 
-    })
-    .directive('otBranchBuildView', function ($modal, otFormService, otStructureService) {
-        return {
-            restrict: 'E',
-            templateUrl: 'app/view/view.branchBuildView.tpl.html',
-            scope: {
-                view: '=',
-                validationStamps: '='
-            },
-            link: function (scope) {
-                scope.$watch('view', function () {
-                    if (scope.view) {
-                        /**
-                         * Creating a validation run
-                         */
-                        scope.createValidationRun = function (buildView, validationStampRunView) {
-                            otStructureService.create(
-                                buildView.build._validate,
-                                'Validation for the build',
-                                {
-                                    postForm: function (form) {
-                                        return otFormService.updateFieldValue(form, 'validationStamp', validationStampRunView.validationStamp.id);
-                                    }
-                                }
-                            ).then(
-                                function on_success() {
-                                    // FIXME Reloads the branch build view
-                                }
-                            );
-                        };
-                        /**
-                         * Displaying the validation runs
-                         */
-                        scope.displayValidationRuns = function (buildView, validationStampRunView) {
-                            $modal.open({
-                                templateUrl: 'app/dialog/dialog.validationStampRunView.tpl.html',
-                                controller: 'otDialogValidationStampRunView',
-                                resolve: {
-                                    config: function () {
-                                        return {
-                                            buildView: buildView,
-                                            validationStampRunView: validationStampRunView
-                                        };
-                                    }
-                                }
-                            });
+        /**
+         * Creating a validation run
+         */
+        $scope.createValidationRun = function (buildView, validationStampRunView) {
+            otStructureService.create(
+                buildView.build._validate,
+                'Validation for the build',
+                {
+                    postForm: function (form) {
+                        return otFormService.updateFieldValue(form, 'validationStamp', validationStampRunView.validationStamp.id);
+                    }
+                }
+            ).then(
+                function on_success() {
+                    // FIXME Reloads the branch build view
+                }
+            );
+        };
+
+        /**
+         * Displaying the validation runs
+         */
+        $scope.displayValidationRuns = function (buildView, validationStampRunView) {
+            $modal.open({
+                templateUrl: 'app/dialog/dialog.validationStampRunView.tpl.html',
+                controller: 'otDialogValidationStampRunView',
+                resolve: {
+                    config: function () {
+                        return {
+                            buildView: buildView,
+                            validationStampRunView: validationStampRunView
                         };
                     }
-                });
-            }
+                }
+            });
         };
+
     })
 ;
