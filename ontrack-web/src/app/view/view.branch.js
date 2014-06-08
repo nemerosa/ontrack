@@ -101,13 +101,14 @@ angular.module('ot.view.branch', [
             link: function (scope) {
                 scope.$watch('view', function () {
                     if (scope.view) {
-                        scope.displayValidationRuns = function (validationStampRunView) {
+                        scope.displayValidationRuns = function (buildView, validationStampRunView) {
                             $modal.open({
                                 templateUrl: 'app/dialog/dialog.validationStampRunView.tpl.html',
                                 controller: 'otDialogValidationStampRunView',
                                 resolve: {
                                     config: function () {
                                         return {
+                                            buildView: buildView,
                                             validationStampRunView: validationStampRunView
                                         };
                                     }

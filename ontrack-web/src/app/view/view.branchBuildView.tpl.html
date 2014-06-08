@@ -46,7 +46,7 @@
             <span ng-if="!validationStampRunView.run"><ot-validation-run-status-none></ot-validation-run-status-none></span>
             <!-- Last status -->
             <span ng-if="validationStampRunView.run">
-                <span class="ot-action" ng-click="displayValidationRuns(validationStampRunView)">
+                <span class="ot-action" ng-click="displayValidationRuns(buildView, validationStampRunView)">
                     <ot-validation-run-status status="validationStampRunView.lastStatus"></ot-validation-run-status>
                 </span>
             </span>

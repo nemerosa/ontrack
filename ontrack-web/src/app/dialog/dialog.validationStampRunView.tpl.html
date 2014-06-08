@@ -1,13 +1,16 @@
 <div class="modal-header">
     <h3 ng-click="cancel()">
+        Runs for
         <ot-entity-image entity="config.validationStampRunView.validationStamp" link="#/validationStamp/{{config.validationStampRunView.validationStamp.id}}">
             {{config.validationStampRunView.validationStamp.name}}
         </ot-entity-image>
-        runs
+        in build
+        <a href="#/build/{{config.buildView.build.id}}">
+            {{config.buildView.build.name}}
+        </a>
     </h3>
 </div>
 <div class="modal-body">
-    {{config.validationStampRunView}}
 </div>
 <div class="modal-footer">
     <button class="btn btn-primary" type="submit" ng-click="cancel()">OK</button>
