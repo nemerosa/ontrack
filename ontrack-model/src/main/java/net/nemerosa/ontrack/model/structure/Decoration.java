@@ -13,25 +13,16 @@ import java.net.URI;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class Decoration {
 
+    private final String id;
     private final String title;
-    private final String cls;
-    private final String iconPath;
     private final URI uri;
 
-    public static Decoration of(String title) {
-        return new Decoration(title, "", "", null);
-    }
-
-    public Decoration withCls(String value) {
-        return new Decoration(title, value, iconPath, uri);
-    }
-
-    public Decoration withIconPath(String value) {
-        return new Decoration(title, cls, value, uri);
+    public static Decoration of(String id, String title) {
+        return new Decoration(id, title, null);
     }
 
     public Decoration withUri(URI value) {
-        return new Decoration(title, cls, iconPath, value);
+        return new Decoration(id, title, value);
     }
 
 }
