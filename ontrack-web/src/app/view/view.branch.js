@@ -90,7 +90,7 @@ angular.module('ot.view.branch', [
         };
 
     })
-    .directive('otBranchBuildView', function ($modal) {
+    .directive('otBranchBuildView', function ($modal, otStructureService) {
         return {
             restrict: 'E',
             templateUrl: 'app/view/view.branchBuildView.tpl.html',
@@ -101,6 +101,20 @@ angular.module('ot.view.branch', [
             link: function (scope) {
                 scope.$watch('view', function () {
                     if (scope.view) {
+                        /**
+                         * Creating a validation run
+                         */
+                        scope.createValidationRun = function (buildView, validationStampRunView) {
+                            // TODO Prefills the validation stamp
+                            otStructureService.create(buildView.build._validate, 'Validation for the build').then(
+                                function on_success() {
+                                    // FIXME Reloads the branch build view
+                                }
+                            );
+                        };
+                        /**
+                         * Displaying the validation runs
+                         */
                         scope.displayValidationRuns = function (buildView, validationStampRunView) {
                             $modal.open({
                                 templateUrl: 'app/dialog/dialog.validationStampRunView.tpl.html',

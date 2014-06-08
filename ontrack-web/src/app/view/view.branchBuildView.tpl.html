@@ -43,7 +43,9 @@
         <!-- Validation runs -->
         <td ng-repeat="validationStampRunView in buildView.validationStampRunViews" class="ot-branch-build-view-validation">
             <!-- Not run -->
-            <span ng-if="!validationStampRunView.run"><ot-validation-run-status-none></ot-validation-run-status-none></span>
+            <span ng-if="!validationStampRunView.run" class="ot-command" ng-click="createValidationRun(buildView, validationStampRunView)">
+                <ot-validation-run-status-none></ot-validation-run-status-none>
+            </span>
             <!-- Last status -->
             <span ng-if="validationStampRunView.run">
                 <span class="ot-action" ng-click="displayValidationRuns(buildView, validationStampRunView)">
