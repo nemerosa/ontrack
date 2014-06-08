@@ -15,7 +15,7 @@ import java.util.List;
 public class ValidationRun implements ProjectEntity {
 
     private final ID id;
-    @JsonView({ValidationRun.class})
+    @JsonView({ValidationRun.class, ValidationStampRunView.class})
     private final Build build;
     @JsonView({ValidationRun.class, Build.class})
     private final ValidationStamp validationStamp;
@@ -27,7 +27,7 @@ public class ValidationRun implements ProjectEntity {
     /**
      * Must always contain at least one validation run status at creation time.
      */
-    @JsonView({ValidationRun.class, BranchBuildView.class, Build.class})
+    @JsonView({ValidationRun.class, BranchBuildView.class, Build.class, ValidationStampRunView.class})
     private final List<ValidationRunStatus> validationRunStatuses;
 
     public ValidationRun add(ValidationRunStatus status) {

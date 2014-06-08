@@ -305,6 +305,13 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public List<ValidationRun> getValidationRunsForValidationStamp(ID validationStampId, int offset, int count) {
+        ValidationStamp validationStamp = getValidationStamp(validationStampId);
+        securityService.checkProjectFunction(validationStamp.getBranch().getProject().id(), ProjectView.class);
+        return structureRepository.getValidationRunsForValidationStamp(validationStamp, offset, count);
+    }
+
+    @Override
     public ValidationRun newValidationRunStatus(ValidationRun validationRun, ValidationRunStatus runStatus) {
         // Entity check
         Entity.isEntityDefined(validationRun, "Validation run must be defined");

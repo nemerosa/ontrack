@@ -135,6 +135,12 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>ontrack-extension-general</artifactId>
+            <version>${project.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>ontrack-extension-jenkins</artifactId>
             <version>${project.version}</version>
             <scope>runtime</scope>
