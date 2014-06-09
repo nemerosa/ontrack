@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import net.nemerosa.ontrack.extension.jenkins.JenkinsConfiguration;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -16,20 +15,18 @@ import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.util.EntityUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
-@Component
 public class DefaultJenkinsClient implements JenkinsClient {
 
     private final ObjectMapper mapper = ObjectMapperFactory.create();
-    private final JenkinsConfiguration jenkinsConfiguration;
+    private final JenkinsConnection jenkinsConnection;
     // Local cache for user data
     private final LoadingCache<String, JenkinsUser> userCache =
             CacheBuilder.newBuilder()
@@ -41,9 +38,13 @@ public class DefaultJenkinsClient implements JenkinsClient {
                         }
                     });
 
-    @Autowired
-    public DefaultJenkinsClient(JenkinsConfiguration jenkinsConfiguration) {
-        this.jenkinsConfiguration = jenkinsConfiguration;
+    public DefaultJenkinsClient(JenkinsConnection jenkinsConnection) {
+        this.jenkinsConnection = jenkinsConnection;
+    }
+
+    @Override
+    public boolean hasSameConnection(JenkinsConnection connection) {
+        return Objects.equals(this.jenkinsConnection, connection);
     }
 
     @Override
@@ -118,7 +119,7 @@ public class DefaultJenkinsClient implements JenkinsClient {
     }
 
     private String getJenkinsJobUrl(String job) {
-        return jenkinsConfiguration.getUrl() + "/job/" + job;
+        return jenkinsConnection.getUrl() + "/job/" + job;
     }
 
     private JenkinsBuildLink toBuildLink(JsonNode tree, String fieldName) {

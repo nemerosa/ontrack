@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.jenkins.client;
 
 public interface JenkinsClient {
 
-    JenkinsJob getJob(String jenkinsJobUrl, boolean details);
+    JenkinsJob getJob(String job, boolean details);
 
+    boolean hasSameConnection(JenkinsConnection connection);
 }
