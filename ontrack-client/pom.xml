@@ -20,6 +20,11 @@
         <!-- ontrack -->
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>ontrack-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>ontrack-json</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -41,6 +46,11 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
+        </dependency>
+        <!-- Logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
         <!-- Lombok -->
         <dependency>

@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.jenkins.client;
 
-import net.nemerosa.ontrack.model.exceptions.BaseException;
+import net.nemerosa.ontrack.common.BaseException;
 
 public abstract class JenkinsClientException extends BaseException {
 

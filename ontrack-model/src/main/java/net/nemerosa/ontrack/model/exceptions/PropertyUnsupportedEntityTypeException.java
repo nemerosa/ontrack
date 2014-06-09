@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.model.exceptions;
 
+import net.nemerosa.ontrack.common.BaseException;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 
 public class PropertyUnsupportedEntityTypeException extends BaseException {

@@ -1,60 +1,32 @@
 package net.nemerosa.ontrack.extension.jenkins.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import net.nemerosa.ontrack.client.JsonClient;
-import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
-import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 
 public class DefaultJenkinsClient implements JenkinsClient {
 
-    private final ObjectMapper mapper = ObjectMapperFactory.create();
-    private final JenkinsConnection jenkinsConnection;
     private final JsonClient jsonClient;
-    // Local cache for user data
-    private final LoadingCache<String, JenkinsUser> userCache =
-            CacheBuilder.newBuilder()
-                    .maximumSize(50)
-                    .build(new CacheLoader<String, JenkinsUser>() {
-                        @Override
-                        public JenkinsUser load(String url) throws Exception {
-                            return loadUser(url);
-                        }
-                    });
+    // TODO Local cache for user data
 
-    public DefaultJenkinsClient(JenkinsConnection jenkinsConnection, JsonClient jsonClient) {
-        this.jenkinsConnection = jenkinsConnection;
+    public DefaultJenkinsClient(JsonClient jsonClient) {
         this.jsonClient = jsonClient;
     }
 
     @Override
-    public boolean hasSameConnection(JenkinsConnection connection) {
-        return Objects.equals(this.jenkinsConnection, connection);
-    }
-
-    @Override
     public JenkinsJob getJob(String job, boolean depth) {
-        String jobUrl = getJenkinsJobUrl(job);
+        String jobPath = getJobPath(job, depth);
         // Gets the job as JSON
-        JsonNode tree = getJsonNode(jobUrl, depth);
+        JsonNode tree = getJsonNode(jobPath);
 
         // Name
         String name = tree.get("name").asText();
@@ -90,6 +62,7 @@ public class DefaultJenkinsClient implements JenkinsClient {
                         }
                         // For each culprit
                         for (JsonNode jCulprit : jCulprits) {
+                            // TODO We cannot use the absolute URL here
                             String culpritUrl = jCulprit.get("absoluteUrl").textValue();
                             JenkinsUser user = getUser(culpritUrl);
                             if (user != null) {
@@ -113,7 +86,7 @@ public class DefaultJenkinsClient implements JenkinsClient {
         // OK
         return new JenkinsJob(
                 name,
-                jobUrl,
+                jobPath,
                 result,
                 state,
                 culprits,
@@ -121,8 +94,14 @@ public class DefaultJenkinsClient implements JenkinsClient {
         );
     }
 
-    private String getJenkinsJobUrl(String job) {
-        return jenkinsConnection.getUrl() + "/job/" + job;
+    private String getJobPath(String job, boolean depth) {
+        StringBuilder path = new StringBuilder();
+        path.append("/job/").append(job);
+        path.append("/api/json");
+        if (depth) {
+            path.append("?depth=1");
+        }
+        return path.toString();
     }
 
     private JenkinsBuildLink toBuildLink(JsonNode tree, String fieldName) {
@@ -152,16 +131,18 @@ public class DefaultJenkinsClient implements JenkinsClient {
     }
 
     protected JenkinsUser getUser(String userUrl) {
-        try {
-            return userCache.get(userUrl);
-        } catch (ExecutionException e) {
-            return null;
-        }
+//        try {
+        return loadUser(userUrl);
+        // TODO return userCache.get(userUrl);
+//        } catch (ExecutionException e) {
+//            return null;
+//        }
     }
 
     protected JenkinsUser loadUser(String culpritUrl) {
         // Node
-        JsonNode tree = getJsonNode(culpritUrl, false);
+        // TODO Use a relative path
+        JsonNode tree = getJsonNode(culpritUrl);
         // Basic data
         String id = tree.get("id").textValue();
         String fullName = tree.get("fullName").textValue();
@@ -232,50 +213,9 @@ public class DefaultJenkinsClient implements JenkinsClient {
         }
     }
 
-    private JsonNode getJsonNode(String url, boolean depth) {
-        // Gets a client
-        DefaultHttpClient client = createClient();
-        // Gets the JSON API URL for the job
-        String apiUrl = getAPIURL(url, depth);
-        // Creates the request
-        HttpGet get = new HttpGet(apiUrl);
-        // Call
-        HttpResponse response;
-        try {
-            response = client.execute(get);
-        } catch (UnknownHostException ex) {
-            throw new JenkinsClientNotFoundException(url);
-        } catch (IOException e) {
-            throw new JenkinsClientCallException(get, e);
-        }
-        // Checks the status
-        int statusCode = response.getStatusLine().getStatusCode();
-        if (statusCode == HttpStatus.SC_NOT_FOUND) {
-            throw new JenkinsClientNotFoundException(url);
-        } else if (statusCode != HttpStatus.SC_OK) {
-            throw new JenkinsClientNotOKException(get, statusCode);
-        }
-        // Response entity
-        HttpEntity responseEntity = response.getEntity();
-        // Gets the content as UTF-8 string
-        String content;
-        try {
-            content = responseEntity != null ? EntityUtils.toString(responseEntity, "UTF-8") : null;
-        } catch (IOException e) {
-            throw new JenkinsClientCannotGetContentException(get, e);
-        }
-        // Checks for null
-        if (content == null) {
-            throw new JenkinsClientNullContentException(get);
-        }
-        // Parses as a tree
-        JsonNode tree;
-        try {
-            tree = mapper.readTree(content);
-        } catch (IOException e) {
-            throw new JenkinsClientCannotParseContentException(get, e);
-        }
-        return tree;
+    private JsonNode getJsonNode(String path) {
+        // Gets the JSON at this URL
+        return jsonClient.get(path);
     }
 
     private String getAPIURL(String url, boolean depth) {

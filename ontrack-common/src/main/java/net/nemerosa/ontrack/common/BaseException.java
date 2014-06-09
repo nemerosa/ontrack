@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.model.exceptions;
+package net.nemerosa.ontrack.common;
 
 public abstract class BaseException extends RuntimeException {
 

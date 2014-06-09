@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.client;
 
 import org.springframework.stereotype.Component;
 
+import java.net.MalformedURLException;
+
 @Component
 public class DefaultClientFactory implements ClientFactory {
 
@@ -11,6 +13,10 @@ public class DefaultClientFactory implements ClientFactory {
     }
 
     private HttpClient getHttpClient(ClientConnection connection) {
-        return new HttpClientImpl(connection);
+        try {
+            return new HttpClientImpl(connection);
+        } catch (MalformedURLException e) {
+            throw new ClientURLException(e);
+        }
     }
 }

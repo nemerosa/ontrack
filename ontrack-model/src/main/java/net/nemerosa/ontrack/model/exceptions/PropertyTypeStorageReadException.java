@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.model.exceptions;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import net.nemerosa.ontrack.common.BaseException;
 
 public class PropertyTypeStorageReadException extends BaseException {
 
