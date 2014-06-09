@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import net.nemerosa.ontrack.client.JsonClient;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -27,6 +28,7 @@ public class DefaultJenkinsClient implements JenkinsClient {
 
     private final ObjectMapper mapper = ObjectMapperFactory.create();
     private final JenkinsConnection jenkinsConnection;
+    private final JsonClient jsonClient;
     // Local cache for user data
     private final LoadingCache<String, JenkinsUser> userCache =
             CacheBuilder.newBuilder()
@@ -38,8 +40,9 @@ public class DefaultJenkinsClient implements JenkinsClient {
                         }
                     });
 
-    public DefaultJenkinsClient(JenkinsConnection jenkinsConnection) {
+    public DefaultJenkinsClient(JenkinsConnection jenkinsConnection, JsonClient jsonClient) {
         this.jenkinsConnection = jenkinsConnection;
+        this.jsonClient = jsonClient;
     }
 
     @Override

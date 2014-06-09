@@ -11,29 +11,16 @@
         <version>2.0.0.ALPHA-SNAPSHOT</version>
     </parent>
 
-    <artifactId>ontrack-extension-support</artifactId>
-    <name>ontrack Extension Support</name>
+    <artifactId>ontrack-client</artifactId>
+    <name>ontrack Client</name>
+
+    <description>Client utilities</description>
 
     <dependencies>
         <!-- ontrack -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>ontrack-extension-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>ontrack-ui-support</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>ontrack-repository-support</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>ontrack-client</artifactId>
+            <artifactId>ontrack-json</artifactId>
             <version>${project.version}</version>
         </dependency>
         <!-- Spring -->
@@ -41,9 +28,19 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
         </dependency>
+        <!-- HTTP client -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+        </dependency>
+        <!-- Guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
         </dependency>
         <!-- Lombok -->
         <dependency>

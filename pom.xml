@@ -59,6 +59,7 @@
         <module>ontrack-extension-issues</module>
         <module>ontrack-extension-jira</module>
         <module>ontrack-extension-general</module>
+        <module>ontrack-client</module>
     </modules>
 
     <dependencyManagement>
