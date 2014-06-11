@@ -1,7 +1,10 @@
 package net.nemerosa.ontrack.extension.jenkins;
 
 import net.nemerosa.ontrack.extension.api.DecorationExtension;
-import net.nemerosa.ontrack.extension.jenkins.client.*;
+import net.nemerosa.ontrack.extension.jenkins.client.JenkinsClient;
+import net.nemerosa.ontrack.extension.jenkins.client.JenkinsClientFactory;
+import net.nemerosa.ontrack.extension.jenkins.client.JenkinsJob;
+import net.nemerosa.ontrack.extension.jenkins.client.JenkinsJobState;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
 import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,10 +45,8 @@ public class JenkinsJobDecorationExtension extends AbstractExtension implements 
         if (property.isEmpty()) {
             return null;
         } else {
-            // Gets the connection information
-            JenkinsConnection connection = property.getValue().getConfiguration().getConnection();
             // Gets a client
-            JenkinsClient jenkinsClient = jenkinsClientFactory.getClient(connection);
+            JenkinsClient jenkinsClient = jenkinsClientFactory.getClient(property.getValue().getConfiguration());
             // Gets the Jenkins job
             JenkinsJob job = jenkinsClient.getJob(property.getValue().getJob(), false);
             // Gets the decoration for the job

@@ -8,10 +8,10 @@ import java.io.IOException;
 
 public class JsonClientImpl implements JsonClient {
 
-    private final HttpClient httpClient;
+    private final OTHttpClient httpClient;
     private final ObjectMapper objectMapper;
 
-    public JsonClientImpl(HttpClient httpClient) {
+    public JsonClientImpl(OTHttpClient httpClient) {
         this.httpClient = httpClient;
         this.objectMapper = ObjectMapperFactory.create();
     }

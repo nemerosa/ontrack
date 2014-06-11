@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.extension.jenkins;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import net.nemerosa.ontrack.extension.jenkins.client.JenkinsConnection;
 import net.nemerosa.ontrack.extension.support.configurations.UserPasswordConfiguration;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Password;
@@ -60,15 +58,4 @@ public class JenkinsConfiguration implements UserPasswordConfiguration<JenkinsCo
         return new ConfigurationDescriptor(name, name);
     }
 
-    /**
-     * Gets the Jenkins connection information
-     */
-    @JsonIgnore
-    public JenkinsConnection getConnection() {
-        return new JenkinsConnection(
-                url,
-                user,
-                password
-        );
-    }
 }

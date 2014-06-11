@@ -2,45 +2,39 @@ package net.nemerosa.ontrack.client;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.*;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import static java.lang.String.format;
 
-public class HttpClientImpl implements HttpClient {
+public class OTHttpClientImpl implements OTHttpClient {
 
-    private final Logger logger = LoggerFactory.getLogger(HttpClient.class);
-    private final String url;
+    private static final Logger logger = LoggerFactory.getLogger(OTHttpClient.class);
+
+    private final URL url;
     private final HttpHost host;
-    private HttpClientContext httpContext = HttpClientContext.create();
+    private final CloseableHttpClient httpClient;
+    private final HttpClientContext httpContext;
 
-    public HttpClientImpl(ClientConnection connection) throws MalformedURLException {
-        this.url = connection.getUrl();
-        URL u = new URL(connection.getUrl());
-        this.host = new HttpHost(
-                u.getHost(),
-                u.getPort(),
-                u.getProtocol()
-        );
+    public OTHttpClientImpl(URL url, HttpHost host, CloseableHttpClient httpClient, HttpClientContext httpContext) {
+        this.url = url;
+        this.host = host;
+        this.httpClient = httpClient;
+        this.httpContext = httpContext;
     }
 
-    protected CloseableHttpClient http() {
-        return httpBuilder().build();
-    }
-
-    protected HttpClientBuilder httpBuilder() {
-        return HttpClientBuilder.create().setConnectionManager(new PoolingHttpClientConnectionManager());
+    @Override
+    public URL getUrl() {
+        return url;
     }
 
     protected String getUrl(String path, Object... parameters) {
@@ -70,7 +64,7 @@ public class HttpClientImpl implements HttpClient {
         logger.debug("[request] {}", request);
         // Executes the call
         try {
-            try (CloseableHttpClient http = http()) {
+            try (CloseableHttpClient http = httpClient) {
                 HttpResponse response = http.execute(host, request, httpContext);
                 logger.debug("[response] {}", response);
                 // Entity response
@@ -141,5 +135,4 @@ public class HttpClientImpl implements HttpClient {
         T handleResponse(HttpRequestBase request, HttpResponse response, HttpEntity entity) throws ParseException, IOException;
 
     }
-
 }

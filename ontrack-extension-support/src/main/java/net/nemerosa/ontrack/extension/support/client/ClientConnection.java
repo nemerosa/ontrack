@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.client;
+package net.nemerosa.ontrack.extension.support.client;
 
 import lombok.Data;
 
