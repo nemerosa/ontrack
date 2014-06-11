@@ -22,8 +22,6 @@ public class DefaultClientFactory implements ClientFactory {
         return OTHttpClientBuilder.create(clientConnection.getUrl())
                 // Basic credentials
                 .withCredentials(clientConnection.getUser(), clientConnection.getPassword())
-                        // TODO Uses the global settings
-                .withTrustAnyCertificate(true)
                         // OK
                 .build();
     }

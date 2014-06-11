@@ -1,11 +1,13 @@
 ontrack deployment documentation
 ================================
 
-## Running in production mode
+## Running in production mode with a local H2 database
 
 In a working directory:
 
     java -jar ontrack-ui-<version>.jar --spring.profiles.active=prod --logging.path=log/
+    
+The `database` directory will be created in the same directory.
 
 ## Certificate management
 
