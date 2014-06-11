@@ -18,7 +18,7 @@ public interface RunProfile {
     /**
      * Acceptance mode
      */
-    String ACC = "acc";
+    String ACC = "acceptance";
 
     /**
      * Production mode
