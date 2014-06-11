@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>ontrack-parent</artifactId>
+        <groupId>net.nemerosa.ontrack</groupId>
+        <version>2.0.0.ALPHA-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>ontrack-acceptance</artifactId>
+    <name>ontrack Acceptance</name>
+
+    <properties>
+        <ontrack.version>${project.version}</ontrack.version>
+        <ontrack.url>http://localhost:9999</ontrack.url>
+        <ontrack.port>9999</ontrack.port>
+        <ontrack.stop.skip>false</ontrack.stop.skip>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ontrack-client</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+
+        <!-- Sonar profile -->
+        <profile>
+            <id>sonar</id>
+            <activation>
+                <property>
+                    <name>sonar</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <!-- redo configuration from parent - no coverage in client -->
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <argLine>-Xmx1024m -Xms256m -XX:MaxPermSize=256m</argLine>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>jacoco-prepare-acceptance-agent</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>prepare-agent-integration</goal>
+                                </goals>
+                                <configuration>
+                                    <destFile>${sonar.jacoco.itReportPath}</destFile>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- Running the acceptance tests -->
+
+        <profile>
+            <id>acceptance</id>
+            <build>
+                <plugins>
+
+                    <!-- Running acceptance tests in integration phase -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <includes>
+                                <include>**/ACC*.java</include>
+                            </includes>
+                            <argLine>-Xmx512m</argLine>
+                            <systemPropertyVariables>
+                                <ontrack.url>${ontrack.url}</ontrack.url>
+                            </systemPropertyVariables>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>acceptance-tests</id>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <!--
+            Runs the acceptance server by launching ontrack-ui with the 'acceptance' profile. The version of
+            the application to launch defaults to this project's version. This version can be overridden
+            by the <code>ontrack.version</code> system property.
+            By default, the application in launched on port 8080 (can be overridden
+            by the <code>ontrack.port</code> system property
+            -->
+            <id>acceptance-local</id>
+            <properties>
+                <ontrack.url>http://localhost:${ontrack.port}</ontrack.url>
+                <ontrack.wait>30</ontrack.wait>
+            </properties>
+            <build>
+                <plugins>
+                    <!-- Getting the application to deploy -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>acceptance-application-download</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>${project.groupId}</groupId>
+                                            <artifactId>ontrack-ui</artifactId>
+                                            <version>${ontrack.version}</version>
+                                            <type>jar</type>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Starting and stopping the web application -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>acceptance-application-start</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <property name="app.file"
+                                                  value="${basedir}/target/dependency/ontrack-ui-${ontrack.version}.jar"/>
+                                        <property name="app.dir" value="${basedir}/target/run"/>
+                                        <property name="app.log" value="${basedir}/target/run/log/"/>
+                                        <mkdir dir="${app.dir}"/>
+                                        <echo message="Starting application in ${app.dir}"/>
+                                        <echo message="Starting application defined by ${app.file}"/>
+                                        <echo message="Starting application on port ${ontrack.port}"/>
+                                        <echo message="Log files available at ${app.log}"/>
+                                        <echo message="Running with JVM arguments: [${sonar.jacoco.args}]"/>
+                                        <java
+                                                jar="${app.file}"
+                                                fork="true"
+                                                spawn="true"
+                                                dir="${app.dir}">
+                                            <jvmarg line="${sonar.jacoco.args}"/>
+                                            <arg value="--server.port=${ontrack.port}"/>
+                                            <arg value="--logging.path=${app.log}"/>
+                                            <arg value="--spring.profiles.active=acceptance"/>
+                                        </java>
+                                        <!-- Waits for the JVM to start -->
+                                        <echo message="Waiting ${ontrack.wait} seconds (max) for the JVM to start"/>
+                                        <waitfor maxwait="${ontrack.wait}" maxwaitunit="second" checkevery="500">
+                                            <http url="${ontrack.url}/info"/>
+                                        </waitfor>
+                                        <echo message="JVM is started"/>
+                                    </target>
+                                </configuration>
+                            </execution>
+                            <!-- Application stop -->
+                            <!-- Use the shutdown endpoint of Spring Boot -->
+                            <execution>
+                                <id>acceptance-application-stop</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>${ontrack.stop.skip}</skip>
+                                    <target>
+                                        <echo message="Stopping the JVM at ${ontrack.url}"/>
+                                        <exec executable="curl" failonerror="true">
+                                            <arg value="-v"/>
+                                            <arg value="--fail"/>
+                                            <arg value="${ontrack.url}/manage/shutdown"/>
+                                            <arg value="-X"/>
+                                            <arg value="POST"/>
+                                            <arg value="--user"/>
+                                            <arg value="admin:admin"/>
+                                        </exec>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+    </profiles>
+
+</project>

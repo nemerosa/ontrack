@@ -75,6 +75,7 @@
         <module>ontrack-extension-jira</module>
         <module>ontrack-extension-general</module>
         <module>ontrack-client</module>
+        <module>ontrack-acceptance</module>
     </modules>
 
     <dependencyManagement>
