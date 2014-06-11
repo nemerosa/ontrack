@@ -11,7 +11,7 @@ import org.springframework.security.access.AccessDeniedException;
 
 import static org.junit.Assert.*;
 
-public class ProjectControllerTest extends AbstractWebTestSupport {
+public class ProjectControllerIT extends AbstractWebTestSupport {
 
     @Autowired
     private ProjectController controller;

@@ -25,7 +25,7 @@ import static org.junit.Assert.*;
 /**
  * Integration tests for the property controller.
  */
-public class PropertyControllerTest extends AbstractWebTestSupport {
+public class PropertyControllerIT extends AbstractWebTestSupport {
 
     @Autowired
     private PropertyController controller;

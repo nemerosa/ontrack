@@ -19,7 +19,7 @@ import static net.nemerosa.ontrack.test.TestUtils.uid;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class BuildControllerTest extends AbstractWebTestSupport {
+public class BuildControllerIT extends AbstractWebTestSupport {
 
     @Autowired
     private BuildController buildController;

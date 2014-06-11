@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class StructureJdbcRepositoryTest extends AbstractITTestSupport {
+public class StructureJdbcRepositoryIT extends AbstractITTestSupport {
 
     @Autowired
     private StructureRepository repository;

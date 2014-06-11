@@ -12,7 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import static org.junit.Assert.*;
 
-public class PasswordAuthenticationProviderTest extends AbstractITTestSupport {
+public class PasswordAuthenticationProviderIT extends AbstractITTestSupport {
 
     @Autowired
     @Qualifier("password")

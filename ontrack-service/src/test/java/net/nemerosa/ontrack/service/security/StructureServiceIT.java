@@ -14,7 +14,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class StructureServiceTest extends AbstractITTestSupport {
+public class StructureServiceIT extends AbstractITTestSupport {
 
     @Autowired
     private StructureService structureService;

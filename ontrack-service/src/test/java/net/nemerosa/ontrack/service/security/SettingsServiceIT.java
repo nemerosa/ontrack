@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 
-public class SettingsServiceTest extends AbstractITTestSupport {
+public class SettingsServiceIT extends AbstractITTestSupport {
 
     @Autowired
     private SettingsService settingsService;

@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-public class SecurityServiceTest extends AbstractITTestSupport {
+public class SecurityServiceIT extends AbstractITTestSupport {
 
     @Autowired
     private SecurityService securityService;
