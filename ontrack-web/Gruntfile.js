@@ -246,9 +246,19 @@ module.exports = function (grunt) {
              * code and all specified vendor source code into a single file.
              */
             prod_js: {
-                src: [
-                    'target/include/**/*.js'
-                ],
+                src: function () {
+                    // Vendor sources first
+                    var srcArray = [];
+                    for (var i = 0 ; i < vendor.js.length ; i++) {
+                        srcArray.push('target/include/' + vendor.js[i]);
+                    }
+                    // Application sources
+                    srcArray.push('target/include/app/**/*.js');
+                    // Generated templates
+                    srcArray.push('target/include/*.js');
+                    // OK
+                    return srcArray;
+                }(),
                 dest: 'target/prod/assets/<%= pkg.name %>-<%= pkg.version %>.js'
             },
             /**
