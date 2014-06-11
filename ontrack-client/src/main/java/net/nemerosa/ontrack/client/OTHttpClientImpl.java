@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.client;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.*;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
@@ -15,6 +14,8 @@ import java.io.IOException;
 import java.net.URL;
 
 import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.prependIfMissing;
+import static org.apache.commons.lang3.StringUtils.stripEnd;
 
 public class OTHttpClientImpl implements OTHttpClient {
 
@@ -38,7 +39,11 @@ public class OTHttpClientImpl implements OTHttpClient {
     }
 
     protected String getUrl(String path, Object... parameters) {
-        return format("%s%s", url, format(path, parameters));
+        return format(
+                "%s%s",
+                stripEnd(url.toString(), "/"),
+                prependIfMissing(format(path, parameters), "/")
+        );
     }
 
     @Override
