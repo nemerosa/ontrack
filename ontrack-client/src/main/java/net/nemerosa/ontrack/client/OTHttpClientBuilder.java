@@ -9,17 +9,19 @@ import org.apache.http.client.CookieStore;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLContextBuilder;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.*;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyManagementException;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 
 public class OTHttpClientBuilder {
 
@@ -88,13 +90,31 @@ public class OTHttpClientBuilder {
         // SSL context
         if (trustAnyCertificate) {
             try {
+                SSLContext sslContext = SSLContext.getInstance("SSL");
+                sslContext.init(null,
+                        new TrustManager[]{
+                                new X509TrustManager() {
+                                    public X509Certificate[] getAcceptedIssuers() {
+                                        return null;
+                                    }
+
+                                    public void checkClientTrusted(
+                                            X509Certificate[] certs, String authType) {
+                                    }
+
+                                    public void checkServerTrusted(
+                                            X509Certificate[] certs, String authType) {
+                                    }
+                                }
+                        },
+                        new SecureRandom()
+                );
                 SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
-                        new SSLContextBuilder()
-                                .loadTrustMaterial(null, new TrustSelfSignedStrategy())
-                                .build()
+                        sslContext,
+                        SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER
                 );
                 builder.setSSLSocketFactory(sslsf);
-            } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
+            } catch (NoSuchAlgorithmException | KeyManagementException e) {
                 throw new ClientCannotConfigureSSLException(e);
             }
         }
