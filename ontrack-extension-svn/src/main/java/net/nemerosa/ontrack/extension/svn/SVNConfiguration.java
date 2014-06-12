@@ -28,6 +28,17 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
     private final long indexationStart;
     // TODO Optional link to an issue service configuration
 
+    /**
+     * The same SVN repository might be used with different ticketing systems. Therefore, indexation of issues
+     * at configuration level might prove difficult.
+     * <p/>
+     * A solution could be to associate _several_ issue services with a repository, but again, the configuration
+     * might prove difficult.
+     * <p/>
+     * At last, a _type_ of issue service could be associated with a SVN repository, that would allow for indexation
+     * only. For example, for a JIRA issue service, we would index using the JIRA tickets.
+     */
+
     public static Form form() {
         return Form.create()
                 .with(defaultText())

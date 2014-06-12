@@ -272,7 +272,23 @@ public class IndexationServiceImpl implements IndexationService {
 
     private void indexSVNEvents(SVNRepository repository, SVNLogEntry logEntry) {
         indexSVNCopyEvents(repository, logEntry);
-        // FIXME indexSVNStopEvents(repository, logEntry);
+        indexSVNStopEvents(repository, logEntry);
+    }
+
+    private void indexSVNStopEvents(SVNRepository repository, SVNLogEntry logEntry) {
+        long revision = logEntry.getRevision();
+        // Looking for copy tags
+        @SuppressWarnings("unchecked")
+        Map<String, SVNLogEntryPath> changedPaths = logEntry.getChangedPaths();
+        // For all changes path
+        for (SVNLogEntryPath logEntryPath : changedPaths.values()) {
+            String path = logEntryPath.getPath();
+            if (logEntryPath.getType() == SVNLogEntryPath.TYPE_DELETED && svnClient.isTagOrBranch(repository, path)) {
+                logger.debug(String.format("\tSTOP %s", path));
+                // Adds the stop event
+                eventDao.createStopEvent(repository.getId(), revision, path);
+            }
+        }
     }
 
     private void indexSVNCopyEvents(SVNRepository repository, SVNLogEntry logEntry) {

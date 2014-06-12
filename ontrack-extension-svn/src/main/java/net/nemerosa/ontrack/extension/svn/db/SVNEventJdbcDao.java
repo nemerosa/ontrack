@@ -25,4 +25,13 @@ public class SVNEventJdbcDao extends AbstractJdbcRepository implements SVNEventD
                         .addValue("copyToPath", copyToPath)
         );
     }
+
+    @Override
+    public void createStopEvent(int repositoryId, long revision, String path) {
+        getNamedParameterJdbcTemplate().update(
+                "INSERT INTO EXT_SVN_STOP (REPOSITORY, REVISION, PATH) VALUES (:repository, :revision, :path)",
+                params("revision", revision)
+                        .addValue("repository", repositoryId)
+                        .addValue("path", path));
+    }
 }
