@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Repository
@@ -45,5 +46,18 @@ public class SVNRevisionJdbcDao extends AbstractJdbcRepository implements SVNRev
                         .addValue("message", Objects.toString(StringUtils.abbreviate(message, MESSAGE_LENGTH), ""))
                         .addValue("branch", branch)
         );
+    }
+
+    @Override
+    public void addMergedRevisions(int repositoryId, long revision, List<Long> mergedRevisions) {
+        NamedParameterJdbcTemplate t = getNamedParameterJdbcTemplate();
+        for (long mergedRevision : mergedRevisions) {
+            t.update("INSERT INTO SVN_EXT_MERGE_REVISION (REPOSITORY, REVISION, TARGET) " +
+                            "VALUES (:repository, :mergedRevision, :revision)",
+                    params("mergedRevision", mergedRevision)
+                            .addValue("repository", repositoryId)
+                            .addValue("revision", revision)
+            );
+        }
     }
 }

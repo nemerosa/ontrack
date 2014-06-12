@@ -261,7 +261,7 @@ public class IndexationServiceImpl implements IndexationService {
         // Merge relationships (using a nested SVN client)
         try (Transaction ignored = transactionService.start(true)) {
             List<Long> mergedRevisions = svnClient.getMergedRevisions(repository, SVNUtils.toURL(repository.getConfiguration().getUrl(), branch), revision);
-            // TODO revisionDao.addMergedRevisions(repository.getId(), revision, mergedRevisions);
+            revisionDao.addMergedRevisions(repository.getId(), revision, mergedRevisions);
         }
         // Subversion events
         // TODO indexSVNEvents(repository, logEntry);
