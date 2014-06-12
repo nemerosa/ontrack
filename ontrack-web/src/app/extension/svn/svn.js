@@ -67,5 +67,11 @@ angular.module('ontrack.extension.svn', [
                 }
             }).then(loadSVNConfigurations);
         };
+
+        // FIXME Configuration indexation
+        $scope.indexation = function (configuration) {
+
+        };
+
     })
 ;
