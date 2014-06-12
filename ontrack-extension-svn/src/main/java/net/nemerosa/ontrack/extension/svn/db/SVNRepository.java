@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.nemerosa.ontrack.extension.svn.SVNConfiguration;
+import org.apache.commons.lang3.StringUtils;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -14,5 +15,14 @@ public class SVNRepository {
 
     public static SVNRepository of(int id, SVNConfiguration configuration) {
         return new SVNRepository(id, configuration);
+    }
+
+    public String getBranchPattern() {
+        String branchPattern = configuration.getBranchPattern();
+        if (StringUtils.isNotBlank(branchPattern)) {
+            return branchPattern;
+        } else {
+            return ".*/branches/.+";
+        }
     }
 }

@@ -13,4 +13,5 @@ public interface SVNClient {
              boolean stopOnCopy, boolean discoverChangedPaths, long limit, boolean includeMergedRevisions,
              ISVNLogEntryHandler isvnLogEntryHandler);
 
+    boolean isTrunkOrBranch(SVNRepository repository, String path);
 }

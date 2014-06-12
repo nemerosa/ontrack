@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.Time;
 import net.nemerosa.ontrack.tx.Transaction;
 import net.nemerosa.ontrack.tx.TransactionService;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -254,7 +256,7 @@ public class IndexationServiceImpl implements IndexationService {
         // Date to date time
         LocalDateTime dateTime = Time.from(date, Time.now());
         // Branch for the revision
-        // TODO String branch = getBranchForRevision(repository, logEntry);
+        String branch = getBranchForRevision(repository, logEntry);
         // Logging
         logger.info(String.format("Indexing revision %d", revision));
         // Inserting or updating the revision
@@ -268,6 +270,42 @@ public class IndexationServiceImpl implements IndexationService {
         // TODO indexSVNEvents(repository, logEntry);
         // Indexes the issues
         // TODO indexIssues(repository, logEntry);
+    }
+
+    private String getBranchForRevision(SVNRepository repository, SVNLogEntry logEntry) {
+        // List of paths for this revision
+        @SuppressWarnings("unchecked")
+        Set<String> paths = logEntry.getChangedPaths().keySet();
+        // Finds the common path among all those paths
+        String commonPath = null;
+        for (String path : paths) {
+            if (commonPath == null) {
+                commonPath = path;
+            } else {
+                int diff = StringUtils.indexOfDifference(commonPath, path);
+                commonPath = StringUtils.left(commonPath, diff);
+            }
+        }
+        // Gets the branch for this path
+        if (commonPath != null) {
+            return extractBranch(repository, commonPath);
+        } else {
+            // No path in the revision: no branch!
+            return null;
+        }
+    }
+
+    private String extractBranch(SVNRepository repository, String path) {
+        if (svnClient.isTrunkOrBranch(repository, path)) {
+            return path;
+        } else {
+            String before = StringUtils.substringBeforeLast(path, "/");
+            if (StringUtils.isBlank(before)) {
+                return null;
+            } else {
+                return extractBranch(repository, before);
+            }
+        }
     }
 
     /**

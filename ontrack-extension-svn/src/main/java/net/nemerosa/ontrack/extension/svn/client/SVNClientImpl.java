@@ -12,6 +12,8 @@ import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
 import org.tmatesoft.svn.core.wc.*;
 
+import java.util.regex.Pattern;
+
 @Component
 public class SVNClientImpl implements SVNClient {
 
@@ -40,6 +42,23 @@ public class SVNClientImpl implements SVNClient {
         } catch (SVNException e) {
             throw translateSVNException(e);
         }
+    }
+
+    @Override
+    public boolean isTrunkOrBranch(SVNRepository repository, String path) {
+        return isTrunk(path) || isBranch(repository, path);
+    }
+
+    private boolean isBranch(SVNRepository repository, String path) {
+        return isPathOK(repository.getBranchPattern(), path);
+    }
+
+    private boolean isPathOK(String pattern, String path) {
+        return org.apache.commons.lang.StringUtils.isNotBlank(pattern) && Pattern.matches(pattern, path);
+    }
+
+    private boolean isTrunk(String path) {
+        return isPathOK(".+/trunk", path);
     }
 
     private SVNClientException translateSVNException(SVNException e) {
