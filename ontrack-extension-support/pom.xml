@@ -36,11 +36,6 @@
             <artifactId>ontrack-repository-support</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>ontrack-client</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <!-- Spring -->
         <dependency>
             <groupId>org.springframework</groupId>
