@@ -43,6 +43,17 @@ In the end, the controllers return _model_ objects that must be decorated by lin
 
 The controllers are not directly responsible for the decoration of the model objects as _resources_ (model + links).
 
+## Running the application in development mode
+
+1. In `ontrack-web`, run `grunt watch`
+1. In `ontrack-ui`, run the `Application` main class with `--spring.profiles.active=dev` as argument.
+
+When you need to restart the application, just restart the Java part - you can let the `grunt watch` run as long
+ as you do not add any new Javascript file. When you add a new JS file (or delete one), the `watch` task should be
+ restarted.
+ 
+Please note that Intellij IDEA allows a good integration with Grunt.
+
 ## Glossary
 
 **Form**
