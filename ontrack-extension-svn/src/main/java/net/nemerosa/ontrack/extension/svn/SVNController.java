@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.svn;
 
 import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
+import net.nemerosa.ontrack.extension.svn.indexation.IndexationService;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
@@ -21,12 +22,14 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 public class SVNController extends AbstractExtensionController<SVNExtensionFeature> {
 
     private final SVNConfigurationService svnConfigurationService;
+    private final IndexationService indexationService;
     private final SecurityService securityService;
 
     @Autowired
-    public SVNController(SVNExtensionFeature feature, SVNConfigurationService svnConfigurationService, SecurityService securityService) {
+    public SVNController(SVNExtensionFeature feature, SVNConfigurationService svnConfigurationService, IndexationService indexationService, SecurityService securityService) {
         super(feature);
         this.svnConfigurationService = svnConfigurationService;
+        this.indexationService = indexationService;
         this.securityService = securityService;
     }
 
@@ -77,6 +80,25 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     @RequestMapping(value = "configurations/{name}", method = RequestMethod.GET)
     public SVNConfiguration getConfiguration(@PathVariable String name) {
         return svnConfigurationService.getConfiguration(name);
+    }
+
+    // TODO Gets the last revision for a configuration
+    // TODO Indexation from latest
+    // TODO Indexation of a range
+
+    /**
+     * Full indexation
+     */
+    @RequestMapping(value = "configurations/{name}/indexation/full", method = RequestMethod.POST)
+    @ResponseBody
+    public Ack full(@PathVariable String name) {
+        // Full indexation
+        if (indexationService.isIndexationRunning(name)) {
+            return Ack.NOK;
+        } else {
+            indexationService.reindex(name);
+            return Ack.OK;
+        }
     }
 
     /**

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.repository;
 
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.ID;
+import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

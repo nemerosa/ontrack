@@ -1,11 +1,11 @@
-package net.nemerosa.ontrack.repository;
+package net.nemerosa.ontrack.repository.support;
 
 import org.junit.Test;
 
 import java.time.LocalDateTime;
 
-import static net.nemerosa.ontrack.repository.AbstractJdbcRepository.dateTimeForDB;
-import static net.nemerosa.ontrack.repository.AbstractJdbcRepository.dateTimeFromDB;
+import static net.nemerosa.ontrack.repository.support.AbstractJdbcRepository.dateTimeForDB;
+import static net.nemerosa.ontrack.repository.support.AbstractJdbcRepository.dateTimeFromDB;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
