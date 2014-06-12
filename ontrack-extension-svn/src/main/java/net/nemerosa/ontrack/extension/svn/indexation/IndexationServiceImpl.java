@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.svn.indexation;
 
 import net.nemerosa.ontrack.extension.svn.SVNConfigurationService;
+import net.nemerosa.ontrack.extension.svn.client.SVNClient;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepositoryDao;
 import net.nemerosa.ontrack.extension.svn.db.SVNRevisionDao;
@@ -26,6 +27,7 @@ public class IndexationServiceImpl implements IndexationService {
     private final SVNConfigurationService configurationService;
     private final SVNRepositoryDao repositoryDao;
     private final SVNRevisionDao revisionDao;
+    private final SVNClient svnClient;
     private final SecurityService securityService;
     private final TransactionService transactionService;
 
@@ -40,6 +42,7 @@ public class IndexationServiceImpl implements IndexationService {
             SVNConfigurationService configurationService,
             SVNRepositoryDao repositoryDao,
             SVNRevisionDao revisionDao,
+            SVNClient svnClient,
             SecurityService securityService,
             TransactionService transactionService
     ) {
@@ -47,6 +50,7 @@ public class IndexationServiceImpl implements IndexationService {
         this.configurationService = configurationService;
         this.repositoryDao = repositoryDao;
         this.revisionDao = revisionDao;
+        this.svnClient = svnClient;
         this.securityService = securityService;
         this.transactionService = transactionService;
     }
@@ -85,8 +89,8 @@ public class IndexationServiceImpl implements IndexationService {
             }
             // Logging
             logger.info("[svn-indexation] Repository={}, LastScannedRevision={}", repository.getId(), lastScannedRevision);
-            // FIXME HEAD revision
-            // long repositoryRevision = subversionService.getRepositoryRevision(repository, url);
+            // HEAD revision
+            long repositoryRevision = svnClient.getRepositoryRevision(repository, url);
             // FIXME Request index of the range
             // indexRange(repositoryId, lastScannedRevision + 1, repositoryRevision);
         }
