@@ -5,7 +5,11 @@ import org.tmatesoft.svn.core.ISVNLogEntryHandler;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
+import java.util.List;
+
 public interface SVNClient {
+
+    boolean exists(SVNRepository repository, SVNURL url, SVNRevision revision);
 
     long getRepositoryRevision(SVNRepository repository, SVNURL url);
 
@@ -14,4 +18,6 @@ public interface SVNClient {
              ISVNLogEntryHandler isvnLogEntryHandler);
 
     boolean isTrunkOrBranch(SVNRepository repository, String path);
+
+    List<Long> getMergedRevisions(SVNRepository repository, SVNURL url, long revision);
 }

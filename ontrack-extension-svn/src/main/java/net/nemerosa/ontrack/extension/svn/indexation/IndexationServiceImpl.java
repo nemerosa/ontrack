@@ -26,10 +26,7 @@ import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -263,7 +260,7 @@ public class IndexationServiceImpl implements IndexationService {
         revisionDao.addRevision(repository.getId(), revision, author, dateTime, message, branch);
         // Merge relationships (using a nested SVN client)
         try (Transaction ignored = transactionService.start(true)) {
-            // TODO List<Long> mergedRevisions = subversionService.getMergedRevisions(repository, SVNUtils.toURL(repository.getUrl(), branch), revision);
+            List<Long> mergedRevisions = svnClient.getMergedRevisions(repository, SVNUtils.toURL(repository.getConfiguration().getUrl(), branch), revision);
             // TODO revisionDao.addMergedRevisions(repository.getId(), revision, mergedRevisions);
         }
         // Subversion events
