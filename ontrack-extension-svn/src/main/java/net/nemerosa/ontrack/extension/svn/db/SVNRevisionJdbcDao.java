@@ -60,4 +60,19 @@ public class SVNRevisionJdbcDao extends AbstractJdbcRepository implements SVNRev
             );
         }
     }
+
+    @Override
+    public TRevision getLastRevision(int repositoryId) {
+        return getFirstItem(
+                "SELECT * FROM EXT_SVN_REVISION WHERE REPOSITORY = :repositoryId ORDER BY REVISION DESC LIMIT 1",
+                params("repositoryId", repositoryId),
+                (rs, rowNum) -> new TRevision(
+                        rs.getInt("REPOSITORY"),
+                        rs.getLong("REVISION"),
+                        rs.getString("AUTHOR"),
+                        dateTimeFromDB(rs.getString("CREATION")),
+                        rs.getString("MESSAGE"),
+                        rs.getString("BRANCH")
+                ));
+    }
 }

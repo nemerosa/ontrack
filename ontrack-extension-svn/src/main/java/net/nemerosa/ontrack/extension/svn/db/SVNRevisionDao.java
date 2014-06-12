@@ -10,4 +10,6 @@ public interface SVNRevisionDao {
     void addRevision(int repositoryId, long revision, String author, LocalDateTime dateTime, String message, String branch);
 
     void addMergedRevisions(int repositoryId, long revision, List<Long> mergedRevisions);
+
+    TRevision getLastRevision(int repositoryId);
 }

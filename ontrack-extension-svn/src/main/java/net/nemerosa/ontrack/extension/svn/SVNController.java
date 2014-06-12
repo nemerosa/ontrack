@@ -82,7 +82,15 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
         return svnConfigurationService.getConfiguration(name);
     }
 
-    // TODO Gets the last revision for a configuration
+    /**
+     * Gets the last revision for a configuration
+     */
+    @RequestMapping(value = "configurations/{name}/indexation", method = RequestMethod.GET)
+    @ResponseBody
+    public LastRevisionInfo getLastRevisionInfo(@PathVariable String name) {
+        return indexationService.getLastRevisionInfo(name);
+    }
+
     // TODO Indexation from latest
     // TODO Indexation of a range
 

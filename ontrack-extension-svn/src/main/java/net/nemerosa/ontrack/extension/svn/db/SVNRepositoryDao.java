@@ -7,4 +7,6 @@ public interface SVNRepositoryDao {
     void delete(int id);
 
     int create(String name);
+
+    int getByName(String name);
 }

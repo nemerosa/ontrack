@@ -38,4 +38,13 @@ public class SVNRepositoryJdbcDao extends AbstractJdbcRepository implements SVNR
                 params("name", name)
         );
     }
+
+    @Override
+    public int getByName(String name) {
+        return getNamedParameterJdbcTemplate().queryForObject(
+                "SELECT ID FROM EXT_SVN_REPOSITORY WHERE NAME = :name",
+                params("name", name),
+                Integer.class
+        );
+    }
 }

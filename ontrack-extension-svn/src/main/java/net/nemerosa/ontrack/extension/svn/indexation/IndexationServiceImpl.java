@@ -1,12 +1,10 @@
 package net.nemerosa.ontrack.extension.svn.indexation;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import net.nemerosa.ontrack.extension.svn.LastRevisionInfo;
 import net.nemerosa.ontrack.extension.svn.SVNConfigurationService;
 import net.nemerosa.ontrack.extension.svn.client.SVNClient;
-import net.nemerosa.ontrack.extension.svn.db.SVNEventDao;
-import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
-import net.nemerosa.ontrack.extension.svn.db.SVNRepositoryDao;
-import net.nemerosa.ontrack.extension.svn.db.SVNRevisionDao;
+import net.nemerosa.ontrack.extension.svn.db.*;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.Time;
@@ -100,6 +98,32 @@ public class IndexationServiceImpl implements IndexationService {
         SVNRepository repository = SVNRepository.of(repositoryId, configurationService.getConfiguration(name));
         // OK, launches a new indexation
         indexFromLatest(repository);
+    }
+
+    @Override
+    public LastRevisionInfo getLastRevisionInfo(String name) {
+        try (Transaction ignored = transactionService.start()) {
+            int repositoryId = repositoryDao.getByName(name);
+            TRevision r = revisionDao.getLastRevision(repositoryId);
+            if (r != null) {
+                // Gets the configuration
+                SVNRepository repository = SVNRepository.of(repositoryId, configurationService.getConfiguration(name));
+                SVNURL url = SVNUtils.toURL(repository.getConfiguration().getUrl());
+                long repositoryRevision = svnClient.getRepositoryRevision(repository, url);
+                // OK
+                return new LastRevisionInfo(
+                        r.getRevision(),
+                        r.getMessage(),
+                        repositoryRevision
+                );
+            } else {
+                return new LastRevisionInfo(
+                        0L,
+                        "",
+                        0L
+                );
+            }
+        }
     }
 
     private void indexFromLatest(SVNRepository repository) {
