@@ -87,4 +87,6 @@ public interface StructureService {
     Project findProjectByName(String project);
 
     Branch findBranchByName(String project, String branch);
+
+    PromotionLevel findPromotionLevelByName(String project, String branch, String promotionLevel);
 }

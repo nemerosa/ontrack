@@ -46,6 +46,8 @@ public interface StructureRepository {
 
     PromotionLevel getPromotionLevel(ID promotionLevelId);
 
+    PromotionLevel getPromotionLevelByName(String project, String branch, String promotionLevel);
+
     Document getPromotionLevelImage(ID promotionLevelId);
 
     void setPromotionLevelImage(ID promotionLevelId, Document document);

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Project;
+import net.nemerosa.ontrack.model.structure.PromotionLevel;
 import net.nemerosa.ontrack.model.structure.StructureService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,7 +39,13 @@ public class StructureController extends AbstractProjectEntityController {
         return structureService.findBranchByName(project, branch);
     }
 
-    // FIXME PROMOTION_LEVEL
+    /**
+     * Promotion level access
+     */
+    @RequestMapping(value = "entity/promotionLevel/{project}/{branch}/{promotionLevel}", method = RequestMethod.GET)
+    public PromotionLevel branch(@PathVariable String project, @PathVariable String branch, @PathVariable String promotionLevel) {
+        return structureService.findPromotionLevelByName(project, branch, promotionLevel);
+    }
 
     // FIXME VALIDATION_STAMP
 

@@ -333,6 +333,11 @@ public class StructureServiceImpl implements StructureService {
         return structureRepository.getBranchByName(project, branch);
     }
 
+    @Override
+    public PromotionLevel findPromotionLevelByName(String project, String branch, String promotionLevel) {
+        return structureRepository.getPromotionLevelByName(project, branch, promotionLevel);
+    }
+
     protected void checkImage(Document document) {
         // Checks the image type
         if (document != null && !ArrayUtils.contains(ACCEPTED_IMAGE_TYPES, document.getType())) {

@@ -105,8 +105,8 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         try {
             Project p = getProjectByName(project);
             return getNamedParameterJdbcTemplate().queryForObject(
-                    "SELECT * FROM BRANCHES WHERE NAME = :name",
-                    params("name", branch),
+                    "SELECT * FROM BRANCHES WHERE PROJECTID = :project AND NAME = :name",
+                    params("name", branch).addValue("project", p.id()),
                     (rs, rowNum) -> toBranch(rs, id -> p)
             );
         } catch (EmptyResultDataAccessException ex) {
@@ -272,6 +272,20 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
             );
         } catch (EmptyResultDataAccessException ex) {
             throw new PromotionLevelNotFoundException(promotionLevelId);
+        }
+    }
+
+    @Override
+    public PromotionLevel getPromotionLevelByName(String project, String branch, String promotionLevel) {
+        try {
+            Branch b = getBranchByName(project, branch);
+            return getNamedParameterJdbcTemplate().queryForObject(
+                    "SELECT * FROM PROMOTION_LEVELS WHERE BRANCHID = :branch AND NAME = :name",
+                    params("name", promotionLevel).addValue("branch", b.id()),
+                    (rs, rowNum) -> toPromotionLevel(rs, this::getBranch)
+            );
+        } catch (EmptyResultDataAccessException ex) {
+            throw new PromotionLevelNotFoundException(project, branch, promotionLevel);
         }
     }
 
