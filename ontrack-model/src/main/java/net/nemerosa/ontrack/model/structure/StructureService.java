@@ -81,4 +81,10 @@ public interface StructureService {
     List<ValidationRun> getValidationRunsForValidationStamp(ID validationStampId, int offset, int count);
 
     ValidationRun newValidationRunStatus(ValidationRun validationRun, ValidationRunStatus runStatus);
+
+    // Entity searches by name
+
+    Project findProjectByName(String project);
+
+    Branch findBranchByName(String project, String branch);
 }

@@ -65,6 +65,19 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    public Project getProjectByName(String project) {
+        try {
+            return getNamedParameterJdbcTemplate().queryForObject(
+                    "SELECT * FROM PROJECTS WHERE NAME = :name",
+                    params("name", project),
+                    (rs, rowNum) -> toProject(rs)
+            );
+        } catch (EmptyResultDataAccessException ex) {
+            throw new ProjectNotFoundException(project);
+        }
+    }
+
+    @Override
     public void saveProject(Project project) {
         getNamedParameterJdbcTemplate().update(
                 "UPDATE PROJECTS SET NAME = :name, DESCRIPTION = :description WHERE ID = :id",
@@ -84,6 +97,20 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
             );
         } catch (EmptyResultDataAccessException ex) {
             throw new BranchNotFoundException(branchId);
+        }
+    }
+
+    @Override
+    public Branch getBranchByName(String project, String branch) {
+        try {
+            Project p = getProjectByName(project);
+            return getNamedParameterJdbcTemplate().queryForObject(
+                    "SELECT * FROM BRANCHES WHERE NAME = :name",
+                    params("name", branch),
+                    (rs, rowNum) -> toBranch(rs, id -> p)
+            );
+        } catch (EmptyResultDataAccessException ex) {
+            throw new BranchNotFoundException(project, branch);
         }
     }
 

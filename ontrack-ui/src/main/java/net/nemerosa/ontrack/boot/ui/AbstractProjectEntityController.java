@@ -8,7 +8,7 @@ import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 
 public abstract class AbstractProjectEntityController extends AbstractResourceController {
 
-    private final StructureService structureService;
+    protected final StructureService structureService;
 
     public AbstractProjectEntityController(StructureService structureService) {
         this.structureService = structureService;

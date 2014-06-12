@@ -323,6 +323,16 @@ public class StructureServiceImpl implements StructureService {
         return structureRepository.newValidationRunStatus(validationRun, runStatus);
     }
 
+    @Override
+    public Project findProjectByName(String project) {
+        return structureRepository.getProjectByName(project);
+    }
+
+    @Override
+    public Branch findBranchByName(String project, String branch) {
+        return structureRepository.getBranchByName(project, branch);
+    }
+
     protected void checkImage(Document document) {
         // Checks the image type
         if (document != null && !ArrayUtils.contains(ACCEPTED_IMAGE_TYPES, document.getType())) {

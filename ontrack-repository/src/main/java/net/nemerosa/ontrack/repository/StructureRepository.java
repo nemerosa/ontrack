@@ -14,11 +14,15 @@ public interface StructureRepository {
 
     Project getProject(ID projectId);
 
+    Project getProjectByName(String project);
+
     void saveProject(Project project);
 
     // Branches
 
     Branch getBranch(ID branchId);
+
+    Branch getBranchByName(String project, String branch);
 
     List<Branch> getBranchesForProject(ID projectId);
 
