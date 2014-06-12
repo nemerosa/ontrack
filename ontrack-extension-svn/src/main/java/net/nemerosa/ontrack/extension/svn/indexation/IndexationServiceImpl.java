@@ -260,7 +260,7 @@ public class IndexationServiceImpl implements IndexationService {
         // Logging
         logger.info(String.format("Indexing revision %d", revision));
         // Inserting or updating the revision
-        // TODO revisionDao.addRevision(repository.getId(), revision, author, dateTime, message, branch);
+        revisionDao.addRevision(repository.getId(), revision, author, dateTime, message, branch);
         // Merge relationships (using a nested SVN client)
         try (Transaction ignored = transactionService.start(true)) {
             // TODO List<Long> mergedRevisions = subversionService.getMergedRevisions(repository, SVNUtils.toURL(repository.getUrl(), branch), revision);
