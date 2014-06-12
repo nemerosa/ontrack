@@ -6,13 +6,11 @@ import net.nemerosa.ontrack.tx.TransactionService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.tmatesoft.svn.core.ISVNLogEntryHandler;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
-import org.tmatesoft.svn.core.wc.SVNClientManager;
-import org.tmatesoft.svn.core.wc.SVNInfo;
-import org.tmatesoft.svn.core.wc.SVNRevision;
-import org.tmatesoft.svn.core.wc.SVNWCClient;
+import org.tmatesoft.svn.core.wc.*;
 
 @Component
 public class SVNClientImpl implements SVNClient {
@@ -34,12 +32,26 @@ public class SVNClientImpl implements SVNClient {
         }
     }
 
+    @Override
+    public void log(SVNRepository repository, SVNURL url, SVNRevision pegRevision, SVNRevision startRevision, SVNRevision stopRevision, boolean stopOnCopy, boolean discoverChangedPaths, long limit, boolean includeMergedRevisions, ISVNLogEntryHandler isvnLogEntryHandler) {
+        try {
+            getLogClient(repository).doLog(url, null, pegRevision, startRevision, stopRevision, stopOnCopy, discoverChangedPaths,
+                    includeMergedRevisions, limit, null, isvnLogEntryHandler);
+        } catch (SVNException e) {
+            throw translateSVNException(e);
+        }
+    }
+
     private SVNClientException translateSVNException(SVNException e) {
         return new SVNClientException(e);
     }
 
     protected SVNWCClient getWCClient(SVNRepository repository) {
         return getClientManager(repository).getWCClient();
+    }
+
+    protected SVNLogClient getLogClient(SVNRepository repository) {
+        return getClientManager(repository).getLogClient();
     }
 
     protected SVNClientManager getClientManager(final SVNRepository repository) {
