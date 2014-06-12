@@ -2,9 +2,11 @@ package net.nemerosa.ontrack.model.support;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 public final class Time {
 
@@ -30,6 +32,14 @@ public final class Time {
             return null;
         } else {
             return LocalDateTime.parse(value, DATE_TIME_STORAGE_FORMAT.withZone(ZoneOffset.UTC));
+        }
+    }
+
+    public static LocalDateTime from(Date date, LocalDateTime defaultValue) {
+        if (date != null) {
+            return LocalDateTime.ofInstant(Instant.ofEpochMilli(date.getTime()), ZoneOffset.UTC);
+        } else {
+            return defaultValue;
         }
     }
 }

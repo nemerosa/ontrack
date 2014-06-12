@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.svn.db.SVNRepositoryDao;
 import net.nemerosa.ontrack.extension.svn.db.SVNRevisionDao;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
 import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.support.Time;
 import net.nemerosa.ontrack.tx.Transaction;
 import net.nemerosa.ontrack.tx.TransactionService;
 import org.slf4j.Logger;
@@ -23,6 +24,7 @@ import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
@@ -250,7 +252,7 @@ public class IndexationServiceImpl implements IndexationService {
         author = Objects.toString(author, "");
         message = Objects.toString(message, "");
         // Date to date time
-        // TODO DateTime dateTime = date != null ? new DateTime(date.getTime(), DateTimeZone.UTC) : new DateTime(DateTimeZone.UTC);
+        LocalDateTime dateTime = Time.from(date, Time.now());
         // Branch for the revision
         // TODO String branch = getBranchForRevision(repository, logEntry);
         // Logging
