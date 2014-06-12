@@ -8,5 +8,10 @@ angular.module('ot.extension.svn.dialog.indexation', [
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
         };
+
+        // Full re-indexation
+        $scope.fullReindexation = function () {
+
+        };
     })
 ;
