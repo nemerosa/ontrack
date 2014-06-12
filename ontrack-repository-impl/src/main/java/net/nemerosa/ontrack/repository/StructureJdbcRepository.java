@@ -424,6 +424,20 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    public ValidationStamp getValidationStampByName(String project, String branch, String validationStamp) {
+        try {
+            Branch b = getBranchByName(project, branch);
+            return getNamedParameterJdbcTemplate().queryForObject(
+                    "SELECT * FROM VALIDATION_STAMPS WHERE NAME = :name",
+                    params("name", validationStamp).addValue("branch", b.id()),
+                    (rs, rowNum) -> toValidationStamp(rs, id -> b)
+            );
+        } catch (EmptyResultDataAccessException ex) {
+            throw new ValidationStampNotFoundException(project, branch, validationStamp);
+        }
+    }
+
+    @Override
     public Document getValidationStampImage(ID validationStampId) {
         return getFirstItem(
                 "SELECT IMAGETYPE, IMAGEBYTES FROM VALIDATION_STAMPS WHERE ID = :id",

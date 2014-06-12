@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.boot.ui;
 
-import net.nemerosa.ontrack.model.structure.Branch;
-import net.nemerosa.ontrack.model.structure.Project;
-import net.nemerosa.ontrack.model.structure.PromotionLevel;
-import net.nemerosa.ontrack.model.structure.StructureService;
+import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,11 +40,17 @@ public class StructureController extends AbstractProjectEntityController {
      * Promotion level access
      */
     @RequestMapping(value = "entity/promotionLevel/{project}/{branch}/{promotionLevel}", method = RequestMethod.GET)
-    public PromotionLevel branch(@PathVariable String project, @PathVariable String branch, @PathVariable String promotionLevel) {
+    public PromotionLevel promotionLevel(@PathVariable String project, @PathVariable String branch, @PathVariable String promotionLevel) {
         return structureService.findPromotionLevelByName(project, branch, promotionLevel);
     }
 
-    // FIXME VALIDATION_STAMP
+    /**
+     * Validation stamp access
+     */
+    @RequestMapping(value = "entity/validationStamp/{project}/{branch}/{validationStamp}", method = RequestMethod.GET)
+    public ValidationStamp validationStamp(@PathVariable String project, @PathVariable String branch, @PathVariable String validationStamp) {
+        return structureService.findValidationStampByName(project, branch, validationStamp);
+    }
 
     // FIXME BUILD
 
