@@ -115,7 +115,8 @@
             <id>acceptance-local</id>
             <properties>
                 <ontrack.url>http://localhost:${ontrack.port}</ontrack.url>
-                <ontrack.wait>30</ontrack.wait>
+                <!-- Timeout in seconds -->
+                <ontrack.wait>120</ontrack.wait>
             </properties>
             <build>
                 <plugins>
