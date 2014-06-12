@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.svn.indexation;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.nemerosa.ontrack.extension.svn.SVNConfigurationService;
 import net.nemerosa.ontrack.extension.svn.client.SVNClient;
+import net.nemerosa.ontrack.extension.svn.db.SVNEventDao;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepositoryDao;
 import net.nemerosa.ontrack.extension.svn.db.SVNRevisionDao;
@@ -19,10 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.tmatesoft.svn.core.ISVNLogEntryHandler;
-import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.SVNLogEntry;
-import org.tmatesoft.svn.core.SVNURL;
+import org.tmatesoft.svn.core.*;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
 import java.time.LocalDateTime;
@@ -39,6 +37,7 @@ public class IndexationServiceImpl implements IndexationService {
     private final SVNConfigurationService configurationService;
     private final SVNRepositoryDao repositoryDao;
     private final SVNRevisionDao revisionDao;
+    private final SVNEventDao eventDao;
     private final SVNClient svnClient;
     private final SecurityService securityService;
     private final TransactionService transactionService;
@@ -65,6 +64,7 @@ public class IndexationServiceImpl implements IndexationService {
             SVNConfigurationService configurationService,
             SVNRepositoryDao repositoryDao,
             SVNRevisionDao revisionDao,
+            SVNEventDao eventDao,
             SVNClient svnClient,
             SecurityService securityService,
             TransactionService transactionService
@@ -73,6 +73,7 @@ public class IndexationServiceImpl implements IndexationService {
         this.configurationService = configurationService;
         this.repositoryDao = repositoryDao;
         this.revisionDao = revisionDao;
+        this.eventDao = eventDao;
         this.svnClient = svnClient;
         this.securityService = securityService;
         this.transactionService = transactionService;
@@ -264,9 +265,40 @@ public class IndexationServiceImpl implements IndexationService {
             revisionDao.addMergedRevisions(repository.getId(), revision, mergedRevisions);
         }
         // Subversion events
-        // TODO indexSVNEvents(repository, logEntry);
+        indexSVNEvents(repository, logEntry);
         // Indexes the issues
-        // TODO indexIssues(repository, logEntry);
+        // FIXME indexIssues(repository, logEntry);
+    }
+
+    private void indexSVNEvents(SVNRepository repository, SVNLogEntry logEntry) {
+        indexSVNCopyEvents(repository, logEntry);
+        // FIXME indexSVNStopEvents(repository, logEntry);
+    }
+
+    private void indexSVNCopyEvents(SVNRepository repository, SVNLogEntry logEntry) {
+        long revision = logEntry.getRevision();
+        // Looking for copy tags
+        @SuppressWarnings("unchecked")
+        Map<String, SVNLogEntryPath> changedPaths = logEntry.getChangedPaths();
+        // Copies
+        /*
+         * Looks through all changed paths and retains only copy operations toward branches or tags
+		 */
+        for (SVNLogEntryPath logEntryPath : changedPaths.values()) {
+            // Gets the copy path
+            String copyFromPath = logEntryPath.getCopyPath();
+            if (StringUtils.isNotBlank(copyFromPath) && logEntryPath.getType() == SVNLogEntryPath.TYPE_ADDED) {
+                // Registers the new history
+                String copyToPath = logEntryPath.getPath();
+                // Retains only branches and tags
+                if (svnClient.isTagOrBranch(repository, copyToPath)) {
+                    long copyFromRevision = logEntryPath.getCopyRevision();
+                    logger.debug(String.format("\tCOPY %s@%d --> %s", copyFromPath, copyFromRevision, copyToPath));
+                    // Adds a copy event
+                    eventDao.createCopyEvent(repository.getId(), revision, copyFromPath, copyFromRevision, copyToPath);
+                }
+            }
+        }
     }
 
     private String getBranchForRevision(SVNRepository repository, SVNLogEntry logEntry) {

@@ -125,6 +125,16 @@ public class SVNClientImpl implements SVNClient {
         }
     }
 
+    @Override
+    public boolean isTagOrBranch(SVNRepository repository, String path) {
+        return isTag(repository, path) || isBranch(repository, path);
+    }
+
+    @Override
+    public boolean isTag(SVNRepository repository, String path) {
+        return isPathOK(repository.getTagPattern(), path);
+    }
+
     private boolean isBranch(SVNRepository repository, String path) {
         return isPathOK(repository.getBranchPattern(), path);
     }

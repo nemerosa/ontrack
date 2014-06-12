@@ -19,5 +19,9 @@ public interface SVNClient {
 
     boolean isTrunkOrBranch(SVNRepository repository, String path);
 
+    boolean isTagOrBranch(SVNRepository repository, String path);
+
+    boolean isTag(SVNRepository repository, String path);
+
     List<Long> getMergedRevisions(SVNRepository repository, SVNURL url, long revision);
 }

@@ -25,4 +25,13 @@ public class SVNRepository {
             return ".*/branches/.+";
         }
     }
+
+    public String getTagPattern() {
+        String tagPattern = configuration.getTagPattern();
+        if (StringUtils.isNotBlank(tagPattern)) {
+            return tagPattern;
+        } else {
+            return ".*/tags/.+";
+        }
+    }
 }
