@@ -1,7 +1,8 @@
 angular.module('ontrack.extension.svn', [
     'ui.router',
     'ot.service.core',
-    'ot.service.form'
+    'ot.service.form',
+    'ot.extension.svn.dialog.indexation'
 ])
     .config(function ($stateProvider) {
         // SVN configurations
@@ -11,7 +12,7 @@ angular.module('ontrack.extension.svn', [
             controller: 'SVNConfigurationsCtrl'
         });
     })
-    .controller('SVNConfigurationsCtrl', function ($scope, $http, ot, otFormService, otAlertService) {
+    .controller('SVNConfigurationsCtrl', function ($scope, $http, $modal, ot, otFormService, otAlertService) {
         var view = ot.view();
         view.title = 'SVN configurations';
         view.description = 'Management of the SVN configurations.';
@@ -68,9 +69,19 @@ angular.module('ontrack.extension.svn', [
             }).then(loadSVNConfigurations);
         };
 
-        // FIXME Configuration indexation
+        // Configuration indexation
         $scope.indexation = function (configuration) {
-
+            $modal.open({
+                templateUrl: 'app/extension/svn/svn.dialog.indexation.tpl.html',
+                controller: 'svnDialogIndexation',
+                resolve: {
+                    config: function () {
+                        return {
+                            configuration: configuration
+                        };
+                    }
+                }
+            });
         };
 
     })
