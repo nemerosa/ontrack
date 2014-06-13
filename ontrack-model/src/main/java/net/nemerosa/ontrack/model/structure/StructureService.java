@@ -56,6 +56,8 @@ public interface StructureService {
 
     PromotionRun getPromotionRun(ID promotionRunId);
 
+    PromotionLevel findPromotionLevelByName(String project, String branch, String promotionLevel);
+
     List<PromotionRun> getLastPromotionRunsForBuild(ID buildId);
 
     // Validation stamps
@@ -65,6 +67,8 @@ public interface StructureService {
     ValidationStamp newValidationStamp(ValidationStamp validationStamp);
 
     ValidationStamp getValidationStamp(ID validationStampId);
+
+    ValidationStamp findValidationStampByName(String project, String branch, String validationStamp);
 
     Document getValidationStampImage(ID validationStampId);
 
@@ -81,4 +85,10 @@ public interface StructureService {
     List<ValidationRun> getValidationRunsForValidationStamp(ID validationStampId, int offset, int count);
 
     ValidationRun newValidationRunStatus(ValidationRun validationRun, ValidationRunStatus runStatus);
+
+    // Entity searches by name
+
+    Project findProjectByName(String project);
+
+    Branch findBranchByName(String project, String branch);
 }

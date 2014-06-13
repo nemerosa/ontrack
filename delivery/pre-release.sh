@@ -25,4 +25,4 @@ echo RELEASE=${RELEASE} >> version.properties
 echo ${RELEASE} > .release
 
 echo Changing version in POM to ${RELEASE}
-mvn versions:set --quiet -DnewVersion=${RELEASE} -DgenerateBackupPoms=false | grep -v Props
+mvn versions:set --quiet -DnewVersion=${RELEASE} -DgenerateBackupPoms=false

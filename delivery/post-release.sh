@@ -12,5 +12,4 @@ git reset --hard HEAD
 git tag --force --message "v$RELEASE" "$RELEASE"
 
 # Pushing
-git push
 git push --tags

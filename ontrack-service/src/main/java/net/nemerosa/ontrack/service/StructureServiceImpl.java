@@ -258,6 +258,11 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public ValidationStamp findValidationStampByName(String project, String branch, String validationStamp) {
+        return structureRepository.getValidationStampByName(project, branch, validationStamp);
+    }
+
+    @Override
     public Document getValidationStampImage(ID validationStampId) {
         // Checks access
         getValidationStamp(validationStampId);
@@ -321,6 +326,21 @@ public class StructureServiceImpl implements StructureService {
         validationRunStatusService.checkTransition(validationRun.getLastStatus().getStatusID(), runStatus.getStatusID());
         // OK
         return structureRepository.newValidationRunStatus(validationRun, runStatus);
+    }
+
+    @Override
+    public Project findProjectByName(String project) {
+        return structureRepository.getProjectByName(project);
+    }
+
+    @Override
+    public Branch findBranchByName(String project, String branch) {
+        return structureRepository.getBranchByName(project, branch);
+    }
+
+    @Override
+    public PromotionLevel findPromotionLevelByName(String project, String branch, String promotionLevel) {
+        return structureRepository.getPromotionLevelByName(project, branch, promotionLevel);
     }
 
     protected void checkImage(Document document) {

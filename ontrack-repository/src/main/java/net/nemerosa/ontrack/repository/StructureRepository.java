@@ -14,11 +14,15 @@ public interface StructureRepository {
 
     Project getProject(ID projectId);
 
+    Project getProjectByName(String project);
+
     void saveProject(Project project);
 
     // Branches
 
     Branch getBranch(ID branchId);
+
+    Branch getBranchByName(String project, String branch);
 
     List<Branch> getBranchesForProject(ID projectId);
 
@@ -42,6 +46,8 @@ public interface StructureRepository {
 
     PromotionLevel getPromotionLevel(ID promotionLevelId);
 
+    PromotionLevel getPromotionLevelByName(String project, String branch, String promotionLevel);
+
     Document getPromotionLevelImage(ID promotionLevelId);
 
     void setPromotionLevelImage(ID promotionLevelId, Document document);
@@ -61,6 +67,8 @@ public interface StructureRepository {
     ValidationStamp newValidationStamp(ValidationStamp validationStamp);
 
     ValidationStamp getValidationStamp(ID validationStampId);
+
+    ValidationStamp getValidationStampByName(String project, String branch, String validationStamp);
 
     Document getValidationStampImage(ID validationStampId);
 
