@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.tmatesoft.svn.core.*;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
+import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
+import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.wc.*;
 
 import java.util.*;
@@ -22,6 +24,9 @@ public class SVNClientImpl implements SVNClient {
     @Autowired
     public SVNClientImpl(TransactionService transactionService) {
         this.transactionService = transactionService;
+        // Repository factories
+        SVNRepositoryFactoryImpl.setup();
+        DAVRepositoryFactory.setup();
     }
 
     @Override
