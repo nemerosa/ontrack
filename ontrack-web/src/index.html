@@ -40,7 +40,7 @@
                 <!-- Application info messages -->
 
                 <!-- No messages: -->
-                <li class="dropdown">
+                <li class="dropdown" ng-if="!applicationInfo.resources.length">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <span class="ot-application-info ot-application-info-none"></span>
                     </a>
@@ -52,17 +52,15 @@
                 </li>
 
                 <!-- With messages: -->
-                <li class="dropdown">
+                <li class="dropdown" ng-if="applicationInfo.resources.length">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <span class="ot-application-info"></span>
-                        <span class="ot-application-info-count">4</span>
+                        <span class="ot-application-info-count">{{applicationInfo.resources.length}}</span>
                     </a>
                     <ul class="dropdown-menu" role="menu">
                         <li>
-                            <a class="ot-application-info-info">Message 1</a>
-                            <a class="ot-application-info-success">Message 2</a>
-                            <a class="ot-application-info-error">Message 3</a>
-                            <a class="ot-application-info-warning">Message 4</a>
+                            <a class="ot-application-info-none">Application messages:</a>
+                            <a ng-repeat="info in applicationInfo.resources" class="ot-application-info-{{info.type | lowercase}}">{{info.message}}</a>
                         </li>
                     </ul>
                 </li>

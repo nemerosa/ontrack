@@ -12,6 +12,7 @@ var ontrack = angular.module('ontrack', [
         'ot.directive.properties',
         // Services
         'ot.service.user',
+        'ot.service.info',
         // Views
         'ot.view.home',
         'ot.view.settings',
@@ -37,7 +38,7 @@ var ontrack = angular.module('ontrack', [
             $urlRouterProvider.otherwise("/home");
         })
         // Main controller
-        .controller('AppCtrl', function ($log, $scope, $rootScope, otUserService) {
+        .controller('AppCtrl', function ($log, $scope, $rootScope, otUserService, otInfoService) {
 
             /**
              * User mgt
@@ -71,6 +72,12 @@ var ontrack = angular.module('ontrack', [
                     }
                 );
             };
+
+            /**
+             * Application info mgt
+             */
+
+            otInfoService.init();
 
             /**
              * Scope methods
