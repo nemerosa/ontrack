@@ -11,7 +11,6 @@
     <!-- include: "type": "css", "files": "**/*.css" -->
 
     <!-- JS includes -->
-    <!-- TODO Preserve the order of sources -->
     <!-- include: "type": "js", "files": "vendor/jquery/**/*.js" -->
     <!-- include: "type": "js", "files": "vendor/angular/*.js" -->
     <!-- include: "type": "js", "files": "vendor/angular-ui-router/**/*.js" -->
@@ -37,6 +36,21 @@
         </div>
         <div class="navbar-collapse">
             <ul class="nav navbar-nav navbar-right">
+
+                <!-- Application info messages -->
+
+                <!-- No messages: -->
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <span class="ot-application-info ot-application-info-none"></span>
+                    </a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li>
+                            <a class="ot-application-info-none">No message to display</a>
+                        </li>
+                    </ul>
+                </li>
+
                 <!-- User menu: not logged -->
                 <li class="dropdown" ng-show="!logged()">
                     <!-- Login link -->
