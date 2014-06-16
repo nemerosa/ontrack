@@ -1,11 +1,14 @@
 buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
     dependencies {
         classpath('org.springframework.boot:spring-boot-gradle-plugin:1.0.2.RELEASE')
     }
 }
 
 apply plugin: 'maven'
-apply plugin: 'spring-boot'
 
 /**
  * Meta information
@@ -14,11 +17,6 @@ apply plugin: 'spring-boot'
 allprojects {
     group = 'net.nemerosa.ontrack'
     version = projectVersion // Defined in gradle.properties
-}
-
-jar {
-    baseName = 'ontrack'
-    version = projectVersion
 }
 
 /**
