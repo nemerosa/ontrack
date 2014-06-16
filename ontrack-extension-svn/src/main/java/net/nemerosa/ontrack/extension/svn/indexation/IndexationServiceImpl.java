@@ -1,7 +1,10 @@
 package net.nemerosa.ontrack.extension.svn.indexation;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import net.nemerosa.ontrack.extension.issues.IssueServiceExtension;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
+import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.svn.LastRevisionInfo;
 import net.nemerosa.ontrack.extension.svn.SVNConfiguration;
 import net.nemerosa.ontrack.extension.svn.SVNConfigurationService;
@@ -19,6 +22,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -42,10 +46,11 @@ public class IndexationServiceImpl implements IndexationService, ApplicationInfo
     private final SVNRepositoryDao repositoryDao;
     private final SVNRevisionDao revisionDao;
     private final SVNEventDao eventDao;
+    private final SVNIssueRevisionDao issueRevisionDao;
     private final SVNClient svnClient;
-    private final IssueServiceRegistry issueServiceRegistry;
     private final SecurityService securityService;
     private final TransactionService transactionService;
+    private final ApplicationContext applicationContext;
 
     /**
      * Current indexations
@@ -70,12 +75,15 @@ public class IndexationServiceImpl implements IndexationService, ApplicationInfo
             SVNRepositoryDao repositoryDao,
             SVNRevisionDao revisionDao,
             SVNEventDao eventDao,
+            SVNIssueRevisionDao issueRevisionDao,
             SVNClient svnClient,
-            IssueServiceRegistry issueServiceRegistry,
+            // IssueServiceRegistry issueServiceRegistry,
             SecurityService securityService,
-            TransactionService transactionService
+            TransactionService transactionService,
+            ApplicationContext applicationContext
     ) {
-        this.issueServiceRegistry = issueServiceRegistry;
+        this.applicationContext = applicationContext;
+        this.issueRevisionDao = issueRevisionDao;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
         this.configurationService = configurationService;
         this.repositoryDao = repositoryDao;
@@ -140,8 +148,16 @@ public class IndexationServiceImpl implements IndexationService, ApplicationInfo
         return SVNRepository.of(
                 repositoryId,
                 configuration,
-                issueServiceRegistry.getConfiguredIssueService(configuration.getIssueServiceConfigurationIdentifier())
+                getIssueServiceRegistry().getConfiguredIssueService(configuration.getIssueServiceConfigurationIdentifier())
         );
+    }
+
+    /**
+     * The {@link net.nemerosa.ontrack.extension.issues.IssueServiceRegistry} cannot be inject because
+     * this would create a circular dependency in injections.
+     */
+    private IssueServiceRegistry getIssueServiceRegistry() {
+        return applicationContext.getBean(IssueServiceRegistry.class);
     }
 
     @Override
@@ -336,7 +352,36 @@ public class IndexationServiceImpl implements IndexationService, ApplicationInfo
         // Subversion events
         indexSVNEvents(repository, logEntry);
         // Indexes the issues
-        // FIXME indexIssues(repository, logEntry);
+        indexIssues(repository, logEntry);
+    }
+
+    private void indexIssues(SVNRepository repository, SVNLogEntry logEntry) {
+        // Is the repository associated with any issue service?
+        ConfiguredIssueService configuredIssueService = repository.getConfiguredIssueService();
+        if (configuredIssueService != null) {
+            IssueServiceExtension issueServiceExtension = configuredIssueService.getIssueServiceExtension();
+            IssueServiceConfiguration issueServiceConfiguration = configuredIssueService.getIssueServiceConfiguration();
+            // Revision information to scan
+            long revision = logEntry.getRevision();
+            String message = logEntry.getMessage();
+            // Cache for issues
+            Set<String> revisionIssues = new HashSet<>();
+            // Gets all issues from the message
+            Set<String> issues = issueServiceExtension.extractIssueKeysFromMessage(
+                    issueServiceConfiguration,
+                    message
+            );
+            // For each issue in the message
+            for (String issueKey : issues) {
+                // Checks that the issue has not already been associated with this revision
+                if (!revisionIssues.contains(issueKey)) {
+                    revisionIssues.add(issueKey);
+                    logger.info(String.format("     Indexing revision %d <-> %s", revision, issueKey));
+                    // Indexes this issue
+                    issueRevisionDao.link(repository.getId(), revision, issueKey);
+                }
+            }
+        }
     }
 
     private void indexSVNEvents(SVNRepository repository, SVNLogEntry logEntry) {
