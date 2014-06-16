@@ -2,12 +2,12 @@ package net.nemerosa.ontrack.extension.svn;
 
 import lombok.Data;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationId;
 import net.nemerosa.ontrack.extension.support.configurations.UserPasswordConfiguration;
-import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.form.Int;
-import net.nemerosa.ontrack.model.form.Password;
-import net.nemerosa.ontrack.model.form.Text;
+import net.nemerosa.ontrack.model.form.*;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
+
+import java.util.List;
 
 import static net.nemerosa.ontrack.model.form.Form.defaultText;
 
@@ -29,7 +29,7 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
     private final long indexationStart;
     private final IssueServiceConfiguration issueServiceConfiguration;
 
-    public static Form form() {
+    public static Form form(List<IssueServiceConfigurationId> availableIssueServiceConfigurations) {
         return Form.create()
                 .with(defaultText())
                 .url()
@@ -110,6 +110,13 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
                                 .min(1)
                                 .value(1)
                                 .help("Revision to start the indexation from.")
+                )
+                .with(
+                        Selection.of("issueServiceConfiguration")
+                                .label("Issue configuration")
+                                .help("Select an issue service that is sued to associate tickets and issues to the source.")
+                                .optional()
+                                .items(availableIssueServiceConfigurations)
                 );
     }
 
@@ -132,8 +139,8 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
         );
     }
 
-    public Form asForm() {
-        return form()
+    public Form asForm(List<IssueServiceConfigurationId> availableIssueServiceConfigurations) {
+        return form(availableIssueServiceConfigurations)
                 .with(defaultText().readOnly().value(name))
                 .fill("url", url)
                 .fill("user", user)
@@ -146,6 +153,8 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
                 .fill("browserForChange", browserForChange)
                 .fill("indexationInterval", indexationInterval)
                 .fill("indexationStart", indexationStart)
+                .fill("issueServiceConfiguration", issueServiceConfiguration != null ?
+                       issueServiceConfiguration.toId() : null)
                 ;
     }
 

@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.extension.svn.indexation.IndexationService;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.form.Selection;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.ui.resource.Link;
@@ -67,15 +66,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
      */
     @RequestMapping(value = "configurations/create", method = RequestMethod.GET)
     public Form getConfigurationForm() {
-        return SVNConfiguration.form()
-                .with(
-                        Selection.of("issueServiceConfiguration")
-                                .label("Issue configuration")
-                                .help("Select an issue service that is sued to associate tickets and issues to the source.")
-                                .optional()
-                                .items(issueServiceRegistry.getAvailableIssueServiceConfigurations())
-                )
-                ;
+        return SVNConfiguration.form(issueServiceRegistry.getAvailableIssueServiceConfigurations());
     }
 
     /**
@@ -136,7 +127,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
      */
     @RequestMapping(value = "configurations/{name}/update", method = RequestMethod.GET)
     public Form updateConfigurationForm(@PathVariable String name) {
-        return svnConfigurationService.getConfiguration(name).asForm();
+        return svnConfigurationService.getConfiguration(name).asForm(issueServiceRegistry.getAvailableIssueServiceConfigurations());
     }
 
     /**

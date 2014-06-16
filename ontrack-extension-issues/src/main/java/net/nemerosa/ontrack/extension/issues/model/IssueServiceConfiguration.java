@@ -6,4 +6,8 @@ public interface IssueServiceConfiguration {
 
     String getName();
 
+    default String toId() {
+        return String.format("%s//%s", getServiceId(), getName());
+    }
+
 }

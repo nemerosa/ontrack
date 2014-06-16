@@ -14,7 +14,7 @@ public class IssueServiceConfigurationId {
 
     public static IssueServiceConfigurationId of(IssueServiceExtension issueServiceExtension, IssueServiceConfiguration issueServiceConfiguration) {
         return new IssueServiceConfigurationId(
-                String.format("%s//%s", issueServiceExtension.getId(), issueServiceConfiguration.getName()),
+                issueServiceConfiguration.toId(),
                 String.format("%s (%s)", issueServiceConfiguration.getName(), issueServiceExtension.getName())
         );
     }
