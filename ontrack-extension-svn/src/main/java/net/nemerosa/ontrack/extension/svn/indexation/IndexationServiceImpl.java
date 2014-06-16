@@ -255,7 +255,7 @@ public class IndexationServiceImpl implements IndexationService, ApplicationInfo
             } catch (Exception ex) {
                 logger.error(String.format("Could not index range from %s to %s", min, max), ex);
             } finally {
-                indexationJobs.remove(repository.getId());
+                indexationJobs.remove(repository.getConfiguration().getName());
             }
         }
 
