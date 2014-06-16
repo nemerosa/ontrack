@@ -1,8 +1,7 @@
 package net.nemerosa.ontrack.extension.svn;
 
 import lombok.Data;
-import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
-import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationId;
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
 import net.nemerosa.ontrack.extension.support.configurations.UserPasswordConfiguration;
 import net.nemerosa.ontrack.model.form.*;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
@@ -27,9 +26,9 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
     private final String browserForChange;
     private final int indexationInterval;
     private final long indexationStart;
-    private final IssueServiceConfiguration issueServiceConfiguration;
+    private final String issueServiceConfigurationIdentifier;
 
-    public static Form form(List<IssueServiceConfigurationId> availableIssueServiceConfigurations) {
+    public static Form form(List<IssueServiceConfigurationRepresentation> availableIssueServiceConfigurations) {
         return Form.create()
                 .with(defaultText())
                 .url()
@@ -112,7 +111,7 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
                                 .help("Revision to start the indexation from.")
                 )
                 .with(
-                        Selection.of("issueServiceConfiguration")
+                        Selection.of("issueServiceConfigurationIdentifier")
                                 .label("Issue configuration")
                                 .help("Select an issue service that is sued to associate tickets and issues to the source.")
                                 .optional()
@@ -135,11 +134,11 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
                 browserForChange,
                 indexationInterval,
                 indexationStart,
-                issueServiceConfiguration
+                issueServiceConfigurationIdentifier
         );
     }
 
-    public Form asForm(List<IssueServiceConfigurationId> availableIssueServiceConfigurations) {
+    public Form asForm(List<IssueServiceConfigurationRepresentation> availableIssueServiceConfigurations) {
         return form(availableIssueServiceConfigurations)
                 .with(defaultText().readOnly().value(name))
                 .fill("url", url)
@@ -153,8 +152,7 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
                 .fill("browserForChange", browserForChange)
                 .fill("indexationInterval", indexationInterval)
                 .fill("indexationStart", indexationStart)
-                .fill("issueServiceConfiguration", issueServiceConfiguration != null ?
-                       issueServiceConfiguration.toId() : null)
+                .fill("issueServiceConfigurationIdentifier", issueServiceConfigurationIdentifier)
                 ;
     }
 
@@ -173,7 +171,7 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
                 browserForChange,
                 indexationInterval,
                 indexationStart,
-                issueServiceConfiguration
+                issueServiceConfigurationIdentifier
         );
     }
 

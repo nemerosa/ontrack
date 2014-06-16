@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.support.configurations;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ConfigurationService<T extends UserPasswordConfiguration> {
 
@@ -13,6 +14,8 @@ public interface ConfigurationService<T extends UserPasswordConfiguration> {
     T newConfiguration(T configuration);
 
     T getConfiguration(String name);
+
+    Optional<T> getOptionalConfiguration(String name);
 
     void deleteConfiguration(String name);
 

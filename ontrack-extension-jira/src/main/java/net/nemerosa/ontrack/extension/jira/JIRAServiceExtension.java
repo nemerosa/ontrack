@@ -23,4 +23,9 @@ public class JIRAServiceExtension extends AbstractIssueServiceExtension {
     public List<? extends IssueServiceConfiguration> getConfigurationList() {
         return jiraConfigurationService.getConfigurations();
     }
+
+    @Override
+    public IssueServiceConfiguration getConfigurationByName(String name) {
+        return jiraConfigurationService.getOptionalConfiguration(name).orElse(null);
+    }
 }

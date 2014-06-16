@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.jira;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.support.configurations.UserPasswordConfiguration;
@@ -62,6 +63,7 @@ public class JIRAConfiguration implements UserPasswordConfiguration<JIRAConfigur
     }
 
     @Override
+    @JsonIgnore
     public String getServiceId() {
         return JIRAServiceExtension.SERVICE;
     }

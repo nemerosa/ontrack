@@ -27,4 +27,12 @@ public interface IssueServiceExtension extends Extension {
      * Returns the unfiltered list of all configurations for this issue service.
      */
     List<? extends IssueServiceConfiguration> getConfigurationList();
+
+    /**
+     * Gets a configuration using its name
+     *
+     * @param name Name of the configuration
+     * @return Configuration or <code>null</code> if not found
+     */
+    IssueServiceConfiguration getConfigurationByName(String name);
 }
