@@ -7,6 +7,9 @@ import net.nemerosa.ontrack.extension.svn.client.SVNClient;
 import net.nemerosa.ontrack.extension.svn.db.*;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
 import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.support.ApplicationInfo;
+import net.nemerosa.ontrack.model.support.ApplicationInfoProvider;
+import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import net.nemerosa.ontrack.model.support.Time;
 import net.nemerosa.ontrack.tx.Transaction;
 import net.nemerosa.ontrack.tx.TransactionService;
@@ -29,7 +32,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Service
-public class IndexationServiceImpl implements IndexationService {
+public class IndexationServiceImpl implements IndexationService, ApplicationInfoProvider {
 
     private final Logger logger = LoggerFactory.getLogger(IndexationService.class);
     private final TransactionTemplate transactionTemplate;
@@ -76,6 +79,33 @@ public class IndexationServiceImpl implements IndexationService {
         this.svnClient = svnClient;
         this.securityService = securityService;
         this.transactionService = transactionService;
+    }
+
+    @Override
+    public List<ApplicationInfo> getApplicationInfoList() {
+        List<ApplicationInfo> messages = new ArrayList<>();
+        // Gets all the repositories
+        List<ConfigurationDescriptor> configurationDescriptors = configurationService.getConfigurationDescriptors();
+        for (ConfigurationDescriptor descriptor : configurationDescriptors) {
+            // Gets the current indexation job for this configuration (if any)
+            IndexationJob job = indexationJobs.get(descriptor.getId());
+            if (job != null) {
+                messages.add(
+                        ApplicationInfo.info(
+                                String.format(
+                                        "Indexation on %6$s is %1$s (%2$s to %3$s - at %4$s - %5$s%%)",
+                                        job.isRunning() ? "running" : "pending", // 1
+                                        job.getMin(), // 2
+                                        job.getMax(), // 3
+                                        job.getCurrent(), // 4
+                                        job.getProgress(), // 5
+                                        descriptor.getName() // 6
+                                )
+                        )
+                );
+            }
+        }
+        return messages;
     }
 
     @Override
