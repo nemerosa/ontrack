@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.jira;
 
 import lombok.Data;
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.support.configurations.UserPasswordConfiguration;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Password;
@@ -10,7 +11,7 @@ import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import static net.nemerosa.ontrack.model.form.Form.defaultText;
 
 @Data
-public class JIRAConfiguration implements UserPasswordConfiguration<JIRAConfiguration> {
+public class JIRAConfiguration implements UserPasswordConfiguration<JIRAConfiguration>, IssueServiceConfiguration {
 
     private final String name;
     private final String url;
@@ -58,5 +59,10 @@ public class JIRAConfiguration implements UserPasswordConfiguration<JIRAConfigur
     @Override
     public ConfigurationDescriptor getDescriptor() {
         return new ConfigurationDescriptor(name, name);
+    }
+
+    @Override
+    public String getServiceId() {
+        return JIRAServiceExtension.SERVICE;
     }
 }

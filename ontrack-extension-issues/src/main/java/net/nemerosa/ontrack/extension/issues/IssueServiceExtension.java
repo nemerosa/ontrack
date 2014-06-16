@@ -1,6 +1,9 @@
 package net.nemerosa.ontrack.extension.issues;
 
 import net.nemerosa.ontrack.extension.api.Extension;
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
+
+import java.util.List;
 
 /**
  * Defines a generic service used to access issues from a ticketing system like
@@ -20,4 +23,8 @@ public interface IssueServiceExtension extends Extension {
      */
     String getName();
 
+    /**
+     * Returns the unfiltered list of all configurations for this issue service.
+     */
+    List<? extends IssueServiceConfiguration> getConfigurationList();
 }

@@ -1,10 +1,12 @@
 package net.nemerosa.ontrack.extension.svn;
 
 import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
+import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.extension.svn.indexation.IndexationService;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.form.Selection;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.ui.resource.Link;
@@ -23,13 +25,15 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
 
     private final SVNConfigurationService svnConfigurationService;
     private final IndexationService indexationService;
+    private final IssueServiceRegistry issueServiceRegistry;
     private final SecurityService securityService;
 
     @Autowired
-    public SVNController(SVNExtensionFeature feature, SVNConfigurationService svnConfigurationService, IndexationService indexationService, SecurityService securityService) {
+    public SVNController(SVNExtensionFeature feature, SVNConfigurationService svnConfigurationService, IndexationService indexationService, IssueServiceRegistry issueServiceRegistry, SecurityService securityService) {
         super(feature);
         this.svnConfigurationService = svnConfigurationService;
         this.indexationService = indexationService;
+        this.issueServiceRegistry = issueServiceRegistry;
         this.securityService = securityService;
     }
 
@@ -63,7 +67,15 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
      */
     @RequestMapping(value = "configurations/create", method = RequestMethod.GET)
     public Form getConfigurationForm() {
-        return SVNConfiguration.form();
+        return SVNConfiguration.form()
+                .with(
+                        Selection.of("issueServiceConfiguration")
+                                .label("Issue configuration")
+                                .help("Select an issue service that is sued to associate tickets and issues to the source.")
+                                .optional()
+                                .items(issueServiceRegistry.getAvailableIssueServiceConfigurations())
+                )
+                ;
     }
 
     /**

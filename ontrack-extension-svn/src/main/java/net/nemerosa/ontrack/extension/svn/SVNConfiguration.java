@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.svn;
 
 import lombok.Data;
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.support.configurations.UserPasswordConfiguration;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Int;
@@ -26,18 +27,7 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
     private final String browserForChange;
     private final int indexationInterval;
     private final long indexationStart;
-    // TODO Optional link to an issue service configuration
-
-    /**
-     * The same SVN repository might be used with different ticketing systems. Therefore, indexation of issues
-     * at configuration level might prove difficult.
-     * <p/>
-     * A solution could be to associate _several_ issue services with a repository, but again, the configuration
-     * might prove difficult.
-     * <p/>
-     * At last, a _type_ of issue service could be associated with a SVN repository, that would allow for indexation
-     * only. For example, for a JIRA issue service, we would index using the JIRA tickets.
-     */
+    private final IssueServiceConfiguration issueServiceConfiguration;
 
     public static Form form() {
         return Form.create()
@@ -137,7 +127,8 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
                 browserForRevision,
                 browserForChange,
                 indexationInterval,
-                indexationStart
+                indexationStart,
+                issueServiceConfiguration
         );
     }
 
@@ -172,7 +163,8 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
                 browserForRevision,
                 browserForChange,
                 indexationInterval,
-                indexationStart
+                indexationStart,
+                issueServiceConfiguration
         );
     }
 

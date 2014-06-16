@@ -1,5 +1,8 @@
 package net.nemerosa.ontrack.extension.issues;
 
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationId;
+
+import java.util.List;
 import java.util.Optional;
 
 public interface IssueServiceRegistry {
@@ -18,4 +21,5 @@ public interface IssueServiceRegistry {
      */
     Optional<IssueServiceExtension> getOptionalIssueService(String id);
 
+    List<IssueServiceConfigurationId> getAvailableIssueServiceConfigurations();
 }
