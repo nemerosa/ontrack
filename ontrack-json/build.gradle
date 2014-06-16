@@ -1,0 +1,6 @@
+apply plugin: 'java'
+
+dependencies {
+    compile libraries.jackson_databind
+    compile libraries.commons_lang3
+}

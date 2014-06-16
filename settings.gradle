@@ -1,3 +1,4 @@
 rootProject.name = 'ontrack'
 
 include ':ontrack-common'
+include ':ontrack-json'
