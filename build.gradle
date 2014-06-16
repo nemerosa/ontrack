@@ -10,30 +10,10 @@ allprojects {
 }
 
 /**
- * Resolution
- */
-allprojects {
-    repositories {
-        mavenCentral()
-    }
-}
-
-/**
  * Dependency management
  */
 
-ext {
-    libraries = [
-            commons_lang3   : 'org.apache.commons:commons-lang3:3.3.2',
-            commons_io      : 'commons-io:commons-io:2.4',
-            jackson_databind: 'com.fasterxml.jackson.core:jackson-databind:2.3.3',
-            guava           : 'com.google.guava:guava:17.0',
-            // Test
-            junit           : 'junit:junit:4.11',
-            // Other
-            lombok          : 'org.projectlombok:lombok:1.12.6'
-    ]
-}
+apply from: 'gradle/dependencies.gradle'
 
 /**
  * Java projects

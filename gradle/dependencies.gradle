@@ -1,0 +1,47 @@
+/**
+ * Resolution
+ */
+allprojects {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+}
+
+/**
+ * Common versions
+ */
+
+def springVersion = '4.0.3.RELEASE'
+def httpClientVersion = '4.3.3'
+def slf4jVersion = '1.7.5'
+
+/**
+ * List of dependencies
+ */
+
+ext {
+    libraries = [
+            // Misc
+            commons_lang3   : 'org.apache.commons:commons-lang3:3.3.2',
+            commons_io      : 'commons-io:commons-io:2.4',
+            jackson_databind: 'com.fasterxml.jackson.core:jackson-databind:2.3.3',
+            guava           : 'com.google.guava:guava:17.0',
+
+            // Spring
+            spring_context  : "org.springframework:spring-context:${springVersion}",
+
+            // HTTP client
+            http_client     : "org.apache.httpcomponents:httpclient:${httpClientVersion}",
+            http_mime       : "org.apache.httpcomponents:httpmime:${httpClientVersion}",
+
+            // Logging
+            slf4j_api       : "org.slf4j:slf4j-api:${slf4jVersion}",
+
+            // Test
+            junit           : 'junit:junit:4.11',
+
+            // Other
+            lombok          : 'org.projectlombok:lombok:1.12.6'
+    ]
+}
