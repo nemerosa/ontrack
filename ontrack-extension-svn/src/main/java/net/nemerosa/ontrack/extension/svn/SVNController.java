@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.svn;
 
 import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
+import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.extension.svn.indexation.IndexationService;
 import net.nemerosa.ontrack.model.Ack;
@@ -23,13 +24,15 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
 
     private final SVNConfigurationService svnConfigurationService;
     private final IndexationService indexationService;
+    private final IssueServiceRegistry issueServiceRegistry;
     private final SecurityService securityService;
 
     @Autowired
-    public SVNController(SVNExtensionFeature feature, SVNConfigurationService svnConfigurationService, IndexationService indexationService, SecurityService securityService) {
+    public SVNController(SVNExtensionFeature feature, SVNConfigurationService svnConfigurationService, IndexationService indexationService, IssueServiceRegistry issueServiceRegistry, SecurityService securityService) {
         super(feature);
         this.svnConfigurationService = svnConfigurationService;
         this.indexationService = indexationService;
+        this.issueServiceRegistry = issueServiceRegistry;
         this.securityService = securityService;
     }
 
@@ -63,7 +66,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
      */
     @RequestMapping(value = "configurations/create", method = RequestMethod.GET)
     public Form getConfigurationForm() {
-        return SVNConfiguration.form();
+        return SVNConfiguration.form(issueServiceRegistry.getAvailableIssueServiceConfigurations());
     }
 
     /**
@@ -124,7 +127,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
      */
     @RequestMapping(value = "configurations/{name}/update", method = RequestMethod.GET)
     public Form updateConfigurationForm(@PathVariable String name) {
-        return svnConfigurationService.getConfiguration(name).asForm();
+        return svnConfigurationService.getConfiguration(name).asForm(issueServiceRegistry.getAvailableIssueServiceConfigurations());
     }
 
     /**

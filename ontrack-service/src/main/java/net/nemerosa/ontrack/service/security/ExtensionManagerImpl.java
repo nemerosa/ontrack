@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service.security;
 
+import net.nemerosa.ontrack.extension.api.AvailableExtension;
 import net.nemerosa.ontrack.extension.api.Extension;
 import net.nemerosa.ontrack.extension.api.ExtensionFeature;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
@@ -68,7 +69,22 @@ public class ExtensionManagerImpl implements ExtensionManager, StartupService {
         return (Collection<T>) collection;
     }
 
-    private boolean isExtensionEnabled(Extension x) {
+    @Override
+    public <T extends Extension> Collection<AvailableExtension<T>> getAllExtensions(Class<T> extensionType) {
+        // Filters the extensions
+        @SuppressWarnings("unchecked")
+        List<AvailableExtension<T>> collection = extensions.stream()
+                .filter(extensionType::isInstance)
+                .map(x -> new AvailableExtension<T>(
+                        (T) x,
+                        isExtensionEnabled(x)
+                ))
+                .collect(Collectors.toList());
+        return collection;
+    }
+
+    @Override
+    public boolean isExtensionEnabled(Extension x) {
         return isExtensionFeatureEnabled(x.getFeature());
     }
 

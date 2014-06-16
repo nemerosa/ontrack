@@ -41,7 +41,7 @@
 
                 <!-- No messages: -->
                 <li class="dropdown" ng-if="!applicationInfo.resources.length">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" title="Application messages: none">
                         <span class="ot-application-info ot-application-info-none"></span>
                     </a>
                     <ul class="dropdown-menu" role="menu">
@@ -52,7 +52,7 @@
                 </li>
 
                 <!-- With messages: -->
-                <li class="dropdown" ng-if="applicationInfo.resources.length">
+                <li class="dropdown" ng-if="applicationInfo.resources.length" title="Application messages: {{applicationInfo.resources.length}}">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <span class="ot-application-info"></span>
                         <span class="ot-application-info-count">{{applicationInfo.resources.length}}</span>

@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.extension.svn;
 
 import lombok.Data;
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
 import net.nemerosa.ontrack.extension.support.configurations.UserPasswordConfiguration;
-import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.form.Int;
-import net.nemerosa.ontrack.model.form.Password;
-import net.nemerosa.ontrack.model.form.Text;
+import net.nemerosa.ontrack.model.form.*;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
+
+import java.util.List;
 
 import static net.nemerosa.ontrack.model.form.Form.defaultText;
 
@@ -26,20 +26,9 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
     private final String browserForChange;
     private final int indexationInterval;
     private final long indexationStart;
-    // TODO Optional link to an issue service configuration
+    private final String issueServiceConfigurationIdentifier;
 
-    /**
-     * The same SVN repository might be used with different ticketing systems. Therefore, indexation of issues
-     * at configuration level might prove difficult.
-     * <p/>
-     * A solution could be to associate _several_ issue services with a repository, but again, the configuration
-     * might prove difficult.
-     * <p/>
-     * At last, a _type_ of issue service could be associated with a SVN repository, that would allow for indexation
-     * only. For example, for a JIRA issue service, we would index using the JIRA tickets.
-     */
-
-    public static Form form() {
+    public static Form form(List<IssueServiceConfigurationRepresentation> availableIssueServiceConfigurations) {
         return Form.create()
                 .with(defaultText())
                 .url()
@@ -120,6 +109,13 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
                                 .min(1)
                                 .value(1)
                                 .help("Revision to start the indexation from.")
+                )
+                .with(
+                        Selection.of("issueServiceConfigurationIdentifier")
+                                .label("Issue configuration")
+                                .help("Select an issue service that is sued to associate tickets and issues to the source.")
+                                .optional()
+                                .items(availableIssueServiceConfigurations)
                 );
     }
 
@@ -137,12 +133,13 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
                 browserForRevision,
                 browserForChange,
                 indexationInterval,
-                indexationStart
+                indexationStart,
+                issueServiceConfigurationIdentifier
         );
     }
 
-    public Form asForm() {
-        return form()
+    public Form asForm(List<IssueServiceConfigurationRepresentation> availableIssueServiceConfigurations) {
+        return form(availableIssueServiceConfigurations)
                 .with(defaultText().readOnly().value(name))
                 .fill("url", url)
                 .fill("user", user)
@@ -155,6 +152,7 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
                 .fill("browserForChange", browserForChange)
                 .fill("indexationInterval", indexationInterval)
                 .fill("indexationStart", indexationStart)
+                .fill("issueServiceConfigurationIdentifier", issueServiceConfigurationIdentifier)
                 ;
     }
 
@@ -172,7 +170,8 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
                 browserForRevision,
                 browserForChange,
                 indexationInterval,
-                indexationStart
+                indexationStart,
+                issueServiceConfigurationIdentifier
         );
     }
 

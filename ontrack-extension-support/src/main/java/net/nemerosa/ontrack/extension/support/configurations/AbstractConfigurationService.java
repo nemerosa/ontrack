@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public abstract class AbstractConfigurationService<T extends UserPasswordConfiguration<T>> implements ConfigurationService<T> {
@@ -57,6 +58,12 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
         return configurationRepository
                 .find(configurationClass, name)
                 .orElseThrow(() -> new ConfigurationNotFoundException(name));
+    }
+
+    @Override
+    public Optional<T> getOptionalConfiguration(String name) {
+        checkAccess();
+        return configurationRepository.find(configurationClass, name);
     }
 
     @Override
