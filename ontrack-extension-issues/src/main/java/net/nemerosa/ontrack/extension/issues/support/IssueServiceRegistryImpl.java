@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.api.AvailableExtension;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtension;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
+import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationIdentifier;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
@@ -71,6 +72,25 @@ public class IssueServiceRegistryImpl implements IssueServiceRegistry {
             return null;
         } else {
             return getIssueServiceConfigurationById(IssueServiceConfigurationIdentifier.parse(id));
+        }
+    }
+
+    @Override
+    public ConfiguredIssueService getConfiguredIssueService(String issueServiceConfigurationIdentifier) {
+        // Parsing
+        IssueServiceConfigurationIdentifier identifier = IssueServiceConfigurationIdentifier.parse(issueServiceConfigurationIdentifier);
+        if (identifier != null) {
+            Optional<IssueServiceExtension> issueService = getOptionalIssueService(identifier.getServiceId());
+            if (issueService.isPresent()) {
+                return new ConfiguredIssueService(
+                        issueService.get(),
+                        issueService.get().getConfigurationByName(identifier.getName())
+                );
+            } else {
+                return null;
+            }
+        } else {
+            return null;
         }
     }
 

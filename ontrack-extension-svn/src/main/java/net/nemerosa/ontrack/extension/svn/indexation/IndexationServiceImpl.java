@@ -1,7 +1,9 @@
 package net.nemerosa.ontrack.extension.svn.indexation;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.svn.LastRevisionInfo;
+import net.nemerosa.ontrack.extension.svn.SVNConfiguration;
 import net.nemerosa.ontrack.extension.svn.SVNConfigurationService;
 import net.nemerosa.ontrack.extension.svn.client.SVNClient;
 import net.nemerosa.ontrack.extension.svn.db.*;
@@ -41,6 +43,7 @@ public class IndexationServiceImpl implements IndexationService, ApplicationInfo
     private final SVNRevisionDao revisionDao;
     private final SVNEventDao eventDao;
     private final SVNClient svnClient;
+    private final IssueServiceRegistry issueServiceRegistry;
     private final SecurityService securityService;
     private final TransactionService transactionService;
 
@@ -68,9 +71,11 @@ public class IndexationServiceImpl implements IndexationService, ApplicationInfo
             SVNRevisionDao revisionDao,
             SVNEventDao eventDao,
             SVNClient svnClient,
+            IssueServiceRegistry issueServiceRegistry,
             SecurityService securityService,
             TransactionService transactionService
     ) {
+        this.issueServiceRegistry = issueServiceRegistry;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
         this.configurationService = configurationService;
         this.repositoryDao = repositoryDao;
@@ -125,9 +130,18 @@ public class IndexationServiceImpl implements IndexationService, ApplicationInfo
         // Creates the repository entry
         repositoryId = repositoryDao.create(name);
         // Gets the configuration
-        SVNRepository repository = SVNRepository.of(repositoryId, configurationService.getConfiguration(name));
+        SVNRepository repository = loadRepository(repositoryId, name);
         // OK, launches a new indexation
         indexFromLatest(repository);
+    }
+
+    protected SVNRepository loadRepository(int repositoryId, String name) {
+        SVNConfiguration configuration = configurationService.getConfiguration(name);
+        return SVNRepository.of(
+                repositoryId,
+                configuration,
+                issueServiceRegistry.getConfiguredIssueService(configuration.getIssueServiceConfigurationIdentifier())
+        );
     }
 
     @Override
@@ -137,7 +151,7 @@ public class IndexationServiceImpl implements IndexationService, ApplicationInfo
             TRevision r = revisionDao.getLastRevision(repositoryId);
             if (r != null) {
                 // Gets the configuration
-                SVNRepository repository = SVNRepository.of(repositoryId, configurationService.getConfiguration(name));
+                SVNRepository repository = loadRepository(repositoryId, name);
                 SVNURL url = SVNUtils.toURL(repository.getConfiguration().getUrl());
                 long repositoryRevision = svnClient.getRepositoryRevision(repository, url);
                 // OK

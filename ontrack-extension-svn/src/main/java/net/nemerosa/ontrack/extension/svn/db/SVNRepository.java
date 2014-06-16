@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.svn.db;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.svn.SVNConfiguration;
 import org.apache.commons.lang3.StringUtils;
 
@@ -12,9 +13,10 @@ public class SVNRepository {
 
     private final int id;
     private final SVNConfiguration configuration;
+    private final ConfiguredIssueService configuredIssueService;
 
-    public static SVNRepository of(int id, SVNConfiguration configuration) {
-        return new SVNRepository(id, configuration);
+    public static SVNRepository of(int id, SVNConfiguration configuration, ConfiguredIssueService configuredIssueService) {
+        return new SVNRepository(id, configuration, configuredIssueService);
     }
 
     public String getBranchPattern() {

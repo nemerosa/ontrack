@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.issues;
 
+import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
 
@@ -32,4 +33,10 @@ public interface IssueServiceRegistry {
      * @see net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation
      */
     IssueServiceConfiguration getIssueServiceConfigurationById(String id);
+
+    /**
+     * Gets the association between a service and a configuration, or <code>null</code>
+     * if neither service nor configuration can be found.
+     */
+    ConfiguredIssueService getConfiguredIssueService(String issueServiceConfigurationIdentifier);
 }
