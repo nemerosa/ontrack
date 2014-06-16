@@ -1,0 +1,17 @@
+[/]
+admin = rw
+ontrack = r
+
+[/project]
+user=r
+ci=r
+
+[/project/trunk]
+user=rw
+
+[/project/branches]
+user=rw
+
+[/project/tags]
+ci=rw
+
