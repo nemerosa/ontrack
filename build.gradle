@@ -1,0 +1,32 @@
+repositories {
+    mavenCentral()
+}
+
+apply plugin: 'maven'
+
+/**
+ * Meta information
+ */
+
+allprojects {
+    group = 'net.nemerosa.ontrack'
+    version = projectVersion // Defined in gradle.properties
+}
+
+/**
+ * Java projects
+ */
+
+subprojects {
+
+    apply plugin: 'java'
+
+}
+
+/**
+ * Wrapper definition
+ */
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.12'
+}
