@@ -25,6 +25,7 @@ allprojects {
 ext {
     libraries = [
             commons_lang3   : 'org.apache.commons:commons-lang3:3.3.2',
+            commons_io      : 'commons-io:commons-io:2.4',
             jackson_databind: 'com.fasterxml.jackson.core:jackson-databind:2.3.3',
             // Test
             junit           : 'junit:junit:4.11',
