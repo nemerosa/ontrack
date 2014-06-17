@@ -31,14 +31,16 @@ apply from: 'gradle/dependencies.gradle'
 
 subprojects { project ->
 
-    project.apply plugin: 'java'
+    if (project.path != ':ontrack-web') {
+        project.apply plugin: 'java'
 
-    project.dependencies {
-        // TODO Lombok not to be released
-        compile libraries.lombok
-        // Testing
-        testCompile libraries.junit
-        testCompile libraries.mockito
+        project.dependencies {
+            // TODO Lombok not to be released
+            compile libraries.lombok
+            // Testing
+            testCompile libraries.junit
+            testCompile libraries.mockito
+        }
     }
 
 }
