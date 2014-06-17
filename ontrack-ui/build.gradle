@@ -15,3 +15,16 @@ dependencies {
     // TODO List of extensions
     runtime project(':ontrack-extension-jenkins')
 }
+
+/**
+ * Copy of Web resources before release
+ */
+
+task copyWebResources(dependsOn: ':ontrack-web:release') << {
+    copy {
+        from project(':ontrack-web').tasks.release.output
+        into project.file('src/main/resources/static')
+    }
+}
+
+release.dependsOn copyWebResources
