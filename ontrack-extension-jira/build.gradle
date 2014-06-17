@@ -1,0 +1,4 @@
+dependencies {
+    compile project(':ontrack-extension-issues')
+    compile libraries.spring_tx
+}
