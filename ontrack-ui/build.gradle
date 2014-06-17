@@ -7,6 +7,8 @@ dependencies {
     runtime project(':ontrack-service')
     runtime project(':ontrack-repository-impl')
     runtime libraries.spring_boot_starter_aop
+    runtime libraries.spring_boot_starter_jdbc
+    runtime libraries.h2
 
     testCompile project(':ontrack-test-utils')
     testCompile project(':ontrack-it-utils')

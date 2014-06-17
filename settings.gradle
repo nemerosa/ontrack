@@ -24,6 +24,4 @@ include ':ontrack-ui-support'
 include ':ontrack-web'
 
 // TODO include ':ontrack-acceptance'
-// TODO UI Start
-// TODO UI Web copy
 // TODO UI Boot packaging
