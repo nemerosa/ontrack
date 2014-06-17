@@ -8,4 +8,6 @@ dependencies {
     compile libraries.spring_security_core
     compile libraries.spring_boot_starter_jdbc
     compile libraries.slf4j_api
+    
+    runtime libraries.h2
 }
