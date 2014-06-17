@@ -19,6 +19,9 @@ apply from: 'gradle/dependencies.gradle'
  * Java projects
  */
 
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
 subprojects { project ->
 
     if (project.path != ':ontrack-web') {
