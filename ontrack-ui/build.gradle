@@ -5,4 +5,9 @@ dependencies {
     compile libraries.spring_boot_starter_security
 
     testCompile project(':ontrack-test-utils')
+    testCompile project(':ontrack-it-utils')
+    testCompile project(':ontrack-extension-jenkins')
+
+    // TODO List of extensions
+    runtime project(':ontrack-extension-jenkins')
 }
