@@ -145,7 +145,7 @@ public class SVNClientImpl implements SVNClient {
     }
 
     private boolean isPathOK(String pattern, String path) {
-        return org.apache.commons.lang.StringUtils.isNotBlank(pattern) && Pattern.matches(pattern, path);
+        return StringUtils.isNotBlank(pattern) && Pattern.matches(pattern, path);
     }
 
     private boolean isTrunk(String path) {
