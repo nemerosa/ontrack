@@ -17,6 +17,17 @@ dependencies {
 }
 
 /**
+ * Cleaning the Web resources
+ */
+
+clean << {
+    println 'Deleting Web resources'
+    project.delete 'src/main/resources/static/assets'
+    project.delete 'src/main/resources/static/fonts'
+    project.delete 'src/main/resources/static/index.html'
+}
+
+/**
  * Copy of Web resources before release
  */
 
