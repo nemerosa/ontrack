@@ -6,6 +6,8 @@ public interface IndexationService {
 
     boolean isIndexationRunning(String name);
 
+    void indexFromLatest(String name);
+
     void reindex(String name);
 
     LastRevisionInfo getLastRevisionInfo(String name);

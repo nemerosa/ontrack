@@ -94,7 +94,21 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
         return indexationService.getLastRevisionInfo(name);
     }
 
-    // TODO Indexation from latest
+    /**
+     * Indexation from latest
+     */
+    @RequestMapping(value = "configurations/{name}/indexation/latest", method = RequestMethod.POST)
+    @ResponseBody
+    public Ack indexFromLatest(@PathVariable String name) {
+        // Full indexation
+        if (indexationService.isIndexationRunning(name)) {
+            return Ack.NOK;
+        } else {
+            indexationService.indexFromLatest(name);
+            return Ack.OK;
+        }
+    }
+
     // TODO Indexation of a range
 
     /**

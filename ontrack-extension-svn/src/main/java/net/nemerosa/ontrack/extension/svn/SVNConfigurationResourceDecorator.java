@@ -31,6 +31,7 @@ public class SVNConfigurationResourceDecorator extends AbstractResourceDecorator
                         // TODO Rights for indexation
                         // Indexation
                 .link("_indexation", on(SVNController.class).getLastRevisionInfo(configuration.getName()))
+                .link("_indexationFromLatest", on(SVNController.class).indexFromLatest(configuration.getName()))
                 .link("_indexationFull", on(SVNController.class).full(configuration.getName()))
                         // OK
                 .build();
