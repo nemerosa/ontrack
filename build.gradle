@@ -38,6 +38,7 @@ subprojects { project ->
         compile libraries.lombok
         // Testing
         testCompile libraries.junit
+        testCompile libraries.mockito
     }
 
 }

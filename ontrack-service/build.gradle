@@ -1,0 +1,11 @@
+dependencies {
+    compile project(':ontrack-model')
+    compile project(':ontrack-repository')
+    compile project(':ontrack-extension-api')
+    compile libraries.spring_context
+    compile libraries.spring_tx
+    compile libraries.spring_security_core
+    compile libraries.slf4j_api
+
+    testCompile project(':ontrack-it-utils')
+}

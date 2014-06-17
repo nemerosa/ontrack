@@ -35,6 +35,7 @@ ext {
             // Spring
             spring_context          : "org.springframework:spring-context:${springVersion}",
             spring_jdbc             : "org.springframework:spring-jdbc:${springVersion}",
+            spring_tx               : "org.springframework:spring-tx:${springVersion}",
             spring_test             : "org.springframework:spring-test:${springVersion}",
 
             // Spring security
@@ -52,6 +53,7 @@ ext {
 
             // Test
             junit                   : 'junit:junit:4.11',
+            mockito                 : 'org.mockito:mockito-core:1.9.5',
 
             // Other
             lombok                  : 'org.projectlombok:lombok:1.12.6'
