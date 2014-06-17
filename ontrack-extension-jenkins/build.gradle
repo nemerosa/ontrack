@@ -1,0 +1,6 @@
+dependencies {
+    compile project(':ontrack-extension-support')
+    compile libraries.spring_tx
+
+    testCompile project(':ontrack-test-utils')
+}
