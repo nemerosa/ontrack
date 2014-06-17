@@ -4,8 +4,24 @@
 <div class="modal-body">
 
     <p>TODO Last revision message</p>
-    <p>TODO Index</p>
-    <p>TODO Range</p>
+
+
+    <section>
+        <h1><small>Index</small></h1>
+        <p>Click on the following button to launch an indexation from the latest indexed revision.</p>
+        <button type="button" class="btn btn-primary" ng-click="indexFromLatest()">Index</button>
+    </section>
+
+    <section>
+        <h1><small>Range re-indexation</small></h1>
+        <div class="form-inline">
+            <label for="subversion-indexation-dialog-range-from">From:</label>
+            <input id="subversion-indexation-dialog-range-from" ng-model="range.from" class="input-mini" name="from" type="number" size="7" min="1" max="5000000" required="required"  />
+            <label for="subversion-indexation-dialog-range-to">to:</label>
+            <input id="subversion-indexation-dialog-range-to" ng-model="range.to" class="input-mini" name="to" type="number" size="7" min="1" max="5000000" required="required" />
+            <button id="subversion-indexation-dialog-range-submit" type="button" class="btn btn-primary" ng-click="indexRange()">Index</button>
+        </div>
+    </section>
 
     <section>
         <h1><small>Full re-indexation</small></h1>
