@@ -31,6 +31,9 @@ subprojects { project ->
             testCompile libraries.junit
             testCompile libraries.mockito
         }
+
+        // Release task
+        task release(dependsOn: 'build') {}
     }
 
 }
