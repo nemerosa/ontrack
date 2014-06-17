@@ -4,6 +4,10 @@ dependencies {
     compile libraries.spring_boot_starter_web
     compile libraries.spring_boot_starter_security
 
+    runtime project(':ontrack-service')
+    runtime project(':ontrack-repository-impl')
+    runtime libraries.spring_boot_starter_aop
+
     testCompile project(':ontrack-test-utils')
     testCompile project(':ontrack-it-utils')
     testCompile project(':ontrack-extension-jenkins')
