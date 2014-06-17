@@ -13,16 +13,62 @@ task acceptanceTest(type: Test) {
 
 // Local acceptance tests
 task localAcceptanceTest << {
+    // Running the acceptance tests
     project.tasks.acceptanceTest.execute()
 }
 
-project.tasks.localAcceptanceTest.dependsOn 'localAcceptanceTestStart'
-project.tasks.localAcceptanceTest.finalizedBy 'localAcceptanceTestEnd'
-
 task localAcceptanceTestStart << {
-    println "START"
+
+    // Getting the version on the UI to get
+    def ontrackVersion = project.hasProperty('ontrackVersion') ? ontrackVersion : project.version
+    println "Using Ontrack version ${ontrackVersion}"
+
+    // Copying the UI JAR locally
+    println "Copying the UI JAR to ${project.buildDir}/local-acceptance"
+    copy {
+        from project(':ontrack-ui').tasks.jar
+        into "${project.buildDir}/local-acceptance"
+    }
+
+    ant {
+        echo 'Starting the UI for the acceptance tests...'
+    }
+
+    /**
+     <property name="app.file"
+     value="${basedir}/target/dependency/ontrack-ui-${ontrack.version}.jar"/>
+     <property name="app.dir" value="${basedir}/target/run"/>
+     <property name="app.log" value="${basedir}/target/run/log/"/>
+     <mkdir dir="${app.dir}"/>
+     <echo message="Starting application in ${app.dir}"/>
+     <echo message="Starting application defined by ${app.file}"/>
+     <echo message="Starting application on port ${ontrack.port}"/>
+     <echo message="Log files available at ${app.log}"/>
+     <echo message="Running with JVM arguments: [${sonar.jacoco.args}]"/>
+     <java
+     jar="${app.file}"
+     fork="true"
+     spawn="true"
+     dir="${app.dir}">
+     <jvmarg line="${sonar.jacoco.args}"/>
+     <arg value="--server.port=${ontrack.port}"/>
+     <arg value="--logging.path=${app.log}"/>
+     <arg value="--spring.profiles.active=acceptance"/>
+     </java>
+     <!-- Waits for the JVM to start -->
+     <echo message="Waiting ${ontrack.wait} seconds (max) for the JVM to start"/>
+     <waitfor maxwait="${ontrack.wait}" maxwaitunit="second" checkevery="500">
+     <http url="${ontrack.url}/info"/>
+     </waitfor>
+     <echo message="JVM is started"/>
+     */
 }
 
 task localAcceptanceTestEnd << {
     println "END"
 }
+
+// Ordering
+project.tasks.localAcceptanceTestStart.dependsOn ':ontrack-ui:build'
+project.tasks.localAcceptanceTest.dependsOn 'localAcceptanceTestStart'
+project.tasks.localAcceptanceTest.finalizedBy 'localAcceptanceTestEnd'
