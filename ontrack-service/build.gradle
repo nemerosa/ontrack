@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.*
+
 dependencies {
     compile project(':ontrack-model')
     compile project(':ontrack-repository')
@@ -8,4 +10,11 @@ dependencies {
     compile libraries.slf4j_api
 
     testCompile project(':ontrack-it-utils')
+    testRuntime project(':ontrack-repository-impl')
+}
+
+processResources {
+    filter ReplaceTokens, tokens: [
+            'app.version': version
+    ]
 }
