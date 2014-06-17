@@ -1,0 +1,8 @@
+dependencies {
+    compile project(':ontrack-ui-support')
+    compile project(':ontrack-extension-api')
+    compile libraries.spring_boot_starter_web
+    compile libraries.spring_boot_starter_security
+
+    testCompile project(':ontrack-test-utils')
+}
