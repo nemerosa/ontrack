@@ -1,0 +1,28 @@
+dependencies {
+    testCompile project(':ontrack-client')
+}
+
+// Disable unit tests (none in this project)
+test {
+    enabled = false
+}
+
+// Acceptance tests
+task acceptanceTest(type: Test) {
+}
+
+// Local acceptance tests
+task localAcceptanceTest << {
+    project.tasks.acceptanceTest.execute()
+}
+
+project.tasks.localAcceptanceTest.dependsOn 'localAcceptanceTestStart'
+project.tasks.localAcceptanceTest.finalizedBy 'localAcceptanceTestEnd'
+
+task localAcceptanceTestStart << {
+    println "START"
+}
+
+task localAcceptanceTestEnd << {
+    println "END"
+}

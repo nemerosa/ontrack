@@ -22,6 +22,4 @@ include ':ontrack-tx'
 include ':ontrack-ui'
 include ':ontrack-ui-support'
 include ':ontrack-web'
-
-// TODO include ':ontrack-acceptance'
-// TODO UI Boot packaging
+include ':ontrack-acceptance'
