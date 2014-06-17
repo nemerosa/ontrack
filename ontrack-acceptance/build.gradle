@@ -19,6 +19,9 @@ task localAcceptanceTest << {
 
 task localAcceptanceTestStart << {
 
+    // Properties
+    def ontrackPort = project.hasProperty('ontrackPort') ? ontrackPort : 9999
+
     // Getting the version on the UI to get
     def ontrackVersion = project.hasProperty('ontrackVersion') ? ontrackVersion : project.version
     println "Using Ontrack version ${ontrackVersion}"
@@ -30,21 +33,17 @@ task localAcceptanceTestStart << {
         into "${project.buildDir}/local-acceptance"
     }
 
-    ant {
-        echo 'Starting the UI for the acceptance tests...'
-    }
+    ant.echo 'Starting the UI for the acceptance tests...'
+    ant.property(name: 'app.file', value: "${project.buildDir}/local-acceptance/${project(':ontrack-ui').tasks.jar.archiveName}")
+    ant.property(name: 'app.dir', value: "${project.buildDir}/local-acceptance/run")
+    ant.property(name: 'app.log', value: "${project.buildDir}/local-acceptance/run/log/")
+    ant.mkdir(dir: '${app.dir}')
+    ant.echo 'Starting application in ${app.dir}'
+    ant.echo 'Starting application defined by ${app.file}'
+    ant.echo "Starting application on port ${ontrackPort}"
+    ant.echo 'Log files available at ${app.log}'
 
     /**
-     <property name="app.file"
-     value="${basedir}/target/dependency/ontrack-ui-${ontrack.version}.jar"/>
-     <property name="app.dir" value="${basedir}/target/run"/>
-     <property name="app.log" value="${basedir}/target/run/log/"/>
-     <mkdir dir="${app.dir}"/>
-     <echo message="Starting application in ${app.dir}"/>
-     <echo message="Starting application defined by ${app.file}"/>
-     <echo message="Starting application on port ${ontrack.port}"/>
-     <echo message="Log files available at ${app.log}"/>
-     <echo message="Running with JVM arguments: [${sonar.jacoco.args}]"/>
      <java
      jar="${app.file}"
      fork="true"
