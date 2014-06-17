@@ -14,8 +14,11 @@ dependencies {
     testCompile project(':ontrack-it-utils')
     testCompile project(':ontrack-extension-jenkins')
 
-    // TODO List of extensions
+    // List of extensions
+    runtime project(':ontrack-extension-general')
     runtime project(':ontrack-extension-jenkins')
+    runtime project(':ontrack-extension-jira')
+    runtime project(':ontrack-extension-svn')
 }
 
 /**
