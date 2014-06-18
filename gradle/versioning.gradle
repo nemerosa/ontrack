@@ -57,7 +57,7 @@ if (!hasGit) {
 // We can use git
 else {
     // Gets the current commit
-    versionCommit = 'git log -1 --format="%H"'.execute().text
+    versionCommit = 'git log -1 --format=%H'.execute().text
     // Gets the tag info
     def tagInfo = 'git describe --exact-match'.execute().text
     // We have a tag info
