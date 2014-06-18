@@ -137,6 +137,8 @@ public class IndexationServiceImpl implements IndexationService, ApplicationInfo
     public void indexRange(String name, long from, long to) {
         SVNRepository repository = getRepositoryByName(name);
         indexRange(repository, from, to);
+        // FIXME Method net.nemerosa.ontrack.extension.svn.indexation.IndexationServiceImpl.indexRange
+
     }
 
     @Override
@@ -186,25 +188,25 @@ public class IndexationServiceImpl implements IndexationService, ApplicationInfo
     @Override
     public LastRevisionInfo getLastRevisionInfo(String name) {
         try (Transaction ignored = transactionService.start()) {
-            int repositoryId = repositoryDao.getByName(name);
-            TRevision r = revisionDao.getLastRevision(repositoryId);
-            if (r != null) {
-                // Gets the configuration
-                SVNRepository repository = loadRepository(repositoryId, name);
-                SVNURL url = SVNUtils.toURL(repository.getConfiguration().getUrl());
-                long repositoryRevision = svnClient.getRepositoryRevision(repository, url);
-                // OK
-                return new LastRevisionInfo(
-                        r.getRevision(),
-                        r.getMessage(),
-                        repositoryRevision
-                );
+            Integer repositoryId = repositoryDao.findByName(name);
+            if (repositoryId != null) {
+                TRevision r = revisionDao.getLastRevision(repositoryId);
+                if (r != null) {
+                    // Gets the configuration
+                    SVNRepository repository = loadRepository(repositoryId, name);
+                    SVNURL url = SVNUtils.toURL(repository.getConfiguration().getUrl());
+                    long repositoryRevision = svnClient.getRepositoryRevision(repository, url);
+                    // OK
+                    return new LastRevisionInfo(
+                            r.getRevision(),
+                            r.getMessage(),
+                            repositoryRevision
+                    );
+                } else {
+                    return LastRevisionInfo.none();
+                }
             } else {
-                return new LastRevisionInfo(
-                        0L,
-                        "",
-                        0L
-                );
+                return LastRevisionInfo.none();
             }
         }
     }

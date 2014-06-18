@@ -9,6 +9,12 @@ angular.module('ot.extension.svn.dialog.indexation', [
             from: 1,
             to: 1
         };
+
+        // Getting the last revision info
+        ot.call($http.get(config.configuration._indexation)).then(function (lastRevisionInfo) {
+            $scope.lastRevisionInfo = lastRevisionInfo;
+        });
+
         // Cancelling the dialog
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
