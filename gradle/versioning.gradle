@@ -2,6 +2,8 @@
  * Versioning policy
  */
 
+// TODO Gets the tag info (if available)
+
 // Build number indicator
 
 def buildNumber
@@ -18,3 +20,8 @@ def baseVersion = projectVersion
 // Full version
 
 version = "${baseVersion}-${buildNumber}"
+
+// Version information
+project.ext.versionBuild = buildNumber
+project.ext.versionBase = baseVersion
+// TODO Commit info

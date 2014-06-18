@@ -56,3 +56,15 @@ task copyWebResources(dependsOn: ':ontrack-web:release') << {
 }
 
 release.dependsOn copyWebResources
+release {
+    doFirst {
+        // Amends the application.properties file with version information
+        File file = project.file('src/main/resources/application.properties')
+        file.text = """\
+ontrack.version.date = ${new Date().format("yyyy-MM-dd'T'HH:mm:ss")}
+ontrack.version.full = ${project.version}
+ontrack.version.base = ${project.versionBase}
+ontrack.version.build = ${project.versionBuild}
+"""
+    }
+}
