@@ -9,6 +9,12 @@
  *
  * The way this information is collected depends on the environment:
  *
+ * - if not .git information is available, we cannot determine the version:
+ *     - base = projectVersion (from the gradle.properties file)
+ *     - build = NA
+ *     - <full> = <base>-<build>
+ *     - commit = NONE
+ *
  * - from a tag (we want to build from a tag)
  *     - the working copy is associated with a tag
  *     - the information is computed from the tag name: <full> = <base>-<build>
@@ -33,23 +39,49 @@
  * - from a tag (we want to build from a tag)
  */
 
-// TODO Gets the tag info (if available)
+// Information to collect
+def versionBase = projectVersion
+def versionBuild
+def versionFull
+def versionCommit
 
-// Build number indicator
+boolean hasGit = project.file('.git').exists()
 
-def buildNumber
-if (System.env.BUILD_NUMBER) {
-    buildNumber = System.env.BUILD_NUMBER
-} else {
-    buildNumber = 'DEV'
+// No git information
+if (!hasGit) {
+    versionBuild = 'NA'
+    versionFull = "${versionBase}-${versionBuild}"
+    versionCommit = 'NONE'
 }
 
-// Base version (taken from the `gradle.properties` file)
+// We can use git
+else {
+    // Gets the current commit
+    versionCommit = 'git log -1 --format="%H"'.execute().text
+    // Gets the tag info
+    def tagInfo = 'git describe --exact-match'.execute().text
+    // We have a tag info
+    if (tagInfo) {
+        versionFull = tagInfo
+        // Extract base & build from the tag info using a regex
+    }
+    // We do not have tag info
+    else {
+        // ... but we have a build number
+        if (System.env.BUILD_NUMBER) {
+            versionBuild = System.env.BUILD_NUMBER
+            versionFull = "${versionBase}-${versionBuild}"
+        }
+        // ... or not (we are a developer)
+        else {
+            versionBuild = 'DEV'
+            versionFull = "${versionBase}-${versionBuild}"
+        }
+    }
+}
 
-def baseVersion = projectVersion
-
-// Version information
-project.ext.versionBuild = buildNumber
-project.ext.versionBase = baseVersion
-project.ext.versionFull = "${baseVersion}-${buildNumber}"
-// TODO Commit info
+// Storing the version information
+project.ext.versionBuild = versionBuild
+project.ext.versionBase = versionBase
+project.ext.versionFull = versionFull
+project.ext.versionCommit = versionCommit
