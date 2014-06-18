@@ -31,7 +31,13 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
     public static Form form(List<IssueServiceConfigurationRepresentation> availableIssueServiceConfigurations) {
         return Form.create()
                 .with(defaultNameField())
-                .url()
+                .with(
+                        // Note that the URL property cannot be implemented through a URL field
+                        // since some SVN repository URL could use the svn: protocol or other.
+                        Text.of("url")
+                                .label("URL")
+                                .help("URL to the root of a SVN repository")
+                )
                 .with(
                         Text.of("user")
                                 .label("User")
