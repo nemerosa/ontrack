@@ -71,7 +71,10 @@ else {
     if (tagInfo) {
         versionFull = tagInfo
         versionSource = 'tag'
-        // TODO Extract base & build from the tag info using a regex
+
+        def versionRegex = /(.*)-([0-9]+)/
+        versionBase = versionFull.find(versionRegex) { it[1] }
+        versionBuild = versionFull.find(versionRegex) { it[2] }
     }
     // We do not have tag info
     else {
