@@ -94,6 +94,11 @@ public class SecurityServiceImpl implements SecurityService {
     }
 
     @Override
+    public <T> T asAdmin(Supplier<T> supplier) {
+        return runAsAdmin(supplier).get();
+    }
+
+    @Override
     public <T> Supplier<T> runner(Supplier<T> supplier) {
         // Current context
         SecurityContext context = SecurityContextHolder.getContext();
