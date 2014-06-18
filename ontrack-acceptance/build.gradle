@@ -20,7 +20,16 @@ task localAcceptanceTest << {
 task localAcceptanceTestStart << {
 
     // Properties
-    def ontrackPort = project.hasProperty('ontrackPort') ? ontrackPort : 9999
+    project.ext.ontrackPort = project.hasProperty('ontrackPort') ? ontrackPort : 9999
+    def ontrackWait = 30
+
+    // Ontrack URL
+    project.ext.ontrackUrl = "http://localhost:${ontrackPort}"
+
+    // Configuring the acceptance tests
+    project.tasks.acceptanceTest.configure {
+        systemProperty 'ontrack.url', project.ext.ontrackUrl
+    }
 
     // Getting the version on the UI to get
     def ontrackVersion = project.hasProperty('ontrackVersion') ? ontrackVersion : project.version
@@ -54,24 +63,12 @@ task localAcceptanceTestStart << {
         arg(value: '--spring.profiles.active=acceptance')
     }
 
-    /**
-     <java
-     jar="${app.file}"
-     fork="true"
-     spawn="true"
-     dir="${app.dir}">
-     <jvmarg line="${sonar.jacoco.args}"/>
-     <arg value="--server.port=${ontrack.port}"/>
-     <arg value="--logging.path=${app.log}"/>
-     <arg value="--spring.profiles.active=acceptance"/>
-     </java>
-     <!-- Waits for the JVM to start -->
-     <echo message="Waiting ${ontrack.wait} seconds (max) for the JVM to start"/>
-     <waitfor maxwait="${ontrack.wait}" maxwaitunit="second" checkevery="500">
-     <http url="${ontrack.url}/info"/>
-     </waitfor>
-     <echo message="JVM is started"/>
-     */
+    ant.echo "Waiting ${ontrackWait} seconds (max) for the JVM to start"
+    ant.waitfor(maxwait: ontrackWait, maxwaitunit: 'second', checkevery:500) {
+        http(url: "${ontrackUrl}/info")
+    }
+    ant.echo 'JVM is started'
+
 }
 
 task localAcceptanceTestEnd << {
