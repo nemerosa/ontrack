@@ -63,10 +63,10 @@ release {
         file.text = """\
 ontrack.version.date = ${new Date().format("yyyy-MM-dd'T'HH:mm:ss")}
 ontrack.version.full = ${project.version}
-ontrack.version.base = ${project.versionBase}
-ontrack.version.build = ${project.versionBuild}
-ontrack.version.commit = ${project.versionCommit}
-ontrack.version.source = ${project.versionSource}
+ontrack.version.base = ${rootProject.versionBase}
+ontrack.version.build = ${rootProject.versionBuild}
+ontrack.version.commit = ${rootProject.versionCommit}
+ontrack.version.source = ${rootProject.versionSource}
 """
     }
 }

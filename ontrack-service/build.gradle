@@ -13,8 +13,9 @@ dependencies {
     testRuntime project(':ontrack-repository-impl')
 }
 
-processResources {
-    filter ReplaceTokens, tokens: [
-            'app.version': version
-    ]
-}
+// FIXME Uses the OntrackVersion properties
+//processResources {
+//    filter ReplaceTokens, tokens: [
+//            'app.version': version
+//    ]
+//}
