@@ -42,6 +42,15 @@ subprojects { project ->
 }
 
 /**
+ * Task to display the version information
+ */
+task displayVersion << {
+    println "ontrack.version.full = ${project.version}"
+    println "ontrack.version.base = ${project.versionBase}"
+    println "ontrack.version.build = ${project.versionBuild}"
+}
+
+/**
  * Wrapper definition
  */
 
