@@ -4,9 +4,12 @@ apply plugin: 'maven'
  * Meta information
  */
 
+
+apply from: "$rootDir/gradle/versioning.gradle"
+
 allprojects {
     group = 'net.nemerosa.ontrack'
-    apply from: "$rootDir/gradle/versioning.gradle"
+    version = rootProject.versionFull
 }
 
 /**

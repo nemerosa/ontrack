@@ -48,11 +48,8 @@ if (System.env.BUILD_NUMBER) {
 
 def baseVersion = projectVersion
 
-// Full version
-
-version = "${baseVersion}-${buildNumber}"
-
 // Version information
 project.ext.versionBuild = buildNumber
 project.ext.versionBase = baseVersion
+project.ext.versionFull = "${baseVersion}-${buildNumber}"
 // TODO Commit info
