@@ -64,7 +64,7 @@ task localAcceptanceTestStart << {
     }
 
     ant.echo "Waiting ${ontrackWait} seconds (max) for the JVM to start"
-    ant.waitfor(maxwait: ontrackWait, maxwaitunit: 'second', checkevery:500) {
+    ant.waitfor(maxwait: ontrackWait, maxwaitunit: 'second', checkevery: 500) {
         http(url: "${ontrackUrl}/info")
     }
     ant.echo 'JVM is started'
@@ -72,7 +72,14 @@ task localAcceptanceTestStart << {
 }
 
 task localAcceptanceTestEnd << {
-    println "END"
+    ant.echo "Stopping the JVM at ${ontrackUrl}"
+    ant.exec(executable: 'curl', failOnError: true) {
+        arg(value: '-v')
+        arg(value: '--fail')
+        arg(value: "${ontrackUrl}/manage/shutdown")
+        arg(value: '-X')
+        arg(value: 'POST')
+    }
 }
 
 // Ordering
