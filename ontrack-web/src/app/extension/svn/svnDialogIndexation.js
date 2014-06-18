@@ -42,9 +42,20 @@ angular.module('ot.extension.svn.dialog.indexation', [
 
         // Range indexation
         $scope.indexRange = function () {
-            var to = $scope.range.to;
             var from = $scope.range.from;
-            // FIXME Calling the range indexation
+            var to = $scope.range.to;
+            ot.call($http.post($scope.config.configuration._indexationRange, {
+                from: from,
+                to: to
+            })).then(
+                function success() {
+                    // Closes the dialog
+                    $scope.cancel();
+                },
+                function error(message) {
+                    $scope.message = message;
+                }
+            );
         };
 
         // Full re-indexation
