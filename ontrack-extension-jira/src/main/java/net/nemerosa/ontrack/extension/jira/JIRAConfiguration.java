@@ -11,7 +11,7 @@ import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 
 import java.util.regex.Pattern;
 
-import static net.nemerosa.ontrack.model.form.Form.defaultText;
+import static net.nemerosa.ontrack.model.form.Form.defaultNameField;
 
 @Data
 public class JIRAConfiguration implements UserPasswordConfiguration<JIRAConfiguration>, IssueServiceConfiguration {
@@ -27,7 +27,7 @@ public class JIRAConfiguration implements UserPasswordConfiguration<JIRAConfigur
 
     public static Form form() {
         return Form.create()
-                .with(defaultText())
+                .with(defaultNameField())
                 .url()
                 .with(Text.of("user").label("User").length(16).optional())
                 .with(Password.of("password").label("Password").length(40).optional());
@@ -45,7 +45,7 @@ public class JIRAConfiguration implements UserPasswordConfiguration<JIRAConfigur
 
     public Form asForm() {
         return form()
-                .with(defaultText().readOnly().value(name))
+                .with(defaultNameField().readOnly().value(name))
                 .fill("url", url)
                 .fill("user", user)
                 .fill("password", "");

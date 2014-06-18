@@ -1,12 +1,61 @@
 angular.module('ot.extension.svn.dialog.indexation', [
-    'ot.service.core'
+    'ot.service.core',
+    'ot.service.form'
 ])
-    .controller('svnDialogIndexation', function ($scope, $modalInstance, $http, config, ot, otAlertService) {
+    .controller('svnDialogIndexation', function ($scope, $modalInstance, $http, config, ot, otAlertService, otFormService) {
         // General configuration
         $scope.config = config;
+        // Range form
+        $scope.range = {
+            from: 1,
+            to: 1
+        };
+
+        // Getting the last revision info
+        ot.call($http.get(config.configuration._indexation)).then(function (lastRevisionInfo) {
+            $scope.lastRevisionInfo = lastRevisionInfo;
+        });
+
+        // Getting the range
+        ot.call($http.get(config.configuration._indexationRange)).then(function (form) {
+            $scope.range.from = otFormService.getFieldValue(form, 'from');
+            $scope.range.to = otFormService.getFieldValue(form, 'to');
+        });
+
         // Cancelling the dialog
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
+        };
+
+        // Indexation from latest
+        $scope.indexFromLatest = function () {
+            ot.call($http.post($scope.config.configuration._indexationFromLatest)).then(
+                function success() {
+                    // Closes the dialog
+                    $scope.cancel();
+                },
+                function error(message) {
+                    $scope.message = message;
+                }
+            );
+        };
+
+        // Range indexation
+        $scope.indexRange = function () {
+            var from = $scope.range.from;
+            var to = $scope.range.to;
+            ot.call($http.post($scope.config.configuration._indexationRange, {
+                from: from,
+                to: to
+            })).then(
+                function success() {
+                    // Closes the dialog
+                    $scope.cancel();
+                },
+                function error(message) {
+                    $scope.message = message;
+                }
+            );
         };
 
         // Full re-indexation

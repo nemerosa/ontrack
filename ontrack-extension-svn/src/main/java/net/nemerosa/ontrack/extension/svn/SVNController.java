@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.svn;
 import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
+import net.nemerosa.ontrack.extension.svn.indexation.IndexationRange;
 import net.nemerosa.ontrack.extension.svn.indexation.IndexationService;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
@@ -39,7 +40,6 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     @Override
     @RequestMapping(value = "", method = RequestMethod.GET)
     public Resource<ExtensionFeatureDescription> getDescription() {
-        // TODO ExtensionFeatureDescription must be decorated according to the Jenkins controller
         return Resource.of(
                 feature.getFeatureDescription(),
                 uri(MvcUriComponentsBuilder.on(getClass()).getDescription())
@@ -94,8 +94,60 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
         return indexationService.getLastRevisionInfo(name);
     }
 
-    // TODO Indexation from latest
-    // TODO Indexation of a range
+    /**
+     * Indexation from latest
+     */
+    @RequestMapping(value = "configurations/{name}/indexation/latest", method = RequestMethod.POST)
+    @ResponseBody
+    public Ack indexFromLatest(@PathVariable String name) {
+        // Full indexation
+        if (indexationService.isIndexationRunning(name)) {
+            return Ack.NOK;
+        } else {
+            indexationService.indexFromLatest(name);
+            return Ack.OK;
+        }
+    }
+
+    /**
+     * Indexation of a range (form)
+     */
+    @RequestMapping(value = "configurations/{name}/indexation/range", method = RequestMethod.GET)
+    @ResponseBody
+    public Form indexRange(@PathVariable String name) {
+        // Gets the latest revision info
+        LastRevisionInfo lastRevisionInfo = getLastRevisionInfo(name);
+        // If none, use the start revision
+        if (lastRevisionInfo.isNone()) {
+            // Gets the start revision
+            return new IndexationRange(
+                    getConfiguration(name).getIndexationStart(),
+                    lastRevisionInfo.getRepositoryRevision()
+            ).asForm();
+        }
+        // Uses this information to get a form
+        else {
+            return new IndexationRange(
+                    lastRevisionInfo.getRevision(),
+                    lastRevisionInfo.getRepositoryRevision()
+            ).asForm();
+        }
+    }
+
+    /**
+     * Indexation of a range
+     */
+    @RequestMapping(value = "configurations/{name}/indexation/range", method = RequestMethod.POST)
+    @ResponseBody
+    public Ack indexRange(@PathVariable String name, @RequestBody IndexationRange range) {
+        // Full indexation
+        if (indexationService.isIndexationRunning(name)) {
+            return Ack.NOK;
+        } else {
+            indexationService.indexRange(name, range);
+            return Ack.OK;
+        }
+    }
 
     /**
      * Full indexation
