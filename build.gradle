@@ -60,8 +60,8 @@ task displayVersion << {
  *
  * Use the full version to create a tag.
  */
-task release << {
-    "git tag ${version}".execute()
+task release(type: Exec, dependsOn: ['displayVersion']) {
+    commandLine 'git', 'tag', version
 }
 
 /**
