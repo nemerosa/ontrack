@@ -52,6 +52,7 @@ task displayVersion << {
     println "ontrack.version.base = ${project.versionBase}"
     println "ontrack.version.build = ${project.versionBuild}"
     println "ontrack.version.commit = ${project.versionCommit}"
+    println "ontrack.version.source = ${project.versionSource}"
 }
 
 /**

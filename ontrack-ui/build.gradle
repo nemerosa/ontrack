@@ -66,6 +66,7 @@ ontrack.version.full = ${project.version}
 ontrack.version.base = ${project.versionBase}
 ontrack.version.build = ${project.versionBuild}
 ontrack.version.commit = ${project.versionCommit}
+ontrack.version.source = ${project.versionSource}
 """
     }
 }

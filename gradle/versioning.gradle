@@ -6,6 +6,7 @@
  *      - the base version - version information without the build number
  *      - the build version - the build number
  *      - the commit - the commit for this version
+ *      - the source - where the version was computed from
  *
  * The way this information is collected depends on the environment:
  *
@@ -14,11 +15,13 @@
  *     - build = NA
  *     - <full> = <base>-<build>
  *     - commit = NONE
+ *     - source = na
  *
  * - from a tag (we want to build from a tag)
  *     - the working copy is associated with a tag
  *     - the information is computed from the tag name: <full> = <base>-<build>
  *     - commit = current commit
+ *     - source = tag
  *
  * - in a build environment:
  *     - the working copy is not associated with a tag
@@ -27,6 +30,7 @@
  *     - build = BUILD_NUMBER
  *     - <full> = <base>-<build>
  *     - commit = current commit
+ *     - source = build
  *
  * - in development mode
  *     - the working copy is not associated with a tag
@@ -35,6 +39,7 @@
  *     - build = DEV
  *     - <full> = <base>-<build>
  *     - commit = current commit
+ *     - source = dev
  *
  * - from a tag (we want to build from a tag)
  */
@@ -44,6 +49,7 @@ def versionBase = projectVersion
 def versionBuild
 def versionFull
 def versionCommit
+def versionSource
 
 boolean hasGit = project.file('.git').exists()
 
@@ -52,18 +58,20 @@ if (!hasGit) {
     versionBuild = 'NA'
     versionFull = "${versionBase}-${versionBuild}"
     versionCommit = 'NONE'
+    versionSource = 'na'
 }
 
 // We can use git
 else {
     // Gets the current commit
-    versionCommit = 'git log -1 --format=%H'.execute().text
+    versionCommit = 'git log -1 --format=%H'.execute().text.trim()
     // Gets the tag info
     def tagInfo = 'git describe --exact-match'.execute().text
     // We have a tag info
     if (tagInfo) {
         versionFull = tagInfo
-        // Extract base & build from the tag info using a regex
+        versionSource = 'tag'
+        // TODO Extract base & build from the tag info using a regex
     }
     // We do not have tag info
     else {
@@ -71,11 +79,13 @@ else {
         if (System.env.BUILD_NUMBER) {
             versionBuild = System.env.BUILD_NUMBER
             versionFull = "${versionBase}-${versionBuild}"
+            versionSource = 'build'
         }
         // ... or not (we are a developer)
         else {
             versionBuild = 'DEV'
             versionFull = "${versionBase}-${versionBuild}"
+            versionSource = 'dev'
         }
     }
 }
@@ -85,3 +95,4 @@ project.ext.versionBuild = versionBuild
 project.ext.versionBase = versionBase
 project.ext.versionFull = versionFull
 project.ext.versionCommit = versionCommit
+project.ext.versionSource = versionSource
