@@ -1,5 +1,36 @@
 /**
- * Versioning policy
+ * Versioning policy.
+ *
+ * The following information must be collected:
+ *      - the full version - will be used for the project's version.
+ *      - the base version - version information without the build number
+ *      - the build version - the build number
+ *      - the commit - the commit for this version
+ *
+ * The way this information is collected depends on the environment:
+ *
+ * - from a tag (we want to build from a tag)
+ *     - the working copy is associated with a tag
+ *     - the information is computed from the tag name: <full> = <base>-<build>
+ *     - commit = current commit
+ *
+ * - in a build environment:
+ *     - the working copy is not associated with a tag
+ *     - the BUILD_NUMBER environment variable is available
+ *     - base = projectVersion (from the gradle.properties file)
+ *     - build = BUILD_NUMBER
+ *     - <full> = <base>-<build>
+ *     - commit = current commit
+ *
+ * - in development mode
+ *     - the working copy is not associated with a tag
+ *     - the BUILD_NUMBER environment variable is not available
+ *     - base = projectVersion (from the gradle.properties file)
+ *     - build = DEV
+ *     - <full> = <base>-<build>
+ *     - commit = current commit
+ *
+ * - from a tag (we want to build from a tag)
  */
 
 // TODO Gets the tag info (if available)
