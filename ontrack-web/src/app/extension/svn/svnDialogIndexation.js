@@ -1,7 +1,8 @@
 angular.module('ot.extension.svn.dialog.indexation', [
-    'ot.service.core'
+    'ot.service.core',
+    'ot.service.form'
 ])
-    .controller('svnDialogIndexation', function ($scope, $modalInstance, $http, config, ot, otAlertService) {
+    .controller('svnDialogIndexation', function ($scope, $modalInstance, $http, config, ot, otAlertService, otFormService) {
         // General configuration
         $scope.config = config;
         // Range form
@@ -13,6 +14,12 @@ angular.module('ot.extension.svn.dialog.indexation', [
         // Getting the last revision info
         ot.call($http.get(config.configuration._indexation)).then(function (lastRevisionInfo) {
             $scope.lastRevisionInfo = lastRevisionInfo;
+        });
+
+        // Getting the range
+        ot.call($http.get(config.configuration._indexationRange)).then(function (form) {
+            $scope.range.from = otFormService.getFieldValue(form, 'from');
+            $scope.range.to = otFormService.getFieldValue(form, 'to');
         });
 
         // Cancelling the dialog
