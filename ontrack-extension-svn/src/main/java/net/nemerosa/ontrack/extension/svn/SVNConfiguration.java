@@ -8,7 +8,7 @@ import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 
 import java.util.List;
 
-import static net.nemerosa.ontrack.model.form.Form.defaultText;
+import static net.nemerosa.ontrack.model.form.Form.defaultNameField;
 
 @Data
 public class SVNConfiguration implements UserPasswordConfiguration<SVNConfiguration> {
@@ -30,7 +30,7 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
 
     public static Form form(List<IssueServiceConfigurationRepresentation> availableIssueServiceConfigurations) {
         return Form.create()
-                .with(defaultText())
+                .with(defaultNameField())
                 .url()
                 .with(
                         Text.of("user")
@@ -140,7 +140,7 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
 
     public Form asForm(List<IssueServiceConfigurationRepresentation> availableIssueServiceConfigurations) {
         return form(availableIssueServiceConfigurations)
-                .with(defaultText().readOnly().value(name))
+                .with(defaultNameField().readOnly().value(name))
                 .fill("url", url)
                 .fill("user", user)
                 .fill("password", "")
