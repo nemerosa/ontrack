@@ -8,6 +8,8 @@ public interface IndexationService {
 
     void indexFromLatest(String name);
 
+    void indexRange(String name, long from, long to);
+
     void reindex(String name);
 
     LastRevisionInfo getLastRevisionInfo(String name);

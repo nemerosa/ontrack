@@ -39,7 +39,6 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     @Override
     @RequestMapping(value = "", method = RequestMethod.GET)
     public Resource<ExtensionFeatureDescription> getDescription() {
-        // TODO ExtensionFeatureDescription must be decorated according to the Jenkins controller
         return Resource.of(
                 feature.getFeatureDescription(),
                 uri(MvcUriComponentsBuilder.on(getClass()).getDescription())
@@ -109,7 +108,20 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
         }
     }
 
-    // TODO Indexation of a range
+    /**
+     * Indexation of a range
+     */
+    @RequestMapping(value = "configurations/{name}/indexation/range", method = RequestMethod.POST)
+    @ResponseBody
+    public Ack indexRange(@PathVariable String name, @RequestParam long from, @RequestParam long to) {
+        // Full indexation
+        if (indexationService.isIndexationRunning(name)) {
+            return Ack.NOK;
+        } else {
+            indexationService.indexRange(name, from, to);
+            return Ack.OK;
+        }
+    }
 
     /**
      * Full indexation

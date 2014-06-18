@@ -129,9 +129,14 @@ public class IndexationServiceImpl implements IndexationService, ApplicationInfo
 
     @Override
     public void indexFromLatest(String name) {
-        int repositoryId = repositoryDao.getByName(name);
-        SVNRepository repository = loadRepository(repositoryId, name);
+        SVNRepository repository = getRepositoryByName(name);
         indexFromLatest(repository);
+    }
+
+    @Override
+    public void indexRange(String name, long from, long to) {
+        SVNRepository repository = getRepositoryByName(name);
+        indexRange(repository, from, to);
     }
 
     @Override
@@ -148,6 +153,17 @@ public class IndexationServiceImpl implements IndexationService, ApplicationInfo
         SVNRepository repository = loadRepository(repositoryId, name);
         // OK, launches a new indexation
         indexFromLatest(repository);
+    }
+
+    protected SVNRepository getRepositoryByName(String name) {
+        // Gets the repository if it exists
+        Integer repositoryId = repositoryDao.findByName(name);
+        // If it does not exist, creates it
+        if (repositoryId == null) {
+            repositoryId = repositoryDao.create(name);
+        }
+        // Gets the configuration
+        return loadRepository(repositoryId, name);
     }
 
     protected SVNRepository loadRepository(int repositoryId, String name) {
