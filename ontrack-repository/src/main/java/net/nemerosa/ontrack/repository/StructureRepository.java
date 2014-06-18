@@ -36,6 +36,8 @@ public interface StructureRepository {
 
     Build getBuild(ID buildId);
 
+    Build getBuildByName(String project, String branch, String build);
+
     List<Build> builds(Branch branch, BuildFilter buildFilter);
 
     // Promotion levels
