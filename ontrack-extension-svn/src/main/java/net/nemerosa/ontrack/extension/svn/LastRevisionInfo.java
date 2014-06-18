@@ -9,8 +9,8 @@ public class LastRevisionInfo {
     private final String message;
     private final long repositoryRevision;
 
-    public static LastRevisionInfo none() {
-        return new LastRevisionInfo(0L, "", 0L);
+    public static LastRevisionInfo none(long repositoryRevision) {
+        return new LastRevisionInfo(0L, "", repositoryRevision);
     }
 
     public boolean isNone() {

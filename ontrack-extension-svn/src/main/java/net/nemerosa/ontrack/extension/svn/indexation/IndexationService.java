@@ -8,7 +8,7 @@ public interface IndexationService {
 
     void indexFromLatest(String name);
 
-    void indexRange(String name, long from, long to);
+    void indexRange(String name, IndexationRange range);
 
     void reindex(String name);
 

@@ -134,11 +134,9 @@ public class IndexationServiceImpl implements IndexationService, ApplicationInfo
     }
 
     @Override
-    public void indexRange(String name, long from, long to) {
+    public void indexRange(String name, IndexationRange range) {
         SVNRepository repository = getRepositoryByName(name);
-        indexRange(repository, from, to);
-        // FIXME Method net.nemerosa.ontrack.extension.svn.indexation.IndexationServiceImpl.indexRange
-
+        indexRange(repository, range.getFrom(), range.getTo());
     }
 
     @Override
@@ -188,25 +186,18 @@ public class IndexationServiceImpl implements IndexationService, ApplicationInfo
     @Override
     public LastRevisionInfo getLastRevisionInfo(String name) {
         try (Transaction ignored = transactionService.start()) {
-            Integer repositoryId = repositoryDao.findByName(name);
-            if (repositoryId != null) {
-                TRevision r = revisionDao.getLastRevision(repositoryId);
-                if (r != null) {
-                    // Gets the configuration
-                    SVNRepository repository = loadRepository(repositoryId, name);
-                    SVNURL url = SVNUtils.toURL(repository.getConfiguration().getUrl());
-                    long repositoryRevision = svnClient.getRepositoryRevision(repository, url);
-                    // OK
-                    return new LastRevisionInfo(
-                            r.getRevision(),
-                            r.getMessage(),
-                            repositoryRevision
-                    );
-                } else {
-                    return LastRevisionInfo.none();
-                }
+            SVNRepository repository = getRepositoryByName(name);
+            SVNURL url = SVNUtils.toURL(repository.getConfiguration().getUrl());
+            long repositoryRevision = svnClient.getRepositoryRevision(repository, url);
+            TRevision r = revisionDao.getLastRevision(repository.getId());
+            if (r != null) {
+                return new LastRevisionInfo(
+                        r.getRevision(),
+                        r.getMessage(),
+                        repositoryRevision
+                );
             } else {
-                return LastRevisionInfo.none();
+                return LastRevisionInfo.none(repositoryRevision);
             }
         }
     }
