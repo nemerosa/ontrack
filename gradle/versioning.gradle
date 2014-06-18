@@ -1,0 +1,20 @@
+/**
+ * Versioning policy
+ */
+
+// Build number indicator
+
+def buildNumber
+if (System.env.BUILD_NUMBER) {
+    buildNumber = System.env.BUILD_NUMBER
+} else {
+    buildNumber = 'DEV'
+}
+
+// Base version (taken from the `gradle.properties` file)
+
+def baseVersion = projectVersion
+
+// Full version
+
+version = "${baseVersion}-${buildNumber}"

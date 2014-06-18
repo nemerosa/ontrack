@@ -6,14 +6,14 @@ apply plugin: 'maven'
 
 allprojects {
     group = 'net.nemerosa.ontrack'
-    version = projectVersion // Defined in gradle.properties
+    apply from: "$rootDir/gradle/versioning.gradle"
 }
 
 /**
  * Dependency management
  */
 
-apply from: 'gradle/dependencies.gradle'
+apply from: "$rootDir/gradle/dependencies.gradle"
 
 /**
  * Java projects
