@@ -52,7 +52,7 @@ public class StructureController extends AbstractProjectEntityController {
         return structureService.findValidationStampByName(project, branch, validationStamp);
     }
 
-    @RequestMapping(value = "entity/build/{project}/{branch}/{build}", method = RequestMethod.GET)
+    @RequestMapping(value = "entity/build/{project}/{branch}/{build:.*}", method = RequestMethod.GET)
     public Build build(@PathVariable String project, @PathVariable String branch, @PathVariable String build) {
         return structureService.findBuildByName(project, branch, build);
     }
