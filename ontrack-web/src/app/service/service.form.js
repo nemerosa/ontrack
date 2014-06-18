@@ -123,6 +123,19 @@ angular.module('ot.service.form', [
             return form;
         };
 
+        /**
+         * Gets the value for a field in a form
+         */
+        self.getFieldValue = function (form, fieldName) {
+            for (var i = 0; i < form.fields.length; i++) {
+                var field = form.fields[i];
+                if (field.name == fieldName) {
+                    return field.value;
+                }
+            }
+            throw "Could not find any field with name " + fieldName;
+        };
+
         return self;
     })
 ;

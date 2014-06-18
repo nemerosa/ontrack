@@ -21,7 +21,7 @@ public class Form {
 
     public Form name() {
         return with(
-                defaultText()
+                defaultNameField()
         );
     }
 
@@ -87,7 +87,7 @@ public class Form {
         return this;
     }
 
-    public static Text defaultText() {
+    public static Text defaultNameField() {
         return Text.of("name")
                 .label("Name")
                 .length(40)
