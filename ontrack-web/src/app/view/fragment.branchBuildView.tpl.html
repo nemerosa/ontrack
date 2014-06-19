@@ -1,5 +1,3 @@
-From: {{selectedBuild.from}}
-to: {{selectedBuild.to}}
 <table class="ot-branch-build-view">
     <thead>
     <!-- Validation stamps -->
@@ -27,8 +25,8 @@ to: {{selectedBuild.to}}
     <tr ng-repeat="buildView in branchBuildView.buildViews">
         <td>
             <span ng-if="branchBuildView.buildDiffActions">
-                <input type="radio" id="build-from-{{buildView.build.id}}" name="selectedBuildFrom" ng-model="selectedBuild.from" ng-value="buildView.build.id" />
-                <input type="radio" id="build-to-{{buildView.build.id}}" name="selectedBuildTo" ng-model="selectedBuild.to" ng-value="buildView.build.id" />
+                <input type="radio" id="build-from-{{buildView.build.id}}" name="selectedBuildFrom" ng-model="selectedBuild.from" ng-value="buildView.build" />
+                <input type="radio" id="build-to-{{buildView.build.id}}" name="selectedBuildTo" ng-model="selectedBuild.to" ng-value="buildView.build" />
             </span>
             <span ng-if="!branchBuildView.buildDiffActions">&nbsp;</span>
         </td>

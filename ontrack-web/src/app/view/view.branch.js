@@ -19,8 +19,8 @@ angular.module('ot.view.branch', [
 
         // Selected builds
         $scope.selectedBuild = {
-            from: 0,
-            to: 0
+            from: undefined,
+            to: undefined
         };
 
         // Loading the build view
