@@ -72,15 +72,15 @@ configure(javaProjects) {
 }
 
 /**
- * TODO General test report
+ * General test report
  */
 
-//task testReport(type: TestReport) {
-//    destinationDir = file("$buildDir/reports/allTests")
-//    // Include the results from the `test` tasks in all Java subprojects
-//    reportOn javaProjects*.test, javaProjects*.integrationTest
-//}
-//build.dependsOn testReport
+task testReport(type: TestReport) {
+    destinationDir = file("$buildDir/reports/allTests")
+    // Include the results from the `test` tasks in all Java subprojects
+    reportOn javaProjects*.test, javaProjects*.integrationTest
+}
+build.dependsOn testReport
 
 /**
  * Task to display the version information
