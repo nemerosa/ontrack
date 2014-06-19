@@ -39,7 +39,8 @@
         <td>
             <span ng-repeat="promotionRun in buildView.promotionRuns">
                 <span class="ot-promotion-run">
-                    <ot-entity-image entity="promotionRun.promotionLevel" link="#/promotionLevel/{{promotionRun.promotionLevel.id}}">
+                    <ot-entity-image entity="promotionRun.promotionLevel"
+                                     link="#/promotionLevel/{{promotionRun.promotionLevel.id}}">
                         {{promotionRun.promotionLevel.name}}
                     </ot-entity-image>
                     <span class="ot-promotion-run-signature">
@@ -50,9 +51,11 @@
             </span>
         </td>
         <!-- Validation runs -->
-        <td ng-repeat="validationStampRunView in buildView.validationStampRunViews" class="ot-branch-build-view-validation">
+        <td ng-repeat="validationStampRunView in buildView.validationStampRunViews"
+            class="ot-branch-build-view-validation">
             <!-- Not run and validation enabled -->
-            <span ng-if="!validationStampRunView.run && buildView.build._validate" class="ot-command" ng-click="createValidationRun(buildView, validationStampRunView)">
+            <span ng-if="!validationStampRunView.run && buildView.build._validate" class="ot-command"
+                  ng-click="createValidationRun(buildView, validationStampRunView)">
                 <ot-validation-run-status-none></ot-validation-run-status-none>
             </span>
             <!-- Not run and validation not enabled -->
@@ -69,7 +72,14 @@
     </tr>
     </tbody>
     <tfoot>
-    <!-- TODO Filter command -->
-    <!-- TODO Build diff extension commands -->
+    <tr>
+        <td colspan="3">
+            <!-- TODO Filter command -->
+            <!-- Build diff extension commands -->
+            <button ng-repeat="action in branchBuildView.buildDiffActions" class="btn btn-default" id="{{action.id}}">
+                {{action.name}}
+            </button>
+        </td>
+    </tr>
     </tfoot>
 </table>

@@ -13,8 +13,6 @@ import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -84,13 +82,11 @@ public class BranchController extends AbstractResourceController {
         // Gets the list of builds
         List<Build> builds = structureService.getFilteredBuilds(branchId);
         // Gets the list of build diff actions
-        List<Action> buildDiffActions = new ArrayList<>();
-        Collection<BuildDiffExtension> extensions = extensionManager.getExtensions(BuildDiffExtension.class);
-        for (BuildDiffExtension extension : extensions) {
-            if (extension.apply(branch)) {
-                buildDiffActions.add(extension.getAction());
-            }
-        }
+        List<Action> buildDiffActions = extensionManager.getExtensions(BuildDiffExtension.class)
+                .stream()
+                .filter(extension -> extension.apply(branch))
+                .map(this::resolveExtensionAction)
+                .collect(Collectors.toList());
         // Gets the views for each build
         return new BranchBuildView(
                 builds.stream()

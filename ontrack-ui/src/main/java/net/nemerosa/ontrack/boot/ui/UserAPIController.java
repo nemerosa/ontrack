@@ -86,7 +86,7 @@ public class UserAPIController extends AbstractResourceController {
         // TODO Profile
         // TODO Account management
         // TODO Extension management
-        // TODO Contributions from extensions
+        // Contributions from extensions
         user = userMenuExtensions(user);
         // OK
         return user;
@@ -102,7 +102,7 @@ public class UserAPIController extends AbstractResourceController {
             if (fn == null || securityService.isGlobalFunctionGranted(fn)) {
                 // Adds the menu entry
                 // Prepends the extension ID
-                user.add(extension.getAction().prepend(String.format("extension/%s/", extension.getFeature().getId())));
+                user.add(resolveExtensionAction(extension));
             }
         }
         // OK
