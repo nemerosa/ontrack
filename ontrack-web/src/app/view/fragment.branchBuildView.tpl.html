@@ -1,8 +1,10 @@
+From: {{selectedBuild.from}}
+to: {{selectedBuild.to}}
 <table class="ot-branch-build-view">
     <thead>
     <!-- Validation stamps -->
     <tr>
-        <th colspan="2">
+        <th colspan="3">
             <!-- Place holder for builds and promotions -->
         </th>
         <!-- All validation stamps -->
@@ -12,7 +14,7 @@
     </tr>
     <!-- Validation stamps decorations -->
     <tr>
-        <th colspan="2">
+        <th colspan="3">
             <!-- Place holder for builds and promotions -->
         </th>
         <!-- For each validation stamp -->
@@ -23,6 +25,13 @@
     </thead>
     <tbody>
     <tr ng-repeat="buildView in branchBuildView.buildViews">
+        <td>
+            <span ng-if="branchBuildView.buildDiffActions">
+                <input type="radio" id="build-from-{{buildView.build.id}}" name="selectedBuildFrom" ng-model="selectedBuild.from" ng-value="buildView.build.id" />
+                <input type="radio" id="build-to-{{buildView.build.id}}" name="selectedBuildTo" ng-model="selectedBuild.to" ng-value="buildView.build.id" />
+            </span>
+            <span ng-if="!branchBuildView.buildDiffActions">&nbsp;</span>
+        </td>
         <td>
             <!-- Build name and link -->
             <a href="#/build/{{buildView.build.id}}" class="ot-branch-build-view-build-name">
@@ -73,7 +82,7 @@
     </tbody>
     <tfoot>
     <tr>
-        <td colspan="3">
+        <td colspan="4">
             <!-- TODO Filter command -->
             <!-- Build diff extension commands -->
             <button ng-repeat="action in branchBuildView.buildDiffActions" class="btn btn-default"

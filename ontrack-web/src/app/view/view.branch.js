@@ -17,6 +17,12 @@ angular.module('ot.view.branch', [
         // Branch's id
         var branchId = $stateParams.branchId;
 
+        // Selected builds
+        $scope.selectedBuild = {
+            from: 0,
+            to: 0
+        };
+
         // Loading the build view
         function loadBuildView() {
             // TODO Use links from the branch
