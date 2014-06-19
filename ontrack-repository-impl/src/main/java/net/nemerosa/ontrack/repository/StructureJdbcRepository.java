@@ -228,6 +228,21 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         }
     }
 
+
+    @Override
+    public Build getBuildByName(String project, String branch, String build) {
+        try {
+            Branch b = getBranchByName(project, branch);
+            return getNamedParameterJdbcTemplate().queryForObject(
+                    "SELECT * FROM BUILDS WHERE NAME = :name",
+                    params("name", build),
+                    (rs, rowNum) -> toBuild(rs, this::getBranch)
+            );
+        } catch (EmptyResultDataAccessException ex) {
+            throw new BuildNotFoundException(project, branch, build);
+        }
+    }
+
     @Override
     public List<PromotionLevel> getPromotionLevelListForBranch(ID branchId) {
         Branch branch = getBranch(branchId);

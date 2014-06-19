@@ -12,10 +12,7 @@ import net.nemerosa.ontrack.extension.svn.client.SVNClient;
 import net.nemerosa.ontrack.extension.svn.db.*;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.support.ApplicationInfo;
-import net.nemerosa.ontrack.model.support.ApplicationInfoProvider;
-import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
-import net.nemerosa.ontrack.model.support.Time;
+import net.nemerosa.ontrack.model.support.*;
 import net.nemerosa.ontrack.tx.Transaction;
 import net.nemerosa.ontrack.tx.TransactionService;
 import org.apache.commons.lang3.StringUtils;
@@ -23,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.scheduling.Trigger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -38,7 +36,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Service
-public class IndexationServiceImpl implements IndexationService, ApplicationInfoProvider {
+public class IndexationServiceImpl implements IndexationService, ScheduledService, ApplicationInfoProvider {
 
     private final Logger logger = LoggerFactory.getLogger(IndexationService.class);
     private final TransactionTemplate transactionTemplate;
@@ -239,6 +237,78 @@ public class IndexationServiceImpl implements IndexationService, ApplicationInfo
         indexationJobs.put(repository.getConfiguration().getName(), job);
         // Schedule the scan
         executor.submit(job);
+    }
+
+    @Override
+    public Runnable getTask() {
+        return () -> {
+            // Gets all configurations
+            List<SVNConfiguration> configurations = getSvnConfigurations();
+            // Launches all indexations
+            for (SVNConfiguration configuration : configurations) {
+                int scanInterval = configuration.getIndexationInterval();
+                // TODO Scanning must be disabled when the SVN Extension is not enabled
+                if (scanInterval > 0) {
+                    indexTask(configuration);
+                }
+            }
+        };
+    }
+
+    private void indexTask(SVNConfiguration configuration) {
+        String repositoryName = configuration.getName();
+        logger.info("[svn-indexation] Repository={}, Indexation task starting...", repositoryName);
+        // Checks if there is running indexation for this repository
+        if (isIndexationRunning(repositoryName)) {
+            // Log
+            logger.info("[indexation] Repository={}, An indexation is already running. Will try later", repositoryName);
+        } else {
+            // Launches the indexation, using admin rights
+            securityService.asAdmin(() -> {
+                // Indexes from latest
+                indexFromLatest(repositoryName);
+                // Nothing to return
+                return null;
+            });
+        }
+        logger.info("[indexation] Repository={}, Indexation task stopped.", repositoryName);
+    }
+
+    @Override
+    public Trigger getTrigger() {
+        return triggerContext -> {
+            // Gets the mimimum of the scan intervals (outside of 0)
+            Integer scanInterval = null;
+            List<SVNConfiguration> configurations = getSvnConfigurations();
+            for (SVNConfiguration configuration : configurations) {
+                int interval = configuration.getIndexationInterval();
+                if (interval > 0) {
+                    if (scanInterval != null) {
+                        scanInterval = Math.min(scanInterval, interval);
+                    } else {
+                        scanInterval = interval;
+                    }
+                }
+            }
+            // No scan, tries again in one minute, in case the configuration has changed
+            if (scanInterval == null || scanInterval <= 0) {
+                return Time.toJavaUtilDate(Time.now().plusMinutes(1));
+            } else {
+                // Last execution time
+                Date time = triggerContext.lastActualExecutionTime();
+                if (time != null) {
+                    return Time.toJavaUtilDate(Time.from(time, null).plusMinutes(scanInterval));
+                } else {
+                    // Never executed before
+                    return Time.toJavaUtilDate(Time.now().plusMinutes(scanInterval));
+                }
+            }
+        };
+    }
+
+    @SuppressWarnings("Convert2MethodRef")
+    protected List<SVNConfiguration> getSvnConfigurations() {
+        return securityService.asAdmin(() -> configurationService.getConfigurations());
     }
 
     private static interface IndexationListener {

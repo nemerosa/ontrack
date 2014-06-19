@@ -10,13 +10,14 @@ public class Action {
 
     private final String id;
     private final String name;
-    private final String uriFragment;
+    private final String uri;
 
-    public static Action of(String id, String name, String uriFragment, Object... parameters) {
-        return new Action(id, name, String.format(uriFragment, parameters));
+    public static Action of(String id, String name, String uri, Object... parameters) {
+        return new Action(id, name, String.format(uri, parameters));
     }
 
-    public Action prepend(String path) {
-        return new Action(id, name, path + uriFragment);
+    public Action withUri(String uri) {
+        return Action.of(id, name, uri);
     }
+
 }

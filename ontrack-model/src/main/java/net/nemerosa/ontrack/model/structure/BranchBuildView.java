@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.model.structure;
 
 import lombok.Data;
+import net.nemerosa.ontrack.model.security.Action;
 
 import java.util.List;
 
@@ -15,5 +16,10 @@ public class BranchBuildView implements View {
      * Filtered list of build views (the filter is not managed by the view itself)
      */
     private final List<BuildView> buildViews;
+
+    /**
+     * List of build diff actions.
+     */
+    private final List<Action> buildDiffActions;
 
 }

@@ -263,6 +263,11 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public Build findBuildByName(String project, String branch, String build) {
+        return structureRepository.getBuildByName(project, branch, build);
+    }
+
+    @Override
     public Document getValidationStampImage(ID validationStampId) {
         // Checks access
         getValidationStamp(validationStampId);

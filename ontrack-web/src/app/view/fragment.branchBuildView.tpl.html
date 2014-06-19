@@ -2,7 +2,7 @@
     <thead>
     <!-- Validation stamps -->
     <tr>
-        <th colspan="2">
+        <th colspan="3">
             <!-- Place holder for builds and promotions -->
         </th>
         <!-- All validation stamps -->
@@ -12,7 +12,7 @@
     </tr>
     <!-- Validation stamps decorations -->
     <tr>
-        <th colspan="2">
+        <th colspan="3">
             <!-- Place holder for builds and promotions -->
         </th>
         <!-- For each validation stamp -->
@@ -23,6 +23,13 @@
     </thead>
     <tbody>
     <tr ng-repeat="buildView in branchBuildView.buildViews">
+        <td>
+            <span ng-if="branchBuildView.buildDiffActions">
+                <input type="radio" id="build-from-{{buildView.build.id}}" name="selectedBuildFrom" ng-model="selectedBuild.from" ng-value="buildView.build.id" />
+                <input type="radio" id="build-to-{{buildView.build.id}}" name="selectedBuildTo" ng-model="selectedBuild.to" ng-value="buildView.build.id" />
+            </span>
+            <span ng-if="!branchBuildView.buildDiffActions">&nbsp;</span>
+        </td>
         <td>
             <!-- Build name and link -->
             <a href="#/build/{{buildView.build.id}}" class="ot-branch-build-view-build-name">
@@ -39,7 +46,8 @@
         <td>
             <span ng-repeat="promotionRun in buildView.promotionRuns">
                 <span class="ot-promotion-run">
-                    <ot-entity-image entity="promotionRun.promotionLevel" link="#/promotionLevel/{{promotionRun.promotionLevel.id}}">
+                    <ot-entity-image entity="promotionRun.promotionLevel"
+                                     link="#/promotionLevel/{{promotionRun.promotionLevel.id}}">
                         {{promotionRun.promotionLevel.name}}
                     </ot-entity-image>
                     <span class="ot-promotion-run-signature">
@@ -50,9 +58,11 @@
             </span>
         </td>
         <!-- Validation runs -->
-        <td ng-repeat="validationStampRunView in buildView.validationStampRunViews" class="ot-branch-build-view-validation">
+        <td ng-repeat="validationStampRunView in buildView.validationStampRunViews"
+            class="ot-branch-build-view-validation">
             <!-- Not run and validation enabled -->
-            <span ng-if="!validationStampRunView.run && buildView.build._validate" class="ot-command" ng-click="createValidationRun(buildView, validationStampRunView)">
+            <span ng-if="!validationStampRunView.run && buildView.build._validate" class="ot-command"
+                  ng-click="createValidationRun(buildView, validationStampRunView)">
                 <ot-validation-run-status-none></ot-validation-run-status-none>
             </span>
             <!-- Not run and validation not enabled -->
@@ -69,7 +79,16 @@
     </tr>
     </tbody>
     <tfoot>
-    <!-- TODO Filter command -->
-    <!-- TODO Build diff extension commands -->
+    <tr>
+        <td colspan="4">
+            <!-- TODO Filter command -->
+            <!-- Build diff extension commands -->
+            <button ng-repeat="action in branchBuildView.buildDiffActions" class="btn btn-default"
+                    id="{{action.id}}"
+                    ng-click="buildDiff(action)">
+                {{action.name}}
+            </button>
+        </td>
+    </tr>
     </tfoot>
 </table>

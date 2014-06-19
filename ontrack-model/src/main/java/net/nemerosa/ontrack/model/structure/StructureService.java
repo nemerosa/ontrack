@@ -30,6 +30,8 @@ public interface StructureService {
 
     Build getBuild(ID buildId);
 
+    Build findBuildByName(String project, String branch, String build);
+
     /**
      * Branch builds
      */

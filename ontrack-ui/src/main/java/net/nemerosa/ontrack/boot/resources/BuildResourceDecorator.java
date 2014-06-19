@@ -39,7 +39,8 @@ public class BuildResourceDecorator extends AbstractResourceDecorator<Build> {
                 .link(
                         "_validate",
                         on(ValidationRunController.class).newValidationRunForm(build.getId()),
-                        ValidationRunCreate.class, build.getBranch().getProject().id()
+                        ValidationRunCreate.class,
+                        build.getBranch().getProject().id()
                 )
                         // Actual properties for this build
                 .link("_properties", on(PropertyController.class).getProperties(ProjectEntityType.BUILD, build.getId()))

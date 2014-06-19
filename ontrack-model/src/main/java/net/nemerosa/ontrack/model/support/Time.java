@@ -42,4 +42,8 @@ public final class Time {
             return defaultValue;
         }
     }
+
+    public static Date toJavaUtilDate(LocalDateTime localDateTime) {
+        return Date.from(localDateTime.toInstant(ZoneOffset.UTC));
+    }
 }

@@ -17,6 +17,12 @@ angular.module('ot.view.branch', [
         // Branch's id
         var branchId = $stateParams.branchId;
 
+        // Selected builds
+        $scope.selectedBuild = {
+            from: undefined,
+            to: undefined
+        };
+
         // Loading the build view
         function loadBuildView() {
             // TODO Use links from the branch
@@ -26,6 +32,12 @@ angular.module('ot.view.branch', [
             ).then(
                 function success(branchBuildView) {
                     $scope.branchBuildView = branchBuildView;
+                    // Selection of build boundaries
+                    var buildViews = branchBuildView.buildViews;
+                    if (buildViews) {
+                        $scope.selectedBuild.from = buildViews[0].build.id;
+                        $scope.selectedBuild.to = buildViews[buildViews.length - 1].build.id;
+                    }
                 }
             );
         }
@@ -121,6 +133,16 @@ angular.module('ot.view.branch', [
                     }
                 }
             });
+        };
+
+        /**
+         * Build diff action
+         */
+        $scope.buildDiff = function (action) {
+            var selectedBuild = $scope.selectedBuild;
+            if (selectedBuild.from && selectedBuild.to && selectedBuild.from != selectedBuild.to) {
+                alert('From ' + selectedBuild.from + ' to ' + selectedBuild.to);
+            }
         };
 
     })

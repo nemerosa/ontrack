@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.security.BuildCreate;
 import net.nemerosa.ontrack.model.security.PromotionLevelCreate;
 import net.nemerosa.ontrack.model.security.ValidationStampCreate;
 import net.nemerosa.ontrack.model.structure.Branch;
+import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.ResourceContext;
@@ -53,6 +54,8 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                         "_validationStamps",
                         on(ValidationStampController.class).getValidationStampListForBranch(branch.getId())
                 )
+                        // Actual properties for this build
+                .link("_properties", on(PropertyController.class).getProperties(ProjectEntityType.BRANCH, branch.getId()))
                         // TODO Update link (with authorisation)
                         // TODO Delete link
                         // TODO View link
