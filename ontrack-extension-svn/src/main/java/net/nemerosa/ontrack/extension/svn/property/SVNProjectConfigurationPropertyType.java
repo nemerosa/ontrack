@@ -2,7 +2,10 @@ package net.nemerosa.ontrack.extension.svn.property;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
+import net.nemerosa.ontrack.extension.svn.SVNConfigurationService;
 import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.form.Selection;
+import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
@@ -12,6 +15,12 @@ import java.util.EnumSet;
 import java.util.Set;
 
 public class SVNProjectConfigurationPropertyType extends AbstractPropertyType<SVNProjectConfigurationProperty> {
+
+    private final SVNConfigurationService configurationService;
+
+    public SVNProjectConfigurationPropertyType(SVNConfigurationService configurationService) {
+        this.configurationService = configurationService;
+    }
 
     @Override
     public String getName() {
@@ -40,8 +49,20 @@ public class SVNProjectConfigurationPropertyType extends AbstractPropertyType<SV
 
     @Override
     public Form getEditionForm(SVNProjectConfigurationProperty value) {
-        // FIXME Method net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationPropertyType.getEditionForm
-        return null;
+        return Form.create()
+                .with(
+                        Selection.of("configuration")
+                                .label("Configuration")
+                                .help("SVN configuration to use to access the repository")
+                                .items(configurationService.getConfigurationDescriptors())
+                                .value(value != null ? value.getConfiguration().getName() : null)
+                ).with(
+                        Text.of("projectPath")
+                                .label("Project path")
+                                .help("Path of the main project branch (trunk) in this configuration. The path is relative to the root " +
+                                        "of the repository.")
+                                .validation(value != null ? value.getProjectPath() : "/trunk")
+                );
     }
 
     @Override
