@@ -1,6 +1,9 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import net.nemerosa.ontrack.extension.api.BuildDiffExtension;
+import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.security.Action;
 import net.nemerosa.ontrack.model.security.BranchCreate;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
@@ -10,6 +13,8 @@ import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,11 +25,13 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 public class BranchController extends AbstractResourceController {
 
     private final StructureService structureService;
+    private final ExtensionManager extensionManager;
     private final SecurityService securityService;
 
     @Autowired
-    public BranchController(StructureService structureService, SecurityService securityService) {
+    public BranchController(StructureService structureService, ExtensionManager extensionManager, SecurityService securityService) {
         this.structureService = structureService;
+        this.extensionManager = extensionManager;
         this.securityService = securityService;
     }
 
@@ -71,14 +78,25 @@ public class BranchController extends AbstractResourceController {
     @RequestMapping(value = "branches/{branchId}/view", method = RequestMethod.GET)
     // TODO Filter
     public BranchBuildView buildView(@PathVariable ID branchId) {
+        // Gets the branch
+        Branch branch = getBranch(branchId);
         // TODO Defines the filter for the service
         // Gets the list of builds
         List<Build> builds = structureService.getFilteredBuilds(branchId);
+        // Gets the list of build diff actions
+        List<Action> buildDiffActions = new ArrayList<>();
+        Collection<BuildDiffExtension> extensions = extensionManager.getExtensions(BuildDiffExtension.class);
+        for (BuildDiffExtension extension : extensions) {
+            if (extension.apply(branch)) {
+                buildDiffActions.add(extension.getAction());
+            }
+        }
         // Gets the views for each build
         return new BranchBuildView(
                 builds.stream()
                         .map(this::toBuildView)
-                        .collect(Collectors.toList())
+                        .collect(Collectors.toList()),
+                buildDiffActions
         );
     }
 
