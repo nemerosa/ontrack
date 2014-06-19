@@ -1,4 +1,5 @@
 dependencies {
     compile project(':ontrack-model')
+    compile project(':ontrack-extension-api')
     compile libraries.spring_webmvc
 }
