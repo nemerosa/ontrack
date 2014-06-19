@@ -1,0 +1,41 @@
+dependencies {
+    compile project(':ontrack-ui-support')
+    compile project(':ontrack-extension-api')
+    compile libraries.spring_boot_starter_web
+    compile libraries.spring_boot_starter_security
+
+    runtime project(':ontrack-service')
+    runtime project(':ontrack-repository-impl')
+    runtime libraries.spring_boot_starter_aop
+
+    testCompile project(':ontrack-test-utils')
+    testCompile project(':ontrack-it-utils')
+    testCompile project(':ontrack-extension-jenkins')
+
+    // TODO List of extensions
+    runtime project(':ontrack-extension-jenkins')
+}
+
+/**
+ * Cleaning the Web resources
+ */
+
+clean << {
+    println 'Deleting Web resources'
+    project.delete 'src/main/resources/static/assets'
+    project.delete 'src/main/resources/static/fonts'
+    project.delete 'src/main/resources/static/index.html'
+}
+
+/**
+ * Copy of Web resources before release
+ */
+
+task copyWebResources(dependsOn: ':ontrack-web:release') << {
+    copy {
+        from project(':ontrack-web').tasks.release.output
+        into project.file('src/main/resources/static')
+    }
+}
+
+release.dependsOn copyWebResources

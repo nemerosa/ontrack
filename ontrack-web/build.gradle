@@ -1,0 +1,21 @@
+// TODO Dev & watch
+// TODO Version replacement for prod
+
+task clean(type: Exec) {
+    commandLine 'grunt', 'clean'
+}
+
+task release(dependsOn: ['setup', 'gruntProd']) {
+    ext {
+        output = "${project.buildDir}/grunt/prod"
+    }
+}
+
+task setup(type: Exec) {
+    commandLine 'npm', 'install'
+    commandLine 'bower', 'install', '--force-latest'
+}
+
+task gruntProd(type: Exec) {
+    commandLine 'grunt', 'prod'
+}

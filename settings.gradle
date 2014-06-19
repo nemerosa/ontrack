@@ -1,0 +1,29 @@
+rootProject.name = 'ontrack'
+
+include ':ontrack-common'
+include ':ontrack-json'
+include ':ontrack-test-utils'
+include ':ontrack-model'
+include ':ontrack-client'
+include ':ontrack-extension-api'
+include ':ontrack-extension-general'
+include ':ontrack-extension-issues'
+include ':ontrack-extension-jenkins'
+include ':ontrack-extension-jira'
+include ':ontrack-extension-support'
+include ':ontrack-extension-svn'
+include ':ontrack-it-utils'
+include ':ontrack-ref'
+include ':ontrack-repository'
+include ':ontrack-repository-impl'
+include ':ontrack-repository-support'
+include ':ontrack-service'
+include ':ontrack-tx'
+include ':ontrack-ui'
+include ':ontrack-ui-support'
+include ':ontrack-web'
+
+// TODO include ':ontrack-acceptance'
+// TODO UI Start
+// TODO UI Web copy
+// TODO UI Boot packaging

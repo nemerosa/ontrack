@@ -28,8 +28,8 @@ module.exports = function (grunt) {
          * Cleaning all directories
          */
         clean: [
-            'target/dev',
-            'target/prod',
+            'build/grunt/dev',
+            'build/grunt/prod',
             'src/assets/main.css'
         ],
 
@@ -45,7 +45,7 @@ module.exports = function (grunt) {
                     {
                         cwd: 'src',
                         src: [ '**/*.js' ],
-                        dest: 'target/dev',
+                        dest: 'build/grunt/dev',
                         expand: true
                     }
                 ]
@@ -57,7 +57,7 @@ module.exports = function (grunt) {
                 files: [
                     {
                         src: [ '**/*.tpl.html' ],
-                        dest: 'target/dev',
+                        dest: 'build/grunt/dev',
                         cwd: 'src',
                         expand: true
                     }
@@ -71,7 +71,7 @@ module.exports = function (grunt) {
                     {
                         cwd: 'src/assets',
                         src: [ '**' ],
-                        dest: 'target/dev/assets',
+                        dest: 'build/grunt/dev/assets',
                         expand: true
                     }
                 ]
@@ -83,7 +83,7 @@ module.exports = function (grunt) {
                 files: [
                     {
                         src: vendor.js,
-                        dest: 'target/dev',
+                        dest: 'build/grunt/dev',
                         cwd: '.',
                         expand: true
                     }
@@ -96,7 +96,7 @@ module.exports = function (grunt) {
                 files: [
                     {
                         src: vendor.fonts,
-                        dest: 'target/dev/fonts',
+                        dest: 'build/grunt/dev/fonts',
                         cwd: '.',
                         expand: true,
                         flatten: true
@@ -111,7 +111,7 @@ module.exports = function (grunt) {
                     {
                         cwd: 'src/assets',
                         src: [ '**' ],
-                        dest: 'target/prod/assets',
+                        dest: 'build/grunt/prod/assets',
                         expand: true
                     }
                 ]
@@ -123,7 +123,7 @@ module.exports = function (grunt) {
                 files: [
                     {
                         src: vendor.js,
-                        dest: 'target/include',
+                        dest: 'build/grunt/include',
                         cwd: '.',
                         expand: true
                     }
@@ -136,7 +136,7 @@ module.exports = function (grunt) {
                 files: [
                     {
                         src: vendor.fonts,
-                        dest: 'target/prod/fonts',
+                        dest: 'build/grunt/prod/fonts',
                         cwd: '.',
                         expand: true,
                         flatten: true
@@ -152,7 +152,7 @@ module.exports = function (grunt) {
             dev: {
                 files: [
                     {
-                        'target/dev/assets/main.css': 'src/less/**/*.less'
+                        'build/grunt/dev/assets/main.css': 'src/less/**/*.less'
                     }
                 ]
             },
@@ -162,7 +162,7 @@ module.exports = function (grunt) {
                 },
                 files: [
                     {
-                        'target/include/assets/main.css': 'src/less/**/*.less'
+                        'build/grunt/include/assets/main.css': 'src/less/**/*.less'
                     }
                 ]
             }
@@ -208,7 +208,7 @@ module.exports = function (grunt) {
                     module: 'ot.templates'
                 },
                 src: [ 'src/**/*.tpl.html' ],
-                dest: 'target/dev/app/ot.templates.js'
+                dest: 'build/grunt/dev/app/ot.templates.js'
             },
             prod: {
                 options: {
@@ -216,7 +216,7 @@ module.exports = function (grunt) {
                     module: 'ot.templates'
                 },
                 src: [ 'src/**/*.tpl.html' ],
-                dest: 'target/include/ot.templates.js'
+                dest: 'build/grunt/include/ot.templates.js'
             }
         },
 
@@ -230,7 +230,7 @@ module.exports = function (grunt) {
                     {
                         src: [ '**/*.js' ],
                         cwd: 'src',
-                        dest: 'target/include',
+                        dest: 'build/grunt/include',
                         expand: true
                     }
                 ]
@@ -250,16 +250,16 @@ module.exports = function (grunt) {
                     // Vendor sources first
                     var srcArray = [];
                     for (var i = 0 ; i < vendor.js.length ; i++) {
-                        srcArray.push('target/include/' + vendor.js[i]);
+                        srcArray.push('build/grunt/include/' + vendor.js[i]);
                     }
                     // Application sources
-                    srcArray.push('target/include/app/**/*.js');
+                    srcArray.push('build/grunt/include/app/**/*.js');
                     // Generated templates
-                    srcArray.push('target/include/*.js');
+                    srcArray.push('build/grunt/include/*.js');
                     // OK
                     return srcArray;
                 }()),
-                dest: 'target/prod/assets/<%= pkg.name %>-<%= pkg.version %>.js'
+                dest: 'build/grunt/prod/assets/<%= pkg.name %>-<%= pkg.version %>.js'
             },
             /**
              * The `prod_css` target is the concatenation of our application source
@@ -267,9 +267,9 @@ module.exports = function (grunt) {
              */
             prod_css: {
                 src: [
-                    'target/include/**/*.css'
+                    'build/grunt/include/**/*.css'
                 ],
-                dest: 'target/prod/assets/<%= pkg.name %>-<%= pkg.version %>.css'
+                dest: 'build/grunt/prod/assets/<%= pkg.name %>-<%= pkg.version %>.css'
             }
         },
 
@@ -290,20 +290,20 @@ module.exports = function (grunt) {
         includeSource: {
             dev: {
                 options: {
-                    basePath: 'target/dev',
+                    basePath: 'build/grunt/dev',
                     baseUrl: ''
                 },
                 files: {
-                    'target/dev/index.html': 'src/index.html'
+                    'build/grunt/dev/index.html': 'src/index.html'
                 }
             },
             prod: {
                 options: {
-                    basePath: 'target/prod',
+                    basePath: 'build/grunt/prod',
                     baseUrl: ''
                 },
                 files: {
-                    'target/prod/index.html': 'src/index.html'
+                    'build/grunt/prod/index.html': 'src/index.html'
                 }
             }
         },

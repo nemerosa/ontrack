@@ -1,0 +1,5 @@
+dependencies {
+    compile project(':ontrack-model')
+    compile libraries.spring_jdbc
+    compile libraries.dbinit
+}

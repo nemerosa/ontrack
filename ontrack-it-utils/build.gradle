@@ -1,0 +1,13 @@
+dependencies {
+    compile project(':ontrack-common')
+    compile project(':ontrack-model')
+    compile project(':ontrack-test-utils')
+    compile libraries.spring_context
+    compile libraries.spring_jdbc
+    compile libraries.spring_test
+    compile libraries.spring_security_core
+    compile libraries.spring_boot_starter_jdbc
+    compile libraries.slf4j_api
+    
+    runtime libraries.h2
+}

@@ -1,0 +1,47 @@
+apply plugin: 'maven'
+
+/**
+ * Meta information
+ */
+
+allprojects {
+    group = 'net.nemerosa.ontrack'
+    version = projectVersion // Defined in gradle.properties
+}
+
+/**
+ * Dependency management
+ */
+
+apply from: 'gradle/dependencies.gradle'
+
+/**
+ * Java projects
+ */
+
+subprojects { project ->
+
+    if (project.path != ':ontrack-web') {
+        project.apply plugin: 'java'
+
+        project.dependencies {
+            // TODO Lombok not to be released
+            compile libraries.lombok
+            // Testing
+            testCompile libraries.junit
+            testCompile libraries.mockito
+        }
+
+        // Release task
+        task release(dependsOn: 'build') {}
+    }
+
+}
+
+/**
+ * Wrapper definition
+ */
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.12'
+}

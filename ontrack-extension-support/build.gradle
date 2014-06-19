@@ -1,0 +1,5 @@
+dependencies {
+    compile project(':ontrack-extension-api')
+    compile project(':ontrack-client')
+    compile project(':ontrack-ui-support')
+}

@@ -1,0 +1,9 @@
+dependencies {
+
+    compile project(':ontrack-common')
+    compile project(':ontrack-json')
+    compile libraries.guava
+
+    testCompile project(':ontrack-test-utils')
+
+}

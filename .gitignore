@@ -6,4 +6,5 @@ target
 .settings
 work
 .DS_Store
-
+build
+/.gradle

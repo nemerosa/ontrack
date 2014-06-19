@@ -1,0 +1,5 @@
+dependencies {
+    compile libraries.junit
+    compile libraries.commons_io
+    compile project(':ontrack-json')
+}
