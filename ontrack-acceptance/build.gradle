@@ -2,6 +2,14 @@ dependencies {
     testCompile project(':ontrack-client')
 }
 
+ext {
+    ontrackUrl = 'http://localhost:8080'
+}
+
+acceptanceTest {
+    systemProperty 'ontrack.url', ontrackUrl
+}
+
 // Disable unit tests (none in this project)
 test {
     enabled = false
