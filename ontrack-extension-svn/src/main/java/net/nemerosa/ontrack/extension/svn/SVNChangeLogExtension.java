@@ -8,6 +8,8 @@ import net.nemerosa.ontrack.model.structure.PropertyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+// TODO Creates also a SVNBranchConfiguration property that will hold the build path and the branch path
+
 @Component
 public class SVNChangeLogExtension extends AbstractExtension implements BuildDiffExtension {
 
