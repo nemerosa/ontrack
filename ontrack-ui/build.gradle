@@ -1,19 +1,36 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.1.1.RELEASE")
+    }
+}
+
+apply plugin: 'spring-boot'
+
 dependencies {
     compile project(':ontrack-ui-support')
     compile project(':ontrack-extension-api')
     compile libraries.spring_boot_starter_web
     compile libraries.spring_boot_starter_security
+    compile libraries.spring_boot_starter_actuator
 
     runtime project(':ontrack-service')
     runtime project(':ontrack-repository-impl')
     runtime libraries.spring_boot_starter_aop
+    runtime libraries.spring_boot_starter_jdbc
+    runtime libraries.h2
 
     testCompile project(':ontrack-test-utils')
     testCompile project(':ontrack-it-utils')
     testCompile project(':ontrack-extension-jenkins')
 
-    // TODO List of extensions
+    // List of extensions
+    runtime project(':ontrack-extension-general')
     runtime project(':ontrack-extension-jenkins')
+    runtime project(':ontrack-extension-jira')
+    runtime project(':ontrack-extension-svn')
 }
 
 /**
@@ -39,3 +56,17 @@ task copyWebResources(dependsOn: ':ontrack-web:release') << {
 }
 
 release.dependsOn copyWebResources
+release {
+    doFirst {
+        // Amends the application.properties file with version information
+        File file = project.file('src/main/resources/application.properties')
+        file.text = """\
+ontrack.version.date = ${new Date().format("yyyy-MM-dd'T'HH:mm:ss")}
+ontrack.version.full = ${project.version}
+ontrack.version.base = ${rootProject.versionBase}
+ontrack.version.build = ${rootProject.versionBuild}
+ontrack.version.commit = ${rootProject.versionCommit}
+ontrack.version.source = ${rootProject.versionSource}
+"""
+    }
+}

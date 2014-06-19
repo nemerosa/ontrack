@@ -1,6 +1,5 @@
 dependencies {
-    compile project(':ontrack-extension-support')
-    compile project(':ontrack-extension-issues')
+    compile project(':ontrack-extension-scm')
     compile project(':ontrack-repository-support')
     compile project(':ontrack-tx')
     compile libraries.spring_tx

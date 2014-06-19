@@ -43,7 +43,15 @@ In the end, the controllers return _model_ objects that must be decorated by lin
 
 The controllers are not directly responsible for the decoration of the model objects as _resources_ (model + links).
 
-## Running the application in development mode
+## Developing
+
+After the initial check-out, you have to make sure you can build the client side by installing:
+
+* NodeJS (v0.10 or better) to get NPM
+* Bower: `npm -g install bower`
+* Grunt: `npm -g install grunt-cli`
+
+In order to launch the application:
 
 1. In `ontrack-web`, run `grunt watch`
 1. In `ontrack-ui`, run the `Application` main class with `--spring.profiles.active=dev` as argument.

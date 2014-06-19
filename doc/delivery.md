@@ -1,6 +1,30 @@
 ontrack deployment documentation
 ================================
 
+## Creating a package for delivery
+
+At the root, just run:
+
+    ./gradlew clean acceptanceTest release
+
+The `acceptanceTest` is there just to make sure the application is OK.
+
+## Versioning
+
+The base version for the application is stored as `projectVersion` in the `gradle.properties` file. This version
+must be changed manually and should follow the rules of [semantic versioning](http://semver.org).
+
+When running for a development environment, the version to be created will be `<projectVersion>-DEV`. This is
+normally _not_ suitable for delivery.
+
+In a continuous delivery environment, the _BUILD_NUMBER_ environment variable must be available. In this case,
+the version will be `<projectVersion>-<buildNumber>`. A tag will also be created using the version as a name. In
+case of success, the tag should be pushed together with the delivery of the `ontrack-ui` executable JAR file.
+
+The details about the versioning are available in the `gradle/versioning.gradle` file.
+
+The release management and the tag creationare dealt with in the `build.gradle` file using the `release` task.
+
 ## Running in production mode with a local H2 database
 
 In a working directory:

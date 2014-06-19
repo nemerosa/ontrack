@@ -11,6 +11,7 @@ include ':ontrack-extension-issues'
 include ':ontrack-extension-jenkins'
 include ':ontrack-extension-jira'
 include ':ontrack-extension-support'
+include ':ontrack-extension-scm'
 include ':ontrack-extension-svn'
 include ':ontrack-it-utils'
 include ':ontrack-ref'
@@ -22,8 +23,4 @@ include ':ontrack-tx'
 include ':ontrack-ui'
 include ':ontrack-ui-support'
 include ':ontrack-web'
-
-// TODO include ':ontrack-acceptance'
-// TODO UI Start
-// TODO UI Web copy
-// TODO UI Boot packaging
+include ':ontrack-acceptance'

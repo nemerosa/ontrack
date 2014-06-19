@@ -4,38 +4,111 @@ apply plugin: 'maven'
  * Meta information
  */
 
+
+apply from: "$rootDir/gradle/versioning.gradle"
+
 allprojects {
     group = 'net.nemerosa.ontrack'
-    version = projectVersion // Defined in gradle.properties
+    version = rootProject.versionFull
 }
 
 /**
  * Dependency management
  */
 
-apply from: 'gradle/dependencies.gradle'
+apply from: "$rootDir/gradle/dependencies.gradle"
+
+/**
+ * Build task (used only as an anchor point at the root level)
+ */
+
+task build
 
 /**
  * Java projects
  */
 
-subprojects { project ->
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
-    if (project.path != ':ontrack-web') {
-        project.apply plugin: 'java'
+def javaProjects = subprojects.findAll { it.path != ':ontrack-web' }
 
-        project.dependencies {
-            // TODO Lombok not to be released
-            compile libraries.lombok
-            // Testing
-            testCompile libraries.junit
-            testCompile libraries.mockito
-        }
+configure(javaProjects) {
 
-        // Release task
-        task release(dependsOn: 'build') {}
+    /**
+     * For all Java projects
+     */
+
+    apply plugin: 'java'
+
+    dependencies {
+        // TODO Lombok not to be released
+        compile libraries.lombok
+        // Testing
+        testCompile libraries.junit
+        testCompile libraries.mockito
     }
 
+    // Unit tests run with the `test` task
+    test {
+        include '**/*Test.class'
+        reports {
+            html.enabled = false
+        }
+    }
+
+    // Integration tests
+    task integrationTest(type: Test, dependsOn: 'test') {
+        include '**/*IT.class'
+        ignoreFailures true
+        reports {
+            html.enabled = false
+        }
+    }
+
+    // Acceptance tests
+    task acceptanceTest(type: Test, dependsOn: 'integrationTest') {
+        include '**/ACC*.class'
+        ignoreFailures true
+        reports {
+            html.enabled = false
+        }
+    }
+
+    // Release task
+    task release(dependsOn: 'build') {}
+
+}
+
+/**
+ * General test report
+ */
+
+task testReport(type: TestReport) {
+    destinationDir = file("$buildDir/reports/allTests")
+    // Include the results from the `test` tasks in all Java subprojects
+    reportOn javaProjects*.test, javaProjects*.integrationTest, javaProjects*.acceptanceTest
+}
+build.dependsOn testReport
+
+/**
+ * Task to display the version information
+ */
+task displayVersion << {
+    println "ontrack.version.full = ${project.version}"
+    println "ontrack.version.base = ${project.versionBase}"
+    println "ontrack.version.build = ${project.versionBuild}"
+    println "ontrack.version.commit = ${project.versionCommit}"
+    println "ontrack.version.source = ${project.versionSource}"
+}
+
+/**
+ * Release task.
+ *
+ * Use the full version to create a tag.
+ */
+task release(type: Exec, dependsOn: ['displayVersion']) {
+    commandLine 'git', 'tag', version
 }
 
 /**
