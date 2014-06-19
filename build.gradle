@@ -66,6 +66,15 @@ configure(javaProjects) {
         }
     }
 
+    // Acceptance tests
+    task acceptanceTest(type: Test, dependsOn: 'integrationTest') {
+        include '**/ACC*.class'
+        ignoreFailures true
+        reports {
+            html.enabled = false
+        }
+    }
+
     // Release task
     task release(dependsOn: 'build') {}
 
@@ -78,7 +87,7 @@ configure(javaProjects) {
 task testReport(type: TestReport) {
     destinationDir = file("$buildDir/reports/allTests")
     // Include the results from the `test` tasks in all Java subprojects
-    reportOn javaProjects*.test, javaProjects*.integrationTest
+    reportOn javaProjects*.test, javaProjects*.integrationTest, javaProjects*.acceptanceTest
 }
 build.dependsOn testReport
 

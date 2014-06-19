@@ -7,10 +7,6 @@ test {
     enabled = false
 }
 
-// Acceptance tests
-task acceptanceTest(type: Test) {
-}
-
 // Local acceptance tests
 task localAcceptanceTest << {
     // Running the acceptance tests
