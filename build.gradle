@@ -19,30 +19,68 @@ allprojects {
 apply from: "$rootDir/gradle/dependencies.gradle"
 
 /**
+ * Build task (used only as an anchor point at the root level)
+ */
+
+task build
+
+/**
  * Java projects
  */
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-subprojects { project ->
+def javaProjects = subprojects.findAll { it.path != ':ontrack-web' }
 
-    if (project.path != ':ontrack-web') {
-        project.apply plugin: 'java'
+configure(javaProjects) {
 
-        project.dependencies {
-            // TODO Lombok not to be released
-            compile libraries.lombok
-            // Testing
-            testCompile libraries.junit
-            testCompile libraries.mockito
-        }
+    /**
+     * For all Java projects
+     */
 
-        // Release task
-        task release(dependsOn: 'build') {}
+    apply plugin: 'java'
+
+    dependencies {
+        // TODO Lombok not to be released
+        compile libraries.lombok
+        // Testing
+        testCompile libraries.junit
+        testCompile libraries.mockito
     }
 
+    // Unit tests run with the `test` task
+    test {
+        include '**/*Test.class'
+        reports {
+            html.enabled = false
+        }
+    }
+
+    // Integration tests
+    task integrationTest(type: Test, dependsOn: 'test') {
+        include '**/*IT.class'
+        ignoreFailures true
+        reports {
+            html.enabled = false
+        }
+    }
+
+    // Release task
+    task release(dependsOn: 'build') {}
+
 }
+
+/**
+ * TODO General test report
+ */
+
+//task testReport(type: TestReport) {
+//    destinationDir = file("$buildDir/reports/allTests")
+//    // Include the results from the `test` tasks in all Java subprojects
+//    reportOn javaProjects*.test, javaProjects*.integrationTest
+//}
+//build.dependsOn testReport
 
 /**
  * Task to display the version information
