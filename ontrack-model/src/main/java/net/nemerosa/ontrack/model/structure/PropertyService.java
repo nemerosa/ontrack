@@ -43,10 +43,20 @@ public interface PropertyService {
      * authorization exception.
      *
      * @param entity           Entity to get the edition form for
-     * @param propertyTypeName Fully qualified name of the property to get the form for
+     * @param propertyTypeName Fully qualified name of the property to get the property for
      * @return A response that defines the property
      */
     <T> Property<T> getProperty(ProjectEntity entity, String propertyTypeName);
+
+    /**
+     * Same than {@link #getProperty(ProjectEntity, String)} but using the class of
+     * the property type.
+     *
+     * @param entity            Entity to get the edition form for
+     * @param propertyTypeClass Class of the property type to get the property for
+     * @return A response that defines the property
+     */
+    <T> Property<T> getProperty(ProjectEntity entity, Class<? extends PropertyType<T>> propertyTypeClass);
 
     /**
      * Edits the value of a property.

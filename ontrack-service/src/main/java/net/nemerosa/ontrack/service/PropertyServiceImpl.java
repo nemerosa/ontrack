@@ -83,6 +83,11 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
+    public <T> Property<T> getProperty(ProjectEntity entity, Class<? extends PropertyType<T>> propertyTypeClass) {
+        return getProperty(entity, propertyTypeClass.getName());
+    }
+
+    @Override
     public Ack editProperty(ProjectEntity entity, String propertyTypeName, JsonNode data) {
         // Gets the property using its fully qualified type name
         PropertyType<?> propertyType = getPropertyTypeByName(propertyTypeName);

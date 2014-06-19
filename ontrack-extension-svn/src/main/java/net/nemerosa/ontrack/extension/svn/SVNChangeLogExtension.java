@@ -2,13 +2,13 @@ package net.nemerosa.ontrack.extension.svn;
 
 import net.nemerosa.ontrack.extension.api.BuildDiffExtension;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
+import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType;
+import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationPropertyType;
 import net.nemerosa.ontrack.model.security.Action;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.PropertyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-// TODO Creates also a SVNBranchConfiguration property that will hold the build path and the branch path
 
 @Component
 public class SVNChangeLogExtension extends AbstractExtension implements BuildDiffExtension {
@@ -31,7 +31,7 @@ public class SVNChangeLogExtension extends AbstractExtension implements BuildDif
      */
     @Override
     public boolean apply(Branch branch) {
-        // FIXME Method net.nemerosa.ontrack.extension.svn.SVNChangeLogExtension.apply
-        return false;
+        return propertyService.getProperty(branch, SVNBranchConfigurationPropertyType.class) != null
+                && propertyService.getProperty(branch.getProject(), SVNProjectConfigurationPropertyType.class) != null;
     }
 }
