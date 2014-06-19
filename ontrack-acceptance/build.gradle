@@ -25,7 +25,7 @@ task localAcceptanceTestStart << {
 
     // Properties
     project.ext.ontrackPort = project.hasProperty('ontrackPort') ? ontrackPort : 9999
-    def ontrackWait = 30
+    def ontrackWait = 120
 
     // Ontrack URL
     project.ext.ontrackUrl = "http://localhost:${ontrackPort}"
