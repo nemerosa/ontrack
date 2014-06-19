@@ -76,7 +76,9 @@
         <td colspan="3">
             <!-- TODO Filter command -->
             <!-- Build diff extension commands -->
-            <button ng-repeat="action in branchBuildView.buildDiffActions" class="btn btn-default" id="{{action.id}}">
+            <button ng-repeat="action in branchBuildView.buildDiffActions" class="btn btn-default"
+                    id="{{action.id}}"
+                    ng-click="buildDiff(action)">
                 {{action.name}}
             </button>
         </td>

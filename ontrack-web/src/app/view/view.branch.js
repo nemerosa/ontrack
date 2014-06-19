@@ -123,5 +123,12 @@ angular.module('ot.view.branch', [
             });
         };
 
+        /**
+         * Build diff action
+         */
+        $scope.buildDiff = function (action) {
+            alert(action.uri);
+        };
+
     })
 ;
