@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepr
 import net.nemerosa.ontrack.extension.support.configurations.UserPasswordConfiguration;
 import net.nemerosa.ontrack.model.form.*;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -184,5 +185,14 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
     @Override
     public ConfigurationDescriptor getDescriptor() {
         return new ConfigurationDescriptor(name, name);
+    }
+
+    /**
+     * Gets the absolute URL to a path relative to this repository.
+     */
+    public String getUrl(String path) {
+        return StringUtils.stripEnd(url, "/")
+                + "/"
+                + StringUtils.stripStart(path, "/");
     }
 }

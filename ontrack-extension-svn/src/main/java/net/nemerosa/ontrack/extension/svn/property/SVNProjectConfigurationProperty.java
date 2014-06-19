@@ -21,4 +21,11 @@ public class SVNProjectConfigurationProperty {
      */
     private final String projectPath;
 
+    /**
+     * Derived property: the full URL to the Subversion URL.
+     */
+    public String getUrl() {
+        return configuration.getUrl(projectPath);
+    }
+
 }

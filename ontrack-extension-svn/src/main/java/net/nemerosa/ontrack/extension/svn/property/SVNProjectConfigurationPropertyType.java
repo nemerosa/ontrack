@@ -26,7 +26,7 @@ public class SVNProjectConfigurationPropertyType extends AbstractPropertyType<SV
 
     @Override
     public String getName() {
-        return "Subversion configuration";
+        return "SVN configuration";
     }
 
     @Override
