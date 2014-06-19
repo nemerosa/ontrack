@@ -139,7 +139,10 @@ angular.module('ot.view.branch', [
          * Build diff action
          */
         $scope.buildDiff = function (action) {
-            alert(action.uri);
+            var selectedBuild = $scope.selectedBuild;
+            if (selectedBuild.from && selectedBuild.to && selectedBuild.from != selectedBuild.to) {
+                alert('From ' + selectedBuild.from + ' to ' + selectedBuild.to);
+            }
         };
 
     })
