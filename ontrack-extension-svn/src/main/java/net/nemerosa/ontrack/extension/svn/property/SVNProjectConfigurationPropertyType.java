@@ -63,7 +63,7 @@ public class SVNProjectConfigurationPropertyType extends AbstractPropertyType<SV
                                 .label("Project path")
                                 .help("Path of the main project branch (trunk) in this configuration. The path is relative to the root " +
                                         "of the repository.")
-                                .value(value != null ? value.getProjectPath() : "/trunk")
+                                .value(value != null ? value.getProjectPath() : "/project/trunk")
                 );
     }
 
