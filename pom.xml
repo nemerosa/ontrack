@@ -77,6 +77,7 @@
         <module>ontrack-client</module>
         <module>ontrack-acceptance</module>
         <module>ontrack-tx</module>
+        <module>ontrack-extension-scm</module>
     </modules>
 
     <dependencyManagement>
