@@ -32,6 +32,12 @@ angular.module('ot.view.branch', [
             ).then(
                 function success(branchBuildView) {
                     $scope.branchBuildView = branchBuildView;
+                    // Selection of build boundaries
+                    var buildViews = branchBuildView.buildViews;
+                    if (buildViews) {
+                        $scope.selectedBuild.from = buildViews[0].build.id;
+                        $scope.selectedBuild.to = buildViews[buildViews.length - 1].build.id;
+                    }
                 }
             );
         }
