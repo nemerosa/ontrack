@@ -9,7 +9,14 @@ angular.module('ot.extension.svn.changelog', [
             controller: 'SVNChangeLogCtrl'
         });
     })
-    .controller('SVNChangeLogCtrl', function () {
+    .controller('SVNChangeLogCtrl', function ($location, $scope) {
+
+        // The build request
+        $scope.buildDiffRequest = {
+            branch: $location.search().branch,
+            from: $location.search().from,
+            to: $location.search().to
+        };
 
     })
 ;
