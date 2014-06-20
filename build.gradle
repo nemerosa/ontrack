@@ -28,8 +28,10 @@ task build
  * Java projects
  */
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+ext {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+}
 
 def javaProjects = subprojects.findAll { it.path != ':ontrack-web' }
 
