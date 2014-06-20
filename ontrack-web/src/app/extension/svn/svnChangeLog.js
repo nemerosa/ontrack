@@ -1,5 +1,6 @@
 angular.module('ot.extension.svn.changelog', [
-    'ui.router'
+    'ui.router',
+    'ot.service.core'
 ])
     .config(function ($stateProvider) {
         // SVN configurations
@@ -9,7 +10,7 @@ angular.module('ot.extension.svn.changelog', [
             controller: 'SVNChangeLogCtrl'
         });
     })
-    .controller('SVNChangeLogCtrl', function ($stateParams, $scope) {
+    .controller('SVNChangeLogCtrl', function ($log, $location, $stateParams, $scope, $http, ot) {
 
         // The build request
         $scope.buildDiffRequest = {
@@ -17,6 +18,20 @@ angular.module('ot.extension.svn.changelog', [
             from: $stateParams.from,
             to: $stateParams.to
         };
+
+        /**
+         * The REST end point to contact is contained by the current path, with the leading
+         * slash being removed.
+         */
+        var path = $location.path().substring(1);
+
+        /**
+         * Loads the change log
+         */
+
+        ot.call($http.get(path, {params: $scope.buildDiffRequest})).then(function (changeLog) {
+            $log.debug('changeLog=', changeLog);
+        });
 
     })
 ;
