@@ -9,7 +9,7 @@ task bowerInstall(type: Exec) {
     commandLine 'bower', 'install', '--force-latest'
 }
 
-task setup(dependsOn: [ 'npmInstall', 'bowerInstall' ])
+task setup(dependsOn: ['npmInstall', 'bowerInstall'])
 
 task clean(type: Exec, dependsOn: 'setup') {
     commandLine 'grunt', 'clean'
@@ -21,6 +21,16 @@ task release(dependsOn: ['setup', 'gruntProd']) {
     }
 }
 
+task build(dependsOn: ['setup', 'gruntDev'])
+
 task gruntProd(type: Exec) {
     commandLine 'grunt', 'prod'
 }
+
+task gruntDev(type: Exec) {
+    commandLine 'grunt', 'dev'
+}
+
+clean.mustRunAfter setup
+gruntDev.mustRunAfter setup
+gruntProd.mustRunAfter setup
