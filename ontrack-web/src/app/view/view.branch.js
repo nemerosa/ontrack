@@ -12,7 +12,7 @@ angular.module('ot.view.branch', [
             controller: 'BranchCtrl'
         });
     })
-    .controller('BranchCtrl', function ($location, $scope, $stateParams, $http, $modal, ot, otFormService, otStructureService) {
+    .controller('BranchCtrl', function ($state, $scope, $stateParams, $http, $modal, ot, otFormService, otStructureService) {
         var view = ot.view();
         // Branch's id
         var branchId = $stateParams.branchId;
@@ -141,9 +141,11 @@ angular.module('ot.view.branch', [
         $scope.buildDiff = function (action) {
             var selectedBuild = $scope.selectedBuild;
             if (selectedBuild.from && selectedBuild.to && selectedBuild.from != selectedBuild.to) {
-                location.hash = action.uri + '?branch=' + branchId +
-                    '&from=' + selectedBuild.from +
-                    '&to=' + selectedBuild.to;
+                $state.go(action.id, {
+                    branch: branchId,
+                    from: selectedBuild.from,
+                    to: selectedBuild.to
+                });
             }
         };
 
