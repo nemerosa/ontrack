@@ -2,6 +2,7 @@ angular.module('ontrack.extension.svn', [
     'ui.router',
     'ot.service.core',
     'ot.service.form',
+    'ot.extension.svn.changelog',
     'ot.extension.svn.dialog.indexation'
 ])
     .config(function ($stateProvider) {
@@ -11,6 +12,7 @@ angular.module('ontrack.extension.svn', [
             templateUrl: 'app/extension/svn/svn.configurations.tpl.html',
             controller: 'SVNConfigurationsCtrl'
         });
+
     })
     .controller('SVNConfigurationsCtrl', function ($scope, $http, $modal, ot, otFormService, otAlertService) {
         var view = ot.view();
