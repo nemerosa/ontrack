@@ -12,8 +12,11 @@ public abstract class AbstractSCMChangeLogService {
     }
 
     protected SCMChangeLog defaultChangeLog(BuildDiffRequest request) {
-        // FIXME Method net.nemerosa.ontrack.extension.svn.changelog.SVNChangeLogServiceImpl.defaultChangeLog
-        return null;
+        return SCMChangeLog.of(
+                structureService.getBranch(request.getBranch()),
+                structureService.getBuildView(structureService.getBuild(request.getFrom())),
+                structureService.getBuildView(structureService.getBuild(request.getTo()))
+        );
     }
 
 }

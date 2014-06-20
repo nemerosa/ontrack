@@ -90,17 +90,10 @@ public class BranchController extends AbstractResourceController {
         // Gets the views for each build
         return new BranchBuildView(
                 builds.stream()
-                        .map(this::toBuildView)
+                        .map(structureService::getBuildView)
                         .collect(Collectors.toList()),
                 buildDiffActions
         );
     }
 
-    private BuildView toBuildView(Build build) {
-        return new BuildView(
-                build,
-                structureService.getLastPromotionRunsForBuild(build.getId()),
-                structureService.getValidationStampRunViewsForBuild(build)
-        );
-    }
 }

@@ -268,6 +268,15 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public BuildView getBuildView(Build build) {
+        return new BuildView(
+                build,
+                getLastPromotionRunsForBuild(build.getId()),
+                getValidationStampRunViewsForBuild(build)
+        );
+    }
+
+    @Override
     public Document getValidationStampImage(ID validationStampId) {
         // Checks access
         getValidationStamp(validationStampId);
