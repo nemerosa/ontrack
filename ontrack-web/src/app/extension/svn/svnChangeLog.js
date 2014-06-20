@@ -12,11 +12,11 @@ angular.module('ot.extension.svn.changelog', [
     .controller('SVNChangeLogCtrl', function ($stateParams, $scope) {
 
         // The build request
-//        $scope.buildDiffRequest = {
-//            branch: $location.search().branch,
-//            from: $location.search().from,
-//            to: $location.search().to
-//        };
+        $scope.buildDiffRequest = {
+            branch: $stateParams.branch,
+            from: $stateParams.from,
+            to: $stateParams.to
+        };
 
     })
 ;
