@@ -5,6 +5,9 @@ import net.nemerosa.ontrack.model.structure.Branch;
 /**
  * This extension allows to an action on the selection of two {@link net.nemerosa.ontrack.model.structure.Build builds}
  * for the same {@link net.nemerosa.ontrack.model.structure.Branch branch}.
+ * <p>
+ * The {@link #getAction()} method must point to a REST endpoint that accepts a
+ * {@link net.nemerosa.ontrack.extension.api.model.BuildDiffRequest} as a <code>GET</code> parameter.
  */
 public interface BuildDiffExtension extends ActionExtension {
 
