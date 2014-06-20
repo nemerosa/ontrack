@@ -1,5 +1,8 @@
 dependencies {
     testCompile project(':ontrack-client')
+
+    testRuntime libraries.slf4j_log4j
+    testRuntime libraries.log4j
 }
 
 ext {

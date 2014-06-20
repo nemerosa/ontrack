@@ -89,7 +89,6 @@ task testReport(type: TestReport) {
     // Include the results from the `test` tasks in all Java subprojects
     reportOn javaProjects*.test, javaProjects*.integrationTest, javaProjects*.acceptanceTest
 }
-build.dependsOn testReport
 
 /**
  * Task to display the version information
