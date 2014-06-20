@@ -2,23 +2,21 @@ package net.nemerosa.ontrack.extension.svn.changelog;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import net.nemerosa.ontrack.extension.scm.changelog.SCMBuildView;
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLog;
+import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.model.structure.Branch;
-import net.nemerosa.ontrack.model.structure.BuildView;
 
 @EqualsAndHashCode(callSuper = false)
 @Data
-public class SVNChangeLog extends SCMChangeLog {
+public class SVNChangeLog extends SCMChangeLog<SVNRepository, SVNHistory> {
 
-    protected SVNChangeLog(Branch branch, BuildView fromBuild, BuildView toBuild) {
-        super(branch, fromBuild, toBuild);
+    public SVNChangeLog(
+            Branch branch,
+            SVNRepository scmBranch,
+            SCMBuildView<SVNHistory> scmBuildFrom,
+            SCMBuildView<SVNHistory> scmBuildTo) {
+        super(branch, scmBranch, scmBuildFrom, scmBuildTo);
     }
 
-    public static SVNChangeLog of(SCMChangeLog scmChangeLog) {
-        return new SVNChangeLog(
-                scmChangeLog.getBranch(),
-                scmChangeLog.getFromBuild(),
-                scmChangeLog.getToBuild()
-        );
-    }
 }

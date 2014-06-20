@@ -6,21 +6,15 @@ import lombok.Data;
  * Two builds in a branch.
  */
 @Data
-public class BuildDiff {
+public abstract class BuildDiff {
 
     /**
      * The associated branch
      */
     private final Branch branch;
 
-    /**
-     * From the build...
-     */
-    private final BuildView fromBuild;
+    public abstract BuildView getFrom();
 
-    /**
-     * ... to the build
-     */
-    private final BuildView toBuild;
+    public abstract BuildView getTo();
 
 }
