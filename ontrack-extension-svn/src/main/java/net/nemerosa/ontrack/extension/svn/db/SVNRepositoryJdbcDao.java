@@ -47,4 +47,10 @@ public class SVNRepositoryJdbcDao extends AbstractJdbcRepository implements SVNR
                 Integer.class
         );
     }
+
+    @Override
+    public int getOrCreateByName(String name) {
+        Integer id = findByName(name);
+        return id != null ? id : create(name);
+    }
 }

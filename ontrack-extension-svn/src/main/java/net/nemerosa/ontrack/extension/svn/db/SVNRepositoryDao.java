@@ -9,4 +9,6 @@ public interface SVNRepositoryDao {
     int create(String name);
 
     int getByName(String name);
+
+    int getOrCreateByName(String name);
 }
