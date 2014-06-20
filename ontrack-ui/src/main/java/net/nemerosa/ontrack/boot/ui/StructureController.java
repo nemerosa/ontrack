@@ -23,7 +23,7 @@ public class StructureController extends AbstractProjectEntityController {
     /**
      * Project access
      */
-    @RequestMapping(value = "entity/project/{project}", method = RequestMethod.GET)
+    @RequestMapping(value = "entity/project/{project:.*}", method = RequestMethod.GET)
     public Project project(@PathVariable String project) {
         return structureService.findProjectByName(project);
     }
@@ -31,7 +31,7 @@ public class StructureController extends AbstractProjectEntityController {
     /**
      * Branch access
      */
-    @RequestMapping(value = "entity/branch/{project}/{branch}", method = RequestMethod.GET)
+    @RequestMapping(value = "entity/branch/{project}/{branch:.*}", method = RequestMethod.GET)
     public Branch branch(@PathVariable String project, @PathVariable String branch) {
         return structureService.findBranchByName(project, branch);
     }
@@ -39,7 +39,7 @@ public class StructureController extends AbstractProjectEntityController {
     /**
      * Promotion level access
      */
-    @RequestMapping(value = "entity/promotionLevel/{project}/{branch}/{promotionLevel}", method = RequestMethod.GET)
+    @RequestMapping(value = "entity/promotionLevel/{project}/{branch}/{promotionLevel:.*}", method = RequestMethod.GET)
     public PromotionLevel promotionLevel(@PathVariable String project, @PathVariable String branch, @PathVariable String promotionLevel) {
         return structureService.findPromotionLevelByName(project, branch, promotionLevel);
     }
@@ -47,7 +47,7 @@ public class StructureController extends AbstractProjectEntityController {
     /**
      * Validation stamp access
      */
-    @RequestMapping(value = "entity/validationStamp/{project}/{branch}/{validationStamp}", method = RequestMethod.GET)
+    @RequestMapping(value = "entity/validationStamp/{project}/{branch}/{validationStamp:.*}", method = RequestMethod.GET)
     public ValidationStamp validationStamp(@PathVariable String project, @PathVariable String branch, @PathVariable String validationStamp) {
         return structureService.findValidationStampByName(project, branch, validationStamp);
     }
