@@ -141,7 +141,9 @@ angular.module('ot.view.branch', [
         $scope.buildDiff = function (action) {
             var selectedBuild = $scope.selectedBuild;
             if (selectedBuild.from && selectedBuild.to && selectedBuild.from != selectedBuild.to) {
-                alert('From ' + selectedBuild.from + ' to ' + selectedBuild.to);
+                location.href = '#' + action.uri + '?branch=' + branchId +
+                    '&from=' + selectedBuild.from +
+                    '&to=' + selectedBuild.to;
             }
         };
 
