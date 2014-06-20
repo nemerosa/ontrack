@@ -1,8 +1,11 @@
 package net.nemerosa.ontrack.extension.svn;
 
 import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
+import net.nemerosa.ontrack.model.structure.BuildDiff;
+import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
+import net.nemerosa.ontrack.extension.svn.changelog.SVNChangeLogService;
 import net.nemerosa.ontrack.extension.svn.indexation.IndexationRange;
 import net.nemerosa.ontrack.extension.svn.indexation.IndexationService;
 import net.nemerosa.ontrack.model.Ack;
@@ -25,14 +28,16 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
 
     private final SVNConfigurationService svnConfigurationService;
     private final IndexationService indexationService;
+    private final SVNChangeLogService changeLogService;
     private final IssueServiceRegistry issueServiceRegistry;
     private final SecurityService securityService;
 
     @Autowired
-    public SVNController(SVNExtensionFeature feature, SVNConfigurationService svnConfigurationService, IndexationService indexationService, IssueServiceRegistry issueServiceRegistry, SecurityService securityService) {
+    public SVNController(SVNExtensionFeature feature, SVNConfigurationService svnConfigurationService, IndexationService indexationService, SVNChangeLogService changeLogService, IssueServiceRegistry issueServiceRegistry, SecurityService securityService) {
         super(feature);
         this.svnConfigurationService = svnConfigurationService;
         this.indexationService = indexationService;
+        this.changeLogService = changeLogService;
         this.issueServiceRegistry = issueServiceRegistry;
         this.securityService = securityService;
     }
@@ -189,6 +194,14 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     public SVNConfiguration updateConfiguration(@PathVariable String name, @RequestBody SVNConfiguration configuration) {
         svnConfigurationService.updateConfiguration(name, configuration);
         return getConfiguration(name);
+    }
+
+    /**
+     * Change log entry point
+     */
+    @RequestMapping(value = "changelog", method = RequestMethod.GET)
+    public BuildDiff changeLog(@RequestParam BuildDiffRequest request) {
+        return changeLogService.changeLog(request);
     }
 
 }

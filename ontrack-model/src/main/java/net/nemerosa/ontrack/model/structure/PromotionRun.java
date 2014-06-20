@@ -12,7 +12,7 @@ public class PromotionRun implements ProjectEntity {
     private final ID id;
     @JsonView({PromotionRun.class})
     private final Build build;
-    @JsonView({Build.class, PromotionRun.class, BranchBuildView.class})
+    @JsonView({Build.class, PromotionRun.class, BranchBuildView.class, BuildDiff.class})
     private final PromotionLevel promotionLevel;
     private final Signature signature;
     private final String description;

@@ -7,7 +7,8 @@ import net.nemerosa.ontrack.model.structure.Branch;
  * for the same {@link net.nemerosa.ontrack.model.structure.Branch branch}.
  * <p>
  * The {@link #getAction()} method must point to a REST endpoint that accepts a
- * {@link net.nemerosa.ontrack.extension.api.model.BuildDiffRequest} as a <code>GET</code> parameter.
+ * {@link net.nemerosa.ontrack.extension.api.model.BuildDiffRequest} as a <code>GET</code> parameter and
+ * returns a {@link net.nemerosa.ontrack.model.structure.BuildDiff} as a decorated response.
  */
 public interface BuildDiffExtension extends ActionExtension {
 
