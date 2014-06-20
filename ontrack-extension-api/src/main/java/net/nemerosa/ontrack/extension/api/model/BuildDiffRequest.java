@@ -9,14 +9,14 @@ public class BuildDiffRequest {
     /**
      * Branch to get the diff on
      */
-    private final ID branch;
+    private ID branch;
     /**
      * Build ID
      */
-    private final ID from;
+    private ID from;
     /**
      * Build ID
      */
-    private final ID to;
+    private ID to;
 
 }

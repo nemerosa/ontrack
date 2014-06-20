@@ -200,7 +200,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
      * Change log entry point
      */
     @RequestMapping(value = "changelog", method = RequestMethod.GET)
-    public BuildDiff changeLog(@RequestParam BuildDiffRequest request) {
+    public BuildDiff changeLog(BuildDiffRequest request) {
         return changeLogService.changeLog(request);
     }
 
