@@ -36,4 +36,8 @@ public class SVNRepository {
             return ".*/tags/.+";
         }
     }
+
+    public String getUrl(String path) {
+        return configuration.getUrl(path);
+    }
 }

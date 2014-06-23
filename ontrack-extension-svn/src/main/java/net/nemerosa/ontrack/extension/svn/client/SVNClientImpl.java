@@ -1,7 +1,13 @@
 package net.nemerosa.ontrack.extension.svn.client;
 
+import net.nemerosa.ontrack.extension.svn.db.SVNEventDao;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
+import net.nemerosa.ontrack.extension.svn.db.TCopyEvent;
+import net.nemerosa.ontrack.extension.svn.model.SVNHistory;
+import net.nemerosa.ontrack.extension.svn.model.SVNReference;
 import net.nemerosa.ontrack.extension.svn.support.SVNLogEntryCollector;
+import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
+import net.nemerosa.ontrack.model.support.Time;
 import net.nemerosa.ontrack.tx.Transaction;
 import net.nemerosa.ontrack.tx.TransactionService;
 import org.apache.commons.lang3.StringUtils;
@@ -14,15 +20,22 @@ import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.wc.*;
 
 import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
 public class SVNClientImpl implements SVNClient {
 
+    public static final int HISTORY_MAX_DEPTH = 6;
+
+    private final SVNEventDao svnEventDao;
     private final TransactionService transactionService;
 
+    private final Pattern pathWithRevision = Pattern.compile("(.*)@(\\d+)$");
+
     @Autowired
-    public SVNClientImpl(TransactionService transactionService) {
+    public SVNClientImpl(SVNEventDao svnEventDao, TransactionService transactionService) {
+        this.svnEventDao = svnEventDao;
         this.transactionService = transactionService;
         // Repository factories
         SVNRepositoryFactoryImpl.setup();
@@ -127,6 +140,78 @@ public class SVNClientImpl implements SVNClient {
             }
         } catch (SVNException ex) {
             throw translateSVNException(ex);
+        }
+    }
+
+    @Override
+    public SVNHistory getHistory(SVNRepository repository, String path) {
+        // Gets the reference for this first path
+        SVNReference reference = getReference(repository, path);
+        // Initializes the history
+        SVNHistory history = new SVNHistory();
+        // Adds the initial reference if this a branch or trunk
+        if (isTrunkOrBranch(repository, reference.getPath())) {
+            history = history.add(reference);
+        }
+        // Loops on copies
+        int depth = HISTORY_MAX_DEPTH;
+        while (reference != null && depth > 0) {
+            depth--;
+            // Gets the reference of the source
+            SVNReference origin = getOrigin(repository, reference);
+            if (origin != null) {
+                // Adds to the history if this a branch or trunk
+                if (isTrunkOrBranch(repository, origin.getPath())) {
+                    history = history.add(origin);
+                }
+                // Going on
+                reference = origin;
+            } else {
+                reference = null;
+            }
+        }
+        // OK
+        return history;
+    }
+
+    private SVNReference getReference(SVNRepository repository, String path) {
+        Matcher matcher = pathWithRevision.matcher(path);
+        if (matcher.matches()) {
+            String pathOnly = matcher.group(1);
+            long revision = Long.parseLong(matcher.group(2), 10);
+            return getReference(repository, pathOnly, SVNRevision.create(revision));
+        } else {
+            return getReference(repository, path, SVNRevision.HEAD);
+        }
+    }
+
+    private SVNReference getReference(SVNRepository repository, String path, SVNRevision revision) {
+        String url = repository.getUrl(path);
+        SVNURL svnurl = SVNUtils.toURL(url);
+        SVNInfo info = getInfo(repository, svnurl, revision);
+        return new SVNReference(
+                path,
+                url,
+                info.getRevision().getNumber(),
+                Time.from(info.getCommittedDate(), null)
+        );
+    }
+
+    private SVNInfo getInfo(SVNRepository repository, SVNURL url, SVNRevision revision) {
+        try {
+            return getWCClient(repository).doInfo(url, revision, revision);
+        } catch (SVNException e) {
+            throw translateSVNException(e);
+        }
+    }
+
+    private SVNReference getOrigin(SVNRepository repository, SVNReference destination) {
+        // Gets the last copy event
+        TCopyEvent copyEvent = svnEventDao.getLastCopyEvent(repository.getId(), destination.getPath(), destination.getRevision());
+        if (copyEvent != null) {
+            return getReference(repository, copyEvent.getCopyFromPath(), SVNRevision.create(copyEvent.getCopyFromRevision()));
+        } else {
+            return null;
         }
     }
 

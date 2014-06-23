@@ -34,4 +34,18 @@ public class SVNEventJdbcDao extends AbstractJdbcRepository implements SVNEventD
                         .addValue("repository", repositoryId)
                         .addValue("path", path));
     }
+
+    @Override
+    public TCopyEvent getLastCopyEvent(int repositoryId, String path, long revision) {
+        return getFirstItem(
+                "SELECT * FROM EXT_SVN_COPY WHERE REPOSITORY = :repository AND COPYTOPATH = :path AND REVISION <= :revision ORDER BY REVISION DESC LIMIT 1",
+                params("path", path).addValue("revision", revision).addValue("repository", repositoryId),
+                (rs, rowNum) -> new TCopyEvent(
+                        rs.getInt("repository"),
+                        rs.getLong("revision"),
+                        rs.getString("copyFromPath"),
+                        rs.getLong("copyFromRevision"),
+                        rs.getString("copyToPath")
+                ));
+    }
 }

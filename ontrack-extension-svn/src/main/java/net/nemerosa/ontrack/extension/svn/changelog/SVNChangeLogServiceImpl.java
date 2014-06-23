@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.extension.svn.UnknownBuildPathExpression;
 import net.nemerosa.ontrack.extension.svn.client.SVNClient;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepositoryDao;
+import net.nemerosa.ontrack.extension.svn.model.SVNHistory;
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty;
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType;
 import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationProperty;
@@ -69,8 +70,7 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
         // Gets the build path for the branch
         String svnBuildPath = getSVNBuildPath(build);
         // Gets the history from the SVN client
-        // FIXME return svnClient.getHistory(svnRepository, svnBuildPath);
-        return null;
+        return svnClient.getHistory(svnRepository, svnBuildPath);
     }
 
     protected String getSVNBuildPath(Build build) {
