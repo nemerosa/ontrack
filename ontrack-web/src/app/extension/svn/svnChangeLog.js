@@ -41,6 +41,17 @@ angular.module('ot.extension.svn.changelog', [
 
         ot.pageCall($http.get(path, {params: $scope.buildDiffRequest})).then(function (changeLog) {
             $scope.changeLog = changeLog;
+
+            // Loading the revisions if needed
+            $scope.changeLogRevisions = function () {
+                // Loads the revisions if needed
+                if (!$scope.revisions) {
+                    ot.pageCall($http.get($scope.changeLog._revisions)).then(function (revisions) {
+                        $scope.revisions = revisions;
+                    });
+                    // TODO Navigates to the revisions section
+                }
+            };
         });
 
     })
