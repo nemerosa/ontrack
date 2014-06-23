@@ -117,6 +117,13 @@
                         {{revisionsCommand}}
                     </button>
                 </li>
+                <li>
+                    <button class="btn btn-default" ng-click="changeLogIssues()" ng-disabled="issuesLoading">
+                        <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="issues"></span>
+                        <span class="ot-extension-scm-changelog-command-loading"></span>
+                        {{issuesCommand}}
+                    </button>
+                </li>
             </ul>
         </div>
     </div>

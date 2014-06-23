@@ -43,23 +43,36 @@ angular.module('ot.extension.svn.changelog', [
             $scope.changeLog = changeLog;
 
             $scope.revisionsCommand = "Revisions";
+            $scope.issuesCommand = "Issues";
 
             // Loading the revisions if needed
             $scope.changeLogRevisions = function () {
-                // Loads the revisions if needed
                 if (!$scope.revisions) {
                     $scope.revisionsLoading = true;
                     $scope.revisionsCommand = "Loading the revisions...";
                     ot.pageCall($http.get($scope.changeLog._revisions)).then(function (revisions) {
                         $scope.revisions = revisions;
-                        $log.info('Revisions loaded: ', $scope.revisions);
-                        // TODO Navigates to the revisions section (after it has been displayed)
-                        $location.hash('revisions');
-                        $anchorScroll();
                         $scope.revisionsLoading = false;
                         $scope.revisionsCommand = "Revisions";
                     });
                 }
+                $location.hash('revisions');
+                $anchorScroll();
+            };
+
+            // Loading the issues if needed
+            $scope.changeLogIssues = function () {
+                if (!$scope.issues) {
+                    $scope.issuesLoading = true;
+                    $scope.issuesCommand = "Loading the issues...";
+                    ot.pageCall($http.get($scope.changeLog._issues)).then(function (issues) {
+                        $scope.issues = issues;
+                        $scope.issuesLoading = false;
+                        $scope.issuesCommand = "Issues";
+                    });
+                }
+                $location.hash('issues');
+                $anchorScroll();
             };
         });
 
