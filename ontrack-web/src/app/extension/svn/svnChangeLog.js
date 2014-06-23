@@ -19,6 +19,14 @@ angular.module('ot.extension.svn.changelog', [
             to: $stateParams.to
         };
 
+        // The view
+        var view = ot.view();
+        view.title = "Subversion change log";
+        view.description = "Loading change log...";
+
+        // Loading the branch
+        //view.breadcrumbs = ot.branchBreadcrumbs(build.branch);
+
         /**
          * The REST end point to contact is contained by the current path, with the leading
          * slash being removed.
@@ -30,7 +38,7 @@ angular.module('ot.extension.svn.changelog', [
          */
 
         ot.pageCall($http.get(path, {params: $scope.buildDiffRequest})).then(function (changeLog) {
-            $log.debug('changeLog=', changeLog);
+            $scope.changeLog = changeLog;
         });
 
     })
