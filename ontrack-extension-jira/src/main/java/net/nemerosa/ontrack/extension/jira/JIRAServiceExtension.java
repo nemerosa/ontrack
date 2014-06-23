@@ -128,7 +128,7 @@ public class JIRAServiceExtension extends AbstractIssueServiceExtension {
         try (Transaction tx = transactionService.start()) {
             JIRASession session = getJIRASession(tx, configuration);
             // Gets the JIRA issue
-            return session.getClient().getIssue(key);
+            return session.getClient().getIssue(key, configuration);
         }
     }
 
