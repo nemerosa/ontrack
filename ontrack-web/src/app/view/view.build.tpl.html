@@ -3,19 +3,7 @@
         <div class="col-md-12">
             <ot-section-title>Promotions</ot-section-title>
             <div class="well">
-                <span ng-repeat="promotionRun in promotionRunCollection.resources">
-                    <span class="ot-promotion-run">
-                        <ot-entity-image entity="promotionRun.promotionLevel"
-                                         link="#/promotionLevel/{{promotionRun.promotionLevel.id}}">
-                            {{promotionRun.promotionLevel.name}}
-                        </ot-entity-image>
-                        <span class="ot-promotion-run-signature">
-                            {{promotionRun.signature.time | date:'mediumDate'}}
-                            {{promotionRun.signature.time | date:'shortTime'}}
-                        </span>
-                    </span>
-                    <span ng-if="!$last" class="ot-promotion-run-separator"></span>
-                </span>
+                <ot-build-promotion-runs promotion-runs="promotionRunCollection.resources"></ot-build-promotion-runs>
             </div>
         </div>
     </div>

@@ -37,6 +37,15 @@ angular.module('ot.directive.entity', [
             }
         };
     })
+    .directive('otBuildPromotionRuns', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'app/directive/directive.buildPromotionRuns.tpl.html',
+            scope: {
+                promotionRuns: '='
+            }
+        };
+    })
     .directive('otValidationRunStatus', function () {
         return {
             restrict: 'E',
