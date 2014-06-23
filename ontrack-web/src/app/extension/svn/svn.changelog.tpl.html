@@ -61,6 +61,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <a name="revisions"></a>
+
                     <div class="panel panel-default">
                         <div class="panel-heading">Revisions</div>
                         <div class="panel-body">
@@ -72,12 +73,12 @@
                             <!-- TODO Merge -->
                             <table class="table table-condensed table-hover" ng-show="revisions">
                                 <thead>
-                                    <tr>
-                                        <th>Revision</th>
-                                        <th>Author</th>
-                                        <th>Date</th>
-                                        <th>Message</th>
-                                    </tr>
+                                <tr>
+                                    <th>Revision</th>
+                                    <th>Author</th>
+                                    <th>Date</th>
+                                    <th>Message</th>
+                                </tr>
                                 </thead>
                                 <tbody>
                                 <tr ng-repeat="svnChangeLogRevision in revisions.list">
@@ -104,6 +105,26 @@
             </div>
 
             <!-- End of sections -->
+
+            <!-- Revision sections -->
+            <div class="row">
+                <div class="col-md-12">
+                    <a name="issues"></a>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Issues</div>
+                        <div class="panel-body">
+                            <div class="alert alert-warning" ng-hide="revisions">
+                                No issue has been loaded yet. Click
+                                <a ng-click="changeLogIssues()">here</a>
+                                to load them.
+                            </div>
+                            <table class="table table-condensed table-hover" ng-show="issues">
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
         </div>
 
