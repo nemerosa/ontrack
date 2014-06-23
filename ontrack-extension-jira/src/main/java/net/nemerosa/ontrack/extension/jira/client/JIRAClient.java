@@ -6,4 +6,5 @@ public interface JIRAClient {
 
     JIRAIssue getIssue(String key);
 
+    void close();
 }

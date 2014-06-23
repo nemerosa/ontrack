@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.jira;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtension;
@@ -129,44 +128,7 @@ public class JIRAServiceExtension extends AbstractIssueServiceExtension {
         try (Transaction tx = transactionService.start()) {
             JIRASession session = getJIRASession(tx, configuration);
             // Gets the JIRA issue
-            JIRAIssue issue = session.getClient().getIssue(key);
-
-            // TODO Translation of fields
-//                List<JIRAField> fields = issue.get
-//                        Lists.newArrayList(
-//                        Iterables.transform(
-//                                issue.getFields(),
-//                                new Function<IssueField, JIRAField>() {
-//                                    @Override
-//                                    public JIRAField apply(IssueField f) {
-//                                        return toField(f);
-//                                    }
-//                                }
-//                        )
-//                );
-
-            // TODO Versions
-//                List<JIRAVersion> affectedVersions = toVersions(issue.getAffectedVersions());
-//                List<JIRAVersion> fixVersions = toVersions(issue.getFixVersions());
-
-            // TODO Status
-//                JIRAStatus status = toStatus(configuration, issue.getStatus());
-
-            // TODO JIRA issue
-//                return new JIRAIssue(
-//                        getIssueURL(configuration, issue.getKey()),
-//                        issue.getKey(),
-//                        issue.getSummary(),
-//                        status,
-//                        getUserName(issue.getAssignee()),
-//                        issue.getUpdateDate(),
-//                        fields,
-//                        affectedVersions,
-//                        fixVersions
-//                );
-
-            // OK
-            return issue;
+            return session.getClient().getIssue(key);
         }
     }
 
