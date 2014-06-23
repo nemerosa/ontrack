@@ -17,8 +17,11 @@ import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropert
 import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationProperty;
 import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationPropertyType;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.tx.Transaction;
+import net.nemerosa.ontrack.tx.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,6 +33,7 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
     private final SVNRepositoryDao repositoryDao;
     private final IssueServiceRegistry issueServiceRegistry;
     private final SVNClient svnClient;
+    private final TransactionService transactionService;
 
     @Autowired
     public SVNChangeLogServiceImpl(
@@ -37,24 +41,28 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
             PropertyService propertyService,
             SVNRepositoryDao repositoryDao,
             IssueServiceRegistry issueServiceRegistry,
-            SVNClient svnClient) {
+            SVNClient svnClient, TransactionService transactionService) {
         super(structureService);
         this.propertyService = propertyService;
         this.repositoryDao = repositoryDao;
         this.issueServiceRegistry = issueServiceRegistry;
         this.svnClient = svnClient;
+        this.transactionService = transactionService;
     }
 
     @Override
+    @Transactional
     public SVNChangeLog changeLog(BuildDiffRequest request) {
-        Branch branch = structureService.getBranch(request.getBranch());
-        SVNRepository svnRepository = getSVNRepository(branch);
-        return new SVNChangeLog(
-                branch,
-                svnRepository,
-                getSCMBuildView(svnRepository, request.getFrom()),
-                getSCMBuildView(svnRepository, request.getTo())
-        );
+        try (Transaction ignored = transactionService.start()) {
+            Branch branch = structureService.getBranch(request.getBranch());
+            SVNRepository svnRepository = getSVNRepository(branch);
+            return new SVNChangeLog(
+                    branch,
+                    svnRepository,
+                    getSCMBuildView(svnRepository, request.getFrom()),
+                    getSCMBuildView(svnRepository, request.getTo())
+            );
+        }
     }
 
     protected SCMBuildView<SVNHistory> getSCMBuildView(SVNRepository svnRepository, ID buildId) {

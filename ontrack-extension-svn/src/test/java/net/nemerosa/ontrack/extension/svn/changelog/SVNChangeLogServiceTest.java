@@ -15,8 +15,8 @@ public class SVNChangeLogServiceTest {
                 null,
                 null,
                 null,
-                null
-        );
+                null,
+                null);
         assertEquals("/project/tags/v1", service.expandBuildPath("/project/tags/v{build}", build()));
     }
 
@@ -27,8 +27,8 @@ public class SVNChangeLogServiceTest {
                 null,
                 null,
                 null,
-                null
-        );
+                null,
+                null);
         service.expandBuildPath("/project/tags/v{test}", build());
     }
 
@@ -39,8 +39,8 @@ public class SVNChangeLogServiceTest {
                 null,
                 null,
                 null,
-                null
-        );
+                null,
+                null);
         assertEquals("1", service.expandBuildPathExpression("build", build()));
     }
 
@@ -51,8 +51,8 @@ public class SVNChangeLogServiceTest {
                 null,
                 null,
                 null,
-                null
-        );
+                null,
+                null);
         service.expandBuildPathExpression("test", build());
     }
 
