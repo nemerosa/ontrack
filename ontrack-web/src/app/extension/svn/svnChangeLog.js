@@ -11,7 +11,7 @@ angular.module('ot.extension.svn.changelog', [
             controller: 'SVNChangeLogCtrl'
         });
     })
-    .controller('SVNChangeLogCtrl', function ($q, $log, $interpolate, $location, $stateParams, $scope, $http, ot, otStructureService) {
+    .controller('SVNChangeLogCtrl', function ($q, $log, $interpolate, $anchorScroll, $location, $stateParams, $scope, $http, ot, otStructureService) {
 
         // The build request
         $scope.buildDiffRequest = {
@@ -49,7 +49,9 @@ angular.module('ot.extension.svn.changelog', [
                     ot.pageCall($http.get($scope.changeLog._revisions)).then(function (revisions) {
                         $scope.revisions = revisions;
                         $log.info('Revisions loaded: ', $scope.revisions);
-                        // TODO Navigates to the revisions section
+                        // TODO Navigates to the revisions section (after it has been displayed)
+                        $location.hash('revisions');
+                        $anchorScroll();
                     });
                 }
             };

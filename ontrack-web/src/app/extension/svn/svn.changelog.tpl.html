@@ -35,7 +35,7 @@
                     </ot-scm-changelog-build>
                 </div>
                 <div class="col-md-6">
-                    <a name="buildTo"></a>
+                    <a id="buildTo"></a>
                     <ot-scm-changelog-build scm-build-view="changeLog.scmBuildTo">
                         <div class="row">
                             <div class="col-md-12">
@@ -58,12 +58,18 @@
             </div>
 
             <!-- Revision sections -->
-            <div class="row" ng-show="revisions">
+            <div class="row">
                 <div class="col-md-12">
+                    <a name="revisions"></a>
                     <div class="panel panel-default">
                         <div class="panel-heading">Revisions</div>
                         <div class="panel-body">
-                            <table class="table table-condensed table-hover">
+                            <div class="alert alert-warning" ng-hide="revisions">
+                                No revision has been loaded yet. Click
+                                <a ng-click="changeLogRevisions()">here</a>
+                                to load them.
+                            </div>
+                            <table class="table table-condensed table-hover" ng-show="revisions">
                                 <thead>
                                     <tr>
                                         <th>Revision</th>
