@@ -17,6 +17,13 @@
                     <div class="col-md-12">
                         <h3><small>History</small></h3>
                         <ul class="ot-extension-svn-build-history">
+                            <li ng-repeat="reference in changeLog.scmBuildFrom.scm.references">
+                                <a href="{{reference.url}}">
+                                    {{reference.path}}
+                                    @
+                                    {{reference.revision}}
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -24,7 +31,20 @@
         </div>
         <div class="col-md-6">
             <ot-scm-changelog-build scm-build-view="changeLog.scmBuildTo">
-                HISTORY!
+                <div class="row">
+                    <div class="col-md-12">
+                        <h3><small>History</small></h3>
+                        <ul class="ot-extension-svn-build-history">
+                            <li ng-repeat="reference in changeLog.scmBuildTo.scm.references">
+                                <a href="{{reference.url}}">
+                                    {{reference.path}}
+                                    @
+                                    {{reference.revision}}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </ot-scm-changelog-build>
         </div>
     </div>
