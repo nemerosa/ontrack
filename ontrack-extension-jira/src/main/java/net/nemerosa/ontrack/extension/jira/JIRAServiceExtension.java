@@ -1,8 +1,14 @@
 package net.nemerosa.ontrack.extension.jira;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtension;
+import net.nemerosa.ontrack.extension.jira.model.JIRAIssue;
+import net.nemerosa.ontrack.extension.jira.tx.JIRASession;
+import net.nemerosa.ontrack.extension.jira.tx.JIRASessionFactory;
+import net.nemerosa.ontrack.tx.Transaction;
+import net.nemerosa.ontrack.tx.TransactionService;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -24,11 +30,19 @@ public class JIRAServiceExtension extends AbstractIssueServiceExtension {
 
     public static final String SERVICE = "jira";
     private final JIRAConfigurationService jiraConfigurationService;
+    private final JIRASessionFactory jiraSessionFactory;
+    private final TransactionService transactionService;
 
     @Autowired
-    public JIRAServiceExtension(JIRAExtensionFeature extensionFeature, JIRAConfigurationService jiraConfigurationService) {
+    public JIRAServiceExtension(
+            JIRAExtensionFeature extensionFeature,
+            JIRAConfigurationService jiraConfigurationService,
+            JIRASessionFactory jiraSessionFactory,
+            TransactionService transactionService) {
         super(extensionFeature, SERVICE, "JIRA");
         this.jiraConfigurationService = jiraConfigurationService;
+        this.jiraSessionFactory = jiraSessionFactory;
+        this.transactionService = transactionService;
     }
 
     @Override
@@ -108,8 +122,55 @@ public class JIRAServiceExtension extends AbstractIssueServiceExtension {
 
     @Override
     public Issue getIssue(IssueServiceConfiguration issueServiceConfiguration, String issueKey) {
-        // FIXME Method net.nemerosa.ontrack.extension.jira.JIRAServiceExtension.getIssue
-        return null;
+        return getIssue((JIRAConfiguration) issueServiceConfiguration, issueKey);
+    }
+
+    public JIRAIssue getIssue(JIRAConfiguration configuration, String key) {
+        try (Transaction tx = transactionService.start()) {
+            JIRASession session = getJIRASession(tx, configuration);
+            // Gets the JIRA issue
+            JsonNode issue = session.getClient().getIssue(key);
+
+            // TODO Translation of fields
+//                List<JIRAField> fields = issue.get
+//                        Lists.newArrayList(
+//                        Iterables.transform(
+//                                issue.getFields(),
+//                                new Function<IssueField, JIRAField>() {
+//                                    @Override
+//                                    public JIRAField apply(IssueField f) {
+//                                        return toField(f);
+//                                    }
+//                                }
+//                        )
+//                );
+
+            // TODO Versions
+//                List<JIRAVersion> affectedVersions = toVersions(issue.getAffectedVersions());
+//                List<JIRAVersion> fixVersions = toVersions(issue.getFixVersions());
+
+            // TODO Status
+//                JIRAStatus status = toStatus(configuration, issue.getStatus());
+
+            // TODO JIRA issue
+//                return new JIRAIssue(
+//                        getIssueURL(configuration, issue.getKey()),
+//                        issue.getKey(),
+//                        issue.getSummary(),
+//                        status,
+//                        getUserName(issue.getAssignee()),
+//                        issue.getUpdateDate(),
+//                        fields,
+//                        affectedVersions,
+//                        fixVersions
+//                );
+
+            return null;
+        }
+    }
+
+    private JIRASession getJIRASession(Transaction tx, final JIRAConfiguration configuration) {
+        return tx.getResource(JIRASession.class, configuration.getName(), () -> jiraSessionFactory.create(configuration));
     }
 
     protected Set<String> extractJIRAIssuesFromMessage(JIRAConfiguration configuration, String message) {
