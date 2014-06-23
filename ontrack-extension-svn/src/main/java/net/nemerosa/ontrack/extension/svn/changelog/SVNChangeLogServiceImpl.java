@@ -4,15 +4,23 @@ import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.scm.changelog.AbstractSCMChangeLogService;
 import net.nemerosa.ontrack.extension.scm.changelog.SCMBuildView;
+import net.nemerosa.ontrack.extension.svn.MissingSVNBranchConfigurationException;
 import net.nemerosa.ontrack.extension.svn.MissingSVNProjectConfigurationException;
 import net.nemerosa.ontrack.extension.svn.SVNConfiguration;
+import net.nemerosa.ontrack.extension.svn.UnknownBuildPathExpression;
+import net.nemerosa.ontrack.extension.svn.client.SVNClient;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepositoryDao;
+import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty;
+import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType;
 import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationProperty;
 import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationPropertyType;
 import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService implements SVNChangeLogService {
@@ -20,15 +28,20 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
     private final PropertyService propertyService;
     private final SVNRepositoryDao repositoryDao;
     private final IssueServiceRegistry issueServiceRegistry;
+    private final SVNClient svnClient;
 
     @Autowired
     public SVNChangeLogServiceImpl(
             StructureService structureService,
-            PropertyService propertyService, SVNRepositoryDao repositoryDao, IssueServiceRegistry issueServiceRegistry) {
+            PropertyService propertyService,
+            SVNRepositoryDao repositoryDao,
+            IssueServiceRegistry issueServiceRegistry,
+            SVNClient svnClient) {
         super(structureService);
         this.propertyService = propertyService;
         this.repositoryDao = repositoryDao;
         this.issueServiceRegistry = issueServiceRegistry;
+        this.svnClient = svnClient;
     }
 
     @Override
@@ -52,9 +65,51 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
         return new SCMBuildView<>(buildView, history);
     }
 
-    private SVNHistory getBuildSVNHistory(SVNRepository svnRepository, Build build) {
-        // FIXME Method net.nemerosa.ontrack.extension.svn.changelog.SVNChangeLogServiceImpl.getBuildSVNHistory
+    protected SVNHistory getBuildSVNHistory(SVNRepository svnRepository, Build build) {
+        // Gets the build path for the branch
+        String svnBuildPath = getSVNBuildPath(build);
+        // Gets the history from the SVN client
+        // FIXME return svnClient.getHistory(svnRepository, svnBuildPath);
         return null;
+    }
+
+    protected String getSVNBuildPath(Build build) {
+        // Gets the build path property value
+        Property<SVNBranchConfigurationProperty> branchConfiguration = propertyService.getProperty(
+                build.getBranch(),
+                SVNBranchConfigurationPropertyType.class
+        );
+        if (branchConfiguration.isEmpty()) {
+            throw new MissingSVNBranchConfigurationException(build.getBranch().getName());
+        } else {
+            // Gets the build path definition
+            String buildPathDefinition = branchConfiguration.getValue().getBuildPath();
+            // Expands the build path
+            return expandBuildPath(buildPathDefinition, build);
+        }
+    }
+
+    protected String expandBuildPath(String buildPathDefinition, Build build) {
+        // Pattern
+        Pattern pattern = Pattern.compile("\\{([^}]+)\\}");
+        Matcher matcher = pattern.matcher(buildPathDefinition);
+        StringBuffer path = new StringBuffer();
+        while (matcher.find()) {
+            String replacement = expandBuildPathExpression(matcher.group(1), build);
+            matcher.appendReplacement(path, replacement);
+        }
+        matcher.appendTail(path);
+        // TODO Property expansion
+        // OK
+        return path.toString();
+    }
+
+    protected String expandBuildPathExpression(String expression, Build build) {
+        if ("build".equals(expression)) {
+            return build.getName();
+        } else {
+            throw new UnknownBuildPathExpression(expression);
+        }
     }
 
     protected SVNRepository getSVNRepository(Branch branch) {
