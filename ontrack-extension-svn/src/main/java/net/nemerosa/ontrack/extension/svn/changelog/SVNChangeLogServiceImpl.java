@@ -16,6 +16,7 @@ import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropert
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType;
 import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationProperty;
 import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationPropertyType;
+import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.tx.Transaction;
 import net.nemerosa.ontrack.tx.TransactionService;
@@ -34,6 +35,7 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
     private final IssueServiceRegistry issueServiceRegistry;
     private final SVNClient svnClient;
     private final TransactionService transactionService;
+    private final SecurityService securityService;
 
     @Autowired
     public SVNChangeLogServiceImpl(
@@ -41,13 +43,14 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
             PropertyService propertyService,
             SVNRepositoryDao repositoryDao,
             IssueServiceRegistry issueServiceRegistry,
-            SVNClient svnClient, TransactionService transactionService) {
+            SVNClient svnClient, TransactionService transactionService, SecurityService securityService) {
         super(structureService);
         this.propertyService = propertyService;
         this.repositoryDao = repositoryDao;
         this.issueServiceRegistry = issueServiceRegistry;
         this.svnClient = svnClient;
         this.transactionService = transactionService;
+        this.securityService = securityService;
     }
 
     @Override
@@ -130,11 +133,11 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
             throw new MissingSVNProjectConfigurationException(branch.getProject().getName());
         } else {
             SVNConfiguration configuration = projectConfiguration.getValue().getConfiguration();
-            return SVNRepository.of(
+            return securityService.asAdmin(() -> SVNRepository.of(
                     repositoryDao.getOrCreateByName(configuration.getName()),
                     configuration,
                     issueServiceRegistry.getConfiguredIssueService(configuration.getIssueServiceConfigurationIdentifier())
-            );
+            ));
         }
     }
 
