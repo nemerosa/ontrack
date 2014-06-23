@@ -10,6 +10,14 @@
                 <ot-build-promotion-runs promotion-runs="scmBuildView.buildView.promotionRuns"></ot-build-promotion-runs>
             </div>
         </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h3><small>Validation runs</small></h3>
+                <span ng-repeat="validationStampRunView in scmBuildView.buildView.validationStampRunViews">
+                    <ot-validation-stamp-run-view validation-stamp-run-view="validationStampRunView"></ot-validation-stamp-run-view>
+                </span>
+            </div>
+        </div>
     </div>
 </div>
 
