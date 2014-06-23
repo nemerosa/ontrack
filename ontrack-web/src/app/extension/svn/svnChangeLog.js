@@ -42,16 +42,22 @@ angular.module('ot.extension.svn.changelog', [
         ot.pageCall($http.get(path, {params: $scope.buildDiffRequest})).then(function (changeLog) {
             $scope.changeLog = changeLog;
 
+            $scope.revisionsCommand = "Revisions";
+
             // Loading the revisions if needed
             $scope.changeLogRevisions = function () {
                 // Loads the revisions if needed
                 if (!$scope.revisions) {
+                    $scope.revisionsLoading = true;
+                    $scope.revisionsCommand = "Loading the revisions...";
                     ot.pageCall($http.get($scope.changeLog._revisions)).then(function (revisions) {
                         $scope.revisions = revisions;
                         $log.info('Revisions loaded: ', $scope.revisions);
                         // TODO Navigates to the revisions section (after it has been displayed)
                         $location.hash('revisions');
                         $anchorScroll();
+                        $scope.revisionsLoading = false;
+                        $scope.revisionsCommand = "Revisions";
                     });
                 }
             };
