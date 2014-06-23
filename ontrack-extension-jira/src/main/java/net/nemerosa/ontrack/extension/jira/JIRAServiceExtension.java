@@ -129,7 +129,7 @@ public class JIRAServiceExtension extends AbstractIssueServiceExtension {
         try (Transaction tx = transactionService.start()) {
             JIRASession session = getJIRASession(tx, configuration);
             // Gets the JIRA issue
-            JsonNode issue = session.getClient().getIssue(key);
+            JIRAIssue issue = session.getClient().getIssue(key);
 
             // TODO Translation of fields
 //                List<JIRAField> fields = issue.get
@@ -165,7 +165,8 @@ public class JIRAServiceExtension extends AbstractIssueServiceExtension {
 //                        fixVersions
 //                );
 
-            return null;
+            // OK
+            return issue;
         }
     }
 

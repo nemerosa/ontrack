@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.extension.jira.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.extension.jira.model.JIRAIssue;
 
 public interface JIRAClient {
 
-    JsonNode getIssue(String key);
+    JIRAIssue getIssue(String key);
 
 }
