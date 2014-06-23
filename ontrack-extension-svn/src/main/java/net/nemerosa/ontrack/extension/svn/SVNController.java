@@ -213,11 +213,15 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
      */
     @RequestMapping(value = "changelog", method = RequestMethod.GET)
     public BuildDiff changeLog(BuildDiffRequest request) {
-        return changeLogService.changeLog(request);
+        SVNChangeLog changeLog = changeLogService.changeLog(request);
+        // Stores in cache
+        logCache.put(changeLog.getUuid(), changeLog);
+        // OK
+        return changeLog;
     }
 
     /**
-     * TODO Change log revisions
+     * Change log revisions
      */
     @RequestMapping(value = "changelog/{uuid}/revisions", method = RequestMethod.GET)
     public SVNChangeLogRevisions changeLogRevisions(@PathVariable String uuid) {
