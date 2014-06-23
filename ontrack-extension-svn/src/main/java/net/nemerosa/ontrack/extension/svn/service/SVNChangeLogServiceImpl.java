@@ -1,14 +1,13 @@
-package net.nemerosa.ontrack.extension.svn.changelog;
+package net.nemerosa.ontrack.extension.svn.service;
 
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.scm.changelog.AbstractSCMChangeLogService;
 import net.nemerosa.ontrack.extension.scm.changelog.SCMBuildView;
-import net.nemerosa.ontrack.extension.svn.*;
 import net.nemerosa.ontrack.extension.svn.client.SVNClient;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepositoryDao;
-import net.nemerosa.ontrack.extension.svn.model.SVNHistory;
+import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty;
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType;
 import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationProperty;

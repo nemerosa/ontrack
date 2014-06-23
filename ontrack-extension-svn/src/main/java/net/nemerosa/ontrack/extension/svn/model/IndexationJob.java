@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.svn.indexation;
+package net.nemerosa.ontrack.extension.svn.model;
 
 
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;

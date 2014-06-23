@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.extension.svn.property;
 
 import lombok.Data;
-import net.nemerosa.ontrack.extension.svn.SVNConfiguration;
+import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration;
 
 /**
  * Associates a {@link net.nemerosa.ontrack.model.structure.Project} with a
- * {@link net.nemerosa.ontrack.extension.svn.SVNConfiguration}.
+ * {@link net.nemerosa.ontrack.extension.svn.model.SVNConfiguration}.
  */
 @Data
 public class SVNProjectConfigurationProperty {

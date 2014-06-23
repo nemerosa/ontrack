@@ -1,15 +1,16 @@
-package net.nemerosa.ontrack.extension.svn.indexation;
+package net.nemerosa.ontrack.extension.svn.service;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtension;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
-import net.nemerosa.ontrack.extension.svn.LastRevisionInfo;
-import net.nemerosa.ontrack.extension.svn.SVNConfiguration;
-import net.nemerosa.ontrack.extension.svn.SVNConfigurationService;
+import net.nemerosa.ontrack.extension.svn.model.LastRevisionInfo;
+import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration;
 import net.nemerosa.ontrack.extension.svn.client.SVNClient;
 import net.nemerosa.ontrack.extension.svn.db.*;
+import net.nemerosa.ontrack.extension.svn.model.IndexationJob;
+import net.nemerosa.ontrack.extension.svn.model.IndexationRange;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.*;

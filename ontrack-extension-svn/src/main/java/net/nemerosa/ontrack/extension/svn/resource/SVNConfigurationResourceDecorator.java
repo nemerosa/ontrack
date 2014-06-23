@@ -1,5 +1,7 @@
-package net.nemerosa.ontrack.extension.svn;
+package net.nemerosa.ontrack.extension.svn.resource;
 
+import net.nemerosa.ontrack.extension.svn.SVNController;
+import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.ResourceContext;

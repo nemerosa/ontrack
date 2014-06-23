@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.svn;
+package net.nemerosa.ontrack.extension.svn.model;
 
 import net.nemerosa.ontrack.common.BaseException;
 

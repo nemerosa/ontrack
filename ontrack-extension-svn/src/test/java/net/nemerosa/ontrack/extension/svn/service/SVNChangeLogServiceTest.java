@@ -1,6 +1,7 @@
-package net.nemerosa.ontrack.extension.svn.changelog;
+package net.nemerosa.ontrack.extension.svn.service;
 
-import net.nemerosa.ontrack.extension.svn.UnknownBuildPathExpression;
+import net.nemerosa.ontrack.extension.svn.model.UnknownBuildPathExpression;
+import net.nemerosa.ontrack.extension.svn.service.SVNChangeLogServiceImpl;
 import net.nemerosa.ontrack.model.structure.*;
 import org.junit.Test;
 

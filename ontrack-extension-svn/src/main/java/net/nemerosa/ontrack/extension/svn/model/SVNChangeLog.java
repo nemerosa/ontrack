@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.svn.changelog;
+package net.nemerosa.ontrack.extension.svn.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

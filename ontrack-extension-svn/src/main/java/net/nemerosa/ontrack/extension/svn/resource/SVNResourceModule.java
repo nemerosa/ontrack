@@ -1,6 +1,5 @@
-package net.nemerosa.ontrack.extension.svn;
+package net.nemerosa.ontrack.extension.svn.resource;
 
-import net.nemerosa.ontrack.extension.svn.changelog.SVNChangeLogResourceDecorator;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceModule;
 import net.nemerosa.ontrack.ui.resource.ResourceDecorator;
 import org.springframework.stereotype.Component;

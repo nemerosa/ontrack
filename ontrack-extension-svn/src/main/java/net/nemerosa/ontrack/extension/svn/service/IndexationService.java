@@ -1,6 +1,7 @@
-package net.nemerosa.ontrack.extension.svn.indexation;
+package net.nemerosa.ontrack.extension.svn.service;
 
-import net.nemerosa.ontrack.extension.svn.LastRevisionInfo;
+import net.nemerosa.ontrack.extension.svn.model.LastRevisionInfo;
+import net.nemerosa.ontrack.extension.svn.model.IndexationRange;
 
 public interface IndexationService {
 

@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
-import net.nemerosa.ontrack.extension.svn.SVNConfiguration;
+import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration;
 import org.apache.commons.lang3.StringUtils;
 
 @Data
