@@ -1,21 +1,21 @@
 <ot-view>
 
-    <div class="row">
-        <div class="col-md-12">
-            <div class="ot-description">
-                Change log from
-                <a href="#/build/{{buildFrom.id}}">{{buildFrom.name}}</a>
-                to
-                <a href="#/build/{{buildTo.id}}">{{buildTo.name}}</a>
-                <br/>
-                <br/>
-            </div>
+    <div class="row" ng-hide="changeLog">
+        <div class="col-md-12 alert alert-warning">
+            The change log is loading. This may take some time...
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-12 alert alert-warning">
-            The change log is loading. This may take some time...
+    <!-- TODO Quick links and activation of detailed change logs -->
+
+    <!-- Main information -->
+
+    <div class="row" ng-show="changeLog">
+        <div class="col-md-6">
+            <ot-scm-changelog-build scm-build-view="changeLog.scmBuildFrom"></ot-scm-changelog-build>
+        </div>
+        <div class="col-md-6">
+            <ot-scm-changelog-build scm-build-view="changeLog.scmBuildTo"></ot-scm-changelog-build>
         </div>
     </div>
 

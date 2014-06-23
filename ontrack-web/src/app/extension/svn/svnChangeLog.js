@@ -29,16 +29,6 @@ angular.module('ot.extension.svn.changelog', [
             view.breadcrumbs = ot.branchBreadcrumbs(branch);
         });
 
-        // Loading the builds
-        $q.all([
-            otStructureService.getBuild($stateParams.from),
-            otStructureService.getBuild($stateParams.to)
-        ]).then(function (result) {
-            $scope.buildFrom = result[0];
-            $scope.buildTo = result[1];
-        });
-        // otStructureService.getBuild($stateParams.from).then(function (build1))
-
         /**
          * The REST end point to contact is contained by the current path, with the leading
          * slash being removed.

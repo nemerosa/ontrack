@@ -1,5 +1,6 @@
 angular.module('ontrack.extension.svn', [
     'ui.router',
+    'ontrack.extension.scm',
     'ot.service.core',
     'ot.service.form',
     'ot.extension.svn.changelog',
