@@ -23,7 +23,6 @@ angular.module('ot.extension.svn.changelog', [
         // The view
         var view = ot.view();
         view.title = "Subversion change log";
-        view.description = "Loading change log...";
 
         // Loading the branch
         otStructureService.getBranch($stateParams.branch).then(function (branch) {
@@ -37,11 +36,6 @@ angular.module('ot.extension.svn.changelog', [
         ]).then(function (result) {
             $scope.buildFrom = result[0];
             $scope.buildTo = result[1];
-            // Adjusting the view description
-            view.description = $interpolate("From build {{buildFrom.name}} to {{buildTo.name}}")({
-                buildFrom: $scope.buildFrom,
-                buildTo: $scope.buildTo
-            });
         });
         // otStructureService.getBuild($stateParams.from).then(function (build1))
 
