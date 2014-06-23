@@ -69,6 +69,7 @@
                                 <a ng-click="changeLogRevisions()">here</a>
                                 to load them.
                             </div>
+                            <!-- TODO Merge -->
                             <table class="table table-condensed table-hover" ng-show="revisions">
                                 <thead>
                                     <tr>
@@ -78,6 +79,24 @@
                                         <th>Message</th>
                                     </tr>
                                 </thead>
+                                <tbody>
+                                <tr ng-repeat="svnChangeLogRevision in revisions.list">
+                                    <td>
+                                        <a href="{{svnChangeLogRevision.revisionUrl}}" target="_blank">
+                                            {{svnChangeLogRevision.revision}}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        {{svnChangeLogRevision.author}}
+                                    </td>
+                                    <td>
+                                        {{svnChangeLogRevision.revisionDate | date:'mediumDate'}}
+                                        {{svnChangeLogRevision.revisionDate | date:'shortTime'}}
+                                    </td>
+                                    <td ng-bind-html="svnChangeLogRevision.formattedMessage">
+                                    </td>
+                                </tr>
+                                </tbody>
                             </table>
                         </div>
                     </div>
