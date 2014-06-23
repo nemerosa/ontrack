@@ -23,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -237,7 +238,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
         // Stores in cache
         logCache.put(uuid, changeLog.withRevision(revisions));
         // OK
-        return changeLog.getRevisions();
+        return revisions;
     }
 
     private SVNChangeLog getChangeLog(String uuid) {
