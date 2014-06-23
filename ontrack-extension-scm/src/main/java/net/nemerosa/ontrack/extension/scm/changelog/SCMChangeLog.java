@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.scm.changelog;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.nemerosa.ontrack.model.structure.Branch;
@@ -14,6 +15,7 @@ import net.nemerosa.ontrack.model.structure.BuildView;
 @Data
 public class SCMChangeLog<S, T> extends BuildDiff {
 
+    @JsonIgnore
     private final S scmBranch;
     private final SCMBuildView<T> scmBuildFrom;
     private final SCMBuildView<T> scmBuildTo;
