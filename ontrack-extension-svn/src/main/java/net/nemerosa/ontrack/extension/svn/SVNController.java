@@ -1,14 +1,14 @@
 package net.nemerosa.ontrack.extension.svn;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
-import net.nemerosa.ontrack.extension.svn.model.LastRevisionInfo;
-import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration;
-import net.nemerosa.ontrack.extension.svn.service.SVNChangeLogService;
-import net.nemerosa.ontrack.extension.svn.model.IndexationRange;
+import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.extension.svn.service.IndexationService;
+import net.nemerosa.ontrack.extension.svn.service.SVNChangeLogService;
 import net.nemerosa.ontrack.extension.svn.service.SVNConfigurationService;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
@@ -23,6 +23,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
+import java.util.concurrent.TimeUnit;
+
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
@@ -35,6 +37,8 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     private final IssueServiceRegistry issueServiceRegistry;
     private final SecurityService securityService;
 
+    private final Cache<String, SVNChangeLog> logCache;
+
     @Autowired
     public SVNController(SVNExtensionFeature feature, SVNConfigurationService svnConfigurationService, IndexationService indexationService, SVNChangeLogService changeLogService, IssueServiceRegistry issueServiceRegistry, SecurityService securityService) {
         super(feature);
@@ -43,6 +47,11 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
         this.changeLogService = changeLogService;
         this.issueServiceRegistry = issueServiceRegistry;
         this.securityService = securityService;
+        // Cache
+        logCache = CacheBuilder.newBuilder()
+                .maximumSize(20)
+                .expireAfterAccess(10, TimeUnit.MINUTES)
+                .build();
     }
 
     @Override
@@ -211,8 +220,29 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
      * TODO Change log revisions
      */
     @RequestMapping(value = "changelog/{uuid}/revisions", method = RequestMethod.GET)
-    public Ack changeLogRevisions(@PathVariable String uuid) {
-        return Ack.NOK;
+    public SVNChangeLogRevisions changeLogRevisions(@PathVariable String uuid) {
+        // Gets the change log
+        SVNChangeLog changeLog = getChangeLog(uuid);
+        // Cached?
+        SVNChangeLogRevisions revisions = changeLog.getRevisions();
+        if (revisions != null) {
+            return revisions;
+        }
+        // Loads the revisions
+        revisions = changeLogService.getChangeLogRevisions(changeLog);
+        // Stores in cache
+        logCache.put(uuid, changeLog.withRevision(revisions));
+        // OK
+        return changeLog.getRevisions();
+    }
+
+    private SVNChangeLog getChangeLog(String uuid) {
+        SVNChangeLog changeLog = logCache.getIfPresent(uuid);
+        if (changeLog != null) {
+            return changeLog;
+        } else {
+            throw new SVNChangeLogUUIDException(uuid);
+        }
     }
 
 }

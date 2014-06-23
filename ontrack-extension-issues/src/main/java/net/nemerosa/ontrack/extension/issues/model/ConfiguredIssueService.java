@@ -13,4 +13,7 @@ public class ConfiguredIssueService {
     private final IssueServiceExtension issueServiceExtension;
     private final IssueServiceConfiguration issueServiceConfiguration;
 
+    public String formatIssuesInMessage(String message) {
+        return issueServiceExtension.formatIssuesInMessage(issueServiceConfiguration, message);
+    }
 }

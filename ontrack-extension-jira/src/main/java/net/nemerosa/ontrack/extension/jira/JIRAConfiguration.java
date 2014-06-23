@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Password;
 import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.regex.Pattern;
 
@@ -81,5 +82,14 @@ public class JIRAConfiguration implements UserPasswordConfiguration<JIRAConfigur
         return false;
         // TODO return excludedIssues.contains(token)
         // TODO        || excludedProjects.contains(StringUtils.substringBefore(token, "-"));
+    }
+
+    public String getIssueURL(String key) {
+        String base = getUrl();
+        if (StringUtils.isNotBlank(base)) {
+            return String.format("%s/browse/%s", base, key);
+        } else {
+            return key;
+        }
     }
 }

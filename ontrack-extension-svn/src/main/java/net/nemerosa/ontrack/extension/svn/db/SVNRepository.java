@@ -40,4 +40,8 @@ public class SVNRepository {
     public String getUrl(String path) {
         return configuration.getUrl(path);
     }
+
+    public String getRevisionBrowsingURL(long revision) {
+        return configuration.getRevisionBrowsingURL(revision);
+    }
 }

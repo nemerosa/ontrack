@@ -81,7 +81,7 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
                                 .length(400)
                                 .optional()
                                 .help("URL that defines how to browse to a path. The path is relative to the " +
-                                        "repository root and must be parameterized as ${path} in the URL.")
+                                        "repository root and must be parameterized as {path} in the URL.")
                 )
                 .with(
                         Text.of("browserForRevision")
@@ -89,7 +89,7 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
                                 .length(400)
                                 .optional()
                                 .help("URL that defines how to browse to a revision. The revision must be " +
-                                        "parameterized as ${revision} in the URL.")
+                                        "parameterized as {revision} in the URL.")
                 )
                 .with(
                         Text.of("browserForChange")
@@ -97,8 +97,8 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
                                 .length(400)
                                 .optional()
                                 .help("URL that defines how to browse to the changes of a path at a given revision. " +
-                                        "The revision must be parameterized as ${revision} in the URL and the path " +
-                                        "as ${path}.")
+                                        "The revision must be parameterized as {revision} in the URL and the path " +
+                                        "as {path}.")
                 )
                 .with(
                         Int.of("indexationInterval")
@@ -194,5 +194,13 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
         return StringUtils.stripEnd(url, "/")
                 + "/"
                 + StringUtils.stripStart(path, "/");
+    }
+
+    public String getRevisionBrowsingURL(long revision) {
+        if (StringUtils.isNotBlank(browserForRevision)) {
+            return browserForRevision.replace("{revision}", String.valueOf(revision));
+        } else {
+            return String.valueOf(revision);
+        }
     }
 }

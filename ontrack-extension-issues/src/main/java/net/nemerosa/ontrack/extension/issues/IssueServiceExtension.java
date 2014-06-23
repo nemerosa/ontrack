@@ -45,4 +45,14 @@ public interface IssueServiceExtension extends Extension {
      * @return List of keys (can be empty, never <code>null</code>)
      */
     Set<String> extractIssueKeysFromMessage(IssueServiceConfiguration issueServiceConfiguration, String message);
+
+    /**
+     * Given a message, returns this message where issues have been replaced
+     * by hyperlinks to a page that can display details about this issue.
+     *
+     * @param issueServiceConfiguration Configuration for the service
+     * @param message                   Message to format
+     * @return Formatted message
+     */
+    String formatIssuesInMessage(IssueServiceConfiguration issueServiceConfiguration, String message);
 }
