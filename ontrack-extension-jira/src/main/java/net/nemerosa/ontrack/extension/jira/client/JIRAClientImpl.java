@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.jira.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.client.ClientForbiddenException;
+import net.nemerosa.ontrack.client.ClientNotFoundException;
 import net.nemerosa.ontrack.client.JsonClient;
 import net.nemerosa.ontrack.extension.jira.JIRAConfiguration;
 import net.nemerosa.ontrack.extension.jira.model.JIRAField;
@@ -24,7 +26,18 @@ public class JIRAClientImpl implements JIRAClient {
 
     @Override
     public JIRAIssue getIssue(String key, JIRAConfiguration configuration) {
-        JsonNode node = jsonClient.get("/rest/api/2/issue/%s?expand=names", key);
+        JsonNode node;
+        try {
+            node = jsonClient.get("/rest/api/2/issue/%s?expand=names", key);
+        } catch (ClientForbiddenException ex) {
+            // The issue cannot be accessed
+            // TODO What do we log here?
+            // For the moment, ignoring silently
+            return null;
+        } catch (ClientNotFoundException ex) {
+            // Issue not found
+            return null;
+        }
 
         // Translation of fields
         List<JIRAField> fields = new ArrayList<>();
