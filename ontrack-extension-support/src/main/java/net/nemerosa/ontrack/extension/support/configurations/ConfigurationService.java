@@ -26,7 +26,7 @@ public interface ConfigurationService<T extends UserPasswordConfiguration> {
     void updateConfiguration(String name, T configuration);
 
     /**
-     * Loads the obfuscated version of a configuration
+     * Loads the obfuscated version of a configuration (no need for admin right)
      */
     T getObfuscatedConfiguration(String configurationName);
 }

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.svn;
 
 import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
+import net.nemerosa.ontrack.extension.svn.changelog.SVNChangeLog;
 import net.nemerosa.ontrack.model.structure.BuildDiff;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
