@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.extension.svn;
 
 import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
-import net.nemerosa.ontrack.extension.svn.changelog.SVNChangeLog;
-import net.nemerosa.ontrack.model.structure.BuildDiff;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
@@ -13,6 +11,7 @@ import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.structure.BuildDiff;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
@@ -203,6 +202,14 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     @RequestMapping(value = "changelog", method = RequestMethod.GET)
     public BuildDiff changeLog(BuildDiffRequest request) {
         return changeLogService.changeLog(request);
+    }
+
+    /**
+     * TODO Change log revisions
+     */
+    @RequestMapping(value = "changelog/{uuid}/revisions", method = RequestMethod.GET)
+    public Ack changeLogRevisions(@PathVariable String uuid) {
+        return Ack.NOK;
     }
 
 }

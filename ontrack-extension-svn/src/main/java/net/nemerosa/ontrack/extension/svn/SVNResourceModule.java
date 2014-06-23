@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.svn;
 
+import net.nemerosa.ontrack.extension.svn.changelog.SVNChangeLogResourceDecorator;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceModule;
 import net.nemerosa.ontrack.ui.resource.ResourceDecorator;
 import org.springframework.stereotype.Component;
@@ -16,7 +17,8 @@ public class SVNResourceModule extends AbstractResourceModule {
     @Override
     public Collection<ResourceDecorator<?>> decorators() {
         return Arrays.asList(
-                new SVNConfigurationResourceDecorator()
+                new SVNConfigurationResourceDecorator(),
+                new SVNChangeLogResourceDecorator()
         );
     }
 
