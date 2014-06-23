@@ -48,8 +48,9 @@ angular.module('ot.extension.svn.changelog', [
                 if (!$scope.revisions) {
                     ot.pageCall($http.get($scope.changeLog._revisions)).then(function (revisions) {
                         $scope.revisions = revisions;
+                        $log.info('Revisions loaded: ', $scope.revisions);
+                        // TODO Navigates to the revisions section
                     });
-                    // TODO Navigates to the revisions section
                 }
             };
         });
