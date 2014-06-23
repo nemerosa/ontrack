@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.issues;
 
 import net.nemerosa.ontrack.extension.api.Extension;
+import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 
 import java.util.List;
@@ -55,4 +56,23 @@ public interface IssueServiceExtension extends Extension {
      * @return Formatted message
      */
     String formatIssuesInMessage(IssueServiceConfiguration issueServiceConfiguration, String message);
+
+    /**
+     * Given a list of issues, returns a link that allows the user to display the list of
+     * all those issues in a browser.
+     *
+     * @param issueServiceConfiguration Configuration for the service
+     * @param issues                    List of issues to display. Can be empty, but not <code>null</code>.
+     * @return Link
+     */
+    String getLinkForAllIssues(IssueServiceConfiguration issueServiceConfiguration, List<Issue> issues);
+
+    /**
+     * Given a key, tries to find the issue with this key.
+     *
+     * @param issueServiceConfiguration Configuration for the service
+     * @param issueKey                  Issue key
+     * @return Issue if found, <code>null</code> otherwise
+     */
+    Issue getIssue(IssueServiceConfiguration issueServiceConfiguration, String issueKey);
 }

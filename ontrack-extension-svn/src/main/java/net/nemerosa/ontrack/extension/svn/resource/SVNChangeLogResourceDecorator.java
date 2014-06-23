@@ -20,7 +20,7 @@ public class SVNChangeLogResourceDecorator extends AbstractResourceDecorator<SVN
     public List<Link> links(SVNChangeLog resource, ResourceContext resourceContext) {
         return resourceContext.links()
                 .link("_revisions", on(SVNController.class).changeLogRevisions(resource.getUuid()))
-                // TODO Issues
+                .link("_issues", on(SVNController.class).changeLogIssues(resource.getUuid()))
                 // TODO Files
                 .build();
     }

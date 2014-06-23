@@ -1,13 +1,14 @@
 package net.nemerosa.ontrack.extension.svn.service;
 
-import com.google.common.base.*;
 import com.google.common.collect.Maps;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
+import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.scm.changelog.AbstractSCMChangeLogService;
 import net.nemerosa.ontrack.extension.scm.changelog.SCMBuildView;
 import net.nemerosa.ontrack.extension.svn.client.SVNClient;
+import net.nemerosa.ontrack.extension.svn.db.SVNIssueRevisionDao;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepositoryDao;
 import net.nemerosa.ontrack.extension.svn.model.*;
@@ -22,6 +23,7 @@ import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.Time;
 import net.nemerosa.ontrack.tx.Transaction;
 import net.nemerosa.ontrack.tx.TransactionService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,10 +31,10 @@ import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService implements SVNChangeLogService {
@@ -40,7 +42,9 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
     private final PropertyService propertyService;
     private final SVNConfigurationService configurationService;
     private final SVNRepositoryDao repositoryDao;
+    private final SVNIssueRevisionDao issueRevisionDao;
     private final IssueServiceRegistry issueServiceRegistry;
+    private final SVNService svnService;
     private final SVNClient svnClient;
     private final TransactionService transactionService;
     private final SecurityService securityService;
@@ -49,14 +53,21 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
     public SVNChangeLogServiceImpl(
             StructureService structureService,
             PropertyService propertyService,
-            SVNConfigurationService configurationService, SVNRepositoryDao repositoryDao,
+            SVNConfigurationService configurationService,
+            SVNRepositoryDao repositoryDao,
+            SVNIssueRevisionDao issueRevisionDao,
             IssueServiceRegistry issueServiceRegistry,
-            SVNClient svnClient, TransactionService transactionService, SecurityService securityService) {
+            SVNService svnService,
+            SVNClient svnClient,
+            TransactionService transactionService,
+            SecurityService securityService) {
         super(structureService);
         this.propertyService = propertyService;
         this.configurationService = configurationService;
         this.repositoryDao = repositoryDao;
+        this.issueRevisionDao = issueRevisionDao;
         this.issueServiceRegistry = issueServiceRegistry;
+        this.svnService = svnService;
         this.svnClient = svnClient;
         this.transactionService = transactionService;
         this.securityService = securityService;
@@ -79,6 +90,7 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
     }
 
     @Override
+    @Transactional
     public SVNChangeLogRevisions getChangeLogRevisions(SVNChangeLog changeLog) {
 
         // Reference
@@ -131,6 +143,77 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
             }
             // OK
             return new SVNChangeLogRevisions(revisions);
+        }
+    }
+
+    @Override
+    @Transactional
+    public SVNChangeLogIssues getChangeLogIssues(SVNChangeLog changeLog) {
+        // Revisions must have been loaded first
+        if (changeLog.getRevisions() == null) {
+            changeLog.withRevisions(getChangeLogRevisions(changeLog));
+        }
+        // In a transaction
+        try (Transaction ignored = transactionService.start()) {
+            // Repository
+            SVNRepository repository = changeLog.getScmBranch();
+            // Index of issues, sorted by keys
+            Map<String, SVNChangeLogIssue> issues = new TreeMap<>();
+            // For all revisions in this revision log
+            for (SVNChangeLogRevision changeLogRevision : changeLog.getRevisions().getList()) {
+                long revision = changeLogRevision.getRevision();
+                collectIssuesForRevision(repository, issues, revision);
+            }
+            // List of issues
+            List<SVNChangeLogIssue> issuesList = new ArrayList<>(issues.values());
+            // Issues link
+            String allIssuesLink = "";
+            ConfiguredIssueService configuredIssueService = repository.getConfiguredIssueService();
+            if (configuredIssueService != null) {
+                allIssuesLink = configuredIssueService.getLinkForAllIssues(
+                        issuesList.stream().map(SVNChangeLogIssue::getIssue).collect(Collectors.toList())
+                );
+            }
+            // OK
+            return new SVNChangeLogIssues(allIssuesLink, issuesList);
+
+        }
+    }
+
+    private void collectIssuesForRevision(SVNRepository repository, Map<String, SVNChangeLogIssue> issues, long revision) {
+        // Gets all issues attached to this revision
+        List<String> issueKeys = issueRevisionDao.findIssuesByRevision(repository.getId(), revision);
+        // For each issue
+        for (String issueKey : issueKeys) {
+            // Gets its details if not indexed yet
+            SVNChangeLogIssue changeLogIssue = issues.get(issueKey);
+            if (changeLogIssue == null) {
+                changeLogIssue = getChangeLogIssue(repository, issueKey);
+            }
+            // Existing issue?
+            if (changeLogIssue != null) {
+                // Attaches the revision to this issue
+                SVNRevisionInfo issueRevision = svnService.getRevisionInfo(repository, revision);
+                changeLogIssue = changeLogIssue.addRevision(issueRevision);
+                // Puts back into the cache
+                issues.put(issueKey, changeLogIssue);
+            }
+        }
+    }
+
+    private SVNChangeLogIssue getChangeLogIssue(SVNRepository repository, String issueKey) {
+        // Issue service
+        ConfiguredIssueService configuredIssueService = repository.getConfiguredIssueService();
+        // Gets the details about the issue
+        if (configuredIssueService != null) {
+            Issue issue = configuredIssueService.getIssue(issueKey);
+            if (issue == null || StringUtils.isBlank(issue.getKey())) {
+                return null;
+            }
+            // Creates the issue details for the change logs
+            return new SVNChangeLogIssue(issue);
+        } else {
+            return null;
         }
     }
 

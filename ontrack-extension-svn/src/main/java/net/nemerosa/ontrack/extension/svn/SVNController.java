@@ -23,7 +23,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -236,9 +235,29 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
         // Loads the revisions
         revisions = changeLogService.getChangeLogRevisions(changeLog);
         // Stores in cache
-        logCache.put(uuid, changeLog.withRevision(revisions));
+        logCache.put(uuid, changeLog.withRevisions(revisions));
         // OK
         return revisions;
+    }
+
+    /**
+     * Change log issues
+     */
+    @RequestMapping(value = "changelog/{uuid}/issues", method = RequestMethod.GET)
+    public SVNChangeLogIssues changeLogIssues(@PathVariable String uuid) {
+        // Gets the change log
+        SVNChangeLog changeLog = getChangeLog(uuid);
+        // Cached?
+        SVNChangeLogIssues issues = changeLog.getIssues();
+        if (issues != null) {
+            return issues;
+        }
+        // Loads the issues
+        issues = changeLogService.getChangeLogIssues(changeLog);
+        // Stores in cache
+        logCache.put(uuid, changeLog.withIssues(issues));
+        // OK
+        return issues;
     }
 
     private SVNChangeLog getChangeLog(String uuid) {

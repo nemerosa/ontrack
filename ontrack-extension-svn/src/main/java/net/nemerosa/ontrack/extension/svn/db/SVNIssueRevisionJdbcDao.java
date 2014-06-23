@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.util.List;
 
 @Repository
 public class SVNIssueRevisionJdbcDao extends AbstractJdbcRepository implements SVNIssueRevisionDao {
@@ -31,5 +32,14 @@ public class SVNIssueRevisionJdbcDao extends AbstractJdbcRepository implements S
                     "INSERT INTO EXT_SVN_REVISION_ISSUE (REPOSITORY, REVISION, ISSUE) VALUES (:repository, :revision, :key)",
                     params("revision", revision).addValue("key", key).addValue("repository", repositoryId));
         }
+    }
+
+    @Override
+    public List<String> findIssuesByRevision(int repositoryId, long revision) {
+        return getNamedParameterJdbcTemplate().queryForList(
+                "SELECT ISSUE FROM EXT_SVN_REVISION_ISSUE WHERE REPOSITORY = :repository AND REVISION = :revision ORDER BY ISSUE",
+                params("revision", revision).addValue("repository", repositoryId),
+                String.class
+        );
     }
 }

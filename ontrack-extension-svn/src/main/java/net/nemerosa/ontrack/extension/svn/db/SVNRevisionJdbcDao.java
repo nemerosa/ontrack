@@ -1,13 +1,17 @@
 package net.nemerosa.ontrack.extension.svn.db;
 
+import net.nemerosa.ontrack.extension.svn.model.SVNRevisionNotFoundException;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -66,13 +70,30 @@ public class SVNRevisionJdbcDao extends AbstractJdbcRepository implements SVNRev
         return getFirstItem(
                 "SELECT * FROM EXT_SVN_REVISION WHERE REPOSITORY = :repositoryId ORDER BY REVISION DESC LIMIT 1",
                 params("repositoryId", repositoryId),
-                (rs, rowNum) -> new TRevision(
-                        rs.getInt("REPOSITORY"),
-                        rs.getLong("REVISION"),
-                        rs.getString("AUTHOR"),
-                        dateTimeFromDB(rs.getString("CREATION")),
-                        rs.getString("MESSAGE"),
-                        rs.getString("BRANCH")
-                ));
+                (rs, rowNum) -> toRevision(rs));
+    }
+
+    private TRevision toRevision(ResultSet rs) throws SQLException {
+        return new TRevision(
+                rs.getInt("REPOSITORY"),
+                rs.getLong("REVISION"),
+                rs.getString("AUTHOR"),
+                dateTimeFromDB(rs.getString("CREATION")),
+                rs.getString("MESSAGE"),
+                rs.getString("BRANCH")
+        );
+    }
+
+    @Override
+    public TRevision get(int repositoryId, long revision) {
+        try {
+            return getNamedParameterJdbcTemplate().queryForObject(
+                    "SELECT * FROM EXT_SVN_REVISION WHERE REPOSITORY = :repository AND REVISION = :revision",
+                    params("revision", revision).addValue("repository", repositoryId),
+                    (rs, rowNum) -> toRevision(rs)
+            );
+        } catch (EmptyResultDataAccessException ex) {
+            throw new SVNRevisionNotFoundException(revision);
+        }
     }
 }

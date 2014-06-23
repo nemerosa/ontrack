@@ -13,17 +13,9 @@ import net.nemerosa.ontrack.model.structure.Branch;
 public class SVNChangeLog extends SCMChangeLog<SVNRepository, SVNHistory> {
 
     @JsonIgnore // Not sent to the client
-    private final SVNChangeLogRevisions revisions;
-
-    protected SVNChangeLog(
-            String uuid,
-            Branch branch,
-            SVNRepository scmBranch,
-            SCMBuildView<SVNHistory> scmBuildFrom,
-            SCMBuildView<SVNHistory> scmBuildTo, SVNChangeLogRevisions revisions) {
-        super(uuid, branch, scmBranch, scmBuildFrom, scmBuildTo);
-        this.revisions = revisions;
-    }
+    private SVNChangeLogRevisions revisions;
+    @JsonIgnore // Not sent to the client
+    private SVNChangeLogIssues issues;
 
     public SVNChangeLog(
             String uuid,
@@ -31,17 +23,16 @@ public class SVNChangeLog extends SCMChangeLog<SVNRepository, SVNHistory> {
             SVNRepository scmBranch,
             SCMBuildView<SVNHistory> scmBuildFrom,
             SCMBuildView<SVNHistory> scmBuildTo) {
-        this(uuid, branch, scmBranch, scmBuildFrom, scmBuildTo, null);
+        super(uuid, branch, scmBranch, scmBuildFrom, scmBuildTo);
     }
 
-    public SVNChangeLog withRevision(SVNChangeLogRevisions revisions) {
-        return new SVNChangeLog(
-                getUuid(),
-                getBranch(),
-                getScmBranch(),
-                getScmBuildFrom(),
-                getScmBuildTo(),
-                revisions
-        );
+    public SVNChangeLog withRevisions(SVNChangeLogRevisions revisions) {
+        this.revisions = revisions;
+        return this;
+    }
+
+    public SVNChangeLog withIssues(SVNChangeLogIssues issues) {
+        this.issues = issues;
+        return this;
     }
 }
