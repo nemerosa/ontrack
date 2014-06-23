@@ -12,10 +12,20 @@
 
     <div class="row" ng-show="changeLog">
         <div class="col-md-6">
-            <ot-scm-changelog-build scm-build-view="changeLog.scmBuildFrom"></ot-scm-changelog-build>
+            <ot-scm-changelog-build scm-build-view="changeLog.scmBuildFrom">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h3><small>History</small></h3>
+                        <ul class="ot-extension-svn-build-history">
+                        </ul>
+                    </div>
+                </div>
+            </ot-scm-changelog-build>
         </div>
         <div class="col-md-6">
-            <ot-scm-changelog-build scm-build-view="changeLog.scmBuildTo"></ot-scm-changelog-build>
+            <ot-scm-changelog-build scm-build-view="changeLog.scmBuildTo">
+                HISTORY!
+            </ot-scm-changelog-build>
         </div>
     </div>
 
