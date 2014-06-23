@@ -70,6 +70,7 @@ public class JIRAClientImpl implements JIRAClient {
         // Status
         JsonNode statusNode = field(node, "status");
         JIRAStatus status = new JIRAStatus(
+                // FIXME Not correct
                 fieldValue(statusNode, "name"),
                 fieldValue(statusNode, "iconUrl")
         );
