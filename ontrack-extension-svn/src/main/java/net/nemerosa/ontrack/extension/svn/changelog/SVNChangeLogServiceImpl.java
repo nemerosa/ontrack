@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -59,6 +60,7 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
             Branch branch = structureService.getBranch(request.getBranch());
             SVNRepository svnRepository = getSVNRepository(branch);
             return new SVNChangeLog(
+                    UUID.randomUUID().toString(),
                     branch,
                     svnRepository,
                     getSCMBuildView(svnRepository, request.getFrom()),

@@ -13,11 +13,12 @@ import net.nemerosa.ontrack.model.structure.Branch;
 public class SVNChangeLog extends SCMChangeLog<SVNRepository, SVNHistory> {
 
     public SVNChangeLog(
+            String uuid,
             Branch branch,
             SVNRepository scmBranch,
             SCMBuildView<SVNHistory> scmBuildFrom,
             SCMBuildView<SVNHistory> scmBuildTo) {
-        super(branch, scmBranch, scmBuildFrom, scmBuildTo);
+        super(uuid, branch, scmBranch, scmBuildFrom, scmBuildTo);
     }
 
 }
