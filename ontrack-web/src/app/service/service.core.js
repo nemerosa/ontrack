@@ -4,7 +4,7 @@ angular.module('ot.service.core', [
 /**
  * Basic services
  */
-    .service('ot', function ($q, $rootScope, $log, $interpolate) {
+    .service('ot', function ($q, $rootScope, otNotificationService) {
         var self = {};
 
         /**
@@ -90,6 +90,23 @@ angular.module('ot.service.core', [
                         });
                     }
                 });
+            return d.promise;
+        };
+
+        /**
+         * Wraps a HTTP call into a promise and uses the notification service for errors.
+         */
+        self.pageCall = function (httpCall) {
+            var d = $q.defer();
+            self.call(httpCall).then(
+                function success(result) {
+                    d.resolve(result);
+                },
+                function error(e) {
+                    otNotificationService.error(e.content);
+                    d.reject();
+                }
+            );
             return d.promise;
         };
 

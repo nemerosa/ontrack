@@ -29,7 +29,7 @@ angular.module('ot.extension.svn.changelog', [
          * Loads the change log
          */
 
-        ot.call($http.get(path, {params: $scope.buildDiffRequest})).then(function (changeLog) {
+        ot.pageCall($http.get(path, {params: $scope.buildDiffRequest})).then(function (changeLog) {
             $log.debug('changeLog=', changeLog);
         });
 
