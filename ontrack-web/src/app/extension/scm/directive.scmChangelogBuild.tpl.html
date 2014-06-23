@@ -1,6 +1,17 @@
-<h1>
-    <small>
+<div class="panel panel-default">
+    <div class="panel-heading">
         Build
         <a href="#/build/{{scmBuildView.buildView.build.id}}">{{scmBuildView.buildView.build.name}}</a>
-    </small>
-</h1>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <h3><small>Promotions</small></h3>
+                <ot-build-promotion-runs promotion-runs="scmBuildView.buildView.promotionRuns"></ot-build-promotion-runs>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- TODO Validation runs -->
+<!-- TODO History: transclude -->

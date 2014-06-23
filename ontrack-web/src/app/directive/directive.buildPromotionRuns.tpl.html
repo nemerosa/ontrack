@@ -1,4 +1,4 @@
-<span ng-repeat="promotionRun in promotionRuns">
+<span ng-repeat="promotionRun in promotionRuns" ng-if="promotionRuns">
     <span class="ot-promotion-run">
         <ot-entity-image entity="promotionRun.promotionLevel"
                          link="#/promotionLevel/{{promotionRun.promotionLevel.id}}">
@@ -10,4 +10,7 @@
         </span>
     </span>
     <span ng-if="!$last" class="ot-promotion-run-separator"></span>
+</span>
+<span ng-hide="promotionRuns" class="ot-description">
+    No promotion yet.
 </span>
