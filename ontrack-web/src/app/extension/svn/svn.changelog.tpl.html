@@ -6,46 +6,69 @@
         </div>
     </div>
 
-    <!-- TODO Quick links and activation of detailed change logs -->
-
-    <!-- Main information -->
-
     <div class="row" ng-show="changeLog">
-        <div class="col-md-6">
-            <ot-scm-changelog-build scm-build-view="changeLog.scmBuildFrom">
-                <div class="row">
-                    <div class="col-md-12">
-                        <h3><small>History</small></h3>
-                        <ul class="ot-extension-svn-build-history">
-                            <li ng-repeat="reference in changeLog.scmBuildFrom.scm.references">
-                                <a href="{{reference.url}}">
-                                    {{reference.path}}
-                                    @
-                                    {{reference.revision}}
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
+        <div class="col-md-10">
+
+            <!-- Main content -->
+
+            <!-- Build info -->
+            <div class="row">
+                <div class="col-md-6">
+                    <a name="buildFrom"></a>
+                    <ot-scm-changelog-build scm-build-view="changeLog.scmBuildFrom">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h3>
+                                    <small>History</small>
+                                </h3>
+                                <ul class="ot-extension-svn-build-history">
+                                    <li ng-repeat="reference in changeLog.scmBuildFrom.scm.references">
+                                        <a href="{{reference.url}}">
+                                            {{reference.path}}
+                                            @
+                                            {{reference.revision}}
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </ot-scm-changelog-build>
                 </div>
-            </ot-scm-changelog-build>
+                <div class="col-md-6">
+                    <a name="buildTo"></a>
+                    <ot-scm-changelog-build scm-build-view="changeLog.scmBuildTo">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h3>
+                                    <small>History</small>
+                                </h3>
+                                <ul class="ot-extension-svn-build-history">
+                                    <li ng-repeat="reference in changeLog.scmBuildTo.scm.references">
+                                        <a href="{{reference.url}}">
+                                            {{reference.path}}
+                                            @
+                                            {{reference.revision}}
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </ot-scm-changelog-build>
+                </div>
+            </div>
+
         </div>
-        <div class="col-md-6">
-            <ot-scm-changelog-build scm-build-view="changeLog.scmBuildTo">
-                <div class="row">
-                    <div class="col-md-12">
-                        <h3><small>History</small></h3>
-                        <ul class="ot-extension-svn-build-history">
-                            <li ng-repeat="reference in changeLog.scmBuildTo.scm.references">
-                                <a href="{{reference.url}}">
-                                    {{reference.path}}
-                                    @
-                                    {{reference.revision}}
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </ot-scm-changelog-build>
+
+        <div class="col-md-2">
+            <!-- Quick links and activation of detailed change logs -->
+            <ul class="ot-extension-scm-changelog-commands">
+                <li>
+                    <button class="btn btn-default" ng-click="">
+                        <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="changeLogRevisions"></span>
+                        Revisions
+                    </button>
+                </li>
+            </ul>
         </div>
     </div>
 
