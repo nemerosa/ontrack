@@ -20,19 +20,7 @@
                             <tr ng-repeat="validationStampRunView in validationStampRunViewCollection.resources"
                                 ng-if="validationStampRunView.run && validationStampRunView.passed">
                                 <td>
-                                    <ot-entity-image entity="validationStampRunView.validationStamp"
-                                                     link="#/validationStamp/{{validationStampRunView.validationStamp.id}}">
-                                        {{validationStampRunView.validationStamp.name}}
-                                    </ot-entity-image>
-                                </td>
-                                <td>
-                                    <span ng-repeat="validationRun in validationStampRunView.validationRun"
-                                          class="ot-validation-run-status-horizontal">
-                                        <a href="#/validationRun/{{validationRun.id}}">
-                                            <ot-validation-run-status
-                                                    status="validationRun.lastStatus"></ot-validation-run-status>
-                                        </a>
-                                    </span>
+                                    <ot-validation-stamp-run-view validation-stamp-run-view="validationStampRunView"></ot-validation-stamp-run-view>
                                 </td>
                             </tr>
                         </table>
@@ -47,19 +35,7 @@
                             <tr ng-repeat="validationStampRunView in validationStampRunViewCollection.resources"
                                 ng-if="validationStampRunView.run && !validationStampRunView.passed">
                                 <td>
-                                    <ot-entity-image entity="validationStampRunView.validationStamp"
-                                                     link="#/validationStamp/{{validationStampRunView.validationStamp.id}}">
-                                        {{validationStampRunView.validationStamp.name}}
-                                    </ot-entity-image>
-                                </td>
-                                <td>
-                                    <span ng-repeat="validationRun in validationStampRunView.validationRun"
-                                          class="ot-validation-run-status-horizontal">
-                                        <a href="#/validationRun/{{validationRun.id}}">
-                                            <ot-validation-run-status
-                                                    status="validationRun.lastStatus"></ot-validation-run-status>
-                                        </a>
-                                    </span>
+                                    <ot-validation-stamp-run-view validation-stamp-run-view="validationStampRunView"></ot-validation-stamp-run-view>
                                 </td>
                             </tr>
                         </table>
@@ -74,10 +50,7 @@
                             <tr ng-repeat="validationStampRunView in validationStampRunViewCollection.resources"
                                 ng-if="!validationStampRunView.run">
                                 <td>
-                                    <ot-entity-image entity="validationStampRunView.validationStamp"
-                                                     link="#/validationStamp/{{validationStampRunView.validationStamp.id}}">
-                                        {{validationStampRunView.validationStamp.name}}
-                                    </ot-entity-image>
+                                    <ot-validation-stamp-run-view validation-stamp-run-view="validationStampRunView"></ot-validation-stamp-run-view>
                                 </td>
                             </tr>
                         </table>

@@ -55,6 +55,15 @@ angular.module('ot.directive.entity', [
             }
         };
     })
+    .directive('otValidationStampRunView', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'app/directive/directive.validationStampRunView.tpl.html',
+            scope: {
+                validationStampRunView: '='
+            }
+        };
+    })
     .directive('otValidationRunStatusNone', function () {
         return {
             restrict: 'E',
