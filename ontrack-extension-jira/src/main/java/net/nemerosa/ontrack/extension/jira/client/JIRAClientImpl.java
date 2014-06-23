@@ -11,6 +11,9 @@ import net.nemerosa.ontrack.extension.jira.model.JIRAStatus;
 import net.nemerosa.ontrack.extension.jira.model.JIRAVersion;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -18,6 +21,7 @@ import java.util.Map;
 
 public class JIRAClientImpl implements JIRAClient {
 
+    public static final DateTimeFormatter JIRA_DATA_TIME = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
     private final JsonClient jsonClient;
 
     public JIRAClientImpl(JsonClient jsonClient) {
@@ -77,10 +81,17 @@ public class JIRAClientImpl implements JIRAClient {
                 fieldValue(node, "summary"),
                 status,
                 field(node, "assignee").path("name").asText(),
-                LocalDateTime.parse(fieldValue(node, "updated")),
+                parseFromJIRA(fieldValue(node, "updated")),
                 fields,
                 affectedVersions,
                 fixVersions
+        );
+    }
+
+    public static LocalDateTime parseFromJIRA(String value) {
+        return LocalDateTime.ofInstant(
+                ZonedDateTime.parse(value, JIRA_DATA_TIME).toInstant(),
+                ZoneOffset.UTC
         );
     }
 
