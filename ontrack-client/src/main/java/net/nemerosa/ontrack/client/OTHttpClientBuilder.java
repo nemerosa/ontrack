@@ -14,6 +14,7 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.function.Supplier;
 
 public class OTHttpClientBuilder {
 
@@ -48,10 +49,8 @@ public class OTHttpClientBuilder {
     }
 
     public OTHttpClient build() {
-        // Defaults
+
         HttpClientContext httpContext = HttpClientContext.create();
-        HttpClientBuilder builder = HttpClientBuilder.create()
-                .setConnectionManager(new PoolingHttpClientConnectionManager());
 
         // Basic authentication
         if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
@@ -65,16 +64,21 @@ public class OTHttpClientBuilder {
             AuthCache authCache = new BasicAuthCache();
             authCache.put(host, new BasicScheme());
 
-
             httpContext.setCredentialsProvider(credentialsProvider);
             httpContext.setAuthCache(authCache);
-            httpContext.setCookieStore(cookieStore);
-
-            // TODO Associates with the HTTP client
         }
 
-        // OK
-        CloseableHttpClient httpClient = builder.build();
-        return new OTHttpClientImpl(url, host, httpClient, httpContext);
+        httpContext.setCookieStore(cookieStore);
+
+        Supplier<CloseableHttpClient> httpClientSupplier = () -> {
+            // Defaults
+            HttpClientBuilder builder = HttpClientBuilder.create()
+                    .setConnectionManager(new PoolingHttpClientConnectionManager());
+
+            // OK
+            return builder.build();
+        };
+
+        return new OTHttpClientImpl(url, host, httpClientSupplier, httpContext);
     }
 }

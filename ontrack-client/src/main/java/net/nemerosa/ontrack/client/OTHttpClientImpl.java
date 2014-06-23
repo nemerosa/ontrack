@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.function.Supplier;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.prependIfMissing;
@@ -23,13 +24,13 @@ public class OTHttpClientImpl implements OTHttpClient {
 
     private final URL url;
     private final HttpHost host;
-    private final CloseableHttpClient httpClient;
+    private final Supplier<CloseableHttpClient> httpClientSupplier;
     private final HttpClientContext httpContext;
 
-    public OTHttpClientImpl(URL url, HttpHost host, CloseableHttpClient httpClient, HttpClientContext httpContext) {
+    public OTHttpClientImpl(URL url, HttpHost host, Supplier<CloseableHttpClient> httpClientSupplier, HttpClientContext httpContext) {
         this.url = url;
         this.host = host;
-        this.httpClient = httpClient;
+        this.httpClientSupplier = httpClientSupplier;
         this.httpContext = httpContext;
     }
 
@@ -69,7 +70,7 @@ public class OTHttpClientImpl implements OTHttpClient {
         logger.debug("[request] {}", request);
         // Executes the call
         try {
-            try (CloseableHttpClient http = httpClient) {
+            try (CloseableHttpClient http = httpClientSupplier.get()) {
                 HttpResponse response = http.execute(host, request, httpContext);
                 logger.debug("[response] {}", response);
                 // Entity response
