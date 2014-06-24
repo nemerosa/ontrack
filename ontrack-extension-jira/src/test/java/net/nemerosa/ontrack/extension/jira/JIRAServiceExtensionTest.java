@@ -9,38 +9,47 @@ import net.nemerosa.ontrack.extension.jira.tx.JIRASession;
 import net.nemerosa.ontrack.extension.jira.tx.JIRASessionFactory;
 import net.nemerosa.ontrack.tx.DefaultTransactionService;
 import net.nemerosa.ontrack.tx.TransactionService;
+import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class JIRAServiceExtensionTest {
 
-    @Test
-    public void issueNotFound() {
-        JIRAConfiguration config = jiraConfiguration();
+    private JIRASessionFactory jiraSessionFactory;
+    private JsonClient jsonClient;
+    private JIRASession session;
+    private JIRAServiceExtension service;
 
-        JIRASessionFactory jiraSessionFactory = mock(JIRASessionFactory.class);
+    @Before
+    public void before() {
+        jiraSessionFactory = mock(JIRASessionFactory.class);
         TransactionService transactionService = new DefaultTransactionService();
         JIRAConfigurationService jiraConfigurationService = mock(JIRAConfigurationService.class);
 
-        JsonClient jsonClient = mock(JsonClient.class);
-        when(jsonClient.get("/rest/api/2/issue/%s?expand=names", "XXX-1")).thenThrow(new ClientNotFoundException("XXX-1"));
-
+        jsonClient = mock(JsonClient.class);
         JIRAClient client = new JIRAClientImpl(jsonClient);
 
-        JIRASession session = mock(JIRASession.class);
+        session = mock(JIRASession.class);
         when(session.getClient()).thenReturn(client);
 
-        when(jiraSessionFactory.create(config)).thenReturn(session);
-
-        JIRAServiceExtension service = new JIRAServiceExtension(
+        service = new JIRAServiceExtension(
                 new JIRAExtensionFeature(),
                 jiraConfigurationService,
                 jiraSessionFactory,
                 transactionService
         );
+    }
+
+    @Test
+    public void issueNotFound() {
+        JIRAConfiguration config = jiraConfiguration();
+
+        when(jsonClient.get("/rest/api/2/issue/%s?expand=names", "XXX-1")).thenThrow(new ClientNotFoundException("XXX-1"));
+        when(jiraSessionFactory.create(config)).thenReturn(session);
 
         JIRAIssue issue = service.getIssue(config, "XXX-1");
         assertNull(issue);
@@ -60,23 +69,14 @@ public class JIRAServiceExtensionTest {
 //                jiraSessionFactory);
 //        assertTrue(service.isIssue(config, "TEST-12"));
 //    }
-//
-//    @Test
-//    public void insertIssueUrlsInMessage() {
-//        ExtensionManager extensionManager = mock(ExtensionManager.class);
-//        JIRAConfiguration config = new JIRAConfiguration(0, "test", "http://jira", "user",
-//                Collections.<String>emptySet(),
-//                Sets.newHashSet("TEST-12", "PRJ-12"));
-//        JIRASessionFactory jiraSessionFactory = mock(JIRASessionFactory.class);
-//        JIRAConfigurationService jiraConfigurationService = mock(JIRAConfigurationService.class);
-//        PropertiesService propertiesService = mock(PropertiesService.class);
-//        TransactionService transactionService = mock(TransactionService.class);
-//        DefaultJIRAService service = new DefaultJIRAService(
-//                extensionManager, jiraConfigurationService, propertiesService, transactionService,
-//                jiraSessionFactory);
-//        String message = service.formatIssuesInMessage(config, "TEST-12, PRJ-12, PRJ-13 List of issues");
-//        assertEquals("TEST-12, PRJ-12, <a href=\"http://jira/browse/PRJ-13\">PRJ-13</a> List of issues", message);
-//    }
+
+    @Test
+    public void formatIssuesInMessage() {
+        JIRAConfiguration config = jiraConfiguration();
+        // TODO List of excluded projects and issues
+        String message = service.formatIssuesInMessage(config, "TEST-12, PRJ-12, PRJ-13 List of issues");
+        assertEquals("<a href=\"http://jira/browse/TEST-12\">TEST-12</a>, <a href=\"http://jira/browse/PRJ-12\">PRJ-12</a>, <a href=\"http://jira/browse/PRJ-13\">PRJ-13</a> List of issues", message);
+    }
 //
 //    @Test
 //    public void extractIssueKeysFromMessage() {
