@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.svn.service;
 
-import com.google.common.collect.Maps;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
@@ -94,7 +93,7 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
     public SVNChangeLogRevisions getChangeLogRevisions(SVNChangeLog changeLog) {
 
         // Reference
-        Collection<SVNChangeLogReference> references = getChangeLogReferences(changeLog);
+        Collection<SVNChangeLogReference> references = changeLog.getChangeLogReferences();
 
         // No difference?
         if (references.isEmpty()) {
@@ -251,59 +250,6 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
                 message,
                 revisionUrl,
                 formattedMessage);
-    }
-
-    private Collection<SVNChangeLogReference> getChangeLogReferences(SVNChangeLog changeLog) {
-
-        // Gets the two histories
-        SVNHistory historyFrom = changeLog.getScmBuildFrom().getScm();
-        SVNHistory historyTo = changeLog.getScmBuildTo().getScm();
-
-        // Sort them from->to with 'to' having the highest revision
-        {
-            long fromRevision = historyFrom.getReferences().get(0).getRevision();
-            long toRevision = historyTo.getReferences().get(0).getRevision();
-            if (toRevision < fromRevision) {
-                SVNHistory tmp = historyTo;
-                historyTo = historyFrom;
-                historyFrom = tmp;
-            }
-        }
-
-        // Indexation of the 'from' history using the paths
-        Map<String, SVNReference> historyFromIndex = Maps.uniqueIndex(
-                historyFrom.getReferences(),
-                SVNReference::getPath
-        );
-
-        // List of ranges to collect
-        List<SVNChangeLogReference> references = new ArrayList<>();
-
-        // For each reference on the 'to' history
-        for (SVNReference toReference : historyTo.getReferences()) {
-            // Collects a range of revisions
-            long toRevision = toReference.getRevision();
-            long fromRevision = 0;
-            // Gets any 'from' reference
-            SVNReference fromReference = historyFromIndex.get(toReference.getPath());
-            if (fromReference != null) {
-                fromRevision = fromReference.getRevision();
-                if (fromRevision > toRevision) {
-                    long t = toRevision;
-                    toRevision = fromRevision;
-                    fromRevision = t;
-                }
-            }
-            // Adds this reference
-            references.add(new SVNChangeLogReference(
-                    toReference.getPath(),
-                    fromRevision,
-                    toRevision
-            ));
-        }
-
-        // OK
-        return references;
     }
 
     protected SCMBuildView<SVNHistory> getSCMBuildView(SVNRepository svnRepository, ID buildId) {
