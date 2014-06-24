@@ -31,7 +31,7 @@ public class SVNChangeLogExtension extends AbstractExtension implements BuildDif
      */
     @Override
     public boolean apply(Branch branch) {
-        return propertyService.getProperty(branch, SVNBranchConfigurationPropertyType.class) != null
-                && propertyService.getProperty(branch.getProject(), SVNProjectConfigurationPropertyType.class) != null;
+        return !propertyService.getProperty(branch, SVNBranchConfigurationPropertyType.class).isEmpty()
+                && !propertyService.getProperty(branch.getProject(), SVNProjectConfigurationPropertyType.class).isEmpty();
     }
 }
