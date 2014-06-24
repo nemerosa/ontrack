@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.jira;
 
+import com.google.common.collect.Sets;
 import net.nemerosa.ontrack.client.ClientNotFoundException;
 import net.nemerosa.ontrack.client.JsonClient;
 import net.nemerosa.ontrack.extension.jira.client.JIRAClient;
@@ -11,6 +12,8 @@ import net.nemerosa.ontrack.tx.DefaultTransactionService;
 import net.nemerosa.ontrack.tx.TransactionService;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -77,33 +80,16 @@ public class JIRAServiceExtensionTest {
         String message = service.formatIssuesInMessage(config, "TEST-12, PRJ-12, PRJ-13 List of issues");
         assertEquals("<a href=\"http://jira/browse/TEST-12\">TEST-12</a>, <a href=\"http://jira/browse/PRJ-12\">PRJ-12</a>, <a href=\"http://jira/browse/PRJ-13\">PRJ-13</a> List of issues", message);
     }
-//
-//    @Test
-//    public void extractIssueKeysFromMessage() {
-//        ExtensionManager extensionManager = mock(ExtensionManager.class);
-//        JIRAConfiguration config = new JIRAConfiguration(12, "test", "http://jira", "user",
-//                Sets.newHashSet("TEST"),
-//                Sets.newHashSet("PRJ-12"));
-//        JIRAConfigurationService jiraConfigurationService = mock(JIRAConfigurationService.class);
-//        JIRASessionFactory jiraSessionFactory = mock(JIRASessionFactory.class);
-//        PropertiesService propertiesService = mock(PropertiesService.class);
-//        TransactionService transactionService = mock(TransactionService.class);
-//
-//        when(propertiesService.getPropertyValue(
-//                Entity.PROJECT,
-//                10,
-//                JIRAExtension.EXTENSION,
-//                JIRAConfigurationPropertyExtension.NAME
-//        )).thenReturn("12");
-//        when(jiraConfigurationService.getConfigurationById(12)).thenReturn(config);
-//
-//        DefaultJIRAService service = new DefaultJIRAService(
-//                extensionManager, jiraConfigurationService, propertiesService, transactionService,
-//                jiraSessionFactory);
-//        Set<String> issues = service.extractIssueKeysFromMessage(10, "TEST-12, PRJ-12, PRJ-13 List of issues");
-//        assertEquals(Collections.singleton("PRJ-13"), issues);
-//    }
-//
+
+    @Test
+    public void extractIssueKeysFromMessage() {
+        JIRAConfiguration config = jiraConfiguration();
+
+        // TODO List of excluded projects and issues
+        Set<String> issues = service.extractIssueKeysFromMessage(config, "TEST-12, PRJ-12, PRJ-13 List of issues");
+        assertEquals(Sets.newHashSet("TEST-12", "PRJ-12", "PRJ-13"), issues);
+    }
+
 //    @Test(expected = NullPointerException.class)
 //    public void getLinkForAllIssues_null_config() {
 //        DefaultJIRAService service = new DefaultJIRAService(null, null, null, null, null);
