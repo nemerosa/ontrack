@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -18,8 +19,8 @@ public class SVNHistory {
         this(Collections.<SVNReference>emptyList());
     }
 
-    public SVNHistory(SVNReference reference) {
-        this(Collections.singletonList(reference));
+    public SVNHistory(SVNReference... references) {
+        this(Arrays.asList(references));
     }
 
     public SVNHistory add(SVNReference reference) {

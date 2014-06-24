@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.model.structure;
 
 import lombok.Data;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -9,6 +10,10 @@ import java.util.List;
  */
 @Data
 public class BuildView implements View {
+
+    public static BuildView of(Build build) {
+        return new BuildView(build, Collections.emptyList(), Collections.emptyList());
+    }
 
     /**
      * The build for this view
