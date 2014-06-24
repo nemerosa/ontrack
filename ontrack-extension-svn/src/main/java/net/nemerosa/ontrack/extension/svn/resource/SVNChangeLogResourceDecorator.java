@@ -17,10 +17,10 @@ public class SVNChangeLogResourceDecorator extends AbstractResourceDecorator<SVN
     }
 
     @Override
-    public List<Link> links(SVNChangeLog resource, ResourceContext resourceContext) {
+    public List<Link> links(SVNChangeLog changeLog, ResourceContext resourceContext) {
         return resourceContext.links()
-                .link("_revisions", on(SVNController.class).changeLogRevisions(resource.getUuid()))
-                .link("_issues", on(SVNController.class).changeLogIssues(resource.getUuid()))
+                .link("_revisions", on(SVNController.class).changeLogRevisions(changeLog.getUuid()))
+                .link("_issues", on(SVNController.class).changeLogIssues(changeLog.getUuid()), changeLog.getScmBranch().getConfiguredIssueService() != null)
                 // TODO Files
                 .build();
     }
