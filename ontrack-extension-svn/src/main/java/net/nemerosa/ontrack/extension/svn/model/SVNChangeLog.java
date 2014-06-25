@@ -22,6 +22,8 @@ public class SVNChangeLog extends SCMChangeLog<SVNRepository, SVNHistory> {
     private SVNChangeLogRevisions revisions;
     @JsonIgnore // Not sent to the client
     private SVNChangeLogIssues issues;
+    @JsonIgnore // Not sent to the client
+    private SVNChangeLogFiles files;
 
     public SVNChangeLog(
             String uuid,
@@ -40,6 +42,11 @@ public class SVNChangeLog extends SCMChangeLog<SVNRepository, SVNHistory> {
 
     public SVNChangeLog withIssues(SVNChangeLogIssues issues) {
         this.issues = issues;
+        return this;
+    }
+
+    public SVNChangeLog withFiles(SVNChangeLogFiles files) {
+        this.files = files;
         return this;
     }
 
