@@ -32,4 +32,15 @@ angular.module('ot.directive.misc', [
             }
         };
     })
+    .directive('otInclude', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'app/directive/directive.include.tpl.html',
+            transclude: true,
+            scope: {
+                value: '=',
+                template: '@'
+            }
+        };
+    })
 ;

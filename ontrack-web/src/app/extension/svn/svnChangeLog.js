@@ -54,10 +54,13 @@ angular.module('ot.extension.svn.changelog', [
                         $scope.revisions = revisions;
                         $scope.revisionsLoading = false;
                         $scope.revisionsCommand = "Revisions";
+                        $location.hash('revisions');
+                        $anchorScroll();
                     });
+                } else {
+                    $location.hash('revisions');
+                    $anchorScroll();
                 }
-                $location.hash('revisions');
-                $anchorScroll();
             };
 
             // Loading the issues if needed
@@ -69,10 +72,13 @@ angular.module('ot.extension.svn.changelog', [
                         $scope.issues = issues;
                         $scope.issuesLoading = false;
                         $scope.issuesCommand = "Issues";
+                        $location.hash('issues');
+                        $anchorScroll();
                     });
+                } else {
+                    $location.hash('issues');
+                    $anchorScroll();
                 }
-                $location.hash('issues');
-                $anchorScroll();
             };
         });
 

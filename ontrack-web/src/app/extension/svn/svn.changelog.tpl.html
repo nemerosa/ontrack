@@ -119,8 +119,10 @@
                                 <a ng-click="changeLogIssues()">here</a>
                                 to load them.
                             </div>
-                            <table class="table table-condensed table-hover" ng-show="issues">
-                            </table>
+                            <div ng-show="issues">
+                                <ot-include value="issues" template="app/extension/{{issues.issueServiceConfiguration.serviceId}}/changelog.issues.tpl.html">
+                                </ot-include>
+                            </div>
                         </div>
                     </div>
                 </div>
