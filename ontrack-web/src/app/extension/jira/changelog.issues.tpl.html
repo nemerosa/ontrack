@@ -26,14 +26,14 @@
             {{changeLogIssue.issue.summary}}
         </td>
         <td>
-            <span ng-repeat="version in changeLogIssue.affectedVersions">
-                {{version}}
+            <span ng-repeat="version in changeLogIssue.issue.affectedVersions" class="label label-default">
+                {{version.name}}
                 <span ng-if="!$last">, </span>
             </span>
         </td>
         <td>
-            <span ng-repeat="version in changeLogIssue.fixVersions">
-                {{version}}
+            <span ng-repeat="version in changeLogIssue.issue.fixVersions" class="label label-default">
+                {{version.name}}
                 <span ng-if="!$last">, </span>
             </span>
         </td>
