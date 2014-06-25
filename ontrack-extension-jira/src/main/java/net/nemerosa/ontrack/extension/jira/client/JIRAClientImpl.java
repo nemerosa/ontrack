@@ -42,7 +42,12 @@ public class JIRAClientImpl implements JIRAClient {
             // Issue not found
             return null;
         }
+        return toIssue(configuration, node);
 
+
+    }
+
+    protected static JIRAIssue toIssue(JIRAConfiguration configuration, JsonNode node) {
         // Translation of fields
         List<JIRAField> fields = new ArrayList<>();
         JsonNode names = node.path("names");
@@ -65,15 +70,17 @@ public class JIRAClientImpl implements JIRAClient {
 
         // Versions
         List<JIRAVersion> affectedVersions = toVersions(node, "versions");
-        List<JIRAVersion> fixVersions = toVersions(node, "fixVersion");
+        List<JIRAVersion> fixVersions = toVersions(node, "fixVersions");
 
         // Status
         JsonNode statusNode = field(node, "status");
         JIRAStatus status = new JIRAStatus(
-                // FIXME Not correct
-                fieldValue(statusNode, "name"),
-                fieldValue(statusNode, "iconUrl")
+                statusNode.path("name").asText(),
+                statusNode.path("iconUrl").asText()
         );
+
+        // Key
+        String key = node.path("key").asText();
 
         // JIRA issue
         return new JIRAIssue(
@@ -96,7 +103,7 @@ public class JIRAClientImpl implements JIRAClient {
         );
     }
 
-    private List<JIRAVersion> toVersions(JsonNode node, String versionFieldName) {
+    private static List<JIRAVersion> toVersions(JsonNode node, String versionFieldName) {
         JsonNode versionField = field(node, versionFieldName);
         List<JIRAVersion> versions = new ArrayList<>();
         for (JsonNode versionNode : versionField) {
@@ -110,11 +117,11 @@ public class JIRAClientImpl implements JIRAClient {
         return versions;
     }
 
-    private String fieldValue(JsonNode node, String name) {
+    private static String fieldValue(JsonNode node, String name) {
         return field(node, name).asText();
     }
 
-    private JsonNode field(JsonNode node, String name) {
+    private static JsonNode field(JsonNode node, String name) {
         return node.path("fields").path(name);
     }
 
