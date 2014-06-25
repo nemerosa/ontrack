@@ -26,4 +26,11 @@ public class ConfiguredIssueService {
     public Issue getIssue(String issueKey) {
         return issueServiceExtension.getIssue(issueServiceConfiguration, issueKey);
     }
+
+    public IssueServiceConfigurationRepresentation getIssueServiceConfigurationRepresentation() {
+        return IssueServiceConfigurationRepresentation.of(
+                issueServiceExtension,
+                issueServiceConfiguration
+        );
+    }
 }

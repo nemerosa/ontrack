@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
 import net.nemerosa.ontrack.extension.scm.changelog.AbstractSCMChangeLogService;
 import net.nemerosa.ontrack.extension.scm.changelog.SCMBuildView;
 import net.nemerosa.ontrack.extension.svn.client.SVNClient;
@@ -166,15 +167,17 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
             // List of issues
             List<SVNChangeLogIssue> issuesList = new ArrayList<>(issues.values());
             // Issues link
+            IssueServiceConfigurationRepresentation issueServiceConfiguration = null;
             String allIssuesLink = "";
             ConfiguredIssueService configuredIssueService = repository.getConfiguredIssueService();
             if (configuredIssueService != null) {
+                issueServiceConfiguration = configuredIssueService.getIssueServiceConfigurationRepresentation();
                 allIssuesLink = configuredIssueService.getLinkForAllIssues(
                         issuesList.stream().map(SVNChangeLogIssue::getIssue).collect(Collectors.toList())
                 );
             }
             // OK
-            return new SVNChangeLogIssues(allIssuesLink, issuesList);
+            return new SVNChangeLogIssues(allIssuesLink, issueServiceConfiguration, issuesList);
 
         }
     }
