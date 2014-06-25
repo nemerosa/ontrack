@@ -260,6 +260,26 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
         return issues;
     }
 
+    /**
+     * Change log files
+     */
+    @RequestMapping(value = "changelog/{uuid}/files", method = RequestMethod.GET)
+    public SVNChangeLogFiles changeLogFiles(@PathVariable String uuid) {
+        // Gets the change log
+        SVNChangeLog changeLog = getChangeLog(uuid);
+        // Cached?
+        SVNChangeLogFiles files = changeLog.getFiles();
+        if (files != null) {
+            return files;
+        }
+        // Loads the files
+        files = changeLogService.getChangeLogFiles(changeLog);
+        // Stores in cache
+        logCache.put(uuid, changeLog.withFiles(files));
+        // OK
+        return files;
+    }
+
     private SVNChangeLog getChangeLog(String uuid) {
         SVNChangeLog changeLog = logCache.getIfPresent(uuid);
         if (changeLog != null) {
