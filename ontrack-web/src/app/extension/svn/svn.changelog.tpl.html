@@ -67,10 +67,13 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">Revisions</div>
                         <div class="panel-body">
-                            <div class="alert alert-warning" ng-hide="revisions">
+                            <div class="alert alert-warning" ng-hide="revisions || revisionsLoading">
                                 No revision has been loaded yet. Click
                                 <a ng-click="changeLogRevisions()">here</a>
                                 to load them.
+                            </div>
+                            <div class="ot-description" ng-show="revisionsLoading">
+                                Revisions are loading...
                             </div>
                             <!-- TODO Merge -->
                             <table class="table table-condensed table-hover" ng-show="revisions">
@@ -114,10 +117,13 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">Issues</div>
                         <div class="panel-body">
-                            <div class="alert alert-warning" ng-hide="issues">
+                            <div class="alert alert-warning" ng-hide="issues || issuesLoading">
                                 No issue has been loaded yet. Click
                                 <a ng-click="changeLogIssues()">here</a>
                                 to load them.
+                            </div>
+                            <div class="ot-description" ng-show="issuesLoading">
+                                Issues are loading...
                             </div>
                             <div ng-show="issues">
                                 <ot-include value="issues" template="app/extension/{{issues.issueServiceConfiguration.serviceId}}/changelog.issues.tpl.html">
