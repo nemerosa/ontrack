@@ -1,7 +1,8 @@
 package net.nemerosa.ontrack.extension.svn.client;
 
-import net.nemerosa.ontrack.extension.svn.model.SVNHistory;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
+import net.nemerosa.ontrack.extension.svn.model.SVNHistory;
+import net.nemerosa.ontrack.extension.svn.model.SVNRevisionPath;
 import org.tmatesoft.svn.core.ISVNLogEntryHandler;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.wc.SVNRevision;
@@ -27,4 +28,6 @@ public interface SVNClient {
     List<Long> getMergedRevisions(SVNRepository repository, SVNURL url, long revision);
 
     SVNHistory getHistory(SVNRepository repository, String path);
+
+    List<SVNRevisionPath> getRevisionPaths(SVNRepository repository, long revision);
 }

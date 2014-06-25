@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.svn.service;
 
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.svn.model.SVNChangeLog;
+import net.nemerosa.ontrack.extension.svn.model.SVNChangeLogFiles;
 import net.nemerosa.ontrack.extension.svn.model.SVNChangeLogIssues;
 import net.nemerosa.ontrack.extension.svn.model.SVNChangeLogRevisions;
 
@@ -12,4 +13,6 @@ public interface SVNChangeLogService {
     SVNChangeLogRevisions getChangeLogRevisions(SVNChangeLog changeLog);
 
     SVNChangeLogIssues getChangeLogIssues(SVNChangeLog changeLog);
+
+    SVNChangeLogFiles getChangeLogFiles(SVNChangeLog changeLog);
 }

@@ -18,6 +18,11 @@ public enum SVNChangeLogFileChangeType {
     /**
      * The file has been deleted
      */
-    DELETED
+    DELETED,
+
+    /**
+     * Change not managed
+     */
+    UNDEFINED
 
 }

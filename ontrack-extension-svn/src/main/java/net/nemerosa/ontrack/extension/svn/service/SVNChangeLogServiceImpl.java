@@ -182,6 +182,50 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
         }
     }
 
+    @Override
+    @Transactional
+    public SVNChangeLogFiles getChangeLogFiles(SVNChangeLog changeLog) {
+        // Revisions must have been loaded first
+        if (changeLog.getRevisions() == null) {
+            changeLog.withRevisions(getChangeLogRevisions(changeLog));
+        }
+        // In a transaction
+        try (Transaction ignored = transactionService.start()) {
+            // Index of files, indexed by path
+            Map<String, SVNChangeLogFile> files = new TreeMap<>();
+            // For each revision
+            for (SVNChangeLogRevision changeLogRevision : changeLog.getRevisions().getList()) {
+                // Takes into account only the unmerged revisions
+                if (changeLogRevision.getLevel() == 0) {
+                    long revision = changeLogRevision.getRevision();
+                    collectFilesForRevision(changeLog.getScmBranch(), files, revision);
+                }
+            }
+            // List of files
+            return new SVNChangeLogFiles(new ArrayList<>(files.values()));
+        }
+    }
+
+    private void collectFilesForRevision(SVNRepository repository, Map<String, SVNChangeLogFile> files, long revision) {
+        SVNRevisionPaths revisionPaths = svnService.getRevisionPaths(repository, revision);
+        for (SVNRevisionPath revisionPath : revisionPaths.getPaths()) {
+            String path = revisionPath.getPath();
+            // Existing file entry?
+            SVNChangeLogFile changeLogFile = files.get(path);
+            if (changeLogFile == null) {
+                changeLogFile = new SVNChangeLogFile(path, repository.getPathBrowsingURL(path));
+                files.put(path, changeLogFile);
+            }
+            // Adds the revision and the type
+            SVNChangeLogFileChange change = new SVNChangeLogFileChange(
+                    revisionPaths.getInfo(),
+                    revisionPath.getChangeType(),
+                    repository.getFileChangeBrowsingURL(path, revisionPaths.getInfo().getRevision())
+            );
+            changeLogFile.addChange(change);
+        }
+    }
+
     private void collectIssuesForRevision(SVNRepository repository, Map<String, SVNChangeLogIssue> issues, long revision) {
         // Gets all issues attached to this revision
         List<String> issueKeys = issueRevisionDao.findIssuesByRevision(repository.getId(), revision);

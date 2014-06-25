@@ -203,4 +203,20 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
             return String.valueOf(revision);
         }
     }
+
+    public String getPathBrowsingURL(String path) {
+        if (StringUtils.isNotBlank(browserForPath)) {
+            return browserForPath.replace("{path}", path);
+        } else {
+            return path;
+        }
+    }
+
+    public String getFileChangeBrowsingURL(String path, long revision) {
+        if (StringUtils.isNotBlank(browserForChange)) {
+            return browserForChange.replace("{path}", path).replace("{revision}", String.valueOf(revision));
+        } else {
+            return path;
+        }
+    }
 }

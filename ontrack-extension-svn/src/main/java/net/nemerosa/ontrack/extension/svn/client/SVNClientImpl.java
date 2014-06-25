@@ -3,8 +3,10 @@ package net.nemerosa.ontrack.extension.svn.client;
 import net.nemerosa.ontrack.extension.svn.db.SVNEventDao;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.db.TCopyEvent;
+import net.nemerosa.ontrack.extension.svn.model.SVNChangeLogFileChangeType;
 import net.nemerosa.ontrack.extension.svn.model.SVNHistory;
 import net.nemerosa.ontrack.extension.svn.model.SVNReference;
+import net.nemerosa.ontrack.extension.svn.model.SVNRevisionPath;
 import net.nemerosa.ontrack.extension.svn.support.SVNLogEntryCollector;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
 import net.nemerosa.ontrack.model.support.Time;
@@ -172,6 +174,51 @@ public class SVNClientImpl implements SVNClient {
         }
         // OK
         return history;
+    }
+
+    @Override
+    public List<SVNRevisionPath> getRevisionPaths(SVNRepository repository, long revision) {
+        // Result
+        List<SVNRevisionPath> paths = new ArrayList<>();
+        // Gets the URL of the repository
+        SVNURL rootUrl = repository.getRootUrl();
+        // Gets the diff for the revision
+        try {
+            getDiffClient(repository).doDiffStatus(
+                    rootUrl,
+                    SVNRevision.create(revision - 1),
+                    rootUrl,
+                    SVNRevision.create(revision),
+                    SVNDepth.INFINITY,
+                    false,
+                    diffStatus -> {
+                        if (diffStatus.getKind() == SVNNodeKind.FILE) {
+                            paths.add(
+                                    new SVNRevisionPath(
+                                            "/" + diffStatus.getPath(),
+                                            toFileChangeType(diffStatus.getModificationType())
+                                    )
+                            );
+                        }
+                    }
+            );
+        } catch (SVNException ex) {
+            throw translateSVNException(ex);
+        }
+        // OK
+        return paths;
+    }
+
+    private SVNChangeLogFileChangeType toFileChangeType(SVNStatusType modificationType) {
+        if (modificationType.equals(SVNStatusType.STATUS_MODIFIED)) {
+            return SVNChangeLogFileChangeType.MODIFIED;
+        } else if (modificationType.equals(SVNStatusType.STATUS_ADDED)) {
+            return SVNChangeLogFileChangeType.ADDED;
+        } else if (modificationType.equals(SVNStatusType.STATUS_DELETED)) {
+            return SVNChangeLogFileChangeType.DELETED;
+        } else {
+            return SVNChangeLogFileChangeType.UNDEFINED;
+        }
     }
 
     private SVNReference getReference(SVNRepository repository, String path) {

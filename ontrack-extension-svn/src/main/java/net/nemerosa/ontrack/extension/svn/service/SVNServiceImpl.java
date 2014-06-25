@@ -1,20 +1,28 @@
 package net.nemerosa.ontrack.extension.svn.service;
 
+import net.nemerosa.ontrack.extension.svn.client.SVNClient;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.db.SVNRevisionDao;
 import net.nemerosa.ontrack.extension.svn.db.TRevision;
 import net.nemerosa.ontrack.extension.svn.model.SVNRevisionInfo;
+import net.nemerosa.ontrack.extension.svn.model.SVNRevisionPath;
+import net.nemerosa.ontrack.extension.svn.model.SVNRevisionPaths;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.tmatesoft.svn.core.SVNURL;
+
+import java.util.List;
 
 @Service
 public class SVNServiceImpl implements SVNService {
 
     private final SVNRevisionDao revisionDao;
+    private final SVNClient svnClient;
 
     @Autowired
-    public SVNServiceImpl(SVNRevisionDao revisionDao) {
+    public SVNServiceImpl(SVNRevisionDao revisionDao, SVNClient svnClient) {
         this.revisionDao = revisionDao;
+        this.svnClient = svnClient;
     }
 
     @Override
@@ -28,5 +36,17 @@ public class SVNServiceImpl implements SVNService {
                 t.getMessage(),
                 repository.getRevisionBrowsingURL(t.getRevision())
         );
+    }
+
+    @Override
+    public SVNRevisionPaths getRevisionPaths(SVNRepository repository, long revision) {
+        // Gets the URL of the repository
+        SVNURL rootUrl = repository.getRootUrl();
+        // Gets the diff for the revision
+        List<SVNRevisionPath> revisionPaths = svnClient.getRevisionPaths(repository, revision);
+        // OK
+        return new SVNRevisionPaths(
+                getRevisionInfo(repository, revision),
+                revisionPaths);
     }
 }
