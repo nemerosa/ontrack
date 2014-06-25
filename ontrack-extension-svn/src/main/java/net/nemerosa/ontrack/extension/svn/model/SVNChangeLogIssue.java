@@ -25,4 +25,12 @@ public class SVNChangeLogIssue {
         list.add(revision);
         return new SVNChangeLogIssue(issue, list);
     }
+
+    public SVNRevisionInfo getLastRevision() {
+        if (revisions != null && !revisions.isEmpty()) {
+            return revisions.get(revisions.size() - 1);
+        } else {
+            return null;
+        }
+    }
 }
