@@ -150,10 +150,33 @@
                             <div class="ot-description" ng-show="filesLoading">
                                 File changes are loading...
                             </div>
-                            <div ng-show="files">
-                                FILES
-                            </div>
                         </div>
+                        <table class="table table-condensed table-hover" ng-show="files" width="100%">
+                            <thead>
+                            <tr>
+                                <th>File</th>
+                                <th>Changes</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="svnChangeLogFile in files.list">
+                                <td>
+                                    <a href="{{svnChangeLogFile.url}}">
+                                        {{svnChangeLogFile.path}}
+                                    </a>
+                                </td>
+                                <td>
+                                    <span ng-repeat="svnChangeLogFileChange in svnChangeLogFile.changes" class="label label-default">
+                                        <span class="ot-extension-svn-changetype-{{svnChangeLogFileChange.changeType | lowercase}}"></span>
+                                        <a href="{{svnChangeLogFileChange.url}}"
+                                           title="{{svnChangeLogFileChange.revisionInfo.message}} ({{svnChangeLogFileChange.revisionInfo.dateTime | date:'mediumDate'}})">
+                                            {{svnChangeLogFileChange.revisionInfo.revision}}
+                                        </a>
+                                    </span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

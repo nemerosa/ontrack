@@ -9,7 +9,6 @@ import net.nemerosa.ontrack.extension.svn.model.SVNRevisionPath;
 import net.nemerosa.ontrack.extension.svn.model.SVNRevisionPaths;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.tmatesoft.svn.core.SVNURL;
 
 import java.util.List;
 
@@ -40,8 +39,6 @@ public class SVNServiceImpl implements SVNService {
 
     @Override
     public SVNRevisionPaths getRevisionPaths(SVNRepository repository, long revision) {
-        // Gets the URL of the repository
-        SVNURL rootUrl = repository.getRootUrl();
         // Gets the diff for the revision
         List<SVNRevisionPath> revisionPaths = svnClient.getRevisionPaths(repository, revision);
         // OK
