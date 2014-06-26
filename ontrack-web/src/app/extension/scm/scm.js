@@ -11,4 +11,21 @@ angular.module('ontrack.extension.scm', [
             transclude: true
         };
     })
+/**
+ * Truncates the start of a path
+ */
+    .filter('otExtensionScmTruncatePath', function () {
+        return function (text, length) {
+            var prefix = '...';
+            if (isNaN(length)) {
+                length = 10;
+            }
+            if (text.length <= length || text.length - prefix.length <= length) {
+                return text;
+            }
+            else {
+                return prefix + String(text).substring(text.length - prefix.length - length, text.length);
+            }
+        };
+    })
 ;
