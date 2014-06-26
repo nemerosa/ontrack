@@ -1,9 +1,10 @@
 var APPLICATION_INFO_HEART_BEAT = 30000; // 30 seconds
 
 angular.module('ot.service.info', [
-    'ot.service.core'
+    'ot.service.core',
+    'ot.dialog.versionInfo'
 ])
-    .service('otInfoService', function (ot, $log, $interval, $http, $rootScope) {
+    .service('otInfoService', function (ot, $log, $modal, $interval, $http, $rootScope) {
         var self = {};
 
         self.loadApplicationInfo = function () {
@@ -29,6 +30,21 @@ angular.module('ot.service.info', [
             $log.debug('[info] init');
             // Loading the application information
             self.loadInfo();
+        };
+
+        /**
+         * Displaying the version information
+         */
+        self.displayVersionInfo = function (versionInfo) {
+            $modal.open({
+                templateUrl: 'app/dialog/dialog.versionInfo.tpl.html',
+                controller: 'otDialogVersionInfo',
+                resolve: {
+                    versionInfo: function () {
+                        return versionInfo;
+                    }
+                }
+            });
         };
 
         return self;

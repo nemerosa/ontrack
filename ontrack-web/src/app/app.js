@@ -79,6 +79,10 @@ var ontrack = angular.module('ontrack', [
 
             otInfoService.init();
 
+            $scope.displayVersionInfo = function (versionInfo) {
+                otInfoService.displayVersionInfo(versionInfo);
+            };
+
             /**
              * Scope methods
              */

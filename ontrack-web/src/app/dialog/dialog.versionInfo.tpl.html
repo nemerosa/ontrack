@@ -1,0 +1,31 @@
+<div class="modal-header">
+    <h3>ontrack version information</h3>
+</div>
+<div class="modal-body">
+    <dl>
+        <dt>Full version</dt>
+        <dd>
+            <span class="label label-info">{{versionInfo.full}}</span>
+        </dd>
+        <dt>Commit</dt>
+        <dd>
+            <span class="label label-default">{{versionInfo.commit}}</span>
+        </dd>
+        <dt>Source</dt>
+        <dd>
+            <span class="label" ng-class="{'label-danger':versionInfo.source != 'tag', 'label-success':versionInfo.source == 'tag'}">
+                {{versionInfo.source}}
+            </span>
+            <span ng-if="versionInfo.source != 'tag'" class="ot-description">
+                &nbsp;This version is not a release! Please use with care.
+            </span>
+        </dd>
+        <dt>&nbsp;</dt>
+        <dd>
+            <a href="http://nemerosa.github.io/ontrack">Go to ontrack</a>
+        </dd>
+    </dl>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" type="button" ng-click="cancel()">OK</button>
+</div>
