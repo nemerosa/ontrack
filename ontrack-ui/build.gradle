@@ -70,3 +70,5 @@ ontrack.version.source = ${rootProject.versionSource}
 """
     }
 }
+
+assemble.mustRunAfter copyWebResources
