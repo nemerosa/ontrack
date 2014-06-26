@@ -134,6 +134,30 @@
                 </div>
             </div>
 
+            <!-- Files sections -->
+            <div class="row">
+                <div class="col-md-12">
+                    <a name="files"></a>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">File changes</div>
+                        <div class="panel-body">
+                            <div class="alert alert-warning" ng-hide="files || filesLoading">
+                                No file change has been loaded yet. Click
+                                <a ng-click="changeLogFiles()">here</a>
+                                to load them.
+                            </div>
+                            <div class="ot-description" ng-show="filesLoading">
+                                File changes are loading...
+                            </div>
+                            <div ng-show="files">
+                                FILES
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- End of sections -->
 
         </div>
@@ -153,6 +177,13 @@
                         <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="issues"></span>
                         <span class="ot-extension-scm-changelog-command-loading"></span>
                         {{issuesCommand}}
+                    </button>
+                </li>
+                <li>
+                    <button class="btn btn-default" ng-click="changeLogFiles()" ng-disabled="filesLoading">
+                        <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="files"></span>
+                        <span class="ot-extension-scm-changelog-command-loading"></span>
+                        {{filesCommand}}
                     </button>
                 </li>
             </ul>

@@ -44,6 +44,7 @@ angular.module('ot.extension.svn.changelog', [
 
             $scope.revisionsCommand = "Revisions";
             $scope.issuesCommand = "Issues";
+            $scope.filesCommand = "File changes";
 
             // Loading the revisions if needed
             $scope.changeLogRevisions = function () {
@@ -77,6 +78,24 @@ angular.module('ot.extension.svn.changelog', [
                     });
                 } else {
                     $location.hash('issues');
+                    $anchorScroll();
+                }
+            };
+
+            // Loading the file changes if needed
+            $scope.changeLogFiles = function () {
+                if (!$scope.files) {
+                    $scope.filesLoading = true;
+                    $scope.filesCommand = "Loading the file changes...";
+                    ot.pageCall($http.get($scope.changeLog._files)).then(function (files) {
+                        $scope.files = files;
+                        $scope.filesLoading = false;
+                        $scope.filesCommand = "File changes";
+                        $location.hash('files');
+                        $anchorScroll();
+                    });
+                } else {
+                    $location.hash('files');
                     $anchorScroll();
                 }
             };
