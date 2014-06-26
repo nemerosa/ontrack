@@ -18,23 +18,23 @@ public class VersionInfoConfig {
     /**
      * Full version string, including the build number
      */
-    private String full;
+    private String full = "SOURCE";
     /**
      * Base version string, without the build number
      */
-    private String base;
+    private String base = "SOURCE";
     /**
      * Build number
      */
-    private String build;
+    private String build = "0";
     /**
      * Associated commit (hash)
      */
-    private String commit;
+    private String commit = "NA";
     /**
      * Source of the version. It can be a tag (correct for a real release) or a developer environment.
      */
-    private String source;
+    private String source = "source";
 
     /**
      * Gets the representation of the version
