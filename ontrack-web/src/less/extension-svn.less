@@ -1,7 +1,35 @@
 @import '../../vendor/bootstrap/less/glyphicons';
+@import '../../vendor/bootstrap/less/labels';
+@import '../../vendor/bootstrap/less/mixins';
 @import 'variables.less';
 
 .ot-svn-command-indexation {
   .glyphicon;
   .glyphicon-time;
+}
+
+.ot-svn-changelog-revision {
+  .label;
+  margin-right: 2px;
+  .ot-svn-changetype-icon {
+    .glyphicon;
+  }
+  &.ot-svn-changetype-modified {
+    .label-info;
+    .ot-svn-changetype-icon {
+      .glyphicon-pencil;
+    }
+  }
+  &.ot-svn-changetype-added {
+    .label-success;
+    .ot-svn-changetype-icon {
+      .glyphicon-plus;
+    }
+  }
+  &.ot-svn-changetype-deleted {
+    .label-danger;
+    .ot-svn-changetype-icon {
+      .glyphicon-remove;
+    }
+  }
 }

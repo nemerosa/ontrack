@@ -166,8 +166,8 @@
                                     </a>
                                 </td>
                                 <td>
-                                    <span ng-repeat="svnChangeLogFileChange in svnChangeLogFile.changes" class="label label-default">
-                                        <span class="ot-extension-svn-changetype-{{svnChangeLogFileChange.changeType | lowercase}}"></span>
+                                    <span ng-repeat="svnChangeLogFileChange in svnChangeLogFile.changes" class="ot-svn-changelog-revision ot-svn-changetype-{{svnChangeLogFileChange.changeType | lowercase}}">
+                                        <span class="ot-svn-changetype-icon"></span>
                                         <a href="{{svnChangeLogFileChange.url}}"
                                            title="{{svnChangeLogFileChange.revisionInfo.message}} ({{svnChangeLogFileChange.revisionInfo.dateTime | date:'mediumDate'}})">
                                             {{svnChangeLogFileChange.revisionInfo.revision}}
