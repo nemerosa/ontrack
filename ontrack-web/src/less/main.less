@@ -151,10 +151,18 @@ div.ot-view {
     text-align: right;
     font-size: 80%;
   }
+  .ot-version {
+    color: @link-color;
+    cursor: pointer;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
   .ot-version-warning {
     font-weight: bold;
     .label;
     .label-danger;
+    text-decoration: no-underline !important;
   }
 }
 
