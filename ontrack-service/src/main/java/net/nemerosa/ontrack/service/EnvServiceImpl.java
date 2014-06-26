@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service;
 
+import net.nemerosa.ontrack.model.structure.VersionInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,13 +17,14 @@ public class EnvServiceImpl implements EnvService {
 
     private final Logger logger = LoggerFactory.getLogger(EnvService.class);
     private final String profiles;
-    private final String version;
+    private final VersionInfo version;
 
     @Autowired
-    public EnvServiceImpl(@Value("${app.version}") String version,
+    public EnvServiceImpl(VersionInfoConfig version,
                           ApplicationContext ctx) {
         this.profiles = StringUtils.join(ctx.getEnvironment().getActiveProfiles(), ",");
-        this.version = version;
+        // Version information from the configuration
+        this.version = version.toInfo();
     }
 
     @Override
@@ -31,7 +33,7 @@ public class EnvServiceImpl implements EnvService {
     }
 
     @Override
-    public String getVersion() {
+    public VersionInfo getVersion() {
         return version;
     }
 

@@ -1,9 +1,8 @@
-import org.apache.tools.ant.filters.*
-
 dependencies {
     compile project(':ontrack-model')
     compile project(':ontrack-repository')
     compile project(':ontrack-extension-api')
+    compile libraries.spring_boot
     compile libraries.spring_context
     compile libraries.spring_tx
     compile libraries.spring_security_core
@@ -12,10 +11,3 @@ dependencies {
     testCompile project(':ontrack-it-utils')
     testRuntime project(':ontrack-repository-impl')
 }
-
-// FIXME Uses the OntrackVersion properties
-//processResources {
-//    filter ReplaceTokens, tokens: [
-//            'app.version': version
-//    ]
-//}

@@ -11,6 +11,6 @@ public class Info {
     /**
      * Version of the application.
      */
-    private final String version;
+    private final VersionInfo version;
 
 }

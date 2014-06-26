@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.service;
 
+import net.nemerosa.ontrack.model.structure.VersionInfo;
+
 public interface EnvService {
 
     /**
@@ -12,6 +14,6 @@ public interface EnvService {
     /**
      * Version of the application
      */
-    String getVersion();
+    VersionInfo getVersion();
 
 }
