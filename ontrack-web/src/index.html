@@ -111,7 +111,18 @@
         <div class="container">
             <div class="ot-footer-inner">
                 <p>
-                    <a href="https://nemerosa.github.io/ontrack">vVERSION</a>
+                    <a
+                            href="https://nemerosa.github.io/ontrack"
+                            title="{{info.version.full}} - {{info.version.date | date:'mediumDate'}}"
+                            >
+                        v{{info.version.base}}
+                        <span
+                                ng-if="info.version.source != 'tag'"
+                                class="ot-version-warning"
+                                title="This version is not a release! Please use with care.">
+                            {{info.version.source}}
+                        </span>
+                    </a>
                 </p>
             </div>
         </div>
