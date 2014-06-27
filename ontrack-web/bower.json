@@ -1,6 +1,5 @@
 {
   "name": "ontrack",
-  "version": "DEV",
   "dependencies": {
     "angular": "~1.2.16",
     "angular-sanitize": "~1.2.16",

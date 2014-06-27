@@ -11,8 +11,15 @@ task bowerInstall(type: Exec) {
 
 task setup(dependsOn: ['npmInstall', 'bowerInstall'])
 
-task clean(type: Exec, dependsOn: 'setup') {
+task gruntClean(type: Exec, dependsOn: ['setup']) {
     commandLine 'grunt', 'clean'
+}
+
+task versionClean(type: Exec) {
+    commandLine 'git', 'checkout', '--', 'package.json'
+}
+
+task clean(dependsOn: ['gruntClean', 'versionClean']) {
 }
 
 task release(dependsOn: ['setup', 'gruntProd']) {
