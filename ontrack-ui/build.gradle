@@ -61,6 +61,8 @@ release {
         // Amends the application.properties file with version information
         File file = project.file('src/main/resources/application.properties')
         file.text = """\
+# This file is generated at build time to contain version information
+# Do not edit it, do not commit it
 ontrack.version.date = ${new Date().format("yyyy-MM-dd'T'HH:mm:ss")}
 ontrack.version.full = ${project.version}
 ontrack.version.base = ${rootProject.versionBase}
