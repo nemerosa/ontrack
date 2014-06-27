@@ -55,12 +55,10 @@ task copyWebResources(dependsOn: ':ontrack-web:release') << {
     }
 }
 
-release.dependsOn copyWebResources
-release {
-    doFirst {
-        // Amends the application.properties file with version information
-        File file = project.file('src/main/resources/application.properties')
-        file.text = """\
+task generationVersionInfo << {
+    // Amends the application.properties file with version information
+    File file = project.file('src/main/resources/application.properties')
+    file.text = """\
 # This file is generated at build time to contain version information
 # Do not edit it, do not commit it
 ontrack.version.date = ${new Date().format("yyyy-MM-dd'T'HH:mm:ss")}
@@ -70,7 +68,10 @@ ontrack.version.build = ${rootProject.versionBuild}
 ontrack.version.commit = ${rootProject.versionCommit}
 ontrack.version.source = ${rootProject.versionSource}
 """
-    }
 }
 
-assemble.mustRunAfter copyWebResources
+release.dependsOn copyWebResources
+release.dependsOn generationVersionInfo
+
+jar.mustRunAfter copyWebResources
+jar.mustRunAfter generationVersionInfo
