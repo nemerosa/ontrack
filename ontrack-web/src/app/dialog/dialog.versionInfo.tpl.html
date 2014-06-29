@@ -13,10 +13,10 @@
         </dd>
         <dt>Source</dt>
         <dd>
-            <span class="label" ng-class="{'label-danger':versionInfo.source != 'tag', 'label-success':versionInfo.source == 'tag'}">
+            <span class="label" ng-class="{'label-danger':versionInfo.source != 'build', 'label-success':versionInfo.source == 'build'}">
                 {{versionInfo.source}}
             </span>
-            <span ng-if="versionInfo.source != 'tag'" class="ot-description">
+            <span ng-if="versionInfo.source != 'build'" class="ot-description">
                 &nbsp;This version is not a release! Please use with care.
             </span>
         </dd>
