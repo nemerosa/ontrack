@@ -7,13 +7,21 @@ import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
+import net.nemerosa.ontrack.model.structure.PropertyService;
 
 import java.util.EnumSet;
 import java.util.Set;
 
 public class SVNBranchConfigurationPropertyType extends AbstractPropertyType<SVNBranchConfigurationProperty> {
+
+    private final PropertyService propertyService;
+
+    public SVNBranchConfigurationPropertyType(PropertyService propertyService) {
+        this.propertyService = propertyService;
+    }
 
     @Override
     public String getName() {
@@ -30,9 +38,16 @@ public class SVNBranchConfigurationPropertyType extends AbstractPropertyType<SVN
         return EnumSet.of(ProjectEntityType.BRANCH);
     }
 
+    /**
+     * One can edit the SVN configuration of a branch only if he can configurure a project and if the project
+     * is itself configured with SVN.
+     */
     @Override
     public boolean canEdit(ProjectEntity entity, SecurityService securityService) {
-        return securityService.isProjectFunctionGranted(entity.projectId(), ProjectConfig.class);
+        return securityService.isProjectFunctionGranted(entity.projectId(), ProjectConfig.class) &&
+                propertyService.hasProperty(
+                        ((Branch) entity).getProject(),
+                        SVNProjectConfigurationPropertyType.class);
     }
 
     @Override

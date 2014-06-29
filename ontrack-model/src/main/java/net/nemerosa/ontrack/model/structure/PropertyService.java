@@ -74,4 +74,11 @@ public interface PropertyService {
      * @param propertyTypeName Fully qualified name of the property to delete
      */
     Ack deleteProperty(ProjectEntity entity, String propertyTypeName);
+
+    /**
+     * Tests if a property is defined.
+     */
+    default <T> boolean hasProperty(ProjectEntity entity, Class<? extends PropertyType<T>> propertyTypeClass) {
+        return !getProperty(entity, propertyTypeClass).isEmpty();
+    }
 }
