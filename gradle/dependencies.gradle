@@ -54,6 +54,9 @@ ext {
             http_client                 : "org.apache.httpcomponents:httpclient:${httpClientVersion}",
             http_mime                   : "org.apache.httpcomponents:httpmime:${httpClientVersion}",
 
+            // Groovy
+            groovy                      : 'org.codehaus.groovy:groovy-all:2.3.3',
+
             // Logging
             slf4j_api                   : "org.slf4j:slf4j-api:${slf4jVersion}",
             slf4j_log4j                 : "org.slf4j:slf4j-log4j12:${slf4jVersion}",

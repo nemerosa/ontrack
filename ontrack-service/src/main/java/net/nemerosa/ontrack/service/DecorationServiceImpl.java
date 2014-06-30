@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.api.DecorationExtension;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.structure.Decoration;
 import net.nemerosa.ontrack.model.structure.DecorationService;
+import net.nemerosa.ontrack.model.structure.Decorator;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.service.support.ErrorDecorator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +42,7 @@ public class DecorationServiceImpl implements DecorationService {
     /**
      * Gets the decoration for an entity, and returns an "error" decoration in case of problem.
      */
-    protected Decoration getDecoration(ProjectEntity entity, DecorationExtension decorator) {
+    protected Decoration getDecoration(ProjectEntity entity, Decorator decorator) {
         try {
             return decorator.getDecoration(entity);
         } catch (Exception ex) {
