@@ -10,7 +10,7 @@ angular.module('ot.view.project', [
             controller: 'ProjectCtrl'
         });
     })
-    .controller('ProjectCtrl', function ($scope, $stateParams, $http, ot, otStructureService) {
+    .controller('ProjectCtrl', function ($scope, $stateParams, $state, $http, ot, otStructureService, otAlertService) {
         var view = ot.view();
         // Project's id
         var projectId = $stateParams.projectId;
@@ -29,6 +29,25 @@ angular.module('ot.view.project', [
                         cls: 'ot-command-branch-new',
                         action: function () {
                             otStructureService.create(branchCollection._create, "New branch").then(loadBranches);
+                        }
+                    },
+                    {
+                        condition: function () {
+                            return $scope.project._delete;
+                        },
+                        id: 'deleteProject',
+                        name: "Delete project",
+                        cls: 'ot-command-project-delete',
+                        action: function () {
+                            otAlertService.confirm({
+                                title: "Deleting a project",
+                                message: "Do you really want to delete the project " + $scope.project.name +
+                                    " and all its associated data?"
+                            }).then(function () {
+                                return ot.call($http.delete($scope.project._delete));
+                            }).then(function () {
+                                $state.go('home');
+                            });
                         }
                     },
                     ot.viewCloseCommand('/home')
