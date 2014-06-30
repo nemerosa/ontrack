@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.repository;
 
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.exceptions.*;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
@@ -85,6 +86,16 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 params("name", project.getName())
                         .addValue("description", project.getDescription())
                         .addValue("id", project.getId().getValue())
+        );
+    }
+
+    @Override
+    public Ack deleteProject(ID projectId) {
+        return Ack.one(
+                getNamedParameterJdbcTemplate().update(
+                        "DELETE FROM PROJECTS WHERE ID = :id",
+                        params("id", projectId.getValue())
+                )
         );
     }
 

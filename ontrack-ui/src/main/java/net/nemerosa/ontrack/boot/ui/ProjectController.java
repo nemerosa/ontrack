@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.ProjectCreation;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -57,6 +58,11 @@ public class ProjectController extends AbstractResourceController {
     @RequestMapping(value = "{projectId}", method = RequestMethod.GET)
     public Project getProject(@PathVariable ID projectId) {
         return structureService.getProject(projectId);
+    }
+
+    @RequestMapping(value = "{projectId}", method = RequestMethod.DELETE)
+    public Ack deleteProject(@PathVariable ID projectId) {
+        return structureService.deleteProject(projectId);
     }
 
     @RequestMapping(value = "{projectId}/update", method = RequestMethod.GET)

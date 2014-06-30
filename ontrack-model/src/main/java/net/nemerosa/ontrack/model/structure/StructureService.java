@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.model.structure;
 
+import net.nemerosa.ontrack.model.Ack;
+
 import java.util.List;
 
 public interface StructureService {
@@ -13,6 +15,8 @@ public interface StructureService {
     Project getProject(ID projectId);
 
     void saveProject(Project project);
+
+    Ack deleteProject(ID projectId);
 
     // Branches
 

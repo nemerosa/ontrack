@@ -27,6 +27,8 @@ public interface LinksBuilder {
 
     LinksBuilder update(Object methodInvocation, Class<? extends ProjectFunction> fn, int projectId);
 
+    LinksBuilder delete(Object methodInvocation, Class<? extends ProjectFunction> fn, int projectId);
+
     List<Link> build();
 
 }

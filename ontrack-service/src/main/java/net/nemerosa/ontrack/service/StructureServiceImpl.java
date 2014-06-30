@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service;
 
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.exceptions.ImageFileSizeException;
 import net.nemerosa.ontrack.model.exceptions.ImageTypeNotAcceptedException;
 import net.nemerosa.ontrack.model.security.*;
@@ -70,6 +71,13 @@ public class StructureServiceImpl implements StructureService {
         isEntityDefined(project, "Project must be defined");
         securityService.checkProjectFunction(project.id(), ProjectEdit.class);
         structureRepository.saveProject(project);
+    }
+
+    @Override
+    public Ack deleteProject(ID projectId) {
+        Validate.isTrue(projectId.isSet(), "Project ID must be set");
+        securityService.checkProjectFunction(projectId.getValue(), ProjectDelete.class);
+        return structureRepository.deleteProject(projectId);
     }
 
     @Override

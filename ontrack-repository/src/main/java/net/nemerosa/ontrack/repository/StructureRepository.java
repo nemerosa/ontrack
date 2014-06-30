@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.repository;
 
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.structure.*;
 
 import java.util.List;
@@ -17,6 +18,8 @@ public interface StructureRepository {
     Project getProjectByName(String project);
 
     void saveProject(Project project);
+
+    Ack deleteProject(ID projectId);
 
     // Branches
 

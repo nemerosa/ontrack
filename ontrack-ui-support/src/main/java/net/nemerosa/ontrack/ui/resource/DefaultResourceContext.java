@@ -86,6 +86,11 @@ public class DefaultResourceContext implements ResourceContext {
         }
 
         @Override
+        public LinksBuilder delete(Object methodInvocation, Class<? extends ProjectFunction> fn, int projectId) {
+            return link(Link.DELETE, methodInvocation, fn, projectId);
+        }
+
+        @Override
         public List<Link> build() {
             return new ArrayList<>(links.values());
         }
