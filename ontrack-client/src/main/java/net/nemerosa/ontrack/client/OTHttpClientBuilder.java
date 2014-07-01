@@ -18,8 +18,6 @@ import java.util.function.Supplier;
 
 public class OTHttpClientBuilder {
 
-    private static final CookieStore cookieStore = new BasicCookieStore();
-
     public static OTHttpClientBuilder create(String url) {
         return new OTHttpClientBuilder(url);
     }
@@ -68,6 +66,7 @@ public class OTHttpClientBuilder {
             httpContext.setAuthCache(authCache);
         }
 
+        CookieStore cookieStore = new BasicCookieStore();
         httpContext.setCookieStore(cookieStore);
 
         Supplier<CloseableHttpClient> httpClientSupplier = () -> {
