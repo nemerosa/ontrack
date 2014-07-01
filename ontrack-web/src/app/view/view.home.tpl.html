@@ -3,11 +3,46 @@
         <ot-noentry list="projectCollection.resources">
             No project has been created yet, or no right is granted for you to see at least one of them.
         </ot-noentry>
-        <div ng-repeat="project in projectCollection.resources" class="ot-home-project-row">
-            <div class="col-md-12">
-                <a class="ot-home-project-label" href="#/project/{{project.id}}">
-                    {{project.name}}
-                </a>
+        <div class="col-md-12" ng-if="projectCollection.resources">
+            <div class="row" ng-repeat="project in projectCollection.resources">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <a href="#/project/{{project.id}}">
+                                {{project.name}}
+                            </a>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table>
+                                        <tbody>
+                                        <tr>
+                                            <!-- For each branch -->
+                                            <td ng-repeat="branchStatusView in project.branchStatusViews.resources" class="ot-project-branch-status-view">
+                                                <span class="ot-project-branch-status-view-branch">
+                                                    <a href="#/branch/{{branchStatusView.branch.id}}">{{branchStatusView.branch.name}}</a>
+                                                </span>
+                                                <span ng-if="branchStatusView.lastPromotionView">
+                                                    <a href="#/build/{{branchStatusView.lastPromotionView.promotionRun.build.id}}">{{branchStatusView.lastPromotionView.promotionRun.build.name}}</a>
+                                                    <span class="glyphicon glyphicon-arrow-right"></span>
+                                                    <a href="#/promotionLevel/{{branchStatusView.lastPromotionView.promotionLevel.id}}">
+                                                        <ot-entity-image entity="branchStatusView.lastPromotionView.promotionLevel"></ot-entity-image>
+                                                        {{branchStatusView.lastPromotionView.promotionLevel.name}}
+                                                    </a>
+                                                </span>
+                                                <span ng-if="!branchStatusView.lastPromotionView">
+                                                    <span class="glyphicon glyphicon-ban-circle"></span>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
