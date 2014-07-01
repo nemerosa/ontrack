@@ -1,7 +1,17 @@
 <ot-view>
     <div class="row">
-        <div class="col-md-12 alert alert-warning" ng-hide="searchLoaded">
+        <div class="col-md-12 alert alert-warning" ng-hide="results">
             Loading the search results...
+        </div>
+        <div class="col-md-12" ng-show="results">
+            <dl ng-repeat="result in results" class="ot-search-result">
+                <dt>
+                    <a href="">{{result.title}}</a>
+                </dt>
+                <dd>
+                    {{result.description}}
+                </dd>
+            </dl>
         </div>
     </div>
 </ot-view>

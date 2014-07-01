@@ -21,7 +21,6 @@ angular.module('ot.view.search', [
 
         // Launching the search
         ot.pageCall($http.post('search', {token: $scope.token})).then(function (results) {
-            $scope.searchLoaded = true;
             $scope.results = results;
         });
 
