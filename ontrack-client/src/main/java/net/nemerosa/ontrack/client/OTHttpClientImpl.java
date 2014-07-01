@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.client;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.*;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -53,6 +54,15 @@ public class OTHttpClientImpl implements OTHttpClient {
     }
 
     @Override
+    public <T> T post(ResponseParser<T> responseParser, HttpEntity data, String path, Object... parameters) {
+        HttpPost post = new HttpPost(getUrl(path, parameters));
+        if (data != null) {
+            post.setEntity(data);
+        }
+        return request(post, responseParser);
+    }
+
+    @Override
     public <T> T request(HttpRequestBase request, final ResponseParser<T> responseParser) {
         return request(
                 request,
@@ -92,7 +102,8 @@ public class OTHttpClientImpl implements OTHttpClient {
                                        EntityParser<T> entityParser) throws ParseException, IOException {
         // Parses the response
         int statusCode = response.getStatusLine().getStatusCode();
-        if (statusCode == HttpStatus.SC_OK) {
+        if (statusCode == HttpStatus.SC_OK ||
+                statusCode == HttpStatus.SC_CREATED) {
             return entityParser.parse(entity);
         } else if (statusCode == HttpStatus.SC_BAD_REQUEST) {
             throw new ClientValidationException(getMessage(response));

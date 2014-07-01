@@ -10,11 +10,21 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import static net.nemerosa.ontrack.json.JsonUtils.object;
+import static net.nemerosa.ontrack.test.TestUtils.uid;
+
 /**
  * Class to be inherited in order to create an acceptance test with some support
  * for the application fixtures.
  */
 public abstract class AcceptanceSupport {
+
+    public JsonNode nameDescription() {
+        return object()
+                .with("name", uid(""))
+                .with("description", uid(""))
+                .end();
+    }
 
     public static String env(String property, boolean required, String defaultValue, String name) {
         String sys = System.getProperty(property);
@@ -44,6 +54,11 @@ public abstract class AcceptanceSupport {
         return client(() -> clientBuilder().build());
     }
 
+    protected Client admin() {
+        String adminPassword = env("acceptance.admin.password", false, "admin", "Acceptance admin password");
+        return client(() -> clientBuilder().withCredentials("admin", adminPassword).build());
+    }
+
     private OTHttpClientBuilder clientBuilder() {
         return OTHttpClientBuilder.create(getBaseURL());
     }
@@ -54,12 +69,17 @@ public abstract class AcceptanceSupport {
 
     private Client client(Supplier<OTHttpClient> otHttpClientSupplier) {
         JsonClient jsonClient = new JsonClientImpl(otHttpClientSupplier.get());
-        return (path, parameters) -> {
-            JsonNode jsonNode = jsonClient.get(path, parameters);
-            return consumer -> {
-                consumer.accept(jsonNode);
-                return consumer;
-            };
+        return new Client() {
+
+            @Override
+            public JsonResult get(String path, Object... parameters) {
+                return new SimpleJsonResult(jsonClient.get(path, parameters));
+            }
+
+            @Override
+            public JsonResult post(JsonNode data, String path, Object... parameters) {
+                return new SimpleJsonResult(jsonClient.post(data, path, parameters));
+            }
         };
     }
 
@@ -67,12 +87,36 @@ public abstract class AcceptanceSupport {
 
         JsonResult get(String path, Object... parameters);
 
+        JsonResult post(JsonNode data, String path, Object... parameters);
+
     }
 
     protected static interface JsonResult {
 
+        JsonNode get();
+
         Consumer<JsonNode> with(Consumer<JsonNode> consumer);
 
+    }
+
+    protected static class SimpleJsonResult implements JsonResult {
+
+        private final JsonNode node;
+
+        public SimpleJsonResult(JsonNode node) {
+            this.node = node;
+        }
+
+        @Override
+        public JsonNode get() {
+            return node;
+        }
+
+        @Override
+        public Consumer<JsonNode> with(Consumer<JsonNode> consumer) {
+            consumer.accept(node);
+            return consumer;
+        }
     }
 
 }

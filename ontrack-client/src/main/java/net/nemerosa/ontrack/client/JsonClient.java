@@ -6,4 +6,6 @@ public interface JsonClient {
 
     JsonNode get(String path, Object... parameters);
 
+    JsonNode post(JsonNode data, String path, Object... parameters);
+
 }

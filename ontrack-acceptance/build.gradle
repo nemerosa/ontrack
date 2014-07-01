@@ -1,5 +1,9 @@
+apply plugin: 'groovy'
+
 dependencies {
     testCompile project(':ontrack-client')
+    testCompile project(':ontrack-test-utils')
+    testCompile libraries.groovy
 
     testRuntime libraries.slf4j_log4j
     testRuntime libraries.log4j
