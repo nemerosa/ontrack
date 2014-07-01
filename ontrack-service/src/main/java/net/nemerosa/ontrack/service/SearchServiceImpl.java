@@ -5,20 +5,20 @@ import net.nemerosa.ontrack.model.structure.SearchRequest;
 import net.nemerosa.ontrack.model.structure.SearchResult;
 import net.nemerosa.ontrack.model.structure.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class SearchServiceImpl implements SearchService {
 
-    private final List<SearchProvider> providers;
+    private final Collection<SearchProvider> providers;
 
     @Autowired
-    public SearchServiceImpl(List<SearchProvider> providers) {
-        this.providers = providers;
+    public SearchServiceImpl(ApplicationContext applicationContext) {
+        this.providers = applicationContext.getBeansOfType(SearchProvider.class).values();
     }
 
     @Override
