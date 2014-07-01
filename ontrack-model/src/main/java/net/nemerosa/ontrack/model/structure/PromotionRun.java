@@ -10,7 +10,7 @@ import lombok.Data;
 public class PromotionRun implements ProjectEntity {
 
     private final ID id;
-    @JsonView({PromotionRun.class})
+    @JsonView({BranchStatusView.class, PromotionView.class, PromotionRun.class})
     private final Build build;
     @JsonView({Build.class, PromotionRun.class, BranchBuildView.class, BuildDiff.class})
     private final PromotionLevel promotionLevel;

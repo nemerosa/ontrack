@@ -181,6 +181,15 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         );
     }
 
+    @Override
+    public Build getLastBuildForBranch(Branch branch) {
+        return getFirstItem(
+                "SELECT * FROM BUILDS WHERE BRANCHID = :branch ORDER BY ID DESC LIMIT 1",
+                params("branch", branch.id()),
+                (rs, num) -> toBuild(rs, (id) -> branch)
+        );
+    }
+
     protected Build toBuild(ResultSet rs, Function<ID, Branch> branchSupplier) throws SQLException {
         return Build.of(
                 branchSupplier.apply(id(rs, "branchId")),
@@ -376,6 +385,17 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public PromotionRun getLastPromotionRunForPromotionLevel(PromotionLevel promotionLevel) {
+        return getFirstItem(
+                "SELECT * FROM PROMOTION_RUNS WHERE PROMOTIONLEVELID = :promotionLevelId ORDER BY CREATION DESC LIMIT 1",
+                params("promotionLevelId", promotionLevel.id()),
+                (rs, rowNum) -> toPromotionRun(rs,
+                        this::getBuild,
+                        (promotionLevelId) -> promotionLevel)
+        );
     }
 
     protected Optional<PromotionRun> getLastPromotionRun(Build build, PromotionLevel promotionLevel) {

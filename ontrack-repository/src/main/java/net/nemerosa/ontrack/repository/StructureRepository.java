@@ -43,6 +43,8 @@ public interface StructureRepository {
 
     List<Build> builds(Branch branch, BuildFilter buildFilter);
 
+    Build getLastBuildForBranch(Branch branch);
+
     // Promotion levels
 
     List<PromotionLevel> getPromotionLevelListForBranch(ID branchId);
@@ -64,6 +66,8 @@ public interface StructureRepository {
     PromotionRun getPromotionRun(ID promotionRunId);
 
     List<PromotionRun> getLastPromotionRunsForBuild(Build build);
+
+    PromotionRun getLastPromotionRunForPromotionLevel(PromotionLevel promotionLevel);
 
     // Validation stamps
 

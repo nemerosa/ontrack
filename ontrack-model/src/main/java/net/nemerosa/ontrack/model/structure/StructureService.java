@@ -26,6 +26,8 @@ public interface StructureService {
 
     Branch newBranch(Branch branch);
 
+    List<BranchStatusView> getBranchStatusViews(ID projectId);
+
     // Builds
 
     Build newBuild(Build build);
@@ -37,6 +39,8 @@ public interface StructureService {
     Build findBuildByName(String project, String branch, String build);
 
     BuildView getBuildView(Build build);
+
+    Build getLastBuildForBranch(Branch branch);
 
     /**
      * Branch builds
@@ -67,6 +71,8 @@ public interface StructureService {
     PromotionLevel findPromotionLevelByName(String project, String branch, String promotionLevel);
 
     List<PromotionRun> getLastPromotionRunsForBuild(ID buildId);
+
+    PromotionRun getLastPromotionRunForPromotionLevel(PromotionLevel promotionLevel);
 
     // Validation stamps
 

@@ -10,7 +10,6 @@ public class PromotionView implements View {
 
     private final PromotionLevel promotionLevel;
     @JsonView({BranchStatusView.class, PromotionView.class})
-    private final Build promotedBuild;
     private final PromotionRun promotionRun;
 
 }

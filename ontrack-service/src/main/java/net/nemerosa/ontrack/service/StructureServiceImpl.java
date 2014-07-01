@@ -105,6 +105,47 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public List<BranchStatusView> getBranchStatusViews(ID projectId) {
+        return getBranchesForProject(projectId).stream()
+                .map(this::toBranchStatusView)
+                .collect(Collectors.toList());
+    }
+
+    protected BranchStatusView toBranchStatusView(Branch branch) {
+        return new BranchStatusView(
+                branch,
+                getLastBuildForBranch(branch),
+                getPromotionLevelListForBranch(branch.getId()).stream()
+                        .map(this::toPromotionView)
+                        .collect(Collectors.toList())
+        );
+    }
+
+    protected PromotionView toPromotionView(PromotionLevel promotionLevel) {
+        // Gets the last build having this promotion level
+        PromotionRun promotionRun = getLastPromotionRunForPromotionLevel(promotionLevel);
+        // OK
+        return new PromotionView(
+                promotionLevel,
+                promotionRun
+        );
+    }
+
+    @Override
+    public PromotionRun getLastPromotionRunForPromotionLevel(PromotionLevel promotionLevel) {
+        securityService.checkProjectFunction(promotionLevel.projectId(), ProjectView.class);
+        return structureRepository.getLastPromotionRunForPromotionLevel(promotionLevel);
+    }
+
+    @Override
+    public Build getLastBuildForBranch(Branch branch) {
+        // Checks the accesses
+        securityService.checkProjectFunction(branch.projectId(), ProjectView.class);
+        // Gets the last build
+        return structureRepository.getLastBuildForBranch(branch);
+    }
+
+    @Override
     public Build newBuild(Build build) {
         // Validation
         isEntityNew(build, "Build must be new");

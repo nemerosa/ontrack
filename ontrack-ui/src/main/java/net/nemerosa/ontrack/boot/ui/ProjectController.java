@@ -4,10 +4,7 @@ import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.ProjectCreation;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.structure.ID;
-import net.nemerosa.ontrack.model.structure.NameDescription;
-import net.nemerosa.ontrack.model.structure.Project;
-import net.nemerosa.ontrack.model.structure.StructureService;
+import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resources;
@@ -53,6 +50,14 @@ public class ProjectController extends AbstractResourceController {
         project = structureService.newProject(project);
         // OK
         return project;
+    }
+
+    @RequestMapping(value = "{projectId}/view", method = RequestMethod.GET)
+    public Resources<BranchStatusView> getBranchStatusViews(@PathVariable ID projectId) {
+        return Resources.of(
+                structureService.getBranchStatusViews(projectId),
+                uri(on(ProjectController.class).getBranchStatusViews(projectId))
+        );
     }
 
     @RequestMapping(value = "{projectId}", method = RequestMethod.GET)
