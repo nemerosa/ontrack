@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.structure.*;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface StructureRepository {
 
@@ -15,7 +16,7 @@ public interface StructureRepository {
 
     Project getProject(ID projectId);
 
-    Project getProjectByName(String project);
+    Optional<Project> getProjectByName(String project);
 
     void saveProject(Project project);
 
@@ -25,7 +26,7 @@ public interface StructureRepository {
 
     Branch getBranch(ID branchId);
 
-    Branch getBranchByName(String project, String branch);
+    Optional<Branch> getBranchByName(String project, String branch);
 
     List<Branch> getBranchesForProject(ID projectId);
 
@@ -39,7 +40,7 @@ public interface StructureRepository {
 
     Build getBuild(ID buildId);
 
-    Build getBuildByName(String project, String branch, String build);
+    Optional<Build> getBuildByName(String project, String branch, String build);
 
     List<Build> builds(Branch branch, BuildFilter buildFilter);
 
@@ -53,7 +54,7 @@ public interface StructureRepository {
 
     PromotionLevel getPromotionLevel(ID promotionLevelId);
 
-    PromotionLevel getPromotionLevelByName(String project, String branch, String promotionLevel);
+    Optional<PromotionLevel> getPromotionLevelByName(String project, String branch, String promotionLevel);
 
     Document getPromotionLevelImage(ID promotionLevelId);
 
@@ -77,7 +78,7 @@ public interface StructureRepository {
 
     ValidationStamp getValidationStamp(ID validationStampId);
 
-    ValidationStamp getValidationStampByName(String project, String branch, String validationStamp);
+    Optional<ValidationStamp> getValidationStampByName(String project, String branch, String validationStamp);
 
     Document getValidationStampImage(ID validationStampId);
 

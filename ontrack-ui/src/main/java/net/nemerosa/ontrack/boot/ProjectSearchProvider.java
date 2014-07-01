@@ -13,6 +13,7 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 @Component
@@ -33,14 +34,14 @@ public class ProjectSearchProvider extends AbstractSearchProvider {
 
     @Override
     public Collection<SearchResult> search(String token) {
-        Project project = structureService.findProjectByName(token);
-        if (project != null) {
+        Optional<Project> project = structureService.findProjectByName(token);
+        if (project.isPresent()) {
             return Collections.singletonList(
                     new SearchResult(
-                            project.getName(),
-                            String.format("%s project", project.getName()),
-                            uri(MvcUriComponentsBuilder.on(ProjectController.class).getProject(project.getId())),
-                            String.format("/project/%d", project.id()),
+                            project.get().getName(),
+                            String.format("%s project", project.get().getName()),
+                            uri(MvcUriComponentsBuilder.on(ProjectController.class).getProject(project.get().getId())),
+                            String.format("/project/%d", project.get().id()),
                             100
                     )
             );

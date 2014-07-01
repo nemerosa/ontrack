@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static net.nemerosa.ontrack.model.structure.Entity.isEntityDefined;
@@ -308,13 +309,15 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
-    public ValidationStamp findValidationStampByName(String project, String branch, String validationStamp) {
-        return structureRepository.getValidationStampByName(project, branch, validationStamp);
+    public Optional<ValidationStamp> findValidationStampByName(String project, String branch, String validationStamp) {
+        return structureRepository.getValidationStampByName(project, branch, validationStamp)
+                .filter(vs -> securityService.isProjectFunctionGranted(vs, ProjectView.class));
     }
 
     @Override
-    public Build findBuildByName(String project, String branch, String build) {
-        return structureRepository.getBuildByName(project, branch, build);
+    public Optional<Build> findBuildByName(String project, String branch, String build) {
+        return structureRepository.getBuildByName(project, branch, build)
+                .filter(b -> securityService.isProjectFunctionGranted(b, ProjectView.class));
     }
 
     @Override
@@ -393,28 +396,21 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
-    public Project findProjectByName(String project) {
-        Project p = structureRepository.getProjectByName(project);
-        if (securityService.isProjectFunctionGranted(p.id(), ProjectView.class)) {
-            return p;
-        } else {
-            return null;
-        }
+    public Optional<Project> findProjectByName(String project) {
+        return structureRepository.getProjectByName(project)
+                .filter(p -> securityService.isProjectFunctionGranted(p.id(), ProjectView.class));
     }
 
     @Override
-    public Branch findBranchByName(String project, String branch) {
-        Branch b = structureRepository.getBranchByName(project, branch);
-        if (securityService.isProjectFunctionGranted(b.projectId(), ProjectView.class)) {
-            return b;
-        } else {
-            return null;
-        }
+    public Optional<Branch> findBranchByName(String project, String branch) {
+        return structureRepository.getBranchByName(project, branch)
+                .filter(b -> securityService.isProjectFunctionGranted(b.projectId(), ProjectView.class));
     }
 
     @Override
-    public PromotionLevel findPromotionLevelByName(String project, String branch, String promotionLevel) {
-        return structureRepository.getPromotionLevelByName(project, branch, promotionLevel);
+    public Optional<PromotionLevel> findPromotionLevelByName(String project, String branch, String promotionLevel) {
+        return structureRepository.getPromotionLevelByName(project, branch, promotionLevel)
+                .filter(pl -> securityService.isProjectFunctionGranted(pl.projectId(), ProjectView.class));
     }
 
     protected void checkImage(Document document) {

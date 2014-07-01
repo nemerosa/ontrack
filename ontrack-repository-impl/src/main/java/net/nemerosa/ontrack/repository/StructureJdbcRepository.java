@@ -67,16 +67,14 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
-    public Project getProjectByName(String project) {
-        try {
-            return getNamedParameterJdbcTemplate().queryForObject(
-                    "SELECT * FROM PROJECTS WHERE NAME = :name",
-                    params("name", project),
-                    (rs, rowNum) -> toProject(rs)
-            );
-        } catch (EmptyResultDataAccessException ex) {
-            throw new ProjectNotFoundException(project);
-        }
+    public Optional<Project> getProjectByName(String project) {
+        return Optional.ofNullable(
+                getFirstItem(
+                        "SELECT * FROM PROJECTS WHERE NAME = :name",
+                        params("name", project),
+                        (rs, rowNum) -> toProject(rs)
+                )
+        );
     }
 
     @Override
@@ -113,17 +111,13 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
-    public Branch getBranchByName(String project, String branch) {
-        try {
-            Project p = getProjectByName(project);
-            return getNamedParameterJdbcTemplate().queryForObject(
-                    "SELECT * FROM BRANCHES WHERE PROJECTID = :project AND NAME = :name",
-                    params("name", branch).addValue("project", p.id()),
-                    (rs, rowNum) -> toBranch(rs, id -> p)
-            );
-        } catch (EmptyResultDataAccessException ex) {
-            throw new BranchNotFoundException(project, branch);
-        }
+    public Optional<Branch> getBranchByName(String project, String branch) {
+        return getProjectByName(project)
+                .map(p -> getFirstItem(
+                        "SELECT * FROM BRANCHES WHERE PROJECTID = :project AND NAME = :name",
+                        params("name", branch).addValue("project", p.id()),
+                        (rs, rowNum) -> toBranch(rs, id -> p)
+                ));
     }
 
     @Override
@@ -250,17 +244,12 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
 
 
     @Override
-    public Build getBuildByName(String project, String branch, String build) {
-        try {
-            Branch b = getBranchByName(project, branch);
-            return getNamedParameterJdbcTemplate().queryForObject(
-                    "SELECT * FROM BUILDS WHERE NAME = :name",
-                    params("name", build),
-                    (rs, rowNum) -> toBuild(rs, this::getBranch)
-            );
-        } catch (EmptyResultDataAccessException ex) {
-            throw new BuildNotFoundException(project, branch, build);
-        }
+    public Optional<Build> getBuildByName(String project, String branch, String build) {
+        return getBranchByName(project, branch).map(b -> getFirstItem(
+                "SELECT * FROM BUILDS WHERE NAME = :name",
+                params("name", build),
+                (rs, rowNum) -> toBuild(rs, this::getBranch)
+        ));
     }
 
     @Override
@@ -312,17 +301,12 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
-    public PromotionLevel getPromotionLevelByName(String project, String branch, String promotionLevel) {
-        try {
-            Branch b = getBranchByName(project, branch);
-            return getNamedParameterJdbcTemplate().queryForObject(
-                    "SELECT * FROM PROMOTION_LEVELS WHERE BRANCHID = :branch AND NAME = :name",
-                    params("name", promotionLevel).addValue("branch", b.id()),
-                    (rs, rowNum) -> toPromotionLevel(rs, this::getBranch)
-            );
-        } catch (EmptyResultDataAccessException ex) {
-            throw new PromotionLevelNotFoundException(project, branch, promotionLevel);
-        }
+    public Optional<PromotionLevel> getPromotionLevelByName(String project, String branch, String promotionLevel) {
+        return getBranchByName(project, branch).map(b -> getFirstItem(
+                "SELECT * FROM PROMOTION_LEVELS WHERE BRANCHID = :branch AND NAME = :name",
+                params("name", promotionLevel).addValue("branch", b.id()),
+                (rs, rowNum) -> toPromotionLevel(rs, this::getBranch)
+        ));
     }
 
     @Override
@@ -471,17 +455,12 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
-    public ValidationStamp getValidationStampByName(String project, String branch, String validationStamp) {
-        try {
-            Branch b = getBranchByName(project, branch);
-            return getNamedParameterJdbcTemplate().queryForObject(
-                    "SELECT * FROM VALIDATION_STAMPS WHERE NAME = :name",
-                    params("name", validationStamp).addValue("branch", b.id()),
-                    (rs, rowNum) -> toValidationStamp(rs, id -> b)
-            );
-        } catch (EmptyResultDataAccessException ex) {
-            throw new ValidationStampNotFoundException(project, branch, validationStamp);
-        }
+    public Optional<ValidationStamp> getValidationStampByName(String project, String branch, String validationStamp) {
+        return getBranchByName(project, branch).map(b -> getFirstItem(
+                "SELECT * FROM VALIDATION_STAMPS WHERE NAME = :name",
+                params("name", validationStamp).addValue("branch", b.id()),
+                (rs, rowNum) -> toValidationStamp(rs, id -> b)
+        ));
     }
 
     @Override

@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.model.structure;
 import net.nemerosa.ontrack.model.Ack;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface StructureService {
 
@@ -38,7 +39,7 @@ public interface StructureService {
 
     Build getBuild(ID buildId);
 
-    Build findBuildByName(String project, String branch, String build);
+    Optional<Build> findBuildByName(String project, String branch, String build);
 
     BuildView getBuildView(Build build);
 
@@ -70,7 +71,7 @@ public interface StructureService {
 
     PromotionRun getPromotionRun(ID promotionRunId);
 
-    PromotionLevel findPromotionLevelByName(String project, String branch, String promotionLevel);
+    Optional<PromotionLevel> findPromotionLevelByName(String project, String branch, String promotionLevel);
 
     List<PromotionRun> getLastPromotionRunsForBuild(ID buildId);
 
@@ -84,7 +85,7 @@ public interface StructureService {
 
     ValidationStamp getValidationStamp(ID validationStampId);
 
-    ValidationStamp findValidationStampByName(String project, String branch, String validationStamp);
+    Optional<ValidationStamp> findValidationStampByName(String project, String branch, String validationStamp);
 
     Document getValidationStampImage(ID validationStampId);
 
@@ -104,7 +105,7 @@ public interface StructureService {
 
     // Entity searches by name
 
-    Project findProjectByName(String project);
+    Optional<Project> findProjectByName(String project);
 
-    Branch findBranchByName(String project, String branch);
+    Optional<Branch> findBranchByName(String project, String branch);
 }

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import net.nemerosa.ontrack.model.exceptions.*;
 import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,7 +26,7 @@ public class StructureController extends AbstractProjectEntityController {
      */
     @RequestMapping(value = "entity/project/{project:.*}", method = RequestMethod.GET)
     public Project project(@PathVariable String project) {
-        return structureService.findProjectByName(project);
+        return structureService.findProjectByName(project).orElseThrow(() -> new ProjectNotFoundException(project));
     }
 
     /**
@@ -33,7 +34,7 @@ public class StructureController extends AbstractProjectEntityController {
      */
     @RequestMapping(value = "entity/branch/{project}/{branch:.*}", method = RequestMethod.GET)
     public Branch branch(@PathVariable String project, @PathVariable String branch) {
-        return structureService.findBranchByName(project, branch);
+        return structureService.findBranchByName(project, branch).orElseThrow(() -> new BranchNotFoundException(project, branch));
     }
 
     /**
@@ -41,7 +42,8 @@ public class StructureController extends AbstractProjectEntityController {
      */
     @RequestMapping(value = "entity/promotionLevel/{project}/{branch}/{promotionLevel:.*}", method = RequestMethod.GET)
     public PromotionLevel promotionLevel(@PathVariable String project, @PathVariable String branch, @PathVariable String promotionLevel) {
-        return structureService.findPromotionLevelByName(project, branch, promotionLevel);
+        return structureService.findPromotionLevelByName(project, branch, promotionLevel)
+                .orElseThrow(() -> new PromotionLevelNotFoundException(project, branch, promotionLevel));
     }
 
     /**
@@ -49,12 +51,14 @@ public class StructureController extends AbstractProjectEntityController {
      */
     @RequestMapping(value = "entity/validationStamp/{project}/{branch}/{validationStamp:.*}", method = RequestMethod.GET)
     public ValidationStamp validationStamp(@PathVariable String project, @PathVariable String branch, @PathVariable String validationStamp) {
-        return structureService.findValidationStampByName(project, branch, validationStamp);
+        return structureService.findValidationStampByName(project, branch, validationStamp)
+                .orElseThrow(() -> new ValidationStampNotFoundException(project, branch, validationStamp));
     }
 
     @RequestMapping(value = "entity/build/{project}/{branch}/{build:.*}", method = RequestMethod.GET)
     public Build build(@PathVariable String project, @PathVariable String branch, @PathVariable String build) {
-        return structureService.findBuildByName(project, branch, build);
+        return structureService.findBuildByName(project, branch, build)
+                .orElseThrow(() -> new BuildNotFoundException(project, branch, build));
     }
 
     // FIXME PROMOTION_RUN
