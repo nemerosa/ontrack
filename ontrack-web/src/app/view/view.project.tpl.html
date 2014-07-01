@@ -23,8 +23,25 @@
                             <span class="glyphicon glyphicon-ban-circle" ></span>
                         </span>
                     </div>
-                    <div class="col-md-8">
-                        PROMOTIONS
+                    <div class="col-md-8" ng-show="branch.branchStatusView">
+                            <div ng-repeat="promotionView in branch.branchStatusView.promotions">
+                                <div ng-if="promotionView.promotionRun" class="ot-project-branch-promotion-run">
+                                    <a href="#/promotionLevel/{{promotionView.promotionLevel.id}}">
+                                        <ot-entity-image entity="promotionView.promotionLevel"></ot-entity-image>
+                                        {{promotionView.promotionLevel.name}}
+                                    </a>
+                                    <span class="glyphicon glyphicon-star-empty"></span>
+                                    <a href="#/build/{{promotionView.promotionRun.build.id}}">{{promotionView.promotionRun.build.name}}</a>
+                                </div>
+                                <div ng-if="!promotionView.promotionRun" class="ot-project-branch-promotion-run">
+                                    <a href="#/promotionLevel/{{promotionView.promotionLevel.id}}">
+                                        <ot-entity-image entity="promotionView.promotionLevel"></ot-entity-image>
+                                        {{promotionView.promotionLevel.name}}
+                                    </a>
+                                    <span class="glyphicon glyphicon-ban-circle"></span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
