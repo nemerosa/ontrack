@@ -22,7 +22,6 @@ public class PromotionViewTest {
         );
         assertJsonWrite(
                 object()
-                        .with("promotedBuild", (String) null)
                         .with("promotionLevel", object()
                                 .with("id", 0)
                                 .with("name", "PL")
@@ -66,18 +65,6 @@ public class PromotionViewTest {
         );
         assertJsonWrite(
                 object()
-                        .with("promotedBuild", object()
-                                .with("id", 0)
-                                .with("name", "11")
-                                .with("description", "Build 11")
-                                .with("signature", object()
-                                        .with("time", dateTimeJson())
-                                        .with("user", object()
-                                                .with("name", "User")
-                                                .end())
-                                        .end())
-                                        // Branch skipped
-                                .end())
                         .with("promotionLevel", object()
                                 .with("id", 0)
                                 .with("name", "PL")
@@ -97,7 +84,6 @@ public class PromotionViewTest {
                         .with("promotionRun", object()
                                 .with("id", 0)
                                         // Promotion level skipped
-                                        // Build skipped
                                 .with("signature", object()
                                         .with("time", dateTimeJson())
                                         .with("user", object()
@@ -105,6 +91,18 @@ public class PromotionViewTest {
                                                 .end())
                                         .end())
                                 .with("description", "Promotion")
+                                .with("build", object()
+                                        .with("id", 0)
+                                        .with("name", "11")
+                                        .with("description", "Build 11")
+                                        .with("signature", object()
+                                                .with("time", dateTimeJson())
+                                                .with("user", object()
+                                                        .with("name", "User")
+                                                        .end())
+                                                .end())
+                                                // Branch skipped
+                                        .end())
                                 .end())
                         .end(),
                 view,
