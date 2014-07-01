@@ -102,6 +102,16 @@ var ontrack = angular.module('ontrack', [
                 $rootScope.notification = undefined;
             };
 
+            /**
+             * Search
+             */
+
+            $scope.search = function (token) {
+                if ($scope.searchToken) {
+                    alert($scope.searchToken);
+                }
+            };
+
 
         })
     ;
