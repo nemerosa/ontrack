@@ -10,7 +10,7 @@ angular.module('ot.view.home', [
             controller: 'HomeCtrl'
         });
     })
-    .controller('HomeCtrl', function ($rootScope, $location, $scope, otStructureService, otNotificationService) {
+    .controller('HomeCtrl', function ($rootScope, $location, $scope, $http, ot, otStructureService, otNotificationService) {
         var code = $location.search().code;
         $rootScope.view = {
             // Title
@@ -22,7 +22,12 @@ angular.module('ot.view.home', [
         function loadProjects() {
             otStructureService.getProjects().then(function (projectCollection) {
                 $scope.projectCollection = projectCollection;
-                // TODO Loading the projects' views
+                // Loading the projects' views
+                angular.forEach($scope.projectCollection.resources, function (project) {
+                    ot.call($http.get(project._branchStatusViews)).then(function (branchStatusViews) {
+                        project.branchStatusViews = branchStatusViews;
+                    });
+                });
                 // Commands
                 $rootScope.view.commands = [
                     {
