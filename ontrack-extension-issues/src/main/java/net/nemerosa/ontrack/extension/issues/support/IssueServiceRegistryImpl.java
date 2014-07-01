@@ -19,13 +19,14 @@ import java.util.stream.Collectors;
 public class IssueServiceRegistryImpl implements IssueServiceRegistry {
 
     private final ExtensionManager extensionManager;
-    private final Map<String, IssueServiceExtension> extensions;
 
     @Autowired
     public IssueServiceRegistryImpl(ExtensionManager extensionManager) {
         this.extensionManager = extensionManager;
-        // Indexation of all issue services
-        this.extensions = extensionManager.getAllExtensions(IssueServiceExtension.class).stream()
+    }
+
+    protected Map<String, IssueServiceExtension> getIssueServiceExtensionMap() {
+        return extensionManager.getAllExtensions(IssueServiceExtension.class).stream()
                 .map(AvailableExtension::getExtension)
                 .collect(Collectors.toMap(
                                 IssueServiceExtension::getId,
@@ -36,7 +37,7 @@ public class IssueServiceRegistryImpl implements IssueServiceRegistry {
 
     @Override
     public Collection<IssueServiceExtension> getIssueServices() {
-        return extensions.values();
+        return getIssueServiceExtensionMap().values();
     }
 
     @Override
@@ -48,13 +49,13 @@ public class IssueServiceRegistryImpl implements IssueServiceRegistry {
 
     @Override
     public Optional<IssueServiceExtension> getOptionalIssueService(String id) {
-        return Optional.ofNullable(extensions.get(id));
+        return Optional.ofNullable(getIssueServiceExtensionMap().get(id));
     }
 
     @Override
     public List<IssueServiceConfigurationRepresentation> getAvailableIssueServiceConfigurations() {
         List<IssueServiceConfigurationRepresentation> issueServiceConfigurationRepresentations = new ArrayList<>();
-        for (IssueServiceExtension issueServiceExtension : extensions.values()) {
+        for (IssueServiceExtension issueServiceExtension : getIssueServiceExtensionMap().values()) {
             List<? extends IssueServiceConfiguration> configurationList = issueServiceExtension.getConfigurationList();
             for (IssueServiceConfiguration issueServiceConfiguration : configurationList) {
                 issueServiceConfigurationRepresentations.add(

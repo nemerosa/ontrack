@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.svn.service;
 
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
-import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
@@ -10,7 +9,6 @@ import net.nemerosa.ontrack.extension.scm.changelog.SCMBuildView;
 import net.nemerosa.ontrack.extension.svn.client.SVNClient;
 import net.nemerosa.ontrack.extension.svn.db.SVNIssueRevisionDao;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
-import net.nemerosa.ontrack.extension.svn.db.SVNRepositoryDao;
 import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty;
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType;
@@ -40,10 +38,7 @@ import java.util.stream.Collectors;
 public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService implements SVNChangeLogService {
 
     private final PropertyService propertyService;
-    private final SVNConfigurationService configurationService;
-    private final SVNRepositoryDao repositoryDao;
     private final SVNIssueRevisionDao issueRevisionDao;
-    private final IssueServiceRegistry issueServiceRegistry;
     private final SVNService svnService;
     private final SVNClient svnClient;
     private final TransactionService transactionService;
@@ -53,20 +48,14 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
     public SVNChangeLogServiceImpl(
             StructureService structureService,
             PropertyService propertyService,
-            SVNConfigurationService configurationService,
-            SVNRepositoryDao repositoryDao,
             SVNIssueRevisionDao issueRevisionDao,
-            IssueServiceRegistry issueServiceRegistry,
             SVNService svnService,
             SVNClient svnClient,
             TransactionService transactionService,
             SecurityService securityService) {
         super(structureService);
         this.propertyService = propertyService;
-        this.configurationService = configurationService;
-        this.repositoryDao = repositoryDao;
         this.issueRevisionDao = issueRevisionDao;
-        this.issueServiceRegistry = issueServiceRegistry;
         this.svnService = svnService;
         this.svnClient = svnClient;
         this.transactionService = transactionService;
@@ -364,13 +353,7 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
             throw new MissingSVNProjectConfigurationException(branch.getProject().getName());
         } else {
             SVNConfiguration configuration = projectConfiguration.getValue().getConfiguration();
-            return securityService.asAdmin(() -> SVNRepository.of(
-                    repositoryDao.getOrCreateByName(configuration.getName()),
-                    // The configuration contained in the property's configuration is obfuscated
-                    // and the original one must be loaded
-                    configurationService.getConfiguration(configuration.getName()),
-                    issueServiceRegistry.getConfiguredIssueService(configuration.getIssueServiceConfigurationIdentifier())
-            ));
+            return securityService.asAdmin(() -> svnService.getRepository(configuration.getName()));
         }
     }
 

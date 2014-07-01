@@ -22,4 +22,12 @@ public interface SVNService {
      */
     SVNRevisionPaths getRevisionPaths(SVNRepository repository, long revision);
 
+    /**
+     * Loads a {@link net.nemerosa.ontrack.extension.svn.db.SVNRepository} using its
+     * configuration name.
+     *
+     * @param name Name of the {@link net.nemerosa.ontrack.extension.svn.model.SVNConfiguration}
+     * @return Repository
+     */
+    SVNRepository getRepository(String name);
 }

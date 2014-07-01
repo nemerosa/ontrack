@@ -46,9 +46,6 @@ public class SVNChangeLogServiceTest {
                 null,
                 null,
                 null,
-                null,
-                null,
-                null,
                 null);
     }
 
