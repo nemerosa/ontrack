@@ -24,23 +24,24 @@
                         </span>
                     </div>
                     <div class="col-md-8" ng-show="branch.branchStatusView">
-                            <div ng-repeat="promotionView in branch.branchStatusView.promotions">
-                                <div ng-if="promotionView.promotionRun" class="ot-project-branch-promotion-run">
+                            <span ng-repeat="promotionView in branch.branchStatusView.promotions" class="ot-project-branch-promotion-run">
+                                <span ng-if="promotionView.promotionRun">
                                     <a href="#/promotionLevel/{{promotionView.promotionLevel.id}}">
                                         <ot-entity-image entity="promotionView.promotionLevel"></ot-entity-image>
                                         {{promotionView.promotionLevel.name}}
                                     </a>
-                                    <span class="glyphicon glyphicon-star-empty"></span>
+                                    <span class="glyphicon glyphicon-arrow-right"></span>
                                     <a href="#/build/{{promotionView.promotionRun.build.id}}">{{promotionView.promotionRun.build.name}}</a>
-                                </div>
-                                <div ng-if="!promotionView.promotionRun" class="ot-project-branch-promotion-run">
+                                </span>
+                                <span ng-if="!promotionView.promotionRun">
                                     <a href="#/promotionLevel/{{promotionView.promotionLevel.id}}">
                                         <ot-entity-image entity="promotionView.promotionLevel"></ot-entity-image>
                                         {{promotionView.promotionLevel.name}}
                                     </a>
+                                    <span class="glyphicon glyphicon-arrow-right"></span>
                                     <span class="glyphicon glyphicon-ban-circle"></span>
-                                </div>
-                            </div>
+                                </span>
+                            </span>
                         </div>
                     </div>
                 </div>
