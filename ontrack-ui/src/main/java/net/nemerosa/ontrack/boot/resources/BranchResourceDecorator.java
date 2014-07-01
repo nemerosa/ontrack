@@ -58,8 +58,10 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                 .link("_properties", on(PropertyController.class).getProperties(ProjectEntityType.BRANCH, branch.getId()))
                         // TODO Update link (with authorisation)
                         // TODO Delete link
-                        // TODO View link
+                        // View link
+                .link("_status", on(BranchController.class).getBranchStatusView(branch.getId()))
                         // TODO Builds link
+                        // OK
                 .build();
     }
 

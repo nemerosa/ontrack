@@ -73,6 +73,11 @@ public class BranchController extends AbstractResourceController {
         return structureService.getBranch(branchId);
     }
 
+    @RequestMapping(value = "branches/{branchId}/status", method = RequestMethod.GET)
+    public BranchStatusView getBranchStatusView(@PathVariable ID branchId) {
+        return structureService.getBranchStatusView(structureService.getBranch(branchId));
+    }
+
     @RequestMapping(value = "branches/{branchId}/view", method = RequestMethod.GET)
     // TODO Filter
     public BranchBuildView buildView(@PathVariable ID branchId) {

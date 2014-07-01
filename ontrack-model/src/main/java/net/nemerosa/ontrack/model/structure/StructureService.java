@@ -28,6 +28,8 @@ public interface StructureService {
 
     List<BranchStatusView> getBranchStatusViews(ID projectId);
 
+    BranchStatusView getBranchStatusView(Branch branch);
+
     // Builds
 
     Build newBuild(Build build);

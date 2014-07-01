@@ -107,11 +107,12 @@ public class StructureServiceImpl implements StructureService {
     @Override
     public List<BranchStatusView> getBranchStatusViews(ID projectId) {
         return getBranchesForProject(projectId).stream()
-                .map(this::toBranchStatusView)
+                .map(this::getBranchStatusView)
                 .collect(Collectors.toList());
     }
 
-    protected BranchStatusView toBranchStatusView(Branch branch) {
+    @Override
+    public BranchStatusView getBranchStatusView(Branch branch) {
         return new BranchStatusView(
                 branch,
                 getLastBuildForBranch(branch),
