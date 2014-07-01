@@ -1,8 +1,13 @@
 package net.nemerosa.ontrack.extension.svn.service;
 
+import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
+import net.nemerosa.ontrack.extension.svn.model.SVNRepositoryIssue;
 import net.nemerosa.ontrack.extension.svn.model.SVNRevisionInfo;
 import net.nemerosa.ontrack.extension.svn.model.SVNRevisionPaths;
+
+import java.util.Collection;
+import java.util.Optional;
 
 /**
  * Layer on top of the basic Subversion client and of the repositories.
@@ -30,4 +35,9 @@ public interface SVNService {
      * @return Repository
      */
     SVNRepository getRepository(String name);
+
+    /**
+     * Searches a list of issues associated to this repository
+     */
+    Optional<SVNRepositoryIssue> searchIssues(SVNRepository repository, String token);
 }

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class SVNIssueRevisionJdbcDao extends AbstractJdbcRepository implements SVNIssueRevisionDao {
@@ -40,6 +41,17 @@ public class SVNIssueRevisionJdbcDao extends AbstractJdbcRepository implements S
                 "SELECT ISSUE FROM EXT_SVN_REVISION_ISSUE WHERE REPOSITORY = :repository AND REVISION = :revision ORDER BY ISSUE",
                 params("revision", revision).addValue("repository", repositoryId),
                 String.class
+        );
+    }
+
+    @Override
+    public Optional<String> findIssueByKey(int repositoryId, String issueKey) {
+        return Optional.ofNullable(
+                getFirstItem(
+                        "SELECT ISSUE FROM EXT_SVN_REVISION_ISSUE WHERE REPOSITORY = :repository AND ISSUE = :issue ORDER BY REVISION LIMIT 1",
+                        params("repository", repositoryId).addValue("issue", issueKey),
+                        String.class
+                )
         );
     }
 }

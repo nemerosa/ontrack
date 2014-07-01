@@ -1,26 +1,25 @@
 package net.nemerosa.ontrack.extension.svn.service;
 
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
+import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.svn.client.SVNClient;
-import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
-import net.nemerosa.ontrack.extension.svn.db.SVNRepositoryDao;
-import net.nemerosa.ontrack.extension.svn.db.SVNRevisionDao;
-import net.nemerosa.ontrack.extension.svn.db.TRevision;
-import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration;
-import net.nemerosa.ontrack.extension.svn.model.SVNRevisionInfo;
-import net.nemerosa.ontrack.extension.svn.model.SVNRevisionPath;
-import net.nemerosa.ontrack.extension.svn.model.SVNRevisionPaths;
+import net.nemerosa.ontrack.extension.svn.db.*;
+import net.nemerosa.ontrack.extension.svn.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
+@Transactional
 public class SVNServiceImpl implements SVNService {
 
     private final IssueServiceRegistry issueServiceRegistry;
     private final SVNConfigurationService configurationService;
     private final SVNRevisionDao revisionDao;
+    private final SVNIssueRevisionDao issueRevisionDao;
     private final SVNRepositoryDao repositoryDao;
     private final SVNClient svnClient;
 
@@ -29,11 +28,13 @@ public class SVNServiceImpl implements SVNService {
             IssueServiceRegistry issueServiceRegistry,
             SVNConfigurationService configurationService,
             SVNRevisionDao revisionDao,
+            SVNIssueRevisionDao issueRevisionDao,
             SVNRepositoryDao repositoryDao,
             SVNClient svnClient) {
         this.issueServiceRegistry = issueServiceRegistry;
         this.configurationService = configurationService;
         this.revisionDao = revisionDao;
+        this.issueRevisionDao = issueRevisionDao;
         this.repositoryDao = repositoryDao;
         this.svnClient = svnClient;
     }
@@ -71,5 +72,20 @@ public class SVNServiceImpl implements SVNService {
                 configuration,
                 issueServiceRegistry.getConfiguredIssueService(configuration.getIssueServiceConfigurationIdentifier())
         );
+    }
+
+    @Override
+    public Optional<SVNRepositoryIssue> searchIssues(SVNRepository repository, String token) {
+        ConfiguredIssueService configuredIssueService = repository.getConfiguredIssueService();
+        if (configuredIssueService != null) {
+            return issueRevisionDao.findIssueByKey(repository.getId(), token)
+                    .map(key -> new SVNRepositoryIssue(
+                                    repository,
+                                    configuredIssueService.getIssue(key)
+                            )
+                    );
+        } else {
+            return Optional.empty();
+        }
     }
 }
