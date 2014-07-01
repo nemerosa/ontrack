@@ -40,6 +40,7 @@ public class ProjectSearchProvider extends AbstractSearchProvider {
                             project.getName(),
                             String.format("%s project", project.getName()),
                             uri(MvcUriComponentsBuilder.on(ProjectController.class).getProject(project.getId())),
+                            String.format("/project/%d", project.id()),
                             100
                     )
             );
