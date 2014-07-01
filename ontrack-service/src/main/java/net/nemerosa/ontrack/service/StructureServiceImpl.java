@@ -394,12 +394,16 @@ public class StructureServiceImpl implements StructureService {
 
     @Override
     public Project findProjectByName(String project) {
-        return structureRepository.getProjectByName(project);
+        Project p = structureRepository.getProjectByName(project);
+        securityService.checkProjectFunction(p.id(), ProjectView.class);
+        return p;
     }
 
     @Override
     public Branch findBranchByName(String project, String branch) {
-        return structureRepository.getBranchByName(project, branch);
+        Branch b = structureRepository.getBranchByName(project, branch);
+        securityService.checkProjectFunction(b.projectId(), ProjectView.class);
+        return b;
     }
 
     @Override
