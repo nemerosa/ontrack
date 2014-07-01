@@ -19,12 +19,12 @@ angular.module('ot.view.branch', [
 
         // Auto refresh status
         function refreshBuildView() {
-            console.log('loadBuildView()');
+            loadBuildView();
         }
 
         $scope.$watch('autoRefresh', function () {
             if ($scope.autoRefresh) {
-                $scope.autoRefreshPromise = $interval(refreshBuildView, 5000);
+                $scope.autoRefreshPromise = $interval(refreshBuildView, 30000);
             } else if ($scope.autoRefreshPromise) {
                 $interval.cancel($scope.autoRefreshPromise);
             }
