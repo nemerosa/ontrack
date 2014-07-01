@@ -23,7 +23,7 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public Collection<SearchResult> search(SearchRequest request) {
-        return providers.parallelStream()
+        return providers.stream()
                 .filter(provider -> provider.isTokenSearchable(request.getToken()))
                 .flatMap(provider -> provider.search(request.getToken()).stream())
                 .collect(Collectors.toList());
