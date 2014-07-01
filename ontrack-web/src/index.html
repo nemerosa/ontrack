@@ -28,81 +28,83 @@
     <!-- Header and menu -->
 
     <nav class="navbar navbar-default navbar-inverse" role="navigation">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="#/">
-                <img class="ot-logo" src="assets/logo-128.png"/>
-                ontrack
-            </a>
-        </div>
-        <div class="navbar-collapse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#/">
+                    <img class="ot-logo" src="assets/logo-128.png"/>
+                    ontrack
+                </a>
+            </div>
+            <div class="navbar-collapse collapse">
 
-            <ul class="nav navbar-nav navbar-right">
+                <ul class="nav navbar-nav navbar-right">
 
-                <!-- Application info messages -->
+                    <!-- Application info messages -->
 
-                <!-- No messages: -->
-                <li class="dropdown" ng-if="!applicationInfo.resources.length">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" title="Application messages: none">
-                        <span class="ot-application-info ot-application-info-none"></span>
-                    </a>
-                    <ul class="dropdown-menu" role="menu">
-                        <li>
-                            <a class="ot-application-info-none">No message to display</a>
-                        </li>
-                    </ul>
-                </li>
+                    <!-- No messages: -->
+                    <li class="dropdown" ng-if="!applicationInfo.resources.length">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" title="Application messages: none">
+                            <span class="ot-application-info ot-application-info-none"></span>
+                        </a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li>
+                                <a class="ot-application-info-none">No message to display</a>
+                            </li>
+                        </ul>
+                    </li>
 
-                <!-- With messages: -->
-                <li class="dropdown" ng-if="applicationInfo.resources.length"
-                    title="Application messages: {{applicationInfo.resources.length}}">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <span class="ot-application-info"></span>
-                        <span class="ot-application-info-count">{{applicationInfo.resources.length}}</span>
-                    </a>
-                    <ul class="dropdown-menu" role="menu">
-                        <li>
-                            <a class="ot-application-info-none">Application messages:</a>
-                            <a ng-repeat="info in applicationInfo.resources"
-                               class="ot-application-info-{{info.type | lowercase}}">{{info.message}}</a>
-                        </li>
-                    </ul>
-                </li>
+                    <!-- With messages: -->
+                    <li class="dropdown" ng-if="applicationInfo.resources.length"
+                        title="Application messages: {{applicationInfo.resources.length}}">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <span class="ot-application-info"></span>
+                            <span class="ot-application-info-count">{{applicationInfo.resources.length}}</span>
+                        </a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li>
+                                <a class="ot-application-info-none">Application messages:</a>
+                                <a ng-repeat="info in applicationInfo.resources"
+                                   class="ot-application-info-{{info.type | lowercase}}">{{info.message}}</a>
+                            </li>
+                        </ul>
+                    </li>
 
-                <!-- User menu: not logged -->
-                <li class="dropdown" ng-show="!logged()">
-                    <!-- Login link -->
-                    <a href="#" ng-click="login()">Sign in</a>
-                </li>
-                <!-- User menu: logged -->
-                <li class="dropdown" ng-show="logged()">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        {{user.account.name}}
-                        <b class="caret"></b>
-                    </a>
-                    <ul class="dropdown-menu" role="menu">
-                        <!-- All actions -->
-                        <li ng-repeat="action in user.actions">
-                            <a id="{{action.id}}" href="#{{action.uri}}">{{action.name}}</a>
-                        </li>
-                        <!-- Logout -->
-                        <li>
-                            <a id="user-logout" ng-click="logout()">Sign out</a>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
+                    <!-- User menu: not logged -->
+                    <li class="dropdown" ng-show="!logged()">
+                        <!-- Login link -->
+                        <a href="#" ng-click="login()">Sign in</a>
+                    </li>
+                    <!-- User menu: logged -->
+                    <li class="dropdown" ng-show="logged()">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            {{user.account.name}}
+                            <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu" role="menu">
+                            <!-- All actions -->
+                            <li ng-repeat="action in user.actions">
+                                <a id="{{action.id}}" href="#{{action.uri}}">{{action.name}}</a>
+                            </li>
+                            <!-- Logout -->
+                            <li>
+                                <a id="user-logout" ng-click="logout()">Sign out</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
 
-            <!-- Search box -->
-            <form class="navbar-form navbar-right" ng-submit="search(searchToken)">
-                <input type="text" class="form-control" placeholder="Search..." ng-model="searchToken">
-            </form>
+                <!-- Search box -->
+                <form class="navbar-form navbar-right" ng-submit="search(searchToken)">
+                    <input type="text" class="form-control" placeholder="Search..." ng-model="searchToken">
+                </form>
 
+            </div>
         </div>
     </nav>
 
     <!-- Notification section -->
 
-    <div class="container" ng-if="hasNotification()">
+    <div class="container-fluid" ng-if="hasNotification()">
         <div class="ot-notification-{{notificationType()}}">
             <button type="button" class="close" ng-click="closeNotification()">&times;</button>
             <span>{{notificationContent()}}</span>
@@ -117,7 +119,7 @@
     <!-- Footer and version information -->
 
     <footer class="ot-footer">
-        <div class="container">
+        <div class="container-fluid">
             <div class="ot-footer-inner">
                 <p>
                     <!-- Displays a popup with information version and a link to ontrack -->
