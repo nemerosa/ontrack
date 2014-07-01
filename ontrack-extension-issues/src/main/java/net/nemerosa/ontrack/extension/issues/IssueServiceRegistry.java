@@ -4,14 +4,16 @@ import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 public interface IssueServiceRegistry {
 
     /**
-     * TODO Gets all the issue services
+     * Gets all the issue services
      */
+    Collection<IssueServiceExtension> getIssueServices();
 
     /**
      * Gets an issue service by its ID

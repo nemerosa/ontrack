@@ -39,6 +39,14 @@ public interface IssueServiceExtension extends Extension {
     IssueServiceConfiguration getConfigurationByName(String name);
 
     /**
+     * Checks if a token may represent a valid issue token.
+     *
+     * @param token Token to test
+     * @return <code>true</code> if the token may represent an issue
+     */
+    boolean validIssueToken(String token);
+
+    /**
      * Given a message, extracts the issue keys from the message
      *
      * @param issueServiceConfiguration Configuration for the service
