@@ -18,6 +18,12 @@ angular.module('ot.view.project', [
         function loadBranches() {
             ot.call($http.get($scope.project._branches)).then(function (branchCollection) {
                 $scope.branchCollection = branchCollection;
+                // Loading the branch status view for each branch
+                angular.forEach(branchCollection.resources, function (branch) {
+                    ot.call($http.get(branch._status)).then(function (branchStatusView) {
+                        branch.branchStatusView = branchStatusView;
+                    });
+                });
                 // View commands
                 view.commands = [
                     {
