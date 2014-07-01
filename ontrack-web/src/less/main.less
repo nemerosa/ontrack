@@ -487,6 +487,18 @@ a.ot-application-info-error {
  * Branch build view
  */
 
+.ot-branch-build-view-auto-refresh {
+  .glyphicon;
+  .glyphicon-refresh;
+  cursor: pointer;
+  &.ot-branch-build-view-auto-refresh-enabled {
+    .text-success;
+  }
+  &.ot-branch-build-view-auto-refresh-disabled {
+    .ot-command;
+  }
+}
+
 table.ot-branch-build-view {
   .table;
   .table-condensed;

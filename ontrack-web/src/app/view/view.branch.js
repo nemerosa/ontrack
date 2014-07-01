@@ -17,6 +17,13 @@ angular.module('ot.view.branch', [
         // Branch's id
         var branchId = $stateParams.branchId;
 
+        // Auto refresh status
+        $scope.autoRefresh = localStorage.getItem('autoRefresh');
+        $scope.toggleAutoRefresh = function () {
+            $scope.autoRefresh = !$scope.autoRefresh;
+            localStorage.setItem('autoRefresh', $scope.autoRefresh);
+        };
+
         // Selected builds
         $scope.selectedBuild = {
             from: undefined,
