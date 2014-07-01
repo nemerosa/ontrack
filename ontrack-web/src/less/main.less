@@ -248,34 +248,6 @@ table.ot-form-view {
   .ot-entity-label;
 }
 
-.ot-project-branch-row {
-  .ot-entity-row;
-}
-
-.ot-project-branch-label {
-  .ot-entity-label;
-}
-
-.ot-project-branch-latest-build {
-  .bg-info;
-  display: inline-block;
-  font-weight: bold;
-  width: 100%;
-  padding: 2em;
-  &.ot-project-branch-latest-build-set {
-    text-decoration: none;
-    cursor: pointer;
-  }
-}
-
-.ot-project-branch-promotion-run {
-  .bg-info;
-  display: inline-block;
-  font-weight: bold;
-  padding: 2em;
-  margin-right: 1em;
-}
-
 .ot-promotionLevel-table {
   .table;
   .table-hover;
@@ -308,6 +280,24 @@ td.ot-entity-image {
   .ot-promotion-run-signature {
     .ot-signature;
     display: block;
+  }
+}
+
+.ot-branch-status-view-latest-build {
+  .btn;
+  .btn-default;
+  cursor: default;
+  height: 3em;
+  margin-left: 1em;
+}
+
+td.ot-promotion-view {
+  > span {
+    .btn;
+    .btn-default;
+    height: 3em;
+    cursor: default;
+    margin-right: 1em;
   }
 }
 
