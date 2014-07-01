@@ -18,7 +18,6 @@ public class PromotionViewTest {
                         ).withId(ID.of(1)),
                         new NameDescription("PL", "Promotion level")
                 ),
-                null,
                 null
         );
         assertJsonWrite(
@@ -55,7 +54,6 @@ public class PromotionViewTest {
         Build build = Build.of(branch, new NameDescription("11", "Build 11"), Signature.of(dateTime(), "User"));
         PromotionView view = new PromotionView(
                 promotionLevel,
-                build,
                 PromotionRun.of(
                         build,
                         promotionLevel,
