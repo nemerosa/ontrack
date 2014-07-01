@@ -12,12 +12,23 @@ angular.module('ot.view.branch', [
             controller: 'BranchCtrl'
         });
     })
-    .controller('BranchCtrl', function ($state, $scope, $stateParams, $http, $modal, ot, otFormService, otStructureService) {
+    .controller('BranchCtrl', function ($interval, $state, $scope, $stateParams, $http, $modal, ot, otFormService, otStructureService) {
         var view = ot.view();
         // Branch's id
         var branchId = $stateParams.branchId;
 
         // Auto refresh status
+        function refreshBuildView() {
+            console.log('loadBuildView()');
+        }
+
+        $scope.$watch('autoRefresh', function () {
+            if ($scope.autoRefresh) {
+                $scope.autoRefreshPromise = $interval(refreshBuildView, 5000);
+            } else if ($scope.autoRefreshPromise) {
+                $interval.cancel($scope.autoRefreshPromise);
+            }
+        });
         $scope.autoRefresh = localStorage.getItem('autoRefresh');
         $scope.toggleAutoRefresh = function () {
             $scope.autoRefresh = !$scope.autoRefresh;
