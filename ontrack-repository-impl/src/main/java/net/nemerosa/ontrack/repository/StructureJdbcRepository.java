@@ -246,8 +246,8 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     @Override
     public Optional<Build> getBuildByName(String project, String branch, String build) {
         return getBranchByName(project, branch).map(b -> getFirstItem(
-                "SELECT * FROM BUILDS WHERE NAME = :name",
-                params("name", build),
+                "SELECT * FROM BUILDS WHERE NAME = :name AND BRANCHID = :branchId",
+                params("name", build).addValue("branchId", b.id()),
                 (rs, rowNum) -> toBuild(rs, this::getBranch)
         ));
     }
@@ -457,7 +457,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     @Override
     public Optional<ValidationStamp> getValidationStampByName(String project, String branch, String validationStamp) {
         return getBranchByName(project, branch).map(b -> getFirstItem(
-                "SELECT * FROM VALIDATION_STAMPS WHERE NAME = :name",
+                "SELECT * FROM VALIDATION_STAMPS WHERE NAME = :name AND BRANCHID = :branch",
                 params("name", validationStamp).addValue("branch", b.id()),
                 (rs, rowNum) -> toValidationStamp(rs, id -> b)
         ));
