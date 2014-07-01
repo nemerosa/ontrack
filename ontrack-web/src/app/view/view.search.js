@@ -9,6 +9,15 @@ angular.module('ot.view.search', [
             controller: 'SearchCtrl'
         });
     })
-    .controller('SearchCtrl', function ($http, ot) {
+    .controller('SearchCtrl', function ($stateParams, $scope, $http, ot) {
+
+        // Search token
+        $scope.token = $stateParams.token;
+
+        // View definition
+        var view = ot.view();
+        view.title = "Search results for \"" + $scope.token + "\"";
+        view.commands = [ ot.viewCloseCommand('/home') ];
+
     })
 ;
