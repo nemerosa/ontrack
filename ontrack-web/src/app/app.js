@@ -15,6 +15,7 @@ var ontrack = angular.module('ontrack', [
         'ot.service.info',
         // Views
         'ot.view.home',
+        'ot.view.search',
         'ot.view.settings',
         'ot.view.project',
         'ot.view.branch',
@@ -38,7 +39,7 @@ var ontrack = angular.module('ontrack', [
             $urlRouterProvider.otherwise("/home");
         })
         // Main controller
-        .controller('AppCtrl', function ($log, $scope, $rootScope, otUserService, otInfoService) {
+        .controller('AppCtrl', function ($log, $scope, $rootScope, $state, otUserService, otInfoService) {
 
             /**
              * User mgt
@@ -108,7 +109,8 @@ var ontrack = angular.module('ontrack', [
 
             $scope.search = function (token) {
                 if ($scope.searchToken) {
-                    alert($scope.searchToken);
+                    $state.go('search', {token: $scope.searchToken});
+                    $scope.searchToken = '';
                 }
             };
 
