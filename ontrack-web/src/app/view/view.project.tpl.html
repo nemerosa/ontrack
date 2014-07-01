@@ -8,10 +8,23 @@
                     No branch has been created yet.
                 </ot-noentry>
                 <div ng-repeat="branch in branchCollection.resources" class="ot-project-branch-row">
-                    <div class="col-md-12">
+                    <div class="col-md-2">
                         <a class="ot-project-branch-label" href="#/branch/{{branch.id}}">
                             {{branch.name}}
                         </a>
+                    </div>
+                    <div class="col-md-2" ng-show="branch.branchStatusView">
+                        <a ng-if="branch.branchStatusView.latestBuild"
+                           href="#/build/{{branch.branchStatusView.latestBuild.id}}"
+                           class="ot-project-branch-latest-build ot-project-branch-latest-build-set">
+                            {{branch.branchStatusView.latestBuild.name}}
+                        </a>
+                        <span ng-if="!branch.branchStatusView.latestBuild" class="ot-project-branch-latest-build">
+                            <span class="glyphicon glyphicon-ban-circle" ></span>
+                        </span>
+                    </div>
+                    <div class="col-md-8">
+                        PROMOTIONS
                     </div>
                 </div>
             </div>
