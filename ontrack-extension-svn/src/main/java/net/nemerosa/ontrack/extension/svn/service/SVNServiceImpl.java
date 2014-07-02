@@ -172,7 +172,8 @@ public class SVNServiceImpl implements SVNService {
 
     }
 
-    private OntrackSVNRevisionInfo getOntrackRevisionInfo(SVNRepository repository, long revision) {
+    @Override
+    public OntrackSVNRevisionInfo getOntrackRevisionInfo(SVNRepository repository, long revision) {
 
         // Gets information about the revision
         SVNRevisionInfo basicInfo = getRevisionInfo(repository, revision);
@@ -191,7 +192,6 @@ public class SVNServiceImpl implements SVNService {
 
         // Data to collect
         Collection<BuildView> buildViews = new ArrayList<>();
-//        List<BranchPromotions> revisionPromotionsPerBranch = new ArrayList<>();
         // Loops over all authorised branches
         for (Project project : structureService.getProjectList()) {
             for (Branch branch : structureService.getBranchesForProject(project.getId())) {

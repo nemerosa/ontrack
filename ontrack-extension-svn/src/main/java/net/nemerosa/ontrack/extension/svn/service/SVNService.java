@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.extension.svn.service;
 
-import net.nemerosa.ontrack.extension.svn.model.OntrackSVNIssueInfo;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
-import net.nemerosa.ontrack.extension.svn.model.SVNRepositoryIssue;
-import net.nemerosa.ontrack.extension.svn.model.SVNRevisionInfo;
-import net.nemerosa.ontrack.extension.svn.model.SVNRevisionPaths;
+import net.nemerosa.ontrack.extension.svn.model.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -58,4 +55,13 @@ public interface SVNService {
      * @return Information (never null, but can be empty)
      */
     OntrackSVNIssueInfo getIssueInfo(String configurationName, String issueKey);
+
+    /**
+     * Gets information about a revision in a repository
+     *
+     * @param repository Repository to get the info from
+     * @param revision   Revision to get information about
+     * @return Information (never null, but can be empty)
+     */
+    OntrackSVNRevisionInfo getOntrackRevisionInfo(SVNRepository repository, long revision);
 }
