@@ -26,6 +26,6 @@ public abstract class AbstractJenkinsPropertyType<T extends AbstractJenkinsPrope
 
 
     protected JenkinsConfiguration loadConfiguration(String configurationName) {
-        return configurationService.getObfuscatedConfiguration(configurationName);
+        return configurationService.getConfiguration(configurationName);
     }
 }
