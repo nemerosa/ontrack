@@ -247,16 +247,15 @@ public class SVNServiceImpl implements SVNService {
         if (SVNUtils.isPathRevision(buildPathPattern)) {
             return getEarliestBuild(branch, location, buildPathPattern);
         }
-//        // Tag pattern
-//        else {
-//            // Uses the copy (if available)
-//            if (firstCopy != null) {
-//                return getEarliestBuild(branchId, firstCopy, buildPathPattern);
-//            } else {
-//                return null;
-//            }
-//        }
-        return null;
+        // Tag pattern
+        else {
+            // Uses the copy (if available)
+            if (firstCopy != null) {
+                return getEarliestBuild(branch, firstCopy, buildPathPattern);
+            } else {
+                return null;
+            }
+        }
     }
 
     private Integer getEarliestBuild(Branch branch, SVNLocation location, String buildPathPattern) {
