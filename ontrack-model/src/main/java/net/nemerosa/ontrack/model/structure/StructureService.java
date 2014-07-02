@@ -41,6 +41,12 @@ public interface StructureService {
 
     Optional<Build> findBuildByName(String project, String branch, String build);
 
+    /**
+     * Finds a build on a branch whose name is the closest. It assumes that build names
+     * are in a numeric format.
+     */
+    Optional<Build> findBuildAfterUsingNumericForm(ID id, String buildName);
+
     BuildView getBuildView(Build build);
 
     Build getLastBuildForBranch(Branch branch);

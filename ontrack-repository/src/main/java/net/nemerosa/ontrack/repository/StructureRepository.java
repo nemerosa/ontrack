@@ -42,6 +42,8 @@ public interface StructureRepository {
 
     Optional<Build> getBuildByName(String project, String branch, String build);
 
+    Optional<Build> findBuildAfterUsingNumericForm(ID branchId, String buildName);
+
     List<Build> builds(Branch branch, BuildFilter buildFilter);
 
     Build getLastBuildForBranch(Branch branch);

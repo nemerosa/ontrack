@@ -253,6 +253,19 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    public Optional<Build> findBuildAfterUsingNumericForm(ID branchId, String buildName) {
+        return Optional.ofNullable(
+                getFirstItem(
+                        "SELECT * FROM (SELECT * FROM BUILD WHERE BRANCH = :branch AND NAME REGEXP '[0-9]+') " +
+                                "WHERE CONVERT(NAME,INT) >= CONVERT(:name,INT) ORDER BY CONVERT(NAME,INT) " +
+                                "LIMIT 1",
+                        params("branch", branchId.getValue()).addValue("name", buildName),
+                        (rs, rowNum) -> toBuild(rs, this::getBranch)
+                )
+        );
+    }
+
+    @Override
     public List<PromotionLevel> getPromotionLevelListForBranch(ID branchId) {
         Branch branch = getBranch(branchId);
         return getNamedParameterJdbcTemplate().query(

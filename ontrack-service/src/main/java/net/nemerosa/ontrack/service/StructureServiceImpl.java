@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.repository.StructureRepository;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -318,6 +319,15 @@ public class StructureServiceImpl implements StructureService {
     public Optional<Build> findBuildByName(String project, String branch, String build) {
         return structureRepository.getBuildByName(project, branch, build)
                 .filter(b -> securityService.isProjectFunctionGranted(b, ProjectView.class));
+    }
+
+    @Override
+    public Optional<Build> findBuildAfterUsingNumericForm(ID branchId, String buildName) {
+        if (StringUtils.isNumeric(buildName)) {
+            return structureRepository.findBuildAfterUsingNumericForm(branchId, buildName);
+        } else {
+            throw new IllegalArgumentException("Build name is expected to be numeric: " + buildName);
+        }
     }
 
     @Override
