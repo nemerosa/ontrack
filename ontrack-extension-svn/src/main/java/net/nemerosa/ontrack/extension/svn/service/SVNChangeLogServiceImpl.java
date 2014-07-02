@@ -16,7 +16,6 @@ import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationProper
 import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationPropertyType;
 import net.nemerosa.ontrack.extension.svn.support.SVNLogEntryCollector;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
-import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.Time;
 import net.nemerosa.ontrack.tx.Transaction;
@@ -41,7 +40,6 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
     private final SVNService svnService;
     private final SVNClient svnClient;
     private final TransactionService transactionService;
-    private final SecurityService securityService;
 
     @Autowired
     public SVNChangeLogServiceImpl(
@@ -50,15 +48,13 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
             SVNIssueRevisionDao issueRevisionDao,
             SVNService svnService,
             SVNClient svnClient,
-            TransactionService transactionService,
-            SecurityService securityService) {
+            TransactionService transactionService) {
         super(structureService);
         this.propertyService = propertyService;
         this.issueRevisionDao = issueRevisionDao;
         this.svnService = svnService;
         this.svnClient = svnClient;
         this.transactionService = transactionService;
-        this.securityService = securityService;
     }
 
     @Override
@@ -305,7 +301,7 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
             throw new MissingSVNProjectConfigurationException(branch.getProject().getName());
         } else {
             SVNConfiguration configuration = projectConfiguration.getValue().getConfiguration();
-            return securityService.asAdmin(() -> svnService.getRepository(configuration.getName()));
+            return svnService.getRepository(configuration.getName());
         }
     }
 

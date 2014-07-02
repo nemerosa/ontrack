@@ -33,7 +33,6 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
 
     @Override
     public List<T> getConfigurations() {
-        checkAccess();
         return configurationRepository.list(configurationClass);
     }
 
@@ -54,7 +53,6 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
 
     @Override
     public T getConfiguration(String name) {
-        checkAccess();
         return configurationRepository
                 .find(configurationClass, name)
                 .orElseThrow(() -> new ConfigurationNotFoundException(name));
@@ -62,7 +60,6 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
 
     @Override
     public Optional<T> getOptionalConfiguration(String name) {
-        checkAccess();
         return configurationRepository.find(configurationClass, name);
     }
 
@@ -90,10 +87,4 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
         configurationRepository.save(configToSave);
     }
 
-    @Override
-    public T getObfuscatedConfiguration(String configurationName) {
-        return securityService.runAsAdmin(
-                () -> getConfiguration(configurationName)
-        ).get().obfuscate();
-    }
 }

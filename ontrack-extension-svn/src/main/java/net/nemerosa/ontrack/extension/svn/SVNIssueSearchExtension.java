@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.extension.support.AbstractExtension;
 import net.nemerosa.ontrack.extension.svn.model.SVNRepositoryIssue;
 import net.nemerosa.ontrack.extension.svn.service.SVNConfigurationService;
 import net.nemerosa.ontrack.extension.svn.service.SVNService;
-import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.SearchProvider;
 import net.nemerosa.ontrack.model.structure.SearchResult;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
@@ -27,7 +26,6 @@ public class SVNIssueSearchExtension extends AbstractExtension implements Search
     private final IssueServiceRegistry issueServiceRegistry;
     private final SVNConfigurationService configurationService;
     private final SVNService svnService;
-    private final SecurityService securityService;
 
     @Autowired
     public SVNIssueSearchExtension(
@@ -35,15 +33,13 @@ public class SVNIssueSearchExtension extends AbstractExtension implements Search
             URIBuilder uriBuilder,
             IssueServiceRegistry issueServiceRegistry,
             SVNConfigurationService configurationService,
-            SVNService svnService,
-            SecurityService securityService
+            SVNService svnService
     ) {
         super(extensionFeature);
         this.uriBuilder = uriBuilder;
         this.issueServiceRegistry = issueServiceRegistry;
         this.configurationService = configurationService;
         this.svnService = svnService;
-        this.securityService = securityService;
     }
 
     @Override
@@ -61,7 +57,7 @@ public class SVNIssueSearchExtension extends AbstractExtension implements Search
             @Override
             public Collection<SearchResult> search(String token) {
                 return configurationService.getConfigurationDescriptors().stream()
-                        .map(descriptor -> securityService.asAdmin(() -> svnService.getRepository(descriptor.getId())))
+                        .map(descriptor -> svnService.getRepository(descriptor.getId()))
                         .map(repository -> svnService.searchIssues(repository, token))
                         .filter(Optional::isPresent).map(Optional::get)
                         .map(repositoryIssue -> new SearchResult(

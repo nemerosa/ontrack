@@ -87,7 +87,7 @@ public class SVNProjectConfigurationPropertyType extends AbstractPropertyType<SV
         String configurationName = node.path("configuration").asText();
         String projectPath = node.path("projectPath").asText();
         // Looks the configuration up
-        SVNConfiguration configuration = configurationService.getObfuscatedConfiguration(configurationName);
+        SVNConfiguration configuration = configurationService.getConfiguration(configurationName);
         // Validates the project path
         validateNotBlank(projectPath, "The project path must not be empty");
         // OK

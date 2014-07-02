@@ -13,6 +13,16 @@ public interface ConfigurationService<T extends UserPasswordConfiguration> {
 
     T newConfiguration(T configuration);
 
+    /**
+     * Gets a configuration by its name and fails if not found.
+     * <p>
+     * Note that the returned configuration is <i>not</i> obfuscated. It can be used internally safely
+     * and will be obfuscated whenever sent to the client.
+     *
+     * @param name Name of the configuration to find
+     * @return Found configuration
+     * @throws ConfigurationNotFoundException If the configuration cannot be found
+     */
     T getConfiguration(String name);
 
     Optional<T> getOptionalConfiguration(String name);
@@ -25,8 +35,4 @@ public interface ConfigurationService<T extends UserPasswordConfiguration> {
      */
     void updateConfiguration(String name, T configuration);
 
-    /**
-     * Loads the obfuscated version of a configuration (no need for admin right)
-     */
-    T getObfuscatedConfiguration(String configurationName);
 }

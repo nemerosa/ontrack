@@ -112,7 +112,6 @@ public class SVNServiceImpl implements SVNService {
 
     @Override
     public OntrackSVNIssueInfo getIssueInfo(String configurationName, String issueKey) {
-        // FIXME Method net.nemerosa.ontrack.extension.svn.service.SVNServiceImpl.getIssueInfo
         // Repository
         SVNRepository repository = getRepository(configurationName);
         // Issue service
