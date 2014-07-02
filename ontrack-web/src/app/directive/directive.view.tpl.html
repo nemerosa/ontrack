@@ -26,6 +26,18 @@
                         <span class="{{command.cls}}"></span>
                         {{command.name}}
                     </a>
+                    <div class="btn-group ot-command-group" ng-if="command.group" ng-show="command.actions">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                            <span class="{{command.cls}}"></span>
+                            {{command.name}}
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li ng-repeat="action in command.actions">
+                                <a id="{{action.id}}" href="#{{action.uri}}">{{action.name}}</a>
+                            </li>
+                        </ul>
+                    </div>
                 </span>
             </div>
         </div>

@@ -4,7 +4,7 @@ angular.module('ot.service.core', [
 /**
  * Basic services
  */
-    .service('ot', function ($q, $rootScope, otNotificationService) {
+    .service('ot', function ($q, $rootScope, $http, otNotificationService) {
         var self = {};
 
         /**
@@ -29,6 +29,24 @@ angular.module('ot.service.core', [
                 cls: 'ot-command-close',
                 link: link
             };
+        };
+
+        /**
+         * Defines a command that list some actions in a select.
+         *
+         * The list of actions is returned by a call to the URI in parameter.
+         */
+        self.viewActionsCommand = function (uri) {
+            var def = {
+                id: 'actions',
+                name: "",
+                cls: 'ot-command-actions',
+                group: true
+            };
+            self.call($http.get(uri)).then(function (actionResources) {
+                def.actions = actionResources.resources;
+            });
+            return  def;
         };
 
         /**
