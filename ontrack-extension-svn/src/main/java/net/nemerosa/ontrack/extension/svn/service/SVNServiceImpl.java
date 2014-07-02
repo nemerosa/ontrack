@@ -219,7 +219,7 @@ public class SVNServiceImpl implements SVNService {
         // Gets the SVN configuration for the branch
         Property<SVNBranchConfigurationProperty> configurationProperty = propertyService.getProperty(branch, SVNBranchConfigurationPropertyType.class);
         if (configurationProperty.isEmpty()) {
-            return null;
+            return Optional.empty();
         }
         // Information
         String buildPathPattern = configurationProperty.getValue().getBuildPath();
@@ -233,7 +233,7 @@ public class SVNServiceImpl implements SVNService {
             if (firstCopy != null) {
                 return getEarliestBuild(branch, firstCopy, buildPathPattern);
             } else {
-                return null;
+                return Optional.empty();
             }
         }
     }
@@ -256,7 +256,7 @@ public class SVNServiceImpl implements SVNService {
                 return structureService.findBuildByName(branch.getProject().getName(), branch.getName(), buildName);
             }
         } else {
-            return null;
+            return Optional.empty();
         }
     }
 
