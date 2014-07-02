@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.svn.db.*;
 import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty;
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType;
+import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationPropertyType;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
 import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -193,15 +194,21 @@ public class SVNServiceImpl implements SVNService {
         Collection<BuildView> buildViews = new ArrayList<>();
         // Loops over all authorised branches
         for (Project project : structureService.getProjectList()) {
-            for (Branch branch : structureService.getBranchesForProject(project.getId())) {
-                // Identifies a possible build given the path/revision and the first copy
-                Optional<Build> build = lookupBuild(basicInfo.toLocation(), firstCopy, branch);
-                // Build found
-                if (build.isPresent()) {
-                    // Gets the build view
-                    BuildView buildView = structureService.getBuildView(build.get());
-                    // Adds it to the list
-                    buildViews.add(buildView);
+            // Filter on SVN configuration
+            if (propertyService.hasProperty(project, SVNProjectConfigurationPropertyType.class)) {
+                for (Branch branch : structureService.getBranchesForProject(project.getId())) {
+                    // Filter on SVN configuration
+                    if (propertyService.hasProperty(branch, SVNBranchConfigurationPropertyType.class)) {
+                        // Identifies a possible build given the path/revision and the first copy
+                        Optional<Build> build = lookupBuild(basicInfo.toLocation(), firstCopy, branch);
+                        // Build found
+                        if (build.isPresent()) {
+                            // Gets the build view
+                            BuildView buildView = structureService.getBuildView(build.get());
+                            // Adds it to the list
+                            buildViews.add(buildView);
+                        }
+                    }
                 }
             }
         }
