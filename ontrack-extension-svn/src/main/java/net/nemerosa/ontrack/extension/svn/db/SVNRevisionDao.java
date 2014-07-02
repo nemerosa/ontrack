@@ -14,4 +14,6 @@ public interface SVNRevisionDao {
     TRevision getLastRevision(int repositoryId);
 
     TRevision get(int repositoryId, long revision);
+
+    List<Long> getMergesForRevision(int repositoryId, long revision);
 }

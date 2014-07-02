@@ -4,6 +4,9 @@ import lombok.Data;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Data that can be collected around an issue.
  */
@@ -18,7 +21,8 @@ public class OntrackSVNIssueInfo {
                 configuration,
                 null,
                 null,
-                null
+                null,
+                Collections.emptyList()
         );
     }
 
@@ -41,5 +45,10 @@ public class OntrackSVNIssueInfo {
      * Primary revision information
      */
     private final OntrackSVNRevisionInfo revisionInfo;
+
+    /**
+     * Merged revision information
+     */
+    private final List<OntrackSVNRevisionInfo> mergedRevisionInfos;
 
 }

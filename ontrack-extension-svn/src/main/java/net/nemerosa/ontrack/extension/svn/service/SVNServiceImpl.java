@@ -14,10 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static net.nemerosa.ontrack.extension.svn.service.SVNServiceUtils.createChangeLogRevision;
@@ -147,38 +144,30 @@ public class SVNServiceImpl implements SVNService {
         OntrackSVNRevisionInfo revisionInfo = getOntrackRevisionInfo(repository, firstRevision.getRevision());
 
         // Merged revisions
-//        List<Long> merges = subversionService.getMergesForRevision(repository, revisionInfo.getChangeLogRevision().getRevision());
-//        List<RevisionInfo> mergedRevisionInfos = new ArrayList<>();
-//        Set<String> paths = new HashSet<>();
-//        for (long merge : merges) {
-//            // Gets the revision info
-//            RevisionInfo mergeRevisionInfo = getRevisionInfo(repository, locale, merge);
-//            // If the information contains as least one build, adds it
-//            if (!mergeRevisionInfo.getBuilds().isEmpty()) {
-//                // Keeps only the first one for a given target path
-//                String path = mergeRevisionInfo.getChangeLogRevision().getPath();
-//                if (!paths.contains(path)) {
-//                    mergedRevisionInfos.add(mergeRevisionInfo);
-//                    paths.add(path);
-//                }
-//            }
-//        }
-//        // OK
-//        return new IssueInfo(
-//                repository,
-//                issue,
-//                subversionService.formatRevisionTime(issue.getUpdateTime()),
-//                revisionInfo,
-//                mergedRevisionInfos,
-//                revisions
-//        );
+        List<Long> merges = revisionDao.getMergesForRevision(repository.getId(), revisionInfo.getRevisionInfo().getRevision());
+        List<OntrackSVNRevisionInfo> mergedRevisionInfos = new ArrayList<>();
+        Set<String> paths = new HashSet<>();
+        for (long merge : merges) {
+            // Gets the revision info
+            OntrackSVNRevisionInfo mergeRevisionInfo = getOntrackRevisionInfo(repository, merge);
+            // If the information contains as least one build, adds it
+            if (!mergeRevisionInfo.getBuildViews().isEmpty()) {
+                // Keeps only the first one for a given target path
+                String path = mergeRevisionInfo.getRevisionInfo().getPath();
+                if (!paths.contains(path)) {
+                    mergedRevisionInfos.add(mergeRevisionInfo);
+                    paths.add(path);
+                }
+            }
+        }
 
         // OK
         return new OntrackSVNIssueInfo(
                 repository.getConfiguration(),
                 repository.getConfiguredIssueService().getIssueServiceConfigurationRepresentation(),
                 issue,
-                revisionInfo
+                revisionInfo,
+                mergedRevisionInfos
         );
 
     }

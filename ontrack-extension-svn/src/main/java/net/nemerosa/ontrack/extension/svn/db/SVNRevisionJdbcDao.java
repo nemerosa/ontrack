@@ -96,4 +96,13 @@ public class SVNRevisionJdbcDao extends AbstractJdbcRepository implements SVNRev
             throw new SVNRevisionNotFoundException(revision);
         }
     }
+
+    @Override
+    public List<Long> getMergesForRevision(int repositoryId, long revision) {
+        return getNamedParameterJdbcTemplate().queryForList(
+                "SELECT TARGET FROM EXT_SVN_MERGE_REVISION WHERE REPOSITORY = :repository AND REVISION = :revision ORDER BY TARGET",
+                params("revision", revision).addValue("repository", repositoryId),
+                Long.class
+        );
+    }
 }
