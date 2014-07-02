@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
+import net.nemerosa.ontrack.extension.svn.db.SVNIssueInfo;
 import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.extension.svn.service.IndexationService;
 import net.nemerosa.ontrack.extension.svn.service.SVNChangeLogService;
@@ -287,6 +288,14 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
         } else {
             throw new SVNChangeLogUUIDException(uuid);
         }
+    }
+
+    /**
+     * FIXME Gets the summary for an issue in a repository
+     */
+    @RequestMapping(value = "configuration/{configuration}/issue/{key}")
+    public SVNIssueInfo issueInfo(@PathVariable String configuration, @PathVariable String key) {
+        return null;
     }
 
 }

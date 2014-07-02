@@ -18,6 +18,8 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+
 @Component
 public class SVNIssueSearchExtension extends AbstractExtension implements SearchExtension {
 
@@ -65,17 +67,19 @@ public class SVNIssueSearchExtension extends AbstractExtension implements Search
                         .map(repositoryIssue -> new SearchResult(
                                 repositoryIssue.getIssue().getKey(),
                                 getSearchIssueDescription(repositoryIssue),
-                                null, // FIXME Issue URI
-                                null, // FIXME Issue view
+                                uri(on(SVNController.class).issueInfo(
+                                        repositoryIssue.getRepository().getConfiguration().getName(),
+                                        repositoryIssue.getIssue().getKey()
+                                )),
+                                String.format("extension/svn/issue/%s/%s",
+                                        repositoryIssue.getRepository().getConfiguration().getName(),
+                                        repositoryIssue.getIssue().getKey()),
                                 100
                         ))
                         .collect(Collectors.toList());
             }
         };
     }
-
-    // TODO The link to the repository+issue can link to several projects and branches
-
 
     private String getSearchIssueDescription(SVNRepositoryIssue repositoryIssue) {
         return String.format("Issue %s in %s repository: %s",
