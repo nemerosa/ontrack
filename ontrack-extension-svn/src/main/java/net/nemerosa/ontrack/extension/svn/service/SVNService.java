@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.svn.service;
 
-import net.nemerosa.ontrack.extension.svn.db.SVNIssueInfo;
+import net.nemerosa.ontrack.extension.svn.model.OntrackSVNIssueInfo;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.model.SVNRepositoryIssue;
 import net.nemerosa.ontrack.extension.svn.model.SVNRevisionInfo;
@@ -57,5 +57,5 @@ public interface SVNService {
      * @param issueKey          Key of the issue
      * @return Information (never null, but can be empty)
      */
-    SVNIssueInfo getIssueInfo(String configurationName, String issueKey);
+    OntrackSVNIssueInfo getIssueInfo(String configurationName, String issueKey);
 }

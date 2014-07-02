@@ -6,7 +6,7 @@ import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
-import net.nemerosa.ontrack.extension.svn.db.SVNIssueInfo;
+import net.nemerosa.ontrack.extension.svn.model.OntrackSVNIssueInfo;
 import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.extension.svn.service.IndexationService;
 import net.nemerosa.ontrack.extension.svn.service.SVNChangeLogService;
@@ -297,7 +297,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
      * Gets the summary for an issue in a repository
      */
     @RequestMapping(value = "configuration/{configuration}/issue/{key}")
-    public SVNIssueInfo issueInfo(@PathVariable String configuration, @PathVariable String key) {
+    public OntrackSVNIssueInfo issueInfo(@PathVariable String configuration, @PathVariable String key) {
         return svnService.getIssueInfo(configuration, key);
     }
 

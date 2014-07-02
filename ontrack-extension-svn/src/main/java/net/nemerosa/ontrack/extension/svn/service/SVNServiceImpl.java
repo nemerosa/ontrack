@@ -114,7 +114,7 @@ public class SVNServiceImpl implements SVNService {
     }
 
     @Override
-    public SVNIssueInfo getIssueInfo(String configurationName, String issueKey) {
+    public OntrackSVNIssueInfo getIssueInfo(String configurationName, String issueKey) {
         // FIXME Method net.nemerosa.ontrack.extension.svn.service.SVNServiceImpl.getIssueInfo
         // Repository
         SVNRepository repository = getRepository(configurationName);
@@ -122,7 +122,7 @@ public class SVNServiceImpl implements SVNService {
         ConfiguredIssueService configuredIssueService = repository.getConfiguredIssueService();
         if (configuredIssueService == null) {
             // No issue service configured
-            return SVNIssueInfo.empty();
+            return OntrackSVNIssueInfo.empty(repository.getConfiguration());
         }
         // Gets the details about the issue
         Issue issue = configuredIssueService.getIssue(issueKey);
@@ -173,7 +173,14 @@ public class SVNServiceImpl implements SVNService {
 //                revisions
 //        );
 
-        return null;
+        // OK
+        return new OntrackSVNIssueInfo(
+                repository.getConfiguration(),
+                repository.getConfiguredIssueService().getIssueServiceConfigurationRepresentation(),
+                issue,
+                revisionInfo
+        );
+
     }
 
     private OntrackSVNRevisionInfo getOntrackRevisionInfo(SVNRepository repository, long revision) {
