@@ -46,7 +46,7 @@ angular.module('ot.view.home', [
             // Any notification?
             if (code) {
                 if (code == 403) {
-                    otNotificationService.error("Due to the access to an unauthorized page, you have been redirected to the home page.");
+                    otNotificationService.error("Due to the access to an unauthorized resource, you have been redirected to the home page.");
                 }
             }
         }
