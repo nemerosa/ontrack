@@ -9,7 +9,6 @@ import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty;
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
-import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException;
 import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -198,7 +197,7 @@ public class SVNServiceImpl implements SVNService {
         for (Project project : structureService.getProjectList()) {
             for (Branch branch : structureService.getBranchesForProject(project.getId())) {
                 // Identifies a possible build given the path/revision and the first copy
-                Integer buildId = lookupBuild(basicInfo.toLocation(), firstCopy, branch);
+                Optional<Build> build = lookupBuild(basicInfo.toLocation(), firstCopy, branch);
 //                // Build found
 //                if (buildId != null) {
 //                    // Gets the build information
@@ -235,7 +234,7 @@ public class SVNServiceImpl implements SVNService {
         return null;
     }
 
-    private Integer lookupBuild(SVNLocation location, SVNLocation firstCopy, Branch branch) {
+    private Optional<Build> lookupBuild(SVNLocation location, SVNLocation firstCopy, Branch branch) {
         // Gets the SVN configuration for the branch
         Property<SVNBranchConfigurationProperty> configurationProperty = propertyService.getProperty(branch, SVNBranchConfigurationPropertyType.class);
         if (configurationProperty.isEmpty()) {
@@ -258,7 +257,7 @@ public class SVNServiceImpl implements SVNService {
         }
     }
 
-    private Integer getEarliestBuild(Branch branch, SVNLocation location, String buildPathPattern) {
+    private Optional<Build> getEarliestBuild(Branch branch, SVNLocation location, String buildPathPattern) {
         if (SVNUtils.followsBuildPattern(location, buildPathPattern)) {
             // Gets the build name
             String buildName = SVNUtils.getBuildName(location, buildPathPattern);
@@ -267,17 +266,13 @@ public class SVNServiceImpl implements SVNService {
              * that follows this revision.
              */
             if (SVNUtils.isPathRevision(buildPathPattern)) {
-                return structureService.findBuildAfterUsingNumericForm(branch.getId(), buildName)
-                        .map(Entity::id)
-                        .orElse(null);
+                return structureService.findBuildAfterUsingNumericForm(branch.getId(), buildName);
             }
             /**
              * In any other case (tag or tag prefix), the build must be looked exactly
              */
             else {
-                return structureService.findBuildByName(branch.getProject().getName(), branch.getName(), buildName)
-                        .orElseThrow(() -> new BuildNotFoundException(branch.getProject().getName(), branch.getName(), buildName))
-                        .id();
+                return structureService.findBuildByName(branch.getProject().getName(), branch.getName(), buildName);
             }
         } else {
             return null;
