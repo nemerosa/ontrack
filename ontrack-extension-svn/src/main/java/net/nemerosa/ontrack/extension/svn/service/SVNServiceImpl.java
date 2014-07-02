@@ -141,10 +141,12 @@ public class SVNServiceImpl implements SVNService {
                     );
                 })
                 .collect(Collectors.toList());
+
         // Gets the last revision (which is the first in the list)
         SVNChangeLogRevision firstRevision = revisions.get(0);
         OntrackSVNRevisionInfo revisionInfo = getOntrackRevisionInfo(repository, firstRevision.getRevision());
-//      Merged revisions
+
+        // Merged revisions
 //        List<Long> merges = subversionService.getMergesForRevision(repository, revisionInfo.getChangeLogRevision().getRevision());
 //        List<RevisionInfo> mergedRevisionInfos = new ArrayList<>();
 //        Set<String> paths = new HashSet<>();
@@ -170,6 +172,7 @@ public class SVNServiceImpl implements SVNService {
 //                mergedRevisionInfos,
 //                revisions
 //        );
+
         return null;
     }
 
@@ -198,40 +201,23 @@ public class SVNServiceImpl implements SVNService {
             for (Branch branch : structureService.getBranchesForProject(project.getId())) {
                 // Identifies a possible build given the path/revision and the first copy
                 Optional<Build> build = lookupBuild(basicInfo.toLocation(), firstCopy, branch);
-//                // Build found
-//                if (buildId != null) {
-//                    // Gets the build information
-//                    BuildSummary buildSummary = managementService.getBuild(buildId);
-//                    // Gets the promotion levels & validation stamps
-//                    List<BuildPromotionLevel> promotionLevels = managementService.getBuildPromotionLevels(locale, buildId);
-//                    List<BuildValidationStamp> buildValidationStamps = managementService.getBuildValidationStamps(locale, buildId);
-//                    // Adds to the list
-//                    buildSummaries.add(
-//                            new BuildInfo(
-//                                    buildSummary,
-//                                    promotionLevels,
-//                                    buildValidationStamps
-//                            ));
-//                    // Gets the promotions for this branch
-//                    List<Promotion> promotions = managementService.getPromotionsForBranch(locale, branchId, buildId);
-//                    if (promotions != null && !promotions.isEmpty()) {
-//                        revisionPromotionsPerBranch.add(new BranchPromotions(
-//                                managementService.getBranch(branchId),
-//                                promotions
-//                        ));
-//                    }
-//                }
+                // Build found
+                if (build.isPresent()) {
+                    // Gets the build view
+                    BuildView buildView = structureService.getBuildView(build.get());
+                    // Adds it to the list
+                    buildViews.add(buildView);
+                }
             }
         }
-//
-//        // OK
-//        return new RevisionInfo(
-//                repository,
-//                changeLogRevision,
-//                buildSummaries,
-//                revisionPromotionsPerBranch
-//        );
-        return null;
+
+        // OK
+        return new OntrackSVNRevisionInfo(
+                repository.getConfiguration(),
+                changeLogRevision,
+                buildViews
+        );
+
     }
 
     private Optional<Build> lookupBuild(SVNLocation location, SVNLocation firstCopy, Branch branch) {
