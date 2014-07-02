@@ -41,30 +41,30 @@ public class SVNUtilsTest {
         assertFalse(followsBuildPattern(new SVNLocation("/project/tags/2.7.0.1", 100000L), "/project/trunk@{build}"));
     }
 
-//    @Test
-//    public void getBuildName_tag_prefix() {
-//        assertEquals("2.7.0.1", getBuildName(new SVNLocation("/project/tags/2.7.0.1", 100000L), "/project/tags/2.7.*"));
-//    }
-//
-//    @Test(expected = IllegalStateException.class)
-//    public void getBuildName_tag_prefix_nok() {
-//        getBuildName(new SVNLocation("/project/tags/2.6.0.1", 100000L), "/project/tags/2.7.*");
-//    }
-//
-//    @Test
-//    public void getBuildName_tag() {
-//        assertEquals("2.7.0.1", getBuildName(new SVNLocation("/project/tags/2.7.0.1", 100000L), "/project/tags/*"));
-//    }
-//
-//    @Test
-//    public void getBuildName_revision() {
-//        assertEquals("123456", getBuildName(new SVNLocation("/project/trunk", 123456), "/project/trunk@*"));
-//    }
-//
-//    @Test(expected = IllegalStateException.class)
-//    public void getBuildName_revision_nok() {
-//        getBuildName(new SVNLocation("/project/branches/2.6.x", 123456), "/project/trunk@*");
-//    }
+    @Test
+    public void getBuildName_tag_prefix() {
+        assertEquals("2.7.0.1", getBuildName(new SVNLocation("/project/tags/2.7.0.1", 100000L), "/project/tags/{build:2.7.*}"));
+    }
+
+    @Test(expected = BuildPathMatchingException.class)
+    public void getBuildName_tag_prefix_nok() {
+        getBuildName(new SVNLocation("/project/tags/2.6.0.1", 100000L), "/project/tags/{build:2.7.*}");
+    }
+
+    @Test
+    public void getBuildName_tag() {
+        assertEquals("2.7.0.1", getBuildName(new SVNLocation("/project/tags/2.7.0.1", 100000L), "/project/tags/{build}"));
+    }
+
+    @Test
+    public void getBuildName_revision() {
+        assertEquals("123456", getBuildName(new SVNLocation("/project/trunk", 123456), "/project/trunk@{build}"));
+    }
+
+    @Test(expected = BuildPathMatchingException.class)
+    public void getBuildName_revision_nok() {
+        getBuildName(new SVNLocation("/project/branches/2.6.x", 123456), "/project/trunk@{build}");
+    }
 
     @Test
     public void isPathRevision_ok() {
@@ -103,12 +103,12 @@ public class SVNUtilsTest {
 
     @Test
     public void expandBuildPathExpression_build() {
-        assertEquals("1", expandBuildPathExpression("build", build()));
+        assertEquals("1", expandBuildPathExpression("build", "1"));
     }
 
     @Test(expected = UnknownBuildPathExpression.class)
     public void expandBuildPathExpression_unknown() {
-        expandBuildPathExpression("test", build());
+        expandBuildPathExpression("test", "1");
     }
 
     @Test

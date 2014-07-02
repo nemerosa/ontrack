@@ -70,10 +70,11 @@ public class SVNBranchConfigurationPropertyType extends AbstractPropertyType<SVN
                                 .label("Build path")
                             // TODO Allows the use of an HTML fragment for complex documentation
                                 .help("Path of a tag in the Subversion repository using a build name. The path is " +
-                                        "computed relative to the root of the repository. Several placeholders can " +
-                                        "be defined in the path definition, that will be replaced at runtime: " +
-                                        "{build} for the build name.")
-                                        // TODO Property placeholder
+                                        "computed relative to the root of the repository. The {build} placeholder is used " +
+                                        "to define the location where to replace the path fragment by the build name. An" +
+                                        "option expression can follow the build keyword: {build:expression}. In this case " +
+                                        "the build name must match the expression, where * stands for any character. For example: " +
+                                        "{build:2.7.*} will match build 2.7.0-15, but not 2.8.0")
                                 .value(value != null ? value.getBuildPath() : "/project/tags/{build}")
                 );
     }

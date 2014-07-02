@@ -13,6 +13,8 @@ import java.util.regex.Pattern;
 
 public class SVNUtils {
 
+    public static final String BUILD_PLACEHOLDER_PATTERN = "\\{([^}]+)\\}";
+
     public static SVNURL toURL(String path) {
         try {
             return SVNURL.parseURIDecoded(path);
@@ -34,27 +36,23 @@ public class SVNUtils {
         return pathPattern.endsWith("@{build}");
     }
 
-    public static boolean followsBuildPattern(SVNLocation location, String pathPattern) {
-        if (isPathRevision(pathPattern)) {
-            // Removes the last part of the pattern
-            String pathOnly = StringUtils.substringBeforeLast(pathPattern, "@");
-            // Equality of paths is required
-            return StringUtils.equals(location.getPath(), pathOnly);
-        } else {
-            return Pattern.compile(StringUtils.replace(pathPattern, "*", ".+")).matcher(location.getPath()).matches();
-        }
+    /**
+     * See the definition of the build path at {@link net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty#buildPath}.
+     */
+    public static String expandBuildPath(String buildPathDefinition, Build build) {
+        return expandBuildPath(buildPathDefinition, build.getName());
     }
 
     /**
      * See the definition of the build path at {@link net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty#buildPath}.
      */
-    public static String expandBuildPath(String buildPathDefinition, Build build) {
+    public static String expandBuildPath(String buildPathDefinition, String name) {
         // Pattern
-        Pattern pattern = Pattern.compile("\\{([^}]+)\\}");
+        Pattern pattern = Pattern.compile(BUILD_PLACEHOLDER_PATTERN);
         Matcher matcher = pattern.matcher(buildPathDefinition);
         StringBuffer path = new StringBuffer();
         while (matcher.find()) {
-            String replacement = expandBuildPathExpression(matcher.group(1), build);
+            String replacement = expandBuildPathExpression(matcher.group(1), name);
             matcher.appendReplacement(path, replacement);
         }
         matcher.appendTail(path);
@@ -62,16 +60,15 @@ public class SVNUtils {
         return path.toString();
     }
 
-    public static String expandBuildPathExpression(String expression, Build build) {
-        // TODO Property expansion
+    public static String expandBuildPathExpression(String expression, String name) {
         if ("build".equals(expression)) {
-            return build.getName();
+            return name;
         } else if (StringUtils.startsWith(expression, "build:")) {
             String pattern = StringUtils.substringAfter(expression, "build:");
-            if (buildPatternOk(pattern, build.getName())) {
-                return build.getName();
+            if (buildPatternOk(pattern, name)) {
+                return name;
             } else {
-                throw new BuildPathMatchingException(build.getName(), pattern);
+                throw new BuildPathMatchingException(name, pattern);
             }
         } else {
             throw new UnknownBuildPathExpression(expression);
@@ -85,4 +82,40 @@ public class SVNUtils {
         );
     }
 
+    public static String getBuildName(SVNLocation location, String pathPattern) {
+        if (isPathRevision(pathPattern)) {
+            // Removes the last part of the pattern
+            String pathOnly = StringUtils.substringBeforeLast(pathPattern, "@");
+            // Equality of paths is required
+            if (StringUtils.equals(location.getPath(), pathOnly)) {
+                return String.valueOf(location.getRevision());
+            } else {
+                throw new BuildPathMatchingException(location.getPath(), pathPattern);
+            }
+        } else {
+            // Replaces the whole build expression by a generic regex
+            String regex = pathPattern.replaceAll(BUILD_PLACEHOLDER_PATTERN, "(.*)");
+            // Identifies the variable part in this regex
+            Matcher matcher = Pattern.compile(regex).matcher(location.getPath());
+            if (matcher.matches()) {
+                String name = matcher.group(1);
+                if (!StringUtils.isBlank(name)
+                        && StringUtils.equals(location.getPath(), expandBuildPath(pathPattern, name))) {
+                    return name;
+                } else {
+                    throw new BuildPathMatchingException(location.getPath(), pathPattern);
+                }
+            } else {
+                throw new BuildPathMatchingException(location.getPath(), pathPattern);
+            }
+        }
+    }
+
+    public static boolean followsBuildPattern(SVNLocation location, String pathPattern) {
+        try {
+            return StringUtils.isNotBlank(getBuildName(location, pathPattern));
+        } catch (BuildPathMatchingException ex) {
+            return false;
+        }
+    }
 }

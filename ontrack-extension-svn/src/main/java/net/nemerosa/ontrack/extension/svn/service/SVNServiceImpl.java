@@ -260,8 +260,8 @@ public class SVNServiceImpl implements SVNService {
 
     private Integer getEarliestBuild(Branch branch, SVNLocation location, String buildPathPattern) {
         if (SVNUtils.followsBuildPattern(location, buildPathPattern)) {
-//            // Gets the build name
-//            String buildName = SVNExplorerPathUtils.getBuildName(location, pathPattern);
+            // Gets the build name
+            String buildName = SVNUtils.getBuildName(location, buildPathPattern);
 //            /**
 //             * If the build is defined by path@revision, the earliest build is the one
 //             * that follows this revision.
