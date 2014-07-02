@@ -29,9 +29,9 @@ import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static net.nemerosa.ontrack.extension.svn.support.SVNUtils.expandBuildPath;
 
 @Service
 public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService implements SVNChangeLogService {
@@ -292,29 +292,6 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
             String buildPathDefinition = branchConfiguration.getValue().getBuildPath();
             // Expands the build path
             return expandBuildPath(buildPathDefinition, build);
-        }
-    }
-
-    protected String expandBuildPath(String buildPathDefinition, Build build) {
-        // Pattern
-        Pattern pattern = Pattern.compile("\\{([^}]+)\\}");
-        Matcher matcher = pattern.matcher(buildPathDefinition);
-        StringBuffer path = new StringBuffer();
-        while (matcher.find()) {
-            String replacement = expandBuildPathExpression(matcher.group(1), build);
-            matcher.appendReplacement(path, replacement);
-        }
-        matcher.appendTail(path);
-        // TODO Property expansion
-        // OK
-        return path.toString();
-    }
-
-    protected String expandBuildPathExpression(String expression, Build build) {
-        if ("build".equals(expression)) {
-            return build.getName();
-        } else {
-            throw new UnknownBuildPathExpression(expression);
         }
     }
 

@@ -19,9 +19,11 @@ public class SVNBranchConfigurationProperty {
      * Path of a tag in the Subversion repository using a build name. The path is computed relative to the root
      * of the repository. Several placeholders can be defined in the path definition, that will be replaced
      * at runtime:
-     * <p/>
+     * <p>
      * <ul>
      * <li><code>{build}</code> - the build name</li>
+     * <li><code>{build:expression}</code> - the build name, which must complies to the expression. This expression
+     * is a simplified regex where * stands for any character.</li>
      * <li>TODO <code>{property:&lt;property&gt;}</code> - gets a property of the build. The property identifier
      * is the full class name of the {@link net.nemerosa.ontrack.model.structure.PropertyType PropertyType}</li>
      * </ul>

@@ -6,10 +6,16 @@ import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.svn.client.SVNClient;
 import net.nemerosa.ontrack.extension.svn.db.*;
 import net.nemerosa.ontrack.extension.svn.model.*;
+import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty;
+import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType;
+import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
+import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -20,6 +26,8 @@ import static net.nemerosa.ontrack.extension.svn.service.SVNServiceUtils.createC
 @Transactional
 public class SVNServiceImpl implements SVNService {
 
+    private final StructureService structureService;
+    private final PropertyService propertyService;
     private final IssueServiceRegistry issueServiceRegistry;
     private final SVNConfigurationService configurationService;
     private final SVNRevisionDao revisionDao;
@@ -30,6 +38,8 @@ public class SVNServiceImpl implements SVNService {
 
     @Autowired
     public SVNServiceImpl(
+            StructureService structureService,
+            PropertyService propertyService,
             IssueServiceRegistry issueServiceRegistry,
             SVNConfigurationService configurationService,
             SVNRevisionDao revisionDao,
@@ -37,6 +47,8 @@ public class SVNServiceImpl implements SVNService {
             SVNEventDao eventDao,
             SVNRepositoryDao repositoryDao,
             SVNClient svnClient) {
+        this.structureService = structureService;
+        this.propertyService = propertyService;
         this.issueServiceRegistry = issueServiceRegistry;
         this.configurationService = configurationService;
         this.revisionDao = revisionDao;
@@ -179,16 +191,13 @@ public class SVNServiceImpl implements SVNService {
         SVNLocation firstCopy = getFirstCopyAfter(repository, basicInfo.toLocation());
 
         // Data to collect
-//        Collection<BuildInfo> buildSummaries = new ArrayList<>();
+        Collection<BuildView> buildViews = new ArrayList<>();
 //        List<BranchPromotions> revisionPromotionsPerBranch = new ArrayList<>();
-//        // Loops over all branches
-//        List<ProjectSummary> projectList = managementService.getProjectList();
-//        for (ProjectSummary projectSummary : projectList) {
-//            List<BranchSummary> branchList = managementService.getBranchList(projectSummary.getId());
-//            for (BranchSummary branchSummary : branchList) {
-//                int branchId = branchSummary.getId();
-//                // Identifies a possible build given the path/revision and the first copy
-//                Integer buildId = lookupBuild(basicInfo.toLocation(), firstCopy, branchSummary.getId());
+        // Loops over all authorised branches
+        for (Project project : structureService.getProjectList()) {
+            for (Branch branch : structureService.getBranchesForProject(project.getId())) {
+                // Identifies a possible build given the path/revision and the first copy
+                Integer buildId = lookupBuild(basicInfo.toLocation(), firstCopy, branch);
 //                // Build found
 //                if (buildId != null) {
 //                    // Gets the build information
@@ -212,8 +221,8 @@ public class SVNServiceImpl implements SVNService {
 //                        ));
 //                    }
 //                }
-//            }
-//        }
+            }
+        }
 //
 //        // OK
 //        return new RevisionInfo(
@@ -223,6 +232,53 @@ public class SVNServiceImpl implements SVNService {
 //                revisionPromotionsPerBranch
 //        );
         return null;
+    }
+
+    private Integer lookupBuild(SVNLocation location, SVNLocation firstCopy, Branch branch) {
+        // Gets the SVN configuration for the branch
+        Property<SVNBranchConfigurationProperty> configurationProperty = propertyService.getProperty(branch, SVNBranchConfigurationPropertyType.class);
+        if (configurationProperty.isEmpty()) {
+            return null;
+        }
+        // Information
+        String buildPathPattern = configurationProperty.getValue().getBuildPath();
+        // Revision path
+        if (SVNUtils.isPathRevision(buildPathPattern)) {
+            return getEarliestBuild(branch, location, buildPathPattern);
+        }
+//        // Tag pattern
+//        else {
+//            // Uses the copy (if available)
+//            if (firstCopy != null) {
+//                return getEarliestBuild(branchId, firstCopy, buildPathPattern);
+//            } else {
+//                return null;
+//            }
+//        }
+        return null;
+    }
+
+    private Integer getEarliestBuild(Branch branch, SVNLocation location, String buildPathPattern) {
+        if (SVNUtils.followsBuildPattern(location, buildPathPattern)) {
+//            // Gets the build name
+//            String buildName = SVNExplorerPathUtils.getBuildName(location, pathPattern);
+//            /**
+//             * If the build is defined by path@revision, the earliest build is the one
+//             * that follows this revision.
+//             */
+//            if (SVNExplorerPathUtils.isPathRevision(pathPattern)) {
+//                return managementService.findBuildAfterUsingNumericForm(branchId, buildName);
+//            }
+//            /**
+//             * In any other case (tag or tag prefix), the build must be looked exactly
+//             */
+//            else {
+//                return managementService.findBuildByName(branchId, buildName);
+//            }
+            return null;
+        } else {
+            return null;
+        }
     }
 
     private SVNLocation getFirstCopyAfter(SVNRepository repository, SVNLocation location) {
