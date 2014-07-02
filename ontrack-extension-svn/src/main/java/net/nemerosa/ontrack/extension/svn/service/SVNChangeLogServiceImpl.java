@@ -28,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -253,7 +252,7 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
     }
 
     private SVNChangeLogRevision createChangeLogRevision(SVNRepository repository, String path, int level, SVNLogEntry svnEntry) {
-        return createChangeLogRevision(
+        return SVNServiceUtils.createChangeLogRevision(
                 repository,
                 path,
                 level,
@@ -262,30 +261,6 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
                 svnEntry.getAuthor(),
                 Time.from(svnEntry.getDate(), null)
         );
-    }
-
-    private SVNChangeLogRevision createChangeLogRevision(SVNRepository repository, String path, int level, long revision, String message, String author, LocalDateTime revisionDate) {
-        // Issue service
-        ConfiguredIssueService configuredIssueService = repository.getConfiguredIssueService();
-        // Formatted message
-        String formattedMessage;
-        if (configuredIssueService != null) {
-            formattedMessage = configuredIssueService.formatIssuesInMessage(message);
-        } else {
-            formattedMessage = message;
-        }
-        // Revision URL
-        String revisionUrl = repository.getRevisionBrowsingURL(revision);
-        // OK
-        return new SVNChangeLogRevision(
-                path,
-                level,
-                revision,
-                author,
-                revisionDate,
-                message,
-                revisionUrl,
-                formattedMessage);
     }
 
     protected SCMBuildView<SVNHistory> getSCMBuildView(SVNRepository svnRepository, ID buildId) {

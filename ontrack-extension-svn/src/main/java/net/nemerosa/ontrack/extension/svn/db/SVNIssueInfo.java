@@ -7,4 +7,12 @@ import lombok.Data;
  */
 @Data
 public class SVNIssueInfo {
+
+    /**
+     * Empty issue info.
+     */
+    public static SVNIssueInfo empty() {
+        return new SVNIssueInfo();
+    }
+
 }

@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.extension.svn.service;
 
-import net.nemerosa.ontrack.extension.issues.model.Issue;
+import net.nemerosa.ontrack.extension.svn.db.SVNIssueInfo;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.model.SVNRepositoryIssue;
 import net.nemerosa.ontrack.extension.svn.model.SVNRevisionInfo;
 import net.nemerosa.ontrack.extension.svn.model.SVNRevisionPaths;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -28,6 +28,15 @@ public interface SVNService {
     SVNRevisionPaths getRevisionPaths(SVNRepository repository, long revision);
 
     /**
+     * Gets the list of revisions for an issue in a repository
+     *
+     * @param repository Repository to get the info from
+     * @param key        Issue key
+     * @return List of revisions associated with this issue
+     */
+    List<Long> getRevisionsForIssueKey(SVNRepository repository, String key);
+
+    /**
      * Loads a {@link net.nemerosa.ontrack.extension.svn.db.SVNRepository} using its
      * configuration name.
      *
@@ -40,4 +49,13 @@ public interface SVNService {
      * Searches a list of issues associated to this repository
      */
     Optional<SVNRepositoryIssue> searchIssues(SVNRepository repository, String token);
+
+    /**
+     * Gets information about an issue in a repository.
+     *
+     * @param configurationName Name of the repository configuration.
+     * @param issueKey          Key of the issue
+     * @return Information (never null, but can be empty)
+     */
+    SVNIssueInfo getIssueInfo(String configurationName, String issueKey);
 }

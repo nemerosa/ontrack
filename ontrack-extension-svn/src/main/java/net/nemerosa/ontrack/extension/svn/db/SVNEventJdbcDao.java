@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.svn.db;
 
+import net.nemerosa.ontrack.extension.svn.model.SVNLocation;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -47,5 +48,17 @@ public class SVNEventJdbcDao extends AbstractJdbcRepository implements SVNEventD
                         rs.getLong("copyFromRevision"),
                         rs.getString("copyToPath")
                 ));
+    }
+
+    @Override
+    public SVNLocation getFirstCopyAfter(int repositoryId, SVNLocation location) {
+        return getFirstItem(
+                "SELECT * FROM EXT_SVN_COPY WHERE REPOSITORY = :repository AND COPYFROMPATH = :path AND COPYFROMREVISION >= :revision",
+                params("path", location.getPath()).addValue("revision", location.getRevision()).addValue("repository", repositoryId),
+                (rs, rowNum) -> new SVNLocation(
+                        rs.getString("copyToPath"),
+                        rs.getLong("revision")
+                )
+        );
     }
 }

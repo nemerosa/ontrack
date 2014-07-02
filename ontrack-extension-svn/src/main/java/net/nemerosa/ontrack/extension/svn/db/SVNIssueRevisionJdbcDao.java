@@ -54,4 +54,13 @@ public class SVNIssueRevisionJdbcDao extends AbstractJdbcRepository implements S
                 )
         );
     }
+
+    @Override
+    public List<Long> findRevisionsByIssue(int repositoryId, String issueKey) {
+        return getNamedParameterJdbcTemplate().queryForList(
+                "SELECT REVISION FROM EXT_SVN_REVISION_ISSUE WHERE REPOSITORY = :repository AND ISSUE = :key ORDER BY REVISION DESC",
+                params("key", issueKey).addValue("repository", repositoryId),
+                Long.class);
+    }
+
 }

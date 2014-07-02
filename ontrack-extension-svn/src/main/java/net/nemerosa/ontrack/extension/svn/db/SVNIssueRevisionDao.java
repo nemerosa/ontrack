@@ -11,4 +11,6 @@ public interface SVNIssueRevisionDao {
 
     Optional<String> findIssueByKey(int repositoryId, String issueKey);
 
+    List<Long> findRevisionsByIssue(int repositoryId, String issueKey);
+
 }
