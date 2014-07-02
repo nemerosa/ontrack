@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.svn.model;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Data;
 import net.nemerosa.ontrack.model.structure.BuildView;
 
@@ -15,6 +16,7 @@ public class OntrackSVNRevisionInfo {
     /**
      * Repository
      */
+    @JsonView({OntrackSVNRevisionInfo.class})
     private final SVNConfiguration configuration;
 
     /**
