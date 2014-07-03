@@ -95,8 +95,8 @@ angular.module('ot.view.branch', [
                             otStructureService.createBuild(branchResource._createBuild).then(loadBuildView);
                         }
                     },
-                    ot.viewActionsCommand($scope.branch._actions),
-                    ot.viewCloseCommand('/project/' + branchResource.project.id)
+                    ot.viewCloseCommand('/project/' + branchResource.project.id),
+                    ot.viewActionsCommand($scope.branch._actions)
                 ];
                 // Loads the build view
                 loadBuildView();
