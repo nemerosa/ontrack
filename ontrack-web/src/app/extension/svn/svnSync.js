@@ -21,6 +21,7 @@ angular.module('ot.extension.svn.sync', [
         // Loading of the branch information
         function loadBranch() {
             otStructureService.getBranch(branchId).then(function (branch) {
+                $scope.branch = branch;
                 // View configuration
                 view.title = $interpolate("Build synchronisation for {{name}}")(branch);
                 view.breadcrumbs = ot.branchBreadcrumbs(branch);
