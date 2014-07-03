@@ -23,6 +23,10 @@
                 by going back to the <a href="#/branch/{{syncInfo.branch.id}}">branch</a> for example. Or
                 you'll be notified of the end of the synchronisation by staying on this page.
             </div>
+
+            <div class="alert alert-warning" ng-show="synchronisingMessage">
+                {{synchronisingMessage}}
+            </div>
         </div>
     </div>
 

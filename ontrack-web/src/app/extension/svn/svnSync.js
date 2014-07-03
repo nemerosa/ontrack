@@ -55,8 +55,10 @@ angular.module('ot.extension.svn.sync', [
             if (syncInfoStatus.finished) {
                 $scope.synchronising = false;
                 $scope.synchronisingDone = true;
+            } else if (syncInfoStatus.message) {
+                $scope.synchronising = false;
+                $scope.synchronisingMessage = syncInfoStatus.message;
             } else {
-                // TODO Error message case
                 // TODO Displays the already created builds
                 // Go on with checking the status
                 $interval(goCheckSyncStatus, 3000, 1);
