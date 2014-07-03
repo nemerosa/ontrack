@@ -38,7 +38,7 @@ public class SVNBranchSyncActionExtension extends AbstractExtension implements P
             return Optional.of(Action.of(
                     "svn-sync",
                     "SVN <-> Build sync",
-                    "sync"
+                    String.format("sync/%d", entity.id())
             ));
         } else {
             return Optional.empty();
