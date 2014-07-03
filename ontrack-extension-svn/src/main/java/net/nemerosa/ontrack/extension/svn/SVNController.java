@@ -7,10 +7,7 @@ import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.extension.svn.model.*;
-import net.nemerosa.ontrack.extension.svn.service.IndexationService;
-import net.nemerosa.ontrack.extension.svn.service.SVNChangeLogService;
-import net.nemerosa.ontrack.extension.svn.service.SVNConfigurationService;
-import net.nemerosa.ontrack.extension.svn.service.SVNService;
+import net.nemerosa.ontrack.extension.svn.service.*;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
@@ -39,18 +36,20 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     private final SVNChangeLogService changeLogService;
     private final IssueServiceRegistry issueServiceRegistry;
     private final SVNService svnService;
+    private final SVNSyncService svnSyncService;
     private final SecurityService securityService;
 
     private final Cache<String, SVNChangeLog> logCache;
 
     @Autowired
-    public SVNController(SVNExtensionFeature feature, SVNConfigurationService svnConfigurationService, IndexationService indexationService, SVNChangeLogService changeLogService, IssueServiceRegistry issueServiceRegistry, SVNService svnService, SecurityService securityService) {
+    public SVNController(SVNExtensionFeature feature, SVNConfigurationService svnConfigurationService, IndexationService indexationService, SVNChangeLogService changeLogService, IssueServiceRegistry issueServiceRegistry, SVNService svnService, SVNSyncService svnSyncService, SecurityService securityService) {
         super(feature);
         this.svnConfigurationService = svnConfigurationService;
         this.indexationService = indexationService;
         this.changeLogService = changeLogService;
         this.issueServiceRegistry = issueServiceRegistry;
         this.svnService = svnService;
+        this.svnSyncService = svnSyncService;
         this.securityService = securityService;
         // Cache
         logCache = CacheBuilder.newBuilder()
@@ -329,8 +328,8 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
      */
     @RequestMapping(value = "sync/{branchId}", method = RequestMethod.POST)
     public Resource<SVNSyncInfoStatus> launchSync(@PathVariable ID branchId) {
-        // TODO Launches the synchronisation
-        SVNSyncInfoStatus status = new SVNSyncInfoStatus(UUID.randomUUID().toString());
+        // Launches the synchronisation
+        SVNSyncInfoStatus status = svnSyncService.launchSync(branchId);
         // Returns the status
         return toSyncStatusResource(status);
     }
@@ -340,8 +339,8 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
      */
     @RequestMapping(value = "sync/{uuid}/status", method = RequestMethod.GET)
     public Resource<SVNSyncInfoStatus> getSyncStatus(@PathVariable String uuid) {
-        // TODO Gets the status
-        SVNSyncInfoStatus status = new SVNSyncInfoStatus(uuid);
+        // Gets the status
+        SVNSyncInfoStatus status = svnSyncService.getSyncStatus(uuid);
         // Returns the status
         return toSyncStatusResource(status);
     }
