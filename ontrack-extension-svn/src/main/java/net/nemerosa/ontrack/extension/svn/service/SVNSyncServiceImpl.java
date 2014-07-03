@@ -7,17 +7,21 @@ import net.nemerosa.ontrack.extension.svn.property.SVNSyncPropertyType;
 import net.nemerosa.ontrack.model.security.BuildCreate;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.model.support.ApplicationInfo;
+import net.nemerosa.ontrack.model.support.ApplicationInfoProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 // TODO Application info provider
 @Service
-public class SVNSyncServiceImpl implements SVNSyncService {
+public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvider {
 
     private final StructureService structureService;
     private final PropertyService propertyService;
@@ -81,6 +85,13 @@ public class SVNSyncServiceImpl implements SVNSyncService {
         }
     }
 
+    @Override
+    public List<ApplicationInfo> getApplicationInfoList() {
+        return jobs.values().stream()
+                .map(SyncJob::getApplicationInfo)
+                .collect(Collectors.toList());
+    }
+
     private class SyncJob implements Runnable {
 
         private final Branch branch;
@@ -99,6 +110,16 @@ public class SVNSyncServiceImpl implements SVNSyncService {
 
         public SVNSyncInfoStatus getStatus() {
             return SVNSyncInfoStatus.of(branch.getId());
+        }
+
+        public ApplicationInfo getApplicationInfo() {
+            return ApplicationInfo.info(
+                    String.format(
+                            "Running build synchronisation from SVN for branch %s/%s",
+                            branch.getProject().getName(),
+                            branch.getName()
+                    )
+            );
         }
     }
 }
