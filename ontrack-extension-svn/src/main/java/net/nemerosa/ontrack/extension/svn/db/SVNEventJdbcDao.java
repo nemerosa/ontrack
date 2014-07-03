@@ -6,6 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
 
 @Repository
 public class SVNEventJdbcDao extends AbstractJdbcRepository implements SVNEventDao {
@@ -41,13 +46,17 @@ public class SVNEventJdbcDao extends AbstractJdbcRepository implements SVNEventD
         return getFirstItem(
                 "SELECT * FROM EXT_SVN_COPY WHERE REPOSITORY = :repository AND COPYTOPATH = :path AND REVISION <= :revision ORDER BY REVISION DESC LIMIT 1",
                 params("path", path).addValue("revision", revision).addValue("repository", repositoryId),
-                (rs, rowNum) -> new TCopyEvent(
-                        rs.getInt("repository"),
-                        rs.getLong("revision"),
-                        rs.getString("copyFromPath"),
-                        rs.getLong("copyFromRevision"),
-                        rs.getString("copyToPath")
-                ));
+                (rs, rowNum) -> toCopyEvent(rs));
+    }
+
+    private TCopyEvent toCopyEvent(ResultSet rs) throws SQLException {
+        return new TCopyEvent(
+                rs.getInt("repository"),
+                rs.getLong("revision"),
+                rs.getString("copyFromPath"),
+                rs.getLong("copyFromRevision"),
+                rs.getString("copyToPath")
+        );
     }
 
     @Override
@@ -59,6 +68,30 @@ public class SVNEventJdbcDao extends AbstractJdbcRepository implements SVNEventD
                         rs.getString("copyToPath"),
                         rs.getLong("revision")
                 )
+        );
+    }
+
+    @Override
+    public List<TCopyEvent> findCopies(int repositoryId, String fromPath, String toPathPrefix, Predicate<TCopyEvent> filter) {
+        return getNamedParameterJdbcTemplate().execute(
+                "SELECT * FROM EXT_SVN_COPY WHERE REPOSITORY = :repositoryId " +
+                        "AND COPYFROMPATH = :fromPath " +
+                        "AND COPYTOPATH LIKE :toPath",
+                params("repositoryId", repositoryId)
+                        .addValue("fromPath", fromPath)
+                        .addValue("toPath", toPathPrefix + "%"),
+                ps -> {
+                    ResultSet rs = ps.executeQuery();
+                    List<TCopyEvent> events = new ArrayList<>();
+                    while (rs.next()) {
+                        TCopyEvent event = toCopyEvent(rs);
+                        if (filter.test(event)) {
+                            events.add(event);
+                        }
+                    }
+                    // List
+                    return events;
+                }
         );
     }
 }

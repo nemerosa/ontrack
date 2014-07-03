@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.svn.service;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import net.nemerosa.ontrack.extension.svn.db.SVNEventDao;
+import net.nemerosa.ontrack.extension.svn.db.TCopyEvent;
 import net.nemerosa.ontrack.extension.svn.model.SVNSyncInfoStatus;
 import net.nemerosa.ontrack.extension.svn.property.*;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
@@ -25,6 +27,8 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
     private final StructureService structureService;
     private final PropertyService propertyService;
     private final SecurityService securityService;
+    private final SVNService svnService;
+    private final SVNEventDao eventDao;
 
     /**
      * Index of jobs per branches
@@ -43,10 +47,12 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
     );
 
     @Autowired
-    public SVNSyncServiceImpl(StructureService structureService, PropertyService propertyService, SecurityService securityService) {
+    public SVNSyncServiceImpl(StructureService structureService, PropertyService propertyService, SecurityService securityService, SVNService svnService, SVNEventDao eventDao) {
         this.structureService = structureService;
         this.propertyService = propertyService;
         this.securityService = securityService;
+        this.svnService = svnService;
+        this.eventDao = eventDao;
     }
 
     @Override
@@ -122,11 +128,19 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
             }
             // Gets the directory to look the tags from
             String basePath = SVNUtils.getBasePath(buildPathPattern);
-            // TODO Gets the list of tags from SVN
-            // TODO Qualifiers each tag to see if they match the build path pattern
-            // TODO Creates the build
+            // Gets the list of tags from the copy events, filtering them
+            List<TCopyEvent> copies = eventDao.findCopies(
+                    // In this repository
+                    svnService.getRepository(projectConfigurationProperty.getConfiguration().getName()).getId(),
+                    // from path...
+                    branchConfigurationProperty.getBranchPath(),
+                    // to path with prefix...
+                    basePath,
+                    // filter the target path with...
+                    (copyEvent) -> SVNUtils.followsBuildPattern(copyEvent.copyToLocation(), buildPathPattern)
+            );
+            // TODO Creates the builds (in a transaction)
             // TODO Removes this job from the list after completion
-            // FIXME Method net.nemerosa.ontrack.extension.svn.service.SVNSyncServiceImpl.SyncJob.run
 
         }
 

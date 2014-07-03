@@ -77,7 +77,7 @@ public class SVNUtils {
         }
     }
 
-    public static boolean buildPatternOk(String pattern, String value) {
+    protected static boolean buildPatternOk(String pattern, String value) {
         return Pattern.matches(
                 pattern.replace(".", "\\.").replace("*", ".+"),
                 value
