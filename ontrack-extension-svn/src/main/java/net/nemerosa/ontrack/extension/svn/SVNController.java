@@ -22,7 +22,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -337,10 +336,10 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     /**
      * Gets the sync status
      */
-    @RequestMapping(value = "sync/{uuid}/status", method = RequestMethod.GET)
-    public Resource<SVNSyncInfoStatus> getSyncStatus(@PathVariable String uuid) {
+    @RequestMapping(value = "sync/{branchId}/status", method = RequestMethod.GET)
+    public Resource<SVNSyncInfoStatus> getSyncStatus(@PathVariable ID branchId) {
         // Gets the status
-        SVNSyncInfoStatus status = svnSyncService.getSyncStatus(uuid);
+        SVNSyncInfoStatus status = svnSyncService.getSyncStatus(branchId);
         // Returns the status
         return toSyncStatusResource(status);
     }
@@ -348,7 +347,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     private Resource<SVNSyncInfoStatus> toSyncStatusResource(SVNSyncInfoStatus status) {
         return Resource.of(
                 status,
-                uri(on(getClass()).getSyncStatus(status.getUuid()))
+                uri(on(getClass()).getSyncStatus(status.getBranch()))
         );
     }
 

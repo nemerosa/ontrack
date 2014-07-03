@@ -7,5 +7,5 @@ public interface SVNSyncService {
 
     SVNSyncInfoStatus launchSync(ID branchId);
 
-    SVNSyncInfoStatus getSyncStatus(String uuid);
+    SVNSyncInfoStatus getSyncStatus(ID branchId);
 }
