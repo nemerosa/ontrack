@@ -76,16 +76,6 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
     }
 
     @Override
-    public SVNSyncInfoStatus getSyncStatus(ID branchId) {
-        SyncJob job = jobs.get(branchId);
-        if (job != null) {
-            return job.getStatus();
-        } else {
-            return SVNSyncInfoStatus.of(branchId).finished();
-        }
-    }
-
-    @Override
     public List<ApplicationInfo> getApplicationInfoList() {
         return jobs.values().stream()
                 .map(SyncJob::getApplicationInfo)

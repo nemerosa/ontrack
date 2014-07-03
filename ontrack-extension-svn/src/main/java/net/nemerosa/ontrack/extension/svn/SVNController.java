@@ -326,29 +326,8 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
      * Launches the synchronisation for a branch.
      */
     @RequestMapping(value = "sync/{branchId}", method = RequestMethod.POST)
-    public Resource<SVNSyncInfoStatus> launchSync(@PathVariable ID branchId) {
-        // Launches the synchronisation
-        SVNSyncInfoStatus status = svnSyncService.launchSync(branchId);
-        // Returns the status
-        return toSyncStatusResource(status);
-    }
-
-    /**
-     * Gets the sync status
-     */
-    @RequestMapping(value = "sync/{branchId}/status", method = RequestMethod.GET)
-    public Resource<SVNSyncInfoStatus> getSyncStatus(@PathVariable ID branchId) {
-        // Gets the status
-        SVNSyncInfoStatus status = svnSyncService.getSyncStatus(branchId);
-        // Returns the status
-        return toSyncStatusResource(status);
-    }
-
-    private Resource<SVNSyncInfoStatus> toSyncStatusResource(SVNSyncInfoStatus status) {
-        return Resource.of(
-                status,
-                uri(on(getClass()).getSyncStatus(status.getBranch()))
-        );
+    public SVNSyncInfoStatus launchSync(@PathVariable ID branchId) {
+        return svnSyncService.launchSync(branchId);
     }
 
 }

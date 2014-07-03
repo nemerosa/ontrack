@@ -18,14 +18,15 @@
                 <a href="#/branch/{{syncInfo.branch.id}}" class="btn btn-link">Cancel</a>
             </div>
 
-            <div class="alert alert-info" ng-show="synchronising">
+            <div class="alert alert-info" ng-show="synchronising && !syncInfoStatus.message">
                 The synchronisation works in background. You can come leave this page at any moment
-                by going back to the <a href="#/branch/{{syncInfo.branch.id}}">branch</a> for example. Or
-                you'll be notified of the end of the synchronisation by staying on this page.
+                by going back to the <a href="#/branch/{{syncInfo.branch.id}}">branch</a> for example. You will
+                be notified of the progress by looking in the application information messages in
+                upper right corner of the page.
             </div>
 
-            <div class="alert alert-warning" ng-show="synchronisingMessage">
-                {{synchronisingMessage}}
+            <div class="alert alert-warning" ng-show="syncInfoStatus.message">
+                {{syncInfoStatus.message}}
             </div>
         </div>
     </div>
