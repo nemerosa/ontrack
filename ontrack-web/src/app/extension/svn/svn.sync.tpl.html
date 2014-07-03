@@ -11,8 +11,17 @@
             </div>
 
             <div>
-                <button class="btn btn-danger">Synchronise</button>
+                <button class="btn btn-danger" ng-click="sync()" ng-disabled="synchronising">
+                    <img src="assets/ajax-loader.gif" ng-show="synchronising"/>
+                    Synchronise
+                </button>
                 <a href="#/branch/{{syncInfo.branch.id}}" class="btn btn-link">Cancel</a>
+            </div>
+
+            <div class="alert alert-info" ng-show="synchronising">
+                The synchronisation works in background. You can come leave this page at any moment
+                by going back to the <a href="#/branch/{{syncInfo.branch.id}}">branch</a> for example. Or
+                you'll be notified of the end of the synchronisation by staying on this page.
             </div>
         </div>
     </div>

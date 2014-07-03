@@ -17,6 +17,8 @@ angular.module('ot.extension.svn.sync', [
             ot.viewCloseCommand('/branch/' + branchId)
         ];
 
+        $scope.synchronising = false;
+
         // Loading of the sync information
         function loadSyncInfo() {
             ot.pageCall($http.get($interpolate("extension/svn/sync/{{branch}}")($stateParams))).then(function (syncInfo) {
@@ -29,6 +31,15 @@ angular.module('ot.extension.svn.sync', [
 
         // Initialisation
         loadSyncInfo();
+
+        // Synchronisation
+        $scope.sync = function () {
+            $scope.synchronising = true;
+            // TODO Launches the sync
+            // TODO Gets the sync status regularly
+            // TODO Displays a message at the end of the sync
+            // TODO Put synchronising to false at the end
+        };
 
     })
 ;
