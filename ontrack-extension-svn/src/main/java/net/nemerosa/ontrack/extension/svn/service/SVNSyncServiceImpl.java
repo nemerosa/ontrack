@@ -2,8 +2,7 @@ package net.nemerosa.ontrack.extension.svn.service;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.nemerosa.ontrack.extension.svn.model.SVNSyncInfoStatus;
-import net.nemerosa.ontrack.extension.svn.property.SVNSyncProperty;
-import net.nemerosa.ontrack.extension.svn.property.SVNSyncPropertyType;
+import net.nemerosa.ontrack.extension.svn.property.*;
 import net.nemerosa.ontrack.model.security.BuildCreate;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
@@ -19,7 +18,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
-// TODO Application info provider
 @Service
 public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvider {
 
@@ -65,8 +63,23 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
         if (syncProperty.isEmpty()) {
             return SVNSyncInfoStatus.of(branchId).withMessage("The synchronisation has not been configured for this branch.");
         }
+        // Gets the project configurations for SVN
+        Property<SVNProjectConfigurationProperty> projectConfigurationProperty =
+                propertyService.getProperty(branch.getProject(), SVNProjectConfigurationPropertyType.class);
+        if (projectConfigurationProperty.isEmpty()) {
+            return SVNSyncInfoStatus.of(branchId).withMessage("SVN has not been configured for this branch's project.");
+        }
+        // Gets the branch configurations for SVN
+        Property<SVNBranchConfigurationProperty> branchConfigurationProperty =
+                propertyService.getProperty(branch, SVNBranchConfigurationPropertyType.class);
+        if (branchConfigurationProperty.isEmpty()) {
+            return SVNSyncInfoStatus.of(branchId).withMessage("SVN has not been configured for this branch.");
+        }
         // Creates a new job for this branch
-        SyncJob job = new SyncJob(branch, syncProperty.getValue());
+        SyncJob job = new SyncJob(branch,
+                projectConfigurationProperty.getValue(),
+                branchConfigurationProperty.getValue(),
+                syncProperty.getValue());
         // Submits the job
         executor.submit(job);
         // Indexes the job
@@ -85,15 +98,22 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
     private class SyncJob implements Runnable {
 
         private final Branch branch;
+        private final SVNProjectConfigurationProperty projectConfigurationProperty;
+        private final SVNBranchConfigurationProperty branchConfigurationProperty;
         private final SVNSyncProperty syncProperty;
 
-        public SyncJob(Branch branch, SVNSyncProperty syncProperty) {
+        public SyncJob(Branch branch, SVNProjectConfigurationProperty projectConfigurationProperty, SVNBranchConfigurationProperty branchConfigurationProperty, SVNSyncProperty syncProperty) {
             this.branch = branch;
+            this.projectConfigurationProperty = projectConfigurationProperty;
+            this.branchConfigurationProperty = branchConfigurationProperty;
             this.syncProperty = syncProperty;
         }
 
         @Override
         public void run() {
+            // TODO Gets the list of tags from SVN
+            // TODO Qualifiers each tag to see if they match the build path pattern
+            // TODO Creates the build
             // FIXME Method net.nemerosa.ontrack.extension.svn.service.SVNSyncServiceImpl.SyncJob.run
 
         }
