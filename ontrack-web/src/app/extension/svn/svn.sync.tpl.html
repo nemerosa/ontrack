@@ -2,12 +2,18 @@
 
     <div class="row">
         <div class="col-md-12">
-            Press the button below to synchronise the builds from Subversion.
-            <p/>
-            <p>
+            <div>Press the button below to synchronise the builds from Subversion.</div>
+
+            <div class="alert alert-danger">
+                The synchronisation settings are set to override builds in case they already exist.
+                This will discard any previous information attached to them, like the validation
+                and promotion runs.
+            </div>
+
+            <div>
                 <button class="btn btn-danger">Synchronise</button>
-                <a href="#/branch/{{branch.id}}" class="btn btn-link">Cancel</a>
-            </p>
+                <a href="#/branch/{{syncInfo.branch.id}}" class="btn btn-link">Cancel</a>
+            </div>
         </div>
     </div>
 

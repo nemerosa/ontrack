@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty;
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType;
 import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationPropertyType;
+import net.nemerosa.ontrack.extension.svn.property.SVNSyncPropertyType;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
 import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -220,6 +221,15 @@ public class SVNServiceImpl implements SVNService {
                 buildViews
         );
 
+    }
+
+    @Override
+    public SVNSyncInfo getSyncInfo(ID branchId) {
+        Branch branch = structureService.getBranch(branchId);
+        return new SVNSyncInfo(
+                branch,
+                propertyService.getProperty(branch, SVNSyncPropertyType.class).getValue()
+        );
     }
 
     private Optional<Build> lookupBuild(SVNLocation location, SVNLocation firstCopy, Branch branch) {

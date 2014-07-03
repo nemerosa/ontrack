@@ -1,7 +1,6 @@
 angular.module('ot.extension.svn.sync', [
     'ui.router',
-    'ot.service.core',
-    'ot.service.structure'
+    'ot.service.core'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('svn-sync', {
@@ -10,7 +9,7 @@ angular.module('ot.extension.svn.sync', [
             controller: 'SVNSyncCtrl'
         });
     })
-    .controller('SVNSyncCtrl', function ($stateParams, $scope, $http, $interpolate, ot, otStructureService) {
+    .controller('SVNSyncCtrl', function ($stateParams, $scope, $http, $interpolate, ot) {
 
         var branchId = $stateParams.branch;
         var view = ot.view();
@@ -18,18 +17,18 @@ angular.module('ot.extension.svn.sync', [
             ot.viewCloseCommand('/branch/' + branchId)
         ];
 
-        // Loading of the branch information
-        function loadBranch() {
-            otStructureService.getBranch(branchId).then(function (branch) {
-                $scope.branch = branch;
+        // Loading of the sync information
+        function loadSyncInfo() {
+            ot.pageCall($http.get($interpolate("extension/svn/sync/{{branch}}")($stateParams))).then(function (syncInfo) {
+                $scope.syncInfo = syncInfo;
                 // View configuration
-                view.title = $interpolate("Build synchronisation for {{name}}")(branch);
-                view.breadcrumbs = ot.branchBreadcrumbs(branch);
+                view.title = $interpolate("Build synchronisation for {{branch.name}}")(syncInfo);
+                view.breadcrumbs = ot.branchBreadcrumbs(syncInfo.branch);
             });
         }
 
         // Initialisation
-        loadBranch();
+        loadSyncInfo();
 
     })
 ;
