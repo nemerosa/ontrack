@@ -47,15 +47,18 @@ public class SVNSyncPropertyType extends AbstractPropertyType<SVNSyncProperty> {
      */
     @Override
     public boolean canEdit(ProjectEntity entity, SecurityService securityService) {
-        return securityService.isProjectFunctionGranted(entity.projectId(), ProjectConfig.class) &&
+        return securityService.isProjectFunctionGranted(entity, ProjectConfig.class) &&
                 propertyService.hasProperty(
                         entity,
                         SVNBranchConfigurationPropertyType.class);
     }
 
+    /**
+     * Only the project configurator can see the property. The other ones do not have to bother.
+     */
     @Override
     public boolean canView(ProjectEntity entity, SecurityService securityService) {
-        return true;
+        return securityService.isProjectFunctionGranted(entity, ProjectConfig.class);
     }
 
     @Override
