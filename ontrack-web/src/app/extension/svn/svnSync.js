@@ -35,10 +35,15 @@ angular.module('ot.extension.svn.sync', [
         // Synchronisation
         $scope.sync = function () {
             $scope.synchronising = true;
-            // TODO Launches the sync
-            // TODO Gets the sync status regularly
-            // TODO Displays a message at the end of the sync
-            // TODO Put synchronising to false at the end
+            // Launches the sync
+            ot.pageCall($http.post($scope.syncInfo._self)).then(
+                function success(syncInfoId) {
+                    // TODO Gets the sync status regularly
+                    // TODO Displays a message at the end of the sync
+                    // TODO Put synchronising to false at the end
+                }, function error() {
+                    $scope.synchronising = false;
+                });
         };
 
     })
