@@ -73,8 +73,12 @@ public class SVNSyncServiceImpl implements SVNSyncService {
 
     @Override
     public SVNSyncInfoStatus getSyncStatus(ID branchId) {
-        // FIXME Method net.nemerosa.ontrack.extension.svn.service.SVNSyncServiceImpl.getSyncStatus
-        return null;
+        SyncJob job = jobs.get(branchId);
+        if (job != null) {
+            return job.getStatus();
+        } else {
+            return SVNSyncInfoStatus.of(branchId).finished();
+        }
     }
 
     private class SyncJob implements Runnable {
