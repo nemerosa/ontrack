@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.BuildDiff;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.ui.resource.Link;
@@ -319,7 +320,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
         return Resource.of(
                 svnService.getSyncInfo(branchId),
                 uri(on(getClass()).getSyncInfo(branchId))
-        );
+        ).withView(Branch.class);
     }
 
     /**

@@ -29,19 +29,26 @@ public class Resource<T> extends LinkContainer<Resource<T>> implements ViewSuppl
     @JsonUnwrapped
     private final T data;
     @JsonIgnore
-    private final Class<T> viewType;
+    private final Class<?> viewType;
 
     @ConstructorProperties({"data", "_self"})
     protected Resource(T data, URI self) {
+        this(data, self, data.getClass());
+    }
+
+    private Resource(T data, URI self, Class<?> view) {
         super(self);
         Validate.notNull(data, "Null data is not acceptable for a resource");
         this.data = data;
-        //noinspection unchecked
-        this.viewType = (Class<T>) data.getClass();
+        this.viewType = view;
     }
 
     public static <R> Resource<R> of(R data, URI self) {
         return new Resource<>(data, self);
+    }
+
+    public Resource<T> withView(Class<?> view) {
+        return new Resource<>(data, get_self(), view);
     }
 
 }
