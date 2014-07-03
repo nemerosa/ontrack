@@ -25,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -320,6 +321,35 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
         return Resource.of(
                 svnService.getSyncInfo(branchId),
                 uri(on(getClass()).getSyncInfo(branchId))
+        );
+    }
+
+    /**
+     * Launches the synchronisation for a branch.
+     */
+    @RequestMapping(value = "sync/{branchId}", method = RequestMethod.POST)
+    public Resource<SVNSyncInfoStatus> launchSync(@PathVariable ID branchId) {
+        // TODO Launches the synchronisation
+        SVNSyncInfoStatus status = new SVNSyncInfoStatus(UUID.randomUUID().toString());
+        // Returns the status
+        return toSyncStatusResource(status);
+    }
+
+    /**
+     * Gets the sync status
+     */
+    @RequestMapping(value = "sync/{uuid}/status", method = RequestMethod.GET)
+    public Resource<SVNSyncInfoStatus> getSyncStatus(@PathVariable String uuid) {
+        // TODO Gets the status
+        SVNSyncInfoStatus status = new SVNSyncInfoStatus(uuid);
+        // Returns the status
+        return toSyncStatusResource(status);
+    }
+
+    private Resource<SVNSyncInfoStatus> toSyncStatusResource(SVNSyncInfoStatus status) {
+        return Resource.of(
+                status,
+                uri(on(getClass()).getSyncStatus(status.getUuid()))
         );
     }
 
