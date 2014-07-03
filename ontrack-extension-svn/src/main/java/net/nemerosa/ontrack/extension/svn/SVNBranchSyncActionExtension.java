@@ -12,6 +12,8 @@ import net.nemerosa.ontrack.model.structure.PropertyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public class SVNBranchSyncActionExtension extends AbstractExtension implements ProjectEntityActionExtension {
 
@@ -29,17 +31,17 @@ public class SVNBranchSyncActionExtension extends AbstractExtension implements P
     }
 
     @Override
-    public Action getAction(ProjectEntity entity) {
+    public Optional<Action> getAction(ProjectEntity entity) {
         if (entity instanceof Branch
                 && propertyService.hasProperty(entity, SVNBranchConfigurationPropertyType.class)
                 && securityService.isProjectFunctionGranted(entity.projectId(), BuildCreate.class)) {
-            return Action.of(
+            return Optional.of(Action.of(
                     "svn-sync",
                     "SVN <-> Build sync",
                     "sync"
-            );
+            ));
         } else {
-            return null;
+            return Optional.empty();
         }
     }
 

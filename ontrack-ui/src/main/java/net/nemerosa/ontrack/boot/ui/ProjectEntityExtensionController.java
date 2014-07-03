@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
+import java.util.Optional;
+
 /**
  * Controller used to get extensions on project entities.
  */
@@ -36,8 +38,9 @@ public class ProjectEntityExtensionController extends AbstractProjectEntityContr
     public Resources<Action> getActions(@PathVariable ProjectEntityType entityType, @PathVariable ID id) {
         return Resources.of(
                 extensionManager.getExtensions(ProjectEntityActionExtension.class).stream()
-                        .map(x -> x.getAction(getEntity(entityType, id)))
-                        .filter(action -> action != null),
+                        .map(x -> x.getAction(getEntity(entityType, id)).map(action -> resolveExtensionAction(x, action)))
+                        .filter(Optional::isPresent)
+                        .map(Optional::get),
                 uri(MvcUriComponentsBuilder.on(getClass()).getActions(entityType, id))
         );
     }
