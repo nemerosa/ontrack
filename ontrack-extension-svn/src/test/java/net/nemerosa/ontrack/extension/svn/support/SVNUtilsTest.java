@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.extension.svn.support;
 
-import net.nemerosa.ontrack.extension.svn.model.BuildPathMatchingException;
-import net.nemerosa.ontrack.extension.svn.model.SVNLocation;
-import net.nemerosa.ontrack.extension.svn.model.UnknownBuildPathExpression;
+import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.model.structure.*;
 import org.junit.Test;
 
@@ -119,6 +117,46 @@ public class SVNUtilsTest {
     @Test
     public void buildPattern_match_nok() {
         assertFalse(buildPatternOk("2.1.*", "2.2.0"));
+    }
+
+    @Test(expected = BuildPathNotDefinedException.class)
+    public void getBasePath_null() {
+        getBasePath(null);
+    }
+
+    @Test(expected = BuildPathNotDefinedException.class)
+    public void getBasePath_blank() {
+        getBasePath("");
+    }
+
+    @Test(expected = NoBasePathForRevisionPatternException.class)
+    public void getBasePath_revision() {
+        getBasePath("/project/trunk/@{build}");
+    }
+
+    @Test
+    public void getBasePath_incorrect_pattern() {
+        assertEquals("/project/tags", getBasePath("/project/tags/{test}"));
+    }
+
+    @Test
+    public void getBasePath_simple() {
+        assertEquals("/project/tags", getBasePath("/project/tags/{build}"));
+    }
+
+    @Test
+    public void getBasePath_simple_with_prefix() {
+        assertEquals("/project/tags", getBasePath("/project/tags/v{build}"));
+    }
+
+    @Test
+    public void getBasePath_expression() {
+        assertEquals("/project/tags", getBasePath("/project/tags/{build:2.7.*}"));
+    }
+
+    @Test
+    public void getBasePath_expression_with_prefix() {
+        assertEquals("/project/tags", getBasePath("/project/tags/v{build:2.7.*}"));
     }
 
     private static Build build() {

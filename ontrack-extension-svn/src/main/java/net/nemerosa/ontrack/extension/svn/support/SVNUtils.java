@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.extension.svn.support;
 
-import net.nemerosa.ontrack.extension.svn.model.BuildPathMatchingException;
-import net.nemerosa.ontrack.extension.svn.model.SVNLocation;
-import net.nemerosa.ontrack.extension.svn.model.UnknownBuildPathExpression;
+import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.model.structure.Build;
 import org.apache.commons.lang3.StringUtils;
 import org.tmatesoft.svn.core.SVNException;
@@ -33,7 +31,11 @@ public class SVNUtils {
     }
 
     public static boolean isPathRevision(String pathPattern) {
-        return pathPattern.endsWith("@{build}");
+        if (StringUtils.isNotBlank(pathPattern)) {
+            return pathPattern.endsWith("@{build}");
+        } else {
+            throw new BuildPathNotDefinedException();
+        }
     }
 
     /**
@@ -116,6 +118,17 @@ public class SVNUtils {
             return StringUtils.isNotBlank(getBuildName(location, pathPattern));
         } catch (BuildPathMatchingException ex) {
             return false;
+        }
+    }
+
+    public static String getBasePath(String pathPattern) {
+        if (isPathRevision(pathPattern)) {
+            throw new NoBasePathForRevisionPatternException(pathPattern);
+        } else {
+            // Removes any expression
+            String rawPath = pathPattern.replaceAll(BUILD_PLACEHOLDER_PATTERN, "");
+            // Gets the path BEFORE the last slash
+            return StringUtils.substringBeforeLast(rawPath, "/");
         }
     }
 }

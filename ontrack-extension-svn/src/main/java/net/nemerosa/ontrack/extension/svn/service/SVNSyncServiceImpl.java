@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.svn.service;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.nemerosa.ontrack.extension.svn.model.SVNSyncInfoStatus;
 import net.nemerosa.ontrack.extension.svn.property.*;
+import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
 import net.nemerosa.ontrack.model.security.BuildCreate;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
@@ -111,9 +112,20 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
 
         @Override
         public void run() {
+            // Gets the build path
+            String buildPathPattern = branchConfigurationProperty.getBuildPath();
+            // Cannot work with revisions only
+            if (SVNUtils.isPathRevision(buildPathPattern)) {
+                // TODO Logs an error
+                // ... and exists
+                return;
+            }
+            // Gets the directory to look the tags from
+            String basePath = SVNUtils.getBasePath(buildPathPattern);
             // TODO Gets the list of tags from SVN
             // TODO Qualifiers each tag to see if they match the build path pattern
             // TODO Creates the build
+            // TODO Removes this job from the list after completion
             // FIXME Method net.nemerosa.ontrack.extension.svn.service.SVNSyncServiceImpl.SyncJob.run
 
         }
