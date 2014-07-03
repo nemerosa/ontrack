@@ -34,7 +34,7 @@ public class SVNBranchSyncActionExtension extends AbstractExtension implements P
     public Optional<Action> getAction(ProjectEntity entity) {
         if (entity instanceof Branch
                 && propertyService.hasProperty(entity, SVNBranchConfigurationPropertyType.class)
-                && securityService.isProjectFunctionGranted(entity.projectId(), BuildCreate.class)) {
+                && securityService.isProjectFunctionGranted(entity, BuildCreate.class)) {
             return Optional.of(Action.of(
                     "svn-sync",
                     "SVN <-> Build sync",
