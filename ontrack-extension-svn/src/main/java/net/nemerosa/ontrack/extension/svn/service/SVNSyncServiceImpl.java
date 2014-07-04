@@ -13,17 +13,18 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.ApplicationInfo;
 import net.nemerosa.ontrack.model.support.ApplicationInfoProvider;
+import net.nemerosa.ontrack.model.support.ScheduledService;
+import net.nemerosa.ontrack.model.support.Time;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.Trigger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,7 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
-public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvider {
+public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvider, ScheduledService {
 
     private final Logger logger = LoggerFactory.getLogger(SVNSyncService.class);
 
@@ -123,6 +124,55 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
         return jobs.values().stream()
                 .map(SyncJob::getApplicationInfo)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Runnable getTask() {
+        // FIXME Method net.nemerosa.ontrack.extension.svn.service.SVNSyncServiceImpl.getTask
+        return () -> {
+            // FIXME Method .run
+        };
+    }
+
+    @Override
+    public Trigger getTrigger() {
+        return triggerContext -> {
+            // Gets the mimimum of the scan intervals (outside of 0)
+            OptionalInt scanInterval = securityService.asAdmin(this::getMinScanInterval);
+            // No scan, tries again in one minute, in case the configuration has changed
+            if (!scanInterval.isPresent() || scanInterval.getAsInt() <= 0) {
+                return Time.toJavaUtilDate(Time.now().plusMinutes(1));
+            } else {
+                // Last execution time
+                Date time = triggerContext.lastActualExecutionTime();
+                if (time != null) {
+                    return Time.toJavaUtilDate(Time.from(time, null).plusMinutes(scanInterval.getAsInt()));
+                } else {
+                    // Never executed before
+                    return Time.toJavaUtilDate(Time.now().plusMinutes(scanInterval.getAsInt()));
+                }
+            }
+        };
+    }
+
+    protected OptionalInt getMinScanInterval() {
+        // List of all projects
+        return structureService.getProjectList()
+                .stream()
+                        // ...which have a SVN configuration
+                .filter(project -> propertyService.hasProperty(project, SVNProjectConfigurationPropertyType.class))
+                        // ...gets all their branches
+                .flatMap(project -> structureService.getBranchesForProject(project.getId()).stream())
+                        // ...which have a SVN configuration
+                .filter(branch -> propertyService.hasProperty(branch, SVNBranchConfigurationPropertyType.class))
+                        // ...gets their SVN sync property
+                .map(branch -> propertyService.getProperty(branch, SVNSyncPropertyType.class))
+                        // ...retains the branches which have actually a SVN sync configured with interval > 0
+                .filter(property -> !property.isEmpty() && property.getValue().getInterval() > 0)
+                        // ...gets the intervals
+                .mapToInt(property -> property.getValue().getInterval())
+                        // ... gets the minimum
+                .min();
     }
 
     private class SyncJob implements Runnable {
