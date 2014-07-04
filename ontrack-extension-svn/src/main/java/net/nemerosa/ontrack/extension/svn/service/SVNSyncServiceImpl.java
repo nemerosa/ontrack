@@ -2,7 +2,9 @@ package net.nemerosa.ontrack.extension.svn.service;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.nemerosa.ontrack.extension.svn.db.SVNEventDao;
+import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.db.TCopyEvent;
+import net.nemerosa.ontrack.extension.svn.model.SVNRevisionInfo;
 import net.nemerosa.ontrack.extension.svn.model.SVNSyncInfoStatus;
 import net.nemerosa.ontrack.extension.svn.property.*;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -152,10 +155,12 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
                 String buildPathPattern = branchConfigurationProperty.getBuildPath();
                 // Gets the directory to look the tags from
                 String basePath = SVNUtils.getBasePath(buildPathPattern);
+                // SVN repository configuration
+                SVNRepository repository = svnService.getRepository(projectConfigurationProperty.getConfiguration().getName());
                 // Gets the list of tags from the copy events, filtering them
                 List<TCopyEvent> copies = eventDao.findCopies(
                         // In this repository
-                        svnService.getRepository(projectConfigurationProperty.getConfiguration().getName()).getId(),
+                        repository.getId(),
                         // from path...
                         branchConfigurationProperty.getBranchPath(),
                         // to path with prefix...
@@ -165,7 +170,7 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
                 );
                 // Creates the builds (in a transaction)
                 for (TCopyEvent copy : copies) {
-                    Optional<Build> build = transactionTemplate.execute(status -> createBuild(copy, buildPathPattern));
+                    Optional<Build> build = transactionTemplate.execute(status -> createBuild(copy, buildPathPattern, repository));
                     // Completes the information collection (build created)
                     if (build.isPresent()) {
                         createdBuilds.incrementAndGet();
@@ -191,7 +196,7 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
             }
         }
 
-        private Optional<Build> createBuild(TCopyEvent copy, String buildPathPattern) {
+        private Optional<Build> createBuild(TCopyEvent copy, String buildPathPattern, SVNRepository repository) {
             // Extracts the build name from the copyTo path
             String buildName = SVNUtils.getBuildName(copy.copyToLocation(), buildPathPattern);
             // Gets an existing build if any
@@ -199,7 +204,7 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
             // If none exists, just creates it
             if (!build.isPresent()) {
                 logger.debug("[svn-sync] Build {} does not exist - creating.");
-                return Optional.of(doCreateBuild(copy, buildName));
+                return Optional.of(doCreateBuild(copy, buildName, repository));
             }
             // If Ok to override, deletes it and creates it
             else if (syncProperty.isOverride()) {
@@ -207,7 +212,7 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
                 // Deletes the build
                 structureService.deleteBuild(build.get().getId());
                 // Creates the build
-                return Optional.of(doCreateBuild(copy, buildName));
+                return Optional.of(doCreateBuild(copy, buildName, repository));
             }
             // Else, just puts some log entry
             else {
@@ -216,7 +221,11 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
             }
         }
 
-        private Build doCreateBuild(TCopyEvent copy, String buildName) {
+        private Build doCreateBuild(TCopyEvent copy, String buildName, SVNRepository repository) {
+            // The build date is assumed to be the creation of the tag
+            SVNRevisionInfo revisionInfo = svnService.getRevisionInfo(repository, copy.getRevision());
+            LocalDateTime revisionTime = revisionInfo.getDateTime();
+            // Creation of the build
             return structureService.newBuild(
                     Build.of(
                             branch,
@@ -224,7 +233,7 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
                                     buildName,
                                     String.format("Build created by SVN synchronisation from tag %s", copy.getCopyToPath())
                             ),
-                            securityService.getCurrentSignature()
+                            securityService.getCurrentSignature().withTime(revisionTime)
                     )
             );
         }
