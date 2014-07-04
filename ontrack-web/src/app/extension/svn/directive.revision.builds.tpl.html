@@ -1,0 +1,35 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        Associated builds
+    </div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>&nbsp;</th>
+            <th>Project</th>
+            <th>Branch</th>
+            <th>Build</th>
+            <th>Validation stamps</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="buildView in ontrackSvnRevisionInfo.buildViews">
+            <td>
+                &nbsp;
+            </td>
+            <td>
+                <a href="#/project/{{buildView.build.branch.project.id}}">{{buildView.build.branch.project.name}}</a>
+            </td>
+            <td>
+                <a href="#/branch/{{buildView.build.branch.id}}">{{buildView.build.branch.name}}</a>
+            </td>
+            <td>
+                <a href="#/build/{{buildView.build.id}}">{{buildView.build.name}}</a>
+            </td>
+            <td>
+                TODO Validation stamps for this build
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>

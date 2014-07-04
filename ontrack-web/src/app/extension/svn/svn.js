@@ -100,4 +100,14 @@ angular.module('ontrack.extension.svn', [
             }
         };
     })
+    .directive('otExtensionSvnRevisionBuilds', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'app/extension/svn/directive.revision.builds.tpl.html',
+            scope: {
+                ontrackSvnRevisionInfo: '='
+                // TODO Merged infos
+            }
+        };
+    })
 ;

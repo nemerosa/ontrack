@@ -13,6 +13,7 @@ import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.Branch;
+import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.BuildDiff;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.ui.resource.Link;
@@ -305,11 +306,14 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
      * Gets the summary for a revision in a repository
      */
     @RequestMapping(value = "configuration/{configuration}/revision/{revision}")
-    public OntrackSVNRevisionInfo revisionInfo(@PathVariable String configuration, @PathVariable long revision) {
-        return svnService.getOntrackRevisionInfo(
-                svnService.getRepository(configuration),
-                revision
-        );
+    public Resource<OntrackSVNRevisionInfo> revisionInfo(@PathVariable String configuration, @PathVariable long revision) {
+        return Resource.of(
+                svnService.getOntrackRevisionInfo(
+                        svnService.getRepository(configuration),
+                        revision
+                ),
+                uri(on(getClass()).revisionInfo(configuration, revision))
+        ).withView(Build.class);
     }
 
     /**

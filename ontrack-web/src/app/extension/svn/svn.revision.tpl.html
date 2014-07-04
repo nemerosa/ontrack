@@ -9,15 +9,17 @@
     <div class="row" ng-show="ontrackSVNRevisionInfo">
         <div class="col-md-12">
 
-            <div class="row">
-                <div class="col-md-12">
-                    <!-- Summary for the revision -->
-                    <ot-extension-svn-revision-summary
-                            revision-info="ontrackSVNRevisionInfo.revisionInfo"></ot-extension-svn-revision-summary>
-                </div>
-            </div>
+            <!-- Summary for the revision -->
+            <ot-extension-svn-revision-summary
+                    revision-info="ontrackSVNRevisionInfo.revisionInfo"></ot-extension-svn-revision-summary>
+
+            <!-- Builds for the revision -->
+            <ot-extension-svn-revision-builds
+                    ontrack-svn-revision-info="ontrackSVNRevisionInfo"></ot-extension-svn-revision-builds>
 
         </div>
     </div>
+
+    TODO Promotions, on which builds
 
 </ot-view>
