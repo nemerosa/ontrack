@@ -1,17 +1,16 @@
-<h2 ng-if="title">
-    <small>
+<div class="panel panel-default">
+    <div class="panel-heading" ng-if="title">
         <a href="{{revisionInfo.revisionUrl}}" target="_blank">
             Revision {{revisionInfo.revision}}
         </a>
-    </small>
-</h2>
-
-<div class="well">
-    <p ng-bind-html="revisionInfo.formattedMessage"></p>
-    <p class="ot-description">
-        --
-        {{revisionInfo.author}},
-        {{revisionInfo.revisionDate | date:'mediumDate'}}
-        {{revisionInfo.revisionDate | date:'shortTime'}}
-    </p>
+    </div>
+    <div class="panel-body">
+        <p ng-bind-html="revisionInfo.formattedMessage"></p>
+        <p class="ot-description">
+            --
+            {{revisionInfo.author}},
+            {{revisionInfo.revisionDate | date:'mediumDate'}}
+            {{revisionInfo.revisionDate | date:'shortTime'}}
+        </p>
+    </div>
 </div>
