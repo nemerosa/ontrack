@@ -213,9 +213,10 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
         public ApplicationInfo getApplicationInfo() {
             return ApplicationInfo.info(
                     String.format(
-                            "Running build synchronisation from SVN for branch %s/%s",
+                            "Running build synchronisation from SVN for branch %s/%s: %d build(s) created",
                             branch.getProject().getName(),
-                            branch.getName()
+                            branch.getName(),
+                            createdBuilds.get()
                     )
             );
         }
