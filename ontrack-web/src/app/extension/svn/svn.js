@@ -110,4 +110,13 @@ angular.module('ontrack.extension.svn', [
             }
         };
     })
+    .directive('otExtensionSvnRevisionPromotions', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'app/extension/svn/directive.revision.promotions.tpl.html',
+            scope: {
+                ontrackSvnRevisionInfo: '='
+            }
+        };
+    })
 ;

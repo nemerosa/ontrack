@@ -9,7 +9,7 @@ import lombok.Data;
 public class PromotionView implements View {
 
     private final PromotionLevel promotionLevel;
-    @JsonView({BranchStatusView.class, PromotionView.class})
+    @JsonView({BranchStatusView.class, PromotionView.class, Build.class})
     private final PromotionRun promotionRun;
 
 }
