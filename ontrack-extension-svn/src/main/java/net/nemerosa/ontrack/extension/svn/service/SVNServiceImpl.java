@@ -190,6 +190,7 @@ public class SVNServiceImpl implements SVNService {
 
         // Data to collect
         Collection<BuildView> buildViews = new ArrayList<>();
+        Collection<BranchStatusView> branchStatusViews = new ArrayList<>();
         // Loops over all authorised branches
         for (Project project : structureService.getProjectList()) {
             // Filter on SVN configuration: must be present and equal to the one the revision info is looked into
@@ -207,6 +208,8 @@ public class SVNServiceImpl implements SVNService {
                             BuildView buildView = structureService.getBuildView(build.get());
                             // Adds it to the list
                             buildViews.add(buildView);
+                            // Collects the promotions for the branch
+                            branchStatusViews.add(structureService.getBranchStatusView(branch));
                         }
                     }
                 }
@@ -217,7 +220,8 @@ public class SVNServiceImpl implements SVNService {
         return new OntrackSVNRevisionInfo(
                 repository.getConfiguration(),
                 changeLogRevision,
-                buildViews
+                buildViews,
+                branchStatusViews
         );
 
     }

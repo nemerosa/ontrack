@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.svn.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Data;
+import net.nemerosa.ontrack.model.structure.BranchStatusView;
 import net.nemerosa.ontrack.model.structure.BuildView;
 
 import java.util.Collection;
@@ -28,5 +29,10 @@ public class OntrackSVNRevisionInfo {
      * Collection of build views
      */
     private final Collection<BuildView> buildViews;
+
+    /**
+     * Collection of promotions for the branches
+     */
+    private final Collection<BranchStatusView> branchStatusViews;
 
 }
