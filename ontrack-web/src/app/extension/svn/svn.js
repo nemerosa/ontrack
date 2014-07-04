@@ -5,6 +5,7 @@ angular.module('ontrack.extension.svn', [
     'ot.service.form',
     'ot.extension.svn.changelog',
     'ot.extension.svn.revision',
+    'ot.extension.svn.issue',
     'ot.extension.svn.sync',
     'ot.extension.svn.dialog.indexation'
 ])
