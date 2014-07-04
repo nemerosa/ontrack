@@ -8,3 +8,4 @@ work
 .DS_Store
 build
 /.gradle
+*.txt
