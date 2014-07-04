@@ -90,4 +90,14 @@ angular.module('ontrack.extension.svn', [
         };
 
     })
+    .directive('otExtensionSvnRevisionSummary', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'app/extension/svn/directive.revision.summary.tpl.html',
+            scope: {
+                revisionInfo: '=',
+                title: '@'
+            }
+        };
+    })
 ;
