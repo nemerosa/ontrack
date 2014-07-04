@@ -143,29 +143,50 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
 
         @Override
         public void run() {
-            // Gets the build path
-            String buildPathPattern = branchConfigurationProperty.getBuildPath();
-            // Gets the directory to look the tags from
-            String basePath = SVNUtils.getBasePath(buildPathPattern);
-            // Gets the list of tags from the copy events, filtering them
-            List<TCopyEvent> copies = eventDao.findCopies(
-                    // In this repository
-                    svnService.getRepository(projectConfigurationProperty.getConfiguration().getName()).getId(),
-                    // from path...
-                    branchConfigurationProperty.getBranchPath(),
-                    // to path with prefix...
-                    basePath,
-                    // filter the target path with...
-                    (copyEvent) -> SVNUtils.followsBuildPattern(copyEvent.copyToLocation(), buildPathPattern)
-            );
-            // Creates the builds (in a transaction)
-            for (TCopyEvent copy : copies) {
-                Optional<Build> build = transactionTemplate.execute(status -> createBuild(copy, buildPathPattern));
-                // Completes the information collection (build created)
-                createdBuilds.incrementAndGet();
+            securityService.asAdmin(this::doRun);
+        }
+
+        private boolean doRun() {
+            try {
+                // Gets the build path
+                String buildPathPattern = branchConfigurationProperty.getBuildPath();
+                // Gets the directory to look the tags from
+                String basePath = SVNUtils.getBasePath(buildPathPattern);
+                // Gets the list of tags from the copy events, filtering them
+                List<TCopyEvent> copies = eventDao.findCopies(
+                        // In this repository
+                        svnService.getRepository(projectConfigurationProperty.getConfiguration().getName()).getId(),
+                        // from path...
+                        branchConfigurationProperty.getBranchPath(),
+                        // to path with prefix...
+                        basePath,
+                        // filter the target path with...
+                        (copyEvent) -> SVNUtils.followsBuildPattern(copyEvent.copyToLocation(), buildPathPattern)
+                );
+                // Creates the builds (in a transaction)
+                for (TCopyEvent copy : copies) {
+                    Optional<Build> build = transactionTemplate.execute(status -> createBuild(copy, buildPathPattern));
+                    // Completes the information collection (build created)
+                    createdBuilds.incrementAndGet();
+                }
+                // :)
+                return true;
+            } catch (Exception ex) {
+                // TODO Logs using the future ApplicationLogService
+                // In the meantime, just logs in the console...
+                logger.error(
+                        String.format("[svn-sync] Error for branch %s/%s (%d)",
+                                branch.getProject().getName(),
+                                branch.getName(),
+                                branch.id()),
+                        ex
+                );
+                // :(
+                return false;
+            } finally {
+                // Removes this job from the list after completion
+                jobs.remove(branch.getId());
             }
-            // Removes this job from the list after completion
-            jobs.remove(branch.getId());
         }
 
         private Optional<Build> createBuild(TCopyEvent copy, String buildPathPattern) {
@@ -182,8 +203,7 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
             else if (syncProperty.isOverride()) {
                 logger.debug("[svn-sync] Build {} already exists - overriding.");
                 // Deletes the build
-                // Uses admin rights for this?
-                securityService.asAdmin(() -> structureService.deleteBuild(build.get().getId()));
+                structureService.deleteBuild(build.get().getId());
                 // Creates the build
                 return Optional.of(doCreateBuild(copy, buildName));
             }
