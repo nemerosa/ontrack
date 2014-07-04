@@ -98,6 +98,10 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
         if (branchConfigurationProperty.isEmpty()) {
             return SVNSyncInfoStatus.of(branchId).withMessage("SVN has not been configured for this branch.");
         }
+        // Cannot work with revisions only
+        if (SVNUtils.isPathRevision(branchConfigurationProperty.getValue().getBuildPath())) {
+            return SVNSyncInfoStatus.of(branchId).withMessage("The build path for the branch is not correctly configured.");
+        }
         // Creates a new job for this branch
         SyncJob job = new SyncJob(branch,
                 projectConfigurationProperty.getValue(),
@@ -141,12 +145,6 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
         public void run() {
             // Gets the build path
             String buildPathPattern = branchConfigurationProperty.getBuildPath();
-            // Cannot work with revisions only
-            if (SVNUtils.isPathRevision(buildPathPattern)) {
-                // TODO Logs an error
-                // ... and exits
-                return;
-            }
             // Gets the directory to look the tags from
             String basePath = SVNUtils.getBasePath(buildPathPattern);
             // Gets the list of tags from the copy events, filtering them
