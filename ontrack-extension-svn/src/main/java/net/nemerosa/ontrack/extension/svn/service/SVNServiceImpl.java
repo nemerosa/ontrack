@@ -6,10 +6,7 @@ import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.svn.client.SVNClient;
 import net.nemerosa.ontrack.extension.svn.db.*;
 import net.nemerosa.ontrack.extension.svn.model.*;
-import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty;
-import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType;
-import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationPropertyType;
-import net.nemerosa.ontrack.extension.svn.property.SVNSyncPropertyType;
+import net.nemerosa.ontrack.extension.svn.property.*;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
 import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -195,10 +192,12 @@ public class SVNServiceImpl implements SVNService {
         Collection<BuildView> buildViews = new ArrayList<>();
         // Loops over all authorised branches
         for (Project project : structureService.getProjectList()) {
-            // Filter on SVN configuration
-            if (propertyService.hasProperty(project, SVNProjectConfigurationPropertyType.class)) {
+            // Filter on SVN configuration: must be present and equal to the one the revision info is looked into
+            Property<SVNProjectConfigurationProperty> projectSvnConfig = propertyService.getProperty(project, SVNProjectConfigurationPropertyType.class);
+            if (!projectSvnConfig.isEmpty()
+                    && repository.getConfiguration().getName().equals(projectSvnConfig.getValue().getConfiguration().getName())) {
                 for (Branch branch : structureService.getBranchesForProject(project.getId())) {
-                    // Filter on SVN configuration
+                    // Filter on SVN configuration: must be present
                     if (propertyService.hasProperty(branch, SVNBranchConfigurationPropertyType.class)) {
                         // Identifies a possible build given the path/revision and the first copy
                         Optional<Build> build = lookupBuild(basicInfo.toLocation(), firstCopy, branch);
