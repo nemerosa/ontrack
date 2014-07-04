@@ -167,7 +167,9 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
                 for (TCopyEvent copy : copies) {
                     Optional<Build> build = transactionTemplate.execute(status -> createBuild(copy, buildPathPattern));
                     // Completes the information collection (build created)
-                    createdBuilds.incrementAndGet();
+                    if (build.isPresent()) {
+                        createdBuilds.incrementAndGet();
+                    }
                 }
                 // :)
                 return true;
