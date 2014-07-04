@@ -48,6 +48,8 @@ public interface StructureRepository {
 
     Build getLastBuildForBranch(Branch branch);
 
+    Ack deleteBuild(ID buildId);
+
     // Promotion levels
 
     List<PromotionLevel> getPromotionLevelListForBranch(ID branchId);

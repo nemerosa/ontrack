@@ -149,6 +149,14 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public Ack deleteBuild(ID buildId) {
+        Validate.isTrue(buildId.isSet(), "Build ID must be set");
+        Build build = getBuild(buildId);
+        securityService.checkProjectFunction(build.projectId(), BuildDelete.class);
+        return structureRepository.deleteBuild(buildId);
+    }
+
+    @Override
     public Build newBuild(Build build) {
         // Validation
         isEntityNew(build, "Build must be new");

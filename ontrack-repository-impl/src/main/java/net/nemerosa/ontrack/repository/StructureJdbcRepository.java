@@ -184,6 +184,16 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         );
     }
 
+    @Override
+    public Ack deleteBuild(ID buildId) {
+        return Ack.one(
+                getNamedParameterJdbcTemplate().update(
+                        "DELETE FROM BUILDS WHERE ID = :id",
+                        params("id", buildId.getValue())
+                )
+        );
+    }
+
     protected Build toBuild(ResultSet rs, Function<ID, Branch> branchSupplier) throws SQLException {
         return Build.of(
                 branchSupplier.apply(id(rs, "branchId")),

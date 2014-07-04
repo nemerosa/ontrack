@@ -51,6 +51,8 @@ public interface StructureService {
 
     Build getLastBuildForBranch(Branch branch);
 
+    Ack deleteBuild(ID buildId);
+
     /**
      * Branch builds
      */

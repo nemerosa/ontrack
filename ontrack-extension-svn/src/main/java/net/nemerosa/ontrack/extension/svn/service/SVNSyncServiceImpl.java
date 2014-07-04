@@ -144,7 +144,7 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
             // Cannot work with revisions only
             if (SVNUtils.isPathRevision(buildPathPattern)) {
                 // TODO Logs an error
-                // ... and exists
+                // ... and exits
                 return;
             }
             // Gets the directory to look the tags from
@@ -183,7 +183,10 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
             // If Ok to override, deletes it and creates it
             else if (syncProperty.isOverride()) {
                 logger.debug("[svn-sync] Build {} already exists - overriding.");
-                // FIXME Deletes the build
+                // Deletes the build
+                // Uses admin rights for this?
+                securityService.asAdmin(() -> structureService.deleteBuild(build.get().getId()));
+                // Creates the build
                 return Optional.of(doCreateBuild(copy, buildName));
             }
             // Else, just puts some log entry
