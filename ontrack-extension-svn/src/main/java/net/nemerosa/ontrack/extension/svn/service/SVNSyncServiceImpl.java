@@ -11,24 +11,33 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.ApplicationInfo;
 import net.nemerosa.ontrack.model.support.ApplicationInfoProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
 public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvider {
+
+    private final Logger logger = LoggerFactory.getLogger(SVNSyncService.class);
 
     private final StructureService structureService;
     private final PropertyService propertyService;
     private final SecurityService securityService;
     private final SVNService svnService;
     private final SVNEventDao eventDao;
+    private final TransactionTemplate transactionTemplate;
 
     /**
      * Index of jobs per branches
@@ -47,12 +56,19 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
     );
 
     @Autowired
-    public SVNSyncServiceImpl(StructureService structureService, PropertyService propertyService, SecurityService securityService, SVNService svnService, SVNEventDao eventDao) {
+    public SVNSyncServiceImpl(
+            StructureService structureService,
+            PropertyService propertyService,
+            SecurityService securityService,
+            SVNService svnService,
+            SVNEventDao eventDao,
+            PlatformTransactionManager transactionManager) {
         this.structureService = structureService;
         this.propertyService = propertyService;
         this.securityService = securityService;
         this.svnService = svnService;
         this.eventDao = eventDao;
+        this.transactionTemplate = new TransactionTemplate(transactionManager);
     }
 
     @Override
@@ -109,6 +125,11 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
         private final SVNBranchConfigurationProperty branchConfigurationProperty;
         private final SVNSyncProperty syncProperty;
 
+        /**
+         * Number of created builds
+         */
+        private final AtomicInteger createdBuilds = new AtomicInteger();
+
         public SyncJob(Branch branch, SVNProjectConfigurationProperty projectConfigurationProperty, SVNBranchConfigurationProperty branchConfigurationProperty, SVNSyncProperty syncProperty) {
             this.branch = branch;
             this.projectConfigurationProperty = projectConfigurationProperty;
@@ -139,9 +160,50 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
                     // filter the target path with...
                     (copyEvent) -> SVNUtils.followsBuildPattern(copyEvent.copyToLocation(), buildPathPattern)
             );
-            // TODO Creates the builds (in a transaction)
-            // TODO Removes this job from the list after completion
+            // Creates the builds (in a transaction)
+            for (TCopyEvent copy : copies) {
+                Optional<Build> build = transactionTemplate.execute(status -> createBuild(copy, buildPathPattern));
+                // Completes the information collection (build created)
+                createdBuilds.incrementAndGet();
+            }
+            // Removes this job from the list after completion
+            jobs.remove(branch.getId());
+        }
 
+        private Optional<Build> createBuild(TCopyEvent copy, String buildPathPattern) {
+            // Extracts the build name from the copyTo path
+            String buildName = SVNUtils.getBuildName(copy.copyToLocation(), buildPathPattern);
+            // Gets an existing build if any
+            Optional<Build> build = structureService.findBuildByName(branch.getProject().getName(), branch.getName(), buildName);
+            // If none exists, just creates it
+            if (!build.isPresent()) {
+                logger.debug("[svn-sync] Build {} does not exist - creating.");
+                return Optional.of(doCreateBuild(copy, buildName));
+            }
+            // If Ok to override, deletes it and creates it
+            else if (syncProperty.isOverride()) {
+                logger.debug("[svn-sync] Build {} already exists - overriding.");
+                // FIXME Deletes the build
+                return Optional.of(doCreateBuild(copy, buildName));
+            }
+            // Else, just puts some log entry
+            else {
+                logger.debug("[svn-sync] Build {} already exists - not overriding.");
+                return Optional.empty();
+            }
+        }
+
+        private Build doCreateBuild(TCopyEvent copy, String buildName) {
+            return structureService.newBuild(
+                    Build.of(
+                            branch,
+                            new NameDescription(
+                                    buildName,
+                                    String.format("Build created by SVN synchronisation from tag %s", copy.getCopyToPath())
+                            ),
+                            securityService.getCurrentSignature()
+                    )
+            );
         }
 
         public SVNSyncInfoStatus getStatus() {
