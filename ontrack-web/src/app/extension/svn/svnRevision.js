@@ -15,14 +15,13 @@ angular.module('ot.extension.svn.revision', [
         var revision = $stateParams.revision;
 
         var view = ot.view();
-        view.title = $interpolate("Revision information for {{revision}} in {{configuration}}")($stateParams);
+        view.title = $interpolate("Revision {{revision}} in {{configuration}} repository")($stateParams);
 
         ot.call(
             $http.get(
                 $interpolate('extension/svn/configuration/{{configuration}}/revision/{{revision}}')($stateParams)
-            )
-        ).then(function (ontrackSVNRevisionInfo) {
-
+            )).then(function (ontrackSVNRevisionInfo) {
+                $scope.ontrackSVNRevisionInfo = ontrackSVNRevisionInfo;
             });
     })
 ;
