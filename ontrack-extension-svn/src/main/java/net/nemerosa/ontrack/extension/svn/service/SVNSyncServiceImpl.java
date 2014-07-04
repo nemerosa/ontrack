@@ -30,6 +30,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvider, ScheduledService {
@@ -126,11 +127,28 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
                 .collect(Collectors.toList());
     }
 
+    protected void runSync() {
+        // TODO Sync must be disabled when the SVN Extension is not enabled
+        // For all SVN-configured branches
+        getSVNConfiguredBranches().forEach(branch -> {
+            Property<SVNSyncProperty> svnSync = propertyService.getProperty(branch, SVNSyncPropertyType.class);
+            // ... if the SVN sync is configured
+            if (!svnSync.isEmpty() && svnSync.getValue().getInterval() > 0) {
+                // ... launches the synchronisation
+                logger.info("[svn-sync] Launching synchronisation for branch {}/{} ({})",
+                        branch.getProject().getName(),
+                        branch.getName(),
+                        branch.id());
+                launchSync(branch.getId());
+            }
+        });
+    }
+
     @Override
     public Runnable getTask() {
-        // FIXME Method net.nemerosa.ontrack.extension.svn.service.SVNSyncServiceImpl.getTask
         return () -> {
-            // FIXME Method .run
+            logger.info("[svn-sync] Launching synchronisation");
+            securityService.asAdmin(this::runSync);
         };
     }
 
@@ -156,16 +174,9 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
     }
 
     protected OptionalInt getMinScanInterval() {
-        // List of all projects
-        return structureService.getProjectList()
-                .stream()
-                        // ...which have a SVN configuration
-                .filter(project -> propertyService.hasProperty(project, SVNProjectConfigurationPropertyType.class))
-                        // ...gets all their branches
-                .flatMap(project -> structureService.getBranchesForProject(project.getId()).stream())
-                        // ...which have a SVN configuration
-                .filter(branch -> propertyService.hasProperty(branch, SVNBranchConfigurationPropertyType.class))
-                        // ...gets their SVN sync property
+        // List of all the SVN-configured branches
+        return getSVNConfiguredBranches()
+                // ...gets their SVN sync property
                 .map(branch -> propertyService.getProperty(branch, SVNSyncPropertyType.class))
                         // ...retains the branches which have actually a SVN sync configured with interval > 0
                 .filter(property -> !property.isEmpty() && property.getValue().getInterval() > 0)
@@ -173,6 +184,20 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
                 .mapToInt(property -> property.getValue().getInterval())
                         // ... gets the minimum
                 .min();
+    }
+
+    /**
+     * Gets the list of all branches, for all projects, which are properly configured for SVN.
+     */
+    protected Stream<Branch> getSVNConfiguredBranches() {
+        return structureService.getProjectList()
+                .stream()
+                        // ...which have a SVN configuration
+                .filter(project -> propertyService.hasProperty(project, SVNProjectConfigurationPropertyType.class))
+                        // ...gets all their branches
+                .flatMap(project -> structureService.getBranchesForProject(project.getId()).stream())
+                        // ...which have a SVN configuration
+                .filter(branch -> propertyService.hasProperty(branch, SVNBranchConfigurationPropertyType.class));
     }
 
     private class SyncJob implements Runnable {
