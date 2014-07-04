@@ -76,7 +76,8 @@ public class SVNEventJdbcDao extends AbstractJdbcRepository implements SVNEventD
         return getNamedParameterJdbcTemplate().execute(
                 "SELECT * FROM EXT_SVN_COPY WHERE REPOSITORY = :repositoryId " +
                         "AND COPYFROMPATH = :fromPath " +
-                        "AND COPYTOPATH LIKE :toPath",
+                        "AND COPYTOPATH LIKE :toPath " +
+                        "ORDER BY REVISION ASC",
                 params("repositoryId", repositoryId)
                         .addValue("fromPath", fromPath)
                         .addValue("toPath", toPathPrefix + "%"),
