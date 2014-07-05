@@ -165,7 +165,8 @@ public class SVNServiceImpl implements SVNService {
                 repository.getConfiguredIssueService().getIssueServiceConfigurationRepresentation(),
                 issue,
                 revisionInfo,
-                mergedRevisionInfos
+                mergedRevisionInfos,
+                revisions
         );
 
     }
