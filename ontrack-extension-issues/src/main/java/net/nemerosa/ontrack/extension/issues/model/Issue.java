@@ -11,6 +11,8 @@ public interface Issue {
 
     String getSummary();
 
+    String getUrl();
+
     IssueStatus getStatus();
 
     LocalDateTime getUpdateTime();
