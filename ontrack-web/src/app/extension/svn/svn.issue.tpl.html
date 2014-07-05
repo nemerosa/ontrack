@@ -35,6 +35,41 @@
             <ot-extension-svn-revision-promotions
                     ontrack-svn-revision-info="ontrackSVNIssueInfo.revisionInfo"></ot-extension-svn-revision-promotions>
 
+            <!-- All other revisions -->
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    All revisions
+                </div>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Revision</th>
+                        <th>Author</th>
+                        <th>Date</th>
+                        <th>Message</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="revisionInfo in ontrackSVNIssueInfo.revisions" ng-class="{'success': $first}">
+                        <td>
+                            <a href="{{revisionInfo.revisionUrl}}">{{revisionInfo.revision}}</a>
+                            <a href="#/extension/svn/revision/{{ontrackSVNIssueInfo.configuration.name}}/{{revisionInfo.revision}}"
+                                    title="Displays release information about this revision">
+                                <span class="glyphicon glyphicon-plus"></span>
+                            </a>
+                        </td>
+                        <td>
+                            {{revisionInfo.author}}
+                        </td>
+                        <td>
+                            {{revisionInfo.revisionDate | date:'mediumDate'}}
+                        </td>
+                        <td ng-bind-html="revisionInfo.formattedMessage"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
         </div>
     </div>
 
