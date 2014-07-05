@@ -21,6 +21,20 @@
                 </div>
             </div>
 
+            <!-- Summary for the revision -->
+            <ot-extension-svn-revision-summary
+                    revision-info="ontrackSVNIssueInfo.revisionInfo.revisionInfo"
+                    title="true"
+                    ></ot-extension-svn-revision-summary>
+
+            <!-- Builds for the revision -->
+            <ot-extension-svn-revision-builds
+                    ontrack-svn-revision-info="ontrackSVNIssueInfo.revisionInfo"></ot-extension-svn-revision-builds>
+
+            <!-- Promotions for the revisions -->
+            <ot-extension-svn-revision-promotions
+                    ontrack-svn-revision-info="ontrackSVNIssueInfo.revisionInfo"></ot-extension-svn-revision-promotions>
+
         </div>
     </div>
 

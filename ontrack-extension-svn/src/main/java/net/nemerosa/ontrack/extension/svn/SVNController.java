@@ -298,8 +298,11 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
      * Gets the summary for an issue in a repository
      */
     @RequestMapping(value = "configuration/{configuration}/issue/{key}")
-    public OntrackSVNIssueInfo issueInfo(@PathVariable String configuration, @PathVariable String key) {
-        return svnService.getIssueInfo(configuration, key);
+    public Resource<OntrackSVNIssueInfo> issueInfo(@PathVariable String configuration, @PathVariable String key) {
+        return Resource.of(
+                svnService.getIssueInfo(configuration, key),
+                uri(on(getClass()).issueInfo(configuration, key))
+        ).withView(Build.class);
     }
 
     /**
