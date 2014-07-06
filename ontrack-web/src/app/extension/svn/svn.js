@@ -106,8 +106,8 @@ angular.module('ontrack.extension.svn', [
             restrict: 'E',
             templateUrl: 'app/extension/svn/directive.revision.builds.tpl.html',
             scope: {
-                ontrackSvnRevisionInfo: '='
-                // TODO Merged infos
+                ontrackSvnRevisionInfo: '=',
+                mergedRevisionInfos: '='
             }
         };
     })
@@ -116,7 +116,8 @@ angular.module('ontrack.extension.svn', [
             restrict: 'E',
             templateUrl: 'app/extension/svn/directive.revision.promotions.tpl.html',
             scope: {
-                ontrackSvnRevisionInfo: '='
+                ontrackSvnRevisionInfo: '=',
+                mergedRevisionInfos: '='
             }
         };
     })

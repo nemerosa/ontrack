@@ -16,7 +16,8 @@
                     </a>
                 </div>
                 <div class="panel-body">
-                    <ot-include value="ontrackSVNIssueInfo.issue" template="app/extension/{{ontrackSVNIssueInfo.issueServiceConfigurationRepresentation.serviceId}}/issue.tpl.html">
+                    <ot-include value="ontrackSVNIssueInfo.issue"
+                                template="app/extension/{{ontrackSVNIssueInfo.issueServiceConfigurationRepresentation.serviceId}}/issue.tpl.html">
                     </ot-include>
                 </div>
             </div>
@@ -29,11 +30,15 @@
 
             <!-- Builds for the revision -->
             <ot-extension-svn-revision-builds
-                    ontrack-svn-revision-info="ontrackSVNIssueInfo.revisionInfo"></ot-extension-svn-revision-builds>
+                    ontrack-svn-revision-info="ontrackSVNIssueInfo.revisionInfo"
+                    merged-revision-infos="ontrackSVNIssueInfo.mergedRevisionInfos"
+                    ></ot-extension-svn-revision-builds>
 
             <!-- Promotions for the revisions -->
             <ot-extension-svn-revision-promotions
-                    ontrack-svn-revision-info="ontrackSVNIssueInfo.revisionInfo"></ot-extension-svn-revision-promotions>
+                    ontrack-svn-revision-info="ontrackSVNIssueInfo.revisionInfo"
+                    merged-revision-infos="ontrackSVNIssueInfo.mergedRevisionInfos"
+                    ></ot-extension-svn-revision-promotions>
 
             <!-- All other revisions -->
             <div class="panel panel-default">
@@ -54,7 +59,7 @@
                         <td>
                             <a href="{{revisionInfo.revisionUrl}}">{{revisionInfo.revision}}</a>
                             <a href="#/extension/svn/revision/{{ontrackSVNIssueInfo.configuration.name}}/{{revisionInfo.revision}}"
-                                    title="Displays release information about this revision">
+                               title="Displays release information about this revision">
                                 <span class="glyphicon glyphicon-plus"></span>
                             </a>
                         </td>
