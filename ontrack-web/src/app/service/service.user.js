@@ -4,7 +4,7 @@ angular.module('ot.service.user', [
     'ot.service.core',
     'ot.service.form'
 ])
-    .service('otUserService', function (ot, $log, $interval, $http, $rootScope, otNotificationService, otFormService) {
+    .service('otUserService', function (ot, $state, $log, $interval, $http, $rootScope, otNotificationService, otFormService) {
         var self = {};
 
         /**
@@ -71,7 +71,12 @@ angular.module('ot.service.user', [
          * Logout
          */
         self.logout = function () {
-            return ot.call($http.post('user/logout', {}));
+            return ot.call($http.post('user/logout', {})).then(function () {
+                // Reloads the user information
+                self.loadUser();
+                // Goes back to the home page
+                $state.go('home');
+            });
         };
 
         return self;

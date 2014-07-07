@@ -65,13 +65,7 @@ var ontrack = angular.module('ontrack', [
 
             // Logout
             $scope.logout = function () {
-                otUserService.logout().then(
-                    function success() {
-                        $log.debug('[app] Reloading after signing out.');
-                        // FIXME Goes back to the home page & reload
-                        location.reload();
-                    }
-                );
+                otUserService.logout();
             };
 
             /**
