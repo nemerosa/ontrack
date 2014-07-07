@@ -26,7 +26,8 @@ var ontrack = angular.module('ontrack', [
         // Extensions
         'ontrack.extension.jenkins',
         'ontrack.extension.svn',
-        'ontrack.extension.jira'
+        'ontrack.extension.jira',
+        'ontrack.extension.artifactory'
     ])
         //HTTP configuration
         .config(function ($httpProvider) {
