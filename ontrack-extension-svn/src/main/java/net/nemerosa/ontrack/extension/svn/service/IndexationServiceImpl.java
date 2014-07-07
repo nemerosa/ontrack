@@ -1,16 +1,14 @@
 package net.nemerosa.ontrack.extension.svn.service;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import net.nemerosa.ontrack.common.MapBuilder;
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtension;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
-import net.nemerosa.ontrack.extension.svn.model.LastRevisionInfo;
-import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration;
 import net.nemerosa.ontrack.extension.svn.client.SVNClient;
 import net.nemerosa.ontrack.extension.svn.db.*;
-import net.nemerosa.ontrack.extension.svn.model.IndexationJob;
-import net.nemerosa.ontrack.extension.svn.model.IndexationRange;
+import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.*;
@@ -48,6 +46,7 @@ public class IndexationServiceImpl implements IndexationService, ScheduledServic
     private final SVNIssueRevisionDao issueRevisionDao;
     private final SVNClient svnClient;
     private final SecurityService securityService;
+    private final ApplicationLogService applicationLogService;
     private final TransactionService transactionService;
     private final ApplicationContext applicationContext;
 
@@ -76,11 +75,12 @@ public class IndexationServiceImpl implements IndexationService, ScheduledServic
             SVNEventDao eventDao,
             SVNIssueRevisionDao issueRevisionDao,
             SVNClient svnClient,
-            // IssueServiceRegistry issueServiceRegistry,
             SecurityService securityService,
+            ApplicationLogService applicationLogService,
             TransactionService transactionService,
             ApplicationContext applicationContext
     ) {
+        this.applicationLogService = applicationLogService;
         this.applicationContext = applicationContext;
         this.issueRevisionDao = issueRevisionDao;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
@@ -264,13 +264,26 @@ public class IndexationServiceImpl implements IndexationService, ScheduledServic
             // Log
             logger.info("[indexation] Repository={}, An indexation is already running. Will try later", repositoryName);
         } else {
-            // Launches the indexation, using admin rights
-            securityService.asAdmin(() -> {
-                // Indexes from latest
-                indexFromLatest(repositoryName);
-                // Nothing to return
-                return null;
-            });
+            try {
+                // Launches the indexation, using admin rights
+                securityService.asAdmin(() -> {
+                    // Indexes from latest
+                    indexFromLatest(repositoryName);
+                    // Nothing to return
+                    return null;
+                });
+            } catch (Exception ex) {
+                applicationLogService.error(
+                        ex,
+                        "SVNIndexationInit",
+                        MapBuilder.<String, Object>create()
+                                .with("configuration", configuration.getName())
+                                .get(),
+                        "Error while indexing revision %d (%s) in repository %s",
+                        ex.getRevision(),
+                        ex.getRevisionMessage(),
+                        repository.getConfiguration().getName());
+            }
         }
         logger.info("[indexation] Repository={}, Indexation task stopped.", repositoryName);
     }
@@ -403,8 +416,7 @@ public class IndexationServiceImpl implements IndexationService, ScheduledServic
                         indexationListener.setRevision(logEntry.getRevision());
                         indexInTransaction(repository, logEntry);
                     } catch (Exception ex) {
-                        logger.error("Cannot index revision " + logEntry.getRevision(), ex);
-                        throw new RuntimeException(ex);
+                        throw new SVNIndexationException(logEntry.getRevision(), logEntry.getMessage(), ex);
                     }
                 }
             });
@@ -587,7 +599,22 @@ public class IndexationServiceImpl implements IndexationService, ScheduledServic
             SVNRevision toRevision = SVNRevision.create(to);
             // Calls the indexer, including merge revisions
             IndexationHandler handler = new IndexationHandler(repository, indexationListener);
-            svnClient.log(repository, url, SVNRevision.HEAD, fromRevision, toRevision, true, true, 0, false, handler);
+            try {
+                svnClient.log(repository, url, SVNRevision.HEAD, fromRevision, toRevision, true, true, 0, false, handler);
+            } catch (SVNIndexationException ex) {
+                applicationLogService.error(
+                        ex.getCause(),
+                        "SVNIndexation",
+                        MapBuilder.<String, Object>create()
+                                .with("revision", ex.getRevision())
+                                .with("configuration", repository.getConfiguration().getName())
+                                .get(),
+                        "Error while indexing revision %d (%s) in repository %s",
+                        ex.getRevision(),
+                        ex.getRevisionMessage(),
+                        repository.getConfiguration().getName()
+                );
+            }
         }
     }
 }
