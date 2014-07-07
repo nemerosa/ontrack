@@ -275,14 +275,12 @@ public class IndexationServiceImpl implements IndexationService, ScheduledServic
             } catch (Exception ex) {
                 applicationLogService.error(
                         ex,
-                        "SVNIndexationInit",
+                        "SVNIndexation",
                         MapBuilder.<String, Object>create()
                                 .with("configuration", configuration.getName())
                                 .get(),
-                        "Error while indexing revision %d (%s) in repository %s",
-                        ex.getRevision(),
-                        ex.getRevisionMessage(),
-                        repository.getConfiguration().getName());
+                        "Error while indexing repository %s",
+                        repositoryName);
             }
         }
         logger.info("[indexation] Repository={}, Indexation task stopped.", repositoryName);
