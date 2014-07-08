@@ -278,12 +278,12 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
             Optional<Build> build = structureService.findBuildByName(branch.getProject().getName(), branch.getName(), buildName);
             // If none exists, just creates it
             if (!build.isPresent()) {
-                logger.debug("[svn-sync] Build {} does not exist - creating.");
+                logger.debug("[svn-sync] Build {} does not exist - creating.", buildName);
                 return Optional.of(doCreateBuild(copy, buildName, repository));
             }
             // If Ok to override, deletes it and creates it
             else if (syncProperty.isOverride()) {
-                logger.debug("[svn-sync] Build {} already exists - overriding.");
+                logger.debug("[svn-sync] Build {} already exists - overriding.", buildName);
                 // Deletes the build
                 structureService.deleteBuild(build.get().getId());
                 // Creates the build
@@ -291,7 +291,7 @@ public class SVNSyncServiceImpl implements SVNSyncService, ApplicationInfoProvid
             }
             // Else, just puts some log entry
             else {
-                logger.debug("[svn-sync] Build {} already exists - not overriding.");
+                logger.debug("[svn-sync] Build {} already exists - not overriding.", buildName);
                 return Optional.empty();
             }
         }
