@@ -140,6 +140,32 @@ public class ArtifactoryPromotionSyncServiceImpl implements JobProvider {
             JsonNode buildInfo = client.getBuildInfo(artifactoryBuildName, buildName);
             // Gets the list of statuses
             List<ArtifactoryStatus> statuses = client.getStatuses(buildInfo);
+            // For all statuses
+            for (ArtifactoryStatus artifactoryStatus : statuses) {
+                String statusName = artifactoryStatus.getName();
+                // Looks for an existing promotion level with the same name on the branch
+                Optional<PromotionLevel> promotionLevelOpt = structureService.findPromotionLevelByName(
+                        branch.getProject().getName(),
+                        branch.getName(),
+                        statusName
+                );
+                if (promotionLevelOpt.isPresent()) {
+                    logger.info("[artifactory-sync] Promote {}/{}/{} to {}",
+                            branch.getProject().getName(),
+                            branch.getName(),
+                            buildName,
+                            statusName);
+                    // Actual promotion
+                    structureService.newPromotionRun(
+                            PromotionRun.of(
+                                    buildOpt.get(),
+                                    promotionLevelOpt.get(),
+                                    Signature.of(artifactoryStatus.getUser()).withTime(artifactoryStatus.getTimestamp()),
+                                    "Promoted from Artifactory"
+                            )
+                    );
+                }
+            }
         }
     }
 }
