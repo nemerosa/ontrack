@@ -52,7 +52,7 @@ angular.module('ot.view.branch', [
                     $scope.branchBuildView = branchBuildView;
                     // Selection of build boundaries
                     var buildViews = branchBuildView.buildViews;
-                    if (buildViews) {
+                    if (buildViews && buildViews.length > 0) {
                         $scope.selectedBuild.from = buildViews[0].build.id;
                         $scope.selectedBuild.to = buildViews[buildViews.length - 1].build.id;
                     }

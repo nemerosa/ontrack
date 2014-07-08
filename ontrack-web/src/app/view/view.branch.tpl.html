@@ -1,10 +1,17 @@
 <ot-view>
-    <div class="row">
+
+    <div class="row" ng-show="branchBuildView.buildViews">
         <div class="col-md-12">
             <ng-include src="'app/view/fragment.branchBuildView.tpl.html'"></ng-include>
         </div>
-
     </div>
+
+    <div class="row" ng-hide="branchBuildView.buildViews">
+        <div class="col-md-12 alert alert-warning">
+            No build has been created yet for this branch.
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-md-4">
             <ot-section-title>Promotion levels</ot-section-title>
