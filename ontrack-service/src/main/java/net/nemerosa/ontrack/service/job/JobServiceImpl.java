@@ -3,15 +3,9 @@ package net.nemerosa.ontrack.service.job;
 import com.google.common.collect.Table;
 import com.google.common.collect.Tables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import net.nemerosa.ontrack.model.job.Job;
-import net.nemerosa.ontrack.model.job.JobDescriptor;
-import net.nemerosa.ontrack.model.job.JobProvider;
-import net.nemerosa.ontrack.model.job.JobService;
+import net.nemerosa.ontrack.model.job.*;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.support.ApplicationInfo;
-import net.nemerosa.ontrack.model.support.ApplicationInfoProvider;
-import net.nemerosa.ontrack.model.support.ApplicationLogService;
-import net.nemerosa.ontrack.model.support.ScheduledService;
+import net.nemerosa.ontrack.model.support.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +22,17 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 @Service
-public class JobServiceImpl implements ScheduledService, JobService, ApplicationInfoProvider {
+public class JobServiceImpl implements ScheduledService,
+        JobService,
+        ApplicationInfoProvider,
+        StartupService,
+        JobConsumer {
 
     private final Logger logger = LoggerFactory.getLogger(JobService.class);
     private final Collection<JobProvider> jobProviders;
     private final SecurityService securityService;
     private final ApplicationLogService applicationLogService;
+    private final JobQueueAccessService jobQueueAccessService;
 
     private final AtomicLong syncCount = new AtomicLong();
     private final Table<String, String, RegisteredJob> registeredJobs = Tables.newCustomTable(
@@ -54,10 +53,32 @@ public class JobServiceImpl implements ScheduledService, JobService, Application
 
 
     @Autowired
-    public JobServiceImpl(ApplicationContext applicationContext, SecurityService securityService, ApplicationLogService applicationLogService) {
+    public JobServiceImpl(ApplicationContext applicationContext, SecurityService securityService, ApplicationLogService applicationLogService, JobQueueAccessService jobQueueAccessService) {
+        this.jobQueueAccessService = jobQueueAccessService;
         this.jobProviders = applicationContext.getBeansOfType(JobProvider.class).values();
         this.securityService = securityService;
         this.applicationLogService = applicationLogService;
+    }
+
+    @Override
+    public String getName() {
+        return "JobService";
+    }
+
+    @Override
+    public int startupOrder() {
+        return 100;
+    }
+
+    @Override
+    public void start() {
+        jobQueueAccessService.registerQueueListener(this);
+    }
+
+    @Override
+    public void accept(Job job) {
+        // FIXME Method net.nemerosa.ontrack.service.job.JobServiceImpl.accept
+
     }
 
     @Override

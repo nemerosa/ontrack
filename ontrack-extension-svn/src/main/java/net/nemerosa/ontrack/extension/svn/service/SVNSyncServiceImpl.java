@@ -7,10 +7,8 @@ import net.nemerosa.ontrack.extension.svn.model.SVNRevisionInfo;
 import net.nemerosa.ontrack.extension.svn.model.SVNSyncInfoStatus;
 import net.nemerosa.ontrack.extension.svn.property.*;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
-import net.nemerosa.ontrack.model.job.Job;
-import net.nemerosa.ontrack.model.job.JobProvider;
-import net.nemerosa.ontrack.model.job.JobTask;
-import net.nemerosa.ontrack.model.job.RunnableJobTask;
+import net.nemerosa.ontrack.model.job.*;
+import net.nemerosa.ontrack.model.security.BuildCreate;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import org.slf4j.Logger;
@@ -29,8 +27,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-// TODO Manual launch by queuing
-
 @Service
 public class SVNSyncServiceImpl implements SVNSyncService, JobProvider {
 
@@ -42,6 +38,7 @@ public class SVNSyncServiceImpl implements SVNSyncService, JobProvider {
     private final SVNService svnService;
     private final SVNEventDao eventDao;
     private final TransactionTemplate transactionTemplate;
+    private final JobQueueService jobQueueService;
 
     @Autowired
     public SVNSyncServiceImpl(
@@ -50,18 +47,47 @@ public class SVNSyncServiceImpl implements SVNSyncService, JobProvider {
             SecurityService securityService,
             SVNService svnService,
             SVNEventDao eventDao,
-            PlatformTransactionManager transactionManager) {
+            PlatformTransactionManager transactionManager,
+            JobQueueService jobQueueService) {
         this.structureService = structureService;
         this.propertyService = propertyService;
         this.securityService = securityService;
         this.svnService = svnService;
         this.eventDao = eventDao;
+        this.jobQueueService = jobQueueService;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
     }
 
     @Override
     public SVNSyncInfoStatus launchSync(ID branchId) {
-        throw new RuntimeException("NYI");
+        Branch branch = structureService.getBranch(branchId);
+        // Security check
+        securityService.checkProjectFunction(branch.projectId(), BuildCreate.class);
+        // Gets the configuration property
+        Property<SVNSyncProperty> syncProperty = propertyService.getProperty(branch, SVNSyncPropertyType.class);
+        if (syncProperty.isEmpty()) {
+            return SVNSyncInfoStatus.of(branchId).withMessage("The synchronisation has not been configured for this branch.");
+        }
+        // Gets the project configurations for SVN
+        Property<SVNProjectConfigurationProperty> projectConfigurationProperty =
+                propertyService.getProperty(branch.getProject(), SVNProjectConfigurationPropertyType.class);
+        if (projectConfigurationProperty.isEmpty()) {
+            return SVNSyncInfoStatus.of(branchId).withMessage("SVN has not been configured for this branch's project.");
+        }
+        // Gets the branch configurations for SVN
+        Property<SVNBranchConfigurationProperty> branchConfigurationProperty =
+                propertyService.getProperty(branch, SVNBranchConfigurationPropertyType.class);
+        if (branchConfigurationProperty.isEmpty()) {
+            return SVNSyncInfoStatus.of(branchId).withMessage("SVN has not been configured for this branch.");
+        }
+        // Cannot work with revisions only
+        if (SVNUtils.isPathRevision(branchConfigurationProperty.getValue().getBuildPath())) {
+            return SVNSyncInfoStatus.of(branchId).withMessage("The build path for the branch is not correctly configured.");
+        }
+        // Queue a new job
+        jobQueueService.queue(createJob(branch));
+        // OK
+        return SVNSyncInfoStatus.of(branchId);
     }
 
     protected void sync(Branch branch, Consumer<String> info) {
