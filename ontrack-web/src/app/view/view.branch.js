@@ -107,7 +107,7 @@ angular.module('ot.view.branch', [
                             otStructureService.update(
                                 branchResource._update,
                                 "Update branch"
-                            );
+                            ).then(loadBranch);
                         }
                     },
                     ot.viewCloseCommand('/project/' + branchResource.project.id),
