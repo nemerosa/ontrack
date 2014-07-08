@@ -77,8 +77,7 @@ public class JobServiceImpl implements ScheduledService,
 
     @Override
     public void accept(Job job) {
-        // FIXME Method net.nemerosa.ontrack.service.job.JobServiceImpl.accept
-
+        runJob(registerJob(-1L, job));
     }
 
     @Override
@@ -115,7 +114,7 @@ public class JobServiceImpl implements ScheduledService,
     }
 
     protected void syncJobs() {
-        if (jobProviders == null || jobProviders.isEmpty()) {
+        if (jobProviders.isEmpty()) {
             return;
         }
         long count = syncCount.incrementAndGet();
@@ -126,18 +125,7 @@ public class JobServiceImpl implements ScheduledService,
                 .collect(Collectors.toList());
         // For all jobs
         for (Job job : jobs) {
-            String category = job.getCategory();
-            String id = job.getId();
-            // Existing job?
-            RegisteredJob registeredJob = registeredJobs.get(category, id);
-            if (registeredJob != null) {
-                // Assuming it is the same
-                registeredJob.sync(job, count);
-            }
-            // New job
-            else {
-                registeredJobs.put(category, id, RegisteredJob.of(job, count));
-            }
+            registerJob(count, job);
         }
         // Checks the obsolescence of jobs in the registered jobs table
         Iterator<RegisteredJob> i = registeredJobs.values().iterator();
@@ -151,17 +139,38 @@ public class JobServiceImpl implements ScheduledService,
         runJobs();
     }
 
+    private RegisteredJob registerJob(long count, Job job) {
+        String category = job.getCategory();
+        String id = job.getId();
+        // Existing job?
+        RegisteredJob registeredJob = registeredJobs.get(category, id);
+        if (registeredJob != null) {
+            // Assuming it is the same
+            registeredJob.sync(job, count);
+        }
+        // New job
+        else {
+            registeredJobs.put(category, id, RegisteredJob.of(job, count));
+        }
+        // OK
+        return registeredJob;
+    }
+
     protected void runJobs() {
         logger.debug("[job] Running jobs");
         for (RegisteredJob registeredJob : registeredJobs.values()) {
-            if (registeredJob.isRunning()) {
-                logger.debug("[job] Still running: {}", registeredJob);
-            } else if (registeredJob.mustStart()) {
-                logger.debug("[job] Starting: {}", registeredJob);
-                start(registeredJob);
-            } else {
-                logger.debug("[job] Idle: {}", registeredJob);
-            }
+            runJob(registeredJob);
+        }
+    }
+
+    private void runJob(RegisteredJob registeredJob) {
+        if (registeredJob.isRunning()) {
+            logger.debug("[job] Still running: {}", registeredJob);
+        } else if (registeredJob.mustStart()) {
+            logger.debug("[job] Starting: {}", registeredJob);
+            start(registeredJob);
+        } else {
+            logger.debug("[job] Idle: {}", registeredJob);
         }
     }
 
