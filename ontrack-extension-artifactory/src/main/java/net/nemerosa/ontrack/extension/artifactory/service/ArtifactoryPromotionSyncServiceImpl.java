@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClient;
 import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClientFactory;
 import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfiguration;
+import net.nemerosa.ontrack.extension.artifactory.model.ArtifactoryStatus;
 import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncProperty;
 import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncPropertyType;
 import net.nemerosa.ontrack.model.job.Job;
@@ -137,6 +138,8 @@ public class ArtifactoryPromotionSyncServiceImpl implements JobProvider {
                     buildName);
             // Gets the build information from Artifactory
             JsonNode buildInfo = client.getBuildInfo(artifactoryBuildName, buildName);
+            // Gets the list of statuses
+            List<ArtifactoryStatus> statuses = client.getStatuses(buildInfo);
         }
     }
 }
