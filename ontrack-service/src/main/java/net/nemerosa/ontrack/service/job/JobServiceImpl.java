@@ -15,6 +15,7 @@ import net.nemerosa.ontrack.model.support.ScheduledService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.stereotype.Service;
@@ -53,8 +54,8 @@ public class JobServiceImpl implements ScheduledService, JobService, Application
 
 
     @Autowired
-    public JobServiceImpl(Collection<JobProvider> jobProviders, SecurityService securityService, ApplicationLogService applicationLogService) {
-        this.jobProviders = jobProviders;
+    public JobServiceImpl(ApplicationContext applicationContext, SecurityService securityService, ApplicationLogService applicationLogService) {
+        this.jobProviders = applicationContext.getBeansOfType(JobProvider.class).values();
         this.securityService = securityService;
         this.applicationLogService = applicationLogService;
     }
@@ -93,6 +94,9 @@ public class JobServiceImpl implements ScheduledService, JobService, Application
     }
 
     protected void syncJobs() {
+        if (jobProviders == null || jobProviders.isEmpty()) {
+            return;
+        }
         long count = syncCount.incrementAndGet();
         logger.debug("[job] Sync jobs: {}", count);
         // Gets the list of all jobs
