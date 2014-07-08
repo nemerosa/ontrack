@@ -104,6 +104,10 @@ angular.module('ot.view.branch', [
                         name: "Update branch",
                         cls: 'ot-command-branch-update',
                         action: function () {
+                            otStructureService.update(
+                                branchResource._update,
+                                "Update branch"
+                            );
                         }
                     },
                     ot.viewCloseCommand('/project/' + branchResource.project.id),
