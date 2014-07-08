@@ -15,13 +15,13 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Service
-public class ArtifactorySyncServiceImpl implements JobProvider {
+public class ArtifactoryPromotionSyncServiceImpl implements JobProvider {
 
     private final StructureService structureService;
     private final PropertyService propertyService;
 
     @Autowired
-    public ArtifactorySyncServiceImpl(StructureService structureService, PropertyService propertyService) {
+    public ArtifactoryPromotionSyncServiceImpl(StructureService structureService, PropertyService propertyService) {
         this.structureService = structureService;
         this.propertyService = propertyService;
     }
