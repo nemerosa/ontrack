@@ -67,7 +67,7 @@ public class ArtifactoryPromotionSyncPropertyType extends AbstractPropertyType<A
                 .with(
                         Text.of("buildNameFilter")
                                 .label("Build name filter")
-                                .help("Filter on the build name in Artifactory (regular expression)")
+                                .help("Filter on the build name in Artifactory (* can be used as a wildcard)")
                                 .value(value != null ? value.getBuildNameFilter() : "")
                 ).with(
                         Int.of("interval")
