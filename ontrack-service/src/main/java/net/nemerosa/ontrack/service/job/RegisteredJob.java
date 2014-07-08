@@ -44,7 +44,10 @@ public class RegisteredJob {
     }
 
     public boolean mustStart() {
-        if (end.get() != null) {
+        if (sync < 0) {
+            // Special case of job registered on the fly, outside of normal registration
+            return true;
+        } else if (end.get() != null) {
             long minutes = Duration.between(end.get(), Time.now()).toMinutes();
             return minutes >= job.getInterval();
         } else {
