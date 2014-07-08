@@ -37,6 +37,8 @@ public interface SecurityService {
 
     void asAdmin(Runnable task);
 
+    Runnable runAsAdmin(Runnable task);
+
     /**
      * In some asynchronous operations, we need to run a task with the same credentials that initiated the operation.
      * This method creates a wrapping supplier that holds the initial security context.

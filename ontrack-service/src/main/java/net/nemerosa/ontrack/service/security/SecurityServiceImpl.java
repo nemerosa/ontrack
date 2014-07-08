@@ -107,6 +107,15 @@ public class SecurityServiceImpl implements SecurityService {
     }
 
     @Override
+    public Runnable runAsAdmin(Runnable task) {
+        Supplier<Void> supplier = runAsAdmin(() -> {
+            task.run();
+            return null;
+        });
+        return supplier::get;
+    }
+
+    @Override
     public <T> Supplier<T> runner(Supplier<T> supplier) {
         // Current context
         SecurityContext context = SecurityContextHolder.getContext();
