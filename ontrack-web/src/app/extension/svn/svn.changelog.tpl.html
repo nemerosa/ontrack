@@ -82,7 +82,21 @@
                     <a name="revisions"></a>
 
                     <div class="panel panel-default">
-                        <div class="panel-heading">Revisions</div>
+                        <div class="panel-heading clearfix">
+                            Revisions
+                            <div class="pull-right">
+                                <a class="btn btn-default btn-xs" ng-if="changeLog._issues" ng-click="changeLogIssues()" ng-disabled="issuesLoading">
+                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="issues"></span>
+                                    <span class="ot-extension-scm-changelog-command-loading"></span>
+                                    {{issuesCommand}}
+                                </a>
+                                <a class="btn btn-default btn-xs" ng-click="changeLogFiles()" ng-disabled="filesLoading">
+                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="files"></span>
+                                    <span class="ot-extension-scm-changelog-command-loading"></span>
+                                    {{filesCommand}}
+                                </a>
+                            </div>
+                        </div>
                         <div class="panel-body">
                             <div class="alert alert-warning" ng-hide="revisions || revisionsLoading">
                                 No revision has been loaded yet. Click
@@ -132,7 +146,21 @@
                     <a name="issues"></a>
 
                     <div class="panel panel-default">
-                        <div class="panel-heading">Issues</div>
+                        <div class="panel-heading clearfix">
+                            Issues
+                            <div class="pull-right">
+                                <a class="btn btn-default btn-xs" ng-click="changeLogRevisions()" ng-disabled="revisionsLoading">
+                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="revisions"></span>
+                                    <span class="ot-extension-scm-changelog-command-loading"></span>
+                                    {{revisionsCommand}}
+                                </a>
+                                <a class="btn btn-default btn-xs" ng-click="changeLogFiles()" ng-disabled="filesLoading">
+                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="files"></span>
+                                    <span class="ot-extension-scm-changelog-command-loading"></span>
+                                    {{filesCommand}}
+                                </a>
+                            </div>
+                        </div>
                         <div class="panel-body">
                             <div class="alert alert-warning" ng-hide="issues || issuesLoading">
                                 No issue has been loaded yet. Click
@@ -157,7 +185,21 @@
                     <a name="files"></a>
 
                     <div class="panel panel-default">
-                        <div class="panel-heading">File changes</div>
+                        <div class="panel-heading clearfix">
+                            File changes
+                            <div class="pull-right">
+                                <a class="btn btn-default btn-xs" ng-click="changeLogRevisions()" ng-disabled="revisionsLoading">
+                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="revisions"></span>
+                                    <span class="ot-extension-scm-changelog-command-loading"></span>
+                                    {{revisionsCommand}}
+                                </a>
+                                <a class="btn btn-default btn-xs" ng-if="changeLog._issues" ng-click="changeLogIssues()" ng-disabled="issuesLoading">
+                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="issues"></span>
+                                    <span class="ot-extension-scm-changelog-command-loading"></span>
+                                    {{issuesCommand}}
+                                </a>
+                            </div>
+                        </div>
                         <div class="panel-body" ng-hide="files || filesLoading">
                             <div class="alert alert-warning">
                                 No file change has been loaded yet. Click
