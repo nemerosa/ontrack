@@ -4,6 +4,7 @@ import com.google.common.collect.Table;
 import com.google.common.collect.Tables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.nemerosa.ontrack.model.job.Job;
+import net.nemerosa.ontrack.model.job.JobDescriptor;
 import net.nemerosa.ontrack.model.job.JobProvider;
 import net.nemerosa.ontrack.model.job.JobService;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -23,9 +24,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
-// TODO Implements JobService
 @Service
-public class JobServiceImpl implements ScheduledService {
+public class JobServiceImpl implements ScheduledService, JobService {
 
     private final Logger logger = LoggerFactory.getLogger(JobService.class);
     private final Collection<JobProvider> jobProviders;
@@ -55,6 +55,21 @@ public class JobServiceImpl implements ScheduledService {
         this.jobProviders = jobProviders;
         this.securityService = securityService;
         this.applicationLogService = applicationLogService;
+    }
+
+    @Override
+    public Collection<JobDescriptor> getRunningJobs() {
+        return registeredJobs.values().stream()
+                .filter(RegisteredJob::isRunning)
+                .map(RegisteredJob::getJobDescriptor)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Collection<JobDescriptor> getRegisteredJobs() {
+        return registeredJobs.values().stream()
+                .map(RegisteredJob::getJobDescriptor)
+                .collect(Collectors.toList());
     }
 
     @Override

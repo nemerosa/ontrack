@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.job;
 
 import net.nemerosa.ontrack.model.job.Job;
+import net.nemerosa.ontrack.model.job.JobDescriptor;
 import net.nemerosa.ontrack.model.support.Time;
 
 import java.time.Duration;
@@ -82,5 +83,9 @@ public class RegisteredJob {
 
     public String getJobDescription() {
         return job.getDescription();
+    }
+
+    public JobDescriptor getJobDescriptor() {
+        return job.getDescriptor();
     }
 }
