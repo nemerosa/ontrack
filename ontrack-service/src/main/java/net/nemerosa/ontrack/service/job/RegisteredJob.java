@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.support.Time;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class RegisteredJob {
@@ -14,6 +15,7 @@ public class RegisteredJob {
     private long sync;
 
     private final AtomicBoolean running = new AtomicBoolean(false);
+    private final AtomicLong runCount = new AtomicLong();
     private final AtomicReference<LocalDateTime> end = new AtomicReference<>(null);
 
     protected RegisteredJob(Job job, long sync) {
@@ -43,7 +45,7 @@ public class RegisteredJob {
             long minutes = Duration.between(end.get(), Time.now()).toMinutes();
             return minutes >= job.getInterval();
         } else {
-            return false;
+            return runCount.get() == 0;
         }
     }
 
@@ -53,6 +55,7 @@ public class RegisteredJob {
                 // Starting
                 end.set(null);
                 running.set(true);
+                runCount.incrementAndGet();
                 // Runs the job
                 job.createTask().run();
             } finally {
