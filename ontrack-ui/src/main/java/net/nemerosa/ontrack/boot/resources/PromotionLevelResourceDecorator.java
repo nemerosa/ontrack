@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.boot.resources;
 
 import net.nemerosa.ontrack.boot.ui.BranchController;
+import net.nemerosa.ontrack.boot.ui.DecorationsController;
 import net.nemerosa.ontrack.boot.ui.ProjectController;
 import net.nemerosa.ontrack.boot.ui.PromotionLevelController;
 import net.nemerosa.ontrack.model.structure.PromotionLevel;
@@ -29,6 +30,9 @@ public class PromotionLevelResourceDecorator extends AbstractResourceDecorator<P
                         // TODO Delete
                         // TODO Next promotion level
                         // TODO Previous promotion level
+                        // Decorations
+                .link("_decorations", on(DecorationsController.class).getDecorations(promotionLevel.getProjectEntityType(), promotionLevel.getId()))
+                        // OK
                 .build();
     }
 

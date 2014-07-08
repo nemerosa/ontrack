@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.boot.resources;
 
-import net.nemerosa.ontrack.boot.ui.BranchController;
-import net.nemerosa.ontrack.boot.ui.ProjectController;
-import net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController;
-import net.nemerosa.ontrack.boot.ui.PropertyController;
+import net.nemerosa.ontrack.boot.ui.*;
 import net.nemerosa.ontrack.model.security.ProjectDelete;
 import net.nemerosa.ontrack.model.security.ProjectEdit;
 import net.nemerosa.ontrack.model.structure.Project;
@@ -38,6 +35,8 @@ public class ProjectResourceDecorator extends AbstractResourceDecorator<Project>
                 .update(on(ProjectController.class).saveProject(project.getId(), null), ProjectEdit.class, project.id())
                         // Delete link
                 .delete(on(ProjectController.class).deleteProject(project.getId()), ProjectDelete.class, project.id())
+                        // Decorations
+                .link("_decorations", on(DecorationsController.class).getDecorations(project.getProjectEntityType(), project.getId()))
                         // OK
                 .build();
     }
