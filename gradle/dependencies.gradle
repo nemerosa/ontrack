@@ -12,10 +12,10 @@ allprojects {
  * Common versions
  */
 
-def springBootVersion = '1.0.2.RELEASE'
-def springVersion = '4.0.3.RELEASE'
-def springSecurityVersion = '3.2.3.RELEASE'
-def httpClientVersion = '4.3.3'
+def springBootVersion = '1.1.4.RELEASE'
+def springVersion = '4.0.6.RELEASE'
+def springSecurityVersion = '3.2.4.RELEASE'
+def httpClientVersion = '4.3.4'
 def slf4jVersion = '1.7.7'
 
 /**
@@ -67,6 +67,6 @@ ext {
             mockito                     : 'org.mockito:mockito-core:1.9.5',
 
             // Other
-            lombok                      : 'org.projectlombok:lombok:1.12.6'
+            lombok                      : 'org.projectlombok:lombok:1.14.4'
     ]
 }
