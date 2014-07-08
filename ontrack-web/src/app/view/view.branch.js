@@ -96,6 +96,16 @@ angular.module('ot.view.branch', [
                             otStructureService.createBuild(branchResource._createBuild).then(loadBuildView);
                         }
                     },
+                    {
+                        condition: function () {
+                            return branchResource._update;
+                        },
+                        id: 'updateBranch',
+                        name: "Update branch",
+                        cls: 'ot-command-branch-update',
+                        action: function () {
+                        }
+                    },
                     ot.viewCloseCommand('/project/' + branchResource.project.id),
                     ot.viewActionsCommand($scope.branch._actions)
                 ];

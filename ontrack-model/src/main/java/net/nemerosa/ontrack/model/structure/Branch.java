@@ -42,4 +42,10 @@ public class Branch implements ProjectEntity {
     public static Form form() {
         return Form.nameAndDescription();
     }
+
+    public Form toForm() {
+        return form()
+                .fill("name", name)
+                .fill("description", description);
+    }
 }
