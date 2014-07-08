@@ -31,6 +31,8 @@ public interface StructureService {
 
     BranchStatusView getBranchStatusView(Branch branch);
 
+    void saveBranch(Branch branch);
+
     // Builds
 
     Build newBuild(Build build);

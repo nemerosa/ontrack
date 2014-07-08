@@ -48,4 +48,8 @@ public class Branch implements ProjectEntity {
                 .fill("name", name)
                 .fill("description", description);
     }
+
+    public Branch update(NameDescription form) {
+        return of(project, form).withId(id);
+    }
 }

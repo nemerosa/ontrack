@@ -148,6 +148,21 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    public void saveBranch(Branch branch) {
+        // Update
+        try {
+            getNamedParameterJdbcTemplate().update(
+                    "UPDATE BRANCHES SET NAME = :name, DESCRIPTION = :description WHERE ID = :id",
+                    params("name", branch.getName())
+                            .addValue("description", branch.getDescription())
+                            .addValue("id", branch.id())
+            );
+        } catch (DuplicateKeyException ex) {
+            throw new BranchNameAlreadyDefinedException(branch.getName());
+        }
+    }
+
+    @Override
     public List<Build> builds(Branch branch, BuildFilter buildFilter) {
         // TODO The filter could contribute to the SQL to accelerate the search
         return getNamedParameterJdbcTemplate().execute(

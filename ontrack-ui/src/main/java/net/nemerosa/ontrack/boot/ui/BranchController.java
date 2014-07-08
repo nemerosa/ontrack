@@ -79,6 +79,16 @@ public class BranchController extends AbstractResourceController {
         return structureService.getBranch(branchId).toForm();
     }
 
+    @RequestMapping(value = "branches/{branchId}/update", method = RequestMethod.PUT)
+    public Branch updateBranch(@PathVariable ID branchId, @RequestBody NameDescription form) {
+        // Loads and updates branch
+        Branch branch = structureService.getBranch(branchId).update(form);
+        // Saves the branch
+        structureService.saveBranch(branch);
+        // OK
+        return branch;
+    }
+
     @RequestMapping(value = "branches/{branchId}/status", method = RequestMethod.GET)
     public BranchStatusView getBranchStatusView(@PathVariable ID branchId) {
         return structureService.getBranchStatusView(structureService.getBranch(branchId));

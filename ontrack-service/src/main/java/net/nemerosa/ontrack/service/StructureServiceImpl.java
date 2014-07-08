@@ -124,6 +124,14 @@ public class StructureServiceImpl implements StructureService {
         );
     }
 
+    @Override
+    public void saveBranch(Branch branch) {
+        isEntityDefined(branch, "Branch must be defined");
+        isEntityDefined(branch.getProject(), "Project must be defined");
+        securityService.checkProjectFunction(branch.projectId(), ProjectEdit.class);
+        structureRepository.saveBranch(branch);
+    }
+
     protected PromotionView toPromotionView(PromotionLevel promotionLevel) {
         // Gets the last build having this promotion level
         PromotionRun promotionRun = getLastPromotionRunForPromotionLevel(promotionLevel);
