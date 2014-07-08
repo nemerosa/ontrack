@@ -7,9 +7,28 @@
     </div>
 
     <div class="row" ng-show="changeLog">
-        <div class="col-md-10">
+        <div class="col-md-12">
 
             <!-- Main content -->
+            <div class="row">
+                <div class="col-md-12 ot-svn-changelog-commands">
+                    <button class="btn btn-default" ng-click="changeLogRevisions()" ng-disabled="revisionsLoading">
+                        <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="revisions"></span>
+                        <span class="ot-extension-scm-changelog-command-loading"></span>
+                        {{revisionsCommand}}
+                    </button>
+                    <button ng-if="changeLog._issues" class="btn btn-default" ng-click="changeLogIssues()" ng-disabled="issuesLoading">
+                        <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="issues"></span>
+                        <span class="ot-extension-scm-changelog-command-loading"></span>
+                        {{issuesCommand}}
+                    </button>
+                    <button class="btn btn-default" ng-click="changeLogFiles()" ng-disabled="filesLoading">
+                        <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="files"></span>
+                        <span class="ot-extension-scm-changelog-command-loading"></span>
+                        {{filesCommand}}
+                    </button>
+                </div>
+            </div>
 
             <!-- Build info -->
             <div class="row">
@@ -139,15 +158,15 @@
 
                     <div class="panel panel-default">
                         <div class="panel-heading">File changes</div>
-                        <div class="panel-body">
-                            <div class="alert alert-warning" ng-hide="files || filesLoading">
+                        <div class="panel-body" ng-hide="files || filesLoading">
+                            <div class="alert alert-warning">
                                 No file change has been loaded yet. Click
                                 <a ng-click="changeLogFiles()">here</a>
                                 to load them.
                             </div>
-                            <div class="ot-description" ng-show="filesLoading">
-                                File changes are loading...
-                            </div>
+                        </div>
+                        <div class="panel-body ot-description" ng-show="filesLoading">
+                            File changes are loading...
                         </div>
                         <table class="table table-condensed table-hover" ng-show="files" width="100%">
                             <thead>
@@ -181,33 +200,6 @@
 
             <!-- End of sections -->
 
-        </div>
-
-        <div class="col-md-2">
-            <!-- Quick links and activation of detailed change logs -->
-            <ul class="ot-extension-scm-changelog-commands">
-                <li>
-                    <button class="btn btn-default" ng-click="changeLogRevisions()" ng-disabled="revisionsLoading">
-                        <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="revisions"></span>
-                        <span class="ot-extension-scm-changelog-command-loading"></span>
-                        {{revisionsCommand}}
-                    </button>
-                </li>
-                <li ng-if="changeLog._issues">
-                    <button class="btn btn-default" ng-click="changeLogIssues()" ng-disabled="issuesLoading">
-                        <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="issues"></span>
-                        <span class="ot-extension-scm-changelog-command-loading"></span>
-                        {{issuesCommand}}
-                    </button>
-                </li>
-                <li>
-                    <button class="btn btn-default" ng-click="changeLogFiles()" ng-disabled="filesLoading">
-                        <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="files"></span>
-                        <span class="ot-extension-scm-changelog-command-loading"></span>
-                        {{filesCommand}}
-                    </button>
-                </li>
-            </ul>
         </div>
     </div>
 
