@@ -68,6 +68,7 @@ angular.module('ot.view.project', [
                 // View settings
                 view.title = projectResource.name;
                 view.description = projectResource.description;
+                view.decorationsEntity = projectResource;
                 // Loads the branches
                 loadBranches();
             });

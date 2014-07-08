@@ -82,6 +82,7 @@ angular.module('ot.view.branch', [
                 view.title = branchResource.name;
                 view.description = branchResource.description;
                 view.breadcrumbs = ot.projectBreadcrumbs(branchResource.project);
+                view.decorationsEntity = branchResource;
                 // Branch commands
                 view.commands = [
                     {
