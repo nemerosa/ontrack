@@ -28,4 +28,9 @@ public class ArtifactoryClientImpl implements ArtifactoryClient {
         return numbers;
     }
 
+    @Override
+    public JsonNode getBuildInfo(String buildName, String buildNumber) {
+        return jsonClient.get("/api/build/%s/%s", buildName, buildNumber).path("buildInfo");
+    }
+
 }
