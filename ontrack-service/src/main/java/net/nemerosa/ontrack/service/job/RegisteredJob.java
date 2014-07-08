@@ -2,11 +2,13 @@ package net.nemerosa.ontrack.service.job;
 
 import net.nemerosa.ontrack.model.job.Job;
 import net.nemerosa.ontrack.model.job.JobDescriptor;
+import net.nemerosa.ontrack.model.job.JobTask;
+import net.nemerosa.ontrack.model.support.ApplicationInfo;
 import net.nemerosa.ontrack.model.support.Time;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -15,7 +17,7 @@ public class RegisteredJob {
     private Job job;
     private long sync;
 
-    private final AtomicBoolean running = new AtomicBoolean(false);
+    private final AtomicReference<JobTask> run = new AtomicReference<>(null);
     private final AtomicLong runCount = new AtomicLong();
     private final AtomicReference<LocalDateTime> end = new AtomicReference<>(null);
 
@@ -38,7 +40,7 @@ public class RegisteredJob {
     }
 
     public boolean isRunning() {
-        return running.get();
+        return run.get() != null;
     }
 
     public boolean mustStart() {
@@ -53,15 +55,17 @@ public class RegisteredJob {
     public Runnable createTask() {
         return () -> {
             try {
+                // Task
+                JobTask task = job.createTask();
+                run.set(task);
                 // Starting
                 end.set(null);
-                running.set(true);
                 runCount.incrementAndGet();
                 // Runs the job
-                job.createTask().run();
+                task.run();
             } finally {
                 // End
-                running.set(false);
+                run.set(null);
                 end.set(Time.now());
             }
         };
@@ -87,5 +91,9 @@ public class RegisteredJob {
 
     public JobDescriptor getJobDescriptor() {
         return job.getDescriptor();
+    }
+
+    public ApplicationInfo getApplicationInfo() {
+        return Optional.ofNullable(run.get()).map(task -> ApplicationInfo.info(task.getInfo())).orElse(null);
     }
 }

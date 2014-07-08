@@ -8,6 +8,8 @@ import net.nemerosa.ontrack.model.job.JobDescriptor;
 import net.nemerosa.ontrack.model.job.JobProvider;
 import net.nemerosa.ontrack.model.job.JobService;
 import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.support.ApplicationInfo;
+import net.nemerosa.ontrack.model.support.ApplicationInfoProvider;
 import net.nemerosa.ontrack.model.support.ApplicationLogService;
 import net.nemerosa.ontrack.model.support.ScheduledService;
 import org.slf4j.Logger;
@@ -25,7 +27,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 @Service
-public class JobServiceImpl implements ScheduledService, JobService {
+public class JobServiceImpl implements ScheduledService, JobService, ApplicationInfoProvider {
 
     private final Logger logger = LoggerFactory.getLogger(JobService.class);
     private final Collection<JobProvider> jobProviders;
@@ -69,6 +71,14 @@ public class JobServiceImpl implements ScheduledService, JobService {
     public Collection<JobDescriptor> getRegisteredJobs() {
         return registeredJobs.values().stream()
                 .map(RegisteredJob::getJobDescriptor)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ApplicationInfo> getApplicationInfoList() {
+        return registeredJobs.values().stream()
+                .filter(RegisteredJob::isRunning)
+                .map(RegisteredJob::getApplicationInfo)
                 .collect(Collectors.toList());
     }
 

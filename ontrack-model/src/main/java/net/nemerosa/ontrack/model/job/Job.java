@@ -28,7 +28,7 @@ public interface Job {
     /**
      * Gets the actual task to run
      */
-    Runnable createTask();
+    JobTask createTask();
 
     /**
      * Descriptor for this job.

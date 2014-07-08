@@ -1,4 +1,4 @@
-var APPLICATION_INFO_HEART_BEAT = 30000; // 30 seconds
+var APPLICATION_INFO_HEART_BEAT = 15000; // 15 seconds
 
 angular.module('ot.service.info', [
     'ot.service.core',

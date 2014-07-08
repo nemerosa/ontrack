@@ -9,6 +9,8 @@ import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionS
 import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncPropertyType;
 import net.nemerosa.ontrack.model.job.Job;
 import net.nemerosa.ontrack.model.job.JobProvider;
+import net.nemerosa.ontrack.model.job.JobTask;
+import net.nemerosa.ontrack.model.job.RunnableJobTask;
 import net.nemerosa.ontrack.model.structure.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -85,14 +88,14 @@ public class ArtifactoryPromotionSyncServiceImpl implements JobProvider {
                 }
 
                 @Override
-                public Runnable createTask() {
-                    return () -> sync(branch);
+                public JobTask createTask() {
+                    return new RunnableJobTask(info -> sync(branch, info));
                 }
             };
         }
     }
 
-    private void sync(Branch branch) {
+    private void sync(Branch branch, Consumer<String> info) {
         // Gets the sync properties
         Property<ArtifactoryPromotionSyncProperty> syncProperty = propertyService.getProperty(branch, ArtifactoryPromotionSyncPropertyType.class);
         if (syncProperty.isEmpty()) {
@@ -101,11 +104,13 @@ public class ArtifactoryPromotionSyncServiceImpl implements JobProvider {
         String buildName = syncProperty.getValue().getBuildName();
         String buildNameFilter = syncProperty.getValue().getBuildNameFilter();
         ArtifactoryConfiguration configuration = syncProperty.getValue().getConfiguration();
-        logger.info("[artifactory-sync] Sync branch {}/{} with Artifactory build {} ({})",
+        String log = String.format("Sync branch %s/%s with Artifactory build %s (%s)",
                 branch.getProject().getName(),
                 branch.getName(),
                 buildName,
                 buildNameFilter);
+        logger.info("[artifactory-sync] {}", log);
+        info.accept(log);
         // Build name filter
         Pattern buildNamePattern = Pattern.compile(
                 replace(replace(buildNameFilter, ".", "\\."), "*", ".*")
@@ -119,11 +124,11 @@ public class ArtifactoryPromotionSyncServiceImpl implements JobProvider {
                 .collect(Collectors.toList());
         // Synchronises the promotion levels for each build
         for (String buildNumber : buildNumbers) {
-            syncBuild(branch, buildName, buildNumber, client);
+            syncBuild(branch, buildName, buildNumber, client, info);
         }
     }
 
-    private void syncBuild(Branch branch, String artifactoryBuildName, String buildName, ArtifactoryClient client) {
+    private void syncBuild(Branch branch, String artifactoryBuildName, String buildName, ArtifactoryClient client, Consumer<String> info) {
         // Looks for the build
         Optional<Build> buildOpt = structureService.findBuildByName(
                 branch.getProject().getName(),
@@ -132,10 +137,12 @@ public class ArtifactoryPromotionSyncServiceImpl implements JobProvider {
         );
         if (buildOpt.isPresent()) {
             // Log
-            logger.debug("[artifactory-sync] Sync branch {}/{} for Artifactory build {}",
+            String log = String.format("Sync branch %s/%s for Artifactory build %s",
                     branch.getProject().getName(),
                     branch.getName(),
                     buildName);
+            logger.debug("[artifactory-sync] {}", log);
+            info.accept(log);
             // Gets the build information from Artifactory
             JsonNode buildInfo = client.getBuildInfo(artifactoryBuildName, buildName);
             // Gets the list of statuses

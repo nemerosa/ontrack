@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ApplicationInfoServiceImpl implements ApplicationInfoService {
@@ -22,10 +23,9 @@ public class ApplicationInfoServiceImpl implements ApplicationInfoService {
 
     @Override
     public List<ApplicationInfo> getApplicationInfoList() {
-        List<ApplicationInfo> messages = new ArrayList<>();
-        for (ApplicationInfoProvider infoProvider : providers) {
-            messages.addAll(infoProvider.getApplicationInfoList());
-        }
-        return messages;
+        return providers.stream()
+                .flatMap(provider -> provider.getApplicationInfoList().stream())
+                .filter(info -> info != null)
+                .collect(Collectors.toList());
     }
 }
