@@ -6,8 +6,6 @@
         </div>
     </div>
 
-    <!-- TODO Displays the issues command and section only if the _issues link is present -->
-
     <div class="row" ng-show="changeLog">
         <div class="col-md-10">
 
@@ -110,7 +108,7 @@
             </div>
 
             <!-- Issue sections -->
-            <div class="row">
+            <div class="row" ng-if="changeLog._issues">
                 <div class="col-md-12">
                     <a name="issues"></a>
 
@@ -195,7 +193,7 @@
                         {{revisionsCommand}}
                     </button>
                 </li>
-                <li>
+                <li ng-if="changeLog._issues">
                     <button class="btn btn-default" ng-click="changeLogIssues()" ng-disabled="issuesLoading">
                         <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="issues"></span>
                         <span class="ot-extension-scm-changelog-command-loading"></span>
