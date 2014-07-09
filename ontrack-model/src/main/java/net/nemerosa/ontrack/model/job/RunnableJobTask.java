@@ -6,9 +6,9 @@ import java.util.function.Consumer;
 public class RunnableJobTask implements JobTask {
 
     private final AtomicReference<String> info = new AtomicReference<>();
-    private final Consumer<Consumer<String>> runner;
+    private final Consumer<JobInfoListener> runner;
 
-    public RunnableJobTask(Consumer<Consumer<String>> runner) {
+    public RunnableJobTask(Consumer<JobInfoListener> runner) {
         this.runner = runner;
     }
 

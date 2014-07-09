@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -90,7 +89,7 @@ public class SVNSyncServiceImpl implements SVNSyncService, JobProvider {
         return SVNSyncInfoStatus.of(branchId);
     }
 
-    protected void sync(Branch branch, Consumer<String> info) {
+    protected void sync(Branch branch, JobInfoListener info) {
         // Number of created builds
         AtomicInteger createdBuilds = new AtomicInteger();
         // Gets the configuration property
@@ -122,7 +121,7 @@ public class SVNSyncServiceImpl implements SVNSyncService, JobProvider {
             // Completes the information collection (build created)
             if (build.isPresent()) {
                 int count = createdBuilds.incrementAndGet();
-                info.accept(String.format(
+                info.post(String.format(
                         "Running build synchronisation from SVN for branch %s/%s: %d build(s) created",
                         branch.getProject().getName(),
                         branch.getName(),
