@@ -23,6 +23,7 @@ var ontrack = angular.module('ontrack', [
         'ot.view.promotionLevel',
         'ot.view.validationStamp',
         'ot.view.validationRun',
+        'ot.view.admin.console',
         // Extensions
         'ontrack.extension.jenkins',
         'ontrack.extension.svn',
