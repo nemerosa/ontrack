@@ -30,9 +30,16 @@ angular.module('ot.extension.svn.dialog.indexation', [
         // Indexation from latest
         $scope.indexFromLatest = function () {
             ot.call($http.post($scope.config.configuration._indexationFromLatest)).then(
-                function success() {
-                    // Closes the dialog
-                    $scope.cancel();
+                function success(ack) {
+                    if (ack.success) {
+                        // Closes the dialog
+                        $scope.cancel();
+                    } else {
+                        $scope.message = {
+                            type: 'warning',
+                            content: "Indexation is already running on this repository."
+                        };
+                    }
                 },
                 function error(message) {
                     $scope.message = message;
