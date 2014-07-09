@@ -87,7 +87,6 @@ public class IndexationServiceImpl implements IndexationService, JobProvider {
         return jobQueueService.queue(createIndexFromLatestJob(configuration));
     }
 
-    // TODO Range indexation job
     @Override
     public Ack indexRange(String name, IndexationRange range) {
         return jobQueueService.queue(new Job() {
@@ -543,7 +542,7 @@ public class IndexationServiceImpl implements IndexationService, JobProvider {
                             min,
                             max,
                             revision,
-                            Math.round((revision - min + 1) / (max - min + 1))
+                            Math.round(100.0 * (revision - min + 1) / (max - min + 1))
                     )
             ));
             svnClient.log(repository, url, SVNRevision.HEAD, fromRevision, toRevision, true, true, 0, false, handler);
