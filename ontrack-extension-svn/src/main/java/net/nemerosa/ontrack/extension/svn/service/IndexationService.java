@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.svn.model.IndexationRange;
 
 public interface IndexationService {
 
+    @Deprecated
     boolean isIndexationRunning(String name);
 
     void indexFromLatest(String name);
