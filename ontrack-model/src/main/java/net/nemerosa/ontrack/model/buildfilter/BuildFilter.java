@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.model.structure;
+package net.nemerosa.ontrack.model.buildfilter;
 
 /**
  * Defines a filter on builds for a branch. This is not only a predicate. It must be able to:

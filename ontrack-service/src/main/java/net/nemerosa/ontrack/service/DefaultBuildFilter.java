@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service;
 
-import net.nemerosa.ontrack.model.structure.BuildFilter;
+import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 
 public final class DefaultBuildFilter implements BuildFilter {
 

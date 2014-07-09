@@ -1,6 +1,8 @@
-package net.nemerosa.ontrack.model.structure;
+package net.nemerosa.ontrack.model.buildfilter;
 
 import lombok.Data;
+import net.nemerosa.ontrack.model.structure.Branch;
+import net.nemerosa.ontrack.model.structure.BuildView;
 
 /**
  * Two builds in a branch.

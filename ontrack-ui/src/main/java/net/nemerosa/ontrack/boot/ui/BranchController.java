@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.extension.api.BuildDiffExtension;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
+import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
+import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.Action;
 import net.nemerosa.ontrack.model.security.BranchCreate;
@@ -94,6 +96,17 @@ public class BranchController extends AbstractResourceController {
     @RequestMapping(value = "branches/{branchId}/status", method = RequestMethod.GET)
     public BranchStatusView getBranchStatusView(@PathVariable ID branchId) {
         return structureService.getBranchStatusView(structureService.getBranch(branchId));
+    }
+
+
+    /**
+     * FIXME Returns the list of existing filters for this branch and the current user, and the list
+     * of forms that can be used to create new ones.
+     * @param branchId ID of the branch to get the filter for.
+     */
+    @RequestMapping(value = "branches/{branchId}/filter", method = RequestMethod.GET)
+    public void buildFilters(@PathVariable ID branchId) {
+
     }
 
     @RequestMapping(value = "branches/{branchId}/view", method = RequestMethod.GET)

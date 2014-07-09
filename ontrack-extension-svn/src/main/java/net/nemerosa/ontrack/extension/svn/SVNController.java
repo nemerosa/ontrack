@@ -14,7 +14,7 @@ import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Build;
-import net.nemerosa.ontrack.model.structure.BuildDiff;
+import net.nemerosa.ontrack.model.buildfilter.BuildDiff;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service;
 
 import net.nemerosa.ontrack.model.Ack;
+import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.exceptions.ImageFileSizeException;
 import net.nemerosa.ontrack.model.exceptions.ImageTypeNotAcceptedException;
 import net.nemerosa.ontrack.model.security.*;

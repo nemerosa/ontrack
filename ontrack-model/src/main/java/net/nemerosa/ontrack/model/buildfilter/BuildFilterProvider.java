@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.model.structure;
+package net.nemerosa.ontrack.model.buildfilter;
 
 public interface BuildFilterProvider {
 

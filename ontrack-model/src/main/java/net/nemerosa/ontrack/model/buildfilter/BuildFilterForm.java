@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.model.structure;
+package net.nemerosa.ontrack.model.buildfilter;
 
 import lombok.Data;
 import net.nemerosa.ontrack.model.form.Form;

@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.service;
 
-import net.nemerosa.ontrack.model.structure.BuildFilter;
-import net.nemerosa.ontrack.model.structure.BuildFilterService;
+import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
+import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import org.springframework.stereotype.Service;
 
 @Service

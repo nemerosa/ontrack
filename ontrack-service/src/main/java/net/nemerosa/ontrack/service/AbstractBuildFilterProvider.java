@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.service;
 
 import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.structure.BuildFilterForm;
-import net.nemerosa.ontrack.model.structure.BuildFilterProvider;
+import net.nemerosa.ontrack.model.buildfilter.BuildFilterForm;
+import net.nemerosa.ontrack.model.buildfilter.BuildFilterProvider;
 
 public abstract class AbstractBuildFilterProvider implements BuildFilterProvider {
 

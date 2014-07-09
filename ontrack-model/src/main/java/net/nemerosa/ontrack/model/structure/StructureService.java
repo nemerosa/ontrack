@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.model.structure;
 
 import net.nemerosa.ontrack.model.Ack;
+import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 
 import java.util.List;
 import java.util.Optional;

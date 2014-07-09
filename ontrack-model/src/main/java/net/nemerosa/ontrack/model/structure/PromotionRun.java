@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import net.nemerosa.ontrack.model.buildfilter.BuildDiff;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)

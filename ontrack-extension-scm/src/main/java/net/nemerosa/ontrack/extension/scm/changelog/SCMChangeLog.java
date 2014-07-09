@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.nemerosa.ontrack.model.structure.Branch;
-import net.nemerosa.ontrack.model.structure.BuildDiff;
+import net.nemerosa.ontrack.model.buildfilter.BuildDiff;
 import net.nemerosa.ontrack.model.structure.BuildView;
 
 import java.util.UUID;
