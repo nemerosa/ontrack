@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.repository;
 
 import net.nemerosa.ontrack.model.Ack;
-import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.exceptions.*;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
@@ -14,10 +13,10 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Repository
@@ -164,33 +163,24 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
-    public List<Build> builds(Branch branch, BuildFilter buildFilter) {
+    public void builds(Branch branch, Predicate<Build> buildPredicate) {
         // TODO The filter could contribute to the SQL to accelerate the search
-        return getNamedParameterJdbcTemplate().execute(
+        getNamedParameterJdbcTemplate().execute(
                 "SELECT * FROM BUILDS WHERE BRANCHID = :branchId ORDER BY ID DESC",
                 params("branchId", branch.id()),
                 ps -> {
                     ResultSet rs = ps.executeQuery();
-                    List<Build> builds = new ArrayList<>();
-                    while (rs.next()) {
-                        // Filter on number of builds (parameter of the filter)
-                        if (!buildFilter.acceptCount(builds.size() + 1)) {
-                            break;
-                        }
+                    boolean goingOn = true;
+                    while (rs.next() && goingOn) {
                         // Gets the builds
                         Build build = toBuild(
                                 rs,
                                 id -> branch
                         );
-                        // TODO Prefiltering without the promotions & validations
-                        // TODO Promotion runs
-                        // TODO Validation runs
-                        // TODO Final filtering
-                        // OK
-                        builds.add(build);
+                        // Dealing with this build
+                        goingOn = buildPredicate.test(build);
                     }
-                    // List
-                    return builds;
+                    return null;
                 }
         );
     }

@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -201,7 +202,27 @@ public class StructureServiceImpl implements StructureService {
         // Gets the branch
         Branch branch = getBranch(branchId);
         // Collects the builds associated with this predicate
-        return structureRepository.builds(branch, buildFilter);
+        List<Build> builds = new ArrayList<>();
+        structureRepository.builds(branch, build -> filterBuild(builds, branch, build, buildFilter));
+        return builds;
+    }
+
+    /**
+     * @param builds      List of builds already added in the list
+     * @param branch      Branch
+     * @param build       Build to test
+     * @param buildFilter Filter definition
+     * @return True is OK to go on with other builds
+     */
+    private boolean filterBuild(List<Build> builds, Branch branch, Build build, BuildFilter buildFilter) {
+        // TODO Prefiltering without the promotions & validations
+        // TODO Promotion runs
+        // TODO Validation runs
+        // TODO Final filtering
+        // Adding the build
+        builds.add(build);
+        // Going on? Count test: can we accept one more build?
+        return buildFilter.acceptCount(builds.size() + 1);
     }
 
     @Override

@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.structure.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 public interface StructureRepository {
 
@@ -47,7 +48,11 @@ public interface StructureRepository {
 
     Optional<Build> findBuildAfterUsingNumericForm(ID branchId, String buildName);
 
-    List<Build> builds(Branch branch, BuildFilter buildFilter);
+    /**
+     * Iterates over the builds of the branch, from the newest to the oldest, until
+     * the <code>buildPredicate</code> returns <code>false</code>.
+     */
+    void builds(Branch branch, Predicate<Build> buildPredicate);
 
     Build getLastBuildForBranch(Branch branch);
 
