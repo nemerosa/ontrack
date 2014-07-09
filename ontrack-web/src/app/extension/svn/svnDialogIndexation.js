@@ -27,20 +27,23 @@ angular.module('ot.extension.svn.dialog.indexation', [
             $modalInstance.dismiss('cancel');
         };
 
+        // Result of the indexation call
+        function onSuccess(ack) {
+            if (ack.success) {
+                // Closes the dialog
+                $scope.cancel();
+            } else {
+                $scope.message = {
+                    type: 'warning',
+                    content: "Indexation is already running on this repository."
+                };
+            }
+        }
+
         // Indexation from latest
         $scope.indexFromLatest = function () {
             ot.call($http.post($scope.config.configuration._indexationFromLatest)).then(
-                function success(ack) {
-                    if (ack.success) {
-                        // Closes the dialog
-                        $scope.cancel();
-                    } else {
-                        $scope.message = {
-                            type: 'warning',
-                            content: "Indexation is already running on this repository."
-                        };
-                    }
-                },
+                onSuccess,
                 function error(message) {
                     $scope.message = message;
                 }
@@ -55,10 +58,7 @@ angular.module('ot.extension.svn.dialog.indexation', [
                 from: from,
                 to: to
             })).then(
-                function success() {
-                    // Closes the dialog
-                    $scope.cancel();
-                },
+                onSuccess,
                 function error(message) {
                     $scope.message = message;
                 }
@@ -73,10 +73,7 @@ angular.module('ot.extension.svn.dialog.indexation', [
             }).then(function () {
                 // Launches full reindexation
                 ot.call($http.post($scope.config.configuration._indexationFull)).then(
-                    function success() {
-                        // Closes the dialog
-                        $scope.cancel();
-                    },
+                    onSuccess,
                     function error(message) {
                         $scope.message = message;
                     }

@@ -35,8 +35,6 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-// FIXME Job: Range indexation
-
 @Service
 public class IndexationServiceImpl implements IndexationService, JobProvider {
 
@@ -92,9 +90,45 @@ public class IndexationServiceImpl implements IndexationService, JobProvider {
     // TODO Range indexation job
     @Override
     public Ack indexRange(String name, IndexationRange range) {
-        SVNRepository repository = getRepositoryByName(name);
-        // TODO indexRange(repository, range.getFrom(), range.getTo());
-        return Ack.NOK;
+        return jobQueueService.queue(new Job() {
+            @Override
+            public String getGroup() {
+                return SVN_INDEXATION_JOB_GROUP;
+            }
+
+            @Override
+            public String getCategory() {
+                return "SVNIndexRange";
+            }
+
+            @Override
+            public String getId() {
+                return name;
+            }
+
+            @Override
+            public String getDescription() {
+                return String.format(
+                        "SVN range indexation for %s, from %d to %d",
+                        name,
+                        range.getFrom(),
+                        range.getTo()
+                );
+            }
+
+            @Override
+            public int getInterval() {
+                return 0;
+            }
+
+            @Override
+            public JobTask createTask() {
+                SVNRepository repository = getRepositoryByName(name);
+                return new RunnableJobTask(info ->
+                        indexRange(repository, range.getFrom(), range.getTo(), info)
+                );
+            }
+        });
     }
 
     @Override
