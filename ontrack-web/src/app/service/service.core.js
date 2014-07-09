@@ -170,6 +170,23 @@ angular.module('ot.service.core', [
                 }
             }).result;
         };
+        /**
+         * Displays a generic dialog box.
+         * @param config.data Data to use as model in the template
+         * @param config.template URI to the template
+         */
+        self.popup = function (config) {
+            return $modal.open({
+                templateUrl: config.template,
+                controller: function ($scope, $modalInstance) {
+                    $scope.data = config.data;
+                    $scope.cancel = function () {
+                        $modalInstance.dismiss('cancel');
+                    };
+                }
+            }).result;
+        };
+        // OK
         return self;
     })
 ;

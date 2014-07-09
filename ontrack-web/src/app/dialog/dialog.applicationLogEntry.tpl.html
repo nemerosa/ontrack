@@ -1,0 +1,29 @@
+<div class="modal-header ot-application-log-{{data.level | lowercase}}">
+    <h3>{{data.level}}</h3>
+</div>
+<div class="modal-body">
+
+    <dl>
+
+        <dt>Timestamp</dt>
+        <dd>{{data.timestamp | date:'fullDate'}} {{data.timestamp | date:'mediumTime'}}</dd>
+
+        <dt>Source</dt>
+        <dd>{{data.source}}</dd>
+
+        <dt>Identifier</dt>
+        <dd>{{data.identifier}}</dd>
+
+        <dt ng-if="data.info">Info</dt>
+        <dd ng-if="data.info">{{data.info}}</dd>
+
+        <dt>Details</dt>
+        <dd>
+            <textarea class="form-control" readonly="readonly" ng-bind="data.detail" rows="8"></textarea>
+        </dd>
+    </dl>
+
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" type="button" ng-click="cancel()">OK</button>
+</div>

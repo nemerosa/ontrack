@@ -9,7 +9,7 @@ angular.module('ot.view.admin.console', [
             controller: 'AdminConsoleCtrl'
         });
     })
-    .controller('AdminConsoleCtrl', function ($scope, $http, $interval,  ot) {
+    .controller('AdminConsoleCtrl', function ($scope, $http, $interval,  ot, otAlertService) {
         var view = ot.view();
         view.title = "Administration console";
         view.description = "Tools for the general management of ontrack";
@@ -24,10 +24,27 @@ angular.module('ot.view.admin.console', [
             });
         }
 
+        // Loads the logs
+        function loadLogs() {
+            ot.call($http.get('admin/logs')).then(function (logs) {
+                $scope.logs = logs;
+            });
+        }
+
         // Initialisation
         loadJobs();
+        loadLogs();
 
         $interval(loadJobs, 5000);
+        $interval(loadLogs, 5000);
+
+        // Showing the details of a log entry
+        $scope.showLogDetails = function (log) {
+            otAlertService.popup({
+                data: log,
+                template: 'app/dialog/dialog.applicationLogEntry.tpl.html'
+            });
+        };
 
     })
 ;

@@ -52,10 +52,59 @@
                             <p>
                                 {{job.descriptor.description}}
                             </p>
+
                             <p class="ot-description" ng-if="job.info">
                                 <span class="glyphicon glyphicon-arrow-right"></span>
                                 {{job.info.message}}
                             </p>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        Log entries
+                    </div>
+                </div>
+                <div class="panel-body">
+                    List of application log messages.
+                </div>
+                <table class="table" ng-if="logs">
+                    <thead>
+                    <tr>
+                        <th>Level</th>
+                        <th>Timestamp</th>
+                        <th>Source</th>
+                        <th>Identifier</th>
+                        <th>Details</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="log in logs.entries" class="ot-application-log-{{log.level | lowercase}}">
+                        <td>
+                            {{log.level}}
+                        </td>
+                        <td>
+                            {{log.timestamp | date:'fullDate'}}
+                            {{log.timestamp | date:'mediumTime'}}
+                        </td>
+                        <td>
+                            {{log.source}}
+                        </td>
+                        <td>
+                            {{log.identifier}}
+                        </td>
+                        <td>
+                            <button class="btn btn-default btn-xs" ng-click="showLogDetails(log)">
+                                Details...
+                            </button>
                         </td>
                     </tr>
                     </tbody>
