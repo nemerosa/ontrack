@@ -5,18 +5,18 @@
     <dl>
         <dt>Full version</dt>
         <dd>
-            <span class="label label-info">{{versionInfo.full}}</span>
+            <span class="label label-info">{{data.full}}</span>
         </dd>
         <dt>Commit</dt>
         <dd>
-            <span class="label label-default">{{versionInfo.commit}}</span>
+            <span class="label label-default">{{data.commit}}</span>
         </dd>
         <dt>Source</dt>
         <dd>
-            <span class="label" ng-class="{'label-danger':versionInfo.source != 'build', 'label-success':versionInfo.source == 'build'}">
-                {{versionInfo.source}}
+            <span class="label" ng-class="{'label-danger':data.source != 'build', 'label-success':data.source == 'build'}">
+                {{data.source}}
             </span>
-            <span ng-if="versionInfo.source != 'build'" class="ot-description">
+            <span ng-if="data.source != 'build'" class="ot-description">
                 &nbsp;This version is not a release! Please use with care.
             </span>
         </dd>
