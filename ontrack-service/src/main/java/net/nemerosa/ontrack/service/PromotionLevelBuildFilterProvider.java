@@ -11,6 +11,11 @@ import org.springframework.stereotype.Component;
 public class PromotionLevelBuildFilterProvider extends AbstractBuildFilterProvider {
 
     @Override
+    public String getName() {
+        return "Last per promotion level";
+    }
+
+    @Override
     protected Form blankForm(ID branchId) {
         return Form.create();
     }

@@ -3,6 +3,7 @@ angular.module('ot.view.branch', [
     'ot.service.core',
     'ot.service.form',
     'ot.service.structure',
+    'ot.service.buildfilter',
     'ot.dialog.validationStampRunView'
 ])
     .config(function ($stateProvider) {
@@ -12,7 +13,7 @@ angular.module('ot.view.branch', [
             controller: 'BranchCtrl'
         });
     })
-    .controller('BranchCtrl', function ($interval, $state, $scope, $stateParams, $http, $modal, ot, otFormService, otStructureService) {
+    .controller('BranchCtrl', function ($interval, $state, $scope, $stateParams, $http, $modal, ot, otFormService, otStructureService, otBuildFilterService) {
         var view = ot.view();
         // Branch's id
         var branchId = $stateParams.branchId;
@@ -190,6 +191,16 @@ angular.module('ot.view.branch', [
                     to: selectedBuild.to
                 });
             }
+        };
+
+        /**
+         * Build filter: new one
+         */
+        $scope.buildFilterNew = function (buildFilterForm) {
+            otBuildFilterService.createBuildFilter({
+                branchId: branchId,
+                buildFilterForm: buildFilterForm
+            });
         };
 
     })

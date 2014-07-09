@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.form.Form;
 public class BuildFilterForm {
 
     private final Class<? extends BuildFilterProvider> type;
+    private final String typeName;
     private final Form form;
 
 }

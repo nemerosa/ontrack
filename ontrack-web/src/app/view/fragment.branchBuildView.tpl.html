@@ -89,7 +89,20 @@
     <tfoot>
     <tr>
         <td colspan="4">
-            <!-- TODO Filter command -->
+            <!-- Filter command -->
+            <div class="btn-group">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                    Action <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                    <li role="presentation" class="dropdown-header">Existing filters:</li>
+                    <li class="divider"></li>
+                    <li role="presentation" class="dropdown-header">New filter:</li>
+                    <li ng-repeat="buildFilterForm in buildFilters.buildFilterForms">
+                        <a ng-click="buildFilterNew(buildFilterForm)">{{buildFilterForm.typeName}}</a>
+                    </li>
+                </ul>
+            </div>
             <!-- Build diff extension commands -->
             <button ng-repeat="action in branchBuildView.buildDiffActions" class="btn btn-default"
                     id="{{action.id}}"

@@ -22,6 +22,11 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider {
     }
 
     @Override
+    public String getName() {
+        return "Standard filter";
+    }
+
+    @Override
     protected Form blankForm(ID branchId) {
         // Promotion levels for this branch
         List<PromotionLevel> promotionLevels = structureService.getPromotionLevelListForBranch(branchId);
@@ -40,6 +45,7 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider {
                                 .help("Builds since the last one which was promoted to this level")
                                 .items(promotionLevels)
                                 .itemId("name")
+                                .optional()
                 )
                 .with(
                         Selection.of("withPromotionLevel")
@@ -47,6 +53,7 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider {
                                 .help("Builds with this promotion level")
                                 .items(promotionLevels)
                                 .itemId("name")
+                                .optional()
                 )
                 // TODO sinceValidationStamps
                 // TODO withValidationStamps
