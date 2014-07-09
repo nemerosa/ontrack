@@ -1,5 +1,10 @@
 package net.nemerosa.ontrack.service;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
+import net.nemerosa.ontrack.model.buildfilter.BuildFilterProvider;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Int;
 import net.nemerosa.ontrack.model.form.Selection;
@@ -10,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class StandardBuildFilterProvider extends AbstractBuildFilterProvider {
@@ -24,6 +30,15 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider {
     @Override
     public String getName() {
         return "Standard filter";
+    }
+
+    @Override
+    public BuildFilter filter(ID branchId, Map<String, String[]> parameters) {
+        StandardBuildFilter filter = StandardBuildFilter.of(BuildFilterProvider.getIntParameter(parameters, "count", 10));
+        // TODO sinceValidationStamps
+        // TODO withValidationStamps
+        // TODO withProperty
+        return filter;
     }
 
     @Override
@@ -59,6 +74,22 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider {
                 // TODO withValidationStamps
                 // TODO withProperty
                 ;
+    }
+
+    @Data
+    @AllArgsConstructor(access = AccessLevel.PROTECTED)
+    private static class StandardBuildFilter implements BuildFilter {
+
+        private final int count;
+
+        public static StandardBuildFilter of(int count) {
+            return new StandardBuildFilter(count);
+        }
+
+        @Override
+        public boolean acceptCount(int size) {
+            return size <= count;
+        }
     }
 
 }

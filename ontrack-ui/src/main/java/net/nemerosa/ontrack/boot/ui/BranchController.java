@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import com.google.common.collect.Maps;
 import net.nemerosa.ontrack.extension.api.BuildDiffExtension;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
@@ -16,8 +17,10 @@ import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.WebRequest;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -116,12 +119,13 @@ public class BranchController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "branches/{branchId}/view", method = RequestMethod.GET)
-    // TODO Filter
-    public BranchBuildView buildView(@PathVariable ID branchId) {
+    public BranchBuildView buildView(@PathVariable ID branchId, WebRequest request) {
         // Gets the branch
         Branch branch = getBranch(branchId);
-        // TODO Defines the filter for the service
-        BuildFilter buildFilter = buildFilterService.defaultFilter();
+        // Gets the parameters
+        Map<String, String[]> parameters = request.getParameterMap();
+        // Defines the filter using a service
+        BuildFilter buildFilter = buildFilterService.computeFilter(branchId, parameters);
         // Gets the list of builds
         List<Build> builds = structureService.getFilteredBuilds(branchId, buildFilter);
         // Gets the list of build diff actions
