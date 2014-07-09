@@ -88,6 +88,10 @@ public class UserAPIController extends AbstractResourceController {
         // TODO Extension management
         // Contributions from extensions
         user = userMenuExtensions(user);
+        // Admin tools
+        if (securityService.isGlobalFunctionGranted(ApplicationManagement.class)) {
+            user.add(Action.of("admin-console", "Admin console", "admin-console"));
+        }
         // OK
         return user;
     }
