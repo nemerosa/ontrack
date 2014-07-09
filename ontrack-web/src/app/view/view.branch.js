@@ -41,6 +41,13 @@ angular.module('ot.view.branch', [
             to: undefined
         };
 
+        // Loading the build filters
+        function loadBuildFilters() {
+            ot.call($http.get($scope.branch._buildFilters)).then(function (buildFilters) {
+                $scope.buildFilters = buildFilters;
+            });
+        }
+
         // Loading the build view
         function loadBuildView() {
             // TODO Use links from the branch
@@ -113,6 +120,8 @@ angular.module('ot.view.branch', [
                     ot.viewCloseCommand('/project/' + branchResource.project.id),
                     ot.viewActionsCommand($scope.branch._actions)
                 ];
+                // Loads the build filters
+                loadBuildFilters();
                 // Loads the build view
                 loadBuildView();
                 // Loads the promotion levels
