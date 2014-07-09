@@ -23,12 +23,14 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 public class BranchController extends AbstractResourceController {
 
     private final StructureService structureService;
+    private final BuildFilterService buildFilterService;
     private final ExtensionManager extensionManager;
     private final SecurityService securityService;
 
     @Autowired
-    public BranchController(StructureService structureService, ExtensionManager extensionManager, SecurityService securityService) {
+    public BranchController(StructureService structureService, BuildFilterService buildFilterService, ExtensionManager extensionManager, SecurityService securityService) {
         this.structureService = structureService;
+        this.buildFilterService = buildFilterService;
         this.extensionManager = extensionManager;
         this.securityService = securityService;
     }
@@ -100,8 +102,9 @@ public class BranchController extends AbstractResourceController {
         // Gets the branch
         Branch branch = getBranch(branchId);
         // TODO Defines the filter for the service
+        BuildFilter buildFilter = buildFilterService.defaultFilter();
         // Gets the list of builds
-        List<Build> builds = structureService.getFilteredBuilds(branchId);
+        List<Build> builds = structureService.getFilteredBuilds(branchId, buildFilter);
         // Gets the list of build diff actions
         List<Action> buildDiffActions = extensionManager.getExtensions(BuildDiffExtension.class)
                 .stream()

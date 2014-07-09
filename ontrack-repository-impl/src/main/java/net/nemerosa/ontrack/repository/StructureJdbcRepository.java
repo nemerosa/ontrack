@@ -172,8 +172,8 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                     ResultSet rs = ps.executeQuery();
                     List<Build> builds = new ArrayList<>();
                     while (rs.next()) {
-                        // TODO Filter on number of builds (parameter of the filter)
-                        if (builds.size() > 20) {
+                        // Filter on number of builds (parameter of the filter)
+                        if (!buildFilter.acceptCount(builds.size())) {
                             break;
                         }
                         // Gets the builds

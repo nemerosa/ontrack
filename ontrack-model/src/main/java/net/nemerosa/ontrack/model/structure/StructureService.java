@@ -58,8 +58,7 @@ public interface StructureService {
     /**
      * Branch builds
      */
-    // TODO Filter on builds
-    List<Build> getFilteredBuilds(ID branchId);
+    List<Build> getFilteredBuilds(ID branchId, BuildFilter buildFilter);
 
     List<ValidationStampRunView> getValidationStampRunViewsForBuild(Build build);
 

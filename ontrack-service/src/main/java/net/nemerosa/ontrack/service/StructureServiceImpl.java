@@ -196,12 +196,9 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
-    public List<Build> getFilteredBuilds(ID branchId) {
+    public List<Build> getFilteredBuilds(ID branchId, BuildFilter buildFilter) {
         // Gets the branch
         Branch branch = getBranch(branchId);
-        // TODO Defines a filter
-        BuildFilter buildFilter = new BuildFilter() {
-        };
         // Collects the builds associated with this predicate
         return structureRepository.builds(branch, buildFilter);
     }
