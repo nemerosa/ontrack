@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.model.buildfilter;
 
+import net.nemerosa.ontrack.model.structure.BuildView;
+
 /**
  * Defines a filter on builds for a branch. This is not only a predicate. It must be able to:
  * <ul>
@@ -24,4 +26,11 @@ public interface BuildFilter {
      */
     boolean acceptCount(int size);
 
+    default boolean needsBuildView() {
+        return false;
+    }
+
+    default boolean acceptBuildView(BuildView buildView) {
+        return true;
+    }
 }

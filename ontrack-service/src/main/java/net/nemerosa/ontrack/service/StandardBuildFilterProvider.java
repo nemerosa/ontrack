@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.buildfilter.BuildFilterProvider;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Int;
 import net.nemerosa.ontrack.model.form.Selection;
+import net.nemerosa.ontrack.model.structure.BuildView;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.PromotionLevel;
 import net.nemerosa.ontrack.model.structure.StructureService;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Component
 public class StandardBuildFilterProvider extends AbstractBuildFilterProvider {
@@ -35,6 +38,8 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider {
     @Override
     public BuildFilter filter(ID branchId, Map<String, String[]> parameters) {
         StandardBuildFilter filter = StandardBuildFilter.of(BuildFilterProvider.getIntParameter(parameters, "count", 10));
+        // TODO sincePromotionLevel
+        filter = filter.withPromotionLevel(BuildFilterProvider.getParameter(parameters, "withPromotionLevel"));
         // TODO sinceValidationStamps
         // TODO withValidationStamps
         // TODO withProperty
@@ -81,14 +86,44 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider {
     private static class StandardBuildFilter implements BuildFilter {
 
         private final int count;
+        private final String withPromotionLevel;
 
         public static StandardBuildFilter of(int count) {
-            return new StandardBuildFilter(count);
+            return new StandardBuildFilter(count, null);
+        }
+
+        public StandardBuildFilter withPromotionLevel(String withPromotionLevel) {
+            return new StandardBuildFilter(
+                    count,
+                    withPromotionLevel
+            );
         }
 
         @Override
         public boolean acceptCount(int size) {
             return size <= count;
+        }
+
+        @Override
+        public boolean needsBuildView() {
+            return true;
+        }
+
+        @Override
+        public boolean acceptBuildView(BuildView buildView) {
+            boolean ok = true;
+            // With promotion level
+            if (isNotBlank(withPromotionLevel)) {
+                ok = buildView.getPromotionRuns().stream()
+                        .filter(run -> withPromotionLevel.equals(run.getPromotionLevel().getName()))
+                        .findAny()
+                        .isPresent();
+            }
+            // TODO sincePromotionLevel
+            // TODO sinceValidationStamps
+            // TODO withValidationStamps
+            // TODO withProperty
+            return ok;
         }
     }
 

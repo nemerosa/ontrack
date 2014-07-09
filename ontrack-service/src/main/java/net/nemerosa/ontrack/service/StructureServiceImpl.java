@@ -215,12 +215,19 @@ public class StructureServiceImpl implements StructureService {
      * @return True is OK to go on with other builds
      */
     private boolean filterBuild(List<Build> builds, Branch branch, Build build, BuildFilter buildFilter) {
+        boolean buildOk = true;
         // TODO Prefiltering without the promotions & validations
-        // TODO Promotion runs
-        // TODO Validation runs
+        // Promotion runs or validation runs
+        if (buildFilter.needsBuildView()) {
+            BuildView buildView = getBuildView(build);
+            // Applies the filtering on the build view
+            buildOk = buildFilter.acceptBuildView(buildView);
+        }
         // TODO Final filtering
         // Adding the build
-        builds.add(build);
+        if (buildOk) {
+            builds.add(build);
+        }
         // Going on? Count test: can we accept one more build?
         return buildFilter.acceptCount(builds.size() + 1);
     }
