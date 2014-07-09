@@ -98,6 +98,43 @@ public class IndexationServiceImpl implements IndexationService, JobProvider {
     // TODO Reindex job
     @Override
     public void reindex(String name) {
+        // Reindex job
+        Job reindexJob = new Job() {
+            @Override
+            public String getCategory() {
+                return "SVNReIndex";
+            }
+
+            @Override
+            public String getId() {
+                return name;
+            }
+
+            @Override
+            public String getDescription() {
+                return String.format(
+                        "SVN full reindexation for %s",
+                        name
+                );
+            }
+
+            @Override
+            public int getInterval() {
+                return 0;
+            }
+
+            @Override
+            public JobTask createTask() {
+                return new RunnableJobTask(
+                        info -> fullReindexation(name, info)
+                );
+            }
+        };
+        // OK, launches a new indexation
+        jobQueueService.queue(reindexJob);
+    }
+
+    private void fullReindexation(String name, JobInfoListener infoListener) {
         // Gets the repository if it exists
         Integer repositoryId = repositoryDao.findByName(name);
         // If it exists, delete it
@@ -108,8 +145,8 @@ public class IndexationServiceImpl implements IndexationService, JobProvider {
         repositoryId = repositoryDao.create(name);
         // Gets the configuration
         SVNRepository repository = loadRepository(repositoryId, name);
-        // OK, launches a new indexation
-        // TODO indexFromLatest(repository);
+        // Index from latest
+        indexFromLatest(repository, infoListener);
     }
 
     protected SVNRepository getRepositoryByName(String name) {
@@ -459,7 +496,7 @@ public class IndexationServiceImpl implements IndexationService, JobProvider {
                             min,
                             max,
                             revision,
-                            Math.round((revision - min) / (max - min))
+                            Math.round((revision - min + 1) / (max - min + 1))
                     )
             ));
             svnClient.log(repository, url, SVNRevision.HEAD, fromRevision, toRevision, true, true, 0, false, handler);

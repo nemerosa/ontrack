@@ -150,7 +150,8 @@ public class JobServiceImpl implements ScheduledService,
         }
         // New job
         else {
-            registeredJobs.put(category, id, RegisteredJob.of(job, count));
+            registeredJob = RegisteredJob.of(job, count);
+            registeredJobs.put(category, id, registeredJob);
         }
         // OK
         return registeredJob;
