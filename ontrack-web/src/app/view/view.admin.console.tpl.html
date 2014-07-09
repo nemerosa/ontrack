@@ -37,9 +37,13 @@
                             <span class="glyphicon glyphicon-ban-circle text-muted" ng-if="!job.running"></span>
                         </td>
                         <td>
-                            <span class="ot-description">
+                            <p>
+                                {{job.descriptor.description}}
+                            </p>
+                            <p class="ot-description" ng-if="job.info">
+                                <span class="glyphicon glyphicon-arrow-right"></span>
                                 {{job.info.message}}
-                            </span>
+                            </p>
                         </td>
                     </tr>
                     </tbody>
