@@ -76,8 +76,9 @@ public class JobServiceImpl implements ScheduledService,
     }
 
     @Override
-    public void accept(Job job) {
-        runJob(registerJob(-1L, job));
+    public boolean accept(Job job) {
+        return !idInSameGroupRunning(job.getGroup(), job.getId())
+                && runJob(registerJob(-1L, job));
     }
 
     @Override
@@ -164,15 +165,32 @@ public class JobServiceImpl implements ScheduledService,
         }
     }
 
-    private void runJob(RegisteredJob registeredJob) {
-        if (registeredJob.isRunning()) {
+    private boolean runJob(RegisteredJob registeredJob) {
+        if (idInSameGroupRunning(registeredJob)) {
+            logger.debug("[job] Same group running: {}", registeredJob);
+            return false;
+        } else if (registeredJob.isRunning()) {
             logger.debug("[job] Still running: {}", registeredJob);
+            return false;
         } else if (registeredJob.mustStart()) {
             logger.debug("[job] Starting: {}", registeredJob);
             start(registeredJob);
+            return true;
         } else {
             logger.debug("[job] Idle: {}", registeredJob);
+            return false;
         }
+    }
+
+    private boolean idInSameGroupRunning(RegisteredJob registeredJob) {
+        return idInSameGroupRunning(registeredJob.getJobGroup(), registeredJob.getJobId());
+    }
+
+    private boolean idInSameGroupRunning(String group, String id) {
+        return registeredJobs.values().stream()
+                .filter(r -> group.equals(r.getJobGroup()) && id.equals(r.getJobId()) && r.isRunning())
+                .findAny()
+                .isPresent();
     }
 
     private void start(RegisteredJob registeredJob) {

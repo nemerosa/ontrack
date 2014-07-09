@@ -122,8 +122,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     @RequestMapping(value = "configurations/{name}/indexation/latest", method = RequestMethod.POST)
     @ResponseBody
     public Ack indexFromLatest(@PathVariable String name) {
-        indexationService.indexFromLatest(name);
-        return Ack.OK;
+        return indexationService.indexFromLatest(name);
     }
 
     /**
@@ -157,8 +156,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     @RequestMapping(value = "configurations/{name}/indexation/range", method = RequestMethod.POST)
     @ResponseBody
     public Ack indexRange(@PathVariable String name, @RequestBody IndexationRange range) {
-        indexationService.indexRange(name, range);
-        return Ack.OK;
+        return indexationService.indexRange(name, range);
     }
 
     /**
@@ -167,8 +165,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     @RequestMapping(value = "configurations/{name}/indexation/full", method = RequestMethod.POST)
     @ResponseBody
     public Ack full(@PathVariable String name) {
-        indexationService.reindex(name);
-        return Ack.OK;
+        return indexationService.reindex(name);
     }
 
     /**

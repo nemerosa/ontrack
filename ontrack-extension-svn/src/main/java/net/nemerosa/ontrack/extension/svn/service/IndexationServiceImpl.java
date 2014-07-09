@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.extension.svn.model.LastRevisionInfo;
 import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration;
 import net.nemerosa.ontrack.extension.svn.model.SVNIndexationException;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.job.*;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.Time;
@@ -34,12 +35,12 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-// FIXME Job: Full indexation
 // FIXME Job: Range indexation
 
 @Service
 public class IndexationServiceImpl implements IndexationService, JobProvider {
 
+    public static final String SVN_INDEXATION_JOB_GROUP = "SVNIndexation";
     private final Logger logger = LoggerFactory.getLogger(IndexationService.class);
     private final TransactionTemplate transactionTemplate;
     private final SVNConfigurationService configurationService;
@@ -83,23 +84,29 @@ public class IndexationServiceImpl implements IndexationService, JobProvider {
      * Indexation from latest
      */
     @Override
-    public void indexFromLatest(String name) {
+    public Ack indexFromLatest(String name) {
         SVNConfiguration configuration = configurationService.getConfiguration(name);
-        jobQueueService.queue(createIndexFromLatestJob(configuration));
+        return jobQueueService.queue(createIndexFromLatestJob(configuration));
     }
 
     // TODO Range indexation job
     @Override
-    public void indexRange(String name, IndexationRange range) {
+    public Ack indexRange(String name, IndexationRange range) {
         SVNRepository repository = getRepositoryByName(name);
         // TODO indexRange(repository, range.getFrom(), range.getTo());
+        return Ack.NOK;
     }
 
-    // TODO Reindex job
     @Override
-    public void reindex(String name) {
+    public Ack reindex(String name) {
         // Reindex job
         Job reindexJob = new Job() {
+
+            @Override
+            public String getGroup() {
+                return SVN_INDEXATION_JOB_GROUP;
+            }
+
             @Override
             public String getCategory() {
                 return "SVNReIndex";
@@ -131,7 +138,7 @@ public class IndexationServiceImpl implements IndexationService, JobProvider {
             }
         };
         // OK, launches a new indexation
-        jobQueueService.queue(reindexJob);
+        return jobQueueService.queue(reindexJob);
     }
 
     private void fullReindexation(String name, JobInfoListener infoListener) {
@@ -242,6 +249,12 @@ public class IndexationServiceImpl implements IndexationService, JobProvider {
 
     protected Job createIndexFromLatestJob(SVNConfiguration configuration) {
         return new Job() {
+
+            @Override
+            public String getGroup() {
+                return SVN_INDEXATION_JOB_GROUP;
+            }
+
             @Override
             public String getCategory() {
                 return "SVNIndexLatest";

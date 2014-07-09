@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service.job;
 
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.job.Job;
 import net.nemerosa.ontrack.model.job.JobConsumer;
 import net.nemerosa.ontrack.model.job.JobQueueAccessService;
@@ -20,9 +21,16 @@ public class JobQueueServiceImpl implements JobQueueService, JobQueueAccessServi
         consumers.add(jobConsumer);
     }
 
+    /**
+     * At least one consumer must have accepted the job.
+     */
     @Override
-    public void queue(Job job) {
-        consumers.forEach(consumer -> consumer.accept(job));
+    public Ack queue(Job job) {
+        boolean accepted = false;
+        for (JobConsumer consumer : consumers) {
+            accepted = accepted || consumer.accept(job);
+        }
+        return Ack.validate(accepted);
     }
 
 }

@@ -77,9 +77,10 @@ public class RegisteredJob {
     @Override
     public String toString() {
         return String.format(
-                "[%s/%s] %s",
-                job.getCategory(),
+                "[%s/%s][%s] %s",
+                job.getGroup(),
                 job.getId(),
+                job.getCategory(),
                 job.getDescription()
         );
     }
@@ -90,6 +91,14 @@ public class RegisteredJob {
 
     public String getJobDescription() {
         return job.getDescription();
+    }
+
+    public String getJobGroup() {
+        return job.getGroup();
+    }
+
+    public String getJobId() {
+        return job.getId();
     }
 
     public JobDescriptor getJobDescriptor() {

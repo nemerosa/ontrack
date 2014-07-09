@@ -6,6 +6,13 @@ package net.nemerosa.ontrack.model.job;
 public interface Job {
 
     /**
+     * Job group, defaults to the category
+     */
+    default String getGroup() {
+        return getCategory();
+    }
+
+    /**
      * Job category
      */
     String getCategory();

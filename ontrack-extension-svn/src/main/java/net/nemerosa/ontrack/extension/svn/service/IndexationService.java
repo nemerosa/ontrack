@@ -2,14 +2,15 @@ package net.nemerosa.ontrack.extension.svn.service;
 
 import net.nemerosa.ontrack.extension.svn.model.IndexationRange;
 import net.nemerosa.ontrack.extension.svn.model.LastRevisionInfo;
+import net.nemerosa.ontrack.model.Ack;
 
 public interface IndexationService {
 
-    void indexFromLatest(String name);
+    Ack indexFromLatest(String name);
 
-    void indexRange(String name, IndexationRange range);
+    Ack indexRange(String name, IndexationRange range);
 
-    void reindex(String name);
+    Ack reindex(String name);
 
     LastRevisionInfo getLastRevisionInfo(String name);
 }
