@@ -4,6 +4,7 @@ import com.google.common.collect.Table;
 import com.google.common.collect.Tables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.nemerosa.ontrack.model.job.*;
+import net.nemerosa.ontrack.model.security.ApplicationManagement;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.*;
 import org.slf4j.Logger;
@@ -82,18 +83,19 @@ public class JobServiceImpl implements ScheduledService,
     }
 
     @Override
-    public Collection<JobDescriptor> getRunningJobs() {
+    public Collection<JobStatus> getJobStatuses() {
+        securityService.checkGlobalFunction(ApplicationManagement.class);
         return registeredJobs.values().stream()
-                .filter(RegisteredJob::isRunning)
-                .map(RegisteredJob::getJobDescriptor)
+                .map(this::getJobStatus)
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public Collection<JobDescriptor> getRegisteredJobs() {
-        return registeredJobs.values().stream()
-                .map(RegisteredJob::getJobDescriptor)
-                .collect(Collectors.toList());
+    protected JobStatus getJobStatus(RegisteredJob registeredJob) {
+        return new JobStatus(
+                registeredJob.getJobDescriptor(),
+                registeredJob.isRunning(),
+                registeredJob.getApplicationInfo()
+        );
     }
 
     @Override

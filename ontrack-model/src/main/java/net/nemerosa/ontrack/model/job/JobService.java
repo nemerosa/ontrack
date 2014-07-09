@@ -8,13 +8,8 @@ import java.util.Collection;
 public interface JobService {
 
     /**
-     * List of running jobs
+     * List of job statuses
      */
-    Collection<JobDescriptor> getRunningJobs();
-
-    /**
-     * List of registered jobs
-     */
-    Collection<JobDescriptor> getRegisteredJobs();
-
+    Collection<JobStatus> getJobStatuses();
+    
 }

@@ -16,5 +16,15 @@ angular.module('ot.view.admin.console', [
         view.commands = [
             ot.viewCloseCommand('/home')
         ];
+
+        // Loads the jobs
+        function loadJobs() {
+            ot.call($http.get('admin/jobs')).then(function (jobs) {
+                $scope.jobs = jobs;
+            });
+        }
+
+        // Initialisation
+        loadJobs();
     })
 ;

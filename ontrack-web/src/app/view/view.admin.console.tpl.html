@@ -1,3 +1,51 @@
 <ot-view>
-    ADMIN CONSOLE
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        Jobs
+                    </div>
+                </div>
+                <div class="panel-body">
+                    List of registered jobs and their status.
+                </div>
+                <table class="table" ng-if="jobs">
+                    <thead>
+                    <tr>
+                        <th>Group</th>
+                        <th>Category</th>
+                        <th>ID</th>
+                        <th>State</th>
+                        <th>Info</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="job in jobs.resources" ng-class="{'success': job.running}">
+                        <td>
+                            {{job.descriptor.group}}
+                        </td>
+                        <td>
+                            {{job.descriptor.category}}
+                        </td>
+                        <td>
+                            {{job.descriptor.id}}
+                        </td>
+                        <td>
+                            <span class="glyphicon glyphicon-time text-success" ng-if="job.running"></span>
+                            <span class="glyphicon glyphicon-ban-circle text-muted" ng-if="!job.running"></span>
+                        </td>
+                        <td>
+                            <span class="ot-description">
+                                {{job.info.message}}
+                            </span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
 </ot-view>

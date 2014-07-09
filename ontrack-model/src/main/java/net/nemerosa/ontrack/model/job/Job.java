@@ -42,6 +42,7 @@ public interface Job {
      */
     default JobDescriptor getDescriptor() {
         return new JobDescriptor(
+                getGroup(),
                 getCategory(),
                 getId(),
                 getDescription(),
