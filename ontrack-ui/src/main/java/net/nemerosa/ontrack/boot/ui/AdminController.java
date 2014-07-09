@@ -2,28 +2,42 @@ package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.model.job.JobService;
 import net.nemerosa.ontrack.model.job.JobStatus;
+import net.nemerosa.ontrack.model.support.ApplicationLogEntries;
+import net.nemerosa.ontrack.model.support.ApplicationLogService;
+import net.nemerosa.ontrack.model.support.Page;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
+import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
+
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
 @RequestMapping("/admin")
 public class AdminController extends AbstractResourceController {
 
     private final JobService jobService;
+    private final ApplicationLogService applicationLogService;
 
     @Autowired
-    public AdminController(JobService jobService) {
+    public AdminController(JobService jobService, ApplicationLogService applicationLogService) {
         this.jobService = jobService;
+        this.applicationLogService = applicationLogService;
     }
 
     /**
-     * TODO Gets the list of admin API
+     * Gets the list of application log entries
      */
+    @RequestMapping(value = "logs", method = RequestMethod.GET)
+    public Resource<ApplicationLogEntries> getLogEntries(Page page) {
+        return Resource.of(
+                applicationLogService.getLogEntries(page),
+                uri(on(getClass()).getLogEntries(page))
+        );
+    }
 
     /**
      * Gets the list of jobs and their status
@@ -32,7 +46,7 @@ public class AdminController extends AbstractResourceController {
     public Resources<JobStatus> getJobs() {
         return Resources.of(
                 jobService.getJobStatuses(),
-                uri(MvcUriComponentsBuilder.on(getClass()).getJobs())
+                uri(on(getClass()).getJobs())
         );
     }
 

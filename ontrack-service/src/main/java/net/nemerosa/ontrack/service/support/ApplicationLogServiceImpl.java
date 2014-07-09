@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.service.support;
 
 import com.google.common.collect.EvictingQueue;
+import net.nemerosa.ontrack.model.security.ApplicationManagement;
+import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.*;
 import net.nemerosa.ontrack.service.OntrackConfigProperties;
 import org.slf4j.Logger;
@@ -17,10 +19,12 @@ public class ApplicationLogServiceImpl implements ApplicationLogService {
 
     private final Logger logger = LoggerFactory.getLogger(ApplicationLogService.class);
 
+    private final SecurityService securityService;
     private final EvictingQueue<ApplicationLogEntry> entries;
 
     @Autowired
-    public ApplicationLogServiceImpl(OntrackConfigProperties ontrackConfigProperties) {
+    public ApplicationLogServiceImpl(OntrackConfigProperties ontrackConfigProperties, SecurityService securityService) {
+        this.securityService = securityService;
         this.entries = EvictingQueue.create(ontrackConfigProperties.getApplicationLogMaxEntries());
     }
 
@@ -54,6 +58,7 @@ public class ApplicationLogServiceImpl implements ApplicationLogService {
 
     @Override
     public synchronized ApplicationLogEntries getLogEntries(Page page) {
+        securityService.checkGlobalFunction(ApplicationManagement.class);
         int total = entries.size();
         int offset = page.getOffset();
         int count = page.getCount();
@@ -65,7 +70,7 @@ public class ApplicationLogServiceImpl implements ApplicationLogService {
             );
         } else {
             List<ApplicationLogEntry> list = new ArrayList<>(entries);
-            list = list.subList(offset, count);
+            list = list.subList(offset, Math.min(offset + count, total));
             return new ApplicationLogEntries(
                     list,
                     new Page(offset, list.size()),
