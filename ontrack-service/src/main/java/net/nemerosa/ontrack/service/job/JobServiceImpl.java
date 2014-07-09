@@ -207,9 +207,15 @@ public class JobServiceImpl implements ScheduledService,
             } catch (Exception ex) {
                 applicationLogService.error(
                         ex,
-                        registeredJob.getJobCategory(),
-                        Collections.emptyMap(),
-                        registeredJob.getJobDescription()
+                        getClass(),
+                        String.format(
+                                "%s/%s/%s",
+                                registeredJob.getJobGroup(),
+                                registeredJob.getJobCategory(),
+                                registeredJob.getJobId()
+                        ),
+                        registeredJob.getJobDescription(),
+                        Optional.ofNullable(registeredJob.getApplicationInfo()).map(ApplicationInfo::getMessage).orElse(null)
                 );
             }
         };

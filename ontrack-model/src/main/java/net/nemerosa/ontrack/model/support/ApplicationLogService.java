@@ -1,7 +1,5 @@
 package net.nemerosa.ontrack.model.support;
 
-import java.util.Map;
-
 /**
  * This service is used to log messages at application level, to be seen by operation and administration people.
  * <p>
@@ -10,14 +8,19 @@ import java.util.Map;
 public interface ApplicationLogService {
 
     /**
+     * List of messages
+     */
+    ApplicationLogEntries getLogEntries(Page page);
+
+    /**
      * Logs an error.
      *
-     * @param exception     Exception associated with this error, can be null
-     * @param service       Source of the error
-     * @param info          Properties for the error source
-     * @param message       Descriptive message for the error
-     * @param messageParams Parameters for the error message
+     * @param exception  Exception associated with this error, can be null
+     * @param source     General source of the error (cannot be null)
+     * @param identifier Identifier within the source (might be null)
+     * @param context    Descriptive message for the source
+     * @param info       Additional information
      */
-    void error(Throwable exception, String service, Map<String, ?> info, String message, Object... messageParams);
+    void error(Throwable exception, Class<?> source, String identifier, String context, String info);
 
 }

@@ -1,30 +1,76 @@
 package net.nemerosa.ontrack.service.support;
 
-import net.nemerosa.ontrack.model.support.ApplicationLogService;
+import com.google.common.collect.EvictingQueue;
+import net.nemerosa.ontrack.model.support.*;
+import net.nemerosa.ontrack.service.OntrackConfigProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
-
-import static java.lang.String.format;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Service
 public class ApplicationLogServiceImpl implements ApplicationLogService {
 
     private final Logger logger = LoggerFactory.getLogger(ApplicationLogService.class);
 
-    @Override
-    public void error(Throwable exception, String service, Map<String, ?> info, String message, Object... messageParams) {
-        // Message to log
-        String log = format(
-                "[application] service=%s,%s,message=%s",
-                service,
-                info,
-                format(message, messageParams)
-        );
-        // Logging
-        logger.error(log, exception);
+    private final EvictingQueue<ApplicationLogEntry> entries;
+
+    @Autowired
+    public ApplicationLogServiceImpl(OntrackConfigProperties ontrackConfigProperties) {
+        this.entries = EvictingQueue.create(ontrackConfigProperties.getApplicationLogMaxEntries());
     }
 
+    @Override
+    public void error(Throwable exception, Class<?> source, String identifier, String context, String info) {
+        logger.error(
+                String.format(
+                        "[%s/%s] [%s] [%s]",
+                        source,
+                        identifier,
+                        context,
+                        info
+                ),
+                exception
+        );
+        log(
+                new ApplicationLogEntry(
+                        ApplicationLogEntryLevel.ERROR,
+                        source,
+                        identifier,
+                        context,
+                        info
+                ).withException(exception)
+        );
+    }
+
+    private synchronized void log(ApplicationLogEntry entry) {
+        // Storage
+        entries.add(entry);
+    }
+
+    @Override
+    public synchronized ApplicationLogEntries getLogEntries(Page page) {
+        int total = entries.size();
+        int offset = page.getOffset();
+        int count = page.getCount();
+        if (offset >= total) {
+            return new ApplicationLogEntries(
+                    Collections.emptyList(),
+                    new Page(offset, 0),
+                    total
+            );
+        } else {
+            List<ApplicationLogEntry> list = new ArrayList<>(entries);
+            list = list.subList(offset, count);
+            return new ApplicationLogEntries(
+                    list,
+                    new Page(offset, list.size()),
+                    total
+            );
+        }
+    }
 }
