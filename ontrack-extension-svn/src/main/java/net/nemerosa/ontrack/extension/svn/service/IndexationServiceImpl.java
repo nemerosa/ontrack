@@ -36,7 +36,6 @@ import java.util.stream.Collectors;
 
 // FIXME Job: Full indexation
 // FIXME Job: Range indexation
-// FIXME Job: Indexation from latest
 
 @Service
 public class IndexationServiceImpl implements IndexationService, JobProvider {
@@ -52,6 +51,7 @@ public class IndexationServiceImpl implements IndexationService, JobProvider {
     private final SecurityService securityService;
     private final TransactionService transactionService;
     private final ApplicationContext applicationContext;
+    private final JobQueueService jobQueueService;
 
     @Autowired
     public IndexationServiceImpl(
@@ -64,10 +64,11 @@ public class IndexationServiceImpl implements IndexationService, JobProvider {
             SVNClient svnClient,
             SecurityService securityService,
             TransactionService transactionService,
-            ApplicationContext applicationContext
-    ) {
+            ApplicationContext applicationContext,
+            JobQueueService jobQueueService) {
         this.applicationContext = applicationContext;
         this.issueRevisionDao = issueRevisionDao;
+        this.jobQueueService = jobQueueService;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
         this.configurationService = configurationService;
         this.repositoryDao = repositoryDao;
@@ -78,17 +79,13 @@ public class IndexationServiceImpl implements IndexationService, JobProvider {
         this.transactionService = transactionService;
     }
 
-    // TODO Obsolete
-    @Override
-    public boolean isIndexationRunning(String name) {
-        return false;
-    }
-
-    // TODO Indexation from latest
+    /**
+     * Indexation from latest
+     */
     @Override
     public void indexFromLatest(String name) {
-        SVNRepository repository = getRepositoryByName(name);
-        // TODO indexFromLatest(repository);
+        SVNConfiguration configuration = configurationService.getConfiguration(name);
+        jobQueueService.queue(createIndexFromLatestJob(configuration));
     }
 
     // TODO Range indexation job

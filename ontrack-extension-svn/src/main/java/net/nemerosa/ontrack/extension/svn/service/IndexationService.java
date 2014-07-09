@@ -1,12 +1,9 @@
 package net.nemerosa.ontrack.extension.svn.service;
 
-import net.nemerosa.ontrack.extension.svn.model.LastRevisionInfo;
 import net.nemerosa.ontrack.extension.svn.model.IndexationRange;
+import net.nemerosa.ontrack.extension.svn.model.LastRevisionInfo;
 
 public interface IndexationService {
-
-    @Deprecated
-    boolean isIndexationRunning(String name);
 
     void indexFromLatest(String name);
 
