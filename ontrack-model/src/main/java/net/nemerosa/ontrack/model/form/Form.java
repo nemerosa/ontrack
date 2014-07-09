@@ -94,4 +94,9 @@ public class Form {
                 .regex("[A-Za-z0-9_\\.\\-]+")
                 .validation("Name is required and must contain only alpha-numeric characters, underscores, points or dashes.");
     }
+
+    public Form append(Form form) {
+        this.fields.putAll(form.fields);
+        return this;
+    }
 }

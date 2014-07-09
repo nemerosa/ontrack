@@ -5,6 +5,8 @@ import net.nemerosa.ontrack.model.buildfilter.BuildFilterProvider;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.structure.ID;
 
+import static net.nemerosa.ontrack.model.form.Form.defaultNameField;
+
 public abstract class AbstractBuildFilterProvider implements BuildFilterProvider {
 
     @Override
@@ -12,7 +14,7 @@ public abstract class AbstractBuildFilterProvider implements BuildFilterProvider
         return new BuildFilterForm(
                 getClass(),
                 getName(),
-                blankForm(branchId)
+                Form.create().with(defaultNameField().optional()).append(blankForm(branchId))
         );
     }
 
