@@ -107,6 +107,7 @@ public class CoreResourceModuleTest {
                         .with("_actions", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getActions:BRANCH,1")
                         .with("_status", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranchStatusView:1")
                         .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:BRANCH,1")
+                        .with("_buildFilters", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#buildFilters:1")
                         .end(),
                 b
         );
@@ -194,6 +195,7 @@ public class CoreResourceModuleTest {
                                 .with("_actions", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getActions:BRANCH,1")
                                 .with("_status", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranchStatusView:1")
                                 .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:BRANCH,1")
+                                .with("_buildFilters", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#buildFilters:1")
                                 .end())
                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionLevel:1")
                         .with("_branch", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranch:1")
@@ -234,6 +236,7 @@ public class CoreResourceModuleTest {
                                         .with("_actions", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getActions:BRANCH,1")
                                         .with("_status", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranchStatusView:1")
                                         .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:BRANCH,1")
+                                        .with("_buildFilters", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#buildFilters:1")
                                         .end())
                                 .with(object()
                                         .with("id", 2)
@@ -247,6 +250,7 @@ public class CoreResourceModuleTest {
                                         .with("_actions", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getActions:BRANCH,2")
                                         .with("_status", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranchStatusView:2")
                                         .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:BRANCH,2")
+                                        .with("_buildFilters", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#buildFilters:2")
                                         .end())
                                 .end())
                         .end(),

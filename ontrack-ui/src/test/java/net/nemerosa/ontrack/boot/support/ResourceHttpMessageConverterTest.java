@@ -79,6 +79,7 @@ public class ResourceHttpMessageConverterTest {
                         .with("_actions", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getActions:BRANCH,1")
                         .with("_status", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranchStatusView:1")
                         .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:BRANCH,1")
+                        .with("_buildFilters", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#buildFilters:1")
                         .end(),
                 node
         );
