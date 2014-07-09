@@ -15,13 +15,20 @@ angular.module('ot.dialog.form', [
             if (isValid) {
                 otFormService.prepareForSubmit(config.form, $scope.data);
                 // Submit
-                config.formConfig.submit($scope.data).then(
-                    function success() {
-                        $modalInstance.close('ok');
-                    },
-                    function error(message) {
-                        $scope.message = message;
-                    });
+                var submit = config.formConfig.submit($scope.data);
+                if (submit === true) {
+                    $modalInstance.close('ok');
+                } else if (angular.isString(submit)) {
+                    $scope.message = submit;
+                } else {
+                    submit.then(
+                        function success() {
+                            $modalInstance.close('ok');
+                        },
+                        function error(message) {
+                            $scope.message = message;
+                        });
+                }
             }
         };
     })

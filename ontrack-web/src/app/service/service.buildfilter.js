@@ -12,17 +12,22 @@ angular.module('ot.service.buildfilter', [
          * @return Promise with the created filter
          */
         self.createBuildFilter = function (config) {
+            var result = {};
+            var d = $q.defer();
             otFormService.display({
                 title: "New filter",
                 form: config.buildFilterForm.form,
                 submit: function (filterData) {
-                    var sq = $q.defer();
                     // TODO Stores locally the filter data if named
+                    // Stores for the reuse
+                    result.filterData = filterData;
                     // OK
-                    sq.resolve();
-                    return sq.promise;
+                    return true;
                 }
+            }).then(function () {
+                d.resolve(result.filterData);
             });
+            return d.promise;
         };
 
         return self;

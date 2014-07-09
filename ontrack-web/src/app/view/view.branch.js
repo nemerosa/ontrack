@@ -200,6 +200,8 @@ angular.module('ot.view.branch', [
             otBuildFilterService.createBuildFilter({
                 branchId: branchId,
                 buildFilterForm: buildFilterForm
+            }).then(function (filterData) {
+                // TODO Applying the filter
             });
         };
 
