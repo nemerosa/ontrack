@@ -18,6 +18,7 @@
                         <th>Category</th>
                         <th>ID</th>
                         <th>State</th>
+                        <th>Schedule</th>
                         <th>Info</th>
                     </tr>
                     </thead>
@@ -35,6 +36,17 @@
                         <td>
                             <span class="glyphicon glyphicon-time text-success" ng-if="job.running"></span>
                             <span class="glyphicon glyphicon-ban-circle text-muted" ng-if="!job.running"></span>
+                        </td>
+                        <td>
+                            <span ng-if="job.descriptor.interval == 0">
+                                Manually
+                            </span>
+                            <span ng-if="job.descriptor.interval == 1">
+                                Every minute
+                            </span>
+                            <span ng-if="job.descriptor.interval > 1">
+                                Every {{job.descriptor.interval}} minutes
+                            </span>
                         </td>
                         <td>
                             <p>
