@@ -46,15 +46,24 @@ angular.module('ot.view.branch', [
         function loadBuildFilters() {
             ot.call($http.get($scope.branch._buildFilters)).then(function (buildFilters) {
                 $scope.buildFilters = buildFilters;
+            }).then(function () {
+                // Loading the build view AFTER the filter have been loaded
+                loadBuildView();
             });
         }
 
         // Loading the build view
         function loadBuildView() {
             // TODO Use links from the branch
-            // TODO Adds the filter parameters
+            // Parameters for the call
+            var config = {};
+            // Adds the filter parameters
+            if ($scope.buildFilters.current) {
+                config.params = $scope.buildFilters.current;
+            }
+            // Call
             ot.call(
-                $http.get('structure/branches/' + branchId + '/view')
+                $http.get('structure/branches/' + branchId + '/view', config)
             ).then(
                 function success(branchBuildView) {
                     $scope.branchBuildView = branchBuildView;
@@ -123,13 +132,10 @@ angular.module('ot.view.branch', [
                 ];
                 // Loads the build filters
                 loadBuildFilters();
-                // Loads the build view
-                loadBuildView();
                 // Loads the promotion levels
                 loadPromotionLevels();
                 // Loads the validation stamps
                 loadValidationStamps();
-                // TODO Branch commands
             });
         }
 
@@ -201,7 +207,11 @@ angular.module('ot.view.branch', [
                 branchId: branchId,
                 buildFilterForm: buildFilterForm
             }).then(function (filterData) {
-                // TODO Applying the filter
+                // Adding the type to the filter
+                filterData.type = buildFilterForm.type;
+                // Applying the filter
+                $scope.buildFilters.current = filterData;
+                loadBuildView();
             });
         };
 
