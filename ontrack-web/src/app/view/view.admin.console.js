@@ -9,7 +9,7 @@ angular.module('ot.view.admin.console', [
             controller: 'AdminConsoleCtrl'
         });
     })
-    .controller('AdminConsoleCtrl', function ($scope, $http, ot) {
+    .controller('AdminConsoleCtrl', function ($scope, $http, $interval,  ot) {
         var view = ot.view();
         view.title = "Administration console";
         view.description = "Tools for the general management of ontrack";
@@ -26,5 +26,8 @@ angular.module('ot.view.admin.console', [
 
         // Initialisation
         loadJobs();
+
+        $interval(loadJobs, 5000);
+
     })
 ;
