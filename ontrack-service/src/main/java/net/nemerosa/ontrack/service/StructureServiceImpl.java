@@ -1,7 +1,9 @@
 package net.nemerosa.ontrack.service;
 
+import net.nemerosa.ontrack.common.CachedSupplier;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
+import net.nemerosa.ontrack.model.buildfilter.BuildFilterResult;
 import net.nemerosa.ontrack.model.exceptions.ImageFileSizeException;
 import net.nemerosa.ontrack.model.exceptions.ImageTypeNotAcceptedException;
 import net.nemerosa.ontrack.model.security.*;
@@ -215,21 +217,19 @@ public class StructureServiceImpl implements StructureService {
      * @return True is OK to go on with other builds
      */
     private boolean filterBuild(List<Build> builds, Branch branch, Build build, BuildFilter buildFilter) {
-        boolean buildOk = true;
-        // TODO Prefiltering without the promotions & validations
-        // Promotion runs or validation runs
-        if (buildFilter.needsBuildView()) {
-            BuildView buildView = getBuildView(build);
-            // Applies the filtering on the build view
-            buildOk = buildFilter.acceptBuildView(buildView);
-        }
-        // TODO Final filtering
+        // Calls the filter
+        BuildFilterResult result = buildFilter.filter(
+                builds,
+                branch,
+                build,
+                CachedSupplier.of(() -> getBuildView(build))
+        );
         // Adding the build
-        if (buildOk) {
+        if (result.isAccept()) {
             builds.add(build);
         }
-        // Going on? Count test: can we accept one more build?
-        return buildFilter.acceptCount(builds.size() + 1);
+        // Going on?
+        return result.isGoingOn();
     }
 
     @Override

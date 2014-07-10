@@ -5,18 +5,17 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterProvider;
+import net.nemerosa.ontrack.model.buildfilter.BuildFilterResult;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Int;
 import net.nemerosa.ontrack.model.form.Selection;
-import net.nemerosa.ontrack.model.structure.BuildView;
-import net.nemerosa.ontrack.model.structure.ID;
-import net.nemerosa.ontrack.model.structure.PromotionLevel;
-import net.nemerosa.ontrack.model.structure.StructureService;
+import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
@@ -38,7 +37,7 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider {
     @Override
     public BuildFilter filter(ID branchId, Map<String, String[]> parameters) {
         StandardBuildFilter filter = StandardBuildFilter.of(BuildFilterProvider.getIntParameter(parameters, "count", 10));
-        // TODO sincePromotionLevel
+        filter = filter.sincePromotionLevel(BuildFilterProvider.getParameter(parameters, "sincePromotionLevel"));
         filter = filter.withPromotionLevel(BuildFilterProvider.getParameter(parameters, "withPromotionLevel"));
         // TODO sinceValidationStamps
         // TODO withValidationStamps
@@ -86,44 +85,60 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider {
     private static class StandardBuildFilter implements BuildFilter {
 
         private final int count;
+        private final String sincePromotionLevel;
         private final String withPromotionLevel;
 
         public static StandardBuildFilter of(int count) {
-            return new StandardBuildFilter(count, null);
+            return new StandardBuildFilter(count, null, null);
         }
 
         public StandardBuildFilter withPromotionLevel(String withPromotionLevel) {
             return new StandardBuildFilter(
                     count,
+                    sincePromotionLevel,
+                    withPromotionLevel
+            );
+        }
+
+        public StandardBuildFilter sincePromotionLevel(String sincePromotionLevel) {
+            return new StandardBuildFilter(
+                    count,
+                    sincePromotionLevel,
                     withPromotionLevel
             );
         }
 
         @Override
-        public boolean acceptCount(int size) {
-            return size <= count;
-        }
-
-        @Override
-        public boolean needsBuildView() {
-            return true;
-        }
-
-        @Override
-        public boolean acceptBuildView(BuildView buildView) {
-            boolean ok = true;
+        public BuildFilterResult filter(List<Build> builds, Branch branch, Build build, Supplier<BuildView> buildViewSupplier) {
+            // Count test
+            if (builds.size() >= count) {
+                return BuildFilterResult.stopNow();
+            }
+            // Result by default is: accept and go on
+            BuildFilterResult result = BuildFilterResult.ok();
             // With promotion level
             if (isNotBlank(withPromotionLevel)) {
-                ok = buildView.getPromotionRuns().stream()
-                        .filter(run -> withPromotionLevel.equals(run.getPromotionLevel().getName()))
-                        .findAny()
-                        .isPresent();
+                result = result.acceptIf(
+                        buildViewSupplier.get().getPromotionRuns().stream()
+                                .filter(run -> withPromotionLevel.equals(run.getPromotionLevel().getName()))
+                                .findAny()
+                                .isPresent()
+                );
             }
-            // TODO sincePromotionLevel
+            // Since promotion level
+            if (isNotBlank(sincePromotionLevel)) {
+                result = result.goOnIf(
+                        !buildViewSupplier.get().getPromotionRuns().stream()
+                                .filter(run -> sincePromotionLevel.equals(run.getPromotionLevel().getName()))
+                                .findAny()
+                                .isPresent()
+                );
+            }
             // TODO sinceValidationStamps
             // TODO withValidationStamps
             // TODO withProperty
-            return ok;
+            // OK
+            return result;
         }
     }
 

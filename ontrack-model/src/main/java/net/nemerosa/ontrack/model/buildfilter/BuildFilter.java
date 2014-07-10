@@ -1,6 +1,11 @@
 package net.nemerosa.ontrack.model.buildfilter;
 
+import net.nemerosa.ontrack.model.structure.Branch;
+import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.BuildView;
+
+import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * Defines a filter on builds for a branch. This is not only a predicate. It must be able to:
@@ -18,19 +23,20 @@ import net.nemerosa.ontrack.model.structure.BuildView;
 public interface BuildFilter {
 
     /**
-     * Does this filter accept the given number of builds?
-     * <p>
-     * Implementation note: this method is called for each build.
+     * Actual filter method that is called to filter the build.
      *
-     * @param size Number of builds
+     * @param builds            Current list of builds as they have been already accepted by the filter. This filter
+     *                          is free to update this list if needed.
+     * @param branch            Branch the filter operates on
+     * @param build             Build to filter
+     * @param buildViewSupplier If the filter needs to access the
+     *                          {@link net.nemerosa.ontrack.model.structure.BuildView BuildView}
+     *                          for this build, it can call this supplier to load it on demand.
+     * @return Result of the filter. The {@link BuildFilterResult#isGoingOn() goingOn} property must be set to
+     * <code>true</code> if the filtering must go on with following builds. The
+     * {@link net.nemerosa.ontrack.model.buildfilter.BuildFilterResult#isAccept() accept} property must be set to
+     * <code>true</code> if the build must be added to the list (note that the filter could add it directly to
+     * the list and return <code>false</code> instead)
      */
-    boolean acceptCount(int size);
-
-    default boolean needsBuildView() {
-        return false;
-    }
-
-    default boolean acceptBuildView(BuildView buildView) {
-        return true;
-    }
+    BuildFilterResult filter(List<Build> builds, Branch branch, Build build, Supplier<BuildView> buildViewSupplier);
 }
