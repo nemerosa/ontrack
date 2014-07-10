@@ -129,6 +129,13 @@ angular.module('ot.service.buildfilter', [
             } else {
                 // TODO Remote delete
             }
+            // What about the current filter?
+            // If selected, stores only its content, not its name
+            var currentFilter = self.getCurrentFilter(branch.id);
+            if (currentFilter && currentFilter.name && currentFilter.name == filter.name) {
+                currentFilter.name = '';
+                self.storeCurrent(branch.id, currentFilter);
+            }
         };
 
         return self;

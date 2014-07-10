@@ -219,8 +219,10 @@ angular.module('ot.view.branch', [
          * Applying a filter
          */
         $scope.buildFilterApply = function (filter) {
-            otBuildFilterService.storeCurrent(branchId, filter);
-            loadBuildView();
+            if (filter.removing) {
+                otBuildFilterService.storeCurrent(branchId, filter);
+                loadBuildView();
+            }
         };
 
         /**
@@ -235,6 +237,7 @@ angular.module('ot.view.branch', [
          * Removing an existing filter
          */
         $scope.buildFilterRemove = function (filter) {
+            filter.removing = true;
             otBuildFilterService.removeFilter($scope.branch, filter);
             loadBuildFilters();
         };
