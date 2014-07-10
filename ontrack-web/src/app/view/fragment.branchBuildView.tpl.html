@@ -93,7 +93,8 @@
             <div class="btn-group">
                 <button type="button" class="btn dropdown-toggle" data-toggle="dropdown"
                         ng-class="{
-                        'btn-warning': currentFilter
+                        'btn-warning': currentFilter,
+                        'btn-default': !currentFilter
                         }">
                     Filter<span ng-show="currentFilter.name">: {{currentFilter.name}}</span>
                     <span class="caret"></span>
@@ -106,6 +107,10 @@
                             {{filter.name}}
                             <span ng-if="filter.local"> (local)</span>
                         </a>
+                    </li>
+                    <li class="divider"></li>
+                    <li>
+                        <a ng-click="buildFilterErase()">Erase filter</a>
                     </li>
                     <li class="divider"></li>
                     <li role="presentation" class="dropdown-header">New filter:</li>

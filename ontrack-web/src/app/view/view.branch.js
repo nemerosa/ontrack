@@ -223,5 +223,13 @@ angular.module('ot.view.branch', [
             loadBuildView();
         };
 
+        /**
+         * Removing the current filter
+         */
+        $scope.buildFilterErase = function () {
+            otBuildFilterService.eraseCurrent(branchId);
+            loadBuildView();
+        };
+
     })
 ;

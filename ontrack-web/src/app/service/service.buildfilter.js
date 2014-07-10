@@ -82,6 +82,10 @@ angular.module('ot.service.buildfilter', [
             );
         };
 
+        self.eraseCurrent = function (branchId) {
+            localStorage.removeItem('build_filter_' + branchId + '_current');
+        };
+
         self.storeForBranch = function (config, filterData) {
             // Gets the store for this branch
             var store = self.getStoreForBranch(config.branchId);
