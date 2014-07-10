@@ -55,6 +55,7 @@ angular.module('ot.service.buildfilter', [
                 title: "New filter",
                 form: config.buildFilterForm.form,
                 submit: function (filterData) {
+                    filterData.type = config.buildFilterForm.type;
                     // Stores locally the filter data if named
                     if (filterData.name) {
                         self.storeForBranch(config, filterData);
