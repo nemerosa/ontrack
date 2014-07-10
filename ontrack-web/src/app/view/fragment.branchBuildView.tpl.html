@@ -97,7 +97,11 @@
                 <ul class="dropdown-menu" role="menu">
                     <li role="presentation" class="dropdown-header">Existing filters:</li>
                     <li ng-repeat="filter in filters.store">
-                        <a ng-click="buildFilterApply(filter.filter)">{{filter.name}}</a>
+                        <a ng-click="buildFilterApply(filter.filter)"
+                                ng-class="{'ot-buildfilter-local': filter.local, 'ot-buildfilter-remote': !filter.local}">
+                            {{filter.name}}
+                            <span ng-if="filter.local"> (local)</span>
+                        </a>
                     </li>
                     <li class="divider"></li>
                     <li role="presentation" class="dropdown-header">New filter:</li>
