@@ -18,7 +18,12 @@ angular.module('ot.service.buildfilter', [
                 title: "New filter",
                 form: config.buildFilterForm.form,
                 submit: function (filterData) {
-                    // TODO Stores locally the filter data if named
+                    // Stores locally the filter data if named
+                    if (filterData.name) {
+                        // TODO self.storeForBranch(config, filterData);
+                    }
+                    // Stores locally as current
+                    self.storeCurrent(config, filterData);
                     // Stores for the reuse
                     result.filterData = filterData;
                     // OK
@@ -28,6 +33,12 @@ angular.module('ot.service.buildfilter', [
                 d.resolve(result.filterData);
             });
             return d.promise;
+        };
+
+        self.storeCurrent = function (config, filterData) {
+            localStorage.setItem('build_filter_' + config.branchId + '_current',
+                JSON.stringify(filterData)
+            );
         };
 
         return self;
