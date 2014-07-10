@@ -56,8 +56,9 @@ angular.module('ot.view.branch', [
             // Parameters for the call
             var config = {};
             // Adds the filter parameters
-            if ($scope.currentFilter) {
-                config.params = $scope.currentFilter;
+            var currentFilter = otBuildFilterService.getCurrentFilter(branchId);
+            if (currentFilter) {
+                config.params = currentFilter;
             }
             // Call
             ot.call(
@@ -205,11 +206,9 @@ angular.module('ot.view.branch', [
             otBuildFilterService.createBuildFilter({
                 branchId: branchId,
                 buildFilterForm: buildFilterForm
-            }).then(function (filterData) {
-                // Adding the type to the filter
-                filterData.type = buildFilterForm.type;
-                // Applying the filter
-                $scope.buildFilterApply(filterData);
+            }).then(function () {
+                // Reloads the filters
+                loadBuildFilters();
             });
         };
 
@@ -217,7 +216,7 @@ angular.module('ot.view.branch', [
          * Applying a filter
          */
         $scope.buildFilterApply = function (filter) {
-            $scope.currentFilter = filter;
+            otBuildFilterService.storeCurrent(branchId, filter);
             loadBuildView();
         };
 

@@ -51,9 +51,7 @@ angular.module('ot.service.buildfilter', [
          * @return Promise with the created filter
          */
         self.createBuildFilter = function (config) {
-            var result = {};
-            var d = $q.defer();
-            otFormService.display({
+            return otFormService.display({
                 title: "New filter",
                 form: config.buildFilterForm.form,
                 submit: function (filterData) {
@@ -62,20 +60,24 @@ angular.module('ot.service.buildfilter', [
                         self.storeForBranch(config, filterData);
                     }
                     // Stores locally as current
-                    self.storeCurrent(config, filterData);
-                    // Stores for the reuse
-                    result.filterData = filterData;
+                    self.storeCurrent(config.branchId, filterData);
                     // OK
                     return true;
                 }
-            }).then(function () {
-                d.resolve(result.filterData);
             });
-            return d.promise;
         };
 
-        self.storeCurrent = function (config, filterData) {
-            localStorage.setItem('build_filter_' + config.branchId + '_current',
+        self.getCurrentFilter = function (branchId) {
+            var json = localStorage.getItem('build_filter_' + branchId + '_current');
+            if (json) {
+                return JSON.parse(json);
+            } else {
+                return undefined;
+            }
+        };
+
+        self.storeCurrent = function (branchId, filterData) {
+            localStorage.setItem('build_filter_' + branchId + '_current',
                 JSON.stringify(filterData)
             );
         };
