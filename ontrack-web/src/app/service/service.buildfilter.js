@@ -6,6 +6,45 @@ angular.module('ot.service.buildfilter', [
         var self = {};
 
         /**
+         * Loads the list of available filters from two sources:
+         * - the server filters for the current user (if logged)
+         * - the local filters
+         *
+         * The remote filters have priority over the local ones.
+         *
+         * Additionally, fetches the available filter forms for the branch.
+         */
+        self.loadFilters = function (branch) {
+            var d = $q.defer();
+            // Result to define
+            var filters = {
+            };
+            // Loads the local filters for this branch
+            var store = self.getStoreForBranch(branch.id);
+            // Loads the remote filters & the filter forms for this branch
+            ot.call($http.get(branch._buildFilters)).then(function (buildFilters) {
+                // List of forms
+                filters.buildFilterForms = buildFilters.buildFilterForms;
+                // Combine local & remote filters
+                angular.forEach(store, function (filter) {
+                    filter.local = true;
+                });
+                angular.forEach(buildFilters.buildFilterResources, function (buildFilterResource) {
+                    store[buildFilterResource.name] = buildFilterResource;
+                });
+                // Gets the values for the store
+                filters.store = [];
+                angular.forEach(store, function (value) {
+                    filters.store.push(value);
+                });
+                // OK
+                d.resolve(filters);
+            });
+            // OK
+            return d.promise;
+        };
+
+        /**
          * Creating a new build filter
          * @param config.branchId ID of the branch
          * @param config.buildFilterForm Build filter form
@@ -45,6 +84,7 @@ angular.module('ot.service.buildfilter', [
             // Gets the store for this branch
             var store = self.getStoreForBranch(config.branchId);
             // Stores the resource in the store
+            filterData.type = config.buildFilterForm.type;
             store[filterData.name] = {
                 name: filterData.name,
                 type: config.buildFilterForm.type,

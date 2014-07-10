@@ -44,6 +44,9 @@ angular.module('ot.view.branch', [
 
         // Loading the build filters
         function loadBuildFilters() {
+            otBuildFilterService.loadFilters($scope.branch).then(function (filters) {
+                $scope.filters = filters;
+            });
             ot.call($http.get($scope.branch._buildFilters)).then(function (buildFilters) {
                 $scope.buildFilters = buildFilters;
             }).then(function () {
@@ -54,7 +57,6 @@ angular.module('ot.view.branch', [
 
         // Loading the build view
         function loadBuildView() {
-            // TODO Use links from the branch
             // Parameters for the call
             var config = {};
             // Adds the filter parameters
@@ -63,6 +65,7 @@ angular.module('ot.view.branch', [
             }
             // Call
             ot.call(
+                // TODO Use links from the branch
                 $http.get('structure/branches/' + branchId + '/view', config)
             ).then(
                 function success(branchBuildView) {
@@ -210,9 +213,16 @@ angular.module('ot.view.branch', [
                 // Adding the type to the filter
                 filterData.type = buildFilterForm.type;
                 // Applying the filter
-                $scope.buildFilters.current = filterData;
-                loadBuildView();
+                $scope.buildFilterApply(filterData);
             });
+        };
+
+        /**
+         * Applying a filter
+         */
+        $scope.buildFilterApply = function (filter) {
+            $scope.buildFilters.current = filter;
+            loadBuildView();
         };
 
     })
