@@ -102,13 +102,13 @@
                 <ul class="dropdown-menu ot-buildfilter-list" role="menu">
                     <li role="presentation" class="dropdown-header">Existing filters:</li>
                     <li ng-repeat="filter in filters.store">
-                        <a ng-click="buildFilterApply(filter.filter)"
-                           ng-class="{'ot-buildfilter-local': filter.local, 'ot-buildfilter-remote': !filter.local}">
-                            {{filter.name}}
-                            <span ng-if="filter.local"> (local)</span>
-                            <span class="pull-right">
-                                <span class="glyphicon glyphicon-trash ot-command" ng-click="buildFilterRemove(filter)"></span>
+                        <a>
+                            <span ng-click="buildFilterApply(filter.filter)"
+                               ng-class="{'ot-buildfilter-local': filter.local, 'ot-buildfilter-remote': !filter.local}">
+                                {{filter.name}}
+                                <span ng-if="filter.local"> (local)</span>
                             </span>
+                            <span class="glyphicon glyphicon-trash ot-command" ng-click="buildFilterRemove(filter)"></span>
                         </a>
                     </li>
                     <li class="divider"></li>
