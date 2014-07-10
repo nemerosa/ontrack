@@ -99,13 +99,16 @@
                     Filter<span ng-show="currentFilter.name">: {{currentFilter.name}}</span>
                     <span class="caret"></span>
                 </button>
-                <ul class="dropdown-menu" role="menu">
+                <ul class="dropdown-menu ot-buildfilter-list" role="menu">
                     <li role="presentation" class="dropdown-header">Existing filters:</li>
                     <li ng-repeat="filter in filters.store">
                         <a ng-click="buildFilterApply(filter.filter)"
                            ng-class="{'ot-buildfilter-local': filter.local, 'ot-buildfilter-remote': !filter.local}">
                             {{filter.name}}
                             <span ng-if="filter.local"> (local)</span>
+                            <span class="pull-right">
+                                <span class="glyphicon glyphicon-trash ot-command"></span>
+                            </span>
                         </a>
                     </li>
                     <li class="divider"></li>
