@@ -20,7 +20,7 @@ angular.module('ot.service.buildfilter', [
                 submit: function (filterData) {
                     // Stores locally the filter data if named
                     if (filterData.name) {
-                        // TODO self.storeForBranch(config, filterData);
+                        self.storeForBranch(config, filterData);
                     }
                     // Stores locally as current
                     self.storeCurrent(config, filterData);
@@ -39,6 +39,34 @@ angular.module('ot.service.buildfilter', [
             localStorage.setItem('build_filter_' + config.branchId + '_current',
                 JSON.stringify(filterData)
             );
+        };
+
+        self.storeForBranch = function (config, filterData) {
+            // Gets the store for this branch
+            var store = self.getStoreForBranch(config.branchId);
+            // Stores the resource in the store
+            store[filterData.name] = {
+                name: filterData.name,
+                type: config.buildFilterForm.type,
+                filter: filterData
+            };
+            // Saves the store back
+            localStorage.setItem(self.getStoreIdForBranch(config.branchId),
+                JSON.stringify(store)
+            );
+        };
+
+        self.getStoreForBranch = function (branchId) {
+            var json = localStorage.getItem(self.getStoreIdForBranch(branchId));
+            if (json) {
+                return JSON.parse(json);
+            } else {
+                return {};
+            }
+        };
+
+        self.getStoreIdForBranch = function (branchId) {
+            return 'build_filter_' + branchId;
         };
 
         return self;
