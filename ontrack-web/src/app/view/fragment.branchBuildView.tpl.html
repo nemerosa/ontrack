@@ -100,7 +100,7 @@
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu ot-buildfilter-list" role="menu">
-                    <li role="presentation" class="dropdown-header">Existing filters:</li>
+                    <li role="presentation" class="dropdown-header" ng-if="filters.store">Existing filters:</li>
                     <li ng-repeat="filter in filters.store">
                         <a>
                             <span ng-click="buildFilterApply(filter.filter)"
@@ -111,11 +111,11 @@
                             <span class="glyphicon glyphicon-trash ot-command" ng-click="buildFilterRemove(filter)"></span>
                         </a>
                     </li>
-                    <li class="divider"></li>
-                    <li>
+                    <li class="divider" ng-if="filters.store"></li>
+                    <li ng-if="currentFilter">
                         <a ng-click="buildFilterErase()">Erase filter</a>
                     </li>
-                    <li class="divider"></li>
+                    <li class="divider" ng-if="currentFilter"></li>
                     <li role="presentation" class="dropdown-header">New filter:</li>
                     <li ng-repeat="buildFilterForm in filters.buildFilterForms">
                         <a ng-click="buildFilterNew(buildFilterForm)">{{buildFilterForm.typeName}}</a>
