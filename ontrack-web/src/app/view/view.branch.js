@@ -59,6 +59,9 @@ angular.module('ot.view.branch', [
             var currentFilter = otBuildFilterService.getCurrentFilter(branchId);
             if (currentFilter) {
                 config.params = currentFilter;
+                $scope.currentFilter = currentFilter;
+            } else {
+                $scope.currentFilter = undefined;
             }
             // Call
             ot.call(
