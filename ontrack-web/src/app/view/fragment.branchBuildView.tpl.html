@@ -107,7 +107,7 @@
                             {{filter.name}}
                             <span ng-if="filter.local"> (local)</span>
                             <span class="pull-right">
-                                <span class="glyphicon glyphicon-trash ot-command"></span>
+                                <span class="glyphicon glyphicon-trash ot-command" ng-click="buildFilterRemove(filter)"></span>
                             </span>
                         </a>
                     </li>

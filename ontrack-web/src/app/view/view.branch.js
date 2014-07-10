@@ -231,5 +231,13 @@ angular.module('ot.view.branch', [
             loadBuildView();
         };
 
+        /**
+         * Removing an existing filter
+         */
+        $scope.buildFilterRemove = function (filter) {
+            otBuildFilterService.removeFilter($scope.branch, filter);
+            loadBuildFilters();
+        };
+
     })
 ;

@@ -115,6 +115,21 @@ angular.module('ot.service.buildfilter', [
             return 'build_filter_' + branchId;
         };
 
+        self.removeFilter = function (branch, filter) {
+            if (filter.local) {
+                // Gets the store for this branch
+                var store = self.getStoreForBranch(branch.id);
+                // Removes from the store
+                delete store[filter.name];
+                // Saves the store back
+                localStorage.setItem(self.getStoreIdForBranch(branch.id),
+                    JSON.stringify(store)
+                );
+            } else {
+                // TODO Remote delete
+            }
+        };
+
         return self;
     })
 ;
