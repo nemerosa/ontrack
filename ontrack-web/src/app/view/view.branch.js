@@ -46,10 +46,6 @@ angular.module('ot.view.branch', [
         function loadBuildFilters() {
             otBuildFilterService.loadFilters($scope.branch).then(function (filters) {
                 $scope.filters = filters;
-            });
-            ot.call($http.get($scope.branch._buildFilters)).then(function (buildFilters) {
-                $scope.buildFilters = buildFilters;
-            }).then(function () {
                 // Loading the build view AFTER the filter have been loaded
                 loadBuildView();
             });
@@ -60,8 +56,8 @@ angular.module('ot.view.branch', [
             // Parameters for the call
             var config = {};
             // Adds the filter parameters
-            if ($scope.buildFilters.current) {
-                config.params = $scope.buildFilters.current;
+            if ($scope.currentFilter) {
+                config.params = $scope.currentFilter;
             }
             // Call
             ot.call(
@@ -221,7 +217,7 @@ angular.module('ot.view.branch', [
          * Applying a filter
          */
         $scope.buildFilterApply = function (filter) {
-            $scope.buildFilters.current = filter;
+            $scope.currentFilter = filter;
             loadBuildView();
         };
 
