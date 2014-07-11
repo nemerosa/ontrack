@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.model.security;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.Signature;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public interface SecurityService {
@@ -23,6 +24,13 @@ public interface SecurityService {
      * Returns the current logged account or <code>null</code> if none is logged.
      */
     Account getCurrentAccount();
+
+    /**
+     * Returns the current logged account as an option
+     */
+    default Optional<Account> getAccount() {
+        return Optional.ofNullable(getCurrentAccount());
+    }
 
     Signature getCurrentSignature();
 

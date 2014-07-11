@@ -6,8 +6,8 @@ import net.nemerosa.ontrack.extension.api.BuildDiffExtension;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
+import net.nemerosa.ontrack.model.buildfilter.BuildFilterResource;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
-import net.nemerosa.ontrack.model.buildfilter.BuildFilters;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.Action;
 import net.nemerosa.ontrack.model.security.BranchCreate;
@@ -15,7 +15,6 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Link;
-import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -107,14 +106,13 @@ public class BranchController extends AbstractResourceController {
 
 
     /**
-     * Returns the list of existing filters for this branch and the current user, and the list
-     * of forms that can be used to create new ones.
+     * Returns the list of existing filters for this branch and the current user.
      *
      * @param branchId ID of the branch to get the filter for.
      */
     @RequestMapping(value = "branches/{branchId}/filter", method = RequestMethod.GET)
-    public Resource<BuildFilters> buildFilters(@PathVariable ID branchId) {
-        return Resource.of(
+    public Resources<BuildFilterResource<?>> buildFilters(@PathVariable ID branchId) {
+        return Resources.of(
                 buildFilterService.getBuildFilters(branchId),
                 uri(on(getClass()).buildFilters(branchId))
         );

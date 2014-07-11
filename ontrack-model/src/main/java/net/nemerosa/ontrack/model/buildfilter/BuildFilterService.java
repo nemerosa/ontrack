@@ -1,7 +1,11 @@
 package net.nemerosa.ontrack.model.buildfilter;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.model.exceptions.BuildFilterNotFoundException;
+import net.nemerosa.ontrack.model.exceptions.BuildFilterNotLoggedException;
 import net.nemerosa.ontrack.model.structure.ID;
+
+import java.util.Collection;
 
 /**
  * Management of build filters.
@@ -14,12 +18,20 @@ public interface BuildFilterService {
     BuildFilter defaultFilter();
 
     /**
-     * Gets the list of all filters, and the forms to create new ones.
+     * Gets the list of all existing filters.
      *
      * @param branchId Branch to get the filters for
-     * @return List of filters and the forms to define new ones
+     * @return List of filters
      */
-    BuildFilters getBuildFilters(ID branchId);
+    Collection<BuildFilterResource<?>> getBuildFilters(ID branchId);
+
+    /**
+     * Gets the list of forms to create new filters
+     *
+     * @param branchId Branch to get the forms for
+     * @return List of forms
+     */
+    Collection<BuildFilterForm> getBuildFilterForms(ID branchId);
 
     /**
      * Basic method to compute an actual filter from a type and a list of parameters.
@@ -32,4 +44,27 @@ public interface BuildFilterService {
      * the given parameters.
      */
     BuildFilter computeFilter(ID branchId, String type, JsonNode parameters);
+
+    /**
+     * Gets the form to edit an existing filter.
+     *
+     * @param branchId Branch to get the form on
+     * @param name     name of the filter on the branch
+     * @return An edition form
+     * @throws BuildFilterNotFoundException  If the filter is not defined
+     * @throws BuildFilterNotLoggedException If the user is not logged
+     */
+    BuildFilterForm getEditionForm(ID branchId, String name) throws BuildFilterNotFoundException, BuildFilterNotLoggedException;
+
+    /**
+     * Saves a filter for a branch. This method does nothing if the user is not logged,
+     * or if the filter type is not found, or if the parameters are not valid.
+     *
+     * @param branchId   Branch to save the filter for
+     * @param name       Name of the filter
+     * @param type       Type of the filter
+     * @param parameters Parameters for the filter
+     */
+    void saveFilter(ID branchId, String name, String type, JsonNode parameters);
+
 }
