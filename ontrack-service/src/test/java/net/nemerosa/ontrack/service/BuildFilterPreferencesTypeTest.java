@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.common.MapBuilder;
 import org.junit.Test;
 
-import java.util.Arrays;
-
 import static net.nemerosa.ontrack.json.JsonUtils.object;
-import static net.nemerosa.ontrack.json.JsonUtils.stringArray;
 import static net.nemerosa.ontrack.test.TestUtils.assertJsonEquals;
 
 public class BuildFilterPreferencesTypeTest {
@@ -19,20 +16,20 @@ public class BuildFilterPreferencesTypeTest {
         preferences = preferences.add(1, new BuildFilterPreferencesEntry(
                 "Copper since bronze",
                 StandardBuildFilterProvider.class.getName(),
-                MapBuilder.of("withPromotionLevel", Arrays.asList("COPPER"))
-                        .with("sincePromotionLevel", Arrays.asList("BRONZE"))
+                MapBuilder.of("withPromotionLevel", "COPPER")
+                        .with("sincePromotionLevel", "BRONZE")
                         .get()
         ));
         preferences = preferences.add(1, new BuildFilterPreferencesEntry(
                 "Only copper",
                 StandardBuildFilterProvider.class.getName(),
-                MapBuilder.of("withPromotionLevel", Arrays.asList("COPPER"))
+                MapBuilder.of("withPromotionLevel", "COPPER")
                         .get()
         ));
         preferences = preferences.add(2, new BuildFilterPreferencesEntry(
                 "Only copper",
                 StandardBuildFilterProvider.class.getName(),
-                MapBuilder.of("withPromotionLevel", Arrays.asList("COPPER"))
+                MapBuilder.of("withPromotionLevel", "COPPER")
                         .get()
         ));
         JsonNode node = type.forStorage(preferences);
@@ -44,15 +41,15 @@ public class BuildFilterPreferencesTypeTest {
                                                 .with("name", "Copper since bronze")
                                                 .with("type", "net.nemerosa.ontrack.service.StandardBuildFilterProvider")
                                                 .with("data", object()
-                                                        .with("withPromotionLevel", stringArray("COPPER"))
-                                                        .with("sincePromotionLevel", stringArray("BRONZE"))
+                                                        .with("withPromotionLevel", "COPPER")
+                                                        .with("sincePromotionLevel", "BRONZE")
                                                         .end())
                                                 .end())
                                         .with("Only copper", object()
                                                 .with("name", "Only copper")
                                                 .with("type", "net.nemerosa.ontrack.service.StandardBuildFilterProvider")
                                                 .with("data", object()
-                                                        .with("withPromotionLevel", stringArray("COPPER"))
+                                                        .with("withPromotionLevel", "COPPER")
                                                         .end())
                                                 .end())
                                         .end())
@@ -61,7 +58,7 @@ public class BuildFilterPreferencesTypeTest {
                                                 .with("name", "Only copper")
                                                 .with("type", "net.nemerosa.ontrack.service.StandardBuildFilterProvider")
                                                 .with("data", object()
-                                                        .with("withPromotionLevel", stringArray("COPPER"))
+                                                        .with("withPromotionLevel", "COPPER")
                                                         .end())
                                                 .end())
                                         .end())

@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.service;
 
-import com.google.common.collect.Maps;
 import net.nemerosa.ontrack.model.buildfilter.*;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.PreferencesService;
@@ -8,7 +7,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,13 +35,12 @@ public class BuildFilterServiceImpl implements BuildFilterService {
     public BuildFilters getBuildFilters(ID branchId) {
         return new BuildFilters(
                 getBuildFilterForms(branchId),
-                // TODO Existing filters
-                Collections.emptyList()
+                loadExistingFilters(branchId)
         );
     }
 
     @Override
-    public BuildFilter computeFilter(ID branchId, Map<String, String[]> parameters) {
+    public BuildFilter computeFilter(ID branchId, Map<String, String> parameters) {
         // Gets the type parameter
         String type = BuildFilterProvider.getParameter(parameters, "type");
         if (StringUtils.isBlank(type)) {
@@ -67,7 +67,36 @@ public class BuildFilterServiceImpl implements BuildFilterService {
         }
     }
 
-    private void storeFilterInPreferences(ID branchId, BuildFilterProvider buildFilterProvider, String name, Map<String, String[]> parameters) {
+    private Collection<BuildFilterResource> loadExistingFilters(ID branchId) {
+        // Gets the preferences and the list of entries for the branch
+        Collection<BuildFilterPreferencesEntry> entries = preferencesService.load(
+                preferencesType,
+                BuildFilterPreferences.empty()
+        ).getEntriesForBranch(branchId.getValue());
+
+        return entries.stream()
+                .map(prefEntry -> loadPrefEntry(branchId, prefEntry))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+    }
+
+    private Optional<BuildFilterResource> loadPrefEntry(ID branchId, BuildFilterPreferencesEntry prefEntry) {
+        return buildFilterProviders.stream()
+                .filter(provider -> StringUtils.equals(prefEntry.getType(), provider.getClass().getName()))
+                .findFirst()
+                .map(provider -> createBuildResource(branchId, provider, prefEntry.getName(), prefEntry.getData()));
+    }
+
+    private BuildFilterResource createBuildResource(ID branchId, BuildFilterProvider provider, String name, Map<String, String> data) {
+        return new BuildFilterResource(
+                name,
+                provider.newFilterForm(branchId).with(data),
+                data
+        );
+    }
+
+    private void storeFilterInPreferences(ID branchId, BuildFilterProvider buildFilterProvider, String name, Map<String, String> parameters) {
         // Gets the previous preferences
         BuildFilterPreferences preferences = preferencesService.load(
                 preferencesType,
@@ -79,10 +108,7 @@ public class BuildFilterServiceImpl implements BuildFilterService {
                 new BuildFilterPreferencesEntry(
                         name,
                         buildFilterProvider.getClass().getName(),
-                        Maps.transformValues(
-                                parameters,
-                                Arrays::asList
-                        )
+                        parameters
                 )
         );
         // Stores the preferences back

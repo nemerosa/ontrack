@@ -87,6 +87,11 @@ public class Form {
         return this;
     }
 
+    public Form fill(Map<String, ?> data) {
+        data.forEach(this::fill);
+        return this;
+    }
+
     public static Text defaultNameField() {
         return Text.of("name")
                 .label("Name")

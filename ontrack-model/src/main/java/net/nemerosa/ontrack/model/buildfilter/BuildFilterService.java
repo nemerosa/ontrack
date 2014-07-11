@@ -10,5 +10,5 @@ public interface BuildFilterService {
 
     BuildFilters getBuildFilters(ID branchId);
 
-    BuildFilter computeFilter(ID branchId, Map<String, String[]> parameters);
+    BuildFilter computeFilter(ID branchId, Map<String, String> parameters);
 }

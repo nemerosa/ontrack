@@ -1,13 +1,14 @@
 package net.nemerosa.ontrack.model.buildfilter;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
+
+import java.util.Map;
 
 @Data
 public class BuildFilterResource {
 
     private final String name;
     private final BuildFilterForm form;
-    private final JsonNode filter;
+    private final Map<String, String> filter;
 
 }

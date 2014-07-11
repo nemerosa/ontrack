@@ -30,7 +30,7 @@ public class PromotionLevelBuildFilterProvider extends AbstractBuildFilterProvid
     }
 
     @Override
-    public BuildFilter filter(ID branchId, Map<String, String[]> parameters) {
+    public BuildFilter filter(ID branchId, Map<String, String> parameters) {
         return new PromotionLevelBuildFilter(
                 structureService.getPromotionLevelListForBranch(branchId)
         );

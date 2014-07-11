@@ -123,7 +123,20 @@ public class BranchController extends AbstractResourceController {
         // Gets the branch
         Branch branch = getBranch(branchId);
         // Gets the parameters
-        Map<String, String[]> parameters = request.getParameterMap();
+        Map<String, String[]> requestParameters = request.getParameterMap();
+        // Converts to single values
+        Map<String, String> parameters = Maps.transformValues(
+                requestParameters,
+                array -> {
+                    if (array == null || array.length == 0) {
+                        return null;
+                    } else if (array.length == 1) {
+                        return array[0];
+                    } else {
+                        throw new IllegalStateException("Cannot accept several identical parameters");
+                    }
+                }
+        );
         // Defines the filter using a service
         BuildFilter buildFilter = buildFilterService.computeFilter(branchId, parameters);
         // Gets the list of builds

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service;
 
 import lombok.Data;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,5 +28,12 @@ public class BuildFilterPreferences {
         branchEntries.put(entry.getName(), entry);
         // OK
         return new BuildFilterPreferences(entries);
+    }
+
+    public Collection<BuildFilterPreferencesEntry> getEntriesForBranch(int branchIdValue) {
+        return entries.getOrDefault(
+                branchIdValue,
+                Collections.emptyMap()
+        ).values();
     }
 }

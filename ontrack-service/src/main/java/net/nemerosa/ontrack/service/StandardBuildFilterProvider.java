@@ -35,7 +35,7 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider {
     }
 
     @Override
-    public BuildFilter filter(ID branchId, Map<String, String[]> parameters) {
+    public BuildFilter filter(ID branchId, Map<String, String> parameters) {
         StandardBuildFilter filter = StandardBuildFilter.of(BuildFilterProvider.getIntParameter(parameters, "count", 10));
         filter = filter.sincePromotionLevel(BuildFilterProvider.getParameter(parameters, "sincePromotionLevel"));
         filter = filter.withPromotionLevel(BuildFilterProvider.getParameter(parameters, "withPromotionLevel"));
