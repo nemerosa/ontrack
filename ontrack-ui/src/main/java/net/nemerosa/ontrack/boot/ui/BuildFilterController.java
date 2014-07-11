@@ -48,7 +48,7 @@ public class BuildFilterController extends AbstractResourceController {
     /**
      * Getting the edition form for a filter
      */
-    @RequestMapping(value = "branches/{branchId}/filters/{name}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "branches/{branchId}/filters/{name}", method = RequestMethod.GET)
     public Resource<BuildFilterForm> getEditionForm(@PathVariable ID branchId, @PathVariable String name) {
         BuildFilterForm editionForm = buildFilterService.getEditionForm(branchId, name);
         return Resource.of(
