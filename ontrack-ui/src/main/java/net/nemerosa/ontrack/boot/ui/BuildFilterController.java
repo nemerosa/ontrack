@@ -54,7 +54,7 @@ public class BuildFilterController extends AbstractResourceController {
      * Deletes a filter
      */
     @RequestMapping(value = "branches/{branchId}/filters/{name}", method = RequestMethod.DELETE)
-    public Ack buildFilters(@PathVariable ID branchId, @PathVariable String name) {
+    public Ack deleteFilter(@PathVariable ID branchId, @PathVariable String name) {
         return buildFilterService.deleteFilter(branchId, name);
     }
 }

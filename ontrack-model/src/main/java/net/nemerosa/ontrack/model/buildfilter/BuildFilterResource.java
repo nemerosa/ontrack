@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.model.buildfilter;
 
 import lombok.Data;
+import net.nemerosa.ontrack.model.structure.ID;
 
 /**
  * @param <T> Type of configuration data for this build filter
@@ -8,6 +9,10 @@ import lombok.Data;
 @Data
 public class BuildFilterResource<T> {
 
+    /**
+     * Branch
+     */
+    private final ID branchId;
     /**
      * Name for this filter
      */

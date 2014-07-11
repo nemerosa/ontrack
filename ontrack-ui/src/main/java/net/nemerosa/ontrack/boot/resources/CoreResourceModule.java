@@ -20,7 +20,8 @@ public class CoreResourceModule extends AbstractResourceModule {
                 new ValidationStampResourceDecorator(),
                 new BuildResourceDecorator(),
                 new PromotionRunResourceDecorator(),
-                new ValidationRunResourceDecorator()
+                new ValidationRunResourceDecorator(),
+                new BuildFilterResourceDecorator()
         );
     }
 }
