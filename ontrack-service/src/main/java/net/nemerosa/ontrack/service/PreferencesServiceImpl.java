@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.service;
 
-import net.nemerosa.ontrack.model.exceptions.PreferencesNoAccountException;
 import net.nemerosa.ontrack.model.security.Account;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.PreferencesService;
@@ -32,8 +31,8 @@ public class PreferencesServiceImpl implements PreferencesService {
                     .map(preferencesType::fromStorage)
                     .orElse(defaultValue);
         } else {
-            // Not logger
-            throw new PreferencesNoAccountException();
+            // Not logged
+            return defaultValue;
         }
     }
 
@@ -47,9 +46,6 @@ public class PreferencesServiceImpl implements PreferencesService {
                     preferencesType.getClass().getName(),
                     preferencesType.forStorage(value)
             );
-        } else {
-            // Not logger
-            throw new PreferencesNoAccountException();
         }
     }
 }
