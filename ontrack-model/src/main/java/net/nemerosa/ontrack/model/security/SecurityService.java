@@ -19,6 +19,9 @@ public interface SecurityService {
         return isProjectFunctionGranted(entity.projectId(), fn);
     }
 
+    /**
+     * Returns the current logged account or <code>null</code> if none is logged.
+     */
     Account getCurrentAccount();
 
     Signature getCurrentSignature();

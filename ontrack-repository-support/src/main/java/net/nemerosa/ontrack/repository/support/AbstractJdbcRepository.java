@@ -107,7 +107,10 @@ public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSuppor
     }
 
     protected JsonNode readJson(ResultSet rs, String column) throws SQLException {
-        String json = rs.getString(column);
+        return readJson(rs.getString(column));
+    }
+
+    protected JsonNode readJson(String json) {
         try {
             if (StringUtils.isBlank(json)) {
                 return null;
