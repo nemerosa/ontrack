@@ -19,6 +19,9 @@ import java.util.function.Supplier;
  * Additionally, there must be extension points to extend the filters, at service and at GUI level.
  * <p>
  * Typically, each extension point will either contribute to a named form, or contribute to the default form.
+ * <p>
+ * Implementation note: a <code>BuildFilter</code> instance is created for each query, and can therefore
+ * hold instance variables.
  */
 public interface BuildFilter {
 
