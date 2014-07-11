@@ -13,10 +13,6 @@ public class BuildFilterResource<T> {
      */
     private final String name;
     /**
-     * Form to edit this filter
-     */
-    private final BuildFilterForm form;
-    /**
      * Specific data for this filter
      */
     private final T data;

@@ -92,7 +92,6 @@ public class BuildFilterServiceImpl implements BuildFilterService {
         return provider.parse(data).map(parsedData ->
                         new BuildFilterResource<>(
                                 name,
-                                provider.getFilterForm(ID.of(branchId), parsedData),
                                 parsedData
                         )
         );
