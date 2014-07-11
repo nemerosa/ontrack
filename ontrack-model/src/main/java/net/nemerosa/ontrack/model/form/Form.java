@@ -88,7 +88,11 @@ public class Form {
     }
 
     public Form fill(Map<String, ?> data) {
-        data.forEach(this::fill);
+        data.forEach((name, value) -> {
+            if (fields.containsKey(name)) {
+                fill(name, value);
+            }
+        });
         return this;
     }
 
