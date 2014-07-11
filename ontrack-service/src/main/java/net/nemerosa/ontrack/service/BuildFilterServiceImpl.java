@@ -55,7 +55,7 @@ public class BuildFilterServiceImpl implements BuildFilterService {
                 // Storage of filter
                 String name = BuildFilterProvider.getParameter(parameters, "name");
                 if (StringUtils.isNotBlank(name)) {
-                    storeFilterInPreferences(optProvider.get(), name, parameters);
+                    storeFilterInPreferences(branchId, optProvider.get(), name, parameters);
                 }
                 // Returns the filter
                 return optProvider.get().filter(branchId, parameters);
@@ -67,7 +67,7 @@ public class BuildFilterServiceImpl implements BuildFilterService {
         }
     }
 
-    private void storeFilterInPreferences(BuildFilterProvider buildFilterProvider, String name, Map<String, String[]> parameters) {
+    private void storeFilterInPreferences(ID branchId, BuildFilterProvider buildFilterProvider, String name, Map<String, String[]> parameters) {
         // Gets the previous preferences
         BuildFilterPreferences preferences = preferencesService.load(
                 preferencesType,
@@ -75,6 +75,7 @@ public class BuildFilterServiceImpl implements BuildFilterService {
         );
         // Builds the new preferences
         preferences = preferences.add(
+                branchId.getValue(),
                 new BuildFilterPreferencesEntry(
                         name,
                         buildFilterProvider.getClass().getName(),

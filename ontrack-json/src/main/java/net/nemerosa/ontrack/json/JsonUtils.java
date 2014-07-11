@@ -22,6 +22,14 @@ public final class JsonUtils {
         return new ArrayBuilder(factory);
     }
 
+    public static JsonNode stringArray(String... values) {
+        ArrayBuilder builder = array();
+        for (String value : values) {
+            builder.with(text(value));
+        }
+        return builder.end();
+    }
+
     public static Map<String, ?> toMap(JsonNode node) throws IOException {
         if (node.isObject()) {
             Map<String, Object> map = new LinkedHashMap<>();
