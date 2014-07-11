@@ -8,17 +8,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 /**
- * Defines a filter on builds for a branch. This is not only a predicate. It must be able to:
- * <ul>
- * <li>contribute to the query by filtering the builds</li>
- * <li>pre- and post- filter</li>
- * <li>acts on the number of builds</li>
- * <li>...</li>
- * </ul>
- * <p>
- * Additionally, there must be extension points to extend the filters, at service and at GUI level.
- * <p>
- * Typically, each extension point will either contribute to a named form, or contribute to the default form.
+ * Defines a filter on builds for a branch.
  * <p>
  * Implementation note: a <code>BuildFilter</code> instance is created for each query, and can therefore
  * hold instance variables.

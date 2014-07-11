@@ -1,8 +1,7 @@
 package net.nemerosa.ontrack.model.buildfilter;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.model.structure.ID;
-
-import java.util.Map;
 
 public interface BuildFilterService {
 
@@ -10,5 +9,5 @@ public interface BuildFilterService {
 
     BuildFilters getBuildFilters(ID branchId);
 
-    BuildFilter computeFilter(ID branchId, Map<String, String> parameters);
+    BuildFilter computeFilter(ID branchId, String type, JsonNode parameters);
 }

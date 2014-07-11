@@ -77,4 +77,12 @@ public final class JsonUtils {
     public static JsonNode number(int value) {
         return factory.numberNode(value);
     }
+
+    public static JsonNode mapToJson(Map<String, String> parameters) {
+        ObjectBuilder builder = object();
+        if (parameters != null) {
+            parameters.forEach(builder::with);
+        }
+        return builder.end();
+    }
 }

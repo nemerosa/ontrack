@@ -2,12 +2,14 @@ package net.nemerosa.ontrack.service;
 
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterResult;
-import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -15,7 +17,7 @@ import java.util.stream.Collectors;
  * Gets each last build for each promotion level
  */
 @Component
-public class PromotionLevelBuildFilterProvider extends AbstractBuildFilterProvider {
+public class PromotionLevelBuildFilterProvider extends AbstractPredefinedBuildFilterProvider {
 
     private final StructureService structureService;
 
@@ -30,20 +32,10 @@ public class PromotionLevelBuildFilterProvider extends AbstractBuildFilterProvid
     }
 
     @Override
-    public BuildFilter filter(ID branchId, Map<String, String> parameters) {
+    public BuildFilter filter(ID branchId, Object parameters) {
         return new PromotionLevelBuildFilter(
                 structureService.getPromotionLevelListForBranch(branchId)
         );
-    }
-
-    @Override
-    protected boolean isPredefined() {
-        return true;
-    }
-
-    @Override
-    protected Form blankForm(ID branchId) {
-        return Form.create();
     }
 
     private static class PromotionLevelBuildFilter implements BuildFilter {

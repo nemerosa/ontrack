@@ -1,10 +1,11 @@
 package net.nemerosa.ontrack.service;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
+import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
-import net.nemerosa.ontrack.model.buildfilter.BuildFilterProvider;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterResult;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Int;
@@ -14,14 +15,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Component
-public class StandardBuildFilterProvider extends AbstractBuildFilterProvider {
+public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<StandardBuildFilterData> {
 
+    private final ObjectMapper objectMapper = ObjectMapperFactory.create();
     private final StructureService structureService;
 
     @Autowired
@@ -35,14 +37,8 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider {
     }
 
     @Override
-    public BuildFilter filter(ID branchId, Map<String, String> parameters) {
-        StandardBuildFilter filter = StandardBuildFilter.of(BuildFilterProvider.getIntParameter(parameters, "count", 10));
-        filter = filter.sincePromotionLevel(BuildFilterProvider.getParameter(parameters, "sincePromotionLevel"));
-        filter = filter.withPromotionLevel(BuildFilterProvider.getParameter(parameters, "withPromotionLevel"));
-        // TODO sinceValidationStamps
-        // TODO withValidationStamps
-        // TODO withProperty
-        return filter;
+    public BuildFilter filter(ID branchId, StandardBuildFilterData data) {
+        return new StandardBuildFilter(data);
     }
 
     @Override
@@ -85,56 +81,53 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider {
                 ;
     }
 
+    @Override
+    protected Form fill(Form form, StandardBuildFilterData data) {
+        return form
+                .fill("count", data.getCount())
+                .fill("sincePromotionLevel", data.getSincePromotionLevel())
+                .fill("withPromotionLevel", data.getWithPromotionLevel());
+        // TODO sinceValidationStamps
+        // TODO withValidationStamps
+        // TODO withProperty
+    }
+
+    @Override
+    public Optional<StandardBuildFilterData> parse(JsonNode data) {
+        try {
+            return Optional.of(objectMapper.treeToValue(data, StandardBuildFilterData.class));
+        } catch (JsonProcessingException e) {
+            return Optional.empty();
+        }
+    }
+
     @Data
-    @AllArgsConstructor(access = AccessLevel.PROTECTED)
     private static class StandardBuildFilter implements BuildFilter {
 
-        private final int count;
-        private final String sincePromotionLevel;
-        private final String withPromotionLevel;
-
-        public static StandardBuildFilter of(int count) {
-            return new StandardBuildFilter(count, null, null);
-        }
-
-        public StandardBuildFilter withPromotionLevel(String withPromotionLevel) {
-            return new StandardBuildFilter(
-                    count,
-                    sincePromotionLevel,
-                    withPromotionLevel
-            );
-        }
-
-        public StandardBuildFilter sincePromotionLevel(String sincePromotionLevel) {
-            return new StandardBuildFilter(
-                    count,
-                    sincePromotionLevel,
-                    withPromotionLevel
-            );
-        }
+        private final StandardBuildFilterData data;
 
         @Override
         public BuildFilterResult filter(List<Build> builds, Branch branch, Build build, Supplier<BuildView> buildViewSupplier) {
             // Count test
-            if (builds.size() >= count) {
+            if (builds.size() >= data.getCount()) {
                 return BuildFilterResult.stopNow();
             }
             // Result by default is: accept and go on
             BuildFilterResult result = BuildFilterResult.ok();
             // With promotion level
-            if (isNotBlank(withPromotionLevel)) {
+            if (isNotBlank(data.getWithPromotionLevel())) {
                 result = result.acceptIf(
                         buildViewSupplier.get().getPromotionRuns().stream()
-                                .filter(run -> withPromotionLevel.equals(run.getPromotionLevel().getName()))
+                                .filter(run -> data.getWithPromotionLevel().equals(run.getPromotionLevel().getName()))
                                 .findAny()
                                 .isPresent()
                 );
             }
             // Since promotion level
-            if (isNotBlank(sincePromotionLevel)) {
+            if (isNotBlank(data.getSincePromotionLevel())) {
                 result = result.goOnIf(
                         !buildViewSupplier.get().getPromotionRuns().stream()
-                                .filter(run -> sincePromotionLevel.equals(run.getPromotionLevel().getName()))
+                                .filter(run -> data.getSincePromotionLevel().equals(run.getPromotionLevel().getName()))
                                 .findAny()
                                 .isPresent()
                 );

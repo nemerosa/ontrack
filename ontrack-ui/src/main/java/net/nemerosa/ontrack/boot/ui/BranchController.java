@@ -1,8 +1,10 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
 import net.nemerosa.ontrack.extension.api.BuildDiffExtension;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
+import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilters;
@@ -119,12 +121,18 @@ public class BranchController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "branches/{branchId}/view", method = RequestMethod.GET)
-    public BranchBuildView buildView(@PathVariable ID branchId, WebRequest request) {
-        // Gets the branch
-        Branch branch = getBranch(branchId);
+    public BranchBuildView buildView(@PathVariable ID branchId) {
+        // Using the default filter
+        BuildFilter buildFilter = buildFilterService.defaultFilter();
+        return buildViewWithFilter(branchId, buildFilter);
+
+    }
+
+    @RequestMapping(value = "branches/{branchId}/view/{filterType}", method = RequestMethod.GET)
+    public BranchBuildView buildViewWithFilter(@PathVariable ID branchId, @PathVariable String filterType, WebRequest request) {
         // Gets the parameters
         Map<String, String[]> requestParameters = request.getParameterMap();
-        // Converts to single values
+        // Converts the request parameters to single values
         Map<String, String> parameters = Maps.transformValues(
                 requestParameters,
                 array -> {
@@ -133,12 +141,21 @@ public class BranchController extends AbstractResourceController {
                     } else if (array.length == 1) {
                         return array[0];
                     } else {
-                        throw new IllegalStateException("Cannot accept several identical parameters");
+                        throw new IllegalArgumentException("Cannot accept several identical parameters");
                     }
                 }
         );
+        // Gets the parameters as JSON
+        JsonNode jsonParameters = JsonUtils.mapToJson(parameters);
         // Defines the filter using a service
-        BuildFilter buildFilter = buildFilterService.computeFilter(branchId, parameters);
+        BuildFilter buildFilter = buildFilterService.computeFilter(branchId, filterType, jsonParameters);
+        // Gets the build view
+        return buildViewWithFilter(branchId, buildFilter);
+    }
+
+    private BranchBuildView buildViewWithFilter(ID branchId, BuildFilter buildFilter) {
+        // Gets the branch
+        Branch branch = getBranch(branchId);
         // Gets the list of builds
         List<Build> builds = structureService.getFilteredBuilds(branchId, buildFilter);
         // Gets the list of build diff actions
