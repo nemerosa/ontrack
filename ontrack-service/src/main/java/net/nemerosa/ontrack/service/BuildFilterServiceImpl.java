@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service;
 
 import net.nemerosa.ontrack.model.buildfilter.*;
 import net.nemerosa.ontrack.model.structure.ID;
+import net.nemerosa.ontrack.model.structure.PreferencesService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,10 +16,12 @@ import java.util.stream.Collectors;
 public class BuildFilterServiceImpl implements BuildFilterService {
 
     private final Collection<BuildFilterProvider> buildFilterProviders;
+    private final PreferencesService preferencesService;
 
     @Autowired
-    public BuildFilterServiceImpl(Collection<BuildFilterProvider> buildFilterProviders) {
+    public BuildFilterServiceImpl(Collection<BuildFilterProvider> buildFilterProviders, PreferencesService preferencesService) {
         this.buildFilterProviders = buildFilterProviders;
+        this.preferencesService = preferencesService;
     }
 
     @Override
