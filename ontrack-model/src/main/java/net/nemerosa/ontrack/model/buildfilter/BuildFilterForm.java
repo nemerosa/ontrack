@@ -8,6 +8,7 @@ public class BuildFilterForm {
 
     private final Class<? extends BuildFilterProvider> type;
     private final String typeName;
+    private final boolean predefined;
     private final Form form;
 
 }

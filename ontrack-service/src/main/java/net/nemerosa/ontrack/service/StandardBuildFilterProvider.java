@@ -46,6 +46,11 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider {
     }
 
     @Override
+    protected boolean isPredefined() {
+        return false;
+    }
+
+    @Override
     protected Form blankForm(ID branchId) {
         // Promotion levels for this branch
         List<PromotionLevel> promotionLevels = structureService.getPromotionLevelListForBranch(branchId);

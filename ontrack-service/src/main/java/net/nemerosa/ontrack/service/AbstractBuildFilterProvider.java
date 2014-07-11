@@ -14,9 +14,17 @@ public abstract class AbstractBuildFilterProvider implements BuildFilterProvider
         return new BuildFilterForm(
                 getClass(),
                 getName(),
+                isPredefined(),
                 Form.create().with(defaultNameField().optional()).append(blankForm(branchId))
         );
     }
+
+    /**
+     * If this method returns <code>true</code>, there is no need to configure the filter,
+     * and the {@link #blankForm(net.nemerosa.ontrack.model.structure.ID)} method
+     * should return an {@linkplain net.nemerosa.ontrack.model.form.Form#create() empty form}.
+     */
+    protected abstract boolean isPredefined();
 
     protected abstract Form blankForm(ID branchId);
 }

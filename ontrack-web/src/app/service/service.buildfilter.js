@@ -51,21 +51,32 @@ angular.module('ot.service.buildfilter', [
          * @return Promise with the created filter
          */
         self.createBuildFilter = function (config) {
-            return otFormService.display({
-                title: "New filter",
-                form: config.buildFilterForm.form,
-                submit: function (filterData) {
-                    filterData.type = config.buildFilterForm.type;
-                    // Stores locally the filter data if named
-                    if (filterData.name) {
-                        self.storeForBranch(config, filterData);
+            if (config.buildFilterForm.predefined) {
+                var d = $q.defer();
+                var filter = {
+                    name: config.buildFilterForm.typeName,
+                    type: config.buildFilterForm.type
+                };
+                self.storeCurrent(config.branchId, filter);
+                d.resolve(filter);
+                return d.promise;
+            } else {
+                return otFormService.display({
+                    title: "New filter",
+                    form: config.buildFilterForm.form,
+                    submit: function (filterData) {
+                        filterData.type = config.buildFilterForm.type;
+                        // Stores locally the filter data if named
+                        if (filterData.name) {
+                            self.storeForBranch(config, filterData);
+                        }
+                        // Stores locally as current
+                        self.storeCurrent(config.branchId, filterData);
+                        // OK
+                        return true;
                     }
-                    // Stores locally as current
-                    self.storeCurrent(config.branchId, filterData);
-                    // OK
-                    return true;
-                }
-            });
+                });
+            }
         };
 
         self.getCurrentFilter = function (branchId) {

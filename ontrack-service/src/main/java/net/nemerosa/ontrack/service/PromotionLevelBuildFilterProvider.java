@@ -25,6 +25,11 @@ public class PromotionLevelBuildFilterProvider extends AbstractBuildFilterProvid
     }
 
     @Override
+    protected boolean isPredefined() {
+        return true;
+    }
+
+    @Override
     protected Form blankForm(ID branchId) {
         return Form.create();
     }
