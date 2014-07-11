@@ -52,11 +52,6 @@ public class BuildFilterServiceImpl implements BuildFilterService {
                     .findFirst();
             // If found
             if (optProvider.isPresent()) {
-                // Storage of filter
-                String name = BuildFilterProvider.getParameter(parameters, "name");
-                if (StringUtils.isNotBlank(name)) {
-                    storeFilterInPreferences(branchId, optProvider.get(), name, parameters);
-                }
                 // Returns the filter
                 return optProvider.get().filter(branchId, parameters);
             }
