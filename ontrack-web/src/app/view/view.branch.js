@@ -44,11 +44,16 @@ angular.module('ot.view.branch', [
 
         // Loading the build filters
         function loadBuildFilters() {
-            otBuildFilterService.loadFilters($scope.branch).then(function (filters) {
-                $scope.filters = filters;
-                // Loading the build view AFTER the filter have been loaded
-                loadBuildView();
+            // Loads filter forms
+            ot.call($http.get($scope.branch._buildFilterForms)).then(function (buildFilterForms) {
+                $scope.buildFilterForms = buildFilterForms;
             });
+            // Loads existing filters
+//            otBuildFilterService.loadFilters($scope.branch).then(function (filters) {
+//                $scope.filters = filters;
+//                // Loading the build view AFTER the filter have been loaded
+            loadBuildView();
+//            });
         }
 
         // Loading the build view

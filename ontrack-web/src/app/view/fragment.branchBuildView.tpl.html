@@ -116,8 +116,9 @@
                         <a ng-click="buildFilterErase()">Erase filter</a>
                     </li>
                     <li class="divider" ng-if="currentFilter"></li>
+                    <!-- New filters -->
                     <li role="presentation" class="dropdown-header">New filter:</li>
-                    <li ng-repeat="buildFilterForm in filters.buildFilterForms">
+                    <li ng-repeat="buildFilterForm in buildFilterForms.resources">
                         <a ng-click="buildFilterNew(buildFilterForm)">{{buildFilterForm.typeName}}</a>
                     </li>
                 </ul>
