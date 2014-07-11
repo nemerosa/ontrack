@@ -1,10 +1,13 @@
 package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.model.Ack;
+import net.nemerosa.ontrack.model.buildfilter.BuildFilterForm;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterResource;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
+import net.nemerosa.ontrack.ui.resource.Link;
+import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,6 +44,24 @@ public class BuildFilterController extends AbstractResourceController {
                 uri(on(getClass()).buildFilters(branchId))
         );
     }
+
+    /**
+     * Getting the edition form for a filter
+     */
+    @RequestMapping(value = "branches/{branchId}/filters/{name}", method = RequestMethod.DELETE)
+    public Resource<BuildFilterForm> getEditionForm(@PathVariable ID branchId, @PathVariable String name) {
+        BuildFilterForm editionForm = buildFilterService.getEditionForm(branchId, name);
+        return Resource.of(
+                editionForm,
+                uri(on(getClass()).getEditionForm(branchId, name))
+        ).with(Link.UPDATE, uri(on(getClass()).saveFilter(
+                branchId,
+                name,
+                editionForm.getType().getName(),
+                null
+        )));
+    }
+
 
     /**
      * Saving a filter

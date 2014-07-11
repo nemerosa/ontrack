@@ -19,8 +19,9 @@ public class BuildFilterResourceDecorator extends AbstractResourceDecorator<Buil
     @Override
     public List<Link> links(BuildFilterResource resource, ResourceContext resourceContext) {
         return resourceContext.links()
-                // TODO Update
-                // Delete
+                // Update
+                .link(Link.UPDATE, on(BuildFilterController.class).getEditionForm(resource.getBranchId(), resource.getName()))
+                        // Delete
                 .link(Link.DELETE, on(BuildFilterController.class).deleteFilter(resource.getBranchId(), resource.getName()))
                         // OK
                 .build();
