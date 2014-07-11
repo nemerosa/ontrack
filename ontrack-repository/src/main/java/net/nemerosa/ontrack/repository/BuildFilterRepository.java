@@ -13,7 +13,7 @@ public interface BuildFilterRepository {
 
     Optional<TBuildFilter> findByBranchAndName(int accountId, int branchId, String name);
 
-    void save(int accountId, int branchId, String name, String type, JsonNode data);
+    Ack save(int accountId, int branchId, String name, String type, JsonNode data);
 
     Ack delete(int accountId, int branchId, String name);
 }

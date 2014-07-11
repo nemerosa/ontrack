@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.WebRequest;
 
+import static net.nemerosa.ontrack.boot.ui.UIUtils.requestParametersToJson;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 /**
@@ -38,6 +40,14 @@ public class BuildFilterController extends AbstractResourceController {
                 buildFilterService.getBuildFilters(branchId),
                 uri(on(getClass()).buildFilters(branchId))
         );
+    }
+
+    /**
+     * Saving a filter
+     */
+    @RequestMapping(value = "branches/{branchId}/filters/{name}/{type}", method = RequestMethod.PUT)
+    public Ack saveFilter(@PathVariable ID branchId, @PathVariable String name, @PathVariable String type, WebRequest request) {
+        return buildFilterService.saveFilter(branchId, name, type, requestParametersToJson(request));
     }
 
     /**

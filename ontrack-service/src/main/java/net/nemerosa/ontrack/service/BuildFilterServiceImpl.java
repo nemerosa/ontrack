@@ -94,23 +94,23 @@ public class BuildFilterServiceImpl implements BuildFilterService {
     }
 
     @Override
-    public void saveFilter(ID branchId, String name, String type, JsonNode parameters) {
+    public Ack saveFilter(ID branchId, String name, String type, JsonNode parameters) {
         // Checks the account
         Account account = securityService.getCurrentAccount();
         if (account == null) {
-            return;
+            return Ack.NOK;
         }
         // Checks the provider
         Optional<? extends BuildFilterProvider<Object>> provider = getBuildFilterProviderByType(type);
         if (!provider.isPresent()) {
-            return;
+            return Ack.NOK;
         }
         // Checks the data
         if (!provider.get().parse(parameters).isPresent()) {
-            return;
+            return Ack.NOK;
         }
         // Saving
-        buildFilterRepository.save(account.id(), branchId.getValue(), name, type, parameters);
+        return buildFilterRepository.save(account.id(), branchId.getValue(), name, type, parameters);
     }
 
     @Override

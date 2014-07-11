@@ -1,10 +1,8 @@
 package net.nemerosa.ontrack.boot.ui;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.Maps;
 import net.nemerosa.ontrack.extension.api.BuildDiffExtension;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
-import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.form.Form;
@@ -20,9 +18,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
+import static net.nemerosa.ontrack.boot.ui.UIUtils.requestParametersToJson;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
@@ -113,23 +111,7 @@ public class BranchController extends AbstractResourceController {
 
     @RequestMapping(value = "branches/{branchId}/view/{filterType}", method = RequestMethod.GET)
     public BranchBuildView buildViewWithFilter(@PathVariable ID branchId, @PathVariable String filterType, WebRequest request) {
-        // Gets the parameters
-        Map<String, String[]> requestParameters = request.getParameterMap();
-        // Converts the request parameters to single values
-        Map<String, String> parameters = Maps.transformValues(
-                requestParameters,
-                array -> {
-                    if (array == null || array.length == 0) {
-                        return null;
-                    } else if (array.length == 1) {
-                        return array[0];
-                    } else {
-                        throw new IllegalArgumentException("Cannot accept several identical parameters");
-                    }
-                }
-        );
-        // Gets the parameters as JSON
-        JsonNode jsonParameters = JsonUtils.mapToJson(parameters);
+        JsonNode jsonParameters = requestParametersToJson(request);
         // Defines the filter using a service
         BuildFilter buildFilter = buildFilterService.computeFilter(branchId, filterType, jsonParameters);
         // Gets the build view

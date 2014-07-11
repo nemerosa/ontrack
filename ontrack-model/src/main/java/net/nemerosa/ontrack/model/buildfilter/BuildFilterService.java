@@ -66,7 +66,7 @@ public interface BuildFilterService {
      * @param type       Type of the filter
      * @param parameters Parameters for the filter
      */
-    void saveFilter(ID branchId, String name, String type, JsonNode parameters);
+    Ack saveFilter(ID branchId, String name, String type, JsonNode parameters);
 
     /**
      * Deletes a filter for a branch. This method does nothing if the user is not logged,

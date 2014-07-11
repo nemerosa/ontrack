@@ -52,16 +52,18 @@ public class BuildFilterJdbcRepository extends AbstractJdbcRepository implements
     }
 
     @Override
-    public void save(int accountId, int branchId, String name, String type, JsonNode data) {
+    public Ack save(int accountId, int branchId, String name, String type, JsonNode data) {
         MapSqlParameterSource params = params("branchId", branchId).addValue("accountId", accountId).addValue("name", name);
         getNamedParameterJdbcTemplate().update(
                 "DELETE FROM BUILD_FILTERS WHERE ACCOUNTID = :accountId AND BRANCHID = :branchId AND NAME = :name",
                 params
         );
-        getNamedParameterJdbcTemplate().update(
-                "INSERT INTO BUILD_FILTERS (ACCOUNTID, BRANCHID, NAME, TYPE, DATA) " +
-                        "VALUES (:accountId, :branchId, :name, :type, :data)",
-                params.addValue("type", type).addValue("data", writeJson(data))
+        return Ack.one(
+                getNamedParameterJdbcTemplate().update(
+                        "INSERT INTO BUILD_FILTERS (ACCOUNTID, BRANCHID, NAME, TYPE, DATA) " +
+                                "VALUES (:accountId, :branchId, :name, :type, :data)",
+                        params.addValue("type", type).addValue("data", writeJson(data))
+                )
         );
     }
 
