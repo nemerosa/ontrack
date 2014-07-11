@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.repository;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -61,6 +62,16 @@ public class BuildFilterJdbcRepository extends AbstractJdbcRepository implements
                 "INSERT INTO BUILD_FILTERS (ACCOUNTID, BRANCHID, NAME, TYPE, DATA) " +
                         "VALUES (:accountId, :branchId, :name, :type, :data)",
                 params.addValue("type", type).addValue("data", writeJson(data))
+        );
+    }
+
+    @Override
+    public Ack delete(int accountId, int branchId, String name) {
+        return Ack.one(
+                getNamedParameterJdbcTemplate().update(
+                        "DELETE FROM BUILD_FILTERS WHERE ACCOUNTID = :accountId AND BRANCHID = :branchId AND NAME = :name",
+                        params("branchId", branchId).addValue("accountId", accountId).addValue("name", name)
+                )
         );
     }
 

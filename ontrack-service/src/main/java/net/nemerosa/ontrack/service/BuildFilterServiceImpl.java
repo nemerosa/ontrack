@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.buildfilter.*;
 import net.nemerosa.ontrack.model.exceptions.BuildFilterNotFoundException;
 import net.nemerosa.ontrack.model.exceptions.BuildFilterNotLoggedException;
@@ -110,6 +111,13 @@ public class BuildFilterServiceImpl implements BuildFilterService {
         }
         // Saving
         buildFilterRepository.save(account.id(), branchId.getValue(), name, type, parameters);
+    }
+
+    @Override
+    public Ack deleteFilter(ID branchId, String name) {
+        return securityService.getAccount()
+                .map(account -> buildFilterRepository.delete(account.id(), branchId.getValue(), name))
+                .orElse(Ack.NOK);
     }
 
     private <T> BuildFilter getBuildFilter(ID branchId, BuildFilterProvider<T> provider, JsonNode jsonData) {

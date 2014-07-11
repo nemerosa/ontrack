@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.model.buildfilter;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.exceptions.BuildFilterNotFoundException;
 import net.nemerosa.ontrack.model.exceptions.BuildFilterNotLoggedException;
 import net.nemerosa.ontrack.model.structure.ID;
@@ -66,5 +67,14 @@ public interface BuildFilterService {
      * @param parameters Parameters for the filter
      */
     void saveFilter(ID branchId, String name, String type, JsonNode parameters);
+
+    /**
+     * Deletes a filter for a branch. This method does nothing if the user is not logged,
+     * or if the filter is not found.
+     *
+     * @param branchId Branch to save the filter for
+     * @param name     Name of the filter
+     */
+    Ack deleteFilter(ID branchId, String name);
 
 }

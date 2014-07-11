@@ -68,7 +68,8 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                         // Decorations
                 .link("_decorations", on(DecorationsController.class).getDecorations(branch.getProjectEntityType(), branch.getId()))
                         // Build filters
-                .link("_buildFilters", on(BranchController.class).buildFilters(branch.getId()))
+                .link("_buildFilters", on(BuildFilterController.class).buildFilters(branch.getId()))
+                        // TODO Build forms
                         // OK
                 .build();
     }
