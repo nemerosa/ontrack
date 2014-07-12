@@ -243,8 +243,7 @@ angular.module('ot.view.branch', [
          */
         $scope.buildFilterRemove = function (buildFilterResource) {
             buildFilterResource.removing = true;
-            otBuildFilterService.removeFilter($scope.branch, buildFilterResource);
-            loadBuildFilters();
+            otBuildFilterService.removeFilter($scope.branch, buildFilterResource).then(loadBuildFilters);
         };
 
         /**

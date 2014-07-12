@@ -129,13 +129,20 @@ angular.module('ot.service.buildfilter', [
             localStorage.setItem(self.getStoreIdForBranch(branch.id),
                 JSON.stringify(store)
             );
-            // TODO Remote delete
             // What about the current filter?
             // If selected, stores only its content, not its name
             var currentBuildFilterResource = self.getCurrentFilter(branch.id);
             if (currentBuildFilterResource && currentBuildFilterResource.name && currentBuildFilterResource.name == buildFilterResource.name) {
                 currentBuildFilterResource.name = '';
                 self.storeCurrent(branch.id, currentBuildFilterResource);
+            }
+            // Remote delete
+            if (buildFilterResource._delete) {
+                return ot.call($http.delete(buildFilterResource._delete));
+            } else {
+                var d = $q.defer();
+                d.resolve();
+                return d.promise;
             }
         };
 
