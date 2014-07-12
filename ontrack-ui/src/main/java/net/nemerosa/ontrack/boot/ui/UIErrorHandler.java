@@ -1,18 +1,24 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import net.nemerosa.ontrack.common.BaseException;
 import net.nemerosa.ontrack.model.exceptions.InputException;
 import net.nemerosa.ontrack.model.exceptions.NotFoundException;
+import net.nemerosa.ontrack.model.security.Account;
+import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.support.ApplicationLogService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -21,10 +27,14 @@ import java.util.stream.Collectors;
 public class UIErrorHandler {
 
     private final MessageSource messageSource;
+    private final ApplicationLogService applicationLogService;
+    private final SecurityService securityService;
 
     @Autowired
-    public UIErrorHandler(MessageSource messageSource) {
+    public UIErrorHandler(MessageSource messageSource, ApplicationLogService applicationLogService, SecurityService securityService) {
         this.messageSource = messageSource;
+        this.applicationLogService = applicationLogService;
+        this.securityService = securityService;
     }
 
     @ExceptionHandler(NotFoundException.class)
@@ -71,6 +81,36 @@ public class UIErrorHandler {
                 HttpStatus.BAD_REQUEST,
                 message
         );
+    }
+
+    @ExceptionHandler(BaseException.class)
+    @ResponseBody
+    public ResponseEntity<UIErrorMessage> onBaseException(BaseException ex) {
+        // Returns a message to display to the user
+        String message = ex.getMessage();
+        // OK
+        return getMessageResponse(HttpStatus.INTERNAL_SERVER_ERROR, message);
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseBody
+    public ResponseEntity<UIErrorMessage> onAnyException(HttpServletRequest request, Exception ex) {
+        // Returns a message to display to the user
+        String message = "An error has occurred.";
+        // Logs the error in the application
+        applicationLogService.error(
+                ex,
+                getClass(),
+                request.getServletPath(),
+                getSecurityContext(),
+                ex.getMessage()
+        );
+        // OK
+        return getMessageResponse(HttpStatus.INTERNAL_SERVER_ERROR, message);
+    }
+
+    private String getSecurityContext() {
+        return securityService.getAccount().map(Account::getName).orElse("anonymous");
     }
 
     protected ResponseEntity<UIErrorMessage> getMessageResponse(HttpStatus status, String message) {
