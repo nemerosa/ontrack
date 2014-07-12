@@ -53,12 +53,13 @@ angular.module('ot.service.buildfilter', [
         self.createBuildFilter = function (config) {
             if (config.buildFilterForm.predefined) {
                 var d = $q.defer();
-                var filter = {
+                var buildFilterResource = {
                     name: config.buildFilterForm.typeName,
-                    type: config.buildFilterForm.type
+                    typeName: config.buildFilterForm.type,
+                    data: {}
                 };
-                self.storeCurrent(config.branchId, filter);
-                d.resolve(filter);
+                self.storeCurrent(config.branchId, buildFilterResource);
+                d.resolve(buildFilterResource);
                 return d.promise;
             } else {
                 return otFormService.display({
@@ -88,9 +89,9 @@ angular.module('ot.service.buildfilter', [
             }
         };
 
-        self.storeCurrent = function (branchId, filterData) {
+        self.storeCurrent = function (branchId, buildFilterResource) {
             localStorage.setItem('build_filter_' + branchId + '_current',
-                JSON.stringify(filterData)
+                JSON.stringify(buildFilterResource)
             );
         };
 

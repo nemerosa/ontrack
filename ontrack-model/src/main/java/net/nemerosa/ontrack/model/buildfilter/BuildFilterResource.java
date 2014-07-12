@@ -20,7 +20,7 @@ public class BuildFilterResource<T> {
     /**
      * Type for this filter
      */
-    private final String typeName;
+    private final String type;
     /**
      * Specific data for this filter
      */
