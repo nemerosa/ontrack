@@ -223,9 +223,9 @@ angular.module('ot.view.branch', [
         /**
          * Applying a filter
          */
-        $scope.buildFilterApply = function (filter) {
-            if (!filter.removing) {
-                otBuildFilterService.storeCurrent(branchId, filter);
+        $scope.buildFilterApply = function (buildFilterResource) {
+            if (!buildFilterResource.removing) {
+                otBuildFilterService.storeCurrent(branchId, buildFilterResource);
                 loadBuildView();
             }
         };
