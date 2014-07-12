@@ -95,7 +95,6 @@ public class BuildFilterServiceImpl implements BuildFilterService {
 
     @Override
     public Ack saveFilter(ID branchId, String name, String type, JsonNode parameters) {
-        // TODO Excludes predefined filters
         // Checks the account
         Account account = securityService.getCurrentAccount();
         if (account == null) {
@@ -104,6 +103,10 @@ public class BuildFilterServiceImpl implements BuildFilterService {
         // Checks the provider
         Optional<? extends BuildFilterProvider<Object>> provider = getBuildFilterProviderByType(type);
         if (!provider.isPresent()) {
+            return Ack.NOK;
+        }
+        // Excludes predefined filters
+        if (provider.get().isPredefined()) {
             return Ack.NOK;
         }
         // Checks the data

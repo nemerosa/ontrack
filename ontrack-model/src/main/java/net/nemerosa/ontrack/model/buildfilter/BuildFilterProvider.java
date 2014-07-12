@@ -15,6 +15,11 @@ public interface BuildFilterProvider<T> {
     String getName();
 
     /**
+     * If this method returns <code>true</code>, there is no need to configure the filter.
+     */
+    boolean isPredefined();
+
+    /**
      * Gets the form for a new filter on the given branch
      */
     BuildFilterForm newFilterForm(ID branchId);

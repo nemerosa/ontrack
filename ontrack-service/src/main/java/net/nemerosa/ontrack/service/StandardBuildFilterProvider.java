@@ -42,7 +42,7 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
     }
 
     @Override
-    protected boolean isPredefined() {
+    public boolean isPredefined() {
         return false;
     }
 

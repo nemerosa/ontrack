@@ -9,7 +9,7 @@ import java.util.Optional;
 public abstract class AbstractPredefinedBuildFilterProvider extends AbstractBuildFilterProvider<Object> {
 
     @Override
-    protected boolean isPredefined() {
+    public boolean isPredefined() {
         return true;
     }
 
