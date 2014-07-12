@@ -1,9 +1,12 @@
 package net.nemerosa.ontrack.acceptance;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.nemerosa.ontrack.client.*;
+import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -17,6 +20,8 @@ import static org.junit.Assert.fail;
  * for the application fixtures.
  */
 public abstract class AcceptanceSupport {
+
+    private static final ObjectMapper mapper = ObjectMapperFactory.create();
 
     public JsonNode nameDescription() {
         return object()
@@ -82,14 +87,15 @@ public abstract class AcceptanceSupport {
         };
     }
 
-    protected void validationMessage(Runnable task, String expectedMessage) {
+    protected void validationMessage(Runnable task, String expectedMessage) throws IOException {
         try {
             task.run();
             fail("The call should have failed with a validation exception.");
         } catch (ClientValidationException ex) {
+            JsonNode error = mapper.readTree(ex.getMessage());
             assertEquals(
                     expectedMessage,
-                    ex.getMessage()
+                    error.path("message").asText()
             );
         }
     }
