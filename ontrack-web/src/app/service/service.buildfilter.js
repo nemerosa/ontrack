@@ -121,18 +121,15 @@ angular.module('ot.service.buildfilter', [
         };
 
         self.removeFilter = function (branch, buildFilterResource) {
-            if (buildFilterResource.local) {
-                // Gets the store for this branch
-                var store = self.getStoreForBranch(branch.id);
-                // Removes from the store
-                delete store[buildFilterResource.name];
-                // Saves the store back
-                localStorage.setItem(self.getStoreIdForBranch(branch.id),
-                    JSON.stringify(store)
-                );
-            } else {
-                // TODO Remote delete
-            }
+            // Gets the store for this branch
+            var store = self.getStoreForBranch(branch.id);
+            // Removes from the store
+            delete store[buildFilterResource.name];
+            // Saves the store back
+            localStorage.setItem(self.getStoreIdForBranch(branch.id),
+                JSON.stringify(store)
+            );
+            // TODO Remote delete
             // What about the current filter?
             // If selected, stores only its content, not its name
             var currentBuildFilterResource = self.getCurrentFilter(branch.id);

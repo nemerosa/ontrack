@@ -241,9 +241,9 @@ angular.module('ot.view.branch', [
         /**
          * Removing an existing filter
          */
-        $scope.buildFilterRemove = function (filter) {
-            filter.removing = true;
-            otBuildFilterService.removeFilter($scope.branch, filter);
+        $scope.buildFilterRemove = function (buildFilterResource) {
+            buildFilterResource.removing = true;
+            otBuildFilterService.removeFilter($scope.branch, buildFilterResource);
             loadBuildFilters();
         };
 
