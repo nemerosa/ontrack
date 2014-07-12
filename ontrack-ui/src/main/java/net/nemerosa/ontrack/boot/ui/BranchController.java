@@ -109,7 +109,7 @@ public class BranchController extends AbstractResourceController {
 
     }
 
-    @RequestMapping(value = "branches/{branchId}/view/{filterType}", method = RequestMethod.GET)
+    @RequestMapping(value = "branches/{branchId}/view/{filterType:.*}", method = RequestMethod.GET)
     public BranchBuildView buildViewWithFilter(@PathVariable ID branchId, @PathVariable String filterType, WebRequest request) {
         JsonNode jsonParameters = requestParametersToJson(request);
         // Defines the filter using a service
