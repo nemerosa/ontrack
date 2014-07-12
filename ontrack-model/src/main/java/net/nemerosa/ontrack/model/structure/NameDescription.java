@@ -13,8 +13,13 @@ public class NameDescription {
      */
     public static final String NAME = "[A-Za-z0-9\\.-_]+";
 
+    /**
+     * Message associated with the regular expression
+     */
+    public static final String NAME_MESSAGE_SUFFIX = "can only have letter, digits, dot (.), dashes (-) or underscores (_).";
+
     @NotNull(message = "The name is required.")
-    @Pattern(regexp = NAME, message = "The name can only have letter, digits, dot (.), dashes (-) or underscores (_).")
+    @Pattern(regexp = NAME, message = "The name " + NAME_MESSAGE_SUFFIX)
     private final String name;
     private final String description;
 

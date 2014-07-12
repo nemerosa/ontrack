@@ -14,6 +14,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 /**
@@ -75,7 +77,7 @@ public class BuildFilterController extends AbstractResourceController {
      * Creating a filter
      */
     @RequestMapping(value = "branches/{branchId}/filters", method = RequestMethod.POST)
-    public Ack createFilter(@PathVariable ID branchId, @RequestBody BuildFilterInput input) {
+    public Ack createFilter(@PathVariable ID branchId, @RequestBody @Valid BuildFilterInput input) {
         return buildFilterService.saveFilter(branchId, input.getName(), input.getType(), input.getData());
     }
 
@@ -83,7 +85,7 @@ public class BuildFilterController extends AbstractResourceController {
      * Saving a filter
      */
     @RequestMapping(value = "branches/{branchId}/filters/{name}", method = RequestMethod.PUT)
-    public Ack saveFilter(@PathVariable ID branchId, @PathVariable String name, @RequestBody BuildFilterInput input) {
+    public Ack saveFilter(@PathVariable ID branchId, @PathVariable String name, @RequestBody @Valid BuildFilterInput input) {
         if (!StringUtils.equals(name, input.getName())) {
             throw new IllegalArgumentException("The input name must be identical to the one in the URI.");
         }

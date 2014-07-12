@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
@@ -40,7 +42,7 @@ public class BuildController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "branches/{branchId}/builds/create", method = RequestMethod.POST)
-    public Build newBuild(@PathVariable ID branchId, @RequestBody BuildRequest request) {
+    public Build newBuild(@PathVariable ID branchId, @RequestBody @Valid BuildRequest request) {
         // Gets the holding branch
         Branch branch = structureService.getBranch(branchId);
         // Build signature
@@ -96,7 +98,7 @@ public class BuildController extends AbstractResourceController {
 
     @RequestMapping(value = "builds/{buildId}/promotionRun/create", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public PromotionRun newPromotionRun(@PathVariable ID buildId, @RequestBody PromotionRunRequest promotionRunRequest) {
+    public PromotionRun newPromotionRun(@PathVariable ID buildId, @RequestBody @Valid PromotionRunRequest promotionRunRequest) {
         // Gets the build
         Build build = structureService.getBuild(buildId);
         // Gets the promotion level

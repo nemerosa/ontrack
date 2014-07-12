@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.model.structure;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.beans.ConstructorProperties;
 import java.util.Collections;
 import java.util.List;
@@ -16,6 +18,8 @@ import java.util.List;
 @Data
 public class BuildRequest {
 
+    @NotNull(message = "The build name is required.")
+    @Pattern(regexp = NameDescription.NAME, message = "The build name " + NameDescription.NAME_MESSAGE_SUFFIX)
     private final String name;
     private final String description;
     private final List<PropertyCreationRequest> properties;

@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.io.IOException;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -57,7 +58,7 @@ public class ValidationStampController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "branches/{branchId}/validationStamps/create", method = RequestMethod.POST)
-    public ValidationStamp newValidationStamp(@PathVariable ID branchId, @RequestBody NameDescription nameDescription) {
+    public ValidationStamp newValidationStamp(@PathVariable ID branchId, @RequestBody @Valid NameDescription nameDescription) {
         // Gets the holding branch
         Branch branch = structureService.getBranch(branchId);
         // Creates a new promotion level

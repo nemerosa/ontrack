@@ -78,7 +78,7 @@ public class ProjectController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "{projectId}/update", method = RequestMethod.PUT)
-    public Project saveProject(@PathVariable ID projectId, @RequestBody NameDescription nameDescription) {
+    public Project saveProject(@PathVariable ID projectId, @RequestBody @Valid NameDescription nameDescription) {
         // Gets from the repository
         Project project = structureService.getProject(projectId);
         // Updates

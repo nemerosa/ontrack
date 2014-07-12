@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -64,7 +65,7 @@ public class BranchController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "projects/{projectId}/branches/create", method = RequestMethod.POST)
-    public Branch newBranch(@PathVariable ID projectId, @RequestBody NameDescription nameDescription) {
+    public Branch newBranch(@PathVariable ID projectId, @RequestBody @Valid NameDescription nameDescription) {
         // Gets the project
         Project project = structureService.getProject(projectId);
         // Creates a new branch instance
@@ -87,7 +88,7 @@ public class BranchController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "branches/{branchId}/update", method = RequestMethod.PUT)
-    public Branch updateBranch(@PathVariable ID branchId, @RequestBody NameDescription form) {
+    public Branch updateBranch(@PathVariable ID branchId, @RequestBody @Valid NameDescription form) {
         // Loads and updates branch
         Branch branch = structureService.getBranch(branchId).update(form);
         // Saves the branch
