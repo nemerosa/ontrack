@@ -79,7 +79,7 @@ public class BuildFilterController extends AbstractResourceController {
     /**
      * Saving a filter
      */
-    @RequestMapping(value = "branches/{branchId}/filters/{name}/{type}", method = RequestMethod.PUT)
+    @RequestMapping(value = "branches/{branchId}/filters/{name}/{type:.*}", method = RequestMethod.PUT)
     public Ack saveFilter(@PathVariable ID branchId, @PathVariable String name, @PathVariable String type, WebRequest request) {
         return buildFilterService.saveFilter(branchId, name, type, requestParametersToJson(request));
     }
