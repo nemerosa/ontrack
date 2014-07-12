@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
@@ -43,7 +45,7 @@ public class ProjectController extends AbstractResourceController {
 
     @RequestMapping(value = "create", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public Project newProject(@RequestBody NameDescription nameDescription) {
+    public Project newProject(@RequestBody @Valid NameDescription nameDescription) {
         // Creates a new project instance
         Project project = Project.of(nameDescription);
         // Saves it into the repository

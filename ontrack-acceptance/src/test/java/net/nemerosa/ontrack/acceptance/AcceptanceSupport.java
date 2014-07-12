@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.acceptance;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import net.nemerosa.ontrack.client.JsonClient;
-import net.nemerosa.ontrack.client.JsonClientImpl;
-import net.nemerosa.ontrack.client.OTHttpClient;
-import net.nemerosa.ontrack.client.OTHttpClientBuilder;
+import net.nemerosa.ontrack.client.*;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.function.Consumer;
@@ -12,6 +9,8 @@ import java.util.function.Supplier;
 
 import static net.nemerosa.ontrack.json.JsonUtils.object;
 import static net.nemerosa.ontrack.test.TestUtils.uid;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * Class to be inherited in order to create an acceptance test with some support
@@ -81,6 +80,18 @@ public abstract class AcceptanceSupport {
                 return new SimpleJsonResult(jsonClient.post(data, path, parameters));
             }
         };
+    }
+
+    protected void validationMessage(Runnable task, String expectedMessage) {
+        try {
+            task.run();
+            fail("The call should have failed with a validation exception.");
+        } catch (ClientValidationException ex) {
+            assertEquals(
+                    expectedMessage,
+                    ex.getMessage()
+            );
+        }
     }
 
     protected static interface Client {

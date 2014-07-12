@@ -67,6 +67,7 @@ ext {
             mockito                     : 'org.mockito:mockito-core:1.9.5',
 
             // Other
-            lombok                      : 'org.projectlombok:lombok:1.14.4'
+            lombok                      : 'org.projectlombok:lombok:1.14.4',
+            validation_api              : 'javax.validation:validation-api:1.1.0.Final'
     ]
 }
