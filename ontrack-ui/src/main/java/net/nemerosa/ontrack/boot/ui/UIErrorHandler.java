@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.model.exceptions.InputException;
 import net.nemerosa.ontrack.model.exceptions.NotFoundException;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
@@ -49,7 +50,14 @@ public class UIErrorHandler {
     public ResponseEntity<UIErrorMessage> onValidationException(MethodArgumentNotValidException ex) {
         // Field errors to messages
         List<String> messages = ex.getBindingResult().getFieldErrors().stream()
-                .map(fieldError -> messageSource.getMessage(fieldError, Locale.ENGLISH))
+                .map(fieldError -> {
+                    String defaultMessage = fieldError.getDefaultMessage();
+                    if (StringUtils.isNotBlank(defaultMessage)) {
+                        return defaultMessage;
+                    } else {
+                        return messageSource.getMessage(fieldError, Locale.ENGLISH);
+                    }
+                })
                 .collect(Collectors.toList());
         // Returned message
         String message;
