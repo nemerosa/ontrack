@@ -64,13 +64,16 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                         // TODO Delete link
                         // View link
                 .link("_status", on(BranchController.class).getBranchStatusView(branch.getId()))
-                        // TODO Builds link
+                        // Builds link
+                .link("_view", on(BranchController.class).buildView(branch.getId()))
                         // Decorations
                 .link("_decorations", on(DecorationsController.class).getDecorations(branch.getProjectEntityType(), branch.getId()))
                         // Build filters
                 .link("_buildFilterResources", on(BuildFilterController.class).buildFilters(branch.getId()))
-                        // Build forms
+                        // Build filter forms
                 .link("_buildFilterForms", on(BuildFilterController.class).buildFilterForms(branch.getId()))
+                        // Saving a filter
+                .link("_buildFilterSave", on(BuildFilterController.class).createFilter(branch.getId(), null))
                         // OK
                 .build();
     }

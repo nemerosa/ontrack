@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterForm;
+import net.nemerosa.ontrack.model.buildfilter.BuildFilterInput;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterResource;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.structure.ID;
@@ -9,14 +10,10 @@ import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.bind.annotation.*;
 
-import static net.nemerosa.ontrack.boot.ui.UIUtils.requestParametersToJson;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 /**
@@ -70,18 +67,27 @@ public class BuildFilterController extends AbstractResourceController {
         ).with(Link.UPDATE, uri(on(getClass()).saveFilter(
                 branchId,
                 name,
-                editionForm.getType().getName(),
                 null
         )));
     }
 
+    /**
+     * Creating a filter
+     */
+    @RequestMapping(value = "branches/{branchId}/filters", method = RequestMethod.POST)
+    public Ack createFilter(@PathVariable ID branchId, @RequestBody BuildFilterInput input) {
+        return buildFilterService.saveFilter(branchId, input.getName(), input.getType(), input.getData());
+    }
 
     /**
      * Saving a filter
      */
-    @RequestMapping(value = "branches/{branchId}/filters/{name}/{type:.*}", method = RequestMethod.PUT)
-    public Ack saveFilter(@PathVariable ID branchId, @PathVariable String name, @PathVariable String type, WebRequest request) {
-        return buildFilterService.saveFilter(branchId, name, type, requestParametersToJson(request));
+    @RequestMapping(value = "branches/{branchId}/filters/{name}", method = RequestMethod.PUT)
+    public Ack saveFilter(@PathVariable ID branchId, @PathVariable String name, @RequestBody BuildFilterInput input) {
+        if (!StringUtils.equals(name, input.getName())) {
+            throw new IllegalArgumentException("The input name must be identical to the one in the URI.");
+        }
+        return buildFilterService.saveFilter(branchId, name, input.getType(), input.getData());
     }
 
     /**
