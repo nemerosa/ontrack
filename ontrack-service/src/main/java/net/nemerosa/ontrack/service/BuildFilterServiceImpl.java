@@ -146,6 +146,7 @@ public class BuildFilterServiceImpl implements BuildFilterService {
                         new BuildFilterResource<>(
                                 ID.of(branchId),
                                 name,
+                                provider.getClass().getName(),
                                 parsedData
                         )
         );

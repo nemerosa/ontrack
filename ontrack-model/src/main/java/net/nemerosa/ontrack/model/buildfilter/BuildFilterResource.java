@@ -18,6 +18,10 @@ public class BuildFilterResource<T> {
      */
     private final String name;
     /**
+     * Type for this filter
+     */
+    private final String typeName;
+    /**
      * Specific data for this filter
      */
     private final T data;
