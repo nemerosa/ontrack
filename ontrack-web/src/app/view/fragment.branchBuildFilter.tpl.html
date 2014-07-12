@@ -1,0 +1,40 @@
+<div class="btn-group">
+    <button type="button" class="btn dropdown-toggle" data-toggle="dropdown"
+            ng-class="{
+                        'btn-warning': currentBuildFilterResource,
+                        'btn-default': !currentBuildFilterResource
+                        }">
+        Filter<span ng-show="currentBuildFilterResource.name">: {{currentBuildFilterResource.name}}</span>
+        <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu ot-buildfilter-list" role="menu">
+        <li role="presentation" class="dropdown-header" ng-if="buildFilterResources">Existing filters:</li>
+        <li ng-repeat="buildFilterResource in buildFilterResources">
+            <a>
+                            <span ng-click="buildFilterApply(buildFilterResource)"
+                                  ng-class="{'ot-buildfilter-local': !buildFilterResource._update, 'ot-buildfilter-remote': buildFilterResource._update}">
+                                {{buildFilterResource.name}}
+                                <span ng-if="!buildFilterResource._update"> (local)</span>
+                            </span>
+                <!-- Saving only if local and logged -->
+                <span class="glyphicon glyphicon-save ot-command" ng-if="!buildFilterResource._update && logged()"
+                      title="Save this filter in your preferences"
+                      ng-click="buildFilterSave(buildFilterResource)"></span>
+                <!-- Deletion always available -->
+                <span class="glyphicon glyphicon-trash ot-command"
+                      title="Delete this filter"
+                      ng-click="buildFilterRemove(buildFilterResource)"></span>
+            </a>
+        </li>
+        <li class="divider" ng-if="buildFilterResources"></li>
+        <li ng-if="currentBuildFilterResource">
+            <a ng-click="buildFilterErase()">Erase filter</a>
+        </li>
+        <li class="divider" ng-if="currentBuildFilterResource"></li>
+        <!-- New filters -->
+        <li role="presentation" class="dropdown-header">New filter:</li>
+        <li ng-repeat="buildFilterForm in buildFilterForms.resources">
+            <a ng-click="buildFilterNew(buildFilterForm)">{{buildFilterForm.typeName}}</a>
+        </li>
+    </ul>
+</div>
