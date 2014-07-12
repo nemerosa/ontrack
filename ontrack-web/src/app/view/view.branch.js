@@ -61,12 +61,12 @@ angular.module('ot.view.branch', [
             // Parameters for the call
             var config = {};
             // Adds the filter parameters
-            var currentFilter = otBuildFilterService.getCurrentFilter(branchId);
-            if (currentFilter) {
-                config.params = currentFilter;
-                $scope.currentFilter = currentFilter;
+            var currentBuildFilterResource = otBuildFilterService.getCurrentFilter(branchId);
+            if (currentBuildFilterResource) {
+                config.params = currentBuildFilterResource;
+                $scope.currentBuildFilterResource = currentBuildFilterResource;
             } else {
-                $scope.currentFilter = undefined;
+                $scope.currentBuildFilterResource = undefined;
             }
             // Call
             ot.call(
