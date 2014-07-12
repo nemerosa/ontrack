@@ -16,29 +16,20 @@ angular.module('ot.service.buildfilter', [
          */
         self.loadFilters = function (branch) {
             var d = $q.defer();
-            // Result to define
-            var filters = {
-            };
             // Loads the local filters for this branch
             var store = self.getStoreForBranch(branch.id);
             // Loads the remote filters & the filter forms for this branch
-            ot.call($http.get(branch._buildFilters)).then(function (buildFilters) {
-                // List of forms
-                filters.buildFilterForms = buildFilters.buildFilterForms;
-                // Combine local & remote filters
-                angular.forEach(store, function (filter) {
-                    filter.local = true;
-                });
-                angular.forEach(buildFilters.buildFilterResources, function (buildFilterResource) {
+            ot.call($http.get(branch._buildFilterResources)).then(function (buildFilterResources) {
+                angular.forEach(buildFilterResources.resources, function (buildFilterResource) {
                     store[buildFilterResource.name] = buildFilterResource;
                 });
-                // Gets the values for the store
-                filters.store = [];
+                // Flatten the values for the store
+                var flatBuildFilterResources = [];
                 angular.forEach(store, function (value) {
-                    filters.store.push(value);
+                    flatBuildFilterResources.push(value);
                 });
                 // OK
-                d.resolve(filters);
+                d.resolve(flatBuildFilterResources);
             });
             // OK
             return d.promise;
