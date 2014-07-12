@@ -65,14 +65,20 @@ angular.module('ot.service.buildfilter', [
                 return otFormService.display({
                     title: "New filter",
                     form: config.buildFilterForm.form,
-                    submit: function (filterData) {
-                        filterData.type = config.buildFilterForm.type;
+                    submit: function (data) {
+                        var name = data.name;
+                        delete data.name;
+                        var buildFilterResource = {
+                            name: name,
+                            type: config.buildFilterForm.type,
+                            data: data
+                        };
                         // Stores locally the filter data if named
-                        if (filterData.name) {
-                            self.storeForBranch(config, filterData);
+                        if (name) {
+                            self.storeForBranch(config.branchId, buildFilterResource);
                         }
                         // Stores locally as current
-                        self.storeCurrent(config.branchId, filterData);
+                        self.storeCurrent(config.branchId, buildFilterResource);
                         // OK
                         return true;
                     }
@@ -99,18 +105,13 @@ angular.module('ot.service.buildfilter', [
             localStorage.removeItem('build_filter_' + branchId + '_current');
         };
 
-        self.storeForBranch = function (config, filterData) {
+        self.storeForBranch = function (branchId, buildFilterResource) {
             // Gets the store for this branch
-            var store = self.getStoreForBranch(config.branchId);
+            var store = self.getStoreForBranch(branchId);
             // Stores the resource in the store
-            filterData.type = config.buildFilterForm.type;
-            store[filterData.name] = {
-                name: filterData.name,
-                type: config.buildFilterForm.type,
-                filter: filterData
-            };
+            store[buildFilterResource.name] = buildFilterResource;
             // Saves the store back
-            localStorage.setItem(self.getStoreIdForBranch(config.branchId),
+            localStorage.setItem(self.getStoreIdForBranch(branchId),
                 JSON.stringify(store)
             );
         };
@@ -128,12 +129,12 @@ angular.module('ot.service.buildfilter', [
             return 'build_filter_' + branchId;
         };
 
-        self.removeFilter = function (branch, filter) {
-            if (filter.local) {
+        self.removeFilter = function (branch, buildFilterResource) {
+            if (buildFilterResource.local) {
                 // Gets the store for this branch
                 var store = self.getStoreForBranch(branch.id);
                 // Removes from the store
-                delete store[filter.name];
+                delete store[buildFilterResource.name];
                 // Saves the store back
                 localStorage.setItem(self.getStoreIdForBranch(branch.id),
                     JSON.stringify(store)
@@ -143,10 +144,10 @@ angular.module('ot.service.buildfilter', [
             }
             // What about the current filter?
             // If selected, stores only its content, not its name
-            var currentFilter = self.getCurrentFilter(branch.id);
-            if (currentFilter && currentFilter.name && currentFilter.name == filter.name) {
-                currentFilter.name = '';
-                self.storeCurrent(branch.id, currentFilter);
+            var currentBuildFilterResource = self.getCurrentFilter(branch.id);
+            if (currentBuildFilterResource && currentBuildFilterResource.name && currentBuildFilterResource.name == buildFilterResource.name) {
+                currentBuildFilterResource.name = '';
+                self.storeCurrent(branch.id, currentBuildFilterResource);
             }
         };
 
