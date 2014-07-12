@@ -59,20 +59,20 @@ angular.module('ot.view.branch', [
         // Loading the build view
         function loadBuildView() {
             // Parameters for the call
+            // TODO Use '_view' link from the branch
+            var uri = 'structure/branches/' + branchId + '/view';
             var config = {};
             // Adds the filter parameters
             var currentBuildFilterResource = otBuildFilterService.getCurrentFilter(branchId);
             if (currentBuildFilterResource) {
-                config.params = currentBuildFilterResource;
                 $scope.currentBuildFilterResource = currentBuildFilterResource;
+                config.params = currentBuildFilterResource.data;
+                uri += '/' + currentBuildFilterResource.type;
             } else {
                 $scope.currentBuildFilterResource = undefined;
             }
             // Call
-            ot.call(
-                // TODO Use links from the branch
-                $http.get('structure/branches/' + branchId + '/view', config)
-            ).then(
+            ot.call($http.get(uri, config)).then(
                 function success(branchBuildView) {
                     $scope.branchBuildView = branchBuildView;
                     // Selection of build boundaries

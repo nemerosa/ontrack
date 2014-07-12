@@ -55,7 +55,7 @@ angular.module('ot.service.buildfilter', [
                 var d = $q.defer();
                 var buildFilterResource = {
                     name: config.buildFilterForm.typeName,
-                    typeName: config.buildFilterForm.type,
+                    type: config.buildFilterForm.type,
                     data: {}
                 };
                 self.storeCurrent(config.branchId, buildFilterResource);
