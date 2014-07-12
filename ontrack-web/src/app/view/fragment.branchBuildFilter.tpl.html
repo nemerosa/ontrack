@@ -34,7 +34,18 @@
         <!-- New filters -->
         <li role="presentation" class="dropdown-header">New filter:</li>
         <li ng-repeat="buildFilterForm in buildFilterForms.resources">
-            <a ng-click="buildFilterNew(buildFilterForm)">{{buildFilterForm.typeName}}</a>
+            <a>
+                <span ng-click="buildFilterNew(buildFilterForm)">
+                    <span ng-if="!buildFilterForm.predefined">{{buildFilterForm.typeName}}...</span>
+                    <span class="ot-buildfilter-remote"
+                          ng-if="buildFilterForm.predefined"
+                          title="This filter does not need any configuration">
+                        {{buildFilterForm.typeName}}
+                        <span class="glyphicon glyphicon-star"></span>
+                    </span>
+                </span>
+
+            </a>
         </li>
     </ul>
 </div>
