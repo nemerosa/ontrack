@@ -139,6 +139,12 @@ angular.module('ot.service.buildfilter', [
             }
         };
 
+        self.saveFilter = function (branch, buildFilterResource) {
+            return ot.call(
+                $http.post(branch._buildFilterSave, buildFilterResource)
+            );
+        };
+
         return self;
     })
 ;

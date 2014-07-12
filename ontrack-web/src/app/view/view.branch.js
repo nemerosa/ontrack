@@ -251,7 +251,7 @@ angular.module('ot.view.branch', [
          * Saving a local filter
          */
         $scope.buildFilterSave = function (buildFilterResource) {
-
+            otBuildFilterService.saveFilter($scope.branch, buildFilterResource).then(loadBuildFilters);
         };
 
     })
