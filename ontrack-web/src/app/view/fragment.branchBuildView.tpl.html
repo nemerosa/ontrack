@@ -108,6 +108,9 @@
                                 {{buildFilterResource.name}}
                                 <span ng-if="!buildFilterResource._update"> (local)</span>
                             </span>
+                            <!-- Saving only if local and logged -->
+                            <span class="glyphicon glyphicon-star-empty ot-command" ng-if="!buildFilterResource._update && logged()" ng-click="buildFilterSave(buildFilterResource)"></span>
+                            <!-- Deletion always available -->
                             <span class="glyphicon glyphicon-trash ot-command" ng-click="buildFilterRemove(buildFilterResource)"></span>
                         </a>
                     </li>
