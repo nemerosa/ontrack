@@ -17,9 +17,13 @@
                                 <span ng-if="!buildFilterResource._update"> (local)</span>
                             </span>
                 <!-- Saving only if local and logged -->
-                <span class="glyphicon glyphicon-save ot-command" ng-if="!buildFilterResource._update && logged()"
+                <span class="glyphicon glyphicon-star-empty ot-command" ng-if="!buildFilterResource._update && logged()"
                       title="Save this filter in your preferences"
                       ng-click="buildFilterSave(buildFilterResource)"></span>
+                <!-- Saved filter -->
+                <span class="glyphicon glyphicon-star ot-command" ng-if="buildFilterResource._update"
+                      title="This filter has been saved in your preferences"
+                      ng-click="buildFilterApply(buildFilterResource)"></span>
                 <!-- Deletion always available -->
                 <span class="glyphicon glyphicon-trash ot-command"
                       title="Delete this filter"
