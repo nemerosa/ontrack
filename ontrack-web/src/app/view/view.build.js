@@ -47,6 +47,20 @@ angular.module('ot.view.build', [
                         cls: 'ot-command-validate',
                         action: validate
                     },
+                    {
+                        condition: function () {
+                            return build._update;
+                        },
+                        id: 'updateBuild',
+                        name: "Update build",
+                        cls: 'ot-command-build-update',
+                        action: function () {
+                            otStructureService.update(
+                                build._update,
+                                "Update build"
+                            ).then(loadBuild);
+                        }
+                    },
                     ot.viewCloseCommand('/branch/' + build.branch.id)
                 ];
             });
