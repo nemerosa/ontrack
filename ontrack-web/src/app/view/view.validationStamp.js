@@ -10,7 +10,7 @@ angular.module('ot.view.validationStamp', [
             controller: 'ValidationStampCtrl'
         });
     })
-    .controller('ValidationStampCtrl', function ($scope, $stateParams, $http, ot, otStructureService) {
+    .controller('ValidationStampCtrl', function ($state, $scope, $stateParams, $http, ot, otStructureService, otAlertService) {
         var view = ot.view();
         // ValidationStamp's id
         var validationStampId = $stateParams.validationStampId;
@@ -25,6 +25,39 @@ angular.module('ot.view.validationStamp', [
                 view.breadcrumbs = ot.branchBreadcrumbs(validationStamp.branch);
                 // Commands
                 view.commands = [
+                    {
+                        condition: function () {
+                            return validationStamp._update;
+                        },
+                        id: 'updateValidationStamp',
+                        name: "Update validation stamp",
+                        cls: 'ot-command-validation-stamp-update',
+                        action: function () {
+                            otStructureService.update(
+                                validationStamp._update,
+                                "Update validation stamp"
+                            ).then(loadValidationStamp);
+                        }
+                    },
+                    {
+                        condition: function () {
+                            return validationStamp._delete;
+                        },
+                        id: 'deleteValidationStamp',
+                        name: "Delete validation stamp",
+                        cls: 'ot-command-validation-stamp-delete',
+                        action: function () {
+                            otAlertService.confirm({
+                                title: "Deleting a validation stamp",
+                                message: "Do you really want to delete the validation stamp " + validationStamp.name +
+                                    " and all its associated data?"
+                            }).then(function () {
+                                return ot.call($http.delete(validationStamp._delete));
+                            }).then(function () {
+                                $state.go('branch', {branchId: validationStamp.branch.id});
+                            });
+                        }
+                    },
                     ot.viewCloseCommand('/branch/' + $scope.validationStamp.branch.id)
                 ];
             });
