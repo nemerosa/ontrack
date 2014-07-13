@@ -18,18 +18,16 @@
             <ot-noentry list="promotionLevelCollection.resources">
                 No promotion level has been created yet.
             </ot-noentry>
-            <table class="ot-promotionLevel-table">
-                <tr ng-repeat="promotionLevel in promotionLevelCollection.resources">
-                    <td class="ot-entity-image">
+            <div ng-if="promotionLevelCollection.resources" class="ot-promotion-level-list">
+                <div ng-repeat="promotionLevel in promotionLevelCollection.resources" class="ot-promotion-level-list-item">
+                    <span class="ot-promotion-level-list-image">
                         <ot-entity-image entity="promotionLevel" link="#/promotionLevel/{{promotionLevel.id}}"></ot-entity-image>
-                    </td>
-                    <td>
-                        <a href="#/promotionLevel/{{promotionLevel.id}}">
-                            {{promotionLevel.name}}
-                        </a>
-                    </td>
-                </tr>
-            </table>
+                    </span>
+                    <a href="#/promotionLevel/{{promotionLevel.id}}" class="ot-promotion-level-list-link">
+                        {{promotionLevel.name}}
+                    </a>
+                </div>
+            </div>
             <button ng-if="branch._createPromotionLevel" type="button" class="btn btn-default"
                     ng-click="createPromotionLevel()">New promotion level
             </button>

@@ -253,11 +253,6 @@ table.ot-form-view {
   .ot-entity-label;
 }
 
-.ot-promotionLevel-table {
-  .table;
-  .table-hover;
-}
-
 .ot-validationStamp-table {
   .table;
   .table-hover;
@@ -351,6 +346,25 @@ table.ot-validation-runs {
   }
   img.ot-validation-run-status {
     padding-left: 0.5em;
+  }
+}
+
+/**
+ * Promotion level list
+ */
+
+.ot-promotion-level-list {
+  .ot-promotion-level-list-item {
+    padding-left: 0.5em;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    border-top: solid 1px @table-border-color;
+    &:hover {
+      background-color: @table-bg-hover;
+    }
+    .ot-promotion-level-list-link {
+      margin-left: 1em;
+    }
   }
 }
 
