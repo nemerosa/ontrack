@@ -371,6 +371,31 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    public void savePromotionLevel(PromotionLevel promotionLevel) {
+        // Update
+        try {
+            getNamedParameterJdbcTemplate().update(
+                    "UPDATE PROMOTION_LEVELS SET NAME = :name, DESCRIPTION = :description WHERE ID = :id",
+                    params("name", promotionLevel.getName())
+                            .addValue("description", promotionLevel.getDescription())
+                            .addValue("id", promotionLevel.id())
+            );
+        } catch (DuplicateKeyException ex) {
+            throw new PromotionLevelNameAlreadyDefinedException(promotionLevel.getName());
+        }
+    }
+
+    @Override
+    public Ack deletePromotionLevel(ID promotionLevelId) {
+        return Ack.one(
+                getNamedParameterJdbcTemplate().update(
+                        "DELETE FROM PROMOTION_LEVELS WHERE ID = :id",
+                        params("id", promotionLevelId.getValue())
+                )
+        );
+    }
+
+    @Override
     public PromotionRun newPromotionRun(PromotionRun promotionRun) {
         return promotionRun.withId(
                 id(

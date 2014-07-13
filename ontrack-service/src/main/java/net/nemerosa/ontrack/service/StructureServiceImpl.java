@@ -306,6 +306,26 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public void savePromotionLevel(PromotionLevel promotionLevel) {
+        // Validation
+        isEntityDefined(promotionLevel, "Promotion level must be defined");
+        isEntityDefined(promotionLevel.getBranch(), "Branch must be defined");
+        isEntityDefined(promotionLevel.getBranch().getProject(), "Project must be defined");
+        // Security
+        securityService.checkProjectFunction(promotionLevel.projectId(), PromotionLevelEdit.class);
+        // Repository
+        structureRepository.savePromotionLevel(promotionLevel);
+    }
+
+    @Override
+    public Ack deletePromotionLevel(ID promotionLevelId) {
+        Validate.isTrue(promotionLevelId.isSet(), "Promotion level ID must be set");
+        PromotionLevel promotionLevel = getPromotionLevel(promotionLevelId);
+        securityService.checkProjectFunction(promotionLevel.projectId(), PromotionLevelDelete.class);
+        return structureRepository.deletePromotionLevel(promotionLevelId);
+    }
+
+    @Override
     public PromotionRun newPromotionRun(PromotionRun promotionRun) {
         // Validation
         isEntityNew(promotionRun, "Promotion run must be new");

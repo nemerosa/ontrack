@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.PromotionLevelCreate;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -72,6 +73,28 @@ public class PromotionLevelController extends AbstractResourceController {
     @RequestMapping(value = "promotionLevels/{promotionLevelId}", method = RequestMethod.GET)
     public PromotionLevel getPromotionLevel(@PathVariable ID promotionLevelId) {
         return structureService.getPromotionLevel(promotionLevelId);
+    }
+
+    @RequestMapping(value = "promotionLevels/{promotionLevelId}/update", method = RequestMethod.GET)
+    public Form updatePromotionLevelForm(@PathVariable ID promotionLevelId) {
+        return structureService.getPromotionLevel(promotionLevelId).asForm();
+    }
+
+    @RequestMapping(value = "promotionLevels/{promotionLevelId}/update", method = RequestMethod.PUT)
+    public PromotionLevel updatePromotionLevel(@PathVariable ID promotionLevelId, @RequestBody @Valid NameDescription nameDescription) {
+        // Gets from the repository
+        PromotionLevel promotionLevel = structureService.getPromotionLevel(promotionLevelId);
+        // Updates
+        promotionLevel = promotionLevel.update(nameDescription);
+        // Saves in repository
+        structureService.savePromotionLevel(promotionLevel);
+        // As resource
+        return promotionLevel;
+    }
+
+    @RequestMapping(value = "promotionLevels/{promotionLevelId}", method = RequestMethod.DELETE)
+    public Ack deletePromotionLevel(@PathVariable ID promotionLevelId) {
+        return structureService.deletePromotionLevel(promotionLevelId);
     }
 
     @RequestMapping(value = "promotionLevels/{promotionLevelId}/image", method = RequestMethod.GET)

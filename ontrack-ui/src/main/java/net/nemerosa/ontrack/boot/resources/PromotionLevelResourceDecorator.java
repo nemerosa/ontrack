@@ -4,6 +4,8 @@ import net.nemerosa.ontrack.boot.ui.BranchController;
 import net.nemerosa.ontrack.boot.ui.DecorationsController;
 import net.nemerosa.ontrack.boot.ui.ProjectController;
 import net.nemerosa.ontrack.boot.ui.PromotionLevelController;
+import net.nemerosa.ontrack.model.security.PromotionLevelDelete;
+import net.nemerosa.ontrack.model.security.PromotionLevelEdit;
 import net.nemerosa.ontrack.model.structure.PromotionLevel;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
 import net.nemerosa.ontrack.ui.resource.Link;
@@ -26,8 +28,10 @@ public class PromotionLevelResourceDecorator extends AbstractResourceDecorator<P
                 .link("_branch", on(BranchController.class).getBranch(promotionLevel.getBranch().getId()))
                 .link("_project", on(ProjectController.class).getProject(promotionLevel.getBranch().getProject().getId()))
                 .link(Link.IMAGE_LINK, on(PromotionLevelController.class).getPromotionLevelImage_(promotionLevel.getId()))
-                        // TODO Update
-                        // TODO Delete
+                        // Update
+                .update(on(PromotionLevelController.class).updatePromotionLevelForm(promotionLevel.getId()), PromotionLevelEdit.class, promotionLevel.projectId())
+                        // Delete
+                .delete(on(PromotionLevelController.class).deletePromotionLevel(promotionLevel.getId()), PromotionLevelDelete.class, promotionLevel.projectId())
                         // TODO Next promotion level
                         // TODO Previous promotion level
                         // Decorations

@@ -44,4 +44,20 @@ public class PromotionLevel implements ProjectEntity {
     public static Form form() {
         return Form.nameAndDescription();
     }
+
+    public Form asForm() {
+        return form()
+                .fill("name", name)
+                .fill("description", description);
+    }
+
+    public PromotionLevel update(NameDescription nameDescription) {
+        return new PromotionLevel(
+                id,
+                nameDescription.getName(),
+                nameDescription.getDescription(),
+                branch,
+                image
+        );
+    }
 }

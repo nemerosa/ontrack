@@ -74,6 +74,10 @@ public interface StructureRepository {
 
     void setPromotionLevelImage(ID promotionLevelId, Document document);
 
+    void savePromotionLevel(PromotionLevel promotionLevel);
+
+    Ack deletePromotionLevel(ID promotionLevelId);
+
     // Promotion runs
 
     PromotionRun newPromotionRun(PromotionRun promotionRun);
