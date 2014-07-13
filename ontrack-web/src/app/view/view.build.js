@@ -10,7 +10,7 @@ angular.module('ot.view.build', [
             controller: 'BuildCtrl'
         });
     })
-    .controller('BuildCtrl', function ($scope, $stateParams, $http, ot, otStructureService) {
+    .controller('BuildCtrl', function ($state, $scope, $stateParams, $http, ot, otStructureService, otAlertService) {
         var view = ot.view();
         // Build's id
         var buildId = $stateParams.buildId;
@@ -59,6 +59,25 @@ angular.module('ot.view.build', [
                                 build._update,
                                 "Update build"
                             ).then(loadBuild);
+                        }
+                    },
+                    {
+                        condition: function () {
+                            return build._delete;
+                        },
+                        id: 'deleteBuild',
+                        name: "Delete build",
+                        cls: 'ot-command-build-delete',
+                        action: function () {
+                            otAlertService.confirm({
+                                title: "Deleting a build",
+                                message: "Do you really want to delete the build " + build.name +
+                                    " and all its associated data?"
+                            }).then(function () {
+                                return ot.call($http.delete(build._delete));
+                            }).then(function () {
+                                $state.go('branch', {branchId: build.branch.id});
+                            });
                         }
                     },
                     ot.viewCloseCommand('/branch/' + build.branch.id)
