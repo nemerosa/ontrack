@@ -52,6 +52,14 @@ public class ValidationStampController extends AbstractResourceController {
                 ;
     }
 
+    @RequestMapping(value = "branches/{branchId}/validationStamps/reorder", method = RequestMethod.PUT)
+    public Resources<ValidationStamp> reorderValidationStampListForBranch(@PathVariable ID branchId, @RequestBody Reordering reordering) {
+        // Reordering
+        structureService.reorderValidationStamps(branchId, reordering);
+        // OK
+        return getValidationStampListForBranch(branchId);
+    }
+
     @RequestMapping(value = "branches/{branchId}/validationStamps/create", method = RequestMethod.GET)
     public Form newValidationStampForm(@PathVariable ID branchId) {
         structureService.getBranch(branchId);

@@ -79,6 +79,13 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                         PromotionLevelEdit.class,
                         branch.projectId()
                 )
+                        // Reordering of validation stamps
+                .link(
+                        "_reorderValidationStamps",
+                        on(ValidationStampController.class).reorderValidationStampListForBranch(branch.getId(), null),
+                        ValidationStampEdit.class,
+                        branch.projectId()
+                )
                         // OK
                 .build();
     }
