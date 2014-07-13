@@ -47,4 +47,20 @@ public class ValidationStamp implements ProjectEntity {
         return Form.nameAndDescription();
     }
 
+    public Form asForm() {
+        return form()
+                .fill("name", name)
+                .fill("description", description);
+    }
+
+    public ValidationStamp update(NameDescription nameDescription) {
+        return new ValidationStamp(
+                id,
+                nameDescription.getName(),
+                nameDescription.getDescription(),
+                branch,
+                owner,
+                image
+        );
+    }
 }

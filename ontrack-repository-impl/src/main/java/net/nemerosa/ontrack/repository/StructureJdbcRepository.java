@@ -516,6 +516,31 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    public void saveValidationStamp(ValidationStamp validationStamp) {
+        // Update
+        try {
+            getNamedParameterJdbcTemplate().update(
+                    "UPDATE VALIDATION_STAMPS SET NAME = :name, DESCRIPTION = :description WHERE ID = :id",
+                    params("name", validationStamp.getName())
+                            .addValue("description", validationStamp.getDescription())
+                            .addValue("id", validationStamp.id())
+            );
+        } catch (DuplicateKeyException ex) {
+            throw new ValidationStampNameAlreadyDefinedException(validationStamp.getName());
+        }
+    }
+
+    @Override
+    public Ack deleteValidationStamp(ID validationStampId) {
+        return Ack.one(
+                getNamedParameterJdbcTemplate().update(
+                        "DELETE FROM VALIDATION_STAMPS WHERE ID = :id",
+                        params("id", validationStampId.getValue())
+                )
+        );
+    }
+
+    @Override
     public ValidationRun newValidationRun(ValidationRun validationRun) {
 
         // Validation run itself (parent)

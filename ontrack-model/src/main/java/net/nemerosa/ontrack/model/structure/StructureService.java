@@ -101,6 +101,10 @@ public interface StructureService {
 
     void setValidationStampImage(ID validationStampId, Document document);
 
+    void saveValidationStamp(ValidationStamp validationStamp);
+
+    Ack deleteValidationStamp(ID validationStampId);
+
     // Validation runs
 
     ValidationRun newValidationRun(ValidationRun validationRun);

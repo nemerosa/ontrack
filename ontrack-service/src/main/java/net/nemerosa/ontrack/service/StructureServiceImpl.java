@@ -401,6 +401,26 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public void saveValidationStamp(ValidationStamp validationStamp) {
+        // Validation
+        isEntityDefined(validationStamp, "Validation stamp must be defined");
+        isEntityDefined(validationStamp.getBranch(), "Branch must be defined");
+        isEntityDefined(validationStamp.getBranch().getProject(), "Project must be defined");
+        // Security
+        securityService.checkProjectFunction(validationStamp.projectId(), ProjectEdit.class);
+        // Repository
+        structureRepository.saveValidationStamp(validationStamp);
+    }
+
+    @Override
+    public Ack deleteValidationStamp(ID validationStampId) {
+        Validate.isTrue(validationStampId.isSet(), "Validation stamp ID must be set");
+        ValidationStamp validationStamp = getValidationStamp(validationStampId);
+        securityService.checkProjectFunction(validationStamp.projectId(), ValidationStampDelete.class);
+        return structureRepository.deleteValidationStamp(validationStampId);
+    }
+
+    @Override
     public ValidationRun newValidationRun(ValidationRun validationRun) {
         // Validation
         isEntityNew(validationRun, "Validation run must be new");

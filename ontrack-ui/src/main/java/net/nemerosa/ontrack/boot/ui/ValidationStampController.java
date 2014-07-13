@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.security.ValidationStampCreate;
@@ -70,6 +71,28 @@ public class ValidationStampController extends AbstractResourceController {
     @RequestMapping(value = "validationStamps/{validationStampId}", method = RequestMethod.GET)
     public ValidationStamp getValidationStamp(@PathVariable ID validationStampId) {
         return structureService.getValidationStamp(validationStampId);
+    }
+
+    @RequestMapping(value = "validationStamps/{validationStampId}/update", method = RequestMethod.GET)
+    public Form updateValidationStampForm(@PathVariable ID validationStampId) {
+        return structureService.getValidationStamp(validationStampId).asForm();
+    }
+
+    @RequestMapping(value = "validationStamps/{validationStampId}/update", method = RequestMethod.PUT)
+    public ValidationStamp updateValidationStamp(@PathVariable ID validationStampId, @RequestBody @Valid NameDescription nameDescription) {
+        // Gets from the repository
+        ValidationStamp validationStamp = structureService.getValidationStamp(validationStampId);
+        // Updates
+        validationStamp = validationStamp.update(nameDescription);
+        // Saves in repository
+        structureService.saveValidationStamp(validationStamp);
+        // As resource
+        return validationStamp;
+    }
+
+    @RequestMapping(value = "validationStamps/{validationStampId}", method = RequestMethod.DELETE)
+    public Ack deleteValidationStampForm(@PathVariable ID validationStampId) {
+        return structureService.deleteValidationStamp(validationStampId);
     }
 
     @RequestMapping(value = "validationStamps/{validationStampId}/image", method = RequestMethod.GET)
