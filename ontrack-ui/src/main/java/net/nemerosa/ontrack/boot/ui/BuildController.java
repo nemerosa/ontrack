@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.DateTime;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Selection;
@@ -61,6 +62,28 @@ public class BuildController extends AbstractResourceController {
         }
         // OK
         return build;
+    }
+
+    @RequestMapping(value = "builds/{buildId}/update", method = RequestMethod.GET)
+    public Form updateBuildForm(@PathVariable ID buildId) {
+        return structureService.getBuild(buildId).asForm();
+    }
+
+    @RequestMapping(value = "builds/{buildId}/update", method = RequestMethod.PUT)
+    public Build updateBuild(@PathVariable ID buildId, @RequestBody @Valid NameDescription nameDescription) {
+        // Gets from the repository
+        Build build = structureService.getBuild(buildId);
+        // Updates
+        build = build.update(nameDescription);
+        // Saves in repository
+        structureService.saveBuild(build);
+        // As resource
+        return build;
+    }
+
+    @RequestMapping(value = "builds/{buildId}", method = RequestMethod.DELETE)
+    public Ack deleteBuild(@PathVariable ID buildId) {
+        return structureService.deleteBuild(buildId);
     }
 
     @RequestMapping(value = "builds/{buildId}", method = RequestMethod.GET)

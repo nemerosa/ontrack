@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.boot.ui.BuildController;
 import net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController;
 import net.nemerosa.ontrack.boot.ui.PropertyController;
 import net.nemerosa.ontrack.boot.ui.ValidationRunController;
+import net.nemerosa.ontrack.model.security.ProjectEdit;
 import net.nemerosa.ontrack.model.security.PromotionRunCreate;
 import net.nemerosa.ontrack.model.security.ValidationRunCreate;
 import net.nemerosa.ontrack.model.structure.Build;
@@ -47,8 +48,10 @@ public class BuildResourceDecorator extends AbstractResourceDecorator<Build> {
                 .link("_properties", on(PropertyController.class).getProperties(ProjectEntityType.BUILD, build.getId()))
                         // Actions
                 .link("_actions", on(ProjectEntityExtensionController.class).getActions(ProjectEntityType.BUILD, build.getId()))
-                        // TODO Update
-                        // TODO Delete
+                        // Update link
+                .update(on(BuildController.class).updateBuild(build.getId(), null), ProjectEdit.class, build.projectId())
+                        // Delete link
+                .delete(on(BuildController.class).deleteBuild(build.getId()), ProjectEdit.class, build.projectId())
                         // OK
                 .build();
     }

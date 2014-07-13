@@ -41,4 +41,20 @@ public class Build implements ProjectEntity {
     public static Form form() {
         return Form.nameAndDescription();
     }
+
+    public Form asForm() {
+        return form()
+                .fill("name", name)
+                .fill("description", description);
+    }
+
+    public Build update(NameDescription nameDescription) {
+        return new Build(
+                id,
+                nameDescription.getName(),
+                nameDescription.getDescription(),
+                signature,
+                branch
+        );
+    }
 }
