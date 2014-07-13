@@ -8,7 +8,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class ACCGeneral extends AcceptanceTestClient {
+public class ACCGeneral extends AcceptanceSupport {
 
     @Test
     public void info_api() {
