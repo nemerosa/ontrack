@@ -13,7 +13,7 @@ angular.module('ot.view.branch', [
             controller: 'BranchCtrl'
         });
     })
-    .controller('BranchCtrl', function ($interval, $state, $scope, $stateParams, $http, $modal, ot, otFormService, otStructureService, otBuildFilterService) {
+    .controller('BranchCtrl', function ($interval, $state, $scope, $stateParams, $http, $modal, ot, otFormService, otStructureService, otBuildFilterService, otAlertService) {
         var view = ot.view();
         // Branch's id
         var branchId = $stateParams.branchId;
@@ -133,6 +133,25 @@ angular.module('ot.view.branch', [
                                 branchResource._update,
                                 "Update branch"
                             ).then(loadBranch);
+                        }
+                    },
+                    {
+                        condition: function () {
+                            return $scope.branch._delete;
+                        },
+                        id: 'deleteBranch',
+                        name: "Delete branch",
+                        cls: 'ot-command-branch-delete',
+                        action: function () {
+                            otAlertService.confirm({
+                                title: "Deleting a branch",
+                                message: "Do you really want to delete the branch " + $scope.branch.name +
+                                    " and all its associated data?"
+                            }).then(function () {
+                                return ot.call($http.delete($scope.branch._delete));
+                            }).then(function () {
+                                $state.go('project', {projectId: $scope.branch.project.id});
+                            });
                         }
                     },
                     ot.viewCloseCommand('/project/' + branchResource.project.id),

@@ -136,6 +136,14 @@ public class StructureServiceImpl implements StructureService {
         structureRepository.saveBranch(branch);
     }
 
+    @Override
+    public Ack deleteBranch(ID branchId) {
+        Validate.isTrue(branchId.isSet(), "Branch ID must be set");
+        Branch branch = getBranch(branchId);
+        securityService.checkProjectFunction(branch.projectId(), BranchDelete.class);
+        return structureRepository.deleteBranch(branchId);
+    }
+
     protected PromotionView toPromotionView(PromotionLevel promotionLevel) {
         // Gets the last build having this promotion level
         PromotionRun promotionRun = getLastPromotionRunForPromotionLevel(promotionLevel);

@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.boot.resources;
 
 import net.nemerosa.ontrack.boot.ui.*;
-import net.nemerosa.ontrack.model.security.BuildCreate;
-import net.nemerosa.ontrack.model.security.ProjectEdit;
-import net.nemerosa.ontrack.model.security.PromotionLevelCreate;
-import net.nemerosa.ontrack.model.security.ValidationStampCreate;
+import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
@@ -61,7 +58,8 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                 .link("_actions", on(ProjectEntityExtensionController.class).getActions(ProjectEntityType.BRANCH, branch.getId()))
                         // Update link (with authorisation)
                 .update(on(BranchController.class).getUpdateForm(branch.getId()), ProjectEdit.class, branch.projectId())
-                        // TODO Delete link
+                        // Delete link
+                .delete(on(BranchController.class).deleteBranch(branch.getId()), BranchDelete.class, branch.projectId())
                         // View link
                 .link("_status", on(BranchController.class).getBranchStatusView(branch.getId()))
                         // Builds link

@@ -34,6 +34,8 @@ public interface StructureService {
 
     void saveBranch(Branch branch);
 
+    Ack deleteBranch(ID branchId);
+
     // Builds
 
     Build newBuild(Build build);

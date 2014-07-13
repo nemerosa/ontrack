@@ -163,8 +163,17 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    public Ack deleteBranch(ID branchId) {
+        return Ack.one(
+                getNamedParameterJdbcTemplate().update(
+                        "DELETE FROM BRANCHES WHERE ID = :id",
+                        params("id", branchId.getValue())
+                )
+        );
+    }
+
+    @Override
     public void builds(Branch branch, Predicate<Build> buildPredicate) {
-        // TODO The filter could contribute to the SQL to accelerate the search
         getNamedParameterJdbcTemplate().execute(
                 "SELECT * FROM BUILDS WHERE BRANCHID = :branchId ORDER BY ID DESC",
                 params("branchId", branch.id()),

@@ -36,6 +36,8 @@ public interface StructureRepository {
 
     void saveBranch(Branch branch);
 
+    Ack deleteBranch(ID branchId);
+
     // Builds
 
     Build newBuild(Build build);

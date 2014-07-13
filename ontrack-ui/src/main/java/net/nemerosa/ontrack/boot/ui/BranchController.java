@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.boot.ui;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.api.BuildDiffExtension;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.form.Form;
@@ -79,6 +80,11 @@ public class BranchController extends AbstractResourceController {
     @RequestMapping(value = "branches/{branchId}", method = RequestMethod.GET)
     public Branch getBranch(@PathVariable ID branchId) {
         return structureService.getBranch(branchId);
+    }
+
+    @RequestMapping(value = "branches/{branchId}", method = RequestMethod.DELETE)
+    public Ack deleteBranch(@PathVariable ID branchId) {
+        return structureService.deleteBranch(branchId);
     }
 
     @RequestMapping(value = "branches/{branchId}/update", method = RequestMethod.GET)
