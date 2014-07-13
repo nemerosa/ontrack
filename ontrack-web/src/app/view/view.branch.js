@@ -90,7 +90,16 @@ angular.module('ot.view.branch', [
             ot.call($http.get($scope.branch._promotionLevels)).then(function (collection) {
                 $scope.promotionLevelCollection = collection;
                 $scope.promotionLevelSortOptions = {
-                    disabled: !$scope.branch._reorderPromotionLevels
+                    disabled: !$scope.branch._reorderPromotionLevels,
+                    stop: function (event, ui) {
+                        var ids = $scope.promotionLevelCollection.resources.map(function (pl) {
+                            return pl.id;
+                        });
+                        ot.call($http.put(
+                            $scope.branch._reorderPromotionLevels,
+                            { ids: ids}
+                        ));
+                    }
                 };
             });
         }
