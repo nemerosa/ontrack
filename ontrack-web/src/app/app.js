@@ -1,6 +1,7 @@
 var ontrack = angular.module('ontrack', [
         'ui.bootstrap',
         'ui.router',
+        'ui.sortable',
         'ngSanitize',
         // Templates as JS
         'ot.templates',

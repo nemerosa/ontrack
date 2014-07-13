@@ -9,6 +9,7 @@ module.exports = function (grunt) {
             'vendor/jquery-ui/ui/jquery-ui.js',
             'vendor/angular/angular.js',
             'vendor/angular-ui-router/release/angular-ui-router.js',
+            'vendor/angular-ui-sortable/sortable.js',
             'vendor/angular-sanitize/angular-sanitize.js',
             'vendor/angular-bootstrap/ui-bootstrap-tpls.js'
         ],
