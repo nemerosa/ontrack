@@ -18,16 +18,16 @@
             <ot-noentry list="promotionLevelCollection.resources">
                 No promotion level has been created yet.
             </ot-noentry>
-            <div ng-if="promotionLevelCollection.resources" class="ot-promotion-level-list"
+            <div ng-if="promotionLevelCollection.resources" class="ot-entity-sortable-list"
                     ui-sortable="promotionLevelSortOptions" ng-model="promotionLevelCollection.resources">
-                <div ng-repeat="promotionLevel in promotionLevelCollection.resources" class="ot-promotion-level-list-item">
-                    <span class="ot-promotion-level-list-handle"
+                <div ng-repeat="promotionLevel in promotionLevelCollection.resources" class="ot-entity-sortable-list-item">
+                    <span class="ot-entity-sortable-list-handle"
                           ng-if="branch._reorderPromotionLevels"
                           title="Move this to reorder the promotion levels">&nbsp;</span>
-                    <span class="ot-promotion-level-list-image">
+                    <span class="ot-entity-sortable-list-image">
                         <ot-entity-image entity="promotionLevel" link="#/promotionLevel/{{promotionLevel.id}}"></ot-entity-image>
                     </span>
-                    <a href="#/promotionLevel/{{promotionLevel.id}}" class="ot-promotion-level-list-link">
+                    <a href="#/promotionLevel/{{promotionLevel.id}}" class="ot-entity-sortable-list-link">
                         {{promotionLevel.name}}
                     </a>
                 </div>
