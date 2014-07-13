@@ -89,6 +89,9 @@ angular.module('ot.view.branch', [
         function loadPromotionLevels() {
             ot.call($http.get($scope.branch._promotionLevels)).then(function (collection) {
                 $scope.promotionLevelCollection = collection;
+                $scope.promotionLevelSortOptions = {
+                    disabled: !$scope.branch._reorderPromotionLevels
+                };
             });
         }
 

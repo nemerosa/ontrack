@@ -18,7 +18,8 @@
             <ot-noentry list="promotionLevelCollection.resources">
                 No promotion level has been created yet.
             </ot-noentry>
-            <div ng-if="promotionLevelCollection.resources" class="ot-promotion-level-list">
+            <div ng-if="promotionLevelCollection.resources" class="ot-promotion-level-list"
+                    ui-sortable="promotionLevelSortOptions" ng-model="promotionLevelCollection.resources">
                 <div ng-repeat="promotionLevel in promotionLevelCollection.resources" class="ot-promotion-level-list-item">
                     <span class="ot-promotion-level-list-handle"
                           ng-if="branch._reorderPromotionLevels"
