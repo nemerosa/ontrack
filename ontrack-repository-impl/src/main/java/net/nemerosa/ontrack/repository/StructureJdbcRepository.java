@@ -586,6 +586,17 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    public void reorderValidationStamps(ID branchId, Reordering reordering) {
+        int order = 1;
+        for (int id : reordering.getIds()) {
+            getNamedParameterJdbcTemplate().update(
+                    "UPDATE VALIDATION_STAMPS SET ORDERNB = :order WHERE ID = :id",
+                    params("id", id).addValue("order", order++)
+            );
+        }
+    }
+
+    @Override
     public ValidationRun newValidationRun(ValidationRun validationRun) {
 
         // Validation run itself (parent)
