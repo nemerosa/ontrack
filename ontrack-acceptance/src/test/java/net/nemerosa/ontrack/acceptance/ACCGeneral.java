@@ -6,11 +6,11 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
-public class ACCGeneral extends AcceptanceSupport {
+public class ACCGeneral extends AcceptanceTestClient {
 
     @Test
     public void info_api() {
-        anonymous().get("info").with(node -> {
+        anonymous().get("info").withNode(node -> {
             JsonNode version = node.path("version");
             assertTrue(StringUtils.isNotBlank(version.path("full").asText()));
             assertTrue(StringUtils.isNotBlank(version.path("base").asText()));

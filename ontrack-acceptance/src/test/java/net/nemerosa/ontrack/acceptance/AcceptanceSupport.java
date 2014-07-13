@@ -112,7 +112,7 @@ public abstract class AcceptanceSupport {
 
         JsonNode get();
 
-        Consumer<JsonNode> with(Consumer<JsonNode> consumer);
+        Consumer<JsonNode> withNode(Consumer<JsonNode> consumer);
 
     }
 
@@ -130,7 +130,7 @@ public abstract class AcceptanceSupport {
         }
 
         @Override
-        public Consumer<JsonNode> with(Consumer<JsonNode> consumer) {
+        public Consumer<JsonNode> withNode(Consumer<JsonNode> consumer) {
             consumer.accept(node);
             return consumer;
         }
