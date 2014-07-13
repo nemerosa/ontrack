@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.boot.resources;
 
 import net.nemerosa.ontrack.boot.ui.*;
+import net.nemerosa.ontrack.model.security.ValidationStampDelete;
+import net.nemerosa.ontrack.model.security.ValidationStampEdit;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.structure.ValidationStamp;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
@@ -27,8 +29,10 @@ public class ValidationStampResourceDecorator extends AbstractResourceDecorator<
                 .link("_project", on(ProjectController.class).getProject(validationStamp.getBranch().getProject().getId()))
                         // Image link
                 .link(Link.IMAGE_LINK, on(ValidationStampController.class).getValidationStampImage_(validationStamp.getId()))
-                        // TODO Update
-                        // TODO Delete
+                        // Update link
+                .update(on(ValidationStampController.class).updateValidationStampForm(validationStamp.getId()), ValidationStampEdit.class, validationStamp.projectId())
+                        // Delete link
+                .delete(on(ValidationStampController.class).deleteValidationStamp(validationStamp.getId()), ValidationStampDelete.class, validationStamp.projectId())
                         // TODO Next validation stamp
                         // TODO Previous validation stamp
                         // Actual properties for this validation stamp

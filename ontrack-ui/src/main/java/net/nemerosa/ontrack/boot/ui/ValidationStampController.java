@@ -91,7 +91,7 @@ public class ValidationStampController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "validationStamps/{validationStampId}", method = RequestMethod.DELETE)
-    public Ack deleteValidationStampForm(@PathVariable ID validationStampId) {
+    public Ack deleteValidationStamp(@PathVariable ID validationStampId) {
         return structureService.deleteValidationStamp(validationStampId);
     }
 

@@ -407,7 +407,7 @@ public class StructureServiceImpl implements StructureService {
         isEntityDefined(validationStamp.getBranch(), "Branch must be defined");
         isEntityDefined(validationStamp.getBranch().getProject(), "Project must be defined");
         // Security
-        securityService.checkProjectFunction(validationStamp.projectId(), ProjectEdit.class);
+        securityService.checkProjectFunction(validationStamp.projectId(), ValidationStampEdit.class);
         // Repository
         structureRepository.saveValidationStamp(validationStamp);
     }
