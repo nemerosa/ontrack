@@ -39,6 +39,20 @@ angular.module('ot.view.project', [
                     },
                     {
                         condition: function () {
+                            return $scope.project._update;
+                        },
+                        id: 'updateProject',
+                        name: "Update project",
+                        cls: 'ot-command-project-update',
+                        action: function () {
+                            otStructureService.update(
+                                $scope.project._update,
+                                "Update project"
+                            ).then(loadProject);
+                        }
+                    },
+                    {
+                        condition: function () {
                             return $scope.project._delete;
                         },
                         id: 'deleteProject',
