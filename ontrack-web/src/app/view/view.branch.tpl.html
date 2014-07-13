@@ -41,18 +41,20 @@
             <ot-noentry list="validationStampCollection.resources">
                 No validation stamp has been created yet.
             </ot-noentry>
-            <table class="ot-validationStamp-table">
-                <tr ng-repeat="validationStamp in validationStampCollection.resources">
-                    <td class="ot-entity-image">
+            <div ng-if="validationStampCollection.resources" class="ot-entity-sortable-list"
+                 ui-sortable="validationStampSortOptions" ng-model="validationStampCollection.resources">
+                <div ng-repeat="validationStamp in validationStampCollection.resources" class="ot-entity-sortable-list-item">
+                    <span class="ot-entity-sortable-list-handle"
+                          ng-if="branch._reorderValidationStamps"
+                          title="Move this to reorder the validation stamps">&nbsp;</span>
+                    <span class="ot-entity-sortable-list-image">
                         <ot-entity-image entity="validationStamp" link="#/validationStamp/{{validationStamp.id}}"></ot-entity-image>
-                    </td>
-                    <td>
-                        <a href="#/validationStamp/{{validationStamp.id}}">
-                            {{validationStamp.name}}
-                        </a>
-                    </td>
-                </tr>
-            </table>
+                    </span>
+                    <a href="#/validationStamp/{{validationStamp.id}}" class="ot-entity-sortable-list-link">
+                        {{validationStamp.name}}
+                    </a>
+                </div>
+            </div>
             <button ng-if="branch._createValidationStamp" type="button" class="btn btn-default"
                     ng-click="createValidationStamp()">New validation stamp
             </button>

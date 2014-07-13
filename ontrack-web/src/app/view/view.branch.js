@@ -108,6 +108,18 @@ angular.module('ot.view.branch', [
         function loadValidationStamps() {
             ot.call($http.get($scope.branch._validationStamps)).then(function (collection) {
                 $scope.validationStampCollection = collection;
+                $scope.validationStampSortOptions = {
+                    disabled: !$scope.branch._reorderValidationStamps,
+                    stop: function (event, ui) {
+                        var ids = $scope.validationStampCollection.resources.map(function (pl) {
+                            return pl.id;
+                        });
+                        ot.call($http.put(
+                            $scope.branch._reorderValidationStamps,
+                            { ids: ids}
+                        ));
+                    }
+                };
             });
         }
 
