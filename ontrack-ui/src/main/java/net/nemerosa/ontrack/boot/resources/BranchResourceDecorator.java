@@ -72,6 +72,13 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                 .link("_buildFilterForms", on(BuildFilterController.class).buildFilterForms(branch.getId()))
                         // Saving a filter
                 .link("_buildFilterSave", on(BuildFilterController.class).createFilter(branch.getId(), null))
+                        // Reordering of promotion levels
+                .link(
+                        "_reorderPromotionLevels",
+                        on(PromotionLevelController.class).reorderPromotionLevelListForBranch(branch.getId(), null),
+                        PromotionLevelEdit.class,
+                        branch.projectId()
+                )
                         // OK
                 .build();
     }

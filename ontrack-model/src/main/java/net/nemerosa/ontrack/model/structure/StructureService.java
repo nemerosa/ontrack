@@ -81,6 +81,8 @@ public interface StructureService {
 
     Ack deletePromotionLevel(ID promotionLevelId);
 
+    void reorderPromotionLevels(ID branchId, Reordering reordering);
+
     // Promotion runs
 
     PromotionRun newPromotionRun(PromotionRun promotionRun);

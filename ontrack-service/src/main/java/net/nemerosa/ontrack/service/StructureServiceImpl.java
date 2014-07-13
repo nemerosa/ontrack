@@ -326,6 +326,12 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public void reorderPromotionLevels(ID branchId, Reordering reordering) {
+        // FIXME Method net.nemerosa.ontrack.service.StructureServiceImpl.reorderPromotionLevels
+
+    }
+
+    @Override
     public PromotionRun newPromotionRun(PromotionRun promotionRun) {
         // Validation
         isEntityNew(promotionRun, "Promotion run must be new");

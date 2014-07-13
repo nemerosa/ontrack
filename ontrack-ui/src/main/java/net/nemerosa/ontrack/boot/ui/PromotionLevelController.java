@@ -52,6 +52,14 @@ public class PromotionLevelController extends AbstractResourceController {
                 ;
     }
 
+    @RequestMapping(value = "branches/{branchId}/promotionLevels/reorder", method = RequestMethod.PUT)
+    public Resources<PromotionLevel> reorderPromotionLevelListForBranch(@PathVariable ID branchId, @RequestBody Reordering reordering) {
+        // Reordering
+        structureService.reorderPromotionLevels(branchId, reordering);
+        // OK
+        return getPromotionLevelListForBranch(branchId);
+    }
+
     @RequestMapping(value = "branches/{branchId}/promotionLevels/create", method = RequestMethod.GET)
     public Form newPromotionLevelForm(@PathVariable ID branchId) {
         structureService.getBranch(branchId);
