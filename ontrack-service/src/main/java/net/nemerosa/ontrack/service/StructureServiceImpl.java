@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterResult;
 import net.nemerosa.ontrack.model.exceptions.ImageFileSizeException;
 import net.nemerosa.ontrack.model.exceptions.ImageTypeNotAcceptedException;
+import net.nemerosa.ontrack.model.exceptions.ReorderingSizeException;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.repository.StructureRepository;
@@ -327,8 +328,19 @@ public class StructureServiceImpl implements StructureService {
 
     @Override
     public void reorderPromotionLevels(ID branchId, Reordering reordering) {
-        // FIXME Method net.nemerosa.ontrack.service.StructureServiceImpl.reorderPromotionLevels
-
+        // Loads the branch
+        Branch branch = getBranch(branchId);
+        // Checks the access rights
+        securityService.checkProjectFunction(branch.projectId(), PromotionLevelEdit.class);
+        // Loads the promotion levels
+        List<PromotionLevel> promotionLevels = getPromotionLevelListForBranch(branchId);
+        // Checks the size
+        if (reordering.getIds().size() != promotionLevels.size()) {
+            throw new ReorderingSizeException("The reordering request should have the same number of IDs as the number" +
+                    " of the promotion levels");
+        }
+        // Actual reordering
+        structureRepository.reorderPromotionLevels(branchId, reordering);
     }
 
     @Override

@@ -396,6 +396,17 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    public void reorderPromotionLevels(ID branchId, Reordering reordering) {
+        int order = 1;
+        for (int id : reordering.getIds()) {
+            getNamedParameterJdbcTemplate().update(
+                    "UPDATE PROMOTION_LEVELS SET ORDERNB = :order WHERE ID = :id",
+                    params("id", id).addValue("order", order++)
+            );
+        }
+    }
+
+    @Override
     public PromotionRun newPromotionRun(PromotionRun promotionRun) {
         return promotionRun.withId(
                 id(
