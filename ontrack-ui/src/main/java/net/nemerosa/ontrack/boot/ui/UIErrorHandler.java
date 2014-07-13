@@ -95,6 +95,10 @@ public class UIErrorHandler {
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public ResponseEntity<UIErrorMessage> onAnyException(HttpServletRequest request, Exception ex) {
+        // Not for access denied
+        if (ex instanceof AccessDeniedException) {
+            throw (AccessDeniedException) ex;
+        }
         // Returns a message to display to the user
         String message = "An error has occurred.";
         // Logs the error in the application
