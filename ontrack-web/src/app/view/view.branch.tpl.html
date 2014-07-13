@@ -20,7 +20,9 @@
             </ot-noentry>
             <div ng-if="promotionLevelCollection.resources" class="ot-promotion-level-list">
                 <div ng-repeat="promotionLevel in promotionLevelCollection.resources" class="ot-promotion-level-list-item">
-                    <span class="ot-promotion-level-list-handle" title="Move this to reorder the promotion levels">&nbsp;</span>
+                    <span class="ot-promotion-level-list-handle"
+                          ng-if="branch._reorderPromotionLevels"
+                          title="Move this to reorder the promotion levels">&nbsp;</span>
                     <span class="ot-promotion-level-list-image">
                         <ot-entity-image entity="promotionLevel" link="#/promotionLevel/{{promotionLevel.id}}"></ot-entity-image>
                     </span>
