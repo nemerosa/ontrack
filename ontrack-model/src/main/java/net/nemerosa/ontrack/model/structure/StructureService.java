@@ -113,6 +113,8 @@ public interface StructureService {
 
     Ack deleteValidationStamp(ID validationStampId);
 
+    void reorderValidationStamps(ID branchId, Reordering reordering);
+
     // Validation runs
 
     ValidationRun newValidationRun(ValidationRun validationRun);

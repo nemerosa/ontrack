@@ -467,6 +467,23 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public void reorderValidationStamps(ID branchId, Reordering reordering) {
+        // Loads the branch
+        Branch branch = getBranch(branchId);
+        // Checks the access rights
+        securityService.checkProjectFunction(branch.projectId(), ValidationStampEdit.class);
+        // Loads the validation stamps
+        List<ValidationStamp> validationStamps = getValidationStampListForBranch(branchId);
+        // Checks the size
+        if (reordering.getIds().size() != validationStamps.size()) {
+            throw new ReorderingSizeException("The reordering request should have the same number of IDs as the number" +
+                    " of the validation stamps");
+        }
+        // Actual reordering
+        structureRepository.reorderValidationStamps(branchId, reordering);
+    }
+
+    @Override
     public ValidationRun newValidationRun(ValidationRun validationRun) {
         // Validation
         isEntityNew(validationRun, "Validation run must be new");
