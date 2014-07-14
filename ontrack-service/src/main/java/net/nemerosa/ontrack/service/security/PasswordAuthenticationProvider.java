@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.security;
 
 import net.nemerosa.ontrack.model.security.Account;
+import net.nemerosa.ontrack.model.security.AccountService;
 import net.nemerosa.ontrack.model.security.RolesService;
 import net.nemerosa.ontrack.repository.AccountRepository;
 import net.nemerosa.ontrack.repository.RoleRepository;
@@ -23,8 +24,8 @@ public class PasswordAuthenticationProvider extends AbstractOntrackAuthenticatio
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public PasswordAuthenticationProvider(RoleRepository roleRepository, RolesService rolesService, AccountRepository accountRepository, PasswordEncoder passwordEncoder) {
-        super(roleRepository, rolesService);
+    public PasswordAuthenticationProvider(RoleRepository roleRepository, RolesService rolesService, AccountService accountService, AccountRepository accountRepository, PasswordEncoder passwordEncoder) {
+        super(roleRepository, rolesService, accountService);
         this.accountRepository = accountRepository;
         this.passwordEncoder = passwordEncoder;
     }

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.security;
 
 import net.nemerosa.ontrack.model.security.Account;
+import net.nemerosa.ontrack.model.security.AccountService;
 import net.nemerosa.ontrack.model.security.RolesService;
 import net.nemerosa.ontrack.repository.RoleRepository;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,10 +16,12 @@ public abstract class AbstractOntrackAuthenticationProvider extends AbstractUser
 
     private final RoleRepository roleRepository;
     private final RolesService rolesService;
+    private final AccountService accountService;
 
-    protected AbstractOntrackAuthenticationProvider(RoleRepository roleRepository, RolesService rolesService) {
+    protected AbstractOntrackAuthenticationProvider(RoleRepository roleRepository, RolesService rolesService, AccountService accountService) {
         this.roleRepository = roleRepository;
         this.rolesService = rolesService;
+        this.accountService = accountService;
     }
 
     @Override
@@ -40,6 +43,11 @@ public abstract class AbstractOntrackAuthenticationProvider extends AbstractUser
                 .withProjectRoles(
                         roleRepository.findProjectRoleAssociationsByAccount(raw.id(), rolesService::getProjectRoleAssociation)
                 )
+                        // Groups
+//                .withGroups(
+//                        accountGroupRepository.findAccountGroupByAccount(raw.id())
+//                        .map(t -> )
+//                )
                         // OK
                 .lock();
     }
