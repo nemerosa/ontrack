@@ -54,6 +54,11 @@ public class RolesServiceImpl implements RolesService, StartupService {
     }
 
     @Override
+    public Optional<ProjectRoleAssociation> getProjectRoleAssociation(int project, String roleId) {
+        return getProjectRole(roleId).map(role -> new ProjectRoleAssociation(project, role));
+    }
+
+    @Override
     public String getName() {
         return "Roles";
     }

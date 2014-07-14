@@ -79,4 +79,13 @@ public interface RolesService {
      */
     List<Class<? extends ProjectFunction>> getProjectFunctions();
 
+    /**
+     * Gets a project/role association
+     *
+     * @param project Project ID
+     * @param roleId  Role name
+     * @return Project/role association or {@linkplain java.util.Optional#empty() empty} if the role
+     * does not exist
+     */
+    Optional<ProjectRoleAssociation> getProjectRoleAssociation(int project, String roleId);
 }

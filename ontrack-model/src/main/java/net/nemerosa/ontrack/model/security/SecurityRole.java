@@ -4,8 +4,6 @@ public enum SecurityRole {
 
     ADMINISTRATOR,
 
-    CONTROLLER,
-
     USER
 
 }

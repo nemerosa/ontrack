@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.boot.ui;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import net.nemerosa.ontrack.model.security.Account;
 import net.nemerosa.ontrack.model.security.ConnectedAccount;
-import net.nemerosa.ontrack.model.security.ProjectCreation;
 import net.nemerosa.ontrack.model.security.SecurityRole;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.ui.resource.Resource;
@@ -35,7 +34,6 @@ public class ResourceAccountTest {
                 Resource.of(
                         ConnectedAccount.of(
                                 Account.of("admin", "Administrator", "", SecurityRole.ADMINISTRATOR)
-                                        .with(ProjectCreation.class)
                                         .withId(ID.of(1))
                                         .lock()
                         ),

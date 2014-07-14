@@ -31,4 +31,7 @@ public class ProjectRole {
      */
     private final Set<Class<? extends ProjectFunction>> functions;
 
+    public boolean isGranted(Class<? extends ProjectFunction> functionToCheck) {
+        return functions.stream().anyMatch(functionToCheck::isAssignableFrom);
+    }
 }

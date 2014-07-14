@@ -7,8 +7,7 @@ import lombok.Getter;
 import net.nemerosa.ontrack.model.structure.Entity;
 import net.nemerosa.ontrack.model.structure.ID;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -21,8 +20,8 @@ public class Account implements Entity {
                 fullName,
                 email,
                 role,
-                new HashSet<>(),
-                new HashSet<>(),
+                null, // No global role
+                new HashSet<>(), // No project role
                 false
         );
     }
@@ -33,46 +32,34 @@ public class Account implements Entity {
     private final String email;
     private final SecurityRole role;
     @Getter(AccessLevel.PRIVATE)
-    private final Set<Class<? extends GlobalFunction>> globalFunctions;
+    private final GlobalRole globalRole;
     @Getter(AccessLevel.PRIVATE)
-    private final Set<ProjectFn> projectFns;
+    private final Set<ProjectRoleAssociation> projectRoleAssociations;
     @Getter(AccessLevel.PRIVATE)
     private final boolean locked;
 
 
     public boolean isGranted(Class<? extends GlobalFunction> fn) {
         return (SecurityRole.ADMINISTRATOR == role)
-                || (globalFunctions.contains(fn));
+                || (globalRole != null && globalRole.isGlobalFunctionGranted(fn));
     }
 
     public boolean isGranted(int projectId, Class<? extends ProjectFunction> fn) {
         return SecurityRole.ADMINISTRATOR == role
-                || projectFns.stream().anyMatch(acl -> acl.getId() == projectId && fn.isAssignableFrom(acl.getFn()));
-    }
-
-    public Account with(Class<? extends GlobalFunction> fn) {
-        unlocked();
-        globalFunctions.add(fn);
-        return this;
-    }
-
-    public Account with(int projectId, Class<? extends ProjectFunction> fn) {
-        unlocked();
-        projectFns.add(new ProjectFn(projectId, fn));
-        return this;
+                || (globalRole != null && globalRole.isProjectFunctionGranted(fn))
+                || projectRoleAssociations.stream().anyMatch(pa -> pa.getProjectId() == projectId && pa.isGranted(fn));
     }
 
     public Account withId(ID id) {
-        unlocked();
         return new Account(
                 id,
                 name,
                 fullName,
                 email,
                 role,
-                globalFunctions,
-                projectFns,
-                locked
+                globalRole,
+                projectRoleAssociations,
+                locked()
         );
     }
 
@@ -83,17 +70,60 @@ public class Account implements Entity {
                 fullName,
                 email,
                 role,
-                globalFunctions,
-                projectFns,
+                globalRole,
+                projectRoleAssociations,
                 true
         );
     }
 
-    private void unlocked() {
+    private boolean locked() {
         if (locked) {
             throw new IllegalStateException("Account is locked");
+        } else {
+            return false;
         }
     }
 
+    public Account withGlobalRole(Optional<GlobalRole> globalRole) {
+        return new Account(
+                id,
+                name,
+                fullName,
+                email,
+                role,
+                globalRole.orElse(null),
+                projectRoleAssociations,
+                locked()
+        );
+    }
 
+    public Account withProjectRoles(Collection<ProjectRoleAssociation> projectRoleAssociations) {
+        Set<ProjectRoleAssociation> newProjectRoleAssociations = new LinkedHashSet<>(this.projectRoleAssociations);
+        newProjectRoleAssociations.addAll(projectRoleAssociations);
+        return new Account(
+                id,
+                name,
+                fullName,
+                email,
+                role,
+                globalRole,
+                newProjectRoleAssociations,
+                locked()
+        );
+    }
+
+    public Account withProjectRole(ProjectRoleAssociation projectRoleAssociation) {
+        Set<ProjectRoleAssociation> newProjectRoleAssociations = new LinkedHashSet<>(this.projectRoleAssociations);
+        newProjectRoleAssociations.add(projectRoleAssociation);
+        return new Account(
+                id,
+                name,
+                fullName,
+                email,
+                role,
+                globalRole,
+                newProjectRoleAssociations,
+                locked()
+        );
+    }
 }

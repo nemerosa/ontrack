@@ -39,4 +39,11 @@ public class GlobalRole {
     private final Set<Class<? extends ProjectFunction>> projectFunctions;
 
 
+    public boolean isGlobalFunctionGranted(Class<? extends GlobalFunction> fn) {
+        return globalFunctions.contains(fn);
+    }
+
+    public boolean isProjectFunctionGranted(Class<? extends ProjectFunction> fn) {
+        return projectFunctions.contains(fn);
+    }
 }

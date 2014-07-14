@@ -20,6 +20,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -104,12 +106,20 @@ public abstract class AbstractITTestSupport extends AbstractJUnit4SpringContextT
         }
 
         public UserCall with(Class<? extends GlobalFunction> fn) {
-            account.with(fn);
+            account.withGlobalRole(
+                    Optional.of(
+                            new GlobalRole(
+                                    "test", "Test global role", "",
+                                    Collections.singleton(fn),
+                                    Collections.emptySet()
+                            )
+                    )
+            );
             return this;
         }
 
         public UserCall with(int projectId, Class<? extends ProjectFunction> fn) {
-            account.with(projectId, fn);
+            // FIXME account.with(projectId, fn);
             return this;
         }
 
