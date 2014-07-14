@@ -65,4 +65,22 @@ public class AccountGroup implements Entity {
         );
     }
 
+    public static AccountGroup of(String name) {
+        return new AccountGroup(
+                ID.NONE,
+                name,
+                Authorisations.none(),
+                false);
+
+    }
+
+    public AccountGroup withId(ID id) {
+        checkLock();
+        return new AccountGroup(
+                id,
+                name,
+                authorisations,
+                locked
+        );
+    }
 }
