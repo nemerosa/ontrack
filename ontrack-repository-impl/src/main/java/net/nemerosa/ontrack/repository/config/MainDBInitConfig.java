@@ -10,7 +10,7 @@ import javax.sql.DataSource;
 @Component
 public class MainDBInitConfig extends AbstractDBInitConfig {
 
-    public static final int VERSION = 0;
+    public static final int VERSION = 1;
 
     @Autowired
     public MainDBInitConfig(DataSource dataSource) {
