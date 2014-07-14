@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.support.StartupService;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Management of the roles and functions.
@@ -72,11 +73,29 @@ public class RolesServiceImpl implements RolesService, StartupService {
 
     private void initProjectRoles() {
 
-        // TODO Owner
+        // Owner
+        register("OWNER", "Project owner",
+                "The project owner is allowed to all functions in a project, but for its deletion.",
+                getProjectFunctions().stream().filter(t -> !ProjectDelete.class.isAssignableFrom(t)).collect(Collectors.toList())
+        );
 
         // TODO Validation manager
 
         // TODO Promoter
+
+    }
+
+    private void register(String id, String name, String description, List<Class<? extends ProjectFunction>> projectFunctions) {
+        register(new ProjectRole(
+                id,
+                name,
+                description,
+                new LinkedHashSet<>(projectFunctions)
+        ));
+    }
+
+    private void register(ProjectRole projectRole) {
+        projectRoles.put(projectRole.getId(), projectRole);
 
     }
 
