@@ -7,7 +7,8 @@ import lombok.Getter;
 import net.nemerosa.ontrack.model.structure.Entity;
 import net.nemerosa.ontrack.model.structure.ID;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Optional;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -20,8 +21,7 @@ public class Account implements Entity {
                 fullName,
                 email,
                 role,
-                null, // No global role
-                new HashSet<>(), // No project role
+                Authorisations.none(),
                 false
         );
     }
@@ -32,22 +32,18 @@ public class Account implements Entity {
     private final String email;
     private final SecurityRole role;
     @Getter(AccessLevel.PRIVATE)
-    private GlobalRole globalRole;
-    @Getter(AccessLevel.PRIVATE)
-    private Set<ProjectRoleAssociation> projectRoleAssociations = new LinkedHashSet<>();
+    private Authorisations authorisations;
     @Getter(AccessLevel.PRIVATE)
     private final boolean locked;
 
-
     public boolean isGranted(Class<? extends GlobalFunction> fn) {
         return (SecurityRole.ADMINISTRATOR == role)
-                || (globalRole != null && globalRole.isGlobalFunctionGranted(fn));
+                || authorisations.isGranted(fn);
     }
 
     public boolean isGranted(int projectId, Class<? extends ProjectFunction> fn) {
         return SecurityRole.ADMINISTRATOR == role
-                || (globalRole != null && globalRole.isProjectFunctionGranted(fn))
-                || projectRoleAssociations.stream().anyMatch(pa -> pa.getProjectId() == projectId && pa.isGranted(fn));
+                || authorisations.isGranted(projectId, fn);
     }
 
     public Account withId(ID id) {
@@ -58,8 +54,7 @@ public class Account implements Entity {
                 fullName,
                 email,
                 role,
-                globalRole,
-                projectRoleAssociations,
+                authorisations,
                 locked
         );
     }
@@ -71,8 +66,7 @@ public class Account implements Entity {
                 fullName,
                 email,
                 role,
-                globalRole,
-                projectRoleAssociations,
+                authorisations,
                 true
         );
     }
@@ -85,19 +79,19 @@ public class Account implements Entity {
 
     public Account withGlobalRole(Optional<GlobalRole> globalRole) {
         checkLock();
-        this.globalRole = globalRole.orElse(null);
+        authorisations = authorisations.withGlobalRole(globalRole);
         return this;
     }
 
     public Account withProjectRoles(Collection<ProjectRoleAssociation> projectRoleAssociations) {
         checkLock();
-        this.projectRoleAssociations.addAll(projectRoleAssociations);
+        authorisations = authorisations.withProjectRoles(projectRoleAssociations);
         return this;
     }
 
     public Account withProjectRole(ProjectRoleAssociation projectRoleAssociation) {
         checkLock();
-        this.projectRoleAssociations.add(projectRoleAssociation);
+        authorisations = authorisations.withProjectRole(projectRoleAssociation);
         return this;
     }
 }
