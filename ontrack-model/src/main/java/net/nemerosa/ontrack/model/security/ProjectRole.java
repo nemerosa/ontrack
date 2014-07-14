@@ -24,6 +24,6 @@ public class ProjectRole {
     /**
      * Associated set of project functions
      */
-    private final Set<? extends ProjectFunction> functions;
+    private final Set<Class<? extends ProjectFunction>> functions;
 
 }

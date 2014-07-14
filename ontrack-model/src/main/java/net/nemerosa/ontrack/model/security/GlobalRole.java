@@ -24,14 +24,19 @@ public class GlobalRole {
     private final String name;
 
     /**
+     * Description of the role
+     */
+    private final String description;
+
+    /**
      * Global functions
      */
-    private final Set<? extends GlobalFunction> globalFunctions;
+    private final Set<Class<? extends GlobalFunction>> globalFunctions;
 
     /**
      * Project functions to grant for all projects
      */
-    private final Set<? extends ProjectFunction> projectFunctions;
+    private final Set<Class<? extends ProjectFunction>> projectFunctions;
 
 
 }

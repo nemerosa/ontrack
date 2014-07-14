@@ -59,7 +59,14 @@ public interface RolesService {
      */
     Optional<GlobalRole> getGlobalRole(String id);
 
-    // TODO List of global functions (can be extended)
-    // TODO List of project functions (can be extended)
+    /**
+     * List of all global functions
+     */
+    List<Class<? extends GlobalFunction>> getGlobalFunctions();
+
+    /**
+     * List of all project functions
+     */
+    List<Class<? extends ProjectFunction>> getProjectFunctions();
 
 }
