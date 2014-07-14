@@ -19,14 +19,12 @@ public class RolesServiceImpl implements RolesService, StartupService {
 
     @Override
     public List<GlobalRole> getGlobalRoles() {
-        // FIXME Method net.nemerosa.ontrack.service.security.RolesServiceImpl.getGlobalRoles
-        return null;
+        return new ArrayList<>(globalRoles.values());
     }
 
     @Override
     public Optional<GlobalRole> getGlobalRole(String id) {
-        // FIXME Method net.nemerosa.ontrack.service.security.RolesServiceImpl.getGlobalRole
-        return null;
+        return Optional.ofNullable(globalRoles.get(id));
     }
 
     @Override
