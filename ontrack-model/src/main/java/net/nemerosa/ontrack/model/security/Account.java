@@ -90,6 +90,12 @@ public class Account implements Entity {
         return this;
     }
 
+    public Account withGroups(Collection<AccountGroup> groups) {
+        checkLock();
+        this.accountGroups.addAll(groups);
+        return this;
+    }
+
     public Account withGlobalRole(Optional<GlobalRole> globalRole) {
         checkLock();
         authorisations = authorisations.withGlobalRole(globalRole);
