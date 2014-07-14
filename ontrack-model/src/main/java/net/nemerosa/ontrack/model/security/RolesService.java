@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.model.security;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Management of roles and functions.
@@ -47,6 +48,16 @@ public interface RolesService {
             ValidationRunStatusChange.class,
             PromotionRunCreate.class
     );
+
+    /**
+     * List of global roles.
+     */
+    List<GlobalRole> getGlobalRoles();
+
+    /**
+     * Gets a global role by its identifier
+     */
+    Optional<GlobalRole> getGlobalRole(String id);
 
     // TODO List of global functions (can be extended)
     // TODO List of project functions (can be extended)
