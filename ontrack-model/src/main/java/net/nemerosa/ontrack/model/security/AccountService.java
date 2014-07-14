@@ -5,6 +5,6 @@ package net.nemerosa.ontrack.model.security;
  */
 public interface AccountService {
 
-
+    Account withACL(Account raw);
 
 }

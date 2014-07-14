@@ -2,9 +2,7 @@ package net.nemerosa.ontrack.service.security;
 
 import net.nemerosa.ontrack.model.security.Account;
 import net.nemerosa.ontrack.model.security.AccountService;
-import net.nemerosa.ontrack.model.security.RolesService;
 import net.nemerosa.ontrack.repository.AccountRepository;
-import net.nemerosa.ontrack.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -24,8 +22,8 @@ public class PasswordAuthenticationProvider extends AbstractOntrackAuthenticatio
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public PasswordAuthenticationProvider(RoleRepository roleRepository, RolesService rolesService, AccountService accountService, AccountRepository accountRepository, PasswordEncoder passwordEncoder) {
-        super(roleRepository, rolesService, accountService);
+    public PasswordAuthenticationProvider(AccountService accountService, AccountRepository accountRepository, PasswordEncoder passwordEncoder) {
+        super(accountService);
         this.accountRepository = accountRepository;
         this.passwordEncoder = passwordEncoder;
     }
