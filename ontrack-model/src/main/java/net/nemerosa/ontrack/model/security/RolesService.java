@@ -32,6 +32,7 @@ public interface RolesService {
             ProjectConfig.class,
             ProjectDelete.class,
             BranchCreate.class,
+            BranchEdit.class,
             BranchDelete.class,
             PromotionLevelCreate.class,
             PromotionLevelEdit.class,

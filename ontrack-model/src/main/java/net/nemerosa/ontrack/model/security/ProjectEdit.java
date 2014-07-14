@@ -1,7 +1,8 @@
 package net.nemerosa.ontrack.model.security;
 
 public interface ProjectEdit extends ProjectView, ProjectConfig,
-        BuildCreate,
+        BranchCreate, BranchEdit, BranchDelete,
+        BuildCreate, BuildEdit, BuildDelete,
         PromotionLevelCreate, PromotionLevelEdit, PromotionLevelDelete,
         ValidationStampCreate, ValidationStampEdit, ValidationStampDelete,
         PromotionRunCreate,
