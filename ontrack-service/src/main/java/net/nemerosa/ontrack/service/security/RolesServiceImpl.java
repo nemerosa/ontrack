@@ -79,9 +79,23 @@ public class RolesServiceImpl implements RolesService, StartupService {
                 getProjectFunctions().stream().filter(t -> !ProjectDelete.class.isAssignableFrom(t)).collect(Collectors.toList())
         );
 
-        // TODO Validation manager
+        // Validation manager
+        register("VALIDATION_MANAGER", "Validation manager",
+                "The validation manager can manage the validation stamps.",
+                Arrays.asList(
+                        ValidationStampCreate.class,
+                        ValidationStampEdit.class,
+                        ValidationStampDelete.class
+                )
+        );
 
-        // TODO Promoter
+        // Promoter
+        register("PROMOTER", "Promoter",
+                "The promoter can promote existing builds.",
+                Arrays.asList(
+                        PromotionRunCreate.class
+                )
+        );
 
     }
 
