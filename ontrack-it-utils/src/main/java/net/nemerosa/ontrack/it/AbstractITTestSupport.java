@@ -119,7 +119,15 @@ public abstract class AbstractITTestSupport extends AbstractJUnit4SpringContextT
         }
 
         public UserCall with(int projectId, Class<? extends ProjectFunction> fn) {
-            // FIXME account.with(projectId, fn);
+            account.withProjectRole(
+                    new ProjectRoleAssociation(
+                            projectId,
+                            new ProjectRole(
+                                    "test", "Test", "",
+                                    Collections.singleton(fn)
+                            )
+                    )
+            );
             return this;
         }
 
