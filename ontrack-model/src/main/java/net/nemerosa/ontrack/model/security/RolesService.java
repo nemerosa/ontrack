@@ -4,17 +4,23 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Collection of functions.
+ * Management of roles and functions.
+ *
+ * @see net.nemerosa.ontrack.model.security.GlobalRole
+ * @see net.nemerosa.ontrack.model.security.ProjectRole
+ * @see net.nemerosa.ontrack.model.security.GlobalFunction
+ * @see net.nemerosa.ontrack.model.security.ProjectFunction
  */
-public interface SecurityFunctionsService {
+public interface RolesService {
 
     /**
      * List of core global functions.
      */
     List<Class<? extends GlobalFunction>> defaultGlobalFunctions = Arrays.asList(
+            ProjectCreation.class,
+            ApplicationManagement.class,
             GlobalSettings.class,
-            ProjectList.class,
-            ProjectCreation.class
+            ProjectList.class
     );
 
     /**
@@ -24,13 +30,21 @@ public interface SecurityFunctionsService {
             ProjectView.class,
             ProjectEdit.class,
             ProjectConfig.class,
+            ProjectDelete.class,
             BranchCreate.class,
+            BranchDelete.class,
             PromotionLevelCreate.class,
             PromotionLevelEdit.class,
+            PromotionLevelDelete.class,
             ValidationStampCreate.class,
             ValidationStampEdit.class,
+            ValidationStampDelete.class,
             BuildCreate.class,
-            ValidationRunStatusChange.class
+            BuildEdit.class,
+            BuildDelete.class,
+            ValidationRunCreate.class,
+            ValidationRunStatusChange.class,
+            PromotionRunCreate.class
     );
 
     // TODO List of global functions (can be extended)
