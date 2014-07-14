@@ -60,6 +60,16 @@ public interface RolesService {
     Optional<GlobalRole> getGlobalRole(String id);
 
     /**
+     * List of project roles
+     */
+    List<ProjectRole> getProjectRoles();
+
+    /**
+     * Gets a project role by its identifier
+     */
+    Optional<ProjectRole> getProjectRole(String id);
+
+    /**
      * List of all global functions
      */
     List<Class<? extends GlobalFunction>> getGlobalFunctions();

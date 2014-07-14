@@ -22,6 +22,11 @@ public class ProjectRole {
     private final String name;
 
     /**
+     * Description
+     */
+    private final String description;
+
+    /**
      * Associated set of project functions
      */
     private final Set<Class<? extends ProjectFunction>> functions;

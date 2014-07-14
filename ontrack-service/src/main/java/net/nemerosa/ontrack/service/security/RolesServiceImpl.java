@@ -17,6 +17,11 @@ public class RolesServiceImpl implements RolesService, StartupService {
      */
     private final Map<String, GlobalRole> globalRoles = new LinkedHashMap<>();
 
+    /**
+     * Index of project roles
+     */
+    private final Map<String, ProjectRole> projectRoles = new LinkedHashMap<>();
+
     @Override
     public List<GlobalRole> getGlobalRoles() {
         return new ArrayList<>(globalRoles.values());
@@ -25,6 +30,16 @@ public class RolesServiceImpl implements RolesService, StartupService {
     @Override
     public Optional<GlobalRole> getGlobalRole(String id) {
         return Optional.ofNullable(globalRoles.get(id));
+    }
+
+    @Override
+    public List<ProjectRole> getProjectRoles() {
+        return new ArrayList<>(projectRoles.values());
+    }
+
+    @Override
+    public Optional<ProjectRole> getProjectRole(String id) {
+        return Optional.ofNullable(projectRoles.get(id));
     }
 
     @Override
@@ -51,7 +66,18 @@ public class RolesServiceImpl implements RolesService, StartupService {
     public void start() {
         // Global roles
         initGlobalRoles();
-        // TODO Project roles
+        // Project roles
+        initProjectRoles();
+    }
+
+    private void initProjectRoles() {
+
+        // TODO Owner
+
+        // TODO Validation manager
+
+        // TODO Promoter
+
     }
 
     private void initGlobalRoles() {
