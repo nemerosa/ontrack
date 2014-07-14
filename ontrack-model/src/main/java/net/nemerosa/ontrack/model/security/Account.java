@@ -32,9 +32,9 @@ public class Account implements Entity {
     private final String email;
     private final SecurityRole role;
     @Getter(AccessLevel.PRIVATE)
-    private final GlobalRole globalRole;
+    private GlobalRole globalRole;
     @Getter(AccessLevel.PRIVATE)
-    private final Set<ProjectRoleAssociation> projectRoleAssociations;
+    private Set<ProjectRoleAssociation> projectRoleAssociations = new LinkedHashSet<>();
     @Getter(AccessLevel.PRIVATE)
     private final boolean locked;
 
@@ -51,6 +51,7 @@ public class Account implements Entity {
     }
 
     public Account withId(ID id) {
+        checkLock();
         return new Account(
                 id,
                 name,
@@ -59,7 +60,7 @@ public class Account implements Entity {
                 role,
                 globalRole,
                 projectRoleAssociations,
-                locked()
+                locked
         );
     }
 
@@ -76,54 +77,27 @@ public class Account implements Entity {
         );
     }
 
-    private boolean locked() {
+    private void checkLock() {
         if (locked) {
             throw new IllegalStateException("Account is locked");
-        } else {
-            return false;
         }
     }
 
     public Account withGlobalRole(Optional<GlobalRole> globalRole) {
-        return new Account(
-                id,
-                name,
-                fullName,
-                email,
-                role,
-                globalRole.orElse(null),
-                projectRoleAssociations,
-                locked()
-        );
+        checkLock();
+        this.globalRole = globalRole.orElse(null);
+        return this;
     }
 
     public Account withProjectRoles(Collection<ProjectRoleAssociation> projectRoleAssociations) {
-        Set<ProjectRoleAssociation> newProjectRoleAssociations = new LinkedHashSet<>(this.projectRoleAssociations);
-        newProjectRoleAssociations.addAll(projectRoleAssociations);
-        return new Account(
-                id,
-                name,
-                fullName,
-                email,
-                role,
-                globalRole,
-                newProjectRoleAssociations,
-                locked()
-        );
+        checkLock();
+        this.projectRoleAssociations.addAll(projectRoleAssociations);
+        return this;
     }
 
     public Account withProjectRole(ProjectRoleAssociation projectRoleAssociation) {
-        Set<ProjectRoleAssociation> newProjectRoleAssociations = new LinkedHashSet<>(this.projectRoleAssociations);
-        newProjectRoleAssociations.add(projectRoleAssociation);
-        return new Account(
-                id,
-                name,
-                fullName,
-                email,
-                role,
-                globalRole,
-                newProjectRoleAssociations,
-                locked()
-        );
+        checkLock();
+        this.projectRoleAssociations.add(projectRoleAssociation);
+        return this;
     }
 }

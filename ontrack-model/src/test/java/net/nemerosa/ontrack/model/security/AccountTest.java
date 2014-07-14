@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.model.security;
 import org.junit.Test;
 
 import java.util.Collections;
+import java.util.Optional;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -40,7 +41,7 @@ public class AccountTest {
     }
 
     private Account account(Class<? extends ProjectFunction> fn) {
-        return Account.of("test", "Test", "test@test.com", SecurityRole.USER).withProjectRole(
+        return baseAccount().withProjectRole(
                 new ProjectRoleAssociation(
                         1,
                         new ProjectRole(
@@ -51,6 +52,32 @@ public class AccountTest {
                         )
                 )
         );
+    }
+
+    private Account baseAccount() {
+        return Account.of("test", "Test", "test@test.com", SecurityRole.USER);
+    }
+
+    @Test
+    public void global_function_granted() {
+        Account account = baseAccount().withGlobalRole(
+                Optional.of(
+                        new GlobalRole(
+                                "test", "Test", "",
+                                Collections.singleton(GlobalSettings.class),
+                                Collections.emptySet()
+                        )
+                )
+        );
+        assertTrue(account.isGranted(GlobalSettings.class));
+        assertFalse(account.isGranted(ProjectCreation.class));
+    }
+
+    @Test
+    public void global_function_granted_for_admin() {
+        Account account = Account.of("test", "Test", "test@test.com", SecurityRole.ADMINISTRATOR);
+        assertTrue(account.isGranted(GlobalSettings.class));
+        assertTrue(account.isGranted(ProjectCreation.class));
     }
 
 }
