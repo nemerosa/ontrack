@@ -27,6 +27,7 @@ public class ResourceAccountTest {
                                 .with("fullName", "Administrator")
                                 .with("email", "")
                                 .with("role", "ADMINISTRATOR")
+                                .with("accountGroup", (String) null)
                                 .end())
                         .with("actions", array().end())
                         .with("logged", true)

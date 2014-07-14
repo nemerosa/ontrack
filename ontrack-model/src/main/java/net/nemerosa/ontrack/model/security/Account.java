@@ -21,6 +21,7 @@ public class Account implements Entity {
                 fullName,
                 email,
                 role,
+                null,
                 Authorisations.none(),
                 false
         );
@@ -31,6 +32,7 @@ public class Account implements Entity {
     private final String fullName;
     private final String email;
     private final SecurityRole role;
+    private AccountGroup accountGroup;
     @Getter(AccessLevel.PRIVATE)
     private Authorisations authorisations;
     @Getter(AccessLevel.PRIVATE)
@@ -38,11 +40,13 @@ public class Account implements Entity {
 
     public boolean isGranted(Class<? extends GlobalFunction> fn) {
         return (SecurityRole.ADMINISTRATOR == role)
+                || (accountGroup != null && accountGroup.isGranted(fn))
                 || authorisations.isGranted(fn);
     }
 
     public boolean isGranted(int projectId, Class<? extends ProjectFunction> fn) {
         return SecurityRole.ADMINISTRATOR == role
+                || (accountGroup != null && accountGroup.isGranted(projectId, fn))
                 || authorisations.isGranted(projectId, fn);
     }
 
@@ -54,6 +58,7 @@ public class Account implements Entity {
                 fullName,
                 email,
                 role,
+                accountGroup,
                 authorisations,
                 locked
         );
@@ -66,6 +71,7 @@ public class Account implements Entity {
                 fullName,
                 email,
                 role,
+                accountGroup,
                 authorisations,
                 true
         );
@@ -75,6 +81,12 @@ public class Account implements Entity {
         if (locked) {
             throw new IllegalStateException("Account is locked");
         }
+    }
+
+    public Account withGroup(AccountGroup accountGroup) {
+        checkLock();
+        this.accountGroup = accountGroup;
+        return this;
     }
 
     public Account withGlobalRole(Optional<GlobalRole> globalRole) {
