@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.structure.Entity;
 import net.nemerosa.ontrack.model.structure.ID;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 
 @Data
@@ -21,7 +22,7 @@ public class Account implements Entity {
                 fullName,
                 email,
                 role,
-                null,
+                new LinkedHashSet<>(),
                 Authorisations.none(),
                 false
         );
@@ -32,7 +33,7 @@ public class Account implements Entity {
     private final String fullName;
     private final String email;
     private final SecurityRole role;
-    private AccountGroup accountGroup;
+    private final Collection<AccountGroup> accountGroups;
     @Getter(AccessLevel.PRIVATE)
     private Authorisations authorisations;
     @Getter(AccessLevel.PRIVATE)
@@ -40,13 +41,13 @@ public class Account implements Entity {
 
     public boolean isGranted(Class<? extends GlobalFunction> fn) {
         return (SecurityRole.ADMINISTRATOR == role)
-                || (accountGroup != null && accountGroup.isGranted(fn))
+                || accountGroups.stream().anyMatch(group -> group.isGranted(fn))
                 || authorisations.isGranted(fn);
     }
 
     public boolean isGranted(int projectId, Class<? extends ProjectFunction> fn) {
         return SecurityRole.ADMINISTRATOR == role
-                || (accountGroup != null && accountGroup.isGranted(projectId, fn))
+                || accountGroups.stream().anyMatch(group -> group.isGranted(projectId, fn))
                 || authorisations.isGranted(projectId, fn);
     }
 
@@ -58,7 +59,7 @@ public class Account implements Entity {
                 fullName,
                 email,
                 role,
-                accountGroup,
+                accountGroups,
                 authorisations,
                 locked
         );
@@ -71,7 +72,7 @@ public class Account implements Entity {
                 fullName,
                 email,
                 role,
-                accountGroup,
+                accountGroups,
                 authorisations,
                 true
         );
@@ -85,7 +86,7 @@ public class Account implements Entity {
 
     public Account withGroup(AccountGroup accountGroup) {
         checkLock();
-        this.accountGroup = accountGroup;
+        this.accountGroups.add(accountGroup);
         return this;
     }
 
