@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.service.security;
 
-import net.nemerosa.ontrack.model.security.GlobalFunction;
-import net.nemerosa.ontrack.model.security.GlobalRole;
-import net.nemerosa.ontrack.model.security.ProjectFunction;
-import net.nemerosa.ontrack.model.security.RolesService;
+import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.support.StartupService;
 import org.springframework.stereotype.Service;
 
@@ -60,10 +57,27 @@ public class RolesServiceImpl implements RolesService, StartupService {
     }
 
     private void initGlobalRoles() {
+
+        // Administrator
         register("ADMINISTRATOR", "Administrator",
                 "An administrator is allowed to do everything in the application.",
                 getGlobalFunctions(),
                 getProjectFunctions());
+
+        // Controller
+        register("CONTROLLER", "Controller",
+                "A controller, is allowed to create builds, promotion runs and validation runs. This role is " +
+                        "typically granted to continuous integration tools.",
+                Arrays.asList(
+                        // No global function
+                ),
+                Arrays.asList(
+                        BuildCreate.class,
+                        PromotionRunCreate.class,
+                        ValidationRunCreate.class
+                )
+        );
+
     }
 
     private void register(String id, String name, String description, List<Class<? extends GlobalFunction>> globalFunctions, List<Class<? extends ProjectFunction>> projectFunctions) {
