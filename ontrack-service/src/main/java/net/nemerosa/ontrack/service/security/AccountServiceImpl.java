@@ -1,15 +1,14 @@
 package net.nemerosa.ontrack.service.security;
 
-import net.nemerosa.ontrack.model.security.Account;
-import net.nemerosa.ontrack.model.security.AccountGroup;
-import net.nemerosa.ontrack.model.security.AccountService;
-import net.nemerosa.ontrack.model.security.RolesService;
+import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.repository.AccountGroupRepository;
+import net.nemerosa.ontrack.repository.AccountRepository;
 import net.nemerosa.ontrack.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,13 +17,25 @@ public class AccountServiceImpl implements AccountService {
 
     private final RoleRepository roleRepository;
     private final RolesService rolesService;
+    private final AccountRepository accountRepository;
     private final AccountGroupRepository accountGroupRepository;
+    private final SecurityService securityService;
+    private final AuthenticationSourceService authenticationSourceService;
 
     @Autowired
-    public AccountServiceImpl(RoleRepository roleRepository, RolesService rolesService, AccountGroupRepository accountGroupRepository) {
+    public AccountServiceImpl(
+            RoleRepository roleRepository,
+            RolesService rolesService,
+            AccountRepository accountRepository,
+            AccountGroupRepository accountGroupRepository,
+            SecurityService securityService,
+            AuthenticationSourceService authenticationSourceService) {
         this.roleRepository = roleRepository;
         this.rolesService = rolesService;
+        this.accountRepository = accountRepository;
         this.accountGroupRepository = accountGroupRepository;
+        this.securityService = securityService;
+        this.authenticationSourceService = authenticationSourceService;
     }
 
     @Override
@@ -46,6 +57,15 @@ public class AccountServiceImpl implements AccountService {
                 )
                         // OK
                 .lock();
+    }
+
+    @Override
+    public List<Account> getAccounts() {
+        securityService.checkGlobalFunction(AccountManagement.class);
+        return accountRepository.findAll(authenticationSourceService::getAuthenticationSource)
+                .stream()
+                .map(account -> account.withGroups(accountGroupRepository.findByAccount(account.id())))
+                .collect(Collectors.toList());
     }
 
     protected AccountGroup groupWithACL(AccountGroup group) {

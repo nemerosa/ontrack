@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.model.security;
 
+import java.util.List;
+
 /**
  * Management of accounts.
  */
@@ -12,5 +14,10 @@ public interface AccountService {
      * @return Account with authorisations
      */
     Account withACL(Account raw);
+
+    /**
+     * List of accounts
+     */
+    List<Account> getAccounts();
 
 }
