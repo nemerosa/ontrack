@@ -23,7 +23,10 @@ public class AccountGroupJdbcRepository extends AbstractJdbcRepository implement
                         "INNER JOIN ACCOUNT_GROUP_LINK L ON L.ACCOUNTGROUP = G.ID " +
                         "WHERE L.ACCOUNT = :accountId",
                 params("accountId", accountId),
-                (rs, num) -> AccountGroup.of(rs.getString("name")).withId(id(rs))
+                (rs, num) -> AccountGroup.of(
+                        rs.getString("name"),
+                        rs.getString("description")
+                ).withId(id(rs))
         );
     }
 }

@@ -19,6 +19,7 @@ public class AccountGroup implements Entity {
 
     private final ID id;
     private final String name;
+    private final String description;
     @Getter(AccessLevel.PRIVATE)
     private Authorisations authorisations;
     @Getter(AccessLevel.PRIVATE)
@@ -60,15 +61,17 @@ public class AccountGroup implements Entity {
         return new AccountGroup(
                 id,
                 name,
+                description,
                 authorisations,
                 true
         );
     }
 
-    public static AccountGroup of(String name) {
+    public static AccountGroup of(String name, String description) {
         return new AccountGroup(
                 ID.NONE,
                 name,
+                description,
                 Authorisations.none(),
                 false);
 
@@ -79,6 +82,7 @@ public class AccountGroup implements Entity {
         return new AccountGroup(
                 id,
                 name,
+                description,
                 authorisations,
                 locked
         );
