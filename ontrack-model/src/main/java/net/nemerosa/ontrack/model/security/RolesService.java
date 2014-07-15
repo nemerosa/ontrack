@@ -21,6 +21,7 @@ public interface RolesService {
             ProjectCreation.class,
             ApplicationManagement.class,
             GlobalSettings.class,
+            AccountManagement.class,
             ProjectList.class
     );
 
@@ -32,6 +33,7 @@ public interface RolesService {
             ProjectEdit.class,
             ProjectConfig.class,
             ProjectDelete.class,
+            ProjectAuthorisationsManagement.class,
             BranchCreate.class,
             BranchEdit.class,
             BranchDelete.class,
