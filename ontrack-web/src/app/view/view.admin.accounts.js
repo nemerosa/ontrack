@@ -8,11 +8,6 @@ angular.module('ot.view.admin.accounts', [
             templateUrl: 'app/view/view.admin.accounts.tpl.html',
             controller: 'AdminAccountsCtrl'
         });
-        $stateProvider.state('admin-account', {
-            url: '/admin-account/{accountId}',
-            templateUrl: 'app/view/view.admin.account.tpl.html',
-            controller: 'AdminAccountCtrl'
-        });
     })
 
     .controller('AdminAccountsCtrl', function ($scope, $http, ot, otFormService) {
@@ -43,29 +38,6 @@ angular.module('ot.view.admin.accounts', [
         $scope.createAccount = function () {
             otFormService.create($scope.accounts._create, "Account creation").then(loadAccounts);
         };
-    })
-
-    .controller('AdminAccountCtrl', function ($stateParams, $scope, $http, ot) {
-
-        var accountId = $stateParams.accountId;
-        var view = ot.view();
-
-        // Loading the account
-        function loadAccount() {
-            ot.pageCall($http.get('/accounts/' + accountId)).then(function (account) {
-                $scope.account = account;
-                // View
-                view.title = account.name;
-                // Commands
-                view.commands = [
-                    ot.viewCloseCommand('/admin-accounts')
-                ];
-            });
-        }
-
-        // Initialisation
-        loadAccount();
-
     })
 
 ;

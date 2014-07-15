@@ -14,14 +14,13 @@
             <th>Source</th>
             <th>Role</th>
             <th>Groups</th>
+            <th>&nbsp;</th>
         </tr>
         </thead>
         <tbody>
         <tr ng-repeat="account in accounts.resources">
             <td>
-                <a href="#/admin-account/{{account.id}}">
-                    {{account.name}}
-                </a>
+                {{account.name}}
             </td>
             <td>
                 {{account.fullName}}
@@ -41,6 +40,9 @@
                     {{accountGroup.name}}
                 </span>
                 <span ng-hide="account.accountGroups" class="ot-description">No group</span>
+            </td>
+            <td>
+                Actions
             </td>
         </tr>
         </tbody>
