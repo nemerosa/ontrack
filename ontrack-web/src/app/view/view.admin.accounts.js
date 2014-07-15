@@ -13,14 +13,22 @@ angular.module('ot.view.admin.accounts', [
     .controller('AdminAccountsCtrl', function ($scope, $http, ot) {
         var view = ot.view();
         view.title = "Account management";
-        view.commands = [
-            ot.viewCloseCommand('/home')
-        ];
 
         // Loading the accounts
         function loadAccounts() {
             ot.call($http.get('accounts')).then(function (accounts) {
                 $scope.accounts = accounts;
+                // Commands
+                view.commands = [
+                    {
+                        id: 'createAccount',
+                        name: "Create account",
+                        cls: 'ot-command-new',
+                        action: function () {
+                        }
+                    },
+                    ot.viewCloseCommand('/home')
+                ];
             });
         }
 
