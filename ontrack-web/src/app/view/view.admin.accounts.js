@@ -36,7 +36,7 @@ angular.module('ot.view.admin.accounts', [
 
         // Creating an account
         $scope.createAccount = function () {
-            otFormService.create($scope.accounts._create, "Account creation");
+            otFormService.create($scope.accounts._create, "Account creation").then(loadAccounts);
         };
     })
 
