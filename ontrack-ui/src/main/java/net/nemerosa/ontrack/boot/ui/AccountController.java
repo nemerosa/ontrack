@@ -7,14 +7,12 @@ import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.security.Account;
 import net.nemerosa.ontrack.model.security.AccountInput;
 import net.nemerosa.ontrack.model.security.AccountService;
+import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -64,6 +62,14 @@ public class AccountController extends AbstractResourceController {
     @RequestMapping(value = "create", method = RequestMethod.POST)
     public Account create(@RequestBody @Valid AccountInput input) {
         return accountService.create(input);
+    }
+
+    /**
+     * Gets an account by its ID
+     */
+    @RequestMapping(value = "{accountId}", method = RequestMethod.GET)
+    public Account getAccount(@PathVariable ID accountId) {
+        return accountService.getAccount(accountId);
     }
 
 }

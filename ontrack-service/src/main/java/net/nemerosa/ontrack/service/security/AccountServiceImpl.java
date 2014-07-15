@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.security;
 
 import net.nemerosa.ontrack.model.security.*;
+import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.repository.AccountGroupRepository;
 import net.nemerosa.ontrack.repository.AccountRepository;
 import net.nemerosa.ontrack.repository.RoleRepository;
@@ -89,6 +90,13 @@ public class AccountServiceImpl implements AccountService {
         accountRepository.setPassword(account.id(), passwordEncoder.encode(input.getPassword()));
         // OK
         return account;
+    }
+
+    @Override
+    public Account getAccount(ID accountId) {
+        return accountRepository.getAccount(accountId, authenticationSourceService::getAuthenticationSource)
+                .withGroups(accountGroupRepository.findByAccount(accountId.getValue()))
+                .lock();
     }
 
     protected AccountGroup groupWithACL(AccountGroup group) {

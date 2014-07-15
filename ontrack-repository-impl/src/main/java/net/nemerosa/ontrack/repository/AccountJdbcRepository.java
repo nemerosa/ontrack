@@ -90,4 +90,16 @@ public class AccountJdbcRepository extends AbstractJdbcRepository implements Acc
                         .addValue("password", encodedPassword)
         );
     }
+
+    @Override
+    public Account getAccount(ID accountId, Function<String, AuthenticationSource> authenticationSourceFunction) {
+        return getNamedParameterJdbcTemplate().queryForObject(
+                "SELECT * FROM ACCOUNTS WHERE ID = :id",
+                params("id", accountId.getValue()),
+                (rs, num) -> toAccount(
+                        rs,
+                        authenticationSourceFunction
+                )
+        );
+    }
 }

@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.model.security;
 
+import net.nemerosa.ontrack.model.structure.ID;
+
 import java.util.List;
 
 /**
@@ -24,4 +26,10 @@ public interface AccountService {
      * Creates a built-in account
      */
     Account create(AccountInput input);
+
+    /**
+     * Gets an account using its ID
+     */
+    Account getAccount(ID accountId);
+
 }

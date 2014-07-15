@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.repository;
 import net.nemerosa.ontrack.model.security.Account;
 import net.nemerosa.ontrack.model.security.AuthenticationSource;
 import net.nemerosa.ontrack.model.security.AuthenticationSourceProvider;
+import net.nemerosa.ontrack.model.structure.ID;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -21,4 +22,6 @@ public interface AccountRepository {
     Account newAccount(Account account);
 
     void setPassword(int accountId, String encodedPassword);
+
+    Account getAccount(ID accountId, Function<String, AuthenticationSource> authenticationSourceFunction);
 }
