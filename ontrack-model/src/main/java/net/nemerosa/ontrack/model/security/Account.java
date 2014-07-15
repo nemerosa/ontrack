@@ -12,7 +12,7 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 
 @Data
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class Account implements Entity {
 
     public static Account of(String name, String fullName, String email, SecurityRole role, AuthenticationSource authenticationSource) {
