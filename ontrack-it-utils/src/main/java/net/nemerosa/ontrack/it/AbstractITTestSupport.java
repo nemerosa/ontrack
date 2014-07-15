@@ -83,7 +83,7 @@ public abstract class AbstractITTestSupport extends AbstractJUnit4SpringContextT
         protected final Account account;
 
         public AccountCall(String name, SecurityRole role) {
-            account = Account.of(name, name, name + "@test.com", role);
+            account = Account.of(name, name, name + "@test.com", role, AuthenticationSource.none());
         }
 
         @Override
