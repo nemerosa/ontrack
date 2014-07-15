@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.boot.ui;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import net.nemerosa.ontrack.model.security.Account;
+import net.nemerosa.ontrack.model.security.AuthenticationSource;
 import net.nemerosa.ontrack.model.security.ConnectedAccount;
 import net.nemerosa.ontrack.model.security.SecurityRole;
 import net.nemerosa.ontrack.model.structure.ID;
@@ -26,6 +27,10 @@ public class ResourceAccountTest {
                                 .with("name", "admin")
                                 .with("fullName", "Administrator")
                                 .with("email", "")
+                                .with("authenticationSource", object()
+                                        .with("id", "none")
+                                        .with("name", "Not defined")
+                                        .end())
                                 .with("role", "ADMINISTRATOR")
                                 .with("accountGroups", array().end())
                                 .end())
@@ -34,7 +39,7 @@ public class ResourceAccountTest {
                         .end(),
                 Resource.of(
                         ConnectedAccount.of(
-                                Account.of("admin", "Administrator", "", SecurityRole.ADMINISTRATOR)
+                                Account.of("admin", "Administrator", "", SecurityRole.ADMINISTRATOR, AuthenticationSource.none())
                                         .withId(ID.of(1))
                                         .lock()
                         ),

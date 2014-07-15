@@ -55,7 +55,7 @@ public class AccountTest {
     }
 
     private Account baseAccount() {
-        return Account.of("test", "Test", "test@test.com", SecurityRole.USER);
+        return Account.of("test", "Test", "test@test.com", SecurityRole.USER, AuthenticationSource.none());
     }
 
     @Test
@@ -75,7 +75,7 @@ public class AccountTest {
 
     @Test
     public void global_function_granted_for_admin() {
-        Account account = Account.of("test", "Test", "test@test.com", SecurityRole.ADMINISTRATOR);
+        Account account = Account.of("test", "Test", "test@test.com", SecurityRole.ADMINISTRATOR, AuthenticationSource.none());
         assertTrue(account.isGranted(GlobalSettings.class));
         assertTrue(account.isGranted(ProjectCreation.class));
     }

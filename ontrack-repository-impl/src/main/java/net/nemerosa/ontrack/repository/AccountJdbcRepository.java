@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.repository;
 
 import net.nemerosa.ontrack.model.security.Account;
+import net.nemerosa.ontrack.model.security.AuthenticationSource;
 import net.nemerosa.ontrack.model.security.SecurityRole;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,9 @@ public class AccountJdbcRepository extends AbstractJdbcRepository implements Acc
                                 rs.getString("name"),
                                 rs.getString("fullName"),
                                 rs.getString("email"),
-                                getEnum(SecurityRole.class, rs, "role")
+                                getEnum(SecurityRole.class, rs, "role"),
+                                // TODO The authentication source provider must be passed as an argument
+                                AuthenticationSource.none()
                         ).withId(id(rs))
                 )
         );

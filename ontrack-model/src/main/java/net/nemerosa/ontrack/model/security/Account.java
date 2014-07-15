@@ -15,12 +15,13 @@ import java.util.Optional;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Account implements Entity {
 
-    public static Account of(String name, String fullName, String email, SecurityRole role) {
+    public static Account of(String name, String fullName, String email, SecurityRole role, AuthenticationSource authenticationSource) {
         return new Account(
                 ID.NONE,
                 name,
                 fullName,
                 email,
+                authenticationSource,
                 role,
                 new LinkedHashSet<>(),
                 Authorisations.none(),
@@ -32,6 +33,7 @@ public class Account implements Entity {
     private final String name;
     private final String fullName;
     private final String email;
+    private final AuthenticationSource authenticationSource;
     private final SecurityRole role;
     private final Collection<AccountGroup> accountGroups;
     @Getter(AccessLevel.PRIVATE)
@@ -58,6 +60,7 @@ public class Account implements Entity {
                 name,
                 fullName,
                 email,
+                authenticationSource,
                 role,
                 accountGroups,
                 authorisations,
@@ -71,6 +74,7 @@ public class Account implements Entity {
                 name,
                 fullName,
                 email,
+                authenticationSource,
                 role,
                 accountGroups,
                 authorisations,
