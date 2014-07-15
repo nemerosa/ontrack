@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service.security;
 
 import net.nemerosa.ontrack.model.security.Account;
 import net.nemerosa.ontrack.model.security.AccountService;
+import net.nemerosa.ontrack.model.security.AuthenticationSourceService;
 import net.nemerosa.ontrack.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
