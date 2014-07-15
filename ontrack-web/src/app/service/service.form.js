@@ -60,6 +60,40 @@ angular.module('ot.service.form', [
         };
 
         /**
+         * Creating from a form, using POST
+         */
+        self.create = function (uri, title, additionalFormConfig) {
+            var formConfig = {
+                uri: uri,
+                title: title,
+                submit: function (data) {
+                    return ot.call($http.post(uri, data));
+                }
+            };
+            if (additionalFormConfig) {
+                angular.extend(formConfig, additionalFormConfig);
+            }
+            return self.display(formConfig);
+        };
+
+        /**
+         * Updating from a form, using PUT
+         */
+        self.update = function (uri, title, additionalFormConfig) {
+            var formConfig = {
+                uri: uri,
+                title: title,
+                submit: function (data) {
+                    return ot.call($http.put(uri, data));
+                }
+            };
+            if (additionalFormConfig) {
+                angular.extend(formConfig, additionalFormConfig);
+            }
+            return self.display(formConfig);
+        };
+
+        /**
          * Prepares a form before being displayed
          */
         self.prepareForDisplay = function (form) {

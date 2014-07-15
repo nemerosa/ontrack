@@ -10,7 +10,7 @@ angular.module('ot.view.admin.accounts', [
         });
     })
 
-    .controller('AdminAccountsCtrl', function ($scope, $http, ot) {
+    .controller('AdminAccountsCtrl', function ($scope, $http, ot, otFormService) {
         var view = ot.view();
         view.title = "Account management";
 
@@ -24,8 +24,7 @@ angular.module('ot.view.admin.accounts', [
                         id: 'createAccount',
                         name: "Create account",
                         cls: 'ot-command-new',
-                        action: function () {
-                        }
+                        action: $scope.createAccount
                     },
                     ot.viewCloseCommand('/home')
                 ];
@@ -34,6 +33,11 @@ angular.module('ot.view.admin.accounts', [
 
         // Initialisation
         loadAccounts();
+
+        // Creating an account
+        $scope.createAccount = function () {
+            otFormService.create($scope.accounts._create, "Account creation");
+        };
     })
 
 ;
