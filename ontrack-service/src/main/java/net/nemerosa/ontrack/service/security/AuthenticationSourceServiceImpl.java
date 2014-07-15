@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.service.security;
 import net.nemerosa.ontrack.model.exceptions.AuthenticationSourceProviderNotFoundException;
 import net.nemerosa.ontrack.model.security.AuthenticationSourceProvider;
 import net.nemerosa.ontrack.model.security.AuthenticationSourceService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -16,6 +17,7 @@ public class AuthenticationSourceServiceImpl implements AuthenticationSourceServ
 
     private final Map<String, ? extends AuthenticationSourceProvider> providers;
 
+    @Autowired
     public AuthenticationSourceServiceImpl(Collection<? extends AuthenticationSourceProvider> providers) {
         this.providers = providers.stream().collect(Collectors.toMap(
                 provider -> provider.getSource().getId(),
