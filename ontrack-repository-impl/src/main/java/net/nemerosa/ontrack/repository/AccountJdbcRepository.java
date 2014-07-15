@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.model.security.Account;
 import net.nemerosa.ontrack.model.security.AuthenticationSource;
 import net.nemerosa.ontrack.model.security.AuthenticationSourceProvider;
 import net.nemerosa.ontrack.model.security.SecurityRole;
+import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -63,6 +64,30 @@ public class AccountJdbcRepository extends AbstractJdbcRepository implements Acc
                         rs,
                         authenticationSourceFunction
                 )
+        );
+    }
+
+    @Override
+    public Account newAccount(Account account) {
+        int id = dbCreate(
+                "INSERT INTO ACCOUNTS (NAME, FULLNAME, EMAIL, MODE, PASSWORD, ROLE) " +
+                        "VALUES (:name, :fullName, :email, :mode, :password, :role)",
+                params("name", account.getName())
+                        .addValue("fullName", account.getFullName())
+                        .addValue("email", account.getEmail())
+                        .addValue("mode", account.getAuthenticationSource().getId())
+                        .addValue("password", "")
+                        .addValue("role", account.getRole().name())
+        );
+        return account.withId(ID.of(id));
+    }
+
+    @Override
+    public void setPassword(int accountId, String encodedPassword) {
+        getNamedParameterJdbcTemplate().update(
+                "UPDATE ACCOUNTS SET PASSWORD = :password WHERE ID = :id",
+                params("id", accountId)
+                        .addValue("password", encodedPassword)
         );
     }
 }

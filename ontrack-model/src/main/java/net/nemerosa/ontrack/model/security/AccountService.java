@@ -20,4 +20,8 @@ public interface AccountService {
      */
     List<Account> getAccounts();
 
+    /**
+     * Creates a built-in account
+     */
+    Account create(AccountInput input);
 }

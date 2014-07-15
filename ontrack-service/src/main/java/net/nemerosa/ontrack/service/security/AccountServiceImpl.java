@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.repository.AccountGroupRepository;
 import net.nemerosa.ontrack.repository.AccountRepository;
 import net.nemerosa.ontrack.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ public class AccountServiceImpl implements AccountService {
     private final AccountGroupRepository accountGroupRepository;
     private final SecurityService securityService;
     private final AuthenticationSourceService authenticationSourceService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public AccountServiceImpl(
@@ -29,13 +31,15 @@ public class AccountServiceImpl implements AccountService {
             AccountRepository accountRepository,
             AccountGroupRepository accountGroupRepository,
             SecurityService securityService,
-            AuthenticationSourceService authenticationSourceService) {
+            AuthenticationSourceService authenticationSourceService,
+            PasswordEncoder passwordEncoder) {
         this.roleRepository = roleRepository;
         this.rolesService = rolesService;
         this.accountRepository = accountRepository;
         this.accountGroupRepository = accountGroupRepository;
         this.securityService = securityService;
         this.authenticationSourceService = authenticationSourceService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -66,6 +70,25 @@ public class AccountServiceImpl implements AccountService {
                 .stream()
                 .map(account -> account.withGroups(accountGroupRepository.findByAccount(account.id())))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Account create(AccountInput input) {
+        securityService.checkGlobalFunction(AccountManagement.class);
+        // Creates the account
+        Account account = Account.of(
+                input.getName(),
+                input.getFullName(),
+                input.getEmail(),
+                SecurityRole.USER,
+                authenticationSourceService.getAuthenticationSource("password")
+        );
+        // Saves it
+        account = accountRepository.newAccount(account);
+        // Sets the its password
+        accountRepository.setPassword(account.id(), passwordEncoder.encode(input.getPassword()));
+        // OK
+        return account;
     }
 
     protected AccountGroup groupWithACL(AccountGroup group) {

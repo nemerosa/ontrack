@@ -5,14 +5,18 @@ import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Password;
 import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.security.Account;
+import net.nemerosa.ontrack.model.security.AccountInput;
 import net.nemerosa.ontrack.model.security.AccountService;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -52,6 +56,14 @@ public class AccountController extends AbstractResourceController {
                 .with(Text.of("fullName").length(100).label("Full name").help("Display name for the account"))
                 .with(Email.of("email").label("Email").length(200).help("Contact email for the account"))
                 .with(Password.of("password").label("Password").length(40).help("Password for the account"));
+    }
+
+    /**
+     * Creation of a built-in account
+     */
+    @RequestMapping(value = "create", method = RequestMethod.POST)
+    public Account create(@RequestBody @Valid AccountInput input) {
+        return accountService.create(input);
     }
 
 }
