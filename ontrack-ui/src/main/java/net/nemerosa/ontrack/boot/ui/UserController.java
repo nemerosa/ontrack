@@ -84,8 +84,10 @@ public class UserController extends AbstractResourceController {
             user.add(Action.of("settings", "Settings", "settings"));
         }
         // TODO Profile
-        // TODO Account management
-        // TODO Extension management
+        // Account management
+        if (securityService.isGlobalFunctionGranted(AccountManagement.class)) {
+            user.add(Action.of("admin-accounts", "Account management", "admin-accounts"));
+        }
         // Contributions from extensions
         user = userMenuExtensions(user);
         // Admin tools
