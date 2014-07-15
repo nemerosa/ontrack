@@ -72,4 +72,17 @@ public class AccountController extends AbstractResourceController {
         return accountService.getAccount(accountId);
     }
 
+    /**
+     * Update for an account
+     */
+    @RequestMapping(value = "{accountId}/update", method = RequestMethod.GET)
+    public Form getUpdateForm(@PathVariable ID accountId) {
+        Account account = accountService.getAccount(accountId);
+        return getCreationForm()
+                .fill("name", account.getName())
+                .fill("fullName", account.getFullName())
+                .fill("email", account.getEmail())
+                ;
+    }
+
 }

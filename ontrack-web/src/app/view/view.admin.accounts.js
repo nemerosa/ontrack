@@ -38,6 +38,11 @@ angular.module('ot.view.admin.accounts', [
         $scope.createAccount = function () {
             otFormService.create($scope.accounts._create, "Account creation").then(loadAccounts);
         };
+
+        // Updating an account
+        $scope.updateAccount = function (account) {
+            otFormService.update(account._update, "Updating account").then(loadAccounts);
+        };
     })
 
 ;

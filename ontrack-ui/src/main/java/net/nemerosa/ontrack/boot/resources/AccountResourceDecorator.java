@@ -21,7 +21,8 @@ public class AccountResourceDecorator extends AbstractResourceDecorator<Account>
         return resourceContext.links()
                 // Self
                 .self(on(AccountController.class).getAccount(account.getId()))
-                        // TODO Update
+                        // Update
+                .link(Link.UPDATE, on(AccountController.class).getUpdateForm(account.getId()))
                         // TODO Delete
                         // OK
                 .build();

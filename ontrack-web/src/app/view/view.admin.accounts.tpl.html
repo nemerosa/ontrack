@@ -42,7 +42,8 @@
                 <span ng-hide="account.accountGroups" class="ot-description">No group</span>
             </td>
             <td>
-                Actions
+                <span class="ot-command ot-command-update" title="Update account {{account.name}}"
+                        ng-click="updateAccount(account)"></span>
             </td>
         </tr>
         </tbody>
