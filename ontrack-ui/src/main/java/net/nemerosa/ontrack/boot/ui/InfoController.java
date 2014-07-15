@@ -37,7 +37,7 @@ public class InfoController extends AbstractResourceController {
                 uri(on(getClass()).info())
         )
                 // API links
-                .with("user", uri(on(UserAPIController.class).getCurrentUser()))
+                .with("user", uri(on(UserController.class).getCurrentUser()))
                         // TODO Structure controller (--> projects, branches, etc.)
                         // Info message
                 .with("_applicationInfo", uri(on(InfoController.class).applicationInfo()))

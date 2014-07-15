@@ -17,13 +17,13 @@ import java.util.Collection;
 
 @RestController
 @RequestMapping("/user")
-public class UserAPIController extends AbstractResourceController {
+public class UserController extends AbstractResourceController {
 
     private final SecurityService securityService;
     private final ExtensionManager extensionManager;
 
     @Autowired
-    public UserAPIController(SecurityService securityService, ExtensionManager extensionManager) {
+    public UserController(SecurityService securityService, ExtensionManager extensionManager) {
         this.securityService = securityService;
         this.extensionManager = extensionManager;
     }
