@@ -20,12 +20,14 @@ public class PasswordAuthenticationProvider extends AbstractOntrackAuthenticatio
 
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
+    private final PasswordAuthenticationSourceProvider passwordAuthenticationSourceProvider;
 
     @Autowired
-    public PasswordAuthenticationProvider(AccountService accountService, AccountRepository accountRepository, PasswordEncoder passwordEncoder) {
+    public PasswordAuthenticationProvider(AccountService accountService, AccountRepository accountRepository, PasswordEncoder passwordEncoder, PasswordAuthenticationSourceProvider passwordAuthenticationSourceProvider) {
         super(accountService);
         this.accountRepository = accountRepository;
         this.passwordEncoder = passwordEncoder;
+        this.passwordAuthenticationSourceProvider = passwordAuthenticationSourceProvider;
     }
 
     @Override
@@ -42,6 +44,6 @@ public class PasswordAuthenticationProvider extends AbstractOntrackAuthenticatio
 
     @Override
     protected Optional<Account> findUser(String username, UsernamePasswordAuthenticationToken authentication) {
-        return accountRepository.findUserByNameAndMode(username, "password");
+        return accountRepository.findUserByNameAndSource(username, passwordAuthenticationSourceProvider);
     }
 }

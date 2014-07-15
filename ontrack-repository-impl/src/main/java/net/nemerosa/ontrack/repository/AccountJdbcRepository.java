@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.repository;
 
 import net.nemerosa.ontrack.model.security.Account;
-import net.nemerosa.ontrack.model.security.AuthenticationSource;
+import net.nemerosa.ontrack.model.security.AuthenticationSourceProvider;
 import net.nemerosa.ontrack.model.security.SecurityRole;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,18 +30,17 @@ public class AccountJdbcRepository extends AbstractJdbcRepository implements Acc
     }
 
     @Override
-    public Optional<Account> findUserByNameAndMode(String username, String mode) {
+    public Optional<Account> findUserByNameAndSource(String username, AuthenticationSourceProvider sourceProvider) {
         return Optional.ofNullable(
                 getFirstItem(
                         "SELECT * FROM ACCOUNTS WHERE MODE = :mode AND NAME = :name",
-                        params("name", username).addValue("mode", mode),
+                        params("name", username).addValue("mode", sourceProvider.getSource().getId()),
                         (rs, rowNum) -> Account.of(
                                 rs.getString("name"),
                                 rs.getString("fullName"),
                                 rs.getString("email"),
                                 getEnum(SecurityRole.class, rs, "role"),
-                                // TODO The authentication source provider must be passed as an argument
-                                AuthenticationSource.none()
+                                sourceProvider.getSource()
                         ).withId(id(rs))
                 )
         );
