@@ -79,6 +79,7 @@ public class AccountController extends AbstractResourceController {
     public Form getUpdateForm(@PathVariable ID accountId) {
         Account account = accountService.getAccount(accountId);
         return getCreationForm()
+                .with(Password.of("password").label("Password").length(40).help("Password for the account. Leave blank to keep it unchanged.").optional())
                 .fill("name", account.getName())
                 .fill("fullName", account.getFullName())
                 .fill("email", account.getEmail())
