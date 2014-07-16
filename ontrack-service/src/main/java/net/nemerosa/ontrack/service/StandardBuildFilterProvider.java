@@ -130,13 +130,17 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
             // Result by default is: accept and go on
             BuildFilterResult result = BuildFilterResult.ok();
             // After date
-            result = result.acceptIf(
-                    data.getAfterDate() != null && !data.getAfterDate().isBefore(build.getSignature().getTime().toLocalDate())
-            );
+            if (data.getAfterDate() != null) {
+                result = result.acceptIf(
+                        !data.getAfterDate().isBefore(build.getSignature().getTime().toLocalDate())
+                );
+            }
             // Before date
-            result = result.acceptIf(
-                    data.getBeforeDate() != null && !build.getSignature().getTime().toLocalDate().isBefore(data.getBeforeDate())
-            );
+            if (data.getBeforeDate() != null) {
+                result = result.acceptIf(
+                        !build.getSignature().getTime().toLocalDate().isBefore(data.getBeforeDate())
+                );
+            }
             // With promotion level
             if (isNotBlank(data.getWithPromotionLevel())) {
                 result = result.acceptIf(
