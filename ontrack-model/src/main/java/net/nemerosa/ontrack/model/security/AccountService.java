@@ -32,4 +32,12 @@ public interface AccountService {
      */
     Account getAccount(ID accountId);
 
+    /**
+     * Updating an existing account
+     *
+     * @param accountId ID of the account to update
+     * @param input     Update data
+     * @return Updated account
+     */
+    Account updateAccount(ID accountId, AccountInput input);
 }

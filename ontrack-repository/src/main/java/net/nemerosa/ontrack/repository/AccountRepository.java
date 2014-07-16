@@ -21,6 +21,8 @@ public interface AccountRepository {
 
     Account newAccount(Account account);
 
+    void saveAccount(Account account);
+
     void setPassword(int accountId, String encodedPassword);
 
     Account getAccount(ID accountId, Function<String, AuthenticationSource> authenticationSourceFunction);

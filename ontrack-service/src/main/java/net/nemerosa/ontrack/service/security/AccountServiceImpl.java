@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.repository.AccountGroupRepository;
 import net.nemerosa.ontrack.repository.AccountRepository;
 import net.nemerosa.ontrack.repository.RoleRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -88,6 +89,23 @@ public class AccountServiceImpl implements AccountService {
         account = accountRepository.newAccount(account);
         // Sets the its password
         accountRepository.setPassword(account.id(), passwordEncoder.encode(input.getPassword()));
+        // OK
+        return account;
+    }
+
+    @Override
+    public Account updateAccount(ID accountId, AccountInput input) {
+        securityService.checkGlobalFunction(AccountManagement.class);
+        // Gets the existing account
+        Account account = getAccount(accountId);
+        // Updates it
+        account = account.update(input);
+        // Saves it
+        accountRepository.saveAccount(account);
+        // Updating the password?
+        if (StringUtils.isNotBlank(input.getPassword())) {
+            accountRepository.setPassword(accountId.getValue(), passwordEncoder.encode(input.getPassword()));
+        }
         // OK
         return account;
     }

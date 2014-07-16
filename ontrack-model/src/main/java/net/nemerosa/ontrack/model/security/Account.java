@@ -82,6 +82,20 @@ public class Account implements Entity {
         );
     }
 
+    public Account update(AccountInput input) {
+        return new Account(
+                id,
+                input.getName(),
+                input.getFullName(),
+                input.getEmail(),
+                authenticationSource,
+                role,
+                accountGroups,
+                authorisations,
+                locked
+        );
+    }
+
     private void checkLock() {
         if (locked) {
             throw new IllegalStateException("Account is locked");

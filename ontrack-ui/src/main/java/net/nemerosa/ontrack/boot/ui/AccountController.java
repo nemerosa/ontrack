@@ -73,7 +73,7 @@ public class AccountController extends AbstractResourceController {
     }
 
     /**
-     * Update for an account
+     * Update form for an account
      */
     @RequestMapping(value = "{accountId}/update", method = RequestMethod.GET)
     public Form getUpdateForm(@PathVariable ID accountId) {
@@ -84,6 +84,14 @@ public class AccountController extends AbstractResourceController {
                 .fill("fullName", account.getFullName())
                 .fill("email", account.getEmail())
                 ;
+    }
+
+    /**
+     * Updating an account
+     */
+    @RequestMapping(value = "{accountId}/update", method = RequestMethod.PUT)
+    public Account updateAccount(@PathVariable ID accountId, @RequestBody @Valid AccountInput input) {
+        return accountService.updateAccount(accountId, input);
     }
 
 }

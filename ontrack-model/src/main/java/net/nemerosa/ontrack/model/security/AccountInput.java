@@ -21,8 +21,6 @@ public class AccountInput {
     @NotNull(message = "The account email is required.")
     @Size(min = 1, max = 200, message = "The account email must be between 1 and 200 long.")
     private final String email;
-    @NotNull(message = "The account password is required.")
-    @Size(min = 1, max = 40, message = "The account password must be between 1 and 40 long.")
     private final String password;
 
 }

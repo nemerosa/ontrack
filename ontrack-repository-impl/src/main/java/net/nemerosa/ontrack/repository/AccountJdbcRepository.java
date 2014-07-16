@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.repository;
 
+import net.nemerosa.ontrack.model.exceptions.AccountNameAlreadyDefinedException;
 import net.nemerosa.ontrack.model.security.Account;
 import net.nemerosa.ontrack.model.security.AuthenticationSource;
 import net.nemerosa.ontrack.model.security.AuthenticationSourceProvider;
@@ -7,6 +8,7 @@ import net.nemerosa.ontrack.model.security.SecurityRole;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -69,17 +71,37 @@ public class AccountJdbcRepository extends AbstractJdbcRepository implements Acc
 
     @Override
     public Account newAccount(Account account) {
-        int id = dbCreate(
-                "INSERT INTO ACCOUNTS (NAME, FULLNAME, EMAIL, MODE, PASSWORD, ROLE) " +
-                        "VALUES (:name, :fullName, :email, :mode, :password, :role)",
-                params("name", account.getName())
-                        .addValue("fullName", account.getFullName())
-                        .addValue("email", account.getEmail())
-                        .addValue("mode", account.getAuthenticationSource().getId())
-                        .addValue("password", "")
-                        .addValue("role", account.getRole().name())
-        );
-        return account.withId(ID.of(id));
+        try {
+            int id = dbCreate(
+                    "INSERT INTO ACCOUNTS (NAME, FULLNAME, EMAIL, MODE, PASSWORD, ROLE) " +
+                            "VALUES (:name, :fullName, :email, :mode, :password, :role)",
+                    params("name", account.getName())
+                            .addValue("fullName", account.getFullName())
+                            .addValue("email", account.getEmail())
+                            .addValue("mode", account.getAuthenticationSource().getId())
+                            .addValue("password", "")
+                            .addValue("role", account.getRole().name())
+            );
+            return account.withId(ID.of(id));
+        } catch (DuplicateKeyException ex) {
+            throw new AccountNameAlreadyDefinedException(account.getName());
+        }
+    }
+
+    @Override
+    public void saveAccount(Account account) {
+        try {
+            getNamedParameterJdbcTemplate().update(
+                    "UPDATE ACCOUNTS SET NAME = :name, FULLNAME = :fullName, EMAIL = :email " +
+                            "WHERE ID = :id",
+                    params("id", account.id())
+                            .addValue("name", account.getName())
+                            .addValue("fullName", account.getFullName())
+                            .addValue("email", account.getEmail())
+            );
+        } catch (DuplicateKeyException ex) {
+            throw new AccountNameAlreadyDefinedException(account.getName());
+        }
     }
 
     @Override
