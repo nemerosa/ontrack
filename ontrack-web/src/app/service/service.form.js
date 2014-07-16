@@ -81,6 +81,12 @@ angular.module('ot.service.form', [
                         data.times[field.name] = dateTime;
                     }
                 }
+                // Date handling
+                if (field.type == 'date') {
+                    if (field.value) {
+                        data.dates[field.name] = new Date(field.value);
+                    }
+                }
             });
             // OK
             return data;
@@ -102,6 +108,10 @@ angular.module('ot.service.form', [
                     dateTime.setSeconds(0);
                     dateTime.setMilliseconds(0);
                     data[field.name] = dateTime;
+                }
+                // Date handling
+                if (field.type == 'date') {
+                    data[field.name] = data.dates[field.name];
                 }
             });
             // Cleaning of pseudo fields

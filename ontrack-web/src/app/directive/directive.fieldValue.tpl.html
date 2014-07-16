@@ -13,6 +13,9 @@
 <!-- Type selection -->
 <span ng-if="field.type == 'selection'" class="ot-field-value">{{field.value}}</span>
 
+<!-- Date -->
+<span ng-if="field.type == 'date'" class="ot-field-value">{{field.value | date:'mediumDate'}}</span>
+
 <!-- Date time -->
 <span ng-if="field.type == 'dateTime'" class="ot-field-value">{{field.value | date:'mediumDate'}} {{field.value | date:'smallTime'}}</span>
 

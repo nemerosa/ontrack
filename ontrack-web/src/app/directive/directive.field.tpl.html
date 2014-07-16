@@ -25,6 +25,14 @@
     <option value="">&nbsp;</option>
 </select>
 
+<!-- Date -->
+<span ng-if="field.type == 'date'">
+    <input ng-model="data.dates[field.name]" name="{{field.name}}" type="text" class="form-control"
+           datepicker-popup="EEE dd MMM yyyy"
+           is-open="opened"
+            />
+</span>
+
 <!-- Date time -->
 <span ng-if="field.type == 'dateTime'">
     <div class="row">
@@ -42,8 +50,10 @@
 
 <!-- Yes/no -->
 <span ng-if="field.type == 'yesno'">
-    <label class="radio-inline"><input type="radio" name="{{field.name}}" ng-value="true" ng-model="data[field.name]"/> Yes</label>
-    <label class="radio-inline"><input type="radio" name="{{field.name}}" ng-value="false" ng-model="data[field.name]"/> No</label>
+    <label class="radio-inline"><input type="radio" name="{{field.name}}" ng-value="true" ng-model="data[field.name]"/>
+        Yes</label>
+    <label class="radio-inline"><input type="radio" name="{{field.name}}" ng-value="false" ng-model="data[field.name]"/>
+        No</label>
 </span>
 
 <!-- Type: int -->
