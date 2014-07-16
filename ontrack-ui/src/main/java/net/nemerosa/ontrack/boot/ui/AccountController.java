@@ -79,8 +79,15 @@ public class AccountController extends AbstractResourceController {
     @RequestMapping(value = "{accountId}/update", method = RequestMethod.GET)
     public Form getUpdateForm(@PathVariable ID accountId) {
         Account account = accountService.getAccount(accountId);
-        return getCreationForm()
-                .with(Password.of("password").label("Password").length(40).help("Password for the account. Leave blank to keep it unchanged.").optional())
+        Form form = getCreationForm();
+        // Name in read-only mode for the default admin
+        if (account.isDefaultAdmin()) {
+            form = form.with(Form.defaultNameField().readOnly());
+        }
+        // Password not filled in, and not required on update
+        form = form.with(Password.of("password").label("Password").length(40).help("Password for the account. Leave blank to keep it unchanged.").optional());
+        // OK
+        return form
                 .fill("name", account.getName())
                 .fill("fullName", account.getFullName())
                 .fill("email", account.getEmail())
