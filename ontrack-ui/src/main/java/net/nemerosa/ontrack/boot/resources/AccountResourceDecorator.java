@@ -23,7 +23,8 @@ public class AccountResourceDecorator extends AbstractResourceDecorator<Account>
                 .self(on(AccountController.class).getAccount(account.getId()))
                         // Update
                 .link(Link.UPDATE, on(AccountController.class).getUpdateForm(account.getId()))
-                        // TODO Delete
+                        // Delete
+                .link(Link.DELETE, on(AccountController.class).deleteAccount(account.getId()))
                         // OK
                 .build();
     }

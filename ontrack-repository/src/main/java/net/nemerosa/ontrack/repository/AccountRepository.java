@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.repository;
 
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.security.Account;
 import net.nemerosa.ontrack.model.security.AuthenticationSource;
 import net.nemerosa.ontrack.model.security.AuthenticationSourceProvider;
@@ -22,6 +23,8 @@ public interface AccountRepository {
     Account newAccount(Account account);
 
     void saveAccount(Account account);
+
+    Ack deleteAccount(ID accountId);
 
     void setPassword(int accountId, String encodedPassword);
 

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Email;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Password;
@@ -92,6 +93,14 @@ public class AccountController extends AbstractResourceController {
     @RequestMapping(value = "{accountId}/update", method = RequestMethod.PUT)
     public Account updateAccount(@PathVariable ID accountId, @RequestBody @Valid AccountInput input) {
         return accountService.updateAccount(accountId, input);
+    }
+
+    /**
+     * Deleting an account
+     */
+    @RequestMapping(value = "{accountId}", method = RequestMethod.DELETE)
+    public Ack deleteAccount(@PathVariable ID accountId) {
+        return accountService.deleteAccount(accountId);
     }
 
 }

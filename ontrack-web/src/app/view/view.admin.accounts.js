@@ -10,7 +10,7 @@ angular.module('ot.view.admin.accounts', [
         });
     })
 
-    .controller('AdminAccountsCtrl', function ($scope, $http, ot, otFormService) {
+    .controller('AdminAccountsCtrl', function ($scope, $http, ot, otFormService, otAlertService) {
         var view = ot.view();
         view.title = "Account management";
 
@@ -42,6 +42,17 @@ angular.module('ot.view.admin.accounts', [
         // Updating an account
         $scope.updateAccount = function (account) {
             otFormService.update(account._update, "Updating account").then(loadAccounts);
+        };
+
+        // Deleting an account
+        $scope.deleteAccount = function (account) {
+            otAlertService.confirm({
+                title: "Account deletion",
+                message: "Do you really want to delete this account?"
+            }).then(function () {
+                ot.call($http.delete(account._delete)).then(loadAccounts);
+            });
+
         };
     })
 

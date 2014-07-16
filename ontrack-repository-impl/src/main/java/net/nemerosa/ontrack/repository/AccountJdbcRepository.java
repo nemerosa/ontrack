@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.repository;
 
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.exceptions.AccountNameAlreadyDefinedException;
 import net.nemerosa.ontrack.model.security.Account;
 import net.nemerosa.ontrack.model.security.AuthenticationSource;
@@ -102,6 +103,16 @@ public class AccountJdbcRepository extends AbstractJdbcRepository implements Acc
         } catch (DuplicateKeyException ex) {
             throw new AccountNameAlreadyDefinedException(account.getName());
         }
+    }
+
+    @Override
+    public Ack deleteAccount(ID accountId) {
+        return Ack.one(
+                getNamedParameterJdbcTemplate().update(
+                        "DELETE FROM ACCOUNTS WHERE ID = :id",
+                        params("id", accountId.getValue())
+                )
+        );
     }
 
     @Override

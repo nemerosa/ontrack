@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service.security;
 
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.repository.AccountGroupRepository;
@@ -108,6 +109,15 @@ public class AccountServiceImpl implements AccountService {
         }
         // OK
         return account;
+    }
+
+    @Override
+    public Ack deleteAccount(ID accountId) {
+        // TODO Check the `admin` account
+        // Security check
+        securityService.checkGlobalFunction(AccountManagement.class);
+        // Deletion
+        return accountRepository.deleteAccount(accountId);
     }
 
     @Override

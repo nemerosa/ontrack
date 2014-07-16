@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.model.security;
 
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.structure.ID;
 
 import java.util.List;
@@ -40,4 +41,9 @@ public interface AccountService {
      * @return Updated account
      */
     Account updateAccount(ID accountId, AccountInput input);
+
+    /**
+     * Deletes an account
+     */
+    Ack deleteAccount(ID accountId);
 }
