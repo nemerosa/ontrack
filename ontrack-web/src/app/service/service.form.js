@@ -5,7 +5,7 @@ angular.module('ot.service.form', [
 /**
  * Form service
  */
-    .service('otFormService', function ($q, $http, $modal, ot) {
+    .service('otFormService', function ($filter, $q, $http, $modal, ot) {
         var self = {};
 
         /**
@@ -96,11 +96,12 @@ angular.module('ot.service.form', [
          * Prepares a form before being submitted
          */
         self.prepareForSubmit = function (form, data) {
+            var date;
             // Processing before submit
             angular.forEach(form.fields, function (field) {
                 // Date-time handling
                 if (field.type == 'dateTime') {
-                    var date = data.dates[field.name];
+                    date = data.dates[field.name];
                     var time = data.times[field.name];
                     var dateTime = date;
                     dateTime.setHours(time.getHours());
@@ -111,7 +112,12 @@ angular.module('ot.service.form', [
                 }
                 // Date handling
                 if (field.type == 'date') {
-                    data[field.name] = data.dates[field.name];
+                    date = data.dates[field.name];
+                    if (date) {
+                        data[field.name] = $filter('date')(date, 'yyyy-MM-dd');
+                    } else {
+                        data[field.name] = '';
+                    }
                 }
             });
             // Cleaning of pseudo fields
