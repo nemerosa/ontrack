@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.security;
 
 import net.nemerosa.ontrack.model.Ack;
+import net.nemerosa.ontrack.model.exceptions.AccountDefaultAdminCannotDeleteException;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.repository.AccountGroupRepository;
@@ -113,9 +114,12 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Ack deleteAccount(ID accountId) {
-        // TODO Check the `admin` account
         // Security check
         securityService.checkGlobalFunction(AccountManagement.class);
+        // Check the `admin` account
+        if (getAccount(accountId).isDefaultAdmin()) {
+            throw new AccountDefaultAdminCannotDeleteException();
+        }
         // Deletion
         return accountRepository.deleteAccount(accountId);
     }
