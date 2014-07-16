@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterResult;
 import net.nemerosa.ontrack.model.structure.*;
 import org.junit.Before;
@@ -9,6 +10,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 
+import static net.nemerosa.ontrack.json.JsonUtils.object;
+import static net.nemerosa.ontrack.test.TestUtils.assertJsonRead;
 import static org.junit.Assert.*;
 
 public class StandardBuildFilterTest {
@@ -121,6 +124,18 @@ public class StandardBuildFilterTest {
         assertNotNull(result);
         assertTrue(result.isGoingOn());
         assertTrue(result.isAccept());
+    }
+
+    @Test
+    public void json_to_afterDate() throws JsonProcessingException {
+        assertJsonRead(
+                StandardBuildFilterData.of(2).withAfterDate(LocalDate.of(2014, 7, 14)),
+                object()
+                        .with("count", "2")
+                        .with("afterDate", "2014-07-14")
+                        .end(),
+                StandardBuildFilterData.class
+        );
     }
 
 }

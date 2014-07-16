@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
@@ -40,6 +41,9 @@ public final class ObjectMapperFactory {
         // LocalTime
         jdkTimeModule.addSerializer(LocalTime.class, new JDKLocalTimeSerializer());
         jdkTimeModule.addDeserializer(LocalTime.class, new JDKLocalTimeDeserializer());
+        // LocalDate
+        jdkTimeModule.addSerializer(LocalDate.class, new JDKLocalDateSerializer());
+        jdkTimeModule.addDeserializer(LocalDate.class, new JDKLocalDateDeserializer());
         // YearMonth
         jdkTimeModule.addSerializer(YearMonth.class, new JDKYearMonthSerializer());
         jdkTimeModule.addDeserializer(YearMonth.class, new JDKYearMonthDeserializer());
