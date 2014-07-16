@@ -222,10 +222,13 @@ module.exports = function (grunt) {
         },
 
         /**
-         * `ngmin` annotates the sources before minifying. That is, it allows us
+         * `ngAnnotate` annotates the sources before minifying. That is, it allows us
          * to code without the array syntax in AngularJS.
          */
-        ngmin: {
+        ngAnnotate: {
+            options: {
+                singleQuotes: true,
+            },
             prod: {
                 files: [
                     {
@@ -404,7 +407,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-copy');
-    grunt.loadNpmTasks('grunt-ngmin');
+    grunt.loadNpmTasks('grunt-ng-annotate');
     grunt.loadNpmTasks('grunt-html2js');
     grunt.loadNpmTasks('grunt-include-source');
 
@@ -453,7 +456,7 @@ module.exports = function (grunt) {
         'copy:prod_assets',
         'html2js:prod',
         'copy:prod_vendor_fonts',
-        'ngmin:prod',
+        'ngAnnotate:prod',
         'copy:prod_vendor_js',
         'concat:prod_js',
         'concat:prod_css',
