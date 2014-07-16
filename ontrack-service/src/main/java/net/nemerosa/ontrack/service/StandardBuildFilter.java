@@ -29,13 +29,13 @@ public class StandardBuildFilter implements BuildFilter {
         // After date
         if (data.getAfterDate() != null) {
             result = result.acceptIf(
-                    !data.getAfterDate().isBefore(build.getSignature().getTime().toLocalDate())
+                    build.getSignature().getTime().toLocalDate().compareTo(data.getAfterDate()) >= 0
             );
         }
         // Before date
         if (data.getBeforeDate() != null) {
             result = result.acceptIf(
-                    !build.getSignature().getTime().toLocalDate().isBefore(data.getBeforeDate())
+                    build.getSignature().getTime().toLocalDate().compareTo(data.getBeforeDate()) <= 0
             );
         }
         // With promotion level
