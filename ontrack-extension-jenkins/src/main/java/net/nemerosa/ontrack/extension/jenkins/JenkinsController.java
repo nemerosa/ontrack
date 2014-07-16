@@ -33,7 +33,6 @@ public class JenkinsController extends AbstractExtensionController<JenkinsExtens
     @Override
     @RequestMapping(value = "", method = RequestMethod.GET)
     public Resource<ExtensionFeatureDescription> getDescription() {
-        // TODO ExtensionFeatureDescription must be decorated according to the Jenkins controller
         return Resource.of(
                 feature.getFeatureDescription(),
                 uri(MvcUriComponentsBuilder.on(getClass()).getDescription())
