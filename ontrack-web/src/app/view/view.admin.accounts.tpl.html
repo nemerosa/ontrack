@@ -33,7 +33,8 @@
                 {{account.authenticationSource.name}}
             </td>
             <td>
-                {{account.role}}
+                <span class="ot-description" ng-if="account.defaultAdmin">Built-in administrator</span>
+                <span ng-if="!account.defaultAdmin">Normal user</span>
             </td>
             <td>
                 <span class="label label-info" ng-repeat="accountGroup in account.accountGroups">
@@ -43,9 +44,10 @@
             </td>
             <td>
                 <span class="ot-command ot-command-update" title="Update account {{account.name}}"
-                        ng-click="updateAccount(account)"></span>
+                      ng-click="updateAccount(account)"></span>
                 <span class="ot-command ot-command-delete" title="Delete account {{account.name}}"
-                        ng-click="deleteAccount(account)"></span>
+                      ng-if="account._delete"
+                      ng-click="deleteAccount(account)"></span>
             </td>
         </tr>
         </tbody>

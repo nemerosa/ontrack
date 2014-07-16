@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.Getter;
 import net.nemerosa.ontrack.model.structure.Entity;
 import net.nemerosa.ontrack.model.structure.ID;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -130,5 +131,12 @@ public class Account implements Entity {
         checkLock();
         authorisations = authorisations.withProjectRole(projectRoleAssociation);
         return this;
+    }
+
+    /**
+     * Default built-in admin?
+     */
+    public boolean isDefaultAdmin() {
+        return StringUtils.equals("admin", name);
     }
 }
