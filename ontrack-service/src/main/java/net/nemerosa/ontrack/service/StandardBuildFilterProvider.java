@@ -7,6 +7,7 @@ import lombok.Data;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterResult;
+import net.nemerosa.ontrack.model.form.Date;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Int;
 import net.nemerosa.ontrack.model.form.Selection;
@@ -75,6 +76,18 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
                                 .itemId("name")
                                 .optional()
                 )
+                .with(
+                        Date.of("afterDate")
+                                .label("Build after")
+                                .help("Build created after or on this date")
+                                .optional()
+                )
+                .with(
+                        Date.of("beforeDate")
+                                .label("Build before")
+                                .help("Build created before or on this date")
+                                .optional()
+                )
                 // TODO sinceValidationStamps
                 // TODO withValidationStamps
                 // TODO withProperty
@@ -86,7 +99,9 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
         return form
                 .fill("count", data.getCount())
                 .fill("sincePromotionLevel", data.getSincePromotionLevel())
-                .fill("withPromotionLevel", data.getWithPromotionLevel());
+                .fill("withPromotionLevel", data.getWithPromotionLevel())
+                .fill("afterDate", data.getAfterDate())
+                .fill("beforeDate", data.getBeforeDate());
         // TODO sinceValidationStamps
         // TODO withValidationStamps
         // TODO withProperty
@@ -114,6 +129,14 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
             }
             // Result by default is: accept and go on
             BuildFilterResult result = BuildFilterResult.ok();
+            // After date
+            result = result.acceptIf(
+                    data.getAfterDate() != null && !data.getAfterDate().isBefore(build.getSignature().getTime().toLocalDate())
+            );
+            // Before date
+            result = result.acceptIf(
+                    data.getBeforeDate() != null && !build.getSignature().getTime().toLocalDate().isBefore(data.getBeforeDate())
+            );
             // With promotion level
             if (isNotBlank(data.getWithPromotionLevel())) {
                 result = result.acceptIf(
