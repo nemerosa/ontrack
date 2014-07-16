@@ -3,23 +3,20 @@ package net.nemerosa.ontrack.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Data;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
-import net.nemerosa.ontrack.model.buildfilter.BuildFilterResult;
 import net.nemerosa.ontrack.model.form.Date;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Int;
 import net.nemerosa.ontrack.model.form.Selection;
-import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.model.structure.ID;
+import net.nemerosa.ontrack.model.structure.PromotionLevel;
+import net.nemerosa.ontrack.model.structure.StructureService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Component
 public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<StandardBuildFilterData> {
@@ -113,57 +110,6 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
             return Optional.of(objectMapper.treeToValue(data, StandardBuildFilterData.class));
         } catch (JsonProcessingException e) {
             return Optional.empty();
-        }
-    }
-
-    @Data
-    private static class StandardBuildFilter implements BuildFilter {
-
-        private final StandardBuildFilterData data;
-
-        @Override
-        public BuildFilterResult filter(List<Build> builds, Branch branch, Build build, Supplier<BuildView> buildViewSupplier) {
-            // Count test
-            if (builds.size() >= data.getCount()) {
-                return BuildFilterResult.stopNow();
-            }
-            // Result by default is: accept and go on
-            BuildFilterResult result = BuildFilterResult.ok();
-            // After date
-            if (data.getAfterDate() != null) {
-                result = result.acceptIf(
-                        !data.getAfterDate().isBefore(build.getSignature().getTime().toLocalDate())
-                );
-            }
-            // Before date
-            if (data.getBeforeDate() != null) {
-                result = result.acceptIf(
-                        !build.getSignature().getTime().toLocalDate().isBefore(data.getBeforeDate())
-                );
-            }
-            // With promotion level
-            if (isNotBlank(data.getWithPromotionLevel())) {
-                result = result.acceptIf(
-                        buildViewSupplier.get().getPromotionRuns().stream()
-                                .filter(run -> data.getWithPromotionLevel().equals(run.getPromotionLevel().getName()))
-                                .findAny()
-                                .isPresent()
-                );
-            }
-            // Since promotion level
-            if (isNotBlank(data.getSincePromotionLevel())) {
-                result = result.goOnIf(
-                        !buildViewSupplier.get().getPromotionRuns().stream()
-                                .filter(run -> data.getSincePromotionLevel().equals(run.getPromotionLevel().getName()))
-                                .findAny()
-                                .isPresent()
-                );
-            }
-            // TODO sinceValidationStamps
-            // TODO withValidationStamps
-            // TODO withProperty
-            // OK
-            return result;
         }
     }
 
