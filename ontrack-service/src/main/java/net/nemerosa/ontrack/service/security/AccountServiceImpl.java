@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service.security;
 
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.exceptions.AccountDefaultAdminCannotDeleteException;
+import net.nemerosa.ontrack.model.exceptions.AccountDefaultAdminCannotUpdateNameException;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.repository.AccountGroupRepository;
@@ -100,6 +101,10 @@ public class AccountServiceImpl implements AccountService {
         securityService.checkGlobalFunction(AccountManagement.class);
         // Gets the existing account
         Account account = getAccount(accountId);
+        // Checks if default admin
+        if (account.isDefaultAdmin() && !StringUtils.equals(account.getName(), input.getName())) {
+            throw new AccountDefaultAdminCannotUpdateNameException();
+        }
         // Updates it
         account = account.update(input);
         // Saves it
