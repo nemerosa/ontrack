@@ -133,7 +133,7 @@ public class StructureServiceImpl implements StructureService {
     public void saveBranch(Branch branch) {
         isEntityDefined(branch, "Branch must be defined");
         isEntityDefined(branch.getProject(), "Project must be defined");
-        securityService.checkProjectFunction(branch.projectId(), ProjectEdit.class);
+        securityService.checkProjectFunction(branch.projectId(), BranchEdit.class);
         structureRepository.saveBranch(branch);
     }
 
@@ -196,7 +196,7 @@ public class StructureServiceImpl implements StructureService {
         isEntityDefined(build.getBranch(), "Branch must be defined");
         isEntityDefined(build.getBranch().getProject(), "Project must be defined");
         // Security
-        securityService.checkProjectFunction(build.getBranch().getProject().id(), ProjectEdit.class);
+        securityService.checkProjectFunction(build.getBranch().getProject().id(), BuildEdit.class);
         // Repository
         return structureRepository.saveBuild(build);
     }

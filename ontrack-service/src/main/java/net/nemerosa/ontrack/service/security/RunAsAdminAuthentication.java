@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service.security;
 
 import net.nemerosa.ontrack.model.security.Account;
 import net.nemerosa.ontrack.model.security.AccountHolder;
+import net.nemerosa.ontrack.model.security.AuthenticationSource;
 import net.nemerosa.ontrack.model.security.SecurityRole;
 import net.nemerosa.ontrack.model.structure.ID;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -13,7 +14,8 @@ public class RunAsAdminAuthentication extends AbstractAuthenticationToken {
             "runas_admin",
             "Run-as-administrator",
             "",
-            SecurityRole.ADMINISTRATOR
+            SecurityRole.ADMINISTRATOR,
+            AuthenticationSource.of("runas", "Run-as authentication")
     ).withId(ID.of(1));
 
     private final Account account;
@@ -27,7 +29,8 @@ public class RunAsAdminAuthentication extends AbstractAuthenticationToken {
                     account.getName(),
                     account.getFullName(),
                     account.getEmail(),
-                    SecurityRole.ADMINISTRATOR
+                    SecurityRole.ADMINISTRATOR,
+                    account.getAuthenticationSource()
             ).withId(account.getId());
         }
     }

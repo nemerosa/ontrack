@@ -1,29 +1,34 @@
 package net.nemerosa.ontrack.service.security;
 
 import net.nemerosa.ontrack.model.security.Account;
+import net.nemerosa.ontrack.model.security.AccountService;
+import net.nemerosa.ontrack.model.security.AuthenticationSourceService;
 import net.nemerosa.ontrack.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 @Qualifier("password")
-public class PasswordAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
+public class PasswordAuthenticationProvider extends AbstractOntrackAuthenticationProvider {
 
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
+    private final PasswordAuthenticationSourceProvider passwordAuthenticationSourceProvider;
 
     @Autowired
-    public PasswordAuthenticationProvider(AccountRepository accountRepository, PasswordEncoder passwordEncoder) {
+    public PasswordAuthenticationProvider(AccountService accountService, AccountRepository accountRepository, PasswordEncoder passwordEncoder, PasswordAuthenticationSourceProvider passwordAuthenticationSourceProvider) {
+        super(accountService);
         this.accountRepository = accountRepository;
         this.passwordEncoder = passwordEncoder;
+        this.passwordAuthenticationSourceProvider = passwordAuthenticationSourceProvider;
     }
 
     @Override
@@ -39,12 +44,7 @@ public class PasswordAuthenticationProvider extends AbstractUserDetailsAuthentic
     }
 
     @Override
-    protected UserDetails retrieveUser(String username, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
-        Account t = accountRepository.findUserByNameAndMode(username, "password");
-        if (t != null) {
-            return new AccountUserDetails(t);
-        } else {
-            throw new UsernameNotFoundException(String.format("User %s cannot be found", username));
-        }
+    protected Optional<Account> findUser(String username, UsernamePasswordAuthenticationToken authentication) {
+        return accountRepository.findUserByNameAndSource(username, passwordAuthenticationSourceProvider);
     }
 }

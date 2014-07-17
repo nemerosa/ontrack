@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.boot.resources;
 
-import net.nemerosa.ontrack.boot.ui.UserAPIController;
+import net.nemerosa.ontrack.boot.ui.UserController;
 import net.nemerosa.ontrack.model.security.ConnectedAccount;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
 import net.nemerosa.ontrack.ui.resource.Link;
@@ -19,9 +19,9 @@ public class ConnectedAccountResourceDecorator extends AbstractResourceDecorator
     @Override
     public List<Link> links(ConnectedAccount account, ResourceContext resourceContext) {
         return resourceContext.links()
-                .self(on(UserAPIController.class).getCurrentUser())
+                .self(on(UserController.class).getCurrentUser())
                 // Login if not logged
-                .link("login", on(UserAPIController.class).loginForm(), !account.isLogged())
+                .link("login", on(UserController.class).loginForm(), !account.isLogged())
                 // OK
                 .build();
     }

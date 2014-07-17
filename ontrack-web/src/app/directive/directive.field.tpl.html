@@ -3,6 +3,11 @@
        maxlength="{{field.maxlength}}" type="text" class="form-control" ng-required="field.required"
        ng-readonly="field.readOnly" ng-pattern="field.pattern"/>
 
+<!-- Type: email -->
+<input ng-if="field.type == 'email'" ng-model="data[field.name]" name="{{field.name}}"
+       maxlength="{{field.maxlength}}" type="email" class="form-control" ng-required="field.required"
+       ng-readonly="field.readOnly"/>
+
 <!-- Type: url -->
 <input ng-if="field.type == 'url'" ng-model="data[field.name]" name="{{field.name}}"
        maxlength="{{field.maxlength}}" type="url" class="form-control" ng-required="field.required"

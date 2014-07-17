@@ -57,7 +57,7 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                         // Actions
                 .link("_actions", on(ProjectEntityExtensionController.class).getActions(ProjectEntityType.BRANCH, branch.getId()))
                         // Update link (with authorisation)
-                .update(on(BranchController.class).getUpdateForm(branch.getId()), ProjectEdit.class, branch.projectId())
+                .update(on(BranchController.class).getUpdateForm(branch.getId()), BranchEdit.class, branch.projectId())
                         // Delete link
                 .delete(on(BranchController.class).deleteBranch(branch.getId()), BranchDelete.class, branch.projectId())
                         // View link

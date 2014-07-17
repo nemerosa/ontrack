@@ -1,0 +1,58 @@
+<ot-view>
+
+    <ot-section-title>Accounts</ot-section-title>
+
+    <ot-noentry list="accounts.resources">
+        Loading the accounts...
+    </ot-noentry>
+    <table class="table table-hover" ng-if="accounts.resources">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Full name</th>
+            <th>Email</th>
+            <th>Source</th>
+            <th>Role</th>
+            <th>Groups</th>
+            <th>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="account in accounts.resources">
+            <td>
+                {{account.name}}
+            </td>
+            <td>
+                {{account.fullName}}
+            </td>
+            <td>
+                <span ng-if="account.email">{{account.email}}</span>
+                <span ng-if="!account.email" class="ot-description">No email</span>
+            </td>
+            <td>
+                {{account.authenticationSource.name}}
+            </td>
+            <td>
+                <span class="ot-description" ng-if="account.defaultAdmin">Built-in administrator</span>
+                <span ng-if="!account.defaultAdmin">Normal user</span>
+            </td>
+            <td>
+                <span class="label label-info" ng-repeat="accountGroup in account.accountGroups">
+                    {{accountGroup.name}}
+                </span>
+                <span ng-hide="account.accountGroups" class="ot-description">No group</span>
+            </td>
+            <td>
+                <span class="ot-command ot-command-update" title="Update account {{account.name}}"
+                      ng-click="updateAccount(account)"></span>
+                <span class="ot-command ot-command-delete" title="Delete account {{account.name}}"
+                      ng-if="account._delete"
+                      ng-click="deleteAccount(account)"></span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <ot-section-title>Groups</ot-section-title>
+
+</ot-view>

@@ -6,23 +6,26 @@ import lombok.Data;
 import lombok.Getter;
 import net.nemerosa.ontrack.model.structure.Entity;
 import net.nemerosa.ontrack.model.structure.ID;
+import org.apache.commons.lang3.StringUtils;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Optional;
 
 @Data
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class Account implements Entity {
 
-    public static Account of(String name, String fullName, String email, SecurityRole role) {
+    public static Account of(String name, String fullName, String email, SecurityRole role, AuthenticationSource authenticationSource) {
         return new Account(
                 ID.NONE,
                 name,
                 fullName,
                 email,
+                authenticationSource,
                 role,
-                new HashSet<>(),
-                new HashSet<>(),
+                new LinkedHashSet<>(),
+                Authorisations.none(),
                 false
         );
     }
@@ -31,47 +34,37 @@ public class Account implements Entity {
     private final String name;
     private final String fullName;
     private final String email;
+    private final AuthenticationSource authenticationSource;
     private final SecurityRole role;
+    private final Collection<AccountGroup> accountGroups;
     @Getter(AccessLevel.PRIVATE)
-    private final Set<Class<? extends GlobalFunction>> globalFunctions;
-    @Getter(AccessLevel.PRIVATE)
-    private final Set<ProjectFn> projectFns;
+    private Authorisations authorisations;
     @Getter(AccessLevel.PRIVATE)
     private final boolean locked;
 
-
     public boolean isGranted(Class<? extends GlobalFunction> fn) {
         return (SecurityRole.ADMINISTRATOR == role)
-                || (globalFunctions.contains(fn));
+                || accountGroups.stream().anyMatch(group -> group.isGranted(fn))
+                || authorisations.isGranted(fn);
     }
 
     public boolean isGranted(int projectId, Class<? extends ProjectFunction> fn) {
         return SecurityRole.ADMINISTRATOR == role
-                || projectFns.stream().anyMatch(acl -> acl.getId() == projectId && fn.isAssignableFrom(acl.getFn()));
-    }
-
-    public Account with(Class<? extends GlobalFunction> fn) {
-        unlocked();
-        globalFunctions.add(fn);
-        return this;
-    }
-
-    public Account with(int projectId, Class<? extends ProjectFunction> fn) {
-        unlocked();
-        projectFns.add(new ProjectFn(projectId, fn));
-        return this;
+                || accountGroups.stream().anyMatch(group -> group.isGranted(projectId, fn))
+                || authorisations.isGranted(projectId, fn);
     }
 
     public Account withId(ID id) {
-        unlocked();
+        checkLock();
         return new Account(
                 id,
                 name,
                 fullName,
                 email,
+                authenticationSource,
                 role,
-                globalFunctions,
-                projectFns,
+                accountGroups,
+                authorisations,
                 locked
         );
     }
@@ -82,18 +75,68 @@ public class Account implements Entity {
                 name,
                 fullName,
                 email,
+                authenticationSource,
                 role,
-                globalFunctions,
-                projectFns,
+                accountGroups,
+                authorisations,
                 true
         );
     }
 
-    private void unlocked() {
+    public Account update(AccountInput input) {
+        return new Account(
+                id,
+                input.getName(),
+                input.getFullName(),
+                input.getEmail(),
+                authenticationSource,
+                role,
+                accountGroups,
+                authorisations,
+                locked
+        );
+    }
+
+    private void checkLock() {
         if (locked) {
             throw new IllegalStateException("Account is locked");
         }
     }
 
+    public Account withGroup(AccountGroup accountGroup) {
+        checkLock();
+        this.accountGroups.add(accountGroup);
+        return this;
+    }
 
+    public Account withGroups(Collection<AccountGroup> groups) {
+        checkLock();
+        this.accountGroups.addAll(groups);
+        return this;
+    }
+
+    public Account withGlobalRole(Optional<GlobalRole> globalRole) {
+        checkLock();
+        authorisations = authorisations.withGlobalRole(globalRole);
+        return this;
+    }
+
+    public Account withProjectRoles(Collection<ProjectRoleAssociation> projectRoleAssociations) {
+        checkLock();
+        authorisations = authorisations.withProjectRoles(projectRoleAssociations);
+        return this;
+    }
+
+    public Account withProjectRole(ProjectRoleAssociation projectRoleAssociation) {
+        checkLock();
+        authorisations = authorisations.withProjectRole(projectRoleAssociation);
+        return this;
+    }
+
+    /**
+     * Default built-in admin?
+     */
+    public boolean isDefaultAdmin() {
+        return StringUtils.equals("admin", name);
+    }
 }
