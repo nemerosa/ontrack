@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.boot.resources;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.model.security.AccountGroup;
 import net.nemerosa.ontrack.model.security.ProjectEdit;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
@@ -267,6 +268,22 @@ public class CoreResourceModuleTest {
                                 .end())
                         .end(),
                 resourceCollection
+        );
+    }
+
+    @Test
+    public void account_group_links() throws JsonProcessingException {
+        assertResourceJson(
+                mapper,
+                object()
+                        .with("id", 0)
+                        .with("name", "Admins")
+                        .with("description", "Administrators")
+                        .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.AccountController#getGroup:0")
+                        .with("_update", "urn:test:net.nemerosa.ontrack.boot.ui.AccountController#getGroupUpdateForm:0")
+                        .with("_delete", "urn:test:net.nemerosa.ontrack.boot.ui.AccountController#deleteGroup:0")
+                        .end(),
+                AccountGroup.of("Admins", "Administrators")
         );
     }
 

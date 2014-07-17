@@ -15,7 +15,7 @@ import java.util.Optional;
  * Group of accounts.
  */
 @Data
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class AccountGroup implements Entity {
 
     private final ID id;
