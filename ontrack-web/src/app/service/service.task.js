@@ -16,7 +16,7 @@ angular.module('ot.service.task', [
             var task = {
                 name: name,
                 run: function () {
-                    $log.debug('[task] ' + name);
+                    $log.debug('[task] Launching ' + name);
                     taskFn();
                 }
             };
@@ -24,6 +24,19 @@ angular.module('ot.service.task', [
             self.tasks[name] = task;
             // Launches the task and saves the promise
             task.promise = $interval(task.run, interval);
+        };
+
+        /**
+         * Stops all the tasks.
+         */
+        self.stopAll = function () {
+            angular.forEach(self.tasks, function (task) {
+                if (task.promise) {
+                    $log.debug('[task] Stopping ' + task.name);
+                    $interval.cancel(task.promise);
+                }
+            });
+            self.tasks = {};
         };
 
         // OK
