@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.exceptions.AccountDefaultAdminCannotDeleteExce
 import net.nemerosa.ontrack.model.exceptions.AccountDefaultAdminCannotUpdateNameException;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.ID;
+import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.repository.AccountGroupRepository;
 import net.nemerosa.ontrack.repository.AccountRepository;
 import net.nemerosa.ontrack.repository.RoleRepository;
@@ -133,6 +134,15 @@ public class AccountServiceImpl implements AccountService {
     public List<AccountGroup> getAccountGroups() {
         securityService.checkGlobalFunction(AccountManagement.class);
         return accountGroupRepository.findAll();
+    }
+
+    @Override
+    public AccountGroup createGroup(NameDescription nameDescription) {
+        securityService.checkGlobalFunction(AccountManagement.class);
+        // Creates the account group
+        AccountGroup group = AccountGroup.of(nameDescription.getName(), nameDescription.getDescription());
+        // Saves it
+        return accountGroupRepository.newAccountGroup(group);
     }
 
     @Override

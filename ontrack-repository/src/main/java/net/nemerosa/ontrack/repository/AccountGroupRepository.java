@@ -10,4 +10,6 @@ public interface AccountGroupRepository {
     Collection<AccountGroup> findByAccount(int accountId);
 
     List<AccountGroup> findAll();
+
+    AccountGroup newAccountGroup(AccountGroup group);
 }

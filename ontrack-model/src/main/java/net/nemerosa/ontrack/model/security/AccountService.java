@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.model.security;
 
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.structure.ID;
+import net.nemerosa.ontrack.model.structure.NameDescription;
 
 import java.util.Collection;
 import java.util.List;
@@ -52,4 +53,9 @@ public interface AccountService {
      * List of account groups
      */
     List<AccountGroup> getAccountGroups();
+
+    /**
+     * Creation of an account group
+     */
+    AccountGroup createGroup(NameDescription nameDescription);
 }

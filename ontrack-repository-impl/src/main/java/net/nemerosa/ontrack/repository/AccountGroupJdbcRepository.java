@@ -1,8 +1,11 @@
 package net.nemerosa.ontrack.repository;
 
+import net.nemerosa.ontrack.model.exceptions.AccountGroupNameAlreadyDefinedException;
 import net.nemerosa.ontrack.model.security.AccountGroup;
+import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -43,5 +46,23 @@ public class AccountGroupJdbcRepository extends AbstractJdbcRepository implement
                 "SELECT * FORM ACCOUNT_GROUPS ORDER BY NAME",
                 (rs, num) -> toAccountGroup(rs)
         );
+    }
+
+    @Override
+    public AccountGroup newAccountGroup(AccountGroup group) {
+        try {
+            return group.withId(
+                    ID.of(
+                            dbCreate(
+                                    "INSERT INTO ACCOUNT_GROUPS (NAME, DESCRIPTION) " +
+                                            "VALUES (:name, :description)",
+                                    params("name", group.getName())
+                                            .addValue("description", group.getDescription())
+                            )
+                    )
+            );
+        } catch (DuplicateKeyException ex) {
+            throw new AccountGroupNameAlreadyDefinedException(group.getName());
+        }
     }
 }

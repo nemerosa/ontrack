@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.model.security.AccountGroup;
 import net.nemerosa.ontrack.model.security.AccountInput;
 import net.nemerosa.ontrack.model.security.AccountService;
 import net.nemerosa.ontrack.model.structure.ID;
+import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resources;
@@ -121,6 +122,22 @@ public class AccountController extends AbstractResourceController {
                 uri(on(getClass()).getAccountGroups())
         );
         // TODO .with(Link.CREATE, uri(on(AccountController.class).getCreationForm()));
+    }
+
+    /**
+     * Form to create an account group
+     */
+    @RequestMapping(value = "groups/create", method = RequestMethod.GET)
+    public Form getGroupCreationForm() {
+        return Form.nameAndDescription();
+    }
+
+    /**
+     * Creation of an account group
+     */
+    @RequestMapping(value = "groups/create", method = RequestMethod.POST)
+    public AccountGroup create(@RequestBody @Valid NameDescription nameDescription) {
+        return accountService.createGroup(nameDescription);
     }
 
 }
