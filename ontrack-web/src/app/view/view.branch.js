@@ -1,6 +1,7 @@
 angular.module('ot.view.branch', [
     'ui.router',
     'ot.service.core',
+    'ot.service.task',
     'ot.service.form',
     'ot.service.structure',
     'ot.service.buildfilter',
@@ -13,7 +14,7 @@ angular.module('ot.view.branch', [
             controller: 'BranchCtrl'
         });
     })
-    .controller('BranchCtrl', function ($interval, $state, $scope, $stateParams, $http, $modal, ot, otFormService, otStructureService, otBuildFilterService, otAlertService) {
+    .controller('BranchCtrl', function ($state, $scope, $stateParams, $http, $modal, ot, otFormService, otStructureService, otBuildFilterService, otAlertService, otTaskService) {
         var view = ot.view();
         // Branch's id
         var branchId = $stateParams.branchId;
@@ -23,11 +24,12 @@ angular.module('ot.view.branch', [
             loadBuildView();
         }
 
+        var refreshTaskName = 'Branch build view refresh';
         $scope.$watch('autoRefresh', function () {
             if ($scope.autoRefresh) {
-                $scope.autoRefreshPromise = $interval(refreshBuildView, 30000);
-            } else if ($scope.autoRefreshPromise) {
-                $interval.cancel($scope.autoRefreshPromise);
+                otTaskService.register(refreshTaskName, refreshBuildView, 5 * 1000);
+            } else {
+                otTaskService.stop(refreshTaskName);
             }
         });
         $scope.autoRefresh = localStorage.getItem('autoRefresh');

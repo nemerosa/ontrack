@@ -14,6 +14,7 @@ var ontrack = angular.module('ontrack', [
         // Services
         'ot.service.user',
         'ot.service.info',
+        'ot.service.task',
         // Views
         'ot.view.home',
         'ot.view.search',
@@ -42,7 +43,7 @@ var ontrack = angular.module('ontrack', [
             $urlRouterProvider.otherwise("/home");
         })
         // Main controller
-        .controller('AppCtrl', function ($log, $scope, $rootScope, $state, otUserService, otInfoService) {
+        .controller('AppCtrl', function ($log, $scope, $rootScope, $state, otUserService, otInfoService, otTaskService) {
 
             /**
              * User mgt
@@ -104,12 +105,20 @@ var ontrack = angular.module('ontrack', [
              * Search
              */
 
-            $scope.search = function (token) {
+            $scope.search = function () {
                 if ($scope.searchToken) {
                     $state.go('search', {token: $scope.searchToken});
                     $scope.searchToken = '';
                 }
             };
+
+            /**
+             * Cancel running tasks when chaning page
+             */
+
+            $scope.$on('$stateChangeStart', function () {
+                otTaskService.stopAll();
+            });
 
 
         })

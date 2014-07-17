@@ -9,7 +9,7 @@ angular.module('ot.extension.svn.sync', [
             controller: 'SVNSyncCtrl'
         });
     })
-    .controller('SVNSyncCtrl', function ($stateParams, $scope, $http, $interpolate, $interval, ot) {
+    .controller('SVNSyncCtrl', function ($stateParams, $scope, $http, $interpolate, ot) {
 
         var branchId = $stateParams.branch;
         var view = ot.view();
