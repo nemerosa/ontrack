@@ -22,7 +22,8 @@ public class CoreResourceModule extends AbstractResourceModule {
                 new PromotionRunResourceDecorator(),
                 new ValidationRunResourceDecorator(),
                 new BuildFilterResourceDecorator(),
-                new AccountResourceDecorator()
+                new AccountResourceDecorator(),
+                new AccountGroupResourceDecorator()
         );
     }
 }
