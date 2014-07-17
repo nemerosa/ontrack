@@ -74,6 +74,17 @@ angular.module('ot.view.admin.accounts', [
             otFormService.update(group._update, "Updating group").then(load);
         };
 
+        // Deleting a group
+        $scope.deleteGroup = function (group) {
+            otAlertService.confirm({
+                title: "Account group deletion",
+                message: "Do you really want to delete this group?"
+            }).then(function () {
+                ot.call($http.delete(group._delete)).then(load);
+            });
+
+        };
+
     })
 
 ;
