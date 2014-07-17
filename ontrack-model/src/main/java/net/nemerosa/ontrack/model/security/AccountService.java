@@ -4,7 +4,6 @@ import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -58,4 +57,9 @@ public interface AccountService {
      * Creation of an account group
      */
     AccountGroup createGroup(NameDescription nameDescription);
+
+    /**
+     * Getting a group
+     */
+    AccountGroup getAccountGroup(ID groupId);
 }

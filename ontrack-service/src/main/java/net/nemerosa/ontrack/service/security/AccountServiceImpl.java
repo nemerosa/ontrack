@@ -146,6 +146,12 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public AccountGroup getAccountGroup(ID groupId) {
+        securityService.checkGlobalFunction(AccountManagement.class);
+        return accountGroupRepository.getById(groupId);
+    }
+
+    @Override
     public Account getAccount(ID accountId) {
         return accountRepository.getAccount(accountId, authenticationSourceService::getAuthenticationSource)
                 .withGroups(accountGroupRepository.findByAccount(accountId.getValue()))

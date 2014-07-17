@@ -65,4 +65,13 @@ public class AccountGroupJdbcRepository extends AbstractJdbcRepository implement
             throw new AccountGroupNameAlreadyDefinedException(group.getName());
         }
     }
+
+    @Override
+    public AccountGroup getById(ID groupId) {
+        return getNamedParameterJdbcTemplate().queryForObject(
+                "SELECT * FROM ACCOUNT_GROUPS WHERE ID = :id",
+                params("id", groupId.getValue()),
+                (rs, num) -> toAccountGroup(rs)
+        );
+    }
 }

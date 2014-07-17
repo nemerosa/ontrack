@@ -120,8 +120,8 @@ public class AccountController extends AbstractResourceController {
         return Resources.of(
                 accountService.getAccountGroups(),
                 uri(on(getClass()).getAccountGroups())
-        );
-        // TODO .with(Link.CREATE, uri(on(AccountController.class).getCreationForm()));
+        )
+                .with(Link.CREATE, uri(on(AccountController.class).getGroupCreationForm()));
     }
 
     /**
@@ -139,5 +139,17 @@ public class AccountController extends AbstractResourceController {
     public AccountGroup create(@RequestBody @Valid NameDescription nameDescription) {
         return accountService.createGroup(nameDescription);
     }
+
+    /**
+     * Getting a group
+     */
+    @RequestMapping(value = "groups/{groupId}", method = RequestMethod.GET)
+    public AccountGroup getGroup(@PathVariable ID groupId) {
+        return accountService.getAccountGroup(groupId);
+    }
+
+    // TODO Group update
+    // TODO Group update form
+    // TODO Group deletion
 
 }
