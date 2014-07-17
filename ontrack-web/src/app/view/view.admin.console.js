@@ -1,6 +1,7 @@
 angular.module('ot.view.admin.console', [
     'ui.router',
-    'ot.service.core'
+    'ot.service.core',
+    'ot.service.task'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('admin-console', {
@@ -9,7 +10,7 @@ angular.module('ot.view.admin.console', [
             controller: 'AdminConsoleCtrl'
         });
     })
-    .controller('AdminConsoleCtrl', function ($scope, $http, $interval, ot, otAlertService) {
+    .controller('AdminConsoleCtrl', function ($scope, $http, $interval, ot, otAlertService, otTaskService) {
         var view = ot.view();
         view.title = "Administration console";
         view.description = "Tools for the general management of ontrack";
@@ -40,8 +41,9 @@ angular.module('ot.view.admin.console', [
         loadJobs();
         loadLogs();
 
-        $interval(loadJobs, 5000);
-        $interval(loadLogs, 5000);
+        var interval = 10 * 1000; // 10 seconds
+        otTaskService.register('Admin Console Load Jobs', loadJobs, interval);
+        otTaskService.register('Admin Console Load Logs', loadLogs, interval);
 
         // Showing the details of a log entry
         $scope.showLogDetails = function (log) {
