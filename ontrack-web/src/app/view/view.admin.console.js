@@ -10,7 +10,7 @@ angular.module('ot.view.admin.console', [
             controller: 'AdminConsoleCtrl'
         });
     })
-    .controller('AdminConsoleCtrl', function ($scope, $http, $interval, ot, otAlertService, otTaskService) {
+    .controller('AdminConsoleCtrl', function ($scope, $http, ot, otAlertService, otTaskService) {
         var view = ot.view();
         view.title = "Administration console";
         view.description = "Tools for the general management of ontrack";
