@@ -27,6 +27,19 @@ angular.module('ot.service.task', [
         };
 
         /**
+         * Stopping one task
+         */
+        self.stop = function (name) {
+            var task = self.tasks[name];
+            if (task) {
+                if (task.promise) {
+                    $interval.cancel(task.promise);
+                }
+                delete tasks[name];
+            }
+        };
+
+        /**
          * Stops all the tasks.
          */
         self.stopAll = function () {
