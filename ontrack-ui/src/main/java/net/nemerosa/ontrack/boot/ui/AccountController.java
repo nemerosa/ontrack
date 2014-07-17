@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Password;
 import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.security.Account;
+import net.nemerosa.ontrack.model.security.AccountGroup;
 import net.nemerosa.ontrack.model.security.AccountInput;
 import net.nemerosa.ontrack.model.security.AccountService;
 import net.nemerosa.ontrack.model.structure.ID;
@@ -108,6 +109,18 @@ public class AccountController extends AbstractResourceController {
     @RequestMapping(value = "{accountId}", method = RequestMethod.DELETE)
     public Ack deleteAccount(@PathVariable ID accountId) {
         return accountService.deleteAccount(accountId);
+    }
+
+    /**
+     * List of groups
+     */
+    @RequestMapping(value = "groups", method = RequestMethod.GET)
+    public Resources<AccountGroup> getAccountGroups() {
+        return Resources.of(
+                accountService.getAccountGroups(),
+                uri(on(getClass()).getAccountGroups())
+        );
+        // TODO .with(Link.CREATE, uri(on(AccountController.class).getCreationForm()));
     }
 
 }

@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.model.security;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.structure.ID;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -46,4 +47,9 @@ public interface AccountService {
      * Deletes an account
      */
     Ack deleteAccount(ID accountId);
+
+    /**
+     * List of account groups
+     */
+    List<AccountGroup> getAccountGroups();
 }
