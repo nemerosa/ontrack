@@ -74,4 +74,19 @@ public class AccountGroupJdbcRepository extends AbstractJdbcRepository implement
                 (rs, num) -> toAccountGroup(rs)
         );
     }
+
+    @Override
+    public void update(AccountGroup group) {
+        try {
+            getNamedParameterJdbcTemplate().update(
+                    "UPDATE ACCOUNT_GROUPS SET NAME = :name, DESCRIPTION = :description " +
+                            "WHERE ID = :id",
+                    params("name", group.getName())
+                            .addValue("description", group.getDescription())
+                            .addValue("id", group.id())
+            );
+        } catch (DuplicateKeyException ex) {
+            throw new AccountGroupNameAlreadyDefinedException(group.getName());
+        }
+    }
 }

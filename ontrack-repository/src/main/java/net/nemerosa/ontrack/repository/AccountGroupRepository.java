@@ -15,4 +15,6 @@ public interface AccountGroupRepository {
     AccountGroup newAccountGroup(AccountGroup group);
 
     AccountGroup getById(ID groupId);
+
+    void update(AccountGroup group);
 }

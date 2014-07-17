@@ -62,4 +62,9 @@ public interface AccountService {
      * Getting a group
      */
     AccountGroup getAccountGroup(ID groupId);
+
+    /**
+     * Updating a group
+     */
+    AccountGroup updateGroup(ID groupId, NameDescription input);
 }

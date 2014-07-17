@@ -148,8 +148,26 @@ public class AccountController extends AbstractResourceController {
         return accountService.getAccountGroup(groupId);
     }
 
-    // TODO Group update
-    // TODO Group update form
+    /**
+     * Form to update an account group
+     */
+    @RequestMapping(value = "groups/{groupId}/update", method = RequestMethod.GET)
+    public Form getGroupUpdateForm(@PathVariable ID groupId) {
+        AccountGroup group = accountService.getAccountGroup(groupId);
+        return getGroupCreationForm()
+                .fill("name", group.getName())
+                .fill("description", group.getDescription());
+    }
+
+    /**
+     * Updating a group
+     */
+    @RequestMapping(value = "groups/{groupId}/update", method = RequestMethod.PUT)
+    public AccountGroup updateGroup(@PathVariable ID groupId, @RequestBody @Valid NameDescription input) {
+        return accountService.updateGroup(groupId, input);
+
+    }
+
     // TODO Group deletion
 
 }

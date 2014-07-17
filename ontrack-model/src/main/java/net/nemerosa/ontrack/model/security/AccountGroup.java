@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.Getter;
 import net.nemerosa.ontrack.model.structure.Entity;
 import net.nemerosa.ontrack.model.structure.ID;
+import net.nemerosa.ontrack.model.structure.NameDescription;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -83,6 +84,17 @@ public class AccountGroup implements Entity {
                 id,
                 name,
                 description,
+                authorisations,
+                locked
+        );
+    }
+
+    public AccountGroup update(NameDescription input) {
+        checkLock();
+        return new AccountGroup(
+                id,
+                input.getName(),
+                input.getDescription(),
                 authorisations,
                 locked
         );
