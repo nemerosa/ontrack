@@ -15,9 +15,12 @@ angular.module('ot.view.admin.accounts', [
         view.title = "Account management";
 
         // Loading the accounts
-        function loadAccounts() {
+        function load() {
             ot.call($http.get('accounts')).then(function (accounts) {
                 $scope.accounts = accounts;
+                return ot.call($http.get('accounts/groups'));
+            }).then(function (groups) {
+                $scope.groups = groups;
                 // Commands
                 view.commands = [
                     {
@@ -26,22 +29,28 @@ angular.module('ot.view.admin.accounts', [
                         cls: 'ot-command-new',
                         action: $scope.createAccount
                     },
+                    {
+                        id: 'createGroup',
+                        name: "Create group",
+                        cls: 'ot-command-new',
+                        action: $scope.createGroup
+                    },
                     ot.viewCloseCommand('/home')
                 ];
             });
         }
 
         // Initialisation
-        loadAccounts();
+        load();
 
         // Creating an account
         $scope.createAccount = function () {
-            otFormService.create($scope.accounts._create, "Account creation").then(loadAccounts);
+            otFormService.create($scope.accounts._create, "Account creation").then(load);
         };
 
         // Updating an account
         $scope.updateAccount = function (account) {
-            otFormService.update(account._update, "Updating account").then(loadAccounts);
+            otFormService.update(account._update, "Updating account").then(load);
         };
 
         // Deleting an account
@@ -50,10 +59,16 @@ angular.module('ot.view.admin.accounts', [
                 title: "Account deletion",
                 message: "Do you really want to delete this account?"
             }).then(function () {
-                ot.call($http.delete(account._delete)).then(loadAccounts);
+                ot.call($http.delete(account._delete)).then(load);
             });
 
         };
+
+        // Creating a group
+        $scope.createGroup = function () {
+            otFormService.create($scope.groups._create, "Account group creation").then(load);
+        };
+
     })
 
 ;

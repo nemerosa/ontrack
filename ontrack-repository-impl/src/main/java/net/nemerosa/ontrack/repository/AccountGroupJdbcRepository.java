@@ -44,7 +44,7 @@ public class AccountGroupJdbcRepository extends AbstractJdbcRepository implement
     @Override
     public List<AccountGroup> findAll() {
         return getJdbcTemplate().query(
-                "SELECT * FORM ACCOUNT_GROUPS ORDER BY NAME",
+                "SELECT * FROM ACCOUNT_GROUPS ORDER BY NAME",
                 (rs, num) -> toAccountGroup(rs)
         );
     }
