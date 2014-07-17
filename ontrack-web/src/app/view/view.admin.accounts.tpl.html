@@ -20,7 +20,7 @@
         <tbody>
         <tr ng-repeat="account in accounts.resources">
             <td>
-                {{account.name}}
+                <b>{{account.name}}</b>
             </td>
             <td>
                 {{account.fullName}}
@@ -70,9 +70,9 @@
     <tbody>
     <tr ng-repeat="group in groups.resources">
         <td>
-            {{group.name}}
+            <b>{{group.name}}</b>
         </td>
-        <td>
+        <td class="ot-description">
             {{group.description}}
         </td>
         <td>

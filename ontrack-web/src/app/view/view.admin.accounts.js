@@ -69,6 +69,11 @@ angular.module('ot.view.admin.accounts', [
             otFormService.create($scope.groups._create, "Account group creation").then(load);
         };
 
+        // Updating a group
+        $scope.updateGroup = function (group) {
+            otFormService.update(group._update, "Updating group").then(load);
+        };
+
     })
 
 ;
