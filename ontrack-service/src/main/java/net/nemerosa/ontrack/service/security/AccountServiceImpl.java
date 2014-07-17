@@ -160,6 +160,12 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public Ack deleteGroup(ID groupId) {
+        securityService.checkGlobalFunction(AccountManagement.class);
+        return accountGroupRepository.delete(groupId);
+    }
+
+    @Override
     public Account getAccount(ID accountId) {
         return accountRepository.getAccount(accountId, authenticationSourceService::getAuthenticationSource)
                 .withGroups(accountGroupRepository.findByAccount(accountId.getValue()))

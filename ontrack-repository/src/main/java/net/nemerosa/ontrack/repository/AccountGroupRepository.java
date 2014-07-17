@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.repository;
 
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.security.AccountGroup;
 import net.nemerosa.ontrack.model.structure.ID;
 
@@ -17,4 +18,6 @@ public interface AccountGroupRepository {
     AccountGroup getById(ID groupId);
 
     void update(AccountGroup group);
+
+    Ack delete(ID groupId);
 }

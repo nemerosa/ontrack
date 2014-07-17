@@ -67,4 +67,9 @@ public interface AccountService {
      * Updating a group
      */
     AccountGroup updateGroup(ID groupId, NameDescription input);
+
+    /**
+     * Deleting a group.
+     */
+    Ack deleteGroup(ID groupId);
 }

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.repository;
 
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.exceptions.AccountGroupNameAlreadyDefinedException;
 import net.nemerosa.ontrack.model.security.AccountGroup;
 import net.nemerosa.ontrack.model.structure.ID;
@@ -88,5 +89,15 @@ public class AccountGroupJdbcRepository extends AbstractJdbcRepository implement
         } catch (DuplicateKeyException ex) {
             throw new AccountGroupNameAlreadyDefinedException(group.getName());
         }
+    }
+
+    @Override
+    public Ack delete(ID groupId) {
+        return Ack.one(
+                getNamedParameterJdbcTemplate().update(
+                        "DELETE FROM ACCOUNT_GROUPS WHERE ID = :id",
+                        params("id", groupId.getValue())
+                )
+        );
     }
 }

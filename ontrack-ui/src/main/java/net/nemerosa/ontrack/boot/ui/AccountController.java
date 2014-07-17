@@ -168,6 +168,15 @@ public class AccountController extends AbstractResourceController {
 
     }
 
+    /**
+     * Deleting a group. This does not delete the associated accounts, only the links to them.
+     */
+    @RequestMapping(value = "groups/{groupId}", method = RequestMethod.DELETE)
+    public Ack deleteGroup(@PathVariable ID groupId) {
+        return accountService.deleteGroup(groupId);
+
+    }
+
     // TODO Group deletion
 
 }
