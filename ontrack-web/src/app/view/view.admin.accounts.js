@@ -14,6 +14,13 @@ angular.module('ot.view.admin.accounts', [
         var view = ot.view();
         view.title = "Account management";
         view.commands = [
+            {
+                id: 'admin-global-acl',
+                name: "Global permissions",
+                cls: 'ot-command-admin-global-acl',
+                link: '/admin-global-acl'
+
+            },
             ot.viewCloseCommand('/home')
         ];
 
