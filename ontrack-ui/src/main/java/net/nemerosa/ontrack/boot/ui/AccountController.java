@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.model.Ack;
-import net.nemerosa.ontrack.model.form.Email;
-import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.form.Password;
-import net.nemerosa.ontrack.model.form.Text;
+import net.nemerosa.ontrack.model.form.*;
 import net.nemerosa.ontrack.model.security.Account;
 import net.nemerosa.ontrack.model.security.AccountGroup;
 import net.nemerosa.ontrack.model.security.AccountInput;
@@ -56,7 +53,11 @@ public class AccountController extends AbstractResourceController {
                 .with(Form.defaultNameField())
                 .with(Text.of("fullName").length(100).label("Full name").help("Display name for the account"))
                 .with(Email.of("email").label("Email").length(200).help("Contact email for the account"))
-                .with(Password.of("password").label("Password").length(40).help("Password for the account"));
+                .with(Password.of("password").label("Password").length(40).help("Password for the account"))
+                .with(
+                        MultiSelection.of("groups").label("Groups")
+                                .items(accountService.getAccountGroups())
+                );
     }
 
     /**
