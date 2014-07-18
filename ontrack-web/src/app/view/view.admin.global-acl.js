@@ -62,6 +62,10 @@ angular.module('ot.view.admin.global-acl', [
                 });
         };
 
+        $scope.removeGlobalPermission = function (globalPermission) {
+            ot.call($http.delete(globalPermission._delete)).then(load);
+        };
+
     })
 
 ;

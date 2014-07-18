@@ -50,7 +50,10 @@
                     {{globalPermission.role.name}}
                 </td>
                 <td>
-                    Actions
+                    <span class="ot-command ot-command-delete"
+                          title="Remove the {{globalPermission.role.name}} role from {{globalPermission.target.name}}"
+                          ng-click="removeGlobalPermission(globalPermission)"
+                            ></span>
                 </td>
             </tr>
             </tbody>
