@@ -11,6 +11,13 @@ span.ot-extension-scm-validationStampRunView {
   margin-right: @otExtensionScmValidationStampRunView;
   margin-bottom: @otExtensionScmValidationStampRunView;
   display: inline-block;
+  &.ot-extension-scm-validationStampRunView-norun {
+    border: solid 1px white;
+    background-color: lighten(lightgrey, 15%);
+    a {
+      color: @text-muted;
+    }
+  }
 }
 
 ul.ot-extension-scm-changelog-commands {
