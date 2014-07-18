@@ -7,6 +7,9 @@ import lombok.Data;
 import net.nemerosa.ontrack.model.support.IDJsonSerializer;
 import org.apache.commons.lang3.Validate;
 
+import java.util.Optional;
+import java.util.function.Function;
+
 @Data
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @JsonSerialize(using = IDJsonSerializer.class)
@@ -14,7 +17,7 @@ public final class ID {
 
     /**
      * Undefined ID.
-     * <p/>
+     * <p>
      * Its integer value is <code>0</code> and a call to {@link #isSet()} returns <code>false</code>.
      */
     public static ID NONE = new ID(0);
@@ -44,5 +47,13 @@ public final class ID {
 
     public static boolean isDefined(ID id) {
         return id != null && id.isSet();
+    }
+
+    public <T> Optional<T> ifSet(Function<Integer, T> fn) {
+        if (isSet()) {
+            return Optional.ofNullable(fn.apply(value));
+        } else {
+            return Optional.empty();
+        }
     }
 }

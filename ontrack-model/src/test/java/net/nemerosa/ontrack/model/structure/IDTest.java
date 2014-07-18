@@ -68,4 +68,21 @@ public class IDTest {
         assertTrue(ID.isDefined(ID.of(1)));
     }
 
+    @Test
+    public void if_set_ok() {
+        assertEquals("1", ID.of(1).ifSet(String::valueOf).get());
+        assertEquals("1", ID.of(1).ifSet(String::valueOf).orElse("-"));
+    }
+
+    @Test
+    public void if_set_ok_null() {
+        assertFalse(ID.of(1).ifSet(value -> null).isPresent());
+    }
+
+    @Test
+    public void if_set_nok() {
+        assertFalse(ID.NONE.ifSet(String::valueOf).isPresent());
+        assertEquals("-", ID.NONE.ifSet(String::valueOf).orElse("-"));
+    }
+
 }

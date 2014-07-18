@@ -1,7 +1,7 @@
 {
   "author": "Damien Coraboeuf",
   "name": "ontrack",
-  "version": "2.0.0",
+  "version": "2.0.0-beta-2-DEV",
   "homepage": "https://github.com/nemerosa/ontrack",
   "licenses": {
     "type": "MIT",

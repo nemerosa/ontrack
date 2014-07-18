@@ -72,4 +72,14 @@ public interface AccountService {
      * Deleting a group.
      */
     Ack deleteGroup(ID groupId);
+
+    /**
+     * Returns the list of <i>all</i> account groups, together with the status for their selection
+     * in the given account ID. The account ID may not be {@link net.nemerosa.ontrack.model.structure.ID#isSet() set},
+     * meaning that none of the groups will be selected.
+     *
+     * @param accountId Account ID to get the groups for, or not {@link net.nemerosa.ontrack.model.structure.ID#isSet() set}
+     * @return List of groups with their selection status
+     */
+    List<AccountGroupSelection> getAccountGroupsForSelection(ID accountId);
 }

@@ -56,7 +56,7 @@ public class AccountController extends AbstractResourceController {
                 .with(Password.of("password").label("Password").length(40).help("Password for the account"))
                 .with(
                         MultiSelection.of("groups").label("Groups")
-                                .items(accountService.getAccountGroups())
+                                .items(accountService.getAccountGroupsForSelection(ID.NONE))
                 );
     }
 
@@ -89,6 +89,11 @@ public class AccountController extends AbstractResourceController {
         }
         // Password not filled in, and not required on update
         form = form.with(Password.of("password").label("Password").length(40).help("Password for the account. Leave blank to keep it unchanged.").optional());
+        // Groups
+        form = form.with(
+                MultiSelection.of("groups").label("Groups")
+                        .items(accountService.getAccountGroupsForSelection(accountId))
+        );
         // OK
         return form
                 .fill("name", account.getName())

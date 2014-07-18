@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.exceptions.AccountDefaultAdminCannotDeleteException;
 import net.nemerosa.ontrack.model.exceptions.AccountDefaultAdminCannotUpdateNameException;
 import net.nemerosa.ontrack.model.security.*;
+import net.nemerosa.ontrack.model.structure.Entity;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.repository.AccountGroupRepository;
@@ -15,7 +16,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -163,6 +166,20 @@ public class AccountServiceImpl implements AccountService {
     public Ack deleteGroup(ID groupId) {
         securityService.checkGlobalFunction(AccountManagement.class);
         return accountGroupRepository.delete(groupId);
+    }
+
+    @Override
+    public List<AccountGroupSelection> getAccountGroupsForSelection(ID accountId) {
+        // Account groups or none
+        Set<Integer> accountGroupIds = accountId.ifSet(accountGroupRepository::findByAccount)
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(Entity::id)
+                .collect(Collectors.toSet());
+        // Collection of groups with the selection
+        return getAccountGroups().stream()
+                .map(group -> AccountGroupSelection.of(group, accountGroupIds.contains(group.id())))
+                .collect(Collectors.toList());
     }
 
     @Override
