@@ -145,13 +145,23 @@ angular.module('ot.service.form', [
                     data[field.name] = dateTime;
                 }
                 // Date handling
-                if (field.type == 'date') {
+                else if (field.type == 'date') {
                     date = data.dates[field.name];
                     if (date) {
                         data[field.name] = $filter('date')(date, 'yyyy-MM-dd');
                     } else {
                         data[field.name] = '';
                     }
+                }
+                // Multi-selection
+                else if (field.type == 'multi-selection') {
+                    data[field.name] = field.items
+                        .filter(function (item) {
+                            return item.selected;
+                        })
+                        .map(function (item) {
+                            return item.id;
+                        });
                 }
             });
             // Cleaning of pseudo fields
