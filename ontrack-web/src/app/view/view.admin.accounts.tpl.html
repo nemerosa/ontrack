@@ -1,87 +1,103 @@
 <ot-view>
 
-    <ot-section-title>Accounts</ot-section-title>
-
-    <ot-noentry list="accounts.resources">
-        Loading the accounts...
-    </ot-noentry>
-    <table class="table table-hover" ng-if="accounts.resources">
-        <thead>
-        <tr>
-            <th>Name</th>
-            <th>Full name</th>
-            <th>Email</th>
-            <th>Source</th>
-            <th>Role</th>
-            <th>Groups</th>
-            <th>&nbsp;</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr ng-repeat="account in accounts.resources">
-            <td>
-                <b>{{account.name}}</b>
-            </td>
-            <td>
-                {{account.fullName}}
-            </td>
-            <td>
-                <span ng-if="account.email">{{account.email}}</span>
-                <span ng-if="!account.email" class="ot-description">No email</span>
-            </td>
-            <td>
-                {{account.authenticationSource.name}}
-            </td>
-            <td>
-                <span class="ot-description" ng-if="account.defaultAdmin">Built-in administrator</span>
-                <span ng-if="!account.defaultAdmin">Normal user</span>
-            </td>
-            <td>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="panel-title">
+                Accounts
+                <span class="pull-right">
+                    <button class="btn btn-default btn-xs" ng-click="createAccount()">Create account...</button>
+                </span>
+            </div>
+        </div>
+        <div class="panel-body" ng-hide="accounts.resources">
+            Loading the accounts
+        </div>
+        <table class="table table-hover" ng-if="accounts.resources">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Full name</th>
+                <th>Email</th>
+                <th>Source</th>
+                <th>Role</th>
+                <th>Groups</th>
+                <th>&nbsp;</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="account in accounts.resources">
+                <td>
+                    <b>{{account.name}}</b>
+                </td>
+                <td>
+                    {{account.fullName}}
+                </td>
+                <td>
+                    <span ng-if="account.email">{{account.email}}</span>
+                    <span ng-if="!account.email" class="ot-description">No email</span>
+                </td>
+                <td>
+                    {{account.authenticationSource.name}}
+                </td>
+                <td>
+                    <span class="ot-description" ng-if="account.defaultAdmin">Built-in administrator</span>
+                    <span ng-if="!account.defaultAdmin">Normal user</span>
+                </td>
+                <td>
                 <span class="ot-admin-account-group" ng-repeat="accountGroup in account.accountGroups">
                     {{accountGroup.name}}
                 </span>
-                <span ng-hide="account.accountGroups" class="ot-description">No group</span>
-            </td>
-            <td>
+                    <span ng-hide="account.accountGroups" class="ot-description">No group</span>
+                </td>
+                <td>
                 <span class="ot-command ot-command-update" title="Update account {{account.name}}"
                       ng-click="updateAccount(account)"></span>
                 <span class="ot-command ot-command-delete" title="Delete account {{account.name}}"
                       ng-if="account._delete"
                       ng-click="deleteAccount(account)"></span>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 
-    <ot-section-title>Groups</ot-section-title>
-    <ot-noentry list="groups.resources">
-        No group has been created yet.
-    </ot-noentry>
-
-    <table class="table table-hover" ng-if="groups.resources">
-    <thead>
-    <tr>
-        <th>Name</th>
-        <th>Description</th>
-        <th>&nbsp;</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr ng-repeat="group in groups.resources">
-        <td>
-            <b>{{group.name}}</b>
-        </td>
-        <td class="ot-description">
-            {{group.description}}
-        </td>
-        <td>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="panel-title">
+                Account groups
+                <span class="pull-right">
+                    <button class="btn btn-default btn-xs" ng-click="createGroup()">Create group...</button>
+                </span>
+            </div>
+        </div>
+        <div class="panel-body" ng-hide="groups.resources">
+            No group has been created yet.
+        </div>
+        <table class="table table-hover" ng-if="groups.resources">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>&nbsp;</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="group in groups.resources">
+                <td>
+                    <b>{{group.name}}</b>
+                </td>
+                <td class="ot-description">
+                    {{group.description}}
+                </td>
+                <td>
                 <span class="ot-command ot-command-update" title="Update group {{group.name}}"
                       ng-click="updateGroup(group)"></span>
                 <span class="ot-command ot-command-delete" title="Delete group {{group.name}}"
                       ng-click="deleteGroup(group)"></span>
-        </td>
-    </tr>
-    </tbody>
-</table>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 
 </ot-view>

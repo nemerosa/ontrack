@@ -13,6 +13,9 @@ angular.module('ot.view.admin.accounts', [
     .controller('AdminAccountsCtrl', function ($scope, $http, ot, otFormService, otAlertService) {
         var view = ot.view();
         view.title = "Account management";
+        view.commands = [
+            ot.viewCloseCommand('/home')
+        ];
 
         // Loading the accounts
         function load() {
@@ -21,22 +24,6 @@ angular.module('ot.view.admin.accounts', [
                 return ot.call($http.get('accounts/groups'));
             }).then(function (groups) {
                 $scope.groups = groups;
-                // Commands
-                view.commands = [
-                    {
-                        id: 'createAccount',
-                        name: "Create account",
-                        cls: 'ot-command-new',
-                        action: $scope.createAccount
-                    },
-                    {
-                        id: 'createGroup',
-                        name: "Create group",
-                        cls: 'ot-command-new',
-                        action: $scope.createGroup
-                    },
-                    ot.viewCloseCommand('/home')
-                ];
             });
         }
 
