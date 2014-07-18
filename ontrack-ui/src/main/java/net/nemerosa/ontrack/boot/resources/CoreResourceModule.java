@@ -23,7 +23,8 @@ public class CoreResourceModule extends AbstractResourceModule {
                 new ValidationRunResourceDecorator(),
                 new BuildFilterResourceDecorator(),
                 new AccountResourceDecorator(),
-                new AccountGroupResourceDecorator()
+                new AccountGroupResourceDecorator(),
+                new GlobalPermissionResourceDecorator()
         );
     }
 }
