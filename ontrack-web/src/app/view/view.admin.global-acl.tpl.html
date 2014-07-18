@@ -1,5 +1,22 @@
 <ot-view>
 
-    Global permissions
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Adding/editing a permission
+        </div>
+        <div class="panel-body">
+            <form name="permissionForm" class="form-inline" role="form">
+                <!-- List of global roles -->
+                <select ng-model="form.role" class="form-control"
+                        required="required"
+                        ng-options="role.name for role in globalRoles.resources">
+                    <option value="" disabled="disabled">Select a role...</option>
+                </select>
+                <!-- Creation -->
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+            <span class="ot-description">{{form.role.description}}</span>
+        </div>
+    </div>
 
 </ot-view>

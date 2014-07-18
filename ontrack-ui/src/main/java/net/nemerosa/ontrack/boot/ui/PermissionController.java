@@ -58,7 +58,7 @@ public class PermissionController extends AbstractResourceController {
      * TODO Saving a global permission
      */
     @RequestMapping(value = "globals/{type}/{id}", method = RequestMethod.PUT)
-    public Ack saveGlobalPermission(@PathVariable PermissionTargetType type, @PathVariable int id, @RequestBody PermissionInput input) {
+    public Ack saveGlobalPermission(@PathVariable PermissionTargetType type, @PathVariable String id, @RequestBody PermissionInput input) {
         return Ack.NOK;
     }
 
@@ -66,7 +66,7 @@ public class PermissionController extends AbstractResourceController {
      * TODO Deleting a global permission
      */
     @RequestMapping(value = "globals/{type}/{id}", method = RequestMethod.DELETE)
-    public Ack deleteGlobalPermission(@PathVariable PermissionTargetType type, @PathVariable int id) {
+    public Ack deleteGlobalPermission(@PathVariable PermissionTargetType type, @PathVariable String id) {
         return Ack.NOK;
     }
 

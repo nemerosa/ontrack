@@ -17,6 +17,19 @@ angular.module('ot.view.admin.global-acl', [
             ot.viewCloseCommand('/admin-accounts')
         ];
 
+        // Loading the global permissions
+        function load() {
+            ot.pageCall($http.get("accounts/permissions/globals")).then(function (globalPermissions) {
+                $scope.globalPermissions = globalPermissions;
+                return ot.pageCall($http.get(globalPermissions._globalRoles));
+            }).then(function (globalRoles) {
+                $scope.globalRoles = globalRoles;
+            });
+        }
+
+        // Loading the page
+        load();
+
     })
 
 ;
