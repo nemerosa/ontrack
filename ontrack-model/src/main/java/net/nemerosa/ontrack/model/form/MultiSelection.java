@@ -12,6 +12,8 @@ import java.util.List;
  * <p>
  * The {@link #getItems() items} property contains the {@link net.nemerosa.ontrack.model.support.Selectable selectable}
  * items.
+ * <p>
+ * The value returned by this field will be a list of {@link net.nemerosa.ontrack.model.support.Selectable#getId() id}s.
  */
 @EqualsAndHashCode(callSuper = false)
 @Data
