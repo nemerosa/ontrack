@@ -30,6 +30,21 @@ angular.module('ot.view.admin.global-acl', [
         // Loading the page
         load();
 
+        // Loading the permission targets
+        $scope.loadPermissionTargets = function (token) {
+            return ot.call($http.get('accounts/permissions/search/' + token)).then(function (permissionTargets) {
+                return permissionTargets.resources;
+            });
+        };
+
+        $scope.formatPermissionTarget = function (target) {
+            if (target) {
+                return target.name + (target.type == 'ACCOUNT' ? '' : ' (group)');
+            } else {
+                return '';
+            }
+        };
+
     })
 
 ;
