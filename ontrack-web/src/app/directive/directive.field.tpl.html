@@ -30,6 +30,16 @@
     <option value="">&nbsp;</option>
 </select>
 
+<!-- Type: multi-selection -->
+<div ng-if="field.type == 'multi-selection'"
+     class="multiSelect"
+     multi-select
+     input-model="field.items"
+     button-label="name"
+     item-label="name"
+     tick-property="selected"
+        ></div>
+
 <!-- Date -->
 <span ng-if="field.type == 'date'">
     <input ng-model="data.dates[field.name]" name="{{field.name}}" type="text" class="form-control"

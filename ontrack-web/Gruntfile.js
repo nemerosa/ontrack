@@ -14,6 +14,9 @@ module.exports = function (grunt) {
             'vendor/angular-sanitize/angular-sanitize.js',
             'vendor/angular-bootstrap/ui-bootstrap-tpls.js'
         ],
+        css: [
+            'vendor/angular-multi-select/angular-multi-select.css'
+        ],
         fonts: [
             'vendor/bootstrap/fonts/glyphicons-halflings-regular.*'
         ]
@@ -85,6 +88,19 @@ module.exports = function (grunt) {
                 files: [
                     {
                         src: vendor.js,
+                        dest: 'build/grunt/dev',
+                        cwd: '.',
+                        expand: true
+                    }
+                ]
+            },
+            /**
+             * Copy of vendor CSS files
+             */
+            dev_vendor_css: {
+                files: [
+                    {
+                        src: vendor.css,
                         dest: 'build/grunt/dev',
                         cwd: '.',
                         expand: true
@@ -228,7 +244,7 @@ module.exports = function (grunt) {
          */
         ngAnnotate: {
             options: {
-                singleQuotes: true,
+                singleQuotes: true
             },
             prod: {
                 files: [
@@ -442,6 +458,7 @@ module.exports = function (grunt) {
         'copy:dev_js',
         'copy:dev_templates',
         'copy:dev_vendor_js',
+        'copy:dev_vendor_css',
         'copy:dev_vendor_fonts',
         'html2js:dev',
         'includeSource:dev'
