@@ -242,6 +242,19 @@ public class AccountServiceImpl implements AccountService {
         return permissions;
     }
 
+    @Override
+    public Ack deleteGlobalPermission(PermissionTargetType type, int id) {
+        securityService.checkGlobalFunction(AccountManagement.class);
+        switch (type) {
+            case ACCOUNT:
+                return roleRepository.deleteGlobalRoleForAccount(id);
+            case GROUP:
+                return roleRepository.deleteGlobalRoleForGroup(id);
+            default:
+                return Ack.NOK;
+        }
+    }
+
     private Optional<GlobalPermission> getGroupGlobalPermission(AccountGroup group) {
         Optional<String> roleId = roleRepository.findGlobalRoleByGroup(group.id());
         if (roleId.isPresent()) {

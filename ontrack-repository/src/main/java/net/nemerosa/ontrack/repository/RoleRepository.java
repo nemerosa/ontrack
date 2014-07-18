@@ -27,4 +27,8 @@ public interface RoleRepository {
      * Gets the global role for an account group
      */
     Optional<String> findGlobalRoleByGroup(int groupId);
+
+    Ack deleteGlobalRoleForAccount(int accountId);
+
+    Ack deleteGlobalRoleForGroup(int groupId);
 }

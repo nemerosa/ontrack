@@ -64,11 +64,11 @@ public class PermissionController extends AbstractResourceController {
     }
 
     /**
-     * TODO Deleting a global permission
+     * Deleting a global permission
      */
     @RequestMapping(value = "globals/{type}/{id}", method = RequestMethod.DELETE)
     public Ack deleteGlobalPermission(@PathVariable PermissionTargetType type, @PathVariable int id) {
-        return Ack.NOK;
+        return accountService.deleteGlobalPermission(type, id);
     }
 
 }

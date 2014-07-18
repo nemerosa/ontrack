@@ -100,4 +100,9 @@ public interface AccountService {
      * Gets the list of global permissions.
      */
     Collection<GlobalPermission> getGlobalPermissions();
+
+    /**
+     * Deletes a permission
+     */
+    Ack deleteGlobalPermission(PermissionTargetType type, int id);
 }
