@@ -26,7 +26,7 @@
                 </div>
                 <!-- Creation -->
                 <div class="form-group">
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" class="btn btn-primary" ng-disabled="!form.permissionTarget || !form.role">Submit</button>
                 </div>
             </form>
             <span class="ot-description">{{form.role.description}}</span>
