@@ -100,7 +100,7 @@
                         <div class="panel-body">
                             <div class="alert alert-warning" ng-hide="revisions || revisionsLoading">
                                 No revision has been loaded yet. Click
-                                <a ng-click="changeLogRevisions()">here</a>
+                                <a ng-click="changeLogRevisions()" class="ot-action">here</a>
                                 to load them.
                             </div>
                             <div class="ot-description" ng-show="revisionsLoading">
@@ -164,7 +164,7 @@
                         <div class="panel-body">
                             <div class="alert alert-warning" ng-hide="issues || issuesLoading">
                                 No issue has been loaded yet. Click
-                                <a ng-click="changeLogIssues()">here</a>
+                                <a ng-click="changeLogIssues()" class="ot-action">here</a>
                                 to load them.
                             </div>
                             <div class="ot-description" ng-show="issuesLoading">
@@ -203,7 +203,7 @@
                         <div class="panel-body" ng-hide="files || filesLoading">
                             <div class="alert alert-warning">
                                 No file change has been loaded yet. Click
-                                <a ng-click="changeLogFiles()">here</a>
+                                <a ng-click="changeLogFiles()" class="ot-action">here</a>
                                 to load them.
                             </div>
                         </div>
