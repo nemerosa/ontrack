@@ -3,16 +3,23 @@
     <!-- Validation stamps -->
     <tr>
         <th colspan="3" rowspan="2">
-            <!-- Place holder for builds and promotions -->
-            <!-- General commands for the build view -->
-            <span class="ot-branch-build-view-auto-refresh"
+            <!-- Filter command -->
+            <ng-include src="'app/view/fragment.branchBuildFilter.tpl.html'"></ng-include>
+            <!-- Build diff extension commands -->
+            <button ng-repeat="action in branchBuildView.buildDiffActions" class="btn btn-default"
+                    id="{{action.id}}-top"
+                    ng-click="buildDiff(action)">
+                {{action.name}}
+            </button>
+            <!-- Auto refresh -->
+            <button class="ot-branch-build-view-auto-refresh"
                   ng-class="{
                     'ot-branch-build-view-auto-refresh-enabled': autoRefresh,
                     'ot-branch-build-view-auto-refresh-disabled': !autoRefresh
                     }"
                   title="{{autoRefresh ? 'Auto refresh is enabled' : 'Auto refresh is disabled'}}"
                   ng-click="toggleAutoRefresh()"
-                    ></span>
+                    ></button>
         </th>
         <!-- All validation stamps -->
         <th ng-repeat="validationStamp in validationStampCollection.resources" class="ot-branch-build-view-validation">
@@ -97,6 +104,15 @@
                     ng-click="buildDiff(action)">
                 {{action.name}}
             </button>
+            <!-- Auto refresh -->
+            <button class="ot-branch-build-view-auto-refresh"
+                    ng-class="{
+                    'ot-branch-build-view-auto-refresh-enabled': autoRefresh,
+                    'ot-branch-build-view-auto-refresh-disabled': !autoRefresh
+                    }"
+                    title="{{autoRefresh ? 'Auto refresh is enabled' : 'Auto refresh is disabled'}}"
+                    ng-click="toggleAutoRefresh()"
+                    ></button>
         </td>
     </tr>
     </tfoot>
