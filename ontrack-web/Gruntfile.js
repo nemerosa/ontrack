@@ -148,6 +148,19 @@ module.exports = function (grunt) {
                 ]
             },
             /**
+             * PROD: Copy of vendor CSS files
+             */
+            prod_vendor_css: {
+                files: [
+                    {
+                        src: vendor.css,
+                        dest: 'build/grunt/include',
+                        cwd: '.',
+                        expand: true
+                    }
+                ]
+            },
+            /**
              * PROD: Copy of vendor fonts
              */
             prod_vendor_fonts: {
@@ -476,6 +489,7 @@ module.exports = function (grunt) {
         'copy:prod_vendor_fonts',
         'ngAnnotate:prod',
         'copy:prod_vendor_js',
+        'copy:prod_vendor_css',
         'concat:prod_js',
         'concat:prod_css',
         'uglify:prod',
