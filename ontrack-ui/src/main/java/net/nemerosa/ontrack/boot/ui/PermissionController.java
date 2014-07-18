@@ -4,26 +4,46 @@ import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Resources;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections;
+
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
 @RequestMapping("/accounts/permissions")
 public class PermissionController extends AbstractResourceController {
+
+    private final AccountService accountService;
+    private final RolesService rolesService;
+
+    @Autowired
+    public PermissionController(AccountService accountService, RolesService rolesService) {
+        this.accountService = accountService;
+        this.rolesService = rolesService;
+    }
 
     /**
      * TODO List of global permissions
      */
     @RequestMapping(value = "globals", method = RequestMethod.GET)
     public Resources<GlobalPermission> getGlobalPermissions() {
-        return null;
+        return Resources.of(
+                Collections.<GlobalPermission>emptyList(),
+                uri(on(PermissionController.class).getGlobalPermissions())
+        ).with("_globalRoles", uri(on(PermissionController.class).getGlobalRoles()));
     }
 
     /**
-     * TODO List of global roles
+     * List of global roles
      */
     @RequestMapping(value = "globals/roles", method = RequestMethod.GET)
     public Resources<GlobalRole> getGlobalRoles() {
-        return null;
+        return Resources.of(
+                rolesService.getGlobalRoles(),
+                uri(on(PermissionController.class).getGlobalRoles())
+        );
     }
 
     /**
