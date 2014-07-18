@@ -2,10 +2,17 @@ package net.nemerosa.ontrack.model.form;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import net.nemerosa.ontrack.model.support.Selectable;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This field allows a user to select several items into a list.
+ * <p>
+ * The {@link #getItems() items} property contains the {@link net.nemerosa.ontrack.model.support.Selectable selectable}
+ * items.
+ */
 @EqualsAndHashCode(callSuper = false)
 @Data
 public class MultiSelection extends AbstractField<MultiSelection> {
@@ -14,26 +21,15 @@ public class MultiSelection extends AbstractField<MultiSelection> {
         return new MultiSelection(name);
     }
 
-    private List<?> items = new ArrayList<>();
-    private String itemId = "id";
-    private String itemName = "name";
+    private List<? extends Selectable> items = new ArrayList<>();
 
     protected MultiSelection(String name) {
         super("multi-selection", name);
     }
 
-    public MultiSelection items(List<?> values) {
+    public MultiSelection items(List<? extends Selectable> values) {
         this.items = values;
         return this;
     }
 
-    public MultiSelection itemId(String value) {
-        this.itemId = value;
-        return this;
-    }
-
-    public MultiSelection itemName(String value) {
-        this.itemName = value;
-        return this;
-    }
 }
