@@ -1,9 +1,6 @@
 <ot-view>
 
     <div class="panel panel-default">
-        <div class="panel-heading">
-            Adding/editing a permission
-        </div>
         <div class="panel-body">
             <form name="permissionForm" class="form-inline" role="form" ng-submit="saveGlobalPermission()">
                 <!-- Permission target -->
@@ -31,6 +28,33 @@
             </form>
             <span class="ot-description">{{form.role.description}}</span>
         </div>
+        <table class="table table-hover" ng-if="globalPermissions.resources">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description / Full name</th>
+                <th>Role</th>
+                <th>&nbsp;</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="globalPermission in globalPermissions.resources">
+                <td>
+                    <img src="assets/permission-target-{{globalPermission.target.type}}.png"/>
+                    <b>{{globalPermission.target.name}}</b>
+                </td>
+                <td>
+                    {{globalPermission.target.description}}
+                </td>
+                <td title="{{globalPermission.role.description}}">
+                    {{globalPermission.role.name}}
+                </td>
+                <td>
+                    Actions
+                </td>
+            </tr>
+            </tbody>
+        </table>
     </div>
 
 </ot-view>
