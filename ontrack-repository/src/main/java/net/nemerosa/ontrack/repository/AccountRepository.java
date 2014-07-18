@@ -7,10 +7,10 @@ import net.nemerosa.ontrack.model.security.AuthenticationSourceProvider;
 import net.nemerosa.ontrack.model.structure.ID;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 public interface AccountRepository {
 
@@ -29,4 +29,6 @@ public interface AccountRepository {
     void setPassword(int accountId, String encodedPassword);
 
     Account getAccount(ID accountId, Function<String, AuthenticationSource> authenticationSourceFunction);
+
+    List<Account> findByNameToken(String token, Function<String, AuthenticationSource> authenticationSourceFunction);
 }

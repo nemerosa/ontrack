@@ -22,4 +22,6 @@ public interface AccountGroupRepository {
     Ack delete(ID groupId);
 
     void linkAccountToGroups(int accountId, Collection<Integer> groupIds);
+
+    List<AccountGroup> findByNameToken(String token);
 }

@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.exceptions.AccountGroupNameAlreadyDefinedExcep
 import net.nemerosa.ontrack.model.security.AccountGroup;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
@@ -56,6 +57,15 @@ public class AccountGroupJdbcRepository extends AbstractJdbcRepository implement
                     params("accountId", accountId).addValue("groupId", groupId)
             );
         }
+    }
+
+    @Override
+    public List<AccountGroup> findByNameToken(String token) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT * FROM ACCOUNT_GROUPS WHERE LOWER(NAME) LIKE :filter ORDER BY NAME",
+                params("filter", String.format("%%%s%%", StringUtils.lowerCase(token))),
+                (rs, num) -> toAccountGroup(rs)
+        );
     }
 
     private AccountGroup toAccountGroup(ResultSet rs) throws SQLException {

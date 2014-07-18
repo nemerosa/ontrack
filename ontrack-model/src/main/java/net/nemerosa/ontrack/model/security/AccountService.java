@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -82,4 +83,10 @@ public interface AccountService {
      * @return List of groups with their selection status
      */
     List<AccountGroupSelection> getAccountGroupsForSelection(ID accountId);
+
+    /**
+     * Searches for a list of permission targets using the <code>token</code> as a part in the
+     * name of the permission target.
+     */
+    Collection<PermissionTarget> searchPermissionTargets(String token);
 }

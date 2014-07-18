@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.security.AuthenticationSourceProvider;
 import net.nemerosa.ontrack.model.security.SecurityRole;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
@@ -16,6 +17,7 @@ import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -129,6 +131,18 @@ public class AccountJdbcRepository extends AbstractJdbcRepository implements Acc
         return getNamedParameterJdbcTemplate().queryForObject(
                 "SELECT * FROM ACCOUNTS WHERE ID = :id",
                 params("id", accountId.getValue()),
+                (rs, num) -> toAccount(
+                        rs,
+                        authenticationSourceFunction
+                )
+        );
+    }
+
+    @Override
+    public List<Account> findByNameToken(String token, Function<String, AuthenticationSource> authenticationSourceFunction) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT * FROM ACCOUNTS WHERE LOWER(NAME) LIKE :filter ORDER BY NAME",
+                params("filter", String.format("%%%s%%", StringUtils.lowerCase(token))),
                 (rs, num) -> toAccount(
                         rs,
                         authenticationSourceFunction

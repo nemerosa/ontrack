@@ -47,11 +47,14 @@ public class PermissionController extends AbstractResourceController {
     }
 
     /**
-     * TODO Looking for a permission target
+     * Looking for a permission target
      */
     @RequestMapping(value = "search/{token:.*}", method = RequestMethod.GET)
-    public Resources<PermissionTarget> searchPermissionTarget(@PathVariable String token) {
-        return null;
+    public Resources<PermissionTarget> searchPermissionTargets(@PathVariable String token) {
+        return Resources.of(
+                accountService.searchPermissionTargets(token),
+                uri(on(PermissionController.class).searchPermissionTargets(token))
+        );
     }
 
     /**

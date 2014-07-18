@@ -99,4 +99,13 @@ public class AccountGroup implements Entity {
                 locked
         );
     }
+
+    public PermissionTarget asPermissionTarget() {
+        return new PermissionTarget(
+                PermissionTargetType.GROUP,
+                id(),
+                getName(),
+                getDescription()
+        );
+    }
 }

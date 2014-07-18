@@ -16,9 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -182,6 +180,27 @@ public class AccountServiceImpl implements AccountService {
         return getAccountGroups().stream()
                 .map(group -> AccountGroupSelection.of(group, accountGroupIds.contains(group.id())))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Collection<PermissionTarget> searchPermissionTargets(String token) {
+        List<PermissionTarget> targets = new ArrayList<>();
+        // Users first
+        targets.addAll(
+                accountRepository.findByNameToken(token, authenticationSourceService::getAuthenticationSource)
+                        .stream()
+                        .map(Account::asPermissionTarget)
+                        .collect(Collectors.toList())
+        );
+        // ... then groups
+        targets.addAll(
+                accountGroupRepository.findByNameToken(token)
+                        .stream()
+                        .map(AccountGroup::asPermissionTarget)
+                        .collect(Collectors.toList())
+        );
+        // OK
+        return targets;
     }
 
     @Override

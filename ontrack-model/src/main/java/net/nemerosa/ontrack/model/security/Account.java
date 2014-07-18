@@ -139,4 +139,13 @@ public class Account implements Entity {
     public boolean isDefaultAdmin() {
         return StringUtils.equals("admin", name);
     }
+
+    public PermissionTarget asPermissionTarget() {
+        return new PermissionTarget(
+                PermissionTargetType.ACCOUNT,
+                id(),
+                getName(),
+                getFullName()
+        );
+    }
 }
