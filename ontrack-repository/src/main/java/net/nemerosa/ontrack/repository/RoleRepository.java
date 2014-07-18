@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.repository;
 
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.security.ProjectRoleAssociation;
 
 import java.util.Collection;
@@ -18,4 +19,7 @@ public interface RoleRepository {
             BiFunction<Integer, String, Optional<ProjectRoleAssociation>> projectRoleAssociationMapper
     );
 
+    Ack saveGlobalRoleForAccount(int accountId, String role);
+
+    Ack saveGlobalRoleForGroup(int accountId, String role);
 }

@@ -10,12 +10,15 @@ angular.module('ot.view.admin.global-acl', [
         });
     })
 
-    .controller('AdminGlobalACLCtrl', function ($scope, $http, ot) {
+    .controller('AdminGlobalACLCtrl', function ($scope, $http, $interpolate, ot) {
         var view = ot.view();
         view.title = "Global permissions";
         view.commands = [
             ot.viewCloseCommand('/admin-accounts')
         ];
+
+        $scope.form = {
+        };
 
         // Loading the global permissions
         function load() {
@@ -43,6 +46,20 @@ angular.module('ot.view.admin.global-acl', [
             } else {
                 return '';
             }
+        };
+
+        $scope.saveGlobalPermission = function () {
+            ot.call(
+                $http.put(
+                    $interpolate('accounts/permissions/globals/{{type}}/{{id}}')($scope.form.permissionTarget),
+                    {
+                        role: $scope.form.role.id
+                    }
+                )
+            ).then(function () {
+                    load();
+                    delete $scope.form.permissionTarget;
+                });
         };
 
     })

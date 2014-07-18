@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.repository;
 
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.security.ProjectRoleAssociation;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,5 +47,33 @@ public class RoleJdbcRepository extends AbstractJdbcRepository implements RoleRe
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Ack saveGlobalRoleForAccount(int accountId, String role) {
+        getNamedParameterJdbcTemplate().update(
+                "DELETE FROM GLOBAL_AUTHORIZATIONS WHERE ACCOUNT = :accountId",
+                params("accountId", accountId)
+        );
+        return Ack.one(
+                getNamedParameterJdbcTemplate().update(
+                        "INSERT INTO GLOBAL_AUTHORIZATIONS (ACCOUNT, ROLE) VALUES (:accountId, :role)",
+                        params("accountId", accountId).addValue("role", role)
+                )
+        );
+    }
+
+    @Override
+    public Ack saveGlobalRoleForGroup(int groupId, String role) {
+        getNamedParameterJdbcTemplate().update(
+                "DELETE FROM GROUP_GLOBAL_AUTHORIZATIONS WHERE ACCOUNTGROUP = :groupId",
+                params("groupId", groupId)
+        );
+        return Ack.one(
+                getNamedParameterJdbcTemplate().update(
+                        "INSERT INTO GROUP_GLOBAL_AUTHORIZATIONS (ACCOUNTGROUP, ROLE) VALUES (:groupId, :role)",
+                        params("groupId", groupId).addValue("role", role)
+                )
+        );
     }
 }

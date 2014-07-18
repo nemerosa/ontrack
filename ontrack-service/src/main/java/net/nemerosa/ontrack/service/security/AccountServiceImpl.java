@@ -184,6 +184,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Collection<PermissionTarget> searchPermissionTargets(String token) {
+        securityService.checkGlobalFunction(AccountManagement.class);
         List<PermissionTarget> targets = new ArrayList<>();
         // Users first
         targets.addAll(
@@ -204,7 +205,21 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public Ack saveGlobalPermission(PermissionTargetType type, int id, PermissionInput input) {
+        securityService.checkGlobalFunction(AccountManagement.class);
+        switch (type) {
+            case ACCOUNT:
+                return roleRepository.saveGlobalRoleForAccount(id, input.getRole());
+            case GROUP:
+                return roleRepository.saveGlobalRoleForGroup(id, input.getRole());
+            default:
+                return Ack.NOK;
+        }
+    }
+
+    @Override
     public Account getAccount(ID accountId) {
+        securityService.checkGlobalFunction(AccountManagement.class);
         return accountRepository.getAccount(accountId, authenticationSourceService::getAuthenticationSource)
                 .withGroups(accountGroupRepository.findByAccount(accountId.getValue()))
                 .lock();

@@ -89,4 +89,10 @@ public interface AccountService {
      * name of the permission target.
      */
     Collection<PermissionTarget> searchPermissionTargets(String token);
+
+    /**
+     * Saves the permission for the {@link net.nemerosa.ontrack.model.security.PermissionTarget} defined
+     * by the <code>type</code> and <code>id</code>.
+     */
+    Ack saveGlobalPermission(PermissionTargetType type, int id, PermissionInput input);
 }
