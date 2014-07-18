@@ -7,8 +7,6 @@ import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
@@ -25,12 +23,12 @@ public class PermissionController extends AbstractResourceController {
     }
 
     /**
-     * TODO List of global permissions
+     * List of global permissions
      */
     @RequestMapping(value = "globals", method = RequestMethod.GET)
     public Resources<GlobalPermission> getGlobalPermissions() {
         return Resources.of(
-                Collections.<GlobalPermission>emptyList(),
+                accountService.getGlobalPermissions(),
                 uri(on(PermissionController.class).getGlobalPermissions())
         ).with("_globalRoles", uri(on(PermissionController.class).getGlobalRoles()));
     }

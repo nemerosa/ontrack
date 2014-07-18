@@ -32,6 +32,17 @@ public class RoleJdbcRepository extends AbstractJdbcRepository implements RoleRe
     }
 
     @Override
+    public Optional<String> findGlobalRoleByGroup(int groupId) {
+        return Optional.ofNullable(
+                getFirstItem(
+                        "SELECT ROLE FROM GROUP_GLOBAL_AUTHORIZATIONS WHERE ACCOUNTGROUP = :groupId",
+                        params("groupId", groupId),
+                        String.class
+                )
+        );
+    }
+
+    @Override
     public Collection<ProjectRoleAssociation> findProjectRoleAssociationsByAccount(
             int accountId,
             BiFunction<Integer, String, Optional<ProjectRoleAssociation>> projectRoleAssociationMapper

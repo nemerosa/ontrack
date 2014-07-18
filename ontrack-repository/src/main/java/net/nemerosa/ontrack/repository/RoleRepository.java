@@ -22,4 +22,9 @@ public interface RoleRepository {
     Ack saveGlobalRoleForAccount(int accountId, String role);
 
     Ack saveGlobalRoleForGroup(int accountId, String role);
+
+    /**
+     * Gets the global role for an account group
+     */
+    Optional<String> findGlobalRoleByGroup(int groupId);
 }

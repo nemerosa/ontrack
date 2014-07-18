@@ -95,4 +95,9 @@ public interface AccountService {
      * by the <code>type</code> and <code>id</code>.
      */
     Ack saveGlobalPermission(PermissionTargetType type, int id, PermissionInput input);
+
+    /**
+     * Gets the list of global permissions.
+     */
+    Collection<GlobalPermission> getGlobalPermissions();
 }

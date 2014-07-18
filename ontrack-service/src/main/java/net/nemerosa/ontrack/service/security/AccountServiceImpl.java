@@ -218,6 +218,63 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public Collection<GlobalPermission> getGlobalPermissions() {
+        Collection<GlobalPermission> permissions = new ArrayList<>();
+        // Users first
+        permissions.addAll(
+                accountRepository.findAll(authenticationSourceService::getAuthenticationSource)
+                        .stream()
+                        .map(this::getGlobalPermission)
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .collect(Collectors.toList())
+        );
+        // ... then groups
+        permissions.addAll(
+                accountGroupRepository.findAll()
+                        .stream()
+                        .map(this::getGroupGlobalPermission)
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .collect(Collectors.toList())
+        );
+        // OK
+        return permissions;
+    }
+
+    private Optional<GlobalPermission> getGroupGlobalPermission(AccountGroup group) {
+        Optional<String> roleId = roleRepository.findGlobalRoleByGroup(group.id());
+        if (roleId.isPresent()) {
+            Optional<GlobalRole> globalRole = rolesService.getGlobalRole(roleId.get());
+            if (globalRole.isPresent()) {
+                return Optional.of(
+                        new GlobalPermission(
+                                group.asPermissionTarget(),
+                                globalRole.get()
+                        )
+                );
+            }
+        }
+        return Optional.empty();
+    }
+
+    private Optional<GlobalPermission> getGlobalPermission(Account account) {
+        Optional<String> roleId = roleRepository.findGlobalRoleByAccount(account.id());
+        if (roleId.isPresent()) {
+            Optional<GlobalRole> globalRole = rolesService.getGlobalRole(roleId.get());
+            if (globalRole.isPresent()) {
+                return Optional.of(
+                        new GlobalPermission(
+                                account.asPermissionTarget(),
+                                globalRole.get()
+                        )
+                );
+            }
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public Account getAccount(ID accountId) {
         securityService.checkGlobalFunction(AccountManagement.class);
         return accountRepository.getAccount(accountId, authenticationSourceService::getAuthenticationSource)
