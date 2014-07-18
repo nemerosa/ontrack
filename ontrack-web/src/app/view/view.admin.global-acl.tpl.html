@@ -32,7 +32,6 @@
             <thead>
             <tr>
                 <th>Name</th>
-                <th>Description / Full name</th>
                 <th>Role</th>
                 <th>&nbsp;</th>
             </tr>
@@ -42,9 +41,9 @@
                 <td>
                     <img src="assets/permission-target-{{globalPermission.target.type}}.png"/>
                     <b>{{globalPermission.target.name}}</b>
-                </td>
-                <td>
-                    {{globalPermission.target.description}}
+                    <span class="ot-description" ng-if="globalPermission.target.description">
+                        - {{globalPermission.target.description}}
+                    </span>
                 </td>
                 <td title="{{globalPermission.role.description}}">
                     {{globalPermission.role.name}}
