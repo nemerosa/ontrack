@@ -117,6 +117,8 @@ public class AccountServiceImpl implements AccountService {
         if (StringUtils.isNotBlank(input.getPassword())) {
             accountRepository.setPassword(accountId.getValue(), passwordEncoder.encode(input.getPassword()));
         }
+        // Account groups
+        accountGroupRepository.linkAccountToGroups(account.id(), input.getGroups());
         // OK
         return account;
     }

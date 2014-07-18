@@ -15,6 +15,14 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * <pre>
+ * TABLE ACCOUNT_GROUP_LINK (
+ * ACCOUNT      INTEGER NOT NULL,
+ * ACCOUNTGROUP INTEGER NOT NULL
+ * );
+ * </pre>
+ */
 @Repository
 public class AccountGroupJdbcRepository extends AbstractJdbcRepository implements AccountGroupRepository {
 
@@ -32,6 +40,22 @@ public class AccountGroupJdbcRepository extends AbstractJdbcRepository implement
                 params("accountId", accountId),
                 (rs, num) -> toAccountGroup(rs)
         );
+    }
+
+    @Override
+    public void linkAccountToGroups(int accountId, Collection<Integer> groupIds) {
+        // Removing existing links
+        getNamedParameterJdbcTemplate().update(
+                "DELETE FROM ACCOUNT_GROUP_LINK WHERE ACCOUNT = :accountId",
+                params("accountId", accountId)
+        );
+        // Adding the links
+        for (int groupId : groupIds) {
+            getNamedParameterJdbcTemplate().update(
+                    "INSERT INTO ACCOUNT_GROUP_LINK (ACCOUNT, ACCOUNTGROUP) VALUES (:accountId, :groupId)",
+                    params("accountId", accountId).addValue("groupId", groupId)
+            );
+        }
     }
 
     private AccountGroup toAccountGroup(ResultSet rs) throws SQLException {

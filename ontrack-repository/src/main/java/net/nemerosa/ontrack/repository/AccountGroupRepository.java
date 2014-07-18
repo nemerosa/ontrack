@@ -20,4 +20,6 @@ public interface AccountGroupRepository {
     void update(AccountGroup group);
 
     Ack delete(ID groupId);
+
+    void linkAccountToGroups(int accountId, Collection<Integer> groupIds);
 }
