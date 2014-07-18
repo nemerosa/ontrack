@@ -37,7 +37,7 @@
                 <span ng-if="!account.defaultAdmin">Normal user</span>
             </td>
             <td>
-                <span class="label label-info" ng-repeat="accountGroup in account.accountGroups">
+                <span class="ot-admin-account-group" ng-repeat="accountGroup in account.accountGroups">
                     {{accountGroup.name}}
                 </span>
                 <span ng-hide="account.accountGroups" class="ot-description">No group</span>
