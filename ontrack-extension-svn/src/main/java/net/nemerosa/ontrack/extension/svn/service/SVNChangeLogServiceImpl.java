@@ -268,7 +268,8 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
         return new SCMBuildView<>(buildView, history);
     }
 
-    protected SVNHistory getBuildSVNHistory(SVNRepository svnRepository, Build build) {
+    @Override
+    public SVNHistory getBuildSVNHistory(SVNRepository svnRepository, Build build) {
         // Gets the build path for the branch
         String svnBuildPath = getSVNBuildPath(build);
         // Gets the history from the SVN client

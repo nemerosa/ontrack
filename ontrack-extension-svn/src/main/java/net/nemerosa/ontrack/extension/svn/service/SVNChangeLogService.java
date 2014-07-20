@@ -1,10 +1,9 @@
 package net.nemerosa.ontrack.extension.svn.service;
 
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
-import net.nemerosa.ontrack.extension.svn.model.SVNChangeLog;
-import net.nemerosa.ontrack.extension.svn.model.SVNChangeLogFiles;
-import net.nemerosa.ontrack.extension.svn.model.SVNChangeLogIssues;
-import net.nemerosa.ontrack.extension.svn.model.SVNChangeLogRevisions;
+import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
+import net.nemerosa.ontrack.extension.svn.model.*;
+import net.nemerosa.ontrack.model.structure.Build;
 
 public interface SVNChangeLogService {
 
@@ -15,4 +14,6 @@ public interface SVNChangeLogService {
     SVNChangeLogIssues getChangeLogIssues(SVNChangeLog changeLog);
 
     SVNChangeLogFiles getChangeLogFiles(SVNChangeLog changeLog);
+
+    SVNHistory getBuildSVNHistory(SVNRepository svnRepository, Build build);
 }
