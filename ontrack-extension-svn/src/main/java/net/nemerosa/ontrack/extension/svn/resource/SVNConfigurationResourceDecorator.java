@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.svn.resource;
 
 import net.nemerosa.ontrack.extension.svn.SVNController;
 import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration;
+import net.nemerosa.ontrack.model.security.GlobalSettings;
+import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.ResourceContext;
@@ -12,8 +14,11 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 public class SVNConfigurationResourceDecorator extends AbstractResourceDecorator<SVNConfiguration> {
 
-    public SVNConfigurationResourceDecorator() {
+    private final SecurityService securityService;
+
+    public SVNConfigurationResourceDecorator(SecurityService securityService) {
         super(SVNConfiguration.class);
+        this.securityService = securityService;
     }
 
     /**
@@ -26,16 +31,16 @@ public class SVNConfigurationResourceDecorator extends AbstractResourceDecorator
 
     @Override
     public List<Link> links(SVNConfiguration configuration, ResourceContext resourceContext) {
+        boolean globalSettingsGranted = securityService.isGlobalFunctionGranted(GlobalSettings.class);
         return resourceContext.links()
                 .self(on(SVNController.class).getConfiguration(configuration.getName()))
                 .link(Link.UPDATE, on(SVNController.class).updateConfigurationForm(configuration.getName()))
                 .link(Link.DELETE, on(SVNController.class).deleteConfiguration(configuration.getName()))
-                        // TODO Rights for indexation
                         // Indexation
-                .link("_indexation", on(SVNController.class).getLastRevisionInfo(configuration.getName()))
-                .link("_indexationRange", on(SVNController.class).indexRange(configuration.getName()))
-                .link("_indexationFromLatest", on(SVNController.class).indexFromLatest(configuration.getName()))
-                .link("_indexationFull", on(SVNController.class).full(configuration.getName()))
+                .link("_indexation", on(SVNController.class).getLastRevisionInfo(configuration.getName()), globalSettingsGranted)
+                .link("_indexationRange", on(SVNController.class).indexRange(configuration.getName()), globalSettingsGranted)
+                .link("_indexationFromLatest", on(SVNController.class).indexFromLatest(configuration.getName()), globalSettingsGranted)
+                .link("_indexationFull", on(SVNController.class).full(configuration.getName()), globalSettingsGranted)
                         // OK
                 .build();
     }
