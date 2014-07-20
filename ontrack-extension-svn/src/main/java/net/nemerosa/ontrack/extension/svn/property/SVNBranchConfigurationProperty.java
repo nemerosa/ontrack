@@ -24,8 +24,6 @@ public class SVNBranchConfigurationProperty {
      * <li><code>{build}</code> - the build name</li>
      * <li><code>{build:expression}</code> - the build name, which must complies to the expression. This expression
      * is a simplified regex where * stands for any character.</li>
-     * <li>TODO <code>{property:&lt;property&gt;}</code> - gets a property of the build. The property identifier
-     * is the full class name of the {@link net.nemerosa.ontrack.model.structure.PropertyType PropertyType}</li>
      * </ul>
      */
     private final String buildPath;

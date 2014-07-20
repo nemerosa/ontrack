@@ -81,6 +81,24 @@ public class RoleJdbcRepository extends AbstractJdbcRepository implements RoleRe
     }
 
     @Override
+    public Collection<ProjectRoleAssociation> findProjectRoleAssociationsByGroup(
+            int groupId,
+            BiFunction<Integer, String, Optional<ProjectRoleAssociation>> projectRoleAssociationMapper
+    ) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT PROJECT, ROLE FROM GROUP_PROJECT_AUTHORIZATIONS WHERE ACCOUNTGROUP = :groupId",
+                params("groupId", groupId),
+                (rs, rowNum) -> projectRoleAssociationMapper.apply(
+                        rs.getInt("project"),
+                        rs.getString("role")
+                )
+        ).stream()
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public Ack saveGlobalRoleForAccount(int accountId, String role) {
         getNamedParameterJdbcTemplate().update(
                 "DELETE FROM GLOBAL_AUTHORIZATIONS WHERE ACCOUNT = :accountId",

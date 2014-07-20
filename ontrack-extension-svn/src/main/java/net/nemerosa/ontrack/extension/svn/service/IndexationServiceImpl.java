@@ -13,6 +13,7 @@ import net.nemerosa.ontrack.extension.svn.model.SVNIndexationException;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.job.*;
+import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.Time;
 import net.nemerosa.ontrack.tx.Transaction;
@@ -237,7 +238,7 @@ public class IndexationServiceImpl implements IndexationService, JobProvider {
     }
 
     private void indexFromLatest(SVNRepository repository, JobInfoListener infoListener) {
-        // FIXME Checks the SVNIndexation global function provided by the SVN extension
+        securityService.checkGlobalFunction(GlobalSettings.class);
         try (Transaction ignored = transactionService.start()) {
             // Loads the repository information
             SVNURL url = SVNUtils.toURL(repository.getConfiguration().getUrl());
