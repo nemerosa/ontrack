@@ -28,6 +28,11 @@ public interface RoleRepository {
      */
     Optional<String> findGlobalRoleByGroup(int groupId);
 
+    Collection<ProjectRoleAssociation> findProjectRoleAssociationsByGroup(
+            int groupId,
+            BiFunction<Integer, String, Optional<ProjectRoleAssociation>> projectRoleAssociationMapper
+    );
+
     Ack deleteGlobalRoleForAccount(int accountId);
 
     Ack deleteGlobalRoleForGroup(int groupId);

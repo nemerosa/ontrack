@@ -118,7 +118,7 @@ public class AccountServiceImpl implements AccountService {
         // Account groups
         accountGroupRepository.linkAccountToGroups(account.id(), input.getGroups());
         // OK
-        return account;
+        return getAccount(accountId);
     }
 
     @Override
@@ -291,15 +291,20 @@ public class AccountServiceImpl implements AccountService {
     public Account getAccount(ID accountId) {
         securityService.checkGlobalFunction(AccountManagement.class);
         return accountRepository.getAccount(accountId, authenticationSourceService::getAuthenticationSource)
-                .withGroups(accountGroupRepository.findByAccount(accountId.getValue()))
-                .lock();
+                .withGroups(accountGroupRepository.findByAccount(accountId.getValue()));
     }
 
     protected AccountGroup groupWithACL(AccountGroup group) {
         return group
-                // TODO Global role
-                // TODO Project roles
-                // OK
+                // Global role
+                .withGlobalRole(
+                        roleRepository.findGlobalRoleByGroup(group.id()).flatMap(rolesService::getGlobalRole)
+                )
+                        // Project roles
+                .withProjectRoles(
+                        roleRepository.findProjectRoleAssociationsByGroup(group.id(), rolesService::getProjectRoleAssociation)
+                )
+                        // OK
                 .lock();
     }
 }

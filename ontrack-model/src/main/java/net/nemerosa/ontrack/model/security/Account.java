@@ -8,8 +8,9 @@ import net.nemerosa.ontrack.model.structure.Entity;
 import net.nemerosa.ontrack.model.structure.ID;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Optional;
 
 @Data
@@ -24,7 +25,7 @@ public class Account implements Entity {
                 email,
                 authenticationSource,
                 role,
-                new LinkedHashSet<>(),
+                new ArrayList<>(),
                 Authorisations.none(),
                 false
         );
@@ -36,7 +37,7 @@ public class Account implements Entity {
     private final String email;
     private final AuthenticationSource authenticationSource;
     private final SecurityRole role;
-    private final Collection<AccountGroup> accountGroups;
+    private final List<AccountGroup> accountGroups;
     @Getter(AccessLevel.PRIVATE)
     private Authorisations authorisations;
     @Getter(AccessLevel.PRIVATE)
