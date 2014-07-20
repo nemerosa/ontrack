@@ -1,8 +1,10 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import net.nemerosa.ontrack.extension.api.EntityInformationExtension;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.extension.api.ProjectEntityActionExtension;
 import net.nemerosa.ontrack.model.security.Action;
+import net.nemerosa.ontrack.model.structure.EntityInformation;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.structure.StructureService;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Controller used to get extensions on project entities.
@@ -40,8 +43,30 @@ public class ProjectEntityExtensionController extends AbstractProjectEntityContr
                 extensionManager.getExtensions(ProjectEntityActionExtension.class).stream()
                         .map(x -> x.getAction(getEntity(entityType, id)).map(action -> resolveExtensionAction(x, action)))
                         .filter(Optional::isPresent)
-                        .map(Optional::get),
+                        .map(Optional::get)
+                        .collect(Collectors.toList()),
                 uri(MvcUriComponentsBuilder.on(getClass()).getActions(entityType, id))
+        );
+    }
+
+    /**
+     * Gets the list of information extensions for an entity
+     */
+    @RequestMapping(value = "information/{entityType}/{id}", method = RequestMethod.GET)
+    public Resources<EntityInformation> getInformation(@PathVariable ProjectEntityType entityType, @PathVariable ID id) {
+        return Resources.of(
+                extensionManager.getExtensions(EntityInformationExtension.class).stream()
+                        .map(x -> x.getInformation(getEntity(entityType, id))
+                                .map(o -> new EntityInformation(
+                                        entityType,
+                                        id,
+                                        x.getClass().getName(),
+                                        o
+                                )))
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .collect(Collectors.toList()),
+                uri(MvcUriComponentsBuilder.on(getClass()).getInformation(entityType, id))
         );
     }
 
