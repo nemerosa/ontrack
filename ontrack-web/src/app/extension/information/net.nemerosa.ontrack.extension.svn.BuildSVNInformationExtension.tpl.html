@@ -1,0 +1,16 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        SVN information
+    </div>
+    <div class="panel-body">
+        <ul class="ot-extension-svn-build-history">
+            <li ng-repeat="reference in value.extensionData.references">
+                <a href="{{reference.url}}">
+                    {{reference.path}}
+                    @
+                    {{reference.revision}}
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>

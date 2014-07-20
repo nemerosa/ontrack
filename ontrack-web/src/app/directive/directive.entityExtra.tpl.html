@@ -1,1 +1,13 @@
-Extras
+<div class="ot-alert-warning" ng-if="infosLoading">
+    Loading the extra information...
+</div>
+<div ng-hide="infosLoading">
+    <ot-noentry list="infos.resources">
+        No extra information attached.
+    </ot-noentry>
+</div>
+<div class="row" ng-repeat="entityInformation in infos.resources">
+    <div class="col-md-12">
+        <ot-include value="entityInformation" template="app/extension/information/{{entityInformation.extensionType}}.tpl.html"></ot-include>
+    </div>
+</div>

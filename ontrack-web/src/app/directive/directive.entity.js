@@ -47,7 +47,9 @@ angular.module('ot.directive.entity', [
             link: function (scope) {
                 scope.$watch('entity', function () {
                     if (scope.entity) {
+                        scope.infosLoading = true;
                         ot.call($http.get(scope.entity._extra)).then(function (infos) {
+                            scope.infosLoading = false;
                             scope.infos = infos;
                         });
                     }
