@@ -13,6 +13,8 @@ import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.Property;
 import net.nemerosa.ontrack.model.structure.PropertyService;
+import net.nemerosa.ontrack.tx.Transaction;
+import net.nemerosa.ontrack.tx.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -28,17 +30,20 @@ public class BuildSVNInformationExtension extends AbstractExtension implements E
     private final PropertyService propertyService;
     private final SVNService svnService;
     private final SVNChangeLogService svnChangeLogService;
+    private final TransactionService transactionService;
 
     @Autowired
     public BuildSVNInformationExtension(
             SVNExtensionFeature extensionFeature,
             PropertyService propertyService,
             SVNService svnService,
-            SVNChangeLogService svnChangeLogService) {
+            SVNChangeLogService svnChangeLogService,
+            TransactionService transactionService) {
         super(extensionFeature);
         this.propertyService = propertyService;
         this.svnService = svnService;
         this.svnChangeLogService = svnChangeLogService;
+        this.transactionService = transactionService;
     }
 
     @Override
@@ -54,7 +59,9 @@ public class BuildSVNInformationExtension extends AbstractExtension implements E
                 // Loads the repository
                 SVNRepository repository = svnService.getRepository(projectConfigurationProperty.getValue().getConfiguration().getName());
                 // Gets the build history
-                return Optional.of(svnChangeLogService.getBuildSVNHistory(repository, build));
+                try (Transaction ignored = transactionService.start()) {
+                    return Optional.of(svnChangeLogService.getBuildSVNHistory(repository, build));
+                }
             }
         } else {
             return Optional.empty();

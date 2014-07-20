@@ -37,6 +37,24 @@ angular.module('ot.directive.entity', [
             }
         };
     })
+    .directive('otEntityExtra', function ($http, ot) {
+        return {
+            restrict: 'E',
+            templateUrl: 'app/directive/directive.entityExtra.tpl.html',
+            scope: {
+                entity: '='
+            },
+            link: function (scope) {
+                scope.$watch('entity', function () {
+                    if (scope.entity) {
+                        ot.call($http.get(scope.entity._extra)).then(function (infos) {
+                            scope.infos = infos;
+                        });
+                    }
+                });
+            }
+        };
+    })
     .directive('otBuildPromotionRuns', function () {
         return {
             restrict: 'E',
