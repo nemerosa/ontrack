@@ -279,7 +279,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     /**
      * Gets the summary for an issue in a repository
      */
-    @RequestMapping(value = "configuration/{configuration}/issue/{key}")
+    @RequestMapping(value = "configuration/{configuration}/issue/{key}", method = RequestMethod.GET)
     public Resource<OntrackSVNIssueInfo> issueInfo(@PathVariable String configuration, @PathVariable String key) {
         return Resource.of(
                 svnService.getIssueInfo(configuration, key),
@@ -290,7 +290,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     /**
      * Gets the summary for a revision in a repository
      */
-    @RequestMapping(value = "configuration/{configuration}/revision/{revision}")
+    @RequestMapping(value = "configuration/{configuration}/revision/{revision}", method = RequestMethod.GET)
     public Resource<OntrackSVNRevisionInfo> revisionInfo(@PathVariable String configuration, @PathVariable long revision) {
         return Resource.of(
                 svnService.getOntrackRevisionInfo(
