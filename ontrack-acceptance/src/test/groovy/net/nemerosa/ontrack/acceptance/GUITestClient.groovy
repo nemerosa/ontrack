@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.acceptance
 
 import net.nemerosa.ontrack.acceptance.pages.HomePage
+import org.junit.After
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.openqa.selenium.Dimension
@@ -26,6 +27,11 @@ abstract class GUITestClient extends AcceptanceTestClient {
         }
     }
 
+    @After
+    void after() {
+        driver.manage().deleteAllCookies()
+    }
+
     static WebDriver initDriver() {
         new FirefoxDriver()
     }
@@ -35,8 +41,13 @@ abstract class GUITestClient extends AcceptanceTestClient {
     }
 
     static HomePage startApplication() {
-        driver.get(initUrl())
-        new HomePage()
+        def url = initUrl()
+        driver.get("${url}/index.html")
+        new HomePage(driver)
+    }
+
+    static String getAdminPassword() {
+        System.getProperty('ontrack.admin.password') ?: 'admin'
     }
 
 }

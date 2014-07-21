@@ -4,9 +4,16 @@ import org.openqa.selenium.WebDriver
 
 abstract class AbstractHeaderPage extends AbstractPage {
 
-    HeaderPageComponent header = new HeaderPageComponent()
+    final HeaderPageComponent header
 
     AbstractHeaderPage(WebDriver driver) {
         super(driver)
+        header = new HeaderPageComponent(driver)
     }
+
+    def login(String name, String password) {
+        header.login(name, password)
+        this
+    }
+
 }
