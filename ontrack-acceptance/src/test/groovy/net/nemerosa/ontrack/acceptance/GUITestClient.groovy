@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.acceptance
 
+import com.google.common.base.Predicate
 import net.nemerosa.ontrack.acceptance.pages.HomePage
 import org.junit.After
 import org.junit.AfterClass
@@ -7,6 +8,7 @@ import org.junit.BeforeClass
 import org.openqa.selenium.Dimension
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.firefox.FirefoxDriver
+import org.openqa.selenium.support.ui.WebDriverWait
 
 abstract class GUITestClient extends AcceptanceTestClient {
 
@@ -48,6 +50,19 @@ abstract class GUITestClient extends AcceptanceTestClient {
 
     static String getAdminPassword() {
         System.getProperty('ontrack.admin.password') ?: 'admin'
+    }
+
+    static def waitUntil(Closure<Boolean> closure) {
+        waitUntil(2, closure)
+    }
+
+    static def waitUntil(int seconds, Closure<Boolean> closure) {
+        new WebDriverWait(driver, seconds).until(new Predicate<WebDriver>() {
+            @Override
+            boolean apply(WebDriver input) {
+                closure()
+            }
+        })
     }
 
 }
