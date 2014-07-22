@@ -59,16 +59,13 @@ public class StandardBuildFilter implements BuildFilter {
             );
         }
         // Since validation stamp
-        if (data.getSinceValidationStamp() != null) {
-            String vsName = data.getSinceValidationStamp().getName();
-            if (isNotBlank(vsName)) {
-                result = result.goOnIf(
-                        !buildViewSupplier.get().getValidationStampRunViews().stream()
-                                .filter(validationStampRunView -> hasValidationStamp(validationStampRunView, data.getSinceValidationStamp()))
-                                .findAny()
-                                .isPresent()
-                );
-            }
+        if (isNotBlank(data.getSinceValidationStamp())) {
+            result = result.goOnIf(
+                    !buildViewSupplier.get().getValidationStampRunViews().stream()
+                            .filter(validationStampRunView -> hasValidationStamp(validationStampRunView, data.getSinceValidationStamp(), data.getSinceValidationStampStatus()))
+                            .findAny()
+                            .isPresent()
+            );
         }
         // TODO withValidationStamp
         // TODO withProperty
@@ -76,12 +73,12 @@ public class StandardBuildFilter implements BuildFilter {
         return result;
     }
 
-    private boolean hasValidationStamp(ValidationStampRunView validationStampRunView, ValidationStampFilter filter) {
-        return (StringUtils.equals(filter.getName(), validationStampRunView.getValidationStamp().getName()))
+    private boolean hasValidationStamp(ValidationStampRunView validationStampRunView, String name, String status) {
+        return (StringUtils.equals(name, validationStampRunView.getValidationStamp().getName()))
                 && validationStampRunView.isRun()
                 && (
-                StringUtils.isBlank(filter.getStatus())
-                        || StringUtils.equals(filter.getStatus(), validationStampRunView.getLastStatus().getStatusID().getId())
+                StringUtils.isBlank(status)
+                        || StringUtils.equals(status, validationStampRunView.getLastStatus().getStatusID().getId())
         );
     }
 

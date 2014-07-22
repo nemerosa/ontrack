@@ -114,8 +114,8 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
                 .fill("withPromotionLevel", data.getWithPromotionLevel())
                 .fill("afterDate", data.getAfterDate())
                 .fill("beforeDate", data.getBeforeDate())
-                .fill("sinceValidationStamp", data.getSinceValidationStamp() != null ? data.getSinceValidationStamp().getName() : null)
-                .fill("sinceValidationStampStatus", data.getSinceValidationStamp() != null ? data.getSinceValidationStamp().getStatus() : null)
+                .fill("sinceValidationStamp", data.getSinceValidationStamp())
+                .fill("sinceValidationStampStatus", data.getSinceValidationStampStatus())
                 // TODO withValidationStamp
                 // TODO withProperty
                 ;
@@ -128,12 +128,8 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
                 .withWithPromotionLevel(JsonUtils.get(data, "withPromotionLevel", null))
                 .withAfterDate(JsonUtils.getDate(data, "afterDate", null))
                 .withBeforeDate(JsonUtils.getDate(data, "beforeDate", null))
-                .withSinceValidationStamp(
-                        new ValidationStampFilter(
-                                JsonUtils.get(data, "sinceValidationStamp", null),
-                                JsonUtils.get(data, "sinceValidationStampStatus", null)
-                        )
-                )
+                .withSinceValidationStamp(JsonUtils.get(data, "sinceValidationStamp", null))
+                .withSinceValidationStampStatus(JsonUtils.get(data, "sinceValidationStampStatus", null))
                 // TODO withValidationStamp
                 // TODO withProperty
                 ;
