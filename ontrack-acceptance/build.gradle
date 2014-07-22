@@ -96,6 +96,6 @@ task localAcceptanceTestEnd << {
 }
 
 // Ordering
-project.tasks.localAcceptanceTestStart.dependsOn ':ontrack-ui:build'
+project.tasks.localAcceptanceTestStart.dependsOn ':ontrack-ui:assemble'
 project.tasks.localAcceptanceTest.dependsOn 'localAcceptanceTestStart'
 project.tasks.localAcceptanceTest.finalizedBy 'localAcceptanceTestEnd'
