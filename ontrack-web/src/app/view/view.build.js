@@ -23,6 +23,7 @@ angular.module('ot.view.build', [
                 view.title = "Build " + build.name;
                 view.description = build.description;
                 view.breadcrumbs = ot.branchBreadcrumbs(build.branch);
+                view.decorationsEntity = build;
                 // Loads the promotion runs
                 loadPromotionRuns();
                 // Loads the validation runs
