@@ -21,7 +21,7 @@ public class JDKLocalDateDeserializer extends JsonDeserializer<LocalDate> {
         return parse(s);
     }
 
-    protected LocalDate parse(String s) {
+    public static LocalDate parse(String s) {
         if (StringUtils.isNotBlank(s)) {
             // Tries first with date only
             try {

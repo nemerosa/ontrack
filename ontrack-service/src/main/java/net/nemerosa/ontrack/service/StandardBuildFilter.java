@@ -6,6 +6,8 @@ import net.nemerosa.ontrack.model.buildfilter.BuildFilterResult;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.BuildView;
+import net.nemerosa.ontrack.model.structure.ValidationStampRunView;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -56,11 +58,31 @@ public class StandardBuildFilter implements BuildFilter {
                             .isPresent()
             );
         }
-        // TODO sinceValidationStamps
-        // TODO withValidationStamps
+        // Since validation stamp
+        if (data.getSinceValidationStamp() != null) {
+            String vsName = data.getSinceValidationStamp().getName();
+            if (isNotBlank(vsName)) {
+                result = result.goOnIf(
+                        !buildViewSupplier.get().getValidationStampRunViews().stream()
+                                .filter(validationStampRunView -> hasValidationStamp(validationStampRunView, data.getSinceValidationStamp()))
+                                .findAny()
+                                .isPresent()
+                );
+            }
+        }
+        // TODO withValidationStamp
         // TODO withProperty
         // OK
         return result;
+    }
+
+    private boolean hasValidationStamp(ValidationStampRunView validationStampRunView, ValidationStampFilter filter) {
+        return (StringUtils.equals(filter.getName(), validationStampRunView.getValidationStamp().getName()))
+                && validationStampRunView.isRun()
+                && (
+                StringUtils.isBlank(filter.getStatus())
+                        || StringUtils.equals(filter.getStatus(), validationStampRunView.getLastStatus().getStatusID().getId())
+        );
     }
 
 }

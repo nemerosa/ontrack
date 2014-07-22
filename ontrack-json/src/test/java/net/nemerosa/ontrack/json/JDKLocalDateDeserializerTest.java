@@ -9,23 +9,21 @@ import static org.junit.Assert.assertNull;
 
 public class JDKLocalDateDeserializerTest {
 
-    private final JDKLocalDateDeserializer deserializer = new JDKLocalDateDeserializer();
-
     @Test
     public void null_string() {
-        assertNull(deserializer.parse(null));
+        assertNull(JDKLocalDateDeserializer.parse(null));
     }
 
     @Test
     public void blank_string() {
-        assertNull(deserializer.parse(""));
+        assertNull(JDKLocalDateDeserializer.parse(""));
     }
 
     @Test
     public void date_only() {
         assertEquals(
                 LocalDate.of(2014, 7, 14),
-                deserializer.parse("2014-07-14")
+                JDKLocalDateDeserializer.parse("2014-07-14")
         );
     }
 
@@ -33,7 +31,7 @@ public class JDKLocalDateDeserializerTest {
     public void date_time_zone() {
         assertEquals(
                 LocalDate.of(2014, 7, 14),
-                deserializer.parse("2014-07-14T22:00:00.000Z")
+                JDKLocalDateDeserializer.parse("2014-07-14T22:00:00.000Z")
         );
     }
 
@@ -41,7 +39,7 @@ public class JDKLocalDateDeserializerTest {
     public void date_time() {
         assertEquals(
                 LocalDate.of(2014, 7, 14),
-                deserializer.parse("2014-07-14T22:00:00.000")
+                JDKLocalDateDeserializer.parse("2014-07-14T22:00:00.000")
         );
     }
 
