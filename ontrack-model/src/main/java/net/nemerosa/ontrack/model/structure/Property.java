@@ -56,4 +56,8 @@ public class Property<T> {
     public static <T> Property<T> of(PropertyType<T> type, T value) {
         return new Property<>(type, value, false);
     }
+
+    public boolean containsValue(String propertyValue) {
+        return value != null && type.containsValue(value, propertyValue);
+    }
 }

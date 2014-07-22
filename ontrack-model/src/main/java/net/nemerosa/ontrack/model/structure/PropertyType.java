@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.model.structure;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.SecurityService;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Set;
 
@@ -30,7 +31,7 @@ public interface PropertyType<T> {
 
     /**
      * Edition policy.
-     * <p/>
+     * <p>
      * Can this property be directly edited by a used on the given
      * associated entity.
      *
@@ -48,10 +49,6 @@ public interface PropertyType<T> {
      * @return Authorization policy for this entity
      */
     boolean canView(ProjectEntity entity, SecurityService securityService);
-
-    /**
-     * TODO Obfuscates any sensitive value from the property value before it is sent at client side.
-     */
 
     /**
      * Form to create/update this property.
@@ -102,4 +99,17 @@ public interface PropertyType<T> {
      * @return Index value
      */
     String getSearchKey(T value);
+
+    /**
+     * Checks if the property <code>value</code> contains the given search token.
+     * <p>
+     * By default, this method uses the {@link #getSearchKey(Object) search key}.
+     *
+     * @param value         Value to search into
+     * @param propertyValue Search token
+     * @return <code>true</code> is found
+     */
+    default boolean containsValue(T value, String propertyValue) {
+        return StringUtils.containsIgnoreCase(getSearchKey(value), propertyValue);
+    }
 }

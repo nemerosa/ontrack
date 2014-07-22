@@ -18,6 +18,7 @@ public class StandardBuildFilterTest {
 
     private Branch branch;
     private Build build;
+    private PropertyService propertyService;
 
     @Before
     public void prepare() {
@@ -33,7 +34,8 @@ public class StandardBuildFilterTest {
     @Test
     public void afterDate_nok() {
         StandardBuildFilter filter = new StandardBuildFilter(
-                StandardBuildFilterData.of(5).withAfterDate(LocalDate.of(2014, 7, 16))
+                StandardBuildFilterData.of(5).withAfterDate(LocalDate.of(2014, 7, 16)),
+                propertyService
         );
         BuildFilterResult result = filter.filter(
                 Collections.emptyList(),
@@ -49,7 +51,8 @@ public class StandardBuildFilterTest {
     @Test
     public void afterDate_ok() {
         StandardBuildFilter filter = new StandardBuildFilter(
-                StandardBuildFilterData.of(5).withAfterDate(LocalDate.of(2014, 7, 12))
+                StandardBuildFilterData.of(5).withAfterDate(LocalDate.of(2014, 7, 12)),
+                propertyService
         );
         BuildFilterResult result = filter.filter(
                 Collections.emptyList(),
@@ -65,7 +68,8 @@ public class StandardBuildFilterTest {
     @Test
     public void afterDate_same() {
         StandardBuildFilter filter = new StandardBuildFilter(
-                StandardBuildFilterData.of(5).withAfterDate(LocalDate.of(2014, 7, 14))
+                StandardBuildFilterData.of(5).withAfterDate(LocalDate.of(2014, 7, 14)),
+                propertyService
         );
         BuildFilterResult result = filter.filter(
                 Collections.emptyList(),
@@ -81,7 +85,8 @@ public class StandardBuildFilterTest {
     @Test
     public void beforeDate_nok() {
         StandardBuildFilter filter = new StandardBuildFilter(
-                StandardBuildFilterData.of(5).withBeforeDate(LocalDate.of(2014, 7, 12))
+                StandardBuildFilterData.of(5).withBeforeDate(LocalDate.of(2014, 7, 12)),
+                propertyService
         );
         BuildFilterResult result = filter.filter(
                 Collections.emptyList(),
@@ -97,7 +102,8 @@ public class StandardBuildFilterTest {
     @Test
     public void beforeDate_ok() {
         StandardBuildFilter filter = new StandardBuildFilter(
-                StandardBuildFilterData.of(5).withBeforeDate(LocalDate.of(2014, 7, 16))
+                StandardBuildFilterData.of(5).withBeforeDate(LocalDate.of(2014, 7, 16)),
+                propertyService
         );
         BuildFilterResult result = filter.filter(
                 Collections.emptyList(),
@@ -113,7 +119,8 @@ public class StandardBuildFilterTest {
     @Test
     public void beforeDate_same() {
         StandardBuildFilter filter = new StandardBuildFilter(
-                StandardBuildFilterData.of(5).withAfterDate(LocalDate.of(2014, 7, 14))
+                StandardBuildFilterData.of(5).withAfterDate(LocalDate.of(2014, 7, 14)),
+                propertyService
         );
         BuildFilterResult result = filter.filter(
                 Collections.emptyList(),

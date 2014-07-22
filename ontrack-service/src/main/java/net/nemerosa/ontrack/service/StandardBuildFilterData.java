@@ -20,11 +20,24 @@ public class StandardBuildFilterData {
     private final LocalDate afterDate;
     @Wither
     private final LocalDate beforeDate;
-    // TODO sinceValidationStamps
-    // TODO withValidationStamps
-    // TODO withProperty
+    @Wither
+    private final String sinceValidationStamp;
+    @Wither
+    private final String sinceValidationStampStatus;
+    @Wither
+    private final String withValidationStamp;
+    @Wither
+    private final String withValidationStampStatus;
+    @Wither
+    private final String withProperty;
+    @Wither
+    private final String withPropertyValue;
+    @Wither
+    private final String sinceProperty;
+    @Wither
+    private final String sincePropertyValue;
 
     public static StandardBuildFilterData of(int count) {
-        return new StandardBuildFilterData(count, null, null, null, null);
+        return new StandardBuildFilterData(count, null, null, null, null, null, null, null, null, null, null, null, null);
     }
 }

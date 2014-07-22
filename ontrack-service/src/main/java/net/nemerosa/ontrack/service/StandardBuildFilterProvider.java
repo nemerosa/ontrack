@@ -1,32 +1,30 @@
 package net.nemerosa.ontrack.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import net.nemerosa.ontrack.json.ObjectMapperFactory;
+import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
-import net.nemerosa.ontrack.model.form.Date;
-import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.form.Int;
-import net.nemerosa.ontrack.model.form.Selection;
-import net.nemerosa.ontrack.model.structure.ID;
-import net.nemerosa.ontrack.model.structure.PromotionLevel;
-import net.nemerosa.ontrack.model.structure.StructureService;
+import net.nemerosa.ontrack.model.form.*;
+import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<StandardBuildFilterData> {
 
-    private final ObjectMapper objectMapper = ObjectMapperFactory.create();
     private final StructureService structureService;
+    private final ValidationRunStatusService validationRunStatusService;
+    private final PropertyService propertyService;
 
     @Autowired
-    public StandardBuildFilterProvider(StructureService structureService) {
+    public StandardBuildFilterProvider(StructureService structureService, ValidationRunStatusService validationRunStatusService, PropertyService propertyService) {
         this.structureService = structureService;
+        this.validationRunStatusService = validationRunStatusService;
+        this.propertyService = propertyService;
     }
 
     @Override
@@ -36,7 +34,7 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
 
     @Override
     public BuildFilter filter(ID branchId, StandardBuildFilterData data) {
-        return new StandardBuildFilter(data);
+        return new StandardBuildFilter(data, propertyService);
     }
 
     @Override
@@ -48,6 +46,16 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
     protected Form blankForm(ID branchId) {
         // Promotion levels for this branch
         List<PromotionLevel> promotionLevels = structureService.getPromotionLevelListForBranch(branchId);
+        // Validation stamps for this branch
+        List<ValidationStamp> validationStamps = structureService.getValidationStampListForBranch(branchId);
+        // List of validation run statuses
+        List<ValidationRunStatusID> statuses = new ArrayList<>(validationRunStatusService.getValidationRunStatusList());
+        // List of properties for a build
+        //noinspection Convert2MethodRef
+        List<PropertyTypeDescriptor> properties = propertyService.getPropertyTypes().stream()
+                .filter(type -> type.getSupportedEntityTypes().contains(ProjectEntityType.BUILD))
+                .map(type -> PropertyTypeDescriptor.of(type))
+                .collect(Collectors.toList());
         // Form
         return Form.create()
                 .with(
@@ -85,9 +93,60 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
                                 .help("Build created before or on this date")
                                 .optional()
                 )
-                // TODO sinceValidationStamps
-                // TODO withValidationStamps
-                // TODO withProperty
+                .with(
+                        Selection.of("sinceValidationStamp")
+                                .label("Since validation stamp")
+                                .help("Builds since the last one which had this validation stamp")
+                                .items(validationStamps)
+                                .itemId("name")
+                                .optional()
+                )
+                .with(
+                        Selection.of("sinceValidationStampStatus")
+                                .label("... with status")
+                                .items(statuses)
+                                .optional()
+                )
+                .with(
+                        Selection.of("withValidationStamp")
+                                .label("With validation stamp")
+                                .help("Builds with this validation stamp")
+                                .items(validationStamps)
+                                .itemId("name")
+                                .optional()
+                )
+                .with(
+                        Selection.of("withValidationStampStatus")
+                                .label("... with status")
+                                .items(statuses)
+                                .optional()
+                )
+                .with(
+                        Selection.of("sinceProperty")
+                                .label("Since property")
+                                .items(properties)
+                                .itemId("typeName")
+                                .optional()
+                )
+                .with(
+                        Text.of("sincePropertyValue")
+                                .label("... with value")
+                                .length(40)
+                                .optional()
+                )
+                .with(
+                        Selection.of("withProperty")
+                                .label("With property")
+                                .items(properties)
+                                .itemId("typeName")
+                                .optional()
+                )
+                .with(
+                        Text.of("withPropertyValue")
+                                .label("... with value")
+                                .length(40)
+                                .optional()
+                )
                 ;
     }
 
@@ -98,19 +157,34 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
                 .fill("sincePromotionLevel", data.getSincePromotionLevel())
                 .fill("withPromotionLevel", data.getWithPromotionLevel())
                 .fill("afterDate", data.getAfterDate())
-                .fill("beforeDate", data.getBeforeDate());
-        // TODO sinceValidationStamps
-        // TODO withValidationStamps
-        // TODO withProperty
+                .fill("beforeDate", data.getBeforeDate())
+                .fill("sinceValidationStamp", data.getSinceValidationStamp())
+                .fill("sinceValidationStampStatus", data.getSinceValidationStampStatus())
+                .fill("withValidationStamp", data.getWithValidationStamp())
+                .fill("withValidationStampStatus", data.getWithValidationStampStatus())
+                .fill("sinceProperty", data.getSinceProperty())
+                .fill("sincePropertyValue", data.getSincePropertyValue())
+                .fill("withProperty", data.getWithProperty())
+                .fill("withPropertyValue", data.getWithPropertyValue())
+                ;
     }
 
     @Override
     public Optional<StandardBuildFilterData> parse(JsonNode data) {
-        try {
-            return Optional.of(objectMapper.treeToValue(data, StandardBuildFilterData.class));
-        } catch (JsonProcessingException e) {
-            return Optional.empty();
-        }
+        StandardBuildFilterData filter = StandardBuildFilterData.of(JsonUtils.getInt(data, "count", 10))
+                .withSincePromotionLevel(JsonUtils.get(data, "sincePromotionLevel", null))
+                .withWithPromotionLevel(JsonUtils.get(data, "withPromotionLevel", null))
+                .withAfterDate(JsonUtils.getDate(data, "afterDate", null))
+                .withBeforeDate(JsonUtils.getDate(data, "beforeDate", null))
+                .withSinceValidationStamp(JsonUtils.get(data, "sinceValidationStamp", null))
+                .withSinceValidationStampStatus(JsonUtils.get(data, "sinceValidationStampStatus", null))
+                .withWithValidationStamp(JsonUtils.get(data, "withValidationStamp", null))
+                .withWithValidationStampStatus(JsonUtils.get(data, "withValidationStampStatus", null))
+                .withSinceProperty(JsonUtils.get(data, "sinceProperty", null))
+                .withSincePropertyValue(JsonUtils.get(data, "sincePropertyValue", null))
+                .withWithProperty(JsonUtils.get(data, "withProperty", null))
+                .withWithPropertyValue(JsonUtils.get(data, "withPropertyValue", null));
+        return Optional.of(filter);
     }
 
 }

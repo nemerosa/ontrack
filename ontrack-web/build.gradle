@@ -17,6 +17,9 @@ task versionClean(type: Exec) {
 }
 
 task clean(dependsOn: ['gruntClean', 'versionClean']) {
+    doLast {
+        project.delete project.buildDir
+    }
 }
 
 /**

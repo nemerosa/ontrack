@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.*;
 
 public final class JsonUtils {
@@ -84,5 +85,29 @@ public final class JsonUtils {
             parameters.forEach(builder::with);
         }
         return builder.end();
+    }
+
+    public static String get(JsonNode data, String field, String defaultValue) {
+        if (data.has(field)) {
+            return data.path(field).textValue();
+        } else {
+            return defaultValue;
+        }
+    }
+
+    public static int getInt(JsonNode data, String field, int defaultValue) {
+        if (data.has(field)) {
+            return data.path(field).asInt();
+        } else {
+            return defaultValue;
+        }
+    }
+
+    public static LocalDate getDate(JsonNode data, String field, LocalDate defaultValue) {
+        if (data.has(field)) {
+            return JDKLocalDateDeserializer.parse(data.path(field).asText());
+        } else {
+            return defaultValue;
+        }
     }
 }
