@@ -89,7 +89,7 @@ public final class JsonUtils {
 
     public static String get(JsonNode data, String field, String defaultValue) {
         if (data.has(field)) {
-            return data.path(field).asText();
+            return data.path(field).textValue();
         } else {
             return defaultValue;
         }
