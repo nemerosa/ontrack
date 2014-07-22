@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service;
 
 import net.nemerosa.ontrack.json.JsonUtils;
+import net.nemerosa.ontrack.model.structure.PropertyService;
 import net.nemerosa.ontrack.model.structure.StructureService;
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusService;
 import org.junit.Before;
@@ -19,10 +20,11 @@ public class StandardBuildFilterProviderTest {
     public void before() {
         StructureService structureService = mock(StructureService.class);
         ValidationRunStatusService validationRunStatusService = mock(ValidationRunStatusService.class);
+        PropertyService propertyService = mock(PropertyService.class);
         provider = new StandardBuildFilterProvider(
                 structureService,
-                validationRunStatusService
-        );
+                validationRunStatusService,
+                propertyService);
     }
 
     @Test

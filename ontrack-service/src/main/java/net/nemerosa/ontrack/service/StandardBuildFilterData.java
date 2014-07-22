@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.service;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,9 +28,16 @@ public class StandardBuildFilterData {
     private final String withValidationStamp;
     @Wither
     private final String withValidationStampStatus;
-    // TODO withProperty
+    @Wither
+    private final String withProperty;
+    @Wither
+    private final String withPropertyValue;
+    @Wither
+    private final String sinceProperty;
+    @Wither
+    private final String sincePropertyValue;
 
     public static StandardBuildFilterData of(int count) {
-        return new StandardBuildFilterData(count, null, null, null, null, null, null, null, null);
+        return new StandardBuildFilterData(count, null, null, null, null, null, null, null, null, null, null, null, null);
     }
 }
