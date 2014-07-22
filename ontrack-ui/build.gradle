@@ -49,9 +49,16 @@ clean << {
  * Copy of Web resources before release
  */
 
-task copyWebResources(dependsOn: ':ontrack-web:release') << {
+task copyWebResourcesRelease(dependsOn: ':ontrack-web:release') << {
     copy {
         from project(':ontrack-web').tasks.release.output
+        into project.file('src/main/resources/static')
+    }
+}
+
+task copyWebResourcesBuild(dependsOn: ':ontrack-web:build') << {
+    copy {
+        from project(':ontrack-web').tasks.build.output
         into project.file('src/main/resources/static')
     }
 }
@@ -71,8 +78,12 @@ ontrack.version.source = ${rootProject.versionSource}
 """
 }
 
-release.dependsOn copyWebResources
+release.dependsOn copyWebResourcesRelease
 release.dependsOn generationVersionInfo
 
-jar.mustRunAfter copyWebResources
+build.dependsOn copyWebResourcesBuild
+build.dependsOn generationVersionInfo
+
+jar.mustRunAfter copyWebResourcesRelease
+jar.mustRunAfter copyWebResourcesBuild
 jar.mustRunAfter generationVersionInfo
