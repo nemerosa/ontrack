@@ -38,7 +38,7 @@ public class ReleaseDecorationExtension extends AbstractExtension implements Dec
                     this,
                     "release",
                     property.getValue().getName()
-            );
+            ).withName(property.getValue().getName());
         }
     }
 

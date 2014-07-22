@@ -132,6 +132,15 @@ img.ot-logo {
   max-height: @otIconSize;
 }
 
+.ot-icon-mini {
+  width: @otIconSizeMini;
+  height: @otIconSizeMini;
+  min-width: @otIconSizeMini;
+  min-height: @otIconSizeMini;
+  max-width: @otIconSizeMini;
+  max-height: @otIconSizeMini;
+}
+
 div.ot-view {
   margin-top: 1em;
   .ot-view-title {
@@ -560,9 +569,19 @@ a.ot-application-info-error {
  * Decorations
  */
 
-.ot-decoration {
+img.ot-decoration {
   .ot-icon;
   margin-right: 2px;
+}
+
+span.ot-decoration {
+  .label;
+  .label-default;
+  margin-right: 2px;
+  font-weight: normal;
+  img {
+    .ot-icon-mini;
+  }
 }
 
 /**
