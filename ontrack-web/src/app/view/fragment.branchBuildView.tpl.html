@@ -49,8 +49,9 @@
             <!-- Build name and link -->
             <a href="#/build/{{buildView.build.id}}" class="ot-branch-build-view-build-name">
                 {{buildView.build.name}}
-                <!-- TODO Build decorations -->
             </a>
+            <!-- Build decorations -->
+            <ot-entity-decorations entity="buildView.build"></ot-entity-decorations>
             <!-- Signature, without the creator in the overview -->
             <div class="ot-branch-build-view-build-signature">
                 {{buildView.build.signature.time | date:'mediumDate'}}
