@@ -10,6 +10,8 @@ import org.openqa.selenium.WebDriver
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.support.ui.WebDriverWait
 
+import java.util.concurrent.TimeUnit
+
 abstract class GUITestClient extends AcceptanceTestClient {
 
     protected static WebDriver driver
@@ -20,6 +22,7 @@ abstract class GUITestClient extends AcceptanceTestClient {
         driver = initDriver()
         driver.manage().deleteAllCookies()
         driver.manage().window().setSize(new Dimension(1024, 768))
+        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     }
 
     @AfterClass
