@@ -25,10 +25,13 @@ public class StandardBuildFilterData {
     private final String sinceValidationStamp;
     @Wither
     private final String sinceValidationStampStatus;
-    // TODO withValidationStamps
+    @Wither
+    private final String withValidationStamp;
+    @Wither
+    private final String withValidationStampStatus;
     // TODO withProperty
 
     public static StandardBuildFilterData of(int count) {
-        return new StandardBuildFilterData(count, null, null, null, null, null, null);
+        return new StandardBuildFilterData(count, null, null, null, null, null, null, null, null);
     }
 }

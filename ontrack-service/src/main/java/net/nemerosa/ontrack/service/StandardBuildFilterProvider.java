@@ -101,7 +101,20 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
                                 .items(statuses)
                                 .optional()
                 )
-                // TODO withValidationStamp
+                .with(
+                        Selection.of("withValidationStamp")
+                                .label("With validation stamp")
+                                .help("Builds with this validation stamp")
+                                .items(validationStamps)
+                                .itemId("name")
+                                .optional()
+                )
+                .with(
+                        Selection.of("withValidationStampStatus")
+                                .label("... with status")
+                                .items(statuses)
+                                .optional()
+                )
                 // TODO withProperty
                 ;
     }
@@ -116,7 +129,8 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
                 .fill("beforeDate", data.getBeforeDate())
                 .fill("sinceValidationStamp", data.getSinceValidationStamp())
                 .fill("sinceValidationStampStatus", data.getSinceValidationStampStatus())
-                // TODO withValidationStamp
+                .fill("withValidationStamp", data.getWithValidationStamp())
+                .fill("withValidationStampStatus", data.getWithValidationStampStatus())
                 // TODO withProperty
                 ;
     }
@@ -130,7 +144,8 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
                 .withBeforeDate(JsonUtils.getDate(data, "beforeDate", null))
                 .withSinceValidationStamp(JsonUtils.get(data, "sinceValidationStamp", null))
                 .withSinceValidationStampStatus(JsonUtils.get(data, "sinceValidationStampStatus", null))
-                // TODO withValidationStamp
+                .withWithValidationStamp(JsonUtils.get(data, "withValidationStamp", null))
+                .withWithValidationStampStatus(JsonUtils.get(data, "withValidationStampStatus", null))
                 // TODO withProperty
                 ;
         return Optional.of(filter);

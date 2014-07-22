@@ -67,7 +67,15 @@ public class StandardBuildFilter implements BuildFilter {
                             .isPresent()
             );
         }
-        // TODO withValidationStamp
+        // With validation stamp
+        if (isNotBlank(data.getWithValidationStamp())) {
+            result = result.acceptIf(
+                    buildViewSupplier.get().getValidationStampRunViews().stream()
+                            .filter(validationStampRunView -> hasValidationStamp(validationStampRunView, data.getWithValidationStamp(), data.getWithValidationStampStatus()))
+                            .findAny()
+                            .isPresent()
+            );
+        }
         // TODO withProperty
         // OK
         return result;
