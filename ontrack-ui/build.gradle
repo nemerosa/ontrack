@@ -86,6 +86,6 @@ release.dependsOn generationVersionInfo
 build.dependsOn copyWebResourcesBuild
 build.dependsOn generationVersionInfo
 
-jar.mustRunAfter copyWebResourcesRelease
-jar.mustRunAfter copyWebResourcesBuild
-jar.mustRunAfter generationVersionInfo
+processResources.mustRunAfter copyWebResourcesRelease
+processResources.mustRunAfter copyWebResourcesBuild
+processResources.mustRunAfter generationVersionInfo
