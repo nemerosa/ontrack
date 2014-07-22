@@ -98,7 +98,7 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
                 .with(
                         Selection.of("sinceValidationStampStatus")
                                 .label("... with status")
-                                .items(validationStamps)
+                                .items(statuses)
                                 .optional()
                 )
                 // TODO withValidationStamp
