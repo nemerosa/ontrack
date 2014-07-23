@@ -32,6 +32,8 @@ dependencies {
     runtime project(':ontrack-extension-jira')
     runtime project(':ontrack-extension-svn')
     runtime project(':ontrack-extension-artifactory')
+    runtime project(':ontrack-extension-git')
+    runtime project(':ontrack-extension-github')
 }
 
 /**
