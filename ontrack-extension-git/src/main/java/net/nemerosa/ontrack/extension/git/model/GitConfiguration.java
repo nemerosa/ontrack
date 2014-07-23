@@ -1,10 +1,12 @@
 package net.nemerosa.ontrack.extension.git.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
 import net.nemerosa.ontrack.extension.support.configurations.UserPasswordConfiguration;
 import net.nemerosa.ontrack.model.form.*;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -145,5 +147,10 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
                 .fill("indexationInterval", indexationInterval)
                 .fill("issueServiceConfigurationIdentifier", issueServiceConfigurationIdentifier)
                 ;
+    }
+
+    @JsonIgnore
+    public boolean isValid() {
+        return StringUtils.isNotBlank(remote);
     }
 }
