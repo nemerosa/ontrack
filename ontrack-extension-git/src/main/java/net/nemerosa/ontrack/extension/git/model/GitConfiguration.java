@@ -1,7 +1,10 @@
 package net.nemerosa.ontrack.extension.git.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.experimental.Wither;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
 import net.nemerosa.ontrack.extension.support.configurations.UserPasswordConfiguration;
 import net.nemerosa.ontrack.model.form.*;
@@ -11,49 +14,65 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.List;
 
 import static net.nemerosa.ontrack.model.form.Form.defaultNameField;
+import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 
 @Data
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class GitConfiguration implements UserPasswordConfiguration<GitConfiguration> {
 
     /**
      * Name of this configuration
      */
+    @Wither
     private final String name;
 
     /**
      * Remote path to the source repository
      */
+    @Wither
     private final String remote;
+
+    /**
+     * Default branch
+     */
+    @Wither
+    private final String branch;
 
     /**
      * User name
      */
+    @Wither
     private final String user;
 
     /**
      * User password
      */
+    @Wither
     private final String password;
 
     /**
      * Link to a commit, using {commit} as placeholder
      */
+    @Wither
     private final String commitLink;
 
     /**
      * Link to a file at a given commit, using {commit} and {path} as placeholders
      */
+    @Wither
     private final String fileAtCommitLink;
 
     /**
      * Indexation interval
      */
+    @Wither
     private final int indexationInterval;
 
     /**
      * ID to the {@link net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration} associated
      * with this repository.
      */
+    @Wither
     private final String issueServiceConfigurationIdentifier;
 
     @Override
@@ -67,20 +86,6 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
     @Override
     public GitConfiguration obfuscate() {
         return this;
-    }
-
-    @Override
-    public GitConfiguration withPassword(String password) {
-        return new GitConfiguration(
-                name,
-                remote,
-                user,
-                password,
-                commitLink,
-                fileAtCommitLink,
-                indexationInterval,
-                issueServiceConfigurationIdentifier
-        );
     }
 
     public static Form form(List<IssueServiceConfigurationRepresentation> availableIssueServiceConfigurations) {
@@ -151,6 +156,34 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
 
     @JsonIgnore
     public boolean isValid() {
-        return StringUtils.isNotBlank(remote);
+        return StringUtils.isNotBlank(name) && StringUtils.isNotBlank(remote);
+    }
+
+    public static GitConfiguration empty() {
+        return new GitConfiguration(
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                0,
+                ""
+        );
+    }
+
+    public GitConfiguration merge(GitConfiguration configuration) {
+        return new GitConfiguration(
+                name,
+                defaultIfBlank(configuration.remote, remote),
+                defaultIfBlank(configuration.branch, branch),
+                defaultIfBlank(configuration.user, user),
+                defaultIfBlank(configuration.password, password),
+                defaultIfBlank(configuration.commitLink, commitLink),
+                defaultIfBlank(configuration.fileAtCommitLink, fileAtCommitLink),
+                configuration.indexationInterval > 0 ? configuration.indexationInterval : indexationInterval,
+                defaultIfBlank(configuration.issueServiceConfigurationIdentifier, issueServiceConfigurationIdentifier)
+        );
     }
 }
