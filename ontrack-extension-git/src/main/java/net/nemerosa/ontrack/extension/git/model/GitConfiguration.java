@@ -42,6 +42,12 @@ public class GitConfiguration implements Configuration<GitConfiguration> {
      */
     private final int indexationInterval;
 
+    /**
+     * ID to the {@link net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration} associated
+     * with this repository.
+     */
+    private final String issueServiceConfigurationIdentifier;
+
     @Override
     public ConfigurationDescriptor getDescriptor() {
         return new ConfigurationDescriptor(name, remote);
