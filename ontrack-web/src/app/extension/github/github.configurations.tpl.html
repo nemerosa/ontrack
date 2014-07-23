@@ -9,6 +9,7 @@
                 <thead>
                 <tr>
                     <th>Name</th>
+                    <th>Repository</th>
                     <th>User</th>
                     <th>&nbsp;</th>
                 </tr>
@@ -17,6 +18,9 @@
                 <tr ng-repeat="configuration in configurations.resources">
                     <td>
                         <code>{{configuration.name}}</code>
+                    </td>
+                    <td>
+                        <a href="https://github.com/{{configuration.repository}}">{{configuration.repository}}</a>
                     </td>
                     <td>
                         <span ng-if="configuration.user">

@@ -8,13 +8,20 @@ import net.nemerosa.ontrack.model.form.Password;
 import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 
+import static net.nemerosa.ontrack.model.form.Form.defaultNameField;
+
 @Data
 public class GitHubConfiguration implements UserPasswordConfiguration<GitHubConfiguration> {
 
     /**
-     * Name of this configuration (eq. to the repository name)
+     * Name of this configuration
      */
     private final String name;
+
+    /**
+     * Repository name
+     */
+    private final String repository;
 
     /**
      * User name
@@ -35,7 +42,7 @@ public class GitHubConfiguration implements UserPasswordConfiguration<GitHubConf
     public ConfigurationDescriptor getDescriptor() {
         return new ConfigurationDescriptor(
                 name,
-                name
+                String.format("%s (%s)", name, repository)
         );
     }
 
@@ -48,6 +55,7 @@ public class GitHubConfiguration implements UserPasswordConfiguration<GitHubConf
     public GitHubConfiguration withPassword(String password) {
         return new GitHubConfiguration(
                 name,
+                repository,
                 user,
                 password,
                 indexationInterval
@@ -56,8 +64,9 @@ public class GitHubConfiguration implements UserPasswordConfiguration<GitHubConf
 
     public static Form form() {
         return Form.create()
+                .with(defaultNameField())
                 .with(
-                        Text.of("name")
+                        Text.of("repository")
                                 .label("Repository")
                                 .length(100)
                                 .regex("[A-Za-z0-9_\\.\\-]+")
@@ -88,15 +97,8 @@ public class GitHubConfiguration implements UserPasswordConfiguration<GitHubConf
 
     public Form asForm() {
         return form()
-                .with(
-                        Text.of("name")
-                                .label("Repository")
-                                .length(100)
-                                .regex("[A-Za-z0-9_\\.\\-]+")
-                                .validation("Repository is required and must be a GitHub repository (account/repository).")
-                                .readOnly()
-                                .value(name)
-                )
+                .with(defaultNameField().readOnly().value(name))
+                .fill("repository", repository)
                 .fill("user", user)
                 .fill("password", "")
                 .fill("indexationInterval", indexationInterval)
