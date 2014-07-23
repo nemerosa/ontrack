@@ -23,6 +23,7 @@
     "grunt-contrib-copy": "^0.5.0",
     "grunt-html2js": "^0.2.4",
     "grunt-include-source": "^0.3.8",
-    "grunt-ng-annotate": "^0.2.3"
+    "grunt-ng-annotate": "^0.2.3",
+    "grunt-contrib-connect": "^0.8.0"
   }
 }

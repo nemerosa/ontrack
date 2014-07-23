@@ -422,6 +422,34 @@ module.exports = function (grunt) {
                 files: [ 'src/**/*.less' ],
                 tasks: [ 'less:dev' ]
             }
+        },
+
+        connect: {
+            /**
+             * The 'dev' server can be used in conjunction with the 'watch' task:
+             *
+             * grunt clean connect:dev watch
+             *
+             * This will enable a watch on the resources, notify the browser in changes, and start
+             * a server on port 8000 pointing to the dev resources.
+             *
+             * The server will stop as soon as the shell is exited.
+             */
+            dev: {
+                options: {
+                    base: 'build/grunt/dev'
+                }
+            },
+            /**
+             * The 'prod' server just starts a server on the resources at prod_dir, without
+             * any livereload option, and will be kept alive until stopped.
+             */
+            prod: {
+                options: {
+                    keepalive: true,
+                    base: 'build/grunt/prod'
+                }
+            }
         }
 
     });
@@ -436,6 +464,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-ng-annotate');
     grunt.loadNpmTasks('grunt-html2js');
