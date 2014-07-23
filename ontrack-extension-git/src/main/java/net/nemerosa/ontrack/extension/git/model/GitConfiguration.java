@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.extension.git.model;
 
 import lombok.Data;
-import net.nemerosa.ontrack.model.support.Configuration;
+import net.nemerosa.ontrack.extension.support.configurations.UserPasswordConfiguration;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 
 @Data
-public class GitConfiguration implements Configuration<GitConfiguration> {
+public class GitConfiguration implements UserPasswordConfiguration<GitConfiguration> {
 
     /**
      * Name of this configuration
@@ -58,4 +58,17 @@ public class GitConfiguration implements Configuration<GitConfiguration> {
         return this;
     }
 
+    @Override
+    public GitConfiguration withPassword(String password) {
+        return new GitConfiguration(
+                name,
+                remote,
+                user,
+                password,
+                commitLink,
+                fileAtCommitLink,
+                indexationInterval,
+                issueServiceConfigurationIdentifier
+        );
+    }
 }
