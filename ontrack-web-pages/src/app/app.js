@@ -13,6 +13,9 @@ angular.module('ontrack', [
         $urlRouterProvider.otherwise("/home");
     })
     // Main controller
-    .controller('AppCtrl', function () {
+    .controller('AppCtrl', function ($scope, $http) {
+        $http.get('assets/version.json').success(function (info) {
+            $scope.info = info;
+        });
     })
 ;

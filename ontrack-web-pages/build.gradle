@@ -43,13 +43,17 @@ task versionSet << {
     }
 }
 
-task release(dependsOn: ['setup', 'versionSet', 'gruntProd']) {
+task versionFile << {
+    project.file('src/assets/version.json').text = """{"version":"${version}"}"""
+}
+
+task release(dependsOn: ['setup', 'versionFile', 'versionSet', 'gruntProd']) {
     ext {
         output = "${project.buildDir}/grunt/prod"
     }
 }
 
-task build(dependsOn: ['setup', 'gruntDev']) {
+task build(dependsOn: ['setup', 'versionFile', 'gruntDev']) {
     ext {
         output = "${project.buildDir}/grunt/dev"
     }
@@ -65,5 +69,7 @@ task gruntDev(type: Exec) {
 
 clean.mustRunAfter setup
 gruntDev.mustRunAfter setup
+gruntDev.mustRunAfter versionFile
 gruntProd.mustRunAfter setup
 gruntProd.mustRunAfter versionSet
+gruntProd.mustRunAfter versionFile
