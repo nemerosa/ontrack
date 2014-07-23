@@ -18,6 +18,16 @@ public class GitConfiguration implements Configuration<GitConfiguration> {
     private final String remote;
 
     /**
+     * User name
+     */
+    private final String user;
+
+    /**
+     * User password
+     */
+    private final String password;
+
+    /**
      * Link to a commit, using {commit} as placeholder
      */
     private final String commitLink;
@@ -26,6 +36,11 @@ public class GitConfiguration implements Configuration<GitConfiguration> {
      * Link to a file at a given commit, using {commit} and {path} as placeholders
      */
     private final String fileAtCommitLink;
+
+    /**
+     * Indexation interval
+     */
+    private final int indexationInterval;
 
     @Override
     public ConfigurationDescriptor getDescriptor() {
