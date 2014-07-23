@@ -9,7 +9,13 @@ import lombok.Data;
 @Data
 public class ConfigurationDescriptor {
 
+    /**
+     * Identifier for the configuration
+     */
     private final String id;
+    /**
+     * Display name for the configuration
+     */
     private final String name;
 
 }

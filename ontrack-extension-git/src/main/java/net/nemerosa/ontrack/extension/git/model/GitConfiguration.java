@@ -56,7 +56,10 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
 
     @Override
     public ConfigurationDescriptor getDescriptor() {
-        return new ConfigurationDescriptor(name, remote);
+        return new ConfigurationDescriptor(
+                name,
+                String.format("%s (%s)", name, remote)
+        );
     }
 
     @Override
