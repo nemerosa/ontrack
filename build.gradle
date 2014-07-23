@@ -33,7 +33,9 @@ ext {
     targetCompatibility = 1.8
 }
 
-def javaProjects = subprojects.findAll { it.path != ':ontrack-web' }
+def javaProjects = subprojects.findAll {
+    it.path != ':ontrack-web' && it.path != ':ontrack-web-pages'
+}
 
 configure(javaProjects) {
 
