@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.extension.github.model;
 
 import lombok.Data;
-import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
 import net.nemerosa.ontrack.extension.support.configurations.UserPasswordConfiguration;
-import net.nemerosa.ontrack.model.form.*;
+import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.form.Int;
+import net.nemerosa.ontrack.model.form.Password;
+import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
-
-import java.util.List;
 
 @Data
 public class GitHubConfiguration implements UserPasswordConfiguration<GitHubConfiguration> {
@@ -54,7 +54,7 @@ public class GitHubConfiguration implements UserPasswordConfiguration<GitHubConf
         );
     }
 
-    public static Form form(List<IssueServiceConfigurationRepresentation> availableIssueServiceConfigurations) {
+    public static Form form() {
         return Form.create()
                 .with(
                         Text.of("name")
@@ -83,18 +83,11 @@ public class GitHubConfiguration implements UserPasswordConfiguration<GitHubConf
                                 .help("Interval (in minutes) between each indexation of the GitHub repository. A " +
                                         "zero value indicates that no indexation must take place automatically and they " +
                                         "have to be triggered manually.")
-                )
-                .with(
-                        Selection.of("issueServiceConfigurationIdentifier")
-                                .label("Issue configuration")
-                                .help("Select an issue service that is sued to associate tickets and issues to the source.")
-                                .optional()
-                                .items(availableIssueServiceConfigurations)
                 );
     }
 
-    public Form asForm(List<IssueServiceConfigurationRepresentation> availableIssueServiceConfigurations) {
-        return form(availableIssueServiceConfigurations)
+    public Form asForm() {
+        return form()
                 .with(
                         Text.of("name")
                                 .label("Repository")
