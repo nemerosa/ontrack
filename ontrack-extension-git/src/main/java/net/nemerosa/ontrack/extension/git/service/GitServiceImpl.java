@@ -4,8 +4,10 @@ import net.nemerosa.ontrack.extension.git.client.GitClient;
 import net.nemerosa.ontrack.extension.git.client.GitClientFactory;
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.git.model.GitConfigurator;
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.job.*;
 import net.nemerosa.ontrack.model.structure.Branch;
+import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.StructureService;
 import org.apache.commons.lang3.StringUtils;
@@ -23,12 +25,18 @@ public class GitServiceImpl implements GitService, JobProvider {
     private final StructureService structureService;
     private final Collection<GitConfigurator> configurators;
     private final GitClientFactory gitClientFactory;
+    private final JobQueueService jobQueueService;
 
     @Autowired
-    public GitServiceImpl(StructureService structureService, Collection<GitConfigurator> configurators, GitClientFactory gitClientFactory) {
+    public GitServiceImpl(
+            StructureService structureService,
+            Collection<GitConfigurator> configurators,
+            GitClientFactory gitClientFactory,
+            JobQueueService jobQueueService) {
         this.structureService = structureService;
         this.configurators = configurators;
         this.gitClientFactory = gitClientFactory;
+        this.jobQueueService = jobQueueService;
     }
 
     @Override
@@ -48,6 +56,56 @@ public class GitServiceImpl implements GitService, JobProvider {
     @Override
     public boolean isBranchConfiguredForGit(Branch branch) {
         return getBranchConfiguration(branch).isValid();
+    }
+
+    @Override
+    public Ack launchBuildSync(ID branchId) {
+        // Gets the branch
+        Branch branch = structureService.getBranch(branchId);
+        // Gets its configuration
+        GitConfiguration configuration = getBranchConfiguration(branch);
+        // If valid, launches a job
+        if (configuration.isValid()) {
+            return jobQueueService.queue(createBuildSyncJob(branch));
+        }
+        // Else, nothing has happened
+        else {
+            return Ack.NOK;
+        }
+    }
+
+    private Job createBuildSyncJob(Branch branch) {
+        return new Job() {
+            @Override
+            public String getCategory() {
+                return "GitBuildTagSync";
+            }
+
+            @Override
+            public String getId() {
+                return String.valueOf(branch.getId());
+            }
+
+            @Override
+            public String getDescription() {
+                return format(
+                        "Git build/tag synchro for branch %s/%s",
+                        branch.getProject().getName(),
+                        branch.getName()
+                );
+            }
+
+            @Override
+            public int getInterval() {
+                return 0;
+            }
+
+            @Override
+            public JobTask createTask() {
+                // FIXME Method .createTask
+                return null;
+            }
+        }
     }
 
     private GitConfiguration getBranchConfiguration(Branch branch) {
