@@ -137,6 +137,10 @@ angular.module('ot.service.core', [
             self.display('error', message);
         };
 
+        self.info = function (message) {
+            self.display('info', message);
+        };
+
         self.display = function (type, message) {
             $rootScope.notification = {
                 type: type,

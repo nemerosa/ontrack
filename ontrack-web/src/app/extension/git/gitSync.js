@@ -10,7 +10,7 @@ angular.module('ot.extension.git.sync', [
             controller: 'GitSyncCtrl'
         });
     })
-    .controller('GitSyncCtrl', function ($stateParams, $scope, $http, $interpolate, ot, otStructureService) {
+    .controller('GitSyncCtrl', function ($stateParams, $state, $scope, $http, $interpolate, ot, otStructureService, otNotificationService) {
 
         var branchId = $stateParams.branch;
         var view = ot.view();
@@ -29,6 +29,14 @@ angular.module('ot.extension.git.sync', [
 
         // Initialisation
         load();
+
+        // Launching the sync
+        $scope.launchSync = function () {
+            // Message
+            otNotificationService.info("The build synchronisation has been launched in the background.");
+            // Goes back to the branch
+            $state.go('branch', {branchId: branchId});
+        };
 
     })
 ;
