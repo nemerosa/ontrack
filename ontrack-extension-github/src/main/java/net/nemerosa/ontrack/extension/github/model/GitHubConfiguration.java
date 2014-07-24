@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import net.nemerosa.ontrack.extension.support.configurations.UserPasswordConfiguration;
 import net.nemerosa.ontrack.model.form.Form;
@@ -8,6 +9,7 @@ import net.nemerosa.ontrack.model.form.Password;
 import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 
+import static java.lang.String.format;
 import static net.nemerosa.ontrack.model.form.Form.defaultNameField;
 
 @Data
@@ -42,7 +44,7 @@ public class GitHubConfiguration implements UserPasswordConfiguration<GitHubConf
     public ConfigurationDescriptor getDescriptor() {
         return new ConfigurationDescriptor(
                 name,
-                String.format("%s (%s)", name, repository)
+                format("%s (%s)", name, repository)
         );
     }
 
@@ -104,4 +106,20 @@ public class GitHubConfiguration implements UserPasswordConfiguration<GitHubConf
                 .fill("indexationInterval", indexationInterval)
                 ;
     }
+
+    @JsonIgnore
+    public String getRemote() {
+        return format("https://github.com/%s.git", repository);
+    }
+
+    @JsonIgnore
+    public String getCommitLink() {
+        return format("https://github.com/%s/commit/{commit}", repository);
+    }
+
+    @JsonIgnore
+    public String getFileAtCommitLink() {
+        return format("https://github.com/%s/blob/{commit}/{path}", repository);
+    }
+
 }
