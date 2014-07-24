@@ -32,10 +32,12 @@ angular.module('ot.extension.git.sync', [
 
         // Launching the sync
         $scope.launchSync = function () {
-            // Message
-            otNotificationService.info("The build synchronisation has been launched in the background.");
-            // Goes back to the branch
-            $state.go('branch', {branchId: branchId});
+            ot.pageCall($http.post('extension/git/sync/' + branchId, {})).then(function () {
+                // Message
+                otNotificationService.info("The build synchronisation has been launched in the background.");
+                // Goes back to the branch
+                $state.go('branch', {branchId: branchId});
+            });
         };
 
     })
