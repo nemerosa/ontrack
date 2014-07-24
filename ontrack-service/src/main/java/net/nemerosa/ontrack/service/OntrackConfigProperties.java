@@ -17,4 +17,9 @@ public class OntrackConfigProperties {
      */
     private int applicationLogMaxEntries = 1000;
 
+    /**
+     * Home directory
+     */
+    private String applicationWorkingDir = "workingDir";
+
 }

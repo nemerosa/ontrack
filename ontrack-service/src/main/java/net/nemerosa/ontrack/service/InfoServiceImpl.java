@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service;
 
 import net.nemerosa.ontrack.model.structure.Info;
 import net.nemerosa.ontrack.model.structure.InfoService;
+import net.nemerosa.ontrack.model.support.EnvService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

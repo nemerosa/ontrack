@@ -46,4 +46,11 @@ public final class Time {
     public static Date toJavaUtilDate(LocalDateTime localDateTime) {
         return Date.from(localDateTime.toInstant(ZoneOffset.UTC));
     }
+
+    /**
+     * Returns a UTC local date/time from an Epoch time in milliseconds
+     */
+    public static LocalDateTime from(long epochMillis) {
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(epochMillis), ZoneOffset.UTC);
+    }
 }
