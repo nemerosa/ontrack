@@ -20,6 +20,6 @@ public class OntrackConfigProperties {
     /**
      * Home directory
      */
-    private String applicationWorkingDir = "workingDir";
+    private String applicationWorkingDir = "work/files";
 
 }
