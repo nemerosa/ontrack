@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.git.service;
 
+import net.nemerosa.ontrack.extension.git.client.GitClient;
+import net.nemerosa.ontrack.extension.git.client.GitClientFactory;
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.git.model.GitConfigurator;
 import net.nemerosa.ontrack.model.job.*;
@@ -12,16 +14,20 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import static java.lang.String.format;
+
 @Service
 public class GitServiceImpl implements GitService, JobProvider {
 
     private final StructureService structureService;
     private final Collection<GitConfigurator> configurators;
+    private final GitClientFactory gitClientFactory;
 
     @Autowired
-    public GitServiceImpl(StructureService structureService, Collection<GitConfigurator> configurators) {
+    public GitServiceImpl(StructureService structureService, Collection<GitConfigurator> configurators, GitClientFactory gitClientFactory) {
         this.structureService = structureService;
         this.configurators = configurators;
+        this.gitClientFactory = gitClientFactory;
     }
 
     @Override
@@ -45,6 +51,15 @@ public class GitServiceImpl implements GitService, JobProvider {
         for (GitConfigurator configurator : configurators) {
             configuration = configurator.configure(configuration, branch);
         }
+        // Unique name
+        configuration = configuration.withName(
+                format(
+                        "%s/%s/%s",
+                        branch.getProject().getName(),
+                        branch.getName(),
+                        configuration.getRemote()
+                )
+        );
         // OK
         return configuration;
     }
@@ -63,7 +78,7 @@ public class GitServiceImpl implements GitService, JobProvider {
 
             @Override
             public String getDescription() {
-                return String.format(
+                return format(
                         "Git indexation for %s",
                         config.getName()
                 );
@@ -84,8 +99,11 @@ public class GitServiceImpl implements GitService, JobProvider {
     }
 
     private void index(GitConfiguration config, JobInfoListener info) {
-        // FIXME Method net.nemerosa.ontrack.extension.git.service.GitServiceImpl.index
-
+        info.post(format("Git sync for %s", config.getName()));
+        // Gets the client for this configuration
+        GitClient client = gitClientFactory.getClient(config);
+        // Launches the synchronisation
+        client.sync(info::post);
     }
 
 }

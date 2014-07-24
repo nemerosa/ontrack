@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import java.util.Collection;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public interface GitClient {
@@ -16,7 +17,7 @@ public interface GitClient {
 
     GitCommit toCommit(RevCommit revCommit);
 
-    void sync();
+    void sync(Consumer<String> logger);
 
     GitDiff diff(String from, String to);
 

@@ -6,6 +6,7 @@ import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import java.io.File;
+import java.util.function.Consumer;
 
 public interface GitRepository {
 
@@ -17,7 +18,7 @@ public interface GitRepository {
 
     String getId();
 
-    void sync() throws GitAPIException;
+    void sync(Consumer<String> logger) throws GitAPIException;
 
     Git git();
 

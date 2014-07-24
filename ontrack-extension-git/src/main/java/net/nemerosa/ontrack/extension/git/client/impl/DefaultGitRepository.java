@@ -8,16 +8,16 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.function.Consumer;
+
+import static java.lang.String.format;
 
 public class DefaultGitRepository implements GitRepository {
 
-    private final Logger logger = LoggerFactory.getLogger(GitRepository.class);
     private final File wd;
     private final String remote;
     private final String branch;
@@ -52,14 +52,14 @@ public class DefaultGitRepository implements GitRepository {
     }
 
     @Override
-    public synchronized void sync() throws GitAPIException {
+    public synchronized void sync(Consumer<String> logger) throws GitAPIException {
         // Clone or update?
         if (new File(wd, ".git").exists()) {
             // Fetch
-            fetch();
+            fetch(logger);
         } else {
             // Clone
-            cloneRemote();
+            cloneRemote(logger);
         }
     }
 
@@ -96,8 +96,8 @@ public class DefaultGitRepository implements GitRepository {
         }
     }
 
-    protected synchronized void cloneRemote() throws GitAPIException {
-        logger.debug("[git] Cloning {} into {}", remote, wd);
+    protected synchronized void cloneRemote(Consumer<String> logger) throws GitAPIException {
+        logger.accept(format("[git] Cloning %s into %s", remote, wd));
         new CloneCommand()
                 .setDirectory(wd)
                 .setURI(remote)
@@ -108,13 +108,13 @@ public class DefaultGitRepository implements GitRepository {
             throw new GitCannotCloneException(wd);
         }
         // Done
-        logger.debug("[git] Clone done for {}", remote);
+        logger.accept(format("[git] Clone done for %s", remote));
     }
 
-    protected synchronized void fetch() throws GitAPIException {
-        logger.debug("[git] Fetching {} into {}", remote, wd);
+    protected synchronized void fetch(Consumer<String> logger) throws GitAPIException {
+        logger.accept(format("[git] Fetching %s into %s", remote, wd));
         git().fetch().call();
-        logger.debug("[git] Fetching done for {}", remote);
+        logger.accept(format("[git] Fetching done for %s", remote));
     }
 
 }

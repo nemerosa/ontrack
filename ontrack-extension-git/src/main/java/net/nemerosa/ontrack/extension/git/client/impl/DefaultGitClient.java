@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class DefaultGitClient implements GitClient {
@@ -336,9 +337,9 @@ public class DefaultGitClient implements GitClient {
     }
 
     @Override
-    public void sync() {
+    public void sync(Consumer<String> logger) {
         try {
-            repository.sync();
+            repository.sync(logger);
         } catch (GitAPIException e) {
             throw translationException(e);
         }
