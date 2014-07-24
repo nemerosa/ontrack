@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.job.*;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.StructureService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,6 +45,11 @@ public class GitServiceImpl implements GitService, JobProvider {
         return jobs;
     }
 
+    @Override
+    public boolean isBranchConfiguredForGit(Branch branch) {
+        return getBranchConfiguration(branch).isValid();
+    }
+
     private GitConfiguration getBranchConfiguration(Branch branch) {
         // Empty configuration
         GitConfiguration configuration = GitConfiguration.empty();
@@ -52,14 +58,16 @@ public class GitServiceImpl implements GitService, JobProvider {
             configuration = configurator.configure(configuration, branch);
         }
         // Unique name
-        configuration = configuration.withName(
-                format(
-                        "%s/%s/%s",
-                        branch.getProject().getName(),
-                        branch.getName(),
-                        configuration.getRemote()
-                )
-        );
+        if (StringUtils.isNotBlank(configuration.getRemote())) {
+            configuration = configuration.withName(
+                    format(
+                            "%s/%s/%s",
+                            branch.getProject().getName(),
+                            branch.getName(),
+                            configuration.getRemote()
+                    )
+            );
+        }
         // OK
         return configuration;
     }
