@@ -1,7 +1,8 @@
 angular.module('ot.extension.git.changelog', [
     'ui.router',
     'ot.service.core',
-    'ot.service.structure'
+    'ot.service.structure',
+    'ot.service.plot'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('git-changelog', {
@@ -65,7 +66,7 @@ angular.module('ot.extension.git.changelog', [
         });
 
     })
-    .directive('gitPlot', function () {
+    .directive('gitPlot', function (otPlot) {
         return {
             restrict: 'A',
             scope: {
@@ -75,7 +76,7 @@ angular.module('ot.extension.git.changelog', [
                 scope.$watch('gitPlot',
                     function () {
                         if (scope.gitPlot) {
-                            console.log('DRAWING', scope.gitPlot);
+                            otPlot.draw(element[0], scope.gitPlot);
                         }
                     }
                 );
