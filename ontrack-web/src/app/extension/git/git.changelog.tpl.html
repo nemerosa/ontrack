@@ -70,15 +70,17 @@
                                 Commits are loading...
                             </div>
                         </div>
-                        <table border="1" class="table" ng-show="commits">
+                        <table ng-show="commits" class="table">
                             <tbody>
                             <tr>
                                 <td valign="top">
                                     <table class="table table-condensed">
                                         <thead>
-                                        <th>
-                                            &nbsp;
-                                        </th>
+                                        <tr>
+                                            <th>
+                                                &nbsp;
+                                            </th>
+                                        </tr>
                                         </thead>
                                         <tbody>
                                         <tr>
@@ -90,7 +92,7 @@
                                     </table>
                                 </td>
                                 <td valign="top">
-                                    <table class="table table-condensed table-hover">
+                                    <table class="ot-extension-git-changelog-commits">
                                         <thead>
                                         <tr>
                                             <th>#</th>
