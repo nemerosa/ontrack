@@ -3,12 +3,14 @@ package net.nemerosa.ontrack.extension.git;
 import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.git.service.GitConfigurationService;
+import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
@@ -23,16 +25,19 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 @RequestMapping("extension/git")
 public class GitController extends AbstractExtensionController<GitExtensionFeature> {
 
+    private final GitService gitService;
     private final GitConfigurationService configurationService;
     private final IssueServiceRegistry issueServiceRegistry;
     private final SecurityService securityService;
 
     @Autowired
     public GitController(GitExtensionFeature feature,
+                         GitService gitService,
                          GitConfigurationService configurationService,
                          IssueServiceRegistry issueServiceRegistry,
                          SecurityService securityService) {
         super(feature);
+        this.gitService = gitService;
         this.configurationService = configurationService;
         this.issueServiceRegistry = issueServiceRegistry;
         this.securityService = securityService;
@@ -111,5 +116,13 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
     public GitConfiguration updateConfiguration(@PathVariable String name, @RequestBody GitConfiguration configuration) {
         configurationService.updateConfiguration(name, configuration);
         return getConfiguration(name);
+    }
+
+    /**
+     * Launches the build synchronisation for a branch.
+     */
+    @RequestMapping(value = "sync/{branchId}", method = RequestMethod.POST)
+    public Ack launchBuildSync(@PathVariable ID branchId) {
+        return gitService.launchBuildSync(branchId);
     }
 }
