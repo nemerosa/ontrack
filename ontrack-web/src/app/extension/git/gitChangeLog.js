@@ -65,4 +65,21 @@ angular.module('ot.extension.git.changelog', [
         });
 
     })
+    .directive('gitPlot', function () {
+        return {
+            restrict: 'A',
+            scope: {
+                gitPlot: '='
+            },
+            link: function (scope, element) {
+                scope.$watch('gitPlot',
+                    function () {
+                        if (scope.gitPlot) {
+                            console.log('DRAWING', scope.gitPlot);
+                        }
+                    }
+                );
+            }
+        };
+    })
 ;
