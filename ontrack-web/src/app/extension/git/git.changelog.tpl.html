@@ -46,19 +46,21 @@
                         <div class="panel-heading clearfix">
                             Commits
                             <div class="pull-right">
-                                <a class="btn btn-default btn-xs" ng-if="changeLog._issues" ng-click="changeLogIssues()" ng-disabled="issuesLoading">
+                                <a class="btn btn-default btn-xs" ng-if="changeLog._issues" ng-click="changeLogIssues()"
+                                   ng-disabled="issuesLoading">
                                     <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="issues"></span>
                                     <span class="ot-extension-scm-changelog-command-loading"></span>
                                     {{issuesCommand}}
                                 </a>
-                                <a class="btn btn-default btn-xs" ng-click="changeLogFiles()" ng-disabled="filesLoading">
+                                <a class="btn btn-default btn-xs" ng-click="changeLogFiles()"
+                                   ng-disabled="filesLoading">
                                     <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="files"></span>
                                     <span class="ot-extension-scm-changelog-command-loading"></span>
                                     {{filesCommand}}
                                 </a>
                             </div>
                         </div>
-                        <div class="panel-body">
+                        <div class="panel-body" ng-hide="commits">
                             <div class="alert alert-warning" ng-hide="commits || commitsLoading">
                                 No commit has been loaded yet. Click
                                 <a ng-click="changeLogCommits()" class="ot-action">here</a>
@@ -67,8 +69,58 @@
                             <div class="ot-description" ng-show="commitsLoading">
                                 Commits are loading...
                             </div>
-                            <!-- TODO Commits -->
                         </div>
+                        <table border="1" class="table" ng-show="commits">
+                            <tbody>
+                            <tr>
+                                <td valign="top">
+                                    <table class="table table-condensed">
+                                        <thead>
+                                        <th>
+                                            &nbsp;
+                                        </th>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td>
+                                                GRAPH
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                                <td valign="top">
+                                    <table class="table table-condensed table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Author</th>
+                                            <th>Message</th>
+                                            <th>Date</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="gitUICommit in commits.log.commits">
+                                            <td>
+                                                <code>{{gitUICommit.commit.id}}</code>
+                                            </td>
+                                            <td>
+                                                {{gitUICommit.commit.author.name}}
+                                            </td>
+                                            <td>
+                                                {{gitUICommit.annotatedMessage}}
+                                            </td>
+                                            <td>
+                                                {{gitUICommit.commit.commitTime | date:'mediumDate'}}
+                                                {{gitUICommit.commit.commitTime | date:'shortTime'}}
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
