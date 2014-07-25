@@ -12,231 +12,23 @@
             <!-- Main content -->
             <div class="row">
                 <div class="col-md-12 ot-extension-scm-changelog-commands">
-                    <button class="btn btn-default" ng-click="changeLogRevisions()" ng-disabled="revisionsLoading">
-                        <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="revisions"></span>
-                        <span class="ot-extension-scm-changelog-command-loading"></span>
-                        {{revisionsCommand}}
-                    </button>
-                    <button ng-if="changeLog._issues" class="btn btn-default" ng-click="changeLogIssues()" ng-disabled="issuesLoading">
-                        <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="issues"></span>
-                        <span class="ot-extension-scm-changelog-command-loading"></span>
-                        {{issuesCommand}}
-                    </button>
-                    <button class="btn btn-default" ng-click="changeLogFiles()" ng-disabled="filesLoading">
-                        <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="files"></span>
-                        <span class="ot-extension-scm-changelog-command-loading"></span>
-                        {{filesCommand}}
-                    </button>
                 </div>
             </div>
 
             <!-- Build info -->
+
             <div class="row">
                 <div class="col-md-6">
                     <a name="buildFrom"></a>
                     <ot-scm-changelog-build scm-build-view="changeLog.scmBuildFrom">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <h3>
-                                    <small>History</small>
-                                </h3>
-                                <ul class="ot-extension-svn-build-history">
-                                    <li ng-repeat="reference in changeLog.scmBuildFrom.scm.references">
-                                        <a href="{{reference.url}}">
-                                            {{reference.path}}
-                                            @
-                                            {{reference.revision}}
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
+                        TODO Git info
                     </ot-scm-changelog-build>
                 </div>
                 <div class="col-md-6">
                     <a id="buildTo"></a>
                     <ot-scm-changelog-build scm-build-view="changeLog.scmBuildTo">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <h3>
-                                    <small>History</small>
-                                </h3>
-                                <ul class="ot-extension-svn-build-history">
-                                    <li ng-repeat="reference in changeLog.scmBuildTo.scm.references">
-                                        <a href="{{reference.url}}">
-                                            {{reference.path}}
-                                            @
-                                            {{reference.revision}}
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
+                        TODO Git info
                     </ot-scm-changelog-build>
-                </div>
-            </div>
-
-            <!-- Revision sections -->
-            <div class="row">
-                <div class="col-md-12">
-                    <a name="revisions"></a>
-
-                    <div class="panel panel-default">
-                        <div class="panel-heading clearfix">
-                            Revisions
-                            <div class="pull-right">
-                                <a class="btn btn-default btn-xs" ng-if="changeLog._issues" ng-click="changeLogIssues()" ng-disabled="issuesLoading">
-                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="issues"></span>
-                                    <span class="ot-extension-scm-changelog-command-loading"></span>
-                                    {{issuesCommand}}
-                                </a>
-                                <a class="btn btn-default btn-xs" ng-click="changeLogFiles()" ng-disabled="filesLoading">
-                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="files"></span>
-                                    <span class="ot-extension-scm-changelog-command-loading"></span>
-                                    {{filesCommand}}
-                                </a>
-                            </div>
-                        </div>
-                        <div class="panel-body">
-                            <div class="alert alert-warning" ng-hide="revisions || revisionsLoading">
-                                No revision has been loaded yet. Click
-                                <a ng-click="changeLogRevisions()" class="ot-action">here</a>
-                                to load them.
-                            </div>
-                            <div class="ot-description" ng-show="revisionsLoading">
-                                Revisions are loading...
-                            </div>
-                            <!-- TODO Merge -->
-                            <table class="table table-condensed table-hover" ng-show="revisions">
-                                <thead>
-                                <tr>
-                                    <th>Revision</th>
-                                    <th>Author</th>
-                                    <th>Date</th>
-                                    <th>Message</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr ng-repeat="svnChangeLogRevision in revisions.list">
-                                    <td>
-                                        <a href="{{svnChangeLogRevision.revisionUrl}}" target="_blank">
-                                            {{svnChangeLogRevision.revision}}
-                                        </a>
-                                    </td>
-                                    <td>
-                                        {{svnChangeLogRevision.author}}
-                                    </td>
-                                    <td>
-                                        {{svnChangeLogRevision.revisionDate | date:'mediumDate'}}
-                                        {{svnChangeLogRevision.revisionDate | date:'shortTime'}}
-                                    </td>
-                                    <td ng-bind-html="svnChangeLogRevision.formattedMessage">
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Issue sections -->
-            <div class="row" ng-if="changeLog._issues">
-                <div class="col-md-12">
-                    <a name="issues"></a>
-
-                    <div class="panel panel-default">
-                        <div class="panel-heading clearfix">
-                            Issues
-                            <div class="pull-right">
-                                <a class="btn btn-default btn-xs" ng-click="changeLogRevisions()" ng-disabled="revisionsLoading">
-                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="revisions"></span>
-                                    <span class="ot-extension-scm-changelog-command-loading"></span>
-                                    {{revisionsCommand}}
-                                </a>
-                                <a class="btn btn-default btn-xs" ng-click="changeLogFiles()" ng-disabled="filesLoading">
-                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="files"></span>
-                                    <span class="ot-extension-scm-changelog-command-loading"></span>
-                                    {{filesCommand}}
-                                </a>
-                            </div>
-                        </div>
-                        <div class="panel-body">
-                            <div class="alert alert-warning" ng-hide="issues || issuesLoading">
-                                No issue has been loaded yet. Click
-                                <a ng-click="changeLogIssues()" class="ot-action">here</a>
-                                to load them.
-                            </div>
-                            <div class="ot-description" ng-show="issuesLoading">
-                                Issues are loading...
-                            </div>
-                            <div ng-show="issues">
-                                <ot-include value="issues" template="app/extension/{{issues.issueServiceConfiguration.serviceId}}/changelog.issues.tpl.html">
-                                </ot-include>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Files sections -->
-            <div class="row">
-                <div class="col-md-12">
-                    <a name="files"></a>
-
-                    <div class="panel panel-default">
-                        <div class="panel-heading clearfix">
-                            File changes
-                            <div class="pull-right">
-                                <a class="btn btn-default btn-xs" ng-click="changeLogRevisions()" ng-disabled="revisionsLoading">
-                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="revisions"></span>
-                                    <span class="ot-extension-scm-changelog-command-loading"></span>
-                                    {{revisionsCommand}}
-                                </a>
-                                <a class="btn btn-default btn-xs" ng-if="changeLog._issues" ng-click="changeLogIssues()" ng-disabled="issuesLoading">
-                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="issues"></span>
-                                    <span class="ot-extension-scm-changelog-command-loading"></span>
-                                    {{issuesCommand}}
-                                </a>
-                            </div>
-                        </div>
-                        <div class="panel-body" ng-hide="files || filesLoading">
-                            <div class="alert alert-warning">
-                                No file change has been loaded yet. Click
-                                <a ng-click="changeLogFiles()" class="ot-action">here</a>
-                                to load them.
-                            </div>
-                        </div>
-                        <div class="panel-body ot-description" ng-show="filesLoading">
-                            File changes are loading...
-                        </div>
-                        <table class="table table-condensed table-hover" ng-show="files" width="100%">
-                            <thead>
-                            <tr>
-                                <th>File</th>
-                                <th>Changes</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr ng-repeat="svnChangeLogFile in files.list">
-                                <td>
-                                    <a href="{{svnChangeLogFile.url}}">
-                                        {{svnChangeLogFile.path | otExtensionScmTruncatePath:50}}
-                                    </a>
-                                </td>
-                                <td>
-                                    <span ng-repeat="svnChangeLogFileChange in svnChangeLogFile.changes" class="ot-svn-changelog-revision ot-svn-changetype-{{svnChangeLogFileChange.changeType | lowercase}}">
-                                        <span class="ot-svn-changetype-icon"></span>
-                                        <a href="{{svnChangeLogFileChange.url}}"
-                                           title="{{svnChangeLogFileChange.revisionInfo.message}} ({{svnChangeLogFileChange.revisionInfo.dateTime | date:'mediumDate'}})">
-                                            {{svnChangeLogFileChange.revisionInfo.revision}}
-                                        </a>
-                                    </span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
                 </div>
             </div>
 
