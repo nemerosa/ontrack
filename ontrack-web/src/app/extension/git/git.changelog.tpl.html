@@ -12,6 +12,11 @@
             <!-- Main content -->
             <div class="row">
                 <div class="col-md-12 ot-extension-scm-changelog-commands">
+                    <button class="btn btn-default" ng-click="changeLogCommits()" ng-disabled="commitsLoading">
+                        <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="commits"></span>
+                        <span class="ot-extension-scm-changelog-command-loading"></span>
+                        {{commitsCommand}}
+                    </button>
                 </div>
             </div>
 
@@ -29,6 +34,42 @@
                     <ot-scm-changelog-build scm-build-view="changeLog.scmBuildTo">
                         TODO Git info
                     </ot-scm-changelog-build>
+                </div>
+            </div>
+
+            <!-- Commits sections -->
+            <div class="row">
+                <div class="col-md-12">
+                    <a name="commits"></a>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading clearfix">
+                            Commits
+                            <div class="pull-right">
+                                <a class="btn btn-default btn-xs" ng-if="changeLog._issues" ng-click="changeLogIssues()" ng-disabled="issuesLoading">
+                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="issues"></span>
+                                    <span class="ot-extension-scm-changelog-command-loading"></span>
+                                    {{issuesCommand}}
+                                </a>
+                                <a class="btn btn-default btn-xs" ng-click="changeLogFiles()" ng-disabled="filesLoading">
+                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="files"></span>
+                                    <span class="ot-extension-scm-changelog-command-loading"></span>
+                                    {{filesCommand}}
+                                </a>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="alert alert-warning" ng-hide="commits || commitsLoading">
+                                No commit has been loaded yet. Click
+                                <a ng-click="changeLogCommits()" class="ot-action">here</a>
+                                to load them.
+                            </div>
+                            <div class="ot-description" ng-show="commitsLoading">
+                                Commits are loading...
+                            </div>
+                            <!-- TODO Commits -->
+                        </div>
+                    </div>
                 </div>
             </div>
 

@@ -40,6 +40,28 @@ angular.module('ot.extension.git.changelog', [
 
         ot.pageCall($http.get(path, {params: $scope.buildDiffRequest})).then(function (changeLog) {
             $scope.changeLog = changeLog;
+
+            $scope.commitsCommand = "Commits";
+            $scope.issuesCommand = "Issues";
+            $scope.filesCommand = "File changes";
+
+            // Loading the commits if needed
+            $scope.changeLogCommits = function () {
+                if (!$scope.commits) {
+                    $scope.commitsLoading = true;
+                    $scope.commitsCommand = "Loading the commits...";
+                    ot.pageCall($http.get($scope.changeLog._commits)).then(function (commits) {
+                        $scope.commits = commits;
+                        $scope.commitsLoading = false;
+                        $scope.commitsCommand = "Commits";
+                        $location.hash('commits');
+                        $anchorScroll();
+                    });
+                } else {
+                    $location.hash('commits');
+                    $anchorScroll();
+                }
+            };
         });
 
     })
