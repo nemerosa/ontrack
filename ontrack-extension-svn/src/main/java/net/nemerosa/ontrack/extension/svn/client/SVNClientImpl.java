@@ -76,11 +76,6 @@ public class SVNClientImpl implements SVNClient {
     }
 
     @Override
-    public boolean isTrunkOrBranch(SVNRepository repository, String path) {
-        return isTrunk(path) || isBranch(repository, path);
-    }
-
-    @Override
     public List<Long> getMergedRevisions(SVNRepository repository, SVNURL url, long revision) {
         // Checks that the URL exists at both R-1 and R
         SVNRevision rm1 = SVNRevision.create(revision - 1);
@@ -263,6 +258,11 @@ public class SVNClientImpl implements SVNClient {
     }
 
     @Override
+    public boolean isTrunkOrBranch(SVNRepository repository, String path) {
+        return isTrunk(path) || isBranch(repository, path);
+    }
+
+    @Override
     public boolean isTagOrBranch(SVNRepository repository, String path) {
         return isTag(repository, path) || isBranch(repository, path);
     }
@@ -281,7 +281,7 @@ public class SVNClientImpl implements SVNClient {
     }
 
     private boolean isTrunk(String path) {
-        return isPathOK(".+/trunk", path);
+        return isPathOK(".*/trunk", path);
     }
 
     private SVNClientException translateSVNException(SVNException e) {
