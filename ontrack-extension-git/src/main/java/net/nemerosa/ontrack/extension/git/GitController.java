@@ -1,12 +1,17 @@
 package net.nemerosa.ontrack.extension.git;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
+import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
+import net.nemerosa.ontrack.extension.git.model.GitChangeLog;
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.git.service.GitConfigurationService;
 import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.model.Ack;
+import net.nemerosa.ontrack.model.buildfilter.BuildDiff;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -19,6 +24,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
+import java.util.concurrent.TimeUnit;
+
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
@@ -29,6 +36,8 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
     private final GitConfigurationService configurationService;
     private final IssueServiceRegistry issueServiceRegistry;
     private final SecurityService securityService;
+
+    private final Cache<String, GitChangeLog> logCache;
 
     @Autowired
     public GitController(GitExtensionFeature feature,
@@ -41,6 +50,11 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
         this.configurationService = configurationService;
         this.issueServiceRegistry = issueServiceRegistry;
         this.securityService = securityService;
+        // Cache
+        logCache = CacheBuilder.newBuilder()
+                .maximumSize(20)
+                .expireAfterAccess(10, TimeUnit.MINUTES)
+                .build();
     }
 
     @Override
@@ -124,5 +138,17 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
     @RequestMapping(value = "sync/{branchId}", method = RequestMethod.POST)
     public Ack launchBuildSync(@PathVariable ID branchId) {
         return gitService.launchBuildSync(branchId);
+    }
+
+    /**
+     * Change log entry point
+     */
+    @RequestMapping(value = "changelog", method = RequestMethod.GET)
+    public BuildDiff changeLog(BuildDiffRequest request) {
+        GitChangeLog changeLog = gitService.changeLog(request);
+        // Stores in cache
+        logCache.put(changeLog.getUuid(), changeLog);
+        // OK
+        return changeLog;
     }
 }

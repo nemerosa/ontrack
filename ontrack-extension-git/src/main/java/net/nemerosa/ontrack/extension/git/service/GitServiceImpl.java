@@ -1,46 +1,58 @@
 package net.nemerosa.ontrack.extension.git.service;
 
+import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.git.client.GitClient;
 import net.nemerosa.ontrack.extension.git.client.GitClientFactory;
 import net.nemerosa.ontrack.extension.git.client.GitTag;
+import net.nemerosa.ontrack.extension.git.model.GitBuildInfo;
+import net.nemerosa.ontrack.extension.git.model.GitChangeLog;
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.git.model.GitConfigurator;
+import net.nemerosa.ontrack.extension.scm.changelog.AbstractSCMChangeLogService;
+import net.nemerosa.ontrack.extension.scm.changelog.SCMBuildView;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.job.*;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.tx.Transaction;
+import net.nemerosa.ontrack.tx.TransactionService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.lang.String.format;
 
 @Service
-public class GitServiceImpl implements GitService, JobProvider {
+public class GitServiceImpl extends AbstractSCMChangeLogService implements GitService, JobProvider {
 
-    private final StructureService structureService;
     private final Collection<GitConfigurator> configurators;
     private final GitClientFactory gitClientFactory;
     private final JobQueueService jobQueueService;
     private final SecurityService securityService;
+    private final TransactionService transactionService;
 
     @Autowired
     public GitServiceImpl(
             StructureService structureService,
             Collection<GitConfigurator> configurators,
             GitClientFactory gitClientFactory,
-            JobQueueService jobQueueService, SecurityService securityService) {
-        this.structureService = structureService;
+            JobQueueService jobQueueService,
+            SecurityService securityService,
+            TransactionService transactionService) {
+        super(structureService);
         this.configurators = configurators;
         this.gitClientFactory = gitClientFactory;
         this.jobQueueService = jobQueueService;
         this.securityService = securityService;
+        this.transactionService = transactionService;
     }
 
     @Override
@@ -76,6 +88,31 @@ public class GitServiceImpl implements GitService, JobProvider {
         else {
             return Ack.NOK;
         }
+    }
+
+    @Override
+    @Transactional
+    public GitChangeLog changeLog(BuildDiffRequest request) {
+        try (Transaction ignored = transactionService.start()) {
+            Branch branch = structureService.getBranch(request.getBranch());
+            GitConfiguration configuration = getBranchConfiguration(branch);
+            return new GitChangeLog(
+                    UUID.randomUUID().toString(),
+                    branch,
+                    configuration,
+                    getSCMBuildView(configuration, branch, request.getFrom()),
+                    getSCMBuildView(configuration, branch, request.getTo())
+            );
+        }
+    }
+
+    private SCMBuildView<GitBuildInfo> getSCMBuildView(GitConfiguration configuration, Branch branch, ID buildId) {
+        // Gets the build view
+        BuildView buildView = getBuildView(buildId);
+        // TODO Gets the history for the build
+        // SVNHistory history = getBuildSVNHistory(svnRepository, buildView.getBuild());
+        // OK
+        return new SCMBuildView<>(buildView, new GitBuildInfo());
     }
 
     private GitConfiguration getBranchConfiguration(Branch branch) {
