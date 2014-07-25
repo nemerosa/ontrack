@@ -5,6 +5,7 @@ import com.google.common.cache.CacheBuilder;
 import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
+import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogUUIDException;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.extension.svn.service.*;
@@ -272,7 +273,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
         if (changeLog != null) {
             return changeLog;
         } else {
-            throw new SVNChangeLogUUIDException(uuid);
+            throw new SCMChangeLogUUIDException(uuid);
         }
     }
 

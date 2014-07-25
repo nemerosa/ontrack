@@ -5,10 +5,12 @@ import com.google.common.cache.CacheBuilder;
 import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.git.model.GitChangeLog;
+import net.nemerosa.ontrack.extension.git.model.GitChangeLogCommits;
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.git.service.GitConfigurationService;
 import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
+import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogUUIDException;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.buildfilter.BuildDiff;
@@ -150,5 +152,34 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
         logCache.put(changeLog.getUuid(), changeLog);
         // OK
         return changeLog;
+    }
+
+    private GitChangeLog getChangeLog(String uuid) {
+        GitChangeLog changeLog = logCache.getIfPresent(uuid);
+        if (changeLog != null) {
+            return changeLog;
+        } else {
+            throw new SCMChangeLogUUIDException(uuid);
+        }
+    }
+
+    /**
+     * Change log commits
+     */
+    @RequestMapping(value = "changelog/{uuid}/commits", method = RequestMethod.GET)
+    public GitChangeLogCommits changeLogCommits(@PathVariable String uuid) {
+        // Gets the change log
+        GitChangeLog changeLog = getChangeLog(uuid);
+        // Cached?
+        GitChangeLogCommits commits = changeLog.getCommits();
+        if (commits != null) {
+            return commits;
+        }
+        // Loads the revisions
+        commits = gitService.getChangeLogRevisions(changeLog);
+        // Stores in cache
+        logCache.put(uuid, changeLog.withRevisions(commits));
+        // OK
+        return commits;
     }
 }

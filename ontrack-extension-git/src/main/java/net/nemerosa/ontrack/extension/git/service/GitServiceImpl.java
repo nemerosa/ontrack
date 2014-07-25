@@ -1,13 +1,8 @@
 package net.nemerosa.ontrack.extension.git.service;
 
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
-import net.nemerosa.ontrack.extension.git.client.GitClient;
-import net.nemerosa.ontrack.extension.git.client.GitClientFactory;
-import net.nemerosa.ontrack.extension.git.client.GitTag;
-import net.nemerosa.ontrack.extension.git.model.GitBuildInfo;
-import net.nemerosa.ontrack.extension.git.model.GitChangeLog;
-import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
-import net.nemerosa.ontrack.extension.git.model.GitConfigurator;
+import net.nemerosa.ontrack.extension.git.client.*;
+import net.nemerosa.ontrack.extension.git.model.*;
 import net.nemerosa.ontrack.extension.scm.changelog.AbstractSCMChangeLogService;
 import net.nemerosa.ontrack.extension.scm.changelog.SCMBuildView;
 import net.nemerosa.ontrack.model.Ack;
@@ -21,12 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -104,6 +97,50 @@ public class GitServiceImpl extends AbstractSCMChangeLogService implements GitSe
                     getSCMBuildView(configuration, branch, request.getTo())
             );
         }
+    }
+
+    @Override
+    public GitChangeLogCommits getChangeLogRevisions(GitChangeLog changeLog) {
+        // Gets the branch
+        Branch branch = changeLog.getBranch();
+        // Gets the client client for this branch
+        GitClient gitClient = gitClientFactory.getClient(changeLog.getScmBranch());
+        // Gets the configuration
+        GitConfiguration gitConfiguration = changeLog.getScmBranch();
+        // Gets the tag boundaries
+        String tagFrom = changeLog.getFrom().getBuild().getName();
+        String tagTo = changeLog.getTo().getBuild().getName();
+        // TODO Tag pattern
+//        String tagPattern = gitConfiguration.getTag();
+//        if (StringUtils.isNotBlank(tagPattern)) {
+//            tagFrom = StringUtils.replace(tagPattern, "*", tagFrom);
+//            tagTo = StringUtils.replace(tagPattern, "*", tagTo);
+//        }
+        // Gets the commits
+        GitLog log = gitClient.log(tagFrom, tagTo);
+        List<GitCommit> commits = log.getCommits();
+        List<GitUICommit> uiCommits = toUICommits(branch, gitConfiguration, commits);
+        return new GitChangeLogCommits(
+                new GitUILog(
+                        log.getPlot(),
+                        uiCommits
+                )
+        );
+    }
+
+    private List<GitUICommit> toUICommits(Branch branch, GitConfiguration gitConfiguration, List<GitCommit> commits) {
+        // Link?
+        String commitLink = gitConfiguration.getCommitLink();
+        // OK
+        return commits.stream()
+                // TODO Annotations
+                .map(commit -> new GitUICommit(
+                        commit,
+                        commit.getShortMessage(),
+                        commit.getFullMessage(),
+                        StringUtils.replace(commitLink, "{commit}", commit.getId())
+                ))
+                .collect(Collectors.toList());
     }
 
     private SCMBuildView<GitBuildInfo> getSCMBuildView(GitConfiguration configuration, Branch branch, ID buildId) {
