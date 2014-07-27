@@ -9,6 +9,8 @@ import net.nemerosa.ontrack.extension.jira.client.JIRAClientImpl;
 import net.nemerosa.ontrack.extension.jira.model.JIRAIssue;
 import net.nemerosa.ontrack.extension.jira.tx.JIRASession;
 import net.nemerosa.ontrack.extension.jira.tx.JIRASessionFactory;
+import net.nemerosa.ontrack.model.support.MessageAnnotationUtils;
+import net.nemerosa.ontrack.model.support.MessageAnnotator;
 import net.nemerosa.ontrack.tx.DefaultTransactionService;
 import net.nemerosa.ontrack.tx.TransactionService;
 import org.junit.Before;
@@ -18,10 +20,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -79,10 +81,12 @@ public class JIRAServiceExtensionTest {
 //    }
 
     @Test
-    public void formatIssuesInMessage() {
+    public void getMessageAnnotator() {
         JIRAConfiguration config = jiraConfiguration();
+        Optional<MessageAnnotator> annotator = service.getMessageAnnotator(config);
+        assertTrue(annotator.isPresent());
+        String message = MessageAnnotationUtils.annotate("TEST-12, PRJ-12, PRJ-13 List of issues", Collections.singletonList(annotator.get()));
         // TODO List of excluded projects and issues
-        String message = service.formatIssuesInMessage(config, "TEST-12, PRJ-12, PRJ-13 List of issues");
         assertEquals("<a href=\"http://jira/browse/TEST-12\">TEST-12</a>, <a href=\"http://jira/browse/PRJ-12\">PRJ-12</a>, <a href=\"http://jira/browse/PRJ-13\">PRJ-13</a> List of issues", message);
     }
 

@@ -3,8 +3,10 @@ package net.nemerosa.ontrack.extension.issues;
 import net.nemerosa.ontrack.extension.api.Extension;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
+import net.nemerosa.ontrack.model.support.MessageAnnotator;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -56,14 +58,10 @@ public interface IssueServiceExtension extends Extension {
     Set<String> extractIssueKeysFromMessage(IssueServiceConfiguration issueServiceConfiguration, String message);
 
     /**
-     * Given a message, returns this message where issues have been replaced
-     * by hyperlinks to a page that can display details about this issue.
-     *
-     * @param issueServiceConfiguration Configuration for the service
-     * @param message                   Message to format
-     * @return Formatted message
+     * Returns a message annotator that can be used to extract information from a commit message. According
+     * to the service type and its configuration, they could be or not a possible annotator.
      */
-    String formatIssuesInMessage(IssueServiceConfiguration issueServiceConfiguration, String message);
+    Optional<MessageAnnotator> getMessageAnnotator(IssueServiceConfiguration issueServiceConfiguration);
 
     /**
      * Given a list of issues, returns a link that allows the user to display the list of

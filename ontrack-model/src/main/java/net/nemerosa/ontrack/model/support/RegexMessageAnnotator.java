@@ -34,7 +34,7 @@ public class RegexMessageAnnotator extends AbstractMessageAnnotator {
                 annotations.add(MessageAnnotation.t(previous));
             }
             // Match
-            String match = m.group(1);
+            String match = m.group();
             MessageAnnotation annotation = annotationFactory.apply(match);
             annotations.add(annotation);
             // Next

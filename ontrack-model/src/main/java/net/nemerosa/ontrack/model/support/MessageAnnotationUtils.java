@@ -11,17 +11,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 
 public final class MessageAnnotationUtils {
-
-    public static List<String> annotate(List<String> texts, final List<? extends MessageAnnotator> messageAnnotators) {
-        return texts.stream()
-                .map(text -> annotate(text, messageAnnotators))
-                .collect(Collectors.toList());
-    }
 
     public static String annotate(String text, List<? extends MessageAnnotator> messageAnnotators) {
         Node<Markup> root = annotateAsNode(text, messageAnnotators);

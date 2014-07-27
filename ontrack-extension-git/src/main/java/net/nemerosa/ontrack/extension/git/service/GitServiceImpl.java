@@ -3,12 +3,16 @@ package net.nemerosa.ontrack.extension.git.service;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.git.client.*;
 import net.nemerosa.ontrack.extension.git.model.*;
+import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
+import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.scm.changelog.AbstractSCMChangeLogService;
 import net.nemerosa.ontrack.extension.scm.changelog.SCMBuildView;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.job.*;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.model.support.MessageAnnotationUtils;
+import net.nemerosa.ontrack.model.support.MessageAnnotator;
 import net.nemerosa.ontrack.tx.Transaction;
 import net.nemerosa.ontrack.tx.TransactionService;
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +32,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService implements GitSe
 
     private final Collection<GitConfigurator> configurators;
     private final GitClientFactory gitClientFactory;
+    private final IssueServiceRegistry issueServiceRegistry;
     private final JobQueueService jobQueueService;
     private final SecurityService securityService;
     private final TransactionService transactionService;
@@ -37,12 +42,14 @@ public class GitServiceImpl extends AbstractSCMChangeLogService implements GitSe
             StructureService structureService,
             Collection<GitConfigurator> configurators,
             GitClientFactory gitClientFactory,
+            IssueServiceRegistry issueServiceRegistry,
             JobQueueService jobQueueService,
             SecurityService securityService,
             TransactionService transactionService) {
         super(structureService);
         this.configurators = configurators;
         this.gitClientFactory = gitClientFactory;
+        this.issueServiceRegistry = issueServiceRegistry;
         this.jobQueueService = jobQueueService;
         this.securityService = securityService;
         this.transactionService = transactionService;
@@ -101,8 +108,6 @@ public class GitServiceImpl extends AbstractSCMChangeLogService implements GitSe
 
     @Override
     public GitChangeLogCommits getChangeLogRevisions(GitChangeLog changeLog) {
-        // Gets the branch
-        Branch branch = changeLog.getBranch();
         // Gets the client client for this branch
         GitClient gitClient = gitClientFactory.getClient(changeLog.getScmBranch());
         // Gets the configuration
@@ -119,7 +124,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService implements GitSe
         // Gets the commits
         GitLog log = gitClient.log(tagFrom, tagTo);
         List<GitCommit> commits = log.getCommits();
-        List<GitUICommit> uiCommits = toUICommits(branch, gitConfiguration, commits);
+        List<GitUICommit> uiCommits = toUICommits(gitConfiguration, commits);
         return new GitChangeLogCommits(
                 new GitUILog(
                         log.getPlot(),
@@ -128,16 +133,35 @@ public class GitServiceImpl extends AbstractSCMChangeLogService implements GitSe
         );
     }
 
-    private List<GitUICommit> toUICommits(Branch branch, GitConfiguration gitConfiguration, List<GitCommit> commits) {
+    private List<GitUICommit> toUICommits(GitConfiguration gitConfiguration, List<GitCommit> commits) {
         // Link?
         String commitLink = gitConfiguration.getCommitLink();
+        // Issue-based annotations
+        List<? extends MessageAnnotator> messageAnnotators;
+        String issueServiceConfigurationIdentifier = gitConfiguration.getIssueServiceConfigurationIdentifier();
+        if (StringUtils.isNotBlank(issueServiceConfigurationIdentifier)) {
+            ConfiguredIssueService configuredIssueService = issueServiceRegistry.getConfiguredIssueService(issueServiceConfigurationIdentifier);
+            if (configuredIssueService != null) {
+                // Gets the message annotator
+                Optional<MessageAnnotator> messageAnnotator = configuredIssueService.getMessageAnnotator();
+                // If present annotate the messages
+                if (messageAnnotator.isPresent()) {
+                    messageAnnotators = Collections.singletonList(messageAnnotator.get());
+                } else {
+                    messageAnnotators = Collections.emptyList();
+                }
+            } else {
+                messageAnnotators = Collections.emptyList();
+            }
+        } else {
+            messageAnnotators = Collections.emptyList();
+        }
         // OK
         return commits.stream()
-                // TODO Annotations
                 .map(commit -> new GitUICommit(
                         commit,
-                        commit.getShortMessage(),
-                        commit.getFullMessage(),
+                        MessageAnnotationUtils.annotate(commit.getShortMessage(), messageAnnotators),
+                        MessageAnnotationUtils.annotate(commit.getFullMessage(), messageAnnotators),
                         StringUtils.replace(commitLink, "{commit}", commit.getId())
                 ))
                 .collect(Collectors.toList());

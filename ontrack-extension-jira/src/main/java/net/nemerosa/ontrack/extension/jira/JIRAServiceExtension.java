@@ -6,9 +6,11 @@ import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtensi
 import net.nemerosa.ontrack.extension.jira.model.JIRAIssue;
 import net.nemerosa.ontrack.extension.jira.tx.JIRASession;
 import net.nemerosa.ontrack.extension.jira.tx.JIRASessionFactory;
+import net.nemerosa.ontrack.model.support.MessageAnnotation;
+import net.nemerosa.ontrack.model.support.MessageAnnotator;
+import net.nemerosa.ontrack.model.support.RegexMessageAnnotator;
 import net.nemerosa.ontrack.tx.Transaction;
 import net.nemerosa.ontrack.tx.TransactionService;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
@@ -65,24 +68,16 @@ public class JIRAServiceExtension extends AbstractIssueServiceExtension {
     }
 
     @Override
-    public String formatIssuesInMessage(IssueServiceConfiguration issueServiceConfiguration, String message) {
+    public Optional<MessageAnnotator> getMessageAnnotator(IssueServiceConfiguration issueServiceConfiguration) {
         JIRAConfiguration configuration = (JIRAConfiguration) issueServiceConfiguration;
-        // First, makes the message HTML-ready
-        String htmlMessage = StringEscapeUtils.escapeHtml4(message);
-        // Replaces each issue by a link
-        StringBuffer html = new StringBuffer();
-        Matcher matcher = JIRAConfiguration.ISSUE_PATTERN.matcher(htmlMessage);
-        while (matcher.find()) {
-            String key = matcher.group();
-            if (configuration.isIssue(key)) {
-                String href = configuration.getIssueURL(key);
-                String link = format("<a href=\"%s\">%s</a>", href, key);
-                matcher.appendReplacement(html, link);
-            }
-        }
-        matcher.appendTail(html);
-        // OK
-        return html.toString();
+        return Optional.of(
+                new RegexMessageAnnotator(
+                        JIRAConfiguration.ISSUE_PATTERN,
+                        key -> MessageAnnotation.of("a")
+                                .attr("href", configuration.getIssueURL(key))
+                                .text(key)
+                )
+        );
     }
 
     @Override
