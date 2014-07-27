@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.support.MessageAnnotator;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Association between an {@link net.nemerosa.ontrack.extension.issues.IssueServiceExtension} and
@@ -42,5 +43,11 @@ public class ConfiguredIssueService {
 
     public Optional<MessageAnnotator> getMessageAnnotator() {
         return issueServiceExtension.getMessageAnnotator(issueServiceConfiguration);
+    }
+
+    public List<Issue> extractIssuesFromMessage(String message) {
+        return issueServiceExtension.extractIssueKeysFromMessage(issueServiceConfiguration, message).stream()
+                .map(key -> issueServiceExtension.getIssue(issueServiceConfiguration, key))
+                .collect(Collectors.toList());
     }
 }

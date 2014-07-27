@@ -176,9 +176,9 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
             return commits;
         }
         // Loads the revisions
-        commits = gitService.getChangeLogRevisions(changeLog);
+        commits = gitService.getChangeLogCommits(changeLog);
         // Stores in cache
-        logCache.put(uuid, changeLog.withRevisions(commits));
+        logCache.put(uuid, changeLog.withCommits(commits));
         // OK
         return commits;
     }

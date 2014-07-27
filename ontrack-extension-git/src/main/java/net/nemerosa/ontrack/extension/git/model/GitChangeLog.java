@@ -13,6 +13,8 @@ public class GitChangeLog extends SCMChangeLog<GitConfiguration, GitBuildInfo> {
 
     @JsonIgnore // Not sent to the client
     private GitChangeLogCommits commits;
+    @JsonIgnore // Not sent to the client
+    private GitChangeLogIssues issues;
 
     public GitChangeLog(
             String uuid,
@@ -23,8 +25,13 @@ public class GitChangeLog extends SCMChangeLog<GitConfiguration, GitBuildInfo> {
         super(uuid, branch, configuration, scmBuildFrom, scmBuildTo);
     }
 
-    public GitChangeLog withRevisions(GitChangeLogCommits commits) {
+    public GitChangeLog withCommits(GitChangeLogCommits commits) {
         this.commits = commits;
+        return this;
+    }
+
+    public GitChangeLog withIssues(GitChangeLogIssues issues) {
+        this.issues = issues;
         return this;
     }
 

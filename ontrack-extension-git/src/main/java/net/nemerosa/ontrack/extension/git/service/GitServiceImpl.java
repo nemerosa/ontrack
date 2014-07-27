@@ -5,6 +5,9 @@ import net.nemerosa.ontrack.extension.git.client.*;
 import net.nemerosa.ontrack.extension.git.model.*;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
+import net.nemerosa.ontrack.extension.issues.model.Issue;
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceNotConfiguredException;
 import net.nemerosa.ontrack.extension.scm.changelog.AbstractSCMChangeLogService;
 import net.nemerosa.ontrack.extension.scm.changelog.SCMBuildView;
 import net.nemerosa.ontrack.model.Ack;
@@ -107,7 +110,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService implements GitSe
     }
 
     @Override
-    public GitChangeLogCommits getChangeLogRevisions(GitChangeLog changeLog) {
+    public GitChangeLogCommits getChangeLogCommits(GitChangeLog changeLog) {
         // Gets the client client for this branch
         GitClient gitClient = gitClientFactory.getClient(changeLog.getScmBranch());
         // Gets the configuration
@@ -131,6 +134,47 @@ public class GitServiceImpl extends AbstractSCMChangeLogService implements GitSe
                         uiCommits
                 )
         );
+    }
+
+    @Override
+    public GitChangeLogIssues getChangeLogIssues(GitChangeLog changeLog) {
+        // Commits must have been loaded first
+        if (changeLog.getCommits() == null) {
+            changeLog.withCommits(getChangeLogCommits(changeLog));
+        }
+        // In a transaction
+        try (Transaction ignored = transactionService.start()) {
+            // Configuration
+            GitConfiguration configuration = changeLog.getScmBranch();
+            // Issue service
+            ConfiguredIssueService configuredIssueService = issueServiceRegistry.getConfiguredIssueService(configuration.getIssueServiceConfigurationIdentifier());
+            if (configuredIssueService == null) {
+                throw new IssueServiceNotConfiguredException();
+            }
+            // Index of issues, sorted by keys
+            Map<String, GitChangeLogIssue> issues = new TreeMap<>();
+            // For all commits in this commit log
+            for (GitUICommit gitUICommit : changeLog.getCommits().getLog().getCommits()) {
+                List<Issue> list = configuredIssueService.extractIssuesFromMessage(gitUICommit.getCommit().getFullMessage());
+                for (Issue issue : list) {
+                    String key = issue.getKey();
+                    GitChangeLogIssue existingIssue = issues.get(key);
+                    if (existingIssue != null) {
+                        existingIssue.add(gitUICommit);
+                    } else {
+                        existingIssue = GitChangeLogIssue.of(issue, gitUICommit);
+                        issues.put(key, existingIssue);
+                    }
+                }
+            }
+            // List of issues
+            List<GitChangeLogIssue> issuesList = new ArrayList<>(issues.values());
+            // Issues link
+            IssueServiceConfigurationRepresentation issueServiceConfiguration = configuredIssueService.getIssueServiceConfigurationRepresentation();
+            // OK
+            return new GitChangeLogIssues(issueServiceConfiguration, issuesList);
+
+        }
     }
 
     private List<GitUICommit> toUICommits(GitConfiguration gitConfiguration, List<GitCommit> commits) {
