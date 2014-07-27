@@ -77,7 +77,7 @@
                                     <canvas git-plot="commits.log.plot"></canvas>
                                 </td>
                                 <td valign="top">
-                                    <div ng-repeat="gitUICommit in commits.log.commits">
+                                    <div ng-repeat="gitUICommit in commits.log.commits" class="ot-extension-git-changelog-commit">
                                         <code>{{gitUICommit.commit.shortId}}</code>
                                         {{gitUICommit.annotatedMessage}}
                                         {{gitUICommit.commit.author.name}}

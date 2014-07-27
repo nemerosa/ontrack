@@ -1,15 +1,16 @@
 @import '../../vendor/bootstrap/less/mixins';
-@import '../../vendor/bootstrap/less/tables';
+@import '../../vendor/bootstrap/less/panels';
 @import 'variables.less';
 
-table.ot-extension-git-changelog-commits {
-  .table;
-  .table-condensed;
-  .table-hover;
-  td {
-    padding-bottom: 0px;
-    padding-top: 0px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  }
+@otExtensionGitCommitHeight: 23px;
+
+.ot-extension-git-changelog-commit {
+  .panel;
+  .panel-default;
+  max-height: @otExtensionGitCommitHeight !important;
+  min-height: @otExtensionGitCommitHeight !important;
+  height: @otExtensionGitCommitHeight !important;
+  line-height: @otExtensionGitCommitHeight;
+  margin-top: 1px;
+  margin-bottom: 1px;
 }
