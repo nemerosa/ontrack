@@ -74,51 +74,16 @@
                             <tbody>
                             <tr>
                                 <td valign="top">
-                                    <table class="table table-condensed">
-                                        <thead>
-                                        <tr>
-                                            <th>
-                                                &nbsp;
-                                            </th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr>
-                                            <td>
-                                                <canvas git-plot="commits.log.plot"></canvas>
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
+                                    <canvas git-plot="commits.log.plot"></canvas>
                                 </td>
                                 <td valign="top">
-                                    <table class="ot-extension-git-changelog-commits">
-                                        <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Author</th>
-                                            <th>Message</th>
-                                            <th>Date</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr ng-repeat="gitUICommit in commits.log.commits">
-                                            <td>
-                                                <code>{{gitUICommit.commit.id}}</code>
-                                            </td>
-                                            <td>
-                                                {{gitUICommit.commit.author.name}}
-                                            </td>
-                                            <td>
-                                                {{gitUICommit.annotatedMessage}}
-                                            </td>
-                                            <td>
-                                                {{gitUICommit.commit.commitTime | date:'mediumDate'}}
-                                                {{gitUICommit.commit.commitTime | date:'shortTime'}}
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
+                                    <div ng-repeat="gitUICommit in commits.log.commits">
+                                        <code>{{gitUICommit.commit.id}}</code>
+                                        {{gitUICommit.annotatedMessage}}
+                                        {{gitUICommit.commit.author.name}}
+                                        {{gitUICommit.commit.commitTime | date:'mediumDate'}}
+                                        {{gitUICommit.commit.commitTime | date:'shortTime'}}
+                                    </div>
                                 </td>
                             </tr>
                             </tbody>
