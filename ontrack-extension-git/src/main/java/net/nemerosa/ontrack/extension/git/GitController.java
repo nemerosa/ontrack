@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.git.model.GitChangeLog;
 import net.nemerosa.ontrack.extension.git.model.GitChangeLogCommits;
+import net.nemerosa.ontrack.extension.git.model.GitChangeLogIssues;
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.git.service.GitConfigurationService;
 import net.nemerosa.ontrack.extension.git.service.GitService;
@@ -175,11 +176,31 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
         if (commits != null) {
             return commits;
         }
-        // Loads the revisions
+        // Loads the commits
         commits = gitService.getChangeLogCommits(changeLog);
         // Stores in cache
         logCache.put(uuid, changeLog.withCommits(commits));
         // OK
         return commits;
+    }
+
+    /**
+     * Change log issues
+     */
+    @RequestMapping(value = "changelog/{uuid}/issues", method = RequestMethod.GET)
+    public GitChangeLogIssues changeLogIssues(@PathVariable String uuid) {
+        // Gets the change log
+        GitChangeLog changeLog = getChangeLog(uuid);
+        // Cached?
+        GitChangeLogIssues issues = changeLog.getIssues();
+        if (issues != null) {
+            return issues;
+        }
+        // Loads the issues
+        issues = gitService.getChangeLogIssues(changeLog);
+        // Stores in cache
+        logCache.put(uuid, changeLog.withIssues(issues));
+        // OK
+        return issues;
     }
 }
