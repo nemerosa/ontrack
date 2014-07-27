@@ -107,4 +107,8 @@ public final class TestUtils {
     public static byte[] resourceBytes(String path) throws IOException {
         return IOUtils.toByteArray(TestUtils.class.getResource(path));
     }
+
+    public static JsonNode resourceJson(String path) throws IOException {
+        return mapper.readTree(resourceBytes(path));
+    }
 }
