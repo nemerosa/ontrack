@@ -79,10 +79,14 @@
                                 <td valign="top">
                                     <div ng-repeat="gitUICommit in commits.log.commits" class="ot-extension-git-changelog-commit">
                                         <code>{{gitUICommit.commit.shortId}}</code>
-                                        {{gitUICommit.annotatedMessage}}
-                                        {{gitUICommit.commit.author.name}}
-                                        {{gitUICommit.commit.commitTime | date:'mediumDate'}}
-                                        {{gitUICommit.commit.commitTime | date:'shortTime'}}
+                                        <span class="ot-extension-git-changelog-message">{{gitUICommit.annotatedMessage}}</span>
+                                        <span class="ot-extension-git-changelog-meta">
+                                            <span class="ot-extension-git-changelog-author">{{gitUICommit.commit.author.name}}</span>
+                                            <span class="ot-extension-git-changelog-date">
+                                                {{gitUICommit.commit.commitTime | date:'mediumDate'}}
+                                                {{gitUICommit.commit.commitTime | date:'shortTime'}}
+                                            </span>
+                                         </span>
                                     </div>
                                 </td>
                             </tr>

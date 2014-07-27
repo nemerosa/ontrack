@@ -1,5 +1,7 @@
 @import '../../vendor/bootstrap/less/mixins';
+@import '../../vendor/bootstrap/less/labels';
 @import '../../vendor/bootstrap/less/panels';
+@import '../../vendor/bootstrap/less/utilities';
 @import 'variables.less';
 
 @otExtensionGitCommitHeight: 23px;
@@ -13,4 +15,15 @@
   line-height: @otExtensionGitCommitHeight;
   margin-top: 1px;
   margin-bottom: 1px;
+  .ot-extension-git-changelog-message {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .ot-extension-git-changelog-meta {
+    .pull-right;
+    .ot-extension-git-changelog-author {
+      .label;
+      .label-default;
+    }
+  }
 }
