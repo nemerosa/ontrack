@@ -78,7 +78,7 @@
                                 </td>
                                 <td valign="top">
                                     <div ng-repeat="gitUICommit in commits.log.commits">
-                                        <code>{{gitUICommit.commit.id}}</code>
+                                        <code>{{gitUICommit.commit.shortId}}</code>
                                         {{gitUICommit.annotatedMessage}}
                                         {{gitUICommit.commit.author.name}}
                                         {{gitUICommit.commit.commitTime | date:'mediumDate'}}

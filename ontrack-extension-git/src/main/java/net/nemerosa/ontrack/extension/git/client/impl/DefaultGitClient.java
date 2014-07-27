@@ -324,10 +324,19 @@ public class DefaultGitClient implements GitClient {
         return revCommit.getId().getName();
     }
 
+    private String getShortId(RevCommit revCommit) {
+        try {
+            return repository.git().getRepository().newObjectReader().abbreviate(revCommit.getId()).name();
+        } catch (IOException e) {
+            return revCommit.getId().getName();
+        }
+    }
+
     @Override
     public GitCommit toCommit(RevCommit revCommit) {
         return new GitCommit(
                 getId(revCommit),
+                getShortId(revCommit),
                 toPerson(revCommit.getAuthorIdent()),
                 toPerson(revCommit.getCommitterIdent()),
                 Time.from(1000L * revCommit.getCommitTime()),

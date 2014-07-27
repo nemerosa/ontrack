@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 public class GitCommit {
 
     private final String id;
+    private final String shortId;
     private final GitPerson author;
     private final GitPerson committer;
     private final LocalDateTime commitTime;
