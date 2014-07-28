@@ -1,0 +1,40 @@
+<table class="table table-hover table-condensed">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>State</th>
+        <th>Title</th>
+        <th>Milestone</th>
+        <th>Assignee</th>
+        <th>Updated</th>
+        <th>Labels</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="changeLogIssue in value.list">
+        <td>
+            <code><a href="{{changeLogIssue.issue.url}}">{{changeLogIssue.issue.id}}</a></code>
+        </td>
+        <td>
+            <span>{{changeLogIssue.issue.state}}</span>
+        </td>
+        <td>
+            <span>{{changeLogIssue.issue.title}}</span>
+        </td>
+        <td>
+            <a ng-if="changeLogIssue.issue.milestone" href="{{changeLogIssue.issue.milestone.url}}">{{changeLogIssue.issue.milestone.title}}</a>
+        </td>
+        <td>
+            <a ng-if="changeLogIssue.issue.assignee" href="{{changeLogIssue.issue.assignee.url}}">{{changeLogIssue.issue.assignee.login}}</a>
+        </td>
+        <td>
+            <span>{{changeLogIssue.issue.updatedAt | date:'mediumDate'}}</span>
+        </td>
+        <td>
+            <span ng-repeat="label in changeLogIssue.issue.labels"
+                  ng-style="{'background-color': label.color}"
+                    >{{label.name}}</span>
+        </td>
+    </tr>
+    </tbody>
+</table>

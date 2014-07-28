@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueStatus;
@@ -24,21 +25,25 @@ public class GitHubIssue implements Issue {
     private final LocalDateTime closedAt;
 
     @Override
+    @JsonIgnore
     public String getKey() {
         return String.valueOf(id);
     }
 
     @Override
+    @JsonIgnore
     public String getSummary() {
         return title;
     }
 
     @Override
+    @JsonIgnore
     public IssueStatus getStatus() {
         return state;
     }
 
     @Override
+    @JsonIgnore
     public LocalDateTime getUpdateTime() {
         return updatedAt;
     }
