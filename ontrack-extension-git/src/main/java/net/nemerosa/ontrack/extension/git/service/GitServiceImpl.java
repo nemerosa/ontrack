@@ -155,13 +155,13 @@ public class GitServiceImpl extends AbstractSCMChangeLogService implements GitSe
             Map<String, GitChangeLogIssue> issues = new TreeMap<>();
             // For all commits in this commit log
             for (GitUICommit gitUICommit : changeLog.getCommits().getLog().getCommits()) {
-                List<Issue> list = configuredIssueService.extractIssuesFromMessage(gitUICommit.getCommit().getFullMessage());
-                for (Issue issue : list) {
-                    String key = issue.getKey();
+                Set<String> keys = configuredIssueService.extractIssueKeysFromMessage(gitUICommit.getCommit().getFullMessage());
+                for (String key : keys) {
                     GitChangeLogIssue existingIssue = issues.get(key);
                     if (existingIssue != null) {
                         existingIssue.add(gitUICommit);
                     } else {
+                        Issue issue = configuredIssueService.getIssue(key);
                         existingIssue = GitChangeLogIssue.of(issue, gitUICommit);
                         issues.put(key, existingIssue);
                     }
