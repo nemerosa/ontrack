@@ -27,15 +27,15 @@ public class DefaultGitHubClientConfiguratorFactory implements GitHubClientConfi
             };
         } else {
             return client -> {
-                // TODO OAuth2Token
-//                String oAuth2Token = property.getValue().getConfiguration().getOAuth2Token();
-//                if (StringUtils.isNotBlank(oAuth2Token)) {
-//                    client.setOAuth2Token(oAuth2Token);
-//                }
-                String user = property.getValue().getConfiguration().getUser();
-                String password = property.getValue().getConfiguration().getPassword();
-                if (StringUtils.isNotBlank(user)) {
-                    client.setCredentials(user, password);
+                String oAuth2Token = property.getValue().getConfiguration().getOAuth2Token();
+                if (StringUtils.isNotBlank(oAuth2Token)) {
+                    client.setOAuth2Token(oAuth2Token);
+                } else {
+                    String user = property.getValue().getConfiguration().getUser();
+                    String password = property.getValue().getConfiguration().getPassword();
+                    if (StringUtils.isNotBlank(user)) {
+                        client.setCredentials(user, password);
+                    }
                 }
             };
         }

@@ -38,6 +38,11 @@ public class GitHubConfiguration implements UserPasswordConfiguration<GitHubConf
     private final String password;
 
     /**
+     * OAuth2 token
+     */
+    private final String oAuth2Token;
+
+    /**
      * Indexation interval
      */
     private final int indexationInterval;
@@ -62,6 +67,7 @@ public class GitHubConfiguration implements UserPasswordConfiguration<GitHubConf
                 repository,
                 user,
                 password,
+                oAuth2Token,
                 indexationInterval
         );
     }
@@ -88,6 +94,12 @@ public class GitHubConfiguration implements UserPasswordConfiguration<GitHubConf
                                 .optional()
                 )
                 .with(
+                        Text.of("oAuth2Token")
+                                .label("OAuth2 token")
+                                .length(50)
+                                .optional()
+                )
+                .with(
                         Int.of("indexationInterval")
                                 .label("Indexation interval")
                                 .min(0)
@@ -105,6 +117,7 @@ public class GitHubConfiguration implements UserPasswordConfiguration<GitHubConf
                 .fill("repository", repository)
                 .fill("user", user)
                 .fill("password", "")
+                .fill("oAuth2Token", oAuth2Token)
                 .fill("indexationInterval", indexationInterval)
                 ;
     }
