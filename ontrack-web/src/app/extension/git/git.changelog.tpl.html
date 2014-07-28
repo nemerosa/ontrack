@@ -17,6 +17,11 @@
                         <span class="ot-extension-scm-changelog-command-loading"></span>
                         {{commitsCommand}}
                     </button>
+                    <button ng-if="changeLog._issues" class="btn btn-default" ng-click="changeLogIssues()" ng-disabled="issuesLoading">
+                        <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="issues"></span>
+                        <span class="ot-extension-scm-changelog-command-loading"></span>
+                        {{issuesCommand}}
+                    </button>
                 </div>
             </div>
 
@@ -93,6 +98,45 @@
                             </tr>
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Issue sections -->
+            <div class="row" ng-if="changeLog._issues">
+                <div class="col-md-12">
+                    <a name="issues"></a>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading clearfix">
+                            Issues
+                            <div class="pull-right">
+                                <a class="btn btn-default btn-xs" ng-click="changeLogCommits()" ng-disabled="commitsLoading">
+                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="commits"></span>
+                                    <span class="ot-extension-scm-changelog-command-loading"></span>
+                                    {{commitsCommand}}
+                                </a>
+                                <a class="btn btn-default btn-xs" ng-click="changeLogFiles()" ng-disabled="filesLoading">
+                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="files"></span>
+                                    <span class="ot-extension-scm-changelog-command-loading"></span>
+                                    {{filesCommand}}
+                                </a>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="alert alert-warning" ng-hide="issues || issuesLoading">
+                                No issue has been loaded yet. Click
+                                <a ng-click="changeLogIssues()" class="ot-action">here</a>
+                                to load them.
+                            </div>
+                            <div class="ot-description" ng-show="issuesLoading">
+                                Issues are loading...
+                            </div>
+                            <div ng-show="issues">
+                                <ot-include value="issues" template="app/extension/{{issues.issueServiceConfiguration.serviceId}}/changelog.issues.tpl.html">
+                                </ot-include>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

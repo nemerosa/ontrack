@@ -63,6 +63,24 @@ angular.module('ot.extension.git.changelog', [
                     $anchorScroll();
                 }
             };
+
+            // Loading the issues if needed
+            $scope.changeLogIssues = function () {
+                if (!$scope.issues) {
+                    $scope.issuesLoading = true;
+                    $scope.issuesCommand = "Loading the issues...";
+                    ot.pageCall($http.get($scope.changeLog._issues)).then(function (issues) {
+                        $scope.issues = issues;
+                        $scope.issuesLoading = false;
+                        $scope.issuesCommand = "Issues";
+                        $location.hash('issues');
+                        $anchorScroll();
+                    });
+                } else {
+                    $location.hash('issues');
+                    $anchorScroll();
+                }
+            };
         });
 
     })
