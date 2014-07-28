@@ -1,7 +1,15 @@
 package net.nemerosa.ontrack.extension.github.model;
 
-public enum GitHubState {
+import net.nemerosa.ontrack.extension.issues.model.IssueStatus;
 
-    open, closed
+public enum GitHubState implements IssueStatus {
+
+    open, closed;
+
+    @Override
+    public String getName() {
+        return name();
+    }
+
 
 }

@@ -1,12 +1,14 @@
 package net.nemerosa.ontrack.extension.github.model;
 
 import lombok.Data;
+import net.nemerosa.ontrack.extension.issues.model.Issue;
+import net.nemerosa.ontrack.extension.issues.model.IssueStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-public class GitHubIssue {
+public class GitHubIssue implements Issue {
 
     private final int id;
     private final String url;
@@ -21,4 +23,23 @@ public class GitHubIssue {
     private final LocalDateTime updatedAt;
     private final LocalDateTime closedAt;
 
+    @Override
+    public String getKey() {
+        return String.valueOf(id);
+    }
+
+    @Override
+    public String getSummary() {
+        return title;
+    }
+
+    @Override
+    public IssueStatus getStatus() {
+        return state;
+    }
+
+    @Override
+    public LocalDateTime getUpdateTime() {
+        return updatedAt;
+    }
 }

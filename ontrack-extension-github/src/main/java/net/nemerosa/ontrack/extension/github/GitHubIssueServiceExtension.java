@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.github;
 
+import net.nemerosa.ontrack.extension.github.client.GitHubClientConfiguratorFactory;
+import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClient;
 import net.nemerosa.ontrack.extension.github.model.GitHubConfiguration;
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
@@ -25,11 +27,19 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
     public static final String GITHUB_SERVICE_ID = "github";
     public static final String GITHUB_ISSUE_PATTERN = "#\\d+";
     private final GitHubConfigurationService configurationService;
+    private final GitHubClientConfiguratorFactory gitHubClientConfiguratorFactory;
+    private final OntrackGitHubClient gitHubClient;
 
     @Autowired
-    public GitHubIssueServiceExtension(GitHubExtensionFeature extensionFeature, GitHubConfigurationService configurationService) {
+    public GitHubIssueServiceExtension(
+            GitHubExtensionFeature extensionFeature,
+            GitHubConfigurationService configurationService,
+            GitHubClientConfiguratorFactory gitHubClientConfiguratorFactory,
+            OntrackGitHubClient gitHubClient) {
         super(extensionFeature, GITHUB_SERVICE_ID, "GitHub");
         this.configurationService = configurationService;
+        this.gitHubClientConfiguratorFactory = gitHubClientConfiguratorFactory;
+        this.gitHubClient = gitHubClient;
     }
 
     @Override
@@ -93,7 +103,11 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
 
     @Override
     public Issue getIssue(IssueServiceConfiguration issueServiceConfiguration, String issueKey) {
-        // FIXME Method net.nemerosa.ontrack.extension.github.GitHubIssueServiceException.getIssue
-        return null;
+        GitHubConfiguration configuration = (GitHubConfiguration) issueServiceConfiguration;
+        return gitHubClient.getIssue(
+                configuration.getRepository(),
+                gitHubClientConfiguratorFactory.getGitHubConfigurator(configuration),
+                Integer.parseInt(issueKey, 10)
+        );
     }
 }

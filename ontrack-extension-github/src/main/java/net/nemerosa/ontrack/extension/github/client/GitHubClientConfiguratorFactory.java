@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.extension.github.client;
 
-import net.nemerosa.ontrack.model.structure.Branch;
+import net.nemerosa.ontrack.extension.github.model.GitHubConfiguration;
 
 public interface GitHubClientConfiguratorFactory {
 
-    GitHubClientConfigurator getGitHubConfigurator(Branch branch);
+    GitHubClientConfigurator getGitHubConfigurator(GitHubConfiguration configuration);
 
 }
