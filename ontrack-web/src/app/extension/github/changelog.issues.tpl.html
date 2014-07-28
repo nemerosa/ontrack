@@ -16,13 +16,13 @@
             <code><a href="{{changeLogIssue.issue.url}}">{{changeLogIssue.issue.id}}</a></code>
         </td>
         <td>
-            <span>{{changeLogIssue.issue.state}}</span>
+            <span class="ot-extension-github-state ot-extension-github-state-{{changeLogIssue.issue.state}}">{{changeLogIssue.issue.state}}</span>
         </td>
         <td>
             <span>{{changeLogIssue.issue.title}}</span>
         </td>
         <td>
-            <a ng-if="changeLogIssue.issue.milestone" href="{{changeLogIssue.issue.milestone.url}}">{{changeLogIssue.issue.milestone.title}}</a>
+            <a class="ot-extension-github-state ot-extension-github-state-{{changeLogIssue.issue.milestone.state}}" ng-if="changeLogIssue.issue.milestone" href="{{changeLogIssue.issue.milestone.url}}">{{changeLogIssue.issue.milestone.title}}</a>
         </td>
         <td>
             <a ng-if="changeLogIssue.issue.assignee" href="{{changeLogIssue.issue.assignee.url}}">{{changeLogIssue.issue.assignee.login}}</a>
@@ -32,7 +32,8 @@
         </td>
         <td>
             <span ng-repeat="label in changeLogIssue.issue.labels"
-                  ng-style="{'background-color': label.color}"
+                  class="ot-extension-github-label"
+                  ng-style="{'background-color': '#' + label.color + ' !important'}"
                     >{{label.name}}</span>
         </td>
     </tr>
