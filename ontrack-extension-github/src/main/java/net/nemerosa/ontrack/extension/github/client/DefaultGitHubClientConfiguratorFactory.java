@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfiguration
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Property;
 import net.nemerosa.ontrack.model.structure.PropertyService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +32,11 @@ public class DefaultGitHubClientConfiguratorFactory implements GitHubClientConfi
 //                if (StringUtils.isNotBlank(oAuth2Token)) {
 //                    client.setOAuth2Token(oAuth2Token);
 //                }
+                String user = property.getValue().getConfiguration().getUser();
+                String password = property.getValue().getConfiguration().getPassword();
+                if (StringUtils.isNotBlank(user)) {
+                    client.setCredentials(user, password);
+                }
             };
         }
     }
