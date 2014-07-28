@@ -65,6 +65,8 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
             while (matcher.find()) {
                 // Gets the issue
                 String issueKey = matcher.group();
+                // Removes the trailing #
+                issueKey = issueKey.substring(1);
                 // Adds to the result
                 result.add(issueKey);
             }
