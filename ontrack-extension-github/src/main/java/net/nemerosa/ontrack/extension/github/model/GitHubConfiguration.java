@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.github.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import net.nemerosa.ontrack.extension.github.GitHubIssueServiceExtension;
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.support.configurations.UserPasswordConfiguration;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Int;
@@ -13,7 +15,7 @@ import static java.lang.String.format;
 import static net.nemerosa.ontrack.model.form.Form.defaultNameField;
 
 @Data
-public class GitHubConfiguration implements UserPasswordConfiguration<GitHubConfiguration> {
+public class GitHubConfiguration implements UserPasswordConfiguration<GitHubConfiguration>, IssueServiceConfiguration {
 
     /**
      * Name of this configuration
@@ -122,4 +124,8 @@ public class GitHubConfiguration implements UserPasswordConfiguration<GitHubConf
         return format("https://github.com/%s/blob/{commit}/{path}", repository);
     }
 
+    @Override
+    public String getServiceId() {
+        return GitHubIssueServiceExtension.GITHUB_SERVICE_ID;
+    }
 }
