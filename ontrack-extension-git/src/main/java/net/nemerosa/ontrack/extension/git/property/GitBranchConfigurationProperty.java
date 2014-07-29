@@ -11,4 +11,9 @@ public class GitBranchConfigurationProperty {
      */
     private final String branch;
 
+    /**
+     * Tag pattern
+     */
+    private final String tagPattern;
+
 }

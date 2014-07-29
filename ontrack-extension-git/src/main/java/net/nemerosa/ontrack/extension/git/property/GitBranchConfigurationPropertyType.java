@@ -47,6 +47,13 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
                         Text.of("branch")
                                 .label("Git branch")
                                 .value(value != null ? value.getBranch() : "master")
+                )
+                .with(
+                        Text.of("tagPattern")
+                                .label("Tag pattern")
+                                .help("Regular expression that describes the tags to import when " +
+                                        "build/tag synchronisation is enabled. It defaults to (.*).")
+                                .value(value != null ? value.getTagPattern() : "(.*)")
                 );
     }
 
@@ -58,7 +65,8 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
     @Override
     public GitBranchConfigurationProperty fromStorage(JsonNode node) {
         return new GitBranchConfigurationProperty(
-                JsonUtils.get(node, "branch", "master")
+                JsonUtils.get(node, "branch", "master"),
+                JsonUtils.get(node, "tagPattern", "(.*)")
         );
     }
 
