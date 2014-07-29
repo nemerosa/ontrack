@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.svn.property;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogIssue;
+import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.PropertyService;
@@ -37,19 +38,18 @@ public class SVNRevisionChangeLogIssueValidator extends AbstractSVNChangeLogIssu
 
     @Override
     public SVNRevisionChangeLogIssueValidatorConfig fromClient(JsonNode node) {
-        // FIXME Method net.nemerosa.ontrack.extension.svn.property.SVNRevisionChangeLogIssueValidator.fromClient
-        return null;
+        return fromStorage(node);
     }
 
     @Override
     public SVNRevisionChangeLogIssueValidatorConfig fromStorage(JsonNode node) {
-        // FIXME Method net.nemerosa.ontrack.extension.svn.property.SVNRevisionChangeLogIssueValidator.fromStorage
-        return null;
+        return new SVNRevisionChangeLogIssueValidatorConfig(
+                JsonUtils.getStringList(node, "closedStatuses")
+        );
     }
 
     @Override
     public String getSearchKey(SVNRevisionChangeLogIssueValidatorConfig value) {
-        // FIXME Method net.nemerosa.ontrack.extension.svn.property.SVNRevisionChangeLogIssueValidator.getSearchKey
-        return null;
+        return "";
     }
 }

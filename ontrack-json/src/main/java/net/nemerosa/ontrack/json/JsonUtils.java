@@ -110,4 +110,14 @@ public final class JsonUtils {
             return defaultValue;
         }
     }
+
+    public static List<String> getStringList(JsonNode data, String field) {
+        if (data.has(field)) {
+            List<String> list = new ArrayList<>();
+            data.get(field).forEach(node -> list.add(node.asText()));
+            return list;
+        } else {
+            return null;
+        }
+    }
 }
