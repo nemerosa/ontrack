@@ -8,6 +8,7 @@
     "angular-bootstrap": "~0.10.0",
     "jquery-ui": "~1.10.4",
     "angular-ui-sortable": "~0.12.8",
-    "angular-multi-select": "~2.0.0"
+    "angular-multi-select": "~2.0.0",
+    "angular-taglist": "~0.1.5"
   }
 }

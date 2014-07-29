@@ -40,6 +40,13 @@
      tick-property="selected"
         ></div>
 
+<!-- Type: multi-strings -->
+<div ng-if="field.type == 'multi-strings'">
+    <taglist tag-data="data[field.name]">
+        <input/>
+    </taglist>
+</div>
+
 <!-- Date -->
 <span ng-if="field.type == 'date'">
     <input ng-model="data.dates[field.name]" name="{{field.name}}" type="text" class="form-control"

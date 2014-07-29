@@ -11,11 +11,13 @@ module.exports = function (grunt) {
             'vendor/angular-ui-router/release/angular-ui-router.js',
             'vendor/angular-ui-sortable/sortable.js',
             'vendor/angular-multi-select/angular-multi-select.js',
+            'vendor/angular-taglist/js/angular-taglist-directive.js',
             'vendor/angular-sanitize/angular-sanitize.js',
             'vendor/angular-bootstrap/ui-bootstrap-tpls.js'
         ],
         css: [
-            'vendor/angular-multi-select/angular-multi-select.css'
+            'vendor/angular-multi-select/angular-multi-select.css',
+            'vendor/angular-taglist/css/angular-taglist-directive.css'
         ],
         fonts: [
             'vendor/bootstrap/fonts/glyphicons-halflings-regular.*'

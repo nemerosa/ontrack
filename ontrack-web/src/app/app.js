@@ -3,6 +3,7 @@ var ontrack = angular.module('ontrack', [
         'ui.router',
         'ui.sortable',
         'multi-select',
+        'angular_taglist_directive',
         'ngSanitize',
         // Templates as JS
         'ot.templates',

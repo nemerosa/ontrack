@@ -16,6 +16,16 @@
 <!-- Type selection -->
 <span ng-if="field.type == 'selection'" class="ot-field-value">{{field.value}}</span>
 
+<!-- Type: multi-selection -->
+<span ng-if="field.type == 'multi-selection'" class="ot-field-value">
+    <span class="label label-info" ng-repeat="item in field.items">{{item.name}}</span>
+</span>
+
+<!-- Type: multi-strings -->
+<span ng-if="field.type == 'multi-strings'" class="ot-field-value">
+    <span class="label label-info" ng-repeat="item in field.value">{{item}}</span>
+</span>
+
 <!-- Date -->
 <span ng-if="field.type == 'date'" class="ot-field-value">{{field.value | date:'mediumDate'}}</span>
 
