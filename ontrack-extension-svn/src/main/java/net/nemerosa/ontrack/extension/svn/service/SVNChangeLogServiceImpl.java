@@ -4,8 +4,8 @@ import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
-import net.nemerosa.ontrack.extension.scm.service.AbstractSCMChangeLogService;
 import net.nemerosa.ontrack.extension.scm.model.SCMBuildView;
+import net.nemerosa.ontrack.extension.scm.service.AbstractSCMChangeLogService;
 import net.nemerosa.ontrack.extension.svn.client.SVNClient;
 import net.nemerosa.ontrack.extension.svn.db.SVNIssueRevisionDao;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
@@ -35,7 +35,6 @@ import static net.nemerosa.ontrack.extension.svn.support.SVNUtils.expandBuildPat
 @Service
 public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService implements SVNChangeLogService {
 
-    private final PropertyService propertyService;
     private final SVNIssueRevisionDao issueRevisionDao;
     private final SVNService svnService;
     private final SVNClient svnClient;
@@ -49,8 +48,7 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
             SVNService svnService,
             SVNClient svnClient,
             TransactionService transactionService) {
-        super(structureService);
-        this.propertyService = propertyService;
+        super(structureService, propertyService);
         this.issueRevisionDao = issueRevisionDao;
         this.svnService = svnService;
         this.svnClient = svnClient;
@@ -150,6 +148,8 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
             }
             // List of issues
             List<SVNChangeLogIssue> issuesList = new ArrayList<>(issues.values());
+            // Validations
+            validateIssues(issuesList, changeLog.getBranch());
             // Issues link
             IssueServiceConfigurationRepresentation issueServiceConfiguration = null;
             String allIssuesLink = "";

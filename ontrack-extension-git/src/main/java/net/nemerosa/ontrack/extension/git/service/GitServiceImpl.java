@@ -8,8 +8,8 @@ import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceNotConfiguredException;
-import net.nemerosa.ontrack.extension.scm.service.AbstractSCMChangeLogService;
 import net.nemerosa.ontrack.extension.scm.model.SCMBuildView;
+import net.nemerosa.ontrack.extension.scm.service.AbstractSCMChangeLogService;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.job.*;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -43,13 +43,14 @@ public class GitServiceImpl extends AbstractSCMChangeLogService implements GitSe
     @Autowired
     public GitServiceImpl(
             StructureService structureService,
+            PropertyService propertyService,
             Collection<GitConfigurator> configurators,
             GitClientFactory gitClientFactory,
             IssueServiceRegistry issueServiceRegistry,
             JobQueueService jobQueueService,
             SecurityService securityService,
             TransactionService transactionService) {
-        super(structureService);
+        super(structureService, propertyService);
         this.configurators = configurators;
         this.gitClientFactory = gitClientFactory;
         this.issueServiceRegistry = issueServiceRegistry;
