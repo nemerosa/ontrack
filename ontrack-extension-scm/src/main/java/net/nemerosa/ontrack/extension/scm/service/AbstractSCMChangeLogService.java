@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.scm.changelog;
+package net.nemerosa.ontrack.extension.scm.service;
 
 import net.nemerosa.ontrack.model.structure.BuildView;
 import net.nemerosa.ontrack.model.structure.ID;

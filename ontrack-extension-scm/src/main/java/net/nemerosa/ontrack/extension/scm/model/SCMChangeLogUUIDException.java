@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.scm.changelog;
+package net.nemerosa.ontrack.extension.scm.model;
 
 import net.nemerosa.ontrack.model.exceptions.InputException;
 

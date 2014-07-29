@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.scm.changelog;
+package net.nemerosa.ontrack.extension.scm.model;
 
 import lombok.Data;
 import net.nemerosa.ontrack.extension.issues.model.Issue;

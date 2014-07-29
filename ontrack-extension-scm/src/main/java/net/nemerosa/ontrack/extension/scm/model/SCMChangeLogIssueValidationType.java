@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.scm.changelog;
+package net.nemerosa.ontrack.extension.scm.model;
 
 public enum SCMChangeLogIssueValidationType {
 
@@ -7,5 +7,5 @@ public enum SCMChangeLogIssueValidationType {
     WARNING,
 
     INFO
-    
+
 }

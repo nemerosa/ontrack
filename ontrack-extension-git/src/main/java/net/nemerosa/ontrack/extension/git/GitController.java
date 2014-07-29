@@ -11,7 +11,7 @@ import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.git.service.GitConfigurationService;
 import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
-import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogUUIDException;
+import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogUUIDException;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.buildfilter.BuildDiff;

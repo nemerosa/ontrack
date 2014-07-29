@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.svn.model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
-import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogIssue;
+import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogIssue;
 
 import java.util.ArrayList;
 import java.util.Collections;

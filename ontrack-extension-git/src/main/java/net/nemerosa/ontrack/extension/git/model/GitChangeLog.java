@@ -3,8 +3,8 @@ package net.nemerosa.ontrack.extension.git.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import net.nemerosa.ontrack.extension.scm.changelog.SCMBuildView;
-import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLog;
+import net.nemerosa.ontrack.extension.scm.model.SCMBuildView;
+import net.nemerosa.ontrack.extension.scm.model.SCMChangeLog;
 import net.nemerosa.ontrack.model.structure.Branch;
 
 @EqualsAndHashCode(callSuper = false)
