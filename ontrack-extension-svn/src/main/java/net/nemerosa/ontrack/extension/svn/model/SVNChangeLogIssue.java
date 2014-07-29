@@ -1,20 +1,24 @@
 package net.nemerosa.ontrack.extension.svn.model;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
+import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogIssue;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = false)
 @Data
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class SVNChangeLogIssue {
+public class SVNChangeLogIssue extends SCMChangeLogIssue {
 
-    private final Issue issue;
     private final List<SVNRevisionInfo> revisions;
+
+    protected SVNChangeLogIssue(Issue issue, List<SVNRevisionInfo> revisions) {
+        super(issue);
+        this.revisions = revisions;
+    }
 
     public SVNChangeLogIssue(Issue issue) {
         this(issue, Collections.<SVNRevisionInfo>emptyList());
@@ -23,7 +27,7 @@ public class SVNChangeLogIssue {
     public SVNChangeLogIssue addRevision(SVNRevisionInfo revision) {
         List<SVNRevisionInfo> list = new ArrayList<>(this.revisions);
         list.add(revision);
-        return new SVNChangeLogIssue(issue, list);
+        return new SVNChangeLogIssue(getIssue(), list);
     }
 
     public SVNRevisionInfo getLastRevision() {
