@@ -320,8 +320,11 @@ public class GitServiceImpl extends AbstractSCMChangeLogService implements GitSe
         info.post("Getting list of tags");
         Collection<GitTag> tags = gitClient.getTags();
         // Pattern for the tags
-        // TODO Make the pattern configurable at branch level using a property
-        final Pattern tagPattern = Pattern.compile("(.*)");
+        String tagExpression = "(.*)";
+        if (StringUtils.isNotBlank(configuration.getTagPattern())) {
+            tagExpression = configuration.getTagPattern().replace("*", "(.*)");
+        }
+        final Pattern tagPattern = Pattern.compile(tagExpression);
         // Creates the builds
         info.post("Creating builds from tags");
         for (GitTag tag : tags) {
