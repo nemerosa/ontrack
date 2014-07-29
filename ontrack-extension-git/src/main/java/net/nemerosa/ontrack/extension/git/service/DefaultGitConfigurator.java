@@ -33,6 +33,7 @@ public class DefaultGitConfigurator implements GitConfigurator {
             Property<GitBranchConfigurationProperty> branchConfig = propertyService.getProperty(branch, GitBranchConfigurationPropertyType.class);
             if (!branchConfig.isEmpty()) {
                 thisConfig = thisConfig.withBranch(branchConfig.getValue().getBranch());
+                thisConfig = thisConfig.withTagPattern(branchConfig.getValue().getTagPattern());
             }
             // OK
             return thisConfig;
