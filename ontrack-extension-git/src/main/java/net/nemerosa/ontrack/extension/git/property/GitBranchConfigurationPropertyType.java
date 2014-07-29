@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Text;
+import net.nemerosa.ontrack.model.form.YesNo;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
@@ -56,6 +57,13 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
                                         "to designate the placeholder for the build name. It defaults to *, " +
                                         "meaning that we have a 1:1 relationship between the tag and the build name.")
                                 .value(value != null ? value.getTagPattern() : "*")
+                )
+                .with(
+                        YesNo.of("override")
+                                .label("Override builds")
+                                .help("Can the existing builds be overridden by a synchronisation? If yes, " +
+                                        "the existing validation and promotion runs would be lost as well.")
+                                .value(value != null && value.isOverride())
                 );
     }
 
@@ -68,7 +76,8 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
     public GitBranchConfigurationProperty fromStorage(JsonNode node) {
         return new GitBranchConfigurationProperty(
                 JsonUtils.get(node, "branch", "master"),
-                JsonUtils.get(node, "tagPattern", "*")
+                JsonUtils.get(node, "tagPattern", "*"),
+                JsonUtils.getBoolean(node, "override", false)
         );
     }
 

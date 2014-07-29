@@ -3,6 +3,8 @@ package net.nemerosa.ontrack.extension.git.service;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.git.client.*;
 import net.nemerosa.ontrack.extension.git.model.*;
+import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty;
+import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
@@ -35,6 +37,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService implements GitSe
 
     private final Collection<GitConfigurator> configurators;
     private final GitClientFactory gitClientFactory;
+    private final PropertyService propertyService;
     private final IssueServiceRegistry issueServiceRegistry;
     private final JobQueueService jobQueueService;
     private final SecurityService securityService;
@@ -45,6 +48,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService implements GitSe
             StructureService structureService,
             Collection<GitConfigurator> configurators,
             GitClientFactory gitClientFactory,
+            PropertyService propertyService,
             IssueServiceRegistry issueServiceRegistry,
             JobQueueService jobQueueService,
             SecurityService securityService,
@@ -52,6 +56,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService implements GitSe
         super(structureService);
         this.configurators = configurators;
         this.gitClientFactory = gitClientFactory;
+        this.propertyService = propertyService;
         this.issueServiceRegistry = issueServiceRegistry;
         this.jobQueueService = jobQueueService;
         this.securityService = securityService;
@@ -313,6 +318,12 @@ public class GitServiceImpl extends AbstractSCMChangeLogService implements GitSe
         info.post(format("Git build/tag sync for %s/%s", branch.getProject().getName(), branch.getName()));
         // Gets the branch Git client
         GitClient gitClient = gitClientFactory.getClient(configuration);
+        // Configuration for the sync
+        boolean override = false;
+        Property<GitBranchConfigurationProperty> confProperty = propertyService.getProperty(branch, GitBranchConfigurationPropertyType.class);
+        if (!confProperty.isEmpty()) {
+            override = confProperty.getValue().isOverride();
+        }
         // Makes sure of synchronization
         info.post("Synchronizing before importing");
         gitClient.sync(info::post);
@@ -340,9 +351,6 @@ public class GitServiceImpl extends AbstractSCMChangeLogService implements GitSe
                 boolean createBuild;
                 Optional<Build> build = structureService.findBuildByName(branch.getProject().getName(), branch.getName(), buildName);
                 if (build.isPresent()) {
-                    // TODO Build override policy can be configurable at branch level using a property (same than for the tag pattern)
-                    boolean override = false;
-                    //noinspection ConstantConditions
                     if (override) {
                         // Deletes the build
                         info.post(format("Deleting existing build %s", buildName));

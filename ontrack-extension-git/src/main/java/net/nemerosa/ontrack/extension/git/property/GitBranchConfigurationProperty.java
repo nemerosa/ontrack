@@ -16,4 +16,9 @@ public class GitBranchConfigurationProperty {
      */
     private final String tagPattern;
 
+    /**
+     * Build overriding policy when synchronizing
+     */
+    private final boolean override;
+
 }
