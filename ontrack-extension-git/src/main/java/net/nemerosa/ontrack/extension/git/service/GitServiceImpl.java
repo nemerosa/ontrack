@@ -69,8 +69,16 @@ public class GitServiceImpl extends AbstractSCMChangeLogService implements GitSe
         for (Project project : structureService.getProjectList()) {
             for (Branch branch : structureService.getBranchesForProject(project.getId())) {
                 GitConfiguration configuration = getBranchConfiguration(branch);
-                if (configuration.isValid() && configuration.getIndexationInterval() > 0) {
-                    jobs.add(createIndexationJob(configuration));
+                if (configuration.isValid()) {
+                    // Indexation job
+                    if (configuration.getIndexationInterval() > 0) {
+                        jobs.add(createIndexationJob(configuration));
+                    }
+                    // Build/tag sync job
+                    Property<GitBranchConfigurationProperty> branchConfigurationProperty = propertyService.getProperty(branch, GitBranchConfigurationPropertyType.class);
+                    if (!branchConfigurationProperty.isEmpty() && branchConfigurationProperty.getValue().getBuildTagInterval() > 0) {
+                        jobs.add(createBuildSyncJob(branch, configuration));
+                    }
                 }
             }
         }

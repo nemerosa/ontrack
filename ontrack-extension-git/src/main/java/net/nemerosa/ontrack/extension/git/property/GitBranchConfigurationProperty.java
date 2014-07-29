@@ -21,4 +21,9 @@ public class GitBranchConfigurationProperty {
      */
     private final boolean override;
 
+    /**
+     * Interval in minutes for build/tag synchronization
+     */
+    private final int buildTagInterval;
+
 }
