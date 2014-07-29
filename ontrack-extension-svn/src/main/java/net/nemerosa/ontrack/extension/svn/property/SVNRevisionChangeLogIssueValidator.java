@@ -4,8 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogIssue;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.form.MultiStrings;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.PropertyService;
+
+import java.util.Collections;
 
 public class SVNRevisionChangeLogIssueValidator extends AbstractSVNChangeLogIssueValidator<SVNRevisionChangeLogIssueValidatorConfig> {
 
@@ -32,8 +35,13 @@ public class SVNRevisionChangeLogIssueValidator extends AbstractSVNChangeLogIssu
 
     @Override
     public Form getEditionForm(SVNRevisionChangeLogIssueValidatorConfig value) {
-        return Form.create();
-        // FIXME Method net.nemerosa.ontrack.extension.svn.property.SVNRevisionChangeLogIssueValidator.getEditionForm
+        return Form.create()
+                .with(
+                        MultiStrings.of("closedStatuses")
+                                .label("Closed statuses")
+                                .help("List of issue statuses that are considered as closed.")
+                                .value(value != null ? value.getClosedStatuses() : Collections.emptyList())
+                );
     }
 
     @Override
