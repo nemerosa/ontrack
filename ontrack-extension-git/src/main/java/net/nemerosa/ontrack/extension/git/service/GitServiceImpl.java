@@ -118,12 +118,12 @@ public class GitServiceImpl extends AbstractSCMChangeLogService implements GitSe
         // Gets the tag boundaries
         String tagFrom = changeLog.getFrom().getBuild().getName();
         String tagTo = changeLog.getTo().getBuild().getName();
-        // TODO Tag pattern
-//        String tagPattern = gitConfiguration.getTag();
-//        if (StringUtils.isNotBlank(tagPattern)) {
-//            tagFrom = StringUtils.replace(tagPattern, "*", tagFrom);
-//            tagTo = StringUtils.replace(tagPattern, "*", tagTo);
-//        }
+        // Tag pattern
+        String tagPattern = gitConfiguration.getTagPattern();
+        if (StringUtils.isNotBlank(tagPattern)) {
+            tagFrom = StringUtils.replace(tagPattern, "*", tagFrom);
+            tagTo = StringUtils.replace(tagPattern, "*", tagTo);
+        }
         // Gets the commits
         GitLog log = gitClient.log(tagFrom, tagTo);
         List<GitCommit> commits = log.getCommits();

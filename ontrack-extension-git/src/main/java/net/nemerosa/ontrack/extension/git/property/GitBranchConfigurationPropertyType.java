@@ -51,9 +51,11 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
                 .with(
                         Text.of("tagPattern")
                                 .label("Tag pattern")
-                                .help("Regular expression that describes the tags to import when " +
-                                        "build/tag synchronisation is enabled. It defaults to (.*).")
-                                .value(value != null ? value.getTagPattern() : "(.*)")
+                                .help("Expression that describes the tags to import when " +
+                                        "build/tag synchronisation is enabled. The * placeholder is used " +
+                                        "to designate the placeholder for the build name. It defaults to *, " +
+                                        "meaning that we have a 1:1 relationship between the tag and the build name.")
+                                .value(value != null ? value.getTagPattern() : "*")
                 );
     }
 
@@ -66,7 +68,7 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
     public GitBranchConfigurationProperty fromStorage(JsonNode node) {
         return new GitBranchConfigurationProperty(
                 JsonUtils.get(node, "branch", "master"),
-                JsonUtils.get(node, "tagPattern", "(.*)")
+                JsonUtils.get(node, "tagPattern", "*")
         );
     }
 
