@@ -90,7 +90,5 @@ angular.module('ot.view.project', [
 
         // Initialization
         loadProject();
-        // TODO Loading the project's view
-        // TODO Project commands
     })
 ;
