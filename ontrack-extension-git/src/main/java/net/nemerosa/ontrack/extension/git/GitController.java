@@ -4,10 +4,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
-import net.nemerosa.ontrack.extension.git.model.GitChangeLog;
-import net.nemerosa.ontrack.extension.git.model.GitChangeLogCommits;
-import net.nemerosa.ontrack.extension.git.model.GitChangeLogIssues;
-import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
+import net.nemerosa.ontrack.extension.git.model.*;
 import net.nemerosa.ontrack.extension.git.service.GitConfigurationService;
 import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
@@ -202,5 +199,25 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
         logCache.put(uuid, changeLog.withIssues(issues));
         // OK
         return issues;
+    }
+
+    /**
+     * Change log files
+     */
+    @RequestMapping(value = "changelog/{uuid}/files", method = RequestMethod.GET)
+    public GitChangeLogFiles changeLogFiles(@PathVariable String uuid) {
+        // Gets the change log
+        GitChangeLog changeLog = getChangeLog(uuid);
+        // Cached?
+        GitChangeLogFiles files = changeLog.getFiles();
+        if (files != null) {
+            return files;
+        }
+        // Loads the files
+        files = gitService.getChangeLogFiles(changeLog);
+        // Stores in cache
+        logCache.put(uuid, changeLog.withFiles(files));
+        // OK
+        return files;
     }
 }

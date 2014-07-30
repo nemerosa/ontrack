@@ -22,7 +22,7 @@ public class GitChangeLogResourceDecorator extends AbstractResourceDecorator<Git
         return resourceContext.links()
                 .link("_commits", on(GitController.class).changeLogCommits(changeLog.getUuid()))
                 .link("_issues", on(GitController.class).changeLogIssues(changeLog.getUuid()), StringUtils.isNotBlank(changeLog.getScmBranch().getIssueServiceConfigurationIdentifier()))
-                        // TODO .link("_files", on(SVNController.class).changeLogFiles(changeLog.getUuid()))
+                .link("_files", on(GitController.class).changeLogFiles(changeLog.getUuid()))
                 .build();
     }
 
