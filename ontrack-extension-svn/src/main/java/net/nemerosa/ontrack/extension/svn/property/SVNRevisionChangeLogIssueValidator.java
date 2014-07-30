@@ -1,11 +1,13 @@
 package net.nemerosa.ontrack.extension.svn.property;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogIssue;
+import net.nemerosa.ontrack.extension.scm.model.SCMChangeLog;
+import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
+import net.nemerosa.ontrack.extension.svn.model.SVNChangeLogIssue;
+import net.nemerosa.ontrack.extension.svn.model.SVNHistory;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.MultiStrings;
-import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.PropertyService;
 
 import java.util.Collections;
@@ -17,8 +19,10 @@ public class SVNRevisionChangeLogIssueValidator extends AbstractSVNChangeLogIssu
     }
 
     @Override
-    public void validate(Branch branch, SCMChangeLogIssue issue, SVNRevisionChangeLogIssueValidatorConfig validatorConfig) {
-        if (canApplyTo(branch)) {
+    public void validate(SCMChangeLog<SVNRepository, SVNHistory> changeLog, SVNChangeLogIssue issue, SVNRevisionChangeLogIssueValidatorConfig validatorConfig) {
+        if (canApplyTo(changeLog.getBranch())) {
+            // Last revision for this issue
+            long lastRevision = issue.getLastRevision().getRevision();
             // FIXME Method net.nemerosa.ontrack.extension.svn.property.SVNRevisionChangeLogIssueValidator.validate
         }
     }

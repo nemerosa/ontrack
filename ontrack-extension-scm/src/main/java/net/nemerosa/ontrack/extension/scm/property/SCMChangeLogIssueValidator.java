@@ -1,14 +1,17 @@
 package net.nemerosa.ontrack.extension.scm.property;
 
+import net.nemerosa.ontrack.extension.scm.model.SCMChangeLog;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogIssue;
-import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.PropertyType;
 
 /**
  * @param <T> The configuration for this validator property
+ * @param <S> Type of SCM data associated with the branch
+ * @param <B> Type of SCM data associated with a build
+ * @param <I> Type of issue associated with this change log
  */
-public interface SCMChangeLogIssueValidator<T> extends PropertyType<T> {
+public interface SCMChangeLogIssueValidator<T, S, B, I extends SCMChangeLogIssue> extends PropertyType<T> {
 
-    void validate(Branch branch, SCMChangeLogIssue issue, T validatorConfig);
-    
+    void validate(SCMChangeLog<S, B> changeLog, I issue, T validatorConfig);
+
 }

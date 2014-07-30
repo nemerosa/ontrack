@@ -149,7 +149,7 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
             // List of issues
             List<SVNChangeLogIssue> issuesList = new ArrayList<>(issues.values());
             // Validations
-            validateIssues(issuesList, changeLog.getBranch());
+            validateIssues(issuesList, changeLog);
             // Issues link
             IssueServiceConfigurationRepresentation issueServiceConfiguration = null;
             String allIssuesLink = "";

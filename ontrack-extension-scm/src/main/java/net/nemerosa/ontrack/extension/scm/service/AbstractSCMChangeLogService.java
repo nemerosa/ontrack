@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.scm.service;
 
+import net.nemerosa.ontrack.extension.scm.model.SCMChangeLog;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogIssue;
 import net.nemerosa.ontrack.extension.scm.property.SCMChangeLogIssueValidator;
 import net.nemerosa.ontrack.model.structure.*;
@@ -7,7 +8,12 @@ import net.nemerosa.ontrack.model.structure.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class AbstractSCMChangeLogService {
+/**
+ * @param <S> Type of SCM data associated with the branch
+ * @param <T> Type of SCM data associated with a build
+ * @param <I> Type of issue associated with this change log
+ */
+public abstract class AbstractSCMChangeLogService<S, T, I extends SCMChangeLogIssue> {
 
     protected final StructureService structureService;
     protected final PropertyService propertyService;
@@ -22,22 +28,26 @@ public abstract class AbstractSCMChangeLogService {
     }
 
 
-    protected void validateIssues(List<? extends SCMChangeLogIssue> issuesList, Branch branch) {
+    protected void validateIssues(List<I> issuesList, SCMChangeLog<S, T> changeLog) {
         // Gets the list of validators for this branch
-        List<Property<?>> properties = propertyService.getProperties(branch).stream()
+        List<Property<?>> properties = propertyService.getProperties(changeLog.getBranch()).stream()
                 .filter(property -> !property.isEmpty() && property.getType() instanceof SCMChangeLogIssueValidator)
                 .collect(Collectors.toList());
         // Validates each issues
-        issuesList.forEach(issue -> validateIssue(issue, properties, branch));
+        issuesList.forEach(issue -> validateIssue(issue, properties, changeLog));
     }
 
-    @SuppressWarnings("unchecked")
-    protected void validateIssue(SCMChangeLogIssue issue, List<Property<?>> properties, Branch branch) {
-        properties.forEach(property -> validateIssue(branch, issue, (SCMChangeLogIssueValidator) property.getType(), property.getValue()));
+    protected void validateIssue(I issue, List<Property<?>> properties, SCMChangeLog<S, T> changeLog) {
+        for (Property<?> property : properties) {
+            if (!property.isEmpty()) {
+                validateIssue(issue, property, changeLog);
+            }
+        }
     }
 
-    private <T> void validateIssue(Branch branch, SCMChangeLogIssue issue, SCMChangeLogIssueValidator<T> validator, T validatorConfig) {
-        validator.validate(branch, issue, validatorConfig);
+    private <C> void validateIssue(I issue, Property<C> property, SCMChangeLog<S, T> changeLog) {
+        SCMChangeLogIssueValidator<C, S, T, I> validator = (SCMChangeLogIssueValidator<C, S, T, I>) property.getType();
+        validator.validate(changeLog, issue, property.getValue());
     }
 
 }
