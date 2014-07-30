@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.svn.property;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLog;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogIssueValidation;
+import net.nemerosa.ontrack.extension.svn.db.SVNIssueRevisionDao;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.model.SVNChangeLogIssue;
 import net.nemerosa.ontrack.extension.svn.model.SVNHistory;
@@ -12,11 +13,15 @@ import net.nemerosa.ontrack.model.form.MultiStrings;
 import net.nemerosa.ontrack.model.structure.PropertyService;
 
 import java.util.Collections;
+import java.util.OptionalLong;
 
 public class SVNRevisionChangeLogIssueValidator extends AbstractSVNChangeLogIssueValidator<SVNRevisionChangeLogIssueValidatorConfig> {
 
-    public SVNRevisionChangeLogIssueValidator(PropertyService propertyService) {
+    private final SVNIssueRevisionDao issueRevisionDao;
+
+    public SVNRevisionChangeLogIssueValidator(PropertyService propertyService, SVNIssueRevisionDao issueRevisionDao) {
         super(propertyService);
+        this.issueRevisionDao = issueRevisionDao;
     }
 
     @Override
@@ -25,26 +30,31 @@ public class SVNRevisionChangeLogIssueValidator extends AbstractSVNChangeLogIssu
             // Closed issue?
             if (validatorConfig.getClosedStatuses().contains(issue.getIssue().getStatus().getName())) {
                 // Last revision for this issue
-                long lastRevision = issue.getLastRevision().getRevision();
-                // Boundaries
-                long maxRevision = Math.max(
-                        changeLog.getScmBuildFrom().getScm().getRevision(),
-                        changeLog.getScmBuildTo().getScm().getRevision()
+                OptionalLong lastRevision = issueRevisionDao.findLastRevisionByIssue(
+                        changeLog.getScmBranch().getId(),
+                        issue.getIssue().getKey()
                 );
-                // Checks the boundaries
-                if (lastRevision > maxRevision) {
-                    issue.addValidations(
-                            Collections.singletonList(
-                                    SCMChangeLogIssueValidation.error(
-                                            String.format(
-                                                    "Issue %s is closed (%s), but has been fixed outside this " +
-                                                            "change log",
-                                                    issue.getIssue().getKey(),
-                                                    issue.getIssue().getStatus().getName()
-                                            )
-                                    )
-                            )
+                if (lastRevision.isPresent()) {
+                    // Boundaries
+                    long maxRevision = Math.max(
+                            changeLog.getScmBuildFrom().getScm().getRevision(),
+                            changeLog.getScmBuildTo().getScm().getRevision()
                     );
+                    // Checks the boundaries
+                    if (lastRevision.getAsLong() > maxRevision) {
+                        issue.addValidations(
+                                Collections.singletonList(
+                                        SCMChangeLogIssueValidation.error(
+                                                String.format(
+                                                        "Issue %s is closed (%s), but has been fixed outside this " +
+                                                                "change log",
+                                                        issue.getIssue().getKey(),
+                                                        issue.getIssue().getStatus().getName()
+                                                )
+                                        )
+                                )
+                        );
+                    }
                 }
             }
         }

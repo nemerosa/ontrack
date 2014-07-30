@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.svn.property;
 
+import net.nemerosa.ontrack.extension.svn.db.SVNIssueRevisionDao;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.structure.PropertyService;
 import org.junit.Test;
@@ -14,7 +15,8 @@ public class SVNRevisionChangeLogIssueValidatorTest {
     @Test
     public void fromStorage() {
         PropertyService propertyService = mock(PropertyService.class);
-        SVNRevisionChangeLogIssueValidator validator = new SVNRevisionChangeLogIssueValidator(propertyService);
+        SVNIssueRevisionDao issueRevisionDao = mock(SVNIssueRevisionDao.class);
+        SVNRevisionChangeLogIssueValidator validator = new SVNRevisionChangeLogIssueValidator(propertyService, issueRevisionDao);
         assertEquals(
                 new SVNRevisionChangeLogIssueValidatorConfig(
                         Arrays.asList("Closed", "Resolved")

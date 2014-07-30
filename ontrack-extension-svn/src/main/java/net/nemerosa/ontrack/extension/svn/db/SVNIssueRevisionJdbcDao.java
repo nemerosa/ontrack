@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalLong;
 
 @Repository
 public class SVNIssueRevisionJdbcDao extends AbstractJdbcRepository implements SVNIssueRevisionDao {
@@ -61,6 +62,19 @@ public class SVNIssueRevisionJdbcDao extends AbstractJdbcRepository implements S
                 "SELECT REVISION FROM EXT_SVN_REVISION_ISSUE WHERE REPOSITORY = :repository AND ISSUE = :key ORDER BY REVISION DESC",
                 params("key", issueKey).addValue("repository", repositoryId),
                 Long.class);
+    }
+
+    @Override
+    public OptionalLong findLastRevisionByIssue(int repositoryId, String issueKey) {
+        Long revision = getFirstItem(
+                "SELECT REVISION FROM EXT_SVN_REVISION_ISSUE WHERE REPOSITORY = :repository AND ISSUE = :key ORDER BY REVISION DESC LIMIT 1",
+                params("key", issueKey).addValue("repository", repositoryId),
+                Long.class);
+        if (revision != null) {
+            return OptionalLong.of(revision);
+        } else {
+            return OptionalLong.empty();
+        }
     }
 
 }

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.svn.property;
 
 import net.nemerosa.ontrack.extension.support.AbstractPropertyTypeExtension;
 import net.nemerosa.ontrack.extension.svn.SVNExtensionFeature;
+import net.nemerosa.ontrack.extension.svn.db.SVNIssueRevisionDao;
 import net.nemerosa.ontrack.model.structure.PropertyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -10,8 +11,8 @@ import org.springframework.stereotype.Component;
 public class SVNRevisionChangeLogIssueValidatorExtension extends AbstractPropertyTypeExtension<SVNRevisionChangeLogIssueValidatorConfig> {
 
     @Autowired
-    public SVNRevisionChangeLogIssueValidatorExtension(SVNExtensionFeature extensionFeature, PropertyService propertyService) {
-        super(extensionFeature, new SVNRevisionChangeLogIssueValidator(propertyService));
+    public SVNRevisionChangeLogIssueValidatorExtension(SVNExtensionFeature extensionFeature, PropertyService propertyService, SVNIssueRevisionDao issueRevisionDao) {
+        super(extensionFeature, new SVNRevisionChangeLogIssueValidator(propertyService, issueRevisionDao));
     }
 
 }
