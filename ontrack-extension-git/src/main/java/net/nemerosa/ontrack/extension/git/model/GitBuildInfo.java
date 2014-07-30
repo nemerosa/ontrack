@@ -5,7 +5,9 @@ import lombok.Data;
 @Data
 public class GitBuildInfo {
 
-    // TODO Put something in there...
-    private final String placeholder = "x";
+    /**
+     * This field is not used
+     */
+    private final String placeholder = "";
 
 }
