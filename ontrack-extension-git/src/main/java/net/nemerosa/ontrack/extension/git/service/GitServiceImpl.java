@@ -49,7 +49,6 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             PropertyService propertyService,
             Collection<GitConfigurator> configurators,
             GitClientFactory gitClientFactory,
-            PropertyService propertyService,
             IssueServiceRegistry issueServiceRegistry,
             JobQueueService jobQueueService,
             SecurityService securityService,
