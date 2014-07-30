@@ -15,6 +15,8 @@ public class GitChangeLog extends SCMChangeLog<GitConfiguration, GitBuildInfo> {
     private GitChangeLogCommits commits;
     @JsonIgnore // Not sent to the client
     private GitChangeLogIssues issues;
+    @JsonIgnore // Not sent to the client
+    private GitChangeLogFiles files;
 
     public GitChangeLog(
             String uuid,
@@ -32,6 +34,11 @@ public class GitChangeLog extends SCMChangeLog<GitConfiguration, GitBuildInfo> {
 
     public GitChangeLog withIssues(GitChangeLogIssues issues) {
         this.issues = issues;
+        return this;
+    }
+
+    public GitChangeLog withFiles(GitChangeLogFiles files) {
+        this.files = files;
         return this;
     }
 
