@@ -225,12 +225,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     private SCMBuildView<GitBuildInfo> getSCMBuildView(GitConfiguration configuration, Branch branch, ID buildId) {
-        // Gets the build view
-        BuildView buildView = getBuildView(buildId);
-        // TODO Gets the history for the build
-        // SVNHistory history = getBuildSVNHistory(svnRepository, buildView.getBuild());
-        // OK
-        return new SCMBuildView<>(buildView, new GitBuildInfo());
+        return new SCMBuildView<>(getBuildView(buildId), new GitBuildInfo());
     }
 
     private GitConfiguration getBranchConfiguration(Branch branch) {
