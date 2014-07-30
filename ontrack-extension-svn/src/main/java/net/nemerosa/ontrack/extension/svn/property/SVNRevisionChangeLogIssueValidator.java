@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.svn.property;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLog;
+import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogIssueValidation;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.model.SVNChangeLogIssue;
 import net.nemerosa.ontrack.extension.svn.model.SVNHistory;
@@ -21,9 +22,31 @@ public class SVNRevisionChangeLogIssueValidator extends AbstractSVNChangeLogIssu
     @Override
     public void validate(SCMChangeLog<SVNRepository, SVNHistory> changeLog, SVNChangeLogIssue issue, SVNRevisionChangeLogIssueValidatorConfig validatorConfig) {
         if (canApplyTo(changeLog.getBranch())) {
-            // Last revision for this issue
-            long lastRevision = issue.getLastRevision().getRevision();
-            // FIXME Method net.nemerosa.ontrack.extension.svn.property.SVNRevisionChangeLogIssueValidator.validate
+            // Closed issue?
+            if (validatorConfig.getClosedStatuses().contains(issue.getIssue().getStatus().getName())) {
+                // Last revision for this issue
+                long lastRevision = issue.getLastRevision().getRevision();
+                // Boundaries
+                long maxRevision = Math.max(
+                        changeLog.getScmBuildFrom().getScm().getRevision(),
+                        changeLog.getScmBuildTo().getScm().getRevision()
+                );
+                // Checks the boundaries
+                if (lastRevision > maxRevision) {
+                    issue.addValidations(
+                            Collections.singletonList(
+                                    SCMChangeLogIssueValidation.error(
+                                            String.format(
+                                                    "Issue %s is closed (%s), but has been fixed outside this " +
+                                                            "change log",
+                                                    issue.getIssue().getKey(),
+                                                    issue.getIssue().getStatus().getName()
+                                            )
+                                    )
+                            )
+                    );
+                }
+            }
         }
     }
 

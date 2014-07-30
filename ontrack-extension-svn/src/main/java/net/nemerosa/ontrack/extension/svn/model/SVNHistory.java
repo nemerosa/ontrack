@@ -32,4 +32,8 @@ public class SVNHistory {
     public SVNHistory truncateAbove(int index) {
         return new SVNHistory(references.subList(index + 1, references.size()));
     }
+
+    public long getRevision() {
+        return references.get(0).getRevision();
+    }
 }
