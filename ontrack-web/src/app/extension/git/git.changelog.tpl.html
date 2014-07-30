@@ -22,6 +22,11 @@
                         <span class="ot-extension-scm-changelog-command-loading"></span>
                         {{issuesCommand}}
                     </button>
+                    <button class="btn btn-default" ng-click="changeLogFiles()" ng-disabled="filesLoading">
+                        <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="files"></span>
+                        <span class="ot-extension-scm-changelog-command-loading"></span>
+                        {{filesCommand}}
+                    </button>
                 </div>
             </div>
 
@@ -133,6 +138,57 @@
                                 </ot-include>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Files sections -->
+            <div class="row">
+                <div class="col-md-12">
+                    <a name="files"></a>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading clearfix">
+                            File changes
+                            <div class="pull-right">
+                                <a class="btn btn-default btn-xs" ng-click="changeLogCommits()" ng-disabled="commitsLoading">
+                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="commits"></span>
+                                    <span class="ot-extension-scm-changelog-command-loading"></span>
+                                    {{commitsCommand}}
+                                </a>
+                                <a class="btn btn-default btn-xs" ng-if="changeLog._issues" ng-click="changeLogIssues()" ng-disabled="issuesLoading">
+                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="issues"></span>
+                                    <span class="ot-extension-scm-changelog-command-loading"></span>
+                                    {{issuesCommand}}
+                                </a>
+                            </div>
+                        </div>
+                        <div class="panel-body" ng-hide="files || filesLoading">
+                            <div class="alert alert-warning">
+                                No file change has been loaded yet. Click
+                                <a ng-click="changeLogFiles()" class="ot-action">here</a>
+                                to load them.
+                            </div>
+                        </div>
+                        <div class="panel-body ot-description" ng-show="filesLoading">
+                            File changes are loading...
+                        </div>
+                        <table class="table table-condensed table-hover" ng-show="files" width="100%">
+                            <tbody>
+                            <tr ng-repeat="changeLogFile in files.list">
+                                <td>
+                                    <span class="ot-scm-changelog-revision ot-scm-changetype-{{changeLogFile.changeType | lowercase}}">
+                                        <span class="ot-scm-changetype-icon" title="{{changeLogFile.changeType | lowercase}}"></span>
+                                    </span>
+                                    {{changeLogFile.oldPath | otExtensionScmTruncatePath:50}}
+                                    <span ng-if="changeLogFile.newPath">
+                                        <span class="glyphicon glyphicon-arrow-right"></span>
+                                        {{changeLogFile.newPath | otExtensionScmTruncatePath:50}}
+                                    </span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

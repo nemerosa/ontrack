@@ -1,4 +1,5 @@
 @import '../../vendor/bootstrap/less/glyphicons';
+@import '../../vendor/bootstrap/less/labels';
 @import '../../vendor/bootstrap/less/mixins';
 @import '../../vendor/bootstrap/less/type';
 @import 'variables.less';
@@ -45,5 +46,31 @@ span.ot-extension-scm-validationStampRunView {
   &.ot-extension-scm-changelog-issue-validation-INFO {
     .glyphicon-info-sign;
     .text-info;
+  }
+}
+
+.ot-scm-changelog-revision {
+  .label;
+  margin-right: 2px;
+  .ot-scm-changetype-icon {
+    .glyphicon;
+  }
+  &.ot-scm-changetype-modified {
+    .label-info;
+    .ot-scm-changetype-icon {
+      .glyphicon-pencil;
+    }
+  }
+  &.ot-scm-changetype-added {
+    .label-success;
+    .ot-scm-changetype-icon {
+      .glyphicon-plus;
+    }
+  }
+  &.ot-scm-changetype-deleted {
+    .label-danger;
+    .ot-scm-changetype-icon {
+      .glyphicon-remove;
+    }
   }
 }
