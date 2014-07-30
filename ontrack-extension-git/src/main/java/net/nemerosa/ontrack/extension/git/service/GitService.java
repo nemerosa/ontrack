@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.git.service;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.git.model.GitChangeLog;
 import net.nemerosa.ontrack.extension.git.model.GitChangeLogCommits;
+import net.nemerosa.ontrack.extension.git.model.GitChangeLogFiles;
 import net.nemerosa.ontrack.extension.git.model.GitChangeLogIssues;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.structure.Branch;
@@ -34,5 +35,10 @@ public interface GitService {
      * Change log issues
      */
     GitChangeLogIssues getChangeLogIssues(GitChangeLog changeLog);
+
+    /**
+     * Change log files
+     */
+    GitChangeLogFiles getChangeLogFiles(GitChangeLog changeLog);
 
 }

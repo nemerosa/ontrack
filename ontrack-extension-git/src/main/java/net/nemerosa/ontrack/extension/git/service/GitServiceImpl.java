@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceNotConfiguredException;
 import net.nemerosa.ontrack.extension.scm.model.SCMBuildView;
+import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFileChangeType;
 import net.nemerosa.ontrack.extension.scm.service.AbstractSCMChangeLogService;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.job.*;
@@ -116,8 +117,8 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                     UUID.randomUUID().toString(),
                     branch,
                     configuration,
-                    getSCMBuildView(configuration, branch, request.getFrom()),
-                    getSCMBuildView(configuration, branch, request.getTo())
+                    getSCMBuildView(request.getFrom()),
+                    getSCMBuildView(request.getTo())
             );
         }
     }
@@ -190,6 +191,54 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         }
     }
 
+    @Override
+    public GitChangeLogFiles getChangeLogFiles(GitChangeLog changeLog) {
+        // Gets the client client for this branch
+        GitClient gitClient = gitClientFactory.getClient(changeLog.getScmBranch());
+        // Gets the configuration
+        GitConfiguration gitConfiguration = gitClient.getConfiguration();
+        // Gets the tag boundaries
+        String tagFrom = changeLog.getFrom().getBuild().getName();
+        String tagTo = changeLog.getTo().getBuild().getName();
+        // Tag pattern
+        String tagPattern = gitConfiguration.getTagPattern();
+        if (StringUtils.isNotBlank(tagPattern)) {
+            tagFrom = StringUtils.replace(tagPattern, "*", tagFrom);
+            tagTo = StringUtils.replace(tagPattern, "*", tagTo);
+        }
+        // Diff
+        final GitDiff diff = gitClient.diff(tagFrom, tagTo);
+        // File change links
+        String fileChangeLinkFormat = gitConfiguration.getFileAtCommitLink();
+        // OK
+        return new GitChangeLogFiles(
+                diff.getEntries().stream()
+                        .map(entry -> toChangeLogFile(entry).withUrl(
+                                fileChangeLinkFormat
+                                        .replace("{commit}", entry.getReferenceId(diff.getFrom(), diff.getTo()))
+                                        .replace("{path}", entry.getReferencePath())
+                        ))
+                        .collect(Collectors.toList())
+        );
+    }
+
+    private GitChangeLogFile toChangeLogFile(GitDiffEntry entry) {
+        switch (entry.getChangeType()) {
+            case ADD:
+                return GitChangeLogFile.of(SCMChangeLogFileChangeType.ADDED, entry.getNewPath());
+            case COPY:
+                return GitChangeLogFile.of(SCMChangeLogFileChangeType.COPIED, entry.getOldPath(), entry.getNewPath());
+            case DELETE:
+                return GitChangeLogFile.of(SCMChangeLogFileChangeType.DELETED, entry.getOldPath());
+            case MODIFY:
+                return GitChangeLogFile.of(SCMChangeLogFileChangeType.MODIFIED, entry.getOldPath());
+            case RENAME:
+                return GitChangeLogFile.of(SCMChangeLogFileChangeType.RENAMED, entry.getOldPath(), entry.getNewPath());
+            default:
+                return GitChangeLogFile.of(SCMChangeLogFileChangeType.UNDEFINED, entry.getOldPath(), entry.getNewPath());
+        }
+    }
+
     private List<GitUICommit> toUICommits(GitConfiguration gitConfiguration, List<GitCommit> commits) {
         // Link?
         String commitLink = gitConfiguration.getCommitLink();
@@ -224,7 +273,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                 .collect(Collectors.toList());
     }
 
-    private SCMBuildView<GitBuildInfo> getSCMBuildView(GitConfiguration configuration, Branch branch, ID buildId) {
+    private SCMBuildView<GitBuildInfo> getSCMBuildView(ID buildId) {
         return new SCMBuildView<>(getBuildView(buildId), new GitBuildInfo());
     }
 
