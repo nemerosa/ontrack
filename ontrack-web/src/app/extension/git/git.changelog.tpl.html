@@ -180,7 +180,7 @@
                                     <span class="ot-scm-changelog-revision ot-scm-changetype-{{changeLogFile.changeType | lowercase}}">
                                         <span class="ot-scm-changetype-icon" title="{{changeLogFile.changeType | lowercase}}"></span>
                                     </span>
-                                    {{changeLogFile.oldPath | otExtensionScmTruncatePath:50}}
+                                    <a href="{{changeLogFile.url}}">{{changeLogFile.oldPath | otExtensionScmTruncatePath:50}}</a>
                                     <span ng-if="changeLogFile.newPath">
                                         <span class="glyphicon glyphicon-arrow-right"></span>
                                         {{changeLogFile.newPath | otExtensionScmTruncatePath:50}}
