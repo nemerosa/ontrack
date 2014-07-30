@@ -11,6 +11,15 @@ angular.module('ontrack.extension.scm', [
             transclude: true
         };
     })
+    .directive('otScmChangelogIssueValidations', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'app/extension/scm/directive.scmChangelogIssueValidations.tpl.html',
+            scope: {
+                changeLogIssue: '='
+            }
+        };
+    })
 /**
  * Truncates the start of a path
  */

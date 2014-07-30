@@ -1,4 +1,6 @@
 @import '../../vendor/bootstrap/less/glyphicons';
+@import '../../vendor/bootstrap/less/mixins';
+@import '../../vendor/bootstrap/less/type';
 @import 'variables.less';
 
 @otExtensionScmValidationStampRunView: 5px;
@@ -27,4 +29,21 @@ span.ot-extension-scm-validationStampRunView {
 .ot-extension-scm-changelog-command-unloaded {
   .glyphicon;
   .glyphicon-time;
+}
+
+.ot-extension-scm-changelog-issue-validation {
+  .glyphicon;
+  cursor: pointer;
+  &.ot-extension-scm-changelog-issue-validation-ERROR {
+    .glyphicon-remove;
+    .text-danger;
+  }
+  &.ot-extension-scm-changelog-issue-validation-WARNING {
+    .glyphicon-warning-sign;
+    .text-warning;
+  }
+  &.ot-extension-scm-changelog-issue-validation-INFO {
+    .glyphicon-info-sign;
+    .text-info;
+  }
 }
