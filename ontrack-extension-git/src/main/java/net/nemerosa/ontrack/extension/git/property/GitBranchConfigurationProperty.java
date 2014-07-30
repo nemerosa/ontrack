@@ -11,4 +11,19 @@ public class GitBranchConfigurationProperty {
      */
     private final String branch;
 
+    /**
+     * Tag pattern
+     */
+    private final String tagPattern;
+
+    /**
+     * Build overriding policy when synchronizing
+     */
+    private final boolean override;
+
+    /**
+     * Interval in minutes for build/tag synchronization
+     */
+    private final int buildTagInterval;
+
 }

@@ -103,6 +103,14 @@ public final class JsonUtils {
         }
     }
 
+    public static boolean getBoolean(JsonNode data, String field, boolean defaultValue) {
+        if (data.has(field)) {
+            return data.path(field).asBoolean();
+        } else {
+            return defaultValue;
+        }
+    }
+
     public static LocalDate getDate(JsonNode data, String field, LocalDate defaultValue) {
         if (data.has(field)) {
             return JDKLocalDateDeserializer.parse(data.path(field).asText());

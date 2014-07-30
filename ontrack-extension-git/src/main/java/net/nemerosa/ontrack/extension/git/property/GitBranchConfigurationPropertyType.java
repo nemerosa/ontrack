@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.form.Int;
 import net.nemerosa.ontrack.model.form.Text;
+import net.nemerosa.ontrack.model.form.YesNo;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
@@ -47,6 +49,31 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
                         Text.of("branch")
                                 .label("Git branch")
                                 .value(value != null ? value.getBranch() : "master")
+                )
+                .with(
+                        Text.of("tagPattern")
+                                .label("Tag pattern")
+                                .help("Expression that describes the tags to import when " +
+                                        "build/tag synchronisation is enabled. The * placeholder is used " +
+                                        "to designate the placeholder for the build name. It defaults to *, " +
+                                        "meaning that we have a 1:1 relationship between the tag and the build name.")
+                                .value(value != null ? value.getTagPattern() : "*")
+                )
+                .with(
+                        YesNo.of("override")
+                                .label("Override builds")
+                                .help("Can the existing builds be overridden by a synchronisation? If yes, " +
+                                        "the existing validation and promotion runs would be lost as well.")
+                                .value(value != null && value.isOverride())
+                )
+                .with(
+                        Int.of("buildTagInterval")
+                                .label("Build/tag sync. interval (min)")
+                                .min(0)
+                                .max(60 * 24 * 7) // 1 week
+                                .help("Interval in minutes for the synchronisation between builds and tags. " +
+                                        "If 0, the synchronisation must be done manually")
+                                .value(value != null ? value.getBuildTagInterval() : 0)
                 );
     }
 
@@ -58,7 +85,10 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
     @Override
     public GitBranchConfigurationProperty fromStorage(JsonNode node) {
         return new GitBranchConfigurationProperty(
-                JsonUtils.get(node, "branch", "master")
+                JsonUtils.get(node, "branch", "master"),
+                JsonUtils.get(node, "tagPattern", "*"),
+                JsonUtils.getBoolean(node, "override", false),
+                JsonUtils.getInt(node, "buildTagInterval", 0)
         );
     }
 

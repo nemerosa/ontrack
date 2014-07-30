@@ -1,1 +1,8 @@
-{{property.value.branch}}
+<p>{{property.value.branch}} <code>{{property.value.tagPattern}}</code></p>
+<p>
+    <span ng-if="!property.value.buildTagInterval">No automatic synchronisation.</span>
+    <span ng-if="property.value.buildTagInterval">Synchronisation every {{property.value.buildTagInterval}} minute(s).</span>
+</p>
+<p ng-if="property.value.override">
+    <span><b>Builds are overridden by the synchronisation.</b></span>
+</p>

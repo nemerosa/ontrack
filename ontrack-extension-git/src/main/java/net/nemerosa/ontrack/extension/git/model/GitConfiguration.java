@@ -39,6 +39,12 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
     private final String branch;
 
     /**
+     * Tag pattern configuration
+     */
+    @Wither
+    private final String tagPattern;
+
+    /**
      * User name
      */
     @Wither
@@ -168,6 +174,7 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
                 "",
                 "",
                 "",
+                "",
                 0,
                 ""
         );
@@ -178,6 +185,7 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
                 name,
                 defaultIfBlank(configuration.remote, remote),
                 defaultIfBlank(configuration.branch, branch),
+                defaultIfBlank(configuration.tagPattern, tagPattern),
                 defaultIfBlank(configuration.user, user),
                 defaultIfBlank(configuration.password, password),
                 defaultIfBlank(configuration.commitLink, commitLink),
