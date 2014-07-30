@@ -22,11 +22,14 @@ import net.nemerosa.ontrack.model.support.MessageAnnotator;
 import net.nemerosa.ontrack.tx.Transaction;
 import net.nemerosa.ontrack.tx.TransactionService;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -65,24 +68,31 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     @Override
-    public Collection<Job> getJobs() {
-        Collection<Job> jobs = new ArrayList<>();
+    public void forEachConfiguredBranch(BiConsumer<Branch, GitConfiguration> consumer) {
         for (Project project : structureService.getProjectList()) {
             for (Branch branch : structureService.getBranchesForProject(project.getId())) {
                 GitConfiguration configuration = getBranchConfiguration(branch);
                 if (configuration.isValid()) {
-                    // Indexation job
-                    if (configuration.getIndexationInterval() > 0) {
-                        jobs.add(createIndexationJob(configuration));
-                    }
-                    // Build/tag sync job
-                    Property<GitBranchConfigurationProperty> branchConfigurationProperty = propertyService.getProperty(branch, GitBranchConfigurationPropertyType.class);
-                    if (!branchConfigurationProperty.isEmpty() && branchConfigurationProperty.getValue().getBuildTagInterval() > 0) {
-                        jobs.add(createBuildSyncJob(branch, configuration));
-                    }
+                    consumer.accept(branch, configuration);
                 }
             }
         }
+    }
+
+    @Override
+    public Collection<Job> getJobs() {
+        Collection<Job> jobs = new ArrayList<>();
+        forEachConfiguredBranch((branch, configuration) -> {
+            // Indexation job
+            if (configuration.getIndexationInterval() > 0) {
+                jobs.add(createIndexationJob(configuration));
+            }
+            // Build/tag sync job
+            Property<GitBranchConfigurationProperty> branchConfigurationProperty = propertyService.getProperty(branch, GitBranchConfigurationPropertyType.class);
+            if (!branchConfigurationProperty.isEmpty() && branchConfigurationProperty.getValue().getBuildTagInterval() > 0) {
+                jobs.add(createBuildSyncJob(branch, configuration));
+            }
+        });
         return jobs;
     }
 
@@ -218,6 +228,14 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                         ))
                         .collect(Collectors.toList())
         );
+    }
+
+    @Override
+    public boolean scanCommits(GitConfiguration configuration, Predicate<RevCommit> scanFunction) {
+        // Gets the client client for this branch
+        GitClient gitClient = gitClientFactory.getClient(configuration);
+        // Scanning
+        return gitClient.scanCommits(scanFunction);
     }
 
     private String getDiffUrl(GitDiff diff, GitDiffEntry entry, String fileChangeLinkFormat) {

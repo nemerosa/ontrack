@@ -31,7 +31,7 @@ public interface GitClient {
      * Scans the whole history.
      *
      * @param scanFunction Function that scans the commits. Returns <code>true</code> if the scan
-     *                     must not go on, <code>true</code> otherwise.
+     *                     must not go on, <code>false</code> otherwise.
      * @return <code>true</code> if at least one call to <code>scanFunction</code> has returned <code>true</code>.
      */
     boolean scanCommits(Predicate<RevCommit> scanFunction);
