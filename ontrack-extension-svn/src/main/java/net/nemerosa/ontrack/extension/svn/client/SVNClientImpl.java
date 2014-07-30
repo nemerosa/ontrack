@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.extension.svn.client;
 
+import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFileChangeType;
 import net.nemerosa.ontrack.extension.svn.db.SVNEventDao;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.db.TCopyEvent;
-import net.nemerosa.ontrack.extension.svn.model.SVNChangeLogFileChangeType;
 import net.nemerosa.ontrack.extension.svn.model.SVNHistory;
 import net.nemerosa.ontrack.extension.svn.model.SVNReference;
 import net.nemerosa.ontrack.extension.svn.model.SVNRevisionPath;
@@ -204,15 +204,15 @@ public class SVNClientImpl implements SVNClient {
         return paths;
     }
 
-    private SVNChangeLogFileChangeType toFileChangeType(SVNStatusType modificationType) {
+    private SCMChangeLogFileChangeType toFileChangeType(SVNStatusType modificationType) {
         if (modificationType.equals(SVNStatusType.STATUS_MODIFIED)) {
-            return SVNChangeLogFileChangeType.MODIFIED;
+            return SCMChangeLogFileChangeType.MODIFIED;
         } else if (modificationType.equals(SVNStatusType.STATUS_ADDED)) {
-            return SVNChangeLogFileChangeType.ADDED;
+            return SCMChangeLogFileChangeType.ADDED;
         } else if (modificationType.equals(SVNStatusType.STATUS_DELETED)) {
-            return SVNChangeLogFileChangeType.DELETED;
+            return SCMChangeLogFileChangeType.DELETED;
         } else {
-            return SVNChangeLogFileChangeType.UNDEFINED;
+            return SCMChangeLogFileChangeType.UNDEFINED;
         }
     }
 

@@ -1,9 +1,9 @@
-package net.nemerosa.ontrack.extension.svn.model;
+package net.nemerosa.ontrack.extension.scm.model;
 
 /**
  * Type of change on a file.
  */
-public enum SVNChangeLogFileChangeType {
+public enum SCMChangeLogFileChangeType {
 
     /**
      * The file has been added
@@ -19,6 +19,16 @@ public enum SVNChangeLogFileChangeType {
      * The file has been deleted
      */
     DELETED,
+
+    /**
+     * Renaming
+     */
+    RENAMED,
+
+    /**
+     * Copy
+     */
+    COPIED,
 
     /**
      * Change not managed
