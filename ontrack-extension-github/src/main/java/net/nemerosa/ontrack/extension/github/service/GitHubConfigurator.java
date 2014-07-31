@@ -37,7 +37,7 @@ public class GitHubConfigurator implements GitConfigurator {
                     .withFileAtCommitLink(gitHub.getFileAtCommitLink())
                     .withIssueServiceConfigurationIdentifier(gitHub.toIdentifier().format());
             // User / password
-            String oAuth2Token = gitHub.getOAuth2Token();
+            String oAuth2Token = gitHub.getOauth2Token();
             String user = gitHub.getUser();
             if (StringUtils.isNotBlank(oAuth2Token)) {
                 gitHubConfig = gitHubConfig
