@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.github.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import net.nemerosa.ontrack.extension.github.GitHubIssueServiceExtension;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
@@ -40,7 +41,7 @@ public class GitHubConfiguration implements UserPasswordConfiguration<GitHubConf
     /**
      * OAuth2 token
      */
-    private final String oAuth2Token;
+    private final String oauth2Token;
 
     /**
      * Indexation interval
@@ -67,7 +68,7 @@ public class GitHubConfiguration implements UserPasswordConfiguration<GitHubConf
                 repository,
                 user,
                 password,
-                oAuth2Token,
+                oauth2Token,
                 indexationInterval
         );
     }
@@ -94,7 +95,7 @@ public class GitHubConfiguration implements UserPasswordConfiguration<GitHubConf
                                 .optional()
                 )
                 .with(
-                        Text.of("oAuth2Token")
+                        Text.of("oauth2Token")
                                 .label("OAuth2 token")
                                 .length(50)
                                 .optional()
@@ -117,7 +118,7 @@ public class GitHubConfiguration implements UserPasswordConfiguration<GitHubConf
                 .fill("repository", repository)
                 .fill("user", user)
                 .fill("password", "")
-                .fill("oAuth2Token", oAuth2Token)
+                .fill("oauth2Token", oauth2Token)
                 .fill("indexationInterval", indexationInterval)
                 ;
     }
@@ -138,6 +139,7 @@ public class GitHubConfiguration implements UserPasswordConfiguration<GitHubConf
     }
 
     @Override
+    @JsonIgnore
     public String getServiceId() {
         return GitHubIssueServiceExtension.GITHUB_SERVICE_ID;
     }

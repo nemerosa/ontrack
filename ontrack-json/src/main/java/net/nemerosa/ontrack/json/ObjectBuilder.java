@@ -14,6 +14,10 @@ public class ObjectBuilder implements JsonBuilder<ObjectNode> {
         this.thisNode = factory.objectNode();
     }
 
+    public ObjectBuilder withNull(String field) {
+        return with(field, factory.nullNode());
+    }
+
     public ObjectBuilder with(String field, int value) {
         return with(field, factory.numberNode(value));
     }

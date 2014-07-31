@@ -10,7 +10,7 @@ public class DefaultGitHubClientConfiguratorFactory implements GitHubClientConfi
     @Override
     public GitHubClientConfigurator getGitHubConfigurator(GitHubConfiguration configuration) {
         return client -> {
-            String oAuth2Token = configuration.getOAuth2Token();
+            String oAuth2Token = configuration.getOauth2Token();
             if (StringUtils.isNotBlank(oAuth2Token)) {
                 client.setOAuth2Token(oAuth2Token);
             } else {
