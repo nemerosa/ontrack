@@ -1,0 +1,18 @@
+<div class="panel panel-default">
+    <div class="panel-heading" ng-if="title">
+        Commit
+        <a href="{{commitInfo.uiCommit.link}}" target="_blank">
+            <code>{{commitInfo.uiCommit.commit.id}}</code>
+        </a>
+    </div>
+    <div class="panel-body">
+        <p ng-bind-html="commitInfo.uiCommit.annotatedMessage"></p>
+
+        <p class="ot-description">
+            --
+            {{commitInfo.uiCommit.commit.author.name}},
+            {{commitInfo.uiCommit.commit.commitTime | date:'mediumDate'}}
+            {{commitInfo.uiCommit.commit.commitTime | date:'shortTime'}}
+        </p>
+    </div>
+</div>

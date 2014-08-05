@@ -4,4 +4,14 @@ angular.module('ontrack.extension.git', [
     'ot.extension.git.changelog',
     'ot.extension.git.issue'
 ])
+    .directive('otExtensionGitCommitSummary', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'app/extension/git/directive.commit.summary.tpl.html',
+            scope: {
+                commitInfo: '=',
+                title: '@'
+            }
+        };
+    })
 ;
