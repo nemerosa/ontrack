@@ -57,4 +57,8 @@ public interface GitService {
      */
     boolean scanCommits(GitConfiguration configuration, Predicate<RevCommit> scanFunction);
 
+    /**
+     * Gets information about an issue in a Git-configured branch
+     */
+    OntrackGitIssueInfo getIssueInfo(ID branchId, String key);
 }

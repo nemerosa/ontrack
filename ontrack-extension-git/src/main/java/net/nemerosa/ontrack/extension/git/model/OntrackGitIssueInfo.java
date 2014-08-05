@@ -4,6 +4,8 @@ import lombok.Data;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
 
+import java.util.List;
+
 /**
  * Data that can be collected around an issue.
  */
@@ -33,6 +35,6 @@ public class OntrackGitIssueInfo {
     /**
      * Log
      */
-    private final GitUILog log;
+    private final List<GitUICommit> log;
 
 }

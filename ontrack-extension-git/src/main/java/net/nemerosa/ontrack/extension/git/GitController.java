@@ -15,6 +15,7 @@ import net.nemerosa.ontrack.model.buildfilter.BuildDiff;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
@@ -219,5 +220,16 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
         logCache.put(uuid, changeLog.withFiles(files));
         // OK
         return files;
+    }
+
+    /**
+     * Issue information
+     */
+    @RequestMapping(value = "{branchId}/issue/{issue}", method = RequestMethod.GET)
+    public Resource<OntrackGitIssueInfo> issueInfo(@PathVariable ID branchId, @PathVariable String issue) {
+        return Resource.of(
+                gitService.getIssueInfo(branchId, issue),
+                uri(on(getClass()).issueInfo(branchId, issue))
+        ).withView(Build.class);
     }
 }

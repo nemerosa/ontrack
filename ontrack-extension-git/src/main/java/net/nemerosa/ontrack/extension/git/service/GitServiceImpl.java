@@ -238,6 +238,62 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         return gitClient.scanCommits(scanFunction);
     }
 
+    @Override
+    public OntrackGitIssueInfo getIssueInfo(ID branchId, String key) {
+        // Configuration
+        GitConfiguration configuration = getBranchConfiguration(structureService.getBranch(branchId));
+        if (!configuration.isValid()) {
+            throw new GitBranchNotConfiguredException(branchId);
+        }
+        // Issue service
+        ConfiguredIssueService configuredIssueService = issueServiceRegistry.getConfiguredIssueService(configuration.getIssueServiceConfigurationIdentifier());
+        if (configuredIssueService == null) {
+            throw new GitBranchIssueServiceNotConfiguredException(branchId);
+        }
+        // Gets the details about the issue
+        Issue issue = configuredIssueService.getIssue(key);
+        // Gets the client for the branch
+        GitClient gitClient = gitClientFactory.getClient(configuration);
+        // Gets the commit link
+        String commitLink = configuration.getCommitLink();
+        // Issue-based annotations
+        List<? extends MessageAnnotator> messageAnnotators = getMessageAnnotators(configuration);
+        // Gets the commit log
+        List<GitUICommit> commits = new ArrayList<>();
+        gitClient.scanCommits(revCommit -> {
+            String message = revCommit.getFullMessage();
+            Set<String> keys = configuredIssueService.extractIssueKeysFromMessage(message);
+            if (keys.contains(key)) {
+                commits.add(
+                        toUICommit(
+                                commitLink,
+                                messageAnnotators,
+                                gitClient.toCommit(revCommit)
+                        )
+                );
+            }
+            return false; // Scanning all commits
+        });
+
+        // Gets the last commits (which is the first in the list)
+        GitUICommit firstCommit = commits.get(0);
+        OntrackGitCommitInfo commitInfo = getOntrackGitCommitInfo(configuration, firstCommit);
+
+        // OK
+        return new OntrackGitIssueInfo(
+                configuration,
+                configuredIssueService.getIssueServiceConfigurationRepresentation(),
+                issue,
+                commitInfo,
+                commits
+        );
+    }
+
+    private OntrackGitCommitInfo getOntrackGitCommitInfo(GitConfiguration configuration, GitUICommit commit) {
+        // FIXME Method net.nemerosa.ontrack.extension.git.service.GitServiceImpl.getOntrackGitCommitInfo
+        return null;
+    }
+
     private String getDiffUrl(GitDiff diff, GitDiffEntry entry, String fileChangeLinkFormat) {
         return fileChangeLinkFormat
                 .replace("{commit}", entry.getReferenceId(diff.getFrom(), diff.getTo()))
@@ -265,6 +321,23 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         // Link?
         String commitLink = gitConfiguration.getCommitLink();
         // Issue-based annotations
+        List<? extends MessageAnnotator> messageAnnotators = getMessageAnnotators(gitConfiguration);
+        // OK
+        return commits.stream()
+                .map(commit -> toUICommit(commitLink, messageAnnotators, commit))
+                .collect(Collectors.toList());
+    }
+
+    private GitUICommit toUICommit(String commitLink, List<? extends MessageAnnotator> messageAnnotators, GitCommit commit) {
+        return new GitUICommit(
+                commit,
+                MessageAnnotationUtils.annotate(commit.getShortMessage(), messageAnnotators),
+                MessageAnnotationUtils.annotate(commit.getFullMessage(), messageAnnotators),
+                StringUtils.replace(commitLink, "{commit}", commit.getId())
+        );
+    }
+
+    private List<? extends MessageAnnotator> getMessageAnnotators(GitConfiguration gitConfiguration) {
         List<? extends MessageAnnotator> messageAnnotators;
         String issueServiceConfigurationIdentifier = gitConfiguration.getIssueServiceConfigurationIdentifier();
         if (StringUtils.isNotBlank(issueServiceConfigurationIdentifier)) {
@@ -284,15 +357,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         } else {
             messageAnnotators = Collections.emptyList();
         }
-        // OK
-        return commits.stream()
-                .map(commit -> new GitUICommit(
-                        commit,
-                        MessageAnnotationUtils.annotate(commit.getShortMessage(), messageAnnotators),
-                        MessageAnnotationUtils.annotate(commit.getFullMessage(), messageAnnotators),
-                        StringUtils.replace(commitLink, "{commit}", commit.getId())
-                ))
-                .collect(Collectors.toList());
+        return messageAnnotators;
     }
 
     private SCMBuildView<GitBuildInfo> getSCMBuildView(ID buildId) {
