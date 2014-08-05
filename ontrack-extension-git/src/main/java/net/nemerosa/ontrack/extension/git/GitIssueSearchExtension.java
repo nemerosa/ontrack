@@ -112,7 +112,7 @@ public class GitIssueSearchExtension extends AbstractExtension implements Search
 //                                        repositoryIssue.getRepository().getConfiguration().getName(),
 //                                        repositoryIssue.getIssue().getKey()
 //                                )),
-                                    String.format("extension/git/issue/%d/%s",
+                                    String.format("extension/git/%d/issue/%s",
                                             c.getBranch().id(),
                                             issue.getKey()),
                                     100
