@@ -9,7 +9,7 @@ angular.module('ot.view.search', [
             controller: 'SearchCtrl'
         });
     })
-    .controller('SearchCtrl', function ($location, $stateParams, $scope, $http, ot) {
+    .controller('SearchCtrl', function ($location, $stateParams, $scope, $http, $log, ot) {
 
         // Search token
         $scope.token = $stateParams.token;
@@ -25,6 +25,7 @@ angular.module('ot.view.search', [
             $scope.results = results;
             // If only one result, switches directly to the correct page
             if (results.length == 1) {
+                $log.info('[search] Autoredirect for 1 result: ', results[0]);
                 $location.path(results[0].hint);
             }
         });

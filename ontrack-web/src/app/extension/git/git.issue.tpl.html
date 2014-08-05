@@ -1,0 +1,36 @@
+<ot-view>
+
+    <div class="row" ng-hide="ontrackGitIssueInfo">
+        <div class="col-md-12 alert alert-warning">
+            The revision information is loading. This may take some time...
+        </div>
+    </div>
+
+    <div class="row" ng-if="ontrackGitIssueInfo">
+        <div class="col-md-12">
+
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <a href="{{ontrackGitIssueInfo.issue.url}}">
+                        {{ontrackGitIssueInfo.issue.key}}
+                    </a>
+                </div>
+                <div class="panel-body">
+                    <ot-include value="ontrackGitIssueInfo.issue"
+                                template="app/extension/{{ontrackGitIssueInfo.issueServiceConfigurationRepresentation.serviceId}}/issue.tpl.html">
+                    </ot-include>
+                </div>
+            </div>
+
+            <!-- TODO Summary for the commit -->
+
+            <!-- TODO Builds for the revision -->
+
+            <!-- TODO Promotions for the revisions -->
+
+            <!-- TODO All other commits -->
+
+        </div>
+    </div>
+
+</ot-view>
