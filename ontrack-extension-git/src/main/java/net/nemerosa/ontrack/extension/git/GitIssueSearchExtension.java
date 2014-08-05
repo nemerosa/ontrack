@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+
 @Component
 public class GitIssueSearchExtension extends AbstractExtension implements SearchExtension {
 
@@ -106,12 +108,10 @@ public class GitIssueSearchExtension extends AbstractExtension implements Search
                                             c.getBranch().getProject().getName(),
                                             c.getBranch().getName()
                                     ),
-                                    null,
-                                    // TODO Git issue page
-//                                uri(on(GitController.class).issueInfo(
-//                                        repositoryIssue.getRepository().getConfiguration().getName(),
-//                                        repositoryIssue.getIssue().getKey()
-//                                )),
+                                    uri(on(GitController.class).issueInfo(
+                                            c.getBranch().getId(),
+                                            issue.getKey()
+                                    )),
                                     String.format("extension/git/%d/issue/%s",
                                             c.getBranch().id(),
                                             issue.getKey()),
