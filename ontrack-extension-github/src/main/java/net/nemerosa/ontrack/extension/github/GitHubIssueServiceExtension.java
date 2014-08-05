@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Component
 public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
@@ -104,7 +105,18 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
         return gitHubClient.getIssue(
                 configuration.getRepository(),
                 gitHubClientConfiguratorFactory.getGitHubConfigurator(configuration),
-                Integer.parseInt(issueKey.substring(1), 10)
+                getIssueId(issueKey)
         );
+    }
+
+    protected int getIssueId(String issueKey) {
+        return Integer.parseInt(StringUtils.stripStart(issueKey, "#"), 10);
+    }
+
+    @Override
+    public boolean containsIssueKey(IssueServiceConfiguration issueServiceConfiguration, String key, Set<String> keys) {
+        // Normalisation
+        Set<Integer> ids = keys.stream().map(this::getIssueId).collect(Collectors.toSet());
+        return ids.contains(getIssueId(key));
     }
 }

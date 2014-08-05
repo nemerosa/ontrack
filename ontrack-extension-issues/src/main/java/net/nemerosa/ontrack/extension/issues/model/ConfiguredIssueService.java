@@ -48,4 +48,8 @@ public class ConfiguredIssueService {
     public Set<String> extractIssueKeysFromMessage(String message) {
         return issueServiceExtension.extractIssueKeysFromMessage(issueServiceConfiguration, message);
     }
+
+    public boolean containsIssueKey(String key, Set<String> keys) {
+        return issueServiceExtension.containsIssueKey(issueServiceConfiguration, key, keys);
+    }
 }

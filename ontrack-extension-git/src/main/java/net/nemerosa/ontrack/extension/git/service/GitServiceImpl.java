@@ -265,7 +265,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         gitClient.scanCommits(revCommit -> {
             String message = revCommit.getFullMessage();
             Set<String> keys = configuredIssueService.extractIssueKeysFromMessage(message);
-            if (keys.contains(key)) {
+            if (configuredIssueService.containsIssueKey(key, keys)) {
                 commits.add(
                         toUICommit(
                                 commitLink,
@@ -276,6 +276,11 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             }
             return false; // Scanning all commits
         });
+
+        // Anomaly if commit not found
+        if (commits.isEmpty()) {
+            throw new GitIssueNotFoundException(key);
+        }
 
         // Gets the last commits (which is the first in the list)
         GitUICommit firstCommit = commits.get(0);

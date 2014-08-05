@@ -65,5 +65,15 @@ public class GitHubIssueServiceExtensionTest {
         );
     }
 
+    @Test
+    public void getIssueId_no_prefix() {
+        assertEquals(14, extension.getIssueId("14"));
+    }
+
+    @Test
+    public void getIssueId_with_prefix() {
+        assertEquals(14, extension.getIssueId("#14"));
+    }
+
 
 }

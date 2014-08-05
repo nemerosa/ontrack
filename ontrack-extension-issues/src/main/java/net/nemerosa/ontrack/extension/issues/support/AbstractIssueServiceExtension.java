@@ -2,7 +2,10 @@ package net.nemerosa.ontrack.extension.issues.support;
 
 import net.nemerosa.ontrack.extension.api.ExtensionFeature;
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtension;
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
+
+import java.util.Set;
 
 /**
  * Convenient implementation for most of the issue services.
@@ -32,6 +35,11 @@ public abstract class AbstractIssueServiceExtension extends AbstractExtension im
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public boolean containsIssueKey(IssueServiceConfiguration issueServiceConfiguration, String key, Set<String> keys) {
+        return keys.contains(key);
     }
 
 }
