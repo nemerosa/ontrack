@@ -51,7 +51,7 @@ public class GitHubIssueServiceExtensionTest {
     public void extractIssueKeysFromMessage_one() {
         Set<String> keys = extension.extractIssueKeysFromMessage(configuration, "#12 One GitHub issue");
         assertEquals(
-                Sets.newHashSet("12"),
+                Sets.newHashSet("#12"),
                 keys
         );
     }
@@ -60,7 +60,7 @@ public class GitHubIssueServiceExtensionTest {
     public void extractIssueKeysFromMessage_two() {
         Set<String> keys = extension.extractIssueKeysFromMessage(configuration, "#12 Two GitHub #45 issue");
         assertEquals(
-                Sets.newHashSet("12", "45"),
+                Sets.newHashSet("#12", "#45"),
                 keys
         );
     }

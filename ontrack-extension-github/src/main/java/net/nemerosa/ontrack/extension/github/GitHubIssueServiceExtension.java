@@ -65,8 +65,6 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
             while (matcher.find()) {
                 // Gets the issue
                 String issueKey = matcher.group();
-                // Removes the trailing #
-                issueKey = issueKey.substring(1);
                 // Adds to the result
                 result.add(issueKey);
             }
@@ -81,19 +79,16 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
         return Optional.of(
                 new RegexMessageAnnotator(
                         GITHUB_ISSUE_PATTERN,
-                        key -> {
-                            String id = key.substring(1);
-                            return MessageAnnotation.of("a")
-                                    .attr(
-                                            "href",
-                                            String.format(
-                                                    "https://github.com/%s/issues/%s",
-                                                    configuration.getRepository(),
-                                                    id
-                                            )
-                                    )
-                                    .text(key);
-                        }
+                        key -> MessageAnnotation.of("a")
+                                .attr(
+                                        "href",
+                                        String.format(
+                                                "https://github.com/%s/issues/%s",
+                                                configuration.getRepository(),
+                                                key.substring(1)
+                                        )
+                                )
+                                .text(key)
                 )
         );
     }
@@ -109,7 +104,7 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
         return gitHubClient.getIssue(
                 configuration.getRepository(),
                 gitHubClientConfiguratorFactory.getGitHubConfigurator(configuration),
-                Integer.parseInt(issueKey, 10)
+                Integer.parseInt(issueKey.substring(1), 10)
         );
     }
 }

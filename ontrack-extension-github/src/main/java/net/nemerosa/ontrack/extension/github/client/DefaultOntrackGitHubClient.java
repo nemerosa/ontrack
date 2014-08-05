@@ -10,6 +10,8 @@ import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.RequestException;
 import org.eclipse.egit.github.core.service.IssueService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -22,8 +24,12 @@ import java.util.stream.Collectors;
 @Component
 public class DefaultOntrackGitHubClient implements OntrackGitHubClient {
 
+    private final Logger logger = LoggerFactory.getLogger(OntrackGitHubClient.class);
+
     @Override
     public GitHubIssue getIssue(String project, GitHubClientConfigurator configurator, int id) {
+        // Logging
+        logger.debug("[github] Getting issue {}/{}", project, id);
         // GitHub client (non authentified)
         GitHubClient client = new GitHubClient() {
             @Override
