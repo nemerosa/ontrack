@@ -27,7 +27,7 @@ public class GitHubIssue implements Issue {
     @Override
     @JsonIgnore
     public String getKey() {
-        return String.valueOf(id);
+        return "#" + id;
     }
 
     @Override
