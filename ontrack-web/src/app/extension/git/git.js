@@ -23,4 +23,13 @@ angular.module('ontrack.extension.git', [
             }
         };
     })
+    .directive('otExtensionGitCommitPromotions', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'app/extension/git/directive.commit.promotions.tpl.html',
+            scope: {
+                commitInfo: '='
+            }
+        };
+    })
 ;
