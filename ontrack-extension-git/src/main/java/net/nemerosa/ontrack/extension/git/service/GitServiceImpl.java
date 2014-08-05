@@ -240,8 +240,9 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
 
     @Override
     public OntrackGitIssueInfo getIssueInfo(ID branchId, String key) {
+        Branch branch = structureService.getBranch(branchId);
         // Configuration
-        GitConfiguration configuration = getBranchConfiguration(structureService.getBranch(branchId));
+        GitConfiguration configuration = getBranchConfiguration(branch);
         if (!configuration.isValid()) {
             throw new GitBranchNotConfiguredException(branchId);
         }
@@ -277,7 +278,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
 
         // Gets the last commits (which is the first in the list)
         GitUICommit firstCommit = commits.get(0);
-        OntrackGitCommitInfo commitInfo = getOntrackGitCommitInfo(configuration, firstCommit);
+        OntrackGitCommitInfo commitInfo = getOntrackGitCommitInfo(firstCommit);
 
         // OK
         return new OntrackGitIssueInfo(
@@ -289,9 +290,43 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         );
     }
 
-    private OntrackGitCommitInfo getOntrackGitCommitInfo(GitConfiguration configuration, GitUICommit commit) {
-        // FIXME Method net.nemerosa.ontrack.extension.git.service.GitServiceImpl.getOntrackGitCommitInfo
-        return null;
+    private OntrackGitCommitInfo getOntrackGitCommitInfo(GitUICommit commit) {
+        // Data to collect
+        Collection<BuildView> buildViews = new ArrayList<>();
+        Collection<BranchStatusView> branchStatusViews = new ArrayList<>();
+        // For all configured branches
+        forEachConfiguredBranch((branch, configuration) -> {
+            // Gets the client client for this branch
+            GitClient gitClient = gitClientFactory.getClient(configuration);
+            // Gets the earliest tag on this branch that contains this commit
+            String tagName = gitClient.getEarliestTagForCommit(
+                    commit.getCommit().getId(),
+                    configuration::isValidTagName
+            );
+            // If a tag is provided, gets the corresponding build name
+            if (StringUtils.isNotBlank(tagName)) {
+                // Gets the build name from the tag (we usually do otherwise)
+                String buildName = configuration.getBuildNameFromTagName(tagName);
+                // Gets the build from the ontrack database
+                Optional<Build> buildOpt = structureService.findBuildByName(branch.getProject().getName(), branch.getName(), buildName);
+                // Build found
+                if (buildOpt.isPresent()) {
+                    // Gets the build view
+                    BuildView buildView = structureService.getBuildView(buildOpt.get());
+                    // Adds it to the list
+                    buildViews.add(buildView);
+                    // Collects the promotions for the branch
+                    branchStatusViews.add(structureService.getBranchStatusView(branch));
+                }
+            }
+        });
+
+        // OK
+        return new OntrackGitCommitInfo(
+                commit,
+                buildViews,
+                branchStatusViews
+        );
     }
 
     private String getDiffUrl(GitDiff diff, GitDiffEntry entry, String fileChangeLinkFormat) {

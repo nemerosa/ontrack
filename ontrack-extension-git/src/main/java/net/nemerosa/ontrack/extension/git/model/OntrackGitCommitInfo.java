@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.git.model;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Data;
 import net.nemerosa.ontrack.model.structure.BranchStatusView;
 import net.nemerosa.ontrack.model.structure.BuildView;
@@ -13,12 +12,6 @@ import java.util.Collection;
  */
 @Data
 public class OntrackGitCommitInfo {
-
-    /**
-     * Repository
-     */
-    @JsonView({OntrackGitCommitInfo.class})
-    private final GitConfiguration configuration;
 
     /**
      * Basic info about the commit

@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static net.nemerosa.ontrack.model.form.Form.defaultNameField;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
@@ -193,5 +194,17 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
                 configuration.indexationInterval > 0 ? configuration.indexationInterval : indexationInterval,
                 defaultIfBlank(configuration.issueServiceConfigurationIdentifier, issueServiceConfigurationIdentifier)
         );
+    }
+
+    public boolean isValidTagName(String name) {
+        return StringUtils.isBlank(tagPattern) || Pattern.matches(StringUtils.replace(tagPattern, "*", ".*"), name);
+    }
+
+    public String getBuildNameFromTagName(String tagName) {
+        if (StringUtils.isBlank(tagPattern)) {
+            return tagName;
+        } else {
+            return StringUtils.replace(tagPattern, "*", tagName);
+        }
     }
 }
