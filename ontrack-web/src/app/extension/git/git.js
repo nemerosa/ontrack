@@ -14,4 +14,13 @@ angular.module('ontrack.extension.git', [
             }
         };
     })
+    .directive('otExtensionGitCommitBuilds', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'app/extension/git/directive.commit.builds.tpl.html',
+            scope: {
+                commitInfo: '='
+            }
+        };
+    })
 ;
