@@ -170,7 +170,7 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
         return new GitConfiguration(
                 "",
                 "",
-                "",
+                "master",
                 "",
                 "",
                 "",
