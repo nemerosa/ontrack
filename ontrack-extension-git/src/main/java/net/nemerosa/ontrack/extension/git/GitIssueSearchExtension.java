@@ -127,7 +127,7 @@ public class GitIssueSearchExtension extends AbstractExtension implements Search
         private boolean scanIssue(BranchSearchConfiguration c, RevCommit commit, String key) {
             String message = commit.getFullMessage();
             Set<String> keys = c.getConfiguredIssueService().extractIssueKeysFromMessage(message);
-            return (keys.contains(key));
+            return c.getConfiguredIssueService().containsIssueKey(key, keys);
         }
     }
 }
