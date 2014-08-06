@@ -25,13 +25,11 @@ public class GitHubIssue implements Issue {
     private final LocalDateTime closedAt;
 
     @Override
-    @JsonIgnore
     public String getKey() {
         return String.valueOf(id);
     }
 
     @Override
-    @JsonIgnore
     public String getSummary() {
         return title;
     }

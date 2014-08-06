@@ -1,0 +1,19 @@
+<div ng-bind-html="value.bodyHtml" class="well"></div>
+<div>
+    State:
+    <span class="ot-extension-github-state ot-extension-github-state-{{value.state}}">{{value.state}}</span>
+    <span ng-if="value.milestone">
+        Milestone:
+        <a class="ot-extension-github-state ot-extension-github-state-{{value.milestone.state}}" ng-if="value.milestone" href="{{value.milestone.url}}">{{value.milestone.title}}</a>
+    </span>
+    <span ng-if="value.labels">
+        Labels:
+        <span ng-repeat="label in value.labels" class="ot-extension-github-label">{{label.name}}</span>
+    </span>
+    <span ng-if="value.assignee">
+        Assignee:
+        <a ng-if="value.assignee" href="{{value.assignee.url}}" target="_blank" class="label label-default">
+            {{value.assignee.login}}
+        </a>
+    </span>
+</div>
