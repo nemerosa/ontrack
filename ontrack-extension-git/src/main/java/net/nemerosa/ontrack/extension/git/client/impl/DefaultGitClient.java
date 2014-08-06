@@ -241,7 +241,7 @@ public class DefaultGitClient implements GitClient {
             // 2 - walking back to the history
 
             // Gets boundaries
-            ObjectId headObjectId = gitRepository.resolve("HEAD");
+            ObjectId headObjectId = gitRepository.resolve("origin/" + configuration.getBranch());
             ObjectId commitObjectId = gitRepository.resolve(gitCommitId);
             if (commitObjectId == null) {
                 throw new GitCommitNotFoundException(gitCommitId);
