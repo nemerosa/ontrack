@@ -4,7 +4,7 @@ angular.module('ot.directive.entity', [
     .directive('otEntityImage', function () {
         return {
             restrict: 'E',
-            templateUrl: 'app/directive/directive.entity.tpl.html',
+            templateUrl: 'app/directive/directive.entityImage.tpl.html',
             transclude: true,
             scope: {
                 entity: '=',
