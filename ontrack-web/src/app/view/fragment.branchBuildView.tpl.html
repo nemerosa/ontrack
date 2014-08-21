@@ -18,8 +18,9 @@
                     'ot-branch-build-view-auto-refresh-disabled': !autoRefresh
                     }"
                   title="{{autoRefresh ? 'Auto refresh is enabled' : 'Auto refresh is disabled'}}"
-                  ng-click="toggleAutoRefresh()"
-                    ></button>
+                  ng-click="toggleAutoRefresh()">
+                <span class="glyphicon glyphicon-refresh"></span>
+             </button>
         </th>
         <!-- All validation stamps -->
         <th ng-repeat="validationStamp in validationStampCollection.resources" class="ot-branch-build-view-validation">
@@ -112,8 +113,9 @@
                     'ot-branch-build-view-auto-refresh-disabled': !autoRefresh
                     }"
                     title="{{autoRefresh ? 'Auto refresh is enabled' : 'Auto refresh is disabled'}}"
-                    ng-click="toggleAutoRefresh()"
-                    ></button>
+                    ng-click="toggleAutoRefresh()">
+                <span class="glyphicon glyphicon-refresh"></span>
+            </button>
         </td>
     </tr>
     </tfoot>
