@@ -65,7 +65,9 @@ public class GitCommitSearchExtension extends AbstractExtension implements Searc
                                     String.format("%s %s",
                                             theCommit.getId(),
                                             theCommit.getShortMessage()),
-                                    String.format(""),
+                                    String.format("%s - %s",
+                                            theCommit.getAuthor().getName(),
+                                            commit.get().getFullAnnotatedMessage()),
                                     null, // TODO URI
                                     String.format("extension/git/%d/commit/%s",
                                             branch.id(),
