@@ -6,4 +6,19 @@
         </div>
     </div>
 
+    <div class="row" ng-if="ontrackGitCommitInfo">
+        <div class="col-md-12">
+
+            <!-- Summary for the commit -->
+            <ot-extension-git-commit-summary commit-info="ontrackGitCommitInfo" title="false"></ot-extension-git-commit-summary>
+
+            <!-- Builds for the revision -->
+            <ot-extension-git-commit-builds commit-info="ontrackGitCommitInfo"></ot-extension-git-commit-builds>
+
+            <!-- Promotions for the commits -->
+            <ot-extension-git-commit-promotions commit-info="ontrackGitCommitInfo"></ot-extension-git-commit-promotions>
+
+        </div>
+    </div>
+
 </ot-view>

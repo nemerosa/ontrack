@@ -12,6 +12,7 @@ angular.module('ot.extension.git.commit', [
     .controller('GitCommitCtrl', function ($stateParams, $scope, $http, $interpolate, ot) {
 
         var view = ot.view();
+        view.title = $interpolate("Commit {{commit}}")($stateParams);
 
         ot.call(
             $http.get(
