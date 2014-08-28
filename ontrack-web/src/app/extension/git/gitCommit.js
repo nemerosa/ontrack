@@ -13,11 +13,11 @@ angular.module('ot.extension.git.commit', [
 
         var view = ot.view();
 
-//        ot.call(
-//            $http.get(
-//                $interpolate('extension/git/{{branch}}/commit/{{commit}}')($stateParams)
-//            )).then(function (ontrackGitIssueInfo) {
-//                $scope.ontrackGitIssueInfo = ontrackGitIssueInfo;
-//            });
+        ot.call(
+            $http.get(
+                $interpolate('extension/git/{{branch}}/commit/{{commit}}')($stateParams)
+            )).then(function (ontrackGitCommitInfo) {
+                $scope.ontrackGitCommitInfo = ontrackGitCommitInfo;
+            });
     })
 ;
