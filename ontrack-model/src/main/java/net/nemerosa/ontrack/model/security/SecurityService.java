@@ -14,6 +14,10 @@ public interface SecurityService {
 
     void checkProjectFunction(int projectId, Class<? extends ProjectFunction> fn);
 
+    default void checkProjectFunction(ProjectEntity entity, Class<? extends ProjectFunction> fn) {
+        checkProjectFunction(entity.projectId(), fn);
+    }
+
     boolean isProjectFunctionGranted(int projectId, Class<? extends ProjectFunction> fn);
 
     default boolean isProjectFunctionGranted(ProjectEntity entity, Class<? extends ProjectFunction> fn) {

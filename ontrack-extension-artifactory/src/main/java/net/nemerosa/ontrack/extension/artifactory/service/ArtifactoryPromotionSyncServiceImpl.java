@@ -124,7 +124,7 @@ public class ArtifactoryPromotionSyncServiceImpl implements JobProvider {
         }
     }
 
-    private void syncBuild(Branch branch, String artifactoryBuildName, String buildName, ArtifactoryClient client, JobInfoListener info) {
+    protected void syncBuild(Branch branch, String artifactoryBuildName, String buildName, ArtifactoryClient client, JobInfoListener info) {
         // Looks for the build
         Optional<Build> buildOpt = structureService.findBuildByName(
                 branch.getProject().getName(),
@@ -153,20 +153,25 @@ public class ArtifactoryPromotionSyncServiceImpl implements JobProvider {
                         statusName
                 );
                 if (promotionLevelOpt.isPresent()) {
-                    logger.info("[artifactory-sync] Promote {}/{}/{} to {}",
-                            branch.getProject().getName(),
-                            branch.getName(),
-                            buildName,
-                            statusName);
-                    // Actual promotion
-                    structureService.newPromotionRun(
-                            PromotionRun.of(
-                                    buildOpt.get(),
-                                    promotionLevelOpt.get(),
-                                    Signature.of(artifactoryStatus.getUser()).withTime(artifactoryStatus.getTimestamp()),
-                                    "Promoted from Artifactory"
-                            )
-                    );
+                    // Looks for an existing promotion run for the build
+                    Optional<PromotionRun> runOpt = structureService.getLastPromotionRunForBuildAndPromotionLevel(buildOpt.get(), promotionLevelOpt.get());
+                    if (!runOpt.isPresent()) {
+                        // No existing promotion, we can promote safely
+                        logger.info("[artifactory-sync] Promote {}/{}/{} to {}",
+                                branch.getProject().getName(),
+                                branch.getName(),
+                                buildName,
+                                statusName);
+                        // Actual promotion
+                        structureService.newPromotionRun(
+                                PromotionRun.of(
+                                        buildOpt.get(),
+                                        promotionLevelOpt.get(),
+                                        Signature.of(artifactoryStatus.getUser()).withTime(artifactoryStatus.getTimestamp()),
+                                        "Promoted from Artifactory"
+                                )
+                        );
+                    }
                 }
             }
         }

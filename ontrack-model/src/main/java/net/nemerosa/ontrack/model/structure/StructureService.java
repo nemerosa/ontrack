@@ -93,6 +93,8 @@ public interface StructureService {
 
     List<PromotionRun> getLastPromotionRunsForBuild(ID buildId);
 
+    Optional<PromotionRun> getLastPromotionRunForBuildAndPromotionLevel(Build build, PromotionLevel promotionLevel);
+
     PromotionRun getLastPromotionRunForPromotionLevel(PromotionLevel promotionLevel);
 
     // Validation stamps

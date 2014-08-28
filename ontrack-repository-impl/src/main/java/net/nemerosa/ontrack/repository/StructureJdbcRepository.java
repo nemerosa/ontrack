@@ -460,7 +460,8 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         );
     }
 
-    protected Optional<PromotionRun> getLastPromotionRun(Build build, PromotionLevel promotionLevel) {
+    @Override
+    public Optional<PromotionRun> getLastPromotionRun(Build build, PromotionLevel promotionLevel) {
         return Optional.ofNullable(
                 getFirstItem(
                         "SELECT * FROM PROMOTION_RUNS WHERE BUILDID = :buildId AND PROMOTIONLEVELID = :promotionLevelId ORDER BY CREATION DESC LIMIT 1",
