@@ -11,8 +11,7 @@
                 <dt>
                     <a href="#{{result.hint}}">{{result.title}}</a>
                 </dt>
-                <dd>
-                    {{result.description}}
+                <dd ng-bind-html="result.description">
                 </dd>
             </dl>
         </div>
