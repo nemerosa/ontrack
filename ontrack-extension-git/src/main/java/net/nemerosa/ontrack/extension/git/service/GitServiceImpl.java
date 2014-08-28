@@ -317,6 +317,14 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         }
     }
 
+    @Override
+    public OntrackGitCommitInfo getCommitInfo(ID branchId, String commit) {
+        /**
+         * The information is actually collected on all branches.
+         */
+        return getOntrackGitCommitInfo(commit);
+    }
+
     private OntrackGitCommitInfo getOntrackGitCommitInfo(String commit) {
         // Reference data
         AtomicReference<GitCommit> theCommit = new AtomicReference<>();

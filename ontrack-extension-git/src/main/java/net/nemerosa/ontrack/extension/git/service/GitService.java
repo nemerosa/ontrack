@@ -70,4 +70,9 @@ public interface GitService {
      * @return The content of a commit if it exists, empty otherwise.
      */
     Optional<GitUICommit> lookupCommit(GitConfiguration configuration, String id);
+
+    /**
+     * Gets information about a commit in a Git-configured branch.
+     */
+    OntrackGitCommitInfo getCommitInfo(ID branchId, String commit);
 }

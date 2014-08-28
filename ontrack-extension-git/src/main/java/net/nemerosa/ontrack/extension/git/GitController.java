@@ -232,4 +232,15 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
                 uri(on(getClass()).issueInfo(branchId, issue))
         ).withView(Build.class);
     }
+
+    /**
+     * Commit information
+     */
+    @RequestMapping(value = "{branchId}/commit/{commit}", method = RequestMethod.GET)
+    public Resource<OntrackGitCommitInfo> commitInfo(@PathVariable ID branchId, @PathVariable String commit) {
+        return Resource.of(
+                gitService.getCommitInfo(branchId, commit),
+                uri(on(getClass()).commitInfo(branchId, commit))
+        ).withView(Build.class);
+    }
 }
