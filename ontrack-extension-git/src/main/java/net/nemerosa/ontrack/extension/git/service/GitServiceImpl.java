@@ -296,6 +296,27 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         );
     }
 
+    @Override
+    public Optional<GitUICommit> lookupCommit(GitConfiguration configuration, String id) {
+        // Gets the client client for this configuration
+        GitClient gitClient = gitClientFactory.getClient(configuration);
+        // Gets the commit
+        GitCommit gitCommit = gitClient.getCommitFor(id);
+        if (gitCommit != null) {
+            String commitLink = configuration.getCommitLink();
+            List<? extends MessageAnnotator> messageAnnotators = getMessageAnnotators(configuration);
+            return Optional.of(
+                    toUICommit(
+                            commitLink,
+                            messageAnnotators,
+                            gitCommit
+                    )
+            );
+        } else {
+            return Optional.empty();
+        }
+    }
+
     private OntrackGitCommitInfo getOntrackGitCommitInfo(String commit) {
         // Reference data
         AtomicReference<GitCommit> theCommit = new AtomicReference<>();

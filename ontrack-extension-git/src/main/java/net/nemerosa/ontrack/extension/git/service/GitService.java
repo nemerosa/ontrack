@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ID;
 import org.eclipse.jgit.revwalk.RevCommit;
 
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
@@ -61,4 +62,12 @@ public interface GitService {
      * Gets information about an issue in a Git-configured branch
      */
     OntrackGitIssueInfo getIssueInfo(ID branchId, String key);
+
+    /**
+     * Looks up a commit in the given <code>configuration</code>.
+     *
+     * @param id Commit long or short ID
+     * @return The content of a commit if it exists, empty otherwise.
+     */
+    Optional<GitUICommit> lookupCommit(GitConfiguration configuration, String id);
 }
