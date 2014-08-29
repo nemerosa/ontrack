@@ -1,6 +1,9 @@
 package net.nemerosa.ontrack.extension.git.client.impl
 
+import net.nemerosa.ontrack.extension.git.client.GitClient
+import net.nemerosa.ontrack.extension.git.model.GitConfiguration
 import org.junit.AfterClass
+import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Test
 
@@ -32,7 +35,7 @@ class GitClientEarliestTagIT {
     /**
      * Execution of a command
      */
-    private static void run(String cmd, String... args) {
+    private static String run(String cmd, String... args) {
         println "Running: $cmd ${args.join(' ')}"
         def list = [cmd]
         list.addAll args
@@ -43,7 +46,9 @@ class GitClientEarliestTagIT {
             println process.inputStream.text
             assert false: "Command exited with error = $exit"
         } else {
-            println process.inputStream.text
+            def output = process.inputStream.text
+            println output
+            return output
         }
     }
 
@@ -54,6 +59,7 @@ class GitClientEarliestTagIT {
     static void 'Git repository'() {
         // Gets a directory
         repo = File.createTempDir('ontrack-git', '')
+        println "Git repo at $repo"
 
         // Initialises a Git repository
         run('git', 'init')
@@ -90,12 +96,35 @@ class GitClientEarliestTagIT {
         run('git', 'commit', '-m', "Commit $no")
     }
 
+    protected static String commitLookup(String message) {
+        def info = run('git', 'log', '-g', '--grep', message, '--pretty=format:%h')
+        if (info) {
+            info.trim()
+        } else {
+            throw new RuntimeException("Cannot find commit for message $message")
+        }
+    }
+
     /**
      * Removing the Git repository
      */
     @AfterClass
     static void 'Git repository deletion'() {
         repo.deleteDir()
+    }
+
+    private GitClient gitClient
+
+    @Before
+    void 'Git client'() {
+        GitRepository gitRepository = new DefaultGitRepository(
+                repo,
+                "",
+                "master",
+                "id"
+        )
+        GitConfiguration gitConfiguration = GitConfiguration.empty()
+        gitClient = new DefaultGitClient(gitRepository, gitConfiguration)
     }
 
     /**
@@ -105,7 +134,12 @@ class GitClientEarliestTagIT {
      */
     @Test
     void 'tag_on_commit'() {
-
+        // Identifying SHA for "Commit 8"
+        def commit = commitLookup('Commit 8')
+        // Call
+        def tag = gitClient.getEarliestTagForCommit(commit, { true })
+        // Check
+        assert tag == '1.1.0'
     }
 
     /**
@@ -125,6 +159,16 @@ class GitClientEarliestTagIT {
      */
     @Test
     void 'tag_on_separate_path'() {
+
+    }
+
+    /**
+     * When no tag is found.
+     *
+     * <code>Commit 9</code> gives no tag.
+     */
+    @Test
+    void 'no_tag'() {
 
     }
 

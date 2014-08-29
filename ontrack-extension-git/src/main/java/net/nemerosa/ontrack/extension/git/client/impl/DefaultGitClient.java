@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.git.client.impl;
 
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import net.nemerosa.ontrack.extension.git.client.*;
 import net.nemerosa.ontrack.extension.git.client.plot.GPlot;
@@ -220,6 +221,12 @@ public class DefaultGitClient implements GitClient {
             Git git = repository.git();
             Repository gitRepository = git.getRepository();
 
+            // Target commit
+            ObjectId commitObjectId = gitRepository.resolve(gitCommitId);
+            if (commitObjectId == null) {
+                throw new GitCommitNotFoundException(gitCommitId);
+            }
+
             // 1 - look for exact match
             Map<String, String> commitTagIndex = new HashMap<>();
             List<Ref> tagRefs = git.tagList().call();
@@ -232,35 +239,36 @@ public class DefaultGitClient implements GitClient {
                     RevCommit revCommit = repository.getCommitForTag(tagRef);
                     commitTagIndex.put(revCommit.getId().getName(), tagName);
                     // Equality?
-                    if (revCommit.getId().getName().equals(gitCommitId)) {
+                    if (revCommit.getId().equals(commitObjectId)) {
                         return tagName;
                     }
                 }
             }
 
-            // 2 - walking back to the history
+            // 2 - if no exact match, takes the tag whose distance from the commit
+            // is the smallest.
 
-            // Gets boundaries
-            ObjectId headObjectId = gitRepository.resolve("origin/" + configuration.getBranch());
-            ObjectId commitObjectId = gitRepository.resolve(gitCommitId);
-            if (commitObjectId == null) {
-                throw new GitCommitNotFoundException(gitCommitId);
+            // Tag distance index
+            Map<String, Integer> tagDistances = new HashMap<>();
+
+            // For each tag
+            for (Map.Entry<String, String> entry : commitTagIndex.entrySet()) {
+                String tagCommitId = entry.getKey();
+                String tagName = entry.getValue();
+                ObjectId tagCommitObjectId = gitRepository.resolve(tagCommitId);
+                // Walk
+                RevWalk walk = new RevWalk(gitRepository);
+                walk.markStart(walk.lookupCommit(tagCommitObjectId));
+                walk.markUninteresting(walk.lookupCommit(commitObjectId));
+                // Gets the size of the walk
+                int size = Iterators.size(walk.iterator());
+                // Index
+                tagDistances.put(tagName, size);
             }
-            // Walk
-            RevWalk walk = new RevWalk(gitRepository);
-            walk.markStart(walk.lookupCommit(headObjectId));
-            walk.markUninteresting(walk.lookupCommit(commitObjectId));
-            // List of commits between the commit and the HEAD
-            String tag = null;
-            for (RevCommit revCommit : walk) {
-                // Gets the corresponding tag
-                String candidateTagName = commitTagIndex.get(revCommit.getId().getName());
-                if (candidateTagName != null && tagNamePredicate.test(candidateTagName)) {
-                    tag = candidateTagName;
-                }
-            }
-            // OK
-            return tag;
+
+            // TODO FIXME
+            return null;
+
         } catch (IOException ex) {
             throw new GitIOException(ex);
         } catch (GitAPIException e) {
