@@ -186,11 +186,12 @@ public class DefaultGitClient implements GitClient {
     public GitCommit getCommitFor(String commit) {
         try {
             Repository repo = repository.git().getRepository();
-            return toCommit(
-                    new RevWalk(repo).parseCommit(
-                            repo.resolve(commit + "^0")
-                    )
-            );
+            ObjectId objectId = repo.resolve(commit + "^0");
+            if (objectId != null) {
+                return toCommit(new RevWalk(repo).parseCommit(objectId));
+            } else {
+                return null;
+            }
         } catch (IOException e) {
             return null;
         }

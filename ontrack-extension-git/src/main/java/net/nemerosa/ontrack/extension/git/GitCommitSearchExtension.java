@@ -20,6 +20,8 @@ import java.util.regex.Pattern;
 @Component
 public class GitCommitSearchExtension extends AbstractExtension implements SearchExtension {
 
+    private final Pattern shaPattern = Pattern.compile("[a-f0-9]{40}|[a-f0-9]{7}");
+
     private final GitService gitService;
     private final URIBuilder uriBuilder;
 
@@ -46,7 +48,7 @@ public class GitCommitSearchExtension extends AbstractExtension implements Searc
 
         @Override
         public boolean isTokenSearchable(String token) {
-            return Pattern.matches("[a-f0-9]{40}", token);
+            return shaPattern.matcher(token).matches();
         }
 
         @Override
