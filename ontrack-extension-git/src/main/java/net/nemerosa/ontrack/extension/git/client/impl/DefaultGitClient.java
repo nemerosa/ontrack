@@ -1,11 +1,10 @@
 package net.nemerosa.ontrack.extension.git.client.impl;
 
-import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import net.nemerosa.ontrack.extension.git.client.*;
 import net.nemerosa.ontrack.extension.git.client.plot.GPlot;
 import net.nemerosa.ontrack.extension.git.client.plot.GitPlotRenderer;
-import net.nemerosa.ontrack.extension.git.model.GitCommitNotFoundException;
+import net.nemerosa.ontrack.extension.git.client.support.GitClientSupport;
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.model.support.Time;
 import org.apache.commons.lang3.StringUtils;
@@ -20,17 +19,18 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.AbstractTreeIterator;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class DefaultGitClient implements GitClient {
 
-    private final Logger logger = LoggerFactory.getLogger(GitClient.class);
     private final GitRepository repository;
     private final GitConfiguration configuration;
 
@@ -197,82 +197,17 @@ public class DefaultGitClient implements GitClient {
     }
 
     /**
-     * Emulates the
-     * <a href="https://www.kernel.org/pub/software/scm/git/docs/git-describe.html"><code>describe</code></a>
-     * command.
-     * <p>
-     * For each committish supplied, git describe will first look for a tag which tags exactly that commit.
-     * Annotated tags will always be preferred over lightweight tags, and tags with newer dates will always
-     * be preferred over tags with older dates. If an exact match is found, its name will be output and
-     * searching will stop.
-     * <p>
-     * If an exact match was not found, git describe will walk back through the commit history to locate an
-     * ancestor commit which has been tagged. The ancestor’s tag will be output along with an abbreviation of
-     * the input committish’s SHA1.
-     * <p>
-     * If multiple tags were found during the walk then the tag which has the fewest commits different from the
-     * input committish will be selected and output. Here fewest commits different is defined as the number of
-     * commits which would be shown by git log tag..input will be the smallest number of commits possible.
+     * Gets the earliest commit that contains the commit. Uses the <code>git tag --contains</code> command.
      */
     @Override
     public String getEarliestTagForCommit(String gitCommitId, Predicate<String> tagNamePredicate) {
-        try {
-            // Client
-            Git git = repository.git();
-            Repository gitRepository = git.getRepository();
-
-            // Target commit
-            ObjectId commitObjectId = gitRepository.resolve(gitCommitId);
-            if (commitObjectId == null) {
-                throw new GitCommitNotFoundException(gitCommitId);
-            }
-
-            // 1 - look for exact match
-            Map<String, String> commitTagIndex = new HashMap<>();
-            List<Ref> tagRefs = git.tagList().call();
-            for (Ref tagRef : tagRefs) {
-                // Indexation
-                String tagName = getTagNameFromRef(tagRef);
-                if (tagNamePredicate.test(tagName)) {
-                    // Gets the corresponding commit
-                    logger.debug("[gitclient] Looking commit for tag {}", tagName);
-                    RevCommit revCommit = repository.getCommitForTag(tagRef);
-                    commitTagIndex.put(revCommit.getId().getName(), tagName);
-                    // Equality?
-                    if (revCommit.getId().equals(commitObjectId)) {
-                        return tagName;
-                    }
-                }
-            }
-
-            // 2 - if no exact match, takes the tag whose distance from the commit
-            // is the smallest.
-
-            // Tag distance index
-            Map<String, Integer> tagDistances = new HashMap<>();
-
-            // For each tag
-            for (Map.Entry<String, String> entry : commitTagIndex.entrySet()) {
-                String tagCommitId = entry.getKey();
-                String tagName = entry.getValue();
-                ObjectId tagCommitObjectId = gitRepository.resolve(tagCommitId);
-                // Walk
-                RevWalk walk = new RevWalk(gitRepository);
-                walk.markStart(walk.lookupCommit(tagCommitObjectId));
-                walk.markUninteresting(walk.lookupCommit(commitObjectId));
-                // Gets the size of the walk
-                int size = Iterators.size(walk.iterator());
-                // Index
-                tagDistances.put(tagName, size);
-            }
-
-            // TODO FIXME
+        List<String> tagNames = GitClientSupport.tagContains(repository.wd(), gitCommitId).stream()
+                .filter(tagNamePredicate)
+                .collect(Collectors.toList());
+        if (tagNames.isEmpty()) {
             return null;
-
-        } catch (IOException ex) {
-            throw new GitIOException(ex);
-        } catch (GitAPIException e) {
-            throw new GitException(e);
+        } else {
+            return tagNames.get(0);
         }
     }
 

@@ -13,7 +13,10 @@ import org.junit.Test
  * The integration test creates the following Git history for the tests:
  *
  * <pre>
- * * e7c13f8 (HEAD, master) Commit 10
+ * * e7c13f8 (HEAD, master) Commit 13
+ * * e7c13f8 Commit 12
+ * * e7c13f8 Commit 11
+ * * e7c13f8 (tag: 1.2.0) Commit 10
  * * d7bd568 Commit 9
  * * a01269a (tag: 1.1.0) Commit 8
  * * 92cd6e2 Commit 7
@@ -84,6 +87,10 @@ class GitClientEarliestTagIT {
         run('git', 'tag', '1.1.0')
         commit(9)
         commit(10)
+        run('git', 'tag', '1.2.0')
+        commit(11)
+        commit(12)
+        commit(13)
 
         // Log
         run('git', 'log', '--oneline', '--graph', '--decorate', 'master', '1.0')
@@ -175,12 +182,12 @@ class GitClientEarliestTagIT {
     /**
      * When no tag is found.
      *
-     * <code>Commit 9</code> gives no tag.
+     * <code>Commit 11</code> gives no tag.
      */
     @Test
     void 'no_tag'() {
-        // Identifying SHA for "Commit 9"
-        def commit = commitLookup('Commit 9')
+        // Identifying SHA for "Commit 11"
+        def commit = commitLookup('Commit 11')
         // Call
         def tag = gitClient.getEarliestTagForCommit(commit, { true })
         // Check

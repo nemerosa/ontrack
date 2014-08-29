@@ -5,6 +5,7 @@ dependencies {
     compile project(':ontrack-tx')
     compile 'org.eclipse.jgit:org.eclipse.jgit:3.4.1.201406201815-r'
     compile libraries.spring_tx
+    compile libraries.commons_io
 
     testCompile libraries.groovy
 }
