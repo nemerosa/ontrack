@@ -149,7 +149,12 @@ class GitClientEarliestTagIT {
      */
     @Test
     void 'tag_on_path_to_head'() {
-
+        // Identifying SHA for "Commit 6"
+        def commit = commitLookup('Commit 6')
+        // Call
+        def tag = gitClient.getEarliestTagForCommit(commit, { true })
+        // Check
+        assert tag == '1.1.0'
     }
 
     /**
@@ -159,7 +164,12 @@ class GitClientEarliestTagIT {
      */
     @Test
     void 'tag_on_separate_path'() {
-
+        // Identifying SHA for "Commit 3"
+        def commit = commitLookup('Commit 3')
+        // Call
+        def tag = gitClient.getEarliestTagForCommit(commit, { true })
+        // Check
+        assert tag == '1.0.1'
     }
 
     /**
@@ -169,7 +179,12 @@ class GitClientEarliestTagIT {
      */
     @Test
     void 'no_tag'() {
-
+        // Identifying SHA for "Commit 9"
+        def commit = commitLookup('Commit 9')
+        // Call
+        def tag = gitClient.getEarliestTagForCommit(commit, { true })
+        // Check
+        assert tag == null
     }
 
 }
