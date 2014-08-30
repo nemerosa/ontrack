@@ -46,22 +46,22 @@ var ontrack = angular.module('ontrack', [
             $httpProvider.defaults.withCredentials = true;
         })
         // HTTP global interceptor
-        .factory('httpGlobalInterceptor', function ($log) {
-            var count = 0;
+        .factory('httpGlobalInterceptor', function ($log, $rootScope) {
+            $rootScope.currentCalls = 0;
             return {
                 'request': function (config) {
-                    count++;
-                    $log.debug('Start of request, ', count);
+                    $rootScope.currentCalls++;
+                    $log.debug('Start of request, ', $rootScope.currentCalls);
                     return config;
                 },
                 'response': function (response) {
-                    count--;
-                    $log.debug('End of request, ', count);
+                    $rootScope.currentCalls--;
+                    $log.debug('End of request, ', $rootScope.currentCalls);
                     return response;
                 },
                 'responseError': function (rejection) {
-                    count--;
-                    $log.debug('End of request with error, ', count);
+                    $rootScope.currentCalls--;
+                    $log.debug('End of request with error, ', $rootScope.currentCalls);
                     return rejection;
                 }
             };
