@@ -38,10 +38,33 @@ var ontrack = angular.module('ontrack', [
         'ontrack.extension.git',
         'ontrack.extension.github'
     ])
-        //HTTP configuration
+        // HTTP configuration
         .config(function ($httpProvider) {
+            // General HTTP interceptor
+            $httpProvider.interceptors.push('httpGlobalInterceptor');
             // Authentication using cookies and CORS protection
             $httpProvider.defaults.withCredentials = true;
+        })
+        // HTTP global interceptor
+        .factory('httpGlobalInterceptor', function ($log) {
+            var count = 0;
+            return {
+                'request': function (config) {
+                    count++;
+                    $log.debug('Start of request, ', count);
+                    return config;
+                },
+                'response': function (response) {
+                    count--;
+                    $log.debug('End of request, ', count);
+                    return response;
+                },
+                'responseError': function (rejection) {
+                    count--;
+                    $log.debug('End of request with error, ', count);
+                    return rejection;
+                }
+            };
         })
         // Routing configuration
         .config(function ($stateProvider, $urlRouterProvider) {
