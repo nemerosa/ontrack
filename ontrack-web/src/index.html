@@ -101,6 +101,16 @@
                     <input type="text" class="form-control" placeholder="Search..." ng-model="searchToken">
                 </form>
 
+                <!-- Loading indicator -->
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a
+                                ng-show="currentCalls"
+                                class="ot-loading-indicator" title="Loading elements... {{currentCalls}}"></a>
+                    </li>
+                </ul>
+
+
             </div>
         </div>
     </nav>
