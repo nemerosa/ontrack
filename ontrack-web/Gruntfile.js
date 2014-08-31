@@ -6,7 +6,7 @@ module.exports = function (grunt) {
     var vendor = {
         js: [
             'vendor/jquery/dist/jquery.js',
-            'vendor/jquery-ui/ui/jquery-ui.js',
+            'vendor/jquery-ui/jquery-ui.js',
             'vendor/angular/angular.js',
             'vendor/angular-ui-router/release/angular-ui-router.js',
             'vendor/angular-ui-sortable/sortable.js',
