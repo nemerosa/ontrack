@@ -6,16 +6,16 @@
         </div>
     </div>
 
+    <div class="row" ng-show="branchBuildView && branchBuildView.buildViews.length == 0">
+        <div class="col-md-12 alert alert-warning">
+            No build has been created for this branch or the filter is too restrictive.
+        </div>
+    </div>
+
     <div class="row" ng-show="!branchBuildView && loadingBuildView">
         <div class="col-md-12 alert alert-warning">
             <img src="assets/ajax-loader.gif" />
             Loading the builds...
-        </div>
-    </div>
-
-    <div class="row" ng-show="!branchBuildView && !loadingBuildView">
-        <div class="col-md-12 alert alert-warning">
-            No build has been created yet for this branch.
         </div>
     </div>
 
