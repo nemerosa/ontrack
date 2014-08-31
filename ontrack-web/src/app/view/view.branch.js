@@ -74,8 +74,10 @@ angular.module('ot.view.branch', [
                 $scope.currentBuildFilterResource = undefined;
             }
             // Call
+            $scope.loadingBuildView = true;
             ot.call($http.get(uri, config)).then(
                 function success(branchBuildView) {
+                    $scope.loadingBuildView = false;
                     $scope.branchBuildView = branchBuildView;
                     // Selection of build boundaries
                     var buildViews = branchBuildView.buildViews;
@@ -83,6 +85,8 @@ angular.module('ot.view.branch', [
                         $scope.selectedBuild.from = buildViews[0].build.id;
                         $scope.selectedBuild.to = buildViews[buildViews.length - 1].build.id;
                     }
+                }, function error() {
+                    $scope.loadingBuildView = false;
                 }
             );
         }
