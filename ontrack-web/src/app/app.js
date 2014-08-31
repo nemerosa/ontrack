@@ -51,17 +51,17 @@ var ontrack = angular.module('ontrack', [
             return {
                 'request': function (config) {
                     $rootScope.currentCalls++;
-                    $log.debug('Start of request, ', $rootScope.currentCalls);
+                    // $log.debug('Start of request, ', $rootScope.currentCalls);
                     return config;
                 },
                 'response': function (response) {
                     $rootScope.currentCalls--;
-                    $log.debug('End of request, ', $rootScope.currentCalls);
+                    // $log.debug('End of request, ', $rootScope.currentCalls);
                     return response;
                 },
                 'responseError': function (rejection) {
                     $rootScope.currentCalls--;
-                    $log.debug('End of request with error, ', $rootScope.currentCalls);
+                    // $log.debug('End of request with error, ', $rootScope.currentCalls);
                     return rejection;
                 }
             };
