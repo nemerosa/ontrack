@@ -1,14 +1,14 @@
 {
   "name": "ontrack",
   "dependencies": {
-    "angular": "~1.2.16",
-    "angular-sanitize": "~1.2.16",
-    "angular-ui-router": "~0.2.10",
-    "bootstrap": "~3.1.1",
-    "angular-bootstrap": "~0.10.0",
-    "jquery-ui": "~1.10.4",
-    "angular-ui-sortable": "~0.12.8",
-    "angular-multi-select": "~2.0.0",
+    "angular": "~1.2.23",
+    "angular-sanitize": "~1.2.23",
+    "angular-ui-router": "~0.2.11",
+    "bootstrap": "~3.2.0",
+    "angular-bootstrap": "~0.11.0",
+    "jquery-ui": "~1.11.1",
+    "angular-ui-sortable": "~0.12.10",
+    "angular-multi-select": "~2.0.1",
     "angular-taglist": "~0.1.5"
   }
 }
