@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.jira;
 
+import net.nemerosa.ontrack.extension.issues.model.ExportedIssues;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtension;
@@ -122,6 +123,12 @@ public class JIRAServiceExtension extends AbstractIssueServiceExtension {
     @Override
     public Issue getIssue(IssueServiceConfiguration issueServiceConfiguration, String issueKey) {
         return getIssue((JIRAConfiguration) issueServiceConfiguration, issueKey);
+    }
+
+    @Override
+    public ExportedIssues exportIssues(IssueServiceConfiguration issueServiceConfiguration, List<? extends Issue> issues, String format) {
+        // FIXME Method net.nemerosa.ontrack.extension.jira.JIRAServiceExtension.exportIssues
+        return null;
     }
 
     public JIRAIssue getIssue(JIRAConfiguration configuration, String key) {

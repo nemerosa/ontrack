@@ -4,6 +4,8 @@ import net.nemerosa.ontrack.extension.github.client.GitHubClientConfiguratorFact
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClient;
 import net.nemerosa.ontrack.extension.github.model.GitHubConfiguration;
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService;
+import net.nemerosa.ontrack.extension.issues.model.ExportFormat;
+import net.nemerosa.ontrack.extension.issues.model.ExportedIssues;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtension;
@@ -122,5 +124,11 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public ExportedIssues exportIssues(IssueServiceConfiguration issueServiceConfiguration, List<? extends Issue> issues, String format) {
+        // FIXME Method net.nemerosa.ontrack.extension.github.GitHubIssueServiceExtension.exportIssues
+        return null;
     }
 }

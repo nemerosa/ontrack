@@ -8,6 +8,9 @@ import lombok.Data;
 @Data
 public class ExportFormat {
 
+    public static final ExportFormat TEXT = new ExportFormat("text", "Text");
+    public static final ExportFormat HTML = new ExportFormat("html", "HTML");
+
     private final String id;
     private final String name;
 
