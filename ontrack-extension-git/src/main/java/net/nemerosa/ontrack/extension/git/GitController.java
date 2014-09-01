@@ -21,7 +21,9 @@ import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
@@ -151,6 +153,23 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
         logCache.put(changeLog.getUuid(), changeLog);
         // OK
         return changeLog;
+    }
+
+    /**
+     * Change log export
+     */
+    @RequestMapping(value = "changelog/export/{format}", method = RequestMethod.GET)
+    public ResponseEntity<String> changeLog(BuildDiffRequest request, @PathVariable String format) {
+        // Gets the change log of issues
+        GitChangeLog changeLog = gitService.changeLog(request);
+        // Gets the issue change log
+        GitChangeLogIssues changeLogIssues = gitService.getChangeLogIssues(changeLog);
+        // TODO Exports the change log using the given format
+        // TODO Content type
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("Content-Type", "text/plain");
+        // TODO Body and headers
+        return new ResponseEntity<>("", responseHeaders, HttpStatus.OK);
     }
 
     private GitChangeLog getChangeLog(String uuid) {
