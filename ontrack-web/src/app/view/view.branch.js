@@ -129,6 +129,28 @@ angular.module('ot.view.branch', [
             });
         }
 
+        // Loading of the other branches
+        function loadOtherBranches() {
+            ot.call($http.get($scope.branch._branches)).then(function (branchCollection) {
+                view.commands.push({
+                    id: 'switch-branch',
+                    name: "Switch",
+                    group: true,
+                    actions: branchCollection.resources
+                        .filter(function (theBranch) {
+                            return theBranch.id != branchId;
+                        })
+                        .map(function (theBranch) {
+                        return {
+                            id: 'switch-' + theBranch.id,
+                            name: theBranch.name,
+                            uri: 'branch/' + theBranch.id
+                        };
+                    })
+                });
+            });
+        }
+
         // Loading the branch
         function loadBranch() {
             otStructureService.getBranch(branchId).then(function (branchResource) {
@@ -193,6 +215,8 @@ angular.module('ot.view.branch', [
                 loadPromotionLevels();
                 // Loads the validation stamps
                 loadValidationStamps();
+                // Loads the other branches
+                loadOtherBranches();
             });
         }
 
