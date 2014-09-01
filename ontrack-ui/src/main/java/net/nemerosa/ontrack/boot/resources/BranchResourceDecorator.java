@@ -52,6 +52,11 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                         "_validationStamps",
                         on(ValidationStampController.class).getValidationStampListForBranch(branch.getId())
                 )
+                        // All branches for the same project
+                .link(
+                        "_branches",
+                        on(BranchController.class).getBranchListForProject(branch.getProjectId())
+                )
                         // Actual properties for this build
                 .link("_properties", on(PropertyController.class).getProperties(ProjectEntityType.BRANCH, branch.getId()))
                         // Actions
