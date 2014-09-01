@@ -8,6 +8,10 @@ import net.nemerosa.ontrack.extension.git.model.*;
 import net.nemerosa.ontrack.extension.git.service.GitConfigurationService;
 import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
+import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
+import net.nemerosa.ontrack.extension.issues.model.ExportedIssues;
+import net.nemerosa.ontrack.extension.issues.model.Issue;
+import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogIssue;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogUUIDException;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.model.Ack;
@@ -20,6 +24,7 @@ import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -27,7 +32,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -160,16 +167,35 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
      */
     @RequestMapping(value = "changelog/export/{format}", method = RequestMethod.GET)
     public ResponseEntity<String> changeLog(BuildDiffRequest request, @PathVariable String format) {
-        // Gets the change log of issues
+        // Gets the change log
         GitChangeLog changeLog = gitService.changeLog(request);
+        // Gets the issue service
+        String issueServiceConfigurationIdentifier = changeLog.getScmBranch().getIssueServiceConfigurationIdentifier();
+        if (StringUtils.isBlank(issueServiceConfigurationIdentifier)) {
+            return new ResponseEntity<>(
+                    "The branch is not configured for issues",
+                    HttpStatus.NO_CONTENT
+            );
+        }
+        ConfiguredIssueService configuredIssueService = issueServiceRegistry.getConfiguredIssueService(issueServiceConfigurationIdentifier);
         // Gets the issue change log
         GitChangeLogIssues changeLogIssues = gitService.getChangeLogIssues(changeLog);
-        // TODO Exports the change log using the given format
-        // TODO Content type
+        // List of issues
+        List<Issue> issues = changeLogIssues.getList().stream()
+                .map(SCMChangeLogIssue::getIssue)
+                .collect(Collectors.toList());
+        // Exports the change log using the given format
+        ExportedIssues exportedChangeLogIssues = configuredIssueService.getIssueServiceExtension()
+                .exportIssues(
+                        configuredIssueService.getIssueServiceConfiguration(),
+                        issues,
+                        format
+                );
+        // Content type
         HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set("Content-Type", "text/plain");
-        // TODO Body and headers
-        return new ResponseEntity<>("", responseHeaders, HttpStatus.OK);
+        responseHeaders.set("Content-Type", exportedChangeLogIssues.getFormat());
+        // Body and headers
+        return new ResponseEntity<>(exportedChangeLogIssues.getContent(), responseHeaders, HttpStatus.OK);
     }
 
     private GitChangeLog getChangeLog(String uuid) {
