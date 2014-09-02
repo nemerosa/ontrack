@@ -2,24 +2,33 @@ package net.nemerosa.ontrack.acceptance
 
 import com.google.common.base.Predicate
 import net.nemerosa.ontrack.acceptance.pages.HomePage
+import org.apache.commons.io.FileUtils
 import org.junit.After
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.openqa.selenium.Dimension
+import org.openqa.selenium.OutputType
+import org.openqa.selenium.TakesScreenshot
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.support.ui.WebDriverWait
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+import java.text.SimpleDateFormat
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
+import java.util.concurrent.atomic.AtomicLong
 
 abstract class GUITestClient extends AcceptanceTestClient {
 
     private static final Logger logger = LoggerFactory.getLogger(GUITestClient)
 
     private static int implicitWait
+    private static File screenshotDir
+
     protected static WebDriver driver
+    private static AtomicLong screenshotIndex = new AtomicLong()
 
     @BeforeClass
     static void init() {
@@ -27,7 +36,10 @@ abstract class GUITestClient extends AcceptanceTestClient {
         implicitWait = Integer.parseInt(
                 env('ontrack.implicitWait', false, '5', "Implicit wait time for GUI components (in seconds)"),
                 10)
+        screenshotDir = new File(env('ontrack.screenshots', false, 'build/screenshots', 'Screenshot output directory'))
+        // Logging
         logger.info("[gui] Implicit wait = ${implicitWait}s")
+        logger.info("[gui] Screenshots   = ${screenshotDir}")
         // Web driver class
         driver = initDriver()
         driver.manage().deleteAllCookies()
@@ -69,13 +81,34 @@ abstract class GUITestClient extends AcceptanceTestClient {
         waitUntil(implicitWait, closure)
     }
 
+    static def screenshot(String name) {
+        // Takes the screenshot
+        File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+        // Screenshot name
+        String fullName = String.format(
+                "%s-%d-%s.png",
+                new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()),
+                screenshotIndex.incrementAndGet(),
+                name
+        )
+        // Saves the screenshot in the target directory
+        FileUtils.copyFile(scrFile, new File(screenshotDir, fullName))
+    }
+
     static def waitUntil(int seconds, Closure<Boolean> closure) {
-        new WebDriverWait(driver, seconds).until(new Predicate<WebDriver>() {
-            @Override
-            boolean apply(WebDriver input) {
-                closure()
-            }
-        })
+        try {
+            new WebDriverWait(driver, seconds).until(new Predicate<WebDriver>() {
+                @Override
+                boolean apply(WebDriver input) {
+                    closure()
+                }
+            })
+        } catch (TimeoutException ex) {
+            // Takes a screenshot
+            screenshot("timeout");
+            // The error is still there
+            throw ex;
+        }
     }
 
 }
