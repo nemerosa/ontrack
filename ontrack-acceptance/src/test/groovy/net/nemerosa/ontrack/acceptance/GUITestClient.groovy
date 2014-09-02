@@ -9,20 +9,29 @@ import org.openqa.selenium.Dimension
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.support.ui.WebDriverWait
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import java.util.concurrent.TimeUnit
 
 abstract class GUITestClient extends AcceptanceTestClient {
 
+    private static final Logger logger = LoggerFactory.getLogger(GUITestClient)
+
     protected static WebDriver driver
 
     @BeforeClass
     static void init() {
+        // Configuration
+        int implicitWait = Integer.parseInt(
+                env('ontrack.implicitWait', false, '5', "Implicit wait time for GUI components (in seconds)"),
+                10)
+        logger.info("[gui] Implicit wait = ${implicitWait}s")
         // Web driver class
         driver = initDriver()
         driver.manage().deleteAllCookies()
         driver.manage().window().setSize(new Dimension(1024, 768))
-        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+        driver.manage().timeouts().implicitlyWait(implicitWait, TimeUnit.SECONDS);
     }
 
     @AfterClass

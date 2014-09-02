@@ -17,6 +17,7 @@ ext {
 
 acceptanceTest {
     systemProperty 'ontrack.url', ontrackUrl
+    systemProperty 'ontrack.implicitWait', project.hasProperty('ontrackImplicitWait') ? ontrackImplicitWait : 5
 }
 
 // Disable unit tests (none in this project)
