@@ -164,6 +164,8 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
 
     /**
      * Change log export
+     *
+     * TODO Have this export also in SVN extension
      */
     @RequestMapping(value = "changelog/export/{format}", method = RequestMethod.GET)
     public ResponseEntity<String> changeLog(BuildDiffRequest request, @PathVariable String format) {
