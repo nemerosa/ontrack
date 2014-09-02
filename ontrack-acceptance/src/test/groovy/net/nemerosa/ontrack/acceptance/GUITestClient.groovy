@@ -18,12 +18,13 @@ abstract class GUITestClient extends AcceptanceTestClient {
 
     private static final Logger logger = LoggerFactory.getLogger(GUITestClient)
 
+    private static int implicitWait
     protected static WebDriver driver
 
     @BeforeClass
     static void init() {
         // Configuration
-        int implicitWait = Integer.parseInt(
+        implicitWait = Integer.parseInt(
                 env('ontrack.implicitWait', false, '5', "Implicit wait time for GUI components (in seconds)"),
                 10)
         logger.info("[gui] Implicit wait = ${implicitWait}s")
@@ -65,7 +66,7 @@ abstract class GUITestClient extends AcceptanceTestClient {
     }
 
     static def waitUntil(Closure<Boolean> closure) {
-        waitUntil(2, closure)
+        waitUntil(implicitWait, closure)
     }
 
     static def waitUntil(int seconds, Closure<Boolean> closure) {
