@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.acceptance
 import com.google.common.base.Predicate
 import net.nemerosa.ontrack.acceptance.pages.HomePage
 import org.apache.commons.io.FileUtils
-import org.apache.commons.io.IOUtils
 import org.junit.After
 import org.junit.AfterClass
 import org.junit.BeforeClass
@@ -84,8 +83,6 @@ abstract class GUITestClient extends AcceptanceTestClient {
     }
 
     static def screenshot(String name) {
-        // Takes the screenshot
-        File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
         // Screenshot name
         String fullName = String.format(
                 "%s-%d-%s.png",
@@ -96,6 +93,9 @@ abstract class GUITestClient extends AcceptanceTestClient {
         // Saves the screenshot in the target directory
         def targetFile = new File(screenshotDir, fullName)
         logger.info("[gui] Screenshot at ${targetFile.absolutePath}");
+        // Takes the screenshot
+        File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+        // Copies the file
         FileUtils.copyFile(scrFile, targetFile)
     }
 
