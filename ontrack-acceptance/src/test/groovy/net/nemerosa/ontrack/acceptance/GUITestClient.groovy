@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.acceptance
 import com.google.common.base.Predicate
 import net.nemerosa.ontrack.acceptance.pages.HomePage
 import org.apache.commons.io.FileUtils
+import org.apache.commons.io.IOUtils
 import org.junit.After
 import org.junit.AfterClass
 import org.junit.BeforeClass
@@ -36,7 +37,8 @@ abstract class GUITestClient extends AcceptanceTestClient {
         implicitWait = Integer.parseInt(
                 env('ontrack.implicitWait', false, '5', "Implicit wait time for GUI components (in seconds)"),
                 10)
-        screenshotDir = new File(env('ontrack.screenshots', false, 'build/screenshots', 'Screenshot output directory'))
+        screenshotDir = new File(env('ontrack.screenshots', false, 'build/screenshots', 'Screenshot output directory')).absoluteFile
+        FileUtils.forceMkdir(screenshotDir)
         // Logging
         logger.info("[gui] Implicit wait = ${implicitWait}s")
         logger.info("[gui] Screenshots   = ${screenshotDir}")
