@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.issues.model;
+package net.nemerosa.ontrack.extension.issues.export;
 
 import lombok.Data;
 

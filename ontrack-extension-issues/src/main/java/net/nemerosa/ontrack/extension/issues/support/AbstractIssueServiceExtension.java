@@ -6,14 +6,17 @@ import net.nemerosa.ontrack.extension.api.ExtensionFeature;
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest;
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtension;
 import net.nemerosa.ontrack.extension.issues.export.ExportFormat;
+import net.nemerosa.ontrack.extension.issues.export.ExportedIssues;
+import net.nemerosa.ontrack.extension.issues.export.IssueExportService;
 import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory;
-import net.nemerosa.ontrack.extension.issues.model.*;
+import net.nemerosa.ontrack.extension.issues.model.Issue;
+import net.nemerosa.ontrack.extension.issues.model.IssueExportMoreThanOneGroupException;
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
-
-import static java.lang.String.format;
+import java.util.stream.Collectors;
 
 /**
  * Convenient implementation for most of the issue services.
@@ -58,48 +61,23 @@ public abstract class AbstractIssueServiceExtension extends AbstractExtension im
      */
     @Override
     public List<ExportFormat> exportFormats() {
-        return Arrays.asList(
-                ExportFormat.TEXT,
-                ExportFormat.HTML
-        );
+        return issueExportServiceFactory.getIssueExportServices().stream()
+                .map(IssueExportService::getExportFormat)
+                .collect(Collectors.toList());
     }
 
     @Override
     public ExportedIssues exportIssues(IssueServiceConfiguration issueServiceConfiguration, List<? extends Issue> issues, IssueChangeLogExportRequest request) {
         // Grouping of issues (or not)
         Map<String, List<Issue>> groupedIssues = groupIssues(issueServiceConfiguration, issues, request);
-        if (ExportFormat.TEXT.getId().equals(request.getFormat())) {
-            return new ExportedIssues(
-                    ExportFormat.TEXT.getId(),
-                    exportAsText(groupedIssues)
-            );
-//        } else if (ExportFormat.HTML.getId().equals(request.getFormat())) {
-//            return new ExportedIssues(
-//                    ExportFormat.HTML.getId(),
-//                    exportAsHtml(issueServiceConfiguration, groupedIssues)
-//            );
-        } else {
-            throw new IssueExportFormatNotFoundException(request.getFormat());
-        }
-    }
-
-    protected String exportAsText(Map<String, List<Issue>> groupedIssues) {
-        StringBuilder s = new StringBuilder();
-
-        for (Map.Entry<String, List<Issue>> groupEntry : groupedIssues.entrySet()) {
-            String groupName = groupEntry.getKey();
-            List<Issue> issues = groupEntry.getValue();
-            // Group header
-            s.append(format("%s:%n%n", groupName));
-            // List of issues
-            for (Issue issue : issues) {
-                s.append(format("* %s %s%n", issue.getKey(), issue.getSummary()));
-            }
-            // Group separator
-            s.append(format("%n"));
-        }
-
-        return s.toString();
+        // Export service
+        IssueExportService exportService = issueExportServiceFactory.getIssueExportService(request.getFormat());
+        // Exporting
+        return exportService.export(
+                this,
+                issueServiceConfiguration,
+                groupedIssues
+        );
     }
 
     protected Map<String, List<Issue>> groupIssues(IssueServiceConfiguration issueServiceConfiguration, List<? extends Issue> issues, IssueChangeLogExportRequest request) {
