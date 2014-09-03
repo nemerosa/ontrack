@@ -92,7 +92,9 @@ abstract class GUITestClient extends AcceptanceTestClient {
                 name
         )
         // Saves the screenshot in the target directory
-        FileUtils.copyFile(scrFile, new File(screenshotDir, fullName))
+        def targetFile = new File(screenshotDir, fullName)
+        logger.info("[gui] Screenshot at ${targetFile.absolutePath}");
+        FileUtils.copyFile(scrFile, targetFile)
     }
 
     static def waitUntil(int seconds, Closure<Boolean> closure) {
