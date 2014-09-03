@@ -22,7 +22,7 @@ class TextIssueExportService implements IssueExportService {
             s << "${groupName}\n\n"
             // List of issues
             issues.each { issue ->
-                s << "* ${issue.key} ${issue.summary}\n"
+                s << "* ${issue.displayKey} ${issue.summary}\n"
             }
             // Group separator
             s << '\n'

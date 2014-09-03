@@ -9,6 +9,10 @@ public interface Issue {
 
     String getKey();
 
+    default String getDisplayKey() {
+        return getKey();
+    }
+
     String getSummary();
 
     String getUrl();
