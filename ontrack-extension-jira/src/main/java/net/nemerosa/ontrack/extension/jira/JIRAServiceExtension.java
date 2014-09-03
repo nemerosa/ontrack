@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.jira;
 
-import net.nemerosa.ontrack.extension.issues.model.ExportedIssues;
+import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtension;
@@ -19,10 +19,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
@@ -41,8 +38,10 @@ public class JIRAServiceExtension extends AbstractIssueServiceExtension {
             JIRAExtensionFeature extensionFeature,
             JIRAConfigurationService jiraConfigurationService,
             JIRASessionFactory jiraSessionFactory,
-            TransactionService transactionService) {
-        super(extensionFeature, SERVICE, "JIRA");
+            TransactionService transactionService,
+            IssueExportServiceFactory issueExportServiceFactory
+    ) {
+        super(extensionFeature, SERVICE, "JIRA", issueExportServiceFactory);
         this.jiraConfigurationService = jiraConfigurationService;
         this.jiraSessionFactory = jiraSessionFactory;
         this.transactionService = transactionService;
@@ -126,9 +125,10 @@ public class JIRAServiceExtension extends AbstractIssueServiceExtension {
     }
 
     @Override
-    public ExportedIssues exportIssues(IssueServiceConfiguration issueServiceConfiguration, List<? extends Issue> issues, String format) {
-        // FIXME Method net.nemerosa.ontrack.extension.jira.JIRAServiceExtension.exportIssues
-        return null;
+    protected Set<String> getIssueTypes(IssueServiceConfiguration issueServiceConfiguration, Issue issue) {
+        JIRAIssue jiraIssue = (JIRAIssue) issue;
+        // FIXME JIRA issue type
+        return Collections.singleton("type");
     }
 
     public JIRAIssue getIssue(JIRAConfiguration configuration, String key) {

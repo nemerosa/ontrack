@@ -5,6 +5,8 @@ import com.google.common.collect.Sets;
 import net.nemerosa.ontrack.extension.api.ExtensionFeature;
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest;
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtension;
+import net.nemerosa.ontrack.extension.issues.export.ExportFormat;
+import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory;
 import net.nemerosa.ontrack.extension.issues.model.*;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
 import org.apache.commons.lang3.StringUtils;
@@ -20,17 +22,20 @@ public abstract class AbstractIssueServiceExtension extends AbstractExtension im
 
     private final String id;
     private final String name;
+    private final IssueExportServiceFactory issueExportServiceFactory;
 
     /**
      * Constructor.
      *
-     * @param id   The unique ID for this service.
-     * @param name The display name for this service.
+     * @param id                        The unique ID for this service.
+     * @param name                      The display name for this service.
+     * @param issueExportServiceFactory Factory to get export services
      */
-    protected AbstractIssueServiceExtension(ExtensionFeature extensionFeature, String id, String name) {
+    protected AbstractIssueServiceExtension(ExtensionFeature extensionFeature, String id, String name, IssueExportServiceFactory issueExportServiceFactory) {
         super(extensionFeature);
         this.id = id;
         this.name = name;
+        this.issueExportServiceFactory = issueExportServiceFactory;
     }
 
     @Override
