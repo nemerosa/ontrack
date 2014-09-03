@@ -9,6 +9,8 @@ import java.util.Map;
 
 public interface IssueExportService {
 
+    String NO_GROUP = "";
+
     ExportFormat getExportFormat();
 
     ExportedIssues export(

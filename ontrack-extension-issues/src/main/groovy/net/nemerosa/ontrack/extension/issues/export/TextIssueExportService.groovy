@@ -19,7 +19,9 @@ class TextIssueExportService implements IssueExportService {
 
         groupedIssues.each { groupName, issues ->
             // Group header
-            s << "${groupName}\n\n"
+            if (groupName) {
+                s << "${groupName}\n\n"
+            }
             // List of issues
             issues.each { issue ->
                 s << "* ${issue.displayKey} ${issue.summary}\n"

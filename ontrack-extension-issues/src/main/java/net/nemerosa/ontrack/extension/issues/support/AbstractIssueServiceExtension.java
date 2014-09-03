@@ -104,19 +104,21 @@ public abstract class AbstractIssueServiceExtension extends AbstractExtension im
                 if (issueGroups.size() > 1) {
                     throw new IssueExportMoreThanOneGroupException(issue.getKey(), issueGroups);
                 } else if (issueGroups.isEmpty()) {
-                    targetGroup = request.getAltGroup();
+                    if (groupingSpecification.isEmpty()) {
+                        targetGroup = IssueExportService.NO_GROUP;
+                    } else {
+                        targetGroup = request.getAltGroup();
+                    }
                 } else {
                     targetGroup = Iterables.get(issueGroups, 0);
                 }
                 // Grouping
-                if (StringUtils.isNotBlank(targetGroup)) {
-                    List<Issue> issueList = groupedIssues.get(targetGroup);
-                    if (issueList == null) {
-                        issueList = new ArrayList<>();
-                        groupedIssues.put(targetGroup, issueList);
-                    }
-                    issueList.add(issue);
+                List<Issue> issueList = groupedIssues.get(targetGroup);
+                if (issueList == null) {
+                    issueList = new ArrayList<>();
+                    groupedIssues.put(targetGroup, issueList);
                 }
+                issueList.add(issue);
             }
         }
         // OK
