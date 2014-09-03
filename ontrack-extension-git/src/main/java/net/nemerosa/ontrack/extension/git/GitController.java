@@ -4,6 +4,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
+import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest;
 import net.nemerosa.ontrack.extension.git.model.*;
 import net.nemerosa.ontrack.extension.git.service.GitConfigurationService;
 import net.nemerosa.ontrack.extension.git.service.GitService;
@@ -167,8 +168,8 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
      *
      * TODO Have this export also in SVN extension
      */
-    @RequestMapping(value = "changelog/export/{format}", method = RequestMethod.GET)
-    public ResponseEntity<String> changeLog(BuildDiffRequest request, @PathVariable String format) {
+    @RequestMapping(value = "changelog/export", method = RequestMethod.GET)
+    public ResponseEntity<String> changeLog(IssueChangeLogExportRequest request) {
         // Gets the change log
         GitChangeLog changeLog = gitService.changeLog(request);
         // Gets the issue service
@@ -191,7 +192,7 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
                 .exportIssues(
                         configuredIssueService.getIssueServiceConfiguration(),
                         issues,
-                        format
+                        request
                 );
         // Content type
         HttpHeaders responseHeaders = new HttpHeaders();

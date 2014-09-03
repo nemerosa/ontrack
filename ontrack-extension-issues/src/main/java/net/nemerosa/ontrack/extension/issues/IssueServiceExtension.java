@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.issues;
 
 import net.nemerosa.ontrack.extension.api.Extension;
+import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest;
 import net.nemerosa.ontrack.extension.issues.model.ExportFormat;
 import net.nemerosa.ontrack.extension.issues.model.ExportedIssues;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
@@ -102,9 +103,9 @@ public interface IssueServiceExtension extends Extension {
      *
      * @param issueServiceConfiguration Configuration for the service
      * @param issues                    List of issues to export
-     * @param format                    Format to use for the export
+     * @param request                   Specification for the export
      * @throws net.nemerosa.ontrack.extension.issues.model.IssueExportFormatNotFoundException If the format is not supported.
      */
-    ExportedIssues exportIssues(IssueServiceConfiguration issueServiceConfiguration, List<? extends Issue> issues, String format);
+    ExportedIssues exportIssues(IssueServiceConfiguration issueServiceConfiguration, List<? extends Issue> issues, IssueChangeLogExportRequest request);
 
 }
