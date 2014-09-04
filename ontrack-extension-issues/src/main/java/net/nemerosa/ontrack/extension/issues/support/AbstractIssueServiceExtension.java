@@ -81,7 +81,6 @@ public abstract class AbstractIssueServiceExtension extends AbstractExtension im
     }
 
     protected Map<String, List<Issue>> groupIssues(IssueServiceConfiguration issueServiceConfiguration, List<? extends Issue> issues, IssueChangeLogExportRequest request) {
-        Map<String, List<Issue>> groupedIssues = new LinkedHashMap<>();
         // Excluded issues
         Set<String> excludedTypes = new HashSet<>();
         String exclude = request.getExclude();
@@ -90,6 +89,12 @@ public abstract class AbstractIssueServiceExtension extends AbstractExtension im
         }
         // Gets the grouping specification
         Map<String, Set<String>> groupingSpecification = request.getGroupingSpecification();
+        // Map of issues, ordered by group
+        Map<String, List<Issue>> groupedIssues = new LinkedHashMap<>();
+        // Pre-enter the empty group list, in order to guarantee the ordering
+        for (String groupName : groupingSpecification.keySet()) {
+            groupedIssues.put(groupName, new ArrayList<>());
+        }
         // For all issues
         for (Issue issue : issues) {
             // Issue type(s)
@@ -119,6 +124,14 @@ public abstract class AbstractIssueServiceExtension extends AbstractExtension im
                     groupedIssues.put(targetGroup, issueList);
                 }
                 issueList.add(issue);
+            }
+        }
+        // Prunes empty groups
+        Iterator<Map.Entry<String, List<Issue>>> iterator = groupedIssues.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, List<Issue>> entry = iterator.next();
+            if (entry.getValue().isEmpty()) {
+                iterator.remove();
             }
         }
         // OK
