@@ -7,10 +7,10 @@
 </div>
 <div class="modal-body">
 
-    <form class="form-inline">
+    <form class="form-horizontal">
         <div class="form-group">
-            <label for="exportFormat">Export format:</label>
-            <select ng-model="exportRequest.format" class="form-control"
+            <label for="exportFormat" class="col-md-3">Export format:</label>
+            <select ng-model="exportRequest.format" class="form-control col-md-4"
                     required="required" id="exportFormat"
                     ng-options="format.id as format.name for format in exportFormats">
             </select>
