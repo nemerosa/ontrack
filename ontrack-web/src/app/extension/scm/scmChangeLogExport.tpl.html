@@ -1,0 +1,23 @@
+<div class="modal-header">
+    <h3>
+        Change log of <b>{{config.changeLog.branch.name}}</b>
+        from <b>{{config.changeLog.scmBuildFrom.buildView.build.name}}</b>
+        to <b>{{config.changeLog.scmBuildTo.buildView.build.name}}</b>
+    </h3>
+</div>
+<div class="modal-body">
+
+    <form class="form-inline">
+        <div class="form-group">
+            <label for="exportFormat">Export format:</label>
+            <select ng-model="exportRequest.format" class="form-control"
+                    required="required" id="exportFormat"
+                    ng-options="format.id as format.name for format in exportFormats">
+            </select>
+        </div>
+    </form>
+
+</div>
+<div class="modal-footer">
+    <button class="btn btn-link" type="button" ng-click="cancel()">Done</button>
+</div>

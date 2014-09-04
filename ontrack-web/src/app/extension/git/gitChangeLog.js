@@ -2,7 +2,8 @@ angular.module('ot.extension.git.changelog', [
     'ui.router',
     'ot.service.core',
     'ot.service.structure',
-    'ot.service.plot'
+    'ot.service.plot',
+    'ontrack.extension.scm'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('git-changelog', {
@@ -11,7 +12,7 @@ angular.module('ot.extension.git.changelog', [
             controller: 'GitChangeLogCtrl'
         });
     })
-    .controller('GitChangeLogCtrl', function ($q, $log, $interpolate, $anchorScroll, $location, $stateParams, $scope, $http, ot, otStructureService) {
+    .controller('GitChangeLogCtrl', function ($q, $log, $interpolate, $anchorScroll, $location, $stateParams, $scope, $http, ot, otStructureService, otScmChangeLogService) {
 
         // The build request
         $scope.buildDiffRequest = {
@@ -99,6 +100,15 @@ angular.module('ot.extension.git.changelog', [
                     $anchorScroll();
                 }
             };
+
+            // Configuring the change log export
+            $scope.changeLogExport = function () {
+                otScmChangeLogService.displayChangeLogExport({
+                    changeLog: $scope.changeLog,
+                    exportFormatsLink: changeLog._exportFormats
+                });
+            };
+
         });
 
     })

@@ -37,4 +37,29 @@ angular.module('ontrack.extension.scm', [
             }
         };
     })
+    .service('otScmChangeLogService', function ($http, $modal, ot) {
+        var self = {};
+
+        self.displayChangeLogExport = function (config) {
+            $modal.open({
+                templateUrl: 'app/extension/scm/scmChangeLogExport.tpl.html',
+                controller: function ($scope, $modalInstance) {
+                    $scope.config = config;
+                    // Closing the dialog
+                    $scope.cancel = function () {
+                        $modalInstance.dismiss('cancel');
+                    };
+                    // Export request
+                    // TODO Loads it from the local storage, indexed by the branch ID
+                    $scope.exportRequest = {};
+                    // Loading the export formats
+                    ot.call($http.get(config.exportFormatsLink)).then(function (exportFormatsResources) {
+                        $scope.exportFormats = exportFormatsResources.resources;
+                    });
+                }
+            });
+        };
+
+        return self;
+    })
 ;
