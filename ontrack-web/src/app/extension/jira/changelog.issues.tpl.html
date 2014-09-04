@@ -6,6 +6,7 @@
         <th>Summary</th>
         <th>Affected versions</th>
         <th>Fix versions</th>
+        <th>Issue type</th>
         <th>Assignee</th>
         <th>Updated</th>
         <th>Revision</th>
@@ -37,6 +38,9 @@
                 {{version.name}}
                 <span ng-if="!$last">, </span>
             </span>
+        </td>
+        <td>
+            {{changeLogIssue.issue.issueType}}
         </td>
         <td>
             {{changeLogIssue.issue.assignee}}

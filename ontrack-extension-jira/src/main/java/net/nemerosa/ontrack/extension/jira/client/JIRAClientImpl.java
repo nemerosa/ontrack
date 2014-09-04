@@ -92,7 +92,8 @@ public class JIRAClientImpl implements JIRAClient {
                 parseFromJIRA(fieldValue(node, "updated")),
                 fields,
                 affectedVersions,
-                fixVersions
+                fixVersions,
+                field(node, "issuetype").path("name").asText()
         );
     }
 
