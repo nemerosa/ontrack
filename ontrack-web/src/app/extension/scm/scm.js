@@ -45,10 +45,6 @@ angular.module('ontrack.extension.scm', [
                 templateUrl: 'app/extension/scm/scmChangeLogExport.tpl.html',
                 controller: function ($scope, $modalInstance) {
                     $scope.config = config;
-                    // Closing the dialog
-                    $scope.cancel = function () {
-                        $modalInstance.dismiss('cancel');
-                    };
                     // Export request
                     // TODO Loads it from the local storage, indexed by the branch ID
                     $scope.exportRequest = {};
@@ -56,6 +52,17 @@ angular.module('ontrack.extension.scm', [
                     ot.call($http.get(config.exportFormatsLink)).then(function (exportFormatsResources) {
                         $scope.exportFormats = exportFormatsResources.resources;
                     });
+
+                    // Closing the dialog
+                    $scope.cancel = function () {
+                        $modalInstance.dismiss('cancel');
+                    };
+
+                    // Export generation
+                    $scope.doExport = function () {
+                        alert($scope.exportRequest.format);
+                    };
+
                 }
             });
         };
