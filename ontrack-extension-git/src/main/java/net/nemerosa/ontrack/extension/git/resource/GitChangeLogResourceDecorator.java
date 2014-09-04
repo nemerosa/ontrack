@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.git.resource;
 
+import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest;
 import net.nemerosa.ontrack.extension.git.GitController;
 import net.nemerosa.ontrack.extension.git.model.GitChangeLog;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
@@ -24,6 +25,7 @@ public class GitChangeLogResourceDecorator extends AbstractResourceDecorator<Git
                 .link("_issues", on(GitController.class).changeLogIssues(changeLog.getUuid()), StringUtils.isNotBlank(changeLog.getScmBranch().getIssueServiceConfigurationIdentifier()))
                 .link("_files", on(GitController.class).changeLogFiles(changeLog.getUuid()))
                 .link("_exportFormats", on(GitController.class).changeLogExportFormats(changeLog.getBranch().getId()))
+                .link("_exportIssues", on(GitController.class).changeLog(new IssueChangeLogExportRequest()))
                 .build();
     }
 
