@@ -190,7 +190,7 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
         }
         // No configured issues
         return Resources.of(
-                Collections.emptyList(),
+                Collections.<ExportFormat>emptyList(),
                 uri(on(GitController.class).changeLogExportFormats(branchId))
         );
     }

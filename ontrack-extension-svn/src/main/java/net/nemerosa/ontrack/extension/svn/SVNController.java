@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
+import net.nemerosa.ontrack.extension.issues.export.ExportFormat;
 import net.nemerosa.ontrack.extension.issues.export.ExportedIssues;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
@@ -203,6 +204,17 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     public SVNConfiguration updateConfiguration(@PathVariable String name, @RequestBody SVNConfiguration configuration) {
         svnConfigurationService.updateConfiguration(name, configuration);
         return getConfiguration(name);
+    }
+
+    /**
+     * Change log export, list of formats
+     */
+    @RequestMapping(value = "changelog/export/{branchId}/formats", method = RequestMethod.GET)
+    public Resources<ExportFormat> changeLogExportFormats(@PathVariable ID branchId) {
+        return Resources.of(
+                changeLogService.changeLogExportFormats(branchId),
+                uri(on(SVNController.class).changeLogExportFormats(branchId))
+        );
     }
 
     /**
