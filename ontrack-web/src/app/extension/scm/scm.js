@@ -60,7 +60,23 @@ angular.module('ontrack.extension.scm', [
 
                     // Export generation
                     $scope.doExport = function () {
-                        alert($scope.exportRequest.format);
+                        // Request
+                        var request = {
+                            branch: config.changeLog.branch.id,
+                            from: config.changeLog.scmBuildFrom.buildView.build.id,
+                            to: config.changeLog.scmBuildTo.buildView.build.id
+                        };
+                        // Format
+                        if ($scope.exportRequest.format) {
+                            request.format = $scope.exportRequest.format;
+                        }
+                        // Call
+                        $scope.exportCalling = true;
+                        ot.call($http.get(config.exportIssuesLink, {
+                            params: request
+                        })).then(function success(exportedIssues) {
+                            $scope.exportCalling = false;
+                        });
                     };
 
                 }

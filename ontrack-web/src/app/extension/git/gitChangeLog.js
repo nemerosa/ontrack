@@ -105,7 +105,8 @@ angular.module('ot.extension.git.changelog', [
             $scope.changeLogExport = function () {
                 otScmChangeLogService.displayChangeLogExport({
                     changeLog: $scope.changeLog,
-                    exportFormatsLink: changeLog._exportFormats
+                    exportFormatsLink: changeLog._exportFormats,
+                    exportIssuesLink: changeLog._exportIssues
                 });
             };
 

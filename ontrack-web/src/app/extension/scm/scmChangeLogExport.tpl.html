@@ -8,7 +8,6 @@
 <form class="form-horizontal" ng-submit="doExport()">
     <div class="modal-body">
 
-
         <div class="form-group">
             <label for="exportFormat" class="col-md-3">Export format:</label>
             <select ng-model="exportRequest.format" class="form-control col-md-4"
@@ -19,7 +18,11 @@
 
     </div>
     <div class="modal-footer">
-        <button class="btn btn-primary" type="submit">Export</button>
+        <button class="btn btn-primary" type="submit"
+                ng-disabled="exportCalling">
+            <img src="assets/ajax-loader.gif" ng-show="exportCalling"/>
+            Export
+        </button>
         <button class="btn btn-link" type="button" ng-click="cancel()">Close</button>
     </div>
 </form>
