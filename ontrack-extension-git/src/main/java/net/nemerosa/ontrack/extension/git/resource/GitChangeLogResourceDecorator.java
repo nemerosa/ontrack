@@ -23,6 +23,7 @@ public class GitChangeLogResourceDecorator extends AbstractResourceDecorator<Git
                 .link("_commits", on(GitController.class).changeLogCommits(changeLog.getUuid()))
                 .link("_issues", on(GitController.class).changeLogIssues(changeLog.getUuid()), StringUtils.isNotBlank(changeLog.getScmBranch().getIssueServiceConfigurationIdentifier()))
                 .link("_files", on(GitController.class).changeLogFiles(changeLog.getUuid()))
+                .link("_exportFormats", on(GitController.class).changeLogExportFormats(changeLog.getBranch().getId()))
                 .build();
     }
 
