@@ -47,7 +47,9 @@ angular.module('ontrack.extension.scm', [
                     $scope.config = config;
                     // Export request
                     // TODO Loads it from the local storage, indexed by the branch ID
-                    $scope.exportRequest = {};
+                    $scope.exportRequest = {
+                        grouping: []
+                    };
                     // Loading the export formats
                     ot.call($http.get(config.exportFormatsLink)).then(function (exportFormatsResources) {
                         $scope.exportFormats = exportFormatsResources.resources;
@@ -56,6 +58,15 @@ angular.module('ontrack.extension.scm', [
                     // Closing the dialog
                     $scope.cancel = function () {
                         $modalInstance.dismiss('cancel');
+                    };
+
+                    // Group management
+                    $scope.addGroup = function () {
+                        // Adds an empty group
+                        $scope.exportRequest.grouping.push({
+                            name: '',
+                            types: [ '' ]
+                        });
                     };
 
                     // Export generation
@@ -85,6 +96,7 @@ angular.module('ontrack.extension.scm', [
                             $scope.exportError = '';
                             $scope.exportContent = exportedIssues;
                             $scope.exportPermaLink = url;
+                            // TODO Stores the request
                         }, function error(message) {
                             $scope.exportCalling = false;
                             $scope.exportError = message;
