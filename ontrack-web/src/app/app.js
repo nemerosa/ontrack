@@ -46,7 +46,7 @@ var ontrack = angular.module('ontrack', [
             $httpProvider.defaults.withCredentials = true;
         })
         // HTTP global interceptor
-        .factory('httpGlobalInterceptor', function ($log, $rootScope) {
+        .factory('httpGlobalInterceptor', function ($q, $log, $rootScope) {
             $rootScope.currentCalls = 0;
             return {
                 'request': function (config) {
@@ -62,7 +62,7 @@ var ontrack = angular.module('ontrack', [
                 'responseError': function (rejection) {
                     $rootScope.currentCalls--;
                     // $log.debug('End of request with error, ', $rootScope.currentCalls);
-                    return rejection;
+                    return $q.reject(rejection);
                 }
             };
         })
