@@ -20,6 +20,7 @@
 
     <div class="form-group">
         <label class="col-md-3">Grouping:</label>
+
         <div class="col-md-9">
             TODO
         </div>
@@ -34,7 +35,14 @@
     </div>
 
     <div class="form-group" ng-show="exportPermaLink">
-        <label class="col-md-3">TODO Permalink</label>
+        <label class="col-md-3">
+            <span class="glyphicon glyphicon-link"></span>
+            Permalink
+        </label>
+
+        <div class="col-md-9">
+            <input class="form-control" type="text" readonly="readonly" ng-model="exportPermaLink"/>
+        </div>
     </div>
 
 </div>

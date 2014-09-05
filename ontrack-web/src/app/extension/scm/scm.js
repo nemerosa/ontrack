@@ -37,7 +37,7 @@ angular.module('ontrack.extension.scm', [
             }
         };
     })
-    .service('otScmChangeLogService', function ($http, $modal, ot) {
+    .service('otScmChangeLogService', function ($http, $modal, $interpolate, ot) {
         var self = {};
 
         self.displayChangeLogExport = function (config) {
@@ -60,28 +60,36 @@ angular.module('ontrack.extension.scm', [
 
                     // Export generation
                     $scope.doExport = function () {
+
                         // Request
                         var request = {
                             branch: config.changeLog.branch.id,
                             from: config.changeLog.scmBuildFrom.buildView.build.id,
                             to: config.changeLog.scmBuildTo.buildView.build.id
                         };
+
+                        // Permalink
+                        var url = config.exportIssuesLink;
+                        url += $interpolate('?branch={{branch}}&from={{from}}&to={{to}}')(request);
+
                         // Format
                         if ($scope.exportRequest.format) {
                             request.format = $scope.exportRequest.format;
+                            url += $interpolate('&format={{format}}')(request);
                         }
+
                         // Call
                         $scope.exportCalling = true;
-                        ot.call($http.get(config.exportIssuesLink, {
-                            params: request
-                        })).then(function success(exportedIssues) {
+                        ot.call($http.get(url)).then(function success(exportedIssues) {
                             $scope.exportCalling = false;
                             $scope.exportError = '';
                             $scope.exportContent = exportedIssues;
+                            $scope.exportPermaLink = url;
                         }, function error(message) {
                             $scope.exportCalling = false;
                             $scope.exportError = message;
                             $scope.exportContent = '';
+                            $scope.exportPermaLink = '';
                         });
                     };
 
