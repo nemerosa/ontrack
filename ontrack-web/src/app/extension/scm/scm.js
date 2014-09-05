@@ -76,7 +76,12 @@ angular.module('ontrack.extension.scm', [
                             params: request
                         })).then(function success(exportedIssues) {
                             $scope.exportCalling = false;
+                            $scope.exportError = '';
                             $scope.exportContent = exportedIssues;
+                        }, function error(message) {
+                            $scope.exportCalling = false;
+                            $scope.exportError = message;
+                            $scope.exportContent = '';
                         });
                     };
 
