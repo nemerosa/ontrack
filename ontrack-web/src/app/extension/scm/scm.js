@@ -65,12 +65,14 @@ angular.module('ontrack.extension.scm', [
                         // Adds an empty group
                         $scope.exportRequest.grouping.push({
                             name: '',
-                            types: [ '' ]
+                            types: ''
                         });
                     };
 
                     // Export generation
                     $scope.doExport = function () {
+
+                        console.log('exportRequest=', $scope.exportRequest);
 
                         // Request
                         var request = {
@@ -89,6 +91,21 @@ angular.module('ontrack.extension.scm', [
                             url += $interpolate('&format={{format}}')(request);
                         }
 
+                        // Grouping
+                        if ($scope.exportRequest.grouping.length > 0) {
+                            var grouping = '';
+                            for (var i = 0 ; i < $scope.exportRequest.grouping.length ; i++) {
+                                if (i > 0) {
+                                    grouping += '|';
+                                }
+                                var groupSpec = $scope.exportRequest.grouping[i];
+                                grouping += groupSpec.name + '=' + groupSpec.types;
+                            }
+                            grouping = encodeURIComponent(grouping);
+                            request.grouping = grouping;
+                            url += $interpolate('&grouping={{grouping}}')(request);
+                        }
+
                         // Call
                         $scope.exportCalling = true;
                         ot.call($http.get(url)).then(function success(exportedIssues) {
@@ -99,7 +116,7 @@ angular.module('ontrack.extension.scm', [
                             // TODO Stores the request
                         }, function error(message) {
                             $scope.exportCalling = false;
-                            $scope.exportError = message;
+                            $scope.exportError = message.content;
                             $scope.exportContent = '';
                             $scope.exportPermaLink = '';
                         });
