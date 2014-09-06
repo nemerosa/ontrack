@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
 
     public static final String GITHUB_SERVICE_ID = "github";
-    public static final String GITHUB_ISSUE_PATTERN = "#\\d+";
+    public static final String GITHUB_ISSUE_PATTERN = "#(\\d+)";
     private final GitHubConfigurationService configurationService;
     private final GitHubClientConfiguratorFactory gitHubClientConfiguratorFactory;
     private final OntrackGitHubClient gitHubClient;
@@ -65,7 +65,7 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
             Matcher matcher = Pattern.compile(GITHUB_ISSUE_PATTERN).matcher(message);
             while (matcher.find()) {
                 // Gets the issue
-                String issueKey = matcher.group();
+                String issueKey = matcher.group(1);
                 // Adds to the result
                 result.add(issueKey);
             }
@@ -115,12 +115,8 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
 
     @Override
     public boolean containsIssueKey(IssueServiceConfiguration issueServiceConfiguration, String key, Set<String> keys) {
-        if (validIssueToken(key)) {
-            // Normalisation
-            Set<Integer> ids = keys.stream().map(this::getIssueId).collect(Collectors.toSet());
-            return ids.contains(getIssueId(key));
-        } else {
-            return false;
-        }
+        // Normalisation
+        Set<Integer> ids = keys.stream().map(this::getIssueId).collect(Collectors.toSet());
+        return ids.contains(getIssueId(key));
     }
 }
