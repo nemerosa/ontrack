@@ -25,13 +25,11 @@
             <div class="form-group" ng-repeat="group in exportRequest.grouping">
                 <!-- Group name -->
                 <div class="col-md-3">
-                    <input ng-model="group.name" type="text" class="form-control" placeholder="Group" />
+                    <input ng-model="group.name" type="text" class="form-control" placeholder="Group"/>
                 </div>
                 <!-- Group types -->
-                <div class="col-md-9 form-group">
-                    <div class="col-md-4" ng-repeat="type in group.types">
-                        <input ng-model="type" type="text" class="form-control" placeholder="Type" />
-                    </div>
+                <div class="col-md-9">
+                    <input ng-model="type" type="text" class="form-control" placeholder="Comma-separated issue types"/>
                 </div>
             </div>
             <div class="row">
