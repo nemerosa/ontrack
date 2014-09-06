@@ -4,28 +4,38 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
+import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
+import net.nemerosa.ontrack.extension.issues.export.ExportFormat;
+import net.nemerosa.ontrack.extension.issues.export.ExportedIssues;
+import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
+import net.nemerosa.ontrack.extension.issues.model.Issue;
+import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogIssue;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogUUIDException;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.extension.svn.service.*;
 import net.nemerosa.ontrack.model.Ack;
+import net.nemerosa.ontrack.model.buildfilter.BuildDiff;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Build;
-import net.nemerosa.ontrack.model.buildfilter.BuildDiff;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -194,6 +204,52 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     public SVNConfiguration updateConfiguration(@PathVariable String name, @RequestBody SVNConfiguration configuration) {
         svnConfigurationService.updateConfiguration(name, configuration);
         return getConfiguration(name);
+    }
+
+    /**
+     * Change log export, list of formats
+     */
+    @RequestMapping(value = "changelog/export/{branchId}/formats", method = RequestMethod.GET)
+    public Resources<ExportFormat> changeLogExportFormats(@PathVariable ID branchId) {
+        return Resources.of(
+                changeLogService.changeLogExportFormats(branchId),
+                uri(on(SVNController.class).changeLogExportFormats(branchId))
+        );
+    }
+
+    /**
+     * Change log export
+     */
+    @RequestMapping(value = "changelog/export", method = RequestMethod.GET)
+    public ResponseEntity<String> changeLog(IssueChangeLogExportRequest request) {
+        // Gets the change log
+        SVNChangeLog changeLog = changeLogService.changeLog(request);
+        // Gets the issue service
+        ConfiguredIssueService configuredIssueService = changeLog.getScmBranch().getConfiguredIssueService();
+        if (configuredIssueService == null) {
+            return new ResponseEntity<>(
+                    "The branch is not configured for issues",
+                    HttpStatus.NO_CONTENT
+            );
+        }
+        // Gets the issue change log
+        SVNChangeLogIssues changeLogIssues = changeLogService.getChangeLogIssues(changeLog);
+        // List of issues
+        List<Issue> issues = changeLogIssues.getList().stream()
+                .map(SCMChangeLogIssue::getIssue)
+                .collect(Collectors.toList());
+        // Exports the change log using the given format
+        ExportedIssues exportedChangeLogIssues = configuredIssueService.getIssueServiceExtension()
+                .exportIssues(
+                        configuredIssueService.getIssueServiceConfiguration(),
+                        issues,
+                        request
+                );
+        // Content type
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("Content-Type", exportedChangeLogIssues.getFormat());
+        // Body and headers
+        return new ResponseEntity<>(exportedChangeLogIssues.getContent(), responseHeaders, HttpStatus.OK);
     }
 
     /**

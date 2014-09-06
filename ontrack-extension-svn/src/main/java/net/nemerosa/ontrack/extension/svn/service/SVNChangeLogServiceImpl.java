@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.svn.service;
 
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
+import net.nemerosa.ontrack.extension.issues.export.ExportFormat;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
@@ -274,6 +275,20 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
         String svnBuildPath = getSVNBuildPath(build);
         // Gets the history from the SVN client
         return svnClient.getHistory(svnRepository, svnBuildPath);
+    }
+
+    @Override
+    public Collection<ExportFormat> changeLogExportFormats(ID branchId) {
+        // Gets the branch
+        Branch branch = structureService.getBranch(branchId);
+        // Gets the SVN repository
+        SVNRepository svnRepository = getSVNRepository(branch);
+        ConfiguredIssueService configuredIssueService = svnRepository.getConfiguredIssueService();
+        if (configuredIssueService != null) {
+            return configuredIssueService.getIssueServiceExtension().exportFormats();
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     protected String getSVNBuildPath(Build build) {

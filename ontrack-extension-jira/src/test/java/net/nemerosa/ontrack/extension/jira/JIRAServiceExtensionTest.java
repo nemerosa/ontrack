@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.jira;
 import com.google.common.collect.Sets;
 import net.nemerosa.ontrack.client.ClientNotFoundException;
 import net.nemerosa.ontrack.client.JsonClient;
+import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.jira.client.JIRAClient;
 import net.nemerosa.ontrack.extension.jira.client.JIRAClientImpl;
@@ -46,11 +47,14 @@ public class JIRAServiceExtensionTest {
         session = mock(JIRASession.class);
         when(session.getClient()).thenReturn(client);
 
+        IssueExportServiceFactory issueExportServiceFactory = mock(IssueExportServiceFactory.class);
+
         service = new JIRAServiceExtension(
                 new JIRAExtensionFeature(),
                 jiraConfigurationService,
                 jiraSessionFactory,
-                transactionService
+                transactionService,
+                issueExportServiceFactory
         );
     }
 

@@ -1,6 +1,9 @@
 package net.nemerosa.ontrack.extension.issues;
 
 import net.nemerosa.ontrack.extension.api.Extension;
+import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest;
+import net.nemerosa.ontrack.extension.issues.export.ExportFormat;
+import net.nemerosa.ontrack.extension.issues.export.ExportedIssues;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.model.support.MessageAnnotator;
@@ -89,4 +92,20 @@ public interface IssueServiceExtension extends Extension {
      * method.
      */
     boolean containsIssueKey(IssueServiceConfiguration issueServiceConfiguration, String key, Set<String> keys);
+
+    /**
+     * List of supported export formats for the issues.
+     */
+    List<ExportFormat> exportFormats();
+
+    /**
+     * Exports a list of issues as text for a given <code>format</code>.
+     *
+     * @param issueServiceConfiguration Configuration for the service
+     * @param issues                    List of issues to export
+     * @param request                   Specification for the export
+     * @throws net.nemerosa.ontrack.extension.issues.model.IssueExportFormatNotFoundException If the format is not supported.
+     */
+    ExportedIssues exportIssues(IssueServiceConfiguration issueServiceConfiguration, List<? extends Issue> issues, IssueChangeLogExportRequest request);
+
 }

@@ -19,6 +19,15 @@ public interface GitService {
     boolean isBranchConfiguredForGit(Branch branch);
 
     /**
+     * Gets the configuration for a branch
+     *
+     * @param branch Branch to check
+     * @return Configuration. Never null but can be
+     * {@link net.nemerosa.ontrack.extension.git.model.GitConfiguration#isValid() invalid}.
+     */
+    GitConfiguration getBranchConfiguration(Branch branch);
+
+    /**
      * Launches the build/tag synchronisation for a branch
      */
     Ack launchBuildSync(ID branchId);

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.svn.resource;
 
+import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest;
 import net.nemerosa.ontrack.extension.svn.SVNController;
 import net.nemerosa.ontrack.extension.svn.model.SVNChangeLog;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
@@ -22,6 +23,8 @@ public class SVNChangeLogResourceDecorator extends AbstractResourceDecorator<SVN
                 .link("_revisions", on(SVNController.class).changeLogRevisions(changeLog.getUuid()))
                 .link("_issues", on(SVNController.class).changeLogIssues(changeLog.getUuid()), changeLog.getScmBranch().getConfiguredIssueService() != null)
                 .link("_files", on(SVNController.class).changeLogFiles(changeLog.getUuid()))
+                .link("_exportFormats", on(SVNController.class).changeLogExportFormats(changeLog.getBranch().getId()))
+                .link("_exportIssues", on(SVNController.class).changeLog(new IssueChangeLogExportRequest()))
                 .build();
     }
 

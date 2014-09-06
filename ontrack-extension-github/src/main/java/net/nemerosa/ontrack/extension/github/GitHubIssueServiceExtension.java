@@ -1,9 +1,13 @@
 package net.nemerosa.ontrack.extension.github;
 
+import com.google.common.collect.Sets;
 import net.nemerosa.ontrack.extension.github.client.GitHubClientConfiguratorFactory;
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClient;
 import net.nemerosa.ontrack.extension.github.model.GitHubConfiguration;
+import net.nemerosa.ontrack.extension.github.model.GitHubIssue;
+import net.nemerosa.ontrack.extension.github.model.GitHubLabel;
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService;
+import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtension;
@@ -36,8 +40,10 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
             GitHubExtensionFeature extensionFeature,
             GitHubConfigurationService configurationService,
             GitHubClientConfiguratorFactory gitHubClientConfiguratorFactory,
-            OntrackGitHubClient gitHubClient) {
-        super(extensionFeature, GITHUB_SERVICE_ID, "GitHub");
+            OntrackGitHubClient gitHubClient,
+            IssueExportServiceFactory issueExportServiceFactory
+    ) {
+        super(extensionFeature, GITHUB_SERVICE_ID, "GitHub", issueExportServiceFactory);
         this.configurationService = configurationService;
         this.gitHubClientConfiguratorFactory = gitHubClientConfiguratorFactory;
         this.gitHubClient = gitHubClient;
@@ -118,5 +124,13 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
         // Normalisation
         Set<Integer> ids = keys.stream().map(this::getIssueId).collect(Collectors.toSet());
         return ids.contains(getIssueId(key));
+    }
+
+    @Override
+    protected Set<String> getIssueTypes(IssueServiceConfiguration issueServiceConfiguration, Issue issue) {
+        GitHubIssue gitHubIssue = (GitHubIssue) issue;
+        return Sets.newLinkedHashSet(
+                gitHubIssue.getLabels().stream().map(GitHubLabel::getName).collect(Collectors.toList())
+        );
     }
 }

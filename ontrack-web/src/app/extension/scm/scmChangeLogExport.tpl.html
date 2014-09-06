@@ -1,0 +1,78 @@
+<div class="modal-header">
+    <h3>
+        Change log of <b>{{config.changeLog.branch.name}}</b>
+        from <b>{{config.changeLog.scmBuildFrom.buildView.build.name}}</b>
+        to <b>{{config.changeLog.scmBuildTo.buildView.build.name}}</b>
+    </h3>
+</div>
+<div class="modal-body form-horizontal">
+
+    <div class="form-group">
+        <label for="exportFormat" class="col-md-3">Export format:</label>
+
+        <div class="col-md-4">
+            <select ng-model="exportRequest.format" class="form-control"
+                    required="required" id="exportFormat"
+                    ng-options="format.id as format.name for format in exportFormats">
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-md-3">Grouping:</label>
+
+        <div class="col-md-9">
+            <div class="form-group" ng-repeat="group in exportRequest.grouping">
+                <!-- Group name -->
+                <div class="col-md-3">
+                    <input ng-model="group.name" type="text" class="form-control" placeholder="Group" />
+                </div>
+                <!-- Group types -->
+                <div class="col-md-9 form-group">
+                    <div class="col-md-4" ng-repeat="type in group.types">
+                        <input ng-model="type" type="text" class="form-control" placeholder="Type" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <button title="Add a group" class="btn btn-default btn-xs" ng-click="addGroup()">
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-12">
+            <textarea ng-bind="exportContent" ng-show="exportContent"
+                      rows="16"
+                      class="form-control" readonly="readonly"></textarea>
+        </div>
+    </div>
+
+    <div class="form-group" ng-show="exportPermaLink">
+        <label class="col-md-3">
+            <span class="glyphicon glyphicon-link"></span>
+            Permalink
+        </label>
+
+        <div class="col-md-9">
+            <input class="form-control" type="text" readonly="readonly" ng-model="exportPermaLink"/>
+        </div>
+    </div>
+
+</div>
+<div class="modal-footer">
+    <div class="alert alert-danger" ng-show="exportError">
+        {{exportError}}
+    </div>
+    <button class="btn btn-primary" type="button"
+            ng-click="doExport()"
+            ng-disabled="exportCalling">
+        <img src="assets/ajax-loader.gif" ng-show="exportCalling"/>
+        Export
+    </button>
+    <button class="btn btn-link" type="button" ng-click="cancel()">Close</button>
+</div>

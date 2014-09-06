@@ -456,7 +456,8 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         return new SCMBuildView<>(getBuildView(buildId), new GitBuildInfo());
     }
 
-    private GitConfiguration getBranchConfiguration(Branch branch) {
+    @Override
+    public GitConfiguration getBranchConfiguration(Branch branch) {
         // Empty configuration
         GitConfiguration configuration = GitConfiguration.empty();
         // Configurators{

@@ -30,6 +30,11 @@ public class GitHubIssue implements Issue {
     }
 
     @Override
+    public String getDisplayKey() {
+        return "#" + id;
+    }
+
+    @Override
     public String getSummary() {
         return title;
     }
