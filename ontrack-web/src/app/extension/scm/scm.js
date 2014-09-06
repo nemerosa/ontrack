@@ -40,6 +40,13 @@ angular.module('ontrack.extension.scm', [
     .service('otScmChangeLogService', function ($http, $modal, $interpolate, ot) {
         var self = {};
 
+        function storeExportRequest(branchId, exportRequest) {
+            localStorage.setItem(
+                'issueExportRequest_' + branchId,
+                JSON.stringify(exportRequest)
+            );
+        }
+
         self.displayChangeLogExport = function (config) {
             $modal.open({
                 templateUrl: 'app/extension/scm/scmChangeLogExport.tpl.html',
@@ -72,11 +79,11 @@ angular.module('ontrack.extension.scm', [
                     // Export generation
                     $scope.doExport = function () {
 
-                        console.log('exportRequest=', $scope.exportRequest);
+                        var branchId = config.changeLog.branch.id;
 
                         // Request
                         var request = {
-                            branch: config.changeLog.branch.id,
+                            branch: branchId,
                             from: config.changeLog.scmBuildFrom.buildView.build.id,
                             to: config.changeLog.scmBuildTo.buildView.build.id
                         };
@@ -113,7 +120,7 @@ angular.module('ontrack.extension.scm', [
                             $scope.exportError = '';
                             $scope.exportContent = exportedIssues;
                             $scope.exportPermaLink = url;
-                            // TODO Stores the request
+                            storeExportRequest(branchId, $scope.exportRequest);
                         }, function error(message) {
                             $scope.exportCalling = false;
                             $scope.exportError = message.content;
