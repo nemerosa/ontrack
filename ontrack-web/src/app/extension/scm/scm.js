@@ -42,21 +42,33 @@ angular.module('ontrack.extension.scm', [
 
         function storeExportRequest(branchId, exportRequest) {
             localStorage.setItem(
-                'issueExportRequest_' + branchId,
+                    'issueExportRequest_' + branchId,
                 JSON.stringify(exportRequest)
             );
         }
 
+        function loadExportRequest(branchId) {
+            var json = localStorage.getItem('issueExportRequest_' + branchId);
+            if (json) {
+                return JSON.parse(json);
+            } else {
+                return {
+                    grouping: []
+                };
+            }
+        }
+
         self.displayChangeLogExport = function (config) {
+
+            var branchId = config.changeLog.branch.id;
+
             $modal.open({
                 templateUrl: 'app/extension/scm/scmChangeLogExport.tpl.html',
                 controller: function ($scope, $modalInstance) {
                     $scope.config = config;
                     // Export request
                     // TODO Loads it from the local storage, indexed by the branch ID
-                    $scope.exportRequest = {
-                        grouping: []
-                    };
+                    $scope.exportRequest = loadExportRequest(branchId);
                     // Loading the export formats
                     ot.call($http.get(config.exportFormatsLink)).then(function (exportFormatsResources) {
                         $scope.exportFormats = exportFormatsResources.resources;
@@ -79,8 +91,6 @@ angular.module('ontrack.extension.scm', [
                     // Export generation
                     $scope.doExport = function () {
 
-                        var branchId = config.changeLog.branch.id;
-
                         // Request
                         var request = {
                             branch: branchId,
@@ -101,7 +111,7 @@ angular.module('ontrack.extension.scm', [
                         // Grouping
                         if ($scope.exportRequest.grouping.length > 0) {
                             var grouping = '';
-                            for (var i = 0 ; i < $scope.exportRequest.grouping.length ; i++) {
+                            for (var i = 0; i < $scope.exportRequest.grouping.length; i++) {
                                 if (i > 0) {
                                     grouping += '|';
                                 }
