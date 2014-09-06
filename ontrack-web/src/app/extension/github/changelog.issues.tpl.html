@@ -13,7 +13,7 @@
     <tbody>
     <tr ng-repeat="changeLogIssue in value.list">
         <td>
-            <code><a href="{{changeLogIssue.issue.url}}">{{changeLogIssue.issue.id}}</a></code>
+            <code><a href="{{changeLogIssue.issue.url}}">{{changeLogIssue.issue.displayKey}}</a></code>
         </td>
         <td>
             <span class="ot-extension-github-state ot-extension-github-state-{{changeLogIssue.issue.state}}">{{changeLogIssue.issue.state}}</span>
