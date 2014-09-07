@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory
 
 import java.text.SimpleDateFormat
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeoutException
+import org.openqa.selenium.TimeoutException
 import java.util.concurrent.atomic.AtomicLong
 
 abstract class GUITestClient extends AcceptanceTestClient {
