@@ -28,7 +28,7 @@ class HeaderPageComponent extends AbstractPageComponent {
         screenshot('login-filled-in')
         // Sign in OK
         def okButton = driver.findElement(By.className('btn-primary'))
-        waitUntil(2) { okButton.enabled }
+        waitUntil { okButton.enabled }
         okButton.click()
     }
 }
