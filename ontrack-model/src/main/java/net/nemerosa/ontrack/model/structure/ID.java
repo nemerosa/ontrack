@@ -7,13 +7,14 @@ import lombok.Data;
 import net.nemerosa.ontrack.model.support.IDJsonSerializer;
 import org.apache.commons.lang3.Validate;
 
+import java.io.Serializable;
 import java.util.Optional;
 import java.util.function.Function;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @JsonSerialize(using = IDJsonSerializer.class)
-public final class ID {
+public final class ID implements Serializable {
 
     /**
      * Undefined ID.

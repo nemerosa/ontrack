@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.model.security;
 
+import org.apache.commons.lang3.SerializationUtils;
 import org.junit.Test;
 
 import java.util.Collections;
 import java.util.Optional;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class AccountTest {
 
@@ -38,6 +38,17 @@ public class AccountTest {
     public void projectEdit_does_not_implies_projectView_on_other_project() {
         Account account = account(ProjectEdit.class).lock();
         assertFalse(account.isGranted(2, ProjectView.class));
+    }
+
+    @Test
+    public void serializable_account() {
+        Account account = account(ProjectView.class);
+        // Serialisation
+        byte[] bytes = SerializationUtils.serialize(account);
+        // Deserialisation
+        Account readAccount = SerializationUtils.deserialize(bytes);
+        // Check
+        assertEquals(account, readAccount);
     }
 
     private Account account(Class<? extends ProjectFunction> fn) {

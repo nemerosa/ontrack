@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.structure.Entity;
 import net.nemerosa.ontrack.model.structure.ID;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.Optional;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class Account implements Entity {
+public class Account implements Entity, Serializable {
 
     public static Account of(String name, String fullName, String email, SecurityRole role, AuthenticationSource authenticationSource) {
         return new Account(

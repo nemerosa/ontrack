@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.structure.Entity;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -16,7 +17,7 @@ import java.util.Optional;
  */
 @Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class AccountGroup implements Entity {
+public class AccountGroup implements Entity, Serializable {
 
     private final ID id;
     private final String name;

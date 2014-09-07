@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.model.security;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Set;
 
 /**
@@ -9,7 +10,7 @@ import java.util.Set;
  * {@linkplain net.nemerosa.ontrack.model.security.ProjectFunction project functions}.
  */
 @Data
-public class ProjectRole {
+public class ProjectRole implements Serializable {
 
     /**
      * Project role's identifier

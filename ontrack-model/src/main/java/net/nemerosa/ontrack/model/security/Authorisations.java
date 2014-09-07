@@ -5,11 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.util.*;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Authorisations {
+public class Authorisations implements Serializable {
 
     public static Authorisations none() {
         return new Authorisations(

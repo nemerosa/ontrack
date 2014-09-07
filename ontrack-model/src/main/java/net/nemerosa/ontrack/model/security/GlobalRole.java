@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.model.security;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Set;
 
 /**
@@ -11,7 +12,7 @@ import java.util.Set;
  * that are attributed for all projects.
  */
 @Data
-public class GlobalRole {
+public class GlobalRole implements Serializable {
 
     /**
      * Global role's identifier
