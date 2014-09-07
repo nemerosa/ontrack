@@ -5,6 +5,8 @@ import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
 import org.openqa.selenium.support.FindBy
 
+import static net.nemerosa.ontrack.acceptance.GUITestClient.waitUntil
+
 class HeaderPageComponent extends AbstractPageComponent {
 
     @FindBy(linkText = 'Sign in')
@@ -23,7 +25,7 @@ class HeaderPageComponent extends AbstractPageComponent {
         driver.findElement(By.name('password')).sendKeys password
         // Sign in OK
         def okButton = driver.findElement(By.className('btn-primary'))
-        if (!okButton.enabled) throw new AssertionError("Sign in OK button is not enabled.")
+        waitUntil(2) { okButton.enabled }
         okButton.click()
     }
 }
