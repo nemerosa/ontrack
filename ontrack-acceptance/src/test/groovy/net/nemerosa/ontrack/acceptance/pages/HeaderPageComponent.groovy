@@ -5,6 +5,7 @@ import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
 import org.openqa.selenium.support.FindBy
 
+import static net.nemerosa.ontrack.acceptance.GUITestClient.screenshot
 import static net.nemerosa.ontrack.acceptance.GUITestClient.waitUntil
 
 class HeaderPageComponent extends AbstractPageComponent {
@@ -21,8 +22,10 @@ class HeaderPageComponent extends AbstractPageComponent {
 
     def login(String name, String password) {
         signIn.click()
+        screenshot('login-displayed')
         driver.findElement(By.name('name')).sendKeys name
         driver.findElement(By.name('password')).sendKeys password
+        screenshot('login-filled-in')
         // Sign in OK
         def okButton = driver.findElement(By.className('btn-primary'))
         waitUntil(2) { okButton.enabled }
