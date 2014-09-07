@@ -6,18 +6,15 @@ import org.apache.commons.io.FileUtils
 import org.junit.After
 import org.junit.AfterClass
 import org.junit.BeforeClass
-import org.openqa.selenium.Dimension
-import org.openqa.selenium.OutputType
-import org.openqa.selenium.TakesScreenshot
-import org.openqa.selenium.WebDriver
+import org.openqa.selenium.*
 import org.openqa.selenium.firefox.FirefoxDriver
+import org.openqa.selenium.firefox.FirefoxProfile
 import org.openqa.selenium.support.ui.WebDriverWait
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import java.text.SimpleDateFormat
 import java.util.concurrent.TimeUnit
-import org.openqa.selenium.TimeoutException
 import java.util.concurrent.atomic.AtomicLong
 
 abstract class GUITestClient extends AcceptanceTestClient {
@@ -36,7 +33,7 @@ abstract class GUITestClient extends AcceptanceTestClient {
         implicitWait = Integer.parseInt(
                 env('ontrack.implicitWait', false, '5', "Implicit wait time for GUI components (in seconds)"),
                 10)
-        screenshotDir = new File(env('ontrack.screenshots', false, 'build/screenshots', 'Screenshot output directory')).absoluteFile
+        screenshotDir = new File(env('ontrack.acceptance.screenshots', false, 'build/acceptance/screenshots', 'Screenshot output directory')).absoluteFile
         FileUtils.forceMkdir(screenshotDir)
         // Logging
         logger.info("[gui] Implicit wait = ${implicitWait}s")
@@ -62,7 +59,15 @@ abstract class GUITestClient extends AcceptanceTestClient {
     }
 
     static WebDriver initDriver() {
-        new FirefoxDriver()
+        def loggingDir = new File(env('ontrack.acceptance.logs', false, 'build/acceptance/logs', 'Logging output directory')).absoluteFile
+        FileUtils.forceMkdir(loggingDir)
+        logger.info "[gui] Browser logging directory at ${loggingDir}"
+
+        FirefoxProfile profile = new FirefoxProfile()
+        profile.setPreference('webdriver.log.browser.file', new File(loggingDir, 'browser.log').absolutePath)
+        profile.setPreference('webdriver.log.browser.level', 'all')
+
+        new FirefoxDriver(profile)
     }
 
     static String initUrl() {
