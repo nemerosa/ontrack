@@ -92,6 +92,14 @@ public class UIErrorHandler {
         return getMessageResponse(HttpStatus.INTERNAL_SERVER_ERROR, message);
     }
 
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseBody
+    public ResponseEntity<UIErrorMessage> onAccessDeniedException() {
+        // Logs the error?
+        // Returns a 403 error
+        return getMessageResponse(HttpStatus.FORBIDDEN, "Not authorized.");
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public ResponseEntity<UIErrorMessage> onAnyException(HttpServletRequest request, Exception ex) {
