@@ -21,6 +21,9 @@ class HeaderPageComponent extends AbstractPageComponent {
         signIn.click()
         driver.findElement(By.name('name')).sendKeys name
         driver.findElement(By.name('password')).sendKeys password
-        driver.findElement(By.className('btn-primary')).click()
+        // Sign in OK
+        def okButton = driver.findElement(By.className('btn-primary'))
+        if (!okButton.enabled) throw new AssertionError("Sign in OK button is not enabled.")
+        okButton.click()
     }
 }
