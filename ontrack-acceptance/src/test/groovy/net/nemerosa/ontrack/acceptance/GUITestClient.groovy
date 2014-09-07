@@ -57,6 +57,7 @@ abstract class GUITestClient extends AcceptanceTestClient {
 
     @After
     void after() {
+        screenshot('end')
         driver.manage().deleteAllCookies()
     }
 
