@@ -101,7 +101,7 @@ public class GitIssueSearchExtension extends AbstractExtension implements Search
                     // ... and creates a result entry
                     results.add(
                             new SearchResult(
-                                    issue.getKey(),
+                                    issue.getDisplayKey(),
                                     String.format("Issue %s in Git repository %s for branch %s/%s",
                                             issue.getKey(),
                                             c.getGitConfiguration().getName(),
