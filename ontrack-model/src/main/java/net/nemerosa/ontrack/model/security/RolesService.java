@@ -31,6 +31,7 @@ public interface RolesService {
     List<Class<? extends ProjectFunction>> defaultProjectFunctions = Arrays.asList(
             ProjectView.class,
             ProjectEdit.class,
+            ProjectAuthorisationMgt.class,
             ProjectConfig.class,
             ProjectDelete.class,
             ProjectAuthorisationsManagement.class,
