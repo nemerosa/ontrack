@@ -23,6 +23,17 @@ public class PermissionController extends AbstractResourceController {
     }
 
     /**
+     * Looking for a permission target
+     */
+    @RequestMapping(value = "search/{token:.*}", method = RequestMethod.GET)
+    public Resources<PermissionTarget> searchPermissionTargets(@PathVariable String token) {
+        return Resources.of(
+                accountService.searchPermissionTargets(token),
+                uri(on(PermissionController.class).searchPermissionTargets(token))
+        );
+    }
+
+    /**
      * List of global permissions
      */
     @RequestMapping(value = "globals", method = RequestMethod.GET)
@@ -45,17 +56,6 @@ public class PermissionController extends AbstractResourceController {
     }
 
     /**
-     * Looking for a permission target
-     */
-    @RequestMapping(value = "search/{token:.*}", method = RequestMethod.GET)
-    public Resources<PermissionTarget> searchPermissionTargets(@PathVariable String token) {
-        return Resources.of(
-                accountService.searchPermissionTargets(token),
-                uri(on(PermissionController.class).searchPermissionTargets(token))
-        );
-    }
-
-    /**
      * Saving a global permission
      */
     @RequestMapping(value = "globals/{type}/{id}", method = RequestMethod.PUT)
@@ -69,6 +69,17 @@ public class PermissionController extends AbstractResourceController {
     @RequestMapping(value = "globals/{type}/{id}", method = RequestMethod.DELETE)
     public Ack deleteGlobalPermission(@PathVariable PermissionTargetType type, @PathVariable int id) {
         return accountService.deleteGlobalPermission(type, id);
+    }
+
+    /**
+     * List of project roles
+     */
+    @RequestMapping(value = "projects/roles", method = RequestMethod.GET)
+    public Resources<ProjectRole> getProjectRoles() {
+        return Resources.of(
+                rolesService.getProjectRoles(),
+                uri(on(PermissionController.class).getProjectRoles())
+        );
     }
 
 }
