@@ -257,6 +257,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Collection<ProjectPermission> getProjectPermissions(ID projectId) {
+        securityService.checkProjectFunction(projectId.getValue(), ProjectAuthorisationMgt.class);
         Collection<ProjectPermission> permissions = new ArrayList<>();
         // Users first
         permissions.addAll(
