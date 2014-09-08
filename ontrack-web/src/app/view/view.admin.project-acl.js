@@ -1,6 +1,7 @@
 angular.module('ot.view.admin.project-acl', [
     'ui.router',
-    'ot.service.core'
+    'ot.service.core',
+    'ot.service.structure'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('admin-project-acl', {
@@ -10,15 +11,19 @@ angular.module('ot.view.admin.project-acl', [
         });
     })
 
-    .controller('AdminProjectACLCtrl', function ($stateParams, $scope, $http, $interpolate, ot) {
+    .controller('AdminProjectACLCtrl', function ($stateParams, $scope, $http, $interpolate, ot, otStructureService) {
 
-        var projectId = $stateParams.branchId;
-
+        var projectId = $stateParams.projectId;
         var view = ot.view();
-        view.title = "Project permissions"; // TODO Project name
+        view.title = "Project permissions";
         view.commands = [
             ot.viewCloseCommand('/project/' + projectId)
         ];
+
+        // Loading the project
+        otStructureService.getProject(projectId).then(function (project) {
+            view.breadcrumbs = ot.projectBreadcrumbs(project);
+        });
 
         $scope.form = {
         };
