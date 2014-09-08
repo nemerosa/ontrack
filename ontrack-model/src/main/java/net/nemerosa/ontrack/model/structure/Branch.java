@@ -12,7 +12,7 @@ public class Branch implements ProjectEntity {
     private final String description;
     @JsonView({
             PromotionView.class, Branch.class, Build.class, PromotionLevel.class, ValidationStamp.class,
-            PromotionRun.class, ValidationRun.class
+            PromotionRun.class, ValidationRun.class, PromotionRunView.class
     })
     private final Project project;
 

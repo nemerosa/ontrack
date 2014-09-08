@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Link;
+import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -126,6 +127,14 @@ public class PromotionLevelController extends AbstractResourceController {
                 file.getContentType(),
                 file.getBytes()
         ));
+    }
+
+    @RequestMapping(value = "promotionLevels/{promotionLevelId}/runs", method = RequestMethod.GET)
+    public Resource<PromotionRunView> getPromotionRunView(@PathVariable ID promotionLevelId) {
+        return Resource.of(
+                structureService.getPromotionRunView(getPromotionLevel(promotionLevelId)),
+                uri(on(PromotionLevelController.class).getPromotionRunView(promotionLevelId))
+        );
     }
 
 }
