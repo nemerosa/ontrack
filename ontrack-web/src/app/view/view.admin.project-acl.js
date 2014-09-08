@@ -71,8 +71,8 @@ angular.module('ot.view.admin.project-acl', [
                 });
         };
 
-        $scope.removeGlobalPermission = function (globalPermission) {
-            ot.call($http.delete(globalPermission._delete)).then(load);
+        $scope.removeProjectPermission = function (projectPermission) {
+            ot.call($http.delete(projectPermission._delete)).then(load);
         };
 
     })
