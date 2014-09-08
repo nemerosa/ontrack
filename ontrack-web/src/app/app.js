@@ -29,6 +29,7 @@ var ontrack = angular.module('ontrack', [
         'ot.view.validationRun',
         'ot.view.admin.accounts',
         'ot.view.admin.global-acl',
+        'ot.view.admin.project-acl',
         'ot.view.admin.console',
         // Extensions
         'ontrack.extension.jenkins',
