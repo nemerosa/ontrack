@@ -1,13 +1,9 @@
 <ot-view>
     <div class="row">
-        <div class="col-md-5">
-            <div class="row">
-                <div class="col-md-12 ot-entity-image">
-                    <ot-entity-image entity="promotionLevel"></ot-entity-image>
-                    <span ng-if="!promotionLevel.image" class="ot-entity-image-default">No image</span>
-                    <button type="button" class="btn btn-info btn-sm" ng-click="changeImage()">Change image</button>
-                </div>
-            </div>
+        <div class="col-md-12 ot-view-title">
+            <ot-entity-image entity="promotionLevel">
+                {{promotionLevel.name}}
+            </ot-entity-image>
         </div>
     </div>
 </ot-view>
