@@ -25,15 +25,18 @@ angular.module('ot.view.admin.project-acl', [
         };
 
         // Loading the project
-        otStructureService.getProject(projectId).then(function (project) {
-            view.breadcrumbs = ot.projectBreadcrumbs(project);
-            return ot.pageCall($http.get('accounts/permissions/projects/' + projectId));
-        }).then(function (projectPermissions) {
-            $scope.projectPermissions = projectPermissions;
-            return ot.pageCall($http.get(projectPermissions._projectRoles));
-        }).then(function (projectRoles) {
-            $scope.projectRoles = projectRoles;
-        });
+        function load() {
+            otStructureService.getProject(projectId).then(function (project) {
+                view.breadcrumbs = ot.projectBreadcrumbs(project);
+                return ot.pageCall($http.get('accounts/permissions/projects/' + projectId));
+            }).then(function (projectPermissions) {
+                $scope.projectPermissions = projectPermissions;
+                return ot.pageCall($http.get(projectPermissions._projectRoles));
+            }).then(function (projectRoles) {
+                $scope.projectRoles = projectRoles;
+            });
+        }
+        load();
 
         // Loading the permission targets
         $scope.loadPermissionTargets = function (token) {
@@ -50,10 +53,14 @@ angular.module('ot.view.admin.project-acl', [
             }
         };
 
-        $scope.saveGlobalPermission = function () {
+        $scope.saveProjectPermission = function () {
             ot.call(
                 $http.put(
-                    $interpolate('accounts/permissions/globals/{{type}}/{{id}}')($scope.form.permissionTarget),
+                    $interpolate('accounts/permissions/projects/{{projectId}}/{{type}}/{{id}}')({
+                        projectId: projectId,
+                        type: $scope.form.permissionTarget.type,
+                        id: $scope.form.permissionTarget.id
+                    }),
                     {
                         role: $scope.form.role.id
                     }
