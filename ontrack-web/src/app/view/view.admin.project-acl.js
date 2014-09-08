@@ -20,26 +20,20 @@ angular.module('ot.view.admin.project-acl', [
             ot.viewCloseCommand('/project/' + projectId)
         ];
 
-        // Loading the project
-        otStructureService.getProject(projectId).then(function (project) {
-            view.breadcrumbs = ot.projectBreadcrumbs(project);
-        });
-
+        // Target/role association form
         $scope.form = {
         };
 
-        // Loading the global permissions
-        function load() {
-            ot.pageCall($http.get("accounts/permissions/globals")).then(function (globalPermissions) {
-                $scope.globalPermissions = globalPermissions;
-                return ot.pageCall($http.get(globalPermissions._globalRoles));
-            }).then(function (globalRoles) {
-                $scope.globalRoles = globalRoles;
-            });
-        }
-
-        // Loading the page
-        load();
+        // Loading the project
+        otStructureService.getProject(projectId).then(function (project) {
+            view.breadcrumbs = ot.projectBreadcrumbs(project);
+            return ot.pageCall($http.get('accounts/permissions/projects/' + projectId));
+        }).then(function (projectPermissions) {
+            $scope.projectPermissions = projectPermissions;
+            return ot.pageCall($http.get(projectPermissions._projectRoles));
+        }).then(function (projectRoles) {
+            $scope.projectRoles = projectRoles;
+        });
 
         // Loading the permission targets
         $scope.loadPermissionTargets = function (token) {
