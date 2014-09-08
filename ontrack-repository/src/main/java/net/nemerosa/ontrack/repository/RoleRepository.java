@@ -19,6 +19,10 @@ public interface RoleRepository {
             BiFunction<Integer, String, Optional<ProjectRoleAssociation>> projectRoleAssociationMapper
     );
 
+    Optional<ProjectRoleAssociation> findProjectRoleAssociationsByAccount(
+            int accountId, int projectId,
+            BiFunction<Integer, String, Optional<ProjectRoleAssociation>> projectRoleAssociationMapper);
+
     Ack saveGlobalRoleForAccount(int accountId, String role);
 
     Ack saveGlobalRoleForGroup(int accountId, String role);
@@ -30,6 +34,11 @@ public interface RoleRepository {
 
     Collection<ProjectRoleAssociation> findProjectRoleAssociationsByGroup(
             int groupId,
+            BiFunction<Integer, String, Optional<ProjectRoleAssociation>> projectRoleAssociationMapper
+    );
+
+    Optional<ProjectRoleAssociation> findProjectRoleAssociationsByGroup(
+            int groupId, int projectId,
             BiFunction<Integer, String, Optional<ProjectRoleAssociation>> projectRoleAssociationMapper
     );
 

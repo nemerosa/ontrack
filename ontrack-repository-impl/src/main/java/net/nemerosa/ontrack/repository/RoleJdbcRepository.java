@@ -81,6 +81,21 @@ public class RoleJdbcRepository extends AbstractJdbcRepository implements RoleRe
     }
 
     @Override
+    public Optional<ProjectRoleAssociation> findProjectRoleAssociationsByAccount(
+            int accountId, int projectId,
+            BiFunction<Integer, String, Optional<ProjectRoleAssociation>> projectRoleAssociationMapper) {
+        Optional<ProjectRoleAssociation> value = getFirstItem(
+                "SELECT PROJECT, ROLE FROM PROJECT_AUTHORIZATIONS WHERE ACCOUNT = :accountId AND PROJECT = :projectId",
+                params("accountId", accountId).addValue("projectId", projectId),
+                (rs, rowNum) -> projectRoleAssociationMapper.apply(
+                        rs.getInt("project"),
+                        rs.getString("role")
+                )
+        );
+        return value != null ? value : Optional.empty();
+    }
+
+    @Override
     public Collection<ProjectRoleAssociation> findProjectRoleAssociationsByGroup(
             int groupId,
             BiFunction<Integer, String, Optional<ProjectRoleAssociation>> projectRoleAssociationMapper
@@ -96,6 +111,19 @@ public class RoleJdbcRepository extends AbstractJdbcRepository implements RoleRe
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<ProjectRoleAssociation> findProjectRoleAssociationsByGroup(int groupId, int projectId, BiFunction<Integer, String, Optional<ProjectRoleAssociation>> projectRoleAssociationMapper) {
+        Optional<ProjectRoleAssociation> firstItem = getFirstItem(
+                "SELECT PROJECT, ROLE FROM GROUP_PROJECT_AUTHORIZATIONS WHERE ACCOUNTGROUP = :groupId AND PROJECT = :projectId",
+                params("groupId", groupId).addValue("projectId", projectId),
+                (rs, rowNum) -> projectRoleAssociationMapper.apply(
+                        rs.getInt("project"),
+                        rs.getString("role")
+                )
+        );
+        return firstItem != null ? firstItem : Optional.empty();
     }
 
     @Override

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.security.*;
+import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +81,17 @@ public class PermissionController extends AbstractResourceController {
                 rolesService.getProjectRoles(),
                 uri(on(PermissionController.class).getProjectRoles())
         );
+    }
+
+    /**
+     * List of permissions for a project.
+     */
+    @RequestMapping(value = "projects/{projectId}", method = RequestMethod.GET)
+    public Resources<ProjectPermission> getProjectPermissions(@PathVariable ID projectId) {
+        return Resources.of(
+                accountService.getProjectPermissions(projectId),
+                uri(on(PermissionController.class).getProjectPermissions(projectId))
+        ).with("_projectRoles", uri(on(PermissionController.class).getProjectRoles()));
     }
 
 }

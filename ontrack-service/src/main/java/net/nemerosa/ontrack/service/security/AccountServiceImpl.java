@@ -255,6 +255,67 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
+    @Override
+    public Collection<ProjectPermission> getProjectPermissions(ID projectId) {
+        Collection<ProjectPermission> permissions = new ArrayList<>();
+        // Users first
+        permissions.addAll(
+                accountRepository.findAll(authenticationSourceService::getAuthenticationSource)
+                        .stream()
+                        .map(account -> getProjectPermission(projectId, account))
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .collect(Collectors.toList())
+        );
+        // ... then groups
+        permissions.addAll(
+                accountGroupRepository.findAll()
+                        .stream()
+                        .map(accountGroup -> getGroupProjectPermission(projectId, accountGroup))
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .collect(Collectors.toList())
+        );
+        // OK
+        return permissions;
+    }
+
+    private Optional<ProjectPermission> getGroupProjectPermission(ID projectId, AccountGroup accountGroup) {
+        Optional<ProjectRoleAssociation> roleAssociationOptional = roleRepository.findProjectRoleAssociationsByGroup(
+                accountGroup.id(),
+                projectId.getValue(),
+                rolesService::getProjectRoleAssociation
+        );
+        if (roleAssociationOptional.isPresent()) {
+            return Optional.of(
+                    new ProjectPermission(
+                            accountGroup.asPermissionTarget(),
+                            roleAssociationOptional.get().getProjectRole()
+                    )
+            );
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private Optional<ProjectPermission> getProjectPermission(ID projectId, Account account) {
+        Optional<ProjectRoleAssociation> roleAssociationOptional = roleRepository.findProjectRoleAssociationsByAccount(
+                account.id(),
+                projectId.getValue(),
+                rolesService::getProjectRoleAssociation
+        );
+        if (roleAssociationOptional.isPresent()) {
+            return Optional.of(
+                    new ProjectPermission(
+                            account.asPermissionTarget(),
+                            roleAssociationOptional.get().getProjectRole()
+                    )
+            );
+        } else {
+            return Optional.empty();
+        }
+    }
+
     private Optional<GlobalPermission> getGroupGlobalPermission(AccountGroup group) {
         Optional<String> roleId = roleRepository.findGlobalRoleByGroup(group.id());
         if (roleId.isPresent()) {

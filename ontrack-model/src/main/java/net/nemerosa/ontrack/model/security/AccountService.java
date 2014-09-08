@@ -105,4 +105,11 @@ public interface AccountService {
      * Deletes a permission
      */
     Ack deleteGlobalPermission(PermissionTargetType type, int id);
+
+    /**
+     * Gets the list of permissions for a project.
+     *
+     * @param projectId ID of the project
+     */
+    Collection<ProjectPermission> getProjectPermissions(ID projectId);
 }
