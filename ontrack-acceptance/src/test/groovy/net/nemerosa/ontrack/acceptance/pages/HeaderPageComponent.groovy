@@ -23,9 +23,19 @@ class HeaderPageComponent extends AbstractPageComponent {
     def login(String name, String password) {
         signIn.click()
         screenshot('login-displayed')
-        driver.findElement(By.name('name')).sendKeys name
-        driver.findElement(By.name('password')).sendKeys password
+
+        def tName = driver.findElement(By.name('name'))
+        tName.sendKeys name
+
+        def tPassword = driver.findElement(By.name('password'))
+        tPassword.sendKeys password
+
         screenshot('login-filled-in')
+
+        // Logging
+        println "[gui] Login.name = ${tName.text}"
+        println "[gui] Login.password (size) = ${tPassword.text.size()}"
+
         // Sign in OK
         def okButton = driver.findElement(By.className('btn-primary'))
         waitUntil { okButton.enabled }
