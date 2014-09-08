@@ -32,9 +32,6 @@ class HeaderPageComponent extends AbstractPageComponent {
 
         screenshot('login-filled-in')
 
-        // FIXME #46
-        Thread.sleep 4000L
-
         // Logging
         trace "Login.name = ${tName.getAttribute('value')}"
         trace "Login.password (size) = ${tPassword.getAttribute('value').size()}"
