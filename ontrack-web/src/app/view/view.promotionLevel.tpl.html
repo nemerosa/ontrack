@@ -6,7 +6,7 @@
             </ot-entity-image>
         </div>
     </div>
-    <table class="table table-condensed">
+    <table class="table table-condensed table-hover">
         <thead>
             <tr>
                 <th>Build</th>
@@ -16,7 +16,7 @@
         <tbody>
         <tr ng-repeat="promotionRun in promotionRunView.promotionRuns">
             <td>
-                {{promotionRun.build.name}}
+                <a href="#/build/{{promotionRun.build.id}}">{{promotionRun.build.name}}</a>
             </td>
             <td>
                 <ot-signature value="promotionRun.signature" user="true" time="true"></ot-signature>
