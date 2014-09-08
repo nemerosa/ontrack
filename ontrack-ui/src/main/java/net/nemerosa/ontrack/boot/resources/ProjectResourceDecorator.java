@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.boot.resources;
 
 import net.nemerosa.ontrack.boot.ui.*;
+import net.nemerosa.ontrack.model.security.ProjectAuthorisationMgt;
 import net.nemerosa.ontrack.model.security.ProjectDelete;
 import net.nemerosa.ontrack.model.security.ProjectEdit;
 import net.nemerosa.ontrack.model.structure.Project;
@@ -37,6 +38,8 @@ public class ProjectResourceDecorator extends AbstractResourceDecorator<Project>
                 .delete(on(ProjectController.class).deleteProject(project.getId()), ProjectDelete.class, project.id())
                         // Decorations
                 .link("_decorations", on(DecorationsController.class).getDecorations(project.getProjectEntityType(), project.getId()))
+                        // Authorisation management
+                .link("_permissions", on(PermissionController.class).getProjectPermissions(project.getId()), ProjectAuthorisationMgt.class, project.id())
                         // OK
                 .build();
     }
