@@ -6,4 +6,25 @@
             </ot-entity-image>
         </div>
     </div>
+    <table class="table table-condensed">
+        <thead>
+            <tr>
+                <th>Build</th>
+                <th colspan="2">Promotion</th>
+            </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="promotionRun in promotionRunView.promotionRuns">
+            <td>
+                {{promotionRun.build.name}}
+            </td>
+            <td>
+                <ot-signature value="promotionRun.signature" user="true" time="true"></ot-signature>
+            </td>
+            <td class="ot-description">
+                {{promotionRun.description}}
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </ot-view>

@@ -67,6 +67,10 @@ angular.module('ot.view.promotionLevel', [
                     },
                     ot.viewCloseCommand('/branch/' + $scope.promotionLevel.branch.id)
                 ];
+                // Loads the runs
+                return ot.call($http.get(promotionLevel._runs));
+            }).then(function (promotionRunView) {
+                $scope.promotionRunView = promotionRunView;
             });
         }
 
