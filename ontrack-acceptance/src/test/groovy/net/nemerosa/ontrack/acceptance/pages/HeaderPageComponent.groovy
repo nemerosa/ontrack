@@ -32,9 +32,12 @@ class HeaderPageComponent extends AbstractPageComponent {
 
         screenshot('login-filled-in')
 
+        // FIXME #46
+        Thread.sleep 4000L
+
         // Logging
-        println "[gui] Login.name = ${tName.text}"
-        println "[gui] Login.password (size) = ${tPassword.text.size()}"
+        trace "Login.name = ${tName.getAttribute('value')}"
+        trace "Login.password (size) = ${tPassword.getAttribute('value').size()}"
 
         // Sign in OK
         def okButton = driver.findElement(By.className('btn-primary'))
