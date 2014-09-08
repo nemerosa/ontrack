@@ -53,6 +53,15 @@ angular.module('ot.view.project', [
                     },
                     {
                         condition: function () {
+                            return $scope.project._permissions;
+                        },
+                        id: 'permissionsProject',
+                        name: "Permissions",
+                        cls: 'ot-command-project-permissions',
+                        link: '/admin-project-acl/' + $scope.project.id
+                    },
+                    {
+                        condition: function () {
                             return $scope.project._delete;
                         },
                         id: 'deleteProject',
