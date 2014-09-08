@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.model.security;
 
 import lombok.Data;
+import net.nemerosa.ontrack.model.structure.ID;
 
 /**
  * Definition of a permission on a project: a {@link net.nemerosa.ontrack.model.security.PermissionTarget}
@@ -9,6 +10,7 @@ import lombok.Data;
 @Data
 public class ProjectPermission {
 
+    private final ID projectId;
     private final PermissionTarget target;
     private final ProjectRole role;
 

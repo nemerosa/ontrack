@@ -294,6 +294,19 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
+    @Override
+    public Ack deleteProjectPermission(ID projectId, PermissionTargetType type, int id) {
+        securityService.checkProjectFunction(projectId.getValue(), ProjectAuthorisationMgt.class);
+        switch (type) {
+            case ACCOUNT:
+                return roleRepository.deleteProjectRoleForAccount(projectId.getValue(), id);
+            case GROUP:
+                return roleRepository.deleteProjectRoleForGroup(projectId.getValue(), id);
+            default:
+                return Ack.NOK;
+        }
+    }
+
     private Optional<ProjectPermission> getGroupProjectPermission(ID projectId, AccountGroup accountGroup) {
         Optional<ProjectRoleAssociation> roleAssociationOptional = roleRepository.findProjectRoleAssociationsByGroup(
                 accountGroup.id(),
@@ -303,6 +316,7 @@ public class AccountServiceImpl implements AccountService {
         if (roleAssociationOptional.isPresent()) {
             return Optional.of(
                     new ProjectPermission(
+                            projectId,
                             accountGroup.asPermissionTarget(),
                             roleAssociationOptional.get().getProjectRole()
                     )
@@ -321,6 +335,7 @@ public class AccountServiceImpl implements AccountService {
         if (roleAssociationOptional.isPresent()) {
             return Optional.of(
                     new ProjectPermission(
+                            projectId,
                             account.asPermissionTarget(),
                             roleAssociationOptional.get().getProjectRole()
                     )

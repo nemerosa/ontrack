@@ -118,4 +118,9 @@ public interface AccountService {
      * by the <code>type</code> and <code>id</code>.
      */
     Ack saveProjectPermission(ID projectId, PermissionTargetType type, int id, PermissionInput input);
+
+    /**
+     * Deletes a project permission.
+     */
+    Ack deleteProjectPermission(ID projectId, PermissionTargetType type, int id);
 }

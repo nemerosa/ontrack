@@ -49,4 +49,8 @@ public interface RoleRepository {
     Ack saveProjectRoleForAccount(int projectId, int accountId, String role);
 
     Ack saveProjectRoleForGroup(int projectId, int accountGroupId, String role);
+
+    Ack deleteProjectRoleForAccount(int projectId, int accountId);
+
+    Ack deleteProjectRoleForGroup(int projectId, int accountGroupId);
 }

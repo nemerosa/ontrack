@@ -102,4 +102,12 @@ public class PermissionController extends AbstractResourceController {
         return accountService.saveProjectPermission(projectId, type, id, input);
     }
 
+    /**
+     * Deleting a project permission
+     */
+    @RequestMapping(value = "projects/{projectId}/{type}/{id}", method = RequestMethod.DELETE)
+    public Ack deleteProjectPermission(@PathVariable ID projectId, @PathVariable PermissionTargetType type, @PathVariable int id) {
+        return accountService.deleteProjectPermission(projectId, type, id);
+    }
+
 }

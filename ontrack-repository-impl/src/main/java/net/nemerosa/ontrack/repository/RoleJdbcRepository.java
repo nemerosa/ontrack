@@ -91,6 +91,26 @@ public class RoleJdbcRepository extends AbstractJdbcRepository implements RoleRe
     }
 
     @Override
+    public Ack deleteProjectRoleForAccount(int projectId, int accountId) {
+        return Ack.one(
+                getNamedParameterJdbcTemplate().update(
+                        "DELETE FROM PROJECT_AUTHORIZATIONS WHERE ACCOUNT = :accountId AND PROJECT = :projectId",
+                        params("accountId", accountId).addValue("projectId", projectId)
+                )
+        );
+    }
+
+    @Override
+    public Ack deleteProjectRoleForGroup(int projectId, int accountGroupId) {
+        return Ack.one(
+                getNamedParameterJdbcTemplate().update(
+                        "DELETE FROM GROUP_PROJECT_AUTHORIZATIONS WHERE ACCOUNTGROUP = :accountGroupId AND PROJECT = :projectId",
+                        params("accountGroupId", accountGroupId).addValue("projectId", projectId)
+                )
+        );
+    }
+
+    @Override
     public Collection<ProjectRoleAssociation> findProjectRoleAssociationsByAccount(
             int accountId,
             BiFunction<Integer, String, Optional<ProjectRoleAssociation>> projectRoleAssociationMapper

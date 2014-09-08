@@ -24,7 +24,8 @@ public class CoreResourceModule extends AbstractResourceModule {
                 new BuildFilterResourceDecorator(),
                 new AccountResourceDecorator(),
                 new AccountGroupResourceDecorator(),
-                new GlobalPermissionResourceDecorator()
+                new GlobalPermissionResourceDecorator(),
+                new ProjectPermissionResourceDecorator()
         );
     }
 }
