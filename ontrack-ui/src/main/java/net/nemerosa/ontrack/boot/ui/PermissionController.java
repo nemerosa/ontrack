@@ -94,4 +94,12 @@ public class PermissionController extends AbstractResourceController {
         ).with("_projectRoles", uri(on(PermissionController.class).getProjectRoles()));
     }
 
+    /**
+     * Saving a project permission
+     */
+    @RequestMapping(value = "projects/{projectId}/{type}/{id}", method = RequestMethod.PUT)
+    public Ack saveProjectPermission(@PathVariable ID projectId, @PathVariable PermissionTargetType type, @PathVariable int id, @RequestBody PermissionInput input) {
+        return accountService.saveProjectPermission(projectId, type, id, input);
+    }
+
 }

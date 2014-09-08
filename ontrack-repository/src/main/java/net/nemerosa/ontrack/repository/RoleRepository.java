@@ -25,7 +25,7 @@ public interface RoleRepository {
 
     Ack saveGlobalRoleForAccount(int accountId, String role);
 
-    Ack saveGlobalRoleForGroup(int accountId, String role);
+    Ack saveGlobalRoleForGroup(int accountGroupId, String role);
 
     /**
      * Gets the global role for an account group
@@ -45,4 +45,8 @@ public interface RoleRepository {
     Ack deleteGlobalRoleForAccount(int accountId);
 
     Ack deleteGlobalRoleForGroup(int groupId);
+
+    Ack saveProjectRoleForAccount(int projectId, int accountId, String role);
+
+    Ack saveProjectRoleForGroup(int projectId, int accountGroupId, String role);
 }

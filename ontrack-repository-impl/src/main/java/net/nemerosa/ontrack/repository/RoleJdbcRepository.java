@@ -63,6 +63,34 @@ public class RoleJdbcRepository extends AbstractJdbcRepository implements RoleRe
     }
 
     @Override
+    public Ack saveProjectRoleForAccount(int projectId, int accountId, String role) {
+        getNamedParameterJdbcTemplate().update(
+                "DELETE FROM PROJECT_AUTHORIZATIONS WHERE ACCOUNT = :accountId AND PROJECT = :projectId",
+                params("accountId", accountId).addValue("projectId", projectId)
+        );
+        return Ack.one(
+                getNamedParameterJdbcTemplate().update(
+                        "INSERT INTO PROJECT_AUTHORIZATIONS (PROJECT, ACCOUNT, ROLE) VALUES (:projectId, :accountId, :role)",
+                        params("accountId", accountId).addValue("role", role).addValue("projectId", projectId)
+                )
+        );
+    }
+
+    @Override
+    public Ack saveProjectRoleForGroup(int projectId, int groupId, String role) {
+        getNamedParameterJdbcTemplate().update(
+                "DELETE FROM GROUP_PROJECT_AUTHORIZATIONS WHERE ACCOUNTGROUP = :groupId AND PROJECT = :projectId",
+                params("groupId", groupId).addValue("projectId", projectId)
+        );
+        return Ack.one(
+                getNamedParameterJdbcTemplate().update(
+                        "INSERT INTO GROUP_PROJECT_AUTHORIZATIONS (PROJECT, ACCOUNTGROUP, ROLE) VALUES (:projectId, :groupId, :role)",
+                        params("groupId", groupId).addValue("role", role).addValue("projectId", projectId)
+                )
+        );
+    }
+
+    @Override
     public Collection<ProjectRoleAssociation> findProjectRoleAssociationsByAccount(
             int accountId,
             BiFunction<Integer, String, Optional<ProjectRoleAssociation>> projectRoleAssociationMapper

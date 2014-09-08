@@ -281,6 +281,19 @@ public class AccountServiceImpl implements AccountService {
         return permissions;
     }
 
+    @Override
+    public Ack saveProjectPermission(ID projectId, PermissionTargetType type, int id, PermissionInput input) {
+        securityService.checkProjectFunction(projectId.getValue(), ProjectAuthorisationMgt.class);
+        switch (type) {
+            case ACCOUNT:
+                return roleRepository.saveProjectRoleForAccount(projectId.getValue(), id, input.getRole());
+            case GROUP:
+                return roleRepository.saveProjectRoleForGroup(projectId.getValue(), id, input.getRole());
+            default:
+                return Ack.NOK;
+        }
+    }
+
     private Optional<ProjectPermission> getGroupProjectPermission(ID projectId, AccountGroup accountGroup) {
         Optional<ProjectRoleAssociation> roleAssociationOptional = roleRepository.findProjectRoleAssociationsByGroup(
                 accountGroup.id(),

@@ -112,4 +112,10 @@ public interface AccountService {
      * @param projectId ID of the project
      */
     Collection<ProjectPermission> getProjectPermissions(ID projectId);
+
+    /**
+     * Saves the project permission for the {@link net.nemerosa.ontrack.model.security.PermissionTarget} defined
+     * by the <code>type</code> and <code>id</code>.
+     */
+    Ack saveProjectPermission(ID projectId, PermissionTargetType type, int id, PermissionInput input);
 }
