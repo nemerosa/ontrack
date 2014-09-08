@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collections;
 
 import static net.nemerosa.ontrack.json.JsonUtils.object;
@@ -19,6 +20,8 @@ public class StandardBuildFilterTest {
     private Branch branch;
     private Build build;
     private PropertyService propertyService;
+    private PromotionLevel copper;
+    private PromotionLevel bronze;
 
     @Before
     public void prepare() {
@@ -29,6 +32,141 @@ public class StandardBuildFilterTest {
                 new NameDescription("1", "Build 1"),
                 Signature.of("user").withTime(LocalDateTime.of(2014, 7, 14, 13, 25, 0))
         );
+        copper = PromotionLevel.of(branch, new NameDescription("COPPER", ""));
+        bronze = PromotionLevel.of(branch, new NameDescription("BRONZE", ""));
+    }
+
+    /**
+     * Tests the following sequence:
+     * <p>
+     * <pre>
+     *     1
+     *     2
+     *     3
+     *     4 --> COPPER
+     *     5 --> BRONZE
+     * </pre>
+     * <p>
+     * Builds 1 to 3 should be accepted:
+     * <ul>
+     * <li>Since promotion level: COPPER</li>
+     * </ul>
+     */
+    @Test
+    public void since_promotion_level__none_before_is_accepted() {
+        StandardBuildFilter filter = new StandardBuildFilter(
+                StandardBuildFilterData.of(5).withSincePromotionLevel("COPPER"),
+                propertyService
+        );
+        BuildFilterResult result = filter.filter(
+                Collections.emptyList(),
+                branch,
+                build,
+                () -> new BuildView(
+                        build,
+                        Collections.emptyList(),
+                        Collections.emptyList()
+                )
+        );
+        assertNotNull(result);
+        assertTrue(result.isGoingOn());
+        assertTrue(result.isAccept());
+    }
+
+    /**
+     * Tests the following sequence:
+     * <p>
+     * <pre>
+     *     1
+     *     2 --> COPPER
+     *     3
+     *     4 --> COPPER
+     *     5 --> COPPER, BRONZE
+     * </pre>
+     * <p>
+     * Build 5 should be accepted and no further build should be scan for:
+     * <ul>
+     * <li>With promotion level: COPPER</li>
+     * <li>Since promotion level: BRONZE</li>
+     * </ul>
+     */
+    @Test
+    public void with_since_promotion_level__last_one_accepted() {
+        StandardBuildFilter filter = new StandardBuildFilter(
+                StandardBuildFilterData.of(5).withSincePromotionLevel("BRONZE").withWithPromotionLevel("COPPER"),
+                propertyService
+        );
+        BuildFilterResult result = filter.filter(
+                Collections.emptyList(),
+                branch,
+                build,
+                () -> new BuildView(
+                        build,
+                        Arrays.asList(
+                                PromotionRun.of(
+                                        build,
+                                        copper,
+                                        Signature.of("test"),
+                                        ""
+                                ),
+                                PromotionRun.of(
+                                        build,
+                                        bronze,
+                                        Signature.of("test"),
+                                        ""
+                                )
+                        ),
+                        Collections.emptyList()
+                )
+        );
+        assertNotNull(result);
+        assertFalse("Not going on after Bronze build", result.isGoingOn());
+        assertTrue("Last copper/bronze build accepted", result.isAccept());
+    }
+
+    /**
+     * Tests the following sequence:
+     * <p>
+     * <pre>
+     *     1
+     *     2 --> COPPER
+     *     3
+     *     4 --> COPPER
+     *     5 --> BRONZE
+     * </pre>
+     * <p>
+     * Build 5 should be accepted and no further build should be scan for:
+     * <ul>
+     * <li>With promotion level: COPPER</li>
+     * <li>Since promotion level: BRONZE</li>
+     * </ul>
+     */
+    @Test
+    public void with_since_promotion_level__last_one_accepted_when_not_promoted() {
+        StandardBuildFilter filter = new StandardBuildFilter(
+                StandardBuildFilterData.of(5).withSincePromotionLevel("BRONZE").withWithPromotionLevel("COPPER"),
+                propertyService
+        );
+        BuildFilterResult result = filter.filter(
+                Collections.emptyList(),
+                branch,
+                build,
+                () -> new BuildView(
+                        build,
+                        Arrays.asList(
+                                PromotionRun.of(
+                                        build,
+                                        bronze,
+                                        Signature.of("test"),
+                                        ""
+                                )
+                        ),
+                        Collections.emptyList()
+                )
+        );
+        assertNotNull(result);
+        assertFalse("Not going on after Bronze build", result.isGoingOn());
+        assertTrue("Last bronze build accepted", result.isAccept());
     }
 
     @Test

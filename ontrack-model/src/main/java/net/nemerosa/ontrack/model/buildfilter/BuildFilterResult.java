@@ -30,4 +30,8 @@ public class BuildFilterResult {
     public BuildFilterResult goOnIf(boolean condition) {
         return new BuildFilterResult(accept, goingOn && condition);
     }
+
+    public BuildFilterResult forceAccept() {
+        return new BuildFilterResult(true, goingOn);
+    }
 }
