@@ -474,6 +474,18 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         );
     }
 
+    @Override
+    public List<PromotionRun> getPromotionRunsForPromotionLevel(PromotionLevel promotionLevel) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT * FROM PROMOTION_RUNS WHERE PROMOTIONLEVELID = :promotionLevelId ORDER BY CREATION DESC",
+                params("promotionLevelId", promotionLevel.id()),
+                (rs, rowNum) -> toPromotionRun(rs,
+                        this::getBuild,
+                        (id) -> promotionLevel
+                )
+        );
+    }
+
     protected PromotionRun toPromotionRun(ResultSet rs,
                                           Function<ID, Build> buildLoader,
                                           Function<ID, PromotionLevel> promotionLevelLoader) throws SQLException {

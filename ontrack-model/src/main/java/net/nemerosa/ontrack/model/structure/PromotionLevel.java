@@ -19,7 +19,7 @@ public class PromotionLevel implements ProjectEntity {
     private final ID id;
     private final String name;
     private final String description;
-    @JsonView({PromotionLevel.class, PromotionView.class})
+    @JsonView({PromotionLevel.class, PromotionView.class, PromotionRunView.class})
     private final Branch branch;
     private final Boolean image;
 

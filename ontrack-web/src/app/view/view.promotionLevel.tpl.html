@@ -1,13 +1,30 @@
 <ot-view>
     <div class="row">
-        <div class="col-md-5">
-            <div class="row">
-                <div class="col-md-12 ot-entity-image">
-                    <ot-entity-image entity="promotionLevel"></ot-entity-image>
-                    <span ng-if="!promotionLevel.image" class="ot-entity-image-default">No image</span>
-                    <button type="button" class="btn btn-info btn-sm" ng-click="changeImage()">Change image</button>
-                </div>
-            </div>
+        <div class="col-md-12 ot-view-title">
+            <ot-entity-image entity="promotionLevel">
+                {{promotionLevel.name}}
+            </ot-entity-image>
         </div>
     </div>
+    <table class="table table-condensed table-hover">
+        <thead>
+            <tr>
+                <th>Build</th>
+                <th colspan="2">Promotion</th>
+            </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="promotionRun in promotionRunView.promotionRuns">
+            <td>
+                <a href="#/build/{{promotionRun.build.id}}">{{promotionRun.build.name}}</a>
+            </td>
+            <td>
+                <ot-signature value="promotionRun.signature" user="true" time="true"></ot-signature>
+            </td>
+            <td class="ot-description">
+                {{promotionRun.description}}
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </ot-view>

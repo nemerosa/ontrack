@@ -97,6 +97,8 @@ public interface StructureService {
 
     PromotionRun getLastPromotionRunForPromotionLevel(PromotionLevel promotionLevel);
 
+    PromotionRunView getPromotionRunView(PromotionLevel promotionLevel);
+
     // Validation stamps
 
     List<ValidationStamp> getValidationStampListForBranch(ID branchId);

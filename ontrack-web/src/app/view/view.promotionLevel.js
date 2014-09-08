@@ -19,12 +19,19 @@ angular.module('ot.view.promotionLevel', [
         function loadPromotionLevel() {
             otStructureService.getPromotionLevel(promotionLevelId).then(function (promotionLevel) {
                 $scope.promotionLevel = promotionLevel;
-                // View title
-                view.title = $scope.promotionLevel.name;
-                view.description = $scope.promotionLevel.description;
+                // View breadcrumbs
                 view.breadcrumbs = ot.branchBreadcrumbs(promotionLevel.branch);
                 // Commands
                 view.commands = [
+                    {
+                        condition: function () {
+                            return promotionLevel._update;
+                        },
+                        id: 'updatePromotionLevelImage',
+                        name: "Change image",
+                        cls: 'ot-command-promotion-level-image',
+                        action: changeImage
+                    },
                     {
                         condition: function () {
                             return promotionLevel._update;
@@ -60,6 +67,10 @@ angular.module('ot.view.promotionLevel', [
                     },
                     ot.viewCloseCommand('/branch/' + $scope.promotionLevel.branch.id)
                 ];
+                // Loads the runs
+                return ot.call($http.get(promotionLevel._runs));
+            }).then(function (promotionRunView) {
+                $scope.promotionRunView = promotionRunView;
             });
         }
 
@@ -67,9 +78,9 @@ angular.module('ot.view.promotionLevel', [
         loadPromotionLevel();
 
         // Changing the image
-        $scope.changeImage = function () {
+        function changeImage() {
             otStructureService.changePromotionLevelImage($scope.promotionLevel).then(loadPromotionLevel);
-        };
+        }
 
     })
 ;
