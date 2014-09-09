@@ -121,9 +121,13 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
 
     @Override
     public boolean containsIssueKey(IssueServiceConfiguration issueServiceConfiguration, String key, Set<String> keys) {
-        // Normalisation
-        Set<Integer> ids = keys.stream().map(this::getIssueId).collect(Collectors.toSet());
-        return ids.contains(getIssueId(key));
+        // Searchable key?
+        if (StringUtils.isNumeric(key) || validIssueToken(key)) {
+            Set<Integer> ids = keys.stream().map(this::getIssueId).collect(Collectors.toSet());
+            return ids.contains(getIssueId(key));
+        } else {
+            return false;
+        }
     }
 
     @Override

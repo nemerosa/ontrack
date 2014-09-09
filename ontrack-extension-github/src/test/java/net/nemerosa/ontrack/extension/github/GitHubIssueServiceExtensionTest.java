@@ -72,6 +72,21 @@ public class GitHubIssueServiceExtensionTest {
     }
 
     @Test
+    public void containsIssueKey_jira_in_none() {
+        assertFalse(extension.containsIssueKey(configuration, "ITEACH-14", Collections.emptySet()));
+    }
+
+    @Test
+    public void containsIssueKey_jira_in_one() {
+        assertFalse(extension.containsIssueKey(configuration, "ITEACH-14", Sets.newHashSet("15")));
+    }
+
+    @Test
+    public void containsIssueKey_jira_in_two() {
+        assertFalse(extension.containsIssueKey(configuration, "ITEACH-14", Sets.newHashSet("15", "22")));
+    }
+
+    @Test
     public void extractIssueKeysFromMessage_none() {
         Set<String> keys = extension.extractIssueKeysFromMessage(configuration, "TEST-1 No GitHub issue");
         assertTrue(keys.isEmpty());
