@@ -20,11 +20,18 @@ angular.module('ot.view.validationStamp', [
             otStructureService.getValidationStamp(validationStampId).then(function (validationStamp) {
                 $scope.validationStamp = validationStamp;
                 // View title
-                view.title = $scope.validationStamp.name;
-                view.description = $scope.validationStamp.description;
                 view.breadcrumbs = ot.branchBreadcrumbs(validationStamp.branch);
                 // Commands
                 view.commands = [
+                    {
+                        condition: function () {
+                            return validationStamp._update;
+                        },
+                        id: 'updateValidationStampImage',
+                        name: "Change image",
+                        cls: 'ot-command-validation-stamp-image',
+                        action: changeImage
+                    },
                     {
                         condition: function () {
                             return validationStamp._update;
@@ -67,9 +74,9 @@ angular.module('ot.view.validationStamp', [
         loadValidationStamp();
 
         // Changing the image
-        $scope.changeImage = function () {
+        function changeImage () {
             otStructureService.changeValidationStampImage($scope.validationStamp).then(loadValidationStamp);
-        };
+        }
 
     })
 ;
