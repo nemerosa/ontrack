@@ -195,7 +195,7 @@ public class ValidationRunController extends AbstractResourceController {
             );
         }
         // OK
-        return resources.withPagination(pagination);
+        return resources.withPagination(pagination).forView(ValidationStampRunView.class);
     }
 
 }
