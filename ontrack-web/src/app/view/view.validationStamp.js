@@ -67,6 +67,10 @@ angular.module('ot.view.validationStamp', [
                     },
                     ot.viewCloseCommand('/branch/' + $scope.validationStamp.branch.id)
                 ];
+                // Loading the validation runs
+                return ot.pageCall($http.get(validationStamp._runs));
+            }).then(function (validationRunResources) {
+                $scope.validationRunResources = validationRunResources;
             });
         }
 
