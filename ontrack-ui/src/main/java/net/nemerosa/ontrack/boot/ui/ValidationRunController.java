@@ -146,7 +146,11 @@ public class ValidationRunController extends AbstractResourceController {
     /**
      * List of validation runs for a validation stamp
      */
-    public Resources<ValidationRun> getValidationRunsForValidationStamp(ID validationStampId, int offset, int count) {
+    @RequestMapping(value = "validationStamps/{validationStampId}/validationRuns", method = RequestMethod.GET)
+    public Resources<ValidationRun> getValidationRunsForValidationStamp(
+            @PathVariable ID validationStampId,
+            @RequestParam(required = false, defaultValue = "0") int offset,
+            @RequestParam(required = false, defaultValue = "10") int count) {
         // Gets ALL the runs
         List<ValidationRun> runs = structureService.getValidationRunsForValidationStamp(validationStampId, 0, Integer.MAX_VALUE);
         // Total number of runs
