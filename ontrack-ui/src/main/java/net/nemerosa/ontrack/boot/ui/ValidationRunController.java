@@ -145,7 +145,6 @@ public class ValidationRunController extends AbstractResourceController {
 
     /**
      * List of validation runs for a validation stamp
-     * TODO Include comments as well, by using a generic ValidationRunEvent class
      */
     public Resources<ValidationRun> getValidationRunsForValidationStamp(ID validationStampId, int offset, int count) {
         // Gets ALL the runs
