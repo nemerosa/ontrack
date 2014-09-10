@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.Wither;
 import net.nemerosa.ontrack.model.structure.ViewSupplier;
 
 import java.net.URI;
@@ -17,7 +16,6 @@ import java.util.stream.Stream;
 public class Resources<T> extends LinkContainer<Resources<T>> implements ViewSupplier {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    @Wither
     private final Pagination pagination;
     private final Collection<T> resources;
     @JsonIgnore
@@ -40,5 +38,9 @@ public class Resources<T> extends LinkContainer<Resources<T>> implements ViewSup
 
     public static <R> Resources<R> of(Collection<R> resources, URI href) {
         return new Resources<>(resources, href, Pagination.NONE, Object.class);
+    }
+
+    public Resources<T> withPagination(Pagination pagination) {
+        return this.pagination == pagination ? this : new Resources<>(this.resources, get_self(), pagination, this.viewType);
     }
 }
