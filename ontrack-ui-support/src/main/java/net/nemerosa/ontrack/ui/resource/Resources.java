@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.Wither;
 import net.nemerosa.ontrack.model.structure.ViewSupplier;
 
 import java.net.URI;
@@ -16,6 +17,7 @@ import java.util.stream.Stream;
 public class Resources<T> extends LinkContainer<Resources<T>> implements ViewSupplier {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Wither
     private final Pagination pagination;
     private final Collection<T> resources;
     @JsonIgnore
