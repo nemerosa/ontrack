@@ -62,14 +62,14 @@ public class ValidationRunStatusServiceRef implements ValidationRunStatusService
      */
     @Override
     public void start() {
-        register(ValidationRunStatusID.of(PASSED, "Passed", true, true));
-        register(ValidationRunStatusID.of(WARNING, "Warning", true, true));
-        register(ValidationRunStatusID.of(FIXED, "Fixed", false, true));
-        register(ValidationRunStatusID.of(DEFECTIVE, "Defective", false, false));
-        register(ValidationRunStatusID.of(EXPLAINED, "Explained", false, false), FIXED);
-        register(ValidationRunStatusID.of(INVESTIGATING, "Investigating", true, false), DEFECTIVE, EXPLAINED, FIXED);
-        register(ValidationRunStatusID.of(INTERRUPTED, "Interrupted", true, false), INVESTIGATING, FIXED);
-        register(ValidationRunStatusID.of(FAILED, "Failed", true, false), INTERRUPTED, INVESTIGATING, EXPLAINED, DEFECTIVE);
+        register(STATUS_PASSED);
+        register(STATUS_WARNING);
+        register(STATUS_FIXED);
+        register(STATUS_DEFECTIVE);
+        register(STATUS_EXPLAINED, FIXED);
+        register(STATUS_INVESTIGATING, DEFECTIVE, EXPLAINED, FIXED);
+        register(STATUS_INTERRUPTED, INVESTIGATING, FIXED);
+        register(STATUS_FAILED, INTERRUPTED, INVESTIGATING, EXPLAINED, DEFECTIVE);
         // TODO Participation from extensions
         // Checks the tree
         for (ValidationRunStatusID statusID : statuses.values()) {
