@@ -4,6 +4,8 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import net.nemerosa.ontrack.ui.controller.MockURIBuilder
+import net.nemerosa.ontrack.ui.resource.PaginationCountException
+import net.nemerosa.ontrack.ui.resource.PaginationOffsetException
 import net.nemerosa.ontrack.ui.resource.Resources
 import org.junit.Before
 import org.junit.Test
@@ -46,7 +48,7 @@ class ValidationRunControllerTest {
     }
 
     @Test
-    void getValidationRunsForValidationStamp_none() throws Exception {
+    void 'getValidationRunsForValidationStamp: no result'() throws Exception {
         when(structureService.getValidationRunsForValidationStamp(ID.of(1), 0, Integer.MAX_VALUE)).thenReturn(Collections.emptyList())
         Resources<ValidationRun> resources = controller.getValidationRunsForValidationStamp(ID.of(1), 0, 10)
         assert resources != null
@@ -60,10 +62,8 @@ class ValidationRunControllerTest {
     }
 
     @Test
-    void getValidationRunsForValidationStamp_first_page() throws Exception {
-        def runs = generateRuns(15)
-        assert runs.size() == 15
-        when(structureService.getValidationRunsForValidationStamp(ID.of(1), 0, Integer.MAX_VALUE)).thenReturn(runs)
+    void 'getValidationRunsForValidationStamp: first page'() throws Exception {
+        when(structureService.getValidationRunsForValidationStamp(ID.of(1), 0, Integer.MAX_VALUE)).thenReturn(generateRuns(30))
         Resources<ValidationRun> resources = controller.getValidationRunsForValidationStamp(ID.of(1), 0, 10)
         assert resources != null
         assert resources.resources.size() == 10
@@ -72,7 +72,87 @@ class ValidationRunControllerTest {
         assert resources.pagination.next.toString() == 'urn:test:net.nemerosa.ontrack.boot.ui.ValidationRunController#getValidationRunsForValidationStamp:1,10,10'
         assert resources.pagination.offset == 0
         assert resources.pagination.limit == 10
-        assert resources.pagination.total == 15
+        assert resources.pagination.total == 30
+    }
+
+    @Test
+    void 'getValidationRunsForValidationStamp: middle page'() throws Exception {
+        when(structureService.getValidationRunsForValidationStamp(ID.of(1), 0, Integer.MAX_VALUE)).thenReturn(generateRuns(30))
+        Resources<ValidationRun> resources = controller.getValidationRunsForValidationStamp(ID.of(1), 10, 10)
+        assert resources != null
+        assert resources.resources.size() == 10
+        assert resources.pagination != null
+        assert resources.pagination.prev.toString() == 'urn:test:net.nemerosa.ontrack.boot.ui.ValidationRunController#getValidationRunsForValidationStamp:1,0,10'
+        assert resources.pagination.next.toString() == 'urn:test:net.nemerosa.ontrack.boot.ui.ValidationRunController#getValidationRunsForValidationStamp:1,20,10'
+        assert resources.pagination.offset == 10
+        assert resources.pagination.limit == 10
+        assert resources.pagination.total == 30
+    }
+
+    @Test
+    void 'getValidationRunsForValidationStamp: end page'() throws Exception {
+        when(structureService.getValidationRunsForValidationStamp(ID.of(1), 0, Integer.MAX_VALUE)).thenReturn(generateRuns(30))
+        Resources<ValidationRun> resources = controller.getValidationRunsForValidationStamp(ID.of(1), 20, 10)
+        assert resources != null
+        assert resources.resources.size() == 10
+        assert resources.pagination != null
+        assert resources.pagination.prev.toString() == 'urn:test:net.nemerosa.ontrack.boot.ui.ValidationRunController#getValidationRunsForValidationStamp:1,10,10'
+        assert resources.pagination.next == null
+        assert resources.pagination.offset == 20
+        assert resources.pagination.limit == 10
+        assert resources.pagination.total == 30
+    }
+
+    @Test
+    void 'getValidationRunsForValidationStamp: one page only, less results than required'() throws Exception {
+        when(structureService.getValidationRunsForValidationStamp(ID.of(1), 0, Integer.MAX_VALUE)).thenReturn(generateRuns(8))
+        Resources<ValidationRun> resources = controller.getValidationRunsForValidationStamp(ID.of(1), 0, 10)
+        assert resources != null
+        assert resources.resources.size() == 8
+        assert resources.pagination != null
+        assert resources.pagination.prev == null
+        assert resources.pagination.next == null
+        assert resources.pagination.offset == 0
+        assert resources.pagination.limit == 10
+        assert resources.pagination.total == 8
+    }
+
+    @Test
+    void 'getValidationRunsForValidationStamp: one page only, exact match'() throws Exception {
+        when(structureService.getValidationRunsForValidationStamp(ID.of(1), 0, Integer.MAX_VALUE)).thenReturn(generateRuns(10))
+        Resources<ValidationRun> resources = controller.getValidationRunsForValidationStamp(ID.of(1), 0, 10)
+        assert resources != null
+        assert resources.resources.size() == 10
+        assert resources.pagination != null
+        assert resources.pagination.prev == null
+        assert resources.pagination.next == null
+        assert resources.pagination.offset == 0
+        assert resources.pagination.limit == 10
+        assert resources.pagination.total == 10
+    }
+
+    @Test(expected = PaginationOffsetException)
+    void 'getValidationRunsForValidationStamp: negative offset'() throws Exception {
+        when(structureService.getValidationRunsForValidationStamp(ID.of(1), 0, Integer.MAX_VALUE)).thenReturn(generateRuns(10))
+        controller.getValidationRunsForValidationStamp(ID.of(1), -1, 10)
+    }
+
+    @Test(expected = PaginationOffsetException)
+    void 'getValidationRunsForValidationStamp: offset greater than the total'() throws Exception {
+        when(structureService.getValidationRunsForValidationStamp(ID.of(1), 0, Integer.MAX_VALUE)).thenReturn(generateRuns(10))
+        controller.getValidationRunsForValidationStamp(ID.of(1), 10, 10)
+    }
+
+    @Test(expected = PaginationCountException)
+    void 'getValidationRunsForValidationStamp: count 0'() throws Exception {
+        when(structureService.getValidationRunsForValidationStamp(ID.of(1), 0, Integer.MAX_VALUE)).thenReturn(generateRuns(10))
+        controller.getValidationRunsForValidationStamp(ID.of(1), 0, 0)
+    }
+
+    @Test(expected = PaginationCountException)
+    void 'getValidationRunsForValidationStamp: negative count'() throws Exception {
+        when(structureService.getValidationRunsForValidationStamp(ID.of(1), 0, Integer.MAX_VALUE)).thenReturn(generateRuns(10))
+        controller.getValidationRunsForValidationStamp(ID.of(1), 0, -1)
     }
 
     List<ValidationRun> generateRuns(int count) {

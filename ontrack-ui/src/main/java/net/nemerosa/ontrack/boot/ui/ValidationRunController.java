@@ -6,6 +6,8 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Pagination;
+import net.nemerosa.ontrack.ui.resource.PaginationCountException;
+import net.nemerosa.ontrack.ui.resource.PaginationOffsetException;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -148,9 +150,16 @@ public class ValidationRunController extends AbstractResourceController {
     public Resources<ValidationRun> getValidationRunsForValidationStamp(ID validationStampId, int offset, int count) {
         // Gets ALL the runs
         List<ValidationRun> runs = structureService.getValidationRunsForValidationStamp(validationStampId, 0, Integer.MAX_VALUE);
-        // TODO Checks the offset and count
         // Total number of runs
         int total = runs.size();
+        // Checks the offset and count
+        if (offset < 0) {
+            throw new PaginationOffsetException(offset);
+        } else if (offset > 0 && offset >= total) {
+            throw new PaginationOffsetException(offset);
+        } else if (count <= 0) {
+            throw new PaginationCountException(count);
+        }
         // Prepares the resources
         Resources<ValidationRun> resources = Resources.of(
                 runs.subList(offset, Math.min(offset + count, runs.size())),
