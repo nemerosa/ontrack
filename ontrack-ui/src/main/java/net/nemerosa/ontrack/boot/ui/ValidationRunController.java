@@ -5,6 +5,9 @@ import net.nemerosa.ontrack.model.form.Selection;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
+import net.nemerosa.ontrack.ui.resource.Pagination;
+import net.nemerosa.ontrack.ui.resource.PaginationCountException;
+import net.nemerosa.ontrack.ui.resource.PaginationOffsetException;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -138,6 +141,61 @@ public class ValidationRunController extends AbstractResourceController {
         );
         // Updates the validation run
         return structureService.newValidationRunStatus(run, runStatus);
+    }
+
+    /**
+     * List of validation runs for a validation stamp
+     */
+    @RequestMapping(value = "validationStamps/{validationStampId}/validationRuns", method = RequestMethod.GET)
+    public Resources<ValidationRun> getValidationRunsForValidationStamp(
+            @PathVariable ID validationStampId,
+            @RequestParam(required = false, defaultValue = "0") int offset,
+            @RequestParam(required = false, defaultValue = "10") int count) {
+        // Gets ALL the runs
+        List<ValidationRun> runs = structureService.getValidationRunsForValidationStamp(validationStampId, 0, Integer.MAX_VALUE);
+        // Total number of runs
+        int total = runs.size();
+        // Checks the offset and count
+        if (offset < 0) {
+            throw new PaginationOffsetException(offset);
+        } else if (offset > 0 && offset >= total) {
+            throw new PaginationOffsetException(offset);
+        } else if (count <= 0) {
+            throw new PaginationCountException(count);
+        }
+        // Prepares the resources
+        Resources<ValidationRun> resources = Resources.of(
+                runs.subList(offset, Math.min(offset + count, runs.size())),
+                uri(on(ValidationRunController.class).getValidationRunsForValidationStamp(
+                        validationStampId,
+                        offset,
+                        count
+                ))
+        );
+        // Pagination information
+        Pagination pagination = Pagination.of(offset, count, total);
+        // Previous page
+        if (offset > 0) {
+            pagination = pagination.withPrev(
+                    uri(on(ValidationRunController.class).getValidationRunsForValidationStamp(
+                            validationStampId,
+                            Math.max(0, offset - count),
+                            count
+                    ))
+            );
+        }
+        // Next page
+        if (offset + count < total) {
+            pagination = pagination.withNext(
+                    uri(on(ValidationRunController.class).getValidationRunsForValidationStamp(
+                            validationStampId,
+                            offset + count,
+                            count
+                    ))
+            );
+        }
+        // OK
+        return resources.withPagination(pagination).forView(ValidationStampRunView.class);
     }
 
 }

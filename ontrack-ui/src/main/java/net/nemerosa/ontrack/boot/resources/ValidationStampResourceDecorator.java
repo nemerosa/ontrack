@@ -39,6 +39,8 @@ public class ValidationStampResourceDecorator extends AbstractResourceDecorator<
                 .link("_properties", on(PropertyController.class).getProperties(ProjectEntityType.VALIDATION_STAMP, validationStamp.getId()))
                         // Decorations
                 .link("_decorations", on(DecorationsController.class).getDecorations(validationStamp.getProjectEntityType(), validationStamp.getId()))
+                        // List of runs
+                .link("_runs", on(ValidationRunController.class).getValidationRunsForValidationStamp(validationStamp.getId(), 0, 10))
                         // OK
                 .build();
     }

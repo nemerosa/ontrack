@@ -39,4 +39,8 @@ public class Resources<T> extends LinkContainer<Resources<T>> implements ViewSup
     public static <R> Resources<R> of(Collection<R> resources, URI href) {
         return new Resources<>(resources, href, Pagination.NONE, Object.class);
     }
+
+    public Resources<T> withPagination(Pagination pagination) {
+        return this.pagination == pagination ? this : new Resources<>(this.resources, get_self(), pagination, this.viewType);
+    }
 }

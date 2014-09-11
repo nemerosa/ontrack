@@ -8,6 +8,7 @@ buildscript {
 }
 
 apply plugin: 'spring-boot'
+apply plugin: 'groovy'
 
 dependencies {
     compile project(':ontrack-ui-support')
@@ -25,6 +26,7 @@ dependencies {
     testCompile project(':ontrack-test-utils')
     testCompile project(':ontrack-it-utils')
     testCompile project(':ontrack-extension-jenkins')
+    testCompile libraries.groovy
 
     // List of extensions
     runtime project(':ontrack-extension-general')

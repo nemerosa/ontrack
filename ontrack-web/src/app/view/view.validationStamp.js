@@ -20,11 +20,18 @@ angular.module('ot.view.validationStamp', [
             otStructureService.getValidationStamp(validationStampId).then(function (validationStamp) {
                 $scope.validationStamp = validationStamp;
                 // View title
-                view.title = $scope.validationStamp.name;
-                view.description = $scope.validationStamp.description;
                 view.breadcrumbs = ot.branchBreadcrumbs(validationStamp.branch);
                 // Commands
                 view.commands = [
+                    {
+                        condition: function () {
+                            return validationStamp._update;
+                        },
+                        id: 'updateValidationStampImage',
+                        name: "Change image",
+                        cls: 'ot-command-validation-stamp-image',
+                        action: changeImage
+                    },
                     {
                         condition: function () {
                             return validationStamp._update;
@@ -60,6 +67,10 @@ angular.module('ot.view.validationStamp', [
                     },
                     ot.viewCloseCommand('/branch/' + $scope.validationStamp.branch.id)
                 ];
+                // Loading the validation runs
+                return ot.pageCall($http.get(validationStamp._runs));
+            }).then(function (validationRunResources) {
+                $scope.validationRunResources = validationRunResources;
             });
         }
 
@@ -67,8 +78,15 @@ angular.module('ot.view.validationStamp', [
         loadValidationStamp();
 
         // Changing the image
-        $scope.changeImage = function () {
+        function changeImage () {
             otStructureService.changeValidationStampImage($scope.validationStamp).then(loadValidationStamp);
+        }
+
+        // Switching the page
+        $scope.switchPage = function (pageLink) {
+            ot.pageCall($http.get(pageLink)).then(function (validationRunResources) {
+                $scope.validationRunResources = validationRunResources;
+            });
         };
 
     })

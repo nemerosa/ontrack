@@ -23,4 +23,11 @@ public class NameDescription {
     private final String name;
     private final String description;
 
+    /**
+     * Simple builder
+     */
+    public static NameDescription nd(String name, String description) {
+        return new NameDescription(name, description);
+    }
+
 }

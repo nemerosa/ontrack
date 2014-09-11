@@ -8,13 +8,21 @@ import java.util.*;
 public class ValidationRunStatusID {
 
     public static final String DEFECTIVE = "DEFECTIVE";
+    public static final ValidationRunStatusID STATUS_DEFECTIVE = ValidationRunStatusID.of(DEFECTIVE, "Defective", false, false);
     public static final String EXPLAINED = "EXPLAINED";
+    public static final ValidationRunStatusID STATUS_EXPLAINED = ValidationRunStatusID.of(EXPLAINED, "Explained", false, false);
     public static final String FAILED = "FAILED";
+    public static final ValidationRunStatusID STATUS_FAILED = ValidationRunStatusID.of(FAILED, "Failed", true, false);
     public static final String FIXED = "FIXED";
+    public static final ValidationRunStatusID STATUS_FIXED = ValidationRunStatusID.of(FIXED, "Fixed", false, true);
     public static final String INTERRUPTED = "INTERRUPTED";
+    public static final ValidationRunStatusID STATUS_INTERRUPTED = ValidationRunStatusID.of(INTERRUPTED, "Interrupted", true, false);
     public static final String INVESTIGATING = "INVESTIGATING";
+    public static final ValidationRunStatusID STATUS_INVESTIGATING = ValidationRunStatusID.of(INVESTIGATING, "Investigating", true, false);
     public static final String PASSED = "PASSED";
+    public static final ValidationRunStatusID STATUS_PASSED = ValidationRunStatusID.of(PASSED, "Passed", true, true);
     public static final String WARNING = "WARNING";
+    public static final ValidationRunStatusID STATUS_WARNING = ValidationRunStatusID.of(WARNING, "Warning", true, true);
 
     private final String id;
     private final String name;
