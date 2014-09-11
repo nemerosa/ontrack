@@ -656,7 +656,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     @Override
     public List<ValidationRun> getValidationRunsForValidationStamp(ValidationStamp validationStamp, int offset, int count) {
         return getNamedParameterJdbcTemplate().query(
-                "SELECT * FROM VALIDATION_RUNS WHERE VALIDATIONSTAMPID = :validationStampId ORDER BY ID DESC LIMIT :limit OFFSET :offset",
+                "SELECT * FROM VALIDATION_RUNS WHERE VALIDATIONSTAMPID = :validationStampId ORDER BY BUILDID DESC, ID DESC LIMIT :limit OFFSET :offset",
                 params("validationStampId", validationStamp.id())
                         .addValue("limit", count)
                         .addValue("offset", offset),
