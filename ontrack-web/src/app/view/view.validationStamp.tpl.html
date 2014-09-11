@@ -13,29 +13,47 @@
                 No validation run has been done yet.
             </div>
             <table class="table table-condensed table-hover" ng-show="validationRunResources.resources.length != 0">
-                <tr ng-repeat="validationRun in validationRunResources.resources">
-                    <td>
-                        <a href="#/build/{{validationRun.build.id}}">
-                            {{validationRun.build.name}}
-                        </a>
+                <tbody>
+                    <tr ng-repeat="validationRun in validationRunResources.resources">
+                        <td>
+                            <a href="#/build/{{validationRun.build.id}}">
+                                {{validationRun.build.name}}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="#/validationRun/{{validationRun.id}}">
+                                #{{validationRun.runOrder}}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="#/validationRun/{{validationRun.id}}">
+                                <ot-validation-run-status status="validationRun.lastStatus"></ot-validation-run-status>
+                            </a>
+                        </td>
+                        <td>
+                            {{validationRun.lastStatus.description}}
+                        </td>
+                        <td>
+                            <ot-signature value="validationRun.lastStatus.signature" user="true" time="true"></ot-signature>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="3" align="left">
+                        <button class="btn btn-link" ng-show="validationRunResources.pagination.prev" ng-click="switchPage(validationRunResources.pagination.prev)">
+                            <span class="glyphicon glyphicon-step-backward"></span>
+                            Previous
+                        </button>
                     </td>
-                    <td>
-                        <a href="#/validationRun/{{validationRun.id}}">
-                            #{{validationRun.runOrder}}
-                        </a>
-                    </td>
-                    <td>
-                        <a href="#/validationRun/{{validationRun.id}}">
-                            <ot-validation-run-status status="validationRun.lastStatus"></ot-validation-run-status>
-                        </a>
-                    </td>
-                    <td>
-                        {{validationRun.lastStatus.description}}
-                    </td>
-                    <td>
-                        <ot-signature value="validationRun.lastStatus.signature" user="true" time="true"></ot-signature>
+                    <td colspan="2" align="right">
+                        <button class="btn btn-link" ng-show="validationRunResources.pagination.next" ng-click="switchPage(validationRunResources.pagination.next)">
+                            <span class="glyphicon glyphicon-step-forward"></span>
+                            Next
+                        </button>
                     </td>
                 </tr>
+                </tfoot>
             </table>
         </div>
         <div class="col-md-3">

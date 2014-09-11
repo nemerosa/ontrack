@@ -82,5 +82,12 @@ angular.module('ot.view.validationStamp', [
             otStructureService.changeValidationStampImage($scope.validationStamp).then(loadValidationStamp);
         }
 
+        // Switching the page
+        $scope.switchPage = function (pageLink) {
+            ot.pageCall($http.get(pageLink)).then(function (validationRunResources) {
+                $scope.validationRunResources = validationRunResources;
+            });
+        };
+
     })
 ;
