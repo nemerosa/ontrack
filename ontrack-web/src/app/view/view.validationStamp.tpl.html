@@ -13,13 +13,27 @@
                 No validation run has been done yet.
             </div>
             <table class="table table-condensed" ng-show="validationRunResources.resources.length != 0">
-                <tbody ng-repeat="validationRun in validationRunResources.resources">
-                <tr ng-repeat="validationRunStatus in validationRun.validationRunStatuses">
+                <tr ng-repeat="validationRun in validationRunResources.resources">
                     <td>
-                        <ot-validation-run-status status="validationRunStatus"></ot-validation-run-status>
+                        <a href="#/build/{{validationRun.build.id}}">
+                            {{validationRun.build.name}}
+                        </a>
+                    </td>
+                    <td>
+                        <a href="#/validationRun/{{validationRun.id}}">
+                            #{{validationRun.runOrder}}
+                        </a>
+                    </td>
+                    <td>
+                        <ot-validation-run-status status="validationRun.lastStatus"></ot-validation-run-status>
+                    </td>
+                    <td>
+                        {{validationRun.lastStatus.description}}
+                    </td>
+                    <td>
+                        <ot-signature value="validationRun.lastStatus.signature" user="true" time="true"></ot-signature>
                     </td>
                 </tr>
-                </tbody>
             </table>
         </div>
         <div class="col-md-3">
