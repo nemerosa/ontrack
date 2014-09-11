@@ -12,7 +12,7 @@
             <div class="alert alert-warning" ng-show="validationRunResources.resources.length == 0">
                 No validation run has been done yet.
             </div>
-            <table class="table table-condensed" ng-show="validationRunResources.resources.length != 0">
+            <table class="table table-condensed table-hover" ng-show="validationRunResources.resources.length != 0">
                 <tr ng-repeat="validationRun in validationRunResources.resources">
                     <td>
                         <a href="#/build/{{validationRun.build.id}}">
@@ -25,7 +25,9 @@
                         </a>
                     </td>
                     <td>
-                        <ot-validation-run-status status="validationRun.lastStatus"></ot-validation-run-status>
+                        <a href="#/validationRun/{{validationRun.id}}">
+                            <ot-validation-run-status status="validationRun.lastStatus"></ot-validation-run-status>
+                        </a>
                     </td>
                     <td>
                         {{validationRun.lastStatus.description}}
