@@ -47,7 +47,7 @@ task githubReleaseCreate << {
     def http = new HTTPBuilder(url)
     http.request(Method.POST, ContentType.JSON) { req ->
         headers['Authorization'] = "token ${githubToken}"
-        headers['User-Agent'] = githubRepository
+        headers['User-Agent'] = "${githubRepository}"
         body = [
                 tag_name: ontrackBuild,
                 name: "v${ontrackBuild}",
