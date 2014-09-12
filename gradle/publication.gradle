@@ -62,6 +62,17 @@ task githubReleaseCreate << {
     }
 }
 
+def uploadAsset(File file, String name, int releaseId) {
+    def url = "https://uploads.github.com/repos/${githubRepository}/releases/${releaseId}/assets?name=${name}"
+    def http = new HTTPBuilder(url)
+    http.request(Method.POST) { req ->
+        headers['Authorization'] = "token ${githubToken}"
+        headers['User-Agent'] = "${githubRepository}"
+        headers['Content-Type'] = 'application/zip'
+        send ContentType.BINARY, file.bytes
+    }
+}
+
 /**
  * Uploading assets to a GitHub release
  */
@@ -71,6 +82,7 @@ task githubReleaseAssets(dependsOn: 'githubReleaseCreate') << {
     // Gettings the files
     project.fileTree(dir: projectDir.parentFile, include: releaseAssets).each { File file ->
         println "Uploading ${file.name} to release ${ontrackBuild}..."
+        uploadAsset file, 'ontrack.jar', id
     }
 }
 
