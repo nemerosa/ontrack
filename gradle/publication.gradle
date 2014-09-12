@@ -23,6 +23,7 @@ import groovyx.net.http.Method
 
 if (!hasProperty('ontrackBuild')) throw new GradleException('ontrackBuild property must be set.')
 if (!hasProperty('githubToken')) throw new GradleException('githubToken property must be set.')
+if (!hasProperty('releaseAssets')) throw new GradleException('releaseAssets property must be set.')
 
 /**
  * Optional properties
@@ -37,6 +38,7 @@ if (!hasProperty('githubRepository')) ext { githubRepository = 'nemerosa/ontrack
 println "ontrack build to publish       : ${ontrackBuild}"
 println "GitHub repository to publish to: ${githubRepository}"
 println "GitHub API token               : <set>"
+println "Release assets                 : ${releaseAssets}"
 
 /**
  * Creating a GitHub release
@@ -55,7 +57,7 @@ task githubReleaseCreate << {
         response.success = { resp, json ->
             int id = json.id as int
             println "Release v${ontrackBuild} created with ID = $id"
-            project.tasks.githubReleaseCreate.releaseId = id
+            project.tasks.githubReleaseCreate.ext.releaseId = id
         }
     }
 }
@@ -64,8 +66,10 @@ task githubReleaseCreate << {
  * Uploading assets to a GitHub release
  */
 task githubReleaseAssets(dependsOn: 'githubReleaseCreate') << {
-    int id = project.tasks.githubReleaseCreate.releaseId
+    int id = githubReleaseCreate.releaseId
     println "Publishing assets to release ($id)..."
+    // Gettings the files
+    // project.files(releaseAssets).each { file -> println file}
 }
 
 /**
