@@ -5,6 +5,12 @@
  */
 
 /**
+ * Checking the properties
+ */
+
+if (!project.hasProperty('githubToken')) throw new GradleException('githubToken property must be set.')
+
+/**
  * Creating a GitHub release
  */
 task githubReleaseCreate
