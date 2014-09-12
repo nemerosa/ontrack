@@ -4,16 +4,57 @@
  * See the Wiki at https://github.com/nemerosa/ontrack/wiki/Delivery
  */
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
+    }
+}
+
+import groovy.json.JsonSlurper
+import groovyx.net.http.ContentType
+import groovyx.net.http.HTTPBuilder
+import groovyx.net.http.Method
+
 /**
- * Checking the properties
+ * Checking the required properties
  */
 
-if (!project.hasProperty('githubToken')) throw new GradleException('githubToken property must be set.')
+if (!hasProperty('ontrackBuild')) throw new GradleException('ontrackBuild property must be set.')
+if (!hasProperty('githubToken')) throw new GradleException('githubToken property must be set.')
+
+/**
+ * Optional properties
+ */
+
+if (!hasProperty('githubRepository')) ext { githubRepository = 'nemerosa/ontrack' }
+
+/**
+ * Logging the set-up
+ */
+
+println "ontrack build to publish       : ${ontrackBuild}"
+println "GitHub repository to publish to: ${githubRepository}"
+println "GitHub API token               : <set>"
 
 /**
  * Creating a GitHub release
  */
-task githubReleaseCreate
+task githubReleaseCreate << {
+    def url = "https://api.github.com/repos/${githubRepository}/releases"
+    def http = new HTTPBuilder(url)
+    http.request(Method.POST, ContentType.JSON) { req ->
+        headers['Authorization'] = "token ${githubToken}"
+        body = [
+                tag_name: ontrackBuild,
+                name: "v${ontrackBuild}",
+                prerelease: true
+        ]
+    }
+    // TODO Parses the response to get the release's ID
+}
 
 /**
  * Uploading assets to a GitHub release
