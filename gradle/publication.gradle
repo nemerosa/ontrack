@@ -38,7 +38,7 @@ if (!hasProperty('githubRepository')) ext { githubRepository = 'nemerosa/ontrack
 println "ontrack build to publish       : ${ontrackBuild}"
 println "GitHub repository to publish to: ${githubRepository}"
 println "GitHub API token               : <set>"
-println "releasePath                    : ${releasePath}"
+println "Path to the release files      : ${releasePath}"
 
 /**
  * Creating a GitHub release
