@@ -13,7 +13,6 @@ buildscript {
     }
 }
 
-import groovy.json.JsonSlurper
 import groovyx.net.http.ContentType
 import groovyx.net.http.HTTPBuilder
 import groovyx.net.http.Method
@@ -49,8 +48,8 @@ task githubReleaseCreate << {
         headers['Authorization'] = "token ${githubToken}"
         headers['User-Agent'] = "${githubRepository}"
         body = [
-                tag_name: ontrackBuild,
-                name: "v${ontrackBuild}",
+                tag_name  : "${ontrackBuild}".toString(),
+                name      : "v${ontrackBuild}".toString(),
                 prerelease: true
         ]
     }
