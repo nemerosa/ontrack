@@ -65,12 +65,12 @@ task githubReleaseCreate << {
 /**
  * Uploading assets to a GitHub release
  */
-task githubReleaseAssets(/*dependsOn: 'githubReleaseCreate'*/) << {
-    // int id = githubReleaseCreate.releaseId
-    // println "Publishing assets to release ($id)..."
+task githubReleaseAssets(dependsOn: 'githubReleaseCreate') << {
+    int id = project.tasks.githubReleaseCreate.releaseId
+    println "Publishing assets to release ${ontrackBuild} ($id)..."
     // Gettings the files
     project.fileTree(dir: projectDir.parentFile, include: releaseAssets).each { File file ->
-        println file
+        println "Uploading ${file.name} to release ${ontrackBuild}..."
     }
 }
 
