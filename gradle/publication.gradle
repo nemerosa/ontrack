@@ -52,8 +52,11 @@ task githubReleaseCreate << {
                 name      : "v${ontrackBuild}".toString(),
                 prerelease: true
         ]
+        response.success = { resp, json ->
+            int id = json.id as int
+            println "Release v${ontrackBuild} created with ID = $id"
+        }
     }
-    // TODO Parses the response to get the release's ID
 }
 
 /**
