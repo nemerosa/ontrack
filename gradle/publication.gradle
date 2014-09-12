@@ -108,11 +108,27 @@ task ontrackChangeLog
  */
 task ontrackPromote << {
     // Gets the build ID from ontrack
-    def url = "${ontrackUrl}/structure/entity/build/${ontrackProject}/${ontrackBranch}/${ontrackBuild}"
-    def http = new HTTPBuilder(url)
+    def http = new HTTPBuilder("${ontrackUrl}/structure/entity/build/${ontrackProject}/${ontrackBranch}/${ontrackBuild}")
     http.auth.basic ontrackUserName, ontrackUserPassword
     def buildId = http.get(contentType: ContentType.JSON).id
     println "Build ${ontrackBuild} has ID ${buildId}"
+    // Gets the promotion level for RELEASE
+    http = new HTTPBuilder("${ontrackUrl}/structure/entity/promotionLevel/${ontrackProject}/${ontrackBranch}/RELEASE")
+    http.auth.basic ontrackUserName, ontrackUserPassword
+    def promotionLevelId = http.get(contentType: ContentType.JSON).id
+    println "Promotion level RELEASE has ID ${promotionLevelId}"
+    // Promoting the build
+    http = new HTTPBuilder("${ontrackUrl}/structure/builds/${buildId}/promotionRun/create")
+    http.request(Method.POST, ContentType.JSON) { req ->
+        headers['Authorization'] = authorizationToken()
+        body = [
+                promotionLevel: promotionLevelId,
+                dateTime: null,
+                description: 'Promoted by the release script',
+                properties: []
+        ]
+    }
+    println "Build ${ontrackBuild} is promoted to RELEASE."
 }
 ontrackPromote.mustRunAfter ontrackChangeLog
 
