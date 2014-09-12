@@ -22,6 +22,8 @@ import groovyx.net.http.Method
  */
 
 if (!hasProperty('ontrackBuild')) throw new GradleException('ontrackBuild property must be set.')
+if (!hasProperty('ontrackUserName')) throw new GradleException('ontrackUserName property must be set.')
+if (!hasProperty('ontrackUserPassword')) throw new GradleException('ontrackUserPassword property must be set.')
 if (!hasProperty('githubToken')) throw new GradleException('githubToken property must be set.')
 if (!hasProperty('releasePath')) throw new GradleException('releasePath property must be set.')
 
@@ -29,6 +31,10 @@ if (!hasProperty('releasePath')) throw new GradleException('releasePath property
  * Optional properties
  */
 
+// TODO #65 Use HTTPS for ontrack@ontrack
+if (!hasProperty('ontrackUrl')) ext { ontrackUrl = 'http://ontrack.nemerosa.net:8080' }
+if (!hasProperty('ontrackProject')) ext { ontrackProject = 'ontrack' }
+if (!hasProperty('ontrackBranch')) ext { ontrackBranch = '2.0' }
 if (!hasProperty('githubRepository')) ext { githubRepository = 'nemerosa/ontrack' }
 
 /**
@@ -36,6 +42,11 @@ if (!hasProperty('githubRepository')) ext { githubRepository = 'nemerosa/ontrack
  */
 
 println "ontrack build to publish       : ${ontrackBuild}"
+println "ontrack URL                    : ${ontrackUrl}"
+println "ontrack project                : ${ontrackProject}"
+println "ontrack branch                 : ${ontrackBranch}"
+println "ontrack user name              : ${ontrackUserName}"
+println "ontrack user password          : ${ontrackUserPassword}"
 println "GitHub repository to publish to: ${githubRepository}"
 println "GitHub API token               : <set>"
 println "Path to the release files      : ${releasePath}"
@@ -95,7 +106,14 @@ task ontrackChangeLog
 /**
  * Promoting the build in ontrack @ ontrack
  */
-task ontrackPromote
+task ontrackPromote << {
+    // Gets the build ID from ontrack
+    def url = "${ontrackUrl}/structure/entity/build/${ontrackProject}/${ontrackBranch}/${ontrackBuild}"
+    def http = new HTTPBuilder(url)
+    http.auth.basic ontrackUserName, ontrackUserPassword
+    def buildId = http.get(contentType: ContentType.JSON).id
+    println "Build ${ontrackBuild} has ID ${buildId}"
+}
 ontrackPromote.mustRunAfter ontrackChangeLog
 
 /**
@@ -107,3 +125,11 @@ task githubReleaseDescription(dependsOn: ['githubReleaseCreate', 'ontrackChangeL
  * Main publication task
  */
 task publish(dependsOn: ['githubReleaseCreate', 'githubReleaseAssets', 'ontrackChangeLog', 'ontrackPromote', 'githubReleaseDescription'])
+
+/**
+ * Support functions
+ */
+
+def String authorizationToken() {
+    'Basic ' + "${ontrackUserName}:${ontrackUserPassword}".toString().bytes.encodeBase64().toString()
+}
