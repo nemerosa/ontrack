@@ -18,18 +18,12 @@ import groovyx.net.http.HTTPBuilder
 import groovyx.net.http.Method
 
 /**
- * Assets to upload
- */
-ext {
-    releaseAssets = 'ontrack-ui/build/libs/*.jar'
-}
-
-/**
  * Checking the required properties
  */
 
 if (!hasProperty('ontrackBuild')) throw new GradleException('ontrackBuild property must be set.')
 if (!hasProperty('githubToken')) throw new GradleException('githubToken property must be set.')
+if (!hasProperty('releasePath')) throw new GradleException('releasePath property must be set.')
 
 /**
  * Optional properties
@@ -44,7 +38,7 @@ if (!hasProperty('githubRepository')) ext { githubRepository = 'nemerosa/ontrack
 println "ontrack build to publish       : ${ontrackBuild}"
 println "GitHub repository to publish to: ${githubRepository}"
 println "GitHub API token               : <set>"
-println "Release assets                 : ${releaseAssets}"
+println "releasePath                    : ${releasePath}"
 
 /**
  * Creating a GitHub release
@@ -84,10 +78,11 @@ def uploadAsset(File file, String name, int releaseId) {
  */
 task githubReleaseAssets(dependsOn: 'githubReleaseCreate') << {
     int id = project.tasks.githubReleaseCreate.releaseId
-    println "Publishing assets to release ${ontrackBuild} ($id)..."
-    // Gettings the files
-    project.fileTree(dir: projectDir.parentFile, include: releaseAssets).each { File file ->
-        println "Uploading ${file.name} to release ${ontrackBuild}..."
+    File file = new File(releasePath as String, "${ontrackBuild}.jar")
+    println "Publishing ${file} to release ${ontrackBuild} ($id)..."
+    if (!file.exists()) {
+        throw new GradleException("File ${file} cannot be published because it does not exist.")
+    } else {
         uploadAsset file, 'ontrack.jar', id
     }
 }
