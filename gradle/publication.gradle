@@ -87,7 +87,7 @@ task githubReleaseAssets(dependsOn: 'githubReleaseCreate') << {
 }
 
 /**
- * Getting the change log between the build to promote and the last promoted one
+ * TODO Getting the change log between the build to promote and the last promoted one
  */
 task ontrackChangeLog
 
@@ -98,7 +98,7 @@ task ontrackPromote
 ontrackPromote.mustRunAfter ontrackChangeLog
 
 /**
- * Setting the change log as a description in GitHub
+ * TODO Setting the change log as a description in GitHub
  */
 task githubReleaseDescription(dependsOn: ['githubReleaseCreate', 'ontrackChangeLog'])
 
