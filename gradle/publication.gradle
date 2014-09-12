@@ -1,4 +1,34 @@
 /**
- * Publication of a package in GitHub
+ * PUBLICATION OF A PACKAGE IN GITHUB
  */
 
+/**
+ * Creating a GitHub release
+ */
+task githubReleaseCreate
+
+/**
+ * Uploading assets to a GitHub release
+ */
+task githubReleaseAssets(dependsOn: 'githubReleaseCreate')
+
+/**
+ * Getting the change log between the build to promote and the last promoted one
+ */
+task ontrackChangeLog
+
+/**
+ * Promoting the build in ontrack @ ontrack
+ */
+task ontrackPromote
+ontrackPromote.mustRunAfter ontrackChangeLog
+
+/**
+ * Setting the change log as a description in GitHub
+ */
+task githubReleaseDescription(dependsOn: ['githubReleaseCreate', 'ontrackChangeLog'])
+
+/**
+ * Main publication task
+ */
+task publish(dependsOn: ['githubReleaseCreate', 'githubReleaseAssets', 'ontrackChangeLog', 'ontrackPromote', 'githubReleaseDescription'])
