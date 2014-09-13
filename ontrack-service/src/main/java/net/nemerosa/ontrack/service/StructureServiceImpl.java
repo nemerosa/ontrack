@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.model.exceptions.ImageTypeNotAcceptedException;
 import net.nemerosa.ontrack.model.exceptions.ReorderingSizeException;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.model.support.Time;
 import net.nemerosa.ontrack.repository.StructureRepository;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -362,8 +364,21 @@ public class StructureServiceImpl implements StructureService {
                 "Promotion for a promotion level can be done only on the same branch than the build.");
         // Checks the authorization
         securityService.checkProjectFunction(promotionRun.getBuild().getBranch().getProject().id(), PromotionRunCreate.class);
+        // If the promotion run's time is not defined, takes the current date
+        PromotionRun promotionRunToSave;
+        LocalDateTime time = promotionRun.getSignature().getTime();
+        if (time == null) {
+            promotionRunToSave = PromotionRun.of(
+                    promotionRun.getBuild(),
+                    promotionRun.getPromotionLevel(),
+                    promotionRun.getSignature().withTime(Time.now()),
+                    promotionRun.getDescription()
+            );
+        } else {
+            promotionRunToSave = promotionRun;
+        }
         // Actual creation
-        return structureRepository.newPromotionRun(promotionRun);
+        return structureRepository.newPromotionRun(promotionRunToSave);
     }
 
     @Override
