@@ -31,8 +31,7 @@ if (!hasProperty('releasePath')) throw new GradleException('releasePath property
  * Optional properties
  */
 
-// TODO #65 Use HTTPS for ontrack@ontrack
-if (!hasProperty('ontrackUrl')) ext { ontrackUrl = 'http://ontrack.nemerosa.net:8080' }
+if (!hasProperty('ontrackUrl')) ext { ontrackUrl = 'https://ontrack.nemerosa.net' }
 if (!hasProperty('ontrackProject')) ext { ontrackProject = 'ontrack' }
 if (!hasProperty('ontrackBranch')) ext { ontrackBranch = '2.0' }
 if (!hasProperty('githubRepository')) ext { githubRepository = 'nemerosa/ontrack' }
