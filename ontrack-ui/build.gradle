@@ -87,8 +87,10 @@ ontrack.version.source = ${rootProject.versionSource}
 release.dependsOn copyWebResourcesRelease
 release.dependsOn generationVersionInfo
 
-build.dependsOn copyWebResourcesBuild
-build.dependsOn generationVersionInfo
+if (!('release' in gradle.startParameter.taskNames)) {
+    build.dependsOn copyWebResourcesBuild
+    build.dependsOn generationVersionInfo
+}
 
 processResources.mustRunAfter copyWebResourcesRelease
 processResources.mustRunAfter copyWebResourcesBuild
