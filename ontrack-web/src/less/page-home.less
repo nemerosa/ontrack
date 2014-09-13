@@ -1,18 +1,38 @@
+@import '../../vendor/bootstrap/less/buttons';
 @import '../../vendor/bootstrap/less/mixins';
 @import '../../vendor/bootstrap/less/type';
 @import 'variables.less';
 
-.ot-home-project {
-  min-height: 3em !important;
-  margin-bottom: 0.5em;
+@otHomeRowHeight: 5em;
+@otHomeMargin: 0.5em;
+
+.ot-home-row {
+  min-height: @otHomeRowHeight !important;
+  height: @otHomeRowHeight !important;
 }
 
-.ot-home-project-name {
-  min-height: 3em !important;
-  vertical-align: middle;
-  .bg-primary;
-  a {
-    color: @btn-primary-color;
-    font-weight: bold;
+.ot-home-project {
+  .ot-home-row;
+  margin-bottom: @otHomeMargin;
+
+  .ot-home-project-name {
+    .ot-home-row;
+    vertical-align: middle;
+    .bg-primary;
+    a {
+      color: @btn-primary-color;
+      font-weight: bold;
+    }
+  }
+
+  .ot-home-project-branches {
+    .ot-home-branch {
+      .ot-home-row;
+      border: solid 1px @btn-default-border;
+      margin-left: @otHomeMargin;
+      .ot-home-branch-name {
+
+      }
+    }
   }
 }
