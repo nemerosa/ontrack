@@ -123,6 +123,12 @@ angular.module('ontrack.extension.scm', [
                             url += $interpolate('&grouping={{grouping}}')(request);
                         }
 
+                        // Exclude
+                        if ($scope.exportRequest.exclude) {
+                            request.exclude = $scope.exportRequest.exclude;
+                            url += $interpolate('&exclude={{exclude}}')(request);
+                        }
+
                         // Call
                         $scope.exportCalling = true;
                         ot.call($http.get(url)).then(function success(exportedIssues) {
