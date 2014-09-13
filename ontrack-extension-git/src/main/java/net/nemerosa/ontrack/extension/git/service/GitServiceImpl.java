@@ -23,6 +23,8 @@ import net.nemerosa.ontrack.tx.Transaction;
 import net.nemerosa.ontrack.tx.TransactionService;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +42,7 @@ import static java.lang.String.format;
 @Service
 public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration, GitBuildInfo, GitChangeLogIssue> implements GitService, JobProvider {
 
+    private final Logger logger = LoggerFactory.getLogger(GitService.class);
     private final Collection<GitConfigurator> configurators;
     private final GitClientFactory gitClientFactory;
     private final PropertyService propertyService;
@@ -124,6 +127,9 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         try (Transaction ignored = transactionService.start()) {
             Branch branch = structureService.getBranch(request.getBranch());
             GitConfiguration configuration = getBranchConfiguration(branch);
+            // Forces Git sync before
+            gitClientFactory.getClient(configuration).sync(logger::debug);
+            // Change log computation
             return new GitChangeLog(
                     UUID.randomUUID().toString(),
                     branch,
