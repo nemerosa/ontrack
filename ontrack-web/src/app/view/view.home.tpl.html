@@ -10,10 +10,11 @@
                     level they get promoted to.
                     <input class="ot-home-filter col-md-2"
                            type="text"
+                           ng-model="projectNameFilter"
                            placeholder="Filter on project names"/>
                 </div>
             </div>
-            <div class="row ot-home-project" ng-repeat="project in projectCollection.resources">
+            <div class="row ot-home-project" ng-repeat="project in projectCollection.resources | filter:{name:projectNameFilter}">
                 <div class="col-md-2 ot-home-project-name">
                     <a href="#/project/{{project.id}}">
                         {{project.name}}
