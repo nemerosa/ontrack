@@ -8,54 +8,52 @@
                     No branch has been created yet.
                 </ot-noentry>
                 <div class="col-md-12" ng-if="branchCollection.resources">
-                    <div class="row" ng-repeat="branch in branchCollection.resources">
-                        <div class="col-md-12">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <a href="#/branch/{{branch.id}}">
-                                        {{branch.name}}
+                    <div class="row ot-project-branch" ng-repeat="branch in branchCollection.resources">
+                        <div class="col-md-2 ot-project-branch-name">
+                            <a href="#/branch/{{branch.id}}">
+                                {{branch.name}}
+                            </a>
+                        </div>
+                        <div class="col-md-10 ot-project-branch-promotions">
+                            <div class="row">
+                                <div class="col-md-3 ot-project-branch-promotion"
+                                     ng-if="branch.branchStatusView.latestBuild">
+                                    <span class="glyphicon glyphicon-arrow-right"></span>
+                                    <a href="#/build/{{branch.branchStatusView.latestBuild.id}}"
+                                       title="Latest build on this branch">
+                                        {{branch.branchStatusView.latestBuild.name}}
                                     </a>
                                 </div>
-                                <div class="panel-body">
-                                    <div class="row">
-                                        <div ng-if="branch.branchStatusView.latestBuild" class="col-md-2 ot-branch-status-view-latest-build">
+                                <div class="col-md-3 ot-project-branch-promotion"
+                                     ng-if="!branch.branchStatusView.latestBuild">
+                                            <span class="glyphicon glyphicon-ban-circle"
+                                                  title="No build on this branch"></span>
+                                </div>
+                                <div class="col-md-3 ot-project-branch-promotion"
+                                     ng-repeat="promotionView in branch.branchStatusView.promotions">
+                                    <span ng-if="promotionView.promotionRun">
+                                        <a href="#/promotionLevel/{{promotionView.promotionLevel.id}}">
+                                            <ot-entity-image
+                                                    entity="promotionView.promotionLevel"></ot-entity-image>
+                                            {{promotionView.promotionLevel.name}}
+                                        </a>
+                                        <span class="ot-project-branch-promotion-build">
                                             <span class="glyphicon glyphicon-arrow-right"></span>
-                                            <a href="#/build/{{branch.branchStatusView.latestBuild.id}}" title="Latest build on this branch">
-                                                {{branch.branchStatusView.latestBuild.name}}
-                                            </a>
-                                        </div>
-                                        <div ng-if="!branch.branchStatusView.latestBuild" class="col-md-2 ot-branch-status-view-latest-build">
-                                            <span class="glyphicon glyphicon-ban-circle" title="No build on this branch"></span>
-                                        </div>
-                                        <div class="col-md-9">
-                                            <table>
-                                                <tbody>
-                                                <tr>
-                                                    <td ng-repeat="promotionView in branch.branchStatusView.promotions" class="ot-promotion-view">
-                                                        <span ng-if="promotionView.promotionRun">
-                                                            <a href="#/promotionLevel/{{promotionView.promotionLevel.id}}">
-                                                                <ot-entity-image entity="promotionView.promotionLevel"></ot-entity-image>
-                                                                {{promotionView.promotionLevel.name}}
-                                                            </a>
-                                                            <span class="glyphicon glyphicon-arrow-right"></span>
-                                                            <a href="#/build/{{promotionView.promotionRun.build.id}}">{{promotionView.promotionRun.build.name}}</a>
-                                                        </span>
-                                                        <span ng-if="!promotionView.promotionRun">
-                                                            <a href="#/promotionLevel/{{promotionView.promotionLevel.id}}">
-                                                                <ot-entity-image entity="promotionView.promotionLevel"></ot-entity-image>
-                                                                {{promotionView.promotionLevel.name}}
-                                                            </a>
-                                                            <span class="glyphicon glyphicon-arrow-right"></span>
-                                                            <span class="glyphicon glyphicon-ban-circle"></span>
-                                                        </span>
-                                                    </td>
-                                                </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
+                                            <a href="#/build/{{promotionView.promotionRun.build.id}}">{{promotionView.promotionRun.build.name}}</a>
+                                        </span>
+                                    </span>
+                                    <span ng-if="!promotionView.promotionRun">
+                                        <a href="#/promotionLevel/{{promotionView.promotionLevel.id}}">
+                                            <ot-entity-image
+                                                    entity="promotionView.promotionLevel"></ot-entity-image>
+                                            {{promotionView.promotionLevel.name}}
+                                        </a>
+                                        <span class="glyphicon glyphicon-arrow-right"></span>
+                                        <span class="glyphicon glyphicon-ban-circle"></span>
+                                    </span>
                                 </div>
                             </div>
+
                         </div>
                     </div>
                 </div>

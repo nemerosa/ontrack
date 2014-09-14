@@ -1,0 +1,36 @@
+@import 'main.less';
+
+@otProjectRowHeight: 3.5em;
+@otProjectMargin: 0.5em;
+
+.ot-project-row {
+  min-height: @otProjectRowHeight !important;
+  height: @otProjectRowHeight !important;
+}
+
+.ot-project-branch {
+  margin-bottom: @otProjectMargin;
+  .ot-project-branch-name {
+    .ot-project-row;
+    margin-left: -1px !important;
+    vertical-align: middle;
+    .bg-primary;
+    a {
+      color: @btn-primary-color;
+      font-weight: bold;
+    }
+  }
+  .ot-project-branch-promotions {
+    .ot-project-branch-promotion {
+      .ot-project-row;
+      border: solid 1px @btn-default-border;
+      margin-left: -1px;
+      .ot-icon {
+        .ot-icon-mini;
+      }
+      .ot-project-branch-promotion-build {
+        display: block;
+      }
+    }
+  }
+}
