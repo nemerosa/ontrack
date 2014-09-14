@@ -2,15 +2,23 @@
     <ot-noentry list="projectCollection.resources">
         No project has been created yet, or no right is granted for you to see at least one of them.
     </ot-noentry>
-    <div class="row ot-home-project" ng-repeat="project in projectCollection.resources">
-        <div class="col-md-2 ot-home-project-name">
-            <a href="#/project/{{project.id}}">
-                {{project.name}}
-            </a>
-        </div>
-        <div class="col-md-10 ot-home-project-branches">
+    <div class="row">
+        <div class="col-md-12">
             <div class="row">
-                <div class="col-md-3 ot-home-branch" ng-repeat="branchStatusView in project.branchStatusViews.resources">
+                <div class="col-md-12 ot-home-header">
+                    List of projects with the list of their branches and the highest promotion
+                    level they get promoted to.
+                </div>
+            </div>
+            <div class="row ot-home-project" ng-repeat="project in projectCollection.resources">
+                <div class="col-md-2 ot-home-project-name">
+                    <a href="#/project/{{project.id}}">
+                        {{project.name}}
+                    </a>
+                </div>
+                <div class="col-md-10 ot-home-project-branches">
+                    <div class="row">
+                        <div class="col-md-3 ot-home-branch" ng-repeat="branchStatusView in project.branchStatusViews.resources">
                     <span class="ot-home-branch-name">
                         <a href="#/branch/{{branchStatusView.branch.id}}">{{branchStatusView.branch.name}}</a>
                     </span>
@@ -28,6 +36,8 @@
                             No promotion yet
                         </span>
                     </span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
