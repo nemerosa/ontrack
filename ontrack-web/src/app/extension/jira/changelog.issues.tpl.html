@@ -9,7 +9,6 @@
         <th>Issue type</th>
         <th>Assignee</th>
         <th>Updated</th>
-        <th>Revision</th>
     </tr>
     </thead>
     <tbody>
@@ -47,15 +46,6 @@
         </td>
         <td>
             {{changeLogIssue.issue.updateTime | date: 'mediumDate'}}
-        </td>
-        <td>
-            <span ng-if="changeLogIssue.lastRevision">
-                <a href="{{changeLogIssue.lastRevision.revisionUrl}}"
-                   title="{{changeLogIssue.lastRevision.author}} - {{changeLogIssue.lastRevision.dateTime | date: 'mediumDate'}} {{changeLogIssue.lastRevision.dateTime | date: 'shortTime'}} - {{changeLogIssue.lastRevision.message}}
-                   ">
-                    <code>{{changeLogIssue.lastRevision.revision}}</code>
-                </a>
-            </span>
         </td>
     </tr>
     </tbody>
