@@ -8,6 +8,20 @@
         <span class="caret"></span>
     </button>
     <ul class="dropdown-menu ot-buildfilter-list" role="menu">
+        <!-- Predefined filters -->
+        <li role="presentation" class="dropdown-header">Predefined filters:</li>
+        <li ng-repeat="buildFilterForm in buildFilterForms.resources | filter:{predefined:true}">
+            <a>
+                <span ng-click="buildFilterNew(buildFilterForm)">
+                    <span class="ot-buildfilter-remote"
+                          title="This filter does not need any configuration">
+                        {{buildFilterForm.typeName}}
+                        <span class="glyphicon glyphicon-star"></span>
+                    </span>
+                </span>
+            </a>
+        </li>
+        <!-- Existing filters -->
         <li role="presentation" class="dropdown-header" ng-if="buildFilterResources">Existing filters:</li>
         <li ng-repeat="buildFilterResource in buildFilterResources">
             <a>
@@ -37,18 +51,11 @@
         <li class="divider" ng-if="currentBuildFilterResource"></li>
         <!-- New filters -->
         <li role="presentation" class="dropdown-header">New filter:</li>
-        <li ng-repeat="buildFilterForm in buildFilterForms.resources">
+        <li ng-repeat="buildFilterForm in buildFilterForms.resources | filter:{predefined:false}">
             <a>
                 <span ng-click="buildFilterNew(buildFilterForm)">
                     <span ng-if="!buildFilterForm.predefined">{{buildFilterForm.typeName}}...</span>
-                    <span class="ot-buildfilter-remote"
-                          ng-if="buildFilterForm.predefined"
-                          title="This filter does not need any configuration">
-                        {{buildFilterForm.typeName}}
-                        <span class="glyphicon glyphicon-star"></span>
-                    </span>
                 </span>
-
             </a>
         </li>
     </ul>
