@@ -1,9 +1,6 @@
-@import '../../vendor/bootstrap/less/buttons';
-@import '../../vendor/bootstrap/less/mixins';
-@import '../../vendor/bootstrap/less/type';
-@import 'variables.less';
+@import 'main.less';
 
-@otHomeRowHeight: 5em;
+@otHomeRowHeight: 3.5em;
 @otHomeMargin: 0.5em;
 
 .ot-home-row {
@@ -12,7 +9,6 @@
 }
 
 .ot-home-project {
-  .ot-home-row;
   margin-bottom: @otHomeMargin;
 
   .ot-home-project-name {
@@ -29,9 +25,15 @@
     .ot-home-branch {
       .ot-home-row;
       border: solid 1px @btn-default-border;
-      margin-left: @otHomeMargin;
+      border-left: none;
       .ot-home-branch-name {
-
+        display: block;
+      }
+      .ot-home-branch-promotion {
+        font-size: 85%;
+        .ot-icon {
+          .ot-icon-mini;
+        }
       }
     }
   }
