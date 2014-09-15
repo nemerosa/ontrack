@@ -298,7 +298,7 @@ angular.module('ot.view.branch', [
          */
         $scope.buildFilterEdit = function (buildFilterResource) {
             otBuildFilterService.editBuildFilter({
-                branchId: branchId,
+                branch: $scope.branch,
                 buildFilterResource: buildFilterResource,
                 buildFilterForms: $scope.buildFilterForms
             }).then(function () {

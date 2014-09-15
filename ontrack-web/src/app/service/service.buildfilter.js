@@ -79,7 +79,7 @@ angular.module('ot.service.buildfilter', [
 
         /**
          * Editing a filter
-         * @param config.branchId ID of the branch
+         * @param config.branch Branch
          * @param config.buildFilterResource Build filter to edit
          * @param config.buildFilterForms List of available filter forms
          * @return Promise with the created/editer filter
@@ -104,7 +104,7 @@ angular.module('ot.service.buildfilter', [
                 otFormService.updateForm(resourceBuildFilterForm.form, buildFilterResource.data);
                 // Edit the form
                 return self.createBuildFilter({
-                    branchId: config.branchId,
+                    branchId: config.branch.id,
                     buildFilterForm: resourceBuildFilterForm
                 });
             } else {
