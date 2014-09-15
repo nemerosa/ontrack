@@ -14,7 +14,7 @@ angular.module('ot.view.branch', [
             controller: 'BranchCtrl'
         });
     })
-    .controller('BranchCtrl', function ($state, $scope, $stateParams, $http, $modal, $location, ot, otFormService, otStructureService, otBuildFilterService, otAlertService, otTaskService) {
+    .controller('BranchCtrl', function ($state, $scope, $stateParams, $http, $modal, $location, ot, otFormService, otStructureService, otBuildFilterService, otAlertService, otTaskService, otNotificationService) {
         var view = ot.view();
         // Branch's id
         var branchId = $stateParams.branchId;
@@ -221,6 +221,7 @@ angular.module('ot.view.branch', [
         }
 
         // Initialization
+        loadPermalink();
         loadBranch();
 
         // Creation of a promotion level
@@ -343,7 +344,7 @@ angular.module('ot.view.branch', [
         /**
          * Permalink to the current filter
          */
-        $scope.buildFilterLink = function() {
+        $scope.buildFilterLink = function () {
             var currentFilter = otBuildFilterService.getCurrentFilter(branchId);
             if (currentFilter) {
                 // TODO Special case: shared filter (only the name is needed)
@@ -351,6 +352,26 @@ angular.module('ot.view.branch', [
                 $location.hash(jsonFilter);
             }
         };
+
+        /**
+         * Loading the permalink at startup
+         */
+        function loadPermalink() {
+            var jsonFilter = $location.hash();
+            if (jsonFilter) {
+                // Parsing the JSON
+                try {
+                    var json = JSON.parse(jsonFilter);
+                    // TODO Special case: shared filter (only the name is needed)
+                    // Applies the filter
+                    otBuildFilterService.storeCurrent(branchId, json);
+                    // TODO Removes the hash after use
+                } catch (e) {
+                    // TODO Ignoring the error, just logging it
+                    otNotificationService.error("Cannot get the filter from the permalink.");
+                }
+            }
+        }
 
     })
 ;
