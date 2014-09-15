@@ -14,7 +14,7 @@ angular.module('ot.view.branch', [
             controller: 'BranchCtrl'
         });
     })
-    .controller('BranchCtrl', function ($state, $scope, $stateParams, $http, $modal, ot, otFormService, otStructureService, otBuildFilterService, otAlertService, otTaskService) {
+    .controller('BranchCtrl', function ($state, $scope, $stateParams, $http, $modal, $location, ot, otFormService, otStructureService, otBuildFilterService, otAlertService, otTaskService) {
         var view = ot.view();
         // Branch's id
         var branchId = $stateParams.branchId;
@@ -338,6 +338,18 @@ angular.module('ot.view.branch', [
          */
         $scope.buildFilterSave = function (buildFilterResource) {
             otBuildFilterService.saveFilter($scope.branch, buildFilterResource).then(loadBuildFilters);
+        };
+
+        /**
+         * Permalink to the current filter
+         */
+        $scope.buildFilterLink = function() {
+            var currentFilter = otBuildFilterService.getCurrentFilter(branchId);
+            if (currentFilter) {
+                // TODO Special case: shared filter (only the name is needed)
+                var jsonFilter = JSON.stringify(currentFilter);
+                $location.hash(jsonFilter);
+            }
         };
 
     })
