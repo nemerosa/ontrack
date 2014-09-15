@@ -365,7 +365,8 @@ angular.module('ot.view.branch', [
                     // TODO Special case: shared filter (only the name is needed)
                     // Applies the filter
                     otBuildFilterService.storeCurrent(branchId, json);
-                    // TODO Removes the hash after use
+                    // Removes the hash after use
+                    $location.hash('');
                 } catch (e) {
                     // TODO Ignoring the error, just logging it
                     otNotificationService.error("Cannot get the filter from the permalink.");
