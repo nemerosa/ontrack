@@ -106,6 +106,13 @@ angular.module('ot.service.buildfilter', [
                 return self.createBuildFilter({
                     branchId: config.branch.id,
                     buildFilterForm: resourceBuildFilterForm
+                }).then(function () {
+                    // Loads the current filter
+                    var currentFilter = self.getCurrentFilter(config.branch.id);
+                    // Storing if saved under the same name
+                    if (buildFilterResource._update && buildFilterResource.name == currentFilter.name) {
+                        self.saveFilter(config.branch, currentFilter);
+                    }
                 });
             } else {
                 // TODO Displays an error? No edition form was found for this filter
