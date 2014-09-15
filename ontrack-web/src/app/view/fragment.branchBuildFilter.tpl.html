@@ -50,7 +50,16 @@
         </li>
         <li class="divider" ng-if="buildFilterResources"></li>
         <li ng-if="currentBuildFilterResource">
-            <a ng-click="buildFilterErase()">Erase filter</a>
+            <a ng-click="buildFilterErase()">
+                <span class="glyphicon glyphicon-remove"></span>
+                Erase filter
+            </a>
+        </li>
+        <li ng-if="currentBuildFilterResource">
+            <a ng-click="buildFilterLink()">
+                <span class="glyphicon glyphicon-link"></span>
+                Permalink
+            </a>
         </li>
         <li class="divider" ng-if="currentBuildFilterResource"></li>
         <!-- New filters -->
