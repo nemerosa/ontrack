@@ -184,6 +184,15 @@ angular.module('ot.service.form', [
         };
 
         /**
+         * Updates all values of a form.
+         */
+        self.updateForm = function (form, data) {
+            angular.forEach(form.fields, function (field) {
+                field.value = data[field.name];
+            });
+        };
+
+        /**
          * Gets the value for a field in a form
          */
         self.getFieldValue = function (form, fieldName) {
