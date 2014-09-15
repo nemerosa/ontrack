@@ -2,7 +2,7 @@ angular.module('ot.service.buildfilter', [
     'ot.service.core',
     'ot.service.form'
 ])
-    .service('otBuildFilterService', function (ot, $q, $http, otFormService) {
+    .service('otBuildFilterService', function (ot, $q, $http, otFormService, otNotificationService) {
         var self = {};
 
         /**
@@ -115,7 +115,11 @@ angular.module('ot.service.buildfilter', [
                     }
                 });
             } else {
-                // TODO Displays an error? No edition form was found for this filter
+                otNotificationService.error("The type of this filter appears not to be supported: " + type + ". " +
+                    "Consider to delete it.");
+                var d = $q.defer();
+                d.reject();
+                return d.promise;
             }
         };
 
