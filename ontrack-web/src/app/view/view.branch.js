@@ -141,12 +141,12 @@ angular.module('ot.view.branch', [
                             return theBranch.id != branchId;
                         })
                         .map(function (theBranch) {
-                        return {
-                            id: 'switch-' + theBranch.id,
-                            name: theBranch.name,
-                            uri: 'branch/' + theBranch.id
-                        };
-                    })
+                            return {
+                                id: 'switch-' + theBranch.id,
+                                name: theBranch.name,
+                                uri: 'branch/' + theBranch.id
+                            };
+                        })
                 });
             });
         }
@@ -297,34 +297,14 @@ angular.module('ot.view.branch', [
          * Editing a filter
          */
         $scope.buildFilterEdit = function (buildFilterResource) {
-            // TODO Extracts this code into the buildFilter service
-            // Looking for the edition form
-            var resourceBuildFilterForm;
-            var type = buildFilterResource.type;
-            angular.forEach($scope.buildFilterForms.resources, function (buildFilterForm) {
-                if (buildFilterForm.type == type) {
-                    resourceBuildFilterForm = buildFilterForm;
-                }
+            otBuildFilterService.editBuildFilter({
+                branchId: branchId,
+                buildFilterResource: buildFilterResource,
+                buildFilterForms: $scope.buildFilterForms
+            }).then(function () {
+                // Reloads the filters
+                loadBuildFilters();
             });
-            // Checks for the form
-            if (resourceBuildFilterForm) {
-                // Copy of the fiter's form
-                resourceBuildFilterForm = angular.copy(resourceBuildFilterForm);
-                // Name
-                buildFilterResource.data.name = buildFilterResource.name;
-                // Filling in the form
-                otFormService.updateForm(resourceBuildFilterForm.form, buildFilterResource.data);
-                // Edit the form
-                otBuildFilterService.createBuildFilter({
-                    branchId: branchId,
-                    buildFilterForm: resourceBuildFilterForm
-                }).then(function () {
-                    // Reloads the filters
-                    loadBuildFilters();
-                });
-            } else {
-                // TODO Displays an error? No edition form was found for this filter
-            }
         };
 
         /**

@@ -77,6 +77,41 @@ angular.module('ot.service.buildfilter', [
             }
         };
 
+        /**
+         * Editing a filter
+         * @param config.branchId ID of the branch
+         * @param config.buildFilterResource Build filter to edit
+         * @param config.buildFilterForms List of available filter forms
+         * @return Promise with the created/editer filter
+         */
+        self.editBuildFilter = function (config) {
+            var buildFilterResource = config.buildFilterResource;
+            // Looking for the edition form
+            var resourceBuildFilterForm;
+            var type = buildFilterResource.type;
+            angular.forEach(config.buildFilterForms.resources, function (buildFilterForm) {
+                if (buildFilterForm.type == type) {
+                    resourceBuildFilterForm = buildFilterForm;
+                }
+            });
+            // Checks for the form
+            if (resourceBuildFilterForm) {
+                // Copy of the fiter's form
+                resourceBuildFilterForm = angular.copy(resourceBuildFilterForm);
+                // Name
+                buildFilterResource.data.name = buildFilterResource.name;
+                // Filling in the form
+                otFormService.updateForm(resourceBuildFilterForm.form, buildFilterResource.data);
+                // Edit the form
+                return self.createBuildFilter({
+                    branchId: config.branchId,
+                    buildFilterForm: resourceBuildFilterForm
+                });
+            } else {
+                // TODO Displays an error? No edition form was found for this filter
+            }
+        };
+
         self.getCurrentFilter = function (branchId) {
             var json = localStorage.getItem('build_filter_' + branchId + '_current');
             if (json) {
