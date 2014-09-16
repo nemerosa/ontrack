@@ -18,6 +18,7 @@
                     <th>State</th>
                     <th>Schedule</th>
                     <th>Run count</th>
+                    <th>Last duration</th>
                     <th>Last run</th>
                     <th>Next run</th>
                 </tr>
@@ -54,6 +55,9 @@
                     </td>
                     <td>
                         {{job.runCount}}
+                    </td>
+                    <td>
+                        {{jobDuration(job.lastRunDurationMs)}}
                     </td>
                     <td>
                         {{job.lastRunDate | date:'shortDate'}}

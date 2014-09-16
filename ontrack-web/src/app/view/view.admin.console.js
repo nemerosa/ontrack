@@ -53,5 +53,10 @@ angular.module('ot.view.admin.console', [
             });
         };
 
+        // Duration formatting
+        $scope.jobDuration = function (ms) {
+            return moment.duration(ms, 'ms').humanize();
+        };
+
     })
 ;

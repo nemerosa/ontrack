@@ -21,6 +21,7 @@ public class RegisteredJob {
     private final AtomicLong runCount = new AtomicLong();
     private final AtomicReference<LocalDateTime> lastRunDate = new AtomicReference<>();
     private final AtomicReference<LocalDateTime> end = new AtomicReference<>(null);
+    private final AtomicLong lastRunDurationMs = new AtomicLong();
 
     protected RegisteredJob(Job job, long sync) {
         this.job = job;
@@ -67,7 +68,13 @@ public class RegisteredJob {
                 lastRunDate.set(Time.now());
                 runCount.incrementAndGet();
                 // Runs the job
-                task.run();
+                long _start = System.currentTimeMillis();
+                try {
+                    task.run();
+                } finally {
+                    long _end = System.currentTimeMillis();
+                    lastRunDurationMs.set(_end - _start);
+                }
             } finally {
                 // End
                 run.set(null);
@@ -126,5 +133,9 @@ public class RegisteredJob {
         } else {
             return null;
         }
+    }
+
+    public long getLastRunDurationMs() {
+        return lastRunDurationMs.get();
     }
 }
