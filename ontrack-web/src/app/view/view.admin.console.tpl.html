@@ -2,7 +2,10 @@
 
     <div class="row">
         <div class="col-md-12">
-            <h3>Jobs</h3>
+            <h3>
+                Jobs
+                <input class="form-control col-md-3 pull-right" type="text" ng-model="jobFilter" placeholder="Filter the jobs"/>
+            </h3>
 
             <p class="ot-description">
                 List of registered jobs and their status.
@@ -17,7 +20,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-repeat="job in jobs.resources" ng-class="{'success': job.running}">
+                <tr ng-repeat="job in jobs.resources | filter:jobFilter" ng-class="{'success': job.running}">
                     <td>
                         {{job.descriptor.category}}
                     </td>
