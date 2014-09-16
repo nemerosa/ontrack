@@ -31,6 +31,13 @@
             <td class="ot-description">
                 {{promotionRun.description}}
             </td>
+            <td>
+                <span
+                        ng-if="promotionRun._delete"
+                        ng-click="deletePromotionRun(promotionRun)"
+                        title="Delete this promotion."
+                        class="ot-command ot-command-delete"></span>
+            </td>
         </tr>
         </tbody>
     </table>
