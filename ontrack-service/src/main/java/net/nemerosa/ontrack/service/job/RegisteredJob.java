@@ -19,6 +19,7 @@ public class RegisteredJob {
 
     private final AtomicReference<JobTask> run = new AtomicReference<>(null);
     private final AtomicLong runCount = new AtomicLong();
+    private final AtomicReference<LocalDateTime> lastRunDate = new AtomicReference<>();
     private final AtomicReference<LocalDateTime> end = new AtomicReference<>(null);
 
     protected RegisteredJob(Job job, long sync) {
@@ -63,6 +64,7 @@ public class RegisteredJob {
                 run.set(task);
                 // Starting
                 end.set(null);
+                lastRunDate.set(Time.now());
                 runCount.incrementAndGet();
                 // Runs the job
                 task.run();
@@ -111,5 +113,9 @@ public class RegisteredJob {
 
     public long getRunCount() {
         return runCount.get();
+    }
+
+    public LocalDateTime getLastRunDate() {
+        return lastRunDate.get();
     }
 }

@@ -95,7 +95,8 @@ public class JobServiceImpl implements ScheduledService,
                 registeredJob.getJobDescriptor(),
                 registeredJob.isRunning(),
                 registeredJob.getApplicationInfo(),
-                registeredJob.getRunCount()
+                registeredJob.getRunCount(),
+                registeredJob.getLastRunDate()
         );
     }
 
