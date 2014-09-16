@@ -10,7 +10,10 @@
     </h3>
 </div>
 <div class="modal-body">
-    <table class="table table-condensed table-hover">
+    <div class="alert alert-warning" ng-if="promotionRuns.length == 0">
+        No promotion.
+    </div>
+    <table class="table table-condensed table-hover" ng-if="promotionRuns">
         <thead>
         <tr>
             <th>Promoter</th>
