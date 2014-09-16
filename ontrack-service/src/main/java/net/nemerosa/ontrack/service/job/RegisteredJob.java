@@ -108,4 +108,8 @@ public class RegisteredJob {
     public ApplicationInfo getApplicationInfo() {
         return Optional.ofNullable(run.get()).map(task -> ApplicationInfo.info(task.getInfo())).orElse(null);
     }
+
+    public long getRunCount() {
+        return runCount.get();
+    }
 }

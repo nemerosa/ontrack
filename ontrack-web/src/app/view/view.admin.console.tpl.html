@@ -17,6 +17,7 @@
                     <th>Description</th>
                     <th>State</th>
                     <th>Schedule</th>
+                    <th>Run count</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -48,6 +49,9 @@
                             <span ng-if="job.descriptor.interval > 1">
                                 Every {{job.descriptor.interval}} minutes
                             </span>
+                    </td>
+                    <td>
+                        {{job.runCount}}
                     </td>
                 </tr>
                 </tbody>
