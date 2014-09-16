@@ -63,13 +63,13 @@ public class ValidationRunStatusServiceRef implements ValidationRunStatusService
     @Override
     public void start() {
         register(STATUS_PASSED);
-        register(STATUS_WARNING);
         register(STATUS_FIXED);
         register(STATUS_DEFECTIVE);
         register(STATUS_EXPLAINED, FIXED);
         register(STATUS_INVESTIGATING, DEFECTIVE, EXPLAINED, FIXED);
         register(STATUS_INTERRUPTED, INVESTIGATING, FIXED);
         register(STATUS_FAILED, INTERRUPTED, INVESTIGATING, EXPLAINED, DEFECTIVE);
+        register(STATUS_WARNING, INTERRUPTED, INVESTIGATING, EXPLAINED, DEFECTIVE);
         // TODO Participation from extensions
         // Checks the tree
         for (ValidationRunStatusID statusID : statuses.values()) {
