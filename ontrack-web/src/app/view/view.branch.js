@@ -208,7 +208,10 @@ angular.module('ot.view.branch', [
                         }
                     },
                     ot.viewCloseCommand('/project/' + branchResource.project.id),
-                    ot.viewActionsCommand($scope.branch._actions)
+                    ot.viewActionsCommand(
+                        $scope.branch._actions,
+                        getTools($scope.branch)
+                    )
                 ];
                 // Loads the build filters
                 loadBuildFilters();
@@ -224,6 +227,26 @@ angular.module('ot.view.branch', [
         // Initialization
         loadPermalink();
         loadBranch();
+
+        // Gets the list of tools for a branch
+        function getTools(branch) {
+            var tools = [];
+            // Copy from branch
+            if (branch._update) {
+                tools.push({
+                    id: 'branch-copy',
+                    name: "Copy from branch",
+                    action: copyFromBranch
+                });
+            }
+            // OK
+            return tools;
+        }
+
+        // Copy from a branch
+        function copyFromBranch() {
+            alert("Copy to " + $scope.branch.name);
+        }
 
         // Creation of a promotion level
         $scope.createPromotionLevel = function () {

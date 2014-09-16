@@ -35,7 +35,8 @@
                         </button>
                         <ul class="dropdown-menu" role="menu">
                             <li ng-repeat="action in command.actions">
-                                <a id="{{action.id}}" href="#{{action.uri}}">{{action.name}}</a>
+                                <a ng-if="action.uri" id="{{action.id}}" class="ot-command-{{action.id}}" href="#{{action.uri}}">{{action.name}}</a>
+                                <a ng-if="action.action" id="{{action.id}}" class="ot-command-{{action.id}}" ng-click="action.action()">{{action.name}}</a>
                             </li>
                         </ul>
                     </div>

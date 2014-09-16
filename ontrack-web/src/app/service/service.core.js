@@ -36,15 +36,16 @@ angular.module('ot.service.core', [
          *
          * The list of actions is returned by a call to the URI in parameter.
          */
-        self.viewActionsCommand = function (uri) {
+        self.viewActionsCommand = function (uri, actions) {
             var def = {
                 id: 'actions',
                 name: "",
                 cls: 'ot-command-actions',
-                group: true
+                group: true,
+                actions: actions ? actions : []
             };
             self.call($http.get(uri)).then(function (actionResources) {
-                def.actions = actionResources.resources;
+                def.actions = def.actions.concat(actionResources.resources);
             });
             return  def;
         };
