@@ -402,6 +402,12 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public List<PromotionRun> getPromotionRunsForBuildAndPromotionLevel(Build build, PromotionLevel promotionLevel) {
+        securityService.checkProjectFunction(build, ProjectView.class);
+        return structureRepository.getPromotionRunsForBuildAndPromotionLevel(build, promotionLevel);
+    }
+
+    @Override
     public List<ValidationStamp> getValidationStampListForBranch(ID branchId) {
         Branch branch = getBranch(branchId);
         securityService.checkProjectFunction(branch.getProject().id(), ProjectView.class);

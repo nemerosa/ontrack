@@ -91,6 +91,8 @@ public interface StructureRepository {
 
     Optional<PromotionRun> getLastPromotionRun(Build build, PromotionLevel promotionLevel);
 
+    List<PromotionRun> getPromotionRunsForBuildAndPromotionLevel(Build build, PromotionLevel promotionLevel);
+
     List<PromotionRun> getPromotionRunsForPromotionLevel(PromotionLevel promotionLevel);
 
     // Validation stamps

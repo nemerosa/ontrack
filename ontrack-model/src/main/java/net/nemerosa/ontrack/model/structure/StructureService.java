@@ -95,6 +95,8 @@ public interface StructureService {
 
     Optional<PromotionRun> getLastPromotionRunForBuildAndPromotionLevel(Build build, PromotionLevel promotionLevel);
 
+    List<PromotionRun> getPromotionRunsForBuildAndPromotionLevel(Build build, PromotionLevel promotionLevel);
+
     PromotionRun getLastPromotionRunForPromotionLevel(PromotionLevel promotionLevel);
 
     PromotionRunView getPromotionRunView(PromotionLevel promotionLevel);
