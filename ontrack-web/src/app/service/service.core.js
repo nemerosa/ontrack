@@ -137,8 +137,17 @@ angular.module('ot.service.core', [
             self.display('error', message);
         };
 
+        self.warning = function (message) {
+            self.display('warning', message);
+        };
+
         self.info = function (message) {
             self.display('info', message);
+        };
+
+
+        self.success = function (message) {
+            self.display('success', message);
         };
 
         self.display = function (type, message) {

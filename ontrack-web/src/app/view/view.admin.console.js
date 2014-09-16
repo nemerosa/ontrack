@@ -10,7 +10,7 @@ angular.module('ot.view.admin.console', [
             controller: 'AdminConsoleCtrl'
         });
     })
-    .controller('AdminConsoleCtrl', function ($scope, $http, ot, otAlertService, otTaskService) {
+    .controller('AdminConsoleCtrl', function ($scope, $http, ot, otAlertService, otTaskService, otNotificationService) {
         var view = ot.view();
         view.title = "Administration console";
         view.description = "Tools for the general management of ontrack";
@@ -60,7 +60,16 @@ angular.module('ot.view.admin.console', [
 
         // Launching a job
         $scope.launchJob = function (job) {
-            ot.pageCall($http.post(job._launch)).then(loadJobs);
+            ot.pageCall($http.post(job._launch)).then(function (ack) {
+                // Notification
+                if (ack.success) {
+                    otNotificationService.success("Job was launched.");
+                } else {
+                    otNotificationService.warning("Job is already running or is disabled and could not be launched.");
+                }
+                // Reloads the jobs in any case
+                loadJobs();
+            });
         };
 
     })
