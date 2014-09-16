@@ -13,6 +13,6 @@ public class JobStatus {
     private final ApplicationInfo info;
     private final long runCount;
     private final LocalDateTime lastRunDate;
-    // TODO private final LocalDateTime nextRunDate;
+    private final LocalDateTime nextRunDate;
 
 }

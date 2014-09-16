@@ -118,4 +118,13 @@ public class RegisteredJob {
     public LocalDateTime getLastRunDate() {
         return lastRunDate.get();
     }
+
+    public LocalDateTime getNextRunDate() {
+        LocalDateTime date = getLastRunDate();
+        if (date != null) {
+            return date.plusMinutes(job.getInterval());
+        } else {
+            return null;
+        }
+    }
 }

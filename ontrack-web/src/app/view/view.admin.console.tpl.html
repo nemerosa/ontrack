@@ -19,6 +19,7 @@
                     <th>Schedule</th>
                     <th>Run count</th>
                     <th>Last run</th>
+                    <th>Next run</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -57,6 +58,10 @@
                     <td>
                         {{job.lastRunDate | date:'shortDate'}}
                         {{job.lastRunDate | date:'shortTime'}}
+                    </td>
+                    <td>
+                        {{job.nextRunDate | date:'shortDate'}}
+                        {{job.nextRunDate | date:'shortTime'}}
                     </td>
                 </tr>
                 </tbody>
