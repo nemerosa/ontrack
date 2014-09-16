@@ -439,8 +439,8 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     public Ack deletePromotionRun(ID promotionRunId) {
         return Ack.one(
                 getNamedParameterJdbcTemplate().update(
-                        "DELETE FORM PROMOTION_RUNS WHERE ID = :promotionRunId",
-                        params("promotionRunId", promotionRunId)
+                        "DELETE FROM PROMOTION_RUNS WHERE ID = :promotionRunId",
+                        params("promotionRunId", promotionRunId.getValue())
                 )
         );
     }
@@ -516,7 +516,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 promotionLevelLoader.apply(id(rs, "promotionLevelId")),
                 readSignature(rs),
                 rs.getString("description")
-        );
+        ).withId(id(rs));
     }
 
     @Override
