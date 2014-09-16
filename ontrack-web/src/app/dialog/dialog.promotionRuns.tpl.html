@@ -10,6 +10,30 @@
     </h3>
 </div>
 <div class="modal-body">
+    <table class="table table-condensed table-hover">
+        <thead>
+        <tr>
+            <th>Promoter</th>
+            <th>Date</th>
+            <th>Description</th>
+            <th>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="promotionRun in promotionRuns">
+            <td>
+                {{promotionRun.signature.user.name}}
+            </td>
+            <td>
+                {{promotionRun.signature.time | date:'mediumDate' }}
+                {{promotionRun.signature.time | date:'shortTime' }}
+            </td>
+            <td class="ot-description">
+                {{promotionRun.description}}
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </div>
 <div class="modal-footer">
     <button class="btn btn-primary" type="submit" ng-click="cancel()">OK</button>
