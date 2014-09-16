@@ -23,7 +23,7 @@ angular.module('ot.dialog.promotionRuns', [
                 title: "Promotion deletion",
                 message: "Do you really want to delete this promotion?"
             }).then(function () {
-                return ot.call($http.delete(promotionRun._delete))
+                return ot.call($http.delete(promotionRun._delete));
             }).then(loadRuns);
         };
     })

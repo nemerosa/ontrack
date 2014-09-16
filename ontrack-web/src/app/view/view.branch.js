@@ -266,7 +266,7 @@ angular.module('ot.view.branch', [
                         };
                     }
                 }
-            });
+            }).result.then(loadBuildView, loadBuildView);
         };
 
         /**
