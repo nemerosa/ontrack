@@ -101,6 +101,8 @@ public interface StructureService {
 
     PromotionRunView getPromotionRunView(PromotionLevel promotionLevel);
 
+    Ack deletePromotionRun(ID promotionRunId);
+
     // Validation stamps
 
     List<ValidationStamp> getValidationStampListForBranch(ID branchId);

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.DateTime;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Selection;
@@ -101,4 +102,8 @@ public class PromotionRunController extends AbstractResourceController {
         return structureService.getPromotionRun(promotionRunId);
     }
 
+    @RequestMapping(value = "promotionRuns/{promotionRunId}", method = RequestMethod.DELETE)
+    public Ack deletePromotionRun(@PathVariable ID promotionRunId) {
+        return structureService.deletePromotionRun(promotionRunId);
+    }
 }

@@ -173,6 +173,14 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public Ack deletePromotionRun(ID promotionRunId) {
+        Validate.isTrue(promotionRunId.isSet(), "Promotion run ID must be set");
+        PromotionRun promotionRun = getPromotionRun(promotionRunId);
+        securityService.checkProjectFunction(promotionRun, PromotionRunDelete.class);
+        return structureRepository.deletePromotionRun(promotionRunId);
+    }
+
+    @Override
     public Build getLastBuildForBranch(Branch branch) {
         // Checks the accesses
         securityService.checkProjectFunction(branch.projectId(), ProjectView.class);

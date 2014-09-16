@@ -436,6 +436,16 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    public Ack deletePromotionRun(ID promotionRunId) {
+        return Ack.one(
+                getNamedParameterJdbcTemplate().update(
+                        "DELETE FORM PROMOTION_RUNS WHERE ID = :promotionRunId",
+                        params("promotionRunId", promotionRunId)
+                )
+        );
+    }
+
+    @Override
     public List<PromotionRun> getLastPromotionRunsForBuild(Build build) {
         // Branch
         Branch branch = build.getBranch();
