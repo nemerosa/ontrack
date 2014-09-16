@@ -20,8 +20,24 @@ public class PromotionRunResourceDecorator extends AbstractResourceDecorator<Pro
     @Override
     public List<Link> links(PromotionRun promotionRun, ResourceContext resourceContext) {
         return resourceContext.links()
+                // Self
                 .self(on(PromotionRunController.class).getPromotionRun(promotionRun.getId()))
-                .link(Link.IMAGE_LINK, on(PromotionLevelController.class).getPromotionLevelImage_(promotionRun.getPromotionLevel().getId()))
+                        // List of runs for the build and promotion level
+                .link(
+                        "_all",
+                        on(PromotionRunController.class).getPromotionRunsForBuildAndPromotionLevel(
+                                promotionRun.getBuild().getId(),
+                                promotionRun.getPromotionLevel().getId()
+                        )
+                )
+                        // Image
+                .link(
+                        Link.IMAGE_LINK,
+                        on(PromotionLevelController.class).getPromotionLevelImage_(
+                                promotionRun.getPromotionLevel().getId()
+                        )
+                )
+                        // OK
                 .build();
     }
 

@@ -39,6 +39,17 @@ public class PromotionRunController extends AbstractResourceController {
         ).forView(Build.class);
     }
 
+    @RequestMapping(value = "builds/{buildId}/promotionRun/{promotionLevelId}", method = RequestMethod.GET)
+    public Resources<PromotionRun> getPromotionRunsForBuildAndPromotionLevel(@PathVariable ID buildId, @PathVariable ID promotionLevelId) {
+        return Resources.of(
+                structureService.getPromotionRunsForBuildAndPromotionLevel(
+                        structureService.getBuild(buildId),
+                        structureService.getPromotionLevel(promotionLevelId)
+                ),
+                uri(on(getClass()).getPromotionRunsForBuildAndPromotionLevel(buildId, promotionLevelId))
+        ).forView(Build.class);
+    }
+
     @RequestMapping(value = "builds/{buildId}/promotionRun/create", method = RequestMethod.GET)
     public Form newPromotionRunForm(@PathVariable ID buildId) {
         Build build = structureService.getBuild(buildId);
