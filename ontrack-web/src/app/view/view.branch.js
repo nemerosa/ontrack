@@ -5,6 +5,7 @@ angular.module('ot.view.branch', [
     'ot.service.form',
     'ot.service.structure',
     'ot.service.buildfilter',
+    'ot.service.branch.copy',
     'ot.dialog.validationStampRunView',
     'ot.dialog.promotionRuns'
 ])
@@ -15,7 +16,7 @@ angular.module('ot.view.branch', [
             controller: 'BranchCtrl'
         });
     })
-    .controller('BranchCtrl', function ($state, $scope, $stateParams, $http, $modal, $location, ot, otFormService, otStructureService, otBuildFilterService, otAlertService, otTaskService, otNotificationService) {
+    .controller('BranchCtrl', function ($state, $scope, $stateParams, $http, $modal, $location, ot, otFormService, otStructureService, otBuildFilterService, otAlertService, otTaskService, otNotificationService, otBranchCopyService) {
         var view = ot.view();
         // Branch's id
         var branchId = $stateParams.branchId;
@@ -245,7 +246,7 @@ angular.module('ot.view.branch', [
 
         // Copy from a branch
         function copyFromBranch() {
-            alert("Copy to " + $scope.branch.name);
+            otBranchCopyService.copyFrom($scope.branch);
         }
 
         // Creation of a promotion level
