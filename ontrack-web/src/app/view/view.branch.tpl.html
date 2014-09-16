@@ -9,6 +9,9 @@
     <div class="row" ng-show="branchBuildView && branchBuildView.buildViews.length == 0">
         <div class="col-md-12 alert alert-warning">
             No build has been created for this branch or the filter is too restrictive.
+            <button ng-show="currentBuildFilterResource" class="btn btn-default pull-right" ng-click="buildFilterErase()">
+                Reset filter
+            </button>
         </div>
     </div>
 
