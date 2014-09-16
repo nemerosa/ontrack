@@ -5,7 +5,8 @@ angular.module('ot.view.branch', [
     'ot.service.form',
     'ot.service.structure',
     'ot.service.buildfilter',
-    'ot.dialog.validationStampRunView'
+    'ot.dialog.validationStampRunView',
+    'ot.dialog.promotionRuns'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('branch', {
@@ -247,6 +248,25 @@ angular.module('ot.view.branch', [
                     }
                 }
             ).then(loadBuildView);
+        };
+
+        /**
+         * Displaying the promotion runs
+         */
+        $scope.displayPromotionRuns = function (buildView, promotionRun) {
+            $modal.open({
+                templateUrl: 'app/dialog/dialog.promotionRuns.tpl.html',
+                controller: 'otDialogPromotionRuns',
+                resolve: {
+                    config: function () {
+                        return {
+                            build: buildView.build,
+                            promotionLevel: promotionRun.promotionLevel,
+                            uri: promotionRun._all
+                        };
+                    }
+                }
+            });
         };
 
         /**
