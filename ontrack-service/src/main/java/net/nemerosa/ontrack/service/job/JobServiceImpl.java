@@ -80,7 +80,7 @@ public class JobServiceImpl implements ScheduledService,
     @Override
     public boolean accept(Job job) {
         return !idInSameGroupRunning(job.getGroup(), job.getId())
-                && runJob(registerJob(-1L, job));
+                && runJob(registerJob(-1L, job), true);
     }
 
     @Override
@@ -101,7 +101,7 @@ public class JobServiceImpl implements ScheduledService,
             throw new JobNotFoundException(category, id);
         } else {
             return Ack.validate(
-                    runJob(registeredJob)
+                    runJob(registeredJob, true)
             );
         }
     }
@@ -183,17 +183,21 @@ public class JobServiceImpl implements ScheduledService,
     protected void runJobs() {
         logger.debug("[job] Running jobs");
         for (RegisteredJob registeredJob : registeredJobs.values()) {
-            runJob(registeredJob);
+            runJob(registeredJob, false);
         }
     }
 
-    private boolean runJob(RegisteredJob registeredJob) {
+    private boolean runJob(RegisteredJob registeredJob, boolean forceEarly) {
         if (idInSameGroupRunning(registeredJob)) {
             logger.debug("[job] Same group running: {}", registeredJob);
             return false;
         } else if (registeredJob.isRunning()) {
             logger.debug("[job] Still running: {}", registeredJob);
             return false;
+        } else if (forceEarly) {
+            logger.debug("[job] Starting forced: {}", registeredJob);
+            start(registeredJob);
+            return true;
         } else if (registeredJob.mustStart()) {
             logger.debug("[job] Starting: {}", registeredJob);
             start(registeredJob);
