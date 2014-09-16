@@ -1,7 +1,7 @@
 angular.module('ot.dialog.promotionRuns', [
     'ot.service.core'
 ])
-    .controller('otDialogPromotionRuns', function ($scope, $modalInstance, $http, config, ot) {
+    .controller('otDialogPromotionRuns', function ($scope, $modalInstance, $http, config, ot, otAlertService) {
         // General configuration
         $scope.config = config;
         // Loading all the promotion runs
@@ -19,7 +19,12 @@ angular.module('ot.dialog.promotionRuns', [
 
         // Deleting a promotion run
         $scope.deletePromotionRun = function (promotionRun) {
-            ot.call($http.delete(promotionRun._delete)).then(loadRuns);
+            otAlertService.confirm({
+                title: "Promotion deletion",
+                message: "Do you really want to delete this promotion?"
+            }).then(function () {
+                return ot.call($http.delete(promotionRun._delete))
+            }).then(loadRuns);
         };
     })
 ;
