@@ -76,7 +76,10 @@
             <p class="ot-description">
                 List of application log messages.
             </p>
-            <table class="ot-admin-console-log" ng-if="logs">
+            <p ng-if="logs.entries.length == 0" class="ot-admin-console-log-ok">
+                No log entry - everything is OK!
+            </p>
+            <table class="ot-admin-console-log" ng-if="logs.entries">
                 <thead>
                 <tr>
                     <th>Level</th>
