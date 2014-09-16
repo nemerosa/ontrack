@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.job.JobService;
 import net.nemerosa.ontrack.model.job.JobStatus;
 import net.nemerosa.ontrack.model.support.ApplicationLogEntries;
@@ -9,6 +10,7 @@ import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -48,6 +50,14 @@ public class AdminController extends AbstractResourceController {
                 jobService.getJobStatuses(),
                 uri(on(getClass()).getJobs())
         );
+    }
+
+    /**
+     * Launches a job
+     */
+    @RequestMapping(value = "jobs/{category}/{id:.*}", method = RequestMethod.POST)
+    public Ack launchJob(@PathVariable String category, @PathVariable String id) {
+        return jobService.launchJob(category, id);
     }
 
 }

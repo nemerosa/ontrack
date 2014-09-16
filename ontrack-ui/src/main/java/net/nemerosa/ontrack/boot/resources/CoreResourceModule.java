@@ -25,7 +25,8 @@ public class CoreResourceModule extends AbstractResourceModule {
                 new AccountResourceDecorator(),
                 new AccountGroupResourceDecorator(),
                 new GlobalPermissionResourceDecorator(),
-                new ProjectPermissionResourceDecorator()
+                new ProjectPermissionResourceDecorator(),
+                new JobStatusResourceDecorator()
         );
     }
 }

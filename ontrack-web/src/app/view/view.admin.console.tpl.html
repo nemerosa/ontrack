@@ -15,6 +15,7 @@
                 <tr>
                     <th>Category</th>
                     <th>Description</th>
+                    <th>Action</th>
                     <th>State</th>
                     <th>Schedule</th>
                     <th>Run count</th>
@@ -37,6 +38,13 @@
                             <span class="glyphicon glyphicon-arrow-right"></span>
                             {{job.info.message}}
                         </p>
+                    </td>
+                    <td>
+                        <span
+                                ng-if="job._launch"
+                                title="Launch {{job.descriptor.description}}"
+                                ng-click="launchJob(job)"
+                                class="glyphicon glyphicon-play ot-command"></span>
                     </td>
                     <td>
                         <span class="glyphicon glyphicon-time text-success" ng-if="job.running"></span>

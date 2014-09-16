@@ -58,5 +58,10 @@ angular.module('ot.view.admin.console', [
             return moment.duration(ms, 'ms').humanize();
         };
 
+        // Launching a job
+        $scope.launchJob = function (job) {
+            ot.pageCall($http.post(job._launch)).then(loadJobs);
+        };
+
     })
 ;

@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.service.job;
 import com.google.common.collect.Table;
 import com.google.common.collect.Tables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.job.*;
 import net.nemerosa.ontrack.model.security.ApplicationManagement;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -88,6 +89,21 @@ public class JobServiceImpl implements ScheduledService,
         return registeredJobs.values().stream()
                 .map(this::getJobStatus)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Ack launchJob(String category, String id) {
+        // Checks rights
+        securityService.checkGlobalFunction(ApplicationManagement.class);
+        // Gets a registered job
+        RegisteredJob registeredJob = registeredJobs.get(category, id);
+        if (registeredJob == null) {
+            throw new JobNotFoundException(category, id);
+        } else {
+            return Ack.validate(
+                    runJob(registeredJob)
+            );
+        }
     }
 
     protected JobStatus getJobStatus(RegisteredJob registeredJob) {
