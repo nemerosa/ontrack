@@ -13,7 +13,8 @@ module.exports = function (grunt) {
             'vendor/angular-multi-select/angular-multi-select.js',
             'vendor/angular-taglist/js/angular-taglist-directive.js',
             'vendor/angular-sanitize/angular-sanitize.js',
-            'vendor/angular-bootstrap/ui-bootstrap-tpls.js'
+            'vendor/angular-bootstrap/ui-bootstrap-tpls.js',
+            'vendor/moment/min/moment.min.js'
         ],
         css: [
             'vendor/angular-multi-select/angular-multi-select.css',
