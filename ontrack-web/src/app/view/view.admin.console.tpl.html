@@ -2,42 +2,40 @@
 
     <div class="row">
         <div class="col-md-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        Jobs
-                    </div>
-                </div>
-                <div class="panel-body">
-                    List of registered jobs and their status.
-                </div>
-                <table class="table" ng-if="jobs">
-                    <thead>
-                    <tr>
-                        <th>Group</th>
-                        <th>Category</th>
-                        <th>ID</th>
-                        <th>State</th>
-                        <th>Schedule</th>
-                        <th>Info</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr ng-repeat="job in jobs.resources" ng-class="{'success': job.running}">
-                        <td>
-                            {{job.descriptor.group}}
-                        </td>
-                        <td>
-                            {{job.descriptor.category}}
-                        </td>
-                        <td>
-                            {{job.descriptor.id}}
-                        </td>
-                        <td>
-                            <span class="glyphicon glyphicon-time text-success" ng-if="job.running"></span>
-                            <span class="glyphicon glyphicon-ban-circle text-muted" ng-if="!job.running"></span>
-                        </td>
-                        <td>
+            <h3>Jobs</h3>
+
+            <p class="ot-description">
+                List of registered jobs and their status.
+            </p>
+            <table class="ot-admin-console-jobs" ng-if="jobs">
+                <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>State</th>
+                    <th>Schedule</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="job in jobs.resources" ng-class="{'success': job.running}">
+                    <td>
+                        {{job.descriptor.category}}
+                    </td>
+                    <td>
+                        <p>
+                            {{job.descriptor.description}}
+                        </p>
+
+                        <p class="ot-description" ng-if="job.info">
+                            <span class="glyphicon glyphicon-arrow-right"></span>
+                            {{job.info.message}}
+                        </p>
+                    </td>
+                    <td>
+                        <span class="glyphicon glyphicon-time text-success" ng-if="job.running"></span>
+                        <span class="glyphicon glyphicon-ban-circle text-muted" ng-if="!job.running"></span>
+                    </td>
+                    <td>
                             <span ng-if="job.descriptor.interval == 0">
                                 Manually
                             </span>
@@ -47,69 +45,53 @@
                             <span ng-if="job.descriptor.interval > 1">
                                 Every {{job.descriptor.interval}} minutes
                             </span>
-                        </td>
-                        <td>
-                            <p>
-                                {{job.descriptor.description}}
-                            </p>
-
-                            <p class="ot-description" ng-if="job.info">
-                                <span class="glyphicon glyphicon-arrow-right"></span>
-                                {{job.info.message}}
-                            </p>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        Log entries
-                    </div>
-                </div>
-                <div class="panel-body">
-                    List of application log messages.
-                </div>
-                <table class="table" ng-if="logs">
-                    <thead>
-                    <tr>
-                        <th>Level</th>
-                        <th>Timestamp</th>
-                        <th>Source</th>
-                        <th>Identifier</th>
-                        <th>Details</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr ng-repeat="log in logs.entries" class="ot-application-log-{{log.level | lowercase}}">
-                        <td>
-                            {{log.level}}
-                        </td>
-                        <td>
-                            {{log.timestamp | date:'fullDate'}}
-                            {{log.timestamp | date:'mediumTime'}}
-                        </td>
-                        <td>
-                            {{log.source}}
-                        </td>
-                        <td>
-                            {{log.identifier}}
-                        </td>
-                        <td>
-                            <button class="btn btn-default btn-xs" ng-click="showLogDetails(log)">
-                                Details...
-                            </button>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
+            <h3>Log entries</h3>
+
+            <p class="ot-description">
+                List of application log messages.
+            </p>
+            <table class="ot-admin-console-log" ng-if="logs">
+                <thead>
+                <tr>
+                    <th>Level</th>
+                    <th>Timestamp</th>
+                    <th>Source</th>
+                    <th>Identifier</th>
+                    <th>Details</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="log in logs.entries" class="ot-application-log-{{log.level | lowercase}}">
+                    <td>
+                        {{log.level}}
+                    </td>
+                    <td>
+                        {{log.timestamp | date:'fullDate'}}
+                        {{log.timestamp | date:'mediumTime'}}
+                    </td>
+                    <td>
+                        {{log.source}}
+                    </td>
+                    <td>
+                        {{log.identifier}}
+                    </td>
+                    <td>
+                        <button class="btn btn-default btn-xs" ng-click="showLogDetails(log)">
+                            Details...
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
