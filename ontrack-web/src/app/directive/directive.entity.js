@@ -57,12 +57,29 @@ angular.module('ot.directive.entity', [
             }
         };
     })
-    .directive('otBuildPromotionRuns', function () {
+    .directive('otBuildPromotionRuns', function ($modal) {
         return {
             restrict: 'E',
             templateUrl: 'app/directive/directive.buildPromotionRuns.tpl.html',
             scope: {
                 promotionRuns: '='
+            },
+            controller: function ($scope) {
+                $scope.displayPromotionRuns = function (promotionRun) {
+                    $modal.open({
+                        templateUrl: 'app/dialog/dialog.promotionRuns.tpl.html',
+                        controller: 'otDialogPromotionRuns',
+                        resolve: {
+                            config: function () {
+                                return {
+                                    build: promotionRun.build,
+                                    promotionLevel: promotionRun.promotionLevel,
+                                    uri: promotionRun._all
+                                };
+                            }
+                        }
+                    });
+                };
             }
         };
     })

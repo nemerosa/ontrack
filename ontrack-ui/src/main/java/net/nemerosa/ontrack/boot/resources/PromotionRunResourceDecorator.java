@@ -1,7 +1,8 @@
 package net.nemerosa.ontrack.boot.resources;
 
-import net.nemerosa.ontrack.boot.ui.BuildController;
 import net.nemerosa.ontrack.boot.ui.PromotionLevelController;
+import net.nemerosa.ontrack.boot.ui.PromotionRunController;
+import net.nemerosa.ontrack.model.security.PromotionRunDelete;
 import net.nemerosa.ontrack.model.structure.PromotionRun;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
 import net.nemerosa.ontrack.ui.resource.Link;
@@ -20,8 +21,26 @@ public class PromotionRunResourceDecorator extends AbstractResourceDecorator<Pro
     @Override
     public List<Link> links(PromotionRun promotionRun, ResourceContext resourceContext) {
         return resourceContext.links()
-                .self(on(BuildController.class).getPromotionRun(promotionRun.getId()))
-                .link(Link.IMAGE_LINK, on(PromotionLevelController.class).getPromotionLevelImage_(promotionRun.getPromotionLevel().getId()))
+                // Self
+                .self(on(PromotionRunController.class).getPromotionRun(promotionRun.getId()))
+                        // List of runs for the build and promotion level
+                .link(
+                        "_all",
+                        on(PromotionRunController.class).getPromotionRunsForBuildAndPromotionLevel(
+                                promotionRun.getBuild().getId(),
+                                promotionRun.getPromotionLevel().getId()
+                        )
+                )
+                        // Deletion
+                .delete(on(PromotionRunController.class).deletePromotionRun(promotionRun.getId()), PromotionRunDelete.class, promotionRun.projectId())
+                        // Image
+                .link(
+                        Link.IMAGE_LINK,
+                        on(PromotionLevelController.class).getPromotionLevelImage_(
+                                promotionRun.getPromotionLevel().getId()
+                        )
+                )
+                        // OK
                 .build();
     }
 

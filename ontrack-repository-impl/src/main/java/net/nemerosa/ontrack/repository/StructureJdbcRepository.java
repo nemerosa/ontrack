@@ -436,6 +436,16 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    public Ack deletePromotionRun(ID promotionRunId) {
+        return Ack.one(
+                getNamedParameterJdbcTemplate().update(
+                        "DELETE FROM PROMOTION_RUNS WHERE ID = :promotionRunId",
+                        params("promotionRunId", promotionRunId.getValue())
+                )
+        );
+    }
+
+    @Override
     public List<PromotionRun> getLastPromotionRunsForBuild(Build build) {
         // Branch
         Branch branch = build.getBranch();
@@ -475,6 +485,18 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    public List<PromotionRun> getPromotionRunsForBuildAndPromotionLevel(Build build, PromotionLevel promotionLevel) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT * FROM PROMOTION_RUNS WHERE BUILDID = :buildId AND PROMOTIONLEVELID = :promotionLevelId ORDER BY CREATION DESC",
+                params("buildId", build.id()).addValue("promotionLevelId", promotionLevel.id()),
+                (rs, rowNum) -> toPromotionRun(rs,
+                        (id) -> build,
+                        (id) -> promotionLevel
+                )
+        );
+    }
+
+    @Override
     public List<PromotionRun> getPromotionRunsForPromotionLevel(PromotionLevel promotionLevel) {
         return getNamedParameterJdbcTemplate().query(
                 "SELECT * FROM PROMOTION_RUNS WHERE PROMOTIONLEVELID = :promotionLevelId ORDER BY CREATION DESC",
@@ -494,7 +516,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 promotionLevelLoader.apply(id(rs, "promotionLevelId")),
                 readSignature(rs),
                 rs.getString("description")
-        );
+        ).withId(id(rs));
     }
 
     @Override
