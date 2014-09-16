@@ -35,7 +35,7 @@ public class NamedBuildFilter implements BuildFilter {
         }
 
         // First to?
-        if (to == null && isToBuild(build, buildViewSupplier, fromPattern, toPattern)) {
+        if (from != null && to == null && isToBuild(build, buildViewSupplier, fromPattern, toPattern)) {
             // Keeps this build and stops
             to = build;
             return BuildFilterResult.ok().goOnIf(false);
