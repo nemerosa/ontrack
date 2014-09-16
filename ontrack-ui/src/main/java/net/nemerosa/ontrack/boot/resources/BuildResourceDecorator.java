@@ -26,13 +26,13 @@ public class BuildResourceDecorator extends AbstractResourceDecorator<Build> {
         return resourceContext.links()
                 .self(on(BuildController.class).getBuild(build.getId()))
                         // Other linked resources
-                .link("_lastPromotionRuns", on(BuildController.class).getLastPromotionRuns(build.getId()))
+                .link("_lastPromotionRuns", on(PromotionRunController.class).getLastPromotionRuns(build.getId()))
                 .link("_validationRuns", on(ValidationRunController.class).getValidationRuns(build.getId()))
                 .link("_validationStampRunViews", on(ValidationRunController.class).getValidationStampRunViews(build.getId()))
                         // Creation of a promoted run
                 .link(
                         "_promote",
-                        on(BuildController.class).newPromotionRunForm(build.getId()),
+                        on(PromotionRunController.class).newPromotionRunForm(build.getId()),
                         PromotionRunCreate.class, build.getBranch().getProject().id()
                 )
                         // Creation of a validation run

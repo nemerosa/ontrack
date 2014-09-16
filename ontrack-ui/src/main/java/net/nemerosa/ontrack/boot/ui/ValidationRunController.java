@@ -53,7 +53,7 @@ public class ValidationRunController extends AbstractResourceController {
     public Resources<ValidationRun> getValidationRuns(@PathVariable ID buildId) {
         return Resources.of(
                 structureService.getValidationRunsForBuild(buildId),
-                uri(on(BuildController.class).getLastPromotionRuns(buildId))
+                uri(on(ValidationRunController.class).getValidationRuns(buildId))
         ).forView(Build.class);
     }
 

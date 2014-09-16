@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.boot.resources;
 
-import net.nemerosa.ontrack.boot.ui.BuildController;
 import net.nemerosa.ontrack.boot.ui.PromotionLevelController;
+import net.nemerosa.ontrack.boot.ui.PromotionRunController;
 import net.nemerosa.ontrack.model.structure.PromotionRun;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
 import net.nemerosa.ontrack.ui.resource.Link;
@@ -20,7 +20,7 @@ public class PromotionRunResourceDecorator extends AbstractResourceDecorator<Pro
     @Override
     public List<Link> links(PromotionRun promotionRun, ResourceContext resourceContext) {
         return resourceContext.links()
-                .self(on(BuildController.class).getPromotionRun(promotionRun.getId()))
+                .self(on(PromotionRunController.class).getPromotionRun(promotionRun.getId()))
                 .link(Link.IMAGE_LINK, on(PromotionLevelController.class).getPromotionLevelImage_(promotionRun.getPromotionLevel().getId()))
                 .build();
     }
