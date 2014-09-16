@@ -28,7 +28,7 @@ angular.module('ot.dialog.branchSelection', [
         // Submitting the dialog
         $scope.submit = function (isValid) {
             if (isValid) {
-                $modalInstance.close('ok');
+                $modalInstance.close($scope.data.branch);
             }
         };
     })

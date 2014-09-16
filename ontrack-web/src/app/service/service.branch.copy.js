@@ -19,7 +19,9 @@ angular.module('ot.service.branch.copy', [
             $modal.open({
                 templateUrl: 'app/dialog/dialog.branchSelection.tpl.html',
                 controller: 'otDialogBranchSelection'
-            });
+            }).result.then(function (sourceBranch) {
+                    // TODo Does something with the source branch
+                });
         };
 
         return self;
