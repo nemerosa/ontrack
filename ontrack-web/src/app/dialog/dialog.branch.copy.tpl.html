@@ -63,6 +63,45 @@
                 and replacement expressions.
             </p>
         </div>
+        <div class="form-group">
+            <label class="control-label col-md-3">All properties</label>
+
+            <div class="col-md-9">
+                <input name="prRegex" ng-model="data.propertyRegex" type="text"
+                       placeholder="Regular expression"
+                       class="col-md-5 form-control" />
+                <span class="col-md-1 glyphicon glyphicon-arrow-right text-muted"></span>
+                <input name="prReplacement" ng-model="data.propertyReplacement" type="text"
+                       placeholder="Replacement"
+                       class="col-md-5 form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-3">Promotion levels</label>
+
+            <div class="col-md-9">
+                <input name="plRegex" ng-model="data.promotionLevelRegex" type="text"
+                       placeholder="Regular expression"
+                       class="col-md-5 form-control" />
+                <span class="col-md-1 glyphicon glyphicon-arrow-right text-muted"></span>
+                <input name="plReplacement" ng-model="data.promotionLevelReplacement" type="text"
+                       placeholder="Replacement"
+                       class="col-md-5 form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-3">Validation stamps</label>
+
+            <div class="col-md-9">
+                <input name="vsRegex" ng-model="data.validationStampRegex" type="text"
+                       placeholder="Regular expression"
+                       class="col-md-5 form-control" />
+                <span class="col-md-1 glyphicon glyphicon-arrow-right text-muted"></span>
+                <input name="vsReplacement" ng-model="data.validationStampReplacement" type="text"
+                       placeholder="Replacement"
+                       class="col-md-5 form-control" />
+            </div>
+        </div>
     </div>
     <div class="modal-footer">
         <button class="btn btn-primary" type="submit" ng-disabled="thisForm.$invalid">OK</button>
