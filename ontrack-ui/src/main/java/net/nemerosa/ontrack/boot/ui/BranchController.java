@@ -159,6 +159,17 @@ public class BranchController extends AbstractResourceController {
                 ;
     }
 
+    /**
+     * Copies the configuration from a branch into this one.
+     */
+    @RequestMapping(value = "branches/{branchId}/copy", method = RequestMethod.PUT)
+    public Branch copy(@PathVariable ID branchId, @RequestBody BranchCopyRequest request) {
+        // Gets the branch
+        Branch branch = structureService.getBranch(branchId);
+        // Performs the copy
+        return structureService.copy(branch, request);
+    }
+
     private BranchBuildView buildViewWithFilter(ID branchId, BuildFilter buildFilter) {
         // Gets the branch
         Branch branch = getBranch(branchId);

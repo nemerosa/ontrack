@@ -147,6 +147,26 @@ public class StructureServiceImpl implements StructureService {
         return structureRepository.deleteBranch(branchId);
     }
 
+    @Override
+    public Branch copy(Branch targetBranch, BranchCopyRequest request) {
+        // Gets the source branch
+        Branch sourceBranch = getBranch(request.getSourceBranchId());
+        // If same branch, rejects
+        if (sourceBranch.id() == targetBranch.id()) {
+            throw new IllegalArgumentException("Cannot copy the branch into itself.");
+        }
+        // Checks the rights on the target branch
+        securityService.checkProjectFunction(targetBranch, BranchEdit.class);
+        // Now, we can work in a secure context
+        securityService.asAdmin(() -> doCopy(sourceBranch, targetBranch));
+        return targetBranch;
+    }
+
+    private void doCopy(Branch sourceBranch, Branch targetBranch) {
+        // FIXME Method net.nemerosa.ontrack.service.StructureServiceImpl.doCopy
+
+    }
+
     protected PromotionView toPromotionView(PromotionLevel promotionLevel) {
         // Gets the last build having this promotion level
         PromotionRun promotionRun = getLastPromotionRunForPromotionLevel(promotionLevel);
