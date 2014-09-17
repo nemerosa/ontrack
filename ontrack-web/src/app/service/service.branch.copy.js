@@ -18,7 +18,16 @@ angular.module('ot.service.branch.copy', [
         self.copyFrom = function (targetBranch) {
             $modal.open({
                 templateUrl: 'app/dialog/dialog.branchSelection.tpl.html',
-                controller: 'otDialogBranchSelection'
+                controller: 'otDialogBranchSelection',
+                resolve: {
+                    config: function () {
+                        return {
+                            title: "Copy configuration from branch",
+                            messageUrl: 'app/service/service.branch.copy.tpl.html',
+                            branch: targetBranch
+                        };
+                    }
+                }
             }).result.then(function (sourceBranch) {
                     // TODo Does something with the source branch
                 });

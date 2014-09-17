@@ -1,6 +1,6 @@
 <div class="modal-header">
     <h3>
-        Branch selection
+        {{config.title}}
     </h3>
 </div>
 <form name="thisForm" class="form-horizontal" ng-submit="submit(thisForm.$valid)" novalidate="novalidate">
@@ -26,6 +26,8 @@
                     <option value="">&nbsp;</option>
                 </select>
             </div>
+        </div>
+        <div ng-if="config.messageUrl" class="col-md-12 alert alert-info" ng-include="config.messageUrl">
         </div>
     </div>
     <div class="modal-footer">

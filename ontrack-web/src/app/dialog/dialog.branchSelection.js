@@ -2,7 +2,9 @@ angular.module('ot.dialog.branchSelection', [
     'ot.service.core',
     'ot.service.structure'
 ])
-    .controller('otDialogBranchSelection', function ($scope, $modalInstance, $http, ot, otStructureService) {
+    .controller('otDialogBranchSelection', function ($scope, $modalInstance, $http, config, ot, otStructureService) {
+        // Inject the configuration into the scope
+        $scope.config = config;
         // Selection object
         $scope.data = {
         };

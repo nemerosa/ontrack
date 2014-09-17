@@ -236,7 +236,7 @@ angular.module('ot.view.branch', [
             if (branch._update) {
                 tools.push({
                     id: 'branch-copy',
-                    name: "Copy from branch",
+                    name: "Copy config. from branch",
                     action: copyFromBranch
                 });
             }
