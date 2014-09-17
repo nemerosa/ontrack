@@ -140,6 +140,8 @@ public class BranchController extends AbstractResourceController {
                                         // All branches for all projects
                                 .items(structureService.getProjectList().stream()
                                         .flatMap(project -> structureService.getBranchesForProject(project.getId()).stream())
+                                                // Keeps only the different branches
+                                        .filter(branch -> !branchId.equals(branch.getId()))
                                         .collect(Collectors.toList()))
                 )
                 .with(
