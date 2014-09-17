@@ -22,8 +22,22 @@ angular.module('ot.service.branch.copy', [
                         };
                     }
                 }
-            }).result.then(function (copyData) {
-                    // TODO Does something with the source branch
+            }).result.then(function (copy) {
+                    var request = {
+                        sourceBranchId: copy.branch.id,
+                        propertyReplacements: [{
+                            regex: copy.propertyRegex,
+                            replacement: copy.propertyReplacement
+                        }],
+                        promotionLevelReplacements: [{
+                            regex: copy.promotionLevelRegex,
+                            replacement: copy.promotionLevelReplacement
+                        }],
+                        validationStampReplacements: [{
+                            regex: copy.validationStampRegex,
+                            replacement: copy.validationStampReplacement
+                        }]
+                    };
                 });
         };
 
