@@ -33,7 +33,7 @@ angular.module('ot.dialog.branch.copy', [
         // Submitting the dialog
         $scope.submit = function (isValid) {
             if (isValid) {
-                $modalInstance.close($scope.data.branch);
+                $modalInstance.close($scope.data);
             }
         };
     })

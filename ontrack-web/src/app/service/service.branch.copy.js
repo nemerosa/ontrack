@@ -22,8 +22,8 @@ angular.module('ot.service.branch.copy', [
                         };
                     }
                 }
-            }).result.then(function (sourceBranch) {
-                    // TODo Does something with the source branch
+            }).result.then(function (copyData) {
+                    // TODO Does something with the source branch
                 });
         };
 
