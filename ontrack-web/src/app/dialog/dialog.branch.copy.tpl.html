@@ -1,10 +1,39 @@
 <div class="modal-header">
     <h3>
         Copy configuration from branch
+        <span class="glyphicon glyphicon-question-sign text-info ot-action" ng-click="help = !help" title="Displays help."></span>
     </h3>
 </div>
 <form name="thisForm" class="form-horizontal" ng-submit="submit(thisForm.$valid)" novalidate="novalidate">
     <div class="modal-body">
+        <div class="col-md-12 alert alert-info" ng-if="help">
+            <p>
+                The configuration from the selected branch will be copied into the current branch
+                ({{config.targetBranch.name}}).
+            </p>
+
+            <p>
+                If both the source and the target branches belong to the same project, following items will be copied
+                over:
+            </p>
+            <ul>
+                <li>Promotion levels and their properties</li>
+                <li>Validation stamps and their properties</li>
+                <li>Properties</li>
+                <li>User build filters</li>
+            </ul>
+            <p>
+                If the source and the target branches do not belong to the same project, following items will be copied
+                over:
+            </p>
+            <ul>
+                <li>Promotion levels and their properties</li>
+                <li>Validation stamps and their properties</li>
+            </ul>
+            <p>
+                <b>Items already existing in the target branch <i>will not</i> be overridden.</b>
+            </p>
+        </div>
         <div class="form-group"
              ng-class="{ 'has-error' : thisForm['project'].$invalid && !thisForm['project'].$pristine }">
             <label class="control-label col-md-3">Project</label>
@@ -27,32 +56,11 @@
                 </select>
             </div>
         </div>
-        <div class="col-md-12 alert alert-info">
+        <div class="col-md-12 alert alert-info" ng-if="help">
             <p>
-                The configuration from the selected branch will be copied into the current branch
-                ({{config.targetBranch.name}}).
-            </p>
-
-            <p>
-                If both the source and the target branches belong to the same project, following items will be copied
-                over:
-            </p>
-            <ul>
-                <li>Promotion levels and their properties</li>
-                <li>Validation stamps and their properties</li>
-                <li>Properties</li>
-                <li>User build filters</li>
-            </ul>
-            <p>
-                If the source and the target branches do not belong to the same project, following items will be copied
-                over:
-            </p>
-            <ul>
-                <li>Promotion levels</li>
-                <li>Validation stamps</li>
-            </ul>
-            <p>
-                <b>Items already existing in the target branch <i>will not</i> be overridden.</b>
+                Note that properties and descriptions of all items can be adjusted during the copy
+                by using the <a target="_blank" href="http://regular-expressions.info">regular expressions</a>
+                and replacement expressions.
             </p>
         </div>
     </div>
