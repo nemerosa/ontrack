@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * Field used to define a list of {@link net.nemerosa.ontrack.model.form.Replacement}s.
+ * Field used to define a list of {@link net.nemerosa.ontrack.model.structure.Replacement}s.
  */
 @EqualsAndHashCode(callSuper = false)
 @Data
