@@ -1,14 +1,10 @@
 angular.module('ot.service.branch.copy', [
     'ot.service.core',
     'ot.service.form',
-    'ot.dialog.branchSelection'
+    'ot.dialog.branch.copy'
 ])
     .service('otBranchCopyService', function ($modal) {
         var self = {};
-
-        function branchCopyFrom() {
-
-        }
 
         /**
          * Copies another branch's configuration to the given target branch.
@@ -17,14 +13,12 @@ angular.module('ot.service.branch.copy', [
          */
         self.copyFrom = function (targetBranch) {
             $modal.open({
-                templateUrl: 'app/dialog/dialog.branchSelection.tpl.html',
-                controller: 'otDialogBranchSelection',
+                templateUrl: 'app/dialog/dialog.branch.copy.tpl.html',
+                controller: 'otDialogBranchCopy',
                 resolve: {
                     config: function () {
                         return {
-                            title: "Copy configuration from branch",
-                            messageUrl: 'app/service/service.branch.copy.tpl.html',
-                            branch: targetBranch
+                            targetBranch: targetBranch
                         };
                     }
                 }

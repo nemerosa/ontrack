@@ -1,8 +1,8 @@
-angular.module('ot.dialog.branchSelection', [
+angular.module('ot.dialog.branch.copy', [
     'ot.service.core',
     'ot.service.structure'
 ])
-    .controller('otDialogBranchSelection', function ($scope, $modalInstance, $http, config, ot, otStructureService) {
+    .controller('otDialogBranchCopy', function ($scope, $modalInstance, $http, config, ot, otStructureService) {
         // Inject the configuration into the scope
         $scope.config = config;
         // Selection object
