@@ -158,13 +158,45 @@ public class StructureServiceImpl implements StructureService {
         // Checks the rights on the target branch
         securityService.checkProjectFunction(targetBranch, BranchEdit.class);
         // Now, we can work in a secure context
-        securityService.asAdmin(() -> doCopy(sourceBranch, targetBranch));
+        securityService.asAdmin(() -> doCopy(sourceBranch, targetBranch, request));
         return targetBranch;
     }
 
-    private void doCopy(Branch sourceBranch, Branch targetBranch) {
-        // FIXME Method net.nemerosa.ontrack.service.StructureServiceImpl.doCopy
+    private void doCopy(Branch sourceBranch, Branch targetBranch, BranchCopyRequest request) {
+        // Same project?
+        boolean sameProject = (sourceBranch.projectId() == targetBranch.projectId());
+        // TODO Branch properties
+        // Promotion level and properties
+        doCopyPromotionLevels(sourceBranch, targetBranch, request);
+        // TODO Validation stamps and properties
+        // TODO User filters
+    }
 
+    private void doCopyPromotionLevels(Branch sourceBranch, Branch targetBranch, BranchCopyRequest request) {
+        List<PromotionLevel> sourcePromotionLevels = getPromotionLevelListForBranch(sourceBranch.getId());
+        for (PromotionLevel sourcePromotionLevel : sourcePromotionLevels) {
+            Optional<PromotionLevel> targetPromotionLevel = findPromotionLevelByName(targetBranch.getProject().getName(), targetBranch.getName(), sourcePromotionLevel.getName());
+            if (!targetPromotionLevel.isPresent()) {
+                // Copy of the promotion level
+                newPromotionLevel(
+                        PromotionLevel.of(
+                                targetBranch,
+                                NameDescription.nd(
+                                        sourcePromotionLevel.getName(),
+                                        applyReplacements(sourcePromotionLevel.getDescription(), request.getPromotionLevelReplacements())
+                                )
+                        )
+                );
+            }
+        }
+    }
+
+    private String applyReplacements(final String value, List<Replacement> replacements) {
+        String transformedValue = value;
+        for (Replacement replacement : replacements) {
+            transformedValue = replacement.replace(transformedValue);
+        }
+        return transformedValue;
     }
 
     protected PromotionView toPromotionView(PromotionLevel promotionLevel) {
