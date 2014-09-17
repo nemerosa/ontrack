@@ -7,6 +7,8 @@ import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.form.Replacements;
+import net.nemerosa.ontrack.model.form.Selection;
 import net.nemerosa.ontrack.model.security.Action;
 import net.nemerosa.ontrack.model.security.BranchCreate;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -123,6 +125,36 @@ public class BranchController extends AbstractResourceController {
         BuildFilter buildFilter = buildFilterService.computeFilter(branchId, filterType, jsonParameters);
         // Gets the build view
         return buildViewWithFilter(branchId, buildFilter);
+    }
+
+    /**
+     * Gets the form to copy a source branch into this branch
+     */
+    @RequestMapping(value = "branches/{branchId}/copy", method = RequestMethod.GET)
+    public Form copy(@PathVariable ID branchId) {
+        return Form.create()
+                .with(
+                        Selection.of("sourceBranch")
+                                .label("Source branch")
+                                .help("Branch to copy configuration from")
+                                        // All branches for all projects
+                                .items(structureService.getProjectList().stream()
+                                        .flatMap(project -> structureService.getBranchesForProject(project.getId()).stream())
+                                        .collect(Collectors.toList()))
+                )
+                .with(
+                        Replacements.of("propertyReplacements")
+                                .label("Property replacements")
+                )
+                .with(
+                        Replacements.of("promotionLevelReplacements")
+                                .label("Promotion level replacements")
+                )
+                .with(
+                        Replacements.of("validationStampReplacements")
+                                .label("Validation stamp replacements")
+                )
+                ;
     }
 
     private BranchBuildView buildViewWithFilter(ID branchId, BuildFilter buildFilter) {
