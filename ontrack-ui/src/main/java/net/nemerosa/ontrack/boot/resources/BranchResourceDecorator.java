@@ -91,6 +91,13 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                         ValidationStampEdit.class,
                         branch.projectId()
                 )
+                        // Copy of a configuration from another branch
+                .link(
+                        "_copy",
+                        on(BranchController.class).copy(branch.getId()),
+                        BranchEdit.class,
+                        branch.projectId()
+                )
                         // OK
                 .build();
     }
