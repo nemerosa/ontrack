@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -51,6 +52,7 @@ public class LinkPropertyType extends AbstractPropertyType<LinkProperty> {
                                 .nameOptional()
                                 .addText("Add a link")
                                 .help("List of links")
+                                .value(value != null ? value.getLinks() : Collections.emptyList())
                 )
                 ;
     }
