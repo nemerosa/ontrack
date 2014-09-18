@@ -46,6 +46,7 @@ public class ReleasePropertyType extends AbstractPropertyType<ReleaseProperty> {
                         Text.of("name")
                                 .label("Release name")
                                 .length(20)
+                                .value(value != null ? value.getName() : null)
                 );
     }
 

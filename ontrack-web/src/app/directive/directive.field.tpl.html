@@ -47,6 +47,11 @@
     </taglist>
 </div>
 
+<!-- Type: named entries -->
+<div ng-if="field.type == 'namedEntries'">
+    <ot-field-named-entries field="field" data="data"></ot-field-named-entries>
+</div>
+
 <!-- Date -->
 <span ng-if="field.type == 'date'">
     <input ng-model="data.dates[field.name]" name="{{field.name}}" type="text" class="form-control"

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 public class GeneralExtensionFeature extends AbstractExtensionFeature {
 
     public GeneralExtensionFeature() {
-        super("genaral", "General", "Core extensions");
+        super("general", "General", "Core extensions");
     }
 
 }
