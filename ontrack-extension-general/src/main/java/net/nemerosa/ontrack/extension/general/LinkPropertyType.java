@@ -3,7 +3,9 @@ package net.nemerosa.ontrack.extension.general;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
 import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.security.BuildCreate;
+import net.nemerosa.ontrack.model.form.NamedEntry;
+import net.nemerosa.ontrack.model.form.Repetition;
+import net.nemerosa.ontrack.model.security.ProjectEdit;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
@@ -32,7 +34,7 @@ public class LinkPropertyType extends AbstractPropertyType<LinkProperty> {
 
     @Override
     public boolean canEdit(ProjectEntity entity, SecurityService securityService) {
-        return securityService.isProjectFunctionGranted(entity, BuildCreate.class);
+        return securityService.isProjectFunctionGranted(entity, ProjectEdit.class);
     }
 
     @Override
@@ -42,8 +44,16 @@ public class LinkPropertyType extends AbstractPropertyType<LinkProperty> {
 
     @Override
     public Form getEditionForm(LinkProperty value) {
-        // FIXME Link property form
-        return Form.create();
+        return Form.create()
+                .with(
+                        Repetition.of(
+                                "links",
+                                NamedEntry.of("link").label("Link").nameLabel("Link name").nameOptional()
+                        )
+                                .label("Links")
+                                .help("List of links")
+                )
+                ;
     }
 
     @Override

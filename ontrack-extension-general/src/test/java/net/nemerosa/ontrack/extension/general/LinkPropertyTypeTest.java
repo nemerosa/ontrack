@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.general;
 
+import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import org.junit.Before;
 import org.junit.Test;
 
