@@ -13,6 +13,10 @@ import static net.nemerosa.ontrack.model.structure.NameDescription.nd;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
+// TODO Checks the copy of properties for the branch
+// TODO Checks the copy of properties for the validation stamps
+// TODO Checks the copy of validation stamps
+// TODO Checks the copy of the user filters
 public class CopyServiceImplTest {
 
     private CopyServiceImpl service;
@@ -74,5 +78,6 @@ public class CopyServiceImplTest {
                         nd("copper", "Copper level for P2")
                 )
         );
+        // TODO Checks the copy of properties for the promotion levels
     }
 }
