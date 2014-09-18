@@ -36,12 +36,6 @@ public interface StructureService {
 
     Ack deleteBranch(ID branchId);
 
-    /**
-     * Copies the configuration of the {@linkplain BranchCopyRequest#getSourceBranchId() source branch}
-     * to the target branch.
-     */
-    Branch copy(Branch branch, BranchCopyRequest request);
-
     // Builds
 
     Build newBuild(Build build);

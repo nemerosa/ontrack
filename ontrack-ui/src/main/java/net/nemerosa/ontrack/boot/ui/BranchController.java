@@ -32,13 +32,20 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 public class BranchController extends AbstractResourceController {
 
     private final StructureService structureService;
+    private final CopyService copyService;
     private final BuildFilterService buildFilterService;
     private final ExtensionManager extensionManager;
     private final SecurityService securityService;
 
     @Autowired
-    public BranchController(StructureService structureService, BuildFilterService buildFilterService, ExtensionManager extensionManager, SecurityService securityService) {
+    public BranchController(
+            StructureService structureService,
+            CopyService copyService,
+            BuildFilterService buildFilterService,
+            ExtensionManager extensionManager,
+            SecurityService securityService) {
         this.structureService = structureService;
+        this.copyService = copyService;
         this.buildFilterService = buildFilterService;
         this.extensionManager = extensionManager;
         this.securityService = securityService;
@@ -167,7 +174,7 @@ public class BranchController extends AbstractResourceController {
         // Gets the branch
         Branch branch = structureService.getBranch(branchId);
         // Performs the copy
-        return structureService.copy(branch, request);
+        return copyService.copy(branch, request);
     }
 
     private BranchBuildView buildViewWithFilter(ID branchId, BuildFilter buildFilter) {
