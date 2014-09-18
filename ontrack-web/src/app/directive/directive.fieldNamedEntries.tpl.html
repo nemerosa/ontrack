@@ -1,6 +1,9 @@
+<div class="row" ng-repeat="pair in data[field.name]">
+    TR
+</div>
 <div class="row">
     <div class="col-md-12">
-        <button title="{{field.addText}}" class="btn btn-default btn-xs" type="button" ng-click="addEntry(field)">
+        <button title="{{field.addText}}" class="btn btn-default btn-xs" type="button" ng-click="addEntry(field, data)">
             <span class="glyphicon glyphicon-plus"></span>
         </button>
     </div>

@@ -27,11 +27,18 @@ angular.module('ot.directive.field', [
             restrict: 'E',
             templateUrl: 'app/directive/directive.fieldNamedEntries.tpl.html',
             scope: {
-                field: '='
+                field: '=',
+                data: '='
             },
             controller: function ($scope) {
                 // Adding an entry
-                $scope.addEntry = function (field) {
+                $scope.addEntry = function (field, data) {
+                    // The value of the 'namedEntries' field is a list of name/value pairs
+                    if (!data[field.name]) {
+                        data[field.name] = [];
+                    }
+                    // Adds an entry
+                    data[field.name].push(['', '']);
                 };
             }
         };
