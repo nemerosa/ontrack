@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 public class Repetition<F extends Field> extends AbstractField<Repetition<F>> {
 
     private final F field;
+    private String fieldAddText = "Add an item";
 
     public Repetition(String name, F field) {
         super("repetition", name);
@@ -16,5 +17,10 @@ public class Repetition<F extends Field> extends AbstractField<Repetition<F>> {
 
     public static <F extends Field> Repetition<F> of(String name, F field) {
         return new Repetition<>(name, field);
+    }
+
+    public Repetition<F> fieldAddText(String value) {
+        this.fieldAddText = value;
+        return this;
     }
 }

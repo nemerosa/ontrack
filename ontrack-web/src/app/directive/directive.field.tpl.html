@@ -47,6 +47,11 @@
     </taglist>
 </div>
 
+<!-- Type: repetition -->
+<div ng-if="field.type == 'repetition'">
+    <ot-field-repetition field="field"></ot-field-repetition>
+</div>
+
 <!-- Date -->
 <span ng-if="field.type == 'date'">
     <input ng-model="data.dates[field.name]" name="{{field.name}}" type="text" class="form-control"

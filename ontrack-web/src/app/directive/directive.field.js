@@ -22,4 +22,13 @@ angular.module('ot.directive.field', [
             }
         };
     })
+    .directive('otFieldRepetition', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'app/directive/directive.fieldRepetition.tpl.html',
+            scope: {
+                field: '='
+            }
+        };
+    })
 ;

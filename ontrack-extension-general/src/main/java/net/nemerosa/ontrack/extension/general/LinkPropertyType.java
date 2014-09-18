@@ -51,6 +51,7 @@ public class LinkPropertyType extends AbstractPropertyType<LinkProperty> {
                                 NamedEntry.of("link").label("Link").nameLabel("Link name").nameOptional()
                         )
                                 .label("Links")
+                                .fieldAddText("Add a link")
                                 .help("List of links")
                 )
                 ;
