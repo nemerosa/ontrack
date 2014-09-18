@@ -65,7 +65,7 @@ public class CopyServiceImpl implements CopyService {
         }
     }
 
-    protected String applyReplacements(final String value, List<Replacement> replacements) {
+    protected static String applyReplacements(final String value, List<Replacement> replacements) {
         String transformedValue = value;
         for (Replacement replacement : replacements) {
             transformedValue = replacement.replace(transformedValue);
