@@ -28,6 +28,17 @@ angular.module('ot.directive.field', [
             templateUrl: 'app/directive/directive.fieldRepetition.tpl.html',
             scope: {
                 field: '='
+            },
+            controller: function ($scope) {
+                // Adding a field
+                $scope.addField = function (repetitionField) {
+                    // If the value if not defined, creates it
+                    if (!repetitionField.value) {
+                        repetitionField.value = [];
+                    }
+                    // Adds a copy of the field definition
+                    repetitionField.value.push(angular.copy(repetitionField.field));
+                };
             }
         };
     })
