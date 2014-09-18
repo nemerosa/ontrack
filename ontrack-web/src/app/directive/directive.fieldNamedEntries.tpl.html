@@ -1,5 +1,12 @@
-<div class="row" ng-repeat="pair in data[field.name]">
-    TR
+<div class="form-group" ng-repeat="pair in data[field.name]">
+    <!-- Entry name -->
+    <div class="col-md-3">
+        <input ng-model="pair[0]" type="text" class="form-control" placeholder="{{field.nameLabel}}"/>
+    </div>
+    <!-- Entry value -->
+    <div class="col-md-9">
+        <input ng-model="pair[1]" type="text" class="form-control" placeholder="{{field.label}}"/>
+    </div>
 </div>
 <div class="row">
     <div class="col-md-12">
