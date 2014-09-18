@@ -1,15 +1,15 @@
-<div class="form-group" ng-repeat="pair in data[field.name]">
+<div class="form-group" ng-repeat="entry in data[field.name]">
     <!-- Entry name -->
     <div class="col-md-3">
-        <input ng-model="pair[0]" type="text" class="form-control" placeholder="{{field.nameLabel}}"/>
+        <input ng-model="entry.name" type="text" class="form-control" placeholder="{{field.nameLabel}}"/>
     </div>
     <!-- Entry value -->
     <div class="col-md-8">
-        <input ng-model="pair[1]" type="text" class="form-control" placeholder="{{field.label}}"/>
+        <input ng-model="entry.value" type="text" class="form-control" placeholder="{{field.label}}"/>
     </div>
     <!-- Entry removal -->
     <div class="col-md-1">
-        <span class="glyphicon glyphicon-trash ot-command" title="Removes entry." ng-click="removeEntry(field, data, pair)"></span>
+        <span class="glyphicon glyphicon-trash ot-command" title="Removes entry." ng-click="removeEntry(field, data, entry)"></span>
     </div>
 </div>
 <div class="row">
