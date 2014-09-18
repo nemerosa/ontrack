@@ -72,7 +72,7 @@ public class LinkPropertyType extends AbstractPropertyType<LinkProperty> {
                     if (StringUtils.isNotBlank(namedLink.getName())) {
                         return namedLink.getName();
                     } else {
-                        return namedLink.getUri();
+                        return namedLink.getValue();
                     }
                 })
                 .collect(Collectors.joining(","));
