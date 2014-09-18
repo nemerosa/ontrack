@@ -3,8 +3,7 @@ package net.nemerosa.ontrack.extension.general;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
 import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.form.NamedEntry;
-import net.nemerosa.ontrack.model.form.Repetition;
+import net.nemerosa.ontrack.model.form.NamedEntries;
 import net.nemerosa.ontrack.model.security.ProjectEdit;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
@@ -46,12 +45,11 @@ public class LinkPropertyType extends AbstractPropertyType<LinkProperty> {
     public Form getEditionForm(LinkProperty value) {
         return Form.create()
                 .with(
-                        Repetition.of(
-                                "links",
-                                NamedEntry.of("link").label("Link").nameLabel("Link name").nameOptional()
-                        )
-                                .label("Links")
-                                .fieldAddText("Add a link")
+                        NamedEntries.of("links")
+                                .label("Link")
+                                .nameLabel("Link name")
+                                .nameOptional()
+                                .addText("Add a link")
                                 .help("List of links")
                 )
                 ;

@@ -22,22 +22,16 @@ angular.module('ot.directive.field', [
             }
         };
     })
-    .directive('otFieldRepetition', function () {
+    .directive('otFieldNamedEntries', function () {
         return {
             restrict: 'E',
-            templateUrl: 'app/directive/directive.fieldRepetition.tpl.html',
+            templateUrl: 'app/directive/directive.fieldNamedEntries.tpl.html',
             scope: {
                 field: '='
             },
             controller: function ($scope) {
-                // Adding a field
-                $scope.addField = function (repetitionField) {
-                    // If the value if not defined, creates it
-                    if (!repetitionField.value) {
-                        repetitionField.value = [];
-                    }
-                    // Adds a copy of the field definition
-                    repetitionField.value.push(angular.copy(repetitionField.field));
+                // Adding an entry
+                $scope.addEntry = function (field) {
                 };
             }
         };
