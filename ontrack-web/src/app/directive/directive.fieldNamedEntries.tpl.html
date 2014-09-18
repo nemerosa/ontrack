@@ -4,8 +4,12 @@
         <input ng-model="pair[0]" type="text" class="form-control" placeholder="{{field.nameLabel}}"/>
     </div>
     <!-- Entry value -->
-    <div class="col-md-9">
+    <div class="col-md-8">
         <input ng-model="pair[1]" type="text" class="form-control" placeholder="{{field.label}}"/>
+    </div>
+    <!-- Entry removal -->
+    <div class="col-md-1">
+        <span class="glyphicon glyphicon-trash ot-command" title="Removes entry." ng-click="removeEntry(field, data, pair)"></span>
     </div>
 </div>
 <div class="row">

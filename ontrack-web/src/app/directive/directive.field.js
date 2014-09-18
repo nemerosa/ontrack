@@ -40,6 +40,14 @@ angular.module('ot.directive.field', [
                     // Adds an entry
                     data[field.name].push(['', '']);
                 };
+                // Removing an entry
+                $scope.removeEntry = function (field, data, pair) {
+                    var list = data[field.name];
+                    var idx = list.indexOf(pair);
+                    if (idx >= 0) {
+                        list.splice(idx, 1);
+                    }
+                };
             }
         };
     })

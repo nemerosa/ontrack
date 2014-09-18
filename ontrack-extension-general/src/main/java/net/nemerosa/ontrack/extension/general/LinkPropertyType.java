@@ -46,8 +46,8 @@ public class LinkPropertyType extends AbstractPropertyType<LinkProperty> {
         return Form.create()
                 .with(
                         NamedEntries.of("links")
-                                .label("Link")
-                                .nameLabel("Link name")
+                                .label("List of links")
+                                .nameLabel("Name")
                                 .nameOptional()
                                 .addText("Add a link")
                                 .help("List of links")
