@@ -3,7 +3,7 @@ angular.module('ot.service.branch.copy', [
     'ot.service.form',
     'ot.dialog.branch.copy'
 ])
-    .service('otBranchCopyService', function ($modal) {
+    .service('otBranchCopyService', function ($modal, $http, ot) {
         var self = {};
 
         /**
@@ -12,7 +12,7 @@ angular.module('ot.service.branch.copy', [
          * The user must first select a project and a branch.
          */
         self.copyFrom = function (targetBranch) {
-            $modal.open({
+            return $modal.open({
                 templateUrl: 'app/dialog/dialog.branch.copy.tpl.html',
                 controller: 'otDialogBranchCopy',
                 resolve: {
@@ -25,19 +25,26 @@ angular.module('ot.service.branch.copy', [
             }).result.then(function (copy) {
                     var request = {
                         sourceBranchId: copy.branch.id,
-                        propertyReplacements: [{
-                            regex: copy.propertyRegex,
-                            replacement: copy.propertyReplacement
-                        }],
-                        promotionLevelReplacements: [{
-                            regex: copy.promotionLevelRegex,
-                            replacement: copy.promotionLevelReplacement
-                        }],
-                        validationStampReplacements: [{
-                            regex: copy.validationStampRegex,
-                            replacement: copy.validationStampReplacement
-                        }]
+                        propertyReplacements: [
+                            {
+                                regex: copy.propertyRegex,
+                                replacement: copy.propertyReplacement
+                            }
+                        ],
+                        promotionLevelReplacements: [
+                            {
+                                regex: copy.promotionLevelRegex,
+                                replacement: copy.promotionLevelReplacement
+                            }
+                        ],
+                        validationStampReplacements: [
+                            {
+                                regex: copy.validationStampRegex,
+                                replacement: copy.validationStampReplacement
+                            }
+                        ]
                     };
+                    return ot.pageCall($http.put(targetBranch._copy, request));
                 });
         };
 

@@ -75,16 +75,18 @@ public class CopyServiceImpl implements CopyService {
     }
 
     protected <T> void doCopyProperty(Property<T> property, ProjectEntity targetEntity, List<Replacement> replacements) {
-        // Property value replacement
-        T data = property.getType().replaceValue(property.getValue(), s -> applyReplacements(s, replacements));
-        // Property data
-        JsonNode jsonData = property.getType().forStorage(data);
-        // Creates the property
-        propertyService.editProperty(
-                targetEntity,
-                property.getType().getTypeName(),
-                jsonData
-        );
+        if (!property.isEmpty()) {
+            // Property value replacement
+            T data = property.getType().replaceValue(property.getValue(), s -> applyReplacements(s, replacements));
+            // Property data
+            JsonNode jsonData = property.getType().forStorage(data);
+            // Creates the property
+            propertyService.editProperty(
+                    targetEntity,
+                    property.getType().getTypeName(),
+                    jsonData
+            );
+        }
     }
 
     protected static String applyReplacements(final String value, List<Replacement> replacements) {
