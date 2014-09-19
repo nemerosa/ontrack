@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service;
 
+import net.nemerosa.ontrack.extension.general.LinkPropertyType;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import org.junit.Before;
@@ -9,6 +10,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 
+import static net.nemerosa.ontrack.json.JsonUtils.array;
+import static net.nemerosa.ontrack.json.JsonUtils.object;
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
@@ -21,12 +24,14 @@ public class CopyServiceImplTest {
 
     private CopyServiceImpl service;
     private StructureService structureService;
+    private PropertyService propertyService;
 
     @Before
     public void before() {
         structureService = mock(StructureService.class);
+        propertyService = mock(PropertyService.class);
         SecurityService securityService = mock(SecurityService.class);
-        service = new CopyServiceImpl(structureService, securityService);
+        service = new CopyServiceImpl(structureService, propertyService, securityService);
     }
 
     @Test
@@ -69,15 +74,32 @@ public class CopyServiceImplTest {
                 )
         );
         when(structureService.findPromotionLevelByName("P2", "B2", "copper")).thenReturn(Optional.empty());
+
+        // Promotion level supposed to be created for the target branch
+        PromotionLevel targetPromotionLevel = PromotionLevel.of(
+                targetBranch,
+                nd("copper", "Copper level for P2")
+        );
+        // Result of the creation
+        when(structureService.newPromotionLevel(targetPromotionLevel)).thenReturn(targetPromotionLevel);
+
         // Copy
         service.doCopyPromotionLevels(sourceBranch, targetBranch, request);
-        // Checks that the promotion level is created for the target branch
-        verify(structureService, times(1)).newPromotionLevel(
-                PromotionLevel.of(
-                        targetBranch,
-                        nd("copper", "Copper level for P2")
-                )
+
+        // Checks the promotion level was created
+        verify(structureService, times(1)).newPromotionLevel(targetPromotionLevel);
+        // Checks the copy of properties for the promotion levels
+        verify(propertyService, times(1)).editProperty(
+                eq(targetPromotionLevel),
+                eq(LinkPropertyType.class.getName()),
+                eq(object()
+                        .with("links", array()
+                                .with(object()
+                                        .with("name", "test")
+                                        .with("value", "http://wiki/P2")
+                                        .end())
+                                .end())
+                        .end())
         );
-        // TODO Checks the copy of properties for the promotion levels
     }
 }

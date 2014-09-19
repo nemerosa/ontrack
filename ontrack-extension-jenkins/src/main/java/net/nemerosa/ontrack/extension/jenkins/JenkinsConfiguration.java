@@ -7,6 +7,8 @@ import net.nemerosa.ontrack.model.form.Password;
 import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 
+import java.util.function.Function;
+
 import static net.nemerosa.ontrack.model.form.Form.defaultNameField;
 
 @Data
@@ -58,4 +60,13 @@ public class JenkinsConfiguration implements UserPasswordConfiguration<JenkinsCo
         return new ConfigurationDescriptor(name, name);
     }
 
+    @Override
+    public JenkinsConfiguration clone(String targetConfigurationName, Function<String, String> replacementFunction) {
+        return new JenkinsConfiguration(
+                targetConfigurationName,
+                replacementFunction.apply(url),
+                replacementFunction.apply(user),
+                password
+        );
+    }
 }

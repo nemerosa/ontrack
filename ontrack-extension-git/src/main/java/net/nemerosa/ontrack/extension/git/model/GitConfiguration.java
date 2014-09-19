@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import static net.nemerosa.ontrack.model.form.Form.defaultNameField;
@@ -206,5 +207,21 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
         } else {
             return StringUtils.replace(tagPattern, "*", tagName);
         }
+    }
+
+    @Override
+    public GitConfiguration clone(String targetConfigurationName, Function<String, String> replacementFunction) {
+        return new GitConfiguration(
+                targetConfigurationName,
+                replacementFunction.apply(remote),
+                replacementFunction.apply(branch),
+                replacementFunction.apply(tagPattern),
+                replacementFunction.apply(user),
+                password,
+                replacementFunction.apply(commitLink),
+                replacementFunction.apply(fileAtCommitLink),
+                indexationInterval,
+                issueServiceConfigurationIdentifier
+        );
     }
 }

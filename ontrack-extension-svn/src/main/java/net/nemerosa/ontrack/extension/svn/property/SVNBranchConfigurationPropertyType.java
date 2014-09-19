@@ -14,6 +14,7 @@ import net.nemerosa.ontrack.model.structure.PropertyService;
 
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.function.Function;
 
 public class SVNBranchConfigurationPropertyType extends AbstractPropertyType<SVNBranchConfigurationProperty> {
 
@@ -68,7 +69,7 @@ public class SVNBranchConfigurationPropertyType extends AbstractPropertyType<SVN
                 .with(
                         Text.of("buildPath")
                                 .label("Build path")
-                            // TODO Allows the use of an HTML fragment for complex documentation
+                                        // TODO Allows the use of an HTML fragment for complex documentation
                                 .help("Path of a tag in the Subversion repository using a build name. The path is " +
                                         "computed relative to the root of the repository. The {build} placeholder is used " +
                                         "to define the location where to replace the path fragment by the build name. An" +
@@ -111,5 +112,13 @@ public class SVNBranchConfigurationPropertyType extends AbstractPropertyType<SVN
     @Override
     public String getSearchKey(SVNBranchConfigurationProperty value) {
         return value.getBranchPath();
+    }
+
+    @Override
+    public SVNBranchConfigurationProperty replaceValue(SVNBranchConfigurationProperty value, Function<String, String> replacementFunction) {
+        return new SVNBranchConfigurationProperty(
+                replacementFunction.apply(value.getBranchPath()),
+                replacementFunction.apply(value.getBuildPath())
+        );
     }
 }

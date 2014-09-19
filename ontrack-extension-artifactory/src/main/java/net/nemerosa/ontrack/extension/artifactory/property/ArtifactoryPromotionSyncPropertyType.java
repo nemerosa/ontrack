@@ -13,9 +13,11 @@ import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.function.Function;
 
 public class ArtifactoryPromotionSyncPropertyType extends AbstractPropertyType<ArtifactoryPromotionSyncProperty> {
 
@@ -120,5 +122,15 @@ public class ArtifactoryPromotionSyncPropertyType extends AbstractPropertyType<A
     @Override
     public String getSearchKey(ArtifactoryPromotionSyncProperty value) {
         return value.getConfiguration().getName();
+    }
+
+    @Override
+    public ArtifactoryPromotionSyncProperty replaceValue(ArtifactoryPromotionSyncProperty value, Function<String, String> replacementFunction) {
+        return new ArtifactoryPromotionSyncProperty(
+                configurationService.replaceConfiguration(value.getConfiguration(), replacementFunction),
+                replacementFunction.apply(value.getBuildName()),
+                replacementFunction.apply(value.getBuildNameFilter()),
+                value.getInterval()
+        );
     }
 }

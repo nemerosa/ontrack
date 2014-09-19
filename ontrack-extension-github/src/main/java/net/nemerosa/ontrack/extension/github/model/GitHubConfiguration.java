@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.github.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import net.nemerosa.ontrack.extension.github.GitHubIssueServiceExtension;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
@@ -11,6 +10,8 @@ import net.nemerosa.ontrack.model.form.Int;
 import net.nemerosa.ontrack.model.form.Password;
 import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
+
+import java.util.function.Function;
 
 import static java.lang.String.format;
 import static net.nemerosa.ontrack.model.form.Form.defaultNameField;
@@ -142,5 +143,17 @@ public class GitHubConfiguration implements UserPasswordConfiguration<GitHubConf
     @JsonIgnore
     public String getServiceId() {
         return GitHubIssueServiceExtension.GITHUB_SERVICE_ID;
+    }
+
+    @Override
+    public GitHubConfiguration clone(String targetConfigurationName, Function<String, String> replacementFunction) {
+        return new GitHubConfiguration(
+                targetConfigurationName,
+                replacementFunction.apply(repository),
+                replacementFunction.apply(user),
+                password,
+                oauth2Token,
+                indexationInterval
+        );
     }
 }

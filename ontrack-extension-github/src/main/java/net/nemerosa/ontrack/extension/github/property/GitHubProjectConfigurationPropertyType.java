@@ -14,6 +14,7 @@ import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.function.Function;
 
 public class GitHubProjectConfigurationPropertyType extends AbstractPropertyType<GitHubProjectConfigurationProperty> {
 
@@ -89,4 +90,12 @@ public class GitHubProjectConfigurationPropertyType extends AbstractPropertyType
     public String getSearchKey(GitHubProjectConfigurationProperty value) {
         return value.getConfiguration().getName();
     }
+
+    @Override
+    public GitHubProjectConfigurationProperty replaceValue(GitHubProjectConfigurationProperty value, Function<String, String> replacementFunction) {
+        return new GitHubProjectConfigurationProperty(
+                configurationService.replaceConfiguration(value.getConfiguration(), replacementFunction)
+        );
+    }
+
 }

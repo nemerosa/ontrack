@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 public interface ConfigurationService<T extends UserPasswordConfiguration> {
 
@@ -35,4 +36,21 @@ public interface ConfigurationService<T extends UserPasswordConfiguration> {
      */
     void updateConfiguration(String name, T configuration);
 
+    /**
+     * Tries to replace a configuration by another based on its name.
+     * <p>
+     * If the replacement function, applied on the configuration name, would
+     * give the same exact name, this method returns the configuration.
+     * <p>
+     * If the names are different, there are two cases:
+     * <ul>
+     * <li>If the current user is allowed to create a new configuration,
+     * the given configuration is transformed using the replacement
+     * function and a new configuration is created.</li>
+     * <li>If the current user is not allowed to create a configuration,
+     * a {@link ConfigurationNotFoundException}
+     * exception is thrown.</li>
+     * </ul>
+     */
+    T replaceConfiguration(T configuration, Function<String, String> replacementFunction) throws ConfigurationNotFoundException;
 }

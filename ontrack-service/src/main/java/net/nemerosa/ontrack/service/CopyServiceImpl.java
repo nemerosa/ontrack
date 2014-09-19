@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.model.security.BranchEdit;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
@@ -13,11 +14,13 @@ import java.util.Optional;
 public class CopyServiceImpl implements CopyService {
 
     private final StructureService structureService;
+    private final PropertyService propertyService;
     private final SecurityService securityService;
 
     @Autowired
-    public CopyServiceImpl(StructureService structureService, SecurityService securityService) {
+    public CopyServiceImpl(StructureService structureService, PropertyService propertyService, SecurityService securityService) {
         this.structureService = structureService;
+        this.propertyService = propertyService;
         this.securityService = securityService;
     }
 
@@ -49,10 +52,10 @@ public class CopyServiceImpl implements CopyService {
     protected void doCopyPromotionLevels(Branch sourceBranch, Branch targetBranch, BranchCopyRequest request) {
         List<PromotionLevel> sourcePromotionLevels = structureService.getPromotionLevelListForBranch(sourceBranch.getId());
         for (PromotionLevel sourcePromotionLevel : sourcePromotionLevels) {
-            Optional<PromotionLevel> targetPromotionLevel = structureService.findPromotionLevelByName(targetBranch.getProject().getName(), targetBranch.getName(), sourcePromotionLevel.getName());
-            if (!targetPromotionLevel.isPresent()) {
+            Optional<PromotionLevel> targetPromotionLevelOpt = structureService.findPromotionLevelByName(targetBranch.getProject().getName(), targetBranch.getName(), sourcePromotionLevel.getName());
+            if (!targetPromotionLevelOpt.isPresent()) {
                 // Copy of the promotion level
-                structureService.newPromotionLevel(
+                PromotionLevel targetPromotionLevel = structureService.newPromotionLevel(
                         PromotionLevel.of(
                                 targetBranch,
                                 NameDescription.nd(
@@ -61,8 +64,27 @@ public class CopyServiceImpl implements CopyService {
                                 )
                         )
                 );
+                // Copy of properties
+                // Gets the properties of the source promotion level
+                List<Property<?>> properties = propertyService.getProperties(sourcePromotionLevel);
+                for (Property<?> property : properties) {
+                    doCopyProperty(property, targetPromotionLevel, request.getPromotionLevelReplacements());
+                }
             }
         }
+    }
+
+    protected <T> void doCopyProperty(Property<T> property, ProjectEntity targetEntity, List<Replacement> replacements) {
+        // Property value replacement
+        T data = property.getType().replaceValue(property.getValue(), s -> applyReplacements(s, replacements));
+        // Property data
+        JsonNode jsonData = property.getType().forStorage(data);
+        // Creates the property
+        propertyService.editProperty(
+                targetEntity,
+                property.getType().getTypeName(),
+                jsonData
+        );
     }
 
     protected static String applyReplacements(final String value, List<Replacement> replacements) {

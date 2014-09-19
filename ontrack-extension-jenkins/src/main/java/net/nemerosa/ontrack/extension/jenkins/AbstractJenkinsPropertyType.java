@@ -4,6 +4,8 @@ import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Selection;
 
+import java.util.function.Function;
+
 public abstract class AbstractJenkinsPropertyType<T extends AbstractJenkinsProperty> extends AbstractPropertyType<T> {
 
     protected final JenkinsConfigurationService configurationService;
@@ -27,5 +29,9 @@ public abstract class AbstractJenkinsPropertyType<T extends AbstractJenkinsPrope
 
     protected JenkinsConfiguration loadConfiguration(String configurationName) {
         return configurationService.getConfiguration(configurationName);
+    }
+
+    protected JenkinsConfiguration replaceConfiguration(JenkinsConfiguration configuration, Function<String, String> replacementFunction) {
+        return configurationService.replaceConfiguration(configuration, replacementFunction);
     }
 }

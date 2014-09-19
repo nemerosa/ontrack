@@ -10,6 +10,7 @@ import org.apache.commons.lang3.Validate;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public abstract class AbstractConfigurationService<T extends UserPasswordConfiguration<T>> implements ConfigurationService<T> {
@@ -85,6 +86,26 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
             configToSave = configuration;
         }
         configurationRepository.save(configToSave);
+    }
+
+    @Override
+    public T replaceConfiguration(T configuration, Function<String, String> replacementFunction) throws ConfigurationNotFoundException {
+        // Tries to replace the configuration name
+        String sourceConfigurationName = configuration.getName();
+        String targetConfigurationName = replacementFunction.apply(sourceConfigurationName);
+        // If not different, we can use the same configuration
+        if (StringUtils.equals(sourceConfigurationName, targetConfigurationName)) {
+            return configuration;
+        }
+        // If different, we need to create a new configuration
+        else if (securityService.isGlobalFunctionGranted(GlobalSettings.class)) {
+            throw new ConfigurationNotFoundException(targetConfigurationName);
+        } else {
+            // Clones the configuration
+            T targetConfiguration = configuration.clone(targetConfigurationName, replacementFunction);
+            // Saves the configuration
+            return newConfiguration(targetConfiguration);
+        }
     }
 
 }

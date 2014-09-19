@@ -14,6 +14,8 @@ import net.nemerosa.ontrack.model.structure.PropertyService;
 
 import java.util.Collections;
 import java.util.OptionalLong;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class SVNRevisionChangeLogIssueValidator extends AbstractSVNChangeLogIssueValidator<SVNRevisionChangeLogIssueValidatorConfig> {
 
@@ -96,5 +98,14 @@ public class SVNRevisionChangeLogIssueValidator extends AbstractSVNChangeLogIssu
     @Override
     public String getSearchKey(SVNRevisionChangeLogIssueValidatorConfig value) {
         return "";
+    }
+
+    @Override
+    public SVNRevisionChangeLogIssueValidatorConfig replaceValue(SVNRevisionChangeLogIssueValidatorConfig value, Function<String, String> replacementFunction) {
+        return new SVNRevisionChangeLogIssueValidatorConfig(
+                value.getClosedStatuses().stream()
+                        .map(replacementFunction)
+                        .collect(Collectors.toList())
+        );
     }
 }

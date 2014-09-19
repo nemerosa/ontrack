@@ -14,6 +14,7 @@ import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.function.Function;
 
 public class GitBranchConfigurationPropertyType extends AbstractPropertyType<GitBranchConfigurationProperty> {
 
@@ -95,5 +96,15 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
     @Override
     public String getSearchKey(GitBranchConfigurationProperty value) {
         return value.getBranch();
+    }
+
+    @Override
+    public GitBranchConfigurationProperty replaceValue(GitBranchConfigurationProperty value, Function<String, String> replacementFunction) {
+        return new GitBranchConfigurationProperty(
+                replacementFunction.apply(value.getBranch()),
+                replacementFunction.apply(value.getTagPattern()),
+                value.isOverride(),
+                value.getBuildTagInterval()
+        );
     }
 }

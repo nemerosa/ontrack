@@ -14,6 +14,7 @@ import net.nemerosa.ontrack.model.structure.PropertyService;
 
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.function.Function;
 
 public class SVNSyncPropertyType extends AbstractPropertyType<SVNSyncProperty> {
 
@@ -113,5 +114,10 @@ public class SVNSyncPropertyType extends AbstractPropertyType<SVNSyncProperty> {
     @Override
     public String getSearchKey(SVNSyncProperty value) {
         return "";
+    }
+
+    @Override
+    public SVNSyncProperty replaceValue(SVNSyncProperty value, Function<String, String> replacementFunction) {
+        return value;
     }
 }

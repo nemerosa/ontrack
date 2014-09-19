@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import static net.nemerosa.ontrack.model.form.Form.defaultNameField;
@@ -91,5 +92,15 @@ public class JIRAConfiguration implements UserPasswordConfiguration<JIRAConfigur
         } else {
             return key;
         }
+    }
+
+    @Override
+    public JIRAConfiguration clone(String targetConfigurationName, Function<String, String> replacementFunction) {
+        return new JIRAConfiguration(
+                targetConfigurationName,
+                replacementFunction.apply(url),
+                replacementFunction.apply(user),
+                password
+        );
     }
 }

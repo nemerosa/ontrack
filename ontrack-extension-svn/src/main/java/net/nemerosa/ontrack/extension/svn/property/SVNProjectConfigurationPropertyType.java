@@ -15,6 +15,7 @@ import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.function.Function;
 
 public class SVNProjectConfigurationPropertyType extends AbstractPropertyType<SVNProjectConfigurationProperty> {
 
@@ -101,4 +102,13 @@ public class SVNProjectConfigurationPropertyType extends AbstractPropertyType<SV
     public String getSearchKey(SVNProjectConfigurationProperty value) {
         return value.getConfiguration().getName();
     }
+
+    @Override
+    public SVNProjectConfigurationProperty replaceValue(SVNProjectConfigurationProperty value, Function<String, String> replacementFunction) {
+        return new SVNProjectConfigurationProperty(
+                configurationService.replaceConfiguration(value.getConfiguration(), replacementFunction),
+                replacementFunction.apply(value.getProjectPath())
+        );
+    }
+
 }

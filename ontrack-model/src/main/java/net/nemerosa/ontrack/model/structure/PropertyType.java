@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * Defines the type for a property.
@@ -101,6 +102,15 @@ public interface PropertyType<T> {
     String getSearchKey(T value);
 
     /**
+     * Replaces a value by another one by transforming each string of the value into another one.
+     *
+     * @param value               Value to replace
+     * @param replacementFunction Replacement function to used to transform each string into a new one
+     * @return Transformed value
+     */
+    T replaceValue(T value, Function<String, String> replacementFunction);
+
+    /**
      * Checks if the property <code>value</code> contains the given search token.
      * <p>
      * By default, this method uses the {@link #getSearchKey(Object) search key}.
@@ -111,5 +121,12 @@ public interface PropertyType<T> {
      */
     default boolean containsValue(T value, String propertyValue) {
         return StringUtils.containsIgnoreCase(getSearchKey(value), propertyValue);
+    }
+
+    /**
+     * Type name for this property type.
+     */
+    default String getTypeName() {
+        return getClass().getName();
     }
 }

@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.function.Function;
 
 public class ReleasePropertyType extends AbstractPropertyType<ReleaseProperty> {
 
@@ -65,5 +66,10 @@ public class ReleasePropertyType extends AbstractPropertyType<ReleaseProperty> {
     @Override
     public String getSearchKey(ReleaseProperty value) {
         return value.getName();
+    }
+
+    @Override
+    public ReleaseProperty replaceValue(ReleaseProperty value, Function<String, String> replacementFunction) {
+        return value;
     }
 }

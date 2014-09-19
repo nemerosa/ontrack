@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.function.Function;
 
 public class JenkinsJobPropertyType extends AbstractJenkinsPropertyType<JenkinsJobProperty> {
 
@@ -99,5 +100,13 @@ public class JenkinsJobPropertyType extends AbstractJenkinsPropertyType<JenkinsJ
     @Override
     public String getSearchKey(JenkinsJobProperty value) {
         return value.getJob();
+    }
+
+    @Override
+    public JenkinsJobProperty replaceValue(JenkinsJobProperty value, Function<String, String> replacementFunction) {
+        return new JenkinsJobProperty(
+                replaceConfiguration(value.getConfiguration(), replacementFunction),
+                replacementFunction.apply(value.getJob())
+        );
     }
 }

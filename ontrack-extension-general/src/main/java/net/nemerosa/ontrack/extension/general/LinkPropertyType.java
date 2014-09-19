@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class LinkPropertyType extends AbstractPropertyType<LinkProperty> {
@@ -78,5 +79,10 @@ public class LinkPropertyType extends AbstractPropertyType<LinkProperty> {
                     }
                 })
                 .collect(Collectors.joining(","));
+    }
+
+    @Override
+    public LinkProperty replaceValue(LinkProperty value, Function<String, String> replacementFunction) {
+        return value;
     }
 }

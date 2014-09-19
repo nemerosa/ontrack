@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
+import java.util.function.Function;
 
 import static net.nemerosa.ontrack.model.form.Form.defaultNameField;
 
@@ -218,5 +219,24 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
         } else {
             return path;
         }
+    }
+
+    @Override
+    public SVNConfiguration clone(String targetConfigurationName, Function<String, String> replacementFunction) {
+        return new SVNConfiguration(
+                targetConfigurationName,
+                replacementFunction.apply(url),
+                replacementFunction.apply(user),
+                password,
+                replacementFunction.apply(branchPattern),
+                replacementFunction.apply(tagPattern),
+                replacementFunction.apply(tagFilterPattern),
+                replacementFunction.apply(browserForPath),
+                replacementFunction.apply(browserForRevision),
+                replacementFunction.apply(browserForChange),
+                indexationInterval,
+                indexationStart,
+                issueServiceConfigurationIdentifier
+        );
     }
 }
