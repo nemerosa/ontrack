@@ -64,6 +64,11 @@ public class CopyServiceImpl implements CopyService {
                                 )
                         )
                 );
+                // Copy of the image
+                Document image = structureService.getPromotionLevelImage(sourcePromotionLevel.getId());
+                if (image != null) {
+                    structureService.setPromotionLevelImage(targetPromotionLevel.getId(), image);
+                }
                 // Copy of properties
                 // Gets the properties of the source promotion level
                 List<Property<?>> properties = propertyService.getProperties(sourcePromotionLevel);
