@@ -233,7 +233,7 @@ angular.module('ot.view.branch', [
         function getTools(branch) {
             var tools = [];
             // Copy from branch
-            if (branch._update) {
+            if (branch._copy) {
                 tools.push({
                     id: 'branch-copy',
                     name: "Copy config. from branch",
@@ -246,7 +246,7 @@ angular.module('ot.view.branch', [
 
         // Copy from a branch
         function copyFromBranch() {
-            otBranchCopyService.copyFrom($scope.branch);
+            otBranchCopyService.copyFrom($scope.branch).then(loadBranch);
         }
 
         // Creation of a promotion level
