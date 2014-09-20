@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -122,6 +123,20 @@ public class BuildFilterServiceImpl implements BuildFilterService {
         return securityService.getAccount()
                 .map(account -> buildFilterRepository.delete(account.id(), branchId.getValue(), name))
                 .orElse(Ack.NOK);
+    }
+
+    @Override
+    public void copyToBranch(ID sourceBranchId, ID targetBranchId) {
+        // Gets all the filters for the source branch
+        buildFilterRepository.findForBranch(sourceBranchId.getValue()).forEach(filter ->
+                        buildFilterRepository.save(
+                                filter.getAccountId(),
+                                filter.getBranchId(),
+                                filter.getName(),
+                                filter.getType(),
+                                filter.getData()
+                        )
+        );
     }
 
     private <T> BuildFilter getBuildFilter(ID branchId, BuildFilterProvider<T> provider, JsonNode jsonData) {

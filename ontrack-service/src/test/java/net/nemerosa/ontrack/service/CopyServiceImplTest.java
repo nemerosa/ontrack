@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service;
 
 import net.nemerosa.ontrack.extension.general.LinkProperty;
 import net.nemerosa.ontrack.extension.general.LinkPropertyType;
+import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import org.junit.Before;
@@ -17,7 +18,6 @@ import static net.nemerosa.ontrack.model.structure.NameDescription.nd;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
-// TODO Checks the copy of properties for the branch
 // TODO Checks the copy of the user filters
 public class CopyServiceImplTest {
 
@@ -30,7 +30,8 @@ public class CopyServiceImplTest {
         structureService = mock(StructureService.class);
         propertyService = mock(PropertyService.class);
         SecurityService securityService = mock(SecurityService.class);
-        service = new CopyServiceImpl(structureService, propertyService, securityService);
+        BuildFilterService buildFilterService = mock(BuildFilterService.class);
+        service = new CopyServiceImpl(structureService, propertyService, securityService, buildFilterService);
     }
 
     @Test
@@ -51,6 +52,48 @@ public class CopyServiceImplTest {
                 new Replacement("trunk", "branches/11.7"),
                 new Replacement("Pipeline", "Release pipeline")
         )));
+    }
+
+    @Test
+    public void doCopyBranchProperties() {
+        Branch sourceBranch = Branch.of(Project.of(nd("P1", "")).withId(ID.of(1)), nd("B1", "")).withId(ID.of(1));
+        Branch targetBranch = Branch.of(Project.of(nd("P2", "")).withId(ID.of(2)), nd("B2", "")).withId(ID.of(2));
+        // Request
+        BranchCopyRequest request = new BranchCopyRequest(
+                ID.of(1),
+                Arrays.asList(
+                        new Replacement("P1", "P2")
+                ),
+                Collections.emptyList(),
+                Collections.emptyList()
+        );
+
+        // Properties for the branch
+        when(propertyService.getProperties(sourceBranch)).thenReturn(
+                Arrays.asList(
+                        Property.of(
+                                new LinkPropertyType(),
+                                LinkProperty.of("test", "http://wiki/P1")
+                        )
+                )
+        );
+
+        // Copy
+        service.doCopy(sourceBranch, targetBranch, request);
+
+        // Checks the copy of properties for the branch
+        verify(propertyService, times(1)).editProperty(
+                eq(targetBranch),
+                eq(LinkPropertyType.class.getName()),
+                eq(object()
+                        .with("links", array()
+                                .with(object()
+                                        .with("name", "test")
+                                        .with("value", "http://wiki/P2")
+                                        .end())
+                                .end())
+                        .end())
+        );
     }
 
     @Test

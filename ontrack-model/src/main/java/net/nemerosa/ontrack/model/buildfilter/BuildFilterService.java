@@ -77,4 +77,8 @@ public interface BuildFilterService {
      */
     Ack deleteFilter(ID branchId, String name);
 
+    /**
+     * Copies all the filters from one branch to another
+     */
+    void copyToBranch(ID sourceBranchId, ID targetBranchId);
 }

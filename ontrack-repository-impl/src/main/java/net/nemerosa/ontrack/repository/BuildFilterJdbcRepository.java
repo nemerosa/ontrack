@@ -32,6 +32,15 @@ public class BuildFilterJdbcRepository extends AbstractJdbcRepository implements
     }
 
     @Override
+    public Collection<TBuildFilter> findForBranch(int branchId) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT * FROM BUILD_FILTERS WHERE BRANCHID = :branchId",
+                params("branchId", branchId),
+                (rs, row) -> toBuildFilter(rs)
+        );
+    }
+
+    @Override
     public Collection<TBuildFilter> findForBranch(int accountId, int branchId) {
         return getNamedParameterJdbcTemplate().query(
                 "SELECT * FROM BUILD_FILTERS WHERE ACCOUNTID = :accountId AND BRANCHID = :branchId",
@@ -79,6 +88,7 @@ public class BuildFilterJdbcRepository extends AbstractJdbcRepository implements
 
     private TBuildFilter toBuildFilter(ResultSet rs) throws SQLException {
         return new TBuildFilter(
+                rs.getInt("accountId"),
                 rs.getInt("branchId"),
                 rs.getString("name"),
                 rs.getString("type"),

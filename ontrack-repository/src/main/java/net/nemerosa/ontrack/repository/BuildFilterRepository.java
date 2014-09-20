@@ -9,6 +9,8 @@ import java.util.Optional;
 
 public interface BuildFilterRepository {
 
+    Collection<TBuildFilter> findForBranch(int branchId);
+
     Collection<TBuildFilter> findForBranch(int accountId, int branchId);
 
     Optional<TBuildFilter> findByBranchAndName(int accountId, int branchId, String name);

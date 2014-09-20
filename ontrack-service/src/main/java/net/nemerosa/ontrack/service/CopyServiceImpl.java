@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.security.BranchEdit;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
@@ -16,12 +17,14 @@ public class CopyServiceImpl implements CopyService {
     private final StructureService structureService;
     private final PropertyService propertyService;
     private final SecurityService securityService;
+    private final BuildFilterService buildFilterService;
 
     @Autowired
-    public CopyServiceImpl(StructureService structureService, PropertyService propertyService, SecurityService securityService) {
+    public CopyServiceImpl(StructureService structureService, PropertyService propertyService, SecurityService securityService, BuildFilterService buildFilterService) {
         this.structureService = structureService;
         this.propertyService = propertyService;
         this.securityService = securityService;
+        this.buildFilterService = buildFilterService;
     }
 
     @Override
@@ -46,7 +49,12 @@ public class CopyServiceImpl implements CopyService {
         doCopyPromotionLevels(sourceBranch, targetBranch, request);
         // Validation stamps and properties
         doCopyValidationStamps(sourceBranch, targetBranch, request);
-        // TODO User filters
+        // User filters
+        doCopyUserBuildFilters(sourceBranch, targetBranch);
+    }
+
+    protected void doCopyUserBuildFilters(Branch sourceBranch, Branch targetBranch) {
+        buildFilterService.copyToBranch(sourceBranch.getId(), targetBranch.getId());
     }
 
     protected void doCopyPromotionLevels(Branch sourceBranch, Branch targetBranch, BranchCopyRequest request) {
