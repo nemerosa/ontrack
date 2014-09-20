@@ -45,7 +45,8 @@ public class CopyServiceImpl implements CopyService {
         // TODO Branch properties
         // Promotion level and properties
         doCopyPromotionLevels(sourceBranch, targetBranch, request);
-        // TODO Validation stamps and properties
+        // Validation stamps and properties
+        doCopyValidationStamps(sourceBranch, targetBranch, request);
         // TODO User filters
     }
 
@@ -74,6 +75,36 @@ public class CopyServiceImpl implements CopyService {
                 List<Property<?>> properties = propertyService.getProperties(sourcePromotionLevel);
                 for (Property<?> property : properties) {
                     doCopyProperty(property, targetPromotionLevel, request.getPromotionLevelReplacements());
+                }
+            }
+        }
+    }
+
+    protected void doCopyValidationStamps(Branch sourceBranch, Branch targetBranch, BranchCopyRequest request) {
+        List<ValidationStamp> sourceValidationStamps = structureService.getValidationStampListForBranch(sourceBranch.getId());
+        for (ValidationStamp sourceValidationStamp : sourceValidationStamps) {
+            Optional<ValidationStamp> targetValidationStampOpt = structureService.findValidationStampByName(targetBranch.getProject().getName(), targetBranch.getName(), sourceValidationStamp.getName());
+            if (!targetValidationStampOpt.isPresent()) {
+                // Copy of the validation stamp
+                ValidationStamp targetValidationStamp = structureService.newValidationStamp(
+                        ValidationStamp.of(
+                                targetBranch,
+                                NameDescription.nd(
+                                        sourceValidationStamp.getName(),
+                                        applyReplacements(sourceValidationStamp.getDescription(), request.getValidationStampReplacements())
+                                )
+                        )
+                );
+                // Copy of the image
+                Document image = structureService.getValidationStampImage(sourceValidationStamp.getId());
+                if (image != null) {
+                    structureService.setValidationStampImage(targetValidationStamp.getId(), image);
+                }
+                // Copy of properties
+                // Gets the properties of the source promotion level
+                List<Property<?>> properties = propertyService.getProperties(sourceValidationStamp);
+                for (Property<?> property : properties) {
+                    doCopyProperty(property, targetValidationStamp, request.getValidationStampReplacements());
                 }
             }
         }

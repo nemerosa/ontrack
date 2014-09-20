@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.security.ProjectEdit;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
+import net.nemerosa.ontrack.model.support.NameValue;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
@@ -83,6 +84,10 @@ public class LinkPropertyType extends AbstractPropertyType<LinkProperty> {
 
     @Override
     public LinkProperty replaceValue(LinkProperty value, Function<String, String> replacementFunction) {
-        return value;
+        return new LinkProperty(
+                value.getLinks().stream()
+                        .map(nv -> new NameValue(nv.getName(), replacementFunction.apply(nv.getValue())))
+                        .collect(Collectors.toList())
+        );
     }
 }
