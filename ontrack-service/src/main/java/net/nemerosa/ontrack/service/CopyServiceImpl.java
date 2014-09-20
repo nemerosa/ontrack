@@ -40,9 +40,8 @@ public class CopyServiceImpl implements CopyService {
     }
 
     protected void doCopy(Branch sourceBranch, Branch targetBranch, BranchCopyRequest request) {
-        // Same project?
-        boolean sameProject = (sourceBranch.projectId() == targetBranch.projectId());
-        // TODO Branch properties
+        // Branch properties
+        doCopyProperties(sourceBranch, targetBranch, request.getPropertyReplacements());
         // Promotion level and properties
         doCopyPromotionLevels(sourceBranch, targetBranch, request);
         // Validation stamps and properties
@@ -71,12 +70,15 @@ public class CopyServiceImpl implements CopyService {
                     structureService.setPromotionLevelImage(targetPromotionLevel.getId(), image);
                 }
                 // Copy of properties
-                // Gets the properties of the source promotion level
-                List<Property<?>> properties = propertyService.getProperties(sourcePromotionLevel);
-                for (Property<?> property : properties) {
-                    doCopyProperty(property, targetPromotionLevel, request.getPromotionLevelReplacements());
-                }
+                doCopyProperties(sourcePromotionLevel, targetPromotionLevel, request.getPromotionLevelReplacements());
             }
+        }
+    }
+
+    protected void doCopyProperties(ProjectEntity source, ProjectEntity target, List<Replacement> replacements) {
+        List<Property<?>> properties = propertyService.getProperties(source);
+        for (Property<?> property : properties) {
+            doCopyProperty(property, target, replacements);
         }
     }
 
@@ -101,11 +103,7 @@ public class CopyServiceImpl implements CopyService {
                     structureService.setValidationStampImage(targetValidationStamp.getId(), image);
                 }
                 // Copy of properties
-                // Gets the properties of the source promotion level
-                List<Property<?>> properties = propertyService.getProperties(sourceValidationStamp);
-                for (Property<?> property : properties) {
-                    doCopyProperty(property, targetValidationStamp, request.getValidationStampReplacements());
-                }
+                doCopyProperties(sourceValidationStamp, targetValidationStamp, request.getValidationStampReplacements());
             }
         }
     }
