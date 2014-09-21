@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service.security;
 
-import net.nemerosa.ontrack.it.AbstractITTestSupport;
+import net.nemerosa.ontrack.it.AbstractServiceTestSupport;
 import net.nemerosa.ontrack.model.security.Account;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import org.junit.Test;
@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-public class SecurityServiceIT extends AbstractITTestSupport {
+public class SecurityServiceIT extends AbstractServiceTestSupport {
 
     @Autowired
     private SecurityService securityService;

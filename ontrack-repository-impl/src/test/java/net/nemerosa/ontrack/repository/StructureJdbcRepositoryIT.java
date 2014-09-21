@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.repository;
 
-import net.nemerosa.ontrack.it.AbstractITTestSupport;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.Project;
@@ -10,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class StructureJdbcRepositoryIT extends AbstractITTestSupport {
+public class StructureJdbcRepositoryIT extends AbstractRepositoryTestSupport {
 
     @Autowired
     private StructureRepository repository;

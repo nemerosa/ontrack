@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service.security;
 
-import net.nemerosa.ontrack.it.AbstractITTestSupport;
+import net.nemerosa.ontrack.it.AbstractServiceTestSupport;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.settings.SecuritySettings;
 import net.nemerosa.ontrack.model.settings.SettingsService;
@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 
-public class SettingsServiceIT extends AbstractITTestSupport {
+public class SettingsServiceIT extends AbstractServiceTestSupport {
 
     @Autowired
     private SettingsService settingsService;

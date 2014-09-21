@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service;
 
 import net.nemerosa.ontrack.it.AbstractITTestSupport;
+import net.nemerosa.ontrack.it.AbstractServiceTestSupport;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterResource;
@@ -19,7 +20,7 @@ import java.util.Collections;
 
 import static org.junit.Assert.*;
 
-public class BuildFilterServiceIT extends AbstractITTestSupport {
+public class BuildFilterServiceIT extends AbstractServiceTestSupport {
 
     @Autowired
     private BuildFilterService buildFilterService;

@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service.security;
 
-import net.nemerosa.ontrack.it.AbstractITTestSupport;
+import net.nemerosa.ontrack.it.AbstractServiceTestSupport;
 import net.nemerosa.ontrack.model.exceptions.ImageFileSizeException;
 import net.nemerosa.ontrack.model.exceptions.ImageTypeNotAcceptedException;
 import net.nemerosa.ontrack.model.security.*;
@@ -14,7 +14,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class StructureServiceIT extends AbstractITTestSupport {
+public class StructureServiceIT extends AbstractServiceTestSupport {
 
     @Autowired
     private StructureService structureService;

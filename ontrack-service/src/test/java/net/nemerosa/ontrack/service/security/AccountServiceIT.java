@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service.security;
 
-import net.nemerosa.ontrack.it.AbstractITTestSupport;
+import net.nemerosa.ontrack.it.AbstractServiceTestSupport;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.StructureService;
@@ -13,7 +13,7 @@ import java.util.Collections;
 
 import static org.junit.Assert.*;
 
-public class AccountServiceIT extends AbstractITTestSupport {
+public class AccountServiceIT extends AbstractServiceTestSupport {
 
     @Autowired
     private AccountService accountService;
