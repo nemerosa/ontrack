@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.convert.converter.ConverterRegistry;
+import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -38,5 +40,10 @@ public class ITConfig {
     @Bean
     public PlatformTransactionManager transactionManager() throws IOException {
         return new DataSourceTransactionManager(dataSource());
+    }
+
+    @Bean
+    public ConverterRegistry converterRegistry() {
+        return new DefaultConversionService();
     }
 }

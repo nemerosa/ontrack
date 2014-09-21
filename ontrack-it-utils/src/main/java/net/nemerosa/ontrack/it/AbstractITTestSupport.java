@@ -2,10 +2,9 @@ package net.nemerosa.ontrack.it;
 
 import net.nemerosa.ontrack.common.RunProfile;
 import net.nemerosa.ontrack.model.security.*;
-import net.nemerosa.ontrack.model.structure.NameDescription;
-import net.nemerosa.ontrack.model.structure.PromotionLevel;
-import net.nemerosa.ontrack.test.TestUtils;
+import net.nemerosa.ontrack.model.structure.*;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -24,6 +23,8 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
+import static net.nemerosa.ontrack.test.TestUtils.uid;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
         loader = AnnotationConfigContextLoader.class,
@@ -32,6 +33,12 @@ import java.util.concurrent.Callable;
 @ActiveProfiles(profiles = {RunProfile.UNIT_TEST})
 public abstract class AbstractITTestSupport extends AbstractJUnit4SpringContextTests {
 
+    @Autowired
+    protected AccountService accountService;
+
+    @Autowired
+    protected StructureService structureService;
+
     @Configuration
     @Profile(RunProfile.UNIT_TEST)
     @ComponentScan("net.nemerosa.ontrack")
@@ -39,19 +46,54 @@ public abstract class AbstractITTestSupport extends AbstractJUnit4SpringContextT
     }
 
     public static NameDescription nameDescription() {
-        String uid = TestUtils.uid("");
+        String uid = uid("");
         return new NameDescription(
                 uid,
                 String.format("%s description", uid)
         );
     }
 
+    protected Account doCreateAccount() throws Exception {
+        return asUser().with(AccountManagement.class).call(() -> {
+            String name = uid("A");
+            return accountService.create(
+                    new AccountInput(
+                            name,
+                            "Test " + name,
+                            name + "@test.com",
+                            "test",
+                            Collections.emptyList()
+                    )
+            );
+        });
+    }
+
+    protected Project doCreateProject() throws Exception {
+        return doCreateProject(nameDescription());
+    }
+
+    protected Project doCreateProject(NameDescription nameDescription) throws Exception {
+        return asUser().with(ProjectCreation.class).call(() -> structureService.newProject(
+                Project.of(nameDescription)
+        ));
+    }
+
+    protected Branch doCreateBranch() throws Exception {
+        return doCreateBranch(doCreateProject(), nameDescription());
+    }
+
+    protected Branch doCreateBranch(Project project, NameDescription nameDescription) throws Exception {
+        return asUser().with(project.id(), BranchCreate.class).call(() -> structureService.newBranch(
+                Branch.of(project, nameDescription)
+        ));
+    }
+
     protected UserCall asUser() {
         return new UserCall();
     }
 
-    protected <T> T view(PromotionLevel promotionLevel, Callable<T> callable) throws Exception {
-        return asUser().with(promotionLevel.getBranch().getProject().id(), ProjectView.class).call(callable);
+    protected <T> T view(ProjectEntity projectEntity, Callable<T> callable) throws Exception {
+        return asUser().with(projectEntity.projectId(), ProjectView.class).call(callable);
     }
 
     protected static interface ContextCall {

@@ -224,27 +224,6 @@ public class StructureServiceIT extends AbstractITTestSupport {
         );
     }
 
-    private Branch doCreateBranch() throws Exception {
-        Project project = doCreateProject();
-        return doCreateBranch(project, nameDescription());
-    }
-
-    private Branch doCreateBranch(Project project, NameDescription nameDescription) throws Exception {
-        return asUser().with(project.id(), BranchCreate.class).call(() -> structureService.newBranch(
-                Branch.of(project, nameDescription)
-        ));
-    }
-
-    private Project doCreateProject() throws Exception {
-        return doCreateProject(nameDescription());
-    }
-
-    private Project doCreateProject(NameDescription nameDescription) throws Exception {
-        return asUser().with(ProjectCreation.class).call(() -> structureService.newProject(
-                Project.of(nameDescription)
-        ));
-    }
-
     private int[] doCreateProjects() throws Exception {
         return asUser().with(ProjectCreation.class).call(() -> {
             int[] ids = new int[3];
