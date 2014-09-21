@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 @Data
 public final class Event {
 
-    private static final Pattern EXPRESSION = Pattern.compile("\\$\\{([a-zA-Z]+)\\}");
+    private static final Pattern EXPRESSION = Pattern.compile("\\$\\{([a-zA-Z_]+)\\}");
 
     private final String template;
     private final Signature signature;
@@ -72,13 +72,17 @@ public final class Event {
             this.template = template;
         }
 
+        public EventBuilder with(Signature signature) {
+            this.signature = signature;
+            return this;
+        }
+
         public EventBuilder withBuild(Build build) {
             return withBranch(build.getBranch()).with(build).with(build.getSignature());
         }
 
-        public EventBuilder with(Signature signature) {
-            this.signature = signature;
-            return this;
+        public EventBuilder withPromotionRun(PromotionRun promotionRun) {
+            return withBuild(promotionRun.getBuild()).with(promotionRun.getPromotionLevel()).with(promotionRun.getSignature());
         }
 
         public EventBuilder withBranch(Branch branch) {
@@ -114,6 +118,12 @@ public final class Event {
     public static Event newBuild(Build build) {
         return Event.of("New build ${BUILD} for branch ${BRANCH} in ${PROJECT}.")
                 .withBuild(build)
+                .get();
+    }
+
+    public static Event newPromotionRun(PromotionRun promotionRun) {
+        return Event.of("Build ${BUILD} has been promoted to ${PROMOTION_LEVEL} for branch ${BRANCH} in ${PROJECT}.")
+                .withPromotionRun(promotionRun)
                 .get();
     }
 

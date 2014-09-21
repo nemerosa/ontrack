@@ -394,7 +394,11 @@ public class StructureServiceImpl implements StructureService {
             promotionRunToSave = promotionRun;
         }
         // Actual creation
-        return structureRepository.newPromotionRun(promotionRunToSave);
+        PromotionRun newPromotionRun = structureRepository.newPromotionRun(promotionRunToSave);
+        // Event
+        eventService.post(Event.newPromotionRun(newPromotionRun));
+        // OK
+        return newPromotionRun;
     }
 
     @Override
