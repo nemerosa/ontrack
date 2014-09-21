@@ -18,7 +18,6 @@ import static net.nemerosa.ontrack.model.structure.NameDescription.nd;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
-// TODO Checks the copy of the user filters
 public class CopyServiceImplTest {
 
     private CopyServiceImpl service;
