@@ -1,20 +1,62 @@
 package net.nemerosa.ontrack.model.events;
 
+import com.google.common.collect.Maps;
 import lombok.Data;
 import net.nemerosa.ontrack.model.structure.*;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Definition of an event
+ * <p>
+ * TODO Icon can be found at GUI level using VALIDATION_STAMP or PROMOTION_LEVEL entities
+ * TODO Status can be found at GUI level using VALIDATION_RUN_STATUS values
  */
 @Data
 public final class Event {
 
+    private static final Pattern EXPRESSION = Pattern.compile("\\$\\{([a-zA-Z]+)\\}");
+
     private final String template;
     private final Signature signature;
-    private final Collection<ProjectEntity> projectEntities;
+    private final Map<ProjectEntityType, ProjectEntity> projectEntities;
+
+    public String renderText() {
+        return render(PlainEventRenderer.INSTANCE);
+    }
+
+    public String render(EventRenderer eventRenderer) {
+        Matcher m = EXPRESSION.matcher(template);
+        StringBuffer output = new StringBuffer();
+        while (m.find()) {
+            String value = expandExpression(m.group(1), eventRenderer);
+            m.appendReplacement(output, value);
+        }
+        m.appendTail(output);
+        return output.toString();
+    }
+
+    private String expandExpression(String expression, EventRenderer eventRenderer) {
+        if (StringUtils.startsWith(expression, ":")) {
+            // TODO Value
+            throw new RuntimeException("NYI");
+        } else {
+            // Project entity type
+            ProjectEntityType projectEntityType = ProjectEntityType.valueOf(expression);
+            // Gets the corresponding entity
+            ProjectEntity projectEntity = projectEntities.get(projectEntityType);
+            if (projectEntity == null) {
+                throw new EventMissingEntityException(template, projectEntityType);
+            }
+            // Rendering
+            return eventRenderer.render(projectEntity, this);
+        }
+    }
 
     public static EventBuilder of(String template) {
         return new EventBuilder(template);
@@ -57,9 +99,13 @@ public final class Event {
             Event event = new Event(
                     template,
                     signature,
-                    projectEntities
+                    Maps.uniqueIndex(
+                            projectEntities,
+                            ProjectEntity::getProjectEntityType
+                    )
             );
-            // TODO Checks the event can be resolved with all its references
+            // Checks the event can be resolved with all its references
+            event.renderText();
             // OK
             return event;
         }
