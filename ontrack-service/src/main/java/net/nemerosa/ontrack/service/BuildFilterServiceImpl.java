@@ -131,7 +131,7 @@ public class BuildFilterServiceImpl implements BuildFilterService {
         buildFilterRepository.findForBranch(sourceBranchId.getValue()).forEach(filter ->
                         buildFilterRepository.save(
                                 filter.getAccountId(),
-                                filter.getBranchId(),
+                                targetBranchId.get(),
                                 filter.getName(),
                                 filter.getType(),
                                 filter.getData()

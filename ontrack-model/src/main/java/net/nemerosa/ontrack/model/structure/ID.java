@@ -42,6 +42,10 @@ public final class ID implements Serializable {
         return String.valueOf(value);
     }
 
+    public int get() {
+        return value;
+    }
+
     public boolean isSet() {
         return value > 0;
     }

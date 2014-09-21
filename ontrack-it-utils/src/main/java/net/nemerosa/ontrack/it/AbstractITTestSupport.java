@@ -92,6 +92,10 @@ public abstract class AbstractITTestSupport extends AbstractJUnit4SpringContextT
         return new UserCall();
     }
 
+    protected AccountCall asAccount(Account account) {
+        return new AccountCall(account);
+    }
+
     protected <T> T view(ProjectEntity projectEntity, Callable<T> callable) throws Exception {
         return asUser().with(projectEntity.projectId(), ProjectView.class).call(callable);
     }
@@ -124,8 +128,12 @@ public abstract class AbstractITTestSupport extends AbstractJUnit4SpringContextT
 
         protected final Account account;
 
+        public AccountCall(Account account) {
+            this.account = account;
+        }
+
         public AccountCall(String name, SecurityRole role) {
-            account = Account.of(name, name, name + "@test.com", role, AuthenticationSource.none());
+            this(Account.of(name, name, name + "@test.com", role, AuthenticationSource.none()));
         }
 
         @Override
