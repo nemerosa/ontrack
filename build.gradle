@@ -119,5 +119,5 @@ task release(type: Exec, dependsOn: ['displayVersion']) {
  */
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.12'
+    gradleVersion = '2.1'
 }
