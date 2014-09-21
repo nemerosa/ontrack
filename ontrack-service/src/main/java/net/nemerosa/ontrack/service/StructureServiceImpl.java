@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.common.CachedSupplier;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterResult;
+import net.nemerosa.ontrack.model.events.Event;
 import net.nemerosa.ontrack.model.events.EventService;
 import net.nemerosa.ontrack.model.exceptions.ImageFileSizeException;
 import net.nemerosa.ontrack.model.exceptions.ImageTypeNotAcceptedException;
@@ -12,7 +13,6 @@ import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.Time;
 import net.nemerosa.ontrack.repository.StructureRepository;
-import net.nemerosa.ontrack.service.events.Events;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -211,7 +211,7 @@ public class StructureServiceImpl implements StructureService {
         // Repository
         Build newBuild = structureRepository.newBuild(build);
         // Event
-        eventService.post(Events.newBuild(newBuild));
+        eventService.post(Event.newBuild(newBuild));
         // OK
         return newBuild;
     }

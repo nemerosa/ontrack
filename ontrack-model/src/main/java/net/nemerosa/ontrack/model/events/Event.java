@@ -65,4 +65,10 @@ public final class Event {
         }
     }
 
+    public static Event newBuild(Build build) {
+        return Event.of("New build ${BUILD} for branch ${BRANCH} in ${PROJECT}.")
+                .withBuild(build)
+                .get();
+    }
+
 }
