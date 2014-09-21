@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.common.CachedSupplier;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterResult;
+import net.nemerosa.ontrack.model.events.EventService;
 import net.nemerosa.ontrack.model.exceptions.ImageFileSizeException;
 import net.nemerosa.ontrack.model.exceptions.ImageTypeNotAcceptedException;
 import net.nemerosa.ontrack.model.exceptions.ReorderingSizeException;
@@ -11,6 +12,7 @@ import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.Time;
 import net.nemerosa.ontrack.repository.StructureRepository;
+import net.nemerosa.ontrack.service.events.Events;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -40,12 +42,14 @@ public class StructureServiceImpl implements StructureService {
     };
 
     private final SecurityService securityService;
+    private final EventService eventService;
     private final ValidationRunStatusService validationRunStatusService;
     private final StructureRepository structureRepository;
 
     @Autowired
-    public StructureServiceImpl(SecurityService securityService, ValidationRunStatusService validationRunStatusService, StructureRepository structureRepository) {
+    public StructureServiceImpl(SecurityService securityService, EventService eventService, ValidationRunStatusService validationRunStatusService, StructureRepository structureRepository) {
         this.securityService = securityService;
+        this.eventService = eventService;
         this.validationRunStatusService = validationRunStatusService;
         this.structureRepository = structureRepository;
     }
@@ -205,7 +209,11 @@ public class StructureServiceImpl implements StructureService {
         // Security
         securityService.checkProjectFunction(build.getBranch().getProject().id(), BuildCreate.class);
         // Repository
-        return structureRepository.newBuild(build);
+        Build newBuild = structureRepository.newBuild(build);
+        // Event
+        eventService.post(Events.newBuild(newBuild));
+        // OK
+        return newBuild;
     }
 
     @Override
