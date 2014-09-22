@@ -165,6 +165,10 @@ public final class Event {
         return Event.of("New branch ${BRANCH} for project ${PROJECT}.").withBranch(branch).get();
     }
 
+    public static Event updateBranch(Branch branch) {
+        return Event.of("Branch ${BRANCH} in ${PROJECT} has been updated.").withBranch(branch).get();
+    }
+
     public static Event deleteBranch(Branch branch) {
         return Event.of("Branch ${:branch} has been deleted from ${PROJECT}.")
                 .withProject(branch.getProject())
