@@ -12,6 +12,15 @@ angular.module('ot.directive.entity', [
             }
         };
     })
+    .directive('otEntityEvents', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'app/directive/directive.entityEvents.tpl.html',
+            scope: {
+                entity: '='
+            }
+        };
+    })
     .directive('otEntityDecorations', function ($http, ot) {
         return {
             restrict: 'E',
