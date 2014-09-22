@@ -33,9 +33,10 @@ angular.module('ot.service.task', [
             var task = self.tasks[name];
             if (task) {
                 if (task.promise) {
+                    $log.debug('[task] Stopping ' + name);
                     $interval.cancel(task.promise);
                 }
-                delete tasks[name];
+                delete self.tasks[name];
             }
         };
 
