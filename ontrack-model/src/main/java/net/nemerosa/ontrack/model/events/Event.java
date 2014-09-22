@@ -68,6 +68,15 @@ public final class Event {
         return new EventBuilder(template);
     }
 
+    public Event withSignature(Signature signature) {
+        return new Event(
+                template,
+                signature,
+                entities,
+                values
+        );
+    }
+
     public static class EventBuilder {
 
         private final String template;
@@ -134,6 +143,10 @@ public final class Event {
             // OK
             return event;
         }
+    }
+
+    public static Event newProject(Project project) {
+        return Event.of("New project ${PROJECT}.").withProject(project).get();
     }
 
     public static Event newBuild(Build build) {

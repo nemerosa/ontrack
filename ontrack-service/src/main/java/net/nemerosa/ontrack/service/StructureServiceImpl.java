@@ -58,8 +58,9 @@ public class StructureServiceImpl implements StructureService {
     public Project newProject(Project project) {
         isEntityNew(project, "Project must be defined");
         securityService.checkGlobalFunction(ProjectCreation.class);
-        // TODO Event
-        return structureRepository.newProject(project);
+        Project newProject = structureRepository.newProject(project);
+        eventService.post(Event.newProject(newProject));
+        return newProject;
     }
 
     @Override

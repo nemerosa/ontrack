@@ -42,6 +42,16 @@ public class EventTest {
     }
 
     @Test
+    void newProject() {
+        Event e = Event.newProject(project());
+        assert e != null
+        assert e.signature == null
+        assert e.entities.size() == 1
+        assert e.renderText() == "New project P."
+        assert e.render(testRenderer) == """New project <a href="#/project/1">P</a>."""
+    }
+
+    @Test
     void newBuild() {
         Event e = Event.newBuild(build());
         assert e != null
