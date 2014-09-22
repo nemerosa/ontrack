@@ -58,6 +58,7 @@ public class StructureServiceImpl implements StructureService {
     public Project newProject(Project project) {
         isEntityNew(project, "Project must be defined");
         securityService.checkGlobalFunction(ProjectCreation.class);
+        // TODO Event
         return structureRepository.newProject(project);
     }
 
@@ -83,6 +84,7 @@ public class StructureServiceImpl implements StructureService {
     public void saveProject(Project project) {
         isEntityDefined(project, "Project must be defined");
         securityService.checkProjectFunction(project.id(), ProjectEdit.class);
+        // TODO Event
         structureRepository.saveProject(project);
     }
 
@@ -90,6 +92,7 @@ public class StructureServiceImpl implements StructureService {
     public Ack deleteProject(ID projectId) {
         Validate.isTrue(projectId.isSet(), "Project ID must be set");
         securityService.checkProjectFunction(projectId.getValue(), ProjectDelete.class);
+        // TODO Event
         return structureRepository.deleteProject(projectId);
     }
 
@@ -113,6 +116,7 @@ public class StructureServiceImpl implements StructureService {
         isEntityDefined(branch.getProject(), "Project must be defined");
         // Security
         securityService.checkProjectFunction(branch.getProject().id(), BranchCreate.class);
+        // TODO Event
         // OK
         return structureRepository.newBranch(branch);
     }
@@ -140,6 +144,7 @@ public class StructureServiceImpl implements StructureService {
         isEntityDefined(branch, "Branch must be defined");
         isEntityDefined(branch.getProject(), "Project must be defined");
         securityService.checkProjectFunction(branch.projectId(), BranchEdit.class);
+        // TODO Event
         structureRepository.saveBranch(branch);
     }
 
@@ -148,6 +153,7 @@ public class StructureServiceImpl implements StructureService {
         Validate.isTrue(branchId.isSet(), "Branch ID must be set");
         Branch branch = getBranch(branchId);
         securityService.checkProjectFunction(branch.projectId(), BranchDelete.class);
+        // TODO Event
         return structureRepository.deleteBranch(branchId);
     }
 
@@ -181,6 +187,7 @@ public class StructureServiceImpl implements StructureService {
         Validate.isTrue(promotionRunId.isSet(), "Promotion run ID must be set");
         PromotionRun promotionRun = getPromotionRun(promotionRunId);
         securityService.checkProjectFunction(promotionRun, PromotionRunDelete.class);
+        // TODO Event
         return structureRepository.deletePromotionRun(promotionRunId);
     }
 
@@ -197,6 +204,7 @@ public class StructureServiceImpl implements StructureService {
         Validate.isTrue(buildId.isSet(), "Build ID must be set");
         Build build = getBuild(buildId);
         securityService.checkProjectFunction(build.projectId(), BuildDelete.class);
+        // TODO Event
         return structureRepository.deleteBuild(buildId);
     }
 
@@ -224,6 +232,7 @@ public class StructureServiceImpl implements StructureService {
         isEntityDefined(build.getBranch().getProject(), "Project must be defined");
         // Security
         securityService.checkProjectFunction(build.getBranch().getProject().id(), BuildEdit.class);
+        // TODO Event
         // Repository
         return structureRepository.saveBuild(build);
     }
@@ -304,6 +313,7 @@ public class StructureServiceImpl implements StructureService {
         isEntityDefined(promotionLevel.getBranch().getProject(), "Project must be defined");
         // Security
         securityService.checkProjectFunction(promotionLevel.getBranch().getProject().id(), PromotionLevelCreate.class);
+        // TODO Event
         // Repository
         return structureRepository.newPromotionLevel(promotionLevel);
     }
@@ -329,6 +339,7 @@ public class StructureServiceImpl implements StructureService {
         // Checks access
         PromotionLevel promotionLevel = getPromotionLevel(promotionLevelId);
         securityService.checkProjectFunction(promotionLevel.getBranch().getProject().id(), PromotionLevelEdit.class);
+        // TODO Event
         // Repository
         structureRepository.setPromotionLevelImage(promotionLevelId, document);
     }
@@ -341,6 +352,7 @@ public class StructureServiceImpl implements StructureService {
         isEntityDefined(promotionLevel.getBranch().getProject(), "Project must be defined");
         // Security
         securityService.checkProjectFunction(promotionLevel.projectId(), PromotionLevelEdit.class);
+        // TODO Event
         // Repository
         structureRepository.savePromotionLevel(promotionLevel);
     }
@@ -350,6 +362,7 @@ public class StructureServiceImpl implements StructureService {
         Validate.isTrue(promotionLevelId.isSet(), "Promotion level ID must be set");
         PromotionLevel promotionLevel = getPromotionLevel(promotionLevelId);
         securityService.checkProjectFunction(promotionLevel.projectId(), PromotionLevelDelete.class);
+        // TODO Event
         return structureRepository.deletePromotionLevel(promotionLevelId);
     }
 
@@ -366,6 +379,7 @@ public class StructureServiceImpl implements StructureService {
             throw new ReorderingSizeException("The reordering request should have the same number of IDs as the number" +
                     " of the promotion levels");
         }
+        // TODO Event
         // Actual reordering
         structureRepository.reorderPromotionLevels(branchId, reordering);
     }
@@ -405,6 +419,7 @@ public class StructureServiceImpl implements StructureService {
     public PromotionRun getPromotionRun(ID promotionRunId) {
         PromotionRun promotionRun = structureRepository.getPromotionRun(promotionRunId);
         securityService.checkProjectFunction(promotionRun.getBuild().getBranch().getProject().id(), ProjectView.class);
+        // TODO Event
         return promotionRun;
     }
 
@@ -442,6 +457,7 @@ public class StructureServiceImpl implements StructureService {
         isEntityDefined(validationStamp.getBranch().getProject(), "Project must be defined");
         // Security
         securityService.checkProjectFunction(validationStamp.getBranch().getProject().id(), ValidationStampCreate.class);
+        // TODO Event
         // Repository
         return structureRepository.newValidationStamp(validationStamp);
     }
@@ -498,6 +514,7 @@ public class StructureServiceImpl implements StructureService {
         // Checks access
         ValidationStamp validationStamp = getValidationStamp(validationStampId);
         securityService.checkProjectFunction(validationStamp.getBranch().getProject().id(), ValidationStampEdit.class);
+        // TODO Event
         // Repository
         structureRepository.setValidationStampImage(validationStampId, document);
     }
@@ -510,6 +527,7 @@ public class StructureServiceImpl implements StructureService {
         isEntityDefined(validationStamp.getBranch().getProject(), "Project must be defined");
         // Security
         securityService.checkProjectFunction(validationStamp.projectId(), ValidationStampEdit.class);
+        // TODO Event
         // Repository
         structureRepository.saveValidationStamp(validationStamp);
     }
@@ -519,6 +537,7 @@ public class StructureServiceImpl implements StructureService {
         Validate.isTrue(validationStampId.isSet(), "Validation stamp ID must be set");
         ValidationStamp validationStamp = getValidationStamp(validationStampId);
         securityService.checkProjectFunction(validationStamp.projectId(), ValidationStampDelete.class);
+        // TODO Event
         return structureRepository.deleteValidationStamp(validationStampId);
     }
 
@@ -535,6 +554,7 @@ public class StructureServiceImpl implements StructureService {
             throw new ReorderingSizeException("The reordering request should have the same number of IDs as the number" +
                     " of the validation stamps");
         }
+        // TODO Event
         // Actual reordering
         structureRepository.reorderValidationStamps(branchId, reordering);
     }
