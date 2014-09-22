@@ -586,8 +586,12 @@ public class StructureServiceImpl implements StructureService {
         securityService.checkProjectFunction(validationRun.getBuild().getBranch().getProject().id(), ValidationRunStatusChange.class);
         // Transition check
         validationRunStatusService.checkTransition(validationRun.getLastStatus().getStatusID(), runStatus.getStatusID());
+        // Creation
+        ValidationRun newValidationRun = structureRepository.newValidationRunStatus(validationRun, runStatus);
+        // Event
+        eventService.post(Event.newValidationRunStatus(newValidationRun));
         // OK
-        return structureRepository.newValidationRunStatus(validationRun, runStatus);
+        return newValidationRun;
     }
 
     @Override

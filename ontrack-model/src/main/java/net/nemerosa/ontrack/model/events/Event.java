@@ -93,7 +93,7 @@ public final class Event {
         }
 
         public EventBuilder withValidationRun(ValidationRun validationRun) {
-            return withBuild(validationRun.getBuild()).with(validationRun.getValidationStamp()).with(validationRun.getLastStatus().getSignature());
+            return withBuild(validationRun.getBuild()).with(validationRun.getValidationStamp()).with(validationRun).with(validationRun.getLastStatus().getSignature());
         }
 
         public EventBuilder withBranch(Branch branch) {
@@ -150,6 +150,13 @@ public final class Event {
 
     public static Event newValidationRun(ValidationRun validationRun) {
         return Event.of("Build ${BUILD} has run for ${VALIDATION_STAMP} with status ${:status} in branch ${BRANCH} in ${PROJECT}.")
+                .withValidationRun(validationRun)
+                .withValidationRunStatus(validationRun.getLastStatus().getStatusID())
+                .get();
+    }
+
+    public static Event newValidationRunStatus(ValidationRun validationRun) {
+        return Event.of("Status for ${VALIDATION_STAMP} validation ${VALIDATION_RUN} for build ${BUILD} in branch ${BRANCH} of ${PROJECT} has changed to ${:status}.")
                 .withValidationRun(validationRun)
                 .withValidationRunStatus(validationRun.getLastStatus().getStatusID())
                 .get();
