@@ -54,6 +54,8 @@ public class BuildResourceDecorator extends AbstractResourceDecorator<Build> {
                 .delete(on(BuildController.class).deleteBuild(build.getId()), BuildDelete.class, build.projectId())
                         // Decorations
                 .link("_decorations", on(DecorationsController.class).getDecorations(build.getProjectEntityType(), build.getId()))
+                        // Events
+                .link("_events", on(EventController.class).getEvents(build.getProjectEntityType(), build.getId(), 0, 10))
                         // OK
                 .build();
     }
