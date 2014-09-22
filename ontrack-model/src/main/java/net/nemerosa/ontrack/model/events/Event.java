@@ -17,9 +17,6 @@ import static net.nemerosa.ontrack.model.events.PlainEventRenderer.INSTANCE;
 
 /**
  * Definition of an event
- * <p>
- * TODO Icon can be found at GUI level using VALIDATION_STAMP or PROMOTION_LEVEL entities
- * TODO Status can be found at GUI level using VALIDATION_RUN_STATUS values
  */
 @Data
 public final class Event {
