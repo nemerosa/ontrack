@@ -25,6 +25,9 @@ angular.module('ot.directive.entity', [
                     if (scope.entity) {
                         ot.call($http.get(scope.entity._events)).then(function (events) {
                             scope.renderEvent = otEventService.renderEvent;
+                            scope.renderSince = function (eventTime) {
+                                return moment(eventTime).fromNow();
+                            };
                             scope.events = events;
                         });
                     }

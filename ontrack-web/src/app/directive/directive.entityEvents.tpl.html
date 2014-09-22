@@ -14,4 +14,8 @@
         </span>
     </span>
     <span class="ot-event-message" ng-bind-html="renderEvent(event)"></span>
+    <span class="ot-event-signature">
+        {{event.signature.user.name}}
+        <span title="{{event.signature.time | date:'mediumDate'}} {{event.signature.time | date:'mediumTime'}}">{{renderSince(event.signature.time)}}</span>
+    </span>
 </div>
