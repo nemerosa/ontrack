@@ -93,7 +93,7 @@ public class StructureServiceImpl implements StructureService {
     public Ack deleteProject(ID projectId) {
         Validate.isTrue(projectId.isSet(), "Project ID must be set");
         securityService.checkProjectFunction(projectId.getValue(), ProjectDelete.class);
-        // TODO Event
+        eventService.post(Event.deleteProject(getProject(projectId)));
         return structureRepository.deleteProject(projectId);
     }
 

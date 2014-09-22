@@ -122,9 +122,13 @@ public final class Event {
             return with("status", new NameValue(statusID.getId(), statusID.getName()));
         }
 
-        private EventBuilder with(String name, NameValue value) {
+        public EventBuilder with(String name, NameValue value) {
             values.put(name, value);
             return this;
+        }
+
+        public EventBuilder with(String name, String value) {
+            return with(name, new NameValue(name, value));
         }
 
         public Event get() {
@@ -147,6 +151,10 @@ public final class Event {
 
     public static Event newProject(Project project) {
         return Event.of("New project ${PROJECT}.").withProject(project).get();
+    }
+
+    public static Event deleteProject(Project project) {
+        return Event.of("Project ${:project} has been deleted.").with("project", project.getName()).get();
     }
 
     public static Event newBuild(Build build) {

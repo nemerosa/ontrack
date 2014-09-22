@@ -52,6 +52,16 @@ public class EventTest {
     }
 
     @Test
+    void deleteProject() {
+        Event e = Event.deleteProject(project());
+        assert e != null
+        assert e.signature == null
+        assert e.entities.size() == 0
+        assert e.renderText() == "Project P has been deleted."
+        assert e.render(testRenderer) == """Project <i class="project">P</i> has been deleted."""
+    }
+
+    @Test
     void newBuild() {
         Event e = Event.newBuild(build());
         assert e != null
