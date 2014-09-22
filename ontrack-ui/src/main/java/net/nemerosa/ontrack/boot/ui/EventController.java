@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.events.EventQueryService;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
+import net.nemerosa.ontrack.ui.resource.Pagination;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -37,17 +38,37 @@ public class EventController extends AbstractResourceController {
             @RequestParam(required = false, defaultValue = "0") int offset,
             @RequestParam(required = false, defaultValue = "10") int count) {
         // Gets the events
-        return Resources.of(
+        Resources<UIEvent> resources = Resources.of(
                 eventQueryService.getEvents(entityType, entityId, offset, count).stream()
                         .map(this::toUIEvent)
                         .collect(Collectors.toList()),
                 uri(on(getClass()).getEvents(entityType, entityId, offset, count))).forView(UIEvent.class);
-        // TODO Previous events
-        // TODO Next events
+        // Pagination information
+        Pagination pagination = Pagination.of(offset, count, -1);
+        // Previous page
+        if (offset > 0) {
+            pagination = pagination.withPrev(
+                    uri(on(EventController.class).getEvents(
+                            entityType,
+                            entityId,
+                            Math.max(0, offset - count),
+                            count
+                    ))
+            );
+        }
+        // Next page
+        pagination = pagination.withNext(
+                uri(on(EventController.class).getEvents(
+                        entityType,
+                        entityId,
+                        offset + count,
+                        count
+                ))
+        );
+        return resources.withPagination(pagination);
     }
 
     protected UIEvent toUIEvent(Event event) {
-        // FIXME Method net.nemerosa.ontrack.boot.ui.EventController.toUIEvent
         return new UIEvent(
                 event.getTemplate(),
                 event.getSignature(),

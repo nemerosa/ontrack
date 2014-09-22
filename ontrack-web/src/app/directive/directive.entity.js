@@ -21,13 +21,13 @@ angular.module('ot.directive.entity', [
                 entity: '='
             },
             link: function (scope) {
+                scope.renderEvent = otEventService.renderEvent;
+                scope.renderSince = function (eventTime) {
+                    return moment(eventTime).fromNow();
+                };
                 scope.$watch('entity', function () {
                     if (scope.entity) {
                         ot.call($http.get(scope.entity._events)).then(function (events) {
-                            scope.renderEvent = otEventService.renderEvent;
-                            scope.renderSince = function (eventTime) {
-                                return moment(eventTime).fromNow();
-                            };
                             scope.events = events;
                         });
                     }
