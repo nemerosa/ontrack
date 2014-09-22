@@ -27,11 +27,22 @@ angular.module('ot.directive.entity', [
                 };
                 scope.$watch('entity', function () {
                     if (scope.entity) {
-                        ot.call($http.get(scope.entity._events)).then(function (events) {
-                            scope.events = events;
-                        });
+                        scope.events = [];
+                        loadEvents(scope.entity._events);
                     }
                 });
+                scope.moreEvents = function () {
+                    if (scope.eventsResource.pagination.next) {
+                        loadEvents(scope.eventsResource.pagination.next);
+                    }
+                };
+                function loadEvents(uri) {
+                    ot.call($http.get(uri)).then(function (events) {
+                        scope.eventsResource = events;
+                        scope.events = scope.events.concat(events.resources);
+                        scope.more = (events.resources.length > 0);
+                    });
+                }
             }
         };
     })

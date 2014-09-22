@@ -1,8 +1,8 @@
 <ot-section-title>Events</ot-section-title>
-<div class="alert alert-warning" ng-if="events.resources.length == 0">
+<div class="alert alert-warning" ng-if="events.length == 0">
     No event.
 </div>
-<div class="ot-event" ng-repeat="event in events.resources">
+<div class="ot-event" ng-repeat="event in events">
     <span class="ot-event-category">
         <span ng-if="event.entities.PROMOTION_LEVEL">
             <ot-entity-image entity="event.entities.PROMOTION_LEVEL" link="#/promotionLevel/{{event.entities.PROMOTION_LEVEL.id}}"></ot-entity-image>
@@ -21,4 +21,7 @@
         {{event.signature.user.name}}
         <span title="{{event.signature.time | date:'mediumDate'}} {{event.signature.time | date:'mediumTime'}}">{{renderSince(event.signature.time)}}</span>
     </span>
+</div>
+<div>
+    <button class="btn btn-link pull-right" ng-show="more" ng-click="moreEvents()">More...</button>
 </div>
