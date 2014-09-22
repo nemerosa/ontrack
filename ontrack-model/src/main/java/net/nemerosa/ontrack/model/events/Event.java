@@ -27,7 +27,7 @@ public final class Event {
 
     private final String template;
     private final Signature signature;
-    private final Map<ProjectEntityType, ProjectEntity> projectEntities;
+    private final Map<ProjectEntityType, ProjectEntity> entities;
     private final Map<String, String> values;
 
     public String renderText() {
@@ -57,7 +57,7 @@ public final class Event {
             // Project entity type
             ProjectEntityType projectEntityType = ProjectEntityType.valueOf(expression);
             // Gets the corresponding entity
-            ProjectEntity projectEntity = projectEntities.get(projectEntityType);
+            ProjectEntity projectEntity = entities.get(projectEntityType);
             if (projectEntity == null) {
                 throw new EventMissingEntityException(template, projectEntityType);
             }
@@ -74,7 +74,7 @@ public final class Event {
 
         private final String template;
         private Signature signature;
-        private Collection<ProjectEntity> projectEntities = new ArrayList<>();
+        private Collection<ProjectEntity> entities = new ArrayList<>();
         private Map<String, String> values = new LinkedHashMap<>();
 
         public EventBuilder(String template) {
@@ -107,7 +107,7 @@ public final class Event {
         }
 
         private EventBuilder with(ProjectEntity entity) {
-            projectEntities.add(entity);
+            entities.add(entity);
             return this;
         }
 
@@ -126,7 +126,7 @@ public final class Event {
                     template,
                     signature,
                     Maps.uniqueIndex(
-                            projectEntities,
+                            entities,
                             ProjectEntity::getProjectEntityType
                     ),
                     values

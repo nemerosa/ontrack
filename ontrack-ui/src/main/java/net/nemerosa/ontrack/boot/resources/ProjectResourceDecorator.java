@@ -40,6 +40,8 @@ public class ProjectResourceDecorator extends AbstractResourceDecorator<Project>
                 .link("_decorations", on(DecorationsController.class).getDecorations(project.getProjectEntityType(), project.getId()))
                         // Authorisation management
                 .link("_permissions", on(PermissionController.class).getProjectPermissions(project.getId()), ProjectAuthorisationMgt.class, project.id())
+                        // Events
+                .link("_events", on(EventController.class).getEvents(project.getProjectEntityType(), project.getId(), 0, 10))
                         // OK
                 .build();
     }
