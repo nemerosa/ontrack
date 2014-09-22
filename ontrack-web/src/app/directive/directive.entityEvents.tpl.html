@@ -1,4 +1,7 @@
 <ot-section-title>Events</ot-section-title>
+<div class="alert alert-warning" ng-if="events.resources.length == 0">
+    No event.
+</div>
 <div class="ot-event" ng-repeat="event in events.resources">
     <span class="ot-event-category">
         <span ng-if="event.entities.PROMOTION_LEVEL">
