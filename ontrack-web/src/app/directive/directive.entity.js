@@ -12,12 +12,21 @@ angular.module('ot.directive.entity', [
             }
         };
     })
-    .directive('otEntityEvents', function () {
+    .directive('otEntityEvents', function ($http, ot) {
         return {
             restrict: 'E',
             templateUrl: 'app/directive/directive.entityEvents.tpl.html',
             scope: {
                 entity: '='
+            },
+            link: function (scope) {
+                scope.$watch('entity', function () {
+                    if (scope.entity) {
+                        ot.call($http.get(scope.entity._events)).then(function (events) {
+                            scope.events = events;
+                        });
+                    }
+                });
             }
         };
     })
