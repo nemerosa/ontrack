@@ -117,9 +117,12 @@ public class StructureServiceImpl implements StructureService {
         isEntityDefined(branch.getProject(), "Project must be defined");
         // Security
         securityService.checkProjectFunction(branch.getProject().id(), BranchCreate.class);
-        // TODO Event
+        // Creating the branch
+        Branch newBranch = structureRepository.newBranch(branch);
+        // Event
+        eventService.post(Event.newBranch(newBranch));
         // OK
-        return structureRepository.newBranch(branch);
+        return newBranch;
     }
 
     @Override
