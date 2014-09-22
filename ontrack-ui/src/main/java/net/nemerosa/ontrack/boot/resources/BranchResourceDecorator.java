@@ -98,6 +98,8 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                         BranchEdit.class,
                         branch.projectId()
                 )
+                        // Events
+                .link("_events", on(EventController.class).getEvents(branch.getProjectEntityType(), branch.getId(), 0, 10))
                         // OK
                 .build();
     }
