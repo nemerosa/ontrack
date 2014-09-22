@@ -42,6 +42,8 @@ public class EventController extends AbstractResourceController {
                         .map(this::toUIEvent)
                         .collect(Collectors.toList()),
                 uri(on(getClass()).getEvents(entityType, entityId, offset, count))).forView(UIEvent.class);
+        // TODO Previous events
+        // TODO Next events
     }
 
     protected UIEvent toUIEvent(Event event) {

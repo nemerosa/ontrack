@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -15,7 +14,7 @@ public class EventQueryServiceImpl implements EventQueryService {
     @Override
     public List<Event> getEvents(ProjectEntityType entityType, ID entityId, int offset, int count) {
         // FIXME Method net.nemerosa.ontrack.service.events.EventQueryServiceImpl.getEvents
-        return Collections.emptyList();
+        return EventServiceImpl.events;
     }
 
 }
