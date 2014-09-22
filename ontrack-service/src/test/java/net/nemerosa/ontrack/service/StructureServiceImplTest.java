@@ -42,21 +42,18 @@ public class StructureServiceImplTest {
 
     @Test
     public void newPromotionRun_with_date() throws Exception {
+        PromotionRun promotionRunToCreate = PromotionRun.of(
+                build,
+                copper,
+                Signature.of("test").withTime(LocalDateTime.of(2014, 9, 13, 18, 24)),
+                ""
+        );
+        when(structureRepository.newPromotionRun(promotionRunToCreate)).thenReturn(promotionRunToCreate.withId(ID.of(1)));
         service.newPromotionRun(
-                PromotionRun.of(
-                        build,
-                        copper,
-                        Signature.of("test").withTime(LocalDateTime.of(2014, 9, 13, 18, 24)),
-                        ""
-                )
+                promotionRunToCreate
         );
         verify(structureRepository, times(1)).newPromotionRun(
-                PromotionRun.of(
-                        build,
-                        copper,
-                        Signature.of("test").withTime(LocalDateTime.of(2014, 9, 13, 18, 24)),
-                        ""
-                )
+                promotionRunToCreate
         );
     }
 

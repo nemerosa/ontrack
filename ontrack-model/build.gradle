@@ -7,8 +7,8 @@ dependencies {
     compile libraries.guava
     compile libraries.spring_context
     compile libraries.validation_api
-    compile libraries.groovy
 
+    testCompile libraries.groovy
     testCompile project(':ontrack-test-utils')
 
 }
