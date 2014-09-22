@@ -6,4 +6,5 @@ public interface EventRenderer {
 
     String render(ProjectEntity projectEntity, Event event);
 
+    String render(String valueKey, String value, Event event);
 }

@@ -550,7 +550,11 @@ public class StructureServiceImpl implements StructureService {
         // Checks the authorization
         securityService.checkProjectFunction(validationRun.getBuild().getBranch().getProject().id(), ValidationRunCreate.class);
         // Actual creation
-        return structureRepository.newValidationRun(validationRun);
+        ValidationRun newValidationRun = structureRepository.newValidationRun(validationRun);
+        // Event
+        eventService.post(Event.newValidationRun(newValidationRun));
+        // OK
+        return newValidationRun;
     }
 
     @Override

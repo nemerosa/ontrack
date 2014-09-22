@@ -23,4 +23,9 @@ class PlainEventRenderer implements EventRenderer {
                 throw new EventCannotRenderEntityException(event.template, projectEntity)
         }
     }
+
+    @Override
+    String render(String valueKey, String value, Event event) {
+        value;
+    }
 }

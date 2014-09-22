@@ -30,6 +30,11 @@ public class EventTest {
             }
         }
 
+        @Override
+        String render(String valueKey, String value, Event event) {
+            """<i class="${valueKey}">${value}</i>"""
+        }
+
         protected String link(String name, String uri) {
             return """<a href="#/${uri}">${name}</a>"""
         }
@@ -55,12 +60,34 @@ public class EventTest {
         assert e.render(testRenderer) == """Build <a href="#/build/100">1</a> has been promoted to <a href="#/promotionLevel/100">COPPER</a> for branch <a href="#/branch/10">B</a> in <a href="#/project/1">P</a>."""
     }
 
+    @Test
+    void newValidationRun() {
+        Event e = Event.newValidationRun(validationRun());
+        assert e != null
+        assert e.signature.user.name == 'user'
+        assert e.projectEntities.size() == 4
+        assert e.renderText() == "Build 1 has run for SMOKE with status Failed in branch B in P."
+        assert e.render(testRenderer) == """Build <a href="#/build/100">1</a> has run for <a href="#/validationStamp/100">SMOKE</a> with status <i class="status">Failed</i> in branch <a href="#/branch/10">B</a> in <a href="#/project/1">P</a>."""
+    }
+
     private static PromotionRun promotionRun() {
         def branch = branch();
         PromotionRun.of(
                 Build.of(branch, nd("1", "Build"), Signature.of("user")).withId(ID.of(100)),
                 PromotionLevel.of(branch, nd("COPPER", "")).withId(ID.of(100)),
                 Signature.of("user"),
+                ""
+        ).withId(ID.of(1000))
+    }
+
+    private static ValidationRun validationRun() {
+        def branch = branch();
+        ValidationRun.of(
+                Build.of(branch, nd("1", "Build"), Signature.of("user")).withId(ID.of(100)),
+                ValidationStamp.of(branch, nd("SMOKE", "")).withId(ID.of(100)),
+                1,
+                Signature.of("user"),
+                ValidationRunStatusID.STATUS_FAILED,
                 ""
         ).withId(ID.of(1000))
     }
