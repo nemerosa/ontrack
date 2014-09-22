@@ -153,7 +153,7 @@ public final class Event {
         return Event.of("New project ${PROJECT}.").withProject(project).get();
     }
 
-    public static Event updatedProject(Project project) {
+    public static Event updateProject(Project project) {
         return Event.of("Project ${PROJECT} has been updated.").withProject(project).get();
     }
 
@@ -163,6 +163,13 @@ public final class Event {
 
     public static Event newBranch(Branch branch) {
         return Event.of("New branch ${BRANCH} for project ${PROJECT}.").withBranch(branch).get();
+    }
+
+    public static Event deleteBranch(Branch branch) {
+        return Event.of("Branch ${:branch} has been deleted from ${PROJECT}.")
+                .withProject(branch.getProject())
+                .with("branch", branch.getName())
+                .get();
     }
 
     public static Event newBuild(Build build) {

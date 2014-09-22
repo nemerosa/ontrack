@@ -86,7 +86,7 @@ public class StructureServiceImpl implements StructureService {
         isEntityDefined(project, "Project must be defined");
         securityService.checkProjectFunction(project.id(), ProjectEdit.class);
         structureRepository.saveProject(project);
-        eventService.post(Event.updatedProject(project));
+        eventService.post(Event.updateProject(project));
     }
 
     @Override
@@ -157,7 +157,7 @@ public class StructureServiceImpl implements StructureService {
         Validate.isTrue(branchId.isSet(), "Branch ID must be set");
         Branch branch = getBranch(branchId);
         securityService.checkProjectFunction(branch.projectId(), BranchDelete.class);
-        // TODO Event
+        eventService.post(Event.deleteBranch(branch));
         return structureRepository.deleteBranch(branchId);
     }
 
