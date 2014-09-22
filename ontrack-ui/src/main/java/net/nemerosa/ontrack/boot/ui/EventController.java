@@ -29,6 +29,40 @@ public class EventController extends AbstractResourceController {
     }
 
     /**
+     * Gets the list of events for the root.
+     */
+    @RequestMapping(value = "root", method = RequestMethod.GET)
+    public Resources<UIEvent> getEvents(
+            @RequestParam(required = false, defaultValue = "0") int offset,
+            @RequestParam(required = false, defaultValue = "20") int count) {
+        // Gets the events
+        Resources<UIEvent> resources = Resources.of(
+                eventQueryService.getEvents(offset, count).stream()
+                        .map(this::toUIEvent)
+                        .collect(Collectors.toList()),
+                uri(on(getClass()).getEvents(offset, count))).forView(UIEvent.class);
+        // Pagination information
+        Pagination pagination = Pagination.of(offset, count, -1);
+        // Previous page
+        if (offset > 0) {
+            pagination = pagination.withPrev(
+                    uri(on(EventController.class).getEvents(
+                            Math.max(0, offset - count),
+                            count
+                    ))
+            );
+        }
+        // Next page
+        pagination = pagination.withNext(
+                uri(on(EventController.class).getEvents(
+                        offset + count,
+                        count
+                ))
+        );
+        return resources.withPagination(pagination);
+    }
+
+    /**
      * Gets the list of events for an entity, accessible by the current user.
      */
     @RequestMapping(value = "{entityType}/{entityId}", method = RequestMethod.GET)

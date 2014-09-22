@@ -27,6 +27,19 @@ public class EventQueryServiceImpl implements EventQueryService {
     }
 
     @Override
+    public List<Event> getEvents(int offset, int count) {
+        // Gets the list of projects the current user is allowed to view
+        List<Integer> projectIds = structureService.getProjectList().stream().map(Entity::id).collect(Collectors.toList());
+        // Performs the query
+        return eventRepository.query(
+                projectIds,
+                offset,
+                count,
+                (type, id) -> type.getEntityFn(structureService).apply(id)
+        );
+    }
+
+    @Override
     public List<Event> getEvents(ProjectEntityType entityType, ID entityId, int offset, int count) {
         // Gets the list of projects the current user is allowed to view
         List<Integer> projectIds = structureService.getProjectList().stream().map(Entity::id).collect(Collectors.toList());

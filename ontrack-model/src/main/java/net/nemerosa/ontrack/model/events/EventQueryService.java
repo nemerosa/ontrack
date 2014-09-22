@@ -10,6 +10,8 @@ import java.util.List;
  */
 public interface EventQueryService {
 
+    List<Event> getEvents(int offset, int count);
+
     List<Event> getEvents(ProjectEntityType entityType, ID entityId, int offset, int count);
 
 }

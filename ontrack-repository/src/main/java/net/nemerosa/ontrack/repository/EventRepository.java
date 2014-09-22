@@ -14,6 +14,13 @@ public interface EventRepository {
 
     List<Event> query(
             List<Integer> allowedProjects,
+            int offset,
+            int count,
+            BiFunction<ProjectEntityType, ID, ProjectEntity> entityLoader
+    );
+
+    List<Event> query(
+            List<Integer> allowedProjects,
             ProjectEntityType entityType,
             ID entityId,
             int offset,
