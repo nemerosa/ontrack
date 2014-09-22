@@ -1,4 +1,12 @@
 <ot-section-title>Events</ot-section-title>
 <div class="ot-event" ng-repeat="event in events.resources">
+    <span class="ot-event-category">
+        <span ng-if="event.entities.PROMOTION_LEVEL">
+            <ot-entity-image entity="event.entities.PROMOTION_LEVEL" link="#/promotionLevel/{{event.entities.PROMOTION_LEVEL.id}}"></ot-entity-image>
+        </span>
+    </span>
+    <span class="ot-event-status">
+
+    </span>
     <span class="ot-event-message" ng-bind-html="renderEvent(event)"></span>
 </div>
