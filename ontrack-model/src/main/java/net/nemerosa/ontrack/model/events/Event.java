@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.model.events;
 import com.google.common.collect.Maps;
 import lombok.Data;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.model.support.NameValue;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static net.nemerosa.ontrack.model.events.PlainEventRenderer.*;
+import static net.nemerosa.ontrack.model.events.PlainEventRenderer.INSTANCE;
 
 /**
  * Definition of an event
@@ -28,7 +29,7 @@ public final class Event {
     private final String template;
     private final Signature signature;
     private final Map<ProjectEntityType, ProjectEntity> entities;
-    private final Map<String, String> values;
+    private final Map<String, NameValue> values;
 
     public String renderText() {
         return render(INSTANCE);
@@ -48,7 +49,7 @@ public final class Event {
     private String expandExpression(String expression, EventRenderer eventRenderer) {
         if (StringUtils.startsWith(expression, ":")) {
             String valueKey = expression.substring(1);
-            String value = values.get(valueKey);
+            NameValue value = values.get(valueKey);
             if (value == null) {
                 throw new EventMissingValueException(template, valueKey);
             }
@@ -75,7 +76,7 @@ public final class Event {
         private final String template;
         private Signature signature;
         private Collection<ProjectEntity> entities = new ArrayList<>();
-        private Map<String, String> values = new LinkedHashMap<>();
+        private Map<String, NameValue> values = new LinkedHashMap<>();
 
         public EventBuilder(String template) {
             this.template = template;
@@ -112,10 +113,10 @@ public final class Event {
         }
 
         public EventBuilder withValidationRunStatus(ValidationRunStatusID statusID) {
-            return with("status", statusID.getName());
+            return with("status", new NameValue(statusID.getId(), statusID.getName()));
         }
 
-        private EventBuilder with(String name, String value) {
+        private EventBuilder with(String name, NameValue value) {
             values.put(name, value);
             return this;
         }

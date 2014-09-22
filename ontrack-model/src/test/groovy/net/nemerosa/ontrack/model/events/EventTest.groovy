@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.model.events
 
 import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.support.NameValue
 import org.junit.Test
 
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd
@@ -31,8 +32,8 @@ public class EventTest {
         }
 
         @Override
-        String render(String valueKey, String value, Event event) {
-            """<i class="${valueKey}">${value}</i>"""
+        String render(String valueKey, NameValue value, Event event) {
+            """<i class="${valueKey}">${value.value}</i>"""
         }
 
         protected String link(String name, String uri) {

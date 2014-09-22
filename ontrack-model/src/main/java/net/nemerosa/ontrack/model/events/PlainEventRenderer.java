@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.model.events;
 
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.model.support.NameValue;
 
 public class PlainEventRenderer implements EventRenderer {
 
@@ -27,7 +28,7 @@ public class PlainEventRenderer implements EventRenderer {
     }
 
     @Override
-    public String render(String valueKey, String value, Event event) {
-        return value;
+    public String render(String valueKey, NameValue value, Event event) {
+        return value.getValue();
     }
 }

@@ -25,7 +25,7 @@ angular.module('ot.service.event', [
                         return replacementValueError(event, valueKey);
                     }
                     // Rendering
-                    return $interpolate('<span class="ot-event-value">{{value}}</span>')({
+                    return $interpolate('<span class="ot-event-value">{{value.value}}</span>')({
                         valueKey: valueKey,
                         value: value
                     });
