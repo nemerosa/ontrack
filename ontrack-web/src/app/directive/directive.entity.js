@@ -1,5 +1,6 @@
 angular.module('ot.directive.entity', [
-    'ot.service.core'
+    'ot.service.core',
+    'ot.service.event'
 ])
     .directive('otEntityImage', function () {
         return {
@@ -12,7 +13,7 @@ angular.module('ot.directive.entity', [
             }
         };
     })
-    .directive('otEntityEvents', function ($http, ot) {
+    .directive('otEntityEvents', function ($http, ot, otEventService) {
         return {
             restrict: 'E',
             templateUrl: 'app/directive/directive.entityEvents.tpl.html',
@@ -23,6 +24,7 @@ angular.module('ot.directive.entity', [
                 scope.$watch('entity', function () {
                     if (scope.entity) {
                         ot.call($http.get(scope.entity._events)).then(function (events) {
+                            scope.renderEvent = otEventService.renderEvent;
                             scope.events = events;
                         });
                     }
