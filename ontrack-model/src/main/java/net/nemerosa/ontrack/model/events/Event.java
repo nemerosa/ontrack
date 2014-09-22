@@ -153,6 +153,10 @@ public final class Event {
         return Event.of("New project ${PROJECT}.").withProject(project).get();
     }
 
+    public static Event updatedProject(Project project) {
+        return Event.of("Project ${PROJECT} has been updated.").withProject(project).get();
+    }
+
     public static Event deleteProject(Project project) {
         return Event.of("Project ${:project} has been deleted.").with("project", project.getName()).get();
     }

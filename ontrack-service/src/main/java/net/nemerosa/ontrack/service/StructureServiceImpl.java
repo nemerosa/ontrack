@@ -85,8 +85,8 @@ public class StructureServiceImpl implements StructureService {
     public void saveProject(Project project) {
         isEntityDefined(project, "Project must be defined");
         securityService.checkProjectFunction(project.id(), ProjectEdit.class);
-        // TODO Event
         structureRepository.saveProject(project);
+        eventService.post(Event.updatedProject(project));
     }
 
     @Override
