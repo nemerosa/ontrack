@@ -105,6 +105,14 @@ public final class Event {
             return withBuild(validationRun.getBuild()).with(validationRun.getValidationStamp()).with(validationRun).with(validationRun.getLastStatus().getSignature());
         }
 
+        public EventBuilder withPromotionLevel(PromotionLevel promotionLevel) {
+            return withBranch(promotionLevel.getBranch()).with(promotionLevel);
+        }
+
+        public EventBuilder withValidationStamp(ValidationStamp validationStamp) {
+            return withBranch(validationStamp.getBranch()).with(validationStamp);
+        }
+
         public EventBuilder withBranch(Branch branch) {
             return withProject(branch.getProject()).with(branch);
         }
@@ -173,6 +181,18 @@ public final class Event {
         return Event.of("Branch ${:branch} has been deleted from ${PROJECT}.")
                 .withProject(branch.getProject())
                 .with("branch", branch.getName())
+                .get();
+    }
+
+    public static Event newPromotionLevel(PromotionLevel promotionLevel) {
+        return Event.of("New promotion level ${PROMOTION_LEVEL} for branch ${BRANCH} in ${PROJECT}.")
+                .withPromotionLevel(promotionLevel)
+                .get();
+    }
+
+    public static Event newValidationStamp(ValidationStamp validationStamp) {
+        return Event.of("New validation stamp ${VALIDATION_STAMP} for branch ${BRANCH} in ${PROJECT}.")
+                .withValidationStamp(validationStamp)
                 .get();
     }
 

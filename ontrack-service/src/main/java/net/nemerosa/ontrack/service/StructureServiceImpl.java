@@ -317,9 +317,12 @@ public class StructureServiceImpl implements StructureService {
         isEntityDefined(promotionLevel.getBranch().getProject(), "Project must be defined");
         // Security
         securityService.checkProjectFunction(promotionLevel.getBranch().getProject().id(), PromotionLevelCreate.class);
-        // TODO Event
         // Repository
-        return structureRepository.newPromotionLevel(promotionLevel);
+        PromotionLevel newPromotionLevel = structureRepository.newPromotionLevel(promotionLevel);
+        // Event
+        eventService.post(Event.newPromotionLevel(newPromotionLevel));
+        // OK
+        return newPromotionLevel;
     }
 
     @Override
@@ -461,9 +464,12 @@ public class StructureServiceImpl implements StructureService {
         isEntityDefined(validationStamp.getBranch().getProject(), "Project must be defined");
         // Security
         securityService.checkProjectFunction(validationStamp.getBranch().getProject().id(), ValidationStampCreate.class);
-        // TODO Event
         // Repository
-        return structureRepository.newValidationStamp(validationStamp);
+        ValidationStamp newValidationStamp = structureRepository.newValidationStamp(validationStamp);
+        // Event
+        eventService.post(Event.newValidationStamp(newValidationStamp));
+        // OK
+        return newValidationStamp;
     }
 
     @Override
