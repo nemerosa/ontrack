@@ -13,7 +13,7 @@
     </span>
     <span class="ot-event-status">
         <span ng-if="event.values.status">
-            <img class="ot-icon" src="assets/validation-run-status/{{event.values.status.name}}.png"/>
+            <img class="ot-icon" ng-src="assets/validation-run-status/{{event.values.status.name}}.png"/>
         </span>
     </span>
     <span class="ot-event-message" ng-bind-html="renderEvent(event)"></span>

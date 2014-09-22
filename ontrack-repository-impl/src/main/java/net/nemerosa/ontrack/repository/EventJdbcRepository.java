@@ -63,7 +63,7 @@ public class EventJdbcRepository extends AbstractJdbcRepository implements Event
     @Override
     public List<Event> query(List<Integer> allowedProjects, int offset, int count, BiFunction<ProjectEntityType, ID, ProjectEntity> entityLoader) {
         return getNamedParameterJdbcTemplate().query(
-                "SELECT * FROM EVENTS WHERE PROJECT IN (:projects)" +
+                "SELECT * FROM EVENTS WHERE PROJECT IS NULL OR PROJECT IN (:projects)" +
                         " ORDER BY ID DESC" +
                         " LIMIT :count OFFSET :offset",
                 params("projects", allowedProjects)
