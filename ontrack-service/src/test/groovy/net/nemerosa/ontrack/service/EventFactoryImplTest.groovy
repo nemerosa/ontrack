@@ -168,12 +168,30 @@ public class EventFactoryImplTest {
     }
 
     @Test
+    void propertyDelete_on_promotion_level() {
+        Event e = factory.propertyDelete(promotionLevel(), new LinkPropertyType());
+        assert e != null
+        assert e.signature == null
+        assert e.entities.size() == 2
+        assert e.renderText() == "Links property has been removed from promotion level COPPER."
+    }
+
+    @Test
     void propertyChange_on_project() {
         Event e = factory.propertyChange(project(), new LinkPropertyType());
         assert e != null
         assert e.signature == null
         assert e.entities.size() == 1
         assert e.renderText() == "Links property has changed for project P."
+    }
+
+    @Test
+    void propertyDelete_on_project() {
+        Event e = factory.propertyDelete(project(), new LinkPropertyType());
+        assert e != null
+        assert e.signature == null
+        assert e.entities.size() == 1
+        assert e.renderText() == "Links property has been removed from project P."
     }
 
     private static PromotionRun promotionRun() {

@@ -44,6 +44,7 @@ public class EventFactoryImpl implements EventFactory {
     public static final EventType NEW_VALIDATION_RUN_STATUS = SimpleEventType.of("new_validation_run_status", "Status for ${VALIDATION_STAMP} validation ${VALIDATION_RUN} for build ${BUILD} in branch ${BRANCH} of ${PROJECT} has changed to ${:status}.");
 
     public static final EventType PROPERTY_CHANGE = SimpleEventType.of("property_change", "${:property} property has changed for ${:entity} ${REF}.");
+    public static final EventType PROPERTY_DELETE = SimpleEventType.of("property_delete", "${:property} property has been removed from ${:entity} ${REF}.");
 
     private final Map<String, EventType> types;
 
@@ -80,6 +81,7 @@ public class EventFactoryImpl implements EventFactory {
         register(NEW_VALIDATION_RUN_STATUS);
 
         register(PROPERTY_CHANGE);
+        register(PROPERTY_DELETE);
     }
 
     private void register(EventType eventType) {
@@ -263,6 +265,18 @@ public class EventFactoryImpl implements EventFactory {
     @Override
     public <T> Event propertyChange(ProjectEntity entity, PropertyType<T> propertyType) {
         return Event.of(PROPERTY_CHANGE)
+                .withRef(entity)
+                .with("entity", entity.getProjectEntityType().getDisplayName())
+                .with("property", new NameValue(
+                        propertyType.getTypeName(),
+                        propertyType.getName()
+                ))
+                .get();
+    }
+
+    @Override
+    public <T> Event propertyDelete(ProjectEntity entity, PropertyType<T> propertyType) {
+        return Event.of(PROPERTY_DELETE)
                 .withRef(entity)
                 .with("entity", entity.getProjectEntityType().getDisplayName())
                 .with("property", new NameValue(
