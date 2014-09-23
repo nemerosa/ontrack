@@ -177,13 +177,6 @@ public final class Event {
     }
 
     @Deprecated
-    public static Event newPromotionRun(PromotionRun promotionRun) {
-        return Event.of("Build ${BUILD} has been promoted to ${PROMOTION_LEVEL} for branch ${BRANCH} in ${PROJECT}.")
-                .withPromotionRun(promotionRun)
-                .get();
-    }
-
-    @Deprecated
     public static Event newValidationRun(ValidationRun validationRun) {
         return Event.of("Build ${BUILD} has run for ${VALIDATION_STAMP} with status ${:status} in branch ${BRANCH} in ${PROJECT}.")
                 .withValidationRun(validationRun)

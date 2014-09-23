@@ -46,6 +46,16 @@ public class EventFactoryImplTest {
         assert e.render(testRenderer) == """New build <a href="#/build/100">1</a> for branch <a href="#/branch/10">B</a> in <a href="#/project/1">P</a>."""
     }
 
+    @Test
+    void newPromotionRun() {
+        Event e = factory.newPromotionRun(promotionRun());
+        assert e != null
+        assert e.signature.user.name == 'user'
+        assert e.entities.size() == 4
+        assert e.renderText() == "Build 1 has been promoted to COPPER for branch B in P."
+        assert e.render(testRenderer) == """Build <a href="#/build/100">1</a> has been promoted to <a href="#/promotionLevel/100">COPPER</a> for branch <a href="#/branch/10">B</a> in <a href="#/project/1">P</a>."""
+    }
+
     private static PromotionRun promotionRun() {
         def branch = branch();
         PromotionRun.of(

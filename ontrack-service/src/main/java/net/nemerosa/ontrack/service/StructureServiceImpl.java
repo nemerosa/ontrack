@@ -420,7 +420,7 @@ public class StructureServiceImpl implements StructureService {
         // Actual creation
         PromotionRun newPromotionRun = structureRepository.newPromotionRun(promotionRunToSave);
         // Event
-        eventPostService.post(Event.newPromotionRun(newPromotionRun));
+        eventPostService.post(eventFactory.newPromotionRun(newPromotionRun));
         // OK
         return newPromotionRun;
     }

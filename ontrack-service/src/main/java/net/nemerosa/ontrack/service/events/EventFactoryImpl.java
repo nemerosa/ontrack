@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.service.events;
 
 import net.nemerosa.ontrack.model.events.*;
-import net.nemerosa.ontrack.model.structure.Branch;
-import net.nemerosa.ontrack.model.structure.Build;
-import net.nemerosa.ontrack.model.structure.Project;
-import net.nemerosa.ontrack.model.structure.PromotionLevel;
+import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -21,6 +18,7 @@ public class EventFactoryImpl implements EventFactory {
     public static final EventType DELETE_BRANCH = SimpleEventType.of("delete_branch", "Branch ${:branch} has been deleted from ${PROJECT}.");
     public static final EventType NEW_BUILD = SimpleEventType.of("new_build", "New build ${BUILD} for branch ${BRANCH} in ${PROJECT}.");
     public static final EventType NEW_PROMOTION_LEVEL = SimpleEventType.of("new_promotion_level", "New promotion level ${PROMOTION_LEVEL} for branch ${BRANCH} in ${PROJECT}.");
+    public static final EventType NEW_PROMOTION_RUN = SimpleEventType.of("new_promotion_run", "Build ${BUILD} has been promoted to ${PROMOTION_LEVEL} for branch ${BRANCH} in ${PROJECT}.");
 
     private final Map<String, EventType> types;
 
@@ -33,6 +31,7 @@ public class EventFactoryImpl implements EventFactory {
         register(UPDATE_BRANCH);
         register(NEW_BUILD);
         register(NEW_PROMOTION_LEVEL);
+        register(NEW_PROMOTION_RUN);
     }
 
     private void register(EventType eventType) {
@@ -93,6 +92,13 @@ public class EventFactoryImpl implements EventFactory {
     public Event newPromotionLevel(PromotionLevel promotionLevel) {
         return Event.of(NEW_PROMOTION_LEVEL)
                 .withPromotionLevel(promotionLevel)
+                .get();
+    }
+
+    @Override
+    public Event newPromotionRun(PromotionRun promotionRun) {
+        return Event.of(NEW_PROMOTION_RUN)
+                .withPromotionRun(promotionRun)
                 .get();
     }
 }

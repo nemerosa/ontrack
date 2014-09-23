@@ -42,16 +42,6 @@ public class EventTest {
     }
 
     @Test
-    void newPromotionRun() {
-        Event e = Event.newPromotionRun(promotionRun());
-        assert e != null
-        assert e.signature.user.name == 'user'
-        assert e.entities.size() == 4
-        assert e.renderText() == "Build 1 has been promoted to COPPER for branch B in P."
-        assert e.render(testRenderer) == """Build <a href="#/build/100">1</a> has been promoted to <a href="#/promotionLevel/100">COPPER</a> for branch <a href="#/branch/10">B</a> in <a href="#/project/1">P</a>."""
-    }
-
-    @Test
     void newValidationRun() {
         Event e = Event.newValidationRun(validationRun());
         assert e != null
@@ -69,16 +59,6 @@ public class EventTest {
         assert e.entities.size() == 5
         assert e.renderText() == "Status for SMOKE validation #1 for build 1 in branch B of P has changed to Failed."
         assert e.render(testRenderer) == """Status for <a href="#/validationStamp/100">SMOKE</a> validation <a href="#/validationRun/1000">#1</a> for build <a href="#/build/100">1</a> in branch <a href="#/branch/10">B</a> of <a href="#/project/1">P</a> has changed to <i class="status">Failed</i>."""
-    }
-
-    private static PromotionRun promotionRun() {
-        def branch = branch();
-        PromotionRun.of(
-                Build.of(branch, nd("1", "Build"), Signature.of("user")).withId(ID.of(100)),
-                PromotionLevel.of(branch, nd("COPPER", "")).withId(ID.of(100)),
-                Signature.of("user"),
-                ""
-        ).withId(ID.of(1000))
     }
 
     private static ValidationRun validationRun() {
