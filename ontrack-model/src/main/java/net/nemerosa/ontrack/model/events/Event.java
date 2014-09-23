@@ -23,7 +23,7 @@ public final class Event {
     private final EventType eventType;
     private final Signature signature;
     private final Map<ProjectEntityType, ProjectEntity> entities;
-    private final ProjectEntity ref;
+    private final ProjectEntityType ref;
     private final Map<String, NameValue> values;
 
     public String renderText() {
@@ -53,7 +53,11 @@ public final class Event {
             if (ref == null) {
                 throw new EventMissingRefEntityException(eventType.getTemplate());
             } else {
-                return eventRenderer.render(ref, this);
+                ProjectEntity entity = entities.get(ref);
+                if (entity == null) {
+                    throw new EventMissingEntityException(eventType.getTemplate(), ref);
+                }
+                return eventRenderer.render(entity, this);
             }
         } else {
             // Project entity type
@@ -87,7 +91,7 @@ public final class Event {
         private final EventType eventType;
         private Signature signature;
         private Map<ProjectEntityType, ProjectEntity> entities = new LinkedHashMap<>();
-        private ProjectEntity ref = null;
+        private ProjectEntityType ref = null;
         private Map<String, NameValue> values = new LinkedHashMap<>();
 
         public EventBuilder(EventType eventType) {
@@ -133,7 +137,7 @@ public final class Event {
         }
 
         public EventBuilder withRef(ProjectEntity entity) {
-            this.ref = entity;
+            this.ref = entity.getProjectEntityType();
             return withProject(entity.getProject()).with(entity);
         }
 

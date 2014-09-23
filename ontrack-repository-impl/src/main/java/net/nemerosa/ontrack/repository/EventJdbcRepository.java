@@ -42,7 +42,7 @@ public class EventJdbcRepository extends AbstractJdbcRepository implements Event
         params.addValue("eventTime", dateTimeForDB(event.getSignature().getTime()));
         params.addValue("eventUser", event.getSignature().getUser().getName());
         params.addValue("eventType", event.getEventType().getId());
-        params.addValue("ref", event.getRef() != null ? event.getRef().id() : null);
+        params.addValue("ref", event.getRef() != null ? event.getRef().name() : null);
 
         for (ProjectEntityType type : event.getEntities().keySet()) {
             sql.append(", ").append(type.name());
@@ -118,14 +118,7 @@ public class EventJdbcRepository extends AbstractJdbcRepository implements Event
             }
         }
         // Reference (if any)
-        ProjectEntity refEntity = null;
-        int refId = rs.getInt("ref");
-        if (!rs.wasNull()) {
-            refEntity = entities.values().stream()
-                    .filter(e -> (e.id() == refId))
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalStateException("Could not map reference entity in event."));
-        }
+        ProjectEntityType refEntity = getEnum(ProjectEntityType.class, rs, "ref");
         // Values
         Map<String, NameValue> values = loadValues(rs);
         // OK
