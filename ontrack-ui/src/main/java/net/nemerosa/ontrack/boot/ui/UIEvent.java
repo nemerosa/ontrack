@@ -15,6 +15,7 @@ public class UIEvent {
     private final String template;
     private final Signature signature;
     private final Map<ProjectEntityType, ProjectEntity> entities;
+    private final ProjectEntity ref;
     private final Map<String, NameValue> values;
 
 }

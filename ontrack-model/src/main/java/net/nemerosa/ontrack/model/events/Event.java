@@ -26,6 +26,7 @@ public final class Event {
     private final EventType eventType;
     private final Signature signature;
     private final Map<ProjectEntityType, ProjectEntity> entities;
+    private final ProjectEntity ref;
     private final Map<String, NameValue> values;
 
     public String renderText() {
@@ -51,6 +52,12 @@ public final class Event {
                 throw new EventMissingValueException(eventType.getTemplate(), valueKey);
             }
             return eventRenderer.render(valueKey, value, this);
+        } else if ("REF".equals(expression)) {
+            if (ref == null) {
+                throw new EventMissingRefEntityException(eventType.getTemplate());
+            } else {
+                return eventRenderer.render(ref, this);
+            }
         } else {
             // Project entity type
             ProjectEntityType projectEntityType = ProjectEntityType.valueOf(expression);
@@ -73,6 +80,7 @@ public final class Event {
                 eventType,
                 signature,
                 entities,
+                ref,
                 values
         );
     }
@@ -82,6 +90,7 @@ public final class Event {
         private final EventType eventType;
         private Signature signature;
         private Collection<ProjectEntity> entities = new ArrayList<>();
+        private ProjectEntity ref = null;
         private Map<String, NameValue> values = new LinkedHashMap<>();
 
         public EventBuilder(EventType eventType) {
@@ -126,6 +135,11 @@ public final class Event {
             return with(project);
         }
 
+        public EventBuilder withRef(ProjectEntity entity) {
+            this.ref = entity;
+            return with(entity);
+        }
+
         public EventBuilder with(ProjectEntity entity) {
             entities.add(entity);
             return this;
@@ -153,6 +167,7 @@ public final class Event {
                             entities,
                             ProjectEntity::getProjectEntityType
                     ),
+                    ref,
                     values
             );
             // Checks the event can be resolved with all its references

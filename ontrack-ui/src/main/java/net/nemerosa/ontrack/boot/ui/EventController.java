@@ -108,6 +108,7 @@ public class EventController extends AbstractResourceController {
                 event.getEventType().getTemplate(),
                 event.getSignature(),
                 event.getEntities(),
+                event.getRef(),
                 event.getValues()
         );
     }

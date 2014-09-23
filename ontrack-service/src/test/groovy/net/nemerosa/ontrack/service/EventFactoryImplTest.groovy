@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service
 
+import net.nemerosa.ontrack.extension.general.LinkPropertyType
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventCannotRenderEntityException
 import net.nemerosa.ontrack.model.events.EventFactory
@@ -155,6 +156,15 @@ public class EventFactoryImplTest {
         assert e.entities.size() == 5
         assert e.renderText() == "Status for SMOKE validation #1 for build 1 in branch B of P has changed to Failed."
         assert e.render(testRenderer) == """Status for <a href="#/validationStamp/100">SMOKE</a> validation <a href="#/validationRun/1000">#1</a> for build <a href="#/build/100">1</a> in branch <a href="#/branch/10">B</a> of <a href="#/project/1">P</a> has changed to <i class="status">Failed</i>."""
+    }
+
+    @Test
+    void propertyChange() {
+        Event e = factory.propertyChange(promotionLevel(), new LinkPropertyType());
+        assert e != null
+        assert e.signature == null
+        assert e.entities.size() == 1
+        assert e.renderText() == "Links property has changed for promotion level COPPER."
     }
 
     private static PromotionRun promotionRun() {

@@ -59,4 +59,6 @@ public interface EventFactory {
     Event newValidationRun(ValidationRun validationRun);
 
     Event newValidationRunStatus(ValidationRun validationRun);
+
+    <T> Event propertyChange(ProjectEntity entity, PropertyType<T> propertyType);
 }

@@ -35,18 +35,19 @@ public class EventJdbcRepository extends AbstractJdbcRepository implements Event
 
     @Override
     public void post(Event event) {
-        StringBuilder sql = new StringBuilder("INSERT INTO EVENTS(EVENT_VALUES, EVENT_TIME, EVENT_USER, EVENT_TYPE");
+        StringBuilder sql = new StringBuilder("INSERT INTO EVENTS(EVENT_VALUES, EVENT_TIME, EVENT_USER, EVENT_TYPE, REF");
 
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("eventValues", writeJson(event.getValues()));
         params.addValue("eventTime", dateTimeForDB(event.getSignature().getTime()));
         params.addValue("eventUser", event.getSignature().getUser().getName());
         params.addValue("eventType", event.getEventType().getId());
+        params.addValue("ref", event.getRef() != null ? event.getRef().id() : null);
 
         for (ProjectEntityType type : event.getEntities().keySet()) {
             sql.append(", ").append(type.name());
         }
-        sql.append(") VALUES (:eventValues, :eventTime, :eventUser, :eventType");
+        sql.append(") VALUES (:eventValues, :eventTime, :eventUser, :eventType, :ref");
         for (Map.Entry<ProjectEntityType, ProjectEntity> entry : event.getEntities().entrySet()) {
             ProjectEntityType type = entry.getKey();
             ProjectEntity entity = entry.getValue();
@@ -116,6 +117,15 @@ public class EventJdbcRepository extends AbstractJdbcRepository implements Event
                 entities.put(type, entity);
             }
         }
+        // Reference (if any)
+        ProjectEntity refEntity = null;
+        int refId = rs.getInt("ref");
+        if (!rs.wasNull()) {
+            refEntity = entities.values().stream()
+                    .filter(e -> (e.id() == refId))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("Could not map reference entity in event."));
+        }
         // Values
         Map<String, NameValue> values = loadValues(rs);
         // OK
@@ -123,6 +133,7 @@ public class EventJdbcRepository extends AbstractJdbcRepository implements Event
                 eventTypeLoader.apply(eventTypeName),
                 signature,
                 entities,
+                refEntity,
                 values
         );
     }

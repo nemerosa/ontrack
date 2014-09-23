@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.extension.api.PropertyTypeExtension;
 import net.nemerosa.ontrack.model.Ack;
+import net.nemerosa.ontrack.model.events.EventFactory;
+import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.exceptions.PropertyTypeNotFoundException;
 import net.nemerosa.ontrack.model.exceptions.PropertyUnsupportedEntityTypeException;
 import net.nemerosa.ontrack.model.form.Form;
@@ -27,12 +29,16 @@ import java.util.stream.Collectors;
 @Service
 public class PropertyServiceImpl implements PropertyService {
 
+    private final EventPostService eventPostService;
+    private final EventFactory eventFactory;
     private final PropertyRepository propertyRepository;
     private final SecurityService securityService;
     private final ExtensionManager extensionManager;
 
     @Autowired
-    public PropertyServiceImpl(PropertyRepository propertyRepository, SecurityService securityService, ExtensionManager extensionManager) {
+    public PropertyServiceImpl(EventPostService eventPostService, EventFactory eventFactory, PropertyRepository propertyRepository, SecurityService securityService, ExtensionManager extensionManager) {
+        this.eventPostService = eventPostService;
+        this.eventFactory = eventFactory;
         this.propertyRepository = propertyRepository;
         this.securityService = securityService;
         this.extensionManager = extensionManager;
@@ -112,7 +118,13 @@ public class PropertyServiceImpl implements PropertyService {
         T value = getPropertyValue(propertyType, entity);
         // If existing, deletes it
         if (value != null) {
-            return propertyRepository.deleteProperty(propertyType.getClass().getName(), entity.getProjectEntityType(), entity.getId());
+            Ack ack = propertyRepository.deleteProperty(propertyType.getClass().getName(), entity.getProjectEntityType(), entity.getId());
+            if (ack.isSuccess()) {
+                // Property change event
+                eventPostService.post(eventFactory.propertyChange(entity, propertyType));
+            }
+            // OK
+            return ack;
         } else {
             return Ack.NOK;
         }
@@ -137,6 +149,7 @@ public class PropertyServiceImpl implements PropertyService {
                 storage,
                 searchKey
         );
+        // TODO Property change event
         // OK
         return Ack.OK;
     }

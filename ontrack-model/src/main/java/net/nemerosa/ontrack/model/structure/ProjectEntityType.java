@@ -9,27 +9,33 @@ import java.util.function.Function;
  */
 public enum ProjectEntityType {
 
-    PROJECT(StructureService::getProject),
+    PROJECT("project", StructureService::getProject),
 
-    BRANCH(StructureService::getBranch),
+    BRANCH("branch", StructureService::getBranch),
 
-    PROMOTION_LEVEL(StructureService::getPromotionLevel),
+    PROMOTION_LEVEL("promotion level", StructureService::getPromotionLevel),
 
-    VALIDATION_STAMP(StructureService::getValidationStamp),
+    VALIDATION_STAMP("validation stamp", StructureService::getValidationStamp),
 
-    BUILD(StructureService::getBuild),
+    BUILD("build", StructureService::getBuild),
 
-    PROMOTION_RUN(StructureService::getPromotionRun),
+    PROMOTION_RUN("promotion run", StructureService::getPromotionRun),
 
-    VALIDATION_RUN(StructureService::getValidationRun);
+    VALIDATION_RUN("validation run", StructureService::getValidationRun);
 
+    private final String displayName;
     private final BiFunction<StructureService, ID, ProjectEntity> entityFn;
 
-    ProjectEntityType(BiFunction<StructureService, ID, ProjectEntity> entityFn) {
+    ProjectEntityType(String displayName, BiFunction<StructureService, ID, ProjectEntity> entityFn) {
+        this.displayName = displayName;
         this.entityFn = entityFn;
     }
 
     public Function<ID, ProjectEntity> getEntityFn(StructureService structureService) {
         return id -> entityFn.apply(structureService, id);
+    }
+
+    public String getDisplayName() {
+        return displayName;
     }
 }
