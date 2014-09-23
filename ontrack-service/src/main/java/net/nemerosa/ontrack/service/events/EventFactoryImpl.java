@@ -16,6 +16,7 @@ public class EventFactoryImpl implements EventFactory {
     public static final EventType DELETE_PROJECT = SimpleEventType.of("delete_project", "Project ${:project} has been deleted.");
     public static final EventType NEW_BRANCH = SimpleEventType.of("new_branch", "New branch ${BRANCH} for project ${PROJECT}.");
     public static final EventType UPDATE_BRANCH = SimpleEventType.of("update_branch", "Branch ${BRANCH} in ${PROJECT} has been updated.");
+    public static final EventType DELETE_BRANCH = SimpleEventType.of("delete_branch", "Branch ${:branch} has been deleted from ${PROJECT}.");
 
     private final Map<String, EventType> types;
 
@@ -65,5 +66,13 @@ public class EventFactoryImpl implements EventFactory {
     @Override
     public Event updateBranch(Branch branch) {
         return Event.of(UPDATE_BRANCH).withBranch(branch).get();
+    }
+
+    @Override
+    public Event deleteBranch(Branch branch) {
+        return Event.of(DELETE_BRANCH)
+                .withProject(branch.getProject())
+                .with("branch", branch.getName())
+                .get();
     }
 }

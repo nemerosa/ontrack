@@ -24,4 +24,6 @@ public interface EventFactory {
     Event newBranch(Branch branch);
 
     Event updateBranch(Branch branch);
+
+    Event deleteBranch(Branch branch);
 }

@@ -170,14 +170,6 @@ public final class Event {
     }
 
     @Deprecated
-    public static Event deleteBranch(Branch branch) {
-        return Event.of("Branch ${:branch} has been deleted from ${PROJECT}.")
-                .withProject(branch.getProject())
-                .with("branch", branch.getName())
-                .get();
-    }
-
-    @Deprecated
     public static Event newPromotionLevel(PromotionLevel promotionLevel) {
         return Event.of("New promotion level ${PROMOTION_LEVEL} for branch ${BRANCH} in ${PROJECT}.")
                 .withPromotionLevel(promotionLevel)

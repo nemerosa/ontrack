@@ -160,7 +160,7 @@ public class StructureServiceImpl implements StructureService {
         Validate.isTrue(branchId.isSet(), "Branch ID must be set");
         Branch branch = getBranch(branchId);
         securityService.checkProjectFunction(branch.projectId(), BranchDelete.class);
-        eventPostService.post(Event.deleteBranch(branch));
+        eventPostService.post(eventFactory.deleteBranch(branch));
         return structureRepository.deleteBranch(branchId);
     }
 
