@@ -35,18 +35,18 @@ public class EventJdbcRepository extends AbstractJdbcRepository implements Event
 
     @Override
     public void post(Event event) {
-        StringBuilder sql = new StringBuilder("INSERT INTO EVENTS(EVENT_VALUES, EVENT_TIME, EVENT_USER, EVENT_TEMPLATE");
+        StringBuilder sql = new StringBuilder("INSERT INTO EVENTS(EVENT_VALUES, EVENT_TIME, EVENT_USER, EVENT_TYPE");
 
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("eventValues", writeJson(event.getValues()));
         params.addValue("eventTime", dateTimeForDB(event.getSignature().getTime()));
         params.addValue("eventUser", event.getSignature().getUser().getName());
-        params.addValue("eventTemplate", event.getTemplate());
+        params.addValue("eventType", event.getEventType().getId());
 
         for (ProjectEntityType type : event.getEntities().keySet()) {
             sql.append(", ").append(type.name());
         }
-        sql.append(") VALUES (:eventValues, :eventTime, :eventUser, :eventTemplate");
+        sql.append(") VALUES (:eventValues, :eventTime, :eventUser, :eventType");
         for (Map.Entry<ProjectEntityType, ProjectEntity> entry : event.getEntities().entrySet()) {
             ProjectEntityType type = entry.getKey();
             ProjectEntity entity = entry.getValue();
@@ -121,7 +121,6 @@ public class EventJdbcRepository extends AbstractJdbcRepository implements Event
         // OK
         return new Event(
                 eventTypeLoader.apply(eventTypeName),
-                null,
                 signature,
                 entities,
                 values

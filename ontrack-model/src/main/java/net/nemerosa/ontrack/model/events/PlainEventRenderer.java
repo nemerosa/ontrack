@@ -23,7 +23,7 @@ public class PlainEventRenderer implements EventRenderer {
             case VALIDATION_RUN:
                 return "#" + ((ValidationRun) projectEntity).getRunOrder();
             default:
-                throw new EventCannotRenderEntityException(event.getTemplate(), projectEntity);
+                throw new EventCannotRenderEntityException(event.getEventType().getTemplate(), projectEntity);
         }
     }
 

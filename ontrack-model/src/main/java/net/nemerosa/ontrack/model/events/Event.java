@@ -24,8 +24,6 @@ public final class Event {
     private static final Pattern EXPRESSION = Pattern.compile("\\$\\{([:a-zA-Z_]+)\\}");
 
     private final EventType eventType;
-    @Deprecated
-    private final String template;
     private final Signature signature;
     private final Map<ProjectEntityType, ProjectEntity> entities;
     private final Map<String, NameValue> values;
@@ -50,7 +48,7 @@ public final class Event {
             String valueKey = expression.substring(1);
             NameValue value = values.get(valueKey);
             if (value == null) {
-                throw new EventMissingValueException(template, valueKey);
+                throw new EventMissingValueException(eventType.getTemplate(), valueKey);
             }
             return eventRenderer.render(valueKey, value, this);
         } else {
@@ -59,16 +57,11 @@ public final class Event {
             // Gets the corresponding entity
             ProjectEntity projectEntity = entities.get(projectEntityType);
             if (projectEntity == null) {
-                throw new EventMissingEntityException(template, projectEntityType);
+                throw new EventMissingEntityException(eventType.getTemplate(), projectEntityType);
             }
             // Rendering
             return eventRenderer.render(projectEntity, this);
         }
-    }
-
-    @Deprecated
-    public static EventBuilder of(String template) {
-        return new EventBuilder(null);
     }
 
     public static EventBuilder of(EventType eventType) {
@@ -78,7 +71,6 @@ public final class Event {
     public Event withSignature(Signature signature) {
         return new Event(
                 eventType,
-                template,
                 signature,
                 entities,
                 values
@@ -88,15 +80,12 @@ public final class Event {
     public static class EventBuilder {
 
         private final EventType eventType;
-        @Deprecated
-        private final String template;
         private Signature signature;
         private Collection<ProjectEntity> entities = new ArrayList<>();
         private Map<String, NameValue> values = new LinkedHashMap<>();
 
         public EventBuilder(EventType eventType) {
             this.eventType = eventType;
-            this.template = null;
         }
 
         public EventBuilder with(Signature signature) {
@@ -154,7 +143,6 @@ public final class Event {
             // Creates the event
             Event event = new Event(
                     eventType,
-                    template,
                     signature,
                     Maps.uniqueIndex(
                             entities,
