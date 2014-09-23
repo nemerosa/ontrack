@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.events;
 
 import net.nemerosa.ontrack.model.events.*;
+import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Project;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,7 @@ public class EventFactoryImpl implements EventFactory {
     public static final EventType NEW_PROJECT = SimpleEventType.of("new_project", "New project ${PROJECT}.");
     public static final EventType UPDATE_PROJECT = SimpleEventType.of("update_project", "Project ${PROJECT} has been updated.");
     public static final EventType DELETE_PROJECT = SimpleEventType.of("delete_project", "Project ${:project} has been deleted.");
+    public static final EventType NEW_BRANCH = SimpleEventType.of("new_branch", "New branch ${BRANCH} for project ${PROJECT}.");
 
     private final Map<String, EventType> types;
 
@@ -21,6 +23,7 @@ public class EventFactoryImpl implements EventFactory {
         register(NEW_PROJECT);
         register(UPDATE_PROJECT);
         register(DELETE_PROJECT);
+        register(NEW_BRANCH);
     }
 
     private void register(EventType eventType) {
@@ -50,5 +53,10 @@ public class EventFactoryImpl implements EventFactory {
     @Override
     public Event deleteProject(Project project) {
         return Event.of(DELETE_PROJECT).with("project", project.getName()).get();
+    }
+
+    @Override
+    public Event newBranch(Branch branch) {
+        return Event.of(NEW_BRANCH).withBranch(branch).get();
     }
 }

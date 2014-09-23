@@ -123,7 +123,7 @@ public class StructureServiceImpl implements StructureService {
         // Creating the branch
         Branch newBranch = structureRepository.newBranch(branch);
         // Event
-        eventPostService.post(Event.newBranch(newBranch));
+        eventPostService.post(eventFactory.newBranch(newBranch));
         // OK
         return newBranch;
     }
