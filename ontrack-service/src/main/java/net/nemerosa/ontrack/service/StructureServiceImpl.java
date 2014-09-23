@@ -556,7 +556,7 @@ public class StructureServiceImpl implements StructureService {
         Validate.isTrue(validationStampId.isSet(), "Validation stamp ID must be set");
         ValidationStamp validationStamp = getValidationStamp(validationStampId);
         securityService.checkProjectFunction(validationStamp.projectId(), ValidationStampDelete.class);
-        // TODO Event
+        eventPostService.post(eventFactory.deleteValidationStamp(validationStamp));
         return structureRepository.deleteValidationStamp(validationStampId);
     }
 

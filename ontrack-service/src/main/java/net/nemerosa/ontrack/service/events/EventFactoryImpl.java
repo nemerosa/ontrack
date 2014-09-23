@@ -29,6 +29,7 @@ public class EventFactoryImpl implements EventFactory {
     public static final EventType NEW_VALIDATION_STAMP = SimpleEventType.of("new_validation_stamp", "New validation stamp ${VALIDATION_STAMP} for branch ${BRANCH} in ${PROJECT}.");
     public static final EventType IMAGE_VALIDATION_STAMP = SimpleEventType.of("image_validation_stamp", "Image for validation stamp ${VALIDATION_STAMP} for branch ${BRANCH} in ${PROJECT} has changed.");
     public static final EventType UPDATE_VALIDATION_STAMP = SimpleEventType.of("update_validation_stamp", "Validation stamp ${VALIDATION_STAMP} for branch ${BRANCH} in ${PROJECT} has been updated.");
+    public static final EventType DELETE_VALIDATION_STAMP = SimpleEventType.of("delete_validation_stamp", "Validation stamp ${:validation_stamp} for branch ${BRANCH} in ${PROJECT} has been deleted.");
     public static final EventType NEW_PROMOTION_RUN = SimpleEventType.of("new_promotion_run", "Build ${BUILD} has been promoted to ${PROMOTION_LEVEL} for branch ${BRANCH} in ${PROJECT}.");
     public static final EventType DELETE_PROMOTION_RUN = SimpleEventType.of("delete_promotion_run", "Promotion ${PROMOTION_LEVEL} of build ${BUILD} has been deleted for branch ${BRANCH} in ${PROJECT}.");
     public static final EventType NEW_VALIDATION_RUN = SimpleEventType.of("new_validation_run", "Build ${BUILD} has run for ${VALIDATION_STAMP} with status ${:status} in branch ${BRANCH} in ${PROJECT}.");
@@ -59,6 +60,7 @@ public class EventFactoryImpl implements EventFactory {
         register(NEW_VALIDATION_STAMP);
         register(IMAGE_VALIDATION_STAMP);
         register(UPDATE_VALIDATION_STAMP);
+        register(DELETE_VALIDATION_STAMP);
 
         register(NEW_PROMOTION_RUN);
         register(DELETE_PROMOTION_RUN);
@@ -211,6 +213,14 @@ public class EventFactoryImpl implements EventFactory {
     public Event updateValidationStamp(ValidationStamp validationStamp) {
         return Event.of(UPDATE_VALIDATION_STAMP)
                 .withValidationStamp(validationStamp)
+                .get();
+    }
+
+    @Override
+    public Event deleteValidationStamp(ValidationStamp validationStamp) {
+        return Event.of(DELETE_VALIDATION_STAMP)
+                .withBranch(validationStamp.getBranch())
+                .with("validation_stamp", validationStamp.getName())
                 .get();
     }
 

@@ -52,6 +52,8 @@ public interface EventFactory {
 
     Event updateValidationStamp(ValidationStamp validationStamp);
 
+    Event deleteValidationStamp(ValidationStamp validationStamp);
+
     Event newValidationRun(ValidationRun validationRun);
 
     Event newValidationRunStatus(ValidationRun validationRun);

@@ -101,6 +101,15 @@ public class EventFactoryImplTest {
     }
 
     @Test
+    void deleteValidationStamp() {
+        Event e = factory.deleteValidationStamp(validationStamp());
+        assert e != null
+        assert e.signature == null
+        assert e.entities.size() == 2
+        assert e.renderText() == "Validation stamp SMOKE for branch B in P has been deleted."
+    }
+
+    @Test
     void newPromotionRun() {
         Event e = factory.newPromotionRun(promotionRun());
         assert e != null
