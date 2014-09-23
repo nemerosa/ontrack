@@ -35,7 +35,7 @@ public final class Event {
     }
 
     public String render(EventRenderer eventRenderer) {
-        Matcher m = EXPRESSION.matcher(template);
+        Matcher m = EXPRESSION.matcher(eventType.getTemplate());
         StringBuffer output = new StringBuffer();
         while (m.find()) {
             String value = expandExpression(m.group(1), eventRenderer);
