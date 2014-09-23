@@ -20,6 +20,7 @@ public class EventFactoryImpl implements EventFactory {
     public static final EventType NEW_PROMOTION_LEVEL = SimpleEventType.of("new_promotion_level", "New promotion level ${PROMOTION_LEVEL} for branch ${BRANCH} in ${PROJECT}.");
     public static final EventType NEW_VALIDATION_STAMP = SimpleEventType.of("new_validation_stamp", "New validation stamp ${VALIDATION_STAMP} for branch ${BRANCH} in ${PROJECT}.");
     public static final EventType NEW_PROMOTION_RUN = SimpleEventType.of("new_promotion_run", "Build ${BUILD} has been promoted to ${PROMOTION_LEVEL} for branch ${BRANCH} in ${PROJECT}.");
+    public static final EventType NEW_VALIDATION_RUN = SimpleEventType.of("new_validation_run", "Build ${BUILD} has run for ${VALIDATION_STAMP} with status ${:status} in branch ${BRANCH} in ${PROJECT}.");
 
     private final Map<String, EventType> types;
 
@@ -34,6 +35,7 @@ public class EventFactoryImpl implements EventFactory {
         register(NEW_PROMOTION_LEVEL);
         register(NEW_VALIDATION_STAMP);
         register(NEW_PROMOTION_RUN);
+        register(NEW_VALIDATION_RUN);
     }
 
     private void register(EventType eventType) {
@@ -108,6 +110,14 @@ public class EventFactoryImpl implements EventFactory {
     public Event newValidationStamp(ValidationStamp validationStamp) {
         return Event.of(NEW_VALIDATION_STAMP)
                 .withValidationStamp(validationStamp)
+                .get();
+    }
+
+    @Override
+    public Event newValidationRun(ValidationRun validationRun) {
+        return Event.of(NEW_VALIDATION_RUN)
+                .withValidationRun(validationRun)
+                .withValidationRunStatus(validationRun.getLastStatus().getStatusID())
                 .get();
     }
 }

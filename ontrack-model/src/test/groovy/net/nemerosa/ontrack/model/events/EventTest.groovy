@@ -42,16 +42,6 @@ public class EventTest {
     }
 
     @Test
-    void newValidationRun() {
-        Event e = Event.newValidationRun(validationRun());
-        assert e != null
-        assert e.signature.user.name == 'user'
-        assert e.entities.size() == 5
-        assert e.renderText() == "Build 1 has run for SMOKE with status Failed in branch B in P."
-        assert e.render(testRenderer) == """Build <a href="#/build/100">1</a> has run for <a href="#/validationStamp/100">SMOKE</a> with status <i class="status">Failed</i> in branch <a href="#/branch/10">B</a> in <a href="#/project/1">P</a>."""
-    }
-
-    @Test
     void newValidationRunStatus() {
         Event e = Event.newValidationRunStatus(validationRun());
         assert e != null

@@ -585,7 +585,7 @@ public class StructureServiceImpl implements StructureService {
         // Actual creation
         ValidationRun newValidationRun = structureRepository.newValidationRun(validationRun);
         // Event
-        eventPostService.post(Event.newValidationRun(newValidationRun));
+        eventPostService.post(eventFactory.newValidationRun(newValidationRun));
         // OK
         return newValidationRun;
     }
