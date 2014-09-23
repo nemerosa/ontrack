@@ -24,8 +24,8 @@ public class PromotionLevel implements ProjectEntity {
     private final Boolean image;
 
     @Override
-    public ID getProjectId() {
-        return getBranch().getProjectId();
+    public Project getProject() {
+        return getBranch().getProject();
     }
 
     @Override

@@ -43,8 +43,8 @@ public class ValidationRun implements ProjectEntity {
     }
 
     @Override
-    public ID getProjectId() {
-        return getBuild().getProjectId();
+    public Project getProject() {
+        return getBuild().getProject();
     }
 
     @Override

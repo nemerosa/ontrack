@@ -10,11 +10,18 @@ import static org.apache.commons.lang3.Validate.isTrue;
 public interface ProjectEntity extends Entity {
 
     /**
+     * Returns the project this entity is associated with
+     */
+    Project getProject();
+
+    /**
      * Returns the ID of the project that contains this entity. This method won't return <code>null</code>
      * but the ID could be {@linkplain ID#NONE undefined}.
      */
     @JsonIgnore
-    ID getProjectId();
+    default ID getProjectId() {
+        return getProject().getId();
+    }
 
     /**
      * Shortcut to get the ID as a value.
@@ -24,7 +31,7 @@ public interface ProjectEntity extends Entity {
     default int projectId() {
         ID id = getProjectId();
         isTrue(ID.isDefined(id), "Project ID must be defined");
-        return id.getValue();
+        return id.get();
     }
 
     /**

@@ -25,8 +25,8 @@ public class Build implements ProjectEntity {
     }
 
     @Override
-    public ID getProjectId() {
-        return getBranch().getProjectId();
+    public Project getProject() {
+        return getBranch().getProject();
     }
 
     @Override

@@ -19,8 +19,8 @@ public class Project implements ProjectEntity {
     }
 
     @Override
-    public ID getProjectId() {
-        return id;
+    public Project getProject() {
+        return this;
     }
 
     @Override

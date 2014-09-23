@@ -137,7 +137,7 @@ public final class Event {
 
         public EventBuilder withRef(ProjectEntity entity) {
             this.ref = entity;
-            return with(entity);
+            return withProject(entity.getProject()).with(entity);
         }
 
         public EventBuilder with(ProjectEntity entity) {
