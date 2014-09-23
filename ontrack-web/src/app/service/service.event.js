@@ -69,6 +69,14 @@ angular.module('ot.service.event', [
             };
         }
 
+        function replacementEntityError (event, expression) {
+            return "#ERROR";
+        }
+
+        function replacementValueError (event, key) {
+            return "#ERROR";
+        }
+
         return self;
 
     })
