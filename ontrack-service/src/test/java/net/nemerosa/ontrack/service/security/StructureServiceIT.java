@@ -186,39 +186,12 @@ public class StructureServiceIT extends AbstractServiceTestSupport {
         assertEquals("Validation run order must be 1", 1, run.getRunOrder());
     }
 
-    private Build doCreateBuild(Branch branch, NameDescription nameDescription) throws Exception {
-        return asUser().with(branch.getProject().id(), BuildCreate.class).call(() ->
-                        structureService.newBuild(
-                                Build.of(
-                                        branch,
-                                        nameDescription,
-                                        Signature.of("user")
-                                )
-                        )
-        );
-    }
-
     private ValidationStamp doCreateValidationStamp(Branch branch, NameDescription nameDescription) throws Exception {
         return asUser().with(branch.getProject().id(), ValidationStampCreate.class).call(() ->
                         structureService.newValidationStamp(
                                 ValidationStamp.of(
                                         branch,
                                         nameDescription
-                                )
-                        )
-        );
-    }
-
-    private PromotionLevel doCreatePromotionLevel() throws Exception {
-        Branch branch = doCreateBranch();
-        return doCreatePromotionLevel(branch, nameDescription());
-    }
-
-    private PromotionLevel doCreatePromotionLevel(Branch branch, NameDescription nameDescription) throws Exception {
-        return asUser().with(branch.getProject().id(), PromotionLevelCreate.class).call(() ->
-                        structureService.newPromotionLevel(
-                                PromotionLevel.of(
-                                        branch, nameDescription
                                 )
                         )
         );

@@ -57,6 +57,46 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
         ));
     }
 
+    protected Build doCreateBuild() throws Exception {
+        return doCreateBuild(doCreateBranch(), nameDescription());
+    }
+
+    protected Build doCreateBuild(Branch branch, NameDescription nameDescription) throws Exception {
+        return asUser().with(branch.projectId(), BuildCreate.class).call(() -> structureService.newBuild(
+                Build.of(
+                        branch,
+                        nameDescription,
+                        Signature.of("test")
+                )
+        ));
+    }
+
+    protected PromotionLevel doCreatePromotionLevel() throws Exception {
+        return doCreatePromotionLevel(doCreateBranch(), nameDescription());
+    }
+
+    protected PromotionLevel doCreatePromotionLevel(Branch branch, NameDescription nameDescription) throws Exception {
+        return asUser().with(branch.projectId(), PromotionLevelCreate.class).call(() -> structureService.newPromotionLevel(
+                PromotionLevel.of(
+                        branch,
+                        nameDescription
+                )
+        ));
+    }
+
+    protected PromotionRun doPromote(Build build, PromotionLevel promotionLevel, String description) throws Exception {
+        return asUser().with(build.projectId(), PromotionRunCreate.class).call(() ->
+                        structureService.newPromotionRun(
+                                PromotionRun.of(
+                                        build,
+                                        promotionLevel,
+                                        Signature.of("test"),
+                                        description
+                                )
+                        )
+        );
+    }
+
     protected UserCall asUser() {
         return new UserCall();
     }
