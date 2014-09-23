@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.model.structure;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Data;
 import net.nemerosa.ontrack.model.form.Form;
@@ -14,6 +15,7 @@ public class Branch implements ProjectEntity {
             PromotionView.class, Branch.class, Build.class, PromotionLevel.class, ValidationStamp.class,
             PromotionRun.class, ValidationRun.class, PromotionRunView.class
     })
+    @JsonProperty("project")
     private final Project project;
 
     public static Branch of(Project project, NameDescription nameDescription) {

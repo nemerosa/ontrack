@@ -12,6 +12,7 @@ public interface ProjectEntity extends Entity {
     /**
      * Returns the project this entity is associated with
      */
+    @JsonIgnore
     Project getProject();
 
     /**
