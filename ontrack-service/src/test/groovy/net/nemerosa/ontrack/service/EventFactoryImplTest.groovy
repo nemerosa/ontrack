@@ -83,6 +83,15 @@ public class EventFactoryImplTest {
     }
 
     @Test
+    void imageValidationStamp() {
+        Event e = factory.imageValidationStamp(validationStamp());
+        assert e != null
+        assert e.signature == null
+        assert e.entities.size() == 3
+        assert e.renderText() == "Image for validation stamp SMOKE for branch B in P has changed."
+    }
+
+    @Test
     void newPromotionRun() {
         Event e = factory.newPromotionRun(promotionRun());
         assert e != null
@@ -145,6 +154,10 @@ public class EventFactoryImplTest {
                 ValidationRunStatusID.STATUS_FAILED,
                 ""
         ).withId(ID.of(1000))
+    }
+
+    protected static ValidationStamp validationStamp() {
+        ValidationStamp.of(branch(), nd("SMOKE", "")).withId(ID.of(100))
     }
 
     private static Build build() {

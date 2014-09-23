@@ -434,7 +434,6 @@ public class StructureServiceImpl implements StructureService {
     public PromotionRun getPromotionRun(ID promotionRunId) {
         PromotionRun promotionRun = structureRepository.getPromotionRun(promotionRunId);
         securityService.checkProjectFunction(promotionRun.getBuild().getBranch().getProject().id(), ProjectView.class);
-        // TODO Event
         return promotionRun;
     }
 
@@ -532,9 +531,10 @@ public class StructureServiceImpl implements StructureService {
         // Checks access
         ValidationStamp validationStamp = getValidationStamp(validationStampId);
         securityService.checkProjectFunction(validationStamp.getBranch().getProject().id(), ValidationStampEdit.class);
-        // TODO Event
         // Repository
         structureRepository.setValidationStampImage(validationStampId, document);
+        // Event
+        eventPostService.post(eventFactory.imageValidationStamp(validationStamp));
     }
 
     @Override

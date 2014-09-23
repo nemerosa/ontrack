@@ -27,6 +27,7 @@ public class EventFactoryImpl implements EventFactory {
     public static final EventType DELETE_PROMOTION_LEVEL = SimpleEventType.of("delete_promotion_level", "Promotion level ${:promotion_level} for branch ${BRANCH} in ${PROJECT} has been deleted.");
     public static final EventType REORDER_PROMOTION_LEVEL = SimpleEventType.of("reorder_promotion_level", "Promotion levels for branch ${BRANCH} in ${PROJECT} have been reordered.");
     public static final EventType NEW_VALIDATION_STAMP = SimpleEventType.of("new_validation_stamp", "New validation stamp ${VALIDATION_STAMP} for branch ${BRANCH} in ${PROJECT}.");
+    public static final EventType IMAGE_VALIDATION_STAMP = SimpleEventType.of("image_validation_stamp", "Image for validation stamp ${VALIDATION_STAMP} for branch ${BRANCH} in ${PROJECT} has changed.");
     public static final EventType NEW_PROMOTION_RUN = SimpleEventType.of("new_promotion_run", "Build ${BUILD} has been promoted to ${PROMOTION_LEVEL} for branch ${BRANCH} in ${PROJECT}.");
     public static final EventType DELETE_PROMOTION_RUN = SimpleEventType.of("delete_promotion_run", "Promotion ${PROMOTION_LEVEL} of build ${BUILD} has been deleted for branch ${BRANCH} in ${PROJECT}.");
     public static final EventType NEW_VALIDATION_RUN = SimpleEventType.of("new_validation_run", "Build ${BUILD} has run for ${VALIDATION_STAMP} with status ${:status} in branch ${BRANCH} in ${PROJECT}.");
@@ -39,19 +40,27 @@ public class EventFactoryImpl implements EventFactory {
         register(NEW_PROJECT);
         register(UPDATE_PROJECT);
         register(DELETE_PROJECT);
+
         register(NEW_BRANCH);
         register(UPDATE_BRANCH);
+        register(DELETE_BRANCH);
+
         register(NEW_BUILD);
         register(UPDATE_BUILD);
         register(DELETE_BUILD);
+
         register(NEW_PROMOTION_LEVEL);
         register(IMAGE_PROMOTION_LEVEL);
         register(UPDATE_PROMOTION_LEVEL);
         register(DELETE_PROMOTION_LEVEL);
         register(REORDER_PROMOTION_LEVEL);
+
         register(NEW_VALIDATION_STAMP);
+        register(IMAGE_VALIDATION_STAMP);
+
         register(NEW_PROMOTION_RUN);
         register(DELETE_PROMOTION_RUN);
+
         register(NEW_VALIDATION_RUN);
         register(NEW_VALIDATION_RUN_STATUS);
     }
@@ -185,6 +194,13 @@ public class EventFactoryImpl implements EventFactory {
     @Override
     public Event newValidationStamp(ValidationStamp validationStamp) {
         return Event.of(NEW_VALIDATION_STAMP)
+                .withValidationStamp(validationStamp)
+                .get();
+    }
+
+    @Override
+    public Event imageValidationStamp(ValidationStamp validationStamp) {
+        return Event.of(IMAGE_VALIDATION_STAMP)
                 .withValidationStamp(validationStamp)
                 .get();
     }
