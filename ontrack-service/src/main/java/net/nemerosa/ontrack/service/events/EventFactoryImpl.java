@@ -22,6 +22,7 @@ public class EventFactoryImpl implements EventFactory {
     public static final EventType UPDATE_BUILD = SimpleEventType.of("update_build", "Build ${BUILD} for branch ${BRANCH} in ${PROJECT} has been updated.");
     public static final EventType DELETE_BUILD = SimpleEventType.of("delete_build", "Build ${:build} for branch ${BRANCH} in ${PROJECT} has been deleted.");
     public static final EventType NEW_PROMOTION_LEVEL = SimpleEventType.of("new_promotion_level", "New promotion level ${PROMOTION_LEVEL} for branch ${BRANCH} in ${PROJECT}.");
+    public static final EventType IMAGE_PROMOTION_LEVEL = SimpleEventType.of("image_promotion_level", "Image for promotion level ${PROMOTION_LEVEL} for branch ${BRANCH} in ${PROJECT} has changed.");
     public static final EventType NEW_VALIDATION_STAMP = SimpleEventType.of("new_validation_stamp", "New validation stamp ${VALIDATION_STAMP} for branch ${BRANCH} in ${PROJECT}.");
     public static final EventType NEW_PROMOTION_RUN = SimpleEventType.of("new_promotion_run", "Build ${BUILD} has been promoted to ${PROMOTION_LEVEL} for branch ${BRANCH} in ${PROJECT}.");
     public static final EventType DELETE_PROMOTION_RUN = SimpleEventType.of("delete_promotion_run", "Promotion ${PROMOTION_LEVEL} of build ${BUILD} has been deleted for branch ${BRANCH} in ${PROJECT}.");
@@ -38,8 +39,10 @@ public class EventFactoryImpl implements EventFactory {
         register(NEW_BRANCH);
         register(UPDATE_BRANCH);
         register(NEW_BUILD);
+        register(UPDATE_BUILD);
         register(DELETE_BUILD);
         register(NEW_PROMOTION_LEVEL);
+        register(IMAGE_PROMOTION_LEVEL);
         register(NEW_VALIDATION_STAMP);
         register(NEW_PROMOTION_RUN);
         register(DELETE_PROMOTION_RUN);
@@ -124,6 +127,13 @@ public class EventFactoryImpl implements EventFactory {
     @Override
     public Event newPromotionLevel(PromotionLevel promotionLevel) {
         return Event.of(NEW_PROMOTION_LEVEL)
+                .withPromotionLevel(promotionLevel)
+                .get();
+    }
+
+    @Override
+    public Event imagePromotionLevel(PromotionLevel promotionLevel) {
+        return Event.of(IMAGE_PROMOTION_LEVEL)
                 .withPromotionLevel(promotionLevel)
                 .get();
     }

@@ -351,9 +351,10 @@ public class StructureServiceImpl implements StructureService {
         // Checks access
         PromotionLevel promotionLevel = getPromotionLevel(promotionLevelId);
         securityService.checkProjectFunction(promotionLevel.getBranch().getProject().id(), PromotionLevelEdit.class);
-        // TODO Event
         // Repository
         structureRepository.setPromotionLevelImage(promotionLevelId, document);
+        // Event
+        eventPostService.post(eventFactory.imagePromotionLevel(promotionLevel));
     }
 
     @Override

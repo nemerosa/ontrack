@@ -34,6 +34,8 @@ public interface EventFactory {
 
     Event newPromotionLevel(PromotionLevel promotionLevel);
 
+    Event imagePromotionLevel(PromotionLevel promotionLevel);
+
     Event newPromotionRun(PromotionRun promotionRun);
 
     Event deletePromotionRun(PromotionRun promotionRun);
