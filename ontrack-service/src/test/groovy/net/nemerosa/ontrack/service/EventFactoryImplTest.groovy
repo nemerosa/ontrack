@@ -36,6 +36,16 @@ public class EventFactoryImplTest {
         assert e.render(testRenderer) == """Project <i class="project">P</i> has been deleted."""
     }
 
+    @Test
+    void newBuild() {
+        Event e = factory.newBuild(build());
+        assert e != null
+        assert e.signature.user.name == 'user'
+        assert e.entities.size() == 3
+        assert e.renderText() == "New build 1 for branch B in P."
+        assert e.render(testRenderer) == """New build <a href="#/build/100">1</a> for branch <a href="#/branch/10">B</a> in <a href="#/project/1">P</a>."""
+    }
+
     private static PromotionRun promotionRun() {
         def branch = branch();
         PromotionRun.of(

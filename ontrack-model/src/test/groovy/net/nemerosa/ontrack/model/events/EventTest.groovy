@@ -42,16 +42,6 @@ public class EventTest {
     }
 
     @Test
-    void newBuild() {
-        Event e = Event.newBuild(build());
-        assert e != null
-        assert e.signature.user.name == 'user'
-        assert e.entities.size() == 3
-        assert e.renderText() == "New build 1 for branch B in P."
-        assert e.render(testRenderer) == """New build <a href="#/build/100">1</a> for branch <a href="#/branch/10">B</a> in <a href="#/project/1">P</a>."""
-    }
-
-    @Test
     void newPromotionRun() {
         Event e = Event.newPromotionRun(promotionRun());
         assert e != null
@@ -101,10 +91,6 @@ public class EventTest {
                 ValidationRunStatusID.STATUS_FAILED,
                 ""
         ).withId(ID.of(1000))
-    }
-
-    private static Build build() {
-        return Build.of(branch(), nd("1", "Build"), Signature.of("user")).withId(ID.of(100));
     }
 
     private static Branch branch() {

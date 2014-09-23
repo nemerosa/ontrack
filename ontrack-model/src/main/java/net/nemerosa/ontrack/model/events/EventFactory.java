@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.model.events;
 
 import net.nemerosa.ontrack.model.structure.Branch;
+import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.Project;
 
 /**
@@ -26,4 +27,6 @@ public interface EventFactory {
     Event updateBranch(Branch branch);
 
     Event deleteBranch(Branch branch);
+
+    Event newBuild(Build build);
 }

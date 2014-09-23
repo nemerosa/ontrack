@@ -184,13 +184,6 @@ public final class Event {
     }
 
     @Deprecated
-    public static Event newBuild(Build build) {
-        return Event.of("New build ${BUILD} for branch ${BRANCH} in ${PROJECT}.")
-                .withBuild(build)
-                .get();
-    }
-
-    @Deprecated
     public static Event newPromotionRun(PromotionRun promotionRun) {
         return Event.of("Build ${BUILD} has been promoted to ${PROMOTION_LEVEL} for branch ${BRANCH} in ${PROJECT}.")
                 .withPromotionRun(promotionRun)

@@ -226,7 +226,7 @@ public class StructureServiceImpl implements StructureService {
         // Repository
         Build newBuild = structureRepository.newBuild(build);
         // Event
-        eventPostService.post(Event.newBuild(newBuild));
+        eventPostService.post(eventFactory.newBuild(newBuild));
         // OK
         return newBuild;
     }
