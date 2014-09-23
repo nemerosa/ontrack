@@ -210,7 +210,7 @@ public class StructureServiceImpl implements StructureService {
         Validate.isTrue(buildId.isSet(), "Build ID must be set");
         Build build = getBuild(buildId);
         securityService.checkProjectFunction(build.projectId(), BuildDelete.class);
-        // TODO Event
+        eventPostService.post(eventFactory.deleteBuild(build));
         return structureRepository.deleteBuild(buildId);
     }
 

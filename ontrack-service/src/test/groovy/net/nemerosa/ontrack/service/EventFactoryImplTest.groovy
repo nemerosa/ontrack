@@ -47,6 +47,15 @@ public class EventFactoryImplTest {
     }
 
     @Test
+    void deleteBuild() {
+        Event e = factory.deleteBuild(build());
+        assert e != null
+        assert e.signature == null
+        assert e.entities.size() == 2
+        assert e.renderText() == "Build 1 for branch B in P has been deleted."
+    }
+
+    @Test
     void newPromotionRun() {
         Event e = factory.newPromotionRun(promotionRun());
         assert e != null

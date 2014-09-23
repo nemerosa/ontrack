@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static java.lang.String.format;
+
 @Service
 public class EventFactoryImpl implements EventFactory {
 
@@ -17,6 +19,7 @@ public class EventFactoryImpl implements EventFactory {
     public static final EventType UPDATE_BRANCH = SimpleEventType.of("update_branch", "Branch ${BRANCH} in ${PROJECT} has been updated.");
     public static final EventType DELETE_BRANCH = SimpleEventType.of("delete_branch", "Branch ${:branch} has been deleted from ${PROJECT}.");
     public static final EventType NEW_BUILD = SimpleEventType.of("new_build", "New build ${BUILD} for branch ${BRANCH} in ${PROJECT}.");
+    public static final EventType DELETE_BUILD = SimpleEventType.of("delete_build", "Build ${:build} for branch ${BRANCH} in ${PROJECT} has been deleted.");
     public static final EventType NEW_PROMOTION_LEVEL = SimpleEventType.of("new_promotion_level", "New promotion level ${PROMOTION_LEVEL} for branch ${BRANCH} in ${PROJECT}.");
     public static final EventType NEW_VALIDATION_STAMP = SimpleEventType.of("new_validation_stamp", "New validation stamp ${VALIDATION_STAMP} for branch ${BRANCH} in ${PROJECT}.");
     public static final EventType NEW_PROMOTION_RUN = SimpleEventType.of("new_promotion_run", "Build ${BUILD} has been promoted to ${PROMOTION_LEVEL} for branch ${BRANCH} in ${PROJECT}.");
@@ -34,6 +37,7 @@ public class EventFactoryImpl implements EventFactory {
         register(NEW_BRANCH);
         register(UPDATE_BRANCH);
         register(NEW_BUILD);
+        register(DELETE_BUILD);
         register(NEW_PROMOTION_LEVEL);
         register(NEW_VALIDATION_STAMP);
         register(NEW_PROMOTION_RUN);
@@ -43,7 +47,11 @@ public class EventFactoryImpl implements EventFactory {
     }
 
     private void register(EventType eventType) {
-        types.put(eventType.getId(), eventType);
+        if (types.containsKey(eventType.getId())) {
+            throw new IllegalStateException(format("Event with ID = %s is already registered.", eventType.getId()));
+        } else {
+            types.put(eventType.getId(), eventType);
+        }
     }
 
     @Override
@@ -93,6 +101,14 @@ public class EventFactoryImpl implements EventFactory {
     public Event newBuild(Build build) {
         return Event.of(NEW_BUILD)
                 .withBuild(build)
+                .get();
+    }
+
+    @Override
+    public Event deleteBuild(Build build) {
+        return Event.of(DELETE_BUILD)
+                .withBranch(build.getBranch())
+                .with("build", build.getName())
                 .get();
     }
 
