@@ -170,13 +170,6 @@ public final class Event {
     }
 
     @Deprecated
-    public static Event newValidationStamp(ValidationStamp validationStamp) {
-        return Event.of("New validation stamp ${VALIDATION_STAMP} for branch ${BRANCH} in ${PROJECT}.")
-                .withValidationStamp(validationStamp)
-                .get();
-    }
-
-    @Deprecated
     public static Event newValidationRun(ValidationRun validationRun) {
         return Event.of("Build ${BUILD} has run for ${VALIDATION_STAMP} with status ${:status} in branch ${BRANCH} in ${PROJECT}.")
                 .withValidationRun(validationRun)

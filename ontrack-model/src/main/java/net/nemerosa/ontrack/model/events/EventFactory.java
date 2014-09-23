@@ -31,4 +31,6 @@ public interface EventFactory {
     Event newPromotionLevel(PromotionLevel promotionLevel);
 
     Event newPromotionRun(PromotionRun promotionRun);
+
+    Event newValidationStamp(ValidationStamp validationStamp);
 }

@@ -470,7 +470,7 @@ public class StructureServiceImpl implements StructureService {
         // Repository
         ValidationStamp newValidationStamp = structureRepository.newValidationStamp(validationStamp);
         // Event
-        eventPostService.post(Event.newValidationStamp(newValidationStamp));
+        eventPostService.post(eventFactory.newValidationStamp(newValidationStamp));
         // OK
         return newValidationStamp;
     }
