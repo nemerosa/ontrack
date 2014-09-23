@@ -120,8 +120,8 @@ public class PropertyServiceImpl implements PropertyService {
         if (value != null) {
             Ack ack = propertyRepository.deleteProperty(propertyType.getClass().getName(), entity.getProjectEntityType(), entity.getId());
             if (ack.isSuccess()) {
-                // Property change event
-                eventPostService.post(eventFactory.propertyChange(entity, propertyType));
+                // TODO Property deletion event
+                // eventPostService.post(eventFactory.propertyChange(entity, propertyType));
             }
             // OK
             return ack;
@@ -149,7 +149,8 @@ public class PropertyServiceImpl implements PropertyService {
                 storage,
                 searchKey
         );
-        // TODO Property change event
+        // Property change event
+        eventPostService.post(eventFactory.propertyChange(entity, propertyType));
         // OK
         return Ack.OK;
     }

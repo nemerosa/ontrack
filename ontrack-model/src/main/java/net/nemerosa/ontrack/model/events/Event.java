@@ -1,13 +1,10 @@
 package net.nemerosa.ontrack.model.events;
 
-import com.google.common.collect.Maps;
 import lombok.Data;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.NameValue;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -89,7 +86,7 @@ public final class Event {
 
         private final EventType eventType;
         private Signature signature;
-        private Collection<ProjectEntity> entities = new ArrayList<>();
+        private Map<ProjectEntityType, ProjectEntity> entities = new LinkedHashMap<>();
         private ProjectEntity ref = null;
         private Map<String, NameValue> values = new LinkedHashMap<>();
 
@@ -141,7 +138,7 @@ public final class Event {
         }
 
         public EventBuilder with(ProjectEntity entity) {
-            entities.add(entity);
+            entities.put(entity.getProjectEntityType(), entity);
             return this;
         }
 
@@ -163,10 +160,7 @@ public final class Event {
             Event event = new Event(
                     eventType,
                     signature,
-                    Maps.uniqueIndex(
-                            entities,
-                            ProjectEntity::getProjectEntityType
-                    ),
+                    entities,
                     ref,
                     values
             );
