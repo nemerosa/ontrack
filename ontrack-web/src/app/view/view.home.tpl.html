@@ -8,10 +8,13 @@
                 <div class="col-md-12 ot-home-header">
                     List of projects with the list of their branches and the highest promotion
                     level they get promoted to.
-                    <input class="ot-home-filter col-md-2"
-                           type="text"
-                           ng-model="projectNameFilter"
-                           placeholder="Filter on project names"/>
+                    <div class="ot-home-filter input-group col-md-4">
+                        <input class="form-control"
+                               type="text"
+                               ng-model="projectNameFilter"
+                               placeholder="Filter on project names"/>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
+                    </div>
                 </div>
             </div>
             <div class="row ot-home-project" ng-repeat="project in projectCollection.resources | filter:{name:projectNameFilter}">
