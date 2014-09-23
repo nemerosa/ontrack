@@ -170,13 +170,6 @@ public final class Event {
     }
 
     @Deprecated
-    public static Event newPromotionLevel(PromotionLevel promotionLevel) {
-        return Event.of("New promotion level ${PROMOTION_LEVEL} for branch ${BRANCH} in ${PROJECT}.")
-                .withPromotionLevel(promotionLevel)
-                .get();
-    }
-
-    @Deprecated
     public static Event newValidationStamp(ValidationStamp validationStamp) {
         return Event.of("New validation stamp ${VALIDATION_STAMP} for branch ${BRANCH} in ${PROJECT}.")
                 .withValidationStamp(validationStamp)

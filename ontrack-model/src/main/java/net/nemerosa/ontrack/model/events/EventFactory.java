@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.model.events;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.Project;
+import net.nemerosa.ontrack.model.structure.PromotionLevel;
 
 /**
  * Factory for events.
@@ -29,4 +30,6 @@ public interface EventFactory {
     Event deleteBranch(Branch branch);
 
     Event newBuild(Build build);
+
+    Event newPromotionLevel(PromotionLevel promotionLevel);
 }

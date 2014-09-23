@@ -323,7 +323,7 @@ public class StructureServiceImpl implements StructureService {
         // Repository
         PromotionLevel newPromotionLevel = structureRepository.newPromotionLevel(promotionLevel);
         // Event
-        eventPostService.post(Event.newPromotionLevel(newPromotionLevel));
+        eventPostService.post(eventFactory.newPromotionLevel(newPromotionLevel));
         // OK
         return newPromotionLevel;
     }
