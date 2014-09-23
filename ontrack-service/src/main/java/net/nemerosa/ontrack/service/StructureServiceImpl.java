@@ -4,7 +4,6 @@ import net.nemerosa.ontrack.common.CachedSupplier;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterResult;
-import net.nemerosa.ontrack.model.events.Event;
 import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.exceptions.ImageFileSizeException;
@@ -622,7 +621,7 @@ public class StructureServiceImpl implements StructureService {
         // Creation
         ValidationRun newValidationRun = structureRepository.newValidationRunStatus(validationRun, runStatus);
         // Event
-        eventPostService.post(Event.newValidationRunStatus(newValidationRun));
+        eventPostService.post(eventFactory.newValidationRunStatus(newValidationRun));
         // OK
         return newValidationRun;
     }

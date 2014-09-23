@@ -35,4 +35,6 @@ public interface EventFactory {
     Event newValidationStamp(ValidationStamp validationStamp);
 
     Event newValidationRun(ValidationRun validationRun);
+
+    Event newValidationRunStatus(ValidationRun validationRun);
 }

@@ -66,6 +66,16 @@ public class EventFactoryImplTest {
         assert e.render(testRenderer) == """Build <a href="#/build/100">1</a> has run for <a href="#/validationStamp/100">SMOKE</a> with status <i class="status">Failed</i> in branch <a href="#/branch/10">B</a> in <a href="#/project/1">P</a>."""
     }
 
+    @Test
+    void newValidationRunStatus() {
+        Event e = factory.newValidationRunStatus(validationRun());
+        assert e != null
+        assert e.signature.user.name == 'user'
+        assert e.entities.size() == 5
+        assert e.renderText() == "Status for SMOKE validation #1 for build 1 in branch B of P has changed to Failed."
+        assert e.render(testRenderer) == """Status for <a href="#/validationStamp/100">SMOKE</a> validation <a href="#/validationRun/1000">#1</a> for build <a href="#/build/100">1</a> in branch <a href="#/branch/10">B</a> of <a href="#/project/1">P</a> has changed to <i class="status">Failed</i>."""
+    }
+
     private static PromotionRun promotionRun() {
         def branch = branch();
         PromotionRun.of(
