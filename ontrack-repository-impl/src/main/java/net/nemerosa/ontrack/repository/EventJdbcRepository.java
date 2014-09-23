@@ -105,7 +105,9 @@ public class EventJdbcRepository extends AbstractJdbcRepository implements Event
         // Values
         Map<String, NameValue> values = loadValues(rs);
         // OK
+        // FIXME Event type factory
         return new Event(
+                null,
                 template,
                 signature,
                 entities,

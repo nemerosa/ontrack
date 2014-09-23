@@ -1,20 +1,20 @@
 package net.nemerosa.ontrack.service.events;
 
 import net.nemerosa.ontrack.model.events.Event;
-import net.nemerosa.ontrack.model.events.EventService;
+import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.repository.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EventServiceImpl implements EventService {
+public class EventPostServiceImpl implements EventPostService {
 
     private final SecurityService securityService;
     private final EventRepository eventRepository;
 
     @Autowired
-    public EventServiceImpl(SecurityService securityService, EventRepository eventRepository) {
+    public EventPostServiceImpl(SecurityService securityService, EventRepository eventRepository) {
         this.securityService = securityService;
         this.eventRepository = eventRepository;
     }

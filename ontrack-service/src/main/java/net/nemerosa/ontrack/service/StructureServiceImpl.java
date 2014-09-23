@@ -5,7 +5,8 @@ import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterResult;
 import net.nemerosa.ontrack.model.events.Event;
-import net.nemerosa.ontrack.model.events.EventService;
+import net.nemerosa.ontrack.model.events.EventFactory;
+import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.exceptions.ImageFileSizeException;
 import net.nemerosa.ontrack.model.exceptions.ImageTypeNotAcceptedException;
 import net.nemerosa.ontrack.model.exceptions.ReorderingSizeException;
@@ -42,14 +43,16 @@ public class StructureServiceImpl implements StructureService {
     };
 
     private final SecurityService securityService;
-    private final EventService eventService;
+    private final EventPostService eventPostService;
+    private final EventFactory eventFactory;
     private final ValidationRunStatusService validationRunStatusService;
     private final StructureRepository structureRepository;
 
     @Autowired
-    public StructureServiceImpl(SecurityService securityService, EventService eventService, ValidationRunStatusService validationRunStatusService, StructureRepository structureRepository) {
+    public StructureServiceImpl(SecurityService securityService, EventPostService eventPostService, EventFactory eventFactory, ValidationRunStatusService validationRunStatusService, StructureRepository structureRepository) {
         this.securityService = securityService;
-        this.eventService = eventService;
+        this.eventPostService = eventPostService;
+        this.eventFactory = eventFactory;
         this.validationRunStatusService = validationRunStatusService;
         this.structureRepository = structureRepository;
     }
@@ -59,7 +62,7 @@ public class StructureServiceImpl implements StructureService {
         isEntityNew(project, "Project must be defined");
         securityService.checkGlobalFunction(ProjectCreation.class);
         Project newProject = structureRepository.newProject(project);
-        eventService.post(Event.newProject(newProject));
+        eventPostService.post(eventFactory.newProject(newProject));
         return newProject;
     }
 
@@ -86,14 +89,14 @@ public class StructureServiceImpl implements StructureService {
         isEntityDefined(project, "Project must be defined");
         securityService.checkProjectFunction(project.id(), ProjectEdit.class);
         structureRepository.saveProject(project);
-        eventService.post(Event.updateProject(project));
+        eventPostService.post(eventFactory.updateProject(project));
     }
 
     @Override
     public Ack deleteProject(ID projectId) {
         Validate.isTrue(projectId.isSet(), "Project ID must be set");
         securityService.checkProjectFunction(projectId.getValue(), ProjectDelete.class);
-        eventService.post(Event.deleteProject(getProject(projectId)));
+        eventPostService.post(Event.deleteProject(getProject(projectId)));
         return structureRepository.deleteProject(projectId);
     }
 
@@ -120,7 +123,7 @@ public class StructureServiceImpl implements StructureService {
         // Creating the branch
         Branch newBranch = structureRepository.newBranch(branch);
         // Event
-        eventService.post(Event.newBranch(newBranch));
+        eventPostService.post(Event.newBranch(newBranch));
         // OK
         return newBranch;
     }
@@ -149,7 +152,7 @@ public class StructureServiceImpl implements StructureService {
         isEntityDefined(branch.getProject(), "Project must be defined");
         securityService.checkProjectFunction(branch.projectId(), BranchEdit.class);
         structureRepository.saveBranch(branch);
-        eventService.post(Event.updateBranch(branch));
+        eventPostService.post(Event.updateBranch(branch));
     }
 
     @Override
@@ -157,7 +160,7 @@ public class StructureServiceImpl implements StructureService {
         Validate.isTrue(branchId.isSet(), "Branch ID must be set");
         Branch branch = getBranch(branchId);
         securityService.checkProjectFunction(branch.projectId(), BranchDelete.class);
-        eventService.post(Event.deleteBranch(branch));
+        eventPostService.post(Event.deleteBranch(branch));
         return structureRepository.deleteBranch(branchId);
     }
 
@@ -223,7 +226,7 @@ public class StructureServiceImpl implements StructureService {
         // Repository
         Build newBuild = structureRepository.newBuild(build);
         // Event
-        eventService.post(Event.newBuild(newBuild));
+        eventPostService.post(Event.newBuild(newBuild));
         // OK
         return newBuild;
     }
@@ -320,7 +323,7 @@ public class StructureServiceImpl implements StructureService {
         // Repository
         PromotionLevel newPromotionLevel = structureRepository.newPromotionLevel(promotionLevel);
         // Event
-        eventService.post(Event.newPromotionLevel(newPromotionLevel));
+        eventPostService.post(Event.newPromotionLevel(newPromotionLevel));
         // OK
         return newPromotionLevel;
     }
@@ -417,7 +420,7 @@ public class StructureServiceImpl implements StructureService {
         // Actual creation
         PromotionRun newPromotionRun = structureRepository.newPromotionRun(promotionRunToSave);
         // Event
-        eventService.post(Event.newPromotionRun(newPromotionRun));
+        eventPostService.post(Event.newPromotionRun(newPromotionRun));
         // OK
         return newPromotionRun;
     }
@@ -467,7 +470,7 @@ public class StructureServiceImpl implements StructureService {
         // Repository
         ValidationStamp newValidationStamp = structureRepository.newValidationStamp(validationStamp);
         // Event
-        eventService.post(Event.newValidationStamp(newValidationStamp));
+        eventPostService.post(Event.newValidationStamp(newValidationStamp));
         // OK
         return newValidationStamp;
     }
@@ -582,7 +585,7 @@ public class StructureServiceImpl implements StructureService {
         // Actual creation
         ValidationRun newValidationRun = structureRepository.newValidationRun(validationRun);
         // Event
-        eventService.post(Event.newValidationRun(newValidationRun));
+        eventPostService.post(Event.newValidationRun(newValidationRun));
         // OK
         return newValidationRun;
     }
@@ -619,7 +622,7 @@ public class StructureServiceImpl implements StructureService {
         // Creation
         ValidationRun newValidationRun = structureRepository.newValidationRunStatus(validationRun, runStatus);
         // Event
-        eventService.post(Event.newValidationRunStatus(newValidationRun));
+        eventPostService.post(Event.newValidationRunStatus(newValidationRun));
         // OK
         return newValidationRun;
     }

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service;
 
-import net.nemerosa.ontrack.model.events.EventService;
+import net.nemerosa.ontrack.model.events.EventFactory;
+import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.repository.StructureRepository;
@@ -26,10 +27,12 @@ public class StructureServiceImplTest {
         SecurityService securityService = mock(SecurityService.class);
         ValidationRunStatusService validationRunStatusService = mock(ValidationRunStatusService.class);
         structureRepository = mock(StructureRepository.class);
-        EventService eventService = mock(EventService.class);
+        EventPostService eventService = mock(EventPostService.class);
+        EventFactory eventFactory = mock(EventFactory.class);
         service = new StructureServiceImpl(
                 securityService,
                 eventService,
+                eventFactory,
                 validationRunStatusService,
                 structureRepository
         );

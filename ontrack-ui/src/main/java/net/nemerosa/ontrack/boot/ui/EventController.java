@@ -104,7 +104,8 @@ public class EventController extends AbstractResourceController {
 
     protected UIEvent toUIEvent(Event event) {
         return new UIEvent(
-                event.getTemplate(),
+                event.getEventType().getId(),
+                event.getEventType().getTemplate(),
                 event.getSignature(),
                 event.getEntities(),
                 event.getValues()

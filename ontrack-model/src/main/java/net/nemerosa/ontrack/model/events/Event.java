@@ -23,6 +23,8 @@ public final class Event {
 
     private static final Pattern EXPRESSION = Pattern.compile("\\$\\{([:a-zA-Z_]+)\\}");
 
+    private final EventType eventType;
+    @Deprecated
     private final String template;
     private final Signature signature;
     private final Map<ProjectEntityType, ProjectEntity> entities;
@@ -64,12 +66,18 @@ public final class Event {
         }
     }
 
+    @Deprecated
     public static EventBuilder of(String template) {
-        return new EventBuilder(template);
+        return new EventBuilder(null);
+    }
+
+    public static EventBuilder of(EventType eventType) {
+        return new EventBuilder(eventType);
     }
 
     public Event withSignature(Signature signature) {
         return new Event(
+                eventType,
                 template,
                 signature,
                 entities,
@@ -79,13 +87,16 @@ public final class Event {
 
     public static class EventBuilder {
 
+        private final EventType eventType;
+        @Deprecated
         private final String template;
         private Signature signature;
         private Collection<ProjectEntity> entities = new ArrayList<>();
         private Map<String, NameValue> values = new LinkedHashMap<>();
 
-        public EventBuilder(String template) {
-            this.template = template;
+        public EventBuilder(EventType eventType) {
+            this.eventType = eventType;
+            this.template = null;
         }
 
         public EventBuilder with(Signature signature) {
@@ -142,6 +153,7 @@ public final class Event {
         public Event get() {
             // Creates the event
             Event event = new Event(
+                    eventType,
                     template,
                     signature,
                     Maps.uniqueIndex(
@@ -157,26 +169,32 @@ public final class Event {
         }
     }
 
+    @Deprecated
     public static Event newProject(Project project) {
         return Event.of("New project ${PROJECT}.").withProject(project).get();
     }
 
+    @Deprecated
     public static Event updateProject(Project project) {
         return Event.of("Project ${PROJECT} has been updated.").withProject(project).get();
     }
 
+    @Deprecated
     public static Event deleteProject(Project project) {
         return Event.of("Project ${:project} has been deleted.").with("project", project.getName()).get();
     }
 
+    @Deprecated
     public static Event newBranch(Branch branch) {
         return Event.of("New branch ${BRANCH} for project ${PROJECT}.").withBranch(branch).get();
     }
 
+    @Deprecated
     public static Event updateBranch(Branch branch) {
         return Event.of("Branch ${BRANCH} in ${PROJECT} has been updated.").withBranch(branch).get();
     }
 
+    @Deprecated
     public static Event deleteBranch(Branch branch) {
         return Event.of("Branch ${:branch} has been deleted from ${PROJECT}.")
                 .withProject(branch.getProject())
@@ -184,30 +202,35 @@ public final class Event {
                 .get();
     }
 
+    @Deprecated
     public static Event newPromotionLevel(PromotionLevel promotionLevel) {
         return Event.of("New promotion level ${PROMOTION_LEVEL} for branch ${BRANCH} in ${PROJECT}.")
                 .withPromotionLevel(promotionLevel)
                 .get();
     }
 
+    @Deprecated
     public static Event newValidationStamp(ValidationStamp validationStamp) {
         return Event.of("New validation stamp ${VALIDATION_STAMP} for branch ${BRANCH} in ${PROJECT}.")
                 .withValidationStamp(validationStamp)
                 .get();
     }
 
+    @Deprecated
     public static Event newBuild(Build build) {
         return Event.of("New build ${BUILD} for branch ${BRANCH} in ${PROJECT}.")
                 .withBuild(build)
                 .get();
     }
 
+    @Deprecated
     public static Event newPromotionRun(PromotionRun promotionRun) {
         return Event.of("Build ${BUILD} has been promoted to ${PROMOTION_LEVEL} for branch ${BRANCH} in ${PROJECT}.")
                 .withPromotionRun(promotionRun)
                 .get();
     }
 
+    @Deprecated
     public static Event newValidationRun(ValidationRun validationRun) {
         return Event.of("Build ${BUILD} has run for ${VALIDATION_STAMP} with status ${:status} in branch ${BRANCH} in ${PROJECT}.")
                 .withValidationRun(validationRun)
@@ -215,6 +238,7 @@ public final class Event {
                 .get();
     }
 
+    @Deprecated
     public static Event newValidationRunStatus(ValidationRun validationRun) {
         return Event.of("Status for ${VALIDATION_STAMP} validation ${VALIDATION_RUN} for build ${BUILD} in branch ${BRANCH} of ${PROJECT} has changed to ${:status}.")
                 .withValidationRun(validationRun)

@@ -11,6 +11,7 @@ import java.util.Map;
 @Data
 public class UIEvent {
 
+    private final String eventType;
     private final String template;
     private final Signature signature;
     private final Map<ProjectEntityType, ProjectEntity> entities;
