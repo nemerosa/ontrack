@@ -50,6 +50,8 @@ public interface EventFactory {
 
     Event imageValidationStamp(ValidationStamp validationStamp);
 
+    Event updateValidationStamp(ValidationStamp validationStamp);
+
     Event newValidationRun(ValidationRun validationRun);
 
     Event newValidationRunStatus(ValidationRun validationRun);

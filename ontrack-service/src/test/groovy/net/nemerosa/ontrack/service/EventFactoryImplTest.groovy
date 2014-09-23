@@ -92,6 +92,15 @@ public class EventFactoryImplTest {
     }
 
     @Test
+    void updateValidationStamp() {
+        Event e = factory.updateValidationStamp(validationStamp());
+        assert e != null
+        assert e.signature == null
+        assert e.entities.size() == 3
+        assert e.renderText() == "Validation stamp SMOKE for branch B in P has been updated."
+    }
+
+    @Test
     void newPromotionRun() {
         Event e = factory.newPromotionRun(promotionRun());
         assert e != null
