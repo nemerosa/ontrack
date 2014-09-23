@@ -573,9 +573,10 @@ public class StructureServiceImpl implements StructureService {
             throw new ReorderingSizeException("The reordering request should have the same number of IDs as the number" +
                     " of the validation stamps");
         }
-        // TODO Event
         // Actual reordering
         structureRepository.reorderValidationStamps(branchId, reordering);
+        // Event
+        eventPostService.post(eventFactory.reorderValidationStamps(branch));
     }
 
     @Override

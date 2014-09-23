@@ -110,6 +110,15 @@ public class EventFactoryImplTest {
     }
 
     @Test
+    void reorderValidationStamps() {
+        Event e = factory.reorderValidationStamps(branch());
+        assert e != null
+        assert e.signature == null
+        assert e.entities.size() == 2
+        assert e.renderText() == "Validation stamps for branch B in P have been reordered."
+    }
+
+    @Test
     void newPromotionRun() {
         Event e = factory.newPromotionRun(promotionRun());
         assert e != null
