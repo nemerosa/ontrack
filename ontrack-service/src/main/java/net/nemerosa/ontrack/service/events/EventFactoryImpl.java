@@ -12,6 +12,7 @@ public class EventFactoryImpl implements EventFactory {
 
     public static final EventType NEW_PROJECT = SimpleEventType.of("new_project", "New project ${PROJECT}.");
     public static final EventType UPDATE_PROJECT = SimpleEventType.of("update_project", "Project ${PROJECT} has been updated.");
+    public static final EventType DELETE_PROJECT = SimpleEventType.of("delete_project", "Project ${:project} has been deleted.");
 
     private final Map<String, EventType> types;
 
@@ -19,6 +20,7 @@ public class EventFactoryImpl implements EventFactory {
         types = new ConcurrentHashMap<>();
         register(NEW_PROJECT);
         register(UPDATE_PROJECT);
+        register(DELETE_PROJECT);
     }
 
     private void register(EventType eventType) {
@@ -43,5 +45,10 @@ public class EventFactoryImpl implements EventFactory {
     @Override
     public Event updateProject(Project project) {
         return Event.of(UPDATE_PROJECT).withProject(project).get();
+    }
+
+    @Override
+    public Event deleteProject(Project project) {
+        return Event.of(DELETE_PROJECT).with("project", project.getName()).get();
     }
 }

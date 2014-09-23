@@ -10,12 +10,7 @@ import net.nemerosa.ontrack.service.events.EventFactoryImpl
 import org.junit.Test
 
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd
-import static net.nemerosa.ontrack.model.structure.ProjectEntityType.BRANCH
-import static net.nemerosa.ontrack.model.structure.ProjectEntityType.BUILD
-import static net.nemerosa.ontrack.model.structure.ProjectEntityType.PROJECT
-import static net.nemerosa.ontrack.model.structure.ProjectEntityType.PROMOTION_LEVEL
-import static net.nemerosa.ontrack.model.structure.ProjectEntityType.VALIDATION_RUN
-import static net.nemerosa.ontrack.model.structure.ProjectEntityType.VALIDATION_STAMP
+import static net.nemerosa.ontrack.model.structure.ProjectEntityType.*
 
 public class EventFactoryImplTest {
 
@@ -29,6 +24,16 @@ public class EventFactoryImplTest {
         assert e.entities.size() == 1
         assert e.renderText() == "New project P."
         assert e.render(testRenderer) == """New project <a href="#/project/1">P</a>."""
+    }
+
+    @Test
+    void deleteProject() {
+        Event e = factory.deleteProject(project());
+        assert e != null
+        assert e.signature == null
+        assert e.entities.size() == 0
+        assert e.renderText() == "Project P has been deleted."
+        assert e.render(testRenderer) == """Project <i class="project">P</i> has been deleted."""
     }
 
     private static PromotionRun promotionRun() {

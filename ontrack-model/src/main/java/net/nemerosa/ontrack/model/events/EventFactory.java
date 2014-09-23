@@ -17,4 +17,6 @@ public interface EventFactory {
     Event newProject(Project project);
 
     Event updateProject(Project project);
+
+    Event deleteProject(Project project);
 }

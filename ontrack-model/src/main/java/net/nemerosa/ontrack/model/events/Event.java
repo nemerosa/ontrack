@@ -170,21 +170,6 @@ public final class Event {
     }
 
     @Deprecated
-    public static Event newProject(Project project) {
-        return Event.of("New project ${PROJECT}.").withProject(project).get();
-    }
-
-    @Deprecated
-    public static Event updateProject(Project project) {
-        return Event.of("Project ${PROJECT} has been updated.").withProject(project).get();
-    }
-
-    @Deprecated
-    public static Event deleteProject(Project project) {
-        return Event.of("Project ${:project} has been deleted.").with("project", project.getName()).get();
-    }
-
-    @Deprecated
     public static Event newBranch(Branch branch) {
         return Event.of("New branch ${BRANCH} for project ${PROJECT}.").withBranch(branch).get();
     }
