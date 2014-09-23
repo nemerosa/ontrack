@@ -16,6 +16,11 @@
             <img class="ot-icon" ng-src="assets/validation-run-status/{{event.values.status.name}}.png"/>
         </span>
     </span>
+    <span class="ot-event-property">
+        <span ng-if="event.values.property">
+            <img class="ot-icon" ng-src="assets/extension/property/{{event.values.property.name}}.png"/>
+        </span>
+    </span>
     <span class="ot-event-message" ng-bind-html="renderEvent(event)"></span>
     <span class="ot-event-signature">
         {{event.signature.user.name}}
