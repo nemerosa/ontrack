@@ -19,6 +19,7 @@ public class EventFactoryImpl implements EventFactory {
     public static final EventType UPDATE_BRANCH = SimpleEventType.of("update_branch", "Branch ${BRANCH} in ${PROJECT} has been updated.");
     public static final EventType DELETE_BRANCH = SimpleEventType.of("delete_branch", "Branch ${:branch} has been deleted from ${PROJECT}.");
     public static final EventType NEW_BUILD = SimpleEventType.of("new_build", "New build ${BUILD} for branch ${BRANCH} in ${PROJECT}.");
+    public static final EventType UPDATE_BUILD = SimpleEventType.of("update_build", "Build ${BUILD} for branch ${BRANCH} in ${PROJECT} has been updated.");
     public static final EventType DELETE_BUILD = SimpleEventType.of("delete_build", "Build ${:build} for branch ${BRANCH} in ${PROJECT} has been deleted.");
     public static final EventType NEW_PROMOTION_LEVEL = SimpleEventType.of("new_promotion_level", "New promotion level ${PROMOTION_LEVEL} for branch ${BRANCH} in ${PROJECT}.");
     public static final EventType NEW_VALIDATION_STAMP = SimpleEventType.of("new_validation_stamp", "New validation stamp ${VALIDATION_STAMP} for branch ${BRANCH} in ${PROJECT}.");
@@ -101,6 +102,14 @@ public class EventFactoryImpl implements EventFactory {
     public Event newBuild(Build build) {
         return Event.of(NEW_BUILD)
                 .withBuild(build)
+                .get();
+    }
+
+    @Override
+    public Event updateBuild(Build build) {
+        return Event.of(UPDATE_BUILD)
+                .withBuild(build)
+                .withNoSignature()
                 .get();
     }
 

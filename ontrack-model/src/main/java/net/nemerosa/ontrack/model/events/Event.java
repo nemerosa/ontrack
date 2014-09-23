@@ -93,6 +93,11 @@ public final class Event {
             return this;
         }
 
+        public EventBuilder withNoSignature() {
+            this.signature = null;
+            return this;
+        }
+
         public EventBuilder withBuild(Build build) {
             return withBranch(build.getBranch()).with(build).with(build.getSignature());
         }

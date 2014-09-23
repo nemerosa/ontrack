@@ -28,6 +28,8 @@ public interface EventFactory {
 
     Event newBuild(Build build);
 
+    Event updateBuild(Build build);
+
     Event deleteBuild(Build build);
 
     Event newPromotionLevel(PromotionLevel promotionLevel);

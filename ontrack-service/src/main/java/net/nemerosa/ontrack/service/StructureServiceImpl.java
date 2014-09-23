@@ -238,9 +238,12 @@ public class StructureServiceImpl implements StructureService {
         isEntityDefined(build.getBranch().getProject(), "Project must be defined");
         // Security
         securityService.checkProjectFunction(build.getBranch().getProject().id(), BuildEdit.class);
-        // TODO Event
         // Repository
-        return structureRepository.saveBuild(build);
+        Build savedBuild = structureRepository.saveBuild(build);
+        // Event
+        eventPostService.post(eventFactory.updateBuild(savedBuild));
+        // OK
+        return savedBuild;
     }
 
     @Override

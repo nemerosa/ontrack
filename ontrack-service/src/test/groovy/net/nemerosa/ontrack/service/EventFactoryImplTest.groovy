@@ -47,6 +47,15 @@ public class EventFactoryImplTest {
     }
 
     @Test
+    void updateBuild() {
+        Event e = factory.updateBuild(build());
+        assert e != null
+        assert e.signature == null
+        assert e.entities.size() == 3
+        assert e.renderText() == "Build 1 for branch B in P has been updated."
+    }
+
+    @Test
     void deleteBuild() {
         Event e = factory.deleteBuild(build());
         assert e != null
