@@ -45,4 +45,6 @@ public interface EventFactory {
     Event newValidationRun(ValidationRun validationRun);
 
     Event newValidationRunStatus(ValidationRun validationRun);
+
+    Event updatePromotionLevel(PromotionLevel promotionLevel);
 }

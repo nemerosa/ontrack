@@ -365,9 +365,10 @@ public class StructureServiceImpl implements StructureService {
         isEntityDefined(promotionLevel.getBranch().getProject(), "Project must be defined");
         // Security
         securityService.checkProjectFunction(promotionLevel.projectId(), PromotionLevelEdit.class);
-        // TODO Event
         // Repository
         structureRepository.savePromotionLevel(promotionLevel);
+        // Event
+        eventPostService.post(eventFactory.updatePromotionLevel(promotionLevel));
     }
 
     @Override
