@@ -22,4 +22,6 @@ public interface EventFactory {
     Event deleteProject(Project project);
 
     Event newBranch(Branch branch);
+
+    Event updateBranch(Branch branch);
 }

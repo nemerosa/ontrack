@@ -152,7 +152,7 @@ public class StructureServiceImpl implements StructureService {
         isEntityDefined(branch.getProject(), "Project must be defined");
         securityService.checkProjectFunction(branch.projectId(), BranchEdit.class);
         structureRepository.saveBranch(branch);
-        eventPostService.post(Event.updateBranch(branch));
+        eventPostService.post(eventFactory.updateBranch(branch));
     }
 
     @Override
