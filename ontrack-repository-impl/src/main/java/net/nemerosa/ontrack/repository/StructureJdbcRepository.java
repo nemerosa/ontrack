@@ -462,7 +462,11 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     @Override
     public PromotionRun getLastPromotionRunForPromotionLevel(PromotionLevel promotionLevel) {
         return getFirstItem(
-                "SELECT * FROM PROMOTION_RUNS WHERE PROMOTIONLEVELID = :promotionLevelId ORDER BY CREATION DESC LIMIT 1",
+                "SELECT PR.* FROM PROMOTION_RUNS PR" +
+                        " INNER JOIN BUILDS B ON B.ID = PR.BUILDID" +
+                        " WHERE PROMOTIONLEVELID = :promotionLevelId" +
+                        " ORDER BY B.ID DESC" +
+                        " LIMIT 1",
                 params("promotionLevelId", promotionLevel.id()),
                 (rs, rowNum) -> toPromotionRun(rs,
                         this::getBuild,
