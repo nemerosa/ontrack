@@ -57,6 +57,15 @@ public class EventFactoryImplTest {
     }
 
     @Test
+    void deletePromotionRun() {
+        Event e = factory.deletePromotionRun(promotionRun());
+        assert e != null
+        assert e.signature == null
+        assert e.entities.size() == 4
+        assert e.renderText() == "Promotion COPPER of build 1 has been deleted for branch B in P."
+    }
+
+    @Test
     void newValidationRun() {
         Event e = factory.newValidationRun(validationRun());
         assert e != null

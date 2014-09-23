@@ -121,7 +121,7 @@ public final class Event {
             return with(project);
         }
 
-        private EventBuilder with(ProjectEntity entity) {
+        public EventBuilder with(ProjectEntity entity) {
             entities.add(entity);
             return this;
         }

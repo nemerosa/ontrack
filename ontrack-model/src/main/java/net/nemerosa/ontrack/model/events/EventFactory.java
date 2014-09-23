@@ -32,6 +32,8 @@ public interface EventFactory {
 
     Event newPromotionRun(PromotionRun promotionRun);
 
+    Event deletePromotionRun(PromotionRun promotionRun);
+
     Event newValidationStamp(ValidationStamp validationStamp);
 
     Event newValidationRun(ValidationRun validationRun);

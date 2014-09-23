@@ -193,7 +193,7 @@ public class StructureServiceImpl implements StructureService {
         Validate.isTrue(promotionRunId.isSet(), "Promotion run ID must be set");
         PromotionRun promotionRun = getPromotionRun(promotionRunId);
         securityService.checkProjectFunction(promotionRun, PromotionRunDelete.class);
-        // TODO Event
+        eventPostService.post(eventFactory.deletePromotionRun(promotionRun));
         return structureRepository.deletePromotionRun(promotionRunId);
     }
 
