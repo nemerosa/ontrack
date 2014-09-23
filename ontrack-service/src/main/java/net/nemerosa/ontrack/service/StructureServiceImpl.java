@@ -393,9 +393,10 @@ public class StructureServiceImpl implements StructureService {
             throw new ReorderingSizeException("The reordering request should have the same number of IDs as the number" +
                     " of the promotion levels");
         }
-        // TODO Event
         // Actual reordering
         structureRepository.reorderPromotionLevels(branchId, reordering);
+        // Event
+        eventPostService.post(eventFactory.reorderPromotionLevels(branch));
     }
 
     @Override

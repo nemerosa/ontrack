@@ -40,6 +40,8 @@ public interface EventFactory {
 
     Event deletePromotionLevel(PromotionLevel promotionLevel);
 
+    Event reorderPromotionLevels(Branch branch);
+
     Event newPromotionRun(PromotionRun promotionRun);
 
     Event deletePromotionRun(PromotionRun promotionRun);
