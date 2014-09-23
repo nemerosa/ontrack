@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.service.events;
 
 import net.nemerosa.ontrack.model.events.Event;
+import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventQueryService;
-import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.Entity;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
@@ -18,11 +18,13 @@ import java.util.stream.Collectors;
 public class EventQueryServiceImpl implements EventQueryService {
 
     private final StructureService structureService;
+    private final EventFactory eventFactory;
     private final EventRepository eventRepository;
 
     @Autowired
-    public EventQueryServiceImpl(StructureService structureService, EventRepository eventRepository) {
+    public EventQueryServiceImpl(StructureService structureService, EventFactory eventFactory, EventRepository eventRepository) {
         this.structureService = structureService;
+        this.eventFactory = eventFactory;
         this.eventRepository = eventRepository;
     }
 
@@ -35,7 +37,8 @@ public class EventQueryServiceImpl implements EventQueryService {
                 projectIds,
                 offset,
                 count,
-                (type, id) -> type.getEntityFn(structureService).apply(id)
+                (type, id) -> type.getEntityFn(structureService).apply(id),
+                eventFactory::toEventType
         );
     }
 
@@ -50,7 +53,8 @@ public class EventQueryServiceImpl implements EventQueryService {
                 entityId,
                 offset,
                 count,
-                (type, id) -> type.getEntityFn(structureService).apply(id)
+                (type, id) -> type.getEntityFn(structureService).apply(id),
+                eventFactory::toEventType
         );
     }
 

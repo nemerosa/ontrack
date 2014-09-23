@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.repository;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.model.events.Event;
+import net.nemerosa.ontrack.model.events.EventType;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
@@ -20,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import static java.lang.String.format;
 
@@ -61,7 +63,11 @@ public class EventJdbcRepository extends AbstractJdbcRepository implements Event
     }
 
     @Override
-    public List<Event> query(List<Integer> allowedProjects, int offset, int count, BiFunction<ProjectEntityType, ID, ProjectEntity> entityLoader) {
+    public List<Event> query(List<Integer> allowedProjects,
+                             int offset,
+                             int count,
+                             BiFunction<ProjectEntityType, ID, ProjectEntity> entityLoader,
+                             Function<String, EventType> eventTypeLoader) {
         return getNamedParameterJdbcTemplate().query(
                 "SELECT * FROM EVENTS WHERE PROJECT IS NULL OR PROJECT IN (:projects)" +
                         " ORDER BY ID DESC" +
@@ -69,12 +75,18 @@ public class EventJdbcRepository extends AbstractJdbcRepository implements Event
                 params("projects", allowedProjects)
                         .addValue("count", count)
                         .addValue("offset", offset),
-                (rs, num) -> toEvent(rs, entityLoader)
+                (rs, num) -> toEvent(rs, entityLoader, eventTypeLoader)
         );
     }
 
     @Override
-    public List<Event> query(List<Integer> allowedProjects, ProjectEntityType entityType, ID entityId, int offset, int count, BiFunction<ProjectEntityType, ID, ProjectEntity> entityLoader) {
+    public List<Event> query(List<Integer> allowedProjects,
+                             ProjectEntityType entityType,
+                             ID entityId,
+                             int offset,
+                             int count,
+                             BiFunction<ProjectEntityType, ID, ProjectEntity> entityLoader,
+                             Function<String, EventType> eventTypeLoader) {
         return getNamedParameterJdbcTemplate().query(
                 format("SELECT * FROM EVENTS WHERE %s = :entityId", entityType.name()) +
                         " AND PROJECT IN (:projects)" +
@@ -84,13 +96,15 @@ public class EventJdbcRepository extends AbstractJdbcRepository implements Event
                         .addValue("projects", allowedProjects)
                         .addValue("count", count)
                         .addValue("offset", offset),
-                (rs, num) -> toEvent(rs, entityLoader)
+                (rs, num) -> toEvent(rs, entityLoader, eventTypeLoader)
         );
     }
 
-    private Event toEvent(ResultSet rs, BiFunction<ProjectEntityType, ID, ProjectEntity> entityLoader) throws SQLException {
-        // Template
-        String template = rs.getString("event_template");
+    private Event toEvent(ResultSet rs,
+                          BiFunction<ProjectEntityType, ID, ProjectEntity> entityLoader,
+                          Function<String, EventType> eventTypeLoader) throws SQLException {
+        // Event type name
+        String eventTypeName = rs.getString("event_type");
         // Signature
         Signature signature = readSignature(rs, "event_time", "event_user");
         // Entities
@@ -105,10 +119,9 @@ public class EventJdbcRepository extends AbstractJdbcRepository implements Event
         // Values
         Map<String, NameValue> values = loadValues(rs);
         // OK
-        // FIXME Event type factory
         return new Event(
+                eventTypeLoader.apply(eventTypeName),
                 null,
-                template,
                 signature,
                 entities,
                 values
