@@ -24,6 +24,7 @@ public class EventFactoryImpl implements EventFactory {
     public static final EventType NEW_PROMOTION_LEVEL = SimpleEventType.of("new_promotion_level", "New promotion level ${PROMOTION_LEVEL} for branch ${BRANCH} in ${PROJECT}.");
     public static final EventType IMAGE_PROMOTION_LEVEL = SimpleEventType.of("image_promotion_level", "Image for promotion level ${PROMOTION_LEVEL} for branch ${BRANCH} in ${PROJECT} has changed.");
     public static final EventType UPDATE_PROMOTION_LEVEL = SimpleEventType.of("update_promotion_level", "Promotion level ${PROMOTION_LEVEL} for branch ${BRANCH} in ${PROJECT} has changed.");
+    public static final EventType DELETE_PROMOTION_LEVEL = SimpleEventType.of("delete_promotion_level", "Promotion level ${:promotion_level} for branch ${BRANCH} in ${PROJECT} has been deleted.");
     public static final EventType NEW_VALIDATION_STAMP = SimpleEventType.of("new_validation_stamp", "New validation stamp ${VALIDATION_STAMP} for branch ${BRANCH} in ${PROJECT}.");
     public static final EventType NEW_PROMOTION_RUN = SimpleEventType.of("new_promotion_run", "Build ${BUILD} has been promoted to ${PROMOTION_LEVEL} for branch ${BRANCH} in ${PROJECT}.");
     public static final EventType DELETE_PROMOTION_RUN = SimpleEventType.of("delete_promotion_run", "Promotion ${PROMOTION_LEVEL} of build ${BUILD} has been deleted for branch ${BRANCH} in ${PROJECT}.");
@@ -45,6 +46,7 @@ public class EventFactoryImpl implements EventFactory {
         register(NEW_PROMOTION_LEVEL);
         register(IMAGE_PROMOTION_LEVEL);
         register(UPDATE_PROMOTION_LEVEL);
+        register(DELETE_PROMOTION_LEVEL);
         register(NEW_VALIDATION_STAMP);
         register(NEW_PROMOTION_RUN);
         register(DELETE_PROMOTION_RUN);
@@ -144,6 +146,14 @@ public class EventFactoryImpl implements EventFactory {
     public Event updatePromotionLevel(PromotionLevel promotionLevel) {
         return Event.of(UPDATE_PROMOTION_LEVEL)
                 .withPromotionLevel(promotionLevel)
+                .get();
+    }
+
+    @Override
+    public Event deletePromotionLevel(PromotionLevel promotionLevel) {
+        return Event.of(DELETE_PROMOTION_LEVEL)
+                .withBranch(promotionLevel.getBranch())
+                .with("promotion_level", promotionLevel.getName())
                 .get();
     }
 

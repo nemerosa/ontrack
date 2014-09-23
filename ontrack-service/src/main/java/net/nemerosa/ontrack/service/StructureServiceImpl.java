@@ -376,7 +376,7 @@ public class StructureServiceImpl implements StructureService {
         Validate.isTrue(promotionLevelId.isSet(), "Promotion level ID must be set");
         PromotionLevel promotionLevel = getPromotionLevel(promotionLevelId);
         securityService.checkProjectFunction(promotionLevel.projectId(), PromotionLevelDelete.class);
-        // TODO Event
+        eventPostService.post(eventFactory.deletePromotionLevel(promotionLevel));
         return structureRepository.deletePromotionLevel(promotionLevelId);
     }
 

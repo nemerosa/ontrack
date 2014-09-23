@@ -65,6 +65,15 @@ public class EventFactoryImplTest {
     }
 
     @Test
+    void deletePromotionLevel() {
+        Event e = factory.deletePromotionLevel(promotionLevel());
+        assert e != null
+        assert e.signature == null
+        assert e.entities.size() == 2
+        assert e.renderText() == "Promotion level COPPER for branch B in P has been deleted."
+    }
+
+    @Test
     void newPromotionRun() {
         Event e = factory.newPromotionRun(promotionRun());
         assert e != null
@@ -111,6 +120,10 @@ public class EventFactoryImplTest {
                 Signature.of("user"),
                 ""
         ).withId(ID.of(1000))
+    }
+
+    protected static PromotionLevel promotionLevel() {
+        PromotionLevel.of(branch(), nd("COPPER", "")).withId(ID.of(100))
     }
 
     private static ValidationRun validationRun() {

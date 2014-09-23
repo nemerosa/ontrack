@@ -36,6 +36,10 @@ public interface EventFactory {
 
     Event imagePromotionLevel(PromotionLevel promotionLevel);
 
+    Event updatePromotionLevel(PromotionLevel promotionLevel);
+
+    Event deletePromotionLevel(PromotionLevel promotionLevel);
+
     Event newPromotionRun(PromotionRun promotionRun);
 
     Event deletePromotionRun(PromotionRun promotionRun);
@@ -45,6 +49,4 @@ public interface EventFactory {
     Event newValidationRun(ValidationRun validationRun);
 
     Event newValidationRunStatus(ValidationRun validationRun);
-
-    Event updatePromotionLevel(PromotionLevel promotionLevel);
 }
