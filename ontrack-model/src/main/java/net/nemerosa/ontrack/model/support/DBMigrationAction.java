@@ -6,7 +6,7 @@ public interface DBMigrationAction {
 
     int getPatch();
 
-    void migrate(Connection connection);
+    void migrate(Connection connection) throws Exception;
 
     String getDisplayName();
 }
