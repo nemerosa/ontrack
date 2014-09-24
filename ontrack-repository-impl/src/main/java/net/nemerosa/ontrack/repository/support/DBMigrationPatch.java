@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.repository.support;
 
-import net.nemerosa.ontrack.repository.DBMigrationAction;
+import net.nemerosa.ontrack.model.support.DBMigrationAction;
 import net.sf.dbinit.DBPatchAction;
 import org.apache.commons.lang3.Validate;
 
@@ -14,6 +14,11 @@ public class DBMigrationPatch implements DBPatchAction {
     public DBMigrationPatch(int patch, DBMigrationAction migrationAction) {
         this.patch = patch;
         this.migrationAction = migrationAction;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return migrationAction.getDisplayName();
     }
 
     @Override

@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.repository;
+package net.nemerosa.ontrack.model.support;
 
 import java.sql.Connection;
 
@@ -8,4 +8,5 @@ public interface DBMigrationAction {
 
     void migrate(Connection connection);
 
+    String getDisplayName();
 }

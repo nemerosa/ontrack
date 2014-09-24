@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.repository.config;
 
-import net.nemerosa.ontrack.repository.DBMigrationAction;
+import net.nemerosa.ontrack.model.support.DBMigrationAction;
 import net.nemerosa.ontrack.repository.support.AbstractDBInitConfig;
 import net.nemerosa.ontrack.repository.support.DBMigrationPatch;
 import net.sf.dbinit.DBInit;
