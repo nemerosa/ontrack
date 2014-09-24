@@ -18,11 +18,13 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
     private final Class<T> configurationClass;
     private final ConfigurationRepository configurationRepository;
     private final SecurityService securityService;
+    private final EncryptionService encryptionService;
 
-    public AbstractConfigurationService(Class<T> configurationClass, ConfigurationRepository configurationRepository, SecurityService securityService) {
+    public AbstractConfigurationService(Class<T> configurationClass, ConfigurationRepository configurationRepository, SecurityService securityService, EncryptionService encryptionService) {
         this.configurationClass = configurationClass;
         this.configurationRepository = configurationRepository;
         this.securityService = securityService;
+        this.encryptionService = encryptionService;
     }
 
     /**

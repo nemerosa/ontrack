@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.jira;
 
+import net.nemerosa.ontrack.extension.support.configurations.EncryptionService;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
 import org.junit.Before;
@@ -18,7 +19,8 @@ public class JIRAServiceTest {
     public void before() {
         SecurityService securityService = mock(SecurityService.class);
         configurationRepository = mock(ConfigurationRepository.class);
-        jiraService = new JIRAConfigurationServiceImpl(configurationRepository, securityService);
+        EncryptionService encryptionService = mock(EncryptionService.class);
+        jiraService = new JIRAConfigurationServiceImpl(configurationRepository, securityService, encryptionService);
     }
 
     @Test(expected = IllegalArgumentException.class)
