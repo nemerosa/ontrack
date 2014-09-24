@@ -42,7 +42,15 @@ public class ConfigurationServiceIT extends AbstractServiceTestSupport {
         });
     }
 
-    // TODO Checks the migration process if possible?
-    // TODO Migration of existing configuration through DBInit?
+    /**
+     * Test that the plain configuration that was saved by {@link net.nemerosa.ontrack.service.support.configuration.TestConfigurationUncryptedAction}
+     * is encrypted.
+     */
+    @Test
+    public void encryptedConfigurationMigration() throws Exception {
+        Optional<TestConfiguration> conf = configurationRepository.find(TestConfiguration.class, "plain");
+        assertTrue(conf.isPresent());
+        assertNotEquals("Password must have been encrypted by migration", PLAIN_PASSWORD, conf.get().getPassword());
+    }
 
 }
