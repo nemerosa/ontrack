@@ -16,7 +16,6 @@ import java.util.List;
 public class DefaultJenkinsClient implements JenkinsClient {
 
     private final JsonClient jsonClient;
-    // TODO Local cache for user data
 
     public DefaultJenkinsClient(JsonClient jsonClient) {
         this.jsonClient = jsonClient;
@@ -62,7 +61,7 @@ public class DefaultJenkinsClient implements JenkinsClient {
                         }
                         // For each culprit
                         for (JsonNode jCulprit : jCulprits) {
-                            // TODO We cannot use the absolute URL here
+                            // TODO We cannot use the absolute URL here, because the access might have to be authenticated
                             String culpritUrl = jCulprit.get("absoluteUrl").textValue();
                             JenkinsUser user = getUser(culpritUrl);
                             if (user != null) {
@@ -131,18 +130,8 @@ public class DefaultJenkinsClient implements JenkinsClient {
     }
 
     protected JenkinsUser getUser(String userUrl) {
-//        try {
-        return loadUser(userUrl);
-        // TODO return userCache.get(userUrl);
-//        } catch (ExecutionException e) {
-//            return null;
-//        }
-    }
-
-    protected JenkinsUser loadUser(String culpritUrl) {
-        // Node
-        // TODO Use a relative path
-        JsonNode tree = getJsonNode(culpritUrl);
+        // TODO This is an absolute URL. The access might have to be authenticated.
+        JsonNode tree = getJsonNode(userUrl);
         // Basic data
         String id = tree.get("id").textValue();
         String fullName = tree.get("fullName").textValue();

@@ -1,0 +1,4 @@
+dependencies {
+    compile libraries.commons_lang3
+    compile libraries.commons_io
+}

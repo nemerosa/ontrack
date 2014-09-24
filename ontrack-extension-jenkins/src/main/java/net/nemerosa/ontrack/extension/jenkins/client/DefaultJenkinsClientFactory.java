@@ -11,8 +11,6 @@ public class DefaultJenkinsClientFactory implements JenkinsClientFactory {
 
     private final ClientFactory clientFactory;
 
-    // TODO Local cache for clients
-
     @Autowired
     public DefaultJenkinsClientFactory(ClientFactory clientFactory) {
         this.clientFactory = clientFactory;

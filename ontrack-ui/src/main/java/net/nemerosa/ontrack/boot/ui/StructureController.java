@@ -61,8 +61,4 @@ public class StructureController extends AbstractProjectEntityController {
                 .orElseThrow(() -> new BuildNotFoundException(project, branch, build));
     }
 
-    // FIXME PROMOTION_RUN
-
-    // FIXME VALIDATION_RUN
-
 }

@@ -17,6 +17,8 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+
 @Component
 public class GitCommitSearchExtension extends AbstractExtension implements SearchExtension {
 
@@ -70,7 +72,8 @@ public class GitCommitSearchExtension extends AbstractExtension implements Searc
                                     String.format("%s - %s",
                                             theCommit.getAuthor().getName(),
                                             commit.get().getFullAnnotatedMessage()),
-                                    null, // TODO URI
+                                    uri(on(GitController.class)
+                                            .commitInfo(branch.getId(), theCommit.getId())),
                                     String.format("extension/git/%d/commit/%s",
                                             branch.id(),
                                             theCommit.getId()),

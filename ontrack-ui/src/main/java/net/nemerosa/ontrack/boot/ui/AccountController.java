@@ -183,6 +183,4 @@ public class AccountController extends AbstractResourceController {
 
     }
 
-    // TODO Group deletion
-
 }
