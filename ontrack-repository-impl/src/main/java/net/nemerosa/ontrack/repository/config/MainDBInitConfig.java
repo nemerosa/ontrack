@@ -1,20 +1,28 @@
 package net.nemerosa.ontrack.repository.config;
 
+import net.nemerosa.ontrack.repository.DBMigrationAction;
 import net.nemerosa.ontrack.repository.support.AbstractDBInitConfig;
+import net.nemerosa.ontrack.repository.support.DBMigrationPatch;
 import net.sf.dbinit.DBInit;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class MainDBInitConfig extends AbstractDBInitConfig {
 
     public static final int VERSION = 3;
 
+    private final ApplicationContext applicationContext;
+
     @Autowired
-    public MainDBInitConfig(DataSource dataSource) {
+    public MainDBInitConfig(DataSource dataSource, ApplicationContext applicationContext) {
         super(dataSource);
+        this.applicationContext = applicationContext;
     }
 
     @Override
@@ -37,6 +45,15 @@ public class MainDBInitConfig extends AbstractDBInitConfig {
         db.setVersionColumnTimestamp("UPDATED");
         db.setResourceInitialization("/META-INF/db/init.sql");
         db.setResourceUpdate("/META-INF/db/update.{0}.sql");
+
+        // Gets the migration actions
+        List<DBMigrationPatch> migrationPatches = applicationContext.getBeansOfType(DBMigrationAction.class).values().stream()
+                .map(migrationAction -> new DBMigrationPatch(migrationAction.getPatch(), migrationAction))
+                .collect(Collectors.toList());
+
+        db.setPatchActions(migrationPatches);
+
+        // OK
         return db;
     }
 
