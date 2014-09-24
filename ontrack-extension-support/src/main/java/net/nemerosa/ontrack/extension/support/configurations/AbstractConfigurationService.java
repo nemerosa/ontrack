@@ -108,4 +108,9 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
         }
     }
 
+    @Override
+    public Class<T> getConfigurationType() {
+        return configurationClass;
+    }
+
 }
