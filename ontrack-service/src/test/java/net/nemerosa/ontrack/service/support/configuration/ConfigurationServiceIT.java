@@ -13,7 +13,6 @@ import static org.junit.Assert.*;
 public class ConfigurationServiceIT extends AbstractServiceTestSupport {
 
     public static final String PLAIN_PASSWORD = "verysecret";
-    public static final String CONFIG_NAME = "test";
 
     @Autowired
     private TestConfigurationService configurationService;
@@ -24,17 +23,66 @@ public class ConfigurationServiceIT extends AbstractServiceTestSupport {
     @Test
     public void encryptedPasswordForNewConfig() throws Exception {
         // Creates a new configuration, with a password we want to keep secret
-        TestConfiguration configuration = new TestConfiguration(CONFIG_NAME, "user", PLAIN_PASSWORD);
+        TestConfiguration configuration = new TestConfiguration("test1", "user", PLAIN_PASSWORD);
         asUser().with(GlobalSettings.class).call(() -> {
             // Saves this configuration in the database
             TestConfiguration savedConfiguration = configurationService.newConfiguration(configuration);
             // The returned password is not encrypted (we may need it)
             assertEquals(PLAIN_PASSWORD, savedConfiguration.getPassword());
             // Loads the configuration
-            TestConfiguration loadedConfiguration = configurationService.getConfiguration(CONFIG_NAME);
+            TestConfiguration loadedConfiguration = configurationService.getConfiguration("test1");
             assertEquals(PLAIN_PASSWORD, loadedConfiguration.getPassword());
             // Now, checks the raw result in the repository
-            Optional<TestConfiguration> rawConfiguration = configurationRepository.find(TestConfiguration.class, CONFIG_NAME);
+            Optional<TestConfiguration> rawConfiguration = configurationRepository.find(TestConfiguration.class, "test1");
+            assertTrue(rawConfiguration.isPresent());
+            assertNotEquals("Password must be encrypted", PLAIN_PASSWORD, rawConfiguration.get().getPassword());
+            // End of test
+            return true;
+        });
+    }
+
+    @Test
+    public void encryptedPasswordForSavedConfigWithNewPassword() throws Exception {
+        // Creates a new configuration, with a password we want to keep secret
+        TestConfiguration configuration = new TestConfiguration("test2", "user", PLAIN_PASSWORD);
+        asUser().with(GlobalSettings.class).call(() -> {
+            // Saves this configuration in the database
+            TestConfiguration savedConfiguration = configurationService.newConfiguration(configuration);
+            // Now saves again this configuration with a new password
+            configurationService.updateConfiguration(
+                    "test2",
+                    savedConfiguration.withPassword("newpassword")
+            );
+            // Loads the configuration
+            TestConfiguration loadedConfiguration = configurationService.getConfiguration("test2");
+            assertEquals("newpassword", loadedConfiguration.getPassword());
+            // Now, checks the raw result in the repository
+            Optional<TestConfiguration> rawConfiguration = configurationRepository.find(TestConfiguration.class, "test2");
+            assertTrue(rawConfiguration.isPresent());
+            assertNotEquals("Password must be encrypted", PLAIN_PASSWORD, rawConfiguration.get().getPassword());
+            assertNotEquals("Password must be encrypted", "newpassword", rawConfiguration.get().getPassword());
+            // End of test
+            return true;
+        });
+    }
+
+    @Test
+    public void encryptedPasswordForSavedConfigWithNoNewPassword() throws Exception {
+        // Creates a new configuration, with a password we want to keep secret
+        TestConfiguration configuration = new TestConfiguration("test3", "user", PLAIN_PASSWORD);
+        asUser().with(GlobalSettings.class).call(() -> {
+            // Saves this configuration in the database
+            TestConfiguration savedConfiguration = configurationService.newConfiguration(configuration);
+            // Now saves again this configuration with no new password
+            configurationService.updateConfiguration(
+                    "test3",
+                    savedConfiguration.withPassword("")
+            );
+            // Loads the configuration
+            TestConfiguration loadedConfiguration = configurationService.getConfiguration("test3");
+            assertEquals(PLAIN_PASSWORD, loadedConfiguration.getPassword());
+            // Now, checks the raw result in the repository
+            Optional<TestConfiguration> rawConfiguration = configurationRepository.find(TestConfiguration.class, "test3");
             assertTrue(rawConfiguration.isPresent());
             assertNotEquals("Password must be encrypted", PLAIN_PASSWORD, rawConfiguration.get().getPassword());
             // End of test
