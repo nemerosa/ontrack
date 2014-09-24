@@ -11,4 +11,13 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class StupidEncryptionServiceToReplace implements EncryptionService {
+    @Override
+    public String encrypt(String plain) {
+        return "xxx" + plain;
+    }
+
+    @Override
+    public String decrypt(String crypted) {
+        return crypted.substring(3);
+    }
 }

@@ -36,7 +36,9 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
 
     @Override
     public List<T> getConfigurations() {
-        return configurationRepository.list(configurationClass);
+        return configurationRepository.list(configurationClass).stream()
+                .map(this::decrypt)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -51,19 +53,20 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
     @Override
     public T newConfiguration(T configuration) {
         checkAccess();
-        return configurationRepository.save(configuration);
+        return configurationRepository.save(encrypt(configuration));
     }
 
     @Override
     public T getConfiguration(String name) {
         return configurationRepository
                 .find(configurationClass, name)
+                .map(this::decrypt)
                 .orElseThrow(() -> new ConfigurationNotFoundException(name));
     }
 
     @Override
     public Optional<T> getOptionalConfiguration(String name) {
-        return configurationRepository.find(configurationClass, name);
+        return configurationRepository.find(configurationClass, name).map(this::decrypt);
     }
 
     @Override
@@ -87,7 +90,7 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
         } else {
             configToSave = configuration;
         }
-        configurationRepository.save(configToSave);
+        configurationRepository.save(encrypt(configToSave));
     }
 
     @Override
@@ -113,6 +116,22 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
     @Override
     public Class<T> getConfigurationType() {
         return configurationClass;
+    }
+
+    protected T encrypt(T config) {
+        return config.withPassword(
+                encryptionService.encrypt(
+                        config.getPassword()
+                )
+        );
+    }
+
+    protected T decrypt(T config) {
+        return config.withPassword(
+                encryptionService.decrypt(
+                        config.getPassword()
+                )
+        );
     }
 
 }

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service.support.configuration;
 
+import net.nemerosa.ontrack.extension.support.configurations.EncryptionService;
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
@@ -19,6 +20,16 @@ public class ConfigurationServiceIT extends AbstractServiceTestSupport {
 
     @Autowired
     private ConfigurationRepository configurationRepository;
+
+    @Autowired
+    private EncryptionService encryptionService;
+
+    @Test
+    public void encryption() {
+        String crypted = encryptionService.encrypt("test");
+        assertNotEquals("test", crypted);
+        assertEquals("test", encryptionService.decrypt(crypted));
+    }
 
     @Test
     public void encryptedPasswordForNewConfig() throws Exception {
