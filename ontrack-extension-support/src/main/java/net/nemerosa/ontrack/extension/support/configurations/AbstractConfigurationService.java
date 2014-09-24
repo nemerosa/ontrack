@@ -53,7 +53,8 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
     @Override
     public T newConfiguration(T configuration) {
         checkAccess();
-        return configurationRepository.save(encrypt(configuration));
+        configurationRepository.save(encrypt(configuration));
+        return configuration;
     }
 
     @Override
