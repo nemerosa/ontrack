@@ -64,7 +64,7 @@ public class ExtensionManagerImpl implements ExtensionManager, StartupService {
         List<Extension> collection = extensions.stream()
                 .filter(extensionType::isInstance)
                 .filter(this::isExtensionEnabled)
-                .collect(Collectors.toList());
+                .collect(Collectors.<Extension>toList());
         //noinspection unchecked
         return (Collection<T>) collection;
     }
