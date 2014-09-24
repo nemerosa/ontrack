@@ -29,8 +29,7 @@ ext {
             commons_io                  : 'commons-io:commons-io:2.4',
             jackson_databind            : 'com.fasterxml.jackson.core:jackson-databind:2.3.3',
             guava                       : 'com.google.guava:guava:17.0',
-            // FIXME Use a release
-            dbinit                      : 'net.sf.dbinit:dbinit:1.4-SNAPSHOT',
+            dbinit                      : 'net.sf.dbinit:dbinit:1.4.0',
             h2                          : 'com.h2database:h2:1.4.177',
 
             // Spring
