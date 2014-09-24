@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service.security;
 
+import com.google.common.collect.Maps;
 import net.nemerosa.ontrack.model.exceptions.AuthenticationSourceProviderNotFoundException;
 import net.nemerosa.ontrack.model.security.AuthenticationSourceProvider;
 import net.nemerosa.ontrack.model.security.AuthenticationSourceService;
@@ -9,8 +10,6 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 public class AuthenticationSourceServiceImpl implements AuthenticationSourceService {
@@ -19,10 +18,10 @@ public class AuthenticationSourceServiceImpl implements AuthenticationSourceServ
 
     @Autowired
     public AuthenticationSourceServiceImpl(Collection<? extends AuthenticationSourceProvider> providers) {
-        this.providers = providers.stream().collect(Collectors.toMap(
-                provider -> provider.getSource().getId(),
-                Function.identity()
-        ));
+        this.providers = Maps.uniqueIndex(
+                providers,
+                p -> p.getSource().getId()
+        );
     }
 
     @Override
