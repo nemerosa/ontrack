@@ -55,9 +55,9 @@ public class AdminController extends AbstractResourceController {
     /**
      * Launches a job
      */
-    @RequestMapping(value = "jobs/{category}/{id:.*}", method = RequestMethod.POST)
-    public Ack launchJob(@PathVariable String category, @PathVariable String id) {
-        return jobService.launchJob(category, id);
+    @RequestMapping(value = "jobs/{id:\\d+}", method = RequestMethod.POST)
+    public Ack launchJob(@PathVariable long id) {
+        return jobService.launchJob(id);
     }
 
 }

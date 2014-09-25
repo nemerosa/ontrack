@@ -14,6 +14,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class RegisteredJob {
 
+    private static final AtomicLong ids = new AtomicLong();
+
+    private final long id = ids.incrementAndGet();
     private Job job;
     private long sync;
 
@@ -26,6 +29,10 @@ public class RegisteredJob {
     protected RegisteredJob(Job job, long sync) {
         this.job = job;
         this.sync = sync;
+    }
+
+    public long getId() {
+        return id;
     }
 
     public void sync(Job job, long sync) {

@@ -13,6 +13,7 @@
             <table class="ot-admin-console-jobs" ng-if="jobs">
                 <thead>
                 <tr>
+                    <td>ID</td>
                     <th>Category</th>
                     <th>Description</th>
                     <th>Action</th>
@@ -26,6 +27,9 @@
                 </thead>
                 <tbody>
                 <tr ng-repeat="job in jobs.resources | filter:jobFilter" ng-class="{'success': job.running}">
+                    <td>
+                        {{job.id}}
+                    </td>
                     <td>
                         {{job.descriptor.category}}
                     </td>

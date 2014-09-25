@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 @Data
 public class JobStatus {
 
+    private final long id;
     private final JobDescriptor descriptor;
     private final boolean running;
     private final ApplicationInfo info;
