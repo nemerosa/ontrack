@@ -1,8 +1,10 @@
-package net.nemerosa.ontrack.service;
+package net.nemerosa.ontrack.model.settings;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+
+import java.security.KeyStore;
 
 /**
  * Configuration properties for Ontrack.
@@ -21,5 +23,25 @@ public class OntrackConfigProperties {
      * Home directory
      */
     private String applicationWorkingDir = "work/files";
+
+    /**
+     * Keystore type
+     */
+    private String cryptoKeyStoreType = KeyStore.getDefaultType();
+
+    /**
+     * Key store password
+     */
+    private String cryptoKeyStorePassword = "ontrack";
+
+    /**
+     * Key alias
+     */
+    private String cryptoKeyAlias = "ontrack";
+
+    /**
+     * Cipher type
+     */
+    private String cryptoCipherType = "DES/ECB/PKCS5Padding";
 
 }

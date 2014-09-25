@@ -4,6 +4,7 @@ dependencies {
     compile project(':ontrack-json')
     compile libraries.guava
     compile libraries.spring_context
+    compile libraries.spring_boot
     compile libraries.validation_api
 
     testCompile project(':ontrack-test-utils')
