@@ -5,6 +5,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.Base64;
 
 public class CryptoConfidentialKey implements ConfidentialKey {
 
@@ -47,9 +48,44 @@ public class CryptoConfidentialKey implements ConfidentialKey {
         }
     }
 
+    @Override
+    public String encrypt(String plain) {
+        try {
+            // Creates a cipher
+            Cipher cipher = encrypt();
+            cipher.init(Cipher.ENCRYPT_MODE, getKey());
+            // Message as bytes
+            byte[] bytes = plain.getBytes("UTF-8");
+            // Encryption
+            byte[] encryptedBytes = cipher.doFinal(bytes);
+            // Base64 encoding
+            return Base64.getEncoder().encodeToString(encryptedBytes);
+        } catch (GeneralSecurityException | IOException ex) {
+            throw new EncryptionException(ex);
+        }
+    }
+
+    @Override
+    public String decrypt(String crypted) {
+        try {
+            // Creates a cipher
+            Cipher cipher = decrypt();
+            cipher.init(Cipher.DECRYPT_MODE, getKey());
+            // Decodes from Base64
+            byte[] encryptedBytes = Base64.getDecoder().decode(crypted);
+            // Decrypts
+            byte[] bytes = cipher.doFinal(encryptedBytes);
+            // As UTF-8 string
+            return new String(bytes, "UTF-8");
+        } catch (GeneralSecurityException | IOException ex) {
+            throw new EncryptionException(ex);
+        }
+    }
+
     /**
      * Returns a {@link javax.crypto.Cipher} object for encrypting with this key.
      */
+    @Override
     public Cipher encrypt() {
         try {
             Cipher cipher = Cipher.getInstance(ALGORITHM);
@@ -63,6 +99,7 @@ public class CryptoConfidentialKey implements ConfidentialKey {
     /**
      * Returns a {@link javax.crypto.Cipher} object for decrypting with this key.
      */
+    @Override
     public Cipher decrypt() {
         try {
             Cipher cipher = Cipher.getInstance(ALGORITHM);

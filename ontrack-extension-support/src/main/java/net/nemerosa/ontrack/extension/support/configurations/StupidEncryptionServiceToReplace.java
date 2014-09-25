@@ -1,13 +1,10 @@
 package net.nemerosa.ontrack.extension.support.configurations;
 
-import net.nemerosa.ontrack.model.settings.OntrackConfigProperties;
+import net.nemerosa.ontrack.security.ConfidentialKey;
+import net.nemerosa.ontrack.security.ConfidentialStore;
+import net.nemerosa.ontrack.security.CryptoConfidentialKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import javax.crypto.Cipher;
-import java.io.IOException;
-import java.security.*;
-import java.util.Base64;
 
 /**
  * FIXME #77 No encryption is provided for the moment by ontrack.
@@ -19,57 +16,21 @@ import java.util.Base64;
 @Component
 public class StupidEncryptionServiceToReplace implements EncryptionService {
 
-    private final Key key;
-    private final OntrackConfigProperties ontrackConfig;
+    private final ConfidentialKey key;
 
     @Autowired
-    public StupidEncryptionServiceToReplace(OntrackConfigProperties ontrackConfig) throws KeyStoreException, UnrecoverableKeyException, NoSuchAlgorithmException {
-        this.ontrackConfig = ontrackConfig;
-        // Gets the keystore
-        KeyStore ks = KeyStore.getInstance(ontrackConfig.getCryptoKeyStoreType());
-        // Checks if the key is defined
-        if (!ks.containsAlias(ontrackConfig.getCryptoKeyAlias())) {
-            // TODO Needs to create a key
-        }
-        // Gets the key
-        key = ks.getKey(
-                ontrackConfig.getCryptoKeyAlias(),
-                ontrackConfig.getCryptoKeyStorePassword().toCharArray());
-        // Done - deletes the password
-        ontrackConfig.setCryptoKeyStorePassword(null);
+    public StupidEncryptionServiceToReplace(ConfidentialStore confidentialStore) {
+        // Creates or gets the key
+        key = new CryptoConfidentialKey(confidentialStore, getClass(), "encryption");
     }
 
     @Override
     public String encrypt(String plain) {
-        try {
-            // Creates a cipher
-            Cipher cipher = Cipher.getInstance(ontrackConfig.getCryptoCipherType());
-            cipher.init(Cipher.ENCRYPT_MODE, key);
-            // Message as bytes
-            byte[] bytes = plain.getBytes("UTF-8");
-            // Encryption
-            byte[] encryptedBytes = cipher.doFinal(bytes);
-            // Base64 encoding
-            return Base64.getEncoder().encodeToString(encryptedBytes);
-        } catch (GeneralSecurityException | IOException ex) {
-            throw new EncryptionException(ex);
-        }
+        return key.encrypt(plain);
     }
 
     @Override
     public String decrypt(String crypted) {
-        try {
-            // Creates a cipher
-            Cipher cipher = Cipher.getInstance(ontrackConfig.getCryptoCipherType());
-            cipher.init(Cipher.DECRYPT_MODE, key);
-            // Decodes from Base64
-            byte[] encryptedBytes = Base64.getDecoder().decode(crypted);
-            // Decrypts
-            byte[] bytes = cipher.doFinal(encryptedBytes);
-            // As UTF-8 string
-            return new String(bytes, "UTF-8");
-        } catch (GeneralSecurityException | IOException ex) {
-            throw new EncryptionException(ex);
-        }
+        return key.decrypt(crypted);
     }
 }

@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.support.configurations;
+package net.nemerosa.ontrack.security;
 
 import net.nemerosa.ontrack.common.BaseException;
 

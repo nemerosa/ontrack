@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.security;
 
+import javax.crypto.Cipher;
+
 public interface ConfidentialKey {
 
     /**
@@ -7,4 +9,11 @@ public interface ConfidentialKey {
      */
     String getId();
 
+    Cipher encrypt();
+
+    Cipher decrypt();
+
+    String encrypt(String plain);
+
+    String decrypt(String crypted);
 }
