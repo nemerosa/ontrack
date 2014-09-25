@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.service.support.configuration;
 
-import net.nemerosa.ontrack.security.EncryptionService;
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
+import net.nemerosa.ontrack.security.EncryptionService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -34,7 +34,7 @@ public class ConfigurationServiceIT extends AbstractServiceTestSupport {
     @Test
     public void encryptedPasswordForNewConfig() throws Exception {
         // Creates a new configuration, with a password we want to keep secret
-        TestConfiguration configuration = new TestConfiguration("test1", "user", PLAIN_PASSWORD);
+        TestConfiguration configuration = config("test1");
         asUser().with(GlobalSettings.class).call(() -> {
             // Saves this configuration in the database
             TestConfiguration savedConfiguration = configurationService.newConfiguration(configuration);
@@ -55,7 +55,8 @@ public class ConfigurationServiceIT extends AbstractServiceTestSupport {
     @Test
     public void encryptedPasswordForSavedConfigWithNewPassword() throws Exception {
         // Creates a new configuration, with a password we want to keep secret
-        TestConfiguration configuration = new TestConfiguration("test2", "user", PLAIN_PASSWORD);
+        String testName = "test2";
+        TestConfiguration configuration = config(testName);
         asUser().with(GlobalSettings.class).call(() -> {
             // Saves this configuration in the database
             TestConfiguration savedConfiguration = configurationService.newConfiguration(configuration);
@@ -77,10 +78,14 @@ public class ConfigurationServiceIT extends AbstractServiceTestSupport {
         });
     }
 
+    private TestConfiguration config(String name) {
+        return new TestConfiguration(name, "user", PLAIN_PASSWORD);
+    }
+
     @Test
     public void encryptedPasswordForSavedConfigWithNoNewPassword() throws Exception {
         // Creates a new configuration, with a password we want to keep secret
-        TestConfiguration configuration = new TestConfiguration("test3", "user", PLAIN_PASSWORD);
+        TestConfiguration configuration = config("test3");
         asUser().with(GlobalSettings.class).call(() -> {
             // Saves this configuration in the database
             TestConfiguration savedConfiguration = configurationService.newConfiguration(configuration);
@@ -110,6 +115,50 @@ public class ConfigurationServiceIT extends AbstractServiceTestSupport {
         Optional<TestConfiguration> conf = configurationRepository.find(TestConfiguration.class, "plain");
         assertTrue(conf.isPresent());
         assertNotEquals("Password must have been encrypted by migration", PLAIN_PASSWORD, conf.get().getPassword());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void update_name_check() throws Exception {
+        asUser().with(GlobalSettings.class).call(() -> {
+            configurationService.updateConfiguration("test", config("testx"));
+            return true;
+        });
+    }
+
+    /**
+     * Checks that the password is unchanged when it is given as blank for the same user.
+     */
+    @Test
+    public void update_blank_password() throws Exception {
+        asUser().with(GlobalSettings.class).call(() -> {
+            configurationService.newConfiguration(config("test5"));
+            // Gets the saved password
+            String savedPassword = configurationService.getConfiguration("test5").getPassword();
+            // Update with blank password
+            configurationService.updateConfiguration("test5", config("test5").withPassword(""));
+            // Gets the saved password and compares it
+            String newSavedPassword = configurationService.getConfiguration("test5").getPassword();
+            assertEquals(savedPassword, newSavedPassword);
+            // End of test
+            return true;
+        });
+    }
+
+    /**
+     * Checks that the password is changed when it is given as blank for another user.
+     */
+    @Test
+    public void update_blank_password_for_different_user() throws Exception {
+        asUser().with(GlobalSettings.class).call(() -> {
+            configurationService.newConfiguration(config("test6"));
+            // Update with blank password for another user
+            configurationService.updateConfiguration("test6", new TestConfiguration("test6", "user2", "").withPassword(""));
+            // Gets the configuration back and checks the password is blank
+            assertEquals("", configurationService.getConfiguration("test6").getPassword());
+            assertEquals("user2", configurationService.getConfiguration("test6").getUser());
+            // End of test
+            return true;
+        });
     }
 
 }
