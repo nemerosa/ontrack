@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.model.settings;
+package net.nemerosa.ontrack.service;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

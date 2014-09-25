@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.service;
 
 import net.nemerosa.ontrack.model.exceptions.CannotCreateWorkingDirException;
-import net.nemerosa.ontrack.model.settings.OntrackConfigProperties;
 import net.nemerosa.ontrack.model.structure.VersionInfo;
 import net.nemerosa.ontrack.model.support.EnvService;
 import org.apache.commons.io.FileUtils;

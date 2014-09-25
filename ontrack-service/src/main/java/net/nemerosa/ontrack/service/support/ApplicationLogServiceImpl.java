@@ -4,7 +4,7 @@ import com.google.common.collect.EvictingQueue;
 import net.nemerosa.ontrack.model.security.ApplicationManagement;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.*;
-import net.nemerosa.ontrack.model.settings.OntrackConfigProperties;
+import net.nemerosa.ontrack.service.OntrackConfigProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
