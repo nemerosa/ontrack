@@ -114,7 +114,7 @@ public class ConfigurationServiceIT extends AbstractServiceTestSupport {
     public void encryptedConfigurationMigration() throws Exception {
         Optional<TestConfiguration> conf = configurationRepository.find(TestConfiguration.class, "plain");
         assertTrue(conf.isPresent());
-        assertNotEquals("Password must have been encrypted by migration", PLAIN_PASSWORD, conf.get().getPassword());
+        assertNotEquals("Password should have been encrypted by migration", PLAIN_PASSWORD, conf.get().getPassword());
     }
 
     @Test(expected = IllegalArgumentException.class)

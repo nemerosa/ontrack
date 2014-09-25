@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.support.configurations;
 
-import net.nemerosa.ontrack.model.support.ConfigurationRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.support.DBMigrationAction;
 import net.nemerosa.ontrack.security.EncryptionService;
 import org.slf4j.Logger;
@@ -8,9 +9,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Migration for the configurations, so they can be encrypted
@@ -20,14 +24,16 @@ public class EncryptedConfigurationMigrationAction implements DBMigrationAction 
 
     private final Logger logger = LoggerFactory.getLogger(EncryptedConfigurationMigrationAction.class);
 
+    private final ObjectMapper objectMapper = ObjectMapperFactory.create();
+
     private final Collection<ConfigurationService<?>> configurationServices;
-    private final ConfigurationRepository configurationRepository;
     private final EncryptionService encryptionService;
 
     @Autowired
-    protected EncryptedConfigurationMigrationAction(Collection<ConfigurationService<?>> configurationServices, ConfigurationRepository configurationRepository, EncryptionService encryptionService) {
+    protected EncryptedConfigurationMigrationAction(
+            Collection<ConfigurationService<?>> configurationServices,
+            EncryptionService encryptionService) {
         this.configurationServices = configurationServices;
-        this.configurationRepository = configurationRepository;
         this.encryptionService = encryptionService;
     }
 
@@ -37,28 +43,38 @@ public class EncryptedConfigurationMigrationAction implements DBMigrationAction 
     }
 
     @Override
-    public void migrate(Connection connection) {
+    public void migrate(Connection connection) throws SQLException, IOException {
         // For all configuration services
         for (ConfigurationService<?> configurationService : configurationServices) {
-            migrate(configurationService);
+            migrate(configurationService, connection);
         }
     }
 
-    private <T extends UserPasswordConfiguration> void migrate(ConfigurationService<T> configurationService) {
+    private <T extends UserPasswordConfiguration> void migrate(ConfigurationService<T> configurationService, Connection connection) throws SQLException, IOException {
         logger.info("Encrypting configurations for: {}", configurationService.getClass().getName());
         // Class for the configuration
         Class<T> configurationType = configurationService.getConfigurationType();
         // Gets all configurations for this type
-        List<T> configurations = configurationRepository.list(configurationType);
-        // Saves them again to force encryption
-        for (T configuration : configurations) {
-            logger.info("Encrypting configuration: {}", configuration.getDescriptor().getName());
-            UserPasswordConfiguration migratedConfig = configuration.withPassword(
-                    encryptionService.encrypt(
-                            configuration.getPassword()
-                    )
-            );
-            configurationRepository.save(migratedConfig);
+        /**
+         * We cannot use the repository here since it is using its own connection through the datasource.
+         */
+        try (PreparedStatement ps = connection.prepareStatement("SELECT * FROM CONFIGURATIONS WHERE TYPE = ?", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE)) {
+            ps.setString(1, configurationType.getName());
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String name = rs.getString("name");
+                    logger.info("Encrypting configuration: {}", name);
+                    // Configuration as JSON
+                    String json = rs.getString("content");
+                    // Parses the configuration
+                    T data = objectMapper.readValue(json, configurationType);
+                    // Encrypts the configuration
+                    UserPasswordConfiguration encryptedData = data.withPassword(encryptionService.encrypt(data.getPassword()));
+                    // Saves the data back
+                    rs.updateString("content", objectMapper.writeValueAsString(encryptedData));
+                    rs.updateRow();
+                }
+            }
         }
     }
 

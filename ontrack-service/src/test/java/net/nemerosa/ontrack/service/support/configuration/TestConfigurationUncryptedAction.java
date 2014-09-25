@@ -1,11 +1,14 @@
 package net.nemerosa.ontrack.service.support.configuration;
 
-import net.nemerosa.ontrack.model.support.ConfigurationRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.support.DBMigrationAction;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 /**
  * This action creates an uncrypted (clear) version of a configuration. The
@@ -15,12 +18,7 @@ import java.sql.Connection;
 @Component
 public class TestConfigurationUncryptedAction implements DBMigrationAction {
 
-    private final ConfigurationRepository configurationRepository;
-
-    @Autowired
-    public TestConfigurationUncryptedAction(ConfigurationRepository configurationRepository) {
-        this.configurationRepository = configurationRepository;
-    }
+    private final ObjectMapper objectMapper = ObjectMapperFactory.create();
 
     /**
      * Makes sure we create this configuration BEFORE the migration is done.
@@ -33,14 +31,21 @@ public class TestConfigurationUncryptedAction implements DBMigrationAction {
     }
 
     @Override
-    public void migrate(Connection connection) {
-        configurationRepository.save(
-                new TestConfiguration(
-                        "plain",
-                        "test",
-                        "verysecret"
-                )
-        );
+    public void migrate(Connection connection) throws SQLException, JsonProcessingException {
+        try (PreparedStatement ps =
+                     connection.prepareStatement("INSERT INTO CONFIGURATIONS(TYPE, NAME, CONTENT) VALUES (?, ?, ?)")) {
+            ps.setString(1, TestConfiguration.class.getName());
+            ps.setString(2, "plain");
+            ps.setString(3, objectMapper.writeValueAsString(
+                            new TestConfiguration(
+                                    "plain",
+                                    "test",
+                                    "verysecret"
+                            )
+                    )
+            );
+            ps.execute();
+        }
     }
 
     @Override
