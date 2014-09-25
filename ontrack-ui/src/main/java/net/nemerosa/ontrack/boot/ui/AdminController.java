@@ -7,12 +7,15 @@ import net.nemerosa.ontrack.model.support.ApplicationLogEntry;
 import net.nemerosa.ontrack.model.support.ApplicationLogService;
 import net.nemerosa.ontrack.model.support.Page;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
+import net.nemerosa.ontrack.ui.resource.Pagination;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -34,10 +37,43 @@ public class AdminController extends AbstractResourceController {
      */
     @RequestMapping(value = "logs", method = RequestMethod.GET)
     public Resources<ApplicationLogEntry> getLogEntries(Page page) {
-        return Resources.of(
-                applicationLogService.getLogEntries(page),
+        // Gets the entries
+        List<ApplicationLogEntry> entries = applicationLogService.getLogEntries(page);
+        // Builds the resources
+        Resources<ApplicationLogEntry> resources = Resources.of(
+                entries,
                 uri(on(getClass()).getLogEntries(page))
         );
+        // Pagination information
+        int offset = page.getOffset();
+        int count = page.getCount();
+        int actualCount = entries.size();
+        int total = applicationLogService.getLogEntriesTotal();
+        Pagination pagination = Pagination.of(offset, actualCount, total);
+        // Previous page
+        if (offset > 0) {
+            pagination = pagination.withPrev(
+                    uri(on(AdminController.class).getLogEntries(
+                            new Page(
+                                    Math.max(0, offset - count),
+                                    count
+                            )
+                    ))
+            );
+        }
+        // Next page
+        if (offset + count < total) {
+            pagination = pagination.withNext(
+                    uri(on(AdminController.class).getLogEntries(
+                            new Page(
+                                    offset + count,
+                                    count
+                            )
+                    ))
+            );
+        }
+        // OK
+        return resources.withPagination(pagination);
     }
 
     /**
