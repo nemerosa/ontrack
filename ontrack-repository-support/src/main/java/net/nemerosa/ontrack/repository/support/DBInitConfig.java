@@ -1,7 +1,5 @@
 package net.nemerosa.ontrack.repository.support;
 
-import net.sf.dbinit.DBInit;
-
 /**
  * Declaration for a database initialisation.
  */
@@ -17,7 +15,7 @@ public interface DBInitConfig {
      *
      * @see net.sf.dbinit.DBInit
      */
-    DBInit createConfig();
+    ConfiguredDBInit createConfig();
 
     /**
      * Order of execution
