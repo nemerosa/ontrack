@@ -11,19 +11,22 @@ public class EncryptionServiceImpl implements EncryptionService {
 
     private final ConfidentialKey key;
 
+    public EncryptionServiceImpl(ConfidentialKey key) {
+        this.key = key;
+    }
+
     @Autowired
     public EncryptionServiceImpl(ConfidentialStore confidentialStore) {
-        // Creates or gets the key
-        key = new CryptoConfidentialKey(confidentialStore, getClass(), "encryption");
+        this(new CryptoConfidentialKey(confidentialStore, EncryptionServiceImpl.class, "encryption"));
     }
 
     @Override
     public String encrypt(String plain) {
-        return key.encrypt(plain);
+        return plain != null ? key.encrypt(plain) : null;
     }
 
     @Override
     public String decrypt(String crypted) {
-        return key.decrypt(crypted);
+        return crypted != null ? key.decrypt(crypted) : null;
     }
 }
