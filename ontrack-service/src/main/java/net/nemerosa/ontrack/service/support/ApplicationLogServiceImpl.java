@@ -2,7 +2,10 @@ package net.nemerosa.ontrack.service.support;
 
 import net.nemerosa.ontrack.model.security.ApplicationManagement;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.support.*;
+import net.nemerosa.ontrack.model.support.ApplicationLogEntry;
+import net.nemerosa.ontrack.model.support.ApplicationLogEntryLevel;
+import net.nemerosa.ontrack.model.support.ApplicationLogService;
+import net.nemerosa.ontrack.model.support.Page;
 import net.nemerosa.ontrack.service.OntrackConfigProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,25 +66,22 @@ public class ApplicationLogServiceImpl implements ApplicationLogService {
     }
 
     @Override
-    public synchronized ApplicationLogEntries getLogEntries(Page page) {
+    public synchronized int getLogEntriesTotal() {
+        return entries.size();
+    }
+
+    @Override
+    public synchronized List<ApplicationLogEntry> getLogEntries(Page page) {
         securityService.checkGlobalFunction(ApplicationManagement.class);
         int total = entries.size();
         int offset = page.getOffset();
         int count = page.getCount();
         if (offset >= total) {
-            return new ApplicationLogEntries(
-                    Collections.emptyList(),
-                    new Page(offset, 0),
-                    total
-            );
+            return Collections.emptyList();
         } else {
             List<ApplicationLogEntry> list = new ArrayList<>(entries);
             list = list.subList(offset, Math.min(offset + count, total));
-            return new ApplicationLogEntries(
-                    list,
-                    new Page(offset, list.size()),
-                    total
-            );
+            return list;
         }
     }
 }

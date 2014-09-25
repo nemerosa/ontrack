@@ -24,9 +24,9 @@ class ApplicationLogServiceImplTest {
         // Gets the entries
         def entries = service.getLogEntries(new Page())
         // Checks the order
-        assert entries.total == 2
-        assert entries.entries[0].identifier == "test2"
-        assert entries.entries[1].identifier == "test1"
+        assert entries.size() == 2
+        assert entries[0].identifier == "test2"
+        assert entries[1].identifier == "test1"
     }
 
 }

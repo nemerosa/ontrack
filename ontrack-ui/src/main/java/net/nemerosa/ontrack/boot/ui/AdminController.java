@@ -3,11 +3,10 @@ package net.nemerosa.ontrack.boot.ui;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.job.JobService;
 import net.nemerosa.ontrack.model.job.JobStatus;
-import net.nemerosa.ontrack.model.support.ApplicationLogEntries;
+import net.nemerosa.ontrack.model.support.ApplicationLogEntry;
 import net.nemerosa.ontrack.model.support.ApplicationLogService;
 import net.nemerosa.ontrack.model.support.Page;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
-import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,8 +33,8 @@ public class AdminController extends AbstractResourceController {
      * Gets the list of application log entries
      */
     @RequestMapping(value = "logs", method = RequestMethod.GET)
-    public Resource<ApplicationLogEntries> getLogEntries(Page page) {
-        return Resource.of(
+    public Resources<ApplicationLogEntry> getLogEntries(Page page) {
+        return Resources.of(
                 applicationLogService.getLogEntries(page),
                 uri(on(getClass()).getLogEntries(page))
         );
