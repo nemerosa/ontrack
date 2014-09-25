@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.service.support;
 
-import com.google.common.collect.EvictingQueue;
 import net.nemerosa.ontrack.model.security.ApplicationManagement;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.*;
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -20,12 +20,14 @@ public class ApplicationLogServiceImpl implements ApplicationLogService {
     private final Logger logger = LoggerFactory.getLogger(ApplicationLogService.class);
 
     private final SecurityService securityService;
-    private final EvictingQueue<ApplicationLogEntry> entries;
+    private final int maxEntries;
+    private final LinkedList<ApplicationLogEntry> entries;
 
     @Autowired
     public ApplicationLogServiceImpl(OntrackConfigProperties ontrackConfigProperties, SecurityService securityService) {
         this.securityService = securityService;
-        this.entries = EvictingQueue.create(ontrackConfigProperties.getApplicationLogMaxEntries());
+        this.maxEntries = ontrackConfigProperties.getApplicationLogMaxEntries();
+        this.entries = new LinkedList<>();
     }
 
     @Override
@@ -53,7 +55,11 @@ public class ApplicationLogServiceImpl implements ApplicationLogService {
 
     private synchronized void log(ApplicationLogEntry entry) {
         // Storage
-        entries.add(entry);
+        entries.addFirst(entry);
+        // Pruning
+        while (entries.size() > maxEntries) {
+            entries.removeLast();
+        }
     }
 
     @Override
