@@ -64,4 +64,24 @@ public final class Utils {
             throw new RuntimeException("Error while executing " + cmd + " command", ex);
         }
     }
+
+    /**
+     * Writes some bytes in Hexadecimal format
+     */
+    public static String toHexString(byte[] bytes) {
+        return toHexString(bytes, 0, bytes.length);
+    }
+
+    /**
+     * Writes some bytes in Hexadecimal format
+     */
+    public static String toHexString(byte[] data, int start, int len) {
+        StringBuilder buf = new StringBuilder();
+        for (int i = 0; i < len; i++) {
+            int b = data[start + i] & 0xFF;
+            if (b < 16) buf.append('0');
+            buf.append(Integer.toHexString(b));
+        }
+        return buf.toString();
+    }
 }
