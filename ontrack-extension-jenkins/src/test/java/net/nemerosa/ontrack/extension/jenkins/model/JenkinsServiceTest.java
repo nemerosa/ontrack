@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.jenkins.model;
 import net.nemerosa.ontrack.extension.jenkins.JenkinsConfiguration;
 import net.nemerosa.ontrack.extension.jenkins.JenkinsConfigurationService;
 import net.nemerosa.ontrack.extension.jenkins.JenkinsConfigurationServiceImpl;
-import net.nemerosa.ontrack.extension.support.configurations.EncryptionService;
+import net.nemerosa.ontrack.security.EncryptionService;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
 import org.junit.Before;

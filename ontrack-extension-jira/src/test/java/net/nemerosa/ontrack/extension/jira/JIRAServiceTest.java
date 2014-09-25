@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.jira;
 
-import net.nemerosa.ontrack.extension.support.configurations.EncryptionService;
+import net.nemerosa.ontrack.security.EncryptionService;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
 import org.junit.Before;

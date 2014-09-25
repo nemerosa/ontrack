@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.Configuration;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
+import net.nemerosa.ontrack.security.EncryptionService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.support.configurations;
 
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
 import net.nemerosa.ontrack.model.support.DBMigrationAction;
+import net.nemerosa.ontrack.security.EncryptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

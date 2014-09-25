@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.artifactory.configuration;
 
 import net.nemerosa.ontrack.extension.support.configurations.AbstractConfigurationService;
-import net.nemerosa.ontrack.extension.support.configurations.EncryptionService;
+import net.nemerosa.ontrack.security.EncryptionService;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service.support.configuration;
 
-import net.nemerosa.ontrack.extension.support.configurations.EncryptionService;
+import net.nemerosa.ontrack.security.EncryptionService;
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
