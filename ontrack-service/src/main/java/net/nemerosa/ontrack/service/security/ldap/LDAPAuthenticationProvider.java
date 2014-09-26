@@ -112,7 +112,5 @@ public class LDAPAuthenticationProvider extends AbstractOntrackAuthenticationPro
 
     @Override
     protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
-        // FIXME Method net.nemerosa.ontrack.service.security.LDAPAuthenticationProvider.additionalAuthenticationChecks
-
     }
 }
