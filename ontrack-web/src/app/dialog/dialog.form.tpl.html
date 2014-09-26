@@ -5,7 +5,8 @@
     <div class="modal-body">
 
         <div ng-repeat="field in config.form.fields" class="form-group"
-             ng-class="{ 'has-error' : thisForm[field.name].$invalid && !thisForm[field.name].$pristine }">
+             ng-class="{ 'has-error' : thisForm[field.name].$invalid && !thisForm[field.name].$pristine }"
+             ng-if="isFieldVisible(data, field)">
             <label class="control-label col-md-3">{{field.label}}</label>
 
             <div class="col-md-9">

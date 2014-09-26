@@ -10,6 +10,14 @@ angular.module('ot.dialog.form', [
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
         };
+        // Checking if a field is visible or not
+        $scope.isFieldVisible = function (data, field) {
+            if (field.visibleIf) {
+                return data[field.visibleIf];
+            } else {
+                return true;
+            }
+        };
         // Submitting the dialog
         $scope.submit = function (isValid) {
             if (isValid) {

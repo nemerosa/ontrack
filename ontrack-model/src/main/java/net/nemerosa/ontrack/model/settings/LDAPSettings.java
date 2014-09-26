@@ -28,12 +28,14 @@ public class LDAPSettings {
                 )
                 .with(
                         Text.of("url")
+                                .visibleIf("enabled")
                                 .label("URL")
                                 .help("URL to the LDAP server")
                                 .value(url)
                 )
                 .with(
                         Text.of("user")
+                                .visibleIf("enabled")
                                 .label("User")
                                 .help("Name of the user used to connect to the LDAP server")
                                 .optional()
@@ -41,6 +43,7 @@ public class LDAPSettings {
                 )
                 .with(
                         Password.of("password")
+                                .visibleIf("enabled")
                                 .label("Password")
                                 .help("Password of the user used to connect to the LDAP server")
                                 .optional()
@@ -48,6 +51,7 @@ public class LDAPSettings {
                 )
                 .with(
                         Text.of("searchBase")
+                                .visibleIf("enabled")
                                 .label("Search base")
                                 .help("Query to get the user")
                                 .optional()
@@ -55,6 +59,7 @@ public class LDAPSettings {
                 )
                 .with(
                         Text.of("searchFilter")
+                                .visibleIf("enabled")
                                 .label("Search filter")
                                 .help("Filter on the user query")
                                 .optional()
@@ -62,6 +67,7 @@ public class LDAPSettings {
                 )
                 .with(
                         Text.of("fullNameAttribute")
+                                .visibleIf("enabled")
                                 .label("Full name attribute")
                                 .help("Name of the attribute that contains the full name of the user")
                                 .optional()
@@ -69,6 +75,7 @@ public class LDAPSettings {
                 )
                 .with(
                         Text.of("emailAttribute")
+                                .visibleIf("enabled")
                                 .label("Email attribute")
                                 .help("Name of the attribute that contains the email of the user")
                                 .optional()
