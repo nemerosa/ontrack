@@ -1,34 +1,34 @@
-dn: ou=groups,dc=springframework,dc=org
+dn: ou=groups,dc=nemerosa,dc=net
 objectclass: top
 objectclass: organizationalUnit
 ou: groups
 
-dn: ou=subgroups,ou=groups,dc=springframework,dc=org
+dn: ou=subgroups,ou=groups,dc=nemerosa,dc=net
 objectclass: top
 objectclass: organizationalUnit
 ou: subgroups
 
-dn: ou=people,dc=springframework,dc=org
+dn: ou=people,dc=nemerosa,dc=net
 objectclass: top
 objectclass: organizationalUnit
 ou: people
 
-dn: ou=space cadets,dc=springframework,dc=org
+dn: ou=space cadets,dc=nemerosa,dc=net
 objectclass: top
 objectclass: organizationalUnit
 ou: space cadets
 
-dn: ou=\"quoted people\",dc=springframework,dc=org
+dn: ou=\"quoted people\",dc=nemerosa,dc=net
 objectclass: top
 objectclass: organizationalUnit
 ou: "quoted people"
 
-dn: ou=otherpeople,dc=springframework,dc=org
+dn: ou=otherpeople,dc=nemerosa,dc=net
 objectclass: top
 objectclass: organizationalUnit
 ou: otherpeople
 
-dn: uid=ben,ou=people,dc=springframework,dc=org
+dn: uid=ben,ou=people,dc=nemerosa,dc=net
 objectclass: top
 objectclass: person
 objectclass: organizationalPerson
@@ -38,7 +38,7 @@ sn: Alex
 uid: ben
 userPassword: {SHA}nFCebWjxfaLbHHG1Qk5UU4trbvQ=
 
-dn: uid=bob,ou=people,dc=springframework,dc=org
+dn: uid=bob,ou=people,dc=nemerosa,dc=net
 objectclass: top
 objectclass: person
 objectclass: organizationalPerson
@@ -48,7 +48,7 @@ sn: Hamilton
 uid: bob
 userPassword: bobspassword
 
-dn: uid=joe,ou=otherpeople,dc=springframework,dc=org
+dn: uid=joe,ou=otherpeople,dc=nemerosa,dc=net
 objectclass: top
 objectclass: person
 objectclass: organizationalPerson
@@ -58,7 +58,7 @@ sn: Smeth
 uid: joe
 userPassword: joespassword
 
-dn: cn=mouse\, jerry,ou=people,dc=springframework,dc=org
+dn: cn=mouse\, jerry,ou=people,dc=nemerosa,dc=net
 objectclass: top
 objectclass: person
 objectclass: organizationalPerson
@@ -68,7 +68,7 @@ sn: Mouse
 uid: jerry
 userPassword: jerryspassword
 
-dn: cn=slash/guy,ou=people,dc=springframework,dc=org
+dn: cn=slash/guy,ou=people,dc=nemerosa,dc=net
 objectclass: top
 objectclass: person
 objectclass: organizationalPerson
@@ -78,7 +78,7 @@ sn: Slash
 uid: slashguy
 userPassword: slashguyspassword
 
-dn: cn=quote\"guy,ou=\"quoted people\",dc=springframework,dc=org
+dn: cn=quote\"guy,ou=\"quoted people\",dc=nemerosa,dc=net
 objectclass: top
 objectclass: person
 objectclass: organizationalPerson
@@ -88,7 +88,7 @@ sn: Quote
 uid: quoteguy
 userPassword: quoteguyspassword
 
-dn: uid=space cadet,ou=space cadets,dc=springframework,dc=org
+dn: uid=space cadet,ou=space cadets,dc=nemerosa,dc=net
 objectclass: top
 objectclass: person
 objectclass: organizationalPerson
@@ -100,33 +100,33 @@ userPassword: spacecadetspassword
 
 
 
-dn: cn=developers,ou=groups,dc=springframework,dc=org
+dn: cn=developers,ou=groups,dc=nemerosa,dc=net
 objectclass: top
 objectclass: groupOfNames
 cn: developers
 ou: developer
-member: uid=ben,ou=people,dc=springframework,dc=org
-member: uid=bob,ou=people,dc=springframework,dc=org
+member: uid=ben,ou=people,dc=nemerosa,dc=net
+member: uid=bob,ou=people,dc=nemerosa,dc=net
 
-dn: cn=managers,ou=groups,dc=springframework,dc=org
+dn: cn=managers,ou=groups,dc=nemerosa,dc=net
 objectclass: top
 objectclass: groupOfNames
 cn: managers
 ou: manager
-member: uid=ben,ou=people,dc=springframework,dc=org
-member: cn=mouse\, jerry,ou=people,dc=springframework,dc=org
+member: uid=ben,ou=people,dc=nemerosa,dc=net
+member: cn=mouse\, jerry,ou=people,dc=nemerosa,dc=net
 
-dn: cn=submanagers,ou=subgroups,ou=groups,dc=springframework,dc=org
+dn: cn=submanagers,ou=subgroups,ou=groups,dc=nemerosa,dc=net
 objectclass: top
 objectclass: groupOfNames
 cn: submanagers
 ou: submanager
-member: uid=ben,ou=people,dc=springframework,dc=org
+member: uid=ben,ou=people,dc=nemerosa,dc=net
 
 #Nested groups data
 ###################
 
-dn: ou=jdeveloper,dc=springframework,dc=org
+dn: ou=jdeveloper,dc=nemerosa,dc=net
 objectclass: top
 objectclass: organizationalUnit
 ou: jdeveloper
@@ -134,7 +134,7 @@ ou: jdeveloper
 
 # javadude is part of (in a nested search)
 # circular-java-developers, java-developers, j-developers
-dn: uid=javadude,ou=people,dc=springframework,dc=org
+dn: uid=javadude,ou=people,dc=nemerosa,dc=net
 objectclass: top
 objectclass: person
 objectclass: organizationalPerson
@@ -146,7 +146,7 @@ userPassword: javadudespassword
 
 # groovydude is part of (in a nested search)
 # groovy-developers, java-developers, circular-java-developers, j-developers
-dn: uid=groovydude,ou=people,dc=springframework,dc=org
+dn: uid=groovydude,ou=people,dc=nemerosa,dc=net
 objectclass: top
 objectclass: person
 objectclass: organizationalPerson
@@ -158,7 +158,7 @@ userPassword: groovydudespassword
 
 # closuredude is part of (in a nested search)
 # closure-developers, groovy-developers, java-developers, circular-java-developers, j-developers
-dn: uid=closuredude,ou=people,dc=springframework,dc=org
+dn: uid=closuredude,ou=people,dc=nemerosa,dc=net
 objectclass: top
 objectclass: person
 objectclass: organizationalPerson
@@ -170,7 +170,7 @@ userPassword: closuredudespassword
 
 # scaladude is part of (in a nested search)
 # scala-developers, groovy-developers, java-developers, circular-java-developers, j-developers
-dn: uid=scaladude,ou=people,dc=springframework,dc=org
+dn: uid=scaladude,ou=people,dc=nemerosa,dc=net
 objectclass: top
 objectclass: person
 objectclass: organizationalPerson
@@ -180,51 +180,51 @@ sn: Dude
 uid: scaladude
 userPassword: scaladudespassword
 
-dn: cn=j-developers,ou=jdeveloper,dc=springframework,dc=org
+dn: cn=j-developers,ou=jdeveloper,dc=nemerosa,dc=net
 objectclass: top
 objectclass: groupOfNames
 cn: j-developers
 ou: jdeveloper
-member: cn=java-developers,ou=jdeveloper,dc=springframework,dc=org
+member: cn=java-developers,ou=jdeveloper,dc=nemerosa,dc=net
 
-dn: cn=java-developers,ou=jdeveloper,dc=springframework,dc=org
+dn: cn=java-developers,ou=jdeveloper,dc=nemerosa,dc=net
 objectclass: top
 objectclass: groupOfNames
 cn: java-developers
 ou: jdeveloper
-member: cn=groovy-developers,ou=jdeveloper,dc=springframework,dc=org
-member: cn=scala-developers,ou=jdeveloper,dc=springframework,dc=org
-member: uid=javadude,ou=people,dc=springframework,dc=org
+member: cn=groovy-developers,ou=jdeveloper,dc=nemerosa,dc=net
+member: cn=scala-developers,ou=jdeveloper,dc=nemerosa,dc=net
+member: uid=javadude,ou=people,dc=nemerosa,dc=net
 
-dn: cn=circular-java-developers,ou=jdeveloper,dc=springframework,dc=org
+dn: cn=circular-java-developers,ou=jdeveloper,dc=nemerosa,dc=net
 objectclass: top
 objectclass: groupOfNames
 cn: circular-java-developers
 ou: jdeveloper
-member: cn=groovy-developers,ou=jdeveloper,dc=springframework,dc=org
-member: cn=scala-developers,ou=jdeveloper,dc=springframework,dc=org
-member: uid=javadude,ou=people,dc=springframework,dc=org
+member: cn=groovy-developers,ou=jdeveloper,dc=nemerosa,dc=net
+member: cn=scala-developers,ou=jdeveloper,dc=nemerosa,dc=net
+member: uid=javadude,ou=people,dc=nemerosa,dc=net
 
 
-dn: cn=groovy-developers,ou=jdeveloper,dc=springframework,dc=org
+dn: cn=groovy-developers,ou=jdeveloper,dc=nemerosa,dc=net
 objectclass: top
 objectclass: groupOfNames
 cn: groovy-developers
 ou: jdeveloper
-member: cn=closure-developers,ou=jdeveloper,dc=springframework,dc=org
-member: uid=groovydude,ou=people,dc=springframework,dc=org
-member: cn=circular-java-developers,ou=jdeveloper,dc=springframework,dc=org
+member: cn=closure-developers,ou=jdeveloper,dc=nemerosa,dc=net
+member: uid=groovydude,ou=people,dc=nemerosa,dc=net
+member: cn=circular-java-developers,ou=jdeveloper,dc=nemerosa,dc=net
 
-dn: cn=closure-developers,ou=jdeveloper,dc=springframework,dc=org
+dn: cn=closure-developers,ou=jdeveloper,dc=nemerosa,dc=net
 objectclass: top
 objectclass: groupOfNames
 cn: closure-developers
 ou: jdeveloper
-member: uid=closuredude,ou=people,dc=springframework,dc=org
+member: uid=closuredude,ou=people,dc=nemerosa,dc=net
 
-dn: cn=scala-developers,ou=jdeveloper,dc=springframework,dc=org
+dn: cn=scala-developers,ou=jdeveloper,dc=nemerosa,dc=net
 objectclass: top
 objectclass: groupOfNames
 cn: scala-developers
 ou: jdeveloper
-member: uid=scaladude,ou=people,dc=springframework,dc=org
+member: uid=scaladude,ou=people,dc=nemerosa,dc=net
