@@ -34,6 +34,7 @@ public class SettingsInternalServiceImpl implements SettingsInternalService {
     }
 
     @Override
+    @Cacheable(value = Caches.LDAP_SETTINGS, key = "0")
     public LDAPSettings getLDAPSettings() {
         return new LDAPSettings(
                 settingsRepository.getBoolean(LDAPSettings.class, "enabled", false),
@@ -48,6 +49,7 @@ public class SettingsInternalServiceImpl implements SettingsInternalService {
     }
 
     @Override
+    @CacheEvict(value = Caches.LDAP_SETTINGS, allEntries = true)
     public void saveLDAPSettings(LDAPSettings ldapSettings) {
         settingsRepository.setBoolean(LDAPSettings.class, "enabled", ldapSettings.isEnabled());
         settingsRepository.setString(LDAPSettings.class, "url", ldapSettings.getUrl());
