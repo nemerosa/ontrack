@@ -41,6 +41,7 @@ ext {
 
             // Spring security
             spring_security_core        : "org.springframework.security:spring-security-core:${springSecurityVersion}",
+            spring_security_config      : "org.springframework.security:spring-security-config:${springSecurityVersion}",
             spring_security_ldap        : "org.springframework.security:spring-security-ldap:${springSecurityVersion}",
 
             // Spring boot
