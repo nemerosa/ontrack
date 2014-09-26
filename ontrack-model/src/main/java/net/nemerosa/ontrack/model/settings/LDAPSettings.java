@@ -84,4 +84,15 @@ public class LDAPSettings {
                 ;
     }
 
+    private static LDAPSettings NONE = new LDAPSettings(
+            false,
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+    );
+
 }
