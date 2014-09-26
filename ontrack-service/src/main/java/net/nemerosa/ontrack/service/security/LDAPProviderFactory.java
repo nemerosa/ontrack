@@ -1,6 +1,9 @@
 package net.nemerosa.ontrack.service.security;
 
+import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
+
 public interface LDAPProviderFactory {
 
-    // FIXME LdapAuthenticationProvider getProvider();
+    LdapAuthenticationProvider getProvider();
+
 }
