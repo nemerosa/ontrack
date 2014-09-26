@@ -8,11 +8,11 @@ import net.nemerosa.ontrack.model.security.SecurityRole
 import net.nemerosa.ontrack.model.settings.LDAPSettings
 import net.nemerosa.ontrack.model.settings.SettingsService
 import net.nemerosa.ontrack.repository.AccountRepository
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import net.nemerosa.ontrack.test.TestUtils
+import org.junit.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.ldap.server.ApacheDSContainer
 
 class LDAPAuthenticationProviderIT extends AbstractServiceTestSupport {
 
@@ -46,7 +46,7 @@ class LDAPAuthenticationProviderIT extends AbstractServiceTestSupport {
             settingsService.saveLDAPSettings(
                     new LDAPSettings(
                             true,
-                            'ldap://localhost:389/dc=nemerosa,dc=net',
+                            "ldap://localhost:${serverPort}/dc=nemerosa,dc=net",
                             '',
                             '',
                             '',
@@ -108,6 +108,26 @@ class LDAPAuthenticationProviderIT extends AbstractServiceTestSupport {
         assert account.name == name
         assert account.fullName == name
         assert account.email == ""
+    }
+
+    private static ApacheDSContainer server;
+    private static int serverPort
+
+    @BeforeClass
+    static void 'Creating LDAP server'() {
+        server = new ApacheDSContainer("dc=nemerosa,dc=net", "classpath:test-ldap.ldiff")
+        int port = TestUtils.availablePort
+        server.port = port
+        server.afterPropertiesSet()
+        serverPort = port
+    }
+
+    @AfterClass
+    static void 'Shutting down LDAP server'() {
+        if (server != null) {
+            server.stop()
+            server = null
+        }
     }
 
 }
