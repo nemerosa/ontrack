@@ -8,6 +8,7 @@ dependencies {
     compile libraries.spring_context
     compile libraries.spring_tx
     compile libraries.spring_security_core
+    compile libraries.spring_security_ldap
     compile libraries.slf4j_api
     compile libraries.commons_io
 
