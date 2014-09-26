@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.Configuration;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
+import net.nemerosa.ontrack.security.EncryptionService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
@@ -18,11 +19,13 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
     private final Class<T> configurationClass;
     private final ConfigurationRepository configurationRepository;
     private final SecurityService securityService;
+    private final EncryptionService encryptionService;
 
-    public AbstractConfigurationService(Class<T> configurationClass, ConfigurationRepository configurationRepository, SecurityService securityService) {
+    public AbstractConfigurationService(Class<T> configurationClass, ConfigurationRepository configurationRepository, SecurityService securityService, EncryptionService encryptionService) {
         this.configurationClass = configurationClass;
         this.configurationRepository = configurationRepository;
         this.securityService = securityService;
+        this.encryptionService = encryptionService;
     }
 
     /**
@@ -34,7 +37,9 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
 
     @Override
     public List<T> getConfigurations() {
-        return configurationRepository.list(configurationClass);
+        return configurationRepository.list(configurationClass).stream()
+                .map(this::decrypt)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -49,19 +54,21 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
     @Override
     public T newConfiguration(T configuration) {
         checkAccess();
-        return configurationRepository.save(configuration);
+        configurationRepository.save(encrypt(configuration));
+        return configuration;
     }
 
     @Override
     public T getConfiguration(String name) {
         return configurationRepository
                 .find(configurationClass, name)
+                .map(this::decrypt)
                 .orElseThrow(() -> new ConfigurationNotFoundException(name));
     }
 
     @Override
     public Optional<T> getOptionalConfiguration(String name) {
-        return configurationRepository.find(configurationClass, name);
+        return configurationRepository.find(configurationClass, name).map(this::decrypt);
     }
 
     @Override
@@ -85,7 +92,7 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
         } else {
             configToSave = configuration;
         }
-        configurationRepository.save(configToSave);
+        configurationRepository.save(encrypt(configToSave));
     }
 
     @Override
@@ -106,6 +113,27 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
             // Saves the configuration
             return newConfiguration(targetConfiguration);
         }
+    }
+
+    @Override
+    public Class<T> getConfigurationType() {
+        return configurationClass;
+    }
+
+    protected T encrypt(T config) {
+        return config.withPassword(
+                encryptionService.encrypt(
+                        config.getPassword()
+                )
+        );
+    }
+
+    protected T decrypt(T config) {
+        return config.withPassword(
+                encryptionService.decrypt(
+                        config.getPassword()
+                )
+        );
     }
 
 }

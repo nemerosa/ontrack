@@ -92,22 +92,20 @@ public class JobServiceImpl implements ScheduledService,
     }
 
     @Override
-    public Ack launchJob(String category, String id) {
+    public Ack launchJob(long id) {
         // Checks rights
         securityService.checkGlobalFunction(ApplicationManagement.class);
         // Gets a registered job
-        RegisteredJob registeredJob = registeredJobs.get(category, id);
-        if (registeredJob == null) {
-            throw new JobNotFoundException(category, id);
-        } else {
-            return Ack.validate(
-                    runJob(registeredJob, true)
-            );
-        }
+        return registeredJobs.values().stream()
+                .filter(j -> j.getId() == id)
+                .findFirst()
+                .map(j -> Ack.validate(runJob(j, true)))
+                .orElseThrow(() -> new JobNotFoundException(id));
     }
 
     protected JobStatus getJobStatus(RegisteredJob registeredJob) {
         return new JobStatus(
+                registeredJob.getId(),
                 registeredJob.getJobDescriptor(),
                 registeredJob.isRunning(),
                 registeredJob.getApplicationInfo(),

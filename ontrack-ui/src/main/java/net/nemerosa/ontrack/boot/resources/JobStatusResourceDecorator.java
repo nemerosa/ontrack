@@ -23,7 +23,7 @@ public class JobStatusResourceDecorator extends AbstractResourceDecorator<JobSta
                 // Launching a job
                 .link(
                         "_launch",
-                        on(AdminController.class).launchJob(jobStatus.getDescriptor().getCategory(), jobStatus.getDescriptor().getId()),
+                        on(AdminController.class).launchJob(jobStatus.getId()),
                         ApplicationManagement.class
                 )
                         // OK

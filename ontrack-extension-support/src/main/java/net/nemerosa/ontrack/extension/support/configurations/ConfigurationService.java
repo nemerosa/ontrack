@@ -53,4 +53,9 @@ public interface ConfigurationService<T extends UserPasswordConfiguration> {
      * </ul>
      */
     T replaceConfiguration(T configuration, Function<String, String> replacementFunction) throws ConfigurationNotFoundException;
+
+    /**
+     * Type of configuration handled by this service
+     */
+    Class<T> getConfigurationType();
 }

@@ -17,9 +17,8 @@ public interface JobService {
     /**
      * Tries to launch a job.
      *
-     * @param category Category of the job
-     * @param id       ID of the job in the category
+     * @param id ID of the job
      * @return {@link Ack#OK} if the job could actually be launched, {@link Ack#NOK} otherwise.
      */
-    Ack launchJob(String category, String id);
+    Ack launchJob(long id);
 }

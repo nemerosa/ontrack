@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.model.support;
 
+import java.util.List;
+
 /**
  * This service is used to log messages at application level, to be seen by operation and administration people.
  * <p>
@@ -8,9 +10,14 @@ package net.nemerosa.ontrack.model.support;
 public interface ApplicationLogService {
 
     /**
+     * Total list of messages
+     */
+    int getLogEntriesTotal();
+
+    /**
      * List of messages
      */
-    ApplicationLogEntries getLogEntries(Page page);
+    List<ApplicationLogEntry> getLogEntries(Page page);
 
     /**
      * Logs an error.
