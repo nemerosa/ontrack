@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.svn.db;
 
 import net.nemerosa.ontrack.repository.support.AbstractDBInitConfig;
-import net.sf.dbinit.DBInit;
+import net.nemerosa.ontrack.repository.support.ConfiguredDBInit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,8 +23,8 @@ public class SVNDBInitConfig extends AbstractDBInitConfig {
     }
 
     @Override
-    public DBInit createConfig() {
-        DBInit db = new DBInit();
+    public ConfiguredDBInit createConfig() {
+        ConfiguredDBInit db = new ConfiguredDBInit();
         db.setVersion(VERSION);
         db.setJdbcDataSource(dataSource);
         db.setVersionTable("EXT_SVN_VERSION");
