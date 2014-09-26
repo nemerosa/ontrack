@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.extension.api.GlobalSettingsExtension;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.DescribedForm;
+import net.nemerosa.ontrack.model.settings.LDAPSettings;
 import net.nemerosa.ontrack.model.settings.SecuritySettings;
 import net.nemerosa.ontrack.model.settings.SettingsService;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
@@ -41,6 +42,8 @@ public class SettingsController extends AbstractResourceController {
         List<DescribedForm> forms = new ArrayList<>();
         // Security settings
         forms.add(getSecuritySettingsForm());
+        // LDAP settings
+        forms.add(getLDAPSettingsForm());
         // Extensions settings
         forms.addAll(
                 extensionManager.getExtensions(GlobalSettingsExtension.class).stream()
@@ -61,6 +64,16 @@ public class SettingsController extends AbstractResourceController {
         return Ack.OK;
     }
 
+    /**
+     * LDAP
+     */
+    @RequestMapping(value = "ldap", method = RequestMethod.PUT)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public Ack updateLDAP(@RequestBody LDAPSettings ldapSettings) {
+        settingsService.saveLDAPSettings(ldapSettings);
+        return Ack.OK;
+    }
+
 
     private DescribedForm getSecuritySettingsForm() {
         SecuritySettings securitySettings = settingsService.getSecuritySettings();
@@ -71,6 +84,18 @@ public class SettingsController extends AbstractResourceController {
                 .title("Security")
                 .description("Global settings for the security.")
                 .uri(uri(on(getClass()).updateSecurity(null)));
+    }
+
+
+    private DescribedForm getLDAPSettingsForm() {
+        LDAPSettings ldapSettings = settingsService.getLDAPSettings();
+        return DescribedForm.create(
+                "ldap",
+                ldapSettings.form()
+        )
+                .title("LDAP")
+                .description("LDAP configuration.")
+                .uri(uri(on(getClass()).updateLDAP(null)));
     }
 
 }

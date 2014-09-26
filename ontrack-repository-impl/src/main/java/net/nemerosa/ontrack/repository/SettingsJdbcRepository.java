@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.repository;
 
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
+import net.nemerosa.ontrack.security.EncryptionService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -12,9 +13,12 @@ import java.util.function.Function;
 @Repository
 public class SettingsJdbcRepository extends AbstractJdbcRepository implements SettingsRepository {
 
+    private final EncryptionService encryptionService;
+
     @Autowired
-    public SettingsJdbcRepository(DataSource dataSource) {
+    public SettingsJdbcRepository(DataSource dataSource, EncryptionService encryptionService) {
         super(dataSource);
+        this.encryptionService = encryptionService;
     }
 
     @Override
@@ -30,6 +34,33 @@ public class SettingsJdbcRepository extends AbstractJdbcRepository implements Se
     @Override
     public void setBoolean(Class<?> category, String name, boolean value) {
         setValue(category, name, String.valueOf(value));
+    }
+
+    @Override
+    public String getString(Class<?> category, String name, String defaultValue) {
+        return getValue(category, name, Function.identity(), defaultValue);
+    }
+
+    @Override
+    public void setString(Class<?> category, String name, String value) {
+        setValue(category, name, value);
+    }
+
+    @Override
+    public String getPassword(Class<?> category, String name, String defaultValue) {
+        return getValue(
+                category,
+                name,
+                encryptionService::decrypt,
+                defaultValue
+        );
+    }
+
+    @Override
+    public void setPassword(Class<?> category, String name, String plain, boolean dontSaveIfBlank) {
+        if (!StringUtils.isBlank(plain) || !dontSaveIfBlank) {
+            setValue(category, name, encryptionService.encrypt(plain));
+        }
     }
 
     protected void setValue(Class<?> category, String name, String value) {

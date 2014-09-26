@@ -42,7 +42,7 @@ public class LDAPSettings {
                         Password.of("password")
                                 .label("Password")
                                 .help("Password of the user used to connect to the LDAP server")
-                                .value(password)
+                                .value("") // Password never sent to the client
                 )
                 .with(
                         Text.of("searchBase")
