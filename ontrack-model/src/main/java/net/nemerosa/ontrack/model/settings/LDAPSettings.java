@@ -36,18 +36,21 @@ public class LDAPSettings {
                         Text.of("user")
                                 .label("User")
                                 .help("Name of the user used to connect to the LDAP server")
+                                .optional()
                                 .value(user)
                 )
                 .with(
                         Password.of("password")
                                 .label("Password")
                                 .help("Password of the user used to connect to the LDAP server")
+                                .optional()
                                 .value("") // Password never sent to the client
                 )
                 .with(
                         Text.of("searchBase")
                                 .label("Search base")
                                 .help("Query to get the user")
+                                .optional()
                                 .value(searchBase)
                 )
                 .with(
