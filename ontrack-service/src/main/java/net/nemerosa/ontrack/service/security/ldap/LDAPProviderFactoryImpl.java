@@ -1,10 +1,12 @@
 package net.nemerosa.ontrack.service.security.ldap;
 
+import net.nemerosa.ontrack.model.security.SecurityRole;
 import net.nemerosa.ontrack.model.settings.LDAPSettings;
 import net.nemerosa.ontrack.service.Caches;
 import net.nemerosa.ontrack.service.support.SettingsInternalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
 import org.springframework.security.ldap.authentication.BindAuthenticator;
 import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
@@ -16,12 +18,11 @@ import org.springframework.stereotype.Service;
 public class LDAPProviderFactoryImpl implements LDAPProviderFactory {
 
     private final SettingsInternalService settingsService;
-    private final LdapAuthoritiesPopulator authoritiesPopulator;
+    private final LdapAuthoritiesPopulator authoritiesPopulator = (userData, username) -> AuthorityUtils.createAuthorityList(SecurityRole.USER.name());
 
     @Autowired
-    public LDAPProviderFactoryImpl(SettingsInternalService settingsService, LdapAuthoritiesPopulator authoritiesPopulator) {
+    public LDAPProviderFactoryImpl(SettingsInternalService settingsService) {
         this.settingsService = settingsService;
-        this.authoritiesPopulator = authoritiesPopulator;
     }
 
     @Cacheable(value = Caches.LDAP_SETTINGS, key = "'0'")
