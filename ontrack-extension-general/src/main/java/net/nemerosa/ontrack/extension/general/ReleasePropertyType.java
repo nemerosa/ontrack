@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Text;
-import net.nemerosa.ontrack.model.security.BuildCreate;
+import net.nemerosa.ontrack.model.security.PromotionRunCreate;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
@@ -30,9 +30,12 @@ public class ReleasePropertyType extends AbstractPropertyType<ReleaseProperty> {
         return EnumSet.of(ProjectEntityType.BUILD);
     }
 
+    /**
+     * If one can promote a build, he can also attach a release label to a build.
+     */
     @Override
     public boolean canEdit(ProjectEntity entity, SecurityService securityService) {
-        return securityService.isProjectFunctionGranted(entity, BuildCreate.class);
+        return securityService.isProjectFunctionGranted(entity, PromotionRunCreate.class);
     }
 
     @Override

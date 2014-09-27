@@ -90,7 +90,9 @@ public class RolesServiceImpl implements RolesService, StartupService {
                 Arrays.asList(
                         ValidationStampCreate.class,
                         ValidationStampEdit.class,
-                        ValidationStampDelete.class
+                        ValidationStampDelete.class,
+                        ValidationRunCreate.class,
+                        ValidationRunStatusChange.class
                 )
         );
 
@@ -98,7 +100,8 @@ public class RolesServiceImpl implements RolesService, StartupService {
         register("PROMOTER", "Promoter",
                 "The promoter can promote existing builds.",
                 Arrays.asList(
-                        PromotionRunCreate.class
+                        PromotionRunCreate.class,
+                        PromotionRunDelete.class
                 )
         );
 
