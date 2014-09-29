@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.ldap.server.ApacheDSContainer
 
-@Ignore
 class LDAPAuthenticationProviderIT extends AbstractServiceTestSupport {
 
     /**
@@ -69,6 +68,7 @@ class LDAPAuthenticationProviderIT extends AbstractServiceTestSupport {
     }
 
     @Test
+    @Ignore
     void 'Authenticating an existing account with the LDAP'() {
         // Creates an account
         def name = USER1
@@ -88,6 +88,7 @@ class LDAPAuthenticationProviderIT extends AbstractServiceTestSupport {
     }
 
     @Test
+    @Ignore
     void 'Authenticating with the LDAP and creating the account on the fly'() {
         def name = USER2
         def authenticatedAccount = ldapAuthenticationProvider.findUser(name, new UsernamePasswordAuthenticationToken(name, 'verysecret'))
@@ -100,6 +101,7 @@ class LDAPAuthenticationProviderIT extends AbstractServiceTestSupport {
     }
 
     @Test
+    @Ignore
     void 'Authenticating with the LDAP and missing email'() {
         def name = USER3
         def authenticatedAccount = ldapAuthenticationProvider.findUser(name, new UsernamePasswordAuthenticationToken(name, 'verysecret'))
