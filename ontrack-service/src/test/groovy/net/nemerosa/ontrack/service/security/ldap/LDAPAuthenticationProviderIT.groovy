@@ -48,7 +48,7 @@ class LDAPAuthenticationProviderIT extends AbstractServiceTestSupport {
                             true,
                             "ldap://localhost:${serverPort}/dc=nemerosa,dc=net",
                             '',
-                            '',
+                            'uid={0}',
                             '',
                             '',
                             'fullName',
@@ -115,7 +115,7 @@ class LDAPAuthenticationProviderIT extends AbstractServiceTestSupport {
 
     @BeforeClass
     static void 'Creating LDAP server'() {
-        server = new ApacheDSContainer("dc=nemerosa,dc=net", "classpath:test-ldap.ldiff")
+        server = new ApacheDSContainer("dc=nemerosa,dc=net", "classpath:test-ldap.ldif")
         int port = TestUtils.availablePort
         server.port = port
         server.afterPropertiesSet()
