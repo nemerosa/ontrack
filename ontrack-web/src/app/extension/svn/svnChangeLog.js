@@ -1,7 +1,8 @@
 angular.module('ot.extension.svn.changelog', [
     'ui.router',
     'ot.service.core',
-    'ot.service.structure'
+    'ot.service.structure',
+    'ontrack.extension.scm'
 ])
     .config(function ($stateProvider) {
         // SVN configurations
@@ -11,7 +12,7 @@ angular.module('ot.extension.svn.changelog', [
             controller: 'SVNChangeLogCtrl'
         });
     })
-    .controller('SVNChangeLogCtrl', function ($q, $log, $interpolate, $anchorScroll, $location, $stateParams, $scope, $http, ot, otStructureService) {
+    .controller('SVNChangeLogCtrl', function ($q, $log, $interpolate, $anchorScroll, $location, $stateParams, $scope, $http, ot, otStructureService, otScmChangeLogService) {
 
         // The build request
         $scope.buildDiffRequest = {
@@ -98,6 +99,15 @@ angular.module('ot.extension.svn.changelog', [
                     $location.hash('files');
                     $anchorScroll();
                 }
+            };
+
+            // Configuring the change log export
+            $scope.changeLogExport = function () {
+                otScmChangeLogService.displayChangeLogExport({
+                    changeLog: $scope.changeLog,
+                    exportFormatsLink: changeLog._exportFormats,
+                    exportIssuesLink: changeLog._exportIssues
+                });
             };
         });
 
