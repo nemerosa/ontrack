@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.model.security.Account;
 import net.nemerosa.ontrack.model.security.AccountService;
 import net.nemerosa.ontrack.model.security.SecurityRole;
 import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.support.ApplicationLogService;
 import net.nemerosa.ontrack.repository.AccountRepository;
 import net.nemerosa.ontrack.service.security.AbstractOntrackAuthenticationProvider;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +27,7 @@ public class LDAPAuthenticationProvider extends AbstractOntrackAuthenticationPro
     private final LDAPAuthenticationSourceProvider ldapAuthenticationSourceProvider;
     private final AccountRepository accountRepository;
     private final SecurityService securityService;
+    private final ApplicationLogService applicationLogService;
 
     @Autowired
     public LDAPAuthenticationProvider(
@@ -33,12 +35,14 @@ public class LDAPAuthenticationProvider extends AbstractOntrackAuthenticationPro
             LDAPProviderFactory ldapProviderFactory,
             LDAPAuthenticationSourceProvider ldapAuthenticationSourceProvider,
             AccountRepository accountRepository,
-            SecurityService securityService) {
+            SecurityService securityService,
+            ApplicationLogService applicationLogService) {
         super(accountService);
         this.ldapProviderFactory = ldapProviderFactory;
         this.ldapAuthenticationSourceProvider = ldapAuthenticationSourceProvider;
         this.accountRepository = accountRepository;
         this.securityService = securityService;
+        this.applicationLogService = applicationLogService;
     }
 
     @Override
@@ -51,7 +55,21 @@ public class LDAPAuthenticationProvider extends AbstractOntrackAuthenticationPro
         }
         // LDAP connection
         else {
-            Authentication ldapAuthentication = ldapAuthenticationProvider.authenticate(authentication);
+            Authentication ldapAuthentication;
+            try {
+                ldapAuthentication = ldapAuthenticationProvider.authenticate(authentication);
+            } catch (Exception ex) {
+                // Cannot use the LDAP, logs the error
+                applicationLogService.error(
+                        ex,
+                        LDAPAuthenticationProvider.class,
+                        "ldap",
+                        "",
+                        "Cannot authenticate using the LDAP"
+                );
+                // Rejects the authentication
+                return Optional.empty();
+            }
             if (ldapAuthentication != null && ldapAuthentication.isAuthenticated()) {
                 // Gets the account name
                 final String name = ldapAuthentication.getName();

@@ -41,7 +41,7 @@ class LDAPAuthenticationProviderTest {
                 ldapProviderFactory,
                 ldapAuthenticationSourceProvider,
                 accountRepository,
-                securityService
+                securityService, applicationLogService
         )
     }
 
