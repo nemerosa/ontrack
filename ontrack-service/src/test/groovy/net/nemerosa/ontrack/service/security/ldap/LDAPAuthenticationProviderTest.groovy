@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.security.AccountService
 import net.nemerosa.ontrack.model.security.SecurityRole
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ID
+import net.nemerosa.ontrack.model.support.ApplicationLogService
 import net.nemerosa.ontrack.repository.AccountRepository
 import org.junit.Before
 import org.junit.Test
@@ -36,12 +37,14 @@ class LDAPAuthenticationProviderTest {
         accountRepository = mock(AccountRepository)
         securityService = mock(SecurityService)
         ldapAuthenticationProvider = mock(LdapAuthenticationProvider)
+        ApplicationLogService applicationLogService = mock(ApplicationLogService)
         provider = new LDAPAuthenticationProvider(
                 accountService,
                 ldapProviderFactory,
                 ldapAuthenticationSourceProvider,
                 accountRepository,
-                securityService, applicationLogService
+                securityService,
+                applicationLogService
         )
     }
 
