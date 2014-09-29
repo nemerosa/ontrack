@@ -120,6 +120,8 @@ class LDAPAuthenticationProviderIT extends AbstractServiceTestSupport {
         server.port = port
         server.afterPropertiesSet()
         serverPort = port
+        // Waiting a bit
+        Thread.sleep 1000
     }
 
     @AfterClass
