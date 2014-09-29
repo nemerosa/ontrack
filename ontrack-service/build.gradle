@@ -19,6 +19,9 @@ dependencies {
     testRuntime project(':ontrack-repository-impl')
 
     // Dependencies needed for LDAP integration tests
-    testCompile 'org.springframework.ldap:spring-ldap-test:2.0.2.RELEASE'
+    def apacheDsVersion = '1.5.5'
+    testCompile("org.apache.directory.server:apacheds-all:${apacheDsVersion}") {
+        exclude group: "org.slf4j", module: "slf4j-api"
+    }
 
 }
