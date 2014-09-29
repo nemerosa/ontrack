@@ -1,5 +1,9 @@
 package net.nemerosa.ontrack.service.security.ldap
-// @Configuration
-// @ImportResource("classpath:ldap-config.xml")
+
+import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.ImportResource
+
+@Configuration
+@ImportResource("classpath:ldap-config.xml")
 class LDAPIntegrationTestConfig {
 }

@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.ldap.server.ApacheDSContainer
 
-class LDAPAuthenticationProviderIgnored extends AbstractServiceTestSupport {
+class LDAPAuthenticationProviderIT extends AbstractServiceTestSupport {
 
     /**
      * Known names in the test LDAP.
@@ -54,7 +54,7 @@ class LDAPAuthenticationProviderIgnored extends AbstractServiceTestSupport {
             settingsService.saveLDAPSettings(
                     new LDAPSettings(
                             true,
-                            "ldap://localhost:${serverPort}",
+                            "ldap://127.0.0.1:${serverPort}",
                             'dc=nemerosa,dc=net',
                             'uid={0}',
                             '',
