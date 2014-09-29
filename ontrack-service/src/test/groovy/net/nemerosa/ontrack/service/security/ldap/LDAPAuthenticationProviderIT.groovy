@@ -46,8 +46,8 @@ class LDAPAuthenticationProviderIT extends AbstractServiceTestSupport {
             settingsService.saveLDAPSettings(
                     new LDAPSettings(
                             true,
-                            "ldap://localhost:${serverPort}/dc=nemerosa,dc=net",
-                            '',
+                            "ldap://localhost:${serverPort}",
+                            'dc=nemerosa,dc=net',
                             'uid={0}',
                             '',
                             '',
