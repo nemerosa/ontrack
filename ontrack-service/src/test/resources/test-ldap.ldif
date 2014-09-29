@@ -21,3 +21,12 @@ cn: User 2
 uid: user2
 email: user2@test.com
 userPassword: verysecret
+
+dn: uid=user3,ou=people,dc=nemerosa,dc=net
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+cn: User 3
+uid: user3
+userPassword: verysecret

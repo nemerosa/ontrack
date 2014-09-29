@@ -106,7 +106,7 @@ class LDAPAuthenticationProviderIT extends AbstractServiceTestSupport {
         def account = authenticatedAccount.get()
         assert account.id.value == 0
         assert account.name == name
-        assert account.fullName == name
+        assert account.fullName == "User 3"
         assert account.email == ""
     }
 
