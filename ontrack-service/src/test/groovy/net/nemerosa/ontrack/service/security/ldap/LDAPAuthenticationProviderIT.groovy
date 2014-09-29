@@ -8,8 +8,9 @@ import net.nemerosa.ontrack.model.security.SecurityRole
 import net.nemerosa.ontrack.model.settings.LDAPSettings
 import net.nemerosa.ontrack.model.settings.SettingsService
 import net.nemerosa.ontrack.repository.AccountRepository
-import net.nemerosa.ontrack.test.TestUtils
-import org.junit.*
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.ldap.server.ApacheDSContainer
@@ -24,6 +25,9 @@ class LDAPAuthenticationProviderIT extends AbstractServiceTestSupport {
     private static final String USER1 = 'user1'
     private static final String USER2 = 'user2'
     private static final String USER3 = 'user3'
+
+    @Autowired
+    private ApacheDSContainer dsContainer
 
     @Autowired
     private SettingsService settingsService
@@ -42,6 +46,10 @@ class LDAPAuthenticationProviderIT extends AbstractServiceTestSupport {
 
     @Before
     void 'Setting-up a LDAP'() {
+        // DS port
+        int serverPort = dsContainer.getProperties().get("port") as int
+        println "LDAP server on port ${serverPort}"
+        // Saving the settings
         asUser().with(GlobalSettings).call({
             settingsService.saveLDAPSettings(
                     new LDAPSettings(
@@ -68,7 +76,6 @@ class LDAPAuthenticationProviderIT extends AbstractServiceTestSupport {
     }
 
     @Test
-    @Ignore
     void 'Authenticating an existing account with the LDAP'() {
         // Creates an account
         def name = USER1
@@ -88,7 +95,6 @@ class LDAPAuthenticationProviderIT extends AbstractServiceTestSupport {
     }
 
     @Test
-    @Ignore
     void 'Authenticating with the LDAP and creating the account on the fly'() {
         def name = USER2
         def authenticatedAccount = ldapAuthenticationProvider.findUser(name, new UsernamePasswordAuthenticationToken(name, 'verysecret'))
@@ -101,7 +107,6 @@ class LDAPAuthenticationProviderIT extends AbstractServiceTestSupport {
     }
 
     @Test
-    @Ignore
     void 'Authenticating with the LDAP and missing email'() {
         def name = USER3
         def authenticatedAccount = ldapAuthenticationProvider.findUser(name, new UsernamePasswordAuthenticationToken(name, 'verysecret'))
@@ -111,28 +116,6 @@ class LDAPAuthenticationProviderIT extends AbstractServiceTestSupport {
         assert account.name == name
         assert account.fullName == "User 3"
         assert account.email == ""
-    }
-
-    private static ApacheDSContainer server;
-    private static int serverPort
-
-    @BeforeClass
-    static void 'Creating LDAP server'() {
-        server = new ApacheDSContainer("dc=nemerosa,dc=net", "classpath:test-ldap.ldif")
-        int port = TestUtils.availablePort
-        server.port = port
-        server.afterPropertiesSet()
-        serverPort = port
-        // Waiting a bit
-        Thread.sleep 1000
-    }
-
-    @AfterClass
-    static void 'Shutting down LDAP server'() {
-        if (server != null) {
-            server.stop()
-            server = null
-        }
     }
 
 }
