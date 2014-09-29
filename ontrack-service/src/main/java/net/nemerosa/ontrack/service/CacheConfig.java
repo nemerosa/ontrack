@@ -18,7 +18,8 @@ public class CacheConfig {
         SimpleCacheManager o = new SimpleCacheManager();
         o.setCaches(
                 Arrays.asList(
-                        new GuavaCacheFactoryBean(Caches.SECURITY_SETTINGS, 1, 600).getObject()
+                        new GuavaCacheFactoryBean(Caches.SECURITY_SETTINGS, 1, 600).getObject(),
+                        new GuavaCacheFactoryBean(Caches.LDAP_SETTINGS, 1, 600).getObject()
                 )
         );
         return o;

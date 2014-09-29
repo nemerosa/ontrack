@@ -5,7 +5,7 @@
             <div class="well">
                 <table class="ot-form-view">
                     <tbody>
-                    <tr ng-repeat="field in form.form.fields">
+                    <tr ng-repeat="field in form.form.fields" ng-if="isFieldVisible(form.form, field)">
                         <td>
                             {{field.label}}
                         </td>

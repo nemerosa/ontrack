@@ -44,5 +44,14 @@ angular.module('ot.view.settings', [
                 }
             }).then(loadSettings);
         };
+
+        // Visibility of the fields
+        $scope.isFieldVisible = function (form, field) {
+            if (field.visibleIf) {
+                return otFormService.getFieldValue(form, field.visibleIf);
+            } else {
+                return true;
+            }
+        };
     })
 ;

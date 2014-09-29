@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.model.form;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
@@ -12,6 +14,8 @@ public abstract class AbstractField<F extends AbstractField<F>> implements Field
     private boolean readOnly = false;
     private String validation;
     private String help = "";
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String visibleIf;
     private Object value;
 
     protected AbstractField(String type, String name) {
@@ -28,6 +32,12 @@ public abstract class AbstractField<F extends AbstractField<F>> implements Field
 
     public F readOnly() {
         this.readOnly = true;
+        //noinspection unchecked
+        return (F) this;
+    }
+
+    public F visibleIf(String value) {
+        this.visibleIf = value;
         //noinspection unchecked
         return (F) this;
     }

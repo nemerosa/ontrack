@@ -9,6 +9,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -110,5 +111,11 @@ public final class TestUtils {
 
     public static JsonNode resourceJson(String path) throws IOException {
         return mapper.readTree(resourceBytes(path));
+    }
+
+    public static int getAvailablePort() throws IOException {
+        try (ServerSocket serverSocket = new ServerSocket(0)) {
+            return serverSocket.getLocalPort();
+        }
     }
 }

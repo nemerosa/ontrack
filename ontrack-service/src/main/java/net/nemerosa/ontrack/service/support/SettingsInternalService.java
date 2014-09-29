@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service.support;
 
+import net.nemerosa.ontrack.model.settings.LDAPSettings;
 import net.nemerosa.ontrack.model.settings.SecuritySettings;
 
 public interface SettingsInternalService {
@@ -8,4 +9,7 @@ public interface SettingsInternalService {
 
     void saveSecuritySettings(SecuritySettings securitySettings);
 
+    LDAPSettings getLDAPSettings();
+
+    void saveLDAPSettings(LDAPSettings ldapSettings);
 }

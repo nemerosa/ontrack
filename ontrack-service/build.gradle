@@ -8,6 +8,8 @@ dependencies {
     compile libraries.spring_context
     compile libraries.spring_tx
     compile libraries.spring_security_core
+    compile libraries.spring_security_config
+    compile libraries.spring_security_ldap
     compile libraries.slf4j_api
     compile libraries.commons_io
 
@@ -15,4 +17,14 @@ dependencies {
     testCompile project(':ontrack-it-utils')
     testCompile project(':ontrack-extension-general')
     testRuntime project(':ontrack-repository-impl')
+
+    // Dependencies needed for LDAP integration tests
+    def apacheDsVersion = '1.5.5'
+    testCompile "org.apache.directory.server:apacheds-core:${apacheDsVersion}"
+    testCompile "org.apache.directory.server:apacheds-core-entry:${apacheDsVersion}"
+    testCompile "org.apache.directory.server:apacheds-protocol-shared:${apacheDsVersion}"
+    testCompile "org.apache.directory.server:apacheds-protocol-ldap:${apacheDsVersion}"
+    testCompile "org.apache.directory.server:apacheds-server-jndi:${apacheDsVersion}"
+    testCompile 'org.apache.directory.shared:shared-ldap:0.9.15'
+
 }
