@@ -22,6 +22,11 @@ public class ConfigurableUserDetailsContextMapper extends LdapUserDetailsMapper 
     public UserDetails mapUserFromContext(DirContextOperations ctx, String username, Collection<? extends GrantedAuthority> authorities) {
         // Default details
         LdapUserDetails userDetails = (LdapUserDetails) super.mapUserFromContext(ctx, username, authorities);
+        return extendUserDetails(ctx, username, userDetails);
+
+    }
+
+    protected UserDetails extendUserDetails(DirContextOperations ctx, String username, LdapUserDetails userDetails) {
         // Full name
         String fullName = username;
         String fullNameAttribute = settings.getFullNameAttribute();

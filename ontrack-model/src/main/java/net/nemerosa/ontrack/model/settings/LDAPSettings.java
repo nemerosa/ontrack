@@ -1,12 +1,16 @@
 package net.nemerosa.ontrack.model.settings;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.experimental.Wither;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Password;
 import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.form.YesNo;
 
 @Data
+@AllArgsConstructor(access = AccessLevel.PUBLIC)
 public class LDAPSettings {
 
     private final boolean enabled;
@@ -15,7 +19,9 @@ public class LDAPSettings {
     private final String searchFilter;
     private final String user;
     private final String password;
+    @Wither
     private final String fullNameAttribute;
+    @Wither
     private final String emailAttribute;
     // TODO Group configuration
 
