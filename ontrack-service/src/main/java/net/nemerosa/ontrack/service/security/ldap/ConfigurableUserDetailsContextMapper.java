@@ -25,15 +25,17 @@ public class ConfigurableUserDetailsContextMapper extends LdapUserDetailsMapper 
         // Full name
         String fullName = username;
         String fullNameAttribute = settings.getFullNameAttribute();
-        if (StringUtils.isNotBlank(fullNameAttribute)) {
-            fullName = ctx.getStringAttribute(fullNameAttribute);
+        if (StringUtils.isBlank(fullNameAttribute)) {
+            fullNameAttribute = "cn";
         }
+        fullName = ctx.getStringAttribute(fullNameAttribute);
         // Email
         String email = "";
         String emailAttribute = settings.getEmailAttribute();
-        if (StringUtils.isNotBlank(emailAttribute)) {
-            email = ctx.getStringAttribute(emailAttribute);
+        if (StringUtils.isBlank(emailAttribute)) {
+            emailAttribute = "email";
         }
+        email = ctx.getStringAttribute(emailAttribute);
         // OK
         return new ExtendedLDAPUserDetails(userDetails, fullName, email);
     }

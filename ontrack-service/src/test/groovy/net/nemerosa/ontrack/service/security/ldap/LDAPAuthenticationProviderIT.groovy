@@ -51,8 +51,8 @@ class LDAPAuthenticationProviderIT extends AbstractServiceTestSupport {
                             'uid={0}',
                             '',
                             '',
-                            'fullName',
-                            'email'
+                            '',
+                            ''
                     )
             )
         })

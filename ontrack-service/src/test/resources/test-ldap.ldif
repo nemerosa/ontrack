@@ -19,4 +19,5 @@ objectclass: organizationalPerson
 objectclass: inetOrgPerson
 cn: User 2
 uid: user2
+email: user2@test.com
 userPassword: verysecret
