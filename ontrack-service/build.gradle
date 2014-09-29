@@ -20,11 +20,11 @@ dependencies {
 
     // Dependencies needed for LDAP integration tests
     def apacheDsVersion = '1.5.5'
-    testRuntime "org.apache.directory.server:apacheds-core:${apacheDsVersion}"
-    testRuntime "org.apache.directory.server:apacheds-core-entry:${apacheDsVersion}"
-    testRuntime "org.apache.directory.server:apacheds-protocol-shared:${apacheDsVersion}"
-    testRuntime "org.apache.directory.server:apacheds-protocol-ldap:${apacheDsVersion}"
-    testRuntime "org.apache.directory.server:apacheds-server-jndi:${apacheDsVersion}"
-    testRuntime 'org.apache.directory.shared:shared-ldap:0.9.15'
+    testCompile "org.apache.directory.server:apacheds-core:${apacheDsVersion}"
+    testCompile "org.apache.directory.server:apacheds-core-entry:${apacheDsVersion}"
+    testCompile "org.apache.directory.server:apacheds-protocol-shared:${apacheDsVersion}"
+    testCompile "org.apache.directory.server:apacheds-protocol-ldap:${apacheDsVersion}"
+    testCompile "org.apache.directory.server:apacheds-server-jndi:${apacheDsVersion}"
+    testCompile 'org.apache.directory.shared:shared-ldap:0.9.15'
 
 }
