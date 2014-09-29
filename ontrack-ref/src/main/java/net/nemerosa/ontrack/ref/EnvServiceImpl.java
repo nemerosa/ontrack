@@ -1,8 +1,10 @@
-package net.nemerosa.ontrack.service;
+package net.nemerosa.ontrack.ref;
 
 import net.nemerosa.ontrack.model.exceptions.CannotCreateWorkingDirException;
 import net.nemerosa.ontrack.model.structure.VersionInfo;
 import net.nemerosa.ontrack.model.support.EnvService;
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
+import net.nemerosa.ontrack.model.support.VersionInfoConfig;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

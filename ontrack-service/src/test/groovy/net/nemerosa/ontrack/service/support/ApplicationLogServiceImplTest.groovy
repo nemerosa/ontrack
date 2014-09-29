@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.service.support
 
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.Page
-import net.nemerosa.ontrack.service.OntrackConfigProperties
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.junit.Test
 
 import static org.mockito.Mockito.mock

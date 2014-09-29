@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service;
 
+import net.nemerosa.ontrack.model.support.VersionInfoConfig;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
