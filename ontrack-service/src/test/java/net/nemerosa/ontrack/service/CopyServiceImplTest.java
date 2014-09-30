@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.service;
 import net.nemerosa.ontrack.extension.general.LinkProperty;
 import net.nemerosa.ontrack.extension.general.LinkPropertyType;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
+import net.nemerosa.ontrack.model.security.ProjectEdit;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import org.junit.Before;
@@ -23,12 +24,13 @@ public class CopyServiceImplTest {
     private CopyServiceImpl service;
     private StructureService structureService;
     private PropertyService propertyService;
+    private SecurityService securityService;
 
     @Before
     public void before() {
         structureService = mock(StructureService.class);
         propertyService = mock(PropertyService.class);
-        SecurityService securityService = mock(SecurityService.class);
+        securityService = mock(SecurityService.class);
         BuildFilterService buildFilterService = mock(BuildFilterService.class);
         service = new CopyServiceImpl(structureService, propertyService, securityService, buildFilterService);
     }
@@ -91,6 +93,9 @@ public class CopyServiceImplTest {
                 )
         );
 
+        // Edition of the property must be allowed
+        when(securityService.isProjectFunctionGranted(targetBranch, ProjectEdit.class)).thenReturn(true);
+
         // Copy
         service.doCopy(sourceBranch, targetBranch, request);
 
@@ -148,6 +153,9 @@ public class CopyServiceImplTest {
                         )
                 )
         );
+
+        // Edition of the property must be allowed
+        when(securityService.isProjectFunctionGranted(targetPromotionLevel, ProjectEdit.class)).thenReturn(true);
 
         // Copy
         service.doCopyPromotionLevels(sourceBranch, targetBranch, request);
@@ -208,6 +216,9 @@ public class CopyServiceImplTest {
                         )
                 )
         );
+
+        // Edition of the property must be allowed
+        when(securityService.isProjectFunctionGranted(targetValidationStamp, ProjectEdit.class)).thenReturn(true);
 
         // Copy
         service.doCopyValidationStamps(sourceBranch, targetBranch, request);
