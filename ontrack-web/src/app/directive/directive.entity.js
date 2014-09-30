@@ -56,7 +56,18 @@ angular.module('ot.directive.entity', [
             }
         };
     })
-    .directive('otEntityDecorations', function ($http, ot) {
+    .directive('otEntityDecorations', function ($http, ot, otTaskService) {
+        function updateEntityDecorations(scope, entity) {
+            ot.call($http.get(entity._decorations)).then(function (decorations) {
+                scope.decorations = decorations;
+                scope.decorationImagePath = function (decoration) {
+                    return 'assets/extension/decoration/' + decoration.decorationType + '/' + decoration.id + '.png';
+                };
+                scope.decorationClassName = function (decoration) {
+                    return (decoration.decorationType + '.' + decoration.id).replace(/\./g, '-');
+                };
+            });
+        }
         return {
             restrict: 'E',
             templateUrl: 'app/directive/directive.entityDecorations.tpl.html',
@@ -67,15 +78,16 @@ angular.module('ot.directive.entity', [
             link: function (scope) {
                 scope.$watch('entity', function () {
                     if (scope.entity) {
-                        ot.call($http.get(scope.entity._decorations)).then(function (decorations) {
-                            scope.decorations = decorations;
-                            scope.decorationImagePath = function (decoration) {
-                                return 'assets/extension/decoration/' + decoration.decorationType + '/' + decoration.id + '.png';
-                            };
-                            scope.decorationClassName = function (decoration) {
-                                return (decoration.decorationType + '.' + decoration.id).replace(/\./g, '-');
-                            };
-                        });
+                        updateEntityDecorations(scope, scope.entity);
+                        // Unique task name
+                        var taskName = scope.entity._decorations;
+                        otTaskService.register(
+                            taskName,
+                            function () {
+                                updateEntityDecorations(scope, scope.entity);
+                            },
+                            60000 // 1 minute is more than enough
+                        );
                     }
                 });
             }
