@@ -1,5 +1,5 @@
 angular.module('ot.directive.field', [
-
+    'ot.directive.field.replacements'
 ])
     .directive('otField', function () {
         return {

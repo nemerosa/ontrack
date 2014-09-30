@@ -1,0 +1,21 @@
+<div class="form-group" ng-repeat="replacement in replacements">
+    <!-- Entry name -->
+    <div class="col-md-3">
+        <input ng-model="replacement.regex" type="text" class="form-control" />
+    </div>
+    <!-- Entry value -->
+    <div class="col-md-8">
+        <input ng-model="replacement.replacement" type="text" class="form-control" />
+    </div>
+    <!-- Entry removal -->
+    <div class="col-md-1">
+        <span class="glyphicon glyphicon-trash ot-command" title="Removes entry." ng-click="removeEntry(replacements, replacement)"></span>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <button title="Add entry" class="btn btn-default btn-xs" type="button" ng-click="addEntry(replacements)">
+            <span class="glyphicon glyphicon-plus"></span>
+        </button>
+    </div>
+</div>
