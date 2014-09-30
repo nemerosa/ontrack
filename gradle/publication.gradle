@@ -118,10 +118,12 @@ task ontrackChangeLog << {
     // Boundaries
     def lastBuildId = branchBuildView.buildViews[0].build.id
     def lastReleaseBuildId = branchBuildView.buildViews[branchBuildView.buildViews.size() - 1].build.id
-    println "Change log from ${lastReleaseBuildId} to ${lastBuildId}"
+    println "Getting the change log from ${lastReleaseBuildId} to ${lastBuildId}"
     // Exports the change log
     http = new HTTPBuilder("${ontrackUrl}/extension/git/changelog/export?branch=${branchId}&from=${lastBuildId}&to=${lastReleaseBuildId}&format=text&grouping=Features%3Dfeature%7CEnhancements%3Denhancement%7CBugs%3Dbug&exclude=delivery,design")
-    ext.notes = http.get(contentType: ContentType.TEXT)
+    def notes = http.get(contentType: ContentType.TEXT).text
+    println "Release notes:\n${notes}"
+    ext.notes = notes
 }
 
 /**
@@ -144,9 +146,9 @@ task ontrackPromote << {
         headers['Authorization'] = authorizationToken()
         body = [
                 promotionLevel: promotionLevelId,
-                dateTime: null,
-                description: 'Promoted by the release script',
-                properties: []
+                dateTime      : null,
+                description   : 'Promoted by the release script',
+                properties    : []
         ]
     }
     println "Build ${ontrackBuild()} is promoted to RELEASE."
@@ -154,9 +156,21 @@ task ontrackPromote << {
 ontrackPromote.mustRunAfter ontrackChangeLog
 
 /**
- * TODO Setting the change log as a description in GitHub
+ * Setting the change log as a description in GitHub
  */
-task githubReleaseDescription(dependsOn: ['githubReleaseCreate', 'ontrackChangeLog'])
+task githubReleaseDescription(dependsOn: ['githubReleaseCreate', 'ontrackChangeLog']) << {
+    int releaseId = project.tasks.githubReleaseCreate.releaseId
+    String notes = project.tasks.ontrackChangeLog.notes
+    println "Setting the release notes on ${releaseId}..."
+    def http = new HTTPBuilder("https://api.github.com/repos/${githubRepository}/releases/${releaseId}")
+    http.request(Method.POST, ContentType.JSON) { req ->
+        headers['Authorization'] = "token ${githubToken()}"
+        headers['User-Agent'] = "${githubRepository}"
+        body = [
+                body: notes
+        ]
+    }
+}
 
 /**
  * Main publication task
