@@ -4,7 +4,7 @@ angular.module('ot.service.user', [
     'ot.service.core',
     'ot.service.form'
 ])
-    .service('otUserService', function (ot, $state, $log, $interval, $http, $rootScope, otNotificationService, otFormService) {
+    .service('otUserService', function (ot, $q, $state, $log, $interval, $http, $rootScope, otNotificationService, otFormService) {
         var self = {};
 
         /**
@@ -54,7 +54,8 @@ angular.module('ot.service.user', [
                 uri: $rootScope.user.login,
                 title: "Sign in",
                 submit: function (data) {
-                    return ot.call($http.post(
+                    var d = $q.defer();
+                    $http.post(
                         $rootScope.user.login,
                         {},
                         {
@@ -62,7 +63,18 @@ angular.module('ot.service.user', [
                                 'Authorization': 'Basic ' + window.btoa(data.name + ':' + data.password)
                             }
                         }
-                    ));
+                    )
+                        .success(function (result) {
+                            d.resolve(result);
+                        })
+                        .error(function (response) {
+                            d.reject({
+                                status: response.status,
+                                type: 'error',
+                                content: response.message
+                            });
+                        });
+                    return d.promise;
                 }
             });
         };
