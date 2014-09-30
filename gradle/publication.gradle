@@ -103,10 +103,15 @@ task githubReleaseAssets(dependsOn: 'githubReleaseCreate') << {
 }
 
 /**
- * TODO Getting the change log between the build to promote and the last promoted one
+ * Getting the change log between the build to promote and the last promoted one
  */
 task ontrackChangeLog << {
-
+    // Gets the branch ID
+    def http = new HTTPBuilder("${ontrackUrl}/structure/entity/branch/${ontrackProject}/${ontrackBranch}")
+    def branchId = http.get(contentType: ContentType.JSON).id
+    println "Branch ${ontrackBranch} has ID ${branchId}"
+    // TODO Gets the change log
+    // TODO Exports the change log
 }
 
 /**
