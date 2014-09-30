@@ -5,7 +5,7 @@ dependencies {
     testCompile project(':ontrack-test-utils')
     testCompile libraries.groovy
 
-    testCompile 'org.seleniumhq.selenium:selenium-java:2.42.2'
+    testCompile 'org.seleniumhq.selenium:selenium-java:2.43.1'
 
     testRuntime libraries.slf4j_log4j
     testRuntime libraries.log4j
