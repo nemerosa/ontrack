@@ -1,40 +1,35 @@
 package net.nemerosa.ontrack.extension.git.client.impl;
 
+import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import net.nemerosa.ontrack.model.support.EnvService;
+import net.nemerosa.ontrack.model.support.UserPassword;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Supplier;
 
 @Component
 public class DefaultGitRepositoryManager implements GitRepositoryManager {
 
     private final Logger logger = LoggerFactory.getLogger(GitRepositoryManager.class);
     private final EnvService envService;
-    private final LoadingCache<GitRepositoryKey, GitRepository> repositoryCache =
+    private final Cache<GitRepositoryKey, GitRepository> repositoryCache =
             CacheBuilder.newBuilder()
                     .maximumSize(10)
-                    .build(new CacheLoader<GitRepositoryKey, GitRepository>() {
-                        @Override
-                        public GitRepository load(@SuppressWarnings("NullableProblems") GitRepositoryKey key) throws Exception {
-                            return createRepositoryManager(key);
-                        }
-                    });
+                    .build();
 
     @Autowired
     public DefaultGitRepositoryManager(EnvService envService) {
         this.envService = envService;
     }
 
-    private synchronized GitRepository createRepositoryManager(GitRepositoryKey key) {
-        String remote = key.getRemote();
-        String branch = key.getBranch();
+    private synchronized GitRepository createRepositoryManager(String remote, String branch, Supplier<Optional<UserPassword>> userPasswordSupplier) {
         logger.info("[git-repository] Creating repository manager for {} and branch {}", remote, branch);
         // Gets the ID for this remote location
         String id = getRepositoryId(remote, branch);
@@ -43,14 +38,14 @@ public class DefaultGitRepositoryManager implements GitRepositoryManager {
         File wd = envService.getWorkingDir("git", String.format("wd-%s", id));
         logger.debug("[git-repository] Repository manager working dir for {} is at {}", id, wd);
         // Creates the repository manager
-        return new DefaultGitRepository(wd, remote, branch, id);
+        return new DefaultGitRepository(wd, remote, branch, id, userPasswordSupplier);
     }
 
     @Override
-    public GitRepository getRepository(String remote, String branch) {
+    public GitRepository getRepository(String remote, String branch, Supplier<Optional<UserPassword>> userPasswordSupplier) {
         // Gets the cached repository managed or creates it
         try {
-            return repositoryCache.get(new GitRepositoryKey(remote, branch));
+            return repositoryCache.get(new GitRepositoryKey(remote, branch), () -> createRepositoryManager(remote, branch, userPasswordSupplier));
         } catch (ExecutionException e) {
             throw new GitRepositoryManagerException(remote, e);
         }
