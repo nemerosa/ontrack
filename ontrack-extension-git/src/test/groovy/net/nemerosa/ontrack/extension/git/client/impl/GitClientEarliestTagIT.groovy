@@ -128,7 +128,8 @@ class GitClientEarliestTagIT {
                 repo,
                 "",
                 "master",
-                "id", userPasswordSupplier
+                "id",
+                { Optional.empty() }
         )
         GitConfiguration gitConfiguration = GitConfiguration.empty()
         gitClient = new DefaultGitClient(gitRepository, gitConfiguration)
