@@ -110,8 +110,18 @@ task ontrackChangeLog << {
     def http = new HTTPBuilder("${ontrackUrl}/structure/entity/branch/${ontrackProject}/${ontrackBranch}")
     def branchId = http.get(contentType: ContentType.JSON).id
     println "Branch ${ontrackBranch} has ID ${branchId}"
-    // TODO Gets the change log
-    // TODO Exports the change log
+    // Gets the change log
+    http = new HTTPBuilder("${ontrackUrl}/structure/branches/${branchId}/view/net.nemerosa.ontrack.service.StandardBuildFilterProvider?afterDate=&beforeDate=&count=100&sincePromotionLevel=RELEASE")
+    def branchBuildView = http.get(contentType: ContentType.JSON)
+    // URI for the change log
+    def changelogUri = branchBuildView.buildDiffActions[0].uri
+    // Boundaries
+    def lastBuildId = branchBuildView.buildViews[0].build.id
+    def lastReleaseBuildId = branchBuildView.buildViews[branchBuildView.buildViews.size() - 1].build.id
+    println "Change log from ${lastReleaseBuildId} to ${lastBuildId}"
+    // Exports the change log
+    http = new HTTPBuilder("${ontrackUrl}/extension/git/changelog/export?branch=${branchId}&from=${lastBuildId}&to=${lastReleaseBuildId}&format=text&grouping=Features%3Dfeature%7CEnhancements%3Denhancement%7CBugs%3Dbug&exclude=delivery,design")
+    ext.notes = http.get(contentType: ContentType.TEXT)
 }
 
 /**
