@@ -133,7 +133,7 @@ public class PropertyServiceImpl implements PropertyService {
     private <T> Ack editProperty(ProjectEntity entity, PropertyType<T> propertyType, JsonNode data) {
         // Checks for edition
         if (!propertyType.canEdit(entity, securityService)) {
-            throw new AccessDeniedException("Property is not opened for viewing.");
+            throw new AccessDeniedException("Property is not opened for edition.");
         }
         // Gets the value and validates it
         T value = propertyType.fromClient(data);

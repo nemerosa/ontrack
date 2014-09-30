@@ -117,7 +117,7 @@ public class CopyServiceImpl implements CopyService {
     }
 
     protected <T> void doCopyProperty(Property<T> property, ProjectEntity targetEntity, List<Replacement> replacements) {
-        if (!property.isEmpty()) {
+        if (!property.isEmpty() && property.getType().canEdit(targetEntity, securityService)) {
             // Property value replacement
             T data = property.getType().replaceValue(property.getValue(), s -> applyReplacements(s, replacements));
             // Property data

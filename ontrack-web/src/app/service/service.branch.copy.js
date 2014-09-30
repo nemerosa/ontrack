@@ -25,24 +25,9 @@ angular.module('ot.service.branch.copy', [
             }).result.then(function (copy) {
                     var request = {
                         sourceBranchId: copy.branch.id,
-                        propertyReplacements: [
-                            {
-                                regex: copy.propertyRegex,
-                                replacement: copy.propertyReplacement
-                            }
-                        ],
-                        promotionLevelReplacements: [
-                            {
-                                regex: copy.promotionLevelRegex,
-                                replacement: copy.promotionLevelReplacement
-                            }
-                        ],
-                        validationStampReplacements: [
-                            {
-                                regex: copy.validationStampRegex,
-                                replacement: copy.validationStampReplacement
-                            }
-                        ]
+                        propertyReplacements: copy.propertyReplacements,
+                        promotionLevelReplacements: copy.promotionLevelReplacements,
+                        validationStampReplacements: copy.validationStampReplacements
                     };
                     return ot.pageCall($http.put(targetBranch._copy, request));
                 });

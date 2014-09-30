@@ -39,6 +39,20 @@ public class CopyServiceImplTest {
     }
 
     @Test
+    public void applyReplacements_null() {
+        assertEquals("branches/11.7", CopyServiceImpl.applyReplacements("branches/11.7", Arrays.asList(
+                new Replacement(null, "any")
+        )));
+    }
+
+    @Test
+    public void applyReplacements_blank() {
+        assertEquals("branches/11.7", CopyServiceImpl.applyReplacements("branches/11.7", Arrays.asList(
+                new Replacement("", "any")
+        )));
+    }
+
+    @Test
     public void applyReplacements_direct() {
         assertEquals("branches/11.8", CopyServiceImpl.applyReplacements("branches/11.7", Arrays.asList(
                 new Replacement("11.7", "11.8")
