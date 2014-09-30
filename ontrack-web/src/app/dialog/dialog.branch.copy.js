@@ -7,9 +7,15 @@ angular.module('ot.dialog.branch.copy', [
         $scope.config = config;
         // Selection object
         $scope.data = {
-            propertyReplacement: config.targetBranch.name,
-            promotionLevelReplacement: config.targetBranch.name,
-            validationStampReplacement: config.targetBranch.name
+            propertyReplacements: [{
+                replacement: config.targetBranch.name
+            }],
+            promotionLevelReplacements: [{
+                replacement: config.targetBranch.name
+            }],
+            validationStampReplacements: [{
+                replacement: config.targetBranch.name
+            }]
         };
         // Loading the projects
         otStructureService.getProjects().then(function (projects) {
