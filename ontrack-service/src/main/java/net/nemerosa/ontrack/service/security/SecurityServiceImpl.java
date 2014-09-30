@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.stereotype.Component;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static java.lang.String.format;
@@ -121,6 +122,27 @@ public class SecurityServiceImpl implements SecurityService {
         SecurityContext context = SecurityContextHolder.getContext();
         // Uses it
         return withSecurityContext(supplier, context);
+    }
+
+    @Override
+    public <T, R> Function<T, R> runner(Function<T, R> fn) {
+        // Current context
+        SecurityContext context = SecurityContextHolder.getContext();
+        // Uses it
+        return withSecurityContext(fn, context);
+    }
+
+    private <T, R> Function<T, R> withSecurityContext(Function<T, R> fn, SecurityContext context) {
+        return input -> {
+            SecurityContext oldContext = SecurityContextHolder.getContext();
+            try {
+                SecurityContextHolder.setContext(context);
+                // Result
+                return fn.apply(input);
+            } finally {
+                SecurityContextHolder.setContext(oldContext);
+            }
+        };
     }
 
     protected <T> Supplier<T> withSecurityContext(final Supplier<T> supplier, final SecurityContext context) {

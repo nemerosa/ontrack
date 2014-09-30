@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service;
 
 import net.nemerosa.ontrack.common.BaseException;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
+import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.Decoration;
 import net.nemerosa.ontrack.model.structure.Decorator;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
@@ -23,7 +24,9 @@ public class DecorationServiceImplTest {
         Decorator decorator = mock(Decorator.class);
         when(decorator.getDecoration(any(ProjectEntity.class))).thenThrow(new RuntimeException("Error while generating the decoration"));
 
-        DecorationServiceImpl service = new DecorationServiceImpl(extensionManager);
+        SecurityService securityService = mock(SecurityService.class);
+
+        DecorationServiceImpl service = new DecorationServiceImpl(extensionManager, securityService);
 
         Decoration decoration = service.getDecoration(projectEntity, decorator);
         assertNotNull(decoration);
@@ -39,7 +42,9 @@ public class DecorationServiceImplTest {
         Decorator decorator = mock(Decorator.class);
         when(decorator.getDecoration(any(ProjectEntity.class))).thenThrow(new TestBaseException());
 
-        DecorationServiceImpl service = new DecorationServiceImpl(extensionManager);
+        SecurityService securityService = mock(SecurityService.class);
+
+        DecorationServiceImpl service = new DecorationServiceImpl(extensionManager, securityService);
 
         Decoration decoration = service.getDecoration(projectEntity, decorator);
         assertNotNull(decoration);

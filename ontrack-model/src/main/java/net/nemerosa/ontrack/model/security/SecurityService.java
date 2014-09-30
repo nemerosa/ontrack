@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.Signature;
 
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public interface SecurityService {
@@ -63,4 +64,14 @@ public interface SecurityService {
      * @return A new supplier running in a new security context
      */
     <T> Supplier<T> runner(Supplier<T> supplier);
+
+    /**
+     * In some asynchronous operations, we need to run a task with the same credentials that initiated the operation.
+     * This method creates a wrapping supplier that holds the initial security context.
+     *
+     * @param fn  Call to perform in a protected context
+     * @param <T> Type of data to get back
+     * @return A new function running in a new security context
+     */
+    <T, R> Function<T, R> runner(Function<T, R> fn);
 }
