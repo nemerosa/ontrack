@@ -21,11 +21,16 @@ import groovyx.net.http.Method
  * Checking the required properties
  */
 
-if (!hasProperty('ontrackBuild')) throw new GradleException('ontrackBuild property must be set.')
-if (!hasProperty('ontrackUserName')) throw new GradleException('ontrackUserName property must be set.')
-if (!hasProperty('ontrackUserPassword')) throw new GradleException('ontrackUserPassword property must be set.')
-if (!hasProperty('githubToken')) throw new GradleException('githubToken property must be set.')
-if (!hasProperty('releasePath')) throw new GradleException('releasePath property must be set.')
+def param(String name) {
+    if (!hasProperty(name)) throw new GradleException("${name} property must be set.")
+    else return properties[name]
+}
+
+def githubToken = { param('githubToken') }
+def ontrackBuild = { param('ontrackBuild') }
+def ontrackUserName = { param('ontrackUserName') }
+def ontrackUserPassword = { param('ontrackUserPassword') }
+def releasePath = { param('releasePath') }
 
 /**
  * Optional properties
@@ -40,15 +45,15 @@ if (!hasProperty('githubRepository')) ext { githubRepository = 'nemerosa/ontrack
  * Logging the set-up
  */
 
-println "ontrack build to publish       : ${ontrackBuild}"
-println "ontrack URL                    : ${ontrackUrl}"
-println "ontrack project                : ${ontrackProject}"
-println "ontrack branch                 : ${ontrackBranch}"
-println "ontrack user name              : ${ontrackUserName}"
-println "ontrack user password          : ${ontrackUserPassword}"
-println "GitHub repository to publish to: ${githubRepository}"
-println "GitHub API token               : <set>"
-println "Path to the release files      : ${releasePath}"
+//println "ontrack build to publish       : ${ontrackBuild}"
+//println "ontrack URL                    : ${ontrackUrl}"
+//println "ontrack project                : ${ontrackProject}"
+//println "ontrack branch                 : ${ontrackBranch}"
+//println "ontrack user name              : ${ontrackUserName}"
+//println "ontrack user password          : ${ontrackUserPassword}"
+//println "GitHub repository to publish to: ${githubRepository}"
+//println "GitHub API token               : <set>"
+//println "Path to the release files      : ${releasePath}"
 
 /**
  * Creating a GitHub release
@@ -57,16 +62,16 @@ task githubReleaseCreate << {
     def url = "https://api.github.com/repos/${githubRepository}/releases"
     def http = new HTTPBuilder(url)
     http.request(Method.POST, ContentType.JSON) { req ->
-        headers['Authorization'] = "token ${githubToken}"
+        headers['Authorization'] = "token ${githubToken()}"
         headers['User-Agent'] = "${githubRepository}"
         body = [
-                tag_name  : "${ontrackBuild}".toString(),
-                name      : "v${ontrackBuild}".toString(),
+                tag_name  : "${ontrackBuild()}".toString(),
+                name      : "v${ontrackBuild()}".toString(),
                 prerelease: true
         ]
         response.success = { resp, json ->
             int id = json.id as int
-            println "Release v${ontrackBuild} created with ID = $id"
+            println "Release v${ontrackBuild()} created with ID = $id"
             project.tasks.githubReleaseCreate.ext.releaseId = id
         }
     }
@@ -76,7 +81,7 @@ def uploadAsset(File file, String name, int releaseId) {
     def url = "https://uploads.github.com/repos/${githubRepository}/releases/${releaseId}/assets?name=${name}"
     def http = new HTTPBuilder(url)
     http.request(Method.POST) { req ->
-        headers['Authorization'] = "token ${githubToken}"
+        headers['Authorization'] = "token ${githubToken()}"
         headers['User-Agent'] = "${githubRepository}"
         headers['Content-Type'] = 'application/zip'
         send ContentType.BINARY, file.bytes
@@ -88,8 +93,8 @@ def uploadAsset(File file, String name, int releaseId) {
  */
 task githubReleaseAssets(dependsOn: 'githubReleaseCreate') << {
     int id = project.tasks.githubReleaseCreate.releaseId
-    File file = new File(releasePath as String, "${ontrackBuild}.jar")
-    println "Publishing ${file} to release ${ontrackBuild} ($id)..."
+    File file = new File(releasePath() as String, "${ontrackBuild()}.jar")
+    println "Publishing ${file} to release ${ontrackBuild()} ($id)..."
     if (!file.exists()) {
         throw new GradleException("File ${file} cannot be published because it does not exist.")
     } else {
@@ -100,20 +105,22 @@ task githubReleaseAssets(dependsOn: 'githubReleaseCreate') << {
 /**
  * TODO Getting the change log between the build to promote and the last promoted one
  */
-task ontrackChangeLog
+task ontrackChangeLog << {
+
+}
 
 /**
  * Promoting the build in ontrack @ ontrack
  */
 task ontrackPromote << {
     // Gets the build ID from ontrack
-    def http = new HTTPBuilder("${ontrackUrl}/structure/entity/build/${ontrackProject}/${ontrackBranch}/${ontrackBuild}")
-    http.auth.basic ontrackUserName, ontrackUserPassword
+    def http = new HTTPBuilder("${ontrackUrl}/structure/entity/build/${ontrackProject}/${ontrackBranch}/${ontrackBuild()}")
+    http.auth.basic ontrackUserName(), ontrackUserPassword()
     def buildId = http.get(contentType: ContentType.JSON).id
-    println "Build ${ontrackBuild} has ID ${buildId}"
+    println "Build ${ontrackBuild()} has ID ${buildId}"
     // Gets the promotion level for RELEASE
     http = new HTTPBuilder("${ontrackUrl}/structure/entity/promotionLevel/${ontrackProject}/${ontrackBranch}/RELEASE")
-    http.auth.basic ontrackUserName, ontrackUserPassword
+    http.auth.basic ontrackUserName(), ontrackUserPassword()
     def promotionLevelId = http.get(contentType: ContentType.JSON).id
     println "Promotion level RELEASE has ID ${promotionLevelId}"
     // Promoting the build
@@ -127,7 +134,7 @@ task ontrackPromote << {
                 properties: []
         ]
     }
-    println "Build ${ontrackBuild} is promoted to RELEASE."
+    println "Build ${ontrackBuild()} is promoted to RELEASE."
 }
 ontrackPromote.mustRunAfter ontrackChangeLog
 
@@ -146,5 +153,5 @@ task publish(dependsOn: ['githubReleaseCreate', 'githubReleaseAssets', 'ontrackC
  */
 
 def String authorizationToken() {
-    'Basic ' + "${ontrackUserName}:${ontrackUserPassword}".toString().bytes.encodeBase64().toString()
+    'Basic ' + "${ontrackUserName()}:${ontrackUserPassword()}".toString().bytes.encodeBase64().toString()
 }
