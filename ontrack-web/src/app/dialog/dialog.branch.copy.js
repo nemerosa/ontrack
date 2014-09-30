@@ -42,5 +42,14 @@ angular.module('ot.dialog.branch.copy', [
                 $modalInstance.close($scope.data);
             }
         };
+        // Copying expressions
+        $scope.copyReplacements = function (source, targets) {
+            angular.forEach(targets, function (target) {
+                target.length = 0;
+                angular.forEach(source, function (item) {
+                    target.push(angular.copy(item));
+                });
+            });
+        };
     })
 ;
