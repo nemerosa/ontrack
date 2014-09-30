@@ -21,7 +21,8 @@ public class DefaultGitClientFactory implements GitClientFactory {
         // Repository
         GitRepository repository = repositoryManager.getRepository(
                 gitConfiguration.getRemote(),
-                gitConfiguration.getBranch());
+                gitConfiguration.getBranch(),
+                gitConfiguration.getUserPasswordSupplier());
         // Client
         return new DefaultGitClient(repository, gitConfiguration);
     }
