@@ -19,19 +19,20 @@ angular.module('ot.service.branch.copy', [
                 resolve: {
                     config: function () {
                         return {
-                            targetBranch: targetBranch
+                            targetBranch: targetBranch,
+                            submit: function (copy) {
+                                var request = {
+                                    sourceBranchId: copy.branch.id,
+                                    propertyReplacements: copy.propertyReplacements,
+                                    promotionLevelReplacements: copy.promotionLevelReplacements,
+                                    validationStampReplacements: copy.validationStampReplacements
+                                };
+                                return ot.call($http.put(targetBranch._copy, request));
+                            }
                         };
                     }
                 }
-            }).result.then(function (copy) {
-                    var request = {
-                        sourceBranchId: copy.branch.id,
-                        propertyReplacements: copy.propertyReplacements,
-                        promotionLevelReplacements: copy.promotionLevelReplacements,
-                        validationStampReplacements: copy.validationStampReplacements
-                    };
-                    return ot.pageCall($http.put(targetBranch._copy, request));
-                });
+            }).result;
         };
 
         /**

@@ -33,7 +33,7 @@ public class CopyServiceImpl implements CopyService {
         Branch sourceBranch = structureService.getBranch(request.getSourceBranchId());
         // If same branch, rejects
         if (sourceBranch.id() == targetBranch.id()) {
-            throw new IllegalArgumentException("Cannot copy the branch into itself.");
+            throw new CannotCopyItselfException();
         }
         // Checks the rights on the target branch
         securityService.checkProjectFunction(targetBranch, BranchEdit.class);

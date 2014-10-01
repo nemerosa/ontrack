@@ -1,9 +1,10 @@
 angular.module('ot.dialog.branch.copy', [
     'ot.service.core',
+    'ot.service.form',
     'ot.service.structure',
     'ot.directive.branch.replacements'
 ])
-    .controller('otDialogBranchCopy', function ($scope, $modalInstance, $http, config, ot, otStructureService) {
+    .controller('otDialogBranchCopy', function ($scope, $modalInstance, $http, config, ot, otStructureService, otFormService) {
         // Inject the configuration into the scope
         $scope.config = config;
         // Selection object
@@ -40,7 +41,12 @@ angular.module('ot.dialog.branch.copy', [
         // Submitting the dialog
         $scope.submit = function (isValid) {
             if (isValid) {
-                $modalInstance.close($scope.data);
+                otFormService.submitDialog(
+                    config.submit,
+                    $scope.data,
+                    $modalInstance,
+                    $scope
+                );
             }
         };
     })
