@@ -23,11 +23,13 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 public class ProjectController extends AbstractResourceController {
 
     private final StructureService structureService;
+    private final CopyService copyService;
     private final SecurityService securityService;
 
     @Autowired
-    public ProjectController(StructureService structureService, SecurityService securityService) {
+    public ProjectController(StructureService structureService, CopyService copyService, SecurityService securityService) {
         this.structureService = structureService;
+        this.copyService = copyService;
         this.securityService = securityService;
     }
 
@@ -107,6 +109,17 @@ public class ProjectController extends AbstractResourceController {
                                 .label("Replacements")
                 )
                 ;
+    }
+
+    /**
+     * Clones this project into another one.
+     */
+    @RequestMapping(value = "{projectId}/clone", method = RequestMethod.POST)
+    public Project clone(@PathVariable ID projectId, @RequestBody ProjectCloneRequest request) {
+        // Gets the project
+        Project project = structureService.getProject(projectId);
+        // Performs the clone
+        return copyService.cloneProject(project, request);
     }
 
 }

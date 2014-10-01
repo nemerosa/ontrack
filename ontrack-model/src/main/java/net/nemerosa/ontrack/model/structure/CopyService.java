@@ -19,4 +19,13 @@ public interface CopyService {
      * @return Created branch
      */
     Branch clone(Branch branch, BranchCloneRequest request);
+
+    /**
+     * Clones the <code>project</code> into a new project
+     *
+     * @param project Project to clone (untouched)
+     * @param request Cloning instructions
+     * @return Created project
+     */
+    Project cloneProject(Project project, ProjectCloneRequest request);
 }

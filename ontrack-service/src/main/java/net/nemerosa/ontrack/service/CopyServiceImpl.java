@@ -59,6 +59,40 @@ public class CopyServiceImpl implements CopyService {
         return targetBranch;
     }
 
+    @Override
+    public Project cloneProject(Project sourceProject, ProjectCloneRequest request) {
+
+        // Description of the target project
+        String targetProjectDescription = applyReplacements(sourceProject.getDescription(), request.getReplacements());
+
+        // Creates the project
+        Project targetProject = structureService.newProject(
+                Project.of(
+                        NameDescription.nd(request.getName(), targetProjectDescription)
+                )
+        );
+
+        // Copies the properties for the project
+        doCopyProperties(sourceProject, targetProject, request.getReplacements());
+
+        // Creates a copy of the branch
+        Branch sourceBranch = structureService.getBranch(request.getSourceBranchId());
+        String targetBranchName = applyReplacements(sourceBranch.getName(), request.getReplacements());
+        String targetBranchDescription = applyReplacements(sourceBranch.getDescription(), request.getReplacements());
+        Branch targetBranch = structureService.newBranch(
+                Branch.of(
+                        targetProject,
+                        NameDescription.nd(targetBranchName, targetBranchDescription)
+                )
+        );
+
+        // Configuration of the new branch
+        doCopy(sourceBranch, targetBranch, request);
+
+        // OK
+        return targetProject;
+    }
+
     protected void doCopy(Branch sourceBranch, Branch targetBranch, AbstractCopyRequest request) {
         // Branch properties
         doCopyProperties(sourceBranch, targetBranch, request.getReplacements());
