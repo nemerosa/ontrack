@@ -44,19 +44,20 @@ angular.module('ot.service.branch.copy', [
                 resolve: {
                     config: function () {
                         return {
-                            sourceBranch: sourceBranch
+                            sourceBranch: sourceBranch,
+                            submit: function (specs) {
+                                var request = {
+                                    name: specs.name,
+                                    propertyReplacements: specs.propertyReplacements,
+                                    promotionLevelReplacements: specs.promotionLevelReplacements,
+                                    validationStampReplacements: specs.validationStampReplacements
+                                };
+                                return ot.call($http.post(sourceBranch._clone, request));
+                            }
                         };
                     }
                 }
-            }).result.then(function (specs) {
-                    var request = {
-                        name: specs.name,
-                        propertyReplacements: specs.propertyReplacements,
-                        promotionLevelReplacements: specs.promotionLevelReplacements,
-                        validationStampReplacements: specs.validationStampReplacements
-                    };
-                    return ot.pageCall($http.post(sourceBranch._clone, request));
-                });
+            }).result;
         };
 
         return self;
