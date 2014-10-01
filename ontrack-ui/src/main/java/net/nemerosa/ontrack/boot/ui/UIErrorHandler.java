@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.boot.ui;
 
-import net.nemerosa.ontrack.common.BaseException;
 import net.nemerosa.ontrack.model.exceptions.InputException;
 import net.nemerosa.ontrack.model.exceptions.NotFoundException;
 import net.nemerosa.ontrack.model.security.Account;
@@ -81,15 +80,6 @@ public class UIErrorHandler {
                 HttpStatus.BAD_REQUEST,
                 message
         );
-    }
-
-    @ExceptionHandler(BaseException.class)
-    @ResponseBody
-    public ResponseEntity<UIErrorMessage> onBaseException(BaseException ex) {
-        // Returns a message to display to the user
-        String message = ex.getMessage();
-        // OK
-        return getMessageResponse(HttpStatus.INTERNAL_SERVER_ERROR, message);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
