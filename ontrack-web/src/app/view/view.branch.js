@@ -232,6 +232,14 @@ angular.module('ot.view.branch', [
         // Gets the list of tools for a branch
         function getTools(branch) {
             var tools = [];
+            // Clone into branch
+            if (branch._clone) {
+                tools.push({
+                    id: 'branch-clone',
+                    name: "Clone branch",
+                    action: cloneBranch
+                });
+            }
             // Copy from branch
             if (branch._copy) {
                 tools.push({
@@ -242,6 +250,11 @@ angular.module('ot.view.branch', [
             }
             // OK
             return tools;
+        }
+
+        // Cloning a branch
+        function cloneBranch() {
+
         }
 
         // Copy from a branch
