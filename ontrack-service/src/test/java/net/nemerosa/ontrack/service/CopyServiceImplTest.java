@@ -71,6 +71,94 @@ public class CopyServiceImplTest {
     }
 
     @Test
+    public void cloneProject() {
+        Project sourceProject = Project.of(nd("P1", "Project P1")).withId(ID.of(1));
+        Branch sourceBranch = Branch.of(sourceProject, nd("B1", "Branch B1")).withId(ID.of(1));
+
+        // Request
+        ProjectCloneRequest request = new ProjectCloneRequest(
+                "P2",
+                sourceBranch.getId(),
+                Arrays.asList(
+                        new Replacement("P1", "P2"),
+                        new Replacement("B1", "B2")
+                )
+        );
+
+        // Branch properties
+        when(propertyService.getProperties(sourceBranch)).thenReturn(
+                Arrays.asList(
+                        Property.of(
+                                new LinkPropertyType(),
+                                LinkProperty.of("test", "http://wiki/B1")
+                        )
+                )
+        );
+
+        // Project properties
+        when(propertyService.getProperties(sourceProject)).thenReturn(
+                Arrays.asList(
+                        Property.of(
+                                new LinkPropertyType(),
+                                LinkProperty.of("test", "http://wiki/P1")
+                        )
+                )
+        );
+
+        // Access to the source branch
+        when(structureService.getBranch(ID.of(1))).thenReturn(sourceBranch);
+
+        // Created branch and project
+        Project projectToCreate = Project.of(nd("P2", "Project P2"));
+        Project createdProject = projectToCreate.withId(ID.of(2));
+        Branch branchToCreate = Branch.of(createdProject, nd("B2", "Branch B2"));
+        Branch createdBranch = branchToCreate.withId(ID.of(2));
+
+        // Creation of the project and the branch
+        when(structureService.newProject(projectToCreate)).thenReturn(createdProject);
+        when(structureService.newBranch(branchToCreate)).thenReturn(createdBranch);
+
+        // Edition of the property must be allowed
+        when(securityService.isProjectFunctionGranted(createdProject, ProjectEdit.class)).thenReturn(true);
+        when(securityService.isProjectFunctionGranted(createdBranch, ProjectEdit.class)).thenReturn(true);
+
+        // Call
+        service.cloneProject(sourceProject, request);
+
+        // Checks the branch is created
+        verify(structureService, times(1)).newProject(projectToCreate);
+        verify(structureService, times(1)).newBranch(branchToCreate);
+
+        // Checks the copy of properties for the project
+        verify(propertyService, times(1)).editProperty(
+                eq(createdProject),
+                eq(LinkPropertyType.class.getName()),
+                eq(object()
+                        .with("links", array()
+                                .with(object()
+                                        .with("name", "test")
+                                        .with("value", "http://wiki/P2")
+                                        .end())
+                                .end())
+                        .end())
+        );
+
+        // Checks the copy of properties for the branch
+        verify(propertyService, times(1)).editProperty(
+                eq(createdBranch),
+                eq(LinkPropertyType.class.getName()),
+                eq(object()
+                        .with("links", array()
+                                .with(object()
+                                        .with("name", "test")
+                                        .with("value", "http://wiki/B2")
+                                        .end())
+                                .end())
+                        .end())
+        );
+    }
+
+    @Test
     public void cloneBranch() {
         Project project = Project.of(nd("P1", "")).withId(ID.of(1));
         Branch sourceBranch = Branch.of(project, nd("B1", "Branch B1")).withId(ID.of(1));
