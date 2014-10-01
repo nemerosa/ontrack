@@ -1,6 +1,7 @@
 angular.module('ot.dialog.branch.copy', [
     'ot.service.core',
-    'ot.service.structure'
+    'ot.service.structure',
+    'ot.directive.branch.replacements'
 ])
     .controller('otDialogBranchCopy', function ($scope, $modalInstance, $http, config, ot, otStructureService) {
         // Inject the configuration into the scope
@@ -41,15 +42,6 @@ angular.module('ot.dialog.branch.copy', [
             if (isValid) {
                 $modalInstance.close($scope.data);
             }
-        };
-        // Copying expressions
-        $scope.copyReplacements = function (source, targets) {
-            angular.forEach(targets, function (target) {
-                target.length = 0;
-                angular.forEach(source, function (item) {
-                    target.push(angular.copy(item));
-                });
-            });
         };
     })
 ;

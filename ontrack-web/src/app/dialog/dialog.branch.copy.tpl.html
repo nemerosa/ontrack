@@ -63,48 +63,7 @@
                 and replacement expressions.
             </p>
         </div>
-        <div class="form-group">
-            <label class="control-label col-md-3">
-                All properties
-                <span
-                        class="glyphicon glyphicon-cog ot-command"
-                        title="Copies the replacement expressions to all"
-                        ng-click="copyReplacements(data.propertyReplacements, [data.promotionLevelReplacements, data.validationStampReplacements])"
-                        ></span>
-            </label>
-
-            <div class="col-md-9">
-                <ot-field-replacements replacements="data.propertyReplacements"></ot-field-replacements>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="control-label col-md-3">
-                Promotion levels
-                <span
-                        class="glyphicon glyphicon-cog ot-command"
-                        title="Copies the replacement expressions to all"
-                        ng-click="copyReplacements(data.promotionLevelReplacements, [data.propertyReplacements, data.validationStampReplacements])"
-                        ></span>
-            </label>
-
-            <div class="col-md-9">
-                <ot-field-replacements replacements="data.promotionLevelReplacements"></ot-field-replacements>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="control-label col-md-3">
-                Validation stamps
-                <span
-                        class="glyphicon glyphicon-cog ot-command"
-                        title="Copies the replacement expressions to all"
-                        ng-click="copyReplacements(data.validationStampReplacements, [data.propertyReplacements, data.promotionLevelReplacements])"
-                        ></span>
-            </label>
-
-            <div class="col-md-9">
-                <ot-field-replacements replacements="data.validationStampReplacements"></ot-field-replacements>
-            </div>
-        </div>
+        <ot-branch-replacements data="data"></ot-branch-replacements>
     </div>
     <div class="modal-footer">
         <button class="btn btn-primary" type="submit" ng-disabled="thisForm.$invalid">OK</button>
