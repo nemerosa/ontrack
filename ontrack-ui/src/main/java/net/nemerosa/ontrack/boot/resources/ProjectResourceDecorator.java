@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.boot.resources;
 
 import net.nemerosa.ontrack.boot.ui.*;
 import net.nemerosa.ontrack.model.security.ProjectAuthorisationMgt;
+import net.nemerosa.ontrack.model.security.ProjectCreation;
 import net.nemerosa.ontrack.model.security.ProjectDelete;
 import net.nemerosa.ontrack.model.security.ProjectEdit;
 import net.nemerosa.ontrack.model.structure.Project;
@@ -42,6 +43,12 @@ public class ProjectResourceDecorator extends AbstractResourceDecorator<Project>
                 .link("_permissions", on(PermissionController.class).getProjectPermissions(project.getId()), ProjectAuthorisationMgt.class, project.id())
                         // Events
                 .link("_events", on(EventController.class).getEvents(project.getProjectEntityType(), project.getId(), 0, 10))
+                        // Clone to another project
+                .link(
+                        "_clone",
+                        on(ProjectController.class).clone(project.getId()),
+                        ProjectCreation.class
+                )
                         // OK
                 .build();
     }

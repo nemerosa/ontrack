@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.form.Replacements;
+import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.security.ProjectCreation;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
@@ -87,6 +89,24 @@ public class ProjectController extends AbstractResourceController {
         structureService.saveProject(project);
         // As resource
         return project;
+    }
+
+    /**
+     * Gets the form to clone this project into another projevt
+     */
+    @RequestMapping(value = "{projectId}/clone", method = RequestMethod.GET)
+    public Form clone(@SuppressWarnings("UnusedParameters") @PathVariable ID projectId) {
+        return Form.create()
+                .with(
+                        Text.of("name")
+                                .label("Target project")
+                                .help("Name of the project to create")
+                )
+                .with(
+                        Replacements.of("replacements")
+                                .label("Replacements")
+                )
+                ;
     }
 
 }
