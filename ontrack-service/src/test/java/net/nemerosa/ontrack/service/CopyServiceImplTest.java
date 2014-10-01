@@ -17,6 +17,7 @@ import static net.nemerosa.ontrack.json.JsonUtils.array;
 import static net.nemerosa.ontrack.json.JsonUtils.object;
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
 public class CopyServiceImplTest {
@@ -67,6 +68,58 @@ public class CopyServiceImplTest {
                 new Replacement("trunk", "branches/11.7"),
                 new Replacement("Pipeline", "Release pipeline")
         )));
+    }
+
+    @Test
+    public void cloneBranch() {
+        Project project = Project.of(nd("P1", "")).withId(ID.of(1));
+        Branch sourceBranch = Branch.of(project, nd("B1", "Branch B1")).withId(ID.of(1));
+        // Request
+        BranchCloneRequest request = new BranchCloneRequest(
+                "B2",
+                Arrays.asList(
+                        new Replacement("B1", "B2")
+                )
+        );
+
+        // Branch properties
+        when(propertyService.getProperties(sourceBranch)).thenReturn(
+                Arrays.asList(
+                        Property.of(
+                                new LinkPropertyType(),
+                                LinkProperty.of("test", "http://wiki/B1")
+                        )
+                )
+        );
+
+        // Created branch
+        Branch targetBranch = Branch.of(project, nd("B2", "Branch B2"));
+
+        // Creation of the branch
+        when(structureService.newBranch(targetBranch)).thenReturn(targetBranch.withId(ID.of(2)));
+
+        // Edition of the property must be allowed
+        when(securityService.isProjectFunctionGranted(targetBranch.withId(ID.of(2)), ProjectEdit.class)).thenReturn(true);
+
+        // Cloning
+        service.cloneBranch(sourceBranch, request);
+
+        // Checks the branch is created
+        verify(structureService, times(1)).newBranch(targetBranch);
+
+        // Checks the copy of properties for the branch
+        verify(propertyService, times(1)).editProperty(
+                eq(targetBranch.withId(ID.of(2))),
+                eq(LinkPropertyType.class.getName()),
+                eq(object()
+                        .with("links", array()
+                                .with(object()
+                                        .with("name", "test")
+                                        .with("value", "http://wiki/B2")
+                                        .end())
+                                .end())
+                        .end())
+        );
     }
 
     @Test

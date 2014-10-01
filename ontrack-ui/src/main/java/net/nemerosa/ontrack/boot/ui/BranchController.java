@@ -196,7 +196,7 @@ public class BranchController extends AbstractResourceController {
         // Gets the branch
         Branch branch = structureService.getBranch(branchId);
         // Performs the clone
-        return copyService.clone(branch, request);
+        return copyService.cloneBranch(branch, request);
     }
 
     private BranchBuildView buildViewWithFilter(ID branchId, BuildFilter buildFilter) {

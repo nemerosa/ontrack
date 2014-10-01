@@ -43,7 +43,7 @@ public class CopyServiceImpl implements CopyService {
     }
 
     @Override
-    public Branch clone(Branch sourceBranch, BranchCloneRequest request) {
+    public Branch cloneBranch(Branch sourceBranch, BranchCloneRequest request) {
         // Description of the target branch
         String targetDescription = applyReplacements(sourceBranch.getDescription(), request.getReplacements());
         // Creates the branch
