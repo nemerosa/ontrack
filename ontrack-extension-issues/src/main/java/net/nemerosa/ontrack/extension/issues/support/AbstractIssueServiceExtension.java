@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.issues.support;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
 import net.nemerosa.ontrack.extension.api.ExtensionFeature;
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest;
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtension;
@@ -13,7 +12,6 @@ import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueExportMoreThanOneGroupException;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -82,11 +80,7 @@ public abstract class AbstractIssueServiceExtension extends AbstractExtension im
 
     protected Map<String, List<Issue>> groupIssues(IssueServiceConfiguration issueServiceConfiguration, List<? extends Issue> issues, IssueChangeLogExportRequest request) {
         // Excluded issues
-        Set<String> excludedTypes = new HashSet<>();
-        String exclude = request.getExclude();
-        if (StringUtils.isNotBlank(exclude)) {
-            excludedTypes = Sets.newHashSet(StringUtils.split(exclude));
-        }
+        Set<String> excludedTypes = request.getExcludedTypes();
         // Gets the grouping specification
         Map<String, Set<String>> groupingSpecification = request.getGroupingSpecification();
         // Map of issues, ordered by group
