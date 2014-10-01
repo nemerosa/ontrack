@@ -205,6 +205,26 @@ angular.module('ot.service.form', [
             throw "Could not find any field with name " + fieldName;
         };
 
+        /**
+         * Flexible submit method to be used in dialog controllers
+         */
+        self.submitDialog = function (submitFn, submitData, modalInstance, messageContainer) {
+            var submit = submitFn(submitData);
+            if (submit === true) {
+                modalInstance.close('ok');
+            } else if (angular.isString(submit)) {
+                messageContainer.message = submit;
+            } else {
+                submit.then(
+                    function success() {
+                        modalInstance.close('ok');
+                    },
+                    function error(message) {
+                        messageContainer.message = message;
+                    });
+            }
+        };
+
         return self;
     })
 ;
