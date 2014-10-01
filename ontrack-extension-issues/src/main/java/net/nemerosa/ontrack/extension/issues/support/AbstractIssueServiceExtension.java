@@ -16,6 +16,8 @@ import net.nemerosa.ontrack.extension.support.AbstractExtension;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static net.nemerosa.ontrack.extension.issues.support.IssueServiceUtils.getIssueGroups;
+
 /**
  * Convenient implementation for most of the issue services.
  */
@@ -133,19 +135,5 @@ public abstract class AbstractIssueServiceExtension extends AbstractExtension im
     }
 
     protected abstract Set<String> getIssueTypes(IssueServiceConfiguration issueServiceConfiguration, Issue issue);
-
-    protected Set<String> getIssueGroups(Set<String> issueTypes, Map<String, Set<String>> groupingSpecification) {
-        Set<String> groups = new HashSet<>();
-        for (String issueType : issueTypes) {
-            for (Map.Entry<String, Set<String>> entry : groupingSpecification.entrySet()) {
-                String groupName = entry.getKey();
-                Set<String> groupTypes = entry.getValue();
-                if (groupTypes.contains(issueType)) {
-                    groups.add(groupName);
-                }
-            }
-        }
-        return groups;
-    }
 
 }
