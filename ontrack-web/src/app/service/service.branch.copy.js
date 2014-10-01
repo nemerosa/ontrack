@@ -1,7 +1,8 @@
 angular.module('ot.service.branch.copy', [
     'ot.service.core',
     'ot.service.form',
-    'ot.dialog.branch.copy'
+    'ot.dialog.branch.copy',
+    'ot.dialog.branch.clone'
 ])
     .service('otBranchCopyService', function ($modal, $http, ot) {
         var self = {};
@@ -30,6 +31,31 @@ angular.module('ot.service.branch.copy', [
                         validationStampReplacements: copy.validationStampReplacements
                     };
                     return ot.pageCall($http.put(targetBranch._copy, request));
+                });
+        };
+
+        /**
+         * Clones a branch into another one.
+         */
+        self.cloneBranch = function (sourceBranch) {
+            return $modal.open({
+                templateUrl: 'app/dialog/dialog.branch.clone.tpl.html',
+                controller: 'otDialogBranchClone',
+                resolve: {
+                    config: function () {
+                        return {
+                            sourceBranch: sourceBranch
+                        };
+                    }
+                }
+            }).result.then(function (specs) {
+                    var request = {
+                        name: specs.name,
+                        propertyReplacements: specs.propertyReplacements,
+                        promotionLevelReplacements: specs.promotionLevelReplacements,
+                        validationStampReplacements: specs.validationStampReplacements
+                    };
+                    return ot.pageCall($http.put(sourceBranch._clone, request));
                 });
         };
 

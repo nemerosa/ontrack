@@ -254,7 +254,11 @@ angular.module('ot.view.branch', [
 
         // Cloning a branch
         function cloneBranch() {
-
+            otBranchCopyService.cloneBranch($scope.branch).then(function (newBranch) {
+                $state.go('branch', {
+                    branchId: newBranch.id
+                });
+            });
         }
 
         // Copy from a branch
