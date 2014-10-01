@@ -6,10 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.split;
@@ -102,5 +99,23 @@ public class IssueChangeLogExportRequest extends BuildDiffRequest {
             }
         }
         return result;
+    }
+
+    /**
+     * Parses the comma-separated list of excluded types.
+     */
+    @JsonIgnore
+    public Set<String> getExcludedTypes() {
+        if (StringUtils.isBlank(exclude)) {
+            return Collections.emptySet();
+        } else {
+            return Sets.newHashSet(
+                    Arrays.asList(
+                            StringUtils.split(exclude, ",")
+                    ).stream()
+                            .map(StringUtils::trim)
+                            .collect(Collectors.toList())
+            );
+        }
     }
 }

@@ -53,4 +53,61 @@ public class IssueChangeLogExportRequestTest {
         request.getGroupingSpecification();
     }
 
+    @Test
+    public void getExcludedTypes_null() {
+        IssueChangeLogExportRequest request = new IssueChangeLogExportRequest();
+        request.setExclude(null);
+        assertTrue(request.getExcludedTypes().isEmpty());
+    }
+
+    @Test
+    public void getExcludedTypes_empty() {
+        IssueChangeLogExportRequest request = new IssueChangeLogExportRequest();
+        request.setExclude("");
+        assertTrue(request.getExcludedTypes().isEmpty());
+    }
+
+    @Test
+    public void getExcludedTypes_blank() {
+        IssueChangeLogExportRequest request = new IssueChangeLogExportRequest();
+        request.setExclude("  ");
+        assertTrue(request.getExcludedTypes().isEmpty());
+    }
+
+    @Test
+    public void getExcludedTypes_one() {
+        IssueChangeLogExportRequest request = new IssueChangeLogExportRequest();
+        request.setExclude("type1");
+        assertEquals(
+                Sets.newHashSet("type1"),
+                request.getExcludedTypes());
+    }
+
+    @Test
+    public void getExcludedTypes_one_trimmed() {
+        IssueChangeLogExportRequest request = new IssueChangeLogExportRequest();
+        request.setExclude(" type1  ");
+        assertEquals(
+                Sets.newHashSet("type1"),
+                request.getExcludedTypes());
+    }
+
+    @Test
+    public void getExcludedTypes_several() {
+        IssueChangeLogExportRequest request = new IssueChangeLogExportRequest();
+        request.setExclude("type1,type2,type3");
+        assertEquals(
+                Sets.newHashSet("type1", "type2", "type3"),
+                request.getExcludedTypes());
+    }
+
+    @Test
+    public void getExcludedTypes_several_trimmed() {
+        IssueChangeLogExportRequest request = new IssueChangeLogExportRequest();
+        request.setExclude(" type1  ,  type2 ,    type3   ");
+        assertEquals(
+                Sets.newHashSet("type1", "type2", "type3"),
+                request.getExcludedTypes());
+    }
+
 }
