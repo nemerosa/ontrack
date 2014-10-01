@@ -107,6 +107,28 @@ class IssueServiceUtilsTest {
     }
 
     @Test
+    void 'Grouping issues: grouping and pruning'() {
+        def configuration = mock(IssueServiceConfiguration)
+        def request = new IssueChangeLogExportRequest()
+        request.grouping = 'Bugs=bug|Features=feature'
+        def bug1 = mock(Issue)
+        def bug2 = mock(Issue)
+        def feature = mock(Issue)
+
+        def issueTypeFn = { config, i ->
+            if (i == bug1 || i == bug2) {
+                ['bug'] as Set
+            } else {
+                ['feature'] as Set
+            }
+        }
+
+        def groups = IssueServiceUtils.groupIssues(configuration, [bug1, bug2], request, issueTypeFn)
+        assert groups.size() == 1
+        assert groups['Bugs'] == [bug1, bug2]
+    }
+
+    @Test
     void 'Grouping issues: grouping with other (default)'() {
         def configuration = mock(IssueServiceConfiguration)
         def request = new IssueChangeLogExportRequest()
