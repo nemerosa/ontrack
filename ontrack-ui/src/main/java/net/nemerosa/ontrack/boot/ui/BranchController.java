@@ -204,6 +204,17 @@ public class BranchController extends AbstractResourceController {
                 ;
     }
 
+    /**
+     * Clones this branch into another one.
+     */
+    @RequestMapping(value = "branches/{branchId}/clone", method = RequestMethod.POST)
+    public Branch clone(@PathVariable ID branchId, @RequestBody BranchCloneRequest request) {
+        // Gets the branch
+        Branch branch = structureService.getBranch(branchId);
+        // Performs the clone
+        return copyService.clone(branch, request);
+    }
+
     private BranchBuildView buildViewWithFilter(ID branchId, BuildFilter buildFilter) {
         // Gets the branch
         Branch branch = getBranch(branchId);

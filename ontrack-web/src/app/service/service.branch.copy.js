@@ -55,7 +55,7 @@ angular.module('ot.service.branch.copy', [
                         promotionLevelReplacements: specs.promotionLevelReplacements,
                         validationStampReplacements: specs.validationStampReplacements
                     };
-                    return ot.pageCall($http.put(sourceBranch._clone, request));
+                    return ot.pageCall($http.post(sourceBranch._clone, request));
                 });
         };
 
