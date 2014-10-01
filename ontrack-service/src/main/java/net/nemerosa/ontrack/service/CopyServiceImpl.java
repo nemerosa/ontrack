@@ -33,7 +33,7 @@ public class CopyServiceImpl implements CopyService {
         Branch sourceBranch = structureService.getBranch(request.getSourceBranchId());
         // If same branch, rejects
         if (sourceBranch.id() == targetBranch.id()) {
-            throw new IllegalArgumentException("Cannot copy the branch into itself.");
+            throw new CannotCopyItselfException();
         }
         // Checks the rights on the target branch
         securityService.checkProjectFunction(targetBranch, BranchEdit.class);
@@ -42,7 +42,24 @@ public class CopyServiceImpl implements CopyService {
         return targetBranch;
     }
 
-    protected void doCopy(Branch sourceBranch, Branch targetBranch, BranchCopyRequest request) {
+    @Override
+    public Branch clone(Branch sourceBranch, BranchCloneRequest request) {
+        // Description of the target branch
+        String targetDescription = applyReplacements(sourceBranch.getDescription(), request.getPropertyReplacements());
+        // Creates the branch
+        Branch targetBranch = structureService.newBranch(
+                Branch.of(
+                        sourceBranch.getProject(),
+                        NameDescription.nd(request.getName(), targetDescription)
+                )
+        );
+        // Copies the configuration
+        doCopy(sourceBranch, targetBranch, request);
+        // OK
+        return targetBranch;
+    }
+
+    protected void doCopy(Branch sourceBranch, Branch targetBranch, AbstractCopyRequest request) {
         // Branch properties
         doCopyProperties(sourceBranch, targetBranch, request.getPropertyReplacements());
         // Promotion level and properties
@@ -57,7 +74,7 @@ public class CopyServiceImpl implements CopyService {
         buildFilterService.copyToBranch(sourceBranch.getId(), targetBranch.getId());
     }
 
-    protected void doCopyPromotionLevels(Branch sourceBranch, Branch targetBranch, BranchCopyRequest request) {
+    protected void doCopyPromotionLevels(Branch sourceBranch, Branch targetBranch, AbstractCopyRequest request) {
         List<PromotionLevel> sourcePromotionLevels = structureService.getPromotionLevelListForBranch(sourceBranch.getId());
         for (PromotionLevel sourcePromotionLevel : sourcePromotionLevels) {
             Optional<PromotionLevel> targetPromotionLevelOpt = structureService.findPromotionLevelByName(targetBranch.getProject().getName(), targetBranch.getName(), sourcePromotionLevel.getName());
@@ -90,7 +107,7 @@ public class CopyServiceImpl implements CopyService {
         }
     }
 
-    protected void doCopyValidationStamps(Branch sourceBranch, Branch targetBranch, BranchCopyRequest request) {
+    protected void doCopyValidationStamps(Branch sourceBranch, Branch targetBranch, AbstractCopyRequest request) {
         List<ValidationStamp> sourceValidationStamps = structureService.getValidationStampListForBranch(sourceBranch.getId());
         for (ValidationStamp sourceValidationStamp : sourceValidationStamps) {
             Optional<ValidationStamp> targetValidationStampOpt = structureService.findValidationStampByName(targetBranch.getProject().getName(), targetBranch.getName(), sourceValidationStamp.getName());

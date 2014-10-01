@@ -11,4 +11,12 @@ public interface CopyService {
      */
     Branch copy(Branch branch, BranchCopyRequest request);
 
+    /**
+     * Clones the <code>branch</code> into a new branch
+     *
+     * @param branch  Branch to clone (untouched)
+     * @param request Cloning instructions
+     * @return Created branch
+     */
+    Branch clone(Branch branch, BranchCloneRequest request);
 }

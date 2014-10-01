@@ -98,6 +98,13 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                         BranchEdit.class,
                         branch.projectId()
                 )
+                        // Clone to another branch
+                .link(
+                        "_clone",
+                        on(BranchController.class).clone(branch.getId()),
+                        BranchCreate.class,
+                        branch.projectId()
+                )
                         // Events
                 .link("_events", on(EventController.class).getEvents(branch.getProjectEntityType(), branch.getId(), 0, 10))
                         // OK

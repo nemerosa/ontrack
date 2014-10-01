@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Replacements;
 import net.nemerosa.ontrack.model.form.Selection;
+import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.security.Action;
 import net.nemerosa.ontrack.model.security.BranchCreate;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -175,6 +176,43 @@ public class BranchController extends AbstractResourceController {
         Branch branch = structureService.getBranch(branchId);
         // Performs the copy
         return copyService.copy(branch, request);
+    }
+
+    /**
+     * Gets the form to clone this branch into another branch
+     */
+    @RequestMapping(value = "branches/{branchId}/clone", method = RequestMethod.GET)
+    public Form clone(@PathVariable ID branchId) {
+        return Form.create()
+                .with(
+                        Text.of("name")
+                                .label("Target branch")
+                                .help("Name of the branch to create")
+                )
+                .with(
+                        Replacements.of("propertyReplacements")
+                                .label("Property replacements")
+                )
+                .with(
+                        Replacements.of("promotionLevelReplacements")
+                                .label("Promotion level replacements")
+                )
+                .with(
+                        Replacements.of("validationStampReplacements")
+                                .label("Validation stamp replacements")
+                )
+                ;
+    }
+
+    /**
+     * Clones this branch into another one.
+     */
+    @RequestMapping(value = "branches/{branchId}/clone", method = RequestMethod.POST)
+    public Branch clone(@PathVariable ID branchId, @RequestBody BranchCloneRequest request) {
+        // Gets the branch
+        Branch branch = structureService.getBranch(branchId);
+        // Performs the clone
+        return copyService.clone(branch, request);
     }
 
     private BranchBuildView buildViewWithFilter(ID branchId, BuildFilter buildFilter) {
