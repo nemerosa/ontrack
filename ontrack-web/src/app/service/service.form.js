@@ -216,8 +216,8 @@ angular.module('ot.service.form', [
                 messageContainer.message = submit;
             } else {
                 submit.then(
-                    function success() {
-                        modalInstance.close('ok');
+                    function success(data) {
+                        modalInstance.close(data);
                     },
                     function error(message) {
                         messageContainer.message = message;
