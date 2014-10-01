@@ -9,13 +9,7 @@ angular.module('ot.dialog.branch.copy', [
         $scope.config = config;
         // Selection object
         $scope.data = {
-            propertyReplacements: [{
-                replacement: config.targetBranch.name
-            }],
-            promotionLevelReplacements: [{
-                replacement: config.targetBranch.name
-            }],
-            validationStampReplacements: [{
+            replacements: [{
                 replacement: config.targetBranch.name
             }]
         };

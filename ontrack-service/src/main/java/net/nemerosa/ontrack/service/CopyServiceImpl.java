@@ -45,7 +45,7 @@ public class CopyServiceImpl implements CopyService {
     @Override
     public Branch clone(Branch sourceBranch, BranchCloneRequest request) {
         // Description of the target branch
-        String targetDescription = applyReplacements(sourceBranch.getDescription(), request.getPropertyReplacements());
+        String targetDescription = applyReplacements(sourceBranch.getDescription(), request.getReplacements());
         // Creates the branch
         Branch targetBranch = structureService.newBranch(
                 Branch.of(
@@ -61,7 +61,7 @@ public class CopyServiceImpl implements CopyService {
 
     protected void doCopy(Branch sourceBranch, Branch targetBranch, AbstractCopyRequest request) {
         // Branch properties
-        doCopyProperties(sourceBranch, targetBranch, request.getPropertyReplacements());
+        doCopyProperties(sourceBranch, targetBranch, request.getReplacements());
         // Promotion level and properties
         doCopyPromotionLevels(sourceBranch, targetBranch, request);
         // Validation stamps and properties
@@ -85,7 +85,7 @@ public class CopyServiceImpl implements CopyService {
                                 targetBranch,
                                 NameDescription.nd(
                                         sourcePromotionLevel.getName(),
-                                        applyReplacements(sourcePromotionLevel.getDescription(), request.getPromotionLevelReplacements())
+                                        applyReplacements(sourcePromotionLevel.getDescription(), request.getReplacements())
                                 )
                         )
                 );
@@ -95,7 +95,7 @@ public class CopyServiceImpl implements CopyService {
                     structureService.setPromotionLevelImage(targetPromotionLevel.getId(), image);
                 }
                 // Copy of properties
-                doCopyProperties(sourcePromotionLevel, targetPromotionLevel, request.getPromotionLevelReplacements());
+                doCopyProperties(sourcePromotionLevel, targetPromotionLevel, request.getReplacements());
             }
         }
     }
@@ -118,7 +118,7 @@ public class CopyServiceImpl implements CopyService {
                                 targetBranch,
                                 NameDescription.nd(
                                         sourceValidationStamp.getName(),
-                                        applyReplacements(sourceValidationStamp.getDescription(), request.getValidationStampReplacements())
+                                        applyReplacements(sourceValidationStamp.getDescription(), request.getReplacements())
                                 )
                         )
                 );
@@ -128,7 +128,7 @@ public class CopyServiceImpl implements CopyService {
                     structureService.setValidationStampImage(targetValidationStamp.getId(), image);
                 }
                 // Copy of properties
-                doCopyProperties(sourceValidationStamp, targetValidationStamp, request.getValidationStampReplacements());
+                doCopyProperties(sourceValidationStamp, targetValidationStamp, request.getReplacements());
             }
         }
     }

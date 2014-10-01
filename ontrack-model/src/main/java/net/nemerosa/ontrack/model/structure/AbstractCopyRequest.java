@@ -13,8 +13,6 @@ public abstract class AbstractCopyRequest {
     /**
      * Replacements
      */
-    private final List<Replacement> propertyReplacements;
-    private final List<Replacement> promotionLevelReplacements;
-    private final List<Replacement> validationStampReplacements;
+    private final List<Replacement> replacements;
 
 }

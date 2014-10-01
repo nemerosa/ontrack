@@ -9,17 +9,7 @@ angular.module('ot.dialog.branch.clone', [
         $scope.config = config;
         // Selection object
         $scope.data = {
-            propertyReplacements: [
-                {
-                    regex: config.sourceBranch.name
-                }
-            ],
-            promotionLevelReplacements: [
-                {
-                    regex: config.sourceBranch.name
-                }
-            ],
-            validationStampReplacements: [
+            replacements: [
                 {
                     regex: config.sourceBranch.name
                 }

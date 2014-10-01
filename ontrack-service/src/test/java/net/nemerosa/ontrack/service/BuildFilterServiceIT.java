@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.service;
 
-import net.nemerosa.ontrack.it.AbstractITTestSupport;
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.Ack;
@@ -80,8 +79,6 @@ public class BuildFilterServiceIT extends AbstractServiceTestSupport {
                                         targetBranch,
                                         new BranchCopyRequest(
                                                 sourceBranch.getId(),
-                                                Collections.emptyList(),
-                                                Collections.emptyList(),
                                                 Collections.emptyList()
                                         )
                                 )

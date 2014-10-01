@@ -78,9 +78,7 @@ public class CopyServiceImplTest {
                 ID.of(1),
                 Arrays.asList(
                         new Replacement("P1", "P2")
-                ),
-                Collections.emptyList(),
-                Collections.emptyList()
+                )
         );
 
         // Properties for the branch
@@ -121,11 +119,9 @@ public class CopyServiceImplTest {
         // Request
         BranchCopyRequest request = new BranchCopyRequest(
                 ID.of(1),
-                Collections.emptyList(),
                 Arrays.asList(
                         new Replacement("P1", "P2")
-                ),
-                Collections.emptyList()
+                )
         );
         // Promotion levels for source
         PromotionLevel sourcePromotionLevel = PromotionLevel.of(sourceBranch, nd("copper", "Copper level for P1"));
@@ -184,8 +180,6 @@ public class CopyServiceImplTest {
         // Request
         BranchCopyRequest request = new BranchCopyRequest(
                 ID.of(1),
-                Collections.emptyList(),
-                Collections.emptyList(),
                 Arrays.asList(
                         new Replacement("P1", "P2")
                 )

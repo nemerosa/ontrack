@@ -18,9 +18,9 @@ public class BranchCloneRequest extends AbstractCopyRequest {
      */
     private final String name;
 
-    @ConstructorProperties({"name", "propertyReplacements", "promotionLevelReplacements", "validationStampReplacements"})
-    public BranchCloneRequest(String name, List<Replacement> propertyReplacements, List<Replacement> promotionLevelReplacements, List<Replacement> validationStampReplacements) {
-        super(propertyReplacements, promotionLevelReplacements, validationStampReplacements);
+    @ConstructorProperties({"name", "replacements"})
+    public BranchCloneRequest(String name, List<Replacement> replacements) {
+        super(replacements);
         this.name = name;
     }
 }

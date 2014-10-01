@@ -23,9 +23,7 @@ angular.module('ot.service.branch.copy', [
                             submit: function (copy) {
                                 var request = {
                                     sourceBranchId: copy.branch.id,
-                                    propertyReplacements: copy.propertyReplacements,
-                                    promotionLevelReplacements: copy.promotionLevelReplacements,
-                                    validationStampReplacements: copy.validationStampReplacements
+                                    replacements: copy.replacements
                                 };
                                 return ot.call($http.put(targetBranch._copy, request));
                             }
@@ -49,9 +47,7 @@ angular.module('ot.service.branch.copy', [
                             submit: function (specs) {
                                 var request = {
                                     name: specs.name,
-                                    propertyReplacements: specs.propertyReplacements,
-                                    promotionLevelReplacements: specs.promotionLevelReplacements,
-                                    validationStampReplacements: specs.validationStampReplacements
+                                    replacements: specs.replacements
                                 };
                                 return ot.call($http.post(sourceBranch._clone, request));
                             }

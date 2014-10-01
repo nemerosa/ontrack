@@ -18,9 +18,9 @@ public class BranchCopyRequest extends AbstractCopyRequest {
      */
     private final ID sourceBranchId;
 
-    @ConstructorProperties({"sourceBranchId", "propertyReplacements", "promotionLevelReplacements", "validationStampReplacements"})
-    public BranchCopyRequest(ID sourceBranchId, List<Replacement> propertyReplacements, List<Replacement> promotionLevelReplacements, List<Replacement> validationStampReplacements) {
-        super(propertyReplacements, promotionLevelReplacements, validationStampReplacements);
+    @ConstructorProperties({"sourceBranchId", "replacements"})
+    public BranchCopyRequest(ID sourceBranchId, List<Replacement> replacements) {
+        super(replacements);
         this.sourceBranchId = sourceBranchId;
     }
 }
