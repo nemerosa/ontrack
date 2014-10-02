@@ -1,7 +1,8 @@
 angular.module('ot.view.project', [
     'ui.router',
     'ot.service.core',
-    'ot.service.structure'
+    'ot.service.structure',
+    'ot.service.copy'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('project', {

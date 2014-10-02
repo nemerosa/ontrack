@@ -1,10 +1,10 @@
-angular.module('ot.service.branch.copy', [
+angular.module('ot.service.copy', [
     'ot.service.core',
     'ot.service.form',
     'ot.dialog.branch.copy',
     'ot.dialog.branch.clone'
 ])
-    .service('otBranchCopyService', function ($modal, $http, ot) {
+    .service('otCopyService', function ($modal, $http, ot) {
         var self = {};
 
         /**
