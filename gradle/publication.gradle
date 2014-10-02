@@ -77,11 +77,11 @@ task githubReleaseCreate << {
     }
 }
 
-def uploadAsset(File file, String name, int releaseId) {
+def uploadAsset(File file, String name, int releaseId, String githubToken) {
     def url = "https://uploads.github.com/repos/${githubRepository}/releases/${releaseId}/assets?name=${name}"
     def http = new HTTPBuilder(url)
     http.request(Method.POST) { req ->
-        headers['Authorization'] = "token ${githubToken()}"
+        headers['Authorization'] = "token ${githubToken}"
         headers['User-Agent'] = "${githubRepository}"
         headers['Content-Type'] = 'application/zip'
         send ContentType.BINARY, file.bytes
@@ -98,7 +98,7 @@ task githubReleaseAssets(dependsOn: 'githubReleaseCreate') << {
     if (!file.exists()) {
         throw new GradleException("File ${file} cannot be published because it does not exist.")
     } else {
-        uploadAsset file, 'ontrack.jar', id
+        uploadAsset file, 'ontrack.jar', id, githubToken() as String
     }
 }
 
