@@ -9,11 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
 
+import static net.nemerosa.ontrack.service.support.configuration.TestConfiguration.PLAIN_PASSWORD;
+import static net.nemerosa.ontrack.service.support.configuration.TestConfiguration.config;
 import static org.junit.Assert.*;
 
 public class ConfigurationServiceIT extends AbstractServiceTestSupport {
-
-    public static final String PLAIN_PASSWORD = "verysecret";
 
     @Autowired
     private TestConfigurationService configurationService;
@@ -76,10 +76,6 @@ public class ConfigurationServiceIT extends AbstractServiceTestSupport {
             // End of test
             return true;
         });
-    }
-
-    private TestConfiguration config(String name) {
-        return new TestConfiguration(name, "user", PLAIN_PASSWORD);
     }
 
     @Test

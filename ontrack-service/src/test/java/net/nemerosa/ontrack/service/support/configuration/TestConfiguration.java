@@ -44,4 +44,10 @@ public class TestConfiguration implements UserPasswordConfiguration<TestConfigur
                 ""
         );
     }
+
+    public static final String PLAIN_PASSWORD = "verysecret";
+
+    public static TestConfiguration config(String name) {
+        return new TestConfiguration(name, "user", PLAIN_PASSWORD);
+    }
 }

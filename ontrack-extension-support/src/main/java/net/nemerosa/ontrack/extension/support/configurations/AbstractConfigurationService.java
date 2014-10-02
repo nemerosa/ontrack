@@ -105,7 +105,7 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
             return configuration;
         }
         // If different, we need to create a new configuration
-        else if (securityService.isGlobalFunctionGranted(GlobalSettings.class)) {
+        else if (!securityService.isGlobalFunctionGranted(GlobalSettings.class)) {
             throw new ConfigurationNotFoundException(targetConfigurationName);
         } else {
             // Clones the configuration
