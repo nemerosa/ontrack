@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.boot.ui;
 import net.nemerosa.ontrack.model.security.ProjectCreation;
 import net.nemerosa.ontrack.model.security.ProjectEdit;
 import net.nemerosa.ontrack.model.structure.ID;
-import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.model.structure.NameDescriptionState;
 import net.nemerosa.ontrack.model.structure.Project;
 import org.junit.Test;
@@ -53,12 +52,13 @@ public class ProjectControllerIT extends AbstractWebTestSupport {
         });
     }
 
-    private void checkProject(Project project, NameDescription nameDescription) {
+    private void checkProject(Project project, NameDescriptionState nameDescription) {
         assertNotNull("Project not null", project);
         assertNotNull("Project ID not null", project.getId());
         assertTrue("Project ID set", project.getId().isSet());
         assertEquals("Project name", nameDescription.getName(), project.getName());
         assertEquals("Project description", nameDescription.getDescription(), project.getDescription());
+        assertEquals("Project state", nameDescription.isDisabled(), project.isDisabled());
     }
 
 }

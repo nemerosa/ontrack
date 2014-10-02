@@ -63,11 +63,13 @@ public class ResourcesTest extends AbstractResourceTest {
                                         .with("id", 0)
                                         .with("name", "B1")
                                         .with("description", "Branch 1")
+                                        .with("disabled", false)
                                         .end())
                                 .with(object()
                                         .with("id", 0)
                                         .with("name", "B2")
                                         .with("description", "Branch 2")
+                                        .with("disabled", false)
                                         .end())
                                 .end())
                         .end(),

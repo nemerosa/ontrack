@@ -1,20 +1,20 @@
 package net.nemerosa.ontrack.model.structure;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
-import java.beans.ConstructorProperties;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
-@EqualsAndHashCode(callSuper = false)
+import static net.nemerosa.ontrack.model.structure.NameDescription.NAME;
+import static net.nemerosa.ontrack.model.structure.NameDescription.NAME_MESSAGE_SUFFIX;
+
 @Data
-public class NameDescriptionState extends NameDescription {
+public class NameDescriptionState {
 
+    @NotNull(message = "The name is required.")
+    @Pattern(regexp = NAME, message = "The name " + NAME_MESSAGE_SUFFIX)
+    private final String name;
+    private final String description;
     private final boolean disabled;
-
-    @ConstructorProperties({"name", "description", "disabled"})
-    public NameDescriptionState(String name, String description, boolean disabled) {
-        super(name, description);
-        this.disabled = disabled;
-    }
 
 }
