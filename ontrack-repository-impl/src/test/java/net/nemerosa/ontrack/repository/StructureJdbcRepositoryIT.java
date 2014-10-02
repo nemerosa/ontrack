@@ -34,6 +34,22 @@ public class StructureJdbcRepositoryIT extends AbstractRepositoryTestSupport {
     }
 
     @Test
+    public void save_branch_disabled() {
+        // Creates a project
+        Project project = do_create_project();
+        // Creates a branch for this project
+        Branch branch = repository.newBranch(Branch.of(project, nameDescription()));
+        // Disables it
+        branch = branch.withDisabled(true);
+        // Saves it
+        repository.saveBranch(branch);
+        // Retrieves it
+        branch = repository.getBranch(branch.getId());
+        // Checks it is disabled
+        assertTrue("Branch must be disabled", branch.isDisabled());
+    }
+
+    @Test
     public void create_project() {
         Project p = do_create_project();
         assertNotNull("Project is defined", p);

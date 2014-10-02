@@ -2,15 +2,21 @@ package net.nemerosa.ontrack.model.structure;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.experimental.Wither;
 import net.nemerosa.ontrack.model.form.Form;
 
 @Data
+@AllArgsConstructor(access = AccessLevel.PUBLIC)
 public class Branch implements ProjectEntity {
 
     private final ID id;
     private final String name;
     private final String description;
+    @Wither
+    private final boolean disabled;
     @JsonView({
             PromotionView.class, Branch.class, Build.class, PromotionLevel.class, ValidationStamp.class,
             PromotionRun.class, ValidationRun.class, PromotionRunView.class
@@ -23,6 +29,7 @@ public class Branch implements ProjectEntity {
                 ID.NONE,
                 nameDescription.getName(),
                 nameDescription.getDescription(),
+                false,
                 project
         );
     }
@@ -33,7 +40,7 @@ public class Branch implements ProjectEntity {
     }
 
     public Branch withId(ID id) {
-        return new Branch(id, name, description, project);
+        return new Branch(id, name, description, disabled, project);
     }
 
     public static Form form() {

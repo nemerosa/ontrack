@@ -135,9 +135,10 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         // Creation
         try {
             int id = dbCreate(
-                    "INSERT INTO BRANCHES(PROJECTID, NAME, DESCRIPTION) VALUES (:projectId, :name, :description)",
+                    "INSERT INTO BRANCHES(PROJECTID, NAME, DESCRIPTION, DISABLED) VALUES (:projectId, :name, :description, :disabled)",
                     params("name", branch.getName())
                             .addValue("description", branch.getDescription())
+                            .addValue("disabled", branch.isDisabled())
                             .addValue("projectId", branch.getProject().id())
             );
             // Returns with ID
@@ -152,9 +153,10 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         // Update
         try {
             getNamedParameterJdbcTemplate().update(
-                    "UPDATE BRANCHES SET NAME = :name, DESCRIPTION = :description WHERE ID = :id",
+                    "UPDATE BRANCHES SET NAME = :name, DESCRIPTION = :description, DISABLED = :disabled WHERE ID = :id",
                     params("name", branch.getName())
                             .addValue("description", branch.getDescription())
+                            .addValue("disabled", branch.isDisabled())
                             .addValue("id", branch.id())
             );
         } catch (DuplicateKeyException ex) {
@@ -777,7 +779,9 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                         rs.getString("name"),
                         rs.getString("description")
                 )
-        ).withId(id(rs));
+        )
+                .withId(id(rs))
+                .withDisabled(rs.getBoolean("disabled"));
     }
 
     protected Project toProject(ResultSet rs) throws SQLException {
