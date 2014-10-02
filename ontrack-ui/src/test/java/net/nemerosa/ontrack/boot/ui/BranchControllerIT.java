@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.model.security.BranchCreate;
 import net.nemerosa.ontrack.model.security.ProjectCreation;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.NameDescription;
+import net.nemerosa.ontrack.model.structure.NameDescriptionState;
 import net.nemerosa.ontrack.model.structure.Project;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ public class BranchControllerIT extends AbstractWebTestSupport {
         // Project
         Project project = asUser().with(ProjectCreation.class).call(() -> projectController.newProject(nameDescription()));
         // Branch
-        NameDescription nameDescription = nameDescription();
+        NameDescriptionState nameDescription = nameDescription().asState();
         Branch branch = asUser()
                 .with(project.id(), BranchCreate.class)
                 .call(() -> controller.newBranch(project.getId(), nameDescription));
@@ -36,7 +37,7 @@ public class BranchControllerIT extends AbstractWebTestSupport {
         // Project
         Project project = asUser().with(ProjectCreation.class).call(() -> projectController.newProject(nameDescription()));
         // Branch
-        asUser().call(() -> controller.newBranch(project.getId(), nameDescription()));
+        asUser().call(() -> controller.newBranch(project.getId(), nameDescription().asState()));
     }
 
     private void checkBranchResource(Branch branch, NameDescription nameDescription) {

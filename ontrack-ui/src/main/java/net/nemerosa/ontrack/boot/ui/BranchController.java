@@ -76,7 +76,7 @@ public class BranchController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "projects/{projectId}/branches/create", method = RequestMethod.POST)
-    public Branch newBranch(@PathVariable ID projectId, @RequestBody @Valid NameDescription nameDescription) {
+    public Branch newBranch(@PathVariable ID projectId, @RequestBody @Valid NameDescriptionState nameDescription) {
         // Gets the project
         Project project = structureService.getProject(projectId);
         // Creates a new branch instance
@@ -104,7 +104,7 @@ public class BranchController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "branches/{branchId}/update", method = RequestMethod.PUT)
-    public Branch updateBranch(@PathVariable ID branchId, @RequestBody @Valid NameDescription form) {
+    public Branch updateBranch(@PathVariable ID branchId, @RequestBody @Valid NameDescriptionState form) {
         // Loads and updates branch
         Branch branch = structureService.getBranch(branchId).update(form);
         // Saves the branch
