@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.security;
+package net.nemerosa.ontrack.service.security;
 
 import net.nemerosa.ontrack.model.security.EncryptionService;
 import org.springframework.beans.factory.annotation.Autowired;
