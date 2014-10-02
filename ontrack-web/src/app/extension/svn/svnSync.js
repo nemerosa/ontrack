@@ -1,6 +1,7 @@
 angular.module('ot.extension.svn.sync', [
     'ui.router',
-    'ot.service.core'
+    'ot.service.core',
+    'ot.service.structure'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('svn-sync', {
@@ -9,7 +10,7 @@ angular.module('ot.extension.svn.sync', [
             controller: 'SVNSyncCtrl'
         });
     })
-    .controller('SVNSyncCtrl', function ($stateParams, $scope, $http, $interpolate, ot) {
+    .controller('SVNSyncCtrl', function ($stateParams, $state, $scope, $http, $interpolate, ot, otStructureService, otNotificationService) {
 
         var branchId = $stateParams.branch;
         var view = ot.view();
@@ -17,32 +18,26 @@ angular.module('ot.extension.svn.sync', [
             ot.viewCloseCommand('/branch/' + branchId)
         ];
 
-        $scope.synchronising = false;
-
         // Loading of the sync information
-        function loadSyncInfo() {
-            ot.pageCall($http.get($interpolate("extension/svn/sync/{{branch}}")($stateParams))).then(function (syncInfo) {
-                $scope.syncInfo = syncInfo;
-                // View configuration
-                view.title = $interpolate("Build synchronisation for {{branch.name}}")(syncInfo);
-                view.breadcrumbs = ot.branchBreadcrumbs(syncInfo.branch);
+        function load() {
+            otStructureService.getBranch(branchId).then(function (branch) {
+                $scope.branch = branch;
+                view.title = $interpolate("Build synchronisation for branch {{project.name}}/{{name}}")(branch);
+                view.breadcrumbs = ot.branchBreadcrumbs(branch);
             });
         }
 
         // Initialisation
-        loadSyncInfo();
+        load();
 
-        // Synchronisation
-        $scope.sync = function () {
-            $scope.synchronising = true;
-            // Launches the sync
-            ot.pageCall($http.post($scope.syncInfo._self)).then(
-                function success(syncInfoStatus) {
-                    $scope.syncInfoStatus = syncInfoStatus;
-                    $scope.synchronising = !syncInfoStatus.message;
-                }, function error() {
-                    $scope.synchronising = false;
-                });
+        // Launching the sync
+        $scope.launchSync = function () {
+            ot.pageCall($http.post('extension/svn/sync/' + branchId, {})).then(function () {
+                // Message
+                otNotificationService.info("The build synchronisation has been launched in the background.");
+                // Goes back to the branch
+                $state.go('branch', {branchId: branchId});
+            });
         };
 
     })
