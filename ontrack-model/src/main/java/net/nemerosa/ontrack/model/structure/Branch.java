@@ -26,11 +26,15 @@ public class Branch implements ProjectEntity {
     private final Project project;
 
     public static Branch of(Project project, NameDescription nameDescription) {
+        return of(project, nameDescription.asState());
+    }
+
+    public static Branch of(Project project, NameDescriptionState nameDescription) {
         return new Branch(
                 ID.NONE,
                 nameDescription.getName(),
                 nameDescription.getDescription(),
-                false,
+                nameDescription.isDisabled(),
                 project
         );
     }

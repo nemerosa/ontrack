@@ -22,7 +22,7 @@ public class BranchControllerIT extends AbstractWebTestSupport {
     @Test
     public void createBranch() throws Exception {
         // Project
-        Project project = asUser().with(ProjectCreation.class).call(() -> projectController.newProject(nameDescription()));
+        Project project = asUser().with(ProjectCreation.class).call(() -> projectController.newProject(nameDescription().asState()));
         // Branch
         NameDescriptionState nameDescription = nameDescription().asState();
         Branch branch = asUser()
@@ -35,7 +35,7 @@ public class BranchControllerIT extends AbstractWebTestSupport {
     @Test(expected = AccessDeniedException.class)
     public void createBranch_denied() throws Exception {
         // Project
-        Project project = asUser().with(ProjectCreation.class).call(() -> projectController.newProject(nameDescription()));
+        Project project = asUser().with(ProjectCreation.class).call(() -> projectController.newProject(nameDescription().asState()));
         // Branch
         asUser().call(() -> controller.newBranch(project.getId(), nameDescription().asState()));
     }

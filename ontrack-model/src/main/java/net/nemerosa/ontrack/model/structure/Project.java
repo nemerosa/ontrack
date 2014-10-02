@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Wither;
 import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.form.YesNo;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
@@ -18,6 +19,10 @@ public class Project implements ProjectEntity {
 
     public Project withId(ID id) {
         return new Project(id, name, description, disabled);
+    }
+
+    public static Project of(NameDescriptionState nameDescription) {
+        return new Project(ID.NONE, nameDescription.getName(), nameDescription.getDescription(), nameDescription.isDisabled());
     }
 
     public static Project of(NameDescription nameDescription) {
@@ -35,14 +40,17 @@ public class Project implements ProjectEntity {
     }
 
     public static Form form() {
-        return Form.nameAndDescription();
+        return Form.nameAndDescription()
+                .with(
+                        YesNo.of("disabled").label("Disabled").help("Check if the project must be disabled.")
+                );
     }
 
-    public Project update(NameDescription nameDescription) {
-        return of(nameDescription).withId(id);
+    public Project update(NameDescriptionState form) {
+        return of(form).withId(id).withDisabled(form.isDisabled());
     }
 
     public Form asForm() {
-        return form().name(name).description(description);
+        return form().name(name).description(description).fill("disabled", disabled);
     }
 }
