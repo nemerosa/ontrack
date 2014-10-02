@@ -62,6 +62,17 @@ angular.module('ot.view.project', [
                     },
                     {
                         condition: function () {
+                            return $scope.project._clone;
+                        },
+                        id: 'cloneProject',
+                        name: "Clone project",
+                        cls: 'ot-command-project-clone',
+                        action: function () {
+                            // otStructureService.create(branchCollection._create, "New branch").then(loadBranches);
+                        }
+                    },
+                    {
+                        condition: function () {
                             return $scope.project._delete;
                         },
                         id: 'deleteProject',
