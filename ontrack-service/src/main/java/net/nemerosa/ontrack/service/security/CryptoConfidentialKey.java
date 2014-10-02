@@ -23,10 +23,6 @@ public class CryptoConfidentialKey implements ConfidentialKey {
         return id;
     }
 
-    public CryptoConfidentialKey(ConfidentialStore confidentialStore, Class owner, String shortName) {
-        this(confidentialStore, owner.getName() + '.' + shortName);
-    }
-
     private SecretKey getKey() {
         try {
             if (secret == null) {
