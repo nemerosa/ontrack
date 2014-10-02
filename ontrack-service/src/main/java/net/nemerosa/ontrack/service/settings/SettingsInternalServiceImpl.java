@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service.settings;
 
+import net.nemerosa.ontrack.model.security.EncryptionService;
 import net.nemerosa.ontrack.model.settings.LDAPSettings;
 import net.nemerosa.ontrack.model.settings.SecuritySettings;
 import net.nemerosa.ontrack.repository.SettingsRepository;
@@ -14,10 +15,12 @@ import org.springframework.stereotype.Service;
 public class SettingsInternalServiceImpl implements SettingsInternalService {
 
     private final SettingsRepository settingsRepository;
+    private final EncryptionService encryptionService;
 
     @Autowired
-    public SettingsInternalServiceImpl(SettingsRepository settingsRepository) {
+    public SettingsInternalServiceImpl(SettingsRepository settingsRepository, EncryptionService encryptionService) {
         this.settingsRepository = settingsRepository;
+        this.encryptionService = encryptionService;
     }
 
     @Override
@@ -42,7 +45,7 @@ public class SettingsInternalServiceImpl implements SettingsInternalService {
                 settingsRepository.getString(LDAPSettings.class, "searchBase", ""),
                 settingsRepository.getString(LDAPSettings.class, "searchFilter", ""),
                 settingsRepository.getString(LDAPSettings.class, "user", ""),
-                settingsRepository.getPassword(LDAPSettings.class, "password", ""),
+                settingsRepository.getPassword(LDAPSettings.class, "password", "", encryptionService::decrypt),
                 settingsRepository.getString(LDAPSettings.class, "fullNameAttribute", ""),
                 settingsRepository.getString(LDAPSettings.class, "emailAttribute", "")
         );
@@ -56,7 +59,7 @@ public class SettingsInternalServiceImpl implements SettingsInternalService {
         settingsRepository.setString(LDAPSettings.class, "searchBase", ldapSettings.getSearchBase());
         settingsRepository.setString(LDAPSettings.class, "searchFilter", ldapSettings.getSearchFilter());
         settingsRepository.setString(LDAPSettings.class, "user", ldapSettings.getUser());
-        settingsRepository.setPassword(LDAPSettings.class, "password", ldapSettings.getPassword(), true);
+        settingsRepository.setPassword(LDAPSettings.class, "password", ldapSettings.getPassword(), true, encryptionService::encrypt);
         settingsRepository.setString(LDAPSettings.class, "fullNameAttribute", ldapSettings.getFullNameAttribute());
         settingsRepository.setString(LDAPSettings.class, "emailAttribute", ldapSettings.getEmailAttribute());
     }

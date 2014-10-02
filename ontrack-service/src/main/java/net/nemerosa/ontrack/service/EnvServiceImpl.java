@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.ref;
+package net.nemerosa.ontrack.service;
 
 import net.nemerosa.ontrack.model.exceptions.CannotCreateWorkingDirException;
 import net.nemerosa.ontrack.model.structure.VersionInfo;

@@ -1,7 +1,6 @@
 dependencies {
     compile project(':ontrack-repository')
     compile project(':ontrack-repository-support')
-    compile project(':ontrack-security')
     compile libraries.spring_context
     compile libraries.slf4j_api
 
