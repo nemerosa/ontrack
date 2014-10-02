@@ -14,7 +14,9 @@ public class Replacement {
     private final String replacement;
 
     public String replace(String value) {
-        if (isNotBlank(regex) && isNotBlank(replacement)) {
+        if (value == null) {
+            return null;
+        } else if (isNotBlank(regex) && isNotBlank(replacement)) {
             Matcher m = Pattern.compile(regex).matcher(value);
             StringBuffer s = new StringBuffer();
             while (m.find()) {
