@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.support.configurations;
+package net.nemerosa.ontrack.service.support;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.nemerosa.ontrack.extension.support.ConfigurationService;
