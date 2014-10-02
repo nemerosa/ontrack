@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.service;
 
-import net.nemerosa.ontrack.extension.general.LinkProperty;
-import net.nemerosa.ontrack.extension.general.LinkPropertyType;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.security.ProjectEdit;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.service.support.property.TestProperty;
+import net.nemerosa.ontrack.service.support.property.TestPropertyType;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 
-import static net.nemerosa.ontrack.json.JsonUtils.array;
 import static net.nemerosa.ontrack.json.JsonUtils.object;
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd;
 import static org.junit.Assert.assertEquals;
@@ -89,8 +88,8 @@ public class CopyServiceImplTest {
         when(propertyService.getProperties(sourceBranch)).thenReturn(
                 Arrays.asList(
                         Property.of(
-                                new LinkPropertyType(),
-                                LinkProperty.of("test", "http://wiki/B1")
+                                new TestPropertyType(),
+                                TestProperty.of("http://wiki/B1")
                         )
                 )
         );
@@ -99,8 +98,8 @@ public class CopyServiceImplTest {
         when(propertyService.getProperties(sourceProject)).thenReturn(
                 Arrays.asList(
                         Property.of(
-                                new LinkPropertyType(),
-                                LinkProperty.of("test", "http://wiki/P1")
+                                new TestPropertyType(),
+                                TestProperty.of("http://wiki/P1")
                         )
                 )
         );
@@ -132,28 +131,18 @@ public class CopyServiceImplTest {
         // Checks the copy of properties for the project
         verify(propertyService, times(1)).editProperty(
                 eq(createdProject),
-                eq(LinkPropertyType.class.getName()),
+                eq(TestPropertyType.class.getName()),
                 eq(object()
-                        .with("links", array()
-                                .with(object()
-                                        .with("name", "test")
-                                        .with("value", "http://wiki/P2")
-                                        .end())
-                                .end())
+                        .with("value", "http://wiki/P2")
                         .end())
         );
 
         // Checks the copy of properties for the branch
         verify(propertyService, times(1)).editProperty(
                 eq(createdBranch),
-                eq(LinkPropertyType.class.getName()),
+                eq(TestPropertyType.class.getName()),
                 eq(object()
-                        .with("links", array()
-                                .with(object()
-                                        .with("name", "test")
-                                        .with("value", "http://wiki/B2")
-                                        .end())
-                                .end())
+                        .with("value", "http://wiki/B2")
                         .end())
         );
     }
@@ -174,8 +163,8 @@ public class CopyServiceImplTest {
         when(propertyService.getProperties(sourceBranch)).thenReturn(
                 Arrays.asList(
                         Property.of(
-                                new LinkPropertyType(),
-                                LinkProperty.of("test", "http://wiki/B1")
+                                new TestPropertyType(),
+                                TestProperty.of("http://wiki/B1")
                         )
                 )
         );
@@ -198,14 +187,9 @@ public class CopyServiceImplTest {
         // Checks the copy of properties for the branch
         verify(propertyService, times(1)).editProperty(
                 eq(targetBranch.withId(ID.of(2))),
-                eq(LinkPropertyType.class.getName()),
+                eq(TestPropertyType.class.getName()),
                 eq(object()
-                        .with("links", array()
-                                .with(object()
-                                        .with("name", "test")
-                                        .with("value", "http://wiki/B2")
-                                        .end())
-                                .end())
+                        .with("value", "http://wiki/B2")
                         .end())
         );
     }
@@ -226,8 +210,8 @@ public class CopyServiceImplTest {
         when(propertyService.getProperties(sourceBranch)).thenReturn(
                 Arrays.asList(
                         Property.of(
-                                new LinkPropertyType(),
-                                LinkProperty.of("test", "http://wiki/P1")
+                                new TestPropertyType(),
+                                TestProperty.of("http://wiki/P1")
                         )
                 )
         );
@@ -241,14 +225,9 @@ public class CopyServiceImplTest {
         // Checks the copy of properties for the branch
         verify(propertyService, times(1)).editProperty(
                 eq(targetBranch),
-                eq(LinkPropertyType.class.getName()),
+                eq(TestPropertyType.class.getName()),
                 eq(object()
-                        .with("links", array()
-                                .with(object()
-                                        .with("name", "test")
-                                        .with("value", "http://wiki/P2")
-                                        .end())
-                                .end())
+                        .with("value", "http://wiki/P2")
                         .end())
         );
     }
@@ -285,8 +264,8 @@ public class CopyServiceImplTest {
         when(propertyService.getProperties(sourcePromotionLevel)).thenReturn(
                 Arrays.asList(
                         Property.of(
-                                new LinkPropertyType(),
-                                LinkProperty.of("test", "http://wiki/P1")
+                                new TestPropertyType(),
+                                TestProperty.of("http://wiki/P1")
                         )
                 )
         );
@@ -302,14 +281,9 @@ public class CopyServiceImplTest {
         // Checks the copy of properties for the promotion levels
         verify(propertyService, times(1)).editProperty(
                 eq(targetPromotionLevel),
-                eq(LinkPropertyType.class.getName()),
+                eq(TestPropertyType.class.getName()),
                 eq(object()
-                        .with("links", array()
-                                .with(object()
-                                        .with("name", "test")
-                                        .with("value", "http://wiki/P2")
-                                        .end())
-                                .end())
+                        .with("value", "http://wiki/P2")
                         .end())
         );
     }
@@ -346,8 +320,8 @@ public class CopyServiceImplTest {
         when(propertyService.getProperties(sourceValidationStamp)).thenReturn(
                 Arrays.asList(
                         Property.of(
-                                new LinkPropertyType(),
-                                LinkProperty.of("test", "http://wiki/P1")
+                                new TestPropertyType(),
+                                TestProperty.of("http://wiki/P1")
                         )
                 )
         );
@@ -363,14 +337,9 @@ public class CopyServiceImplTest {
         // Checks the copy of properties for the validation stamps
         verify(propertyService, times(1)).editProperty(
                 eq(targetValidationStamp),
-                eq(LinkPropertyType.class.getName()),
+                eq(TestPropertyType.class.getName()),
                 eq(object()
-                        .with("links", array()
-                                .with(object()
-                                        .with("name", "test")
-                                        .with("value", "http://wiki/P2")
-                                        .end())
-                                .end())
+                        .with("value", "http://wiki/P2")
                         .end())
         );
     }

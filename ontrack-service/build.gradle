@@ -15,7 +15,6 @@ dependencies {
 
     testCompile libraries.groovy
     testCompile project(':ontrack-it-utils')
-    testCompile project(':ontrack-extension-general')
     testRuntime project(':ontrack-repository-impl')
 
     // Dependencies needed for LDAP integration tests

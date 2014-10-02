@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.support.configurations;
+package net.nemerosa.ontrack.extension.support;
 
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 
