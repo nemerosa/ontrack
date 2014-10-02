@@ -40,6 +40,15 @@ public class StructureJdbcRepositoryIT extends AbstractRepositoryTestSupport {
         assertTrue("Project ID is defined", ID.isDefined(p.getId()));
     }
 
+    @Test
+    public void save_project_disabled() {
+        Project p = do_create_project();
+        p = p.withDisabled(true);
+        repository.saveProject(p);
+        p = repository.getProject(p.getId());
+        assertTrue("Project must be disabled", p.isDisabled());
+    }
+
     private Project do_create_project() {
         return repository.newProject(Project.of(nameDescription()));
     }

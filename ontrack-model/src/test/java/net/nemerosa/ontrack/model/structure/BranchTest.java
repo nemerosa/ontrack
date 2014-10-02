@@ -52,6 +52,7 @@ public class BranchTest {
                                 .with("id", 0)
                                 .with("name", "PRJ")
                                 .with("description", "Project")
+                                .with("disabled", false)
                                 .end())
                         .end(),
                 branch,
