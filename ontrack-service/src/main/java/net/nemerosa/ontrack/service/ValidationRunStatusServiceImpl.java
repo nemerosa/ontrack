@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.ref;
+package net.nemerosa.ontrack.service;
 
 import net.nemerosa.ontrack.model.exceptions.ValidationRunStatusChangeForbiddenException;
 import net.nemerosa.ontrack.model.exceptions.ValidationRunStatusNotFoundException;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 import static net.nemerosa.ontrack.model.structure.ValidationRunStatusID.*;
 
 @Service
-public class ValidationRunStatusServiceRef implements ValidationRunStatusService, StartupService {
+public class ValidationRunStatusServiceImpl implements ValidationRunStatusService, StartupService {
 
     private final Logger logger = LoggerFactory.getLogger(ValidationRunStatusService.class);
 

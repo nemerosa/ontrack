@@ -590,7 +590,7 @@ public class StructureServiceImpl implements StructureService {
         // Checks the authorization
         securityService.checkProjectFunction(validationRun.getBuild().getBranch().getProject().id(), ValidationRunCreate.class);
         // Actual creation
-        ValidationRun newValidationRun = structureRepository.newValidationRun(validationRun);
+        ValidationRun newValidationRun = structureRepository.newValidationRun(validationRun, validationRunStatusService::getValidationRunStatus);
         // Event
         eventPostService.post(eventFactory.newValidationRun(newValidationRun));
         // OK
@@ -599,7 +599,7 @@ public class StructureServiceImpl implements StructureService {
 
     @Override
     public ValidationRun getValidationRun(ID validationRunId) {
-        ValidationRun validationRun = structureRepository.getValidationRun(validationRunId);
+        ValidationRun validationRun = structureRepository.getValidationRun(validationRunId, validationRunStatusService::getValidationRunStatus);
         securityService.checkProjectFunction(validationRun.getBuild().getBranch().getProject().id(), ProjectView.class);
         return validationRun;
     }
@@ -608,14 +608,14 @@ public class StructureServiceImpl implements StructureService {
     public List<ValidationRun> getValidationRunsForBuild(ID buildId) {
         Build build = getBuild(buildId);
         securityService.checkProjectFunction(build.getBranch().getProject().id(), ProjectView.class);
-        return structureRepository.getValidationRunsForBuild(build);
+        return structureRepository.getValidationRunsForBuild(build, validationRunStatusService::getValidationRunStatus);
     }
 
     @Override
     public List<ValidationRun> getValidationRunsForValidationStamp(ID validationStampId, int offset, int count) {
         ValidationStamp validationStamp = getValidationStamp(validationStampId);
         securityService.checkProjectFunction(validationStamp.getBranch().getProject().id(), ProjectView.class);
-        return structureRepository.getValidationRunsForValidationStamp(validationStamp, offset, count);
+        return structureRepository.getValidationRunsForValidationStamp(validationStamp, offset, count, validationRunStatusService::getValidationRunStatus);
     }
 
     @Override

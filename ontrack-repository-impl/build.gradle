@@ -4,7 +4,5 @@ dependencies {
     compile libraries.spring_context
     compile libraries.slf4j_api
 
-    runtime project(':ontrack-ref')
-
     testCompile project(':ontrack-it-utils')
 }
