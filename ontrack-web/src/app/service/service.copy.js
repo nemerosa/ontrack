@@ -2,7 +2,8 @@ angular.module('ot.service.copy', [
     'ot.service.core',
     'ot.service.form',
     'ot.dialog.branch.copy',
-    'ot.dialog.branch.clone'
+    'ot.dialog.branch.clone',
+    'ot.dialog.project.clone'
 ])
     .service('otCopyService', function ($modal, $http, ot) {
         var self = {};
@@ -50,6 +51,31 @@ angular.module('ot.service.copy', [
                                     replacements: specs.replacements
                                 };
                                 return ot.call($http.post(sourceBranch._clone, request));
+                            }
+                        };
+                    }
+                }
+            }).result;
+        };
+
+        /**
+         * Clones a project into another one.
+         */
+        self.cloneProject = function (sourceProject) {
+            return $modal.open({
+                templateUrl: 'app/dialog/dialog.project.clone.tpl.html',
+                controller: 'otDialogProjectClone',
+                resolve: {
+                    config: function () {
+                        return {
+                            sourceProject: sourceProject,
+                            submit: function (specs) {
+                                var request = {
+                                    name: specs.name,
+                                    sourceBranchId: specs.branch.id,
+                                    replacements: specs.replacements
+                                };
+                                return ot.call($http.post(sourceProject._clone, request));
                             }
                         };
                     }

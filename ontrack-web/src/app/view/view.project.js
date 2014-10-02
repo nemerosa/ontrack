@@ -11,7 +11,7 @@ angular.module('ot.view.project', [
             controller: 'ProjectCtrl'
         });
     })
-    .controller('ProjectCtrl', function ($scope, $stateParams, $state, $http, ot, otStructureService, otAlertService) {
+    .controller('ProjectCtrl', function ($scope, $stateParams, $state, $http, ot, otStructureService, otAlertService, otCopyService) {
         var view = ot.view();
         // Project's id
         var projectId = $stateParams.projectId;
@@ -69,7 +69,11 @@ angular.module('ot.view.project', [
                         name: "Clone project",
                         cls: 'ot-command-project-clone',
                         action: function () {
-                            // otStructureService.create(branchCollection._create, "New branch").then(loadBranches);
+                            otCopyService.cloneProject($scope.project).then(function (newProject) {
+                                $state.go('project', {
+                                    projectId: newProject.id
+                                });
+                            });
                         }
                     },
                     {
