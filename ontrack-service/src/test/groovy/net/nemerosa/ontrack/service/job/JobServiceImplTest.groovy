@@ -39,6 +39,26 @@ class JobServiceImplTest {
     }
 
     @Test
+    void 'Running job: group running'() {
+        TestJob job = TestJob.create(1)
+        TestJob jobLong = TestJob.create(2).longRunning()
+        RegisteredJob rj = service.registerJob(0, job)
+        RegisteredJob rjLong = service.registerJob(0, jobLong)
+        assert service.runJob(rjLong, true)
+        Thread.sleep 500
+        assert !service.runJob(rj, true)
+    }
+
+    @Test
+    void 'Running job: already running'() {
+        TestJob jobLong = TestJob.create(2).longRunning()
+        RegisteredJob rjLong = service.registerJob(0, jobLong)
+        assert service.runJob(rjLong, true)
+        Thread.sleep 500
+        assert !service.runJob(rjLong, true)
+    }
+
+    @Test
     void 'Group run: no'() {
         TestJob job = TestJob.create(1)
         RegisteredJob rj = service.registerJob(0, job)
