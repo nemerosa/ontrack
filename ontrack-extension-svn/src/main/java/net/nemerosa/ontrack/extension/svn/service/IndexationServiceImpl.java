@@ -91,6 +91,12 @@ public class IndexationServiceImpl implements IndexationService, JobProvider {
     @Override
     public Ack indexRange(String name, IndexationRange range) {
         return jobQueueService.queue(new Job() {
+
+            @Override
+            public boolean isDisabled() {
+                return false;
+            }
+
             @Override
             public String getGroup() {
                 return SVN_INDEXATION_JOB_GROUP;
@@ -135,6 +141,11 @@ public class IndexationServiceImpl implements IndexationService, JobProvider {
     public Ack reindex(String name) {
         // Reindex job
         Job reindexJob = new Job() {
+
+            @Override
+            public boolean isDisabled() {
+                return false;
+            }
 
             @Override
             public String getGroup() {
@@ -283,6 +294,11 @@ public class IndexationServiceImpl implements IndexationService, JobProvider {
 
     protected Job createIndexFromLatestJob(SVNConfiguration configuration) {
         return new Job() {
+
+            @Override
+            public boolean isDisabled() {
+                return false;
+            }
 
             @Override
             public String getGroup() {

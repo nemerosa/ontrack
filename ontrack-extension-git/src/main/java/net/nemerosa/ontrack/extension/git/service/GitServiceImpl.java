@@ -487,6 +487,12 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
 
     private Job createBuildSyncJob(Branch branch, GitConfiguration configuration) {
         return new Job() {
+
+            @Override
+            public boolean isDisabled() {
+                return branch.isDisabled();
+            }
+
             @Override
             public String getCategory() {
                 return "GitBuildTagSync";
@@ -520,6 +526,12 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
 
     private Job createIndexationJob(GitConfiguration config) {
         return new Job() {
+
+            @Override
+            public boolean isDisabled() {
+                return false;
+            }
+
             @Override
             public String getCategory() {
                 return "GitIndexation";
