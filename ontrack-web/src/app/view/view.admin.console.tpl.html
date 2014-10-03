@@ -13,11 +13,12 @@
             <table class="ot-admin-console-jobs" ng-if="jobs">
                 <thead>
                 <tr>
-                    <td>ID</td>
+                    <th>ID</th>
                     <th>Category</th>
                     <th>Description</th>
                     <th>Action</th>
                     <th>State</th>
+                    <th>Status</th>
                     <th>Schedule</th>
                     <th>Run count</th>
                     <th>Last duration</th>
@@ -49,6 +50,10 @@
                                 title="Launch {{job.descriptor.description}}"
                                 ng-click="launchJob(job)"
                                 class="glyphicon glyphicon-play ot-command"></span>
+                    </td>
+                    <td>
+                        <span ng-if="job.disabled">Disabled</span>
+                        <span ng-if="!job.disabled">Enabled</span>
                     </td>
                     <td>
                         <span class="glyphicon glyphicon-time text-success" ng-if="job.running"></span>
