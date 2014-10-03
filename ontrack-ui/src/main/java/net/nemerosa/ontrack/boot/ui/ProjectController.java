@@ -93,6 +93,30 @@ public class ProjectController extends AbstractResourceController {
         return project;
     }
 
+    @RequestMapping(value = "{projectId}/enable", method = RequestMethod.PUT)
+    public Project enableProject(@PathVariable ID projectId) {
+        // Gets from the repository
+        Project project = structureService.getProject(projectId);
+        // Updates
+        project = project.withDisabled(false);
+        // Saves in repository
+        structureService.saveProject(project);
+        // As resource
+        return project;
+    }
+
+    @RequestMapping(value = "{projectId}/disable", method = RequestMethod.PUT)
+    public Project disableProject(@PathVariable ID projectId) {
+        // Gets from the repository
+        Project project = structureService.getProject(projectId);
+        // Updates
+        project = project.withDisabled(true);
+        // Saves in repository
+        structureService.saveProject(project);
+        // As resource
+        return project;
+    }
+
     /**
      * Gets the form to clone this project into another projevt
      */
