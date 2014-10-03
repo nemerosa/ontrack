@@ -12,7 +12,7 @@
                     No branch has been created yet.
                 </ot-noentry>
                 <div class="col-md-12" ng-if="branchCollection.resources">
-                    <div class="row ot-project-branch" ng-repeat="branch in branchCollection.resources">
+                    <div class="row ot-project-branch" ng-repeat="branch in branchCollection.resources" ng-show="showDisabled || !branch.disabled">
                         <div class="col-md-2 ot-project-branch-name">
                             <a href="#/branch/{{branch.id}}">
                                 {{branch.name}}

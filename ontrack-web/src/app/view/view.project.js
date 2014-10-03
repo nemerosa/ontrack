@@ -73,6 +73,26 @@ angular.module('ot.view.project', [
                         action: function () {
                             ot.pageCall($http.put($scope.project._enable)).then(loadProject);
                         }
+                    }, {
+                        id: 'showDisabled',
+                        name: "Show disabled items",
+                        cls: 'ot-command-show-disabled',
+                        condition: function () {
+                            return !$scope.showDisabled;
+                        },
+                        action: function () {
+                            $scope.showDisabled = true;
+                        }
+                    }, {
+                        id: 'hideDisabled',
+                        name: "Hide disabled items",
+                        cls: 'ot-command-hide-disabled',
+                        condition: function () {
+                            return $scope.showDisabled;
+                        },
+                        action: function () {
+                            $scope.showDisabled = false;
+                        }
                     },
                     {
                         condition: function () {
