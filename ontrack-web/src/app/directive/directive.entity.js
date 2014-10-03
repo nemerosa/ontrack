@@ -14,13 +14,20 @@ angular.module('ot.directive.entity', [
             }
         };
     })
-    .directive('otEntityDisabled', function () {
+    .directive('otEntityDisabled', function ($http, ot) {
         return {
             restrict: 'E',
             templateUrl: 'app/directive/directive.entityDisabled.tpl.html',
             transclude: true,
             scope: {
                 entity: '='
+            },
+            controller: function ($scope) {
+                $scope.enableEntity = function (entity) {
+                    ot.pageCall($http.put(entity._enable, entity)).then(function () {
+                        entity.disabled = false;
+                    });
+                };
             }
         };
     })
@@ -78,6 +85,7 @@ angular.module('ot.directive.entity', [
                 };
             });
         }
+
         return {
             restrict: 'E',
             templateUrl: 'app/directive/directive.entityDecorations.tpl.html',
