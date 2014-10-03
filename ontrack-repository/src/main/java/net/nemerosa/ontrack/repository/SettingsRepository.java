@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.repository;
 
-import net.nemerosa.ontrack.model.settings.LDAPSettings;
+import java.util.function.Function;
 
 public interface SettingsRepository {
 
@@ -12,8 +12,8 @@ public interface SettingsRepository {
 
     void setString(Class<?> category, String name, String value);
 
-    String getPassword(Class<?> category, String name, String defaultValue);
+    String getPassword(Class<?> category, String name, String defaultValue, Function<String, String> decryptService);
 
-    void setPassword(Class<?> category, String name, String plain, boolean dontSaveIfBlank);
+    void setPassword(Class<?> category, String name, String plain, boolean dontSaveIfBlank, Function<String, String> encryptService);
 
 }

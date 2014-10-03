@@ -1,5 +1,6 @@
-package net.nemerosa.ontrack.security;
+package net.nemerosa.ontrack.service.security;
 
+import net.nemerosa.ontrack.model.security.EncryptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +18,7 @@ public class EncryptionServiceImpl implements EncryptionService {
 
     @Autowired
     public EncryptionServiceImpl(ConfidentialStore confidentialStore) {
-        this(new CryptoConfidentialKey(confidentialStore, EncryptionServiceImpl.class, "encryption"));
+        this(new CryptoConfidentialKey(confidentialStore, "net.nemerosa.ontrack.security.EncryptionServiceImpl.encryption"));
     }
 
     @Override

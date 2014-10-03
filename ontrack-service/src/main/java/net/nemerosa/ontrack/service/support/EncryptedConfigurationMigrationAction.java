@@ -1,9 +1,11 @@
-package net.nemerosa.ontrack.extension.support.configurations;
+package net.nemerosa.ontrack.service.support;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.nemerosa.ontrack.extension.support.ConfigurationService;
+import net.nemerosa.ontrack.extension.support.UserPasswordConfiguration;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.support.DBMigrationAction;
-import net.nemerosa.ontrack.security.EncryptionService;
+import net.nemerosa.ontrack.model.security.EncryptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

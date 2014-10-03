@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.security;
+package net.nemerosa.ontrack.service.security;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -21,10 +21,6 @@ public class CryptoConfidentialKey implements ConfidentialKey {
     @Override
     public String getId() {
         return id;
-    }
-
-    public CryptoConfidentialKey(ConfidentialStore confidentialStore, Class owner, String shortName) {
-        this(confidentialStore, owner.getName() + '.' + shortName);
     }
 
     private SecretKey getKey() {

@@ -1,10 +1,10 @@
 package net.nemerosa.ontrack.service.support.configuration;
 
-import net.nemerosa.ontrack.extension.support.configurations.ConfigurationNotFoundException;
+import net.nemerosa.ontrack.extension.support.ConfigurationNotFoundException;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
-import net.nemerosa.ontrack.security.EncryptionService;
+import net.nemerosa.ontrack.model.security.EncryptionService;
 import org.junit.Before;
 import org.junit.Test;
 

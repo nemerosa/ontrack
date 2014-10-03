@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.security;
+package net.nemerosa.ontrack.model.security;
 
 public interface EncryptionService {
     String encrypt(String plain);

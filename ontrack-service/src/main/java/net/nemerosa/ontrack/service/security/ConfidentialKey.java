@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.security;
+package net.nemerosa.ontrack.service.security;
 
 import javax.crypto.Cipher;
 

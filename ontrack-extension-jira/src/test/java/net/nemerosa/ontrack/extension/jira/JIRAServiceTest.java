@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.jira;
 
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
-import net.nemerosa.ontrack.security.EncryptionService;
+import net.nemerosa.ontrack.model.security.EncryptionService;
 import org.junit.Before;
 import org.junit.Test;
 

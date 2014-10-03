@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Wither;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
-import net.nemerosa.ontrack.extension.support.configurations.UserPasswordConfiguration;
+import net.nemerosa.ontrack.extension.support.UserPasswordConfiguration;
 import net.nemerosa.ontrack.model.form.*;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import org.apache.commons.lang3.StringUtils;

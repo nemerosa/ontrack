@@ -22,12 +22,9 @@ import java.util.stream.Collectors;
 @Repository
 public class StructureJdbcRepository extends AbstractJdbcRepository implements StructureRepository {
 
-    private final ValidationRunStatusService validationRunStatusService;
-
     @Autowired
-    public StructureJdbcRepository(DataSource dataSource, ValidationRunStatusService validationRunStatusService) {
+    public StructureJdbcRepository(DataSource dataSource) {
         super(dataSource);
-        this.validationRunStatusService = validationRunStatusService;
     }
 
     @Override
@@ -636,7 +633,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
-    public ValidationRun newValidationRun(ValidationRun validationRun) {
+    public ValidationRun newValidationRun(ValidationRun validationRun, Function<String, ValidationRunStatusID> validationRunStatusService) {
 
         // Validation run itself (parent)
         int id = dbCreate(
@@ -650,37 +647,39 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 .forEach(validationRunStatus -> newValidationRunStatus(id, validationRunStatus));
 
         // Reloads the run
-        return getValidationRun(ID.of(id));
+        return getValidationRun(ID.of(id), validationRunStatusService);
     }
 
     @Override
-    public ValidationRun getValidationRun(ID validationRunId) {
+    public ValidationRun getValidationRun(ID validationRunId, Function<String, ValidationRunStatusID> validationRunStatusService) {
         return getNamedParameterJdbcTemplate().queryForObject(
                 "SELECT * FROM VALIDATION_RUNS WHERE ID = :id",
                 params("id", validationRunId.getValue()),
                 (rs, rowNum) -> toValidationRun(
                         rs,
                         this::getBuild,
-                        this::getValidationStamp
+                        this::getValidationStamp,
+                        validationRunStatusService
                 )
         );
     }
 
     @Override
-    public List<ValidationRun> getValidationRunsForBuild(Build build) {
+    public List<ValidationRun> getValidationRunsForBuild(Build build, Function<String, ValidationRunStatusID> validationRunStatusService) {
         return getNamedParameterJdbcTemplate().query(
                 "SELECT * FROM VALIDATION_RUNS WHERE BUILDID = :buildId",
                 params("buildId", build.id()),
                 (rs, rowNum) -> toValidationRun(
                         rs,
                         id -> build,
-                        this::getValidationStamp
+                        this::getValidationStamp,
+                        validationRunStatusService
                 )
         );
     }
 
     @Override
-    public List<ValidationRun> getValidationRunsForValidationStamp(ValidationStamp validationStamp, int offset, int count) {
+    public List<ValidationRun> getValidationRunsForValidationStamp(ValidationStamp validationStamp, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService) {
         return getNamedParameterJdbcTemplate().query(
                 "SELECT * FROM VALIDATION_RUNS WHERE VALIDATIONSTAMPID = :validationStampId ORDER BY BUILDID DESC, ID DESC LIMIT :limit OFFSET :offset",
                 params("validationStampId", validationStamp.id())
@@ -689,7 +688,8 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 (rs, rowNum) -> toValidationRun(
                         rs,
                         this::getBuild,
-                        id -> validationStamp
+                        id -> validationStamp,
+                        validationRunStatusService
                 )
         );
     }
@@ -714,7 +714,10 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         );
     }
 
-    protected ValidationRun toValidationRun(ResultSet rs, Function<ID, Build> buildSupplier, Function<ID, ValidationStamp> validationStampSupplier) throws SQLException {
+    protected ValidationRun toValidationRun(ResultSet rs,
+                                            Function<ID, Build> buildSupplier,
+                                            Function<ID, ValidationStamp> validationStampSupplier,
+                                            Function<String, ValidationRunStatusID> validationRunStatusService) throws SQLException {
         int id = rs.getInt("id");
         // Statuses
         List<ValidationRunStatus> statuses = getNamedParameterJdbcTemplate().query(
@@ -722,7 +725,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 params("validationRunId", id),
                 (rs1, rowNum) -> ValidationRunStatus.of(
                         readSignature(rs1),
-                        validationRunStatusService.getValidationRunStatus(rs1.getString("validationRunStatusId")),
+                        validationRunStatusService.apply(rs1.getString("validationRunStatusId")),
                         rs1.getString("description")
                 )
         );

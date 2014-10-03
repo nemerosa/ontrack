@@ -1,5 +1,0 @@
-description = "Security module related to encryption and protection of data."
-
-dependencies {
-    compile project(':ontrack-model')
-}

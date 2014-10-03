@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.security;
+package net.nemerosa.ontrack.service.security;
 
 import net.nemerosa.ontrack.common.Utils;
 import net.nemerosa.ontrack.model.support.EnvService;
