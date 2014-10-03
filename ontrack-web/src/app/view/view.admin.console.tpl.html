@@ -4,6 +4,14 @@
         <div class="col-md-12">
             <h3>
                 Jobs
+                <button class="btn btn-link pull-right" ng-show="!showDisabled" ng-click="showDisabled = true;">
+                    <span class="glyphicon glyphicon-eye-open"></span>
+                    Show disabled jobs
+                </button>
+                <button class="btn btn-link pull-right" ng-show="showDisabled" ng-click="showDisabled = false;">
+                    <span class="glyphicon glyphicon-eye-close"></span>
+                    Hide disabled jobs
+                </button>
                 <input class="form-control col-md-3 pull-right" type="text" ng-model="jobFilter" placeholder="Filter the jobs"/>
             </h3>
 
@@ -28,6 +36,7 @@
                 </thead>
                 <tbody>
                 <tr ng-repeat="job in jobs.resources | filter:jobFilter"
+                    ng-show="showDisabled || !job.descriptor.disabled"
                     ng-class="{'success': job.running, 'text-muted': job.descriptor.disabled}">
                     <td>
                         {{job.id}}
