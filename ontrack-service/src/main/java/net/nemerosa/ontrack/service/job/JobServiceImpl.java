@@ -186,7 +186,10 @@ public class JobServiceImpl implements ScheduledService,
     }
 
     private boolean runJob(RegisteredJob registeredJob, boolean forceEarly) {
-        if (idInSameGroupRunning(registeredJob)) {
+        if (registeredJob.isDisabled()) {
+            logger.debug("[job] Job disabled: {}", registeredJob);
+            return false;
+        } else if (idInSameGroupRunning(registeredJob)) {
             logger.debug("[job] Same group running: {}", registeredJob);
             return false;
         } else if (registeredJob.isRunning()) {
