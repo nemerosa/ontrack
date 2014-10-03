@@ -1,10 +1,8 @@
 <ot-view>
 
-    <div class="row" ng-if="branch.disabled">
-        <div class="col-md-12 ot-entity-disabled-alert">
-            The branch is disabled.
-        </div>
-    </div>
+    <ot-entity-disabled entity="branch">
+        The branch is disabled.
+    </ot-entity-disabled>
 
     <div class="row" ng-show="branchBuildView.buildViews">
         <div class="col-md-12">

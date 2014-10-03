@@ -14,6 +14,16 @@ angular.module('ot.directive.entity', [
             }
         };
     })
+    .directive('otEntityDisabled', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'app/directive/directive.entityDisabled.tpl.html',
+            transclude: true,
+            scope: {
+                entity: '='
+            }
+        };
+    })
     .directive('otEntityEvents', function ($http, ot, otEventService, otTaskService) {
         return {
             restrict: 'E',
