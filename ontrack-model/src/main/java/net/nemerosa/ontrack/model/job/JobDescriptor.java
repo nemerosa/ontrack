@@ -9,6 +9,7 @@ public class JobDescriptor {
     private final String category;
     private final String id;
     private final String description;
+    private final boolean disabled;
     private final int interval;
 
 }

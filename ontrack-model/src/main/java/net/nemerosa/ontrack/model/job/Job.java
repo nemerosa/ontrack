@@ -51,6 +51,7 @@ public interface Job {
                 getCategory(),
                 getId(),
                 getDescription(),
+                isDisabled(),
                 getInterval()
         );
     }
