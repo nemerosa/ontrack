@@ -1,5 +1,11 @@
 <ot-view>
 
+    <div class="row" ng-if="project.disabled">
+        <div class="col-md-12 ot-entity-disabled-alert">
+            The project is disabled.
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-md-8">
             <ot-section-title>Branches</ot-section-title>
