@@ -17,7 +17,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row ot-home-project" ng-repeat="project in projectCollection.resources | filter:{name:projectNameFilter}">
+            <div class="row ot-home-project" ng-repeat="project in projectCollection.resources | filter:{name:projectNameFilter}" ng-show="showDisabled || !project.disabled">
                 <div class="col-md-2 ot-home-project-name">
                     <a href="#/project/{{project.id}}">
                         {{project.name}}
@@ -25,24 +25,24 @@
                 </div>
                 <div class="col-md-10 ot-home-project-branches">
                     <div class="row">
-                        <div class="col-md-3 ot-home-branch" ng-repeat="branchStatusView in project.branchStatusViews.resources">
-                    <span class="ot-home-branch-name">
-                        <a href="#/branch/{{branchStatusView.branch.id}}">{{branchStatusView.branch.name}}</a>
-                    </span>
-                    <span ng-if="branchStatusView.lastPromotionView" class="ot-home-branch-promotion">
-                        <a href="#/build/{{branchStatusView.lastPromotionView.promotionRun.build.id}}">{{branchStatusView.lastPromotionView.promotionRun.build.name}}</a>
-                        <span class="glyphicon glyphicon-arrow-right"></span>
-                        <a href="#/promotionLevel/{{branchStatusView.lastPromotionView.promotionLevel.id}}">
-                            <ot-entity-image entity="branchStatusView.lastPromotionView.promotionLevel"></ot-entity-image>
-                            {{branchStatusView.lastPromotionView.promotionLevel.name}}
-                        </a>
-                    </span>
-                    <span ng-if="!branchStatusView.lastPromotionView" class="ot-home-branch-promotion">
-                        <span class="glyphicon glyphicon-ban-circle"></span>
-                        <span class="ot-description">
-                            No promotion yet
-                        </span>
-                    </span>
+                        <div class="col-md-3 ot-home-branch" ng-repeat="branchStatusView in project.branchStatusViews.resources" ng-show="showDisabled || !branchStatusView.branch.disabled">
+                            <span class="ot-home-branch-name">
+                                <a href="#/branch/{{branchStatusView.branch.id}}">{{branchStatusView.branch.name}}</a>
+                            </span>
+                            <span ng-if="branchStatusView.lastPromotionView" class="ot-home-branch-promotion">
+                                <a href="#/build/{{branchStatusView.lastPromotionView.promotionRun.build.id}}">{{branchStatusView.lastPromotionView.promotionRun.build.name}}</a>
+                                <span class="glyphicon glyphicon-arrow-right"></span>
+                                <a href="#/promotionLevel/{{branchStatusView.lastPromotionView.promotionLevel.id}}">
+                                    <ot-entity-image entity="branchStatusView.lastPromotionView.promotionLevel"></ot-entity-image>
+                                    {{branchStatusView.lastPromotionView.promotionLevel.name}}
+                                </a>
+                            </span>
+                            <span ng-if="!branchStatusView.lastPromotionView" class="ot-home-branch-promotion">
+                                <span class="glyphicon glyphicon-ban-circle"></span>
+                                <span class="ot-description">
+                                    No promotion yet
+                                </span>
+                            </span>
                         </div>
                     </div>
                 </div>

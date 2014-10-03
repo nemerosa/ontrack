@@ -40,6 +40,26 @@ angular.module('ot.view.home', [
                         action: function () {
                             otStructureService.createProject(projectCollection._create).then(loadProjects);
                         }
+                    }, {
+                        id: 'showDisabled',
+                        name: "Show disabled items",
+                        cls: 'ot-command-show-disabled',
+                        condition: function () {
+                            return !$scope.showDisabled;
+                        },
+                        action: function () {
+                            $scope.showDisabled = true;
+                        }
+                    }, {
+                        id: 'hideDisabled',
+                        name: "Hide disabled items",
+                        cls: 'ot-command-hide-disabled',
+                        condition: function () {
+                            return $scope.showDisabled;
+                        },
+                        action: function () {
+                            $scope.showDisabled = false;
+                        }
                     }
                 ];
             });
