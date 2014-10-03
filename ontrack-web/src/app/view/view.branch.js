@@ -251,6 +251,9 @@ angular.module('ot.view.branch', [
         loadPermalink();
         loadBranch();
 
+        // Reload callback available in the scope
+        $scope.reloadBranch = loadBranch;
+
         // Gets the list of tools for a branch
         function getTools(branch) {
             var tools = [];

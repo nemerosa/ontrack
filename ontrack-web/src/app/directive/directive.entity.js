@@ -20,13 +20,14 @@ angular.module('ot.directive.entity', [
             templateUrl: 'app/directive/directive.entityDisabled.tpl.html',
             transclude: true,
             scope: {
-                entity: '='
+                entity: '=',
+                callback: '&'
             },
             controller: function ($scope) {
                 $scope.enableEntity = function (entity) {
                     ot.pageCall($http.put(entity._enable, entity)).then(function () {
                         entity.disabled = false;
-                    });
+                    }).then($scope.callback);
                 };
             }
         };
