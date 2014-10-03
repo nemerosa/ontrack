@@ -27,7 +27,8 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-repeat="job in jobs.resources | filter:jobFilter" ng-class="{'success': job.running}">
+                <tr ng-repeat="job in jobs.resources | filter:jobFilter"
+                    ng-class="{'success': job.running, 'text-muted': job.descriptor.disabled}">
                     <td>
                         {{job.id}}
                     </td>
@@ -52,8 +53,8 @@
                                 class="glyphicon glyphicon-play ot-command"></span>
                     </td>
                     <td>
-                        <span ng-if="job.disabled">Disabled</span>
-                        <span ng-if="!job.disabled">Enabled</span>
+                        <span ng-if="job.descriptor.disabled">Disabled</span>
+                        <span ng-if="!job.descriptor.disabled">Enabled</span>
                     </td>
                     <td>
                         <span class="glyphicon glyphicon-time text-success" ng-if="job.running"></span>
