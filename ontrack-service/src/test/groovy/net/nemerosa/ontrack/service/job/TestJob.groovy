@@ -13,12 +13,14 @@ class TestJob implements Job {
     private final String id
     private final String description
     private final boolean disabled
+    private final boolean longRunning
 
-    TestJob(String category, String id, String description, boolean disabled) {
+    TestJob(String category, String id, String description, boolean disabled, boolean longRunning) {
         this.category = category
         this.id = id
         this.description = description
         this.disabled = disabled
+        this.longRunning = longRunning
     }
 
     private final AtomicInteger count = new AtomicInteger()
@@ -32,11 +34,16 @@ class TestJob implements Job {
     }
 
     static TestJob create(int id, boolean disabled) {
+        create(id, disabled, false)
+    }
+
+    static TestJob create(int id, boolean disabled, boolean longRunning) {
         new TestJob(
                 "Test",
                 "$id",
                 "Test $id",
-                disabled
+                disabled,
+                longRunning
         )
     }
 
@@ -71,11 +78,20 @@ class TestJob implements Job {
     }
 
     protected def run(JobInfoListener jobInfoListener) {
+        println "Running: $id"
         jobInfoListener.post "Running: $id"
+        if (longRunning) {
+            println "Running long job: $id"
+            Thread.sleep 3000
+        }
         count.incrementAndGet()
     }
 
     int getCount() {
         count.get()
+    }
+
+    TestJob longRunning() {
+        new TestJob(category, id, description, disabled, true)
     }
 }
