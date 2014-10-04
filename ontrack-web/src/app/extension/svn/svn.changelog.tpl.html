@@ -2,7 +2,9 @@
 
     <div class="row" ng-hide="changeLog">
         <div class="col-md-12 alert alert-warning">
-            The change log is loading. This may take some time...
+            <ot-loading>
+                The change log is loading. This may take some time...
+            </ot-loading>
         </div>
     </div>
 
@@ -13,17 +15,20 @@
             <div class="row">
                 <div class="col-md-12 ot-extension-scm-changelog-commands">
                     <button class="btn btn-default" ng-click="changeLogRevisions()" ng-disabled="revisionsLoading">
-                        <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="revisions"></span>
+                        <ot-loading ng-if="revisionsLoading"></ot-loading>
+                        <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="revisions || revisionsLoading"></span>
                         <span class="ot-extension-scm-changelog-command-loading"></span>
                         {{revisionsCommand}}
                     </button>
                     <button ng-if="changeLog._issues" class="btn btn-default" ng-click="changeLogIssues()" ng-disabled="issuesLoading">
-                        <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="issues"></span>
+                        <ot-loading ng-if="issuesLoading"></ot-loading>
+                        <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="issues || issuesLoading"></span>
                         <span class="ot-extension-scm-changelog-command-loading"></span>
                         {{issuesCommand}}
                     </button>
                     <button class="btn btn-default" ng-click="changeLogFiles()" ng-disabled="filesLoading">
-                        <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="files"></span>
+                        <ot-loading ng-if="filesLoading"></ot-loading>
+                        <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="files || filesLoading"></span>
                         <span class="ot-extension-scm-changelog-command-loading"></span>
                         {{filesCommand}}
                     </button>
@@ -86,12 +91,14 @@
                             Revisions
                             <div class="pull-right">
                                 <a class="btn btn-default btn-xs" ng-if="changeLog._issues" ng-click="changeLogIssues()" ng-disabled="issuesLoading">
-                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="issues"></span>
+                                    <ot-loading ng-if="issuesLoading"></ot-loading>
+                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="issues || issuesLoading"></span>
                                     <span class="ot-extension-scm-changelog-command-loading"></span>
                                     {{issuesCommand}}
                                 </a>
                                 <a class="btn btn-default btn-xs" ng-click="changeLogFiles()" ng-disabled="filesLoading">
-                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="files"></span>
+                                    <ot-loading ng-if="filesLoading"></ot-loading>
+                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="files || filesLoading"></span>
                                     <span class="ot-extension-scm-changelog-command-loading"></span>
                                     {{filesCommand}}
                                 </a>
@@ -104,9 +111,9 @@
                                 to load them.
                             </div>
                             <div class="ot-description" ng-show="revisionsLoading">
-                                Revisions are loading...
+                                <ot-loading>Revisions are loading...</ot-loading>
                             </div>
-                            <!-- TODO Merge -->
+                            <!-- Merge -->
                             <table class="table table-condensed table-hover" ng-show="revisions">
                                 <thead>
                                 <tr>
@@ -150,12 +157,14 @@
                             Issues
                             <div class="pull-right">
                                 <a class="btn btn-default btn-xs" ng-click="changeLogRevisions()" ng-disabled="revisionsLoading">
-                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="revisions"></span>
+                                    <ot-loading ng-if="revisionsLoading"></ot-loading>
+                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="revisions || revisionsLoading"></span>
                                     <span class="ot-extension-scm-changelog-command-loading"></span>
                                     {{revisionsCommand}}
                                 </a>
                                 <a class="btn btn-default btn-xs" ng-click="changeLogFiles()" ng-disabled="filesLoading">
-                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="files"></span>
+                                    <ot-loading ng-if="filesLoading"></ot-loading>
+                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="files || filesLoading"></span>
                                     <span class="ot-extension-scm-changelog-command-loading"></span>
                                     {{filesCommand}}
                                 </a>
@@ -172,7 +181,7 @@
                                 to load them.
                             </div>
                             <div class="ot-description" ng-show="issuesLoading">
-                                Issues are loading...
+                                <ot-loading>Issues are loading...</ot-loading>
                             </div>
                             <div ng-show="issues">
                                 <ot-include value="issues" template="app/extension/{{issues.issueServiceConfiguration.serviceId}}/changelog.issues.tpl.html">
@@ -193,12 +202,14 @@
                             File changes
                             <div class="pull-right">
                                 <a class="btn btn-default btn-xs" ng-click="changeLogRevisions()" ng-disabled="revisionsLoading">
-                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="revisions"></span>
+                                    <ot-loading ng-if="revisionsLoading"></ot-loading>
+                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="revisions || revisionsLoading"></span>
                                     <span class="ot-extension-scm-changelog-command-loading"></span>
                                     {{revisionsCommand}}
                                 </a>
                                 <a class="btn btn-default btn-xs" ng-if="changeLog._issues" ng-click="changeLogIssues()" ng-disabled="issuesLoading">
-                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="issues"></span>
+                                    <ot-loading ng-if="issuesLoading"></ot-loading>
+                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="issues || issuesLoading"></span>
                                     <span class="ot-extension-scm-changelog-command-loading"></span>
                                     {{issuesCommand}}
                                 </a>
@@ -212,7 +223,7 @@
                             </div>
                         </div>
                         <div class="panel-body ot-description" ng-show="filesLoading">
-                            File changes are loading...
+                            <ot-loading>File changes are loading...</ot-loading>
                         </div>
                         <table class="table table-condensed table-hover" ng-show="files" width="100%">
                             <thead>

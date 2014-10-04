@@ -11,6 +11,13 @@ angular.module('ot.directive.misc', [
             }
         };
     })
+    .directive('otLoading', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'app/directive/directive.loading.tpl.html',
+            transclude: true
+        };
+    })
     .directive('otSectionTitle', function () {
         return {
             restrict: 'E',
