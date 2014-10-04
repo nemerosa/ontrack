@@ -1,4 +1,3 @@
-@import '../../vendor/bootstrap/less/glyphicons';
 @import '../../vendor/bootstrap/less/labels';
 @import '../../vendor/bootstrap/less/mixins';
 @import '../../vendor/bootstrap/less/type';
@@ -32,18 +31,17 @@ span.ot-extension-scm-validationStampRunView {
 }
 
 .ot-extension-scm-changelog-issue-validation {
-  .glyphicon;
   cursor: pointer;
   &.ot-extension-scm-changelog-issue-validation-ERROR {
-    .glyphicon-remove;
+    .ot-icon-x(@fa-var-close);
     .text-danger;
   }
   &.ot-extension-scm-changelog-issue-validation-WARNING {
-    .glyphicon-warning-sign;
+    .ot-icon-x(@fa-var-warning);
     .text-warning;
   }
   &.ot-extension-scm-changelog-issue-validation-INFO {
-    .glyphicon-info-sign;
+    .ot-icon-x(@fa-var-info);
     .text-info;
   }
 }
@@ -51,25 +49,22 @@ span.ot-extension-scm-validationStampRunView {
 .ot-scm-changelog-revision {
   .label;
   margin-right: 2px;
-  .ot-scm-changetype-icon {
-    .glyphicon;
-  }
   &.ot-scm-changetype-modified {
     .label-info;
     .ot-scm-changetype-icon {
-      .glyphicon-pencil;
+      .ot-icon-x(@fa-var-pencil);
     }
   }
   &.ot-scm-changetype-added {
     .label-success;
     .ot-scm-changetype-icon {
-      .glyphicon-plus;
+      .ot-icon-x(@fa-var-plus);
     }
   }
   &.ot-scm-changetype-deleted {
     .label-danger;
     .ot-scm-changetype-icon {
-      .glyphicon-remove;
+      .ot-icon-x(@fa-var-close);
     }
   }
 }
