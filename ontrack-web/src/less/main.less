@@ -41,7 +41,17 @@
 /**
  * Second, importing Less files from Font Awesome
  */
-@import '../../vendor/font-awesome/less/font-awesome';
+@import '../../vendor/font-awesome/less/mixins';
+@import '../../vendor/font-awesome/less/path';
+@import '../../vendor/font-awesome/less/core';
+@import '../../vendor/font-awesome/less/larger';
+@import '../../vendor/font-awesome/less/fixed-width';
+@import '../../vendor/font-awesome/less/list';
+@import '../../vendor/font-awesome/less/bordered-pulled';
+@import '../../vendor/font-awesome/less/spinning';
+@import '../../vendor/font-awesome/less/rotated-flipped';
+@import '../../vendor/font-awesome/less/stacked';
+@import '../../vendor/font-awesome/less/icons';
 /**
  * This is our main variables file. It in turn imports the `variables` file from
  * Twitter Bootstrap. We must include it last so we can overwrite any variable
@@ -456,48 +466,66 @@ span.ot-view-command {
 }
 
 .ot-command-delete {
-  .glyphicon;
-  .glyphicon-trash;
+  .fa;
+  &:before {
+    content: @fa-var-trash;
+  }
 }
 
 .ot-command-update {
-  .glyphicon;
-  .glyphicon-pencil;
+  .fa;
+  &:before {
+    content: @fa-var-pencil;
+  }
 }
 
 .ot-command-close {
-  .glyphicon;
-  .glyphicon-remove;
+  .fa;
+  &:before{
+    content: @fa-var-close;
+  }
 }
 
 .ot-command-actions {
-  .glyphicon;
-  .glyphicon-cog;
+  .fa;
+  &:before{
+    content: @fa-var-wrench;
+  }
 }
 
 .ot-command-new {
-  .glyphicon;
-  .glyphicon-star;
+  .fa;
+  &:before{
+    content: @fa-var-plus;
+  }
 }
 
 .ot-command-disable {
-  .glyphicon;
-  .glyphicon-star-empty;
+  .fa;
+  &:before{
+    content: @fa-var-ban;
+  }
 }
 
 .ot-command-enable {
-  .glyphicon;
-  .glyphicon-star;
+  .fa;
+  &:before{
+    content: @fa-var-check;
+  }
 }
 
 .ot-command-show-disabled {
-  .glyphicon;
-  .glyphicon-eye-open;
+  .fa;
+  &:before {
+    content: @fa-var-eye;
+  }
 }
 
 .ot-command-hide-disabled {
-  .glyphicon;
-  .glyphicon-eye-close;
+  .fa;
+  &:before {
+    content: @fa-var-eye-slash;
+  }
 }
 
 .ot-command-project-new {
@@ -525,8 +553,10 @@ span.ot-view-command {
 }
 
 .ot-command-project-permissions {
-  .glyphicon;
-  .glyphicon-lock;
+  .fa;
+  &:before {
+    content: @fa-var-key;
+  }
 }
 
 .ot-command-branch-new {
