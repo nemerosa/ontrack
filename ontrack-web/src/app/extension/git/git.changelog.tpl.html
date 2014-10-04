@@ -2,7 +2,7 @@
 
     <div class="row" ng-hide="changeLog">
         <div class="col-md-12 alert alert-warning">
-            The change log is loading. This may take some time...
+            <ot-loading>The change log is loading. This may take some time...</ot-loading>
         </div>
     </div>
 
@@ -13,12 +13,14 @@
             <div class="row">
                 <div class="col-md-12 ot-extension-scm-changelog-commands">
                     <button class="btn btn-default" ng-click="changeLogCommits()" ng-disabled="commitsLoading">
-                        <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="commits"></span>
+                        <ot-loading ng-if="commitsLoading"></ot-loading>
+                        <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="commits || commitsLoading"></span>
                         <span class="ot-extension-scm-changelog-command-loading"></span>
                         {{commitsCommand}}
                     </button>
                     <button ng-if="changeLog._issues" class="btn btn-default" ng-click="changeLogIssues()" ng-disabled="issuesLoading">
-                        <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="issues"></span>
+                        <ot-loading ng-if="issuesLoading"></ot-loading>
+                        <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="issues || issuesLoading"></span>
                         <span class="ot-extension-scm-changelog-command-loading"></span>
                         {{issuesCommand}}
                     </button>
@@ -54,13 +56,15 @@
                             <div class="pull-right">
                                 <a class="btn btn-default btn-xs" ng-if="changeLog._issues" ng-click="changeLogIssues()"
                                    ng-disabled="issuesLoading">
-                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="issues"></span>
+                                    <ot-loading ng-if="issuesLoading"></ot-loading>
+                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="issues || issuesLoading"></span>
                                     <span class="ot-extension-scm-changelog-command-loading"></span>
                                     {{issuesCommand}}
                                 </a>
                                 <a class="btn btn-default btn-xs" ng-click="changeLogFiles()"
                                    ng-disabled="filesLoading">
-                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="files"></span>
+                                    <ot-loading ng-if="filesLoading"></ot-loading>
+                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="files || filesLoading"></span>
                                     <span class="ot-extension-scm-changelog-command-loading"></span>
                                     {{filesCommand}}
                                 </a>
@@ -73,7 +77,7 @@
                                 to load them.
                             </div>
                             <div class="ot-description" ng-show="commitsLoading">
-                                Commits are loading...
+                                <ot-loading>Commits are loading...</ot-loading>
                             </div>
                         </div>
                         <table ng-show="commits" class="table">
@@ -113,12 +117,14 @@
                             Issues
                             <div class="pull-right">
                                 <a class="btn btn-default btn-xs" ng-click="changeLogCommits()" ng-disabled="commitsLoading">
-                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="commits"></span>
+                                    <ot-loading ng-if="commitsLoading"></ot-loading>
+                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="commits || commitsLoading"></span>
                                     <span class="ot-extension-scm-changelog-command-loading"></span>
                                     {{commitsCommand}}
                                 </a>
                                 <a class="btn btn-default btn-xs" ng-click="changeLogFiles()" ng-disabled="filesLoading">
-                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="files"></span>
+                                    <ot-loading ng-if="filesLoading"></ot-loading>
+                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="files || filesLoading"></span>
                                     <span class="ot-extension-scm-changelog-command-loading"></span>
                                     {{filesCommand}}
                                 </a>
@@ -135,7 +141,7 @@
                                 to load them.
                             </div>
                             <div class="ot-description" ng-show="issuesLoading">
-                                Issues are loading...
+                                <ot-loading>Issues are loading...</ot-loading>
                             </div>
                             <div ng-show="issues">
                                 <ot-include value="issues" template="app/extension/{{issues.issueServiceConfiguration.serviceId}}/changelog.issues.tpl.html">
@@ -156,12 +162,14 @@
                             File changes
                             <div class="pull-right">
                                 <a class="btn btn-default btn-xs" ng-click="changeLogCommits()" ng-disabled="commitsLoading">
-                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="commits"></span>
+                                    <ot-loading ng-if="commitsLoading"></ot-loading>
+                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="commits || commitsLoading"></span>
                                     <span class="ot-extension-scm-changelog-command-loading"></span>
                                     {{commitsCommand}}
                                 </a>
                                 <a class="btn btn-default btn-xs" ng-if="changeLog._issues" ng-click="changeLogIssues()" ng-disabled="issuesLoading">
-                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="issues"></span>
+                                    <ot-loading ng-if="issuesLoading"></ot-loading>
+                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="issues || issuesLoading"></span>
                                     <span class="ot-extension-scm-changelog-command-loading"></span>
                                     {{issuesCommand}}
                                 </a>
@@ -175,7 +183,7 @@
                             </div>
                         </div>
                         <div class="panel-body ot-description" ng-show="filesLoading">
-                            File changes are loading...
+                            <ot-loading>File changes are loading...</ot-loading>
                         </div>
                         <table class="table table-condensed table-hover" ng-show="files" width="100%">
                             <tbody>
