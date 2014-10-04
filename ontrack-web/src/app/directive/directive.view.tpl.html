@@ -19,7 +19,7 @@
             <div class="ot-view-commands">
                 <span ng-repeat="command in view.commands" id="{{command.id}}"
                       ng-if="!command.condition || command.condition()" class="ot-view-command">
-                    <span ng-if="command.action" ng-click="command.action()">
+                    <span ng-if="command.action" ng-click="command.action()" class="ot-view-command-name">
                         <span class="{{command.cls}}"></span>
                         {{command.name}}
                     </span>
