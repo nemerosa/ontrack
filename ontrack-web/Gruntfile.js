@@ -21,7 +21,6 @@ module.exports = function (grunt) {
             'vendor/angular-taglist/css/angular-taglist-directive.css'
         ],
         fonts: [
-            'vendor/bootstrap/fonts/glyphicons-halflings-regular.*',
             'vendor/font-awesome/fonts/fontawesome-webfont.*'
         ]
     };
