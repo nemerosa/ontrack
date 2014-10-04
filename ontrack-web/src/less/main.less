@@ -90,8 +90,8 @@
  */
 
 a.ot-loading-indicator {
-  .glyphicon;
-  .glyphicon-time;
+  .ot-icon-x(@fa-var-spinner);
+  .fa-spin;
 }
 
 .ot-description {
@@ -245,8 +245,7 @@ div.ot-view {
 .ot-view-breadcrumbs {
   font-size: 50%;
   .ot-view-breadcrumbs-separator {
-    .glyphicon;
-    .glyphicon-play;
+    .ot-icon-x(@fa-var-play);
     opacity: 0.3;
   }
 }
@@ -371,9 +370,8 @@ td.ot-entity-image {
 }
 
 .ot-promotion-run-separator {
-  .glyphicon;
-  .glyphicon-arrow-right;
-  font-size: 200%;
+  .ot-icon-x(@fa-var-arrow-right);
+  .fa-2x;
   display: inline-block;
   margin-right: 0.5em;
   vertical-align: 5px;
@@ -470,13 +468,6 @@ span.ot-view-command {
   .ot-view-command-name {
     text-wrap: none;
     white-space: nowrap;
-  }
-}
-
-.ot-icon-x(@iconName) {
-  .fa-icon();
-  &:before {
-    content: @iconName;
   }
 }
 
@@ -577,8 +568,7 @@ span.ot-view-command {
 }
 
 .ot-command-validation-stamp-image {
-  .glyphicon;
-  .glyphicon-picture;
+  .ot-icon-x(@fa-var-image);
 }
 
 .ot-command-validation-stamp-update {
@@ -594,8 +584,7 @@ span.ot-view-command {
 }
 
 .ot-command-promotion-level-image {
-  .glyphicon;
-  .glyphicon-picture;
+  .ot-icon-x(@fa-var-image);
 }
 
 .ot-command-promotion-level-delete {
@@ -603,13 +592,11 @@ span.ot-view-command {
 }
 
 .ot-command-promote {
-  .glyphicon;
-  .glyphicon-thumbs-up;
+  .ot-icon-x(@fa-var-thumbs-o-up);
 }
 
 .ot-command-validate {
-  .glyphicon;
-  .glyphicon-cog;
+  .ot-icon-x(@fa-var-legal);
 }
 
 /**
@@ -617,9 +604,9 @@ span.ot-view-command {
  */
 
 .ot-application-info {
-  .glyphicon;
-  .glyphicon-info-sign;
+  .ot-icon-x(@fa-var-info-circle);
   .text-info;
+  .fa-2x;
   &.ot-application-info-none {
     opacity: 0.3;
   }

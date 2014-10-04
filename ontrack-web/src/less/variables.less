@@ -4,6 +4,7 @@
  */
 @import '../../vendor/bootstrap/less/variables';
 @import '../../vendor/font-awesome/less/variables';
+@import '../../vendor/font-awesome/less/mixins';
 
 @fa-font-path: "../fonts";
 
@@ -19,3 +20,14 @@
 
 @otIconSize: 24px;
 @otIconSizeMini: 16px;
+
+/**
+ * Font Awesome icon
+ */
+
+.ot-icon-x(@iconName) {
+  .fa-icon();
+  &:before {
+    content: @iconName;
+  }
+}
