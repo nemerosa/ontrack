@@ -5,11 +5,11 @@
             <h3>
                 Jobs
                 <button class="btn btn-link pull-right" ng-show="!showDisabled" ng-click="showDisabled = true;">
-                    <span class="glyphicon glyphicon-eye-open"></span>
+                    <span class="ot-command-show-disabled"></span>
                     Show disabled jobs
                 </button>
                 <button class="btn btn-link pull-right" ng-show="showDisabled" ng-click="showDisabled = false;">
-                    <span class="glyphicon glyphicon-eye-close"></span>
+                    <span class="ot-command-hide-disabled"></span>
                     Hide disabled jobs
                 </button>
                 <input class="form-control col-md-3 pull-right" type="text" ng-model="jobFilter" placeholder="Filter the jobs"/>
@@ -50,7 +50,7 @@
                         </p>
 
                         <p class="ot-description" ng-if="job.info">
-                            <span class="glyphicon glyphicon-arrow-right"></span>
+                            <span class="fa fa-arrow-right"></span>
                             {{job.info.message}}
                         </p>
                     </td>
@@ -59,15 +59,15 @@
                                 ng-if="job._launch"
                                 title="Launch {{job.descriptor.description}}"
                                 ng-click="launchJob(job)"
-                                class="glyphicon glyphicon-play ot-command"></span>
+                                class="fa fa-play ot-command"></span>
                     </td>
                     <td>
                         <span ng-if="job.descriptor.disabled">Disabled</span>
                         <span ng-if="!job.descriptor.disabled">Enabled</span>
                     </td>
                     <td>
-                        <span class="glyphicon glyphicon-time text-success" ng-if="job.running"></span>
-                        <span class="glyphicon glyphicon-ban-circle text-muted" ng-if="!job.running"></span>
+                        <span class="fa fa-spinner fa-spin text-success" ng-if="job.running"></span>
+                        <span class="fa fa-spinner text-muted" ng-if="!job.running"></span>
                     </td>
                     <td>
                             <span ng-if="job.descriptor.interval == 0">

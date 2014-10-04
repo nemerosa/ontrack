@@ -23,7 +23,7 @@
                             <div class="row">
                                 <div class="col-md-3 ot-project-branch-promotion"
                                      ng-if="branch.branchStatusView.latestBuild">
-                                    <span class="glyphicon glyphicon-arrow-right"></span>
+                                    <span class="fa fa-arrow-right"></span>
                                     <a href="#/build/{{branch.branchStatusView.latestBuild.id}}"
                                        title="Latest build on this branch">
                                         {{branch.branchStatusView.latestBuild.name}}
@@ -31,7 +31,7 @@
                                 </div>
                                 <div class="col-md-3 ot-project-branch-promotion"
                                      ng-if="!branch.branchStatusView.latestBuild">
-                                            <span class="glyphicon glyphicon-ban-circle"
+                                            <span class="fa fa-ban"
                                                   title="No build on this branch"></span>
                                 </div>
                                 <div class="col-md-3 ot-project-branch-promotion"
@@ -43,7 +43,7 @@
                                             {{promotionView.promotionLevel.name}}
                                         </a>
                                         <span class="ot-project-branch-promotion-build">
-                                            <span class="glyphicon glyphicon-arrow-right"></span>
+                                            <span class="fa fa-arrow-right"></span>
                                             <a href="#/build/{{promotionView.promotionRun.build.id}}">{{promotionView.promotionRun.build.name}}</a>
                                         </span>
                                     </span>
@@ -53,8 +53,8 @@
                                                     entity="promotionView.promotionLevel"></ot-entity-image>
                                             {{promotionView.promotionLevel.name}}
                                         </a>
-                                        <span class="glyphicon glyphicon-arrow-right"></span>
-                                        <span class="glyphicon glyphicon-ban-circle"></span>
+                                        <span class="fa fa-arrow-right"></span>
+                                        <span class="fa fa-ban"></span>
                                     </span>
                                 </div>
                             </div>
