@@ -465,67 +465,47 @@ span.ot-view-command {
   margin-left: 0.5em;
 }
 
-.ot-command-delete {
+.ot-icon-x(@iconName) {
   .fa-icon();
   &:before {
-    content: @fa-var-trash;
+    content: @iconName;
   }
+}
+
+.ot-command-delete {
+  .ot-icon-x(@fa-var-trash);
 }
 
 .ot-command-update {
-  .fa-icon();
-  &:before {
-    content: @fa-var-pencil;
-  }
+  .ot-icon-x(@fa-var-pencil);
 }
 
 .ot-command-close {
-  .fa-icon();
-  &:before{
-    content: @fa-var-close;
-  }
+  .ot-icon-x(@fa-var-close);
 }
 
 .ot-command-actions {
-  .fa-icon();
-  &:before{
-    content: @fa-var-wrench;
-  }
+  .ot-icon-x(@fa-var-wrench);
 }
 
 .ot-command-new {
-  .fa-icon();
-  &:before{
-    content: @fa-var-plus;
-  }
+  .ot-icon-x(@fa-var-plus);
 }
 
 .ot-command-disable {
-  .fa-icon();
-  &:before{
-    content: @fa-var-ban;
-  }
+  .ot-icon-x(@fa-var-ban);
 }
 
 .ot-command-enable {
-  .fa-icon();
-  &:before{
-    content: @fa-var-check;
-  }
+  .ot-icon-x(@fa-var-check);
 }
 
 .ot-command-show-disabled {
-  .fa-icon();
-  &:before {
-    content: @fa-var-eye;
-  }
+  .ot-icon-x(@fa-var-eye);
 }
 
 .ot-command-hide-disabled {
-  .fa-icon();
-  &:before {
-    content: @fa-var-eye-slash;
-  }
+  .ot-icon-x(@fa-var-eye-slash);
 }
 
 .ot-command-project-new {
@@ -553,10 +533,7 @@ span.ot-view-command {
 }
 
 .ot-command-project-permissions {
-  .fa-icon();
-  &:before {
-    content: @fa-var-key;
-  }
+  .ot-icon-x(@fa-var-key);
 }
 
 .ot-command-branch-new {
