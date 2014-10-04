@@ -89,7 +89,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         forEachConfiguredBranch((branch, configuration) -> {
             // Indexation job
             if (configuration.getIndexationInterval() > 0) {
-                jobs.add(createIndexationJob(configuration));
+                jobs.add(createIndexationJob(branch, configuration));
             }
             // Build/tag sync job
             Property<GitBranchConfigurationProperty> branchConfigurationProperty = propertyService.getProperty(branch, GitBranchConfigurationPropertyType.class);
@@ -486,7 +486,8 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     private Job createBuildSyncJob(Branch branch, GitConfiguration configuration) {
-        return new Job() {
+        return new BranchJob(branch) {
+
             @Override
             public String getCategory() {
                 return "GitBuildTagSync";
@@ -518,8 +519,9 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         };
     }
 
-    private Job createIndexationJob(GitConfiguration config) {
-        return new Job() {
+    private Job createIndexationJob(Branch branch, GitConfiguration config) {
+        return new BranchJob(branch) {
+
             @Override
             public String getCategory() {
                 return "GitIndexation";

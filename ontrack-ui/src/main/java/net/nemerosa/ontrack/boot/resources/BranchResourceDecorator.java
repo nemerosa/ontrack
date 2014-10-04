@@ -107,6 +107,20 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                 )
                         // Events
                 .link("_events", on(EventController.class).getEvents(branch.getProjectEntityType(), branch.getId(), 0, 10))
+                        // Enable
+                .link(
+                        "_enable",
+                        on(BranchController.class).enableBranch(branch.getId()),
+                        resourceContext.isProjectFunctionGranted(branch.projectId(), ProjectEdit.class)
+                                && branch.isDisabled()
+                )
+                        // Disable
+                .link(
+                        "_disable",
+                        on(BranchController.class).disableBranch(branch.getId()),
+                        resourceContext.isProjectFunctionGranted(branch.projectId(), ProjectEdit.class)
+                                && !branch.isDisabled()
+                )
                         // OK
                 .build();
     }

@@ -58,7 +58,8 @@ public class ArtifactoryPromotionSyncServiceImpl implements JobProvider {
         if (syncProperty.isEmpty()) {
             return null;
         } else {
-            return new Job() {
+            return new BranchJob(branch) {
+
                 @Override
                 public String getCategory() {
                     return "ArtifactoryPromotionSync";

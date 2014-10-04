@@ -30,4 +30,11 @@ public class NameDescription {
         return new NameDescription(name, description);
     }
 
+    public NameDescriptionState asState() {
+        return asState(false);
+    }
+
+    public NameDescriptionState asState(boolean disabled) {
+        return new NameDescriptionState(name, description, disabled);
+    }
 }

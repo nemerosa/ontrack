@@ -1,5 +1,9 @@
 <ot-view>
 
+    <ot-entity-disabled entity="project" callback="reloadProject()">
+        The project is disabled.
+    </ot-entity-disabled>
+
     <div class="row">
         <div class="col-md-8">
             <ot-section-title>Branches</ot-section-title>
@@ -8,8 +12,9 @@
                     No branch has been created yet.
                 </ot-noentry>
                 <div class="col-md-12" ng-if="branchCollection.resources">
-                    <div class="row ot-project-branch" ng-repeat="branch in branchCollection.resources">
-                        <div class="col-md-2 ot-project-branch-name">
+                    <div class="row ot-project-branch" ng-repeat="branch in branchCollection.resources" ng-show="showDisabled || !branch.disabled">
+                        <div class="col-md-2 ot-project-branch-name"
+                             ng-class="{'ot-entity-disabled': branch.disabled}">
                             <a href="#/branch/{{branch.id}}">
                                 {{branch.name}}
                             </a>

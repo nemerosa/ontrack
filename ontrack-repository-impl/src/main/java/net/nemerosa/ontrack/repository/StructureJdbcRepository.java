@@ -32,8 +32,10 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         // Creation
         try {
             int id = dbCreate(
-                    "INSERT INTO PROJECTS(NAME, DESCRIPTION) VALUES (:name, :description)",
-                    params("name", project.getName()).addValue("description", project.getDescription())
+                    "INSERT INTO PROJECTS(NAME, DESCRIPTION, DISABLED) VALUES (:name, :description, :disabled)",
+                    params("name", project.getName())
+                            .addValue("description", project.getDescription())
+                            .addValue("disabled", project.isDisabled())
             );
             // Returns with ID
             return project.withId(id(id));
@@ -77,9 +79,10 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     @Override
     public void saveProject(Project project) {
         getNamedParameterJdbcTemplate().update(
-                "UPDATE PROJECTS SET NAME = :name, DESCRIPTION = :description WHERE ID = :id",
+                "UPDATE PROJECTS SET NAME = :name, DESCRIPTION = :description, DISABLED = :disabled WHERE ID = :id",
                 params("name", project.getName())
                         .addValue("description", project.getDescription())
+                        .addValue("disabled", project.isDisabled())
                         .addValue("id", project.getId().getValue())
         );
     }
@@ -132,9 +135,10 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         // Creation
         try {
             int id = dbCreate(
-                    "INSERT INTO BRANCHES(PROJECTID, NAME, DESCRIPTION) VALUES (:projectId, :name, :description)",
+                    "INSERT INTO BRANCHES(PROJECTID, NAME, DESCRIPTION, DISABLED) VALUES (:projectId, :name, :description, :disabled)",
                     params("name", branch.getName())
                             .addValue("description", branch.getDescription())
+                            .addValue("disabled", branch.isDisabled())
                             .addValue("projectId", branch.getProject().id())
             );
             // Returns with ID
@@ -149,9 +153,10 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         // Update
         try {
             getNamedParameterJdbcTemplate().update(
-                    "UPDATE BRANCHES SET NAME = :name, DESCRIPTION = :description WHERE ID = :id",
+                    "UPDATE BRANCHES SET NAME = :name, DESCRIPTION = :description, DISABLED = :disabled WHERE ID = :id",
                     params("name", branch.getName())
                             .addValue("description", branch.getDescription())
+                            .addValue("disabled", branch.isDisabled())
                             .addValue("id", branch.id())
             );
         } catch (DuplicateKeyException ex) {
@@ -774,14 +779,18 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                         rs.getString("name"),
                         rs.getString("description")
                 )
-        ).withId(id(rs));
+        )
+                .withId(id(rs))
+                .withDisabled(rs.getBoolean("disabled"));
     }
 
     protected Project toProject(ResultSet rs) throws SQLException {
         return Project.of(new NameDescription(
                 rs.getString("name"),
                 rs.getString("description")
-        )).withId(id(rs.getInt("id")));
+        ))
+                .withId(id(rs.getInt("id")))
+                .withDisabled(rs.getBoolean("disabled"));
     }
 
     protected Document toDocument(ResultSet rs) throws SQLException {

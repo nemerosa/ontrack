@@ -177,6 +177,28 @@ angular.module('ot.view.branch', [
                     },
                     {
                         condition: function () {
+                            return branchResource._disable;
+                        },
+                        id: 'disableBranch',
+                        name: "Disable branch",
+                        cls: 'ot-command-branch-disable',
+                        action: function () {
+                            ot.pageCall($http.put(branchResource._disable)).then(loadBranch);
+                        }
+                    },
+                    {
+                        condition: function () {
+                            return branchResource._enable;
+                        },
+                        id: 'enableBranch',
+                        name: "Enable branch",
+                        cls: 'ot-command-branch-enable',
+                        action: function () {
+                            ot.pageCall($http.put(branchResource._enable)).then(loadBranch);
+                        }
+                    },
+                    {
+                        condition: function () {
                             return branchResource._update;
                         },
                         id: 'updateBranch',
@@ -228,6 +250,9 @@ angular.module('ot.view.branch', [
         // Initialization
         loadPermalink();
         loadBranch();
+
+        // Reload callback available in the scope
+        $scope.reloadBranch = loadBranch;
 
         // Gets the list of tools for a branch
         function getTools(branch) {

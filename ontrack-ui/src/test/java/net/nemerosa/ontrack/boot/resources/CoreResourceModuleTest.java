@@ -64,6 +64,7 @@ public class CoreResourceModuleTest {
                         .with("id", 1)
                         .with("name", "P")
                         .with("description", "Project")
+                        .with("disabled", false)
                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
                         .with("_branches", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranchListForProject:1")
                         .with("_branchStatusViews", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getBranchStatusViews:1")
@@ -72,6 +73,32 @@ public class CoreResourceModuleTest {
                         .with("_update", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#saveProject:1,")
                         .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:PROJECT,1")
                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:PROJECT,1,0,10")
+                        .with("_disable", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#disableProject:1")
+                        .end(),
+                p
+        );
+    }
+
+    @Test
+    public void project_granted_for_update_and_disabled() throws JsonProcessingException {
+        Project p = Project.of(new NameDescription("P", "Project")).withId(ID.of(1)).withDisabled(true);
+        when(securityService.isProjectFunctionGranted(1, ProjectEdit.class)).thenReturn(true);
+        assertResourceJson(
+                mapper,
+                object()
+                        .with("id", 1)
+                        .with("name", "P")
+                        .with("description", "Project")
+                        .with("disabled", true)
+                        .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
+                        .with("_branches", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranchListForProject:1")
+                        .with("_branchStatusViews", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getBranchStatusViews:1")
+                        .with("_properties", "urn:test:net.nemerosa.ontrack.boot.ui.PropertyController#getProperties:PROJECT,1")
+                        .with("_actions", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getActions:PROJECT,1")
+                        .with("_update", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#saveProject:1,")
+                        .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:PROJECT,1")
+                        .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:PROJECT,1,0,10")
+                        .with("_enable", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#enableProject:1")
                         .end(),
                 p
         );
@@ -89,10 +116,12 @@ public class CoreResourceModuleTest {
                         .with("id", 1)
                         .with("name", "B")
                         .with("description", "Branch")
+                        .with("disabled", false)
                         .with("project", object()
                                         .with("id", 1)
                                         .with("name", "P")
                                         .with("description", "Project")
+                                        .with("disabled", false)
                                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
                                         .with("_branches", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranchListForProject:1")
                                         .with("_branchStatusViews", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getBranchStatusViews:1")
@@ -130,6 +159,7 @@ public class CoreResourceModuleTest {
                         .with("id", 1)
                         .with("name", "P")
                         .with("description", "Project")
+                        .with("disabled", false)
                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
                         .with("_branches", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranchListForProject:1")
                         .with("_branchStatusViews", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getBranchStatusViews:1")
@@ -187,10 +217,12 @@ public class CoreResourceModuleTest {
                                 .with("id", 1)
                                 .with("name", "B")
                                 .with("description", "Branch")
+                                .with("disabled", false)
                                 .with("project", object()
                                         .with("id", 1)
                                         .with("name", "P")
                                         .with("description", "Project")
+                                        .with("disabled", false)
                                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
                                         .with("_branches", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranchListForProject:1")
                                         .with("_branchStatusViews", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getBranchStatusViews:1")
@@ -247,6 +279,7 @@ public class CoreResourceModuleTest {
                                         .with("id", 1)
                                         .with("name", "B1")
                                         .with("description", "Branch 1")
+                                        .with("disabled", false)
                                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranch:1")
                                         .with("_project", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
                                         .with("_promotionLevels", "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionLevelListForBranch:1")
@@ -266,6 +299,7 @@ public class CoreResourceModuleTest {
                                         .with("id", 2)
                                         .with("name", "B2")
                                         .with("description", "Branch 2")
+                                        .with("disabled", false)
                                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranch:2")
                                         .with("_project", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
                                         .with("_promotionLevels", "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionLevelListForBranch:2")

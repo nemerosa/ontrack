@@ -1,5 +1,9 @@
 <ot-view>
 
+    <ot-entity-disabled entity="branch" callback="reloadBranch()">
+        The branch is disabled.
+    </ot-entity-disabled>
+
     <div class="row" ng-show="branchBuildView.buildViews">
         <div class="col-md-12">
             <ng-include src="'app/view/fragment.branchBuildView.tpl.html'"></ng-include>

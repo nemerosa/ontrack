@@ -160,7 +160,7 @@ public class JobServiceImpl implements ScheduledService,
         runJobs();
     }
 
-    private RegisteredJob registerJob(long count, Job job) {
+    protected RegisteredJob registerJob(long count, Job job) {
         String category = job.getCategory();
         String id = job.getId();
         // Existing job?
@@ -185,8 +185,11 @@ public class JobServiceImpl implements ScheduledService,
         }
     }
 
-    private boolean runJob(RegisteredJob registeredJob, boolean forceEarly) {
-        if (idInSameGroupRunning(registeredJob)) {
+    protected boolean runJob(RegisteredJob registeredJob, boolean forceEarly) {
+        if (registeredJob.isDisabled()) {
+            logger.debug("[job] Job disabled: {}", registeredJob);
+            return false;
+        } else if (idInSameGroupRunning(registeredJob)) {
             logger.debug("[job] Same group running: {}", registeredJob);
             return false;
         } else if (registeredJob.isRunning()) {
@@ -206,18 +209,18 @@ public class JobServiceImpl implements ScheduledService,
         }
     }
 
-    private boolean idInSameGroupRunning(RegisteredJob registeredJob) {
+    protected boolean idInSameGroupRunning(RegisteredJob registeredJob) {
         return idInSameGroupRunning(registeredJob.getJobGroup(), registeredJob.getJobId());
     }
 
-    private boolean idInSameGroupRunning(String group, String id) {
+    protected boolean idInSameGroupRunning(String group, String id) {
         return registeredJobs.values().stream()
                 .filter(r -> group.equals(r.getJobGroup()) && id.equals(r.getJobId()) && r.isRunning())
                 .findAny()
                 .isPresent();
     }
 
-    private void start(RegisteredJob registeredJob) {
+    protected void start(RegisteredJob registeredJob) {
         // Raw task to execute
         Runnable task = registeredJob.createTask();
         // Running it as admin

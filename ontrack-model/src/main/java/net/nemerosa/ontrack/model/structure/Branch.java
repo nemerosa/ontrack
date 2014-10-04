@@ -2,15 +2,22 @@ package net.nemerosa.ontrack.model.structure;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.experimental.Wither;
 import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.form.YesNo;
 
 @Data
+@AllArgsConstructor(access = AccessLevel.PUBLIC)
 public class Branch implements ProjectEntity {
 
     private final ID id;
     private final String name;
     private final String description;
+    @Wither
+    private final boolean disabled;
     @JsonView({
             PromotionView.class, Branch.class, Build.class, PromotionLevel.class, ValidationStamp.class,
             PromotionRun.class, ValidationRun.class, PromotionRunView.class
@@ -19,10 +26,15 @@ public class Branch implements ProjectEntity {
     private final Project project;
 
     public static Branch of(Project project, NameDescription nameDescription) {
+        return of(project, nameDescription.asState());
+    }
+
+    public static Branch of(Project project, NameDescriptionState nameDescription) {
         return new Branch(
                 ID.NONE,
                 nameDescription.getName(),
                 nameDescription.getDescription(),
+                nameDescription.isDisabled(),
                 project
         );
     }
@@ -33,20 +45,24 @@ public class Branch implements ProjectEntity {
     }
 
     public Branch withId(ID id) {
-        return new Branch(id, name, description, project);
+        return new Branch(id, name, description, disabled, project);
     }
 
     public static Form form() {
-        return Form.nameAndDescription();
+        return Form.nameAndDescription()
+                .with(
+                        YesNo.of("disabled").label("Disabled").help("Check if the branch must be disabled.")
+                );
     }
 
     public Form toForm() {
         return form()
                 .fill("name", name)
-                .fill("description", description);
+                .fill("description", description)
+                .fill("disabled", disabled);
     }
 
-    public Branch update(NameDescription form) {
-        return of(project, form).withId(id);
+    public Branch update(NameDescriptionState form) {
+        return of(project, form).withId(id).withDisabled(form.isDisabled());
     }
 }

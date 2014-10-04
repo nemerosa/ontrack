@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
+import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +21,7 @@ import static net.nemerosa.ontrack.test.TestUtils.uid;
         classes = AbstractITTestSupport.AbstractIntegrationTestConfiguration.class)
 @Transactional
 @ActiveProfiles(profiles = {RunProfile.UNIT_TEST})
-public abstract class AbstractITTestSupport extends AbstractJUnit4SpringContextTests {
+public abstract class AbstractITTestSupport extends AbstractTransactionalJUnit4SpringContextTests {
 
     @Configuration
     @Profile(RunProfile.UNIT_TEST)

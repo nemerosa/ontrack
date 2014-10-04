@@ -186,7 +186,8 @@ public class SVNSyncServiceImpl implements SVNSyncService, JobProvider {
 
     protected Job createJob(Branch branch) {
         Property<SVNSyncProperty> svnSync = propertyService.getProperty(branch, SVNSyncPropertyType.class);
-        return new Job() {
+        return new BranchJob(branch) {
+
             @Override
             public String getCategory() {
                 return "SVNSync";

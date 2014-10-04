@@ -274,6 +274,18 @@ table.ot-form-view {
   }
 }
 
+.ot-entity-disabled-alert {
+  .alert;
+  .alert-warning;
+}
+
+.ot-view-content {
+  .ot-entity-disabled-alert {
+    margin-left: 1em;
+    margin-right: 1em;
+  }
+}
+
 .ot-home-project-row {
   .ot-entity-row;
 }
@@ -464,6 +476,26 @@ span.ot-view-command {
   .glyphicon-star;
 }
 
+.ot-command-disable {
+  .glyphicon;
+  .glyphicon-star-empty;
+}
+
+.ot-command-enable {
+  .glyphicon;
+  .glyphicon-star;
+}
+
+.ot-command-show-disabled {
+  .glyphicon;
+  .glyphicon-eye-open;
+}
+
+.ot-command-hide-disabled {
+  .glyphicon;
+  .glyphicon-eye-close;
+}
+
 .ot-command-project-new {
   .ot-command-new;
 }
@@ -480,6 +512,14 @@ span.ot-view-command {
   .ot-command-update;
 }
 
+.ot-command-project-disable {
+  .ot-command-disable;
+}
+
+.ot-command-project-enable {
+  .ot-command-enable;
+}
+
 .ot-command-project-permissions {
   .glyphicon;
   .glyphicon-lock;
@@ -491,6 +531,14 @@ span.ot-view-command {
 
 .ot-command-branch-update {
   .ot-command-update;
+}
+
+.ot-command-branch-disable {
+  .ot-command-disable;
+}
+
+.ot-command-branch-enable {
+  .ot-command-enable;
 }
 
 .ot-command-branch-delete {
