@@ -16,7 +16,7 @@
                     <span class="ot-buildfilter-remote"
                           title="This filter does not need any configuration">
                         {{buildFilterForm.typeName}}
-                        <span class="glyphicon glyphicon-star"></span>
+                        <span class="fa fa-star"></span>
                     </span>
                 </span>
             </a>
@@ -31,19 +31,19 @@
                                 <span ng-if="!buildFilterResource._update"> (local)</span>
                             </span>
                 <!-- Saving only if local and logged -->
-                <span class="glyphicon glyphicon-star-empty ot-command" ng-if="!buildFilterResource._update && logged()"
+                <span class="fa fa-save ot-command" ng-if="!buildFilterResource._update && logged()"
                       title="Save this filter in your preferences"
                       ng-click="buildFilterSave(buildFilterResource)"></span>
                 <!-- Saved filter -->
-                <span class="glyphicon glyphicon-star ot-command" ng-if="buildFilterResource._update"
+                <span class="fa fa-file ot-command" ng-if="buildFilterResource._update"
                       title="This filter has been saved in your preferences"
                       ng-click="buildFilterApply(buildFilterResource)"></span>
                 <!-- Edition -->
-                <span class="glyphicon glyphicon-pencil ot-command"
+                <span class="ot-command-update ot-command"
                       title="Edit this filter"
                       ng-click="buildFilterEdit(buildFilterResource)"></span>
                 <!-- Deletion always available -->
-                <span class="glyphicon glyphicon-trash ot-command"
+                <span class="ot-command-delete ot-command"
                       title="Delete this filter"
                       ng-click="buildFilterRemove(buildFilterResource)"></span>
             </a>
@@ -51,13 +51,13 @@
         <li class="divider" ng-if="buildFilterResources"></li>
         <li ng-if="currentBuildFilterResource">
             <a ng-click="buildFilterErase()">
-                <span class="glyphicon glyphicon-remove"></span>
+                <span class="fa fa-eraser"></span>
                 Reset filter
             </a>
         </li>
         <li ng-if="currentBuildFilterResource">
             <a ng-click="buildFilterLink()">
-                <span class="glyphicon glyphicon-link"></span>
+                <span class="fa fa-link"></span>
                 Permalink
             </a>
         </li>
