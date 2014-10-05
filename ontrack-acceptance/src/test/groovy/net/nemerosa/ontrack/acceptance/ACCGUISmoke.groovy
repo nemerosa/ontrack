@@ -2,9 +2,10 @@ package net.nemerosa.ontrack.acceptance
 
 import net.nemerosa.ontrack.acceptance.pages.HomePage
 import net.nemerosa.ontrack.acceptance.pages.ProjectDialog
-import net.nemerosa.ontrack.test.TestUtils
+import net.nemerosa.ontrack.acceptance.steps.MainSteps
 import org.junit.Test
 
+import static net.nemerosa.ontrack.acceptance.steps.MainSteps.connectAsAdmin
 import static net.nemerosa.ontrack.test.TestUtils.uid
 
 class ACCGUISmoke extends GUITestClient {
@@ -17,8 +18,7 @@ class ACCGUISmoke extends GUITestClient {
 
     @Test
     void 'Admin login'() {
-        HomePage home = startApplication()
-        home.login('admin', adminPassword)
+        HomePage home = connectAsAdmin()
         waitUntil {
             home.header.userMenu.text == 'Administrator'
         }
@@ -27,11 +27,7 @@ class ACCGUISmoke extends GUITestClient {
     @Test
     void 'Project creation'() {
         // Starts and logs
-        HomePage home = startApplication()
-        home.login('admin', adminPassword)
-        waitUntil {
-            home.header.userMenu.text == 'Administrator'
-        }
+        HomePage home = connectAsAdmin()
         // Creates a project
         ProjectDialog dialog = home.createProject()
         def projectName = uid('P')
