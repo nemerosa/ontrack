@@ -21,15 +21,20 @@
     <div class="form-group">
         <label class="col-md-3">Grouping:</label>
 
-        <div class="col-md-9">
+        <div class="col-md-9 ot-extension-scm-changelog-grouping">
             <div class="form-group" ng-repeat="group in exportRequest.grouping">
-                <!-- Group name -->
-                <div class="col-md-3">
-                    <input ng-model="group.name" type="text" class="form-control" placeholder="Group"/>
+                <div class="col-md-11 ot-extension-scm-changelog-grouping-input">
+                    <div class="input-group">
+                        <input ng-model="group.name" type="text" class="form-control" placeholder="Group" />
+                        <span class="input-group-addon">
+                            <span class="fa fa-arrows-h"></span>
+                        </span>
+                        <input ng-model="group.types" type="text" class="form-control" placeholder="Comma-separated issue types" />
+                    </div>
                 </div>
-                <!-- Group types -->
-                <div class="col-md-9">
-                    <input ng-model="group.types" type="text" class="form-control" placeholder="Comma-separated issue types"/>
+                <!-- Group removal -->
+                <div class="col-md-1 ot-extension-scm-changelog-grouping-delete">
+                    <span class="ot-command ot-command-delete" title="Removes group." ng-click="removeGroup(exportRequest.grouping, group)"></span>
                 </div>
             </div>
             <div class="row">
