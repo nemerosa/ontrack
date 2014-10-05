@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory
 abstract class AbstractPageComponent {
 
     final Logger logger = LoggerFactory.getLogger(getClass())
-    final WebDriver driver
+    protected final WebDriver driver
 
     AbstractPageComponent(WebDriver driver) {
         this.driver = driver
