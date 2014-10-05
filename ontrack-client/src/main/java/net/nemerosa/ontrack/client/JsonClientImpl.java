@@ -25,6 +25,11 @@ public class JsonClientImpl implements JsonClient {
     }
 
     @Override
+    public JsonNode delete(String path, Object... parameters) {
+        return httpClient.delete(this::toJson, path, parameters);
+    }
+
+    @Override
     public JsonNode post(JsonNode data, String path, Object... parameters) {
         try {
             return httpClient.post(

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.acceptance
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.client.ClientNotFoundException
 
 abstract class AcceptanceTestClient extends AcceptanceSupport {
 
@@ -10,6 +11,16 @@ abstract class AcceptanceTestClient extends AcceptanceSupport {
 
     JsonNode doCreateProject(JsonNode nameDescription) {
         admin().post(nameDescription, "structure/projects/create").get()
+    }
+
+    def doDeleteProject(String name) {
+        try {
+            def project = admin().get("structure/entity/project/$name").get()
+            if (project) {
+                admin().delete(project._delete)
+            }
+        } catch (ClientNotFoundException ignored) {
+        }
     }
 
     JsonNode doCreateBranch() {

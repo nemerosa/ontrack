@@ -35,11 +35,15 @@ class ACCGUISmoke extends GUITestClient {
         // Creates a project
         ProjectDialog dialog = home.createProject()
         def projectName = uid('P')
-        dialog.name = projectName
-        dialog.description = "Project ${projectName}"
-        dialog.ok()
-        // Checks the project is visible in the list
-        assert home.isProjectPresent(projectName)
+        try {
+            dialog.name = projectName
+            dialog.description = "Project ${projectName}"
+            dialog.ok()
+            // Checks the project is visible in the list
+            assert home.isProjectPresent(projectName)
+        } finally {
+            doDeleteProject projectName
+        }
     }
 
 }
