@@ -17,6 +17,7 @@ class HomePage extends AbstractHeaderPage {
     }
 
     def createProject() {
+        waitUntil { createProjectCommand.displayed }
         createProjectCommand.click()
         new ProjectDialog(driver).waitFor() as ProjectDialog
     }

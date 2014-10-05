@@ -1,9 +1,12 @@
 package net.nemerosa.ontrack.acceptance
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.client.ClientNotFoundException
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 abstract class AcceptanceTestClient extends AcceptanceSupport {
+
+    private final Logger logger = LoggerFactory.getLogger(AcceptanceTestClient)
 
     JsonNode doCreateProject() {
         doCreateProject(nameDescription())
@@ -14,13 +17,11 @@ abstract class AcceptanceTestClient extends AcceptanceSupport {
     }
 
     def doDeleteProject(String name) {
-        try {
-            def project = admin().get("structure/entity/project/$name").get()
-            if (project) {
-                admin().delete(project._delete)
-            }
-        } catch (ClientNotFoundException ignored) {
-        }
+        logger.debug "Deleting project ${name}"
+        def project = admin().get("structure/entity/project/$name").get()
+        def link = project._delete.asText()
+        logger.debug "Deleting project at ${link}"
+        admin().delete(link).get()
     }
 
     JsonNode doCreateBranch() {

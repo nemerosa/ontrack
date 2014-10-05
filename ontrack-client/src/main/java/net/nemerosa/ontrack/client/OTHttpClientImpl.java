@@ -42,11 +42,15 @@ public class OTHttpClientImpl implements OTHttpClient {
     }
 
     protected String getUrl(String path, Object... parameters) {
-        return format(
-                "%s%s",
-                stripEnd(url.toString(), "/"),
-                prependIfMissing(format(path, parameters), "/")
-        );
+        if (StringUtils.startsWith(path, "http")) {
+            return format(path, parameters);
+        } else {
+            return format(
+                    "%s%s",
+                    stripEnd(url.toString(), "/"),
+                    prependIfMissing(format(path, parameters), "/")
+            );
+        }
     }
 
     @Override
