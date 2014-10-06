@@ -17,6 +17,10 @@ public abstract class AbstractHeaderPage extends AbstractPage {
         header = new HeaderModule(browser);
     }
 
+    HeaderModule getHeader() {
+        return header
+    }
+
     @Override
     public void waitFor() {
         browser.waitUntil("Page title") { pageTitle.displayed }

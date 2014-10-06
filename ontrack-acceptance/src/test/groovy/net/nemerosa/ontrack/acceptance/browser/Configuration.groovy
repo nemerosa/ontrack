@@ -120,6 +120,10 @@ public class Configuration {
         }
     }
 
+    static String getAdminPassword() {
+        env('ontrack.admin.password', false, 'admin', "Admin password")
+    }
+
     public static String env(String property, boolean required, String defaultValue, String name) {
         String sys = System.getProperty(property);
         if (StringUtils.isNotBlank(sys)) {

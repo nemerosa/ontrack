@@ -18,6 +18,10 @@ public class HeaderModule extends AbstractModule {
         super(browser);
     }
 
+    public String getUserName() {
+        userMenu.text
+    }
+
     public void login(String name, String password) {
         signIn.click();
         browser.screenshot("login-displayed");
