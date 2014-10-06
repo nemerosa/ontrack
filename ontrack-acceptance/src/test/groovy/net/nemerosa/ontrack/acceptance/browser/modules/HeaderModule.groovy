@@ -1,9 +1,10 @@
-package net.nemerosa.ontrack.acceptance.browser.support;
+package net.nemerosa.ontrack.acceptance.browser.modules
 
-import net.nemerosa.ontrack.acceptance.browser.Browser;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
+import net.nemerosa.ontrack.acceptance.browser.Browser
+import net.nemerosa.ontrack.acceptance.browser.support.AbstractModule
+import org.openqa.selenium.By
+import org.openqa.selenium.WebElement
+import org.openqa.selenium.support.FindBy
 
 public class HeaderModule extends AbstractModule {
 
@@ -35,7 +36,7 @@ public class HeaderModule extends AbstractModule {
 
         // Sign in OK
         WebElement okButton = driver.findElement(By.className("btn-primary"));
-        browser.waitUntil(okButton::isEnabled);
+        browser.waitUntil { okButton.enabled }
         okButton.click();
     }
 

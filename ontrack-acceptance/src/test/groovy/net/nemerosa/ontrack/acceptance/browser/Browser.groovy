@@ -1,10 +1,6 @@
-package net.nemerosa.ontrack.acceptance.browser;
+package net.nemerosa.ontrack.acceptance.browser
 
-import lombok.experimental.Delegate;
-import org.apache.commons.lang3.reflect.ConstructorUtils;
-
-import java.util.Map;
-import java.util.function.Consumer;
+import org.apache.commons.lang3.reflect.ConstructorUtils
 
 public class Browser {
 
@@ -13,13 +9,6 @@ public class Browser {
 
     protected Browser(Configuration configuration) {
         this.configuration = configuration;
-    }
-
-    public static void browser(Consumer<Browser> closure) {
-        Configuration.driver(config -> {
-            Browser browser = new Browser(config);
-            closure.accept(browser);
-        });
     }
 
     public <P extends Page> P goTo(Class<P> pageClass, Map<String, Object> parameters) {
@@ -33,6 +22,14 @@ public class Browser {
         configuration.goTo(path);
         page.waitFor();
         return page;
+    }
+
+    public static void browser(Closure closure) {
+        Configuration.driver({ config ->
+            Browser browser = new Browser(config)
+            closure.delegate = browser
+            closure(browser)
+        })
     }
 
 }

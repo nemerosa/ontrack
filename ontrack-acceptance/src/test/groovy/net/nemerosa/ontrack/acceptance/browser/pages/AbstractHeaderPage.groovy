@@ -1,9 +1,9 @@
-package net.nemerosa.ontrack.acceptance.browser.pages;
+package net.nemerosa.ontrack.acceptance.browser.pages
 
-import net.nemerosa.ontrack.acceptance.browser.Browser;
-import net.nemerosa.ontrack.acceptance.browser.support.HeaderModule;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
+import net.nemerosa.ontrack.acceptance.browser.Browser
+import net.nemerosa.ontrack.acceptance.browser.modules.HeaderModule
+import org.openqa.selenium.WebElement
+import org.openqa.selenium.support.FindBy
 
 public abstract class AbstractHeaderPage extends AbstractPage {
 
@@ -19,7 +19,7 @@ public abstract class AbstractHeaderPage extends AbstractPage {
 
     @Override
     public void waitFor() {
-        browser.waitUntil(pageTitle::isDisplayed);
+        browser.waitUntil { pageTitle.displayed }
     }
 
     public void login(String user, String password) {

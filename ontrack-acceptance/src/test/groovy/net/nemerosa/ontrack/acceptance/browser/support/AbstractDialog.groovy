@@ -1,9 +1,8 @@
-package net.nemerosa.ontrack.acceptance.browser.support;
+package net.nemerosa.ontrack.acceptance.browser.support
 
-import net.nemerosa.ontrack.acceptance.browser.Browser;
-import org.apache.commons.lang3.Validate;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
+import net.nemerosa.ontrack.acceptance.browser.Browser
+import org.openqa.selenium.WebElement
+import org.openqa.selenium.support.FindBy
 
 public class AbstractDialog<D extends AbstractDialog<D>> extends AbstractModule {
 
@@ -15,14 +14,14 @@ public class AbstractDialog<D extends AbstractDialog<D>> extends AbstractModule 
     }
 
     public D waitFor() {
-        browser.waitUntil(okButton::isDisplayed);
+        browser.waitUntil { okButton.displayed }
         //noinspection unchecked
         return (D) this;
     }
 
     public void ok() {
-        Validate.isTrue(okButton.isEnabled());
-        okButton.click();
+        assert okButton.enabled
+        okButton.click()
     }
 
 }

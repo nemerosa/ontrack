@@ -1,9 +1,9 @@
-package net.nemerosa.ontrack.acceptance.browser.pages;
+package net.nemerosa.ontrack.acceptance.browser.dialogs
 
-import net.nemerosa.ontrack.acceptance.browser.Browser;
-import net.nemerosa.ontrack.acceptance.browser.support.AbstractDialog;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
+import net.nemerosa.ontrack.acceptance.browser.Browser
+import net.nemerosa.ontrack.acceptance.browser.support.AbstractDialog
+import org.openqa.selenium.WebElement
+import org.openqa.selenium.support.FindBy
 
 public class ProjectDialog extends AbstractDialog<ProjectDialog> {
 

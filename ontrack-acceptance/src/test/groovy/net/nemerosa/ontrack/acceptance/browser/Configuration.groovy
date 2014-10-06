@@ -1,23 +1,19 @@
-package net.nemerosa.ontrack.acceptance.browser;
+package net.nemerosa.ontrack.acceptance.browser
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.openqa.selenium.*;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.io.FileUtils
+import org.apache.commons.lang3.StringUtils
+import org.openqa.selenium.*
+import org.openqa.selenium.firefox.FirefoxDriver
+import org.openqa.selenium.firefox.FirefoxProfile
+import org.openqa.selenium.support.PageFactory
+import org.openqa.selenium.support.ui.WebDriverWait
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.text.SimpleDateFormat
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicLong
+import java.util.function.Consumer
 
 public class Configuration {
 
@@ -67,15 +63,13 @@ public class Configuration {
         driver.get(String.format("%s/%s", baseUrl, path));
     }
 
-    public boolean waitUntil(Supplier<Boolean> closure) {
+    public boolean waitUntil(Closure<Boolean> closure) {
         return waitUntil(implicitWait, closure);
     }
 
-    public boolean waitUntil(int seconds, Supplier<Boolean> closure) {
+    public boolean waitUntil(int seconds, Closure<Boolean> closure) {
         try {
-            return new WebDriverWait(driver, seconds).until(
-                    (WebDriver input) -> closure.get()
-            );
+            return new WebDriverWait(driver, seconds).until(closure);
         } catch (TimeoutException ex) {
             // Takes a screenshot
             screenshot("timeout");

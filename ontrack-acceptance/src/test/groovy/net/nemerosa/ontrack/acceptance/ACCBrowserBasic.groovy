@@ -1,19 +1,20 @@
 package net.nemerosa.ontrack.acceptance
 
-import net.nemerosa.ontrack.acceptance.browser.Browser
 import net.nemerosa.ontrack.acceptance.browser.pages.HomePage
 import org.junit.Test
+
+import static net.nemerosa.ontrack.acceptance.browser.Browser.browser
 
 /**
  * Basic GUI tests
  */
-class ACCGUIBasic {
+class ACCBrowserBasic {
 
     @Test
     void 'Home page is accessible'() {
-        Browser.browser({ browser ->
-            browser.goTo HomePage, [:]
-        })
+        browser {
+            goTo HomePage, [:]
+        }
     }
 
 }

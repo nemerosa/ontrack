@@ -1,9 +1,9 @@
-package net.nemerosa.ontrack.acceptance.browser.support;
+package net.nemerosa.ontrack.acceptance.browser.support
 
-import net.nemerosa.ontrack.acceptance.browser.Browser;
-import org.openqa.selenium.WebDriver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.nemerosa.ontrack.acceptance.browser.Browser
+import org.openqa.selenium.WebDriver
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 public abstract class AbstractModule {
 
@@ -14,7 +14,7 @@ public abstract class AbstractModule {
 
     protected AbstractModule(Browser browser) {
         this.browser = browser;
-        this.driver = browser.getDriver();
+        this.driver = browser.driver;
     }
 
     public void trace(String message, Object... parameters) {
