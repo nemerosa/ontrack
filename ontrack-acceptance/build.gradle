@@ -16,6 +16,7 @@ ext {
 }
 
 acceptanceTest {
+    outputs.upToDateWhen { false }  // Always run tests
     systemProperty 'ontrack.url', ontrackUrl
     systemProperty 'ontrack.implicitWait', project.hasProperty('ontrackImplicitWait') ? ontrackImplicitWait : 5
 }
