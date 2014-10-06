@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 
+@Deprecated
 abstract class GUITestClient extends AcceptanceTestClient {
 
     private static final Logger logger = LoggerFactory.getLogger(GUITestClient)
