@@ -2,10 +2,10 @@ package net.nemerosa.ontrack.acceptance
 
 import net.nemerosa.ontrack.acceptance.pages.HomePage
 import net.nemerosa.ontrack.acceptance.pages.ProjectDialog
-import net.nemerosa.ontrack.acceptance.steps.MainSteps
 import org.junit.Test
 
 import static net.nemerosa.ontrack.acceptance.steps.MainSteps.connectAsAdmin
+import static net.nemerosa.ontrack.acceptance.steps.MainSteps.withProject
 import static net.nemerosa.ontrack.test.TestUtils.uid
 
 class ACCGUISmoke extends GUITestClient {
@@ -39,6 +39,22 @@ class ACCGUISmoke extends GUITestClient {
             assert home.isProjectPresent(projectName)
         } finally {
             doDeleteProject projectName
+        }
+    }
+
+    @Test
+    void 'Branch creation'() {
+        withProject { projectPage ->
+            // Login
+            projectPage.login 'admin', adminPassword
+            // Creates a branch
+            def branchName = uid('B')
+            projectPage.createBranch {
+                name = branchName
+                description = "Branch $branchName"
+            }
+            // Checks the branch is created
+            assert projectPage.isBranchPresent(branchName)
         }
     }
 

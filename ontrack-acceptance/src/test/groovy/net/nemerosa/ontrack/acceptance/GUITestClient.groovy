@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.acceptance
 
 import com.google.common.base.Predicate
 import net.nemerosa.ontrack.acceptance.pages.HomePage
+import net.nemerosa.ontrack.acceptance.pages.ProjectPage
 import org.apache.commons.io.FileUtils
 import org.junit.After
 import org.junit.AfterClass
@@ -78,6 +79,12 @@ abstract class GUITestClient extends AcceptanceTestClient {
         def url = initUrl()
         driver.get("${url}/index.html")
         new HomePage(driver)
+    }
+
+    static ProjectPage goToProject(int id) {
+        def url = initUrl()
+        driver.get("${url}/index.html#/project/${id}")
+        new ProjectPage(driver)
     }
 
     static String getAdminPassword() {

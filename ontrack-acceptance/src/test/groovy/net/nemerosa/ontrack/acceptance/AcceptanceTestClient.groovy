@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-abstract class AcceptanceTestClient extends AcceptanceSupport {
+class AcceptanceTestClient extends AcceptanceSupport {
 
     private final Logger logger = LoggerFactory.getLogger(AcceptanceTestClient)
 
