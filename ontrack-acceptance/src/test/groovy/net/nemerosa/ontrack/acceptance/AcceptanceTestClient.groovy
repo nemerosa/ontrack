@@ -41,4 +41,15 @@ class AcceptanceTestClient extends AcceptanceSupport {
     JsonNode doCreateBuild(int branchId, JsonNode nameDescription) {
         admin().post(nameDescription, "structure/branches/$branchId/builds/create").get()
     }
+
+    def withProject(Closure closure) {
+        def p = doCreateProject()
+        int id = p.id.asInt()
+        String name = p.name.asText()
+        try {
+            closure(id, name)
+        } finally {
+            doDeleteProject name
+        }
+    }
 }
