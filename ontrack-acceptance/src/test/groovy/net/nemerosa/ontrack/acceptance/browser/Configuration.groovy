@@ -6,7 +6,6 @@ import org.apache.commons.lang3.StringUtils
 import org.openqa.selenium.*
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.firefox.FirefoxProfile
-import org.openqa.selenium.support.PageFactory
 import org.openqa.selenium.support.ui.WebDriverWait
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -157,7 +156,4 @@ public class Configuration {
         return new FirefoxDriver(profile);
     }
 
-    public void initElements(Object o) {
-        PageFactory.initElements(driver, o);
-    }
 }

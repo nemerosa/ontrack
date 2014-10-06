@@ -19,7 +19,7 @@ public abstract class AbstractHeaderPage extends AbstractPage {
 
     @Override
     public void waitFor() {
-        browser.waitUntil("Page title") { pageTitle?.displayed }
+        browser.waitUntil("Page title") { pageTitle.displayed }
     }
 
     public void login(String user, String password) {
