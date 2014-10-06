@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.acceptance.browser
 
+import com.google.common.base.Predicate
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.StringUtils
 import org.openqa.selenium.*
@@ -63,18 +64,27 @@ public class Configuration {
         driver.get(String.format("%s/%s", baseUrl, path));
     }
 
-    public boolean waitUntil(Closure<Boolean> closure) {
-        return waitUntil(implicitWait, closure);
+    public void waitUntil(Closure<Boolean> closure) {
+        waitUntil("element", closure);
     }
 
-    public boolean waitUntil(int seconds, Closure<Boolean> closure) {
+    public void waitUntil(String message, Closure<Boolean> closure) {
+        waitUntil(message, implicitWait, closure);
+    }
+
+    public void waitUntil(String message, int seconds, Closure<Boolean> closure) {
         try {
-            return new WebDriverWait(driver, seconds).until(closure);
+            new WebDriverWait(driver, seconds).until(new Predicate<WebDriver>() {
+                @Override
+                boolean apply(WebDriver input) {
+                    closure()
+                }
+            });
         } catch (TimeoutException ex) {
             // Takes a screenshot
             screenshot("timeout");
             // The error is still there
-            throw ex;
+            throw new TimeoutException("Could not get ${message} in time", ex);
         }
     }
 

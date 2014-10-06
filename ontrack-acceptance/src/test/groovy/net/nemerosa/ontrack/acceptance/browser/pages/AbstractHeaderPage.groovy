@@ -7,7 +7,7 @@ import org.openqa.selenium.support.FindBy
 
 public abstract class AbstractHeaderPage extends AbstractPage {
 
-    @FindBy(className = "ot-view-title")
+    @FindBy(className = 'ot-view-title')
     protected WebElement pageTitle;
 
     private final HeaderModule header;
@@ -19,7 +19,7 @@ public abstract class AbstractHeaderPage extends AbstractPage {
 
     @Override
     public void waitFor() {
-        browser.waitUntil { pageTitle.displayed }
+        browser.waitUntil("Page title") { pageTitle?.displayed }
     }
 
     public void login(String user, String password) {
