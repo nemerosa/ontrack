@@ -13,7 +13,7 @@
                                type="text"
                                ng-model="projectNameFilter"
                                placeholder="Filter on project names"/>
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
+                        <span class="input-group-addon"><span class="fa fa-search"></span></span>
                     </div>
                 </div>
             </div>
@@ -37,14 +37,14 @@
                             </span>
                             <span ng-if="branchStatusView.lastPromotionView" class="ot-home-branch-promotion">
                                 <a href="#/build/{{branchStatusView.lastPromotionView.promotionRun.build.id}}">{{branchStatusView.lastPromotionView.promotionRun.build.name}}</a>
-                                <span class="glyphicon glyphicon-arrow-right"></span>
+                                <span class="fa fa-arrow-right"></span>
                                 <a href="#/promotionLevel/{{branchStatusView.lastPromotionView.promotionLevel.id}}">
                                     <ot-entity-image entity="branchStatusView.lastPromotionView.promotionLevel"></ot-entity-image>
                                     {{branchStatusView.lastPromotionView.promotionLevel.name}}
                                 </a>
                             </span>
                             <span ng-if="!branchStatusView.lastPromotionView" class="ot-home-branch-promotion">
-                                <span class="glyphicon glyphicon-ban-circle"></span>
+                                <span class="fa fa-ban"></span>
                                 <span class="ot-description">
                                     No promotion yet
                                 </span>

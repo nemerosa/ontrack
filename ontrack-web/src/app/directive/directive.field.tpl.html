@@ -19,7 +19,7 @@
        ng-readonly="field.readOnly"/>
 
 <!-- Type: memo -->
-<textarea ng-if="field.type == 'memo'" ng-model="data[field.name]" class="form-control"
+<textarea ng-if="field.type == 'memo'" ng-model="data[field.name]" class="form-control" name="{{field.name}}"
           rows="{{field.rows}}" ng-required="field.required" maxlength="{{field.maxlength}}"
           ng-readonly="field.readOnly"></textarea>
 

@@ -16,7 +16,6 @@
 @import '../../vendor/bootstrap/less/code';
 @import '../../vendor/bootstrap/less/dropdowns';
 @import '../../vendor/bootstrap/less/forms';
-@import '../../vendor/bootstrap/less/glyphicons';
 @import '../../vendor/bootstrap/less/grid';
 @import '../../vendor/bootstrap/less/input-groups';
 @import '../../vendor/bootstrap/less/jumbotron';
@@ -38,6 +37,20 @@
 @import '../../vendor/bootstrap/less/type';
 @import '../../vendor/bootstrap/less/utilities';
 @import '../../vendor/bootstrap/less/wells';
+/**
+ * Second, importing Less files from Font Awesome
+ */
+@import '../../vendor/font-awesome/less/mixins';
+@import '../../vendor/font-awesome/less/path';
+@import '../../vendor/font-awesome/less/core';
+@import '../../vendor/font-awesome/less/larger';
+@import '../../vendor/font-awesome/less/fixed-width';
+@import '../../vendor/font-awesome/less/list';
+@import '../../vendor/font-awesome/less/bordered-pulled';
+@import '../../vendor/font-awesome/less/spinning';
+@import '../../vendor/font-awesome/less/rotated-flipped';
+@import '../../vendor/font-awesome/less/stacked';
+@import '../../vendor/font-awesome/less/icons';
 /**
  * This is our main variables file. It in turn imports the `variables` file from
  * Twitter Bootstrap. We must include it last so we can overwrite any variable
@@ -76,8 +89,8 @@
  */
 
 a.ot-loading-indicator {
-  .glyphicon;
-  .glyphicon-time;
+  .ot-icon-x(@fa-var-spinner);
+  .fa-spin;
 }
 
 .ot-description {
@@ -231,8 +244,7 @@ div.ot-view {
 .ot-view-breadcrumbs {
   font-size: 50%;
   .ot-view-breadcrumbs-separator {
-    .glyphicon;
-    .glyphicon-play;
+    .ot-icon-x(@fa-var-play);
     opacity: 0.3;
   }
 }
@@ -357,9 +369,8 @@ td.ot-entity-image {
 }
 
 .ot-promotion-run-separator {
-  .glyphicon;
-  .glyphicon-arrow-right;
-  font-size: 200%;
+  .ot-icon-x(@fa-var-arrow-right);
+  .fa-2x;
   display: inline-block;
   margin-right: 0.5em;
   vertical-align: 5px;
@@ -446,54 +457,53 @@ table.ot-validation-runs {
   }
 }
 
+.ot-view-commands {
+  text-align: right;
+}
+
 span.ot-view-command {
   .ot-command;
   margin-left: 0.5em;
+  .ot-view-command-name {
+    text-wrap: none;
+    white-space: nowrap;
+  }
 }
 
 .ot-command-delete {
-  .glyphicon;
-  .glyphicon-trash;
+  .ot-icon-x(@fa-var-trash);
 }
 
 .ot-command-update {
-  .glyphicon;
-  .glyphicon-pencil;
+  .ot-icon-x(@fa-var-pencil);
 }
 
 .ot-command-close {
-  .glyphicon;
-  .glyphicon-remove;
+  .ot-icon-x(@fa-var-close);
 }
 
 .ot-command-actions {
-  .glyphicon;
-  .glyphicon-cog;
+  .ot-icon-x(@fa-var-wrench);
 }
 
 .ot-command-new {
-  .glyphicon;
-  .glyphicon-star;
+  .ot-icon-x(@fa-var-plus);
 }
 
 .ot-command-disable {
-  .glyphicon;
-  .glyphicon-star-empty;
+  .ot-icon-x(@fa-var-ban);
 }
 
 .ot-command-enable {
-  .glyphicon;
-  .glyphicon-star;
+  .ot-icon-x(@fa-var-check);
 }
 
 .ot-command-show-disabled {
-  .glyphicon;
-  .glyphicon-eye-open;
+  .ot-icon-x(@fa-var-eye);
 }
 
 .ot-command-hide-disabled {
-  .glyphicon;
-  .glyphicon-eye-close;
+  .ot-icon-x(@fa-var-eye-slash);
 }
 
 .ot-command-project-new {
@@ -501,7 +511,7 @@ span.ot-view-command {
 }
 
 .ot-command-project-clone {
-  .ot-command-new;
+  .ot-icon-x(@fa-var-copy);
 }
 
 .ot-command-project-delete {
@@ -521,8 +531,7 @@ span.ot-view-command {
 }
 
 .ot-command-project-permissions {
-  .glyphicon;
-  .glyphicon-lock;
+  .ot-icon-x(@fa-var-key);
 }
 
 .ot-command-branch-new {
@@ -558,8 +567,7 @@ span.ot-view-command {
 }
 
 .ot-command-validation-stamp-image {
-  .glyphicon;
-  .glyphicon-picture;
+  .ot-icon-x(@fa-var-image);
 }
 
 .ot-command-validation-stamp-update {
@@ -575,8 +583,7 @@ span.ot-view-command {
 }
 
 .ot-command-promotion-level-image {
-  .glyphicon;
-  .glyphicon-picture;
+  .ot-icon-x(@fa-var-image);
 }
 
 .ot-command-promotion-level-delete {
@@ -584,13 +591,11 @@ span.ot-view-command {
 }
 
 .ot-command-promote {
-  .glyphicon;
-  .glyphicon-thumbs-up;
+  .ot-icon-x(@fa-var-thumbs-o-up);
 }
 
 .ot-command-validate {
-  .glyphicon;
-  .glyphicon-cog;
+  .ot-icon-x(@fa-var-legal);
 }
 
 /**
@@ -598,8 +603,7 @@ span.ot-view-command {
  */
 
 .ot-application-info {
-  .glyphicon;
-  .glyphicon-info-sign;
+  .ot-icon-x(@fa-var-info-circle);
   .text-info;
   &.ot-application-info-none {
     opacity: 0.3;
@@ -736,8 +740,7 @@ dl.ot-search-result {
  */
 
 .ot-command-admin-global-acl {
-  .glyphicon;
-  .glyphicon-lock;
+  .ot-icon-x(@fa-var-key);
 }
 
 .ot-admin-account-group {

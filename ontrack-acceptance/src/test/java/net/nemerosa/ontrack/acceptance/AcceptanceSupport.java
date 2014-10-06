@@ -81,6 +81,11 @@ public abstract class AcceptanceSupport {
             }
 
             @Override
+            public JsonResult delete(String path, Object... parameters) {
+                return new SimpleJsonResult(jsonClient.delete(path, parameters));
+            }
+
+            @Override
             public JsonResult post(JsonNode data, String path, Object... parameters) {
                 return new SimpleJsonResult(jsonClient.post(data, path, parameters));
             }
@@ -103,6 +108,8 @@ public abstract class AcceptanceSupport {
     protected static interface Client {
 
         JsonResult get(String path, Object... parameters);
+
+        JsonResult delete(String path, Object... parameters);
 
         JsonResult post(JsonNode data, String path, Object... parameters);
 
