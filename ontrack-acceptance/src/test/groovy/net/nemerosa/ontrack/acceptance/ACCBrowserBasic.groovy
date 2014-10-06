@@ -5,6 +5,7 @@ import org.junit.Test
 
 import static net.nemerosa.ontrack.acceptance.browser.Browser.browser
 import static net.nemerosa.ontrack.acceptance.browser.Configuration.getAdminPassword
+import static net.nemerosa.ontrack.test.TestUtils.uid
 
 /**
  * Basic GUI tests
@@ -24,6 +25,23 @@ class ACCBrowserBasic {
             def home = goTo HomePage, [:]
             home.login 'admin', adminPassword
             waitUntil("User name is 'Administrator'") { home.header.userName == 'Administrator' }
+        }
+    }
+
+    @Test
+    void 'Project creation'() {
+        browser {
+            HomePage home = goTo HomePage, [:]
+            home.login 'admin', adminPassword
+
+            def projectName = uid('P')
+            home.createProject {
+                name = projectName
+                description = "Project ${projectName}"
+            }
+
+            // Checks the project is visible in the list
+            assert home.isProjectPresent(projectName)
         }
     }
 

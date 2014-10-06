@@ -25,12 +25,13 @@ public class HomePage extends AbstractHeaderPage {
         createProjectCommand.click()
         ProjectDialog dialog = new ProjectDialog(browser).waitFor()
         closure.delegate = dialog
-        closure.apply(dialog)
+        closure(dialog)
         dialog.ok()
     }
 
     public boolean isProjectPresent(String name) {
         browser.waitUntil { driver.findElement(By.linkText(name)).displayed }
+        true
     }
 
 }
