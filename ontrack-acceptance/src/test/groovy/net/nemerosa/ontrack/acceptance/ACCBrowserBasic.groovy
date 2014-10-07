@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.acceptance.browser.pages.ProjectPage
 import org.junit.Test
 
 import static net.nemerosa.ontrack.acceptance.browser.Browser.browser
-import static net.nemerosa.ontrack.acceptance.browser.Configuration.getAdminPassword
+import static net.nemerosa.ontrack.acceptance.steps.BasicSteps.loginAsAdmin
 import static net.nemerosa.ontrack.test.TestUtils.uid
 
 /**
@@ -22,19 +22,13 @@ class ACCBrowserBasic extends AcceptanceTestClient {
 
     @Test
     void 'Admin login'() {
-        browser {
-            def home = goTo HomePage, [:]
-            home.login 'admin', adminPassword
-            waitUntil("User name is 'Administrator'") { home.header.userName == 'Administrator' }
-        }
+        browser { browser -> loginAsAdmin(browser) }
     }
 
     @Test
     void 'Project creation'() {
-        browser {
-            HomePage home = goTo HomePage, [:]
-            home.login 'admin', adminPassword
-            waitUntil("User name is 'Administrator'") { home.header.userName == 'Administrator' }
+        browser { browser ->
+            HomePage home = loginAsAdmin(browser)
 
             def projectName = uid('P')
             home.createProject {
@@ -49,12 +43,10 @@ class ACCBrowserBasic extends AcceptanceTestClient {
 
     @Test
     void 'Branch creation'() {
-        browser {
+        browser { browser ->
             withProject { id, name ->
-                // Goes to the home page and logs in
-                HomePage home = goTo HomePage, [:]
-                home.login 'admin', adminPassword
-                waitUntil("User name is 'Administrator'") { home.header.userName == 'Administrator' }
+                // Goes to the home page and logs in browser ->
+                HomePage home = loginAsAdmin(browser)
                 // Goes to the project
                 ProjectPage projectPage = home.goToProject(name)
                 // Creates a branch
