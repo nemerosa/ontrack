@@ -34,4 +34,8 @@ public class HomePage extends AbstractHeaderPage {
         true
     }
 
+    ProjectPage goToProject(String name) {
+        driver.findElement(By.linkText(name)).click()
+        browser.at(ProjectPage)
+    }
 }

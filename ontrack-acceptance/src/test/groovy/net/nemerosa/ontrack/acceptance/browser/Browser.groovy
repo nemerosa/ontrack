@@ -1,6 +1,9 @@
 package net.nemerosa.ontrack.acceptance.browser
 
+import net.nemerosa.ontrack.acceptance.browser.pages.ProjectPage
 import org.apache.commons.lang3.reflect.ConstructorUtils
+
+import java.lang.reflect.Type
 
 public class Browser {
 
@@ -12,12 +15,7 @@ public class Browser {
     }
 
     public <P extends Page> P goTo(Class<P> pageClass, Map<String, Object> parameters) {
-        P page;
-        try {
-            page = ConstructorUtils.invokeExactConstructor(pageClass, this);
-        } catch (Exception e) {
-            throw new CannotBuildPageException(pageClass, e);
-        }
+        P page = page(pageClass)
         String path = page.getPath(parameters);
         configuration.goTo(path);
         page.waitFor();
@@ -32,4 +30,19 @@ public class Browser {
         })
     }
 
+    def <P extends Page> P at(Class<P> pageClass) {
+        P page = page(pageClass)
+        page.waitFor()
+        page
+    }
+
+    protected <P extends Page> P page(Class<P> pageClass) {
+        P page;
+        try {
+            page = ConstructorUtils.invokeExactConstructor(pageClass, this);
+        } catch (Exception e) {
+            throw new CannotBuildPageException(pageClass, e);
+        }
+        page
+    }
 }

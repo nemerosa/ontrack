@@ -34,6 +34,7 @@ class ACCBrowserBasic extends AcceptanceTestClient {
         browser {
             HomePage home = goTo HomePage, [:]
             home.login 'admin', adminPassword
+            waitUntil("User name is 'Administrator'") { home.header.userName == 'Administrator' }
 
             def projectName = uid('P')
             home.createProject {
@@ -50,10 +51,15 @@ class ACCBrowserBasic extends AcceptanceTestClient {
     void 'Branch creation'() {
         browser {
             withProject { id, name ->
-                // Goes to the project page
-                ProjectPage projectPage = goTo ProjectPage, [id: id]
+                // Goes to the home page and logs in
+                HomePage home = goTo HomePage, [:]
+                home.login 'admin', adminPassword
+                waitUntil("User name is 'Administrator'") { home.header.userName == 'Administrator' }
+                // Goes to the project
+                ProjectPage projectPage = home.goToProject(name)
                 // Login
                 projectPage.login 'admin', adminPassword
+                waitUntil("User name is 'Administrator'") { projectPage.header.userName == 'Administrator' }
                 // Creates a branch
                 def branchName = uid('B')
                 projectPage.createBranch { dialog ->
