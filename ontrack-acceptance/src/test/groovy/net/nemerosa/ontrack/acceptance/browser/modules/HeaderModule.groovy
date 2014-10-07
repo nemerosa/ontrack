@@ -12,17 +12,17 @@ public class HeaderModule extends AbstractModule {
     }
 
     public String getUserName() {
-        driver.findElement(By.id('header-user-menu')).text
+        $(By.id('header-user-menu')).text
     }
 
     public void login(String name, String password) {
-        driver.findElement(By.linkText("Sign in")).click();
+        $(By.linkText("Sign in")).click()
         browser.screenshot("login-displayed");
 
-        WebElement tName = driver.findElement(By.name("name"));
+        WebElement tName = $(By.name("name"));
         tName.sendKeys(name);
 
-        WebElement tPassword = driver.findElement(By.name("password"));
+        WebElement tPassword = $(By.name("password"));
         tPassword.sendKeys(password);
 
         browser.screenshot("login-filled-in");
@@ -32,7 +32,7 @@ public class HeaderModule extends AbstractModule {
         trace("Login.password (size) = %d", tPassword.getAttribute("value").length());
 
         // Sign in OK
-        WebElement okButton = driver.findElement(By.className("btn-primary"));
+        WebElement okButton = $(By.className("btn-primary"));
         browser.waitUntil { okButton.enabled }
         okButton.click();
     }

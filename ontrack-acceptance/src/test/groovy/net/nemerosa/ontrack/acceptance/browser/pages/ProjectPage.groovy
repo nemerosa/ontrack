@@ -16,7 +16,7 @@ class ProjectPage extends AbstractHeaderPage {
     }
 
     void createBranch(Closure closure) {
-        def createBranchCommand = driver.findElement(By.className('ot-command-branch-new'))
+        def createBranchCommand = $(By.className('ot-command-branch-new'))
         browser.waitUntil { createBranchCommand.displayed }
         createBranchCommand.click()
         BranchDialog dialog = new BranchDialog(browser).waitFor()
@@ -26,7 +26,7 @@ class ProjectPage extends AbstractHeaderPage {
     }
 
     boolean isBranchPresent(String branchName) {
-        browser.waitUntil { driver.findElement(By.linkText(branchName)).displayed }
+        browser.waitUntil { $(By.linkText(branchName)).displayed }
         true
     }
 }

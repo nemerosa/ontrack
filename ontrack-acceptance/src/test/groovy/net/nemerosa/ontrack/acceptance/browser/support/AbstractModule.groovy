@@ -1,7 +1,9 @@
 package net.nemerosa.ontrack.acceptance.browser.support
 
 import net.nemerosa.ontrack.acceptance.browser.Browser
+import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
+import org.openqa.selenium.WebElement
 import org.openqa.selenium.support.PageFactory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -21,6 +23,10 @@ public abstract class AbstractModule {
 
     public void trace(String message, Object... parameters) {
         logger.debug("[gui] {}", String.format(message, parameters));
+    }
+
+    public WebElement $(By by) {
+        browser.findElement(by)
     }
 
 }

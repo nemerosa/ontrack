@@ -16,7 +16,7 @@ public class HomePage extends AbstractHeaderPage {
     }
 
     public void createProject(Closure closure) {
-        def createProjectCommand = driver.findElement(By.className('ot-command-project-new'))
+        def createProjectCommand = $(By.className('ot-command-project-new'))
         browser.waitUntil { createProjectCommand.displayed }
         createProjectCommand.click()
         ProjectDialog dialog = new ProjectDialog(browser).waitFor()
@@ -26,12 +26,12 @@ public class HomePage extends AbstractHeaderPage {
     }
 
     public boolean isProjectPresent(String name) {
-        browser.waitUntil { driver.findElement(By.linkText(name)).displayed }
+        assert $(By.linkText(name)).displayed
         true
     }
 
     ProjectPage goToProject(String name) {
-        driver.findElement(By.linkText(name)).click()
+        $(By.linkText(name)).click()
         browser.at(ProjectPage)
     }
 }

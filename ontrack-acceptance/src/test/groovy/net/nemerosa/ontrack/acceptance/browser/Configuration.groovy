@@ -1,11 +1,13 @@
 package net.nemerosa.ontrack.acceptance.browser
 
+import com.google.common.base.Function
 import com.google.common.base.Predicate
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.StringUtils
 import org.openqa.selenium.*
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.firefox.FirefoxProfile
+import org.openqa.selenium.support.ui.FluentWait
 import org.openqa.selenium.support.ui.WebDriverWait
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -61,6 +63,21 @@ public class Configuration {
     public void goTo(String path) {
         logger.info("Go to: ${}", path);
         driver.get(String.format("%s/%s", baseUrl, path));
+    }
+
+    public WebElement findElement(By by) {
+        new FluentWait<WebDriver>(driver)
+                .withTimeout(implicitWait, TimeUnit.SECONDS)
+                .pollingEvery(1, TimeUnit.SECONDS)
+                .ignoring(NoSuchElementException.class)
+                .ignoring(StaleElementReferenceException.class)
+                .until(
+                new Function<WebDriver, WebElement>() {
+                    public WebElement apply(WebDriver driver) {
+                        return driver.findElement(by);
+                    }
+                }
+        )
     }
 
     public void waitUntil(Closure<Boolean> closure) {
