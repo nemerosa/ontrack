@@ -35,6 +35,13 @@ public class HeaderModule extends AbstractModule {
         WebElement okButton = $(By.className("btn-primary"));
         browser.waitUntil { okButton.enabled }
         okButton.click();
+
+        /**
+         * Here, the whole page is now reloaded
+         *
+         * Waiting a bit
+         */
+        sleep 500
     }
 
 }
