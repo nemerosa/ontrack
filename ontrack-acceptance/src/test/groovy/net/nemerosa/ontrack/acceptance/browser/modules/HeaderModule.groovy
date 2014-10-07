@@ -12,7 +12,7 @@ public class HeaderModule extends AbstractModule {
     }
 
     public String getUserName() {
-        $(By.id('header-user-menu')).text
+        $('#header-user-menu').text
     }
 
     public void login(String name, String password) {
@@ -32,7 +32,7 @@ public class HeaderModule extends AbstractModule {
         trace("Login.password (size) = %d", tPassword.getAttribute("value").length());
 
         // Sign in OK
-        WebElement okButton = $(By.className("btn-primary"));
+        WebElement okButton = $(".btn-primary");
         browser.waitUntil { okButton.enabled }
         okButton.click();
 

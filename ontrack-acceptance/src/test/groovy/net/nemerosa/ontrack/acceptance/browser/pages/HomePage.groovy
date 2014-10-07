@@ -16,7 +16,7 @@ public class HomePage extends AbstractHeaderPage {
     }
 
     public void createProject(Closure closure) {
-        def createProjectCommand = $(By.className('ot-command-project-new'))
+        def createProjectCommand = $('.ot-command-project-new')
         browser.waitUntil { createProjectCommand.displayed }
         createProjectCommand.click()
         ProjectDialog dialog = new ProjectDialog(browser).waitFor()

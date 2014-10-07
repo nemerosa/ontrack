@@ -16,7 +16,7 @@ class ProjectPage extends AbstractHeaderPage {
     }
 
     void createBranch(Closure closure) {
-        def createBranchCommand = $(By.className('ot-command-branch-new'))
+        def createBranchCommand = $('.ot-command-branch-new')
         browser.waitUntil { createBranchCommand.displayed }
         createBranchCommand.click()
         BranchDialog dialog = new BranchDialog(browser).waitFor()

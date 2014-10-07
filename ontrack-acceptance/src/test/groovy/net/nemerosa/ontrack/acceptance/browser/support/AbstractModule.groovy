@@ -29,4 +29,8 @@ public abstract class AbstractModule {
         browser.findElement(by)
     }
 
+    public WebElement $(String css) {
+        browser.findElement(By.cssSelector(css))
+    }
+
 }
