@@ -3,13 +3,8 @@ package net.nemerosa.ontrack.acceptance.browser.pages
 import net.nemerosa.ontrack.acceptance.browser.Browser
 import net.nemerosa.ontrack.acceptance.browser.dialogs.ProjectDialog
 import org.openqa.selenium.By
-import org.openqa.selenium.WebElement
-import org.openqa.selenium.support.FindBy
 
 public class HomePage extends AbstractHeaderPage {
-
-    @FindBy(className = "ot-command-project-new")
-    private WebElement createProjectCommand;
 
     public HomePage(Browser browser) {
         super(browser);
@@ -21,6 +16,7 @@ public class HomePage extends AbstractHeaderPage {
     }
 
     public void createProject(Closure closure) {
+        def createProjectCommand = driver.findElement(By.className('ot-command-project-new'))
         browser.waitUntil { createProjectCommand.displayed }
         createProjectCommand.click()
         ProjectDialog dialog = new ProjectDialog(browser).waitFor()

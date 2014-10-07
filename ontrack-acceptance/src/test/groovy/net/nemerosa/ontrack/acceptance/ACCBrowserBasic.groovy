@@ -57,9 +57,6 @@ class ACCBrowserBasic extends AcceptanceTestClient {
                 waitUntil("User name is 'Administrator'") { home.header.userName == 'Administrator' }
                 // Goes to the project
                 ProjectPage projectPage = home.goToProject(name)
-                // Login
-                projectPage.login 'admin', adminPassword
-                waitUntil("User name is 'Administrator'") { projectPage.header.userName == 'Administrator' }
                 // Creates a branch
                 def branchName = uid('B')
                 projectPage.createBranch { dialog ->

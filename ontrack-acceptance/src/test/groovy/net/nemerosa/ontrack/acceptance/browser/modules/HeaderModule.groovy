@@ -4,26 +4,19 @@ import net.nemerosa.ontrack.acceptance.browser.Browser
 import net.nemerosa.ontrack.acceptance.browser.support.AbstractModule
 import org.openqa.selenium.By
 import org.openqa.selenium.WebElement
-import org.openqa.selenium.support.FindBy
 
 public class HeaderModule extends AbstractModule {
-
-    @FindBy(linkText = "Sign in")
-    private WebElement signIn;
-
-    @FindBy(id = "header-user-menu")
-    private WebElement userMenu;
 
     public HeaderModule(Browser browser) {
         super(browser);
     }
 
     public String getUserName() {
-        userMenu.text
+        driver.findElement(By.id('header-user-menu')).text
     }
 
     public void login(String name, String password) {
-        signIn.click();
+        driver.findElement(By.linkText("Sign in")).click();
         browser.screenshot("login-displayed");
 
         WebElement tName = driver.findElement(By.name("name"));

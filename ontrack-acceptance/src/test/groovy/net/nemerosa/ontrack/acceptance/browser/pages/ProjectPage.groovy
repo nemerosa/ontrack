@@ -3,13 +3,8 @@ package net.nemerosa.ontrack.acceptance.browser.pages
 import net.nemerosa.ontrack.acceptance.browser.Browser
 import net.nemerosa.ontrack.acceptance.browser.dialogs.BranchDialog
 import org.openqa.selenium.By
-import org.openqa.selenium.WebElement
-import org.openqa.selenium.support.FindBy
 
 class ProjectPage extends AbstractHeaderPage {
-
-    @FindBy(className = 'ot-command-branch-new')
-    private WebElement createBranchCommand
 
     ProjectPage(Browser browser) {
         super(browser)
@@ -21,6 +16,7 @@ class ProjectPage extends AbstractHeaderPage {
     }
 
     void createBranch(Closure closure) {
+        def createBranchCommand = driver.findElement(By.className('ot-command-branch-new'))
         browser.waitUntil { createBranchCommand.displayed }
         createBranchCommand.click()
         BranchDialog dialog = new BranchDialog(browser).waitFor()
