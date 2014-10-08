@@ -37,21 +37,29 @@ public class BuildFilterJdbcRepository extends AbstractJdbcRepository implements
         return getNamedParameterJdbcTemplate().query(
                 "(SELECT * FROM BUILD_FILTERS WHERE BRANCHID = :branchId)" +
                         " UNION " +
-                        "(SELECT NULL, * FROM SHARED_BUILD_FILTERS WHERE BRANCHID = :branchId)",
+                        "(SELECT NULL AS accountId, * FROM SHARED_BUILD_FILTERS WHERE BRANCHID = :branchId)",
                 params("branchId", branchId),
                 (rs, row) -> toBuildFilter(rs)
         );
     }
 
     @Override
-    public Collection<TBuildFilter> findForBranch(int accountId, int branchId) {
-        return getNamedParameterJdbcTemplate().query(
-                "(SELECT * FROM BUILD_FILTERS WHERE ACCOUNTID = :accountId AND BRANCHID = :branchId)" +
-                        " UNION " +
-                        "(SELECT NULL, * FROM SHARED_BUILD_FILTERS WHERE BRANCHID = :branchId)",
-                params("branchId", branchId).addValue("accountId", accountId),
-                (rs, row) -> toBuildFilter(rs)
-        );
+    public Collection<TBuildFilter> findForBranch(OptionalInt accountId, int branchId) {
+        if (accountId.isPresent()) {
+            return getNamedParameterJdbcTemplate().query(
+                    "(SELECT * FROM BUILD_FILTERS WHERE ACCOUNTID = :accountId AND BRANCHID = :branchId)" +
+                            " UNION " +
+                            "(SELECT NULL AS accountId, * FROM SHARED_BUILD_FILTERS WHERE BRANCHID = :branchId)",
+                    params("branchId", branchId).addValue("accountId", accountId.getAsInt()),
+                    (rs, row) -> toBuildFilter(rs)
+            );
+        } else {
+            return getNamedParameterJdbcTemplate().query(
+                    "SELECT NULL AS accountId, * FROM SHARED_BUILD_FILTERS WHERE BRANCHID = :branchId",
+                    params("branchId", branchId),
+                    (rs, row) -> toBuildFilter(rs)
+            );
+        }
     }
 
     @Override
@@ -60,7 +68,7 @@ public class BuildFilterJdbcRepository extends AbstractJdbcRepository implements
                 getFirstItem(
                         "(SELECT * FROM BUILD_FILTERS WHERE ACCOUNTID = :accountId AND BRANCHID = :branchId AND NAME = :name)" +
                                 " UNION " +
-                                "(SELECT NULL, * FROM SHARED_BUILD_FILTERS WHERE BRANCHID = :branchId AND NAME = :name)",
+                                "(SELECT NULL AS accountId, * FROM SHARED_BUILD_FILTERS WHERE BRANCHID = :branchId AND NAME = :name)",
                         params("branchId", branchId).addValue("accountId", accountId).addValue("name", name),
                         (rs, row) -> toBuildFilter(rs)
                 )

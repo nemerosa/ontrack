@@ -133,7 +133,7 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
         protected abstract void contextSetup();
     }
 
-    protected static class AccountCall extends AbstractContextCall {
+    protected static class AccountCall<T extends AccountCall<T>> extends AbstractContextCall {
 
         protected final Account account;
 
@@ -143,6 +143,34 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
 
         public AccountCall(String name, SecurityRole role) {
             this(Account.of(name, name, name + "@test.com", role, AuthenticationSource.none()));
+        }
+
+        public T with(Class<? extends GlobalFunction> fn) {
+            account.withGlobalRole(
+                    Optional.of(
+                            new GlobalRole(
+                                    "test", "Test global role", "",
+                                    Collections.singleton(fn),
+                                    Collections.emptySet()
+                            )
+                    )
+            );
+            //noinspection unchecked
+            return (T) this;
+        }
+
+        public T with(int projectId, Class<? extends ProjectFunction> fn) {
+            account.withProjectRole(
+                    new ProjectRoleAssociation(
+                            projectId,
+                            new ProjectRole(
+                                    "test", "Test", "",
+                                    Collections.singleton(fn)
+                            )
+                    )
+            );
+            //noinspection unchecked
+            return (T) this;
         }
 
         @Override
@@ -158,36 +186,10 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
         }
     }
 
-    protected static class UserCall extends AccountCall {
+    protected static class UserCall extends AccountCall<UserCall> {
 
         public UserCall() {
             super("user", SecurityRole.USER);
-        }
-
-        public UserCall with(Class<? extends GlobalFunction> fn) {
-            account.withGlobalRole(
-                    Optional.of(
-                            new GlobalRole(
-                                    "test", "Test global role", "",
-                                    Collections.singleton(fn),
-                                    Collections.emptySet()
-                            )
-                    )
-            );
-            return this;
-        }
-
-        public UserCall with(int projectId, Class<? extends ProjectFunction> fn) {
-            account.withProjectRole(
-                    new ProjectRoleAssociation(
-                            projectId,
-                            new ProjectRole(
-                                    "test", "Test", "",
-                                    Collections.singleton(fn)
-                            )
-                    )
-            );
-            return this;
         }
 
     }

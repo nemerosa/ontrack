@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.buildfilter.BuildFilterResource;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.security.Account;
 import net.nemerosa.ontrack.model.security.BranchEdit;
+import net.nemerosa.ontrack.model.security.BranchFilterMgt;
 import net.nemerosa.ontrack.model.security.ProjectView;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.BranchCopyRequest;
@@ -44,6 +45,68 @@ public class BuildFilterServiceIT extends AbstractServiceTestSupport {
                         )
         );
         assertFalse("A predefined filter cannot be saved", filterCreated.isSuccess());
+    }
+
+    /**
+     * Checks that sharing a saved filter overrides the account specific one.
+     */
+    @Test
+    public void saveFilter_shared_after_account_one() throws Exception {
+        // Branch
+        Branch branch = doCreateBranch();
+        // Account for the tests
+        Account account = doCreateAccount();
+
+        // Creates a filter for this account
+        Ack ack = asAccount(account).call(() ->
+                        buildFilterService.saveFilter(
+                                branch.getId(),
+                                false,
+                                "MyFilter",
+                                NamedBuildFilterProvider.class.getName(),
+                                objectMapper.valueToTree(NamedBuildFilterData.of("1"))
+                        )
+        );
+        assertTrue("Account filter saved", ack.isSuccess());
+
+        // Makes sure we find this filter back when logged
+        Collection<BuildFilterResource<?>> filters = asAccount(account).call(() -> buildFilterService.getBuildFilters(branch.getId()));
+        assertEquals(1, filters.size());
+        BuildFilterResource<?> filter = filters.iterator().next();
+        assertEquals("MyFilter", filter.getName());
+        assertFalse(filter.isShared());
+
+        // ... but it is not available for anybody else
+        assertTrue("Account filter not available for everybody else", buildFilterService.getBuildFilters(branch.getId()).isEmpty());
+
+        // Now, shares a filter with the same name
+        ack = asAccount(account)
+                .with(branch.projectId(), ProjectView.class)
+                .with(branch.projectId(), BranchFilterMgt.class)
+                .call(() ->
+                                buildFilterService.saveFilter(
+                                        branch.getId(),
+                                        true, // Sharing
+                                        "MyFilter",
+                                        NamedBuildFilterProvider.class.getName(),
+                                        objectMapper.valueToTree(NamedBuildFilterData.of("1"))
+                                )
+                );
+        assertTrue("Account filter shared", ack.isSuccess());
+
+        // Makes sure we find this filter back when logged
+        filters = asAccount(account).call(() -> buildFilterService.getBuildFilters(branch.getId()));
+        assertEquals(1, filters.size());
+        filter = filters.iterator().next();
+        assertEquals("MyFilter", filter.getName());
+        assertTrue(filter.isShared());
+
+        // ... and that it is available also for not logged users
+        filters = buildFilterService.getBuildFilters(branch.getId());
+        assertEquals("Account filter available for everybody else", 1, filters.size());
+        filter = filters.iterator().next();
+        assertEquals("MyFilter", filter.getName());
+        assertTrue(filter.isShared());
     }
 
     @Test

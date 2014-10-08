@@ -12,7 +12,7 @@ public interface BuildFilterRepository {
 
     Collection<TBuildFilter> findForBranch(int branchId);
 
-    Collection<TBuildFilter> findForBranch(int accountId, int branchId);
+    Collection<TBuildFilter> findForBranch(OptionalInt accountId, int branchId);
 
     Optional<TBuildFilter> findByBranchAndName(int accountId, int branchId, String name);
 

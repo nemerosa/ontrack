@@ -67,7 +67,7 @@ public class BuildFilterJdbcRepositoryIT extends AbstractRepositoryTestSupport {
         assertTrue(ack.isSuccess());
 
         // Gets the list for this branch AND account
-        Collection<TBuildFilter> list = repository.findForBranch(account.id(), branch.id());
+        Collection<TBuildFilter> list = repository.findForBranch(OptionalInt.of(account.id()), branch.id());
         assertEquals(
                 Arrays.asList(
                         new TBuildFilter(
@@ -123,7 +123,7 @@ public class BuildFilterJdbcRepositoryIT extends AbstractRepositoryTestSupport {
         assertTrue(ack.isSuccess());
 
         // Gets the list for this branch AND account
-        Collection<TBuildFilter> list = repository.findForBranch(account.id(), branch.id());
+        Collection<TBuildFilter> list = repository.findForBranch(OptionalInt.of(account.id()), branch.id());
         assertEquals(
                 Arrays.asList(
                         new TBuildFilter(
@@ -187,7 +187,7 @@ public class BuildFilterJdbcRepositoryIT extends AbstractRepositoryTestSupport {
         assertTrue(ack.isSuccess());
 
         // Gets the list for this branch AND account
-        Collection<TBuildFilter> list = repository.findForBranch(account.id(), branch.id());
+        Collection<TBuildFilter> list = repository.findForBranch(OptionalInt.of(account.id()), branch.id());
         assertEquals(
                 Arrays.asList(
                         new TBuildFilter(

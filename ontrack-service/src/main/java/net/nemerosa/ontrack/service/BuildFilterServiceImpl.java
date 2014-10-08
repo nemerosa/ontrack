@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.stream.Collectors;
@@ -54,7 +53,7 @@ public class BuildFilterServiceImpl implements BuildFilterService {
         Account account = securityService.getCurrentAccount();
         if (account != null) {
             // Gets the filters for this account and the branch
-            return buildFilterRepository.findForBranch(account.id(), branchId.getValue()).stream()
+            return buildFilterRepository.findForBranch(OptionalInt.of(account.id()), branchId.getValue()).stream()
                     .map(this::loadBuildFilterResource)
                     .filter(Optional::isPresent)
                     .map(Optional::get)
@@ -62,7 +61,12 @@ public class BuildFilterServiceImpl implements BuildFilterService {
         }
         // Not logged, no filter
         else {
-            return Collections.emptyList();
+            // Gets the filters for the branch
+            return buildFilterRepository.findForBranch(OptionalInt.empty(), branchId.get()).stream()
+                    .map(this::loadBuildFilterResource)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toList());
         }
     }
 
