@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.buildfilter.*;
 import net.nemerosa.ontrack.model.exceptions.BuildFilterNotFoundException;
 import net.nemerosa.ontrack.model.exceptions.BuildFilterNotLoggedException;
 import net.nemerosa.ontrack.model.security.Account;
+import net.nemerosa.ontrack.model.security.BranchFilterMgt;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ID;
@@ -16,7 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.stream.Collectors;
 
 @Service
@@ -103,6 +107,12 @@ public class BuildFilterServiceImpl implements BuildFilterService {
         if (account == null) {
             return Ack.NOK;
         }
+        // Saves it for this account
+        return doSaveFilter(OptionalInt.of(account.id()), branchId, name, type, parameters);
+
+    }
+
+    private Ack doSaveFilter(OptionalInt accountId, ID branchId, String name, String type, JsonNode parameters) {
         // Checks the provider
         Optional<? extends BuildFilterProvider<Object>> provider = getBuildFilterProviderByType(type);
         if (!provider.isPresent()) {
@@ -117,16 +127,22 @@ public class BuildFilterServiceImpl implements BuildFilterService {
             return Ack.NOK;
         }
         // Saving
-        return buildFilterRepository.save(OptionalInt.of(account.id()), branchId.getValue(), name, type, parameters);
+        return buildFilterRepository.save(accountId, branchId.getValue(), name, type, parameters);
     }
 
     @Override
     public Ack shareFilter(ID branchId, String name, String type, JsonNode data) {
         // Gets the branch
         Branch branch = structureService.getBranch(branchId);
-        // FIXME Checks access rights
-        // FIXME Saves the filter
-        return Ack.NOK;
+        // Checks access rights
+        securityService.checkProjectFunction(branch, BranchFilterMgt.class);
+        // Deletes any previous filter
+        int currentAccountId = securityService.getCurrentAccount().id();
+        buildFilterRepository.findByBranchAndName(currentAccountId, branchId.get(), name).ifPresent(
+                (filter) -> buildFilterRepository.delete(currentAccountId, branchId.get(), name)
+        );
+        // Saves the filter
+        return doSaveFilter(OptionalInt.empty(), branchId, name, type, data);
     }
 
     @Override
