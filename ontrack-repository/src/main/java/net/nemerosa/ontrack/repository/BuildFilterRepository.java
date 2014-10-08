@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.structure.ID;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.OptionalInt;
 
 public interface BuildFilterRepository {
 
@@ -15,7 +16,7 @@ public interface BuildFilterRepository {
 
     Optional<TBuildFilter> findByBranchAndName(int accountId, int branchId, String name);
 
-    Ack save(int accountId, int branchId, String name, String type, JsonNode data);
+    Ack save(OptionalInt accountId, int branchId, String name, String type, JsonNode data);
 
     Ack delete(int accountId, int branchId, String name);
 }

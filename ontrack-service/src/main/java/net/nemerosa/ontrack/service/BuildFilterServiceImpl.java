@@ -14,10 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -96,6 +93,7 @@ public class BuildFilterServiceImpl implements BuildFilterService {
 
     @Override
     public Ack saveFilter(ID branchId, String name, String type, JsonNode parameters) {
+        // TODO #68 Checks security for shared filters
         // Checks the account
         Account account = securityService.getCurrentAccount();
         if (account == null) {
@@ -115,7 +113,7 @@ public class BuildFilterServiceImpl implements BuildFilterService {
             return Ack.NOK;
         }
         // Saving
-        return buildFilterRepository.save(account.id(), branchId.getValue(), name, type, parameters);
+        return buildFilterRepository.save(OptionalInt.of(account.id()), branchId.getValue(), name, type, parameters);
     }
 
     @Override
@@ -156,13 +154,14 @@ public class BuildFilterServiceImpl implements BuildFilterService {
     @SuppressWarnings("unchecked")
     private <T> Optional<BuildFilterResource<T>> loadBuildFilterResource(TBuildFilter t) {
         return getBuildFilterProviderByType(t.getType())
-                .flatMap(provider -> loadBuildFilterResource((BuildFilterProvider<T>) provider, t.getBranchId(), t.getName(), t.getData()));
+                .flatMap(provider -> loadBuildFilterResource((BuildFilterProvider<T>) provider, t.getBranchId(), t.isShared(), t.getName(), t.getData()));
     }
 
-    private <T> Optional<BuildFilterResource<T>> loadBuildFilterResource(BuildFilterProvider<T> provider, int branchId, String name, JsonNode data) {
+    private <T> Optional<BuildFilterResource<T>> loadBuildFilterResource(BuildFilterProvider<T> provider, int branchId, boolean shared, String name, JsonNode data) {
         return provider.parse(data).map(parsedData ->
                         new BuildFilterResource<>(
                                 ID.of(branchId),
+                                shared,
                                 name,
                                 provider.getClass().getName(),
                                 parsedData

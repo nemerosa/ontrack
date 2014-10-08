@@ -14,6 +14,10 @@ public class BuildFilterResource<T> {
      */
     private final ID branchId;
     /**
+     * Shared filter?
+     */
+    private final boolean shared;
+    /**
      * Name for this filter
      */
     private final String name;
