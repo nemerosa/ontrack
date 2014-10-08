@@ -167,4 +167,82 @@ public class BuildFilterJdbcRepositoryIT extends AbstractRepositoryTestSupport {
         );
     }
 
+    @Test
+    public void save_shared_build_filter_same_name() {
+        Ack ack = repository.save(
+                OptionalInt.empty(),
+                branch.id(),
+                "Test",
+                "TestFilterType",
+                JsonUtils.object().with("test", 1).end()
+        );
+        assertTrue(ack.isSuccess());
+        ack = repository.save(
+                OptionalInt.of(account.id()),
+                branch.id(),
+                "Test",
+                "TestFilterType",
+                JsonUtils.object().with("test", 1).end()
+        );
+        assertTrue(ack.isSuccess());
+
+        // Gets the list for this branch AND account
+        Collection<TBuildFilter> list = repository.findForBranch(account.id(), branch.id());
+        assertEquals(
+                Arrays.asList(
+                        new TBuildFilter(
+                                OptionalInt.of(account.id()),
+                                branch.id(),
+                                "Test",
+                                "TestFilterType",
+                                JsonUtils.object().with("test", 1).end()
+                        ),
+                        new TBuildFilter(
+                                OptionalInt.empty(),
+                                branch.id(),
+                                "Test",
+                                "TestFilterType",
+                                JsonUtils.object().with("test", 1).end()
+                        )
+                ),
+                list
+        );
+
+        // Gets the list for this branch
+        list = repository.findForBranch(branch.id());
+        assertEquals(
+                Arrays.asList(
+                        new TBuildFilter(
+                                OptionalInt.of(account.id()),
+                                branch.id(),
+                                "Test",
+                                "TestFilterType",
+                                JsonUtils.object().with("test", 1).end()
+                        ),
+                        new TBuildFilter(
+                                OptionalInt.empty(),
+                                branch.id(),
+                                "Test",
+                                "TestFilterType",
+                                JsonUtils.object().with("test", 1).end()
+                        )
+                ),
+                list
+        );
+
+        // Gets this filter
+        Optional<TBuildFilter> filter = repository.findByBranchAndName(account.id(), branch.id(), "Test");
+        assertTrue(filter.isPresent());
+        assertEquals(
+                new TBuildFilter(
+                        OptionalInt.of(account.id()),
+                        branch.id(),
+                        "Test",
+                        "TestFilterType",
+                        JsonUtils.object().with("test", 1).end()
+                ),
+                filter.get()
+        );
+    }
+
 }
