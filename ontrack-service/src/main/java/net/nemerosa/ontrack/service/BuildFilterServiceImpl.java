@@ -100,15 +100,30 @@ public class BuildFilterServiceImpl implements BuildFilterService {
     }
 
     @Override
-    public Ack saveFilter(ID branchId, String name, String type, JsonNode parameters) {
-        // TODO #68 Checks security for shared filters
+    public Ack saveFilter(ID branchId, boolean shared, String name, String type, JsonNode parameters) {
         // Checks the account
-        Account account = securityService.getCurrentAccount();
-        if (account == null) {
-            return Ack.NOK;
+        if (shared) {
+            Account account = securityService.getCurrentAccount();
+            // Gets the branch
+            Branch branch = structureService.getBranch(branchId);
+            // Checks access rights
+            securityService.checkProjectFunction(branch, BranchFilterMgt.class);
+            // Deletes any previous filter
+            int currentAccountId = account.id();
+            buildFilterRepository.findByBranchAndName(currentAccountId, branchId.get(), name).ifPresent(
+                    (filter) -> buildFilterRepository.delete(currentAccountId, branchId.get(), name)
+            );
+            // No account to be used
+            return doSaveFilter(OptionalInt.empty(), branchId, name, type, parameters);
+        } else {
+            Account account = securityService.getCurrentAccount();
+            if (account == null) {
+                return Ack.NOK;
+            } else {
+                // Saves it for this account
+                return doSaveFilter(OptionalInt.of(account.id()), branchId, name, type, parameters);
+            }
         }
-        // Saves it for this account
-        return doSaveFilter(OptionalInt.of(account.id()), branchId, name, type, parameters);
 
     }
 
@@ -128,21 +143,6 @@ public class BuildFilterServiceImpl implements BuildFilterService {
         }
         // Saving
         return buildFilterRepository.save(accountId, branchId.getValue(), name, type, parameters);
-    }
-
-    @Override
-    public Ack shareFilter(ID branchId, String name, String type, JsonNode data) {
-        // Gets the branch
-        Branch branch = structureService.getBranch(branchId);
-        // Checks access rights
-        securityService.checkProjectFunction(branch, BranchFilterMgt.class);
-        // Deletes any previous filter
-        int currentAccountId = securityService.getCurrentAccount().id();
-        buildFilterRepository.findByBranchAndName(currentAccountId, branchId.get(), name).ifPresent(
-                (filter) -> buildFilterRepository.delete(currentAccountId, branchId.get(), name)
-        );
-        // Saves the filter
-        return doSaveFilter(OptionalInt.empty(), branchId, name, type, data);
     }
 
     @Override

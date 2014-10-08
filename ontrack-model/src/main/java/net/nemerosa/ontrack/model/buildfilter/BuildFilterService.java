@@ -62,23 +62,12 @@ public interface BuildFilterService {
      * or if the filter type is not found, or if the parameters are not valid.
      *
      * @param branchId   Branch to save the filter for
+     * @param shared     If the filter must be shared in the branch (needs specific authorisation)
      * @param name       Name of the filter
      * @param type       Type of the filter
      * @param parameters Parameters for the filter
      */
-    Ack saveFilter(ID branchId, String name, String type, JsonNode parameters);
-
-    /**
-     * Shares a filter for a branch. Note that any saved filter for the current account
-     * that would have been saved with the same name would be deleted and replaced
-     * by this shared filter.
-     *
-     * @param branchId Branch to save the filter for
-     * @param name     Name of the filter
-     * @param type     Type of the filter
-     * @param data     Parameters for the filter
-     */
-    Ack shareFilter(ID branchId, String name, String type, JsonNode data);
+    Ack saveFilter(ID branchId, boolean shared, String name, String type, JsonNode parameters);
 
     /**
      * Deletes a filter for a branch. This method does nothing if the user is not logged,

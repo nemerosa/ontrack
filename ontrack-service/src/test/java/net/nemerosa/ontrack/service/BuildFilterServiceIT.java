@@ -37,6 +37,7 @@ public class BuildFilterServiceIT extends AbstractServiceTestSupport {
         Ack filterCreated = asAccount(account).call(() ->
                         buildFilterService.saveFilter(
                                 branch.getId(),
+                                false,
                                 "MyFilter",
                                 PromotionLevelBuildFilterProvider.class.getName(),
                                 JsonUtils.object().end()
@@ -57,6 +58,7 @@ public class BuildFilterServiceIT extends AbstractServiceTestSupport {
         Ack filterCreated = asAccount(account).call(() ->
                         buildFilterService.saveFilter(
                                 sourceBranch.getId(),
+                                false,
                                 "MyFilter",
                                 StandardBuildFilterProvider.class.getName(),
                                 JsonUtils.object().with("count", 1).end()
