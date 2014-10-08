@@ -46,4 +46,15 @@ public class StandardBuildFilterProviderTest {
         assertNull(data.get().getWithPromotionLevel());
     }
 
+    @Test
+    public void parse_with_after_date_null() {
+        Optional<StandardBuildFilterData> data = provider.parse(JsonUtils.object()
+                .with("count", 5)
+                .withNull("afterDate")
+                .end());
+        assertTrue(data.isPresent());
+        assertEquals(5, data.get().getCount());
+        assertNull(data.get().getAfterDate());
+    }
+
 }
