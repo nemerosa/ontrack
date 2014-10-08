@@ -7,7 +7,9 @@ import net.nemerosa.ontrack.model.exceptions.BuildFilterNotFoundException;
 import net.nemerosa.ontrack.model.exceptions.BuildFilterNotLoggedException;
 import net.nemerosa.ontrack.model.security.Account;
 import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ID;
+import net.nemerosa.ontrack.model.structure.StructureService;
 import net.nemerosa.ontrack.repository.BuildFilterRepository;
 import net.nemerosa.ontrack.repository.TBuildFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,15 +25,17 @@ public class BuildFilterServiceImpl implements BuildFilterService {
 
     private final Collection<BuildFilterProvider<?>> buildFilterProviders;
     private final BuildFilterRepository buildFilterRepository;
+    private final StructureService structureService;
     private final SecurityService securityService;
 
     @Autowired
     public BuildFilterServiceImpl(
             Collection<BuildFilterProvider<?>> buildFilterProviders,
             BuildFilterRepository buildFilterRepository,
-            SecurityService securityService) {
+            StructureService structureService, SecurityService securityService) {
         this.buildFilterProviders = buildFilterProviders;
         this.buildFilterRepository = buildFilterRepository;
+        this.structureService = structureService;
         this.securityService = securityService;
     }
 
@@ -114,6 +118,15 @@ public class BuildFilterServiceImpl implements BuildFilterService {
         }
         // Saving
         return buildFilterRepository.save(OptionalInt.of(account.id()), branchId.getValue(), name, type, parameters);
+    }
+
+    @Override
+    public Ack shareFilter(ID branchId, String name, String type, JsonNode data) {
+        // Gets the branch
+        Branch branch = structureService.getBranch(branchId);
+        // FIXME Checks access rights
+        // FIXME Saves the filter
+        return Ack.NOK;
     }
 
     @Override

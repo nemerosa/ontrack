@@ -93,6 +93,17 @@ public class BuildFilterController extends AbstractResourceController {
     }
 
     /**
+     * Sharing a filter
+     */
+    @RequestMapping(value = "branches/{branchId}/filters/{name}/share", method = RequestMethod.PUT)
+    public Ack shareFilter(@PathVariable ID branchId, @PathVariable String name, @RequestBody @Valid BuildFilterInput input) {
+        if (!StringUtils.equals(name, input.getName())) {
+            throw new IllegalArgumentException("The input name must be identical to the one in the URI.");
+        }
+        return buildFilterService.shareFilter(branchId, name, input.getType(), input.getData());
+    }
+
+    /**
      * Deletes a filter
      */
     @RequestMapping(value = "branches/{branchId}/filters/{name}", method = RequestMethod.DELETE)

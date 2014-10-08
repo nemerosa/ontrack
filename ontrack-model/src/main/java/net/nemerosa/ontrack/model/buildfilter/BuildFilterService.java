@@ -69,6 +69,18 @@ public interface BuildFilterService {
     Ack saveFilter(ID branchId, String name, String type, JsonNode parameters);
 
     /**
+     * Shares a filter for a branch. Note that any saved filter for the current account
+     * that would have been saved with the same name would be deleted and replaced
+     * by this shared filter.
+     *
+     * @param branchId Branch to save the filter for
+     * @param name     Name of the filter
+     * @param type     Type of the filter
+     * @param data     Parameters for the filter
+     */
+    Ack shareFilter(ID branchId, String name, String type, JsonNode data);
+
+    /**
      * Deletes a filter for a branch. This method does nothing if the user is not logged,
      * or if the filter is not found.
      *
