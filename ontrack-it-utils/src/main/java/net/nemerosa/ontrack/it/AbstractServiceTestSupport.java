@@ -173,6 +173,10 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
             return (T) this;
         }
 
+        public T withView(ProjectEntity e) {
+            return with(e.projectId(), ProjectView.class);
+        }
+
         @Override
         protected void contextSetup() {
             SecurityContext context = new SecurityContextImpl();
@@ -192,5 +196,8 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
             super("user", SecurityRole.USER);
         }
 
+        public AccountCall withId(int id) {
+            return new AccountCall(account.withId(ID.of(id)));
+        }
     }
 }

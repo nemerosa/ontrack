@@ -70,14 +70,19 @@ public class BuildFilterServiceIT extends AbstractServiceTestSupport {
         assertTrue("Account filter saved", ack.isSuccess());
 
         // Makes sure we find this filter back when logged
-        Collection<BuildFilterResource<?>> filters = asAccount(account).call(() -> buildFilterService.getBuildFilters(branch.getId()));
+        Collection<BuildFilterResource<?>> filters = asAccount(account).withView(branch).call(() -> buildFilterService.getBuildFilters(branch.getId()));
         assertEquals(1, filters.size());
         BuildFilterResource<?> filter = filters.iterator().next();
         assertEquals("MyFilter", filter.getName());
         assertFalse(filter.isShared());
 
         // ... but it is not available for anybody else
-        assertTrue("Account filter not available for everybody else", buildFilterService.getBuildFilters(branch.getId()).isEmpty());
+        assertTrue(
+                "Account filter not available for everybody else",
+                asUser().withId(10).withView(branch).call(() ->
+                                buildFilterService.getBuildFilters(branch.getId()).isEmpty()
+                )
+        );
 
         // Now, shares a filter with the same name
         ack = asAccount(account)
@@ -102,7 +107,7 @@ public class BuildFilterServiceIT extends AbstractServiceTestSupport {
         assertTrue(filter.isShared());
 
         // ... and that it is available also for not logged users
-        filters = buildFilterService.getBuildFilters(branch.getId());
+        filters = asUser().withId(10).withView(branch).call(() -> buildFilterService.getBuildFilters(branch.getId()));
         assertEquals("Account filter available for everybody else", 1, filters.size());
         filter = filters.iterator().next();
         assertEquals("MyFilter", filter.getName());
@@ -129,7 +134,7 @@ public class BuildFilterServiceIT extends AbstractServiceTestSupport {
         );
         assertTrue(filterCreated.isSuccess());
         // Checks the filter is created
-        Collection<BuildFilterResource<?>> filters = asAccount(account).call(() -> buildFilterService.getBuildFilters(sourceBranch.getId()));
+        Collection<BuildFilterResource<?>> filters = asAccount(account).with(sourceBranch.projectId(), ProjectView.class).call(() -> buildFilterService.getBuildFilters(sourceBranch.getId()));
         assertEquals(1, filters.size());
         BuildFilterResource<?> filter = filters.iterator().next();
         assertEquals("MyFilter", filter.getName());
@@ -150,7 +155,7 @@ public class BuildFilterServiceIT extends AbstractServiceTestSupport {
                 );
 
         // Gets the filter on the new branch
-        filters = asAccount(account).call(() -> buildFilterService.getBuildFilters(targetBranch.getId()));
+        filters = asAccount(account).withView(targetBranch).call(() -> buildFilterService.getBuildFilters(targetBranch.getId()));
         assertEquals(1, filters.size());
         filter = filters.iterator().next();
         assertEquals("MyFilter", filter.getName());

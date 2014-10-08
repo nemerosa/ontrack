@@ -49,12 +49,13 @@ public class BuildFilterServiceImpl implements BuildFilterService {
 
     @Override
     public Collection<BuildFilterResource<?>> getBuildFilters(ID branchId) {
+        Branch branch = structureService.getBranch(branchId);
         // Are we logged?
         Account account = securityService.getCurrentAccount();
         if (account != null) {
             // Gets the filters for this account and the branch
             return buildFilterRepository.findForBranch(OptionalInt.of(account.id()), branchId.getValue()).stream()
-                    .map(this::loadBuildFilterResource)
+                    .map(t -> loadBuildFilterResource(branch, t))
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .collect(Collectors.toList());
@@ -63,7 +64,7 @@ public class BuildFilterServiceImpl implements BuildFilterService {
         else {
             // Gets the filters for the branch
             return buildFilterRepository.findForBranch(OptionalInt.empty(), branchId.get()).stream()
-                    .map(this::loadBuildFilterResource)
+                    .map(t -> loadBuildFilterResource(branch, t))
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .collect(Collectors.toList());
@@ -185,15 +186,15 @@ public class BuildFilterServiceImpl implements BuildFilterService {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> Optional<BuildFilterResource<T>> loadBuildFilterResource(TBuildFilter t) {
+    private <T> Optional<BuildFilterResource<T>> loadBuildFilterResource(Branch branch, TBuildFilter t) {
         return getBuildFilterProviderByType(t.getType())
-                .flatMap(provider -> loadBuildFilterResource((BuildFilterProvider<T>) provider, t.getBranchId(), t.isShared(), t.getName(), t.getData()));
+                .flatMap(provider -> loadBuildFilterResource((BuildFilterProvider<T>) provider, branch, t.isShared(), t.getName(), t.getData()));
     }
 
-    private <T> Optional<BuildFilterResource<T>> loadBuildFilterResource(BuildFilterProvider<T> provider, int branchId, boolean shared, String name, JsonNode data) {
+    private <T> Optional<BuildFilterResource<T>> loadBuildFilterResource(BuildFilterProvider<T> provider, Branch branch, boolean shared, String name, JsonNode data) {
         return provider.parse(data).map(parsedData ->
                         new BuildFilterResource<>(
-                                ID.of(branchId),
+                                branch,
                                 shared,
                                 name,
                                 provider.getClass().getName(),
