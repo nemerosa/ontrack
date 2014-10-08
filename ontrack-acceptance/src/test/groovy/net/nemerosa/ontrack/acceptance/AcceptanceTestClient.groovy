@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-abstract class AcceptanceTestClient extends AcceptanceSupport {
+class AcceptanceTestClient extends AcceptanceSupport {
 
     private final Logger logger = LoggerFactory.getLogger(AcceptanceTestClient)
 
@@ -40,5 +40,16 @@ abstract class AcceptanceTestClient extends AcceptanceSupport {
 
     JsonNode doCreateBuild(int branchId, JsonNode nameDescription) {
         admin().post(nameDescription, "structure/branches/$branchId/builds/create").get()
+    }
+
+    def withProject(Closure closure) {
+        def p = doCreateProject()
+        int id = p.id.asInt()
+        String name = p.name.asText()
+        try {
+            closure(id, name)
+        } finally {
+            doDeleteProject name
+        }
     }
 }
