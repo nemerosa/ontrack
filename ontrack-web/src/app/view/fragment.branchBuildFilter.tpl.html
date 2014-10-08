@@ -35,7 +35,7 @@
                       title="Save this filter in your preferences"
                       ng-click="buildFilterSave(buildFilterResource)"></span>
                 <!-- Sharing -->
-                <span class="fa fa-share ot-command" ng-if="buildFilterResource._share"
+                <span class="fa fa-share ot-command" ng-if="!buildFilterResource.shared && branch._buildFilterShare"
                       title="Saves this filter and makes it available for all users in the branch"
                       ng-click="buildFilterShare(buildFilterResource)"></span>
                 <!-- Saved filter -->

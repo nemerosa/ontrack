@@ -428,6 +428,13 @@ angular.module('ot.view.branch', [
         };
 
         /**
+         * Sharing a saved filter
+         */
+        $scope.buildFilterShare = function (buildFilterResource) {
+            otBuildFilterService.shareFilter($scope.branch, buildFilterResource).then(loadBuildFilters);
+        };
+
+        /**
          * Permalink to the current filter
          */
         $scope.buildFilterLink = function () {

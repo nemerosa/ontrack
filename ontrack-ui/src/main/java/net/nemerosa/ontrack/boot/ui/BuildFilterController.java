@@ -78,7 +78,7 @@ public class BuildFilterController extends AbstractResourceController {
      */
     @RequestMapping(value = "branches/{branchId}/filters", method = RequestMethod.POST)
     public Ack createFilter(@PathVariable ID branchId, @RequestBody @Valid BuildFilterInput input) {
-        return buildFilterService.saveFilter(branchId, false, input.getName(), input.getType(), input.getData());
+        return buildFilterService.saveFilter(branchId, input.isShared(), input.getName(), input.getType(), input.getData());
     }
 
     /**
