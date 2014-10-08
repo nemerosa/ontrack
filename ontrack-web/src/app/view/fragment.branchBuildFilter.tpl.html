@@ -39,16 +39,22 @@
                       title="Saves this filter and makes it available for all users in the branch"
                       ng-click="buildFilterShare(buildFilterResource)"></span>
                 <!-- Saved filter -->
-                <span class="fa fa-user ot-command" ng-if="buildFilterResource._update"
+                <span class="fa fa-user ot-command" ng-if="buildFilterResource._update && !buildFilterResource.shared"
                       title="This filter has been saved in your preferences"
+                      ng-click="buildFilterApply(buildFilterResource)"></span>
+                <!-- Shared filter -->
+                <span class="fa fa-group ot-command" ng-if="buildFilterResource.shared"
+                      title="This filter has been shared for use in the branch."
                       ng-click="buildFilterApply(buildFilterResource)"></span>
                 <!-- Edition -->
                 <span class="ot-command-update ot-command"
                       title="Edit this filter"
+                      ng-if="!buildFilterResource.shared || branch._buildFilterShare"
                       ng-click="buildFilterEdit(buildFilterResource)"></span>
-                <!-- Deletion always available -->
+                <!-- Deletion always available, but for the shared filters -->
                 <span class="ot-command-delete ot-command"
                       title="Delete this filter"
+                      ng-if="!buildFilterResource.shared || branch._buildFilterShare"
                       ng-click="buildFilterRemove(buildFilterResource)"></span>
             </a>
         </li>
