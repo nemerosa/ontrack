@@ -34,6 +34,10 @@
                 <span class="fa fa-save ot-command" ng-if="!buildFilterResource._update && logged()"
                       title="Save this filter in your preferences"
                       ng-click="buildFilterSave(buildFilterResource)"></span>
+                <!-- Sharing -->
+                <span class="fa fa-share ot-command" ng-if="buildFilterResource._share"
+                      title="Saves this filter and makes it available for all users in the branch"
+                      ng-click="buildFilterShare(buildFilterResource)"></span>
                 <!-- Saved filter -->
                 <span class="fa fa-user ot-command" ng-if="buildFilterResource._update"
                       title="This filter has been saved in your preferences"

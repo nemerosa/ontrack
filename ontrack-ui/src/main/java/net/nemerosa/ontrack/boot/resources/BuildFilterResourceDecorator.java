@@ -29,7 +29,8 @@ public class BuildFilterResourceDecorator extends AbstractResourceDecorator<Buil
                 .link(
                         "_share",
                         on(BuildFilterController.class).getEditionForm(resource.getBranch().getId(), resource.getName()),
-                        BranchFilterMgt.class, resource.getBranch().projectId()
+                        resourceContext.isProjectFunctionGranted(resource.getBranch().projectId(), BranchFilterMgt.class)
+                                && !resource.isShared()
                 )
                         // Delete
                 .link(
