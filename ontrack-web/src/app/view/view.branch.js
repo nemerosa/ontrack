@@ -63,8 +63,7 @@ angular.module('ot.view.branch', [
         // Loading the build view
         function loadBuildView() {
             // Parameters for the call
-            // TODO Use '_view' link from the branch
-            var uri = 'structure/branches/' + branchId + '/view';
+            var uri = $scope.branch._view;
             var config = {};
             // Adds the filter parameters
             var currentBuildFilterResource = otBuildFilterService.getCurrentFilter(branchId);
@@ -440,7 +439,6 @@ angular.module('ot.view.branch', [
         $scope.buildFilterLink = function () {
             var currentFilter = otBuildFilterService.getCurrentFilter(branchId);
             if (currentFilter) {
-                // TODO Special case: shared filter (only the name is needed)
                 var jsonFilter = JSON.stringify(currentFilter);
                 $location.hash(jsonFilter);
             }
@@ -455,13 +453,11 @@ angular.module('ot.view.branch', [
                 // Parsing the JSON
                 try {
                     var json = JSON.parse(jsonFilter);
-                    // TODO Special case: shared filter (only the name is needed)
                     // Applies the filter
                     otBuildFilterService.storeCurrent(branchId, json);
                     // Removes the hash after use
                     $location.hash('');
                 } catch (e) {
-                    // TODO Ignoring the error, just logging it
                     otNotificationService.error("Cannot get the filter from the permalink.");
                 }
             }
