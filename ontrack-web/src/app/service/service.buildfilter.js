@@ -113,6 +113,10 @@ angular.module('ot.service.buildfilter', [
                     if (buildFilterResource._update && buildFilterResource.name == currentFilter.name) {
                         self.saveFilter(config.branch, currentFilter);
                     }
+                    // Sharing if saved under the same name
+                    if (buildFilterResource.shared && config.branch._buildFilterShare && buildFilterResource.name == currentFilter.name) {
+                        self.shareFilter(config.branch, currentFilter);
+                    }
                 });
             } else {
                 otNotificationService.error("The type of this filter appears not to be supported: " + type + ". " +
