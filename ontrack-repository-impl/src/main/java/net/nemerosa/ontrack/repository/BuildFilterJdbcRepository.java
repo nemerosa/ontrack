@@ -107,13 +107,27 @@ public class BuildFilterJdbcRepository extends AbstractJdbcRepository implements
     }
 
     @Override
-    public Ack delete(int accountId, int branchId, String name) {
-        return Ack.one(
+    public Ack delete(int accountId, int branchId, String name, boolean shared) {
+        // Account filter
+        Ack accountFilterDeleted = Ack.one(
                 getNamedParameterJdbcTemplate().update(
                         "DELETE FROM BUILD_FILTERS WHERE ACCOUNTID = :accountId AND BRANCHID = :branchId AND NAME = :name",
                         params("branchId", branchId).addValue("accountId", accountId).addValue("name", name)
                 )
         );
+        // Shared filter
+        if (shared) {
+            return accountFilterDeleted.or(
+                    Ack.one(
+                            getNamedParameterJdbcTemplate().update(
+                                    "DELETE FROM SHARED_BUILD_FILTERS WHERE BRANCHID = :branchId AND NAME = :name",
+                                    params("branchId", branchId).addValue("name", name)
+                            )
+                    )
+            );
+        } else {
+            return accountFilterDeleted;
+        }
     }
 
     private TBuildFilter toBuildFilter(ResultSet rs) throws SQLException {

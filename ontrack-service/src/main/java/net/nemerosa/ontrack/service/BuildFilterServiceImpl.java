@@ -116,7 +116,7 @@ public class BuildFilterServiceImpl implements BuildFilterService {
             // Deletes any previous filter
             int currentAccountId = account.id();
             buildFilterRepository.findByBranchAndName(currentAccountId, branchId.get(), name).ifPresent(
-                    (filter) -> buildFilterRepository.delete(currentAccountId, branchId.get(), name)
+                    (filter) -> buildFilterRepository.delete(currentAccountId, branchId.get(), name, true)
             );
             // No account to be used
             return doSaveFilter(OptionalInt.empty(), branchId, name, type, parameters);
@@ -152,9 +152,13 @@ public class BuildFilterServiceImpl implements BuildFilterService {
 
     @Override
     public Ack deleteFilter(ID branchId, String name) {
-        return securityService.getAccount()
-                .map(account -> buildFilterRepository.delete(account.id(), branchId.getValue(), name))
-                .orElse(Ack.NOK);
+        // Gets the branch
+        Branch branch = structureService.getBranch(branchId);
+        // If user is allowed to manage shared filters, this filter might have to be deleted from the shared filters
+        // as well
+        boolean sharedFilter = securityService.isProjectFunctionGranted(branch, BranchFilterMgt.class);
+        // Deleting the filter
+        return buildFilterRepository.delete(securityService.getCurrentAccount().id(), branchId.get(), name, sharedFilter);
     }
 
     @Override
