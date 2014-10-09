@@ -173,8 +173,12 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
             return (T) this;
         }
 
+        public T with(ProjectEntity e, Class<? extends ProjectFunction> fn) {
+            return with(e.projectId(), fn);
+        }
+
         public T withView(ProjectEntity e) {
-            return with(e.projectId(), ProjectView.class);
+            return with(e, ProjectView.class);
         }
 
         @Override
