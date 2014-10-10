@@ -219,6 +219,16 @@ public class BranchController extends AbstractResourceController {
         return copyService.cloneBranch(branch, request);
     }
 
+    /**
+     * Gets a form to make this branch a template definition.
+     */
+    @RequestMapping(value = "branches/{branchId}/templateDefinition", method = RequestMethod.POST)
+    public Form getTemplateDefinition(@PathVariable ID branchId) {
+        // TODO Gets the template definition for this branch
+        // TODO Gets the form for the template definition
+        return Form.create();
+    }
+
     private BranchBuildView buildViewWithFilter(ID branchId, BuildFilter buildFilter) {
         // Gets the branch
         Branch branch = getBranch(branchId);

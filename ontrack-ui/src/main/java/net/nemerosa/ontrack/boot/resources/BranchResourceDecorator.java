@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.boot.resources;
 import net.nemerosa.ontrack.boot.ui.*;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.Branch;
+import net.nemerosa.ontrack.model.structure.BranchType;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
 import net.nemerosa.ontrack.ui.resource.Link;
@@ -123,6 +124,14 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                         resourceContext.isProjectFunctionGranted(branch.projectId(), ProjectEdit.class)
                                 && !branch.isDisabled()
                 )
+                        // Template definition creation
+                .link(
+                        "_templateDefinition",
+                        on(BranchController.class).getTemplateDefinition(branch.getId()),
+                        branch.getType() != BranchType.TEMPLATE_INSTANCE
+                                && resourceContext.isProjectFunctionGranted(branch, BranchTemplateMgt.class)
+                )
+                        // TODO Gets the template definition for this branch
                         // OK
                 .build();
     }
