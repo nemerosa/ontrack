@@ -6,6 +6,7 @@ angular.module('ot.view.branch', [
     'ot.service.structure',
     'ot.service.buildfilter',
     'ot.service.copy',
+    'ot.service.template',
     'ot.dialog.validationStampRunView',
     'ot.dialog.promotionRuns'
 ])
@@ -16,7 +17,7 @@ angular.module('ot.view.branch', [
             controller: 'BranchCtrl'
         });
     })
-    .controller('BranchCtrl', function ($state, $scope, $stateParams, $http, $modal, $location, ot, otFormService, otStructureService, otBuildFilterService, otAlertService, otTaskService, otNotificationService, otCopyService) {
+    .controller('BranchCtrl', function ($state, $scope, $stateParams, $http, $modal, $location, ot, otFormService, otStructureService, otBuildFilterService, otAlertService, otTaskService, otNotificationService, otCopyService, otTemplateService) {
         var view = ot.view();
         // Branch's id
         var branchId = $stateParams.branchId;
@@ -182,7 +183,7 @@ angular.module('ot.view.branch', [
                         name: "Template definition",
                         cls: 'ot-command-branch-template-definition',
                         action: function () {
-                            // FIXME #40 Displays the template definition form
+                            otTemplateService.templateDefinition(branchResource._templateDefinition).then(loadBranch);
                         }
                     },
                     {

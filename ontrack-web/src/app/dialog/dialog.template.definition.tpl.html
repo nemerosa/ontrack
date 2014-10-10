@@ -1,0 +1,20 @@
+<div class="modal-header">
+    <h3>
+        Template definition
+        <span class="fa fa-question-circle text-info ot-action" ng-click="help = !help" title="Displays help."></span>
+    </h3>
+</div>
+<form name="thisForm" class="form-horizontal" ng-submit="submit(thisForm.$valid)" novalidate="novalidate">
+    <div class="modal-body">
+
+    </div>
+    <div class="modal-footer">
+
+        <div class="ot-alert-{{message.type}} alert-dismissable" ng-show="message">
+            <span>{{message.content}}</span>
+        </div>
+
+        <button class="btn btn-primary" type="submit" ng-disabled="thisForm.$invalid">OK</button>
+        <button class="btn btn-link" type="button" ng-click="cancel()">Cancel</button>
+    </div>
+</form>
