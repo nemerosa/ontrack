@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.model.structure;
 
 import lombok.Data;
 
+import java.util.Map;
+
 /**
  * Synchronisation parameters for a {@linkplain net.nemerosa.ontrack.model.structure.TemplateDefinition template definition}.
  */
@@ -18,7 +20,8 @@ public class TemplateSynchronisation {
     private final int interval;
 
     /**
-     * TODO Template expressions.
+     * Template expressions.
      */
+    private final Map<String, String> templateExpressions;
 
 }
