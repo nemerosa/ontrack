@@ -7,6 +7,24 @@
 <form name="thisForm" class="form-horizontal" ng-submit="submit(thisForm.$valid)" novalidate="novalidate">
     <div class="modal-body">
 
+        {{data}}
+
+        <tabset>
+            <tab heading="Parameters">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button title="Add entry" class="btn btn-default btn-xs" type="button" ng-click="addParameter()">
+                            <span class="ot-command ot-command-new"></span>
+                            Add parameter
+                        </button>
+                    </div>
+                </div>
+            </tab>
+            <tab heading="Synchronisation">
+
+            </tab>
+        </tabset>
+
     </div>
     <div class="modal-footer">
 
