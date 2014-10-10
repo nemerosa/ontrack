@@ -129,6 +129,7 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                         "_templateDefinition",
                         on(BranchController.class).getTemplateDefinition(branch.getId()),
                         // TODO We should rely on BranchTemplateService#isTemplateInstance() instead of a type
+                        // TODO Cannot get a template definition from a branch that contains builds
                         branch.getType() != BranchType.TEMPLATE_INSTANCE
                                 && resourceContext.isProjectFunctionGranted(branch, BranchTemplateMgt.class)
                 )

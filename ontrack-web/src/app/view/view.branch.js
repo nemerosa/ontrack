@@ -176,6 +176,17 @@ angular.module('ot.view.branch', [
                     },
                     {
                         condition: function () {
+                            return branchResource._templateDefinition;
+                        },
+                        id: 'templateDefinitionBranch',
+                        name: "Template definition",
+                        cls: 'ot-command-branch-template-definition',
+                        action: function () {
+                            // FIXME #40 Displays the template definition form
+                        }
+                    },
+                    {
+                        condition: function () {
                             return branchResource._disable;
                         },
                         id: 'disableBranch',
