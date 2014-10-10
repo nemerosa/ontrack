@@ -33,6 +33,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 public class BranchController extends AbstractResourceController {
 
     private final StructureService structureService;
+    private final BranchTemplateService branchTemplateService;
     private final CopyService copyService;
     private final BuildFilterService buildFilterService;
     private final ExtensionManager extensionManager;
@@ -41,11 +42,13 @@ public class BranchController extends AbstractResourceController {
     @Autowired
     public BranchController(
             StructureService structureService,
+            BranchTemplateService branchTemplateService,
             CopyService copyService,
             BuildFilterService buildFilterService,
             ExtensionManager extensionManager,
             SecurityService securityService) {
         this.structureService = structureService;
+        this.branchTemplateService = branchTemplateService;
         this.copyService = copyService;
         this.buildFilterService = buildFilterService;
         this.extensionManager = extensionManager;
@@ -222,11 +225,11 @@ public class BranchController extends AbstractResourceController {
     /**
      * Gets a form to make this branch a template definition.
      */
-    @RequestMapping(value = "branches/{branchId}/templateDefinition", method = RequestMethod.POST)
+    @RequestMapping(value = "branches/{branchId}/templateDefinition", method = RequestMethod.GET)
     public Form getTemplateDefinition(@PathVariable ID branchId) {
-        // TODO Gets the template definition for this branch
-        // TODO Gets the form for the template definition
-        return Form.create();
+        return branchTemplateService.getTemplateDefinition(branchId)
+                .map(TemplateDefinition::form)
+                .orElse(TemplateDefinition.createForm());
     }
 
     private BranchBuildView buildViewWithFilter(ID branchId, BuildFilter buildFilter) {
