@@ -17,4 +17,19 @@ class ExpressionEngineImplTest {
         assert engine.render('', [:]) == ''
     }
 
+    @Test
+    void 'Simple expression'() {
+        assert engine.render('${branchName}', [branchName: '2.0']) == '2.0'
+    }
+
+    @Test
+    void 'Simple template'() {
+        assert engine.render('branches/${branchName}', [branchName: '2.0']) == 'branches/2.0'
+    }
+
+    @Test
+    void 'Uppercase expression'() {
+        assert engine.render('${branchName.toUpperCase()}', [branchName: 'ontrack-xx']) == 'ONTRACK-XX'
+    }
+
 }

@@ -12,8 +12,8 @@ dependencies {
     compile libraries.spring_security_ldap
     compile libraries.slf4j_api
     compile libraries.commons_io
+    compile libraries.groovy
 
-    testCompile libraries.groovy
     testCompile project(':ontrack-it-utils')
     testRuntime project(':ontrack-repository-impl')
 

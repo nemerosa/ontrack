@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.service;
 
+import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
 import net.nemerosa.ontrack.model.structure.ExpressionEngine;
 
 import java.util.Map;
@@ -11,7 +13,7 @@ import java.util.regex.Pattern;
  */
 public class ExpressionEngineImpl implements ExpressionEngine {
 
-    public static final Pattern PATTERN = Pattern.compile("\\$\\{([.]+)\\}");
+    public static final Pattern PATTERN = Pattern.compile("\\$\\{(.+)\\}");
 
     @Override
     public String render(String template, Map<String, Object> parameters) {
@@ -33,7 +35,15 @@ public class ExpressionEngineImpl implements ExpressionEngine {
     }
 
     public String resolve(String expression, Map<String, Object> parameters) {
-        // FIXME Method net.nemerosa.ontrack.service.ExpressionEngineImpl.resolve
-        return null;
+        Binding binding = new Binding(parameters);
+        GroovyShell shell = new GroovyShell(binding);
+        Object result = shell.evaluate(expression);
+        if (result == null) {
+            return null;
+        } else if (!(result instanceof String)) {
+            throw new ExpressionNotStringException(expression);
+        } else {
+            return (String) result;
+        }
     }
 }
