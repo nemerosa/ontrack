@@ -20,6 +20,14 @@ angular.module('ot.dialog.template.definition', [
             });
         };
 
+        // Removing a parameter
+        $scope.removeParameter = function (parameter) {
+            var idx = $scope.data.parameters.indexOf(parameter);
+            if (idx >= 0) {
+                $scope.data.parameters.splice(idx, 1);
+            }
+        };
+
         // Cancelling the dialog
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');

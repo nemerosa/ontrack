@@ -9,21 +9,30 @@
 
         {{data}}
 
-        <tabset>
-            <tab heading="Parameters">
-                <div class="row">
-                    <div class="col-md-12">
-                        <button title="Add entry" class="btn btn-default btn-xs" type="button" ng-click="addParameter()">
-                            <span class="ot-command ot-command-new"></span>
-                            Add parameter
-                        </button>
-                    </div>
-                </div>
-            </tab>
-            <tab heading="Synchronisation">
+        <h2><small>Parameters</small></h2>
 
-            </tab>
-        </tabset>
+        <div class="form-group" ng-repeat="parameter in data.parameters">
+            <div class="col-md-4">
+                <input type="text" placeholder="Name" required="required" ng-model="parameter.name" class="form-control"/>
+            </div>
+            <div class="col-md-7">
+                <input type="text" placeholder="Description" ng-model="parameter.description" class="form-control"/>
+            </div>
+            <div class="col-md-1">
+                <span class="ot-command ot-command-delete" title="Removes parameter" ng-click="removeParameter(parameter)"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <button title="Add entry" class="btn btn-default btn-xs" type="button" ng-click="addParameter()">
+                    <span class="ot-command ot-command-new"></span>
+                    Add parameter
+                </button>
+            </div>
+        </div>
+
+        <h2><small>Synchronisation</small></h2>
 
     </div>
     <div class="modal-footer">
