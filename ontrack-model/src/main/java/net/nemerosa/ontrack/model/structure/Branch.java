@@ -18,6 +18,8 @@ public class Branch implements ProjectEntity {
     private final String description;
     @Wither
     private final boolean disabled;
+    @Wither
+    private final BranchType type;
     @JsonView({
             PromotionView.class, Branch.class, Build.class, PromotionLevel.class, ValidationStamp.class,
             PromotionRun.class, ValidationRun.class, PromotionRunView.class
@@ -35,6 +37,7 @@ public class Branch implements ProjectEntity {
                 nameDescription.getName(),
                 nameDescription.getDescription(),
                 nameDescription.isDisabled(),
+                BranchType.CLASSIC,
                 project
         );
     }
@@ -45,7 +48,7 @@ public class Branch implements ProjectEntity {
     }
 
     public Branch withId(ID id) {
-        return new Branch(id, name, description, disabled, project);
+        return new Branch(id, name, description, disabled, type, project);
     }
 
     public static Form form() {

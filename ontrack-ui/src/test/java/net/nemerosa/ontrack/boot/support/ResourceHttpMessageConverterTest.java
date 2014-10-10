@@ -60,6 +60,7 @@ public class ResourceHttpMessageConverterTest {
                         .with("name", "B")
                         .with("description", "Branch")
                         .with("disabled", false)
+                        .with("type", "CLASSIC")
                         .with("project", object()
                                         .with("id", 1)
                                         .with("name", "P")
