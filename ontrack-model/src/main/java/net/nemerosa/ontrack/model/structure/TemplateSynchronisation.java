@@ -11,8 +11,11 @@ import java.util.Map;
 public class TemplateSynchronisation {
 
     /**
-     * TODO Source of branch names
+     * Source of branch names
+     *
+     * @see TemplateSynchronisationSource#getId()
      */
+    private String synchronisationSourceId;
 
     /**
      * Policy to apply when a branch is configured but no longer available.
