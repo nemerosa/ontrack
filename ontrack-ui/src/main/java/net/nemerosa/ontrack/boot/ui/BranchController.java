@@ -34,6 +34,7 @@ public class BranchController extends AbstractResourceController {
 
     private final StructureService structureService;
     private final BranchTemplateService branchTemplateService;
+    private final TemplateSynchronisationService templateSynchronisationService;
     private final CopyService copyService;
     private final BuildFilterService buildFilterService;
     private final ExtensionManager extensionManager;
@@ -43,12 +44,14 @@ public class BranchController extends AbstractResourceController {
     public BranchController(
             StructureService structureService,
             BranchTemplateService branchTemplateService,
+            TemplateSynchronisationService templateSynchronisationService,
             CopyService copyService,
             BuildFilterService buildFilterService,
             ExtensionManager extensionManager,
             SecurityService securityService) {
         this.structureService = structureService;
         this.branchTemplateService = branchTemplateService;
+        this.templateSynchronisationService = templateSynchronisationService;
         this.copyService = copyService;
         this.buildFilterService = buildFilterService;
         this.extensionManager = extensionManager;
@@ -228,8 +231,8 @@ public class BranchController extends AbstractResourceController {
     @RequestMapping(value = "branches/{branchId}/templateDefinition", method = RequestMethod.GET)
     public Form getTemplateDefinition(@PathVariable ID branchId) {
         return branchTemplateService.getTemplateDefinition(branchId)
-                .map(TemplateDefinition::form)
-                .orElse(TemplateDefinition.createForm());
+                .map(definition -> definition.form(templateSynchronisationService))
+                .orElse(TemplateDefinition.createForm(templateSynchronisationService));
     }
 
     private BranchBuildView buildViewWithFilter(ID branchId, BuildFilter buildFilter) {
