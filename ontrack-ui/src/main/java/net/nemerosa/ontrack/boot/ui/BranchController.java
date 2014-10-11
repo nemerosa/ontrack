@@ -6,10 +6,7 @@ import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
-import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.form.Replacements;
-import net.nemerosa.ontrack.model.form.Selection;
-import net.nemerosa.ontrack.model.form.Text;
+import net.nemerosa.ontrack.model.form.*;
 import net.nemerosa.ontrack.model.security.Action;
 import net.nemerosa.ontrack.model.security.BranchCreate;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -22,7 +19,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
 import javax.validation.Valid;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static net.nemerosa.ontrack.boot.ui.UIUtils.requestParametersToJson;
@@ -230,9 +229,35 @@ public class BranchController extends AbstractResourceController {
      */
     @RequestMapping(value = "branches/{branchId}/templateDefinition", method = RequestMethod.GET)
     public Form getTemplateDefinition(@PathVariable ID branchId) {
-        return branchTemplateService.getTemplateDefinition(branchId)
-                .map(definition -> definition.form(templateSynchronisationService))
-                .orElse(TemplateDefinition.createForm(templateSynchronisationService));
+        Optional<TemplateDefinition> templateDefinition = branchTemplateService.getTemplateDefinition(branchId);
+        return Form.create()
+                .with(
+                        NamedEntries.of("parameters")
+                                .label("Parameters")
+                                .help("List of parameters that define the template")
+                                .value(templateDefinition
+                                        .map(TemplateDefinition::getParameters)
+                                        .orElse(Collections.emptyList()))
+                )
+                        // TODO synchronisationSourceId + form selection
+                .with(
+                        Selection.of("synchronisationSourceId")
+                                .label("Sync. source")
+                                .help("Source of branch names when synchronising")
+                                .optional()
+                                .items(templateSynchronisationService.getSynchronisationSources())
+                )
+                .with(
+                        Int.of("interval")
+                                .label("Interval")
+                                .help("Interval between each synchronisation in minutes. If set to zero, " +
+                                        "no automated synchronisation is performed and it must be done " +
+                                        "manually.")
+                                .min(0)
+                                .value(templateDefinition.map(TemplateDefinition::getInterval).orElse(0))
+                )
+                // TODO Selection of the absence policy
+                ;
     }
 
     private BranchBuildView buildViewWithFilter(ID branchId, BuildFilter buildFilter) {
