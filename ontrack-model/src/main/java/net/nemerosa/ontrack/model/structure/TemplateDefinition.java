@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.model.structure;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.form.Int;
 import net.nemerosa.ontrack.model.form.NamedEntries;
 import net.nemerosa.ontrack.model.form.Selection;
 
@@ -51,6 +52,7 @@ public class TemplateDefinition {
         return createForm(templateSynchronisationService)
                 .fill("parameters", parameters)
                 .fill("synchronisationSourceId", synchronisationSourceId)
+                .fill("interval", interval)
                 ;
     }
 
@@ -61,6 +63,7 @@ public class TemplateDefinition {
                                 .label("Parameters")
                                 .help("List of parameters that define the template")
                 )
+                // TODO synchronisationSourceId + form selection
                 .with(
                         Selection.of("synchronisationSourceId")
                                 .label("Sync. source")
@@ -68,6 +71,15 @@ public class TemplateDefinition {
                                 .optional()
                                 .items(templateSynchronisationService.getSynchronisationSources())
                 )
+                .with(
+                        Int.of("interval")
+                                .label("Interval")
+                                .help("Interval between each synchronisation in minutes. If set to zero, " +
+                                        "no automated synchronisation is performed and it must be done " +
+                                        "manually.")
+                                .min(0)
+                )
+                // TODO Selection of the absence policy
                 ;
     }
 }
