@@ -41,6 +41,8 @@ public class TemplateDefinition {
 
     /**
      * Template expressions.
+     *
+     * FIXME Merge with parameters
      */
     private final Map<String, String> templateExpressions;
 }

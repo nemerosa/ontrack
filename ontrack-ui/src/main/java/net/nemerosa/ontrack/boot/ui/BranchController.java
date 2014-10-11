@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
 import javax.validation.Valid;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -256,7 +257,15 @@ public class BranchController extends AbstractResourceController {
                                 .min(0)
                                 .value(templateDefinition.map(TemplateDefinition::getInterval).orElse(0))
                 )
-                // TODO Selection of the absence policy
+                .with(
+                        Selection.of("absencePolicy")
+                                .label("Absence policy")
+                                .help("Defines what to do with a branch template instance when the corresponding " +
+                                        "name is not defined any longer.")
+                                .items(Arrays.asList(TemplateSynchronisationAbsencePolicy.values()))
+                                .itemId("id")
+                                .itemName("name")
+                )
                 ;
     }
 
