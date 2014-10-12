@@ -1,5 +1,6 @@
 angular.module('ot.directive.field', [
-    'ot.directive.field.replacements'
+    'ot.directive.field.replacements',
+    'ot.directive.field.multiForm'
 ])
     .directive('otField', function () {
         return {
@@ -8,7 +9,8 @@ angular.module('ot.directive.field', [
             transclude: true,
             scope: {
                 data: '=',
-                field: '='
+                field: '=',
+                formRoot: '='
             }
         };
     })
