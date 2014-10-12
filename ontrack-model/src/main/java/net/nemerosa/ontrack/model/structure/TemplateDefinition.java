@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Describes the definition of a branch template.
@@ -38,11 +37,4 @@ public class TemplateDefinition {
      * Synchronisation interval (in minutes). 0 means that synchronisation must be performed manually.
      */
     private final int interval;
-
-    /**
-     * Template expressions.
-     *
-     * FIXME Merge with parameters
-     */
-    private final Map<String, String> templateExpressions;
 }

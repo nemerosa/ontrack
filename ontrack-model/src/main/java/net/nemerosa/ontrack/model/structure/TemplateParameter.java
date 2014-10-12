@@ -16,5 +16,9 @@ public class TemplateParameter {
      * Description of the parameter.
      */
     private final String description;
+    /**
+     * Expression used for synchronisation
+     */
+    private final String expression;
 
 }

@@ -233,7 +233,29 @@ public class BranchController extends AbstractResourceController {
         Optional<TemplateDefinition> templateDefinition = branchTemplateService.getTemplateDefinition(branchId);
         return Form.create()
                 .with(
-                        NamedEntries.of("parameters")
+                        MultiForm.of(
+                                "parameters",
+                                Form.create()
+                                        .with(
+                                                Text.of("name").label("Name").help("Parameter name")
+                                        )
+                                        .with(
+                                                Text.of("description").optional().label("Description").help("Parameter description")
+                                        )
+                                        .with(
+                                                Text.of("expression")
+                                                        .label("Expression")
+                                                        .help(
+                                                                "Those expressions are defined for the synchronisation between " +
+                                                                        "template definitions and template instances. They bind " +
+                                                                        "a parameter name and a branch name to an actual parameter " +
+                                                                        "value. " +
+                                                                        "A template expression is a string that contains " +
+                                                                        "references to the branch name using the ${...} construct " +
+                                                                        "where the content is a Groovy expression where the " +
+                                                                        "branchName variable is bound to the branch name.")
+                                        )
+                        )
                                 .label("Parameters")
                                 .help("List of parameters that define the template")
                                 .value(templateDefinition
