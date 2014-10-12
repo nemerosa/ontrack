@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.exceptions.BranchTemplateHasBuildException
 import net.nemerosa.ontrack.model.exceptions.BranchTemplateInstanceException
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.repository.BranchTemplateRepository
 import org.junit.Before
 import org.junit.Test
 
@@ -15,15 +16,16 @@ class BranchTemplateServiceImplTest {
 
     private BranchTemplateService service
     private StructureService structureService
-    private SecurityService securityService
 
     @Before
     void before() {
         structureService = mock(StructureService)
-        securityService = mock(SecurityService)
-        service = new BranchTemplateServiceImpl(
+        SecurityService securityService = mock(SecurityService)
+        BranchTemplateRepository branchTemplateRepository = mock(BranchTemplateRepository)
+        this.service = new BranchTemplateServiceImpl(
                 structureService,
-                securityService
+                securityService,
+                branchTemplateRepository
         )
     }
 

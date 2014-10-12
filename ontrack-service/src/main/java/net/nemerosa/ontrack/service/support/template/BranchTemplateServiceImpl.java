@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.exceptions.BranchTemplateInstanceException;
 import net.nemerosa.ontrack.model.security.BranchTemplateMgt;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.repository.BranchTemplateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,11 +18,13 @@ public class BranchTemplateServiceImpl implements BranchTemplateService {
 
     private final StructureService structureService;
     private final SecurityService securityService;
+    private final BranchTemplateRepository branchTemplateRepository;
 
     @Autowired
-    public BranchTemplateServiceImpl(StructureService structureService, SecurityService securityService) {
+    public BranchTemplateServiceImpl(StructureService structureService, SecurityService securityService, BranchTemplateRepository branchTemplateRepository) {
         this.structureService = structureService;
         this.securityService = securityService;
+        this.branchTemplateRepository = branchTemplateRepository;
     }
 
     @Override
@@ -45,7 +48,9 @@ public class BranchTemplateServiceImpl implements BranchTemplateService {
         if (buildCount > 0) {
             throw new BranchTemplateHasBuildException(branch.getName());
         }
-        // FIXME Method net.nemerosa.ontrack.service.support.template.BranchTemplateServiceImpl.setTemplateDefinition
+        // TODO In case of updates, checks for impact on the instances
+        // Saves the definition
+        branchTemplateRepository.setTemplateDefinition(branchId, templateDefinition);
         // Reloads the branch
         return structureService.getBranch(branchId);
     }
