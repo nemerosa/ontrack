@@ -4,17 +4,7 @@
 <form name="thisForm" class="form-horizontal" ng-submit="submit(thisForm.$valid)" novalidate="novalidate">
     <div class="modal-body">
 
-        <div ng-repeat="field in config.form.fields" class="form-group"
-             ng-class="{ 'has-error' : thisForm[field.name].$invalid && !thisForm[field.name].$pristine }"
-             ng-if="isFieldVisible(data, field)">
-            <label class="control-label col-md-3">{{field.label}}</label>
-
-            <div class="col-md-9">
-
-                <ot-field data="data" field="field"></ot-field>
-
-            </div>
-        </div>
+        <ot-form form="config.form" data="data" form-root="thisForm"></ot-form>
 
     </div>
     <div class="modal-footer">

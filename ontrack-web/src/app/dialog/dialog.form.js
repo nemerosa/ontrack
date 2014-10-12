@@ -1,5 +1,6 @@
 angular.module('ot.dialog.form', [
-    'ot.service.form'
+    'ot.service.form',
+    'ot.directive.form'
 ])
     .controller('otDialogForm', function ($scope, $modalInstance, config, otFormService) {
         // General configuration
@@ -9,14 +10,6 @@ angular.module('ot.dialog.form', [
         // Cancelling the dialog
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
-        };
-        // Checking if a field is visible or not
-        $scope.isFieldVisible = function (data, field) {
-            if (field.visibleIf) {
-                return data[field.visibleIf];
-            } else {
-                return true;
-            }
         };
         // Submitting the dialog
         $scope.submit = function (isValid) {
