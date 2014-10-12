@@ -11,4 +11,12 @@ public interface Describable {
 
     String getDescription();
 
+    default Description toDescription() {
+        return new Description(
+                getId(),
+                getName(),
+                getDescription()
+        );
+    }
+
 }

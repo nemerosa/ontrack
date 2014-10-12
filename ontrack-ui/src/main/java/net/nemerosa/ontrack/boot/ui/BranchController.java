@@ -284,9 +284,16 @@ public class BranchController extends AbstractResourceController {
                                 .label("Absence policy")
                                 .help("Defines what to do with a branch template instance when the corresponding " +
                                         "name is not defined any longer.")
-                                .items(Arrays.asList(TemplateSynchronisationAbsencePolicy.values()))
+                                .items(Arrays.asList(TemplateSynchronisationAbsencePolicy.values()).stream()
+                                        .map(Describable::toDescription)
+                                        .collect(Collectors.toList()))
                                 .itemId("id")
                                 .itemName("name")
+                                .value(
+                                        templateDefinition
+                                                .map(td -> td.getAbsencePolicy().getId())
+                                                .orElse(TemplateSynchronisationAbsencePolicy.DISABLE.getId())
+                                )
                 )
                 ;
     }
