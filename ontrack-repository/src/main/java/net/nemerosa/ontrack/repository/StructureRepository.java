@@ -50,6 +50,8 @@ public interface StructureRepository {
 
     Optional<Build> findBuildAfterUsingNumericForm(ID branchId, String buildName);
 
+    int getBuildCount(Branch branch);
+
     /**
      * Iterates over the builds of the branch, from the newest to the oldest, until
      * the <code>buildPredicate</code> returns <code>false</code>.

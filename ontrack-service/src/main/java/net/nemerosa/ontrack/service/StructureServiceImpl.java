@@ -206,6 +206,11 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public int getBuildCount(Branch branch) {
+        return structureRepository.getBuildCount(branch);
+    }
+
+    @Override
     public Ack deleteBuild(ID buildId) {
         Validate.isTrue(buildId.isSet(), "Build ID must be set");
         Build build = getBuild(buildId);

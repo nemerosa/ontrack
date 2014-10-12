@@ -9,4 +9,8 @@ public interface BranchTemplateService {
      */
     Optional<TemplateDefinition> getTemplateDefinition(ID branchId);
 
+    /**
+     * Sets the branch as a template definition or updates the existing definition.
+     */
+    Branch setTemplateDefinition(ID branchId, TemplateDefinition templateDefinition);
 }

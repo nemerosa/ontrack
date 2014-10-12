@@ -298,6 +298,14 @@ public class BranchController extends AbstractResourceController {
                 ;
     }
 
+    /**
+     * Sets this branch as a template definition, or updates the definition.
+     */
+    @RequestMapping(value = "branches/{branchId}/templateDefinition", method = RequestMethod.PUT)
+    public Branch setTemplateDefinition(@PathVariable ID branchId, @RequestBody TemplateDefinition templateDefinition) {
+        return branchTemplateService.setTemplateDefinition(branchId, templateDefinition);
+    }
+
     private BranchBuildView buildViewWithFilter(ID branchId, BuildFilter buildFilter) {
         // Gets the branch
         Branch branch = getBranch(branchId);

@@ -297,6 +297,15 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    public int getBuildCount(Branch branch) {
+        return getNamedParameterJdbcTemplate().queryForObject(
+                "SELECT COUNT(ID) FROM BUILDS WHERE BRANCHID = :branchId",
+                params("branchId", branch.id()),
+                Integer.class
+        );
+    }
+
+    @Override
     public List<PromotionLevel> getPromotionLevelListForBranch(ID branchId) {
         Branch branch = getBranch(branchId);
         return getNamedParameterJdbcTemplate().query(
