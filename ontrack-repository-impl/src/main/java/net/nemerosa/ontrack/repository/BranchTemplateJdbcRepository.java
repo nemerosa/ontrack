@@ -3,11 +3,16 @@ package net.nemerosa.ontrack.repository;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.TemplateDefinition;
 import net.nemerosa.ontrack.model.structure.TemplateParameter;
+import net.nemerosa.ontrack.model.structure.TemplateSynchronisationAbsencePolicy;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class BranchTemplateJdbcRepository extends AbstractJdbcRepository implements BranchTemplateRepository {
@@ -15,6 +20,37 @@ public class BranchTemplateJdbcRepository extends AbstractJdbcRepository impleme
     @Autowired
     public BranchTemplateJdbcRepository(DataSource dataSource) {
         super(dataSource);
+    }
+
+    @Override
+    public Optional<TemplateDefinition> getTemplateDefinition(ID branchId) {
+        return getOptional(
+                "SELECT * FROM BRANCH_TEMPLATE_DEFINITIONS WHERE BRANCHID = :branchId",
+                params("branchId", branchId.get()),
+                (rs, num) -> toTemplateDefinition(rs)
+        );
+    }
+
+    private TemplateDefinition toTemplateDefinition(ResultSet rs) throws SQLException {
+        int branchId = rs.getInt("branchId");
+        // Gets the parameters
+        List<TemplateParameter> parameters = getNamedParameterJdbcTemplate().query(
+                "SELECT * FROM BRANCH_TEMPLATE_DEFINITION_PARAMS WHERE BRANCHID = :branchId ORDER BY NAME",
+                params("branchId", branchId),
+                (rsp, num) -> new TemplateParameter(
+                        rsp.getString("NAME"),
+                        rsp.getString("DESCRIPTION"),
+                        rsp.getString("EXPRESSION")
+                )
+        );
+        // OK
+        return new TemplateDefinition(
+                parameters,
+                rs.getString("SYNCHRONISATIONSOURCEID"),
+                readJson(rs, "SYNCHRONISATIONSOURCECONFIG"),
+                getEnum(TemplateSynchronisationAbsencePolicy.class, rs, "ABSENCEPOLICY"),
+                rs.getInt("SYNCINTERVAL")
+        );
     }
 
     @Override

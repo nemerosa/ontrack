@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.OptionalInt;
 
 public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSupport {
@@ -57,6 +58,10 @@ public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSuppor
         } else {
             return items.get(0);
         }
+    }
+
+    protected <T> Optional<T> getOptional(String sql, MapSqlParameterSource criteria, RowMapper<T> rowMapper) {
+        return Optional.ofNullable(getFirstItem(sql, criteria, rowMapper));
     }
 
 
