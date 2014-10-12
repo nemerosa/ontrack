@@ -35,6 +35,21 @@ angular.module('ot.directive.field.multiForm', [
                 // TODO Form entries
                 $scope.formEntries = [];
 
+                // Custom preparation for submit
+                $scope.field.prepareForSubmit = function (data) {
+                    // Prepares each form entry individually
+                    angular.forEach($scope.formEntries, function (formEntry) {
+                        otFormService.prepareForSubmit(
+                            formEntry.form,
+                            formEntry.data
+                        );
+                    });
+                    // Collects the data into a list
+                    data[$scope.field.name] = $scope.formEntries.map(function (formEntry) {
+                        return formEntry.data;
+                    });
+                };
+
                 // Adding an entry
                 $scope.addEntry = function () {
                     // Form definition

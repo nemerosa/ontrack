@@ -175,6 +175,10 @@ angular.module('ot.service.form', [
                             return item.id;
                         });
                 }
+                // Custom mapping
+                else if (field.prepareForSubmit) {
+                    field.prepareForSubmit(data);
+                }
             });
             // Cleaning of pseudo fields
             delete data.dates;
