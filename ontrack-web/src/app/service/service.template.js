@@ -13,6 +13,7 @@ angular.module('ot.service.template', [
             return otFormService.display({
                 uri: templateDefinitionUri,
                 title: "Template configuration",
+                size: 'lg',
                 submit: function (template) {
                     return ot.call($http.put(templateDefinitionUri, template));
                 }

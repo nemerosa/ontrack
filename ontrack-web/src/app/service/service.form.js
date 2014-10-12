@@ -30,6 +30,7 @@ angular.module('ot.service.form', [
          * @param formConfig.uri (optional) URI to get the form from (either `uri` or `form` must be set)
          * @param formConfig.title Title for the dialog
          * @param formConfig.submit Function to call with the raw form data. See {@link #submitDialog}
+         * @param formConfig.size 'sm' (default) or 'lg'
          */
         self.display = function (formConfig) {
             var d = $q.defer();
@@ -39,10 +40,16 @@ angular.module('ot.service.form', [
                 if (formConfig.postForm) {
                     form = formConfig.postForm(form);
                 }
+                // Size
+                var size = 'sm';
+                if (formConfig.size) {
+                    size = formConfig.size;
+                }
                 // Dialog
                 $modal.open({
                     templateUrl: 'app/dialog/dialog.form.tpl.html',
                     controller: 'otDialogForm',
+                    size: size,
                     resolve: {
                         config: function () {
                             return {
