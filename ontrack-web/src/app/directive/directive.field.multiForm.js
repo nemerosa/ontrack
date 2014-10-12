@@ -12,6 +12,26 @@ angular.module('ot.directive.field.multiForm', [
             },
             controller: function ($scope) {
 
+                // Help field
+                $scope.help = {
+                    heading: $scope.field.help,
+                    fields: []
+                };
+
+                // Additional help fields
+                for (var i = 0; i < $scope.field.form.fields.length; i++) {
+                    var field = $scope.field.form.fields[i];
+                    if (field.help) {
+                        $scope.help.fields.push({
+                            label: field.label,
+                            help: field.help
+                        });
+                    }
+                }
+
+                // Removing the help from the field definition
+                delete $scope.field.help;
+
                 // TODO Form entries
                 $scope.formEntries = [];
 
@@ -21,6 +41,11 @@ angular.module('ot.directive.field.multiForm', [
                     var form = $scope.field.form;
                     // Duplicates the form
                     var entryForm = angular.copy(form);
+                    // Removing help
+                    for (var i = 0; i < entryForm.fields.length; i++) {
+                        var field = entryForm.fields[i];
+                        delete field.help;
+                    }
                     // Data
                     var entryData = otFormService.prepareForDisplay(entryForm);
                     // Entry
