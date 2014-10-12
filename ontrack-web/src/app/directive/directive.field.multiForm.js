@@ -11,6 +11,20 @@ angular.module('ot.directive.field.multiForm', [
                 formRoot: '='
             },
             controller: function ($scope) {
+
+                // TODO Form entries
+                $scope.formEntries = [];
+
+                // Adding an entry
+                $scope.addEntry = function () {
+                    // Form definition
+                    var form = $scope.field.form;
+                    // Duplicates the form
+                    var newFormEntry = angular.copy(form);
+                    // Adds to the entries
+                    $scope.formEntries.push(newFormEntry);
+                };
+
             }
         };
     })

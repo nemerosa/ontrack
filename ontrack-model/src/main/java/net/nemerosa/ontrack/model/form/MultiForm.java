@@ -1,5 +1,10 @@
 package net.nemerosa.ontrack.model.form;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@EqualsAndHashCode(callSuper = false)
+@Data
 public class MultiForm extends AbstractField<MultiForm> {
 
     private final Form form;
