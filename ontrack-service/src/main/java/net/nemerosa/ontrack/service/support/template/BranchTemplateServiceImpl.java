@@ -29,8 +29,7 @@ public class BranchTemplateServiceImpl implements BranchTemplateService {
 
     @Override
     public Optional<TemplateDefinition> getTemplateDefinition(ID branchId) {
-        // FIXME Method net.nemerosa.ontrack.service.support.template.BranchTemplateServiceImpl.getTemplateDefinition
-        return Optional.empty();
+        return branchTemplateRepository.getTemplateDefinition(branchId);
     }
 
     @Override
@@ -49,6 +48,7 @@ public class BranchTemplateServiceImpl implements BranchTemplateService {
             throw new BranchTemplateHasBuildException(branch.getName());
         }
         // TODO In case of updates, checks for impact on the instances
+        // TODO Loads the branch type according to the template status (in StructureServiceImpl)
         // Saves the definition
         branchTemplateRepository.setTemplateDefinition(branchId, templateDefinition);
         // Reloads the branch
