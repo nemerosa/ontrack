@@ -32,7 +32,7 @@ public class FixedListTemplateSynchronisationSource extends AbstractTemplateSync
     }
 
     @Override
-    public Form getForm(Project project, FixedListTemplateSynchronisationSourceConfig config) {
+    public Form getForm(Project project) {
         return Form.create()
                 .with(
                         MultiStrings.of("names")

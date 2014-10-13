@@ -32,7 +32,7 @@ public interface TemplateSynchronisationSource<T> {
      * Gets the form used for this source in a project. This can be used
      * to get, for example, SCM information.
      */
-    Form getForm(Project project, T config);
+    Form getForm(Project project);
 
     /**
      * List of branch names to use on synchronisation.

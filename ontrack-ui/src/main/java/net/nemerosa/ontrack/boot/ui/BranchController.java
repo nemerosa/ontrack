@@ -230,6 +230,7 @@ public class BranchController extends AbstractResourceController {
      */
     @RequestMapping(value = "branches/{branchId}/templateDefinition", method = RequestMethod.GET)
     public Form getTemplateDefinition(@PathVariable ID branchId) {
+        Branch branch = getBranch(branchId);
         Optional<TemplateDefinition> templateDefinition = branchTemplateService.getTemplateDefinition(branchId);
         return Form.create()
                 .with(
@@ -262,13 +263,22 @@ public class BranchController extends AbstractResourceController {
                                         .map(TemplateDefinition::getParameters)
                                         .orElse(Collections.emptyList()))
                 )
-                        // TODO synchronisationSourceId + form selection
                 .with(
-                        Selection.of("synchronisationSourceId")
+                        ServiceConfigurator.of("synchronisationSourceConfig")
                                 .label("Sync. source")
                                 .help("Source of branch names when synchronising")
-                                .optional()
-                                .items(templateSynchronisationService.getSynchronisationSources())
+                                .sources(
+                                        templateSynchronisationService.getSynchronisationSources().stream()
+                                                .filter(source -> source.isApplicable(branch.getProject()))
+                                                .map(
+                                                        source -> new ServiceConfigurationSource(
+                                                                source.getId(),
+                                                                source.getName(),
+                                                                source.getForm(branch.getProject())
+                                                        )
+                                                )
+                                                .collect(Collectors.toList())
+                                )
                 )
                 .with(
                         Int.of("interval")
