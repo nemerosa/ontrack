@@ -17,6 +17,8 @@ angular.module('ot.directive.field.serviceConfigurator', [
                     selectSourceId(sourceId);
                 });
 
+                $scope.formEntries = [];
+
                 function selectSourceId(sourceId) {
                     var source = getSource(sourceId);
                     if (source) {
@@ -25,12 +27,12 @@ angular.module('ot.directive.field.serviceConfigurator', [
                         // Prepares the data
                         var data = otFormService.prepareForDisplay(form);
                         // Sets the entry
-                        $scope.formEntry = {
+                        $scope.formEntries = [{
                             form: form,
                             data: data
-                        };
+                        }];
                     } else {
-                        delete $scope.formEntry;
+                        $scope.formEntries = [];
                     }
                 }
 
