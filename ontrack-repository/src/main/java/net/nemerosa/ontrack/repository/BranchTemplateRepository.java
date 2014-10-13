@@ -11,4 +11,7 @@ public interface BranchTemplateRepository {
 
     void setTemplateDefinition(ID branchId, TemplateDefinition templateDefinition);
 
+    boolean isTemplateDefinition(ID branchId);
+
+    boolean isTemplateInstance(ID branchId);
 }

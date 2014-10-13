@@ -82,4 +82,19 @@ public class BranchTemplateJdbcRepository extends AbstractJdbcRepository impleme
             );
         }
     }
+
+    @Override
+    public boolean isTemplateDefinition(ID branchId) {
+        return getFirstItem(
+                "SELECT BRANCHID FROM BRANCH_TEMPLATE_DEFINITIONS WHERE BRANCHID = :branchId",
+                params("branchId", branchId.get()),
+                Integer.class
+        ) != null;
+    }
+
+    @Override
+    public boolean isTemplateInstance(ID branchId) {
+        // FIXME Method net.nemerosa.ontrack.repository.BranchTemplateJdbcRepository.isTemplateInstance
+        return false;
+    }
 }
