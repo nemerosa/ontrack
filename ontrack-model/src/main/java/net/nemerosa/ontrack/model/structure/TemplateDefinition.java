@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.model.structure;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 
 import java.util.List;
@@ -21,12 +20,7 @@ public class TemplateDefinition {
      *
      * @see TemplateSynchronisationSource#getId()
      */
-    private final String synchronisationSourceId;
-
-    /**
-     * Configuration data for the sync source
-     */
-    private final JsonNode synchronisationSourceConfig;
+    private final ServiceConfiguration synchronisationSourceConfig;
 
     /**
      * Policy to apply when a branch is configured but no longer available.

@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.repository;
 
-import net.nemerosa.ontrack.model.structure.ID;
-import net.nemerosa.ontrack.model.structure.TemplateDefinition;
-import net.nemerosa.ontrack.model.structure.TemplateParameter;
-import net.nemerosa.ontrack.model.structure.TemplateSynchronisationAbsencePolicy;
+import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -46,8 +43,10 @@ public class BranchTemplateJdbcRepository extends AbstractJdbcRepository impleme
         // OK
         return new TemplateDefinition(
                 parameters,
-                rs.getString("SYNCHRONISATIONSOURCEID"),
-                readJson(rs, "SYNCHRONISATIONSOURCECONFIG"),
+                new ServiceConfiguration(
+                        rs.getString("SYNCHRONISATIONSOURCEID"),
+                        readJson(rs, "SYNCHRONISATIONSOURCECONFIG")
+                ),
                 getEnum(TemplateSynchronisationAbsencePolicy.class, rs, "ABSENCEPOLICY"),
                 rs.getInt("SYNCINTERVAL")
         );
@@ -67,8 +66,8 @@ public class BranchTemplateJdbcRepository extends AbstractJdbcRepository impleme
                 params("branchId", branchId.get())
                         .addValue("absencePolicy", templateDefinition.getAbsencePolicy().name())
                         .addValue("interval", templateDefinition.getInterval())
-                        .addValue("synchronisationSourceId", templateDefinition.getSynchronisationSourceId())
-                        .addValue("synchronisationSourceConfig", writeJson(templateDefinition.getSynchronisationSourceConfig()))
+                        .addValue("synchronisationSourceId", templateDefinition.getSynchronisationSourceConfig().getId())
+                        .addValue("synchronisationSourceConfig", writeJson(templateDefinition.getSynchronisationSourceConfig().getData()))
         );
         // Parameters
         for (TemplateParameter parameter : templateDefinition.getParameters()) {

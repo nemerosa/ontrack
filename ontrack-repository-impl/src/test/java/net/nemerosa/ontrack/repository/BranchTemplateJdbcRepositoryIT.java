@@ -45,8 +45,10 @@ public class BranchTemplateJdbcRepositoryIT extends AbstractRepositoryTestSuppor
                                 "${branchName}"
                         )
                 ),
-                "fixedList",
-                JsonUtils.stringArray("1.0", "1.1"),
+                new ServiceConfiguration(
+                        "fixedList",
+                        JsonUtils.stringArray("1.0", "1.1")
+                ),
                 TemplateSynchronisationAbsencePolicy.DELETE,
                 10
         );
