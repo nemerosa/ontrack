@@ -785,15 +785,16 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     protected Branch toBranch(ResultSet rs, Function<ID, Project> projectSupplier) throws SQLException {
-        ID branchId = id(rs, "projectId");
+        ID projectId = id(rs, "projectId");
+        ID branchId = id(rs);
         return Branch.of(
-                projectSupplier.apply(branchId),
+                projectSupplier.apply(projectId),
                 new NameDescription(
                         rs.getString("name"),
                         rs.getString("description")
                 )
         )
-                .withId(id(rs))
+                .withId(branchId)
                 .withType(getBranchType(branchId))
                 .withDisabled(rs.getBoolean("disabled"));
     }
