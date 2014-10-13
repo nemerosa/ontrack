@@ -57,6 +57,11 @@
     <ot-field-multi-form field="field" data="data" form-root="formRoot"></ot-field-multi-form>
 </div>
 
+<!-- Type: service configurator -->
+<div ng-if="field.type == 'service-configurator'">
+    <ot-field-service-configurator field="field" data="data" form-root="formRoot"></ot-field-service-configurator>
+</div>
+
 <!-- Date -->
 <span ng-if="field.type == 'date'">
     <input ng-model="data.dates[field.name]" name="{{field.name}}" type="text" class="form-control"

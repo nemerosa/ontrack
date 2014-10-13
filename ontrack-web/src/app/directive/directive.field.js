@@ -1,6 +1,7 @@
 angular.module('ot.directive.field', [
     'ot.directive.field.replacements',
-    'ot.directive.field.multiForm'
+    'ot.directive.field.multiForm',
+    'ot.directive.field.serviceConfigurator'
 ])
     .directive('otField', function () {
         return {
