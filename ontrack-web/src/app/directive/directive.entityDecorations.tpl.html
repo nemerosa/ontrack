@@ -1,17 +1,18 @@
-<img
-        ng-repeat="decoration in decorations.resources"
-        ng-if="!decoration.name"
-        ng-src="{{decorationImagePath(decoration)}}"
-        class="ot-decoration {{decorationClassName(decoration)}}"
-        title="{{decoration.title}}"
-        alt="{{decoration.id}}"/>
-<span
-        ng-repeat="decoration in decorations.resources"
-        ng-if="decoration.name"
-        class="ot-decoration {{decorationClassName(decoration)}}"
-        title="{{decoration.title}}">
+<span class="ot-decoration {{decorationClassName(decoration)}}" title="{{decoration.title}}" ng-repeat="decoration in decorations.resources">
+    <!-- Image if no name provided -->
     <img
+            ng-if="!decoration.name"
             ng-src="{{decorationImagePath(decoration)}}"
+            class="ot-decoration-image-only {{decorationClassName(decoration)}}"
             alt="{{decoration.id}}"/>
-    {{decoration.name}}
+    <!-- Image and label if a name is provided -->
+    <span
+        ng-if="decoration.name"
+        class="ot-decoration-label {{decorationClassName(decoration)}}">
+        <img
+                class="ot-decoration-label-image"
+                ng-src="{{decorationImagePath(decoration)}}"
+                alt="{{decoration.id}}"/>
+        {{decoration.name}}
+    </span>
 </span>
