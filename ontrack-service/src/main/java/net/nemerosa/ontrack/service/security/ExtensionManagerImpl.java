@@ -88,7 +88,8 @@ public class ExtensionManagerImpl implements ExtensionManager, StartupService {
         return isExtensionFeatureEnabled(x.getFeature());
     }
 
-    private boolean isExtensionFeatureEnabled(ExtensionFeature feature) {
+    @Override
+    public boolean isExtensionFeatureEnabled(ExtensionFeature feature) {
         return isExtensionFeatureEnabled(feature.getId());
     }
 
