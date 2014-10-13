@@ -34,6 +34,7 @@
                             <span class="ot-home-branch-name"
                                   ng-class="{'ot-entity-disabled': branchStatusView.branch.disabled}">
                                 <a href="#/branch/{{branchStatusView.branch.id}}">{{branchStatusView.branch.name}}</a>
+                                <ot-entity-decorations entity="branchStatusView.branch"></ot-entity-decorations>
                             </span>
                             <span ng-if="branchStatusView.lastPromotionView" class="ot-home-branch-promotion">
                                 <a href="#/build/{{branchStatusView.lastPromotionView.promotionRun.build.id}}">{{branchStatusView.lastPromotionView.promotionRun.build.name}}</a>
