@@ -27,7 +27,9 @@ public class DecorationServiceImpl implements DecorationService {
     @Autowired
     public DecorationServiceImpl(ExtensionManager extensionManager, List<Decorator> builtinDecorators, SecurityService securityService) {
         this.extensionManager = extensionManager;
-        this.builtinDecorators = builtinDecorators;
+        this.builtinDecorators = builtinDecorators.stream()
+                .filter(decorator -> !(decorator instanceof DecorationExtension))
+                .collect(Collectors.toList());
         this.securityService = securityService;
     }
 
@@ -40,7 +42,7 @@ public class DecorationServiceImpl implements DecorationService {
         List<Decoration> decorations = new ArrayList<>();
         // Built-in decorations
         decorations.addAll(
-                builtinDecorators.parallelStream()
+                builtinDecorators.stream()
                         // ... and gets the decoration
                         .map(securedDecoratorFunction)
                                 // ... and excludes the null ones
@@ -51,7 +53,7 @@ public class DecorationServiceImpl implements DecorationService {
         // Extended decorations
         decorations.addAll(
                 extensionManager.getExtensions(DecorationExtension.class)
-                        .parallelStream()
+                        .stream()
                                 // ... and filters per entity
                         .filter(decorator -> decorator.getScope().contains(entity.getProjectEntityType()))
                                 // ... and gets the decoration
