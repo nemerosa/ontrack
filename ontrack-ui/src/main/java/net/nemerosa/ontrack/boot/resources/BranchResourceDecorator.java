@@ -30,7 +30,9 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                 .link(
                         "_createBuild",
                         on(BuildController.class).newBuild(branch.getId(), null),
-                        BuildCreate.class, branch.getProject().id())
+                        branch.getType() != BranchType.TEMPLATE_DEFINITION &&
+                                resourceContext.isProjectFunctionGranted(branch, BuildCreate.class)
+                )
                         // Promotion level creation
                 .link(
                         "_createPromotionLevel",
@@ -116,6 +118,7 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                         on(BranchController.class).enableBranch(branch.getId()),
                         resourceContext.isProjectFunctionGranted(branch.projectId(), ProjectEdit.class)
                                 && branch.isDisabled()
+                                && branch.getType() != BranchType.TEMPLATE_DEFINITION
                 )
                         // Disable
                 .link(
@@ -123,6 +126,7 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                         on(BranchController.class).disableBranch(branch.getId()),
                         resourceContext.isProjectFunctionGranted(branch.projectId(), ProjectEdit.class)
                                 && !branch.isDisabled()
+                                && branch.getType() != BranchType.TEMPLATE_DEFINITION
                 )
                         // Template definition creation
                 .link(
