@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.service.support.ErrorDecorator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -19,12 +20,14 @@ import java.util.stream.Collectors;
 public class DecorationServiceImpl implements DecorationService {
 
     private final ExtensionManager extensionManager;
+    private final List<Decorator> builtinDecorators;
     private final SecurityService securityService;
     private final ErrorDecorator errorDecorator = new ErrorDecorator();
 
     @Autowired
-    public DecorationServiceImpl(ExtensionManager extensionManager, SecurityService securityService) {
+    public DecorationServiceImpl(ExtensionManager extensionManager, List<Decorator> builtinDecorators, SecurityService securityService) {
         this.extensionManager = extensionManager;
+        this.builtinDecorators = builtinDecorators;
         this.securityService = securityService;
     }
 
@@ -34,16 +37,32 @@ public class DecorationServiceImpl implements DecorationService {
         Function<Decorator, Decoration> securedDecoratorFunction = securityService.runner(
                 decorator -> getDecoration(entity, decorator)
         );
-        return extensionManager.getExtensions(DecorationExtension.class)
-                .parallelStream()
-                        // ... and filters per entity
-                .filter(decorator -> decorator.getScope().contains(entity.getProjectEntityType()))
+        List<Decoration> decorations = new ArrayList<>();
+        // Built-in decorations
+        decorations.addAll(
+                builtinDecorators.parallelStream()
                         // ... and gets the decoration
-                .map(securedDecoratorFunction)
-                        // ... and excludes the null ones
-                .filter(decoration -> decoration != null)
-                        // OK
-                .collect(Collectors.toList());
+                        .map(securedDecoratorFunction)
+                                // ... and excludes the null ones
+                        .filter(decoration -> decoration != null)
+                                // OK
+                        .collect(Collectors.toList())
+        );
+        // Extended decorations
+        decorations.addAll(
+                extensionManager.getExtensions(DecorationExtension.class)
+                        .parallelStream()
+                                // ... and filters per entity
+                        .filter(decorator -> decorator.getScope().contains(entity.getProjectEntityType()))
+                                // ... and gets the decoration
+                        .map(securedDecoratorFunction)
+                                // ... and excludes the null ones
+                        .filter(decoration -> decoration != null)
+                                // OK
+                        .collect(Collectors.toList())
+        );
+        // OK
+        return decorations;
     }
 
     /**
