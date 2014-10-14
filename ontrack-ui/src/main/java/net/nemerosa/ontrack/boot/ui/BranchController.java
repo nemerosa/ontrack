@@ -317,6 +317,16 @@ public class BranchController extends AbstractResourceController {
     }
 
     /**
+     * Gets the form to create a template instance using a name.
+     */
+    @RequestMapping(value = "branches/{branchId}/template", method = RequestMethod.GET)
+    public Form singleTemplateInstanceForm(@PathVariable ID branchId) {
+        return Form.create().with(
+                Form.defaultNameField().label("Branch name")
+        );
+    }
+
+    /**
      * Creates a branch template instance for one name.
      * <p>
      * <ul>
@@ -330,13 +340,13 @@ public class BranchController extends AbstractResourceController {
      * </li>
      * </ul>
      *
-     * @param branchId   ID of the branch template definition
-     * @param branchName Name to use when creating the branch
+     * @param branchId ID of the branch template definition
+     * @param request  Name to use when creating the branch
      * @return Created or updated branch
      */
-    @RequestMapping(value = "branches/{branchId}/template/{branchName:.*}", method = RequestMethod.PUT)
-    public Branch createTemplateInstance(@PathVariable ID branchId, @PathVariable String branchName) {
-        return branchTemplateService.createTemplateInstance(branchId, branchName);
+    @RequestMapping(value = "branches/{branchId}/template", method = RequestMethod.PUT)
+    public Branch createTemplateInstance(@PathVariable ID branchId, @RequestBody @Valid BranchTemplateInstanceSingleRequest request) {
+        return branchTemplateService.createTemplateInstance(branchId, request.getName());
     }
 
     private BranchBuildView buildViewWithFilter(ID branchId, BuildFilter buildFilter) {
