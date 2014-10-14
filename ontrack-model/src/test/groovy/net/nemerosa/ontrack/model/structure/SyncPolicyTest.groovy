@@ -53,30 +53,54 @@ class SyncPolicyTest {
     private static SyncConfig<NameDescription, String> config(
             Map<String, NameDescription> sources,
             Map<String, NameDescription> targets) {
-        SyncConfig.builder()
-                .itemType('Name description')
-                .sourceItems({ sources.values() })
-                .targetItems({ targets.values() })
-                .itemId({ it -> it.name })
-                .targetItem({ String it -> Optional.ofNullable(targets[it]) })
-                .createTargetItem(
-                {
-                    NameDescription source ->
-                        targets.put(
-                                source.name,
-                                nd(source.name, source.description)
-                        )
-                })
-                .replaceTargetItem(
-                {
-                    NameDescription source, NameDescription target ->
-                        targets.put(
-                                target.name,
-                                nd(target.name, source.description)
-                        )
-                })
-                .deleteTargetItem({ NameDescription t -> targets.remove(t.name) })
-                .build()
+        new SyncConfig<NameDescription, String>() {
+
+            @Override
+            String getItemType() {
+                "Name description"
+            }
+
+            @Override
+            Collection<NameDescription> getSourceItems() {
+                sources.values()
+            }
+
+            @Override
+            Collection<NameDescription> getTargetItems() {
+                targets.values()
+            }
+
+            @Override
+            String getItemId(NameDescription item) {
+                item.name
+            }
+
+            @Override
+            Optional<NameDescription> getTargetItem(String id) {
+                Optional.ofNullable(targets[id])
+            }
+
+            @Override
+            void createTargetItem(NameDescription source) {
+                targets.put(
+                        source.name,
+                        nd(source.name, source.description)
+                )
+            }
+
+            @Override
+            void replaceTargetItem(NameDescription source, NameDescription target) {
+                targets.put(
+                        target.name,
+                        nd(target.name, source.description)
+                )
+            }
+
+            @Override
+            void deleteTargetItem(NameDescription t) {
+                targets.remove(t.name)
+            }
+        }
     }
 
 }

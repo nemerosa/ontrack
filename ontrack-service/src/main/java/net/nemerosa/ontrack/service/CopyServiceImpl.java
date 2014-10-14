@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -155,10 +156,52 @@ public class CopyServiceImpl implements CopyService {
     }
 
     protected void doCopyProperties(ProjectEntity source, ProjectEntity target, Function<String, String> replacementFn, SyncPolicy syncPolicy) {
-        List<Property<?>> properties = propertyService.getProperties(source);
-        for (Property<?> property : properties) {
-            doCopyProperty(property, target, replacementFn);
-        }
+        syncPolicy.sync(
+                new SyncConfig<Property<?>, String>() {
+
+                    @Override
+                    public String getItemType() {
+                        return "Property";
+                    }
+
+                    @Override
+                    public Collection<Property<?>> getSourceItems() {
+                        return propertyService.getProperties(source);
+                    }
+
+                    @Override
+                    public Collection<Property<?>> getTargetItems() {
+                        return propertyService.getProperties(target);
+                    }
+
+                    @Override
+                    public String getItemId(Property<?> item) {
+                        return item.getType().getTypeName();
+                    }
+
+                    @Override
+                    public Optional<Property<?>> getTargetItem(String id) {
+                        Property<?> p = propertyService.getProperty(target, id);
+                        if (p.isEmpty()) return Optional.<Property<?>>empty();
+                        else return Optional.of(p);
+                    }
+
+                    @Override
+                    public void createTargetItem(Property<?> sourceProperty) {
+                        doCopyProperty(sourceProperty, target, replacementFn);
+                    }
+
+                    @Override
+                    public void replaceTargetItem(Property<?> sourceProperty, Property<?> targetProperty) {
+                        doCopyProperty(sourceProperty, target, replacementFn);
+                    }
+
+                    @Override
+                    public void deleteTargetItem(Property<?> targetProperty) {
+                        propertyService.deleteProperty(target, targetProperty.getType().getTypeName());
+                    }
+                }
+        );
     }
 
     protected void doCopyValidationStamps(Branch sourceBranch, Branch targetBranch, Function<String, String> replacementFn, SyncPolicy syncPolicy) {

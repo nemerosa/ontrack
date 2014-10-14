@@ -57,13 +57,13 @@ public class SyncPolicy {
     public <T, D> SyncResult sync(SyncConfig<T, D> config) {
         SyncResult result = SyncResult.empty();
         // Gets the source items
-        Collection<T> sourceItems = config.getSourceItems().get();
+        Collection<T> sourceItems = config.getSourceItems();
         // For each source item
         for (T sourceItem : sourceItems) {
             // Gets its identifier for the target items
-            D itemId = config.getItemId().apply(sourceItem);
+            D itemId = config.getItemId(sourceItem);
             // Gets a corresponding item
-            Optional<T> targetItemOpt = config.getTargetItem().apply(itemId);
+            Optional<T> targetItemOpt = config.getTargetItem(itemId);
             // If present
             if (targetItemOpt.isPresent()) {
                 // This depends on the policy
@@ -72,7 +72,7 @@ public class SyncPolicy {
                         result.ignorePresentTarget();
                         break;
                     case REPLACE:
-                        config.getReplaceTargetItem().accept(sourceItem, targetItemOpt.get());
+                        config.replaceTargetItem(sourceItem, targetItemOpt.get());
                         result.replacePresentTarget();
                         break;
                     case ERROR:
@@ -82,20 +82,20 @@ public class SyncPolicy {
             }
             // If not present, creates it
             else {
-                config.getCreateTargetItem().accept(sourceItem);
+                config.createTargetItem(sourceItem);
                 result.create();
             }
         }
         // Now that target items have been either created or updated, we need to know which ones were
         // not matched with the sources
-        Map<D, T> targetMap = config.getTargetItems().get().stream().collect(
+        Map<D, T> targetMap = config.getTargetItems().stream().collect(
                 Collectors.toMap(
-                        config.getItemId(),
+                        config::getItemId,
                         Function.identity()
                 )
         );
         Collection<D> targetIds = new HashSet<>(targetMap.keySet());
-        Collection<D> sourceIds = sourceItems.stream().map(config.getItemId()).collect(Collectors.toList());
+        Collection<D> sourceIds = sourceItems.stream().map(config::getItemId).collect(Collectors.toList());
         targetIds.removeAll(sourceIds);
         int unknownTargetNumber = targetIds.size();
         if (unknownTargetNumber > 0) {
@@ -106,7 +106,7 @@ public class SyncPolicy {
                 case DELETE:
                     for (D targetId : targetIds) {
                         T targetItem = targetMap.get(targetId);
-                        config.getDeleteTargetItem().accept(targetItem);
+                        config.deleteTargetItem(targetItem);
                     }
                     result.setUnknownTargetDeleted(unknownTargetNumber);
                     break;
