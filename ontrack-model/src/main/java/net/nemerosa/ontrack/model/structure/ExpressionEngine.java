@@ -10,11 +10,11 @@ public interface ExpressionEngine {
     /**
      * Renders an expression in its context
      */
-    String render(String template, Map<String, Object> parameters);
+    String render(String template, Map<String, ?> parameters);
 
     /**
      * Resolves a single expression
      */
-    String resolve(String expression, Map<String, Object> parameters);
+    String resolve(String expression, Map<String, ?> parameters);
 
 }

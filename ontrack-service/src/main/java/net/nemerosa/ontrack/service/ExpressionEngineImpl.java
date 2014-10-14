@@ -16,7 +16,7 @@ public class ExpressionEngineImpl implements ExpressionEngine {
     public static final Pattern PATTERN = Pattern.compile("\\$\\{(.+)\\}");
 
     @Override
-    public String render(String template, Map<String, Object> parameters) {
+    public String render(String template, Map<String, ?> parameters) {
         // Null handling
         if (template == null) {
             return null;
@@ -34,7 +34,7 @@ public class ExpressionEngineImpl implements ExpressionEngine {
         return buffer.toString();
     }
 
-    public String resolve(String expression, Map<String, Object> parameters) {
+    public String resolve(String expression, Map<String, ?> parameters) {
         Binding binding = new Binding(parameters);
         GroovyShell shell = new GroovyShell(binding);
         Object result = shell.evaluate(expression);

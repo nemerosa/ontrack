@@ -25,7 +25,7 @@ class BranchTemplateServiceImplTest {
         this.service = new BranchTemplateServiceImpl(
                 structureService,
                 securityService,
-                branchTemplateRepository
+                branchTemplateRepository, expressionEngine, copyService
         )
     }
 

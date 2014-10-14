@@ -15,6 +15,7 @@ public class Branch implements ProjectEntity {
 
     private final ID id;
     private final String name;
+    @Wither
     private final String description;
     @Wither
     private final boolean disabled;

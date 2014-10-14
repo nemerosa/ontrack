@@ -228,7 +228,7 @@ public class BranchController extends AbstractResourceController {
     /**
      * Gets a form to make this branch a template definition.
      */
-    @RequestMapping(value = "branches/{branchId}/templateDefinition", method = RequestMethod.GET)
+    @RequestMapping(value = "branches/{branchId}/template/definition", method = RequestMethod.GET)
     public Form getTemplateDefinition(@PathVariable ID branchId) {
         Branch branch = getBranch(branchId);
         Optional<TemplateDefinition> templateDefinition = branchTemplateService.getTemplateDefinition(branchId);
@@ -311,9 +311,32 @@ public class BranchController extends AbstractResourceController {
     /**
      * Sets this branch as a template definition, or updates the definition.
      */
-    @RequestMapping(value = "branches/{branchId}/templateDefinition", method = RequestMethod.PUT)
+    @RequestMapping(value = "branches/{branchId}/template/definition", method = RequestMethod.PUT)
     public Branch setTemplateDefinition(@PathVariable ID branchId, @RequestBody TemplateDefinition templateDefinition) {
         return branchTemplateService.setTemplateDefinition(branchId, templateDefinition);
+    }
+
+    /**
+     * Creates a branch template instance for one name.
+     * <p>
+     * <ul>
+     * <li>If the target branch does not exist, creates it.</li>
+     * <li>If the target branch exists:
+     * <ul>
+     * <li>If it is linked to the same definition, updates it.</li>
+     * <li>If it is linked to another definition, this is an error.</li>
+     * <li>If it is a normal branch, this is an error.</li>
+     * </ul>
+     * </li>
+     * </ul>
+     *
+     * @param branchId   ID of the branch template definition
+     * @param branchName Name to use when creating the branch
+     * @return Created or updated branch
+     */
+    @RequestMapping(value = "branches/{branchId}/template/{branchName:.*}", method = RequestMethod.PUT)
+    public Branch createTemplateInstance(@PathVariable ID branchId, @PathVariable String branchName) {
+        return branchTemplateService.createTemplateInstance(branchId, branchName);
     }
 
     private BranchBuildView buildViewWithFilter(ID branchId, BuildFilter buildFilter) {
