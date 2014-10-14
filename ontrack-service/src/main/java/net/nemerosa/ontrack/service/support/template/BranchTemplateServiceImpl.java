@@ -122,9 +122,10 @@ public class BranchTemplateServiceImpl implements BranchTemplateService {
             if (unknownParameters.size() > 0) {
                 throw new BranchTemplateInstanceUnknownParametersException(template.getName(), unknownParameters);
             }
-            // TODO Replacement function
-            // TODO OK
-            throw new RuntimeException("NYI");
+            // Replacement function
+            Function<String, String> replacementFn = value -> expressionEngine.render(value, request.getParameters());
+            // OK
+            return updateTemplateInstance(instance, template, replacementFn);
         }
         // Automatic mode
         else {
