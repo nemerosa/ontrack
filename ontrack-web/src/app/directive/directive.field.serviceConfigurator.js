@@ -12,7 +12,31 @@ angular.module('ot.directive.field.serviceConfigurator', [
             },
             controller: function ($scope) {
 
-                $scope.formEntries = [];
+                // Initial selection
+                var serviceConfiguration = $scope.data[$scope.field.name];
+                if (serviceConfiguration && serviceConfiguration.id) {
+                    var source = getSource(serviceConfiguration.id);
+                    if (source) {
+                        // Updates the form
+                        otFormService.updateForm(source.form, serviceConfiguration.data);
+                        // Prepares the data
+                        var data = otFormService.prepareForDisplay(source.form);
+                        // Sets the entry
+                        $scope.formEntries = [
+                            {
+                                sourceId: serviceConfiguration.id,
+                                form: source.form,
+                                data: data
+                            }
+                        ];
+                        // Sets the selection
+                        $scope.sourceId = serviceConfiguration.id;
+                    } else {
+                        $scope.formEntries = [];
+                    }
+                } else {
+                    $scope.formEntries = [];
+                }
 
                 // Custom preparation for submit
                 $scope.field.prepareForSubmit = function (data) {
