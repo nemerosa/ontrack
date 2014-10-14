@@ -185,7 +185,7 @@ public class CopyServiceImplTest {
         when(securityService.isProjectFunctionGranted(targetBranch, ProjectEdit.class)).thenReturn(true);
 
         // Copy
-        service.doCopy(sourceBranch, targetBranch, replacementFn);
+        service.doCopy(sourceBranch, targetBranch, replacementFn, SyncPolicy.COPY);
 
         // Checks the copy of properties for the branch
         verify(propertyService, times(1)).editProperty(
@@ -238,7 +238,7 @@ public class CopyServiceImplTest {
         when(securityService.isProjectFunctionGranted(targetPromotionLevel, ProjectEdit.class)).thenReturn(true);
 
         // Copy
-        service.doCopyPromotionLevels(sourceBranch, targetBranch, replacementFn);
+        service.doCopyPromotionLevels(sourceBranch, targetBranch, replacementFn, SyncPolicy.COPY);
 
         // Checks the promotion level was created
         verify(structureService, times(1)).newPromotionLevel(targetPromotionLevel);
@@ -293,7 +293,7 @@ public class CopyServiceImplTest {
         when(securityService.isProjectFunctionGranted(targetValidationStamp, ProjectEdit.class)).thenReturn(true);
 
         // Copy
-        service.doCopyValidationStamps(sourceBranch, targetBranch, replacementFn);
+        service.doCopyValidationStamps(sourceBranch, targetBranch, replacementFn, SyncPolicy.COPY);
 
         // Checks the validation stamp was created
         verify(structureService, times(1)).newValidationStamp(targetValidationStamp);

@@ -39,12 +39,12 @@ public class CopyServiceImpl implements CopyService {
         // Gets the source branch
         Branch sourceBranch = structureService.getBranch(request.getSourceBranchId());
         // Actual copy
-        return copy(targetBranch, sourceBranch, replacementFn);
+        return copy(targetBranch, sourceBranch, replacementFn, SyncPolicy.COPY);
 
     }
 
     @Override
-    public Branch copy(Branch targetBranch, Branch sourceBranch, Function<String, String> replacementFn) {
+    public Branch copy(Branch targetBranch, Branch sourceBranch, Function<String, String> replacementFn, SyncPolicy syncPolicy) {
         // If same branch, rejects
         if (sourceBranch.id() == targetBranch.id()) {
             throw new CannotCopyItselfException();
@@ -52,7 +52,7 @@ public class CopyServiceImpl implements CopyService {
         // Checks the rights on the target branch
         securityService.checkProjectFunction(targetBranch, BranchEdit.class);
         // Now, we can work in a secure context
-        securityService.asAdmin(() -> doCopy(sourceBranch, targetBranch, replacementFn));
+        securityService.asAdmin(() -> doCopy(sourceBranch, targetBranch, replacementFn, syncPolicy));
         // OK
         return targetBranch;
     }
@@ -71,7 +71,7 @@ public class CopyServiceImpl implements CopyService {
                 )
         );
         // Copies the configuration
-        doCopy(sourceBranch, targetBranch, replacementFn);
+        doCopy(sourceBranch, targetBranch, replacementFn, SyncPolicy.COPY);
         // OK
         return targetBranch;
     }
@@ -93,7 +93,7 @@ public class CopyServiceImpl implements CopyService {
         );
 
         // Copies the properties for the project
-        doCopyProperties(sourceProject, targetProject, replacementFn);
+        doCopyProperties(sourceProject, targetProject, replacementFn, SyncPolicy.COPY);
 
         // Creates a copy of the branch
         Branch sourceBranch = structureService.getBranch(request.getSourceBranchId());
@@ -107,19 +107,19 @@ public class CopyServiceImpl implements CopyService {
         );
 
         // Configuration of the new branch
-        doCopy(sourceBranch, targetBranch, replacementFn);
+        doCopy(sourceBranch, targetBranch, replacementFn, SyncPolicy.COPY);
 
         // OK
         return targetProject;
     }
 
-    protected void doCopy(Branch sourceBranch, Branch targetBranch, Function<String, String> replacementFn) {
+    protected void doCopy(Branch sourceBranch, Branch targetBranch, Function<String, String> replacementFn, SyncPolicy syncPolicy) {
         // Branch properties
-        doCopyProperties(sourceBranch, targetBranch, replacementFn);
+        doCopyProperties(sourceBranch, targetBranch, replacementFn, syncPolicy);
         // Promotion level and properties
-        doCopyPromotionLevels(sourceBranch, targetBranch, replacementFn);
+        doCopyPromotionLevels(sourceBranch, targetBranch, replacementFn, syncPolicy);
         // Validation stamps and properties
-        doCopyValidationStamps(sourceBranch, targetBranch, replacementFn);
+        doCopyValidationStamps(sourceBranch, targetBranch, replacementFn, syncPolicy);
         // User filters
         doCopyUserBuildFilters(sourceBranch, targetBranch);
     }
@@ -128,7 +128,7 @@ public class CopyServiceImpl implements CopyService {
         buildFilterService.copyToBranch(sourceBranch.getId(), targetBranch.getId());
     }
 
-    protected void doCopyPromotionLevels(Branch sourceBranch, Branch targetBranch, Function<String, String> replacementFn) {
+    protected void doCopyPromotionLevels(Branch sourceBranch, Branch targetBranch, Function<String, String> replacementFn, SyncPolicy syncPolicy) {
         List<PromotionLevel> sourcePromotionLevels = structureService.getPromotionLevelListForBranch(sourceBranch.getId());
         for (PromotionLevel sourcePromotionLevel : sourcePromotionLevels) {
             Optional<PromotionLevel> targetPromotionLevelOpt = structureService.findPromotionLevelByName(targetBranch.getProject().getName(), targetBranch.getName(), sourcePromotionLevel.getName());
@@ -149,19 +149,19 @@ public class CopyServiceImpl implements CopyService {
                     structureService.setPromotionLevelImage(targetPromotionLevel.getId(), image);
                 }
                 // Copy of properties
-                doCopyProperties(sourcePromotionLevel, targetPromotionLevel, replacementFn);
+                doCopyProperties(sourcePromotionLevel, targetPromotionLevel, replacementFn, syncPolicy);
             }
         }
     }
 
-    protected void doCopyProperties(ProjectEntity source, ProjectEntity target, Function<String, String> replacementFn) {
+    protected void doCopyProperties(ProjectEntity source, ProjectEntity target, Function<String, String> replacementFn, SyncPolicy syncPolicy) {
         List<Property<?>> properties = propertyService.getProperties(source);
         for (Property<?> property : properties) {
             doCopyProperty(property, target, replacementFn);
         }
     }
 
-    protected void doCopyValidationStamps(Branch sourceBranch, Branch targetBranch, Function<String, String> replacementFn) {
+    protected void doCopyValidationStamps(Branch sourceBranch, Branch targetBranch, Function<String, String> replacementFn, SyncPolicy syncPolicy) {
         List<ValidationStamp> sourceValidationStamps = structureService.getValidationStampListForBranch(sourceBranch.getId());
         for (ValidationStamp sourceValidationStamp : sourceValidationStamps) {
             Optional<ValidationStamp> targetValidationStampOpt = structureService.findValidationStampByName(targetBranch.getProject().getName(), targetBranch.getName(), sourceValidationStamp.getName());
@@ -182,7 +182,7 @@ public class CopyServiceImpl implements CopyService {
                     structureService.setValidationStampImage(targetValidationStamp.getId(), image);
                 }
                 // Copy of properties
-                doCopyProperties(sourceValidationStamp, targetValidationStamp, replacementFn);
+                doCopyProperties(sourceValidationStamp, targetValidationStamp, replacementFn, syncPolicy);
             }
         }
     }

@@ -17,7 +17,7 @@ public interface CopyService {
      * Copies the configuration of the source branch
      * to the target branch.
      */
-    Branch copy(Branch targetBranch, Branch sourceBranch, Function<String, String> replacementFn);
+    Branch copy(Branch targetBranch, Branch sourceBranch, Function<String, String> replacementFn, SyncPolicy syncPolicy);
 
     /**
      * Clones the <code>branch</code> into a new branch

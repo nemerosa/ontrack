@@ -148,11 +148,11 @@ public class BranchTemplateServiceImpl implements BranchTemplateService {
         instance = instance.withDescription(description);
         structureService.saveBranch(instance);
         // Copy replacement function
-        // FIXME Replacement policy
         copyService.copy(
                 instance, // Target
                 template, // Source
-                replacementFn
+                replacementFn,
+                SyncPolicy.SYNC
         );
         // OK - reloads to gets the correct type
         return structureService.getBranch(instance.getId());
