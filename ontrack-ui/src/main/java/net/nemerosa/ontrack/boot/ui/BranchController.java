@@ -280,6 +280,11 @@ public class BranchController extends AbstractResourceController {
                                                 )
                                                 .collect(Collectors.toList())
                                 )
+                                .value(
+                                    templateDefinition
+                                        .map(TemplateDefinition::getSynchronisationSourceConfig)
+                                        .orElse(null)
+                                )
                 )
                 .with(
                         Int.of("interval")
