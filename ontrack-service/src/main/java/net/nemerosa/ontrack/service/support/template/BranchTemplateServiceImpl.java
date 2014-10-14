@@ -134,9 +134,11 @@ public class BranchTemplateServiceImpl implements BranchTemplateService {
     }
 
     protected Branch updateTemplateInstance(Branch instance, Branch template, TemplateDefinition templateDefinition) {
-        // Replacement function
-        Function<String, String> replacementFn = templateDefinition.replacementFn(instance.getName(), expressionEngine);
-        return updateTemplateInstance(instance, template, replacementFn);
+        return updateTemplateInstance(
+                instance,
+                template,
+                templateDefinition.replacementFn(instance.getName(), expressionEngine)
+        );
 
     }
 
@@ -145,7 +147,13 @@ public class BranchTemplateServiceImpl implements BranchTemplateService {
         String description = replacementFn.apply(template.getDescription());
         instance = instance.withDescription(description);
         structureService.saveBranch(instance);
-        // FIXME Copy replacement function
+        // Copy replacement function
+        // FIXME Replacement policy
+        copyService.copy(
+                instance, // Target
+                template, // Source
+                replacementFn
+        );
         // OK - reloads to gets the correct type
         return structureService.getBranch(instance.getId());
     }
