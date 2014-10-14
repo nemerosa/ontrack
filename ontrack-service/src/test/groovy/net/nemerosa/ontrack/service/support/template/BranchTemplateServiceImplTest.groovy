@@ -39,8 +39,10 @@ class BranchTemplateServiceImplTest {
 
         service.setTemplateDefinition(ID.of(1), new TemplateDefinition(
                 [],
-                '',
-                JsonUtils.object().end(),
+                new ServiceConfiguration(
+                        '',
+                        JsonUtils.object().end()
+                ),
                 TemplateSynchronisationAbsencePolicy.DISABLE,
                 0
         ))
@@ -57,8 +59,10 @@ class BranchTemplateServiceImplTest {
 
         service.setTemplateDefinition(ID.of(1), new TemplateDefinition(
                 [],
-                '',
-                JsonUtils.object().end(),
+                new ServiceConfiguration(
+                        '',
+                        JsonUtils.object().end()
+                ),
                 TemplateSynchronisationAbsencePolicy.DISABLE,
                 0
         ))

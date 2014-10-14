@@ -22,8 +22,10 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
         // Template definition
         TemplateDefinition templateDefinition = new TemplateDefinition(
                 [],
-                'test',
-                JsonUtils.object().end(),
+                new ServiceConfiguration(
+                        'test',
+                        JsonUtils.object().end()
+                ),
                 TemplateSynchronisationAbsencePolicy.DELETE,
                 10
         )
