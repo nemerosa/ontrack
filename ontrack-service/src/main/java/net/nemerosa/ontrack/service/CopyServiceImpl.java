@@ -130,29 +130,68 @@ public class CopyServiceImpl implements CopyService {
     }
 
     protected void doCopyPromotionLevels(Branch sourceBranch, Branch targetBranch, Function<String, String> replacementFn, SyncPolicy syncPolicy) {
-        List<PromotionLevel> sourcePromotionLevels = structureService.getPromotionLevelListForBranch(sourceBranch.getId());
-        for (PromotionLevel sourcePromotionLevel : sourcePromotionLevels) {
-            Optional<PromotionLevel> targetPromotionLevelOpt = structureService.findPromotionLevelByName(targetBranch.getProject().getName(), targetBranch.getName(), sourcePromotionLevel.getName());
-            if (!targetPromotionLevelOpt.isPresent()) {
-                // Copy of the promotion level
-                PromotionLevel targetPromotionLevel = structureService.newPromotionLevel(
-                        PromotionLevel.of(
-                                targetBranch,
-                                NameDescription.nd(
-                                        sourcePromotionLevel.getName(),
-                                        replacementFn.apply(sourcePromotionLevel.getDescription())
+        syncPolicy.sync(
+                new SyncConfig<PromotionLevel, String>() {
+
+                    @Override
+                    public String getItemType() {
+                        return "Promotion level";
+                    }
+
+                    @Override
+                    public Collection<PromotionLevel> getSourceItems() {
+                        return structureService.getPromotionLevelListForBranch(sourceBranch.getId());
+                    }
+
+                    @Override
+                    public Collection<PromotionLevel> getTargetItems() {
+                        return structureService.getPromotionLevelListForBranch(targetBranch.getId());
+                    }
+
+                    @Override
+                    public String getItemId(PromotionLevel item) {
+                        return item.getName();
+                    }
+
+                    @Override
+                    public void createTargetItem(PromotionLevel sourcePromotionLevel) {
+                        PromotionLevel targetPromotionLevel = structureService.newPromotionLevel(
+                                PromotionLevel.of(
+                                        targetBranch,
+                                        NameDescription.nd(
+                                                sourcePromotionLevel.getName(),
+                                                replacementFn.apply(sourcePromotionLevel.getDescription())
+                                        )
                                 )
-                        )
-                );
-                // Copy of the image
-                Document image = structureService.getPromotionLevelImage(sourcePromotionLevel.getId());
-                if (image != null) {
-                    structureService.setPromotionLevelImage(targetPromotionLevel.getId(), image);
+                        );
+                        copyPromotionLevelContent(sourcePromotionLevel, targetPromotionLevel);
+
+                    }
+
+                    @Override
+                    public void replaceTargetItem(PromotionLevel sourcePromotionLevel, PromotionLevel targetPromotionLevel) {
+                        structureService.savePromotionLevel(
+                                targetPromotionLevel.withDescription(replacementFn.apply(sourcePromotionLevel.getDescription()))
+                        );
+                        copyPromotionLevelContent(sourcePromotionLevel, targetPromotionLevel);
+                    }
+
+                    @Override
+                    public void deleteTargetItem(PromotionLevel target) {
+                        structureService.deletePromotionLevel(target.getId());
+                    }
+
+                    private void copyPromotionLevelContent(PromotionLevel sourcePromotionLevel, PromotionLevel targetPromotionLevel) {
+                        // Copy of the image
+                        Document image = structureService.getPromotionLevelImage(sourcePromotionLevel.getId());
+                        if (image != null) {
+                            structureService.setPromotionLevelImage(targetPromotionLevel.getId(), image);
+                        }
+                        // Copy of properties
+                        doCopyProperties(sourcePromotionLevel, targetPromotionLevel, replacementFn, syncPolicy);
+                    }
                 }
-                // Copy of properties
-                doCopyProperties(sourcePromotionLevel, targetPromotionLevel, replacementFn, syncPolicy);
-            }
-        }
+        );
     }
 
     protected void doCopyProperties(ProjectEntity source, ProjectEntity target, Function<String, String> replacementFn, SyncPolicy syncPolicy) {
