@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import static net.nemerosa.ontrack.model.structure.Replacement.replacementFn;
+
 @Service
 @Transactional
 public class CopyServiceImpl implements CopyService {
@@ -198,16 +200,6 @@ public class CopyServiceImpl implements CopyService {
                     jsonData
             );
         }
-    }
-
-    protected static Function<String, String> replacementFn(List<Replacement> replacements) {
-        return (String value) -> {
-            String transformedValue = value;
-            for (Replacement replacement : replacements) {
-                transformedValue = replacement.replace(transformedValue);
-            }
-            return transformedValue;
-        };
     }
 
 }

@@ -10,15 +10,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
 import static net.nemerosa.ontrack.json.JsonUtils.object;
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd;
-import static net.nemerosa.ontrack.service.CopyServiceImpl.replacementFn;
-import static org.junit.Assert.assertEquals;
+import static net.nemerosa.ontrack.model.structure.Replacement.replacementFn;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -36,44 +33,6 @@ public class CopyServiceImplTest {
         securityService = mock(SecurityService.class);
         BuildFilterService buildFilterService = mock(BuildFilterService.class);
         service = new CopyServiceImpl(structureService, propertyService, securityService, buildFilterService);
-    }
-
-    protected static String applyReplacements(final String value, List<Replacement> replacements) {
-        return replacementFn(replacements).apply(value);
-    }
-
-    @Test
-    public void applyReplacements_none() {
-        assertEquals("branches/11.7", applyReplacements("branches/11.7", Collections.emptyList()));
-    }
-
-    @Test
-    public void applyReplacements_null() {
-        assertEquals("branches/11.7", applyReplacements("branches/11.7", Arrays.asList(
-                new Replacement(null, "any")
-        )));
-    }
-
-    @Test
-    public void applyReplacements_blank() {
-        assertEquals("branches/11.7", applyReplacements("branches/11.7", Arrays.asList(
-                new Replacement("", "any")
-        )));
-    }
-
-    @Test
-    public void applyReplacements_direct() {
-        assertEquals("branches/11.8", applyReplacements("branches/11.7", Arrays.asList(
-                new Replacement("11.7", "11.8")
-        )));
-    }
-
-    @Test
-    public void applyReplacements_several() {
-        assertEquals("Release pipeline for branches/11.7", applyReplacements("Pipeline for trunk", Arrays.asList(
-                new Replacement("trunk", "branches/11.7"),
-                new Replacement("Pipeline", "Release pipeline")
-        )));
     }
 
     @Test

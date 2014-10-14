@@ -28,9 +28,9 @@ public interface BranchTemplateService {
      * </li>
      * </ul>
      *
-     * @param branchId   ID of the branch template definition
-     * @param branchName Name to use when creating the branch
+     * @param branchId ID of the branch template definition
+     * @param request  Request for the creation
      * @return Created or updated branch
      */
-    Branch createTemplateInstance(ID branchId, String branchName);
+    Branch createTemplateInstance(ID branchId, BranchTemplateInstanceSingleRequest request);
 }

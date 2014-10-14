@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
+import net.nemerosa.ontrack.model.exceptions.BranchNotTemplateDefinitionException;
 import net.nemerosa.ontrack.model.form.*;
 import net.nemerosa.ontrack.model.security.Action;
 import net.nemerosa.ontrack.model.security.BranchCreate;
@@ -321,9 +322,30 @@ public class BranchController extends AbstractResourceController {
      */
     @RequestMapping(value = "branches/{branchId}/template", method = RequestMethod.GET)
     public Form singleTemplateInstanceForm(@PathVariable ID branchId) {
-        return Form.create().with(
-                Form.defaultNameField().label("Branch name")
+        // Gets the template definition for this branch
+        Optional<TemplateDefinition> templateDefinition = branchTemplateService.getTemplateDefinition(branchId);
+        if (!templateDefinition.isPresent()) {
+            throw new BranchNotTemplateDefinitionException(branchId);
+        }
+        // Creates a form with the branch name and all needed parameters
+        Form form = Form.create().with(
+                Form.defaultNameField().label("Branch name").help("Name of the branch to create.")
         );
+        // Auto expression
+        form = form.with(
+                YesNo.of("manual").label("Manual").help("Do not use automatic expansion of parameters using the branch name.")
+        );
+        // Template parameters
+        for (TemplateParameter parameter : templateDefinition.get().getParameters()) {
+            form = form.with(
+                    Text.of(parameter.getName())
+                            .label(parameter.getName())
+                            .visibleIf("manual")
+                            .help(parameter.getDescription())
+            );
+        }
+        // OK
+        return form;
     }
 
     /**
@@ -346,7 +368,7 @@ public class BranchController extends AbstractResourceController {
      */
     @RequestMapping(value = "branches/{branchId}/template", method = RequestMethod.PUT)
     public Branch createTemplateInstance(@PathVariable ID branchId, @RequestBody @Valid BranchTemplateInstanceSingleRequest request) {
-        return branchTemplateService.createTemplateInstance(branchId, request.getName());
+        return branchTemplateService.createTemplateInstance(branchId, request);
     }
 
     private BranchBuildView buildViewWithFilter(ID branchId, BuildFilter buildFilter) {

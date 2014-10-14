@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.service.support.template;
 
-import net.nemerosa.ontrack.model.exceptions.BranchClassicCannotBeTemplateInstanceException;
-import net.nemerosa.ontrack.model.exceptions.BranchNotTemplateDefinitionException;
-import net.nemerosa.ontrack.model.exceptions.BranchTemplateHasBuildException;
-import net.nemerosa.ontrack.model.exceptions.BranchTemplateInstanceException;
+import net.nemerosa.ontrack.model.exceptions.*;
 import net.nemerosa.ontrack.model.security.BranchTemplateMgt;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
@@ -12,8 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -62,7 +63,7 @@ public class BranchTemplateServiceImpl implements BranchTemplateService {
     }
 
     @Override
-    public Branch createTemplateInstance(ID branchId, String branchName) {
+    public Branch createTemplateInstance(ID branchId, BranchTemplateInstanceSingleRequest request) {
         // Loads the branch template definition
         Branch branch = structureService.getBranch(branchId);
         // Gets the template definition
@@ -74,7 +75,7 @@ public class BranchTemplateServiceImpl implements BranchTemplateService {
         securityService.checkProjectFunction(branch, BranchTemplateMgt.class);
 
         // Gets the existing branch
-        Optional<Branch> existingBranch = structureService.findBranchByName(branch.getProject().getName(), branchName);
+        Optional<Branch> existingBranch = structureService.findBranchByName(branch.getProject().getName(), request.getName());
 
         // Not existing
         if (!existingBranch.isPresent()) {
@@ -83,17 +84,17 @@ public class BranchTemplateServiceImpl implements BranchTemplateService {
                     Branch.of(
                             branch.getProject(),
                             NameDescription.nd(
-                                    branchName,
+                                    request.getName(),
                                     ""
                             )
                     )
             );
             // Updates the branch
-            return updateTemplateInstance(instance, branch, templateDefinitionOptional.get());
+            return updateTemplateInstance(instance, branch, request, templateDefinitionOptional.get());
         }
         // Existing, normal branch
         else if (existingBranch.get().getType() == BranchType.CLASSIC) {
-            throw new BranchClassicCannotBeTemplateInstanceException(branchName);
+            throw new BranchClassicCannotBeTemplateInstanceException(request.getName());
         } else {
             throw new RuntimeException("NYI Gets the linked definition");
             // TODO Gets the linked definition
@@ -103,9 +104,42 @@ public class BranchTemplateServiceImpl implements BranchTemplateService {
         }
     }
 
+    protected Branch updateTemplateInstance(Branch instance, Branch template, BranchTemplateInstanceSingleRequest request, TemplateDefinition templateDefinition) {
+        // Manual mode
+        if (request.isManual()) {
+            // Missing parameters
+            List<String> templateParameterNames = templateDefinition.getParameters().stream()
+                    .map(TemplateParameter::getName)
+                    .collect(Collectors.toList());
+            Set<String> missingParameters = new HashSet<>(templateParameterNames);
+            missingParameters.removeAll(request.getParameters().keySet());
+            if (missingParameters.size() > 0) {
+                throw new BranchTemplateInstanceMissingParametersException(template.getName(), missingParameters);
+            }
+            // Unknown parameters
+            Set<String> unknownParameters = new HashSet<>(request.getParameters().keySet());
+            unknownParameters.removeAll(templateParameterNames);
+            if (unknownParameters.size() > 0) {
+                throw new BranchTemplateInstanceUnknownParametersException(template.getName(), unknownParameters);
+            }
+            // TODO Replacement function
+            // TODO OK
+            throw new RuntimeException("NYI");
+        }
+        // Automatic mode
+        else {
+            return updateTemplateInstance(instance, template, templateDefinition);
+        }
+    }
+
     protected Branch updateTemplateInstance(Branch instance, Branch template, TemplateDefinition templateDefinition) {
         // Replacement function
         Function<String, String> replacementFn = templateDefinition.replacementFn(instance.getName(), expressionEngine);
+        return updateTemplateInstance(instance, template, replacementFn);
+
+    }
+
+    protected Branch updateTemplateInstance(Branch instance, Branch template, Function<String, String> replacementFn) {
         // Description of the branch
         String description = replacementFn.apply(template.getDescription());
         instance = instance.withDescription(description);
