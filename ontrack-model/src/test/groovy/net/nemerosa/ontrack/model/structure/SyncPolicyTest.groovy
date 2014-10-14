@@ -76,11 +76,6 @@ class SyncPolicyTest {
             }
 
             @Override
-            Optional<NameDescription> getTargetItem(String id) {
-                Optional.ofNullable(targets[id])
-            }
-
-            @Override
             void createTargetItem(NameDescription source) {
                 targets.put(
                         source.name,

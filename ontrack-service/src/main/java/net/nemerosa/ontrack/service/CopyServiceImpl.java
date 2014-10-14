@@ -180,13 +180,6 @@ public class CopyServiceImpl implements CopyService {
                     }
 
                     @Override
-                    public Optional<Property<?>> getTargetItem(String id) {
-                        Property<?> p = propertyService.getProperty(target, id);
-                        if (p.isEmpty()) return Optional.<Property<?>>empty();
-                        else return Optional.of(p);
-                    }
-
-                    @Override
                     public void createTargetItem(Property<?> sourceProperty) {
                         doCopyProperty(sourceProperty, target, replacementFn);
                     }

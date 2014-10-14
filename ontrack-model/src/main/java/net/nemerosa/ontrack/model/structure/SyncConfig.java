@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.model.structure;
 
 import java.util.Collection;
-import java.util.Optional;
 
 public interface SyncConfig<T, D> {
 
@@ -12,8 +11,6 @@ public interface SyncConfig<T, D> {
     Collection<T> getTargetItems();
 
     D getItemId(T item);
-
-    Optional<T> getTargetItem(D id);
 
     void createTargetItem(T source);
 

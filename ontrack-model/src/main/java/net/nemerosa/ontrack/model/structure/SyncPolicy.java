@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.model.exceptions.SyncTargetItemUnknownException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -58,21 +57,28 @@ public class SyncPolicy {
         SyncResult result = SyncResult.empty();
         // Gets the source items
         Collection<T> sourceItems = config.getSourceItems();
+        // Index of target items
+        Map<D, T> targetMap = config.getTargetItems().stream().collect(
+                Collectors.toMap(
+                        config::getItemId,
+                        Function.identity()
+                )
+        );
         // For each source item
         for (T sourceItem : sourceItems) {
             // Gets its identifier for the target items
             D itemId = config.getItemId(sourceItem);
             // Gets a corresponding item
-            Optional<T> targetItemOpt = config.getTargetItem(itemId);
+            T targetItem = targetMap.get(itemId);
             // If present
-            if (targetItemOpt.isPresent()) {
+            if (targetItem != null) {
                 // This depends on the policy
                 switch (targetPresentPolicy) {
                     case IGNORE:
                         result.ignorePresentTarget();
                         break;
                     case REPLACE:
-                        config.replaceTargetItem(sourceItem, targetItemOpt.get());
+                        config.replaceTargetItem(sourceItem, targetItem);
                         result.replacePresentTarget();
                         break;
                     case ERROR:
@@ -88,7 +94,7 @@ public class SyncPolicy {
         }
         // Now that target items have been either created or updated, we need to know which ones were
         // not matched with the sources
-        Map<D, T> targetMap = config.getTargetItems().stream().collect(
+        targetMap = config.getTargetItems().stream().collect(
                 Collectors.toMap(
                         config::getItemId,
                         Function.identity()
