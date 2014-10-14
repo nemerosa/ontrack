@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.model.structure;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 import net.nemerosa.ontrack.model.exceptions.SyncTargetItemPresentException;
 import net.nemerosa.ontrack.model.exceptions.SyncTargetItemUnknownException;
 
@@ -11,10 +8,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -58,53 +52,6 @@ public class SyncPolicy {
         IGNORE,
         DELETE,
         ERROR
-    }
-
-    @Data
-    public static class SyncConfig<T, D> {
-
-        private final String itemType;
-        private final Supplier<Collection<T>> sourceItems;
-        private final Supplier<Collection<T>> targetItems;
-        private final Function<T, D> itemId;
-        private final Function<D, Optional<T>> targetItem;
-        private final Consumer<T> createTargetItem;
-        private final BiConsumer<T, T> replaceTargetItem;
-        private final Consumer<T> deleteTargetItem;
-
-    }
-
-    @ToString
-    public static class SyncResult {
-
-        @Getter
-        @Setter
-        private int unknownTargetIgnored = 0;
-        @Getter
-        @Setter
-        private int unknownTargetDeleted = 0;
-        @Getter
-        private int created = 0;
-        @Getter
-        private int presentTargetIgnored = 0;
-        @Getter
-        private int presentTargetReplaced = 0;
-
-        public static SyncResult empty() {
-            return new SyncResult();
-        }
-
-        public void create() {
-            created++;
-        }
-
-        public void ignorePresentTarget() {
-            presentTargetIgnored++;
-        }
-
-        public void replacePresentTarget() {
-            presentTargetReplaced++;
-        }
     }
 
     public <T, D> SyncResult sync(SyncConfig<T, D> config) {
@@ -157,7 +104,8 @@ public class SyncPolicy {
                     result.setUnknownTargetIgnored(unknownTargetNumber);
                     break;
                 case DELETE:
-                    for (T targetItem : targetMap.values()) {
+                    for (D targetId : targetIds) {
+                        T targetItem = targetMap.get(targetId);
                         config.getDeleteTargetItem().accept(targetItem);
                     }
                     result.setUnknownTargetDeleted(unknownTargetNumber);

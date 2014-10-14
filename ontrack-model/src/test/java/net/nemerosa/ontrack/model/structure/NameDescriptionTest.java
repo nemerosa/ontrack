@@ -4,10 +4,17 @@ import org.junit.Test;
 
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class NameDescriptionTest {
+
+    @Test
+    public void equality() {
+        assertEquals(
+                NameDescription.nd("a", "A a"),
+                NameDescription.nd("a", "A a")
+        );
+    }
 
     @Test
     public void nameValidation() {
