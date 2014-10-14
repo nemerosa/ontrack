@@ -10,8 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 
 import static net.nemerosa.ontrack.model.structure.Replacement.replacementFn;
@@ -237,29 +235,69 @@ public class CopyServiceImpl implements CopyService {
     }
 
     protected void doCopyValidationStamps(Branch sourceBranch, Branch targetBranch, Function<String, String> replacementFn, SyncPolicy syncPolicy) {
-        List<ValidationStamp> sourceValidationStamps = structureService.getValidationStampListForBranch(sourceBranch.getId());
-        for (ValidationStamp sourceValidationStamp : sourceValidationStamps) {
-            Optional<ValidationStamp> targetValidationStampOpt = structureService.findValidationStampByName(targetBranch.getProject().getName(), targetBranch.getName(), sourceValidationStamp.getName());
-            if (!targetValidationStampOpt.isPresent()) {
-                // Copy of the validation stamp
-                ValidationStamp targetValidationStamp = structureService.newValidationStamp(
-                        ValidationStamp.of(
-                                targetBranch,
-                                NameDescription.nd(
-                                        sourceValidationStamp.getName(),
+        syncPolicy.sync(
+                new SyncConfig<ValidationStamp, String>() {
+                    @Override
+                    public String getItemType() {
+                        return "Validation stamp";
+                    }
+
+                    @Override
+                    public Collection<ValidationStamp> getSourceItems() {
+                        return structureService.getValidationStampListForBranch(sourceBranch.getId());
+                    }
+
+                    @Override
+                    public Collection<ValidationStamp> getTargetItems() {
+                        return structureService.getValidationStampListForBranch(targetBranch.getId());
+                    }
+
+                    @Override
+                    public String getItemId(ValidationStamp item) {
+                        return item.getName();
+                    }
+
+                    @Override
+                    public void createTargetItem(ValidationStamp sourceValidationStamp) {
+                        ValidationStamp targetValidationStamp = structureService.newValidationStamp(
+                                ValidationStamp.of(
+                                        targetBranch,
+                                        NameDescription.nd(
+                                                sourceValidationStamp.getName(),
+                                                replacementFn.apply(sourceValidationStamp.getDescription())
+                                        )
+                                )
+                        );
+                        copyValidationStampContent(sourceValidationStamp, targetValidationStamp);
+
+                    }
+
+                    @Override
+                    public void replaceTargetItem(ValidationStamp sourceValidationStamp, ValidationStamp targetValidationStamp) {
+                        structureService.saveValidationStamp(
+                                targetValidationStamp.withDescription(
                                         replacementFn.apply(sourceValidationStamp.getDescription())
                                 )
-                        )
-                );
-                // Copy of the image
-                Document image = structureService.getValidationStampImage(sourceValidationStamp.getId());
-                if (image != null) {
-                    structureService.setValidationStampImage(targetValidationStamp.getId(), image);
+                        );
+                        copyValidationStampContent(sourceValidationStamp, targetValidationStamp);
+                    }
+
+                    @Override
+                    public void deleteTargetItem(ValidationStamp target) {
+                        structureService.deleteValidationStamp(target.getId());
+                    }
+
+                    private void copyValidationStampContent(ValidationStamp sourceValidationStamp, ValidationStamp targetValidationStamp) {
+                        // Copy of the image
+                        Document image = structureService.getValidationStampImage(sourceValidationStamp.getId());
+                        if (image != null) {
+                            structureService.setValidationStampImage(targetValidationStamp.getId(), image);
+                        }
+                        // Copy of properties
+                        doCopyProperties(sourceValidationStamp, targetValidationStamp, replacementFn, syncPolicy);
+                    }
                 }
-                // Copy of properties
-                doCopyProperties(sourceValidationStamp, targetValidationStamp, replacementFn, syncPolicy);
-            }
-        }
+        );
     }
 
     protected <T> void doCopyProperty(Property<T> property, ProjectEntity targetEntity, Function<String, String> replacementFn) {
