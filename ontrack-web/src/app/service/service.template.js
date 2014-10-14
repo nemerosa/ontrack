@@ -20,6 +20,19 @@ angular.module('ot.service.template', [
             });
         };
 
+        /**
+         * Gets a single branch name and creates a template instance from it.
+         */
+        self.createTemplateInstance = function (templateInstanceUri) {
+            return otFormService.display({
+                uri: templateInstanceUri,
+                title: "Template instance creation",
+                submit: function (data) {
+                    return ot.call($http.put(templateInstanceUri, {name: data.name}));
+                }
+            });
+        };
+
         return self;
     })
 ;

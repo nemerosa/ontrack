@@ -59,8 +59,8 @@ angular.module('ot.service.form', [
                         }
                     }
                 }).result.then(
-                    function success() {
-                        d.resolve();
+                    function success(data) {
+                        d.resolve(data);
                     },
                     function error() {
                         d.reject();

@@ -188,6 +188,21 @@ angular.module('ot.view.branch', [
                     },
                     {
                         condition: function () {
+                            return branchResource._templateInstance;
+                        },
+                        id: 'templateInstanceBranch',
+                        name: "Create template instance",
+                        cls: 'ot-command-branch-template-instance',
+                        action: function () {
+                            otTemplateService.createTemplateInstance(branchResource._templateInstance).then(
+                                function (instance) {
+                                    $state.go('branch', {branchId: instance.id});
+                                }
+                            );
+                        }
+                    },
+                    {
+                        condition: function () {
                             return branchResource._disable;
                         },
                         id: 'disableBranch',
