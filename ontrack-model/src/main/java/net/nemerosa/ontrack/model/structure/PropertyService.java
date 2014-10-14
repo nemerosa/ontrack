@@ -68,6 +68,15 @@ public interface PropertyService {
     Ack editProperty(ProjectEntity entity, String propertyTypeName, JsonNode data);
 
     /**
+     * Edits the value of a property.
+     *
+     * @param entity       Entity to edit
+     * @param propertyType The type of the property to edit
+     * @param data         Property value
+     */
+    <T> Ack editProperty(ProjectEntity entity, Class<? extends PropertyType<T>> propertyType, T data);
+
+    /**
      * Deletes the value of a property.
      *
      * @param entity Type      of the entity to edit
