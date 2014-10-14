@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.model.structure;
 
+import java.util.function.Function;
+
 /**
  * Service used for the duplication, copying and cloning of information.
  */
@@ -10,6 +12,12 @@ public interface CopyService {
      * to the target branch.
      */
     Branch copy(Branch branch, BranchCopyRequest request);
+
+    /**
+     * Copies the configuration of the source branch
+     * to the target branch.
+     */
+    Branch copy(Branch targetBranch, Branch sourceBranch, Function<String, String> replacementFn);
 
     /**
      * Clones the <code>branch</code> into a new branch

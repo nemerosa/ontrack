@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 @Service
 @Transactional
@@ -31,8 +32,17 @@ public class CopyServiceImpl implements CopyService {
 
     @Override
     public Branch copy(Branch targetBranch, BranchCopyRequest request) {
+        // Replacement function
+        Function<String, String> replacementFn = replacementFn(request.getReplacements());
         // Gets the source branch
         Branch sourceBranch = structureService.getBranch(request.getSourceBranchId());
+        // Actual copy
+        return copy(targetBranch, sourceBranch, replacementFn);
+
+    }
+
+    @Override
+    public Branch copy(Branch targetBranch, Branch sourceBranch, Function<String, String> replacementFn) {
         // If same branch, rejects
         if (sourceBranch.id() == targetBranch.id()) {
             throw new CannotCopyItselfException();
@@ -40,14 +50,17 @@ public class CopyServiceImpl implements CopyService {
         // Checks the rights on the target branch
         securityService.checkProjectFunction(targetBranch, BranchEdit.class);
         // Now, we can work in a secure context
-        securityService.asAdmin(() -> doCopy(sourceBranch, targetBranch, request));
+        securityService.asAdmin(() -> doCopy(sourceBranch, targetBranch, replacementFn));
+        // OK
         return targetBranch;
     }
 
     @Override
     public Branch cloneBranch(Branch sourceBranch, BranchCloneRequest request) {
+        // Replacement function
+        Function<String, String> replacementFn = replacementFn(request.getReplacements());
         // Description of the target branch
-        String targetDescription = applyReplacements(sourceBranch.getDescription(), request.getReplacements());
+        String targetDescription = replacementFn.apply(sourceBranch.getDescription());
         // Creates the branch
         Branch targetBranch = structureService.newBranch(
                 Branch.of(
@@ -56,7 +69,7 @@ public class CopyServiceImpl implements CopyService {
                 )
         );
         // Copies the configuration
-        doCopy(sourceBranch, targetBranch, request);
+        doCopy(sourceBranch, targetBranch, replacementFn);
         // OK
         return targetBranch;
     }
@@ -64,8 +77,11 @@ public class CopyServiceImpl implements CopyService {
     @Override
     public Project cloneProject(Project sourceProject, ProjectCloneRequest request) {
 
+        // Replacement function
+        Function<String, String> replacementFn = replacementFn(request.getReplacements());
+
         // Description of the target project
-        String targetProjectDescription = applyReplacements(sourceProject.getDescription(), request.getReplacements());
+        String targetProjectDescription = replacementFn.apply(sourceProject.getDescription());
 
         // Creates the project
         Project targetProject = structureService.newProject(
@@ -75,12 +91,12 @@ public class CopyServiceImpl implements CopyService {
         );
 
         // Copies the properties for the project
-        doCopyProperties(sourceProject, targetProject, request.getReplacements());
+        doCopyProperties(sourceProject, targetProject, replacementFn);
 
         // Creates a copy of the branch
         Branch sourceBranch = structureService.getBranch(request.getSourceBranchId());
-        String targetBranchName = applyReplacements(sourceBranch.getName(), request.getReplacements());
-        String targetBranchDescription = applyReplacements(sourceBranch.getDescription(), request.getReplacements());
+        String targetBranchName = replacementFn.apply(sourceBranch.getName());
+        String targetBranchDescription = replacementFn.apply(sourceBranch.getDescription());
         Branch targetBranch = structureService.newBranch(
                 Branch.of(
                         targetProject,
@@ -89,19 +105,19 @@ public class CopyServiceImpl implements CopyService {
         );
 
         // Configuration of the new branch
-        doCopy(sourceBranch, targetBranch, request);
+        doCopy(sourceBranch, targetBranch, replacementFn);
 
         // OK
         return targetProject;
     }
 
-    protected void doCopy(Branch sourceBranch, Branch targetBranch, AbstractCopyRequest request) {
+    protected void doCopy(Branch sourceBranch, Branch targetBranch, Function<String, String> replacementFn) {
         // Branch properties
-        doCopyProperties(sourceBranch, targetBranch, request.getReplacements());
+        doCopyProperties(sourceBranch, targetBranch, replacementFn);
         // Promotion level and properties
-        doCopyPromotionLevels(sourceBranch, targetBranch, request);
+        doCopyPromotionLevels(sourceBranch, targetBranch, replacementFn);
         // Validation stamps and properties
-        doCopyValidationStamps(sourceBranch, targetBranch, request);
+        doCopyValidationStamps(sourceBranch, targetBranch, replacementFn);
         // User filters
         doCopyUserBuildFilters(sourceBranch, targetBranch);
     }
@@ -110,7 +126,7 @@ public class CopyServiceImpl implements CopyService {
         buildFilterService.copyToBranch(sourceBranch.getId(), targetBranch.getId());
     }
 
-    protected void doCopyPromotionLevels(Branch sourceBranch, Branch targetBranch, AbstractCopyRequest request) {
+    protected void doCopyPromotionLevels(Branch sourceBranch, Branch targetBranch, Function<String, String> replacementFn) {
         List<PromotionLevel> sourcePromotionLevels = structureService.getPromotionLevelListForBranch(sourceBranch.getId());
         for (PromotionLevel sourcePromotionLevel : sourcePromotionLevels) {
             Optional<PromotionLevel> targetPromotionLevelOpt = structureService.findPromotionLevelByName(targetBranch.getProject().getName(), targetBranch.getName(), sourcePromotionLevel.getName());
@@ -121,7 +137,7 @@ public class CopyServiceImpl implements CopyService {
                                 targetBranch,
                                 NameDescription.nd(
                                         sourcePromotionLevel.getName(),
-                                        applyReplacements(sourcePromotionLevel.getDescription(), request.getReplacements())
+                                        replacementFn.apply(sourcePromotionLevel.getDescription())
                                 )
                         )
                 );
@@ -131,19 +147,19 @@ public class CopyServiceImpl implements CopyService {
                     structureService.setPromotionLevelImage(targetPromotionLevel.getId(), image);
                 }
                 // Copy of properties
-                doCopyProperties(sourcePromotionLevel, targetPromotionLevel, request.getReplacements());
+                doCopyProperties(sourcePromotionLevel, targetPromotionLevel, replacementFn);
             }
         }
     }
 
-    protected void doCopyProperties(ProjectEntity source, ProjectEntity target, List<Replacement> replacements) {
+    protected void doCopyProperties(ProjectEntity source, ProjectEntity target, Function<String, String> replacementFn) {
         List<Property<?>> properties = propertyService.getProperties(source);
         for (Property<?> property : properties) {
-            doCopyProperty(property, target, replacements);
+            doCopyProperty(property, target, replacementFn);
         }
     }
 
-    protected void doCopyValidationStamps(Branch sourceBranch, Branch targetBranch, AbstractCopyRequest request) {
+    protected void doCopyValidationStamps(Branch sourceBranch, Branch targetBranch, Function<String, String> replacementFn) {
         List<ValidationStamp> sourceValidationStamps = structureService.getValidationStampListForBranch(sourceBranch.getId());
         for (ValidationStamp sourceValidationStamp : sourceValidationStamps) {
             Optional<ValidationStamp> targetValidationStampOpt = structureService.findValidationStampByName(targetBranch.getProject().getName(), targetBranch.getName(), sourceValidationStamp.getName());
@@ -154,7 +170,7 @@ public class CopyServiceImpl implements CopyService {
                                 targetBranch,
                                 NameDescription.nd(
                                         sourceValidationStamp.getName(),
-                                        applyReplacements(sourceValidationStamp.getDescription(), request.getReplacements())
+                                        replacementFn.apply(sourceValidationStamp.getDescription())
                                 )
                         )
                 );
@@ -164,15 +180,15 @@ public class CopyServiceImpl implements CopyService {
                     structureService.setValidationStampImage(targetValidationStamp.getId(), image);
                 }
                 // Copy of properties
-                doCopyProperties(sourceValidationStamp, targetValidationStamp, request.getReplacements());
+                doCopyProperties(sourceValidationStamp, targetValidationStamp, replacementFn);
             }
         }
     }
 
-    protected <T> void doCopyProperty(Property<T> property, ProjectEntity targetEntity, List<Replacement> replacements) {
+    protected <T> void doCopyProperty(Property<T> property, ProjectEntity targetEntity, Function<String, String> replacementFn) {
         if (!property.isEmpty() && property.getType().canEdit(targetEntity, securityService)) {
             // Property value replacement
-            T data = property.getType().replaceValue(property.getValue(), s -> applyReplacements(s, replacements));
+            T data = property.getType().replaceValue(property.getValue(), replacementFn);
             // Property data
             JsonNode jsonData = property.getType().forStorage(data);
             // Creates the property
@@ -184,12 +200,14 @@ public class CopyServiceImpl implements CopyService {
         }
     }
 
-    protected static String applyReplacements(final String value, List<Replacement> replacements) {
-        String transformedValue = value;
-        for (Replacement replacement : replacements) {
-            transformedValue = replacement.replace(transformedValue);
-        }
-        return transformedValue;
+    protected static Function<String, String> replacementFn(List<Replacement> replacements) {
+        return (String value) -> {
+            String transformedValue = value;
+            for (Replacement replacement : replacements) {
+                transformedValue = replacement.replace(transformedValue);
+            }
+            return transformedValue;
+        };
     }
 
 }
