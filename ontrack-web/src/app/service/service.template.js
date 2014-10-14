@@ -28,7 +28,16 @@ angular.module('ot.service.template', [
                 uri: templateInstanceUri,
                 title: "Template instance creation",
                 submit: function (data) {
-                    return ot.call($http.put(templateInstanceUri, {name: data.name}));
+                    var name = data.name;
+                    var manual = data.manual;
+                    delete data.name;
+                    delete data.manual;
+                    var request = {
+                        name: name,
+                        manual: manual,
+                        parameters: data
+                    };
+                    return ot.call($http.put(templateInstanceUri, request));
                 }
             });
         };
