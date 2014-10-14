@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 @Service
 @Transactional
@@ -103,11 +104,13 @@ public class BranchTemplateServiceImpl implements BranchTemplateService {
     }
 
     protected Branch updateTemplateInstance(Branch instance, Branch template, TemplateDefinition templateDefinition) {
+        // Replacement function
+        Function<String, String> replacementFn = templateDefinition.replacementFn(instance.getName(), expressionEngine);
         // Description of the branch
-        String description = templateDefinition.apply(template.getDescription(), instance.getName(), expressionEngine);
+        String description = replacementFn.apply(template.getDescription());
         instance = instance.withDescription(description);
         structureService.saveBranch(instance);
-        // FIXME Copy
+        // FIXME Copy replacement function
         // OK - reloads to gets the correct type
         return structureService.getBranch(instance.getId());
     }
