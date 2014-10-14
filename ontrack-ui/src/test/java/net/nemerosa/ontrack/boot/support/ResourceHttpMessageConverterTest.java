@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.boot.resources.CoreResourceModule;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.structure.Branch;
-import net.nemerosa.ontrack.model.structure.ID;
-import net.nemerosa.ontrack.model.structure.NameDescription;
-import net.nemerosa.ontrack.model.structure.Project;
+import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.test.TestUtils;
 import net.nemerosa.ontrack.ui.controller.MockURIBuilder;
 import org.junit.Before;
@@ -29,9 +26,10 @@ public class ResourceHttpMessageConverterTest {
     @Before
     public void before() {
         SecurityService securityService = mock(SecurityService.class);
+        StructureService structureService = mock(StructureService.class);
         converter = new ResourceHttpMessageConverter(
                 new MockURIBuilder(), securityService,
-                Arrays.asList(new CoreResourceModule())
+                Arrays.asList(new CoreResourceModule(structureService))
         );
     }
 

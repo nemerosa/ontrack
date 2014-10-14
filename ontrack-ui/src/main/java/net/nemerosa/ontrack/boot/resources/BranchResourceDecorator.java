@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.BranchType;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
+import net.nemerosa.ontrack.model.structure.StructureService;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.ResourceContext;
@@ -15,8 +16,11 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
 
-    protected BranchResourceDecorator() {
+    private final StructureService structureService;
+
+    protected BranchResourceDecorator(StructureService structureService) {
         super(Branch.class);
+        this.structureService = structureService;
     }
 
     @Override
@@ -132,12 +136,11 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                 .link(
                         "_templateDefinition",
                         on(BranchController.class).getTemplateDefinition(branch.getId()),
-                        // TODO We should rely on BranchTemplateService#isTemplateInstance() instead of a type
-                        // TODO Cannot get a template definition from a branch that contains builds
                         branch.getType() != BranchType.TEMPLATE_INSTANCE
+                                && (structureService.getBuildCount(branch) == 0)
                                 && resourceContext.isProjectFunctionGranted(branch, BranchTemplateMgt.class)
                 )
-                        // TODO Gets the template definition for this branch
+                        // TODO Template instance creation
                         // OK
                 .build();
     }

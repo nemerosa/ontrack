@@ -13,7 +13,6 @@ import net.nemerosa.ontrack.ui.resource.ResourceObjectMapperFactory;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.net.URI;
 import java.util.Arrays;
@@ -22,6 +21,7 @@ import java.util.List;
 import static net.nemerosa.ontrack.json.JsonUtils.array;
 import static net.nemerosa.ontrack.json.JsonUtils.object;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class CoreResourceModuleTest {
@@ -31,10 +31,11 @@ public class CoreResourceModuleTest {
 
     @Before
     public void before() {
-        securityService = Mockito.mock(SecurityService.class);
+        securityService = mock(SecurityService.class);
+        StructureService structureService = mock(StructureService.class);
         mapper = new ResourceObjectMapperFactory().resourceObjectMapper(
                 Arrays.asList(
-                        new CoreResourceModule()
+                        new CoreResourceModule(structureService)
                 ),
                 new DefaultResourceContext(new MockURIBuilder(), securityService)
         );

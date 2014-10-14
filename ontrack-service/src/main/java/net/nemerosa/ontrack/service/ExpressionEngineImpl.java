@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.service;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import net.nemerosa.ontrack.model.structure.ExpressionEngine;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -11,6 +12,7 @@ import java.util.regex.Pattern;
 /**
  * Default implementation for an expression engine, based on a Grovy sandbox
  */
+@Component
 public class ExpressionEngineImpl implements ExpressionEngine {
 
     public static final Pattern PATTERN = Pattern.compile("\\$\\{(.+)\\}");
