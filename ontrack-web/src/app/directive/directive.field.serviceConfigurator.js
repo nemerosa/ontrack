@@ -12,12 +12,31 @@ angular.module('ot.directive.field.serviceConfigurator', [
             },
             controller: function ($scope) {
 
+                $scope.formEntries = [];
+
+                // Custom preparation for submit
+                $scope.field.prepareForSubmit = function (data) {
+                    // Prepares each form entry individually
+                    angular.forEach($scope.formEntries, function (formEntry) {
+                        otFormService.prepareForSubmit(
+                            formEntry.form,
+                            formEntry.data
+                        );
+                    });
+                    // Collects the data
+                    if ($scope.formEntries) {
+                        var formEntry = $scope.formEntries[0];
+                        data[$scope.field.name] = {
+                            id: formEntry.sourceId,
+                            data: formEntry.data
+                        };
+                    }
+                };
+
                 // Loading of the form on selection
                 $scope.$watch('sourceId', function (sourceId) {
                     selectSourceId(sourceId);
                 });
-
-                $scope.formEntries = [];
 
                 function selectSourceId(sourceId) {
                     var source = getSource(sourceId);
@@ -27,10 +46,13 @@ angular.module('ot.directive.field.serviceConfigurator', [
                         // Prepares the data
                         var data = otFormService.prepareForDisplay(form);
                         // Sets the entry
-                        $scope.formEntries = [{
-                            form: form,
-                            data: data
-                        }];
+                        $scope.formEntries = [
+                            {
+                                sourceId: sourceId,
+                                form: form,
+                                data: data
+                            }
+                        ];
                     } else {
                         $scope.formEntries = [];
                     }
