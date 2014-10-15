@@ -134,7 +134,16 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
         assert !property.empty
         assert property.value.value == 'Value for instance'
 
-        // TODO Checks the branch promotion levels
+        // Checks the branch promotion levels
+        asUser().withView(instance).call {
+            def copper = structureService.findPromotionLevelByName(instance.project.name, instance.name, 'COPPER')
+            assert copper.present
+            assert copper.get().description == 'Branch INSTANCE promoted to QA.'
+            def bronze = structureService.findPromotionLevelByName(instance.project.name, instance.name, 'BRONZE')
+            assert bronze.present
+            assert bronze.get().description == 'Branch INSTANCE validated by QA.'
+        }
+
         // TODO Checks the branch validation stamps
     }
 
