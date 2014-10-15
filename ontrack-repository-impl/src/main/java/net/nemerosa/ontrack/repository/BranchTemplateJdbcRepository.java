@@ -93,19 +93,63 @@ public class BranchTemplateJdbcRepository extends AbstractJdbcRepository impleme
 
     @Override
     public Optional<TemplateInstance> getTemplateInstance(ID branchId) {
-        // FIXME Method net.nemerosa.ontrack.repository.BranchTemplateJdbcRepository.getTemplateInstance
-        return null;
+        return getOptional(
+                "SELECT * FROM BRANCH_TEMPLATE_INSTANCES WHERE BRANCHID = :branchId",
+                params("branchId", branchId.get()),
+                (rs, num) -> toTemplateInstance(rs)
+        );
+    }
+
+    private TemplateInstance toTemplateInstance(ResultSet rs) throws SQLException {
+        int branchId = rs.getInt("branchId");
+        // Gets the parameters
+        List<TemplateParameterValue> parameters = getNamedParameterJdbcTemplate().query(
+                "SELECT * FROM BRANCH_TEMPLATE_INSTANCE_PARAMS WHERE BRANCHID = :branchId ORDER BY NAME",
+                params("branchId", branchId),
+                (rsp, num) -> new TemplateParameterValue(
+                        rsp.getString("NAME"),
+                        rsp.getString("VALUE")
+                )
+        );
+        // OK
+        return new TemplateInstance(
+                id(rs, "TEMPLATEBRANCHID"),
+                parameters
+        );
     }
 
     @Override
     public void setTemplateInstance(ID branchId, TemplateInstance templateInstance) {
-        // FIXME Method net.nemerosa.ontrack.repository.BranchTemplateJdbcRepository.setTemplateInstance
-
+        // Deletes previous value
+        getNamedParameterJdbcTemplate().update(
+                "DELETE FROM BRANCH_TEMPLATE_INSTANCES WHERE BRANCHID = :branchId",
+                params("branchId", branchId.get())
+        );
+        // Definition
+        getNamedParameterJdbcTemplate().update(
+                "INSERT INTO BRANCH_TEMPLATE_INSTANCES(BRANCHID, TEMPLATEBRANCHID) " +
+                        "VALUES (:branchId, :templateBranchId)",
+                params("branchId", branchId.get())
+                        .addValue("templateBranchId", templateInstance.getTemplateDefinitionId().get())
+        );
+        // Parameters
+        for (TemplateParameterValue parameter : templateInstance.getParameterValues()) {
+            getNamedParameterJdbcTemplate().update(
+                    "INSERT INTO BRANCH_TEMPLATE_INSTANCE_PARAMS(BRANCHID, NAME, VALUE) " +
+                            "VALUES (:branchId, :name, :value)",
+                    params("branchId", branchId.get())
+                            .addValue("name", parameter.getName())
+                            .addValue("value", parameter.getValue())
+            );
+        }
     }
 
     @Override
     public boolean isTemplateInstance(ID branchId) {
-        // FIXME Method net.nemerosa.ontrack.repository.BranchTemplateJdbcRepository.isTemplateInstance
-        return false;
+        return getFirstItem(
+                "SELECT BRANCHID FROM BRANCH_TEMPLATE_INSTANCES WHERE BRANCHID = :branchId",
+                params("branchId", branchId.get()),
+                Integer.class
+        ) != null;
     }
 }
