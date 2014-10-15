@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service.support.template;
 
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.exceptions.*;
 import net.nemerosa.ontrack.model.job.*;
 import net.nemerosa.ontrack.model.security.BranchTemplateMgt;
@@ -7,6 +8,8 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.repository.BranchTemplateRepository;
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +23,8 @@ import static java.lang.String.format;
 @Service
 @Transactional
 public class BranchTemplateServiceImpl implements BranchTemplateService, JobProvider {
+
+    private final Logger logger = LoggerFactory.getLogger(BranchTemplateService.class);
 
     private final StructureService structureService;
     private final SecurityService securityService;
@@ -240,6 +245,12 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
                 );
             }
         };
+    }
+
+    @Override
+    public Ack sync(ID branchId) {
+        syncTemplateDefinition(branchId, logger::info);
+        return Ack.OK;
     }
 
     protected void syncTemplateDefinition(ID branchId, JobInfoListener info) {

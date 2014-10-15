@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.model.structure;
 
+import net.nemerosa.ontrack.model.Ack;
+
 import java.util.Optional;
 
 public interface BranchTemplateService {
@@ -33,4 +35,9 @@ public interface BranchTemplateService {
      * @return Created or updated branch
      */
     Branch createTemplateInstance(ID branchId, BranchTemplateInstanceSingleRequest request);
+
+    /**
+     * Sync. this template definition by creating and updating linked template instances.
+     */
+    Ack sync(ID branchId);
 }

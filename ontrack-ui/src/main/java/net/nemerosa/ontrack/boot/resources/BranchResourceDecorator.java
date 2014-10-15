@@ -140,6 +140,13 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                                 && (structureService.getBuildCount(branch) == 0)
                                 && resourceContext.isProjectFunctionGranted(branch, BranchTemplateMgt.class)
                 )
+                        // Template synchronisation
+                .link(
+                        "_templateSync",
+                        on(BranchController.class).syncTemplateDefinition(branch.getId()),
+                        branch.getType() == BranchType.TEMPLATE_DEFINITION
+                                && resourceContext.isProjectFunctionGranted(branch, BranchTemplateMgt.class)
+                )
                         // Template instance creation
                 .link(
                         "_templateInstance",
