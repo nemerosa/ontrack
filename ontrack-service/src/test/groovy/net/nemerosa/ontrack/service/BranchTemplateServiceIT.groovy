@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.model.exceptions.BranchTemplateInstanceMissingParametersException
+import net.nemerosa.ontrack.model.exceptions.BranchTemplateInstanceUnknownParametersException
 import net.nemerosa.ontrack.model.security.BranchTemplateMgt
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.structure.*
@@ -68,6 +70,45 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
 
         // Checks the created branch
         checkBranchTemplateInstance(instance)
+    }
+
+    @Test(expected = BranchTemplateInstanceMissingParametersException)
+    void 'Creating a single template instance - mode manual - missing parameters'() {
+        // Creates the template definition
+        Branch templateBranch = createBranchTemplateDefinition()
+
+        // Creates a single template
+        asUser().with(templateBranch, BranchTemplateMgt).call {
+            templateService.createTemplateInstance(
+                    templateBranch.id,
+                    new BranchTemplateInstanceSingleRequest(
+                            'instance',
+                            true, // Manual
+                            [:]
+                    )
+            )
+        }
+    }
+
+    @Test(expected = BranchTemplateInstanceUnknownParametersException)
+    void 'Creating a single template instance - mode manual - unknown parameters'() {
+        // Creates the template definition
+        Branch templateBranch = createBranchTemplateDefinition()
+
+        // Creates a single template
+        asUser().with(templateBranch, BranchTemplateMgt).call {
+            templateService.createTemplateInstance(
+                    templateBranch.id,
+                    new BranchTemplateInstanceSingleRequest(
+                            'instance',
+                            true, // Manual
+                            [
+                                    'BRANCH': 'INSTANCE',
+                                    'unknown': "Test"
+                            ]
+                    )
+            )
+        }
     }
 
     protected void checkBranchTemplateInstance(Branch instance) {
