@@ -70,38 +70,29 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
         // Loads the branch template definition
         Branch branch = structureService.getBranch(branchId);
         // Gets the template definition
-        Optional<TemplateDefinition> templateDefinitionOptional = branchTemplateRepository.getTemplateDefinition(branchId);
-        if (!templateDefinitionOptional.isPresent()) {
-            throw new BranchNotTemplateDefinitionException(branchId);
-        }
+        TemplateDefinition templateDefinition = branchTemplateRepository.getTemplateDefinition(branchId)
+                .orElseThrow(() -> new BranchNotTemplateDefinitionException(branchId));
         // Checks the rights
         securityService.checkProjectFunction(branch, BranchTemplateMgt.class);
 
         // Gets the existing branch
-        Optional<Branch> existingBranch = structureService.findBranchByName(branch.getProject().getName(), request.getName());
+        String branchName = request.getName();
+        Optional<Branch> existingBranch = structureService.findBranchByName(branch.getProject().getName(), branchName);
 
         // Not existing
         if (!existingBranch.isPresent()) {
             // Creates the branch
-            Branch instance = structureService.newBranch(
-                    Branch.of(
-                            branch.getProject(),
-                            NameDescription.nd(
-                                    request.getName(),
-                                    ""
-                            )
-                    )
-            );
+            Branch instance = createBranchForTemplateInstance(branch, branchName);
             // Updates the branch
-            return updateTemplateInstance(instance, branch, request, templateDefinitionOptional.get());
+            return updateTemplateInstance(instance, branch, request, templateDefinition);
         }
         // Existing, normal branch
         else if (existingBranch.get().getType() == BranchType.CLASSIC) {
-            throw new BranchClassicCannotBeTemplateInstanceException(request.getName());
+            throw new BranchClassicCannotBeTemplateInstanceException(branchName);
         }
         // Existing, template branch
         else if (existingBranch.get().getType() == BranchType.TEMPLATE_DEFINITION) {
-            throw new BranchTemplateDefinitionCannotBeTemplateInstanceException(request.getName());
+            throw new BranchTemplateDefinitionCannotBeTemplateInstanceException(branchName);
         } else {
             // Gets the template instance
             Optional<TemplateInstance> templateInstanceOptional = branchTemplateRepository.getTemplateInstance(existingBranch.get().getId());
@@ -111,13 +102,25 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
             ID linkedTemplateId = templateInstanceOptional.get().getTemplateDefinitionId();
             // If another definition, error
             if (!Objects.equals(linkedTemplateId, branchId)) {
-                throw new BranchTemplateInstanceCannotUpdateBasedOnOtherDefinitionException(request.getName());
+                throw new BranchTemplateInstanceCannotUpdateBasedOnOtherDefinitionException(branchName);
             }
             // If same definition, updates the branch
             else {
-                return updateTemplateInstance(existingBranch.get(), branch, request, templateDefinitionOptional.get());
+                return updateTemplateInstance(existingBranch.get(), branch, request, templateDefinition);
             }
         }
+    }
+
+    protected Branch createBranchForTemplateInstance(Branch templateBranch, String branchName) {
+        return structureService.newBranch(
+                Branch.of(
+                        templateBranch.getProject(),
+                        NameDescription.nd(
+                                branchName,
+                                ""
+                        )
+                )
+        );
     }
 
     protected Branch updateTemplateInstance(Branch instance, Branch template, BranchTemplateInstanceSingleRequest request, TemplateDefinition templateDefinition) {
@@ -282,7 +285,28 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
     }
 
     protected void syncTemplateDefinition(Branch templateBranch, TemplateDefinition templateDefinition, String branchName, JobInfoListener info) {
-        // FIXME Method net.nemerosa.ontrack.service.support.template.BranchTemplateServiceImpl.syncTemplateDefinition
-
+        // Logging
+        info.post(format("Sync. %s --> %s", templateBranch.getName(), branchName));
+        // Gets the target branch, if it exists
+        Optional<Branch> targetBranch = structureService.findBranchByName(templateBranch.getProject().getName(), branchName);
+        // If it exists, we need to update it
+        if (targetBranch.isPresent()) {
+            info.post(format("%s exists - updating", branchName));
+            updateTemplateInstance(
+                    targetBranch.get(),
+                    templateBranch,
+                    templateDefinition
+            );
+        }
+        // If it does not exist, creates it and updates it
+        else {
+            info.post(format("%s does not exists - creating and updating", branchName));
+            Branch instance = createBranchForTemplateInstance(templateBranch, branchName);
+            updateTemplateInstance(
+                    instance,
+                    templateBranch,
+                    templateDefinition
+            );
+        }
     }
 }
