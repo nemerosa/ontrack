@@ -92,6 +92,18 @@ public class BranchTemplateJdbcRepository extends AbstractJdbcRepository impleme
     }
 
     @Override
+    public Optional<TemplateInstance> getTemplateInstance(ID branchId) {
+        // FIXME Method net.nemerosa.ontrack.repository.BranchTemplateJdbcRepository.getTemplateInstance
+        return null;
+    }
+
+    @Override
+    public void setTemplateInstance(ID branchId, TemplateInstance templateInstance) {
+        // FIXME Method net.nemerosa.ontrack.repository.BranchTemplateJdbcRepository.setTemplateInstance
+
+    }
+
+    @Override
     public boolean isTemplateInstance(ID branchId) {
         // FIXME Method net.nemerosa.ontrack.repository.BranchTemplateJdbcRepository.isTemplateInstance
         return false;
