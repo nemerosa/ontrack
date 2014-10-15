@@ -15,9 +15,6 @@ import static org.junit.Assert.assertTrue;
 public class BranchTemplateJdbcRepositoryIT extends AbstractRepositoryTestSupport {
 
     @Autowired
-    private StructureRepository structureRepository;
-
-    @Autowired
     private BranchTemplateJdbcRepository repository;
 
     private Branch branch;
@@ -65,6 +62,13 @@ public class BranchTemplateJdbcRepositoryIT extends AbstractRepositoryTestSuppor
                 templateDefinition,
                 readDefinition.get()
         );
+    }
+
+    @Test
+    public void save_template_instance() {
+        // Branch as template definition
+        // TODO Does it not need to be an actual template?
+
     }
 
 }

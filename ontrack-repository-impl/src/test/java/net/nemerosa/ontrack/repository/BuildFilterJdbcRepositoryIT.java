@@ -24,9 +24,6 @@ import static org.mockito.Mockito.when;
 public class BuildFilterJdbcRepositoryIT extends AbstractRepositoryTestSupport {
 
     @Autowired
-    private StructureRepository structureRepository;
-
-    @Autowired
     private AccountRepository accountRepository;
 
     @Autowired
