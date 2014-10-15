@@ -129,7 +129,11 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
 
         assert instance.type == BranchType.TEMPLATE_INSTANCE
 
-        // TODO Checks the branch properties
+        // Checks the branch properties
+        def property = propertyService.getProperty(instance, TestPropertyType)
+        assert !property.empty
+        assert property.value.value == 'Value for instance'
+
         // TODO Checks the branch promotion levels
         // TODO Checks the branch validation stamps
     }
