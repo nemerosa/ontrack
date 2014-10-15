@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.exceptions.BranchClassicCannotBeTemplateInstanceException
 import net.nemerosa.ontrack.model.exceptions.BranchTemplateDefinitionCannotBeTemplateInstanceException
+import net.nemerosa.ontrack.model.exceptions.BranchTemplateInstanceCannotUpdateBasedOnOtherDefinitionException
 import net.nemerosa.ontrack.model.exceptions.BranchTemplateInstanceMissingParametersException
 import net.nemerosa.ontrack.model.exceptions.BranchTemplateInstanceUnknownParametersException
 import net.nemerosa.ontrack.model.security.BranchTemplateMgt
@@ -172,6 +173,40 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
                     templateBranch.id,
                     new BranchTemplateInstanceSingleRequest(
                             'anotherTemplate',
+                            false, // Auto
+                            [:]
+                    )
+            )
+        }
+    }
+
+    @Test(expected = BranchTemplateInstanceCannotUpdateBasedOnOtherDefinitionException)
+    void 'Creating a single template instance - already existing - another definition'() {
+
+        // Creates a template definition
+        Branch templateBranch = createBranchTemplateDefinition()
+
+        // Creates another template definition on the same project
+        Branch anotherTemplateBranch = createBranchTemplateDefinition(templateBranch.project, 'anotherTemplate')
+
+        // Creates an instance based on this other template
+        asUser().with(templateBranch, BranchTemplateMgt).call {
+            templateService.createTemplateInstance(
+                    anotherTemplateBranch.id,
+                    new BranchTemplateInstanceSingleRequest(
+                            'instance',
+                            false, // Auto
+                            [:]
+                    )
+            )
+        }
+
+        // Tries to update this instance
+        asUser().with(templateBranch, BranchTemplateMgt).call {
+            templateService.createTemplateInstance(
+                    templateBranch.id,
+                    new BranchTemplateInstanceSingleRequest(
+                            'instance',
                             false, // Auto
                             [:]
                     )

@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.security.BranchTemplateMgt;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.repository.BranchTemplateRepository;
+import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -97,11 +98,18 @@ public class BranchTemplateServiceImpl implements BranchTemplateService {
         else if (existingBranch.get().getType() == BranchType.TEMPLATE_DEFINITION) {
             throw new BranchTemplateDefinitionCannotBeTemplateInstanceException(request.getName());
         } else {
-            throw new RuntimeException("NYI Gets the linked definition");
-            // TODO Gets the linked definition
+            // Gets the template instance
+            Optional<TemplateInstance> templateInstanceOptional = branchTemplateRepository.getTemplateInstance(existingBranch.get().getId());
+            // This must be a template instance then...
+            Validate.isTrue(templateInstanceOptional.isPresent(), "A template instance branch must have a template instance object attached to it");
+            // Gets the linked definition
+            ID linkedTemplateId = templateInstanceOptional.get().getTemplateDefinitionId();
+            // If another definition, error
+            if (!Objects.equals(linkedTemplateId, branchId)) {
+                throw new BranchTemplateInstanceCannotUpdateBasedOnOtherDefinitionException(request.getName());
+            }
             // TODO If same definition, updates the branch
-            // TODO If another definition, error
-            // TODO If normal branch, error
+            throw new RuntimeException("If same definition, updates the branch");
         }
     }
 
