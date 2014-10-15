@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service.support.template;
 
+import net.nemerosa.ontrack.model.exceptions.TemplateSynchronisationSourceNotFoundException;
 import net.nemerosa.ontrack.model.structure.TemplateSynchronisationService;
 import net.nemerosa.ontrack.model.structure.TemplateSynchronisationSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,5 +21,13 @@ public class TemplateSynchronisationServiceImpl implements TemplateSynchronisati
     @Override
     public List<TemplateSynchronisationSource<?>> getSynchronisationSources() {
         return synchronisationSources;
+    }
+
+    @Override
+    public TemplateSynchronisationSource<?> getSynchronisationSource(String id) {
+        return synchronisationSources.stream()
+                .filter(s -> id.equals(s.getId()))
+                .findFirst()
+                .orElseThrow(() -> new TemplateSynchronisationSourceNotFoundException(id));
     }
 }

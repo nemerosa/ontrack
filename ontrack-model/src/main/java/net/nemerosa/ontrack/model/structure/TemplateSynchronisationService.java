@@ -9,4 +9,8 @@ public interface TemplateSynchronisationService {
      */
     List<TemplateSynchronisationSource<?>> getSynchronisationSources();
 
+    /**
+     * Gets a sync. source using its ID.
+     */
+    TemplateSynchronisationSource<?> getSynchronisationSource(String id);
 }

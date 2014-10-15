@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.support.template;
 
 import net.nemerosa.ontrack.model.exceptions.*;
+import net.nemerosa.ontrack.model.job.*;
 import net.nemerosa.ontrack.model.security.BranchTemplateMgt;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
@@ -14,23 +15,27 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
+
 @Service
 @Transactional
-public class BranchTemplateServiceImpl implements BranchTemplateService {
+public class BranchTemplateServiceImpl implements BranchTemplateService, JobProvider {
 
     private final StructureService structureService;
     private final SecurityService securityService;
     private final BranchTemplateRepository branchTemplateRepository;
     private final ExpressionEngine expressionEngine;
     private final CopyService copyService;
+    private final TemplateSynchronisationService templateSynchronisationService;
 
     @Autowired
-    public BranchTemplateServiceImpl(StructureService structureService, SecurityService securityService, BranchTemplateRepository branchTemplateRepository, ExpressionEngine expressionEngine, CopyService copyService) {
+    public BranchTemplateServiceImpl(StructureService structureService, SecurityService securityService, BranchTemplateRepository branchTemplateRepository, ExpressionEngine expressionEngine, CopyService copyService, TemplateSynchronisationService templateSynchronisationService) {
         this.structureService = structureService;
         this.securityService = securityService;
         this.branchTemplateRepository = branchTemplateRepository;
         this.expressionEngine = expressionEngine;
         this.copyService = copyService;
+        this.templateSynchronisationService = templateSynchronisationService;
     }
 
     @Override
@@ -182,5 +187,102 @@ public class BranchTemplateServiceImpl implements BranchTemplateService {
         branchTemplateRepository.setTemplateInstance(instance.getId(), templateInstance);
         // OK - reloads to gets the correct type
         return structureService.getBranch(instance.getId());
+    }
+
+    @Override
+    public Collection<Job> getJobs() {
+        // Gets all template definitions
+        return branchTemplateRepository.getTemplateDefinitions().stream()
+                // ... filters on interval
+                .filter(btd -> (btd.getTemplateDefinition().getInterval() > 0))
+                        // ... and creates a sync. job
+                .map(this::createTemplateDefinitionSyncJob)
+                        // ... ok
+                .collect(Collectors.toList());
+    }
+
+    protected Job createTemplateDefinitionSyncJob(BranchTemplateDefinition btd) {
+        // Loading the branch
+        Branch branch = structureService.getBranch(btd.getBranchId());
+        // Creating the job
+        return new BranchJob(branch) {
+            @Override
+            public String getCategory() {
+                return "BranchTemplateSync";
+            }
+
+            @Override
+            public String getId() {
+                return btd.getBranchId().toString();
+            }
+
+            @Override
+            public String getDescription() {
+                return format(
+                        "Template sync. from %s/%s",
+                        branch.getProject().getName(),
+                        branch.getName()
+                );
+            }
+
+            @Override
+            public int getInterval() {
+                return btd.getTemplateDefinition().getInterval();
+            }
+
+            @Override
+            public JobTask createTask() {
+                return new RunnableJobTask(info ->
+                        syncTemplateDefinition(branch.getId(), info)
+                );
+            }
+        };
+    }
+
+    protected void syncTemplateDefinition(ID branchId, JobInfoListener info) {
+        // Loads the template definition
+        info.post(format("Loading template definition for %s", branchId));
+        TemplateDefinition templateDefinition = getTemplateDefinition(branchId)
+                .orElseThrow(() -> new BranchNotTemplateDefinitionException(branchId));
+        // Gets the source of the branch names to synchronise with
+        TemplateSynchronisationSource<?> templateSynchronisationSource =
+                templateSynchronisationService.getSynchronisationSource(
+                        templateDefinition.getSynchronisationSourceConfig().getId()
+                );
+        // Using the source
+        syncTemplateDefinition(branchId, templateDefinition, templateSynchronisationSource, info);
+    }
+
+    protected <T> void syncTemplateDefinition(
+            ID branchId,
+            TemplateDefinition templateDefinition,
+            TemplateSynchronisationSource<T> templateSynchronisationSource,
+            JobInfoListener info) {
+        // Parsing of the configuration data
+        T config = templateSynchronisationSource.parseConfig(templateDefinition.getSynchronisationSourceConfig().getData());
+        // Loads the branch
+        Branch templateBranch = structureService.getBranch(branchId);
+        // Logging
+        info.post(format("Getting template sync. sources from %s", templateSynchronisationSource.getName()));
+        // Getting the list of names
+        List<String> branchNames = templateSynchronisationSource.getBranchNames(templateBranch.getProject(), config);
+        // Sync on those names
+        syncTemplateDefinition(templateBranch, templateDefinition, branchNames, info);
+    }
+
+    protected void syncTemplateDefinition(
+            Branch templateBranch,
+            TemplateDefinition templateDefinition,
+            List<String> branchNames,
+            JobInfoListener info) {
+        // Sync for each branch
+        for (String branchName : branchNames) {
+            syncTemplateDefinition(templateBranch, templateDefinition, branchName, info);
+        }
+    }
+
+    protected void syncTemplateDefinition(Branch templateBranch, TemplateDefinition templateDefinition, String branchName, JobInfoListener info) {
+        // FIXME Method net.nemerosa.ontrack.service.support.template.BranchTemplateServiceImpl.syncTemplateDefinition
+
     }
 }

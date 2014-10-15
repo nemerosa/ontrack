@@ -1,12 +1,16 @@
 package net.nemerosa.ontrack.repository;
 
+import net.nemerosa.ontrack.model.structure.BranchTemplateDefinition;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.TemplateDefinition;
 import net.nemerosa.ontrack.model.structure.TemplateInstance;
 
+import java.util.Collection;
 import java.util.Optional;
 
 public interface BranchTemplateRepository {
+
+    Collection<BranchTemplateDefinition> getTemplateDefinitions();
 
     Optional<TemplateDefinition> getTemplateDefinition(ID branchId);
 

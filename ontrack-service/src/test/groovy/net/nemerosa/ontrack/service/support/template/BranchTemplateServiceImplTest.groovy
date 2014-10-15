@@ -24,12 +24,14 @@ class BranchTemplateServiceImplTest {
         BranchTemplateRepository branchTemplateRepository = mock(BranchTemplateRepository)
         ExpressionEngine expressionEngine = mock(ExpressionEngine)
         CopyService copyService = mock(CopyService)
+        TemplateSynchronisationService templateSynchronisationService = mock(TemplateSynchronisationService)
         this.service = new BranchTemplateServiceImpl(
                 structureService,
                 securityService,
                 branchTemplateRepository,
                 expressionEngine,
-                copyService
+                copyService,
+                templateSynchronisationService
         )
     }
 

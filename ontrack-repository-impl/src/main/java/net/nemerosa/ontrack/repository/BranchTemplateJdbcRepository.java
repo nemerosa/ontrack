@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +18,17 @@ public class BranchTemplateJdbcRepository extends AbstractJdbcRepository impleme
     @Autowired
     public BranchTemplateJdbcRepository(DataSource dataSource) {
         super(dataSource);
+    }
+
+    @Override
+    public Collection<BranchTemplateDefinition> getTemplateDefinitions() {
+        return getJdbcTemplate().query(
+                "SELECT * FROM BRANCH_TEMPLATE_DEFINITIONS",
+                (rs, num) -> new BranchTemplateDefinition(
+                        id(rs, "BRANCHID"),
+                        toTemplateDefinition(rs)
+                )
+        );
     }
 
     @Override
