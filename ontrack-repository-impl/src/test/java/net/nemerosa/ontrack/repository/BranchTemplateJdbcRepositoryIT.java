@@ -68,7 +68,39 @@ public class BranchTemplateJdbcRepositoryIT extends AbstractRepositoryTestSuppor
     public void save_template_instance() {
         // Branch as template definition
         // TODO Does it not need to be an actual template?
+        Branch template = do_create_branch();
 
+        // Branch as template instance
+        Branch instance = do_create_branch();
+
+        // Template instance
+        TemplateInstance templateInstance = new TemplateInstance(
+                template.getId(),
+                Arrays.asList(
+                        new TemplateParameterValue("SCM_BRANCH", "ontrack-40"),
+                        new TemplateParameterValue("JENKINS_JOB", "ONTRACK-40")
+                )
+        );
+
+        // Saving the instance
+        repository.setTemplateInstance(instance.getId(), templateInstance);
+
+        // Is template instance?
+        assertTrue(repository.isTemplateInstance(instance.getId()));
+
+        // Gets the template instance back
+        Optional<TemplateInstance> retrievedInstance = repository.getTemplateInstance(instance.getId());
+        assertTrue(retrievedInstance.isPresent());
+        assertEquals(
+                new TemplateInstance(
+                        template.getId(),
+                        Arrays.asList(
+                                new TemplateParameterValue("JENKINS_JOB", "ONTRACK-40"),
+                                new TemplateParameterValue("SCM_BRANCH", "ontrack-40")
+                        )
+                ),
+                retrievedInstance.get()
+        );
     }
 
 }
