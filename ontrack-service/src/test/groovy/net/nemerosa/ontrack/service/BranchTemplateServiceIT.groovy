@@ -144,7 +144,15 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
             assert bronze.get().description == 'Branch INSTANCE validated by QA.'
         }
 
-        // TODO Checks the branch validation stamps
+        // Checks the branch validation stamps
+        asUser().withView(instance).call {
+            def test1 = structureService.findValidationStampByName(instance.project.name, instance.name, 'QA.TEST.1')
+            assert test1.present
+            assert test1.get().description == 'Branch INSTANCE has passed the test #1'
+            def test2 = structureService.findValidationStampByName(instance.project.name, instance.name, 'QA.TEST.2')
+            assert test2.present
+            assert test2.get().description == 'Branch INSTANCE has passed the test #2'
+        }
     }
 
 }
