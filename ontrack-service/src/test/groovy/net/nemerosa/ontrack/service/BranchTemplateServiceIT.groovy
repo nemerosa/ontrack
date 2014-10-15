@@ -50,7 +50,7 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
     }
 
     @Test
-    void 'Creating a single template instance'() {
+    void 'Creating a single template instance - mode auto'() {
         // Creates the base branch
         Branch templateBranch = doCreateBranch(
                 doCreateProject(),
@@ -94,7 +94,13 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
 
         // Template definition
         TemplateDefinition templateDefinition = new TemplateDefinition(
-                [],
+                [
+                        new TemplateParameter(
+                                'BRANCH',
+                                "Display name for the branch",
+                                '${branchName.toUpperCase()}'
+                        )
+                ],
                 new ServiceConfiguration(
                         'test',
                         JsonUtils.object().end()
@@ -103,9 +109,29 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
                 10
         )
         // Saves the template
-        templateBranch = asUser().with(templateBranch, BranchTemplateMgt).call({
+        templateBranch = asUser().with(templateBranch, BranchTemplateMgt).call {
             templateService.setTemplateDefinition(templateBranch.id, templateDefinition)
-        })
+        }
+
+        // Creates a single template
+        Branch instance = asUser().with(templateBranch, BranchTemplateMgt).call {
+            templateService.createTemplateInstance(
+                    templateBranch.id,
+                    new BranchTemplateInstanceSingleRequest(
+                            'instance',
+                            false, // Auto
+                            [:]
+                    )
+            )
+        }
+
+        // Checks the created branch
+
+        assert instance.type == BranchType.TEMPLATE_INSTANCE
+
+        // TODO Checks the branch properties
+        // TODO Checks the branch promotion levels
+        // TODO Checks the branch validation stamps
     }
 
 }
