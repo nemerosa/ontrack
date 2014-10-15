@@ -2,7 +2,7 @@ angular.module('ot.service.template', [
     'ot.service.core',
     'ot.service.form'
 ])
-    .service('otTemplateService', function ($http, ot, otFormService) {
+    .service('otTemplateService', function ($http, $modal, ot, otFormService) {
         var self = {};
 
         /**
@@ -18,6 +18,13 @@ angular.module('ot.service.template', [
                     return ot.call($http.put(templateDefinitionUri, template));
                 }
             });
+        };
+
+        /**
+         * Synchronises the template definition with branches.
+         * @param templateSyncUri URL to get the template definition.
+         */
+        self.templateSync = function (templateSyncUri) {
         };
 
         /**

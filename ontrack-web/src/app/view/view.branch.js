@@ -188,6 +188,17 @@ angular.module('ot.view.branch', [
                     },
                     {
                         condition: function () {
+                            return branchResource._templateSync;
+                        },
+                        id: 'templateSyncBranch',
+                        name: "Sync. template",
+                        cls: 'ot-command-branch-template-sync',
+                        action: function () {
+                            otTemplateService.templateSync(branchResource._templateSync);
+                        }
+                    },
+                    {
+                        condition: function () {
                             return branchResource._templateInstance;
                         },
                         id: 'templateInstanceBranch',
