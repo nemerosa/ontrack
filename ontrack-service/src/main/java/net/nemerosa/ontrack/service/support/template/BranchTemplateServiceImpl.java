@@ -92,6 +92,10 @@ public class BranchTemplateServiceImpl implements BranchTemplateService {
         // Existing, normal branch
         else if (existingBranch.get().getType() == BranchType.CLASSIC) {
             throw new BranchClassicCannotBeTemplateInstanceException(request.getName());
+        }
+        // Existing, template branch
+        else if (existingBranch.get().getType() == BranchType.TEMPLATE_DEFINITION) {
+            throw new BranchTemplateDefinitionCannotBeTemplateInstanceException(request.getName());
         } else {
             throw new RuntimeException("NYI Gets the linked definition");
             // TODO Gets the linked definition

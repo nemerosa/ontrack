@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.service
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.exceptions.BranchClassicCannotBeTemplateInstanceException
+import net.nemerosa.ontrack.model.exceptions.BranchTemplateDefinitionCannotBeTemplateInstanceException
 import net.nemerosa.ontrack.model.exceptions.BranchTemplateInstanceMissingParametersException
 import net.nemerosa.ontrack.model.exceptions.BranchTemplateInstanceUnknownParametersException
 import net.nemerosa.ontrack.model.security.BranchTemplateMgt
@@ -158,6 +159,26 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
         }
     }
 
+    @Test(expected = BranchTemplateDefinitionCannotBeTemplateInstanceException)
+    void 'Creating a single template instance - already existing - definition'() {
+        // Creates a template definition
+        Branch templateBranch = createBranchTemplateDefinition()
+        // Creates another template definition on the same project
+        createBranchTemplateDefinition(templateBranch.project, 'anotherTemplate')
+
+        // Creates a single template
+        asUser().with(templateBranch, BranchTemplateMgt).call {
+            templateService.createTemplateInstance(
+                    templateBranch.id,
+                    new BranchTemplateInstanceSingleRequest(
+                            'anotherTemplate',
+                            false, // Auto
+                            [:]
+                    )
+            )
+        }
+    }
+
     protected void checkBranchTemplateInstance(Branch instance) {
         assert instance.type == BranchType.TEMPLATE_INSTANCE
         assert instance.description == 'Branch instance'
@@ -189,10 +210,14 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
     }
 
     protected Branch createBranchTemplateDefinition() {
+        createBranchTemplateDefinition(doCreateProject(), 'template')
+    }
+
+    protected Branch createBranchTemplateDefinition(Project project, String templateName) {
         // Creates the base branch
         Branch templateBranch = doCreateBranch(
-                doCreateProject(),
-                nd('template', 'Branch ${branchName}')
+                project,
+                nd(templateName, 'Branch ${branchName}')
         );
 
         asUser().with(templateBranch, ProjectEdit).call {
