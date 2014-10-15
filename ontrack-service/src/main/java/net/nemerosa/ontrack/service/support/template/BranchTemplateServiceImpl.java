@@ -124,8 +124,13 @@ public class BranchTemplateServiceImpl implements BranchTemplateService {
             }
             // Replacement function
             Function<String, String> replacementFn = value -> expressionEngine.render(value, request.getParameters());
+            // Template instance execution context
+            TemplateInstanceExecution templateInstanceExecution = new TemplateInstanceExecution(
+                    replacementFn,
+                    request.getParameters()
+            );
             // OK
-            return updateTemplateInstance(instance, template, replacementFn);
+            return updateTemplateInstance(instance, template, templateInstanceExecution);
         }
         // Automatic mode
         else {
@@ -137,23 +142,30 @@ public class BranchTemplateServiceImpl implements BranchTemplateService {
         return updateTemplateInstance(
                 instance,
                 template,
-                templateDefinition.replacementFn(instance.getName(), expressionEngine)
+                templateDefinition.templateInstanceExecution(instance.getName(), expressionEngine)
         );
 
     }
 
-    protected Branch updateTemplateInstance(Branch instance, Branch template, Function<String, String> replacementFn) {
+    protected Branch updateTemplateInstance(Branch instance, Branch template, TemplateInstanceExecution templateInstanceExecution) {
         // Description of the branch
-        String description = replacementFn.apply(template.getDescription());
+        String description = templateInstanceExecution.replace(template.getDescription());
         instance = instance.withDescription(description);
         structureService.saveBranch(instance);
         // Copy replacement function
         copyService.copy(
                 instance, // Target
                 template, // Source
-                replacementFn,
+                templateInstanceExecution.getReplacementFn(),
                 SyncPolicy.SYNC
         );
+        // Template instance
+        TemplateInstance templateInstance = new TemplateInstance(
+                template.getId(),
+                templateInstanceExecution.asTemplateParameterValues()
+        );
+        // Branch as a branch template instance
+        branchTemplateRepository.setTemplateInstance(instance.getId(), templateInstance);
         // OK - reloads to gets the correct type
         return structureService.getBranch(instance.getId());
     }
