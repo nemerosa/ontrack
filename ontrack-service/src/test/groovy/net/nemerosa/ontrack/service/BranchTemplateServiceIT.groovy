@@ -111,8 +111,32 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
         }
     }
 
+    @Test
+    void 'Creating a single template instance - mode manual'() {
+        // Creates the template definition
+        Branch templateBranch = createBranchTemplateDefinition()
+
+        // Creates a single template
+        Branch instance = asUser().with(templateBranch, BranchTemplateMgt).call {
+            templateService.createTemplateInstance(
+                    templateBranch.id,
+                    new BranchTemplateInstanceSingleRequest(
+                            'instance',
+                            true, // Manual
+                            [
+                                    'BRANCH': 'INSTANCE'
+                            ]
+                    )
+            )
+        }
+
+        // Checks the created branch
+        checkBranchTemplateInstance(instance)
+    }
+
     protected void checkBranchTemplateInstance(Branch instance) {
         assert instance.type == BranchType.TEMPLATE_INSTANCE
+        assert instance.description == 'Branch instance'
 
         // Checks the branch properties
         def property = propertyService.getProperty(instance, TestPropertyType)
@@ -141,7 +165,7 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
     }
 
     protected Branch createBranchTemplateDefinition() {
-// Creates the base branch
+        // Creates the base branch
         Branch templateBranch = doCreateBranch(
                 doCreateProject(),
                 nd('template', 'Branch ${branchName}')

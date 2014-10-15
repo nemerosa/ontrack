@@ -9,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -122,8 +119,11 @@ public class BranchTemplateServiceImpl implements BranchTemplateService {
             if (unknownParameters.size() > 0) {
                 throw new BranchTemplateInstanceUnknownParametersException(template.getName(), unknownParameters);
             }
+            // Adds `branchName` as a parameter
+            Map<String, String> engineParams = new HashMap<>(request.getParameters());
+            engineParams.put("branchName", instance.getName());
             // Replacement function
-            Function<String, String> replacementFn = value -> expressionEngine.render(value, request.getParameters());
+            Function<String, String> replacementFn = value -> expressionEngine.render(value, engineParams);
             // Template instance execution context
             TemplateInstanceExecution templateInstanceExecution = new TemplateInstanceExecution(
                     replacementFn,
