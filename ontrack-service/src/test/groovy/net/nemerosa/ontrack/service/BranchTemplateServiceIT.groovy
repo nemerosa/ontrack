@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.model.exceptions.BranchClassicCannotBeTemplateInstanceException
 import net.nemerosa.ontrack.model.exceptions.BranchTemplateInstanceMissingParametersException
 import net.nemerosa.ontrack.model.exceptions.BranchTemplateInstanceUnknownParametersException
 import net.nemerosa.ontrack.model.security.BranchTemplateMgt
@@ -103,7 +104,7 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
                             'instance',
                             true, // Manual
                             [
-                                    'BRANCH': 'INSTANCE',
+                                    'BRANCH' : 'INSTANCE',
                                     'unknown': "Test"
                             ]
                     )
@@ -132,6 +133,29 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
 
         // Checks the created branch
         checkBranchTemplateInstance(instance)
+    }
+
+    @Test(expected = BranchClassicCannotBeTemplateInstanceException)
+    void 'Creating a single template instance - already existing - classic'() {
+        // Creates the template definition
+        Branch templateBranch = createBranchTemplateDefinition()
+        // Creates an existing branch
+        doCreateBranch(
+                templateBranch.project,
+                nd('classic', "Normal branch")
+        )
+
+        // Creates a single template
+        asUser().with(templateBranch, BranchTemplateMgt).call {
+            templateService.createTemplateInstance(
+                    templateBranch.id,
+                    new BranchTemplateInstanceSingleRequest(
+                            'classic',
+                            false, // Auto
+                            [:]
+                    )
+            )
+        }
     }
 
     protected void checkBranchTemplateInstance(Branch instance) {
