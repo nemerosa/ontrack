@@ -108,8 +108,10 @@ public class BranchTemplateServiceImpl implements BranchTemplateService {
             if (!Objects.equals(linkedTemplateId, branchId)) {
                 throw new BranchTemplateInstanceCannotUpdateBasedOnOtherDefinitionException(request.getName());
             }
-            // TODO If same definition, updates the branch
-            throw new RuntimeException("If same definition, updates the branch");
+            // If same definition, updates the branch
+            else {
+                return updateTemplateInstance(existingBranch.get(), branch, request, templateDefinitionOptional.get());
+            }
         }
     }
 

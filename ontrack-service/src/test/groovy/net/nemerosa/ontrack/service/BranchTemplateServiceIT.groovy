@@ -214,7 +214,51 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
         }
     }
 
+    @Test
+    void 'Creating a single template instance - already existing and linked'() {
+
+        // Creates a template definition
+        Branch templateBranch = createBranchTemplateDefinition()
+
+        // Creates a single template - auto mode
+        Branch instance = asUser().with(templateBranch, BranchTemplateMgt).call {
+            templateService.createTemplateInstance(
+                    templateBranch.id,
+                    new BranchTemplateInstanceSingleRequest(
+                            'instance',
+                            false, // Auto
+                            [:]
+                    )
+            )
+        }
+
+        // Checks the created branch
+        checkBranchTemplateInstance(instance)
+
+        // Updates this branch
+        asUser().with(templateBranch, BranchTemplateMgt).call {
+            templateService.createTemplateInstance(
+                    templateBranch.id,
+                    new BranchTemplateInstanceSingleRequest(
+                            'instance',
+                            true, // Manual
+                            [
+                                    'BRANCH': 'Updated instance'
+                            ]
+                    )
+            )
+        }
+
+        // Checks the updated branch
+        checkBranchTemplateInstance(instance, 'Updated instance')
+
+    }
+
     protected void checkBranchTemplateInstance(Branch instance) {
+        checkBranchTemplateInstance(instance, 'INSTANCE')
+    }
+
+    protected void checkBranchTemplateInstance(Branch instance, String branch) {
         assert instance.type == BranchType.TEMPLATE_INSTANCE
         assert instance.description == 'Branch instance'
 
@@ -227,20 +271,20 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
         asUser().withView(instance).call {
             def copper = structureService.findPromotionLevelByName(instance.project.name, instance.name, 'COPPER')
             assert copper.present
-            assert copper.get().description == 'Branch INSTANCE promoted to QA.'
+            assert copper.get().description == "Branch ${branch} promoted to QA."
             def bronze = structureService.findPromotionLevelByName(instance.project.name, instance.name, 'BRONZE')
             assert bronze.present
-            assert bronze.get().description == 'Branch INSTANCE validated by QA.'
+            assert bronze.get().description == "Branch ${branch} validated by QA."
         }
 
         // Checks the branch validation stamps
         asUser().withView(instance).call {
             def test1 = structureService.findValidationStampByName(instance.project.name, instance.name, 'QA.TEST.1')
             assert test1.present
-            assert test1.get().description == 'Branch INSTANCE has passed the test #1'
+            assert test1.get().description == "Branch ${branch} has passed the test #1"
             def test2 = structureService.findValidationStampByName(instance.project.name, instance.name, 'QA.TEST.2')
             assert test2.present
-            assert test2.get().description == 'Branch INSTANCE has passed the test #2'
+            assert test2.get().description == "Branch ${branch} has passed the test #2"
         }
     }
 
