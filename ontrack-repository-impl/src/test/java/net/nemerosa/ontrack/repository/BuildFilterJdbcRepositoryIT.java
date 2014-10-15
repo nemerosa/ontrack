@@ -6,10 +6,10 @@ import net.nemerosa.ontrack.model.security.Account;
 import net.nemerosa.ontrack.model.security.AuthenticationSource;
 import net.nemerosa.ontrack.model.security.SecurityRole;
 import net.nemerosa.ontrack.model.structure.Branch;
-import net.nemerosa.ontrack.model.structure.Project;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@Transactional
 public class BuildFilterJdbcRepositoryIT extends AbstractRepositoryTestSupport {
 
     @Autowired
@@ -34,10 +35,7 @@ public class BuildFilterJdbcRepositoryIT extends AbstractRepositoryTestSupport {
 
     @Before
     public void create_branch() {
-        // Creates a project
-        Project project = structureRepository.newProject(Project.of(nameDescription()));
-        // Creates a branch for this project
-        branch = structureRepository.newBranch(Branch.of(project, nameDescription()));
+        branch = do_create_branch();
         // Creates an account
         AuthenticationSource authenticationSource = mock(AuthenticationSource.class);
         when(authenticationSource.getId()).thenReturn("test");
@@ -188,14 +186,14 @@ public class BuildFilterJdbcRepositoryIT extends AbstractRepositoryTestSupport {
         assertEquals(
                 Arrays.asList(
                         new TBuildFilter(
-                                OptionalInt.of(account.id()),
+                                OptionalInt.empty(),
                                 branch.id(),
                                 "Test",
                                 "TestFilterType",
                                 JsonUtils.object().with("test", 1).end()
                         ),
                         new TBuildFilter(
-                                OptionalInt.empty(),
+                                OptionalInt.of(account.id()),
                                 branch.id(),
                                 "Test",
                                 "TestFilterType",
@@ -210,14 +208,14 @@ public class BuildFilterJdbcRepositoryIT extends AbstractRepositoryTestSupport {
         assertEquals(
                 Arrays.asList(
                         new TBuildFilter(
-                                OptionalInt.of(account.id()),
+                                OptionalInt.empty(),
                                 branch.id(),
                                 "Test",
                                 "TestFilterType",
                                 JsonUtils.object().with("test", 1).end()
                         ),
                         new TBuildFilter(
-                                OptionalInt.empty(),
+                                OptionalInt.of(account.id()),
                                 branch.id(),
                                 "Test",
                                 "TestFilterType",
@@ -232,7 +230,7 @@ public class BuildFilterJdbcRepositoryIT extends AbstractRepositoryTestSupport {
         assertTrue(filter.isPresent());
         assertEquals(
                 new TBuildFilter(
-                        OptionalInt.of(account.id()),
+                        OptionalInt.empty(),
                         branch.id(),
                         "Test",
                         "TestFilterType",
