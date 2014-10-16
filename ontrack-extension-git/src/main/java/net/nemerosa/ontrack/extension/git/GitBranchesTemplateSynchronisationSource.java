@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.git;
 
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
+import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Memo;
@@ -66,6 +67,10 @@ public class GitBranchesTemplateSynchronisationSource extends AbstractTemplateSy
 
     @Override
     public List<String> getBranchNames(Branch branch, GitBranchesTemplateSynchronisationSourceConfig config) {
+        // Gets the Git configuration
+        GitConfiguration gitConfiguration = gitService.getBranchConfiguration(branch);
+        // Gets the list of branches
+        List<String> branches = gitService.getRemoteBranches(gitConfiguration);
         // FIXME Method net.nemerosa.ontrack.extension.git.GitBranchesTemplateSynchronisationSource.getBranchNames
         return Collections.emptyList();
     }

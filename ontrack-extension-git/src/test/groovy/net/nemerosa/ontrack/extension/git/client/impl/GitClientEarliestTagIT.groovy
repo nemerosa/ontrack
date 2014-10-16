@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.git.client.impl
 
+import net.nemerosa.ontrack.common.Utils
 import net.nemerosa.ontrack.extension.git.client.GitClient
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration
 import org.junit.AfterClass
@@ -39,20 +40,7 @@ class GitClientEarliestTagIT {
      * Execution of a command
      */
     private static String run(String cmd, String... args) {
-        println "Running: $cmd ${args.join(' ')}"
-        def list = [cmd]
-        list.addAll args
-        def process = new ProcessBuilder(list).directory(repo).start()
-        def exit = process.waitFor()
-        if (exit != 0) {
-            println process.errorStream.text
-            println process.inputStream.text
-            assert false: "Command exited with error = $exit"
-        } else {
-            def output = process.inputStream.text
-            println output
-            return output
-        }
+        Utils.run(repo, cmd, args)
     }
 
     /**

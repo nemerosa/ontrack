@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ID;
 import org.eclipse.jgit.revwalk.RevCommit;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
@@ -84,4 +85,9 @@ public interface GitService {
      * Gets information about a commit in a Git-configured branch.
      */
     OntrackGitCommitInfo getCommitInfo(ID branchId, String commit);
+
+    /**
+     * Gets the list of remote branches, as defined under <code>ref/heads</code>.
+     */
+    List<String> getRemoteBranches(GitConfiguration gitConfiguration);
 }
