@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Data
@@ -22,7 +23,7 @@ public class GitBranchesTemplateSynchronisationSourceConfig {
         Set<String> include = parse(includes);
         Set<String> exclude = parse(excludes);
         // Function
-        return name -> isIncluded(include, name) && !isExcluded(exclude, name);
+        return name -> matches(include, name, true) && !matches(exclude, name, false);
     }
 
     protected static Set<String> parse(String text) {
@@ -36,12 +37,27 @@ public class GitBranchesTemplateSynchronisationSourceConfig {
         }
     }
 
-    protected static boolean isExcluded(Set<String> exclude, String name) {
-        // FIXME Method net.nemerosa.ontrack.extension.git.GitBranchesTemplateSynchronisationSourceConfig.isExcluded
-        return false;
+    protected static boolean matches(Set<String> patterns, String name, boolean emptyMeansAll) {
+        if (patterns.isEmpty()) {
+            return emptyMeansAll;
+        } else {
+            return patterns.stream()
+                    .filter(pattern -> matches(pattern, name))
+                    .findFirst()
+                    .isPresent();
+        }
     }
 
-    protected static boolean isIncluded(Set<String> include, String name) {
-        return false;
+    private static boolean matches(String pattern, String name) {
+        if ("*".equals(pattern)) {
+            return true;
+        } else if (pattern.contains("*")) {
+            return Pattern.matches(
+                    pattern.replaceAll("\\*", ".*"),
+                    name
+            );
+        } else {
+            return StringUtils.equals(pattern, name);
+        }
     }
 }
