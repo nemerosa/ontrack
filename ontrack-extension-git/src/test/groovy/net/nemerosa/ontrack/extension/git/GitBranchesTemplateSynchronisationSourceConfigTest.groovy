@@ -72,4 +72,64 @@ feature/*""") == ['master', 'feature/*'] as Set
         assert !matches(['master', 'feature/*'] as Set, 'feature', false)
     }
 
+    @Test
+    void 'Filter - no filter'() {
+        def filter = new GitBranchesTemplateSynchronisationSourceConfig(
+                "",
+                ""
+        ).filter
+        assert filter.test('feature/ontrack-111-project-manager')
+        assert filter.test('feature/ontrack-40-templating')
+        assert filter.test('fix/ontrack-110')
+        assert filter.test('master')
+    }
+
+    @Test
+    void 'Filter - includes all'() {
+        def filter = new GitBranchesTemplateSynchronisationSourceConfig(
+                "*",
+                ""
+        ).filter
+        assert filter.test('feature/ontrack-111-project-manager')
+        assert filter.test('feature/ontrack-40-templating')
+        assert filter.test('fix/ontrack-110')
+        assert filter.test('master')
+    }
+
+    @Test
+    void 'Filter - exclude master'() {
+        def filter = new GitBranchesTemplateSynchronisationSourceConfig(
+                "",
+                "master"
+        ).filter
+        assert filter.test('feature/ontrack-111-project-manager')
+        assert filter.test('feature/ontrack-40-templating')
+        assert filter.test('fix/ontrack-110')
+        assert !filter.test('master')
+    }
+
+    @Test
+    void 'Filter - include only'() {
+        def filter = new GitBranchesTemplateSynchronisationSourceConfig(
+                "fix/*",
+                ""
+        ).filter
+        assert !filter.test('feature/ontrack-111-project-manager')
+        assert !filter.test('feature/ontrack-40-templating')
+        assert filter.test('fix/ontrack-110')
+        assert !filter.test('master')
+    }
+
+    @Test
+    void 'Filter - include/exclude'() {
+        def filter = new GitBranchesTemplateSynchronisationSourceConfig(
+                "feature/*",
+                "*templating"
+        ).filter
+        assert filter.test('feature/ontrack-111-project-manager')
+        assert !filter.test('feature/ontrack-40-templating')
+        assert !filter.test('fix/ontrack-110')
+        assert !filter.test('master')
+    }
+
 }
