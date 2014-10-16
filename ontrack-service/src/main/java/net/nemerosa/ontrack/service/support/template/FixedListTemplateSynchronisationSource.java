@@ -3,11 +3,9 @@ package net.nemerosa.ontrack.service.support.template;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.MultiStrings;
 import net.nemerosa.ontrack.model.structure.Branch;
-import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.support.AbstractTemplateSynchronisationSource;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -45,11 +43,6 @@ public class FixedListTemplateSynchronisationSource extends AbstractTemplateSync
     @Override
     public List<String> getBranchNames(Branch branch, FixedListTemplateSynchronisationSourceConfig config) {
         return config.getNames();
-    }
-
-    @Override
-    public FixedListTemplateSynchronisationSourceConfig getDefaultConfig(Project project) {
-        return new FixedListTemplateSynchronisationSourceConfig(Collections.emptyList());
     }
 
 }

@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Memo;
 import net.nemerosa.ontrack.model.structure.Branch;
-import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.support.AbstractTemplateSynchronisationSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -75,11 +74,4 @@ public class GitBranchesTemplateSynchronisationSource extends AbstractTemplateSy
         return Collections.emptyList();
     }
 
-    @Override
-    public GitBranchesTemplateSynchronisationSourceConfig getDefaultConfig(Project project) {
-        return new GitBranchesTemplateSynchronisationSourceConfig(
-                "",
-                ""
-        );
-    }
 }

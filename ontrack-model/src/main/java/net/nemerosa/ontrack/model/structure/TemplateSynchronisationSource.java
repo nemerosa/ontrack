@@ -45,11 +45,6 @@ public interface TemplateSynchronisationSource<T> {
     T parseConfig(JsonNode node);
 
     /**
-     * Gets default configuration
-     */
-    T getDefaultConfig(Project project);
-
-    /**
      * Configuration for storage
      */
     JsonNode forStorage(T config);
