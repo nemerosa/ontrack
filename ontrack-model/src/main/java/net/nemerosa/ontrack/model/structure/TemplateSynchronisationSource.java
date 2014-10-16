@@ -24,20 +24,20 @@ public interface TemplateSynchronisationSource<T> {
     String getName();
 
     /**
-     * Is this source applicable for a given project?
+     * Is this source applicable for a given template branch?
      */
-    boolean isApplicable(Project project);
+    boolean isApplicable(Branch branch);
 
     /**
-     * Gets the form used for this source in a project. This can be used
+     * Gets the form used for this source in a branch. This can be used
      * to get, for example, SCM information.
      */
-    Form getForm(Project project);
+    Form getForm(Branch branch);
 
     /**
      * List of branch names to use on synchronisation.
      */
-    List<String> getBranchNames(Project project, T config);
+    List<String> getBranchNames(Branch branch, T config);
 
     /**
      * Parses the configuration

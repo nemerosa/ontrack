@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.extension.git;
 
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
-import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationPropertyType;
+import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Memo;
+import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Project;
-import net.nemerosa.ontrack.model.structure.PropertyService;
 import net.nemerosa.ontrack.model.support.AbstractTemplateSynchronisationSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,14 +18,14 @@ public class GitBranchesTemplateSynchronisationSource extends AbstractTemplateSy
 
     private final GitExtensionFeature gitExtensionFeature;
     private final ExtensionManager extensionManager;
-    private final PropertyService propertyService;
+    private final GitService gitService;
 
     @Autowired
-    public GitBranchesTemplateSynchronisationSource(GitExtensionFeature gitExtensionFeature, ExtensionManager extensionManager, PropertyService propertyService) {
+    public GitBranchesTemplateSynchronisationSource(GitExtensionFeature gitExtensionFeature, ExtensionManager extensionManager, GitService gitService) {
         super(GitBranchesTemplateSynchronisationSourceConfig.class);
         this.gitExtensionFeature = gitExtensionFeature;
         this.extensionManager = extensionManager;
-        this.propertyService = propertyService;
+        this.gitService = gitService;
     }
 
     @Override
@@ -39,13 +39,13 @@ public class GitBranchesTemplateSynchronisationSource extends AbstractTemplateSy
     }
 
     @Override
-    public boolean isApplicable(Project project) {
+    public boolean isApplicable(Branch branch) {
         return extensionManager.isExtensionFeatureEnabled(gitExtensionFeature)
-                && propertyService.hasProperty(project, GitProjectConfigurationPropertyType.class);
+                && gitService.isBranchConfiguredForGit(branch);
     }
 
     @Override
-    public Form getForm(Project project) {
+    public Form getForm(Branch branch) {
         return Form.create()
                 .with(
                         Memo.of("includes")
@@ -65,7 +65,7 @@ public class GitBranchesTemplateSynchronisationSource extends AbstractTemplateSy
     }
 
     @Override
-    public List<String> getBranchNames(Project project, GitBranchesTemplateSynchronisationSourceConfig config) {
+    public List<String> getBranchNames(Branch branch, GitBranchesTemplateSynchronisationSourceConfig config) {
         // FIXME Method net.nemerosa.ontrack.extension.git.GitBranchesTemplateSynchronisationSource.getBranchNames
         return Collections.emptyList();
     }

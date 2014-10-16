@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service.support.template;
 
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.MultiStrings;
+import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.support.AbstractTemplateSynchronisationSource;
 import org.springframework.stereotype.Component;
@@ -27,12 +28,12 @@ public class FixedListTemplateSynchronisationSource extends AbstractTemplateSync
     }
 
     @Override
-    public boolean isApplicable(Project project) {
+    public boolean isApplicable(Branch branch) {
         return true;
     }
 
     @Override
-    public Form getForm(Project project) {
+    public Form getForm(Branch branch) {
         return Form.create()
                 .with(
                         MultiStrings.of("names")
@@ -42,7 +43,7 @@ public class FixedListTemplateSynchronisationSource extends AbstractTemplateSync
     }
 
     @Override
-    public List<String> getBranchNames(Project project, FixedListTemplateSynchronisationSourceConfig config) {
+    public List<String> getBranchNames(Branch branch, FixedListTemplateSynchronisationSourceConfig config) {
         return config.getNames();
     }
 

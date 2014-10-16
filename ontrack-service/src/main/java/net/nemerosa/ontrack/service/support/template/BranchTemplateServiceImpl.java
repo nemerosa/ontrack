@@ -279,7 +279,7 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
         // Logging
         info.post(format("Getting template sync. sources from %s", templateSynchronisationSource.getName()));
         // Getting the list of names
-        List<String> branchNames = templateSynchronisationSource.getBranchNames(templateBranch.getProject(), config);
+        List<String> branchNames = templateSynchronisationSource.getBranchNames(templateBranch, config);
         // Sync on those names
         syncTemplateDefinition(templateBranch, templateDefinition, branchNames, info);
     }

@@ -270,12 +270,12 @@ public class BranchController extends AbstractResourceController {
                                 .help("Source of branch names when synchronising")
                                 .sources(
                                         templateSynchronisationService.getSynchronisationSources().stream()
-                                                .filter(source -> source.isApplicable(branch.getProject()))
+                                                .filter(source -> source.isApplicable(branch))
                                                 .map(
                                                         source -> new ServiceConfigurationSource(
                                                                 source.getId(),
                                                                 source.getName(),
-                                                                source.getForm(branch.getProject())
+                                                                source.getForm(branch)
                                                         )
                                                 )
                                                 .collect(Collectors.toList())
