@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.git.client.impl
 
 import net.nemerosa.ontrack.common.Utils
+import net.nemerosa.ontrack.extension.git.client.GitClient
+import net.nemerosa.ontrack.extension.git.model.GitConfiguration
 
 class GitTestUtils {
 
@@ -20,7 +22,9 @@ class GitTestUtils {
     }
 
     public String run(String cmd, String... args) {
-        Utils.run(dir, cmd, args)
+        def output = Utils.run(dir, cmd, args)
+        println output
+        return output
     }
 
     public void commit(def no) {
@@ -37,6 +41,18 @@ class GitTestUtils {
         } else {
             throw new RuntimeException("Cannot find commit for message $message")
         }
+    }
+
+    GitClient gitClient() {
+        GitRepository gitRepository = new DefaultGitRepository(
+                dir,
+                "",
+                "master",
+                "id",
+                { Optional.empty() }
+        )
+        GitConfiguration gitConfiguration = GitConfiguration.empty()
+        new DefaultGitClient(gitRepository, gitConfiguration)
     }
 
 }

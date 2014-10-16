@@ -238,7 +238,7 @@ public class DefaultGitClient implements GitClient {
     public List<String> getRemoteBranches() {
         try {
             return repository.git().lsRemote().setHeads(true).call().stream()
-                    .map(ref -> StringUtils.removeStart(ref.getName(), "refs/head"))
+                    .map(ref -> StringUtils.removeStart(ref.getName(), "refs/heads/"))
                     .collect(Collectors.toList());
         } catch (GitAPIException e) {
             throw new GitException(e);
