@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.git.client.impl
 
-import net.nemerosa.ontrack.common.Utils
 import net.nemerosa.ontrack.extension.git.client.GitClient
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration
 import org.junit.AfterClass
@@ -34,69 +33,50 @@ import org.junit.Test
  */
 class GitClientEarliestTagIT {
 
-    private static File repo
-
-    /**
-     * Execution of a command
-     */
-    private static String run(String cmd, String... args) {
-        Utils.run(repo, cmd, args)
-    }
+    private static GitTestUtils repo
 
     /**
      * Preparation of the Git repository
      */
     @BeforeClass
     static void 'Git repository'() {
-        // Gets a directory
-        repo = File.createTempDir('ontrack-git', '')
+        // Gets a repository
+        repo = new GitTestUtils()
         println "Git repo at $repo"
 
-        // Initialises a Git repository
-        run('git', 'init')
+        repo.with {
 
-        // Commits 1..4
-        (1..4).each {
-            commit(it)
-        }
+            // Initialises a Git repository
+            run('git', 'init')
 
-        // 1.0 branch and tag
-        run('git', 'checkout', '-b', '1.0')
-        commit(5)
-        run('git', 'tag', '1.0.1')
+            // Commits 1..4
+            (1..4).each {
+                commit(it)
+            }
 
-        // Going further with the master
-        run('git', 'checkout', 'master')
+            // 1.0 branch and tag
+            run('git', 'checkout', '-b', '1.0')
+            commit(5)
+            run('git', 'tag', '1.0.1')
 
-        // Commits and tags
-        commit(6)
-        commit(7)
-        commit(8)
-        run('git', 'tag', '1.1.0')
-        commit(9)
-        commit(10)
-        run('git', 'tag', '1.2.0')
-        commit(11)
-        commit(12)
-        commit(13)
+            // Going further with the master
+            run('git', 'checkout', 'master')
 
-        // Log
-        run('git', 'log', '--oneline', '--graph', '--decorate', 'master', '1.0')
-    }
+            // Commits and tags
+            commit(6)
+            commit(7)
+            commit(8)
+            run('git', 'tag', '1.1.0')
+            commit(9)
+            commit(10)
+            run('git', 'tag', '1.2.0')
+            commit(11)
+            commit(12)
+            commit(13)
 
-    protected static void commit(no) {
-        def fileName = "file${no}"
-        run('touch', fileName)
-        run('git', 'add', fileName)
-        run('git', 'commit', '-m', "Commit $no")
-    }
+            // Log
+            run('git', 'log', '--oneline', '--graph', '--decorate', 'master', '1.0')
 
-    protected static String commitLookup(String message) {
-        def info = run('git', 'log', '-g', '--grep', message, '--pretty=format:%h')
-        if (info) {
-            info.trim()
-        } else {
-            throw new RuntimeException("Cannot find commit for message $message")
         }
     }
 
@@ -105,7 +85,7 @@ class GitClientEarliestTagIT {
      */
     @AfterClass
     static void 'Git repository deletion'() {
-        repo.deleteDir()
+        repo.close()
     }
 
     private GitClient gitClient
@@ -113,7 +93,7 @@ class GitClientEarliestTagIT {
     @Before
     void 'Git client'() {
         GitRepository gitRepository = new DefaultGitRepository(
-                repo,
+                repo.dir,
                 "",
                 "master",
                 "id",
@@ -131,7 +111,7 @@ class GitClientEarliestTagIT {
     @Test
     void 'tag_on_commit'() {
         // Identifying SHA for "Commit 8"
-        def commit = commitLookup('Commit 8')
+        def commit = repo.commitLookup('Commit 8')
         // Call
         def tag = gitClient.getEarliestTagForCommit(commit, { true })
         // Check
@@ -146,7 +126,7 @@ class GitClientEarliestTagIT {
     @Test
     void 'tag_on_path_to_head'() {
         // Identifying SHA for "Commit 6"
-        def commit = commitLookup('Commit 6')
+        def commit = repo.commitLookup('Commit 6')
         // Call
         def tag = gitClient.getEarliestTagForCommit(commit, { true })
         // Check
@@ -161,7 +141,7 @@ class GitClientEarliestTagIT {
     @Test
     void 'tag_on_separate_path'() {
         // Identifying SHA for "Commit 3"
-        def commit = commitLookup('Commit 3')
+        def commit = repo.commitLookup('Commit 3')
         // Call
         def tag = gitClient.getEarliestTagForCommit(commit, { true })
         // Check
@@ -176,7 +156,7 @@ class GitClientEarliestTagIT {
     @Test
     void 'no_tag'() {
         // Identifying SHA for "Commit 11"
-        def commit = commitLookup('Commit 11')
+        def commit = repo.commitLookup('Commit 11')
         // Call
         def tag = gitClient.getEarliestTagForCommit(commit, { true })
         // Check
