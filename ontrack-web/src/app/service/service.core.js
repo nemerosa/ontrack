@@ -1,5 +1,6 @@
 angular.module('ot.service.core', [
-    'ot.alert.confirm'
+    'ot.alert.confirm',
+    'ot.alert.progress'
 ])
 /**
  * Basic services
@@ -197,6 +198,25 @@ angular.module('ot.service.core', [
                     $scope.cancel = function () {
                         $modalInstance.dismiss('cancel');
                     };
+                }
+            }).result;
+        };
+        /**
+         * Displays a progress dialog
+         * @param config.title Title of the dialog
+         * @param config.promptMessage Optional. If set, the task won't start before the user has confirmed.
+         * @param config.waitingMessage Message to display during the execution of the task
+         * @param config.endMessage Message to display when task has been completed successfully
+         * @param config.task Function that must return a promise for the execution of the task
+         */
+        self.displayProgressDialog = function (config) {
+            return $modal.open({
+                templateUrl: 'app/dialog/alert.progress.tpl.html',
+                controller: 'otAlertProgress',
+                resolve: {
+                    config: function () {
+                        return config;
+                    }
                 }
             }).result;
         };

@@ -2,7 +2,7 @@ angular.module('ot.service.template', [
     'ot.service.core',
     'ot.service.form'
 ])
-    .service('otTemplateService', function ($http, $modal, ot, otFormService) {
+    .service('otTemplateService', function ($http, $modal, ot, otFormService, otAlertService) {
         var self = {};
 
         /**
@@ -25,6 +25,16 @@ angular.module('ot.service.template', [
          * @param templateSyncUri URL to get the template definition.
          */
         self.templateSync = function (templateSyncUri) {
+            otAlertService.displayProgressDialog({
+                title: "Template synchronisation",
+                promptMessage: "Synchronisation of this template is about to start. This might change the linked " +
+                    "instances. Do you want to continue?",
+                waitingMessage: "Synchronising the template...",
+                endMessage: "Synchronisation has been done.",
+                task: function() {
+                    return ot.call($http.post(templateSyncUri));
+                }
+            });
         };
 
         /**
