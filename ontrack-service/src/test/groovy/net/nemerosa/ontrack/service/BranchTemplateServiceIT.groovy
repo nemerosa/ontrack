@@ -2,16 +2,13 @@ package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.json.JsonUtils
-import net.nemerosa.ontrack.model.exceptions.BranchClassicCannotBeTemplateInstanceException
-import net.nemerosa.ontrack.model.exceptions.BranchTemplateDefinitionCannotBeTemplateInstanceException
-import net.nemerosa.ontrack.model.exceptions.BranchTemplateInstanceCannotUpdateBasedOnOtherDefinitionException
-import net.nemerosa.ontrack.model.exceptions.BranchTemplateInstanceMissingParametersException
-import net.nemerosa.ontrack.model.exceptions.BranchTemplateInstanceUnknownParametersException
+import net.nemerosa.ontrack.model.exceptions.*
 import net.nemerosa.ontrack.model.security.BranchTemplateMgt
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.service.support.property.TestProperty
 import net.nemerosa.ontrack.service.support.property.TestPropertyType
+import net.nemerosa.ontrack.service.support.template.FixedListTemplateSynchronisationSource
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 
@@ -344,8 +341,10 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
                         )
                 ],
                 new ServiceConfiguration(
-                        'test',
-                        JsonUtils.object().end()
+                        FixedListTemplateSynchronisationSource.ID,
+                        JsonUtils.object()
+                                .with("names", JsonUtils.stringArray("master", "feature/19", "feature/22", "fix/111"))
+                                .end()
                 ),
                 TemplateSynchronisationAbsencePolicy.DELETE,
                 10

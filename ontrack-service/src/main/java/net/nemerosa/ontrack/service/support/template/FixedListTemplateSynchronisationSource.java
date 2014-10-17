@@ -11,13 +11,15 @@ import java.util.List;
 @Component
 public class FixedListTemplateSynchronisationSource extends AbstractTemplateSynchronisationSource<FixedListTemplateSynchronisationSourceConfig> {
 
+    public static final String ID = "fixed";
+
     protected FixedListTemplateSynchronisationSource() {
         super(FixedListTemplateSynchronisationSourceConfig.class);
     }
 
     @Override
     public String getId() {
-        return "fixed";
+        return ID;
     }
 
     @Override
