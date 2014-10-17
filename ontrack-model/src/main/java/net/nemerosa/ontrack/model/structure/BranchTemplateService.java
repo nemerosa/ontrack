@@ -37,6 +37,11 @@ public interface BranchTemplateService {
     Branch createTemplateInstance(ID branchId, BranchTemplateInstanceSingleRequest request);
 
     /**
+     * Gets a template instance for a branch
+     */
+    Optional<TemplateInstance> getTemplateInstance(ID branchId);
+
+    /**
      * Sync. this template definition by creating and updating linked template instances.
      */
     Ack sync(ID branchId);

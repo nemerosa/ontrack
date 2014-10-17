@@ -81,17 +81,18 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
         securityService.checkProjectFunction(branch, BranchTemplateMgt.class);
 
         // Gets the existing branch
-        String branchName = request.getName();
+        String sourceName = request.getName();
+        String branchName = NameDescription.escapeName(sourceName);
         Optional<Branch> existingBranch = structureService.findBranchByName(
                 branch.getProject().getName(),
-                NameDescription.escapeName(branchName));
+                sourceName);
 
         // Not existing
         if (!existingBranch.isPresent()) {
             // Creates the branch
-            Branch instance = createBranchForTemplateInstance(branch, branchName);
+            Branch instance = createBranchForTemplateInstance(branch, sourceName);
             // Updates the branch
-            return updateTemplateInstance(instance, branch, request, templateDefinition);
+            return updateTemplateInstance(sourceName, instance, branch, request, templateDefinition);
         }
         // Existing, normal branch
         else if (existingBranch.get().getType() == BranchType.CLASSIC) {
@@ -113,9 +114,14 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
             }
             // If same definition, updates the branch
             else {
-                return updateTemplateInstance(existingBranch.get(), branch, request, templateDefinition);
+                return updateTemplateInstance(sourceName, existingBranch.get(), branch, request, templateDefinition);
             }
         }
+    }
+
+    @Override
+    public Optional<TemplateInstance> getTemplateInstance(ID branchId) {
+        return branchTemplateRepository.getTemplateInstance(branchId);
     }
 
     protected Branch createBranchForTemplateInstance(Branch templateBranch, String branchName) {
@@ -130,7 +136,7 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
         );
     }
 
-    protected Branch updateTemplateInstance(Branch instance, Branch template, BranchTemplateInstanceSingleRequest request, TemplateDefinition templateDefinition) {
+    protected Branch updateTemplateInstance(String sourceName, Branch instance, Branch template, BranchTemplateInstanceSingleRequest request, TemplateDefinition templateDefinition) {
         // Manual mode
         if (request.isManual()) {
             // Missing parameters
@@ -150,7 +156,7 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
             }
             // Adds `branchName` as a parameter
             Map<String, String> engineParams = new HashMap<>(request.getParameters());
-            engineParams.put("branchName", instance.getName());
+            engineParams.put("branchName", sourceName);
             // Replacement function
             Function<String, String> replacementFn = value -> expressionEngine.render(value, engineParams);
             // Template instance execution context
@@ -163,15 +169,15 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
         }
         // Automatic mode
         else {
-            return updateTemplateInstance(instance, template, templateDefinition);
+            return updateTemplateInstance(sourceName, instance, template, templateDefinition);
         }
     }
 
-    protected Branch updateTemplateInstance(Branch instance, Branch template, TemplateDefinition templateDefinition) {
+    protected Branch updateTemplateInstance(String sourceName, Branch instance, Branch template, TemplateDefinition templateDefinition) {
         return updateTemplateInstance(
                 instance,
                 template,
-                templateDefinition.templateInstanceExecution(instance.getName(), expressionEngine)
+                templateDefinition.templateInstanceExecution(sourceName, expressionEngine)
         );
 
     }
@@ -297,17 +303,19 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
         }
     }
 
-    protected void syncTemplateDefinition(Branch templateBranch, TemplateDefinition templateDefinition, String branchName, JobInfoListener info) {
+    protected void syncTemplateDefinition(Branch templateBranch, TemplateDefinition templateDefinition, String sourceName, JobInfoListener info) {
         // Logging
-        info.post(format("Sync. %s --> %s", templateBranch.getName(), branchName));
+        info.post(format("Sync. %s --> %s", templateBranch.getName(), sourceName));
         // Gets the target branch, if it exists
+        String branchName = NameDescription.escapeName(sourceName);
         Optional<Branch> targetBranch = structureService.findBranchByName(
                 templateBranch.getProject().getName(),
-                NameDescription.escapeName(branchName));
+                branchName);
         // If it exists, we need to update it
         if (targetBranch.isPresent()) {
             info.post(format("%s exists - updating", branchName));
             updateTemplateInstance(
+                    sourceName,
                     targetBranch.get(),
                     templateBranch,
                     templateDefinition
@@ -316,8 +324,9 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
         // If it does not exist, creates it and updates it
         else {
             info.post(format("%s does not exists - creating and updating", branchName));
-            Branch instance = createBranchForTemplateInstance(templateBranch, branchName);
+            Branch instance = createBranchForTemplateInstance(templateBranch, sourceName);
             updateTemplateInstance(
+                    sourceName,
                     instance,
                     templateBranch,
                     templateDefinition

@@ -16,6 +16,8 @@ import static net.nemerosa.ontrack.model.structure.NameDescription.nd
 
 class BranchTemplateServiceIT extends AbstractServiceTestSupport {
 
+    private static final List<String> BRANCHES = ["feature/19", "feature/22", "master"]
+
     @Autowired
     private BranchTemplateService templateService
 
@@ -104,6 +106,7 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
                             true, // Manual
                             [
                                     'BRANCH' : 'INSTANCE',
+                                    'SCM'    : 'master',
                                     'unknown': "Test"
                             ]
                     )
@@ -124,7 +127,8 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
                             'instance',
                             true, // Manual
                             [
-                                    'BRANCH': 'INSTANCE'
+                                    'BRANCH': 'INSTANCE',
+                                    'SCM'   : 'master'
                             ]
                     )
             )
@@ -240,7 +244,8 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
                             'instance',
                             true, // Manual
                             [
-                                    'BRANCH': 'Updated instance'
+                                    'BRANCH': 'Updated instance',
+                                    'SCM'   : 'instance'
                             ]
                     )
             )
@@ -248,6 +253,35 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
 
         // Checks the updated branch
         checkBranchTemplateInstance(instance, 'Updated instance')
+
+    }
+
+    @Test
+    void 'Sync - no filtering'() {
+        // Creating the template
+        Branch template = createBranchTemplateDefinition()
+
+        asUser().with(template, BranchTemplateMgt).call {
+            // Launching synchronisation
+            templateService.sync(template.id)
+            // TODO Checks the result
+
+            // Checks the branches have been created
+            BRANCHES.each { sourceName ->
+                def branchName = sourceName.replace('/', '_')
+                def branch = structureService.findBranchByName(template.project.name, branchName)
+                assert branch.present
+                // Gets its template instance
+                def instanceOpt = templateService.getTemplateInstance(branch.get().id)
+                assert instanceOpt.present
+                def instance = instanceOpt.get()
+                assert instance.templateDefinitionId == template.id
+                assert instance.parameterValues == [
+                        new TemplateParameterValue('BRANCH', branchName.toUpperCase()),
+                        new TemplateParameterValue('SCM', sourceName)
+                ]
+            }
+        }
 
     }
 
@@ -337,13 +371,18 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
                         new TemplateParameter(
                                 'BRANCH',
                                 "Display name for the branch",
-                                '${branchName.toUpperCase()}'
+                                '${branchName.toUpperCase().replaceAll("/","_")}'
+                        ),
+                        new TemplateParameter(
+                                'SCM',
+                                "SCM branch",
+                                '${branchName}'
                         )
                 ],
                 new ServiceConfiguration(
                         FixedListTemplateSynchronisationSource.ID,
                         JsonUtils.object()
-                                .with("names", JsonUtils.stringArray("master", "feature/19", "feature/22", "fix/111"))
+                                .with("names", JsonUtils.stringArray(BRANCHES))
                                 .end()
                 ),
                 TemplateSynchronisationAbsencePolicy.DELETE,
