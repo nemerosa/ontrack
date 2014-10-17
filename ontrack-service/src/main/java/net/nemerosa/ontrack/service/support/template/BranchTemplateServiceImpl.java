@@ -82,7 +82,9 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
 
         // Gets the existing branch
         String branchName = request.getName();
-        Optional<Branch> existingBranch = structureService.findBranchByName(branch.getProject().getName(), branchName);
+        Optional<Branch> existingBranch = structureService.findBranchByName(
+                branch.getProject().getName(),
+                NameDescription.escapeName(branchName));
 
         // Not existing
         if (!existingBranch.isPresent()) {
@@ -121,7 +123,7 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
                 Branch.of(
                         templateBranch.getProject(),
                         NameDescription.nd(
-                                branchName,
+                                NameDescription.escapeName(branchName),
                                 ""
                         )
                 )
@@ -299,7 +301,9 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
         // Logging
         info.post(format("Sync. %s --> %s", templateBranch.getName(), branchName));
         // Gets the target branch, if it exists
-        Optional<Branch> targetBranch = structureService.findBranchByName(templateBranch.getProject().getName(), branchName);
+        Optional<Branch> targetBranch = structureService.findBranchByName(
+                templateBranch.getProject().getName(),
+                NameDescription.escapeName(branchName));
         // If it exists, we need to update it
         if (targetBranch.isPresent()) {
             info.post(format("%s exists - updating", branchName));

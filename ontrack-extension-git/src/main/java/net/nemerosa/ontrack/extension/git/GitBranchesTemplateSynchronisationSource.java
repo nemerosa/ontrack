@@ -71,7 +71,6 @@ public class GitBranchesTemplateSynchronisationSource extends AbstractTemplateSy
         GitConfiguration gitConfiguration = gitService.getBranchConfiguration(branch);
         // Inclusion predicate
         Predicate<String> filter = config.getFilter();
-        // TODO Transformation of characters in branch name in order to it to be valid
         // Gets the list of branches
         return gitService.getRemoteBranches(gitConfiguration).stream()
                 .filter(filter)
