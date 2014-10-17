@@ -25,6 +25,11 @@ public class JsonUtilsTest {
     }
 
     @Test
+    public void get_date_null() throws Exception {
+        assertNull(JsonUtils.getDate(JsonUtils.object().withNull("data").end(), "data", null));
+    }
+
+    @Test
     public void get_string_list_no_field() {
         assertNull(JsonUtils.getStringList(JsonUtils.object().end(), "test"));
     }

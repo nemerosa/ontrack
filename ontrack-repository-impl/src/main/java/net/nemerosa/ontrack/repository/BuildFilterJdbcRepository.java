@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.OptionalInt;
 
 /**
  * <pre>
@@ -34,26 +35,40 @@ public class BuildFilterJdbcRepository extends AbstractJdbcRepository implements
     @Override
     public Collection<TBuildFilter> findForBranch(int branchId) {
         return getNamedParameterJdbcTemplate().query(
-                "SELECT * FROM BUILD_FILTERS WHERE BRANCHID = :branchId",
+                "(SELECT * FROM BUILD_FILTERS WHERE BRANCHID = :branchId)" +
+                        " UNION " +
+                        "(SELECT NULL AS accountId, * FROM SHARED_BUILD_FILTERS WHERE BRANCHID = :branchId)",
                 params("branchId", branchId),
                 (rs, row) -> toBuildFilter(rs)
         );
     }
 
     @Override
-    public Collection<TBuildFilter> findForBranch(int accountId, int branchId) {
-        return getNamedParameterJdbcTemplate().query(
-                "SELECT * FROM BUILD_FILTERS WHERE ACCOUNTID = :accountId AND BRANCHID = :branchId",
-                params("branchId", branchId).addValue("accountId", accountId),
-                (rs, row) -> toBuildFilter(rs)
-        );
+    public Collection<TBuildFilter> findForBranch(OptionalInt accountId, int branchId) {
+        if (accountId.isPresent()) {
+            return getNamedParameterJdbcTemplate().query(
+                    "(SELECT * FROM BUILD_FILTERS WHERE ACCOUNTID = :accountId AND BRANCHID = :branchId)" +
+                            " UNION " +
+                            "(SELECT NULL AS accountId, * FROM SHARED_BUILD_FILTERS WHERE BRANCHID = :branchId)",
+                    params("branchId", branchId).addValue("accountId", accountId.getAsInt()),
+                    (rs, row) -> toBuildFilter(rs)
+            );
+        } else {
+            return getNamedParameterJdbcTemplate().query(
+                    "SELECT NULL AS accountId, * FROM SHARED_BUILD_FILTERS WHERE BRANCHID = :branchId",
+                    params("branchId", branchId),
+                    (rs, row) -> toBuildFilter(rs)
+            );
+        }
     }
 
     @Override
     public Optional<TBuildFilter> findByBranchAndName(int accountId, int branchId, String name) {
         return Optional.ofNullable(
                 getFirstItem(
-                        "SELECT * FROM BUILD_FILTERS WHERE ACCOUNTID = :accountId AND BRANCHID = :branchId AND NAME = :name",
+                        "(SELECT * FROM BUILD_FILTERS WHERE ACCOUNTID = :accountId AND BRANCHID = :branchId AND NAME = :name)" +
+                                " UNION " +
+                                "(SELECT NULL AS accountId, * FROM SHARED_BUILD_FILTERS WHERE BRANCHID = :branchId AND NAME = :name)",
                         params("branchId", branchId).addValue("accountId", accountId).addValue("name", name),
                         (rs, row) -> toBuildFilter(rs)
                 )
@@ -61,34 +76,63 @@ public class BuildFilterJdbcRepository extends AbstractJdbcRepository implements
     }
 
     @Override
-    public Ack save(int accountId, int branchId, String name, String type, JsonNode data) {
-        MapSqlParameterSource params = params("branchId", branchId).addValue("accountId", accountId).addValue("name", name);
-        getNamedParameterJdbcTemplate().update(
-                "DELETE FROM BUILD_FILTERS WHERE ACCOUNTID = :accountId AND BRANCHID = :branchId AND NAME = :name",
-                params
-        );
-        return Ack.one(
-                getNamedParameterJdbcTemplate().update(
-                        "INSERT INTO BUILD_FILTERS (ACCOUNTID, BRANCHID, NAME, TYPE, DATA) " +
-                                "VALUES (:accountId, :branchId, :name, :type, :data)",
-                        params.addValue("type", type).addValue("data", writeJson(data))
-                )
-        );
+    public Ack save(OptionalInt accountId, int branchId, String name, String type, JsonNode data) {
+        if (accountId.isPresent()) {
+            MapSqlParameterSource params = params("branchId", branchId).addValue("accountId", accountId.getAsInt()).addValue("name", name);
+            getNamedParameterJdbcTemplate().update(
+                    "DELETE FROM BUILD_FILTERS WHERE ACCOUNTID = :accountId AND BRANCHID = :branchId AND NAME = :name",
+                    params
+            );
+            return Ack.one(
+                    getNamedParameterJdbcTemplate().update(
+                            "INSERT INTO BUILD_FILTERS (ACCOUNTID, BRANCHID, NAME, TYPE, DATA) " +
+                                    "VALUES (:accountId, :branchId, :name, :type, :data)",
+                            params.addValue("type", type).addValue("data", writeJson(data))
+                    )
+            );
+        } else {
+            MapSqlParameterSource params = params("branchId", branchId).addValue("name", name);
+            getNamedParameterJdbcTemplate().update(
+                    "DELETE FROM SHARED_BUILD_FILTERS WHERE BRANCHID = :branchId AND NAME = :name",
+                    params
+            );
+            return Ack.one(
+                    getNamedParameterJdbcTemplate().update(
+                            "INSERT INTO SHARED_BUILD_FILTERS (BRANCHID, NAME, TYPE, DATA) " +
+                                    "VALUES (:branchId, :name, :type, :data)",
+                            params.addValue("type", type).addValue("data", writeJson(data))
+                    )
+            );
+        }
     }
 
     @Override
-    public Ack delete(int accountId, int branchId, String name) {
-        return Ack.one(
+    public Ack delete(int accountId, int branchId, String name, boolean shared) {
+        // Account filter
+        Ack accountFilterDeleted = Ack.one(
                 getNamedParameterJdbcTemplate().update(
                         "DELETE FROM BUILD_FILTERS WHERE ACCOUNTID = :accountId AND BRANCHID = :branchId AND NAME = :name",
                         params("branchId", branchId).addValue("accountId", accountId).addValue("name", name)
                 )
         );
+        // Shared filter
+        if (shared) {
+            return accountFilterDeleted.or(
+                    Ack.one(
+                            getNamedParameterJdbcTemplate().update(
+                                    "DELETE FROM SHARED_BUILD_FILTERS WHERE BRANCHID = :branchId AND NAME = :name",
+                                    params("branchId", branchId).addValue("name", name)
+                            )
+                    )
+            );
+        } else {
+            return accountFilterDeleted;
+        }
     }
 
     private TBuildFilter toBuildFilter(ResultSet rs) throws SQLException {
         return new TBuildFilter(
-                rs.getInt("accountId"),
+                optionalInt(rs, "accountId"),
                 rs.getInt("branchId"),
                 rs.getString("name"),
                 rs.getString("type"),

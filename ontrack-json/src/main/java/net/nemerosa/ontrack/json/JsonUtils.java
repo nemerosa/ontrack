@@ -112,7 +112,7 @@ public final class JsonUtils {
     }
 
     public static LocalDate getDate(JsonNode data, String field, LocalDate defaultValue) {
-        if (data.has(field)) {
+        if (data.has(field) && !data.get(field).isNull()) {
             return JDKLocalDateDeserializer.parse(data.path(field).asText());
         } else {
             return defaultValue;

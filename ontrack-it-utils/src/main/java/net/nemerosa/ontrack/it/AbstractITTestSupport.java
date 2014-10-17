@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.it;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.nemerosa.ontrack.common.RunProfile;
+import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 import org.junit.runner.RunWith;
 import org.springframework.context.annotation.ComponentScan;
@@ -36,5 +38,7 @@ public abstract class AbstractITTestSupport extends AbstractTransactionalJUnit4S
                 String.format("%s description", uid)
         );
     }
+
+    protected final ObjectMapper objectMapper = ObjectMapperFactory.create();
 
 }

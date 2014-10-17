@@ -1,7 +1,8 @@
 package net.nemerosa.ontrack.model.buildfilter;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import net.nemerosa.ontrack.model.structure.ID;
+import net.nemerosa.ontrack.model.structure.Branch;
 
 /**
  * @param <T> Type of configuration data for this build filter
@@ -12,7 +13,12 @@ public class BuildFilterResource<T> {
     /**
      * Branch
      */
-    private final ID branchId;
+    @JsonIgnore
+    private final Branch branch;
+    /**
+     * Shared filter?
+     */
+    private final boolean shared;
     /**
      * Name for this filter
      */

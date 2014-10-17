@@ -113,6 +113,10 @@ angular.module('ot.service.buildfilter', [
                     if (buildFilterResource._update && buildFilterResource.name == currentFilter.name) {
                         self.saveFilter(config.branch, currentFilter);
                     }
+                    // Sharing if saved under the same name
+                    if (buildFilterResource.shared && config.branch._buildFilterShare && buildFilterResource.name == currentFilter.name) {
+                        self.shareFilter(config.branch, currentFilter);
+                    }
                 });
             } else {
                 otNotificationService.error("The type of this filter appears not to be supported: " + type + ". " +
@@ -194,7 +198,24 @@ angular.module('ot.service.buildfilter', [
 
         self.saveFilter = function (branch, buildFilterResource) {
             return ot.call(
-                $http.post(branch._buildFilterSave, buildFilterResource)
+                $http.post(branch._buildFilterSave, {
+                    name: buildFilterResource.name,
+                    shared: buildFilterResource.shared,
+                    type: buildFilterResource.type,
+                    data: buildFilterResource.data
+                })
+            );
+        };
+
+        self.shareFilter = function (branch, buildFilterResource) {
+            buildFilterResource.shared = true;
+            return ot.call(
+                $http.post(branch._buildFilterShare, {
+                    name: buildFilterResource.name,
+                    shared: true,
+                    type: buildFilterResource.type,
+                    data: buildFilterResource.data
+                })
             );
         };
 
