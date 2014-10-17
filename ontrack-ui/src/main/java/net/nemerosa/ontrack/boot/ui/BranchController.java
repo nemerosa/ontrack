@@ -281,9 +281,9 @@ public class BranchController extends AbstractResourceController {
                                                 .collect(Collectors.toList())
                                 )
                                 .value(
-                                    templateDefinition
-                                        .map(TemplateDefinition::getSynchronisationSourceConfig)
-                                        .orElse(null)
+                                        templateDefinition
+                                                .map(TemplateDefinition::getSynchronisationSourceConfig)
+                                                .orElse(null)
                                 )
                 )
                 .with(
@@ -326,7 +326,7 @@ public class BranchController extends AbstractResourceController {
      * Sync. this template definition by creating and updating linked template instances.
      */
     @RequestMapping(value = "branches/{branchId}/template/sync", method = RequestMethod.POST)
-    public Ack syncTemplateDefinition(@PathVariable ID branchId) {
+    public BranchTemplateSyncResults syncTemplateDefinition(@PathVariable ID branchId) {
         return branchTemplateService.sync(branchId);
     }
 

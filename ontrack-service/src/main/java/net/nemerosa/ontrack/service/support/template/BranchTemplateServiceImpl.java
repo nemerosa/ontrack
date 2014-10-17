@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.service.support.template;
 
-import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.exceptions.*;
 import net.nemerosa.ontrack.model.job.*;
 import net.nemerosa.ontrack.model.security.BranchTemplateMgt;
@@ -256,12 +255,11 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
     }
 
     @Override
-    public Ack sync(ID branchId) {
-        syncTemplateDefinition(branchId, logger::info);
-        return Ack.OK;
+    public BranchTemplateSyncResults sync(ID branchId) {
+        return syncTemplateDefinition(branchId, logger::info);
     }
 
-    protected void syncTemplateDefinition(ID branchId, JobInfoListener info) {
+    protected BranchTemplateSyncResults syncTemplateDefinition(ID branchId, JobInfoListener info) {
         // Loads the template definition
         info.post(format("Loading template definition for %s", branchId));
         TemplateDefinition templateDefinition = getTemplateDefinition(branchId)
@@ -272,10 +270,10 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
                         templateDefinition.getSynchronisationSourceConfig().getId()
                 );
         // Using the source
-        syncTemplateDefinition(branchId, templateDefinition, templateSynchronisationSource, info);
+        return syncTemplateDefinition(branchId, templateDefinition, templateSynchronisationSource, info);
     }
 
-    protected <T> void syncTemplateDefinition(
+    protected <T> BranchTemplateSyncResults syncTemplateDefinition(
             ID branchId,
             TemplateDefinition templateDefinition,
             TemplateSynchronisationSource<T> templateSynchronisationSource,
@@ -287,23 +285,27 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
         // Logging
         info.post(format("Getting template sync. sources from %s", templateSynchronisationSource.getName()));
         // Getting the list of names
-        List<String> branchNames = templateSynchronisationSource.getBranchNames(templateBranch, config);
+        List<String> sourceNames = templateSynchronisationSource.getBranchNames(templateBranch, config);
         // Sync on those names
-        syncTemplateDefinition(templateBranch, templateDefinition, branchNames, info);
+        return syncTemplateDefinition(templateBranch, templateDefinition, sourceNames, info);
     }
 
-    protected void syncTemplateDefinition(
+    protected BranchTemplateSyncResults syncTemplateDefinition(
             Branch templateBranch,
             TemplateDefinition templateDefinition,
-            List<String> branchNames,
+            List<String> sourceNames,
             JobInfoListener info) {
+        BranchTemplateSyncResults results = new BranchTemplateSyncResults();
         // Sync for each branch
-        for (String branchName : branchNames) {
-            syncTemplateDefinition(templateBranch, templateDefinition, branchName, info);
+        for (String sourceName : sourceNames) {
+            BranchTemplateSyncResult result = syncTemplateDefinition(templateBranch, templateDefinition, sourceName, info);
+            results.addBranch(sourceName, result);
         }
+        // OK
+        return results;
     }
 
-    protected void syncTemplateDefinition(Branch templateBranch, TemplateDefinition templateDefinition, String sourceName, JobInfoListener info) {
+    protected BranchTemplateSyncResult syncTemplateDefinition(Branch templateBranch, TemplateDefinition templateDefinition, String sourceName, JobInfoListener info) {
         // Logging
         info.post(format("Sync. %s --> %s", templateBranch.getName(), sourceName));
         // Gets the target branch, if it exists
@@ -320,6 +322,7 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
                     templateBranch,
                     templateDefinition
             );
+            return new BranchTemplateSyncResult(branchName, BranchTemplateSyncType.UPDATED);
         }
         // If it does not exist, creates it and updates it
         else {
@@ -331,6 +334,7 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
                     templateBranch,
                     templateDefinition
             );
+            return new BranchTemplateSyncResult(branchName, BranchTemplateSyncType.CREATED);
         }
     }
 }

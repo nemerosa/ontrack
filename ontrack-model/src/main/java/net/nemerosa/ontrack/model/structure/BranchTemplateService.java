@@ -1,7 +1,5 @@
 package net.nemerosa.ontrack.model.structure;
 
-import net.nemerosa.ontrack.model.Ack;
-
 import java.util.Optional;
 
 public interface BranchTemplateService {
@@ -44,5 +42,5 @@ public interface BranchTemplateService {
     /**
      * Sync. this template definition by creating and updating linked template instances.
      */
-    Ack sync(ID branchId);
+    BranchTemplateSyncResults sync(ID branchId);
 }
