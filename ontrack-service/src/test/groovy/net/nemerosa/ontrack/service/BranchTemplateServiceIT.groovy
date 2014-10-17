@@ -257,7 +257,7 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
     }
 
     @Test
-    void 'Sync - no filtering'() {
+    void 'Sync - new branches'() {
         // Creating the template
         Branch template = createBranchTemplateDefinition()
 
@@ -281,6 +281,21 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
                         new TemplateParameterValue('SCM', sourceName)
                 ]
             }
+        }
+
+    }
+
+    @Test
+    void 'Sync - update branches'() {
+        // Creating the template
+        Branch template = createBranchTemplateDefinition()
+
+        asUser().with(template, BranchTemplateMgt).call {
+            // Launching synchronisation, once
+            templateService.sync(template.id)
+            // ... twice
+            templateService.sync(template.id)
+            // TODO Checks the result
         }
 
     }
