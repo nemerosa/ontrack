@@ -1,5 +1,5 @@
-<a href="{{property.value.url}}" target="_blank">
-    {{property.value.job}}
-    @
-    {{property.value.configuration.name}}
-</a>
+<span ng-repeat="job in property.value.job.split('/job/')">
+    <span ng-if="!$first" class="fa fa-caret-right"></span>
+    <span ng-if="!$last" class="text-muted">{{job}}</span>
+    <a ng-if="$last" href="{{property.value.url}}" target="_blank">{{job}}</a>
+</span>
