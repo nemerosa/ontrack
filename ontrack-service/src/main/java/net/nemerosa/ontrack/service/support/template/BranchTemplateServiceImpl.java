@@ -299,7 +299,7 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
         // Sync for each branch
         for (String sourceName : sourceNames) {
             BranchTemplateSyncResult result = syncTemplateDefinition(templateBranch, templateDefinition, sourceName, info);
-            results.addBranch(sourceName, result);
+            results.addResult(result);
         }
         // OK
         return results;

@@ -264,9 +264,10 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
         asUser().with(template, BranchTemplateMgt).call {
             // Launching synchronisation
             def results = templateService.sync(template.id)
-            assert results.sources.size() == 3
+            assert results.branches.size() == 3
             BRANCHES.each { sourceName ->
-                assert results.sources[sourceName].type == BranchTemplateSyncType.CREATED
+                def branchName = sourceName.replace('/', '_')
+                assert results.branches.find { it.branchName == branchName }.type == BranchTemplateSyncType.CREATED
             }
 
             // Checks the branches have been created
@@ -298,9 +299,10 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
             templateService.sync(template.id)
             // ... twice
             def results = templateService.sync(template.id)
-            assert results.sources.size() == 3
+            assert results.branches.size() == 3
             BRANCHES.each { sourceName ->
-                assert results.sources[sourceName].type == BranchTemplateSyncType.UPDATED
+                def branchName = sourceName.replace('/', '_')
+                assert results.branches.find { it.branchName == branchName }.type == BranchTemplateSyncType.UPDATED
             }
         }
 
