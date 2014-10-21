@@ -355,9 +355,9 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
             assert results.branches.size() == 3
             assert results.branches.find { it.branchName == 'feature_19' }.type == BranchTemplateSyncType.CREATED
             assert results.branches.find { it.branchName == 'feature_22' }.type == BranchTemplateSyncType.CREATED
-            results.branches.find { it.branchName == 'master' }.with {
+            results.branches.find { it.branchName == 'master' }with {
                 assert type == BranchTemplateSyncType.EXISTING_INSTANCE_FROM_OTHER
-                assert message == "Branch master cannot be synchronised from template source master at template, because it is an instance of another template definition (anotherTemplate). Delete first the branch before going on."
+                assert otherTemplateName == 'anotherTemplate'
             }
         }
     }

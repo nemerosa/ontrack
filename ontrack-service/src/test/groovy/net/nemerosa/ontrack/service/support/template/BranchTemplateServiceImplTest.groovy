@@ -30,7 +30,7 @@ class BranchTemplateServiceImplTest {
                 securityService,
                 branchTemplateRepository,
                 expressionEngine,
-                copyService,
+                copyService, eventPostService, eventFactory,
                 templateSynchronisationService
         )
     }

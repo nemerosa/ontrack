@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.service.support.template;
 
+import net.nemerosa.ontrack.model.events.EventFactory;
+import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.exceptions.*;
 import net.nemerosa.ontrack.model.job.*;
 import net.nemerosa.ontrack.model.security.BranchTemplateMgt;
@@ -30,15 +32,19 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
     private final BranchTemplateRepository branchTemplateRepository;
     private final ExpressionEngine expressionEngine;
     private final CopyService copyService;
+    private final EventPostService eventPostService;
+    private final EventFactory eventFactory;
     private final TemplateSynchronisationService templateSynchronisationService;
 
     @Autowired
-    public BranchTemplateServiceImpl(StructureService structureService, SecurityService securityService, BranchTemplateRepository branchTemplateRepository, ExpressionEngine expressionEngine, CopyService copyService, TemplateSynchronisationService templateSynchronisationService) {
+    public BranchTemplateServiceImpl(StructureService structureService, SecurityService securityService, BranchTemplateRepository branchTemplateRepository, ExpressionEngine expressionEngine, CopyService copyService, EventPostService eventPostService, EventFactory eventFactory, TemplateSynchronisationService templateSynchronisationService) {
         this.structureService = structureService;
         this.securityService = securityService;
         this.branchTemplateRepository = branchTemplateRepository;
         this.expressionEngine = expressionEngine;
         this.copyService = copyService;
+        this.eventPostService = eventPostService;
+        this.eventFactory = eventFactory;
         this.templateSynchronisationService = templateSynchronisationService;
     }
 
@@ -287,7 +293,21 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
         // Getting the list of names
         List<String> sourceNames = templateSynchronisationSource.getBranchNames(templateBranch, config);
         // Sync on those names
-        return syncTemplateDefinition(templateBranch, templateDefinition, sourceNames, info);
+        BranchTemplateSyncResults results = syncTemplateDefinition(templateBranch, templateDefinition, sourceNames, info);
+        // Reporting
+        syncReport(templateBranch, results);
+        // OK
+        return results;
+    }
+
+    private void syncReport(Branch templateBranch, BranchTemplateSyncResults results) {
+        for (BranchTemplateSyncResult result : results.getBranches()) {
+            syncReport(templateBranch, result);
+        }
+    }
+
+    private void syncReport(Branch templateBranch, BranchTemplateSyncResult result) {
+        eventPostService.post(result.event(structureService, templateBranch));
     }
 
     protected BranchTemplateSyncResults syncTemplateDefinition(
@@ -325,35 +345,16 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
 
     protected BranchTemplateSyncResult applyMissingPolicy(Branch branch, TemplateSynchronisationAbsencePolicy absencePolicy) {
         if (branch.isDisabled()) {
-            return new BranchTemplateSyncResult(
-                    branch.getName(),
-                    BranchTemplateSyncType.IGNORED,
-                    String.format(
-                            "Branch %s has been ignored by the synchronisation.",
-                            branch.getName()
-                    )
-            );
+            return BranchTemplateSyncResult.ignored(branch.getName());
         } else {
             switch (absencePolicy) {
                 case DELETE:
                     structureService.deleteBranch(branch.getId());
-                    return new BranchTemplateSyncResult(
-                            branch.getName(),
-                            BranchTemplateSyncType.DELETED,
-                            String.format(
-                                    "Branch %s has been deleted because the synchronisation template does not contain its name any longer",
-                                    branch.getName()
-                            ));
+                    return BranchTemplateSyncResult.deleted(branch.getName());
                 case DISABLE:
                 default:
                     structureService.saveBranch(branch.withDisabled(true));
-                    return new BranchTemplateSyncResult(
-                            branch.getName(),
-                            BranchTemplateSyncType.DISABLED,
-                            String.format(
-                                    "Branch %s has been disabled because the synchronisation template does not contain its name any longer",
-                                    branch.getName()
-                            ));
+                    return BranchTemplateSyncResult.disabled(branch.getName());
             }
         }
     }
@@ -369,43 +370,16 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
         // If it exists, we need to update it
         if (targetBranch.isPresent()) {
             if (targetBranch.get().getType() == BranchType.CLASSIC) {
-                return new BranchTemplateSyncResult(
-                        branchName,
-                        BranchTemplateSyncType.EXISTING_CLASSIC,
-                        String.format(
-                                "Branch %s cannot be synchronised from template source %s at %s, because it already exists. " +
-                                        "Delete first the branch before going on.",
-                                branchName,
-                                sourceName,
-                                templateBranch.getName()
-                        )
-                );
+                return BranchTemplateSyncResult.existingClassic(branchName, sourceName);
             } else if (targetBranch.get().getType() == BranchType.TEMPLATE_DEFINITION) {
-                return new BranchTemplateSyncResult(
-                        branchName,
-                        BranchTemplateSyncType.EXISTING_DEFINITION,
-                        String.format(
-                                "Branch %s cannot be synchronised from template source %s at %s, because it is itself a template definition. " +
-                                        "Delete first the branch before going on.",
-                                branchName,
-                                sourceName,
-                                templateBranch.getName()
-                        )
-                );
+                return BranchTemplateSyncResult.existingDefinition(branchName, sourceName);
             } else {
                 Optional<TemplateInstance> existingTemplateInstance = branchTemplateRepository.getTemplateInstance(targetBranch.get().getId());
                 if (existingTemplateInstance.isPresent() && !existingTemplateInstance.get().getTemplateDefinitionId().equals(templateBranch.getId())) {
-                    return new BranchTemplateSyncResult(
+                    return BranchTemplateSyncResult.existingInstanceFromOther(
                             branchName,
-                            BranchTemplateSyncType.EXISTING_INSTANCE_FROM_OTHER,
-                            String.format(
-                                    "Branch %s cannot be synchronised from template source %s at %s, because it is an instance of another template definition (%s). " +
-                                            "Delete first the branch before going on.",
-                                    branchName,
-                                    sourceName,
-                                    templateBranch.getName(),
-                                    structureService.getBranch(existingTemplateInstance.get().getTemplateDefinitionId()).getName()
-                            )
+                            sourceName,
+                            structureService.getBranch(existingTemplateInstance.get().getTemplateDefinitionId()).getName()
                     );
                 } else {
                     info.post(format("%s exists - updating", branchName));
@@ -415,15 +389,9 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
                             templateBranch,
                             templateDefinition
                     );
-                    return new BranchTemplateSyncResult(
+                    return BranchTemplateSyncResult.updated(
                             branchName,
-                            BranchTemplateSyncType.UPDATED,
-                            String.format(
-                                    "Branch %s has been updated from synchronisation template source %s at %s",
-                                    branchName,
-                                    sourceName,
-                                    templateBranch.getName()
-                            )
+                            sourceName
                     );
                 }
             }
@@ -438,15 +406,10 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
                     templateBranch,
                     templateDefinition
             );
-            return new BranchTemplateSyncResult(
+            return BranchTemplateSyncResult.created(
                     branchName,
-                    BranchTemplateSyncType.CREATED,
-                    String.format(
-                            "Branch %s has been created from synchronisation template source %s at %s",
-                            branchName,
-                            sourceName,
-                            templateBranch.getName()
-                    ));
+                    sourceName
+            );
         }
     }
 }
