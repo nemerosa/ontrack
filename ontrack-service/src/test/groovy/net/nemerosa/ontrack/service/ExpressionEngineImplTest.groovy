@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.model.structure.ExpressionEngine
+import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.junit.Test
 
 class ExpressionEngineImplTest {
@@ -30,6 +31,11 @@ class ExpressionEngineImplTest {
     @Test
     void 'Uppercase expression'() {
         assert engine.render('${branchName.toUpperCase()}', [branchName: 'ontrack-xx']) == 'ONTRACK-XX'
+    }
+
+    @Test(expected = MultipleCompilationErrorsException)
+    void 'Secure resolve: no closure'() {
+        engine.resolve('branchName + { "test" }', [branchName: 'test'])
     }
 
 }
