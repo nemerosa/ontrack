@@ -59,18 +59,18 @@ public interface EventFactory {
     );
     EventType SYNC_EXISTING_CLASSIC = SimpleEventType.of(
             "sync_existing_classic",
-            "Branch ${BRANCH} cannot be synchronised with template ${:template} using source {:source} " +
+            "Branch ${BRANCH} cannot be synchronised with template ${:template} using source ${:source} " +
                     "since it already exists. Either delete this branch or exclude it from the sources."
     );
     EventType SYNC_EXISTING_DEFINITION = SimpleEventType.of(
             "sync_existing_definition",
-            "Branch ${BRANCH} cannot be synchronised with template ${:template} using source {:source} " +
+            "Branch ${BRANCH} cannot be synchronised with template ${:template} using source ${:source} " +
                     "since it is a template definition itself. Either delete this branch or exclude " +
                     "it from the sources."
     );
     EventType SYNC_EXISTING_INSTANCE_FROM_OTHER = SimpleEventType.of(
             "sync_existing_instance_from_other",
-            "Branch ${BRANCH} cannot be synchronised with template ${:template} using source {:source} " +
+            "Branch ${BRANCH} cannot be synchronised with template ${:template} using source ${:source} " +
                     "since it already an instance from the ${:otherTemplate} template. Either delete " +
                     "this branch or exclude it from the sources."
     );
