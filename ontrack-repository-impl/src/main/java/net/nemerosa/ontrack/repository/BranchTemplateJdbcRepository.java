@@ -131,6 +131,18 @@ public class BranchTemplateJdbcRepository extends AbstractJdbcRepository impleme
     }
 
     @Override
+    public Collection<BranchTemplateInstance> getTemplateInstancesForDefinition(ID templateDefinitionId) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT * FROM BRANCH_TEMPLATE_INSTANCES WHERE TEMPLATEBRANCHID = :templateDefinitionId",
+                params("templateDefinitionId", templateDefinitionId.get()),
+                (rs, num) -> new BranchTemplateInstance(
+                        id(rs, "BRANCHID"),
+                        toTemplateInstance(rs)
+                )
+        );
+    }
+
+    @Override
     public void setTemplateInstance(ID branchId, TemplateInstance templateInstance) {
         // Deletes previous value
         getNamedParameterJdbcTemplate().update(

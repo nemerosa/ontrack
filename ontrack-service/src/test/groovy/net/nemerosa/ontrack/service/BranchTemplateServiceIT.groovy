@@ -308,6 +308,55 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
 
     }
 
+    @Test
+    void 'Sync - missing branches - disabled'() {
+        // Creating the template with all branches
+        Branch template = createBranchTemplateDefinition(BRANCHES)
+        asUser().with(template, BranchTemplateMgt).call {
+            // Launching synchronisation, once
+            templateService.sync(template.id)
+            // Updates the sync template
+            templateService.setTemplateDefinition(template.id, createTemplateDefinition(
+                    BRANCHES - 'feature/22',
+                    TemplateSynchronisationAbsencePolicy.DISABLE
+            ))
+            // Relaunching sync. with one existing branch outside of the sync.
+            def results = templateService.sync(template.id)
+            assert results.branches.size() == 3
+            assert results.branches.find {it.branchName == 'feature_19'}.type == BranchTemplateSyncType.UPDATED
+            assert results.branches.find {it.branchName == 'feature_22'}.type == BranchTemplateSyncType.DISABLED
+            assert results.branches.find {it.branchName == 'master'}.type == BranchTemplateSyncType.UPDATED
+            // Checks the branch has been disabled
+            assert structureService.findBranchByName(template.project.name, 'feature_22').present
+            assert structureService.findBranchByName(template.project.name, 'feature_22').get().disabled
+        }
+
+    }
+
+    @Test
+    void 'Sync - missing branches - deleted'() {
+        // Creating the template with all branches
+        Branch template = createBranchTemplateDefinition(BRANCHES)
+        asUser().with(template, BranchTemplateMgt).call {
+            // Launching synchronisation, once
+            templateService.sync(template.id)
+            // Updates the sync template
+            templateService.setTemplateDefinition(template.id, createTemplateDefinition(
+                    BRANCHES - 'feature/22',
+                    TemplateSynchronisationAbsencePolicy.DELETE
+            ))
+            // Relaunching sync. with one existing branch outside of the sync.
+            def results = templateService.sync(template.id)
+            assert results.branches.size() == 3
+            assert results.branches.find {it.branchName == 'feature_19'}.type == BranchTemplateSyncType.UPDATED
+            assert results.branches.find {it.branchName == 'feature_22'}.type == BranchTemplateSyncType.DELETED
+            assert results.branches.find {it.branchName == 'master'}.type == BranchTemplateSyncType.UPDATED
+            // Checks the branch has been disabled
+            assert !structureService.findBranchByName(template.project.name, 'feature_22').present
+        }
+
+    }
+
     protected void checkBranchTemplateInstance(Branch instance) {
         checkBranchTemplateInstance(instance, 'INSTANCE')
     }
@@ -343,10 +392,18 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
     }
 
     protected Branch createBranchTemplateDefinition() {
-        createBranchTemplateDefinition(doCreateProject(), 'template')
+        createBranchTemplateDefinition(doCreateProject(), 'template', BRANCHES)
+    }
+
+    protected Branch createBranchTemplateDefinition(Collection<String> sourceNames) {
+        createBranchTemplateDefinition(doCreateProject(), 'template', sourceNames)
     }
 
     protected Branch createBranchTemplateDefinition(Project project, String templateName) {
+        createBranchTemplateDefinition(project, templateName, BRANCHES)
+    }
+
+    protected Branch createBranchTemplateDefinition(Project project, String templateName, Collection<String> sourceNames) {
         // Creates the base branch
         Branch templateBranch = doCreateBranch(
                 project,
@@ -389,6 +446,15 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
         }
 
         // Template definition
+        TemplateDefinition templateDefinition = createTemplateDefinition(sourceNames, TemplateSynchronisationAbsencePolicy.DELETE)
+        // Saves the template
+        templateBranch = asUser().with(templateBranch, BranchTemplateMgt).call {
+            templateService.setTemplateDefinition(templateBranch.id, templateDefinition)
+        }
+        templateBranch
+    }
+
+    protected static TemplateDefinition createTemplateDefinition(Collection<String> sourceNames, TemplateSynchronisationAbsencePolicy absencePolicy) {
         TemplateDefinition templateDefinition = new TemplateDefinition(
                 [
                         new TemplateParameter(
@@ -405,17 +471,13 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
                 new ServiceConfiguration(
                         FixedListTemplateSynchronisationSource.ID,
                         JsonUtils.object()
-                                .with("names", JsonUtils.stringArray(BRANCHES))
+                                .with("names", JsonUtils.stringArray(sourceNames))
                                 .end()
                 ),
-                TemplateSynchronisationAbsencePolicy.DELETE,
+                absencePolicy,
                 10
         )
-        // Saves the template
-        templateBranch = asUser().with(templateBranch, BranchTemplateMgt).call {
-            templateService.setTemplateDefinition(templateBranch.id, templateDefinition)
-        }
-        templateBranch
+        templateDefinition
     }
 
 }

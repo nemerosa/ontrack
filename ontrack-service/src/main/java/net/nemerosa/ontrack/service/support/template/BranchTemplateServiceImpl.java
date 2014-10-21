@@ -296,13 +296,46 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
             List<String> sourceNames,
             JobInfoListener info) {
         BranchTemplateSyncResults results = new BranchTemplateSyncResults();
-        // Sync for each branch
+        // Sync for each branch in the source names
+        List<String> branchNames = new ArrayList<>();
         for (String sourceName : sourceNames) {
             BranchTemplateSyncResult result = syncTemplateDefinition(templateBranch, templateDefinition, sourceName, info);
+            branchNames.add(result.getBranchName());
             results.addResult(result);
+        }
+        // Management of missing branches
+        List<String> allInstanceNames = branchTemplateRepository.getTemplateInstancesForDefinition(templateBranch.getId()).stream()
+                .map(id -> structureService.getBranch(id.getBranchId()).getName())
+                .collect(Collectors.toList());
+        // Missing branches in the sources
+        List<String> missingBranches = new ArrayList<>(allInstanceNames);
+        missingBranches.removeAll(branchNames);
+        // For each missing branch, applies the policy
+        for (String missingBranchName : missingBranches) {
+            results.addResult(
+                    new BranchTemplateSyncResult(
+                            missingBranchName,
+                            applyMissingPolicy(
+                                    structureService.findBranchByName(templateBranch.getProject().getName(), missingBranchName).get(),
+                                    templateDefinition.getAbsencePolicy()
+                            )
+                    )
+            );
         }
         // OK
         return results;
+    }
+
+    protected BranchTemplateSyncType applyMissingPolicy(Branch branch, TemplateSynchronisationAbsencePolicy absencePolicy) {
+        switch (absencePolicy) {
+            case DELETE:
+                structureService.deleteBranch(branch.getId());
+                return BranchTemplateSyncType.DELETED;
+            case DISABLE:
+            default:
+                structureService.saveBranch(branch.withDisabled(true));
+                return BranchTemplateSyncType.DISABLED;
+        }
     }
 
     protected BranchTemplateSyncResult syncTemplateDefinition(Branch templateBranch, TemplateDefinition templateDefinition, String sourceName, JobInfoListener info) {
