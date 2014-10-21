@@ -42,19 +42,19 @@ public interface EventFactory {
 
     EventType SYNC_CREATED = SimpleEventType.of(
             "sync_created",
-            "Branch ${BRANCH} has been created from template ${:template} using source ${:source}."
+            "Branch ${BRANCH} has been created from template ${:template} using source ${:source} upon synchronisation."
     );
     EventType SYNC_UPDATED = SimpleEventType.of(
             "sync_updated",
-            "Branch ${BRANCH} has been updated from template ${:template} using source ${:source}."
+            "Branch ${BRANCH} has been updated from template ${:template} using source ${:source} upon synchronisation."
     );
     EventType SYNC_DELETED = SimpleEventType.of(
             "sync_deleted",
-            "Branch ${:branch} has been deleted because it is no longer in sources of template ${:template}."
+            "Branch ${:branch} has been deleted upon synchronisation because it is no longer in sources of template ${:template}."
     );
     EventType SYNC_IGNORED = SimpleEventType.of(
             "sync_ignored",
-            "Branch ${BRANCH} has been ignored because it has already been disabled. You should " +
+            "Branch ${BRANCH} has been ignored upon synchronisation because it has already been disabled. You should " +
                     "delete this branch or exclude it from the sources of the ${:template} template."
     );
     EventType SYNC_EXISTING_CLASSIC = SimpleEventType.of(
@@ -76,7 +76,7 @@ public interface EventFactory {
     );
     EventType SYNC_DISABLED = SimpleEventType.of(
             "sync_disabled",
-            "Branch ${BRANCH} has been disabled because it is no longer in sources of template ${:template}. " +
+            "Branch ${BRANCH} has been disabled upon synchronisation because it is no longer in sources of template ${:template}. " +
                     "It should either be deleted or excluded from the sources of the template."
     );
 
