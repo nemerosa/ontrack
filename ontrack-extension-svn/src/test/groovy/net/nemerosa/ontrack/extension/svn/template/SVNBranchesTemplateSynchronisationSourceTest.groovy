@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.svn.SVNExtensionFeature
 import net.nemerosa.ontrack.extension.svn.service.SVNService
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.tx.TransactionService
 import org.junit.Before
 import org.junit.Test
 
@@ -25,10 +26,12 @@ class SVNBranchesTemplateSynchronisationSourceTest {
         branch = Branch.of(Project.of(nd('P', "Project")), nd('B', "Branch"))
         extensionManager = mock(ExtensionManager)
         svnService = mock(SVNService)
+        TransactionService transactionService = mock(TransactionService)
         source = new SVNBranchesTemplateSynchronisationSource(
                 extensionFeature,
                 extensionManager,
-                svnService, transactionService
+                svnService,
+                transactionService
         )
     }
 
