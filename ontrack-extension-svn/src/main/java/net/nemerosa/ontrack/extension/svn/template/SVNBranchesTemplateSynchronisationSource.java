@@ -6,12 +6,13 @@ import net.nemerosa.ontrack.extension.svn.service.SVNService;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.support.AbstractTemplateSynchronisationSource;
+import net.nemerosa.ontrack.tx.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Component
 public class SVNBranchesTemplateSynchronisationSource extends AbstractTemplateSynchronisationSource<SVNBranchesTemplateSynchronisationSourceConfig> {
@@ -19,13 +20,15 @@ public class SVNBranchesTemplateSynchronisationSource extends AbstractTemplateSy
     private final SVNExtensionFeature svnExtensionFeature;
     private final ExtensionManager extensionManager;
     private final SVNService svnService;
+    private final TransactionService transactionService;
 
     @Autowired
-    public SVNBranchesTemplateSynchronisationSource(SVNExtensionFeature svnExtensionFeature, ExtensionManager extensionManager, SVNService svnService) {
+    public SVNBranchesTemplateSynchronisationSource(SVNExtensionFeature svnExtensionFeature, ExtensionManager extensionManager, SVNService svnService, TransactionService transactionService) {
         super(SVNBranchesTemplateSynchronisationSourceConfig.class);
         this.svnExtensionFeature = svnExtensionFeature;
         this.extensionManager = extensionManager;
         this.svnService = svnService;
+        this.transactionService = transactionService;
     }
 
     @Override
@@ -51,16 +54,16 @@ public class SVNBranchesTemplateSynchronisationSource extends AbstractTemplateSy
 
     @Override
     public List<String> getBranchNames(Branch branch, SVNBranchesTemplateSynchronisationSourceConfig config) {
-        // TODO Gets the SVN configuration
-        // GitConfiguration gitConfiguration = gitService.getBranchConfiguration(branch);
-        // Inclusion predicate
-        Predicate<String> filter = config.getFilter();
-        // TODO Gets the list of branches
-//        return gitService.getRemoteBranches(gitConfiguration).stream()
-//                .filter(filter)
-//                .sorted()
-//                .collect(Collectors.toList());
-        return Collections.emptyList();
+        return transactionService.doInTransaction(() -> {
+                    // Inclusion predicate
+                    Predicate<String> filter = config.getFilter();
+                    // Gets the list of branches
+                    return svnService.getBranches(branch).stream()
+                            .filter(filter)
+                            .sorted()
+                            .collect(Collectors.toList());
+                }
+        );
     }
 
 }

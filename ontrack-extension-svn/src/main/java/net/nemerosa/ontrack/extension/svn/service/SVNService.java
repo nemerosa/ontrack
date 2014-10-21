@@ -79,4 +79,9 @@ public interface SVNService {
      * Gets the configuration for a branch
      */
     Optional<SVNRepository> getSVNRepository(Branch branch);
+
+    /**
+     * Gets the list of branches
+     */
+    List<String> getBranches(Branch branch);
 }

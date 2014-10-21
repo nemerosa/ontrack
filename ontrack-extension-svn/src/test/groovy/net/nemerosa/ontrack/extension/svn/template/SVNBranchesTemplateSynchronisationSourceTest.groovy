@@ -28,7 +28,7 @@ class SVNBranchesTemplateSynchronisationSourceTest {
         source = new SVNBranchesTemplateSynchronisationSource(
                 extensionFeature,
                 extensionManager,
-                svnService
+                svnService, transactionService
         )
     }
 

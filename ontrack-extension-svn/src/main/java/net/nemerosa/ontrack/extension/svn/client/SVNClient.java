@@ -30,4 +30,6 @@ public interface SVNClient {
     SVNHistory getHistory(SVNRepository repository, String path);
 
     List<SVNRevisionPath> getRevisionPaths(SVNRepository repository, long revision);
+
+    List<String> getBranches(SVNRepository repository, SVNURL url);
 }
