@@ -4,7 +4,6 @@ import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.form.Memo;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.support.AbstractTemplateSynchronisationSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,22 +46,7 @@ public class GitBranchesTemplateSynchronisationSource extends AbstractTemplateSy
 
     @Override
     public Form getForm(Branch branch) {
-        return Form.create()
-                .with(
-                        Memo.of("includes")
-                                .label("Includes")
-                                .optional()
-                                .help("List of branches to include - one pattern per line, where " +
-                                        "* can be used as a wildcard.")
-                )
-                .with(
-                        Memo.of("excludes")
-                                .label("Excludes")
-                                .optional()
-                                .help("List of branches to exclude - one pattern per line, where " +
-                                        "* can be used as a wildcard.")
-                )
-                ;
+        return GitBranchesTemplateSynchronisationSourceConfig.form();
     }
 
     @Override

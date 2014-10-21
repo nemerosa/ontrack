@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.scm.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.form.Memo;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
@@ -59,5 +61,24 @@ public class SCMBranchesTemplateSynchronisationSourceConfig {
         } else {
             return StringUtils.equals(pattern, name);
         }
+    }
+
+    public static Form form() {
+        return Form.create()
+                .with(
+                        Memo.of("includes")
+                                .label("Includes")
+                                .optional()
+                                .help("List of branches to include - one pattern per line, where " +
+                                        "* can be used as a wildcard.")
+                )
+                .with(
+                        Memo.of("excludes")
+                                .label("Excludes")
+                                .optional()
+                                .help("List of branches to exclude - one pattern per line, where " +
+                                        "* can be used as a wildcard.")
+                )
+                ;
     }
 }
