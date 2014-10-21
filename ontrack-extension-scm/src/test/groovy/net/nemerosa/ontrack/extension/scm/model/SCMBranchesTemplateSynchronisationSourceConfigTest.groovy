@@ -1,37 +1,34 @@
-package net.nemerosa.ontrack.extension.git
+package net.nemerosa.ontrack.extension.scm.model
 
 import org.junit.Test
 
-import static net.nemerosa.ontrack.extension.git.GitBranchesTemplateSynchronisationSourceConfig.matches
-import static net.nemerosa.ontrack.extension.git.GitBranchesTemplateSynchronisationSourceConfig.parse
-
-class GitBranchesTemplateSynchronisationSourceConfigTest {
+class SCMBranchesTemplateSynchronisationSourceConfigTest {
 
     @Test
     void 'Parsing - null'() {
-        assert parse(null) == [] as Set
+        assert SCMBranchesTemplateSynchronisationSourceConfig.parse(null) == [] as Set
     }
 
     @Test
     void 'Parsing - empty'() {
-        assert parse('') == [] as Set
+        assert SCMBranchesTemplateSynchronisationSourceConfig.parse('') == [] as Set
     }
 
     @Test
     void 'Parsing - *'() {
-        assert parse('*') == ['*'] as Set
+        assert SCMBranchesTemplateSynchronisationSourceConfig.parse('*') == ['*'] as Set
     }
 
     @Test
     void 'Parsing - several lines'() {
-        assert parse("""\
+        assert SCMBranchesTemplateSynchronisationSourceConfig.parse("""\
 master
 feature/*""") == ['master', 'feature/*'] as Set
     }
 
     @Test
     void 'Parsing - several lines and comments'() {
-        assert parse("""\
+        assert SCMBranchesTemplateSynchronisationSourceConfig.parse("""\
 master
 # All features
 feature/*""") == ['master', 'feature/*'] as Set
@@ -39,42 +36,42 @@ feature/*""") == ['master', 'feature/*'] as Set
 
     @Test
     void 'Matches - empty means all'() {
-        assert matches([] as Set, 'any', true)
+        assert SCMBranchesTemplateSynchronisationSourceConfig.matches([] as Set, 'any', true)
     }
 
     @Test
     void 'Matches - empty means none'() {
-        assert !matches([] as Set, 'any', false)
+        assert !SCMBranchesTemplateSynchronisationSourceConfig.matches([] as Set, 'any', false)
     }
 
     @Test
     void 'Matches - *'() {
-        assert matches(['*'] as Set, 'any', false)
+        assert SCMBranchesTemplateSynchronisationSourceConfig.matches(['*'] as Set, 'any', false)
     }
 
     @Test
     void 'Matches - exact'() {
-        assert matches(['master'] as Set, 'master', false)
-        assert !matches(['master'] as Set, 'master2', false)
+        assert SCMBranchesTemplateSynchronisationSourceConfig.matches(['master'] as Set, 'master', false)
+        assert !SCMBranchesTemplateSynchronisationSourceConfig.matches(['master'] as Set, 'master2', false)
     }
 
     @Test
     void 'Matches - pattern'() {
-        assert matches(['master*'] as Set, 'master', false)
-        assert matches(['master*'] as Set, 'master2', false)
+        assert SCMBranchesTemplateSynchronisationSourceConfig.matches(['master*'] as Set, 'master', false)
+        assert SCMBranchesTemplateSynchronisationSourceConfig.matches(['master*'] as Set, 'master2', false)
     }
 
     @Test
     void 'Matches - patterns'() {
-        assert matches(['master', 'feature/*'] as Set, 'master', false)
-        assert matches(['master', 'feature/*'] as Set, 'feature/2', false)
-        assert !matches(['master', 'feature/*'] as Set, 'fix/1', false)
-        assert !matches(['master', 'feature/*'] as Set, 'feature', false)
+        assert SCMBranchesTemplateSynchronisationSourceConfig.matches(['master', 'feature/*'] as Set, 'master', false)
+        assert SCMBranchesTemplateSynchronisationSourceConfig.matches(['master', 'feature/*'] as Set, 'feature/2', false)
+        assert !SCMBranchesTemplateSynchronisationSourceConfig.matches(['master', 'feature/*'] as Set, 'fix/1', false)
+        assert !SCMBranchesTemplateSynchronisationSourceConfig.matches(['master', 'feature/*'] as Set, 'feature', false)
     }
 
     @Test
     void 'Filter - no filter'() {
-        def filter = new GitBranchesTemplateSynchronisationSourceConfig(
+        def filter = new SCMBranchesTemplateSynchronisationSourceConfig(
                 "",
                 ""
         ).filter
@@ -86,7 +83,7 @@ feature/*""") == ['master', 'feature/*'] as Set
 
     @Test
     void 'Filter - includes all'() {
-        def filter = new GitBranchesTemplateSynchronisationSourceConfig(
+        def filter = new SCMBranchesTemplateSynchronisationSourceConfig(
                 "*",
                 ""
         ).filter
@@ -98,7 +95,7 @@ feature/*""") == ['master', 'feature/*'] as Set
 
     @Test
     void 'Filter - exclude master'() {
-        def filter = new GitBranchesTemplateSynchronisationSourceConfig(
+        def filter = new SCMBranchesTemplateSynchronisationSourceConfig(
                 "",
                 "master"
         ).filter
@@ -110,7 +107,7 @@ feature/*""") == ['master', 'feature/*'] as Set
 
     @Test
     void 'Filter - include only'() {
-        def filter = new GitBranchesTemplateSynchronisationSourceConfig(
+        def filter = new SCMBranchesTemplateSynchronisationSourceConfig(
                 "fix/*",
                 ""
         ).filter
@@ -122,7 +119,7 @@ feature/*""") == ['master', 'feature/*'] as Set
 
     @Test
     void 'Filter - include/exclude'() {
-        def filter = new GitBranchesTemplateSynchronisationSourceConfig(
+        def filter = new SCMBranchesTemplateSynchronisationSourceConfig(
                 "feature/*",
                 "*templating"
         ).filter
