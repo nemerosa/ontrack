@@ -41,8 +41,7 @@ public class SVNBranchesTemplateSynchronisationSource extends AbstractTemplateSy
     @Override
     public boolean isApplicable(Branch branch) {
         return extensionManager.isExtensionFeatureEnabled(svnExtensionFeature)
-                // TODO Branch configured for SVN?
-                ;
+                && svnService.getSVNRepository(branch).isPresent();
     }
 
     @Override
