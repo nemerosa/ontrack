@@ -207,6 +207,7 @@ angular.module('ot.service.core', [
          * @param config.promptMessage Optional. If set, the task won't start before the user has confirmed.
          * @param config.waitingMessage Message to display during the execution of the task
          * @param config.endMessage Message to display when task has been completed successfully
+         * @param config.resultUri Optional. If set, includes a template with <code>result</code> as root object.
          * @param config.task Function that must return a promise for the execution of the task
          */
         self.displayProgressDialog = function (config) {

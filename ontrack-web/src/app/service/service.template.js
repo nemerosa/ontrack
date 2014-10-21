@@ -31,6 +31,7 @@ angular.module('ot.service.template', [
                     "instances. Do you want to continue?",
                 waitingMessage: "Synchronising the template...",
                 endMessage: "Synchronisation has been done.",
+                resultUri: 'app/service/service.template.syncResult.tpl.html',
                 task: function() {
                     return ot.call($http.post(templateSyncUri));
                 }

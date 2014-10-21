@@ -15,6 +15,9 @@
         {{config.endMessage}}
     </div>
 
+    <div ng-if="state == 'done' && config.resultUri" ng-include="config.resultUri">
+    </div>
+
     <div class="ot-alert-{{message.type}} alert-dismissable" ng-if="message">
         <span>{{message.content}}</span>
     </div>
