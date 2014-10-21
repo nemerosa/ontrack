@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.service.support.template;
 
-import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.exceptions.*;
 import net.nemerosa.ontrack.model.job.*;
@@ -33,18 +32,16 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
     private final ExpressionEngine expressionEngine;
     private final CopyService copyService;
     private final EventPostService eventPostService;
-    private final EventFactory eventFactory;
     private final TemplateSynchronisationService templateSynchronisationService;
 
     @Autowired
-    public BranchTemplateServiceImpl(StructureService structureService, SecurityService securityService, BranchTemplateRepository branchTemplateRepository, ExpressionEngine expressionEngine, CopyService copyService, EventPostService eventPostService, EventFactory eventFactory, TemplateSynchronisationService templateSynchronisationService) {
+    public BranchTemplateServiceImpl(StructureService structureService, SecurityService securityService, BranchTemplateRepository branchTemplateRepository, ExpressionEngine expressionEngine, CopyService copyService, EventPostService eventPostService, TemplateSynchronisationService templateSynchronisationService) {
         this.structureService = structureService;
         this.securityService = securityService;
         this.branchTemplateRepository = branchTemplateRepository;
         this.expressionEngine = expressionEngine;
         this.copyService = copyService;
         this.eventPostService = eventPostService;
-        this.eventFactory = eventFactory;
         this.templateSynchronisationService = templateSynchronisationService;
     }
 
@@ -68,7 +65,6 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
         if (buildCount > 0) {
             throw new BranchTemplateHasBuildException(branch.getName());
         }
-        // TODO In case of updates, checks for impact on the instances
         // Saves the definition
         branchTemplateRepository.setTemplateDefinition(branchId, templateDefinition);
         // Reloads the branch

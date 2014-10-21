@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.support.template
 
 import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.model.events.EventPostService
 import net.nemerosa.ontrack.model.exceptions.BranchTemplateHasBuildException
 import net.nemerosa.ontrack.model.exceptions.BranchTemplateInstanceException
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -25,12 +26,14 @@ class BranchTemplateServiceImplTest {
         ExpressionEngine expressionEngine = mock(ExpressionEngine)
         CopyService copyService = mock(CopyService)
         TemplateSynchronisationService templateSynchronisationService = mock(TemplateSynchronisationService)
+        EventPostService eventPostService = mock(EventPostService)
         this.service = new BranchTemplateServiceImpl(
                 structureService,
                 securityService,
                 branchTemplateRepository,
                 expressionEngine,
-                copyService, eventPostService, eventFactory,
+                copyService,
+                eventPostService,
                 templateSynchronisationService
         )
     }
