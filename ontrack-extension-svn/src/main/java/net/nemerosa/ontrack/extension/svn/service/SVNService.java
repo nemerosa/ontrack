@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.svn.service;
 
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.model.*;
+import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ID;
 
 import java.util.List;
@@ -73,4 +74,9 @@ public interface SVNService {
      * @return Information
      */
     SVNSyncInfo getSyncInfo(ID branchId);
+
+    /**
+     * Gets the configuration for a branch
+     */
+    Optional<SVNRepository> getSVNRepository(Branch branch);
 }

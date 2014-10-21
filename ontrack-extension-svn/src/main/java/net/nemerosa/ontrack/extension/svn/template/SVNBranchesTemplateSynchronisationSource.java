@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.svn.template;
 
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.extension.svn.SVNExtensionFeature;
+import net.nemerosa.ontrack.extension.svn.service.SVNService;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.support.AbstractTemplateSynchronisationSource;
@@ -17,12 +18,14 @@ public class SVNBranchesTemplateSynchronisationSource extends AbstractTemplateSy
 
     private final SVNExtensionFeature svnExtensionFeature;
     private final ExtensionManager extensionManager;
+    private final SVNService svnService;
 
     @Autowired
-    public SVNBranchesTemplateSynchronisationSource(SVNExtensionFeature svnExtensionFeature, ExtensionManager extensionManager) {
+    public SVNBranchesTemplateSynchronisationSource(SVNExtensionFeature svnExtensionFeature, ExtensionManager extensionManager, SVNService svnService) {
         super(SVNBranchesTemplateSynchronisationSourceConfig.class);
         this.svnExtensionFeature = svnExtensionFeature;
         this.extensionManager = extensionManager;
+        this.svnService = svnService;
     }
 
     @Override

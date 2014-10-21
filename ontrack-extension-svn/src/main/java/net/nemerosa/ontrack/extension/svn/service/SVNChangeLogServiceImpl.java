@@ -13,8 +13,6 @@ import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty;
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType;
-import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationProperty;
-import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationPropertyType;
 import net.nemerosa.ontrack.extension.svn.support.SVNLogEntryCollector;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
 import net.nemerosa.ontrack.model.structure.*;
@@ -307,18 +305,11 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
         }
     }
 
-    protected SVNRepository getSVNRepository(Branch branch) {
-        // Gets the SVN project configuration property
-        Property<SVNProjectConfigurationProperty> projectConfiguration = propertyService.getProperty(
-                branch.getProject(),
-                SVNProjectConfigurationPropertyType.class
-        );
-        if (projectConfiguration.isEmpty()) {
-            throw new MissingSVNProjectConfigurationException(branch.getProject().getName());
-        } else {
-            SVNConfiguration configuration = projectConfiguration.getValue().getConfiguration();
-            return svnService.getRepository(configuration.getName());
-        }
+    public SVNRepository getSVNRepository(Branch branch) {
+        return svnService.getSVNRepository(branch)
+                .orElseThrow(() ->
+                                new MissingSVNProjectConfigurationException(branch.getProject().getName())
+                );
     }
 
 }

@@ -236,6 +236,23 @@ public class SVNServiceImpl implements SVNService {
         );
     }
 
+    @Override
+    public Optional<SVNRepository> getSVNRepository(Branch branch) {
+        // Gets the SVN project configuration property
+        Property<SVNProjectConfigurationProperty> projectConfiguration = propertyService.getProperty(
+                branch.getProject(),
+                SVNProjectConfigurationPropertyType.class
+        );
+        if (projectConfiguration.isEmpty()) {
+            return Optional.empty();
+        } else {
+            SVNConfiguration configuration = projectConfiguration.getValue().getConfiguration();
+            return Optional.of(
+                    getRepository(configuration.getName())
+            );
+        }
+    }
+
     private Optional<Build> lookupBuild(SVNLocation location, SVNLocation firstCopy, Branch branch) {
         // Gets the SVN configuration for the branch
         Property<SVNBranchConfigurationProperty> configurationProperty = propertyService.getProperty(branch, SVNBranchConfigurationPropertyType.class);
