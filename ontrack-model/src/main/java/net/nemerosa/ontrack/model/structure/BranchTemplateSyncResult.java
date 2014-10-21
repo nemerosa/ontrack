@@ -7,5 +7,6 @@ public class BranchTemplateSyncResult {
 
     private final String branchName;
     private final BranchTemplateSyncType type;
+    private final String message;
 
 }

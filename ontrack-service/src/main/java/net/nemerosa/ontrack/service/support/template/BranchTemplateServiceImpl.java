@@ -313,12 +313,9 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
         // For each missing branch, applies the policy
         for (String missingBranchName : missingBranches) {
             results.addResult(
-                    new BranchTemplateSyncResult(
-                            missingBranchName,
-                            applyMissingPolicy(
-                                    structureService.findBranchByName(templateBranch.getProject().getName(), missingBranchName).get(),
-                                    templateDefinition.getAbsencePolicy()
-                            )
+                    applyMissingPolicy(
+                            structureService.findBranchByName(templateBranch.getProject().getName(), missingBranchName).get(),
+                            templateDefinition.getAbsencePolicy()
                     )
             );
         }
@@ -326,15 +323,38 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
         return results;
     }
 
-    protected BranchTemplateSyncType applyMissingPolicy(Branch branch, TemplateSynchronisationAbsencePolicy absencePolicy) {
-        switch (absencePolicy) {
-            case DELETE:
-                structureService.deleteBranch(branch.getId());
-                return BranchTemplateSyncType.DELETED;
-            case DISABLE:
-            default:
-                structureService.saveBranch(branch.withDisabled(true));
-                return BranchTemplateSyncType.DISABLED;
+    protected BranchTemplateSyncResult applyMissingPolicy(Branch branch, TemplateSynchronisationAbsencePolicy absencePolicy) {
+        if (branch.isDisabled()) {
+            return new BranchTemplateSyncResult(
+                    branch.getName(),
+                    BranchTemplateSyncType.IGNORED,
+                    String.format(
+                            "Branch %s has been ignored by the synchronisation.",
+                            branch.getName()
+                    )
+            );
+        } else {
+            switch (absencePolicy) {
+                case DELETE:
+                    structureService.deleteBranch(branch.getId());
+                    return new BranchTemplateSyncResult(
+                            branch.getName(),
+                            BranchTemplateSyncType.DELETED,
+                            String.format(
+                                    "Branch %s has been deleted because the synchronisation template does not contain its name any longer",
+                                    branch.getName()
+                            ));
+                case DISABLE:
+                default:
+                    structureService.saveBranch(branch.withDisabled(true));
+                    return new BranchTemplateSyncResult(
+                            branch.getName(),
+                            BranchTemplateSyncType.DISABLED,
+                            String.format(
+                                    "Branch %s has been disabled because the synchronisation template does not contain its name any longer",
+                                    branch.getName()
+                            ));
+            }
         }
     }
 
@@ -348,14 +368,65 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
                 branchName);
         // If it exists, we need to update it
         if (targetBranch.isPresent()) {
-            info.post(format("%s exists - updating", branchName));
-            updateTemplateInstance(
-                    sourceName,
-                    targetBranch.get(),
-                    templateBranch,
-                    templateDefinition
-            );
-            return new BranchTemplateSyncResult(branchName, BranchTemplateSyncType.UPDATED);
+            if (targetBranch.get().getType() == BranchType.CLASSIC) {
+                return new BranchTemplateSyncResult(
+                        branchName,
+                        BranchTemplateSyncType.EXISTING_CLASSIC,
+                        String.format(
+                                "Branch %s cannot be synchronised from template source %s at %s, because it already exists. " +
+                                        "Delete first the branch before going on.",
+                                branchName,
+                                sourceName,
+                                templateBranch.getName()
+                        )
+                );
+            } else if (targetBranch.get().getType() == BranchType.TEMPLATE_DEFINITION) {
+                return new BranchTemplateSyncResult(
+                        branchName,
+                        BranchTemplateSyncType.EXISTING_DEFINITION,
+                        String.format(
+                                "Branch %s cannot be synchronised from template source %s at %s, because it is itself a template definition. " +
+                                        "Delete first the branch before going on.",
+                                branchName,
+                                sourceName,
+                                templateBranch.getName()
+                        )
+                );
+            } else {
+                Optional<TemplateInstance> existingTemplateInstance = branchTemplateRepository.getTemplateInstance(targetBranch.get().getId());
+                if (existingTemplateInstance.isPresent() && !existingTemplateInstance.get().getTemplateDefinitionId().equals(templateBranch.getId())) {
+                    return new BranchTemplateSyncResult(
+                            branchName,
+                            BranchTemplateSyncType.EXISTING_INSTANCE_FROM_OTHER,
+                            String.format(
+                                    "Branch %s cannot be synchronised from template source %s at %s, because it is an instance of another template definition (%s). " +
+                                            "Delete first the branch before going on.",
+                                    branchName,
+                                    sourceName,
+                                    templateBranch.getName(),
+                                    structureService.getBranch(existingTemplateInstance.get().getTemplateDefinitionId()).getName()
+                            )
+                    );
+                } else {
+                    info.post(format("%s exists - updating", branchName));
+                    updateTemplateInstance(
+                            sourceName,
+                            targetBranch.get(),
+                            templateBranch,
+                            templateDefinition
+                    );
+                    return new BranchTemplateSyncResult(
+                            branchName,
+                            BranchTemplateSyncType.UPDATED,
+                            String.format(
+                                    "Branch %s has been updated from synchronisation template source %s at %s",
+                                    branchName,
+                                    sourceName,
+                                    templateBranch.getName()
+                            )
+                    );
+                }
+            }
         }
         // If it does not exist, creates it and updates it
         else {
@@ -367,7 +438,15 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
                     templateBranch,
                     templateDefinition
             );
-            return new BranchTemplateSyncResult(branchName, BranchTemplateSyncType.CREATED);
+            return new BranchTemplateSyncResult(
+                    branchName,
+                    BranchTemplateSyncType.CREATED,
+                    String.format(
+                            "Branch %s has been created from synchronisation template source %s at %s",
+                            branchName,
+                            sourceName,
+                            templateBranch.getName()
+                    ));
         }
     }
 }
