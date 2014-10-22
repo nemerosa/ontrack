@@ -32,7 +32,7 @@ angular.module('ot.service.template', [
                 waitingMessage: "Synchronising the template...",
                 endMessage: "Synchronisation has been done.",
                 resultUri: 'app/service/service.template.syncResult.tpl.html',
-                task: function() {
+                task: function () {
                     return ot.call($http.post(templateSyncUri));
                 }
             });
@@ -57,6 +57,19 @@ angular.module('ot.service.template', [
                     };
                     return ot.call($http.put(templateInstanceUri, request));
                 }
+            });
+        };
+
+        /**
+         * Disconnect a branch from its template
+         */
+        self.templateInstanceDisconnect = function (templateInstanceDisconnectUri) {
+            return otAlertService.confirm({
+                title: "Template disconnection",
+                message: "Do you really want to disconnect this branch from its template? There will be no way " +
+                    "to reattach it later on."
+            }).then(function () {
+                return ot.pageCall($http.delete(templateInstanceDisconnectUri));
             });
         };
 

@@ -214,6 +214,18 @@ angular.module('ot.view.branch', [
                     },
                     {
                         condition: function () {
+                            return branchResource._templateInstanceDisconnect;
+                        },
+                        id: 'templateInstanceDisconnect',
+                        name: "Disconnect from template",
+                        cls: 'ot-command-branch-template-instance-disconnect',
+                        action: function () {
+                            otTemplateService.templateInstanceDisconnect(branchResource._templateInstanceDisconnect)
+                                .then(loadBranch);
+                        }
+                    },
+                    {
+                        condition: function () {
                             return branchResource._disable;
                         },
                         id: 'disableBranch',
