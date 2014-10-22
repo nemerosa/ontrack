@@ -346,21 +346,25 @@ public class BranchController extends AbstractResourceController {
                         .label("Branch name")
                         .help("Name of the branch to create.")
         );
-        // Auto expression
-        form = form.with(
-                YesNo.of("manual")
-                        .label("Manual")
-                        .help("Do not use automatic expansion of parameters using the branch name.")
-                        .value(false)
-        );
-        // Template parameters
-        for (TemplateParameter parameter : templateDefinition.get().getParameters()) {
+        // Parameters only if at least one is available
+        List<TemplateParameter> parameters = templateDefinition.get().getParameters();
+        if (!parameters.isEmpty()) {
+            // Auto expression
             form = form.with(
-                    Text.of(parameter.getName())
-                            .label(parameter.getName())
-                            .visibleIf("manual")
-                            .help(parameter.getDescription())
+                    YesNo.of("manual")
+                            .label("Manual")
+                            .help("Do not use automatic expansion of parameters using the branch name.")
+                            .value(false)
             );
+            // Template parameters
+            for (TemplateParameter parameter : parameters) {
+                form = form.with(
+                        Text.of(parameter.getName())
+                                .label(parameter.getName())
+                                .visibleIf("manual")
+                                .help(parameter.getDescription())
+                );
+            }
         }
         // OK
         return form;
