@@ -333,7 +333,9 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
             assert results.branches.size() == 3
             assert results.branches.find { it.branchName == 'feature_19' }.type == BranchTemplateSyncType.CREATED
             assert results.branches.find { it.branchName == 'feature_22' }.type == BranchTemplateSyncType.CREATED
-            assert results.branches.find { it.branchName == 'master' }.type == BranchTemplateSyncType.EXISTING_DEFINITION
+            assert results.branches.find {
+                it.branchName == 'master'
+            }.type == BranchTemplateSyncType.EXISTING_DEFINITION
         }
     }
 
@@ -355,7 +357,7 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
             assert results.branches.size() == 3
             assert results.branches.find { it.branchName == 'feature_19' }.type == BranchTemplateSyncType.CREATED
             assert results.branches.find { it.branchName == 'feature_22' }.type == BranchTemplateSyncType.CREATED
-            results.branches.find { it.branchName == 'master' }with {
+            results.branches.find { it.branchName == 'master' } with {
                 assert type == BranchTemplateSyncType.EXISTING_INSTANCE_FROM_OTHER
                 assert otherTemplateName == 'anotherTemplate'
             }
@@ -379,6 +381,54 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
             }
         }
 
+    }
+
+    @Test
+    void 'Sync - removing parameters after and before sync'() {
+        // Creating the template
+        Branch template = createBranchTemplateDefinition()
+        // First sync
+        asUser().with(template, BranchTemplateMgt).call {
+            templateService.sync(template.id)
+        }
+        // Getting the branch template instance
+        TemplateInstance instance = asUser().with(template, BranchTemplateMgt).call {
+            templateService.getTemplateInstance(
+                    structureService.findBranchByName(template.project.name, 'master').get().id
+            )
+        }.get()
+        // Checks it has two parameters
+        assert instance.parameterValues == [
+                new TemplateParameterValue('BRANCH', 'MASTER'),
+                new TemplateParameterValue('SCM', 'master')
+        ]
+        // Updates the template definition and syncs again
+        TemplateDefinition definition = createTemplateDefinition(BRANCHES, TemplateSynchronisationAbsencePolicy.DISABLE)
+        definition = new TemplateDefinition(
+                [
+                        new TemplateParameter(
+                                'BRANCH',
+                                "Display name for the branch",
+                                'R_${branchName.toUpperCase().replaceAll("/","_")}'
+                        )
+                ],
+                definition.synchronisationSourceConfig,
+                definition.absencePolicy,
+                definition.interval
+        )
+        asUser().with(template, BranchTemplateMgt).call {
+            templateService.setTemplateDefinition(template.id, definition)
+            templateService.sync(template.id)
+        }
+        // Checks the template instance has now one parameter only
+        instance = asUser().with(template, BranchTemplateMgt).call {
+            templateService.getTemplateInstance(
+                    structureService.findBranchByName(template.project.name, 'master').get().id
+            )
+        }.get()
+        assert instance.parameterValues == [
+                new TemplateParameterValue('BRANCH', 'R_MASTER')
+        ]
     }
 
     @Test
