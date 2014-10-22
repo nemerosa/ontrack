@@ -90,6 +90,14 @@ angular.module('ot.directive.field.multiForm', [
                     $scope.formEntries.push(entry);
                 };
 
+                // Removes an entry
+                $scope.removeEntry = function (formEntry) {
+                    var idx = $scope.formEntries.indexOf(formEntry);
+                    if (idx >= 0) {
+                        $scope.formEntries.splice(idx, 1);
+                    }
+                };
+
             }
         };
     })
