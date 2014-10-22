@@ -10,9 +10,14 @@ import net.nemerosa.ontrack.model.structure.ExpressionEngine;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer;
+import org.codehaus.groovy.control.messages.ExceptionMessage;
+import org.codehaus.groovy.control.messages.Message;
 import org.springframework.stereotype.Component;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -80,7 +85,20 @@ public class ExpressionEngineImpl implements ExpressionEngine {
         } catch (MissingPropertyException e) {
             throw new ExpressionCompilationException(expression, "No such property: " + e.getProperty());
         } catch (MultipleCompilationErrorsException e) {
-            throw new ExpressionCompilationException(expression, e.getMessage());
+            StringWriter s = new StringWriter();
+            PrintWriter p = new PrintWriter(s);
+            @SuppressWarnings("unchecked")
+            List<Message> errors = e.getErrorCollector().getErrors();
+            errors.forEach((Message message) -> writeErrorMessage(p, message));
+            throw new ExpressionCompilationException(expression, s.toString());
+        }
+    }
+
+    private void writeErrorMessage(PrintWriter p, Message message) {
+        if (message instanceof ExceptionMessage) {
+            // Just writes the cause
+            //noinspection ThrowableResultOfMethodCallIgnored
+            p.format("%n- %s", ((ExceptionMessage) message).getCause().getMessage());
         }
     }
 }

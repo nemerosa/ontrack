@@ -4,6 +4,8 @@ import net.nemerosa.ontrack.model.exceptions.ExpressionCompilationException
 import net.nemerosa.ontrack.model.structure.ExpressionEngine
 import org.junit.Test
 
+import static org.junit.Assert.fail
+
 class ExpressionEngineImplTest {
 
     private final ExpressionEngine engine = new ExpressionEngineImpl()
@@ -46,6 +48,19 @@ class ExpressionEngineImplTest {
     @Test(expected = ExpressionCompilationException)
     void 'Secure resolve: runtime not authorised'() {
         engine.resolve('branchName + Runtime.runtime.freeMemory()', [branchName: 'test'])
+    }
+
+    @Test
+    void 'Secure resolve: runtime not authorised - output message'() {
+        try {
+            engine.resolve('branchName + Runtime.runtime.totalMemory()', [branchName: 'test'])
+            fail("Should not have compiled")
+        } catch (ExpressionCompilationException ex) {
+            String message = ex.message
+            assert message == """\
+Expression "branchName + Runtime.runtime.totalMemory()" cannot be compiled:
+- Property access not allowed on [java.lang.Runtime]"""
+        }
     }
 
     @Test(expected = ExpressionCompilationException)
