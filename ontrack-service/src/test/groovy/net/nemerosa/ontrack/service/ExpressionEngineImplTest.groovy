@@ -59,7 +59,7 @@ class ExpressionEngineImplTest {
             String message = ex.message
             assert message == """\
 Expression "branchName + Runtime.runtime.totalMemory()" cannot be compiled:
-- Property access not allowed on [java.lang.Runtime]"""
+- java.lang.Class class cannot be accessed."""
         }
     }
 

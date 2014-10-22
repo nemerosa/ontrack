@@ -12,11 +12,12 @@ import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer;
 import org.codehaus.groovy.control.messages.ExceptionMessage;
 import org.codehaus.groovy.control.messages.Message;
+import org.kohsuke.groovy.sandbox.GroovyValueFilter;
+import org.kohsuke.groovy.sandbox.SandboxTransformer;
 import org.springframework.stereotype.Component;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -49,31 +50,39 @@ public class ExpressionEngineImpl implements ExpressionEngine {
         return buffer.toString();
     }
 
-    public String resolve(String expression, Map<String, ?> parameters) {
+    public String resolve(final String expression, Map<String, ?> parameters) {
+
+        SandboxTransformer sandboxTransformer = new SandboxTransformer();
 
         SecureASTCustomizer secure = new SecureASTCustomizer();
         secure.setClosuresAllowed(false);
         secure.setMethodDefinitionAllowed(false);
-        secure.setReceiversClassesWhiteList(Arrays.asList(
-                Object.class,
-                String.class,
-                GString.class
-        ));
-        secure.setImportsWhitelist(Arrays.asList(
-                "java.lang.String"
-        ));
-        secure.setStaticImportsWhitelist(Arrays.asList(
-                "java.lang.String.*"
-        ));
-        // secure.setIndirectImportCheckEnabled(true);
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
-        compilerConfiguration.addCompilationCustomizers(secure);
+        compilerConfiguration.addCompilationCustomizers(sandboxTransformer, secure);
 
         Binding binding = new Binding(parameters);
         GroovyShell shell = new GroovyShell(binding, compilerConfiguration);
 
+        // Sandbox registration (thread level)
+        GroovyValueFilter sandboxFilter = new GroovyValueFilter() {
+            @Override
+            public Object filter(Object o) {
+                if (o == null || o instanceof String || o instanceof GString || o.getClass().getName().equals("Script1")) {
+                    return o;
+                } else {
+                    throw new ExpressionCompilationException(
+                            expression,
+                            String.format(
+                                    "%n- %s class cannot be accessed.",
+                                    o.getClass().getName()
+                            )
+                    );
+                }
+            }
+        };
         try {
+            sandboxFilter.register();
             Object result = shell.evaluate(expression);
             if (result == null) {
                 return null;
@@ -91,6 +100,8 @@ public class ExpressionEngineImpl implements ExpressionEngine {
             List<Message> errors = e.getErrorCollector().getErrors();
             errors.forEach((Message message) -> writeErrorMessage(p, message));
             throw new ExpressionCompilationException(expression, s.toString());
+        } finally {
+            sandboxFilter.unregister();
         }
     }
 
