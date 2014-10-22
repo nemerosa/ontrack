@@ -16,12 +16,15 @@ angular.module('ot.dialog.form', [
             if (isValid) {
                 otFormService.prepareForSubmit(config.form, $scope.data);
                 // Submit
+                $scope.submitting = true;
                 otFormService.submitDialog(
                     config.formConfig.submit,
                     $scope.data,
                     $modalInstance,
                     $scope
-                );
+                ).finally(function () {
+                        $scope.submitting = false;
+                    });
             }
         };
     })

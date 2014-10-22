@@ -231,8 +231,11 @@ angular.module('ot.service.form', [
          *     <li>a <code>Promise</code> which is called and its success result is used to close the dialog
          *     whereas its error is displayed in the dialog without closing it.
          * </ol>
+         *
+         * Returns a promise with the result.
          */
         self.submitDialog = function (submitFn, submitData, modalInstance, messageContainer) {
+            var d = $q.defer();
             var submit = submitFn(submitData);
             if (submit === true) {
                 modalInstance.close('ok');
@@ -242,11 +245,14 @@ angular.module('ot.service.form', [
                 submit.then(
                     function success(data) {
                         modalInstance.close(data);
+                        d.resolve(data);
                     },
                     function error(message) {
                         messageContainer.message = message;
+                        d.reject(message);
                     });
             }
+            return d.promise;
         };
 
         return self;
