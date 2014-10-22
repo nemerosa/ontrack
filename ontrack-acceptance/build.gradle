@@ -13,6 +13,7 @@ dependencies {
 
 ext {
     ontrackUrl = 'http://localhost:8080'
+    ontrackJvmOptions = project.hasProperty('ontrackJvmOptions') ? project.ontrackJvmOptions : '-Xmx256m'
 }
 
 acceptanceTest {
@@ -66,6 +67,7 @@ task localAcceptanceTestStart << {
     ant.echo 'Starting application defined by ${app.file}'
     ant.echo "Starting application on port ${ontrackPort}"
     ant.echo 'Log files available at ${app.log}'
+    ant.echo "JVM options: ${ontrackJvmOptions}"
 
     ant.java(
             jar: '${app.file}',
@@ -73,6 +75,7 @@ task localAcceptanceTestStart << {
             spawn: true,
             dir: '${app.dir}'
     ) {
+        jvmarg(value: "${ontrackJvmOptions}")
         arg(value: "--server.port=${ontrackPort}")
         arg(value: '--logging.path=${app.log}')
         arg(value: '--spring.profiles.active=acceptance')
