@@ -68,8 +68,20 @@ public class ExpressionEngineImpl implements ExpressionEngine {
         GroovyValueFilter sandboxFilter = new GroovyValueFilter() {
             @Override
             public Object filter(Object o) {
-                if (o == null || o instanceof String || o instanceof GString || o.getClass().getName().equals("Script1")) {
+                if (o == null
+                        || o instanceof String
+                        || o instanceof GString
+                        || o.getClass().getName().equals("Script1")
+                        ) {
                     return o;
+                } else if (o instanceof Class) {
+                    throw new ExpressionCompilationException(
+                            expression,
+                            String.format(
+                                    "%n- %s class cannot be accessed.",
+                                    ((Class) o).getName()
+                            )
+                    );
                 } else {
                     throw new ExpressionCompilationException(
                             expression,
