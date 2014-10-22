@@ -68,4 +68,9 @@ Expression "branchName + Runtime.runtime.totalMemory()" cannot be compiled:
         engine.resolve('branchName + System.getenv("PATH")', [branchName: 'test'])
     }
 
+    @Test(expected = ExpressionCompilationException)
+    void 'Secure resolve: execute not authorised'() {
+        engine.resolve('branchName + "ls".execute()', [branchName: 'test'])
+    }
+
 }
