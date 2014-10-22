@@ -85,24 +85,37 @@ public class RolesServiceImpl implements RolesService, StartupService {
         );
 
         // Validation manager
+        List<Class<? extends ProjectFunction>> validationManagerFunctions = Arrays.asList(
+                ValidationStampCreate.class,
+                ValidationStampEdit.class,
+                ValidationStampDelete.class,
+                ValidationRunCreate.class,
+                ValidationRunStatusChange.class
+        );
         register("VALIDATION_MANAGER", "Validation manager",
                 "The validation manager can manage the validation stamps.",
-                Arrays.asList(
-                        ValidationStampCreate.class,
-                        ValidationStampEdit.class,
-                        ValidationStampDelete.class,
-                        ValidationRunCreate.class,
-                        ValidationRunStatusChange.class
-                )
+                validationManagerFunctions
         );
 
         // Promoter
+        List<Class<? extends ProjectFunction>> promoterFunctions = Arrays.asList(
+                PromotionRunCreate.class,
+                PromotionRunDelete.class
+        );
         register("PROMOTER", "Promoter",
                 "The promoter can promote existing builds.",
-                Arrays.asList(
-                        PromotionRunCreate.class,
-                        PromotionRunDelete.class
-                )
+                promoterFunctions
+        );
+
+        // Project manager
+        List<Class<? extends ProjectFunction>> projectManagerFunctions = new ArrayList<>();
+        projectManagerFunctions.addAll(validationManagerFunctions);
+        projectManagerFunctions.addAll(promoterFunctions);
+        projectManagerFunctions.add(BranchFilterMgt.class);
+        register("PROJECT_MANAGER", "Project manager",
+                "The project manager can promote existing builds, manage the validation stamps, " +
+                        "manage the shared build filters and edit some properties.",
+                projectManagerFunctions
         );
 
     }
