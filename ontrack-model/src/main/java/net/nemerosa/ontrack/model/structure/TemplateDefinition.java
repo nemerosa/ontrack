@@ -62,4 +62,15 @@ public class TemplateDefinition {
                 parameterMap
         );
     }
+
+    /**
+     * Checks the compilation of the parameters.
+     *
+     * @param expressionEngine Engine to use for the compilation
+     * @throws net.nemerosa.ontrack.model.exceptions.ExpressionCompilationException In case of compilation problem
+     * @see net.nemerosa.ontrack.model.structure.ExpressionEngine#render(String, java.util.Map)
+     */
+    public void checkCompilation(ExpressionEngine expressionEngine) {
+        templateInstanceExecution("x", expressionEngine);
+    }
 }

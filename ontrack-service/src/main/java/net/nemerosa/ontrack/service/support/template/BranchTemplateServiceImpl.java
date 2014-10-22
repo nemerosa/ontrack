@@ -65,6 +65,8 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
         if (buildCount > 0) {
             throw new BranchTemplateHasBuildException(branch.getName());
         }
+        // Compiles the template definition for anomalies
+        templateDefinition.checkCompilation(expressionEngine);
         // Saves the definition
         branchTemplateRepository.setTemplateDefinition(branchId, templateDefinition);
         // Reloads the branch

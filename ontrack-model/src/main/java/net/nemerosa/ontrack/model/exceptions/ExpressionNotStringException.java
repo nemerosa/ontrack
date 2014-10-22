@@ -1,6 +1,4 @@
-package net.nemerosa.ontrack.service;
-
-import net.nemerosa.ontrack.model.exceptions.InputException;
+package net.nemerosa.ontrack.model.exceptions;
 
 public class ExpressionNotStringException extends InputException {
     public ExpressionNotStringException(String expression) {

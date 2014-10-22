@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.service
 
+import net.nemerosa.ontrack.model.exceptions.ExpressionCompilationException
 import net.nemerosa.ontrack.model.structure.ExpressionEngine
-import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.junit.Test
 
 class ExpressionEngineImplTest {
@@ -33,17 +33,22 @@ class ExpressionEngineImplTest {
         assert engine.render('${branchName.toUpperCase()}', [branchName: 'ontrack-xx']) == 'ONTRACK-XX'
     }
 
-    @Test(expected = MultipleCompilationErrorsException)
+    @Test(expected = ExpressionCompilationException)
+    void 'Compilation: no such property'() {
+        engine.resolve('x', [branchName: 'test'])
+    }
+
+    @Test(expected = ExpressionCompilationException)
     void 'Secure resolve: no closure'() {
         engine.resolve('branchName + { "test" }', [branchName: 'test'])
     }
 
-    @Test(expected = MultipleCompilationErrorsException)
+    @Test(expected = ExpressionCompilationException)
     void 'Secure resolve: runtime not authorised'() {
         engine.resolve('branchName + Runtime.runtime.freeMemory()', [branchName: 'test'])
     }
 
-    @Test(expected = MultipleCompilationErrorsException)
+    @Test(expected = ExpressionCompilationException)
     void 'Secure resolve: system not authorised'() {
         engine.resolve('branchName + System.getenv("PATH")', [branchName: 'test'])
     }

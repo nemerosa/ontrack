@@ -3,8 +3,12 @@ package net.nemerosa.ontrack.service;
 import groovy.lang.Binding;
 import groovy.lang.GString;
 import groovy.lang.GroovyShell;
+import groovy.lang.MissingPropertyException;
+import net.nemerosa.ontrack.model.exceptions.ExpressionCompilationException;
+import net.nemerosa.ontrack.model.exceptions.ExpressionNotStringException;
 import net.nemerosa.ontrack.model.structure.ExpressionEngine;
 import org.codehaus.groovy.control.CompilerConfiguration;
+import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer;
 import org.springframework.stereotype.Component;
 
@@ -64,13 +68,19 @@ public class ExpressionEngineImpl implements ExpressionEngine {
         Binding binding = new Binding(parameters);
         GroovyShell shell = new GroovyShell(binding, compilerConfiguration);
 
-        Object result = shell.evaluate(expression);
-        if (result == null) {
-            return null;
-        } else if (!(result instanceof String)) {
-            throw new ExpressionNotStringException(expression);
-        } else {
-            return (String) result;
+        try {
+            Object result = shell.evaluate(expression);
+            if (result == null) {
+                return null;
+            } else if (!(result instanceof String)) {
+                throw new ExpressionNotStringException(expression);
+            } else {
+                return (String) result;
+            }
+        } catch (MissingPropertyException e) {
+            throw new ExpressionCompilationException(expression, "No such property: " + e.getProperty());
+        } catch (MultipleCompilationErrorsException e) {
+            throw new ExpressionCompilationException(expression, e.getMessage());
         }
     }
 }
