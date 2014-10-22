@@ -73,4 +73,9 @@ Expression "branchName + Runtime.runtime.totalMemory()" cannot be compiled:
         engine.resolve('branchName + "ls".execute()', [branchName: 'test'])
     }
 
+    @Test
+    void 'Secure resolve: regex: replacement'() {
+        assert engine.resolve('branchName.replaceAll("_", ".")', [branchName: '1_0']) == '1.0'
+    }
+
 }
