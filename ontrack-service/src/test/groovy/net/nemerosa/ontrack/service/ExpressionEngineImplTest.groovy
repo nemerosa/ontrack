@@ -21,6 +21,16 @@ class ExpressionEngineImplTest {
     }
 
     @Test
+    void 'Fixed expression'() {
+        assert engine.render('Test', [:]) == 'Test'
+    }
+
+    @Test
+    void 'Incomplete expression'() {
+        assert engine.render('${Test', [:]) == '${Test'
+    }
+
+    @Test
     void 'Simple expression'() {
         assert engine.render('${branchName}', [branchName: '2.0']) == '2.0'
     }
