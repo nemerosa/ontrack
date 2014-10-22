@@ -38,4 +38,14 @@ class ExpressionEngineImplTest {
         engine.resolve('branchName + { "test" }', [branchName: 'test'])
     }
 
+    @Test(expected = MultipleCompilationErrorsException)
+    void 'Secure resolve: runtime not authorised'() {
+        engine.resolve('branchName + Runtime.runtime.freeMemory()', [branchName: 'test'])
+    }
+
+    @Test(expected = MultipleCompilationErrorsException)
+    void 'Secure resolve: system not authorised'() {
+        engine.resolve('branchName + System.getenv("PATH")', [branchName: 'test'])
+    }
+
 }
