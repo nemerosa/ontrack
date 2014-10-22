@@ -154,6 +154,13 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                         branch.getType() == BranchType.TEMPLATE_DEFINITION
                                 && resourceContext.isProjectFunctionGranted(branch, BranchTemplateMgt.class)
                 )
+                        // Template instance disconnection
+                .link(
+                        "_templateInstanceDisconnect",
+                        on(BranchController.class).disconnectTemplateInstance(branch.getId()),
+                        branch.getType() == BranchType.TEMPLATE_INSTANCE
+                                && resourceContext.isProjectFunctionGranted(branch, BranchTemplateMgt.class)
+                )
                         // OK
                 .build();
     }
