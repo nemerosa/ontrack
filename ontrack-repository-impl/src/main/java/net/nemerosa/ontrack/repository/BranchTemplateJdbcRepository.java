@@ -143,12 +143,17 @@ public class BranchTemplateJdbcRepository extends AbstractJdbcRepository impleme
     }
 
     @Override
-    public void setTemplateInstance(ID branchId, TemplateInstance templateInstance) {
-        // Deletes previous value
+    public void disconnectTemplateInstance(ID branchId) {
         getNamedParameterJdbcTemplate().update(
                 "DELETE FROM BRANCH_TEMPLATE_INSTANCES WHERE BRANCHID = :branchId",
                 params("branchId", branchId.get())
         );
+    }
+
+    @Override
+    public void setTemplateInstance(ID branchId, TemplateInstance templateInstance) {
+        // Deletes previous value
+        disconnectTemplateInstance(branchId);
         // Definition
         getNamedParameterJdbcTemplate().update(
                 "INSERT INTO BRANCH_TEMPLATE_INSTANCES(BRANCHID, TEMPLATEBRANCHID) " +

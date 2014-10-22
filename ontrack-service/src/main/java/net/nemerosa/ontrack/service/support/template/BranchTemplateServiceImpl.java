@@ -263,6 +263,14 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
         return syncTemplateDefinition(branchId, logger::info);
     }
 
+    @Override
+    public Branch disconnectTemplateInstance(ID branchId) {
+        // Gets the template instance and disconnects it when available
+        getTemplateInstance(branchId).ifPresent(instance -> branchTemplateRepository.disconnectTemplateInstance(branchId));
+        // Reloads the branch
+        return structureService.getBranch(branchId);
+    }
+
     protected BranchTemplateSyncResults syncTemplateDefinition(ID branchId, JobInfoListener info) {
         // Loads the template definition
         info.post(format("Loading template definition for %s", branchId));

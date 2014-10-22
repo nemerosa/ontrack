@@ -43,4 +43,9 @@ public interface BranchTemplateService {
      * Sync. this template definition by creating and updating linked template instances.
      */
     BranchTemplateSyncResults sync(ID branchId);
+
+    /**
+     * Disconnects the branch from any template definition, if any.
+     */
+    Branch disconnectTemplateInstance(ID branchId);
 }

@@ -393,6 +393,14 @@ public class BranchController extends AbstractResourceController {
         return branchTemplateService.createTemplateInstance(branchId, request);
     }
 
+    /**
+     * Disconnects the branch from any template definition, if any.
+     */
+    @RequestMapping(value = "branches/{branchId}/template/instance", method = RequestMethod.DELETE)
+    public Branch disconnectTemplateInstance(@PathVariable ID branchId) {
+        return branchTemplateService.disconnectTemplateInstance(branchId);
+    }
+
     private BranchBuildView buildViewWithFilter(ID branchId, BuildFilter buildFilter) {
         // Gets the branch
         Branch branch = getBranch(branchId);

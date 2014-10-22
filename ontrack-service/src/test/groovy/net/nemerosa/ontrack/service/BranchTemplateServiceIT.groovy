@@ -480,6 +480,28 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
 
     }
 
+    @Test
+    void 'Sync after disconnect must not update the disconnected branch'() {
+        Branch template = createBranchTemplateDefinition(['mybranch'])
+        asUser().with(template, BranchTemplateMgt).call {
+            // Launching synchronisation, once
+            def results = templateService.sync(template.id)
+            assert results.branches.find { it.branchName == 'mybranch' }.type == BranchTemplateSyncType.CREATED
+            // Gets the branch instance
+            def branch = structureService.findBranchByName(template.project.name, 'mybranch').get()
+            assert branch.type == BranchType.TEMPLATE_INSTANCE
+            // Disconnects it
+            branch = templateService.disconnectTemplateInstance(branch.id)
+            assert branch.type == BranchType.CLASSIC
+            // Relaunches sync
+            results = templateService.sync(template.id)
+            assert results.branches.find { it.branchName == 'mybranch' }.type == BranchTemplateSyncType.EXISTING_CLASSIC
+            // Checks it is untouched
+            branch = structureService.findBranchByName(template.project.name, 'mybranch').get()
+            assert branch.type == BranchType.CLASSIC
+        }
+    }
+
     protected void checkBranchTemplateInstance(Branch instance) {
         checkBranchTemplateInstance(instance, 'INSTANCE')
     }

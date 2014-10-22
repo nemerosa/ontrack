@@ -22,4 +22,6 @@ public interface BranchTemplateRepository {
     boolean isTemplateInstance(ID branchId);
 
     Collection<BranchTemplateInstance> getTemplateInstancesForDefinition(ID templateDefinitionId);
+
+    void disconnectTemplateInstance(ID branchId);
 }
