@@ -37,12 +37,12 @@
                                 <ot-entity-decorations entity="branchStatusView.branch"></ot-entity-decorations>
                             </span>
                             <span ng-if="branchStatusView.lastPromotionView" class="ot-home-branch-promotion">
-                                <a href="#/build/{{branchStatusView.lastPromotionView.promotionRun.build.id}}">{{branchStatusView.lastPromotionView.promotionRun.build.name}}</a>
-                                <span class="fa fa-arrow-right"></span>
                                 <a href="#/promotionLevel/{{branchStatusView.lastPromotionView.promotionLevel.id}}">
                                     <ot-entity-image entity="branchStatusView.lastPromotionView.promotionLevel"></ot-entity-image>
                                     {{branchStatusView.lastPromotionView.promotionLevel.name}}
                                 </a>
+                                <span class="fa fa-arrow-right"></span>
+                                <a href="#/build/{{branchStatusView.lastPromotionView.promotionRun.build.id}}">{{branchStatusView.lastPromotionView.promotionRun.build.name}}</a>
                             </span>
                             <span ng-if="!branchStatusView.lastPromotionView" class="ot-home-branch-promotion">
                                 <span class="fa fa-ban"></span>
