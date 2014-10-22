@@ -50,27 +50,37 @@ class ExpressionEngineImplTest {
         engine.resolve('branchName + Runtime.runtime.freeMemory()', [branchName: 'test'])
     }
 
-    @Test
-    void 'Secure resolve: runtime not authorised - output message'() {
+    protected def on(String expression, Map<String, String> parameters, Closure<String> message) {
         try {
-            engine.resolve('branchName + Runtime.runtime.totalMemory()', [branchName: 'test'])
-            fail("Should not have compiled")
+            engine.resolve(expression, parameters)
+            fail('Should not have compiled')
         } catch (ExpressionCompilationException ex) {
-            String message = ex.message
-            assert message == """\
-Expression "branchName + Runtime.runtime.totalMemory()" cannot be compiled:
-- java.lang.Runtime class cannot be accessed."""
+            assert ex.message == """\
+Expression "${expression}" cannot be compiled:
+- ${message()}"""
         }
     }
 
-    @Test(expected = ExpressionCompilationException)
-    void 'Secure resolve: system not authorised'() {
-        engine.resolve('branchName + System.getenv("PATH")', [branchName: 'test'])
+    @Test
+    void 'Secure resolve: runtime not authorised - output message'() {
+        on('branchName + Runtime.runtime.totalMemory()', [branchName: 'test']) {
+            'java.lang.Runtime class cannot be accessed.'
+        }
     }
 
-    @Test(expected = ExpressionCompilationException)
+    @Test
+    void 'Secure resolve: system not authorised'() {
+        on('branchName + System.getenv("PATH")', [branchName: 'test']) {
+            "java.lang.System class cannot be accessed."
+        }
+    }
+
+    @Test
     void 'Secure resolve: execute not authorised'() {
-        engine.resolve('branchName + "ls".execute()', [branchName: 'test'])
+        on('branchName + "ls".execute()', [branchName: 'test']) {
+            // Hmmm, this test won't work on Windows...
+            "java.lang.UNIXProcess class cannot be accessed."
+        }
     }
 
     @Test
