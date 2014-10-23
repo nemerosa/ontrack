@@ -9,13 +9,13 @@
 }
 
 table.ot-project-branches {
-  border-spacing: @otProjectMargin;
   border-collapse: separate;
   tr {
     .make-branch-row(@otProjectRowHeight);
     td:first-child {
       vertical-align: top;
       padding: @otProjectMargin;
+      border-bottom: solid @otProjectMargin white;
       .bg-primary;
       a {
         color: @btn-primary-color;
@@ -33,7 +33,7 @@ table.ot-project-branches {
     .ot-project-branch-promotion {
       float: left;
       padding: @otProjectMargin;
-      margin-right: @otProjectMargin;
+      margin-left: @otProjectMargin;
       margin-bottom: @otProjectMargin;
       .make-branch-row(@otProjectRowHeight);
       border: solid 1px @btn-default-border;
