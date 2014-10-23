@@ -3,42 +3,44 @@
 @otProjectRowHeight: 3.5em;
 @otProjectMargin: 0.5em;
 
-.ot-project-row {
-  min-height: @otProjectRowHeight !important;
-  height: @otProjectRowHeight !important;
+.make-branch-row(@height) {
+  min-height: @height !important;
+  height: @height !important;
 }
 
-.ot-project-branch {
-  margin-bottom: @otProjectMargin;
-  padding-left: 1em;
-  .ot-project-branch-name {
-    .ot-project-row;
-    margin-left: -1px !important;
-    vertical-align: middle;
-    .bg-primary;
-    a {
-      color: @btn-primary-color;
-      font-weight: bold;
-    }
-    &.ot-entity-disabled {
-      opacity: 0.5;
-    }
-    .ot-decoration {
-      img {
-        .ot-icon-mini;
+table.ot-project-branches {
+  border-spacing: @otProjectMargin;
+  border-collapse: separate;
+  tr {
+    .make-branch-row(@otProjectRowHeight);
+    td:first-child {
+      position: relative;
+      top: 0;
+      bottom: 0;
+      padding: @otProjectMargin;
+      .bg-primary;
+      a {
+        color: @btn-primary-color;
+        font-weight: bold;
+      }
+      &.ot-entity-disabled {
+        opacity: 0.5;
+      }
+      .ot-decoration {
+        img {
+          .ot-icon-mini;
+        }
       }
     }
-  }
-  .ot-project-branch-promotions {
     .ot-project-branch-promotion {
-      .ot-project-row;
+      float: left;
+      padding: @otProjectMargin;
+      margin-right: @otProjectMargin;
+      margin-bottom: @otProjectMargin;
+      .make-branch-row(@otProjectRowHeight);
       border: solid 1px @btn-default-border;
-      margin-left: -1px;
       .ot-icon {
         .ot-icon-mini;
-      }
-      .ot-project-branch-promotion-build {
-        display: block;
       }
     }
   }

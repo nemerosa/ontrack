@@ -12,19 +12,18 @@
                     No branch has been created yet.
                 </ot-noentry>
                 <div class="col-md-12" ng-if="branchCollection.resources">
-                    <div class="row ot-project-branch"
-                         ng-repeat="branch in branchCollection.resources"
-                         ng-show="showDisabled || !(branch.disabled || branch.type == 'TEMPLATE_DEFINITION')">
-                        <div class="col-md-2 ot-project-branch-name"
-                             ng-class="{'ot-entity-disabled': branch.disabled}">
-                            <a href="#/branch/{{branch.id}}">
-                                {{branch.name}}
-                            </a>
-                            <ot-entity-decorations entity="branch"></ot-entity-decorations>
-                        </div>
-                        <div class="col-md-10 ot-project-branch-promotions">
-                            <div class="row">
-                                <div class="col-md-3 ot-project-branch-promotion"
+                    <table class="ot-project-branches">
+                        <tbody>
+                        <tr ng-repeat="branch in branchCollection.resources"
+                            ng-show="showDisabled || !(branch.disabled || branch.type == 'TEMPLATE_DEFINITION')">
+                            <td ng-class="{'ot-entity-disabled': branch.disabled}">
+                                <a href="#/branch/{{branch.id}}">
+                                    {{branch.name}}
+                                </a>
+                                <ot-entity-decorations entity="branch"></ot-entity-decorations>
+                            </td>
+                            <td>
+                                <div class="ot-project-branch-promotion"
                                      ng-if="branch.branchStatusView.latestBuild">
                                     <span class="ot-description">Latest</span>
                                     <span class="fa fa-arrow-right"></span>
@@ -33,12 +32,13 @@
                                         {{branch.branchStatusView.latestBuild.name}}
                                     </a>
                                 </div>
-                                <div class="col-md-3 ot-project-branch-promotion"
+                                <div class="ot-project-branch-promotion"
                                      ng-if="!branch.branchStatusView.latestBuild">
                                             <span class="fa fa-ban"
                                                   title="No build on this branch"></span>
+                                            <span class="ot-description">No build</span>
                                 </div>
-                                <div class="col-md-3 ot-project-branch-promotion"
+                                <div class="ot-project-branch-promotion"
                                      ng-repeat="promotionView in branch.branchStatusView.promotions">
                                     <span ng-if="promotionView.promotionRun">
                                         <a href="#/promotionLevel/{{promotionView.promotionLevel.id}}">
@@ -61,10 +61,10 @@
                                         <span class="fa fa-ban"></span>
                                     </span>
                                 </div>
-                            </div>
-
-                        </div>
-                    </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
