@@ -3,14 +3,14 @@
     <img
             ng-if="!decoration.name"
             ng-src="{{decorationImagePath(decoration)}}"
-            class="ot-decoration-image-only {{decorationClassName(decoration)}}"
+            class="ot-icon ot-decoration-image-only {{decorationClassName(decoration)}}"
             alt="{{decoration.id}}"/>
     <!-- Image and label if a name is provided -->
     <span
         ng-if="decoration.name"
         class="ot-decoration-label {{decorationClassName(decoration)}}">
         <img
-                class="ot-decoration-label-image"
+                class="ot-icon ot-decoration-label-image"
                 ng-src="{{decorationImagePath(decoration)}}"
                 alt="{{decoration.id}}"/>
         {{decoration.name}}
