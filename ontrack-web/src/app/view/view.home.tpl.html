@@ -17,18 +17,17 @@
                     </div>
                 </div>
             </div>
-            <div class="row ot-home-project"
-                 ng-repeat="project in projectCollection.resources | filter:{name:projectNameFilter}"
-                 ng-show="showDisabled || !project.disabled">
-                <div class="col-md-2 ot-home-project-name"
-                     ng-class="{'ot-entity-disabled': project.disabled}">
-                    <a href="#/project/{{project.id}}">
-                        {{project.name}}
-                    </a>
-                </div>
-                <div class="col-md-10 ot-home-project-branches">
-                    <div class="row">
-                        <div class="col-md-3 ot-home-branch"
+            <table class="ot-home-projects">
+                <tbody>
+                <tr ng-repeat="project in projectCollection.resources | filter:{name:projectNameFilter}"
+                    ng-show="showDisabled || !project.disabled">
+                    <td ng-class="{'ot-entity-disabled': project.disabled}">
+                        <a href="#/project/{{project.id}}">
+                            {{project.name}}
+                        </a>
+                    </td>
+                    <td>
+                        <div class="ot-home-branch"
                              ng-repeat="branchStatusView in project.branchStatusViews.resources"
                              ng-show="showDisabled || !(branchStatusView.branch.disabled || branchStatusView.branch.type == 'TEMPLATE_DEFINITION')">
                             <span class="ot-home-branch-name"
@@ -51,9 +50,10 @@
                                 </span>
                             </span>
                         </div>
-                    </div>
-                </div>
-            </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </ot-view>
