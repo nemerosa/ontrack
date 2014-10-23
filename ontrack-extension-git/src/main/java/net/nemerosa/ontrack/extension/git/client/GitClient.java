@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -35,4 +36,9 @@ public interface GitClient {
      * @return <code>true</code> if at least one call to <code>scanFunction</code> has returned <code>true</code>.
      */
     boolean scanCommits(Predicate<RevCommit> scanFunction);
+
+    /**
+     * Gets the list of remote branches, as defined under <code>ref/heads</code>.
+     */
+    List<String> getRemoteBranches();
 }

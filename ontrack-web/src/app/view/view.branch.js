@@ -6,6 +6,7 @@ angular.module('ot.view.branch', [
     'ot.service.structure',
     'ot.service.buildfilter',
     'ot.service.copy',
+    'ot.service.template',
     'ot.dialog.validationStampRunView',
     'ot.dialog.promotionRuns'
 ])
@@ -16,7 +17,7 @@ angular.module('ot.view.branch', [
             controller: 'BranchCtrl'
         });
     })
-    .controller('BranchCtrl', function ($state, $scope, $stateParams, $http, $modal, $location, ot, otFormService, otStructureService, otBuildFilterService, otAlertService, otTaskService, otNotificationService, otCopyService) {
+    .controller('BranchCtrl', function ($state, $scope, $stateParams, $http, $modal, $location, ot, otFormService, otStructureService, otBuildFilterService, otAlertService, otTaskService, otNotificationService, otCopyService, otTemplateService) {
         var view = ot.view();
         // Branch's id
         var branchId = $stateParams.branchId;
@@ -172,6 +173,55 @@ angular.module('ot.view.branch', [
                         cls: 'ot-command-build-new',
                         action: function () {
                             otStructureService.createBuild(branchResource._createBuild).then(loadBuildView);
+                        }
+                    },
+                    {
+                        condition: function () {
+                            return branchResource._templateDefinition;
+                        },
+                        id: 'templateDefinitionBranch',
+                        name: "Template definition",
+                        cls: 'ot-command-branch-template-definition',
+                        action: function () {
+                            otTemplateService.templateDefinition(branchResource._templateDefinition).then(loadBranch);
+                        }
+                    },
+                    {
+                        condition: function () {
+                            return branchResource._templateSync;
+                        },
+                        id: 'templateSyncBranch',
+                        name: "Sync. template",
+                        cls: 'ot-command-branch-template-sync',
+                        action: function () {
+                            otTemplateService.templateSync(branchResource._templateSync);
+                        }
+                    },
+                    {
+                        condition: function () {
+                            return branchResource._templateInstance;
+                        },
+                        id: 'templateInstanceBranch',
+                        name: "Create template instance",
+                        cls: 'ot-command-branch-template-instance',
+                        action: function () {
+                            otTemplateService.createTemplateInstance(branchResource._templateInstance).then(
+                                function (instance) {
+                                    $state.go('branch', {branchId: instance.id});
+                                }
+                            );
+                        }
+                    },
+                    {
+                        condition: function () {
+                            return branchResource._templateInstanceDisconnect;
+                        },
+                        id: 'templateInstanceDisconnect',
+                        name: "Disconnect from template",
+                        cls: 'ot-command-branch-template-instance-disconnect',
+                        action: function () {
+                            otTemplateService.templateInstanceDisconnect(branchResource._templateInstanceDisconnect)
+                                .then(loadBranch);
                         }
                     },
                     {

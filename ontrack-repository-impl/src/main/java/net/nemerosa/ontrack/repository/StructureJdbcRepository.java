@@ -22,9 +22,12 @@ import java.util.stream.Collectors;
 @Repository
 public class StructureJdbcRepository extends AbstractJdbcRepository implements StructureRepository {
 
+    private final BranchTemplateRepository branchTemplateRepository;
+
     @Autowired
-    public StructureJdbcRepository(DataSource dataSource) {
+    public StructureJdbcRepository(DataSource dataSource, BranchTemplateRepository branchTemplateRepository) {
         super(dataSource);
+        this.branchTemplateRepository = branchTemplateRepository;
     }
 
     @Override
@@ -293,6 +296,15 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                         params("branch", branchId.getValue()).addValue("name", buildName),
                         (rs, rowNum) -> toBuild(rs, this::getBranch)
                 )
+        );
+    }
+
+    @Override
+    public int getBuildCount(Branch branch) {
+        return getNamedParameterJdbcTemplate().queryForObject(
+                "SELECT COUNT(ID) FROM BUILDS WHERE BRANCHID = :branchId",
+                params("branchId", branch.id()),
+                Integer.class
         );
     }
 
@@ -773,15 +785,28 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     protected Branch toBranch(ResultSet rs, Function<ID, Project> projectSupplier) throws SQLException {
+        ID projectId = id(rs, "projectId");
+        ID branchId = id(rs);
         return Branch.of(
-                projectSupplier.apply(id(rs, "projectId")),
+                projectSupplier.apply(projectId),
                 new NameDescription(
                         rs.getString("name"),
                         rs.getString("description")
                 )
         )
-                .withId(id(rs))
+                .withId(branchId)
+                .withType(getBranchType(branchId))
                 .withDisabled(rs.getBoolean("disabled"));
+    }
+
+    private BranchType getBranchType(ID branchId) {
+        if (branchTemplateRepository.isTemplateDefinition(branchId)) {
+            return BranchType.TEMPLATE_DEFINITION;
+        } else if (branchTemplateRepository.isTemplateInstance(branchId)) {
+            return BranchType.TEMPLATE_INSTANCE;
+        } else {
+            return BranchType.CLASSIC;
+        }
     }
 
     protected Project toProject(ResultSet rs) throws SQLException {

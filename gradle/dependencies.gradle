@@ -58,6 +58,7 @@ ext {
 
             // Groovy
             groovy                      : 'org.codehaus.groovy:groovy-all:2.3.3',
+            groovy_sandbox              : 'org.kohsuke:groovy-sandbox:1.7',
 
             // Logging
             slf4j_api                   : "org.slf4j:slf4j-api:${slf4jVersion}",

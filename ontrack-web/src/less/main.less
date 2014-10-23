@@ -88,7 +88,7 @@
  * General
  */
 
-a.ot-loading-indicator {
+.ot-loading-indicator {
   .ot-icon-x(@fa-var-spinner);
   .fa-spin;
 }
@@ -172,6 +172,9 @@ div.ot-view {
   }
   .ot-view-commands {
     .pull-right;
+  }
+  .alert {
+    margin-left: 1em;
   }
 }
 
@@ -554,6 +557,22 @@ span.ot-view-command {
   .ot-command-delete;
 }
 
+.ot-command-branch-template-definition {
+  .ot-icon-x(@fa-var-share-alt);
+}
+
+.ot-command-branch-template-sync {
+  .ot-icon-x(@fa-var-arrows-h);
+}
+
+.ot-command-branch-template-instance {
+  .ot-icon-x(@fa-var-link);
+}
+
+.ot-command-branch-template-instance-disconnect {
+  .ot-icon-x(@fa-var-unlink);
+}
+
 .ot-command-build-new {
   .ot-command-new;
 }
@@ -663,18 +682,19 @@ a.ot-application-info-error {
  * Decorations
  */
 
-img.ot-decoration {
-  .ot-icon;
-  margin-right: 2px;
-}
-
-span.ot-decoration {
-  .label;
-  .label-default;
-  margin-right: 2px;
-  font-weight: normal;
-  img {
-    .ot-icon-mini;
+.ot-decoration {
+  img.ot-decoration-image-only {
+    .ot-icon;
+    margin-right: 2px;
+  }
+  span.ot-decoration-label {
+    .label;
+    .label-default;
+    margin-right: 2px;
+    font-weight: normal;
+    img {
+      .ot-icon-mini;
+    }
   }
 }
 

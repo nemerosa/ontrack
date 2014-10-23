@@ -6,10 +6,8 @@ import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
-import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.form.Replacements;
-import net.nemerosa.ontrack.model.form.Selection;
-import net.nemerosa.ontrack.model.form.Text;
+import net.nemerosa.ontrack.model.exceptions.BranchNotTemplateDefinitionException;
+import net.nemerosa.ontrack.model.form.*;
 import net.nemerosa.ontrack.model.security.Action;
 import net.nemerosa.ontrack.model.security.BranchCreate;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -22,7 +20,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
 import javax.validation.Valid;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static net.nemerosa.ontrack.boot.ui.UIUtils.requestParametersToJson;
@@ -33,6 +34,8 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 public class BranchController extends AbstractResourceController {
 
     private final StructureService structureService;
+    private final BranchTemplateService branchTemplateService;
+    private final TemplateSynchronisationService templateSynchronisationService;
     private final CopyService copyService;
     private final BuildFilterService buildFilterService;
     private final ExtensionManager extensionManager;
@@ -41,11 +44,15 @@ public class BranchController extends AbstractResourceController {
     @Autowired
     public BranchController(
             StructureService structureService,
+            BranchTemplateService branchTemplateService,
+            TemplateSynchronisationService templateSynchronisationService,
             CopyService copyService,
             BuildFilterService buildFilterService,
             ExtensionManager extensionManager,
             SecurityService securityService) {
         this.structureService = structureService;
+        this.branchTemplateService = branchTemplateService;
+        this.templateSynchronisationService = templateSynchronisationService;
         this.copyService = copyService;
         this.buildFilterService = buildFilterService;
         this.extensionManager = extensionManager;
@@ -217,6 +224,181 @@ public class BranchController extends AbstractResourceController {
         Branch branch = structureService.getBranch(branchId);
         // Performs the clone
         return copyService.cloneBranch(branch, request);
+    }
+
+    /**
+     * Gets a form to make this branch a template definition.
+     */
+    @RequestMapping(value = "branches/{branchId}/template/definition", method = RequestMethod.GET)
+    public Form getTemplateDefinition(@PathVariable ID branchId) {
+        Branch branch = getBranch(branchId);
+        Optional<TemplateDefinition> templateDefinition = branchTemplateService.getTemplateDefinition(branchId);
+        return Form.create()
+                .with(
+                        MultiForm.of(
+                                "parameters",
+                                Form.create()
+                                        .with(
+                                                Text.of("name").label("Name").help("Parameter name")
+                                        )
+                                        .with(
+                                                Text.of("description").optional().label("Description").help("Parameter description")
+                                        )
+                                        .with(
+                                                Text.of("expression")
+                                                        .label("Expression")
+                                                        .help(
+                                                                "Those expressions are defined for the synchronisation between " +
+                                                                        "template definitions and template instances. They bind " +
+                                                                        "a parameter name and a branch name to an actual parameter " +
+                                                                        "value. " +
+                                                                        "A template expression is a string that contains " +
+                                                                        "references to the branch name using the ${...} construct " +
+                                                                        "where the content is a Groovy expression where the " +
+                                                                        "branchName variable is bound to the branch name.")
+                                        )
+                        )
+                                .label("Parameters")
+                                .help("List of parameters that define the template")
+                                .value(templateDefinition
+                                        .map(TemplateDefinition::getParameters)
+                                        .orElse(Collections.emptyList()))
+                )
+                .with(
+                        ServiceConfigurator.of("synchronisationSourceConfig")
+                                .label("Sync. source")
+                                .help("Source of branch names when synchronising")
+                                .sources(
+                                        templateSynchronisationService.getSynchronisationSources().stream()
+                                                .filter(source -> source.isApplicable(branch))
+                                                .map(
+                                                        source -> new ServiceConfigurationSource(
+                                                                source.getId(),
+                                                                source.getName(),
+                                                                source.getForm(branch)
+                                                        )
+                                                )
+                                                .collect(Collectors.toList())
+                                )
+                                .value(
+                                        templateDefinition
+                                                .map(TemplateDefinition::getSynchronisationSourceConfig)
+                                                .orElse(null)
+                                )
+                )
+                .with(
+                        Int.of("interval")
+                                .label("Interval")
+                                .help("Interval between each synchronisation in minutes. If set to zero, " +
+                                        "no automated synchronisation is performed and it must be done " +
+                                        "manually.")
+                                .min(0)
+                                .value(templateDefinition.map(TemplateDefinition::getInterval).orElse(0))
+                )
+                .with(
+                        Selection.of("absencePolicy")
+                                .label("Absence policy")
+                                .help("Defines what to do with a branch template instance when the corresponding " +
+                                        "name is not defined any longer.")
+                                .items(Arrays.asList(TemplateSynchronisationAbsencePolicy.values()).stream()
+                                        .map(Describable::toDescription)
+                                        .collect(Collectors.toList()))
+                                .itemId("id")
+                                .itemName("name")
+                                .value(
+                                        templateDefinition
+                                                .map(td -> td.getAbsencePolicy().getId())
+                                                .orElse(TemplateSynchronisationAbsencePolicy.DISABLE.getId())
+                                )
+                )
+                ;
+    }
+
+    /**
+     * Sets this branch as a template definition, or updates the definition.
+     */
+    @RequestMapping(value = "branches/{branchId}/template/definition", method = RequestMethod.PUT)
+    public Branch setTemplateDefinition(@PathVariable ID branchId, @RequestBody TemplateDefinition templateDefinition) {
+        return branchTemplateService.setTemplateDefinition(branchId, templateDefinition);
+    }
+
+    /**
+     * Sync. this template definition by creating and updating linked template instances.
+     */
+    @RequestMapping(value = "branches/{branchId}/template/sync", method = RequestMethod.POST)
+    public BranchTemplateSyncResults syncTemplateDefinition(@PathVariable ID branchId) {
+        return branchTemplateService.sync(branchId);
+    }
+
+    /**
+     * Gets the form to create a template instance using a name.
+     */
+    @RequestMapping(value = "branches/{branchId}/template", method = RequestMethod.GET)
+    public Form singleTemplateInstanceForm(@PathVariable ID branchId) {
+        // Gets the template definition for this branch
+        Optional<TemplateDefinition> templateDefinition = branchTemplateService.getTemplateDefinition(branchId);
+        if (!templateDefinition.isPresent()) {
+            throw new BranchNotTemplateDefinitionException(branchId);
+        }
+        // Creates a form with the branch name and all needed parameters
+        Form form = Form.create().with(
+                Form.defaultNameField()
+                        .label("Branch name")
+                        .help("Name of the branch to create.")
+        );
+        // Parameters only if at least one is available
+        List<TemplateParameter> parameters = templateDefinition.get().getParameters();
+        if (!parameters.isEmpty()) {
+            // Auto expression
+            form = form.with(
+                    YesNo.of("manual")
+                            .label("Manual")
+                            .help("Do not use automatic expansion of parameters using the branch name.")
+                            .value(false)
+            );
+            // Template parameters
+            for (TemplateParameter parameter : parameters) {
+                form = form.with(
+                        Text.of(parameter.getName())
+                                .label(parameter.getName())
+                                .visibleIf("manual")
+                                .help(parameter.getDescription())
+                );
+            }
+        }
+        // OK
+        return form;
+    }
+
+    /**
+     * Creates a branch template instance for one name.
+     * <p>
+     * <ul>
+     * <li>If the target branch does not exist, creates it.</li>
+     * <li>If the target branch exists:
+     * <ul>
+     * <li>If it is linked to the same definition, updates it.</li>
+     * <li>If it is linked to another definition, this is an error.</li>
+     * <li>If it is a normal branch, this is an error.</li>
+     * </ul>
+     * </li>
+     * </ul>
+     *
+     * @param branchId ID of the branch template definition
+     * @param request  Name to use when creating the branch
+     * @return Created or updated branch
+     */
+    @RequestMapping(value = "branches/{branchId}/template", method = RequestMethod.PUT)
+    public Branch createTemplateInstance(@PathVariable ID branchId, @RequestBody @Valid BranchTemplateInstanceSingleRequest request) {
+        return branchTemplateService.createTemplateInstance(branchId, request);
+    }
+
+    /**
+     * Disconnects the branch from any template definition, if any.
+     */
+    @RequestMapping(value = "branches/{branchId}/template/instance", method = RequestMethod.DELETE)
+    public Branch disconnectTemplateInstance(@PathVariable ID branchId) {
+        return branchTemplateService.disconnectTemplateInstance(branchId);
     }
 
     private BranchBuildView buildViewWithFilter(ID branchId, BuildFilter buildFilter) {

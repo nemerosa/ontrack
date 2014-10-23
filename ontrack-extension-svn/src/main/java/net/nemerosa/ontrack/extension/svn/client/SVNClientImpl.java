@@ -204,6 +204,28 @@ public class SVNClientImpl implements SVNClient {
         return paths;
     }
 
+    @Override
+    public List<String> getBranches(SVNRepository repository, SVNURL url) {
+        List<String> results = new ArrayList<>();
+        try {
+            getLogClient(repository).doList(
+                    url,
+                    SVNRevision.HEAD,
+                    SVNRevision.HEAD,
+                    false,
+                    false,
+                    dirEntry -> {
+                        if (dirEntry.getKind() == SVNNodeKind.DIR) {
+                            results.add(dirEntry.getName());
+                        }
+                    }
+            );
+        } catch (SVNException ex) {
+            throw translateSVNException(ex);
+        }
+        return results;
+    }
+
     private SCMChangeLogFileChangeType toFileChangeType(SVNStatusType modificationType) {
         if (modificationType.equals(SVNStatusType.STATUS_MODIFIED)) {
             return SCMChangeLogFileChangeType.MODIFIED;

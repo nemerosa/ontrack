@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterResult;
 import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventPostService;
+import net.nemerosa.ontrack.model.exceptions.BranchTemplateCannotHaveBuildException;
 import net.nemerosa.ontrack.model.exceptions.ImageFileSizeException;
 import net.nemerosa.ontrack.model.exceptions.ImageTypeNotAcceptedException;
 import net.nemerosa.ontrack.model.exceptions.ReorderingSizeException;
@@ -206,6 +207,11 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public int getBuildCount(Branch branch) {
+        return structureRepository.getBuildCount(branch);
+    }
+
+    @Override
     public Ack deleteBuild(ID buildId) {
         Validate.isTrue(buildId.isSet(), "Build ID must be set");
         Build build = getBuild(buildId);
@@ -220,6 +226,10 @@ public class StructureServiceImpl implements StructureService {
         isEntityNew(build, "Build must be new");
         isEntityDefined(build.getBranch(), "Branch must be defined");
         isEntityDefined(build.getBranch().getProject(), "Project must be defined");
+        // Branch must not be a template definition
+        if (getBranch(build.getBranch().getId()).getType() == BranchType.TEMPLATE_DEFINITION) {
+            throw new BranchTemplateCannotHaveBuildException(build.getBranch().getName());
+        }
         // Security
         securityService.checkProjectFunction(build.getBranch().getProject().id(), BuildCreate.class);
         // Repository

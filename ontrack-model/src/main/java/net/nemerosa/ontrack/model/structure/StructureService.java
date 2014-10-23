@@ -56,6 +56,11 @@ public interface StructureService {
 
     Build getLastBuildForBranch(Branch branch);
 
+    /**
+     * Gets the number of builds for a branch.
+     */
+    int getBuildCount(Branch branch);
+
     Ack deleteBuild(ID buildId);
 
     /**

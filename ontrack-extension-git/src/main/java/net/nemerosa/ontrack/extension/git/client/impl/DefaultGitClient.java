@@ -234,6 +234,17 @@ public class DefaultGitClient implements GitClient {
         }
     }
 
+    @Override
+    public List<String> getRemoteBranches() {
+        try {
+            return repository.git().lsRemote().setHeads(true).call().stream()
+                    .map(ref -> StringUtils.removeStart(ref.getName(), "refs/heads/"))
+                    .collect(Collectors.toList());
+        } catch (GitAPIException e) {
+            throw new GitException(e);
+        }
+    }
+
     private GitChangeType toChangeType(DiffEntry.ChangeType changeType) {
         switch (changeType) {
             case ADD:

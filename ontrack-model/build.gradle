@@ -1,3 +1,5 @@
+apply plugin: 'groovy'
+
 dependencies {
 
     compile project(':ontrack-common')
@@ -8,6 +10,7 @@ dependencies {
     compile libraries.validation_api
     compile libraries.slf4j_api
 
+    testCompile libraries.groovy
     testCompile project(':ontrack-test-utils')
 
 }

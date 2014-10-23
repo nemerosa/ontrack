@@ -25,6 +25,12 @@ angular.module('ot.service.form', [
 
         /**
          * Gets a form description and displays it
+         * @param formConfig.postForm (optional) function used to configure the form before it is actually displayed
+         * @param formConfig.form (optional) form definition
+         * @param formConfig.uri (optional) URI to get the form from (either `uri` or `form` must be set)
+         * @param formConfig.title Title for the dialog
+         * @param formConfig.submit Function to call with the raw form data. See {@link #submitDialog}
+         * @param formConfig.size 'sm' (default) or 'lg'
          */
         self.display = function (formConfig) {
             var d = $q.defer();
@@ -34,10 +40,16 @@ angular.module('ot.service.form', [
                 if (formConfig.postForm) {
                     form = formConfig.postForm(form);
                 }
+                // Size
+                var size = 'sm';
+                if (formConfig.size) {
+                    size = formConfig.size;
+                }
                 // Dialog
                 $modal.open({
                     templateUrl: 'app/dialog/dialog.form.tpl.html',
                     controller: 'otDialogForm',
+                    size: size,
                     resolve: {
                         config: function () {
                             return {
@@ -47,8 +59,8 @@ angular.module('ot.service.form', [
                         }
                     }
                 }).result.then(
-                    function success() {
-                        d.resolve();
+                    function success(data) {
+                        d.resolve(data);
                     },
                     function error() {
                         d.reject();
@@ -163,6 +175,10 @@ angular.module('ot.service.form', [
                             return item.id;
                         });
                 }
+                // Custom mapping
+                else if (field.prepareForSubmit) {
+                    field.prepareForSubmit(data);
+                }
             });
             // Cleaning of pseudo fields
             delete data.dates;
@@ -206,9 +222,20 @@ angular.module('ot.service.form', [
         };
 
         /**
-         * Flexible submit method to be used in dialog controllers
+         * Flexible submit method to be used in dialog controllers.
+         *
+         * The <code>submitFn</code> is expected to return:
+         * <ol>
+         *     <li>a <code>true</code> value</li>, which then closes the dialog
+         *     <li>a <code>String</code> message, which is displayed as an error message and the dialog is not closed
+         *     <li>a <code>Promise</code> which is called and its success result is used to close the dialog
+         *     whereas its error is displayed in the dialog without closing it.
+         * </ol>
+         *
+         * Returns a promise with the result.
          */
         self.submitDialog = function (submitFn, submitData, modalInstance, messageContainer) {
+            var d = $q.defer();
             var submit = submitFn(submitData);
             if (submit === true) {
                 modalInstance.close('ok');
@@ -218,11 +245,14 @@ angular.module('ot.service.form', [
                 submit.then(
                     function success(data) {
                         modalInstance.close(data);
+                        d.resolve(data);
                     },
                     function error(message) {
                         messageContainer.message = message;
+                        d.reject(message);
                     });
             }
+            return d.promise;
         };
 
         return self;

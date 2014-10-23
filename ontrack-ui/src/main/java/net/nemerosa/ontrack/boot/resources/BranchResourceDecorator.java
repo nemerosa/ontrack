@@ -3,7 +3,9 @@ package net.nemerosa.ontrack.boot.resources;
 import net.nemerosa.ontrack.boot.ui.*;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.Branch;
+import net.nemerosa.ontrack.model.structure.BranchType;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
+import net.nemerosa.ontrack.model.structure.StructureService;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.ResourceContext;
@@ -14,8 +16,11 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
 
-    protected BranchResourceDecorator() {
+    private final StructureService structureService;
+
+    protected BranchResourceDecorator(StructureService structureService) {
         super(Branch.class);
+        this.structureService = structureService;
     }
 
     @Override
@@ -29,7 +34,9 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                 .link(
                         "_createBuild",
                         on(BuildController.class).newBuild(branch.getId(), null),
-                        BuildCreate.class, branch.getProject().id())
+                        branch.getType() != BranchType.TEMPLATE_DEFINITION &&
+                                resourceContext.isProjectFunctionGranted(branch, BuildCreate.class)
+                )
                         // Promotion level creation
                 .link(
                         "_createPromotionLevel",
@@ -115,6 +122,7 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                         on(BranchController.class).enableBranch(branch.getId()),
                         resourceContext.isProjectFunctionGranted(branch.projectId(), ProjectEdit.class)
                                 && branch.isDisabled()
+                                && branch.getType() != BranchType.TEMPLATE_DEFINITION
                 )
                         // Disable
                 .link(
@@ -122,6 +130,36 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                         on(BranchController.class).disableBranch(branch.getId()),
                         resourceContext.isProjectFunctionGranted(branch.projectId(), ProjectEdit.class)
                                 && !branch.isDisabled()
+                                && branch.getType() != BranchType.TEMPLATE_DEFINITION
+                )
+                        // Template definition creation
+                .link(
+                        "_templateDefinition",
+                        on(BranchController.class).getTemplateDefinition(branch.getId()),
+                        branch.getType() != BranchType.TEMPLATE_INSTANCE
+                                && (structureService.getBuildCount(branch) == 0)
+                                && resourceContext.isProjectFunctionGranted(branch, BranchTemplateMgt.class)
+                )
+                        // Template synchronisation
+                .link(
+                        "_templateSync",
+                        on(BranchController.class).syncTemplateDefinition(branch.getId()),
+                        branch.getType() == BranchType.TEMPLATE_DEFINITION
+                                && resourceContext.isProjectFunctionGranted(branch, BranchTemplateMgt.class)
+                )
+                        // Template instance creation
+                .link(
+                        "_templateInstance",
+                        on(BranchController.class).singleTemplateInstanceForm(branch.getId()),
+                        branch.getType() == BranchType.TEMPLATE_DEFINITION
+                                && resourceContext.isProjectFunctionGranted(branch, BranchTemplateMgt.class)
+                )
+                        // Template instance disconnection
+                .link(
+                        "_templateInstanceDisconnect",
+                        on(BranchController.class).disconnectTemplateInstance(branch.getId()),
+                        branch.getType() == BranchType.TEMPLATE_INSTANCE
+                                && resourceContext.isProjectFunctionGranted(branch, BranchTemplateMgt.class)
                 )
                         // OK
                 .build();

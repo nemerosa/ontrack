@@ -23,12 +23,16 @@ public final class JsonUtils {
         return new ArrayBuilder(factory);
     }
 
-    public static JsonNode stringArray(String... values) {
+    public static JsonNode stringArray(Iterable<String> values) {
         ArrayBuilder builder = array();
         for (String value : values) {
             builder.with(text(value));
         }
         return builder.end();
+    }
+
+    public static JsonNode stringArray(String... values) {
+        return stringArray(Arrays.asList(values));
     }
 
     public static Map<String, ?> toMap(JsonNode node) throws IOException {

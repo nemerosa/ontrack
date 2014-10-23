@@ -130,13 +130,27 @@ public class PropertyServiceImpl implements PropertyService {
         }
     }
 
+    @Override
+    public <T> Ack editProperty(ProjectEntity entity, Class<? extends PropertyType<T>> propertyType, T data) {
+        // Gets the property type by name
+        PropertyType<T> actualPropertyType = getPropertyTypeByName(propertyType.getName());
+        // Actual edition
+        return editProperty(entity, actualPropertyType, data);
+    }
+
     private <T> Ack editProperty(ProjectEntity entity, PropertyType<T> propertyType, JsonNode data) {
+        // Gets the value and validates it
+        T value = propertyType.fromClient(data);
+        // Actual edition
+        return editProperty(entity, propertyType, value);
+
+    }
+
+    private <T> Ack editProperty(ProjectEntity entity, PropertyType<T> propertyType, T value) {
         // Checks for edition
         if (!propertyType.canEdit(entity, securityService)) {
             throw new AccessDeniedException("Property is not opened for edition.");
         }
-        // Gets the value and validates it
-        T value = propertyType.fromClient(data);
         // Gets the JSON for the storage
         JsonNode storage = propertyType.forStorage(value);
         // Search key

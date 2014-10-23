@@ -1,4 +1,8 @@
+apply plugin: 'groovy'
+
 dependencies {
     compile project(':ontrack-extension-support')
     compile project(':ontrack-extension-issues')
+
+    testCompile libraries.groovy
 }

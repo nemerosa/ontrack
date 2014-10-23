@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.model.structure;
 
 import lombok.Data;
 
+import java.util.List;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,4 +30,15 @@ public class Replacement {
             return value;
         }
     }
+
+    public static Function<String, String> replacementFn(List<Replacement> replacements) {
+        return (String value) -> {
+            String transformedValue = value;
+            for (Replacement replacement : replacements) {
+                transformedValue = replacement.replace(transformedValue);
+            }
+            return transformedValue;
+        };
+    }
+
 }

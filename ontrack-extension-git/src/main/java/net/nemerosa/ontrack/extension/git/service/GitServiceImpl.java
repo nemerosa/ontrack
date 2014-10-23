@@ -331,6 +331,11 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         return getOntrackGitCommitInfo(commit);
     }
 
+    @Override
+    public List<String> getRemoteBranches(GitConfiguration gitConfiguration) {
+        return gitClientFactory.getClient(gitConfiguration).getRemoteBranches();
+    }
+
     private OntrackGitCommitInfo getOntrackGitCommitInfo(String commit) {
         // Reference data
         AtomicReference<GitCommit> theCommit = new AtomicReference<>();

@@ -10,4 +10,6 @@ public interface ExtensionManager {
 
     boolean isExtensionEnabled(Extension x);
 
+    boolean isExtensionFeatureEnabled(ExtensionFeature feature);
+
 }
