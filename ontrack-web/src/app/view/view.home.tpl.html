@@ -27,6 +27,12 @@
                         </a>
                     </td>
                     <td>
+                        <div class="ot-home-branch" ng-if="project.branchStatusViews.resources.length == 0">
+                            <span class="ot-description">
+                                <span class="fa fa-ban" title="No branch on this project"></span>
+                                No branch
+                            </span>
+                        </div>
                         <div class="ot-home-branch"
                              ng-repeat="branchStatusView in project.branchStatusViews.resources"
                              ng-show="showDisabled || !(branchStatusView.branch.disabled || branchStatusView.branch.type == 'TEMPLATE_DEFINITION')">

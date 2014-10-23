@@ -34,9 +34,10 @@
                                 </div>
                                 <div class="ot-project-branch-promotion"
                                      ng-if="!branch.branchStatusView.latestBuild">
-                                            <span class="fa fa-ban"
-                                                  title="No build on this branch"></span>
-                                            <span class="ot-description">No build</span>
+                                    <span class="ot-description">
+                                        <span class="fa fa-ban" title="No build on this branch"></span>
+                                        No build
+                                    </span>
                                 </div>
                                 <div class="ot-project-branch-promotion"
                                      ng-repeat="promotionView in branch.branchStatusView.promotions">
