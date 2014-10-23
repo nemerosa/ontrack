@@ -250,12 +250,12 @@ public class BranchController extends AbstractResourceController {
                                                         .help(
                                                                 "Those expressions are defined for the synchronisation between " +
                                                                         "template definitions and template instances. They bind " +
-                                                                        "a parameter name and a branch name to an actual parameter " +
+                                                                        "a parameter name and a source name to an actual parameter " +
                                                                         "value. " +
                                                                         "A template expression is a string that contains " +
-                                                                        "references to the branch name using the ${...} construct " +
+                                                                        "references to the source name using the ${...} construct " +
                                                                         "where the content is a Groovy expression where the " +
-                                                                        "branchName variable is bound to the branch name.")
+                                                                        "`sourceName` variable is bound to the source name.")
                                         )
                         )
                                 .label("Parameters")
@@ -267,7 +267,7 @@ public class BranchController extends AbstractResourceController {
                 .with(
                         ServiceConfigurator.of("synchronisationSourceConfig")
                                 .label("Sync. source")
-                                .help("Source of branch names when synchronising")
+                                .help("Source names when synchronising")
                                 .sources(
                                         templateSynchronisationService.getSynchronisationSources().stream()
                                                 .filter(source -> source.isApplicable(branch))
@@ -340,11 +340,11 @@ public class BranchController extends AbstractResourceController {
         if (!templateDefinition.isPresent()) {
             throw new BranchNotTemplateDefinitionException(branchId);
         }
-        // Creates a form with the branch name and all needed parameters
+        // Creates a form with the source name and all needed parameters
         Form form = Form.create().with(
                 Form.defaultNameField()
-                        .label("Branch name")
-                        .help("Name of the branch to create.")
+                        .label("Source name")
+                        .help("Name used to create the branch from.")
         );
         // Parameters only if at least one is available
         List<TemplateParameter> parameters = templateDefinition.get().getParameters();

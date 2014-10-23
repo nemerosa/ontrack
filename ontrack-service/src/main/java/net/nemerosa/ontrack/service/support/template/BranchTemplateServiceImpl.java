@@ -157,9 +157,9 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
             if (unknownParameters.size() > 0) {
                 throw new BranchTemplateInstanceUnknownParametersException(template.getName(), unknownParameters);
             }
-            // Adds `branchName` as a parameter
+            // Adds `sourceName` as a parameter
             Map<String, String> engineParams = new HashMap<>(request.getParameters());
-            engineParams.put("branchName", sourceName);
+            engineParams.put("sourceName", sourceName);
             // Replacement function
             Function<String, String> replacementFn = value -> expressionEngine.render(value, engineParams);
             // Template instance execution context

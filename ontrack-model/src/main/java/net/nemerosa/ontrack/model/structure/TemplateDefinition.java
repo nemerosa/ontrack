@@ -39,22 +39,22 @@ public class TemplateDefinition {
     /**
      * Gets the execution context for the creation of a template instance.
      *
-     * @param branchName       Input for the expression
+     * @param sourceName       Input for the expression
      * @param expressionEngine Expression engine to use
      * @return Transformed string
      */
-    public TemplateInstanceExecution templateInstanceExecution(String branchName, ExpressionEngine expressionEngine) {
-        // Transforms each parameter in a name/value pair, using only the branch name as input
-        Map<String, String> branchNameInput = Collections.singletonMap("branchName", branchName);
+    public TemplateInstanceExecution templateInstanceExecution(String sourceName, ExpressionEngine expressionEngine) {
+        // Transforms each parameter in a name/value pair, using only the source name as input
+        Map<String, String> sourceNameInput = Collections.singletonMap("sourceName", sourceName);
         Map<String, String> parameterMap = Maps.transformValues(
                 Maps.uniqueIndex(
                         parameters,
                         TemplateParameter::getName
                 ),
-                parameter -> expressionEngine.render(parameter.getExpression(), branchNameInput)
+                parameter -> expressionEngine.render(parameter.getExpression(), sourceNameInput)
         );
         // Concatenates the maps
-        Map<String, String> inputMap = new HashMap<>(branchNameInput);
+        Map<String, String> inputMap = new HashMap<>(sourceNameInput);
         inputMap.putAll(parameterMap);
         // Resolves the final expression
         return new TemplateInstanceExecution(

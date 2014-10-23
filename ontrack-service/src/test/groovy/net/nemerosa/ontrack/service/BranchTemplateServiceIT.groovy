@@ -409,7 +409,7 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
                         new TemplateParameter(
                                 'BRANCH',
                                 "Display name for the branch",
-                                'R_${branchName.toUpperCase().replaceAll("/","_")}'
+                                'R_${sourceName.toUpperCase().replaceAll("/","_")}'
                         )
                 ],
                 definition.synchronisationSourceConfig,
@@ -552,7 +552,7 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
         // Creates the base branch
         Branch templateBranch = doCreateBranch(
                 project,
-                nd(templateName, 'Branch ${branchName}')
+                nd(templateName, 'Branch ${sourceName}')
         );
 
         asUser().with(templateBranch, ProjectEdit).call {
@@ -586,7 +586,7 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
             propertyService.editProperty(
                     templateBranch,
                     TestPropertyType,
-                    new TestProperty('Value for ${branchName}')
+                    new TestProperty('Value for ${sourceName}')
             )
         }
 
@@ -606,12 +606,12 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
                         new TemplateParameter(
                                 'BRANCH',
                                 "Display name for the branch",
-                                '${branchName.toUpperCase().replaceAll("/","_")}'
+                                '${sourceName.toUpperCase().replaceAll("/","_")}'
                         ),
                         new TemplateParameter(
                                 'SCM',
                                 "SCM branch",
-                                '${branchName}'
+                                '${sourceName}'
                         )
                 ],
                 new ServiceConfiguration(
