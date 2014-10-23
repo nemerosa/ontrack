@@ -7,6 +7,8 @@ import lombok.EqualsAndHashCode;
 @Data
 public class Password extends AbstractText<Password> {
 
+    private boolean withConfirmation = false;
+
     protected Password(String name) {
         super("password", name);
     }
@@ -15,4 +17,8 @@ public class Password extends AbstractText<Password> {
         return new Password(name);
     }
 
+    public Password withConfirmation() {
+        this.withConfirmation = true;
+        return this;
+    }
 }

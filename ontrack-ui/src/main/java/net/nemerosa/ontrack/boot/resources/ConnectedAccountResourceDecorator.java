@@ -20,9 +20,19 @@ public class ConnectedAccountResourceDecorator extends AbstractResourceDecorator
     public List<Link> links(ConnectedAccount account, ResourceContext resourceContext) {
         return resourceContext.links()
                 .self(on(UserController.class).getCurrentUser())
-                // Login if not logged
-                .link("login", on(UserController.class).loginForm(), !account.isLogged())
-                // OK
+                        // Login if not logged
+                .link(
+                        "login",
+                        on(UserController.class).loginForm(),
+                        !account.isLogged()
+                )
+                        // Changing his password allowed for connected users which are built-in
+                .link(
+                        "_changePassword",
+                        on(UserController.class).getChangePasswordForm(),
+                        account.isLogged() && account.getAccount().getAuthenticationSource().isAllowingPasswordChange()
+                )
+                        // OK
                 .build();
     }
 

@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.model.security;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.experimental.Wither;
 
 import java.io.Serializable;
 
@@ -15,9 +16,11 @@ public class AuthenticationSource implements Serializable {
 
     private final String id;
     private final String name;
+    @Wither
+    private final boolean allowingPasswordChange;
 
     public static AuthenticationSource of(String id, String name) {
-        return new AuthenticationSource(id, name);
+        return new AuthenticationSource(id, name, false);
     }
 
     /**
@@ -26,5 +29,4 @@ public class AuthenticationSource implements Serializable {
     public static AuthenticationSource none() {
         return of("none", "Not defined");
     }
-
 }

@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.boot.ui;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.extension.api.UserMenuExtension;
 import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.form.Password;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +67,23 @@ public class UserController extends AbstractResourceController {
     @RequestMapping(value = "logged-out", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void loggedOut() {
+    }
+
+    @RequestMapping(value = "password", method = RequestMethod.GET)
+    public Form getChangePasswordForm() {
+        return Form.create()
+                .with(
+                        Password.of("oldPassword")
+                                .label("Old password")
+                                .help("You need your old password in order to change it. If you do not remember it, " +
+                                        "you'll have to contact an administrator who can change it for you.")
+                )
+                .with(
+                        Password.of("newPassword")
+                                .label("New password")
+                                .withConfirmation()
+                )
+                ;
     }
 
     // Resource assemblers
