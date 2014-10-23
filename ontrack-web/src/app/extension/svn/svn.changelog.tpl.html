@@ -114,7 +114,7 @@
                                 <ot-loading>Revisions are loading...</ot-loading>
                             </div>
                             <!-- Merge -->
-                            <table class="table table-condensed table-hover" ng-show="revisions">
+                            <table class="table table-condensed table-hover ot-extension-svn-changelog-revisions" ng-show="revisions">
                                 <thead>
                                 <tr>
                                     <th>Revision</th>
@@ -133,7 +133,7 @@
                                     <td>
                                         {{svnChangeLogRevision.author}}
                                     </td>
-                                    <td>
+                                    <td class="ot-extension-svn-changelog-revisions-date">
                                         {{svnChangeLogRevision.revisionDate | date:'mediumDate'}}
                                         {{svnChangeLogRevision.revisionDate | date:'shortTime'}}
                                     </td>
