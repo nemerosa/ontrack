@@ -1,6 +1,6 @@
 @import 'main.less';
 
-@otHomeRowHeight: 3.5em;
+@otHomeRowHeight: 4em;
 @otHomeMargin: 0.5em;
 
 .make-project-row(@height) {
@@ -37,6 +37,12 @@ table.ot-home-projects {
       margin-bottom: @otHomeMargin;
       .make-project-row(@otHomeRowHeight);
       border: solid 1px @btn-default-border;
+      .ot-home-branch-name {
+        display: block;
+        a {
+          font-weight: bold;
+        }
+      }
       .ot-icon {
         .ot-icon-mini;
       }
