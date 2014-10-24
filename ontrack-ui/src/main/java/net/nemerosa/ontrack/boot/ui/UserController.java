@@ -2,19 +2,19 @@ package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.extension.api.UserMenuExtension;
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Password;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.support.Action;
+import net.nemerosa.ontrack.model.support.PasswordChange;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Collection;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -24,11 +24,13 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 public class UserController extends AbstractResourceController {
 
     private final SecurityService securityService;
+    private final UserService userService;
     private final ExtensionManager extensionManager;
 
     @Autowired
-    public UserController(SecurityService securityService, ExtensionManager extensionManager) {
+    public UserController(SecurityService securityService, UserService userService, ExtensionManager extensionManager) {
         this.securityService = securityService;
+        this.userService = userService;
         this.extensionManager = extensionManager;
     }
 
@@ -87,6 +89,11 @@ public class UserController extends AbstractResourceController {
                                 .withConfirmation()
                 )
                 ;
+    }
+
+    @RequestMapping(value = "password", method = RequestMethod.POST)
+    public Ack changePassword(@RequestBody @Valid PasswordChange input) {
+        return userService.changePassword(input);
     }
 
     // Resource assemblers
