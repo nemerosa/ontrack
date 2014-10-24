@@ -7,7 +7,13 @@ Installing Vagrant.
 	
 ## Running
 
+The very first time the machine is created:
+
     vagrant up
+
+To rerun the provisioning:
+
+    vagrant provision
 
 ## Resources
 
