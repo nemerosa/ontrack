@@ -36,4 +36,13 @@ public interface CopyService {
      * @return Created project
      */
     Project cloneProject(Project project, ProjectCloneRequest request);
+
+    /**
+     * Bulk update for a branch, by using replacements on all its components.
+     *
+     * @param branch  Branch to update
+     * @param request Update instructions
+     * @return Updated branch
+     */
+    Branch update(Branch branch, BranchBulkUpdateRequest request);
 }

@@ -8,10 +8,10 @@ import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.exceptions.BranchNotTemplateDefinitionException;
 import net.nemerosa.ontrack.model.form.*;
-import net.nemerosa.ontrack.model.support.Action;
 import net.nemerosa.ontrack.model.security.BranchCreate;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.model.support.Action;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resources;
@@ -195,6 +195,30 @@ public class BranchController extends AbstractResourceController {
         Branch branch = structureService.getBranch(branchId);
         // Performs the copy
         return copyService.copy(branch, request);
+    }
+
+    /**
+     * Gets the form for a bulk update of the branch
+     */
+    @RequestMapping(value = "branches/{branchId}/update/bulk", method = RequestMethod.GET)
+    public Form bulkUpdate(@PathVariable ID branchId) {
+        return Form.create()
+                .with(
+                        Replacements.of("replacements")
+                                .label("Replacements")
+                )
+                ;
+    }
+
+    /**
+     * Bulk update for a branch.
+     */
+    @RequestMapping(value = "branches/{branchId}/update/bulk", method = RequestMethod.PUT)
+    public Branch bulkUpdate(@PathVariable ID branchId, @RequestBody BranchBulkUpdateRequest request) {
+        // Gets the branch
+        Branch branch = structureService.getBranch(branchId);
+        // Performs the update
+        return copyService.update(branch, request);
     }
 
     /**

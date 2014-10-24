@@ -112,6 +112,12 @@ public class CopyServiceImpl implements CopyService {
         return targetProject;
     }
 
+    @Override
+    public Branch update(Branch branch, BranchBulkUpdateRequest request) {
+        // FIXME Method net.nemerosa.ontrack.service.CopyServiceImpl.update
+        return null;
+    }
+
     protected void doCopy(Branch sourceBranch, Branch targetBranch, Function<String, String> replacementFn, SyncPolicy syncPolicy) {
         // Branch properties
         doCopyProperties(sourceBranch, targetBranch, replacementFn, syncPolicy);
