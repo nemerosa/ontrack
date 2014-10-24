@@ -4,13 +4,10 @@ Installing Vagrant.
 
 	vagrant box add hashicorp/precise64
 	# for VM Fusion
+	
+## Running
 
-## Vagrant configuration
-
-	touch Vagrantfile
-	git init
-	git add Vagrantfile 
-	git commit -m "Starting our new dev environment"
+    vagrant up
 
 ## Resources
 
@@ -21,7 +18,7 @@ Installing Vagrant.
 ## Actions
 
 * [x] Running an empty machine
-* [ ] Running puppet apply
+* [x] Running puppet apply
 * [ ] Installing Java
 * [ ] Installing ontrack
 * [ ] Open port in Vagrant
