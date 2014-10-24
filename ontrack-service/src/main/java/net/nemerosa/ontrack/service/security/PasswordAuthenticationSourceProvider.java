@@ -10,7 +10,7 @@ public class PasswordAuthenticationSourceProvider implements AuthenticationSourc
     private final AuthenticationSource source = AuthenticationSource.of(
             "password",
             "Built-in"
-    );
+    ).withAllowingPasswordChange(true);
 
     @Override
     public AuthenticationSource getSource() {

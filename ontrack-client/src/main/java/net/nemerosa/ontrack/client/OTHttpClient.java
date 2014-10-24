@@ -11,6 +11,8 @@ public interface OTHttpClient {
 
     <T> T get(ResponseParser<T> responseParser, String path, Object... parameters);
 
+    <T> T delete(ResponseParser<T> responseParser, String path, Object... parameters);
+
     <T> T post(ResponseParser<T> responseParser, HttpEntity data, String path, Object... parameters);
 
     <T> T request(HttpRequestBase request, final ResponseParser<T> responseParser);

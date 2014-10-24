@@ -236,6 +236,47 @@ public class SVNServiceImpl implements SVNService {
         );
     }
 
+    @Override
+    public Optional<SVNRepository> getSVNRepository(Branch branch) {
+        // Gets the SVN project configuration property
+        Property<SVNProjectConfigurationProperty> projectConfiguration = propertyService.getProperty(
+                branch.getProject(),
+                SVNProjectConfigurationPropertyType.class
+        );
+        if (projectConfiguration.isEmpty()) {
+            return Optional.empty();
+        } else {
+            SVNConfiguration configuration = projectConfiguration.getValue().getConfiguration();
+            return Optional.of(
+                    getRepository(configuration.getName())
+            );
+        }
+    }
+
+    @Override
+    public List<String> getBranches(Branch branch) {
+        Property<SVNProjectConfigurationProperty> svnProperty = propertyService.getProperty(
+                branch.getProject(),
+                SVNProjectConfigurationPropertyType.class
+        );
+        if (svnProperty.isEmpty()) {
+            return Collections.emptyList();
+        } else {
+            SVNRepository repository = getSVNRepository(branch).get();
+            String projectPath = svnProperty.getValue().getProjectPath();
+            String branchesDir;
+            if (projectPath.endsWith("/trunk")) {
+                branchesDir = projectPath.replace("/trunk", "/branches");
+            } else {
+                branchesDir = projectPath + "/branches";
+            }
+            return svnClient.getBranches(
+                    repository,
+                    SVNUtils.toURL(repository.getUrl(branchesDir))
+            );
+        }
+    }
+
     private Optional<Build> lookupBuild(SVNLocation location, SVNLocation firstCopy, Branch branch) {
         // Gets the SVN configuration for the branch
         Property<SVNBranchConfigurationProperty> configurationProperty = propertyService.getProperty(branch, SVNBranchConfigurationPropertyType.class);

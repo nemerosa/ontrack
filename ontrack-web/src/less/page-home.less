@@ -1,11 +1,53 @@
 @import 'main.less';
 
-@otHomeRowHeight: 3.5em;
+@otHomeRowHeight: 4em;
 @otHomeMargin: 0.5em;
 
-.ot-home-row {
-  min-height: @otHomeRowHeight !important;
-  height: @otHomeRowHeight !important;
+.make-project-row(@height) {
+  min-height: @height !important;
+  height: @height !important;
+}
+
+table.ot-home-projects {
+  border-collapse: separate;
+  tr {
+    .make-project-row(@otHomeRowHeight);
+    td:first-child {
+      vertical-align: top;
+      padding: @otHomeMargin;
+      border-bottom: solid @otHomeMargin white;
+      .bg-primary;
+      a {
+        color: @btn-primary-color;
+        font-weight: bold;
+      }
+      &.ot-entity-disabled {
+        opacity: 0.5;
+      }
+      .ot-decoration {
+        img {
+          .ot-icon-mini;
+        }
+      }
+    }
+    .ot-home-branch {
+      float: left;
+      padding: @otHomeMargin;
+      margin-left: @otHomeMargin;
+      margin-bottom: @otHomeMargin;
+      .make-project-row(@otHomeRowHeight);
+      border: solid 1px @btn-default-border;
+      .ot-home-branch-name {
+        display: block;
+        a {
+          font-weight: bold;
+        }
+      }
+      .ot-icon {
+        .ot-icon-mini;
+      }
+    }
+  }
 }
 
 .ot-home-header {
@@ -17,40 +59,4 @@
   margin-bottom: @otHomeMargin;
   margin-top: @otHomeMargin;
   margin-left: -2px;
-}
-
-.ot-home-project {
-  margin-bottom: @otHomeMargin;
-  padding-left: 1em;
-
-  .ot-home-project-name {
-    .ot-home-row;
-    margin-left: -1px !important;
-    vertical-align: middle;
-    .bg-primary;
-    a {
-      color: @btn-primary-color;
-      font-weight: bold;
-    }
-  }
-
-  .ot-home-project-branches {
-    .ot-home-branch {
-      .ot-home-row;
-      border: solid 1px @btn-default-border;
-      margin-left: -1px;
-      .ot-home-branch-name {
-        display: block;
-        a {
-          font-weight: bold;
-        }
-      }
-      .ot-home-branch-promotion {
-        font-size: 85%;
-        .ot-icon {
-          .ot-icon-mini;
-        }
-      }
-    }
-  }
 }

@@ -52,6 +52,10 @@ public class RegisteredJob {
         return run.get() != null;
     }
 
+    public boolean isDisabled() {
+        return job != null && job.isDisabled();
+    }
+
     public boolean mustStart() {
         if (sync < 0) {
             // Special case of job registered on the fly, outside of normal registration

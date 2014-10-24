@@ -87,7 +87,8 @@
                         <ul class="dropdown-menu" role="menu">
                             <!-- All actions -->
                             <li ng-repeat="action in user.actions">
-                                <a id="{{action.id}}" href="#{{action.uri}}">{{action.name}}</a>
+                                <a ng-if="action.type == 'LINK'" id="{{action.id}}-link" href="#{{action.uri}}">{{action.name}}</a>
+                                <a ng-if="action.type == 'FORM'" id="{{action.id}}-form" ng-click="showActionForm(action)">{{action.name}}</a>
                             </li>
                             <!-- Logout -->
                             <li>

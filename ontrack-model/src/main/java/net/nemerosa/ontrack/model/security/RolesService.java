@@ -37,6 +37,8 @@ public interface RolesService {
             ProjectAuthorisationsManagement.class,
             BranchCreate.class,
             BranchEdit.class,
+            BranchFilterMgt.class,
+            BranchTemplateMgt.class,
             BranchDelete.class,
             PromotionLevelCreate.class,
             PromotionLevelEdit.class,

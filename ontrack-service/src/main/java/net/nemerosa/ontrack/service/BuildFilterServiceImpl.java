@@ -6,8 +6,11 @@ import net.nemerosa.ontrack.model.buildfilter.*;
 import net.nemerosa.ontrack.model.exceptions.BuildFilterNotFoundException;
 import net.nemerosa.ontrack.model.exceptions.BuildFilterNotLoggedException;
 import net.nemerosa.ontrack.model.security.Account;
+import net.nemerosa.ontrack.model.security.BranchFilterMgt;
 import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ID;
+import net.nemerosa.ontrack.model.structure.StructureService;
 import net.nemerosa.ontrack.repository.BuildFilterRepository;
 import net.nemerosa.ontrack.repository.TBuildFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,15 +28,17 @@ public class BuildFilterServiceImpl implements BuildFilterService {
 
     private final Collection<BuildFilterProvider<?>> buildFilterProviders;
     private final BuildFilterRepository buildFilterRepository;
+    private final StructureService structureService;
     private final SecurityService securityService;
 
     @Autowired
     public BuildFilterServiceImpl(
             Collection<BuildFilterProvider<?>> buildFilterProviders,
             BuildFilterRepository buildFilterRepository,
-            SecurityService securityService) {
+            StructureService structureService, SecurityService securityService) {
         this.buildFilterProviders = buildFilterProviders;
         this.buildFilterRepository = buildFilterRepository;
+        this.structureService = structureService;
         this.securityService = securityService;
     }
 
@@ -45,19 +49,25 @@ public class BuildFilterServiceImpl implements BuildFilterService {
 
     @Override
     public Collection<BuildFilterResource<?>> getBuildFilters(ID branchId) {
+        Branch branch = structureService.getBranch(branchId);
         // Are we logged?
         Account account = securityService.getCurrentAccount();
         if (account != null) {
             // Gets the filters for this account and the branch
-            return buildFilterRepository.findForBranch(account.id(), branchId.getValue()).stream()
-                    .map(this::loadBuildFilterResource)
+            return buildFilterRepository.findForBranch(OptionalInt.of(account.id()), branchId.getValue()).stream()
+                    .map(t -> loadBuildFilterResource(branch, t))
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .collect(Collectors.toList());
         }
         // Not logged, no filter
         else {
-            return Collections.emptyList();
+            // Gets the filters for the branch
+            return buildFilterRepository.findForBranch(OptionalInt.empty(), branchId.get()).stream()
+                    .map(t -> loadBuildFilterResource(branch, t))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toList());
         }
     }
 
@@ -95,12 +105,34 @@ public class BuildFilterServiceImpl implements BuildFilterService {
     }
 
     @Override
-    public Ack saveFilter(ID branchId, String name, String type, JsonNode parameters) {
+    public Ack saveFilter(ID branchId, boolean shared, String name, String type, JsonNode parameters) {
         // Checks the account
-        Account account = securityService.getCurrentAccount();
-        if (account == null) {
-            return Ack.NOK;
+        if (shared) {
+            Account account = securityService.getCurrentAccount();
+            // Gets the branch
+            Branch branch = structureService.getBranch(branchId);
+            // Checks access rights
+            securityService.checkProjectFunction(branch, BranchFilterMgt.class);
+            // Deletes any previous filter
+            int currentAccountId = account.id();
+            buildFilterRepository.findByBranchAndName(currentAccountId, branchId.get(), name).ifPresent(
+                    (filter) -> buildFilterRepository.delete(currentAccountId, branchId.get(), name, true)
+            );
+            // No account to be used
+            return doSaveFilter(OptionalInt.empty(), branchId, name, type, parameters);
+        } else {
+            Account account = securityService.getCurrentAccount();
+            if (account == null) {
+                return Ack.NOK;
+            } else {
+                // Saves it for this account
+                return doSaveFilter(OptionalInt.of(account.id()), branchId, name, type, parameters);
+            }
         }
+
+    }
+
+    private Ack doSaveFilter(OptionalInt accountId, ID branchId, String name, String type, JsonNode parameters) {
         // Checks the provider
         Optional<? extends BuildFilterProvider<Object>> provider = getBuildFilterProviderByType(type);
         if (!provider.isPresent()) {
@@ -115,14 +147,18 @@ public class BuildFilterServiceImpl implements BuildFilterService {
             return Ack.NOK;
         }
         // Saving
-        return buildFilterRepository.save(account.id(), branchId.getValue(), name, type, parameters);
+        return buildFilterRepository.save(accountId, branchId.getValue(), name, type, parameters);
     }
 
     @Override
     public Ack deleteFilter(ID branchId, String name) {
-        return securityService.getAccount()
-                .map(account -> buildFilterRepository.delete(account.id(), branchId.getValue(), name))
-                .orElse(Ack.NOK);
+        // Gets the branch
+        Branch branch = structureService.getBranch(branchId);
+        // If user is allowed to manage shared filters, this filter might have to be deleted from the shared filters
+        // as well
+        boolean sharedFilter = securityService.isProjectFunctionGranted(branch, BranchFilterMgt.class);
+        // Deleting the filter
+        return buildFilterRepository.delete(securityService.getCurrentAccount().id(), branchId.get(), name, sharedFilter);
     }
 
     @Override
@@ -154,15 +190,16 @@ public class BuildFilterServiceImpl implements BuildFilterService {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> Optional<BuildFilterResource<T>> loadBuildFilterResource(TBuildFilter t) {
+    private <T> Optional<BuildFilterResource<T>> loadBuildFilterResource(Branch branch, TBuildFilter t) {
         return getBuildFilterProviderByType(t.getType())
-                .flatMap(provider -> loadBuildFilterResource((BuildFilterProvider<T>) provider, t.getBranchId(), t.getName(), t.getData()));
+                .flatMap(provider -> loadBuildFilterResource((BuildFilterProvider<T>) provider, branch, t.isShared(), t.getName(), t.getData()));
     }
 
-    private <T> Optional<BuildFilterResource<T>> loadBuildFilterResource(BuildFilterProvider<T> provider, int branchId, String name, JsonNode data) {
+    private <T> Optional<BuildFilterResource<T>> loadBuildFilterResource(BuildFilterProvider<T> provider, Branch branch, boolean shared, String name, JsonNode data) {
         return provider.parse(data).map(parsedData ->
                         new BuildFilterResource<>(
-                                ID.of(branchId),
+                                branch,
+                                shared,
                                 name,
                                 provider.getClass().getName(),
                                 parsedData

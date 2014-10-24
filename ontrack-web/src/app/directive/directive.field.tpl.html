@@ -19,7 +19,7 @@
        ng-readonly="field.readOnly"/>
 
 <!-- Type: memo -->
-<textarea ng-if="field.type == 'memo'" ng-model="data[field.name]" class="form-control"
+<textarea ng-if="field.type == 'memo'" ng-model="data[field.name]" class="form-control" name="{{field.name}}"
           rows="{{field.rows}}" ng-required="field.required" maxlength="{{field.maxlength}}"
           ng-readonly="field.readOnly"></textarea>
 
@@ -50,6 +50,16 @@
 <!-- Type: named entries -->
 <div ng-if="field.type == 'namedEntries'">
     <ot-field-named-entries field="field" data="data"></ot-field-named-entries>
+</div>
+
+<!-- Type: multi form -->
+<div ng-if="field.type == 'multi-form'">
+    <ot-field-multi-form field="field" data="data" form-root="formRoot"></ot-field-multi-form>
+</div>
+
+<!-- Type: service configurator -->
+<div ng-if="field.type == 'service-configurator'">
+    <ot-field-service-configurator field="field" data="data" form-root="formRoot"></ot-field-service-configurator>
 </div>
 
 <!-- Date -->

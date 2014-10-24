@@ -22,12 +22,12 @@ import java.util.stream.Collectors;
 @Repository
 public class StructureJdbcRepository extends AbstractJdbcRepository implements StructureRepository {
 
-    private final ValidationRunStatusService validationRunStatusService;
+    private final BranchTemplateRepository branchTemplateRepository;
 
     @Autowired
-    public StructureJdbcRepository(DataSource dataSource, ValidationRunStatusService validationRunStatusService) {
+    public StructureJdbcRepository(DataSource dataSource, BranchTemplateRepository branchTemplateRepository) {
         super(dataSource);
-        this.validationRunStatusService = validationRunStatusService;
+        this.branchTemplateRepository = branchTemplateRepository;
     }
 
     @Override
@@ -35,8 +35,10 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         // Creation
         try {
             int id = dbCreate(
-                    "INSERT INTO PROJECTS(NAME, DESCRIPTION) VALUES (:name, :description)",
-                    params("name", project.getName()).addValue("description", project.getDescription())
+                    "INSERT INTO PROJECTS(NAME, DESCRIPTION, DISABLED) VALUES (:name, :description, :disabled)",
+                    params("name", project.getName())
+                            .addValue("description", project.getDescription())
+                            .addValue("disabled", project.isDisabled())
             );
             // Returns with ID
             return project.withId(id(id));
@@ -80,9 +82,10 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     @Override
     public void saveProject(Project project) {
         getNamedParameterJdbcTemplate().update(
-                "UPDATE PROJECTS SET NAME = :name, DESCRIPTION = :description WHERE ID = :id",
+                "UPDATE PROJECTS SET NAME = :name, DESCRIPTION = :description, DISABLED = :disabled WHERE ID = :id",
                 params("name", project.getName())
                         .addValue("description", project.getDescription())
+                        .addValue("disabled", project.isDisabled())
                         .addValue("id", project.getId().getValue())
         );
     }
@@ -135,9 +138,10 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         // Creation
         try {
             int id = dbCreate(
-                    "INSERT INTO BRANCHES(PROJECTID, NAME, DESCRIPTION) VALUES (:projectId, :name, :description)",
+                    "INSERT INTO BRANCHES(PROJECTID, NAME, DESCRIPTION, DISABLED) VALUES (:projectId, :name, :description, :disabled)",
                     params("name", branch.getName())
                             .addValue("description", branch.getDescription())
+                            .addValue("disabled", branch.isDisabled())
                             .addValue("projectId", branch.getProject().id())
             );
             // Returns with ID
@@ -152,9 +156,10 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         // Update
         try {
             getNamedParameterJdbcTemplate().update(
-                    "UPDATE BRANCHES SET NAME = :name, DESCRIPTION = :description WHERE ID = :id",
+                    "UPDATE BRANCHES SET NAME = :name, DESCRIPTION = :description, DISABLED = :disabled WHERE ID = :id",
                     params("name", branch.getName())
                             .addValue("description", branch.getDescription())
+                            .addValue("disabled", branch.isDisabled())
                             .addValue("id", branch.id())
             );
         } catch (DuplicateKeyException ex) {
@@ -291,6 +296,15 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                         params("branch", branchId.getValue()).addValue("name", buildName),
                         (rs, rowNum) -> toBuild(rs, this::getBranch)
                 )
+        );
+    }
+
+    @Override
+    public int getBuildCount(Branch branch) {
+        return getNamedParameterJdbcTemplate().queryForObject(
+                "SELECT COUNT(ID) FROM BUILDS WHERE BRANCHID = :branchId",
+                params("branchId", branch.id()),
+                Integer.class
         );
     }
 
@@ -636,7 +650,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
-    public ValidationRun newValidationRun(ValidationRun validationRun) {
+    public ValidationRun newValidationRun(ValidationRun validationRun, Function<String, ValidationRunStatusID> validationRunStatusService) {
 
         // Validation run itself (parent)
         int id = dbCreate(
@@ -650,37 +664,39 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 .forEach(validationRunStatus -> newValidationRunStatus(id, validationRunStatus));
 
         // Reloads the run
-        return getValidationRun(ID.of(id));
+        return getValidationRun(ID.of(id), validationRunStatusService);
     }
 
     @Override
-    public ValidationRun getValidationRun(ID validationRunId) {
+    public ValidationRun getValidationRun(ID validationRunId, Function<String, ValidationRunStatusID> validationRunStatusService) {
         return getNamedParameterJdbcTemplate().queryForObject(
                 "SELECT * FROM VALIDATION_RUNS WHERE ID = :id",
                 params("id", validationRunId.getValue()),
                 (rs, rowNum) -> toValidationRun(
                         rs,
                         this::getBuild,
-                        this::getValidationStamp
+                        this::getValidationStamp,
+                        validationRunStatusService
                 )
         );
     }
 
     @Override
-    public List<ValidationRun> getValidationRunsForBuild(Build build) {
+    public List<ValidationRun> getValidationRunsForBuild(Build build, Function<String, ValidationRunStatusID> validationRunStatusService) {
         return getNamedParameterJdbcTemplate().query(
                 "SELECT * FROM VALIDATION_RUNS WHERE BUILDID = :buildId",
                 params("buildId", build.id()),
                 (rs, rowNum) -> toValidationRun(
                         rs,
                         id -> build,
-                        this::getValidationStamp
+                        this::getValidationStamp,
+                        validationRunStatusService
                 )
         );
     }
 
     @Override
-    public List<ValidationRun> getValidationRunsForValidationStamp(ValidationStamp validationStamp, int offset, int count) {
+    public List<ValidationRun> getValidationRunsForValidationStamp(ValidationStamp validationStamp, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService) {
         return getNamedParameterJdbcTemplate().query(
                 "SELECT * FROM VALIDATION_RUNS WHERE VALIDATIONSTAMPID = :validationStampId ORDER BY BUILDID DESC, ID DESC LIMIT :limit OFFSET :offset",
                 params("validationStampId", validationStamp.id())
@@ -689,7 +705,8 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 (rs, rowNum) -> toValidationRun(
                         rs,
                         this::getBuild,
-                        id -> validationStamp
+                        id -> validationStamp,
+                        validationRunStatusService
                 )
         );
     }
@@ -714,7 +731,10 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         );
     }
 
-    protected ValidationRun toValidationRun(ResultSet rs, Function<ID, Build> buildSupplier, Function<ID, ValidationStamp> validationStampSupplier) throws SQLException {
+    protected ValidationRun toValidationRun(ResultSet rs,
+                                            Function<ID, Build> buildSupplier,
+                                            Function<ID, ValidationStamp> validationStampSupplier,
+                                            Function<String, ValidationRunStatusID> validationRunStatusService) throws SQLException {
         int id = rs.getInt("id");
         // Statuses
         List<ValidationRunStatus> statuses = getNamedParameterJdbcTemplate().query(
@@ -722,7 +742,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 params("validationRunId", id),
                 (rs1, rowNum) -> ValidationRunStatus.of(
                         readSignature(rs1),
-                        validationRunStatusService.getValidationRunStatus(rs1.getString("validationRunStatusId")),
+                        validationRunStatusService.apply(rs1.getString("validationRunStatusId")),
                         rs1.getString("description")
                 )
         );
@@ -765,20 +785,37 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     protected Branch toBranch(ResultSet rs, Function<ID, Project> projectSupplier) throws SQLException {
+        ID projectId = id(rs, "projectId");
+        ID branchId = id(rs);
         return Branch.of(
-                projectSupplier.apply(id(rs, "projectId")),
+                projectSupplier.apply(projectId),
                 new NameDescription(
                         rs.getString("name"),
                         rs.getString("description")
                 )
-        ).withId(id(rs));
+        )
+                .withId(branchId)
+                .withType(getBranchType(branchId))
+                .withDisabled(rs.getBoolean("disabled"));
+    }
+
+    private BranchType getBranchType(ID branchId) {
+        if (branchTemplateRepository.isTemplateDefinition(branchId)) {
+            return BranchType.TEMPLATE_DEFINITION;
+        } else if (branchTemplateRepository.isTemplateInstance(branchId)) {
+            return BranchType.TEMPLATE_INSTANCE;
+        } else {
+            return BranchType.CLASSIC;
+        }
     }
 
     protected Project toProject(ResultSet rs) throws SQLException {
         return Project.of(new NameDescription(
                 rs.getString("name"),
                 rs.getString("description")
-        )).withId(id(rs.getInt("id")));
+        ))
+                .withId(id(rs.getInt("id")))
+                .withDisabled(rs.getBoolean("disabled"));
     }
 
     protected Document toDocument(ResultSet rs) throws SQLException {

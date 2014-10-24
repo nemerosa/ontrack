@@ -2,10 +2,11 @@ angular.module('ot.service.copy', [
     'ot.service.core',
     'ot.service.form',
     'ot.dialog.branch.copy',
+    'ot.dialog.branch.bulk',
     'ot.dialog.branch.clone',
     'ot.dialog.project.clone'
 ])
-    .service('otCopyService', function ($modal, $http, ot) {
+    .service('otCopyService', function ($modal, $http, ot, otFormService) {
         var self = {};
 
         /**
@@ -27,6 +28,29 @@ angular.module('ot.service.copy', [
                                     replacements: copy.replacements
                                 };
                                 return ot.call($http.put(targetBranch._copy, request));
+                            }
+                        };
+                    }
+                }
+            }).result;
+        };
+
+        /**
+         * Bulk update of the branch.
+         */
+        self.bulkUpdate = function (branch) {
+            return $modal.open({
+                templateUrl: 'app/dialog/dialog.branch.bulk.tpl.html',
+                controller: 'otDialogBranchBulk',
+                resolve: {
+                    config: function () {
+                        return {
+                            branch: branch,
+                            submit: function (data) {
+                                var request = {
+                                    replacements: data.replacements
+                                };
+                                return ot.call($http.put(branch._bulkUpdate, request));
                             }
                         };
                     }

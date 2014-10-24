@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.git.service;
 
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
-import net.nemerosa.ontrack.extension.support.configurations.AbstractConfigurationService;
-import net.nemerosa.ontrack.security.EncryptionService;
+import net.nemerosa.ontrack.extension.support.AbstractConfigurationService;
+import net.nemerosa.ontrack.model.security.EncryptionService;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
 import org.springframework.beans.factory.annotation.Autowired;

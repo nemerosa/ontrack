@@ -12,10 +12,10 @@ dependencies {
     compile libraries.spring_security_ldap
     compile libraries.slf4j_api
     compile libraries.commons_io
+    compile libraries.groovy
+    compile libraries.groovy_sandbox
 
-    testCompile libraries.groovy
     testCompile project(':ontrack-it-utils')
-    testCompile project(':ontrack-extension-general')
     testRuntime project(':ontrack-repository-impl')
 
     // Dependencies needed for LDAP integration tests

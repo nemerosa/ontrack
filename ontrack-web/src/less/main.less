@@ -16,7 +16,6 @@
 @import '../../vendor/bootstrap/less/code';
 @import '../../vendor/bootstrap/less/dropdowns';
 @import '../../vendor/bootstrap/less/forms';
-@import '../../vendor/bootstrap/less/glyphicons';
 @import '../../vendor/bootstrap/less/grid';
 @import '../../vendor/bootstrap/less/input-groups';
 @import '../../vendor/bootstrap/less/jumbotron';
@@ -38,6 +37,20 @@
 @import '../../vendor/bootstrap/less/type';
 @import '../../vendor/bootstrap/less/utilities';
 @import '../../vendor/bootstrap/less/wells';
+/**
+ * Second, importing Less files from Font Awesome
+ */
+@import '../../vendor/font-awesome/less/mixins';
+@import '../../vendor/font-awesome/less/path';
+@import '../../vendor/font-awesome/less/core';
+@import '../../vendor/font-awesome/less/larger';
+@import '../../vendor/font-awesome/less/fixed-width';
+@import '../../vendor/font-awesome/less/list';
+@import '../../vendor/font-awesome/less/bordered-pulled';
+@import '../../vendor/font-awesome/less/spinning';
+@import '../../vendor/font-awesome/less/rotated-flipped';
+@import '../../vendor/font-awesome/less/stacked';
+@import '../../vendor/font-awesome/less/icons';
 /**
  * This is our main variables file. It in turn imports the `variables` file from
  * Twitter Bootstrap. We must include it last so we can overwrite any variable
@@ -75,9 +88,9 @@
  * General
  */
 
-a.ot-loading-indicator {
-  .glyphicon;
-  .glyphicon-time;
+.ot-loading-indicator {
+  .ot-icon-x(@fa-var-spinner);
+  .fa-spin;
 }
 
 .ot-description {
@@ -160,6 +173,9 @@ div.ot-view {
   .ot-view-commands {
     .pull-right;
   }
+  .alert {
+    margin-left: 1em;
+  }
 }
 
 .ot-footer {
@@ -231,8 +247,7 @@ div.ot-view {
 .ot-view-breadcrumbs {
   font-size: 50%;
   .ot-view-breadcrumbs-separator {
-    .glyphicon;
-    .glyphicon-play;
+    .ot-icon-x(@fa-var-play);
     opacity: 0.3;
   }
 }
@@ -271,6 +286,18 @@ table.ot-form-view {
   cursor: pointer;
   &:hover {
     color: white;
+  }
+}
+
+.ot-entity-disabled-alert {
+  .alert;
+  .alert-warning;
+}
+
+.ot-view-content {
+  .ot-entity-disabled-alert {
+    margin-left: 1em;
+    margin-right: 1em;
   }
 }
 
@@ -345,9 +372,8 @@ td.ot-entity-image {
 }
 
 .ot-promotion-run-separator {
-  .glyphicon;
-  .glyphicon-arrow-right;
-  font-size: 200%;
+  .ot-icon-x(@fa-var-arrow-right);
+  .fa-2x;
   display: inline-block;
   margin-right: 0.5em;
   vertical-align: 5px;
@@ -434,34 +460,53 @@ table.ot-validation-runs {
   }
 }
 
+.ot-view-commands {
+  text-align: right;
+}
+
 span.ot-view-command {
   .ot-command;
   margin-left: 0.5em;
+  .ot-view-command-name {
+    text-wrap: none;
+    white-space: nowrap;
+  }
 }
 
 .ot-command-delete {
-  .glyphicon;
-  .glyphicon-trash;
+  .ot-icon-x(@fa-var-trash);
 }
 
 .ot-command-update {
-  .glyphicon;
-  .glyphicon-pencil;
+  .ot-icon-x(@fa-var-pencil);
 }
 
 .ot-command-close {
-  .glyphicon;
-  .glyphicon-remove;
+  .ot-icon-x(@fa-var-close);
 }
 
 .ot-command-actions {
-  .glyphicon;
-  .glyphicon-cog;
+  .ot-icon-x(@fa-var-wrench);
 }
 
 .ot-command-new {
-  .glyphicon;
-  .glyphicon-star;
+  .ot-icon-x(@fa-var-plus);
+}
+
+.ot-command-disable {
+  .ot-icon-x(@fa-var-ban);
+}
+
+.ot-command-enable {
+  .ot-icon-x(@fa-var-check);
+}
+
+.ot-command-show-disabled {
+  .ot-icon-x(@fa-var-eye);
+}
+
+.ot-command-hide-disabled {
+  .ot-icon-x(@fa-var-eye-slash);
 }
 
 .ot-command-project-new {
@@ -469,7 +514,7 @@ span.ot-view-command {
 }
 
 .ot-command-project-clone {
-  .ot-command-new;
+  .ot-icon-x(@fa-var-copy);
 }
 
 .ot-command-project-delete {
@@ -480,9 +525,16 @@ span.ot-view-command {
   .ot-command-update;
 }
 
+.ot-command-project-disable {
+  .ot-command-disable;
+}
+
+.ot-command-project-enable {
+  .ot-command-enable;
+}
+
 .ot-command-project-permissions {
-  .glyphicon;
-  .glyphicon-lock;
+  .ot-icon-x(@fa-var-key);
 }
 
 .ot-command-branch-new {
@@ -493,8 +545,32 @@ span.ot-view-command {
   .ot-command-update;
 }
 
+.ot-command-branch-disable {
+  .ot-command-disable;
+}
+
+.ot-command-branch-enable {
+  .ot-command-enable;
+}
+
 .ot-command-branch-delete {
   .ot-command-delete;
+}
+
+.ot-command-branch-template-definition {
+  .ot-icon-x(@fa-var-share-alt);
+}
+
+.ot-command-branch-template-sync {
+  .ot-icon-x(@fa-var-arrows-h);
+}
+
+.ot-command-branch-template-instance {
+  .ot-icon-x(@fa-var-link);
+}
+
+.ot-command-branch-template-instance-disconnect {
+  .ot-icon-x(@fa-var-unlink);
 }
 
 .ot-command-build-new {
@@ -510,8 +586,7 @@ span.ot-view-command {
 }
 
 .ot-command-validation-stamp-image {
-  .glyphicon;
-  .glyphicon-picture;
+  .ot-icon-x(@fa-var-image);
 }
 
 .ot-command-validation-stamp-update {
@@ -527,8 +602,7 @@ span.ot-view-command {
 }
 
 .ot-command-promotion-level-image {
-  .glyphicon;
-  .glyphicon-picture;
+  .ot-icon-x(@fa-var-image);
 }
 
 .ot-command-promotion-level-delete {
@@ -536,13 +610,11 @@ span.ot-view-command {
 }
 
 .ot-command-promote {
-  .glyphicon;
-  .glyphicon-thumbs-up;
+  .ot-icon-x(@fa-var-thumbs-o-up);
 }
 
 .ot-command-validate {
-  .glyphicon;
-  .glyphicon-cog;
+  .ot-icon-x(@fa-var-legal);
 }
 
 /**
@@ -550,8 +622,7 @@ span.ot-view-command {
  */
 
 .ot-application-info {
-  .glyphicon;
-  .glyphicon-info-sign;
+  .ot-icon-x(@fa-var-info-circle);
   .text-info;
   &.ot-application-info-none {
     opacity: 0.3;
@@ -611,18 +682,19 @@ a.ot-application-info-error {
  * Decorations
  */
 
-img.ot-decoration {
-  .ot-icon;
-  margin-right: 2px;
-}
-
-span.ot-decoration {
-  .label;
-  .label-default;
-  margin-right: 2px;
-  font-weight: normal;
-  img {
-    .ot-icon-mini;
+.ot-decoration {
+  img.ot-decoration-image-only {
+    .ot-icon;
+    margin-right: 2px;
+  }
+  span.ot-decoration-label {
+    .label;
+    .label-default;
+    margin-right: 2px;
+    font-weight: normal;
+    img {
+      .ot-icon-mini;
+    }
   }
 }
 
@@ -688,8 +760,7 @@ dl.ot-search-result {
  */
 
 .ot-command-admin-global-acl {
-  .glyphicon;
-  .glyphicon-lock;
+  .ot-icon-x(@fa-var-key);
 }
 
 .ot-admin-account-group {

@@ -49,6 +49,20 @@ public class ProjectResourceDecorator extends AbstractResourceDecorator<Project>
                         on(ProjectController.class).clone(project.getId()),
                         ProjectCreation.class
                 )
+                        // Enable
+                .link(
+                        "_enable",
+                        on(ProjectController.class).enableProject(project.getId()),
+                        resourceContext.isProjectFunctionGranted(project.id(), ProjectEdit.class)
+                                && project.isDisabled()
+                )
+                        // Disable
+                .link(
+                        "_disable",
+                        on(ProjectController.class).disableProject(project.getId()),
+                        resourceContext.isProjectFunctionGranted(project.id(), ProjectEdit.class)
+                                && !project.isDisabled()
+                )
                         // OK
                 .build();
     }

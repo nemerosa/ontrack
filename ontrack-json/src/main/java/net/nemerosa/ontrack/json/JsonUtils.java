@@ -23,12 +23,16 @@ public final class JsonUtils {
         return new ArrayBuilder(factory);
     }
 
-    public static JsonNode stringArray(String... values) {
+    public static JsonNode stringArray(Iterable<String> values) {
         ArrayBuilder builder = array();
         for (String value : values) {
             builder.with(text(value));
         }
         return builder.end();
+    }
+
+    public static JsonNode stringArray(String... values) {
+        return stringArray(Arrays.asList(values));
     }
 
     public static Map<String, ?> toMap(JsonNode node) throws IOException {
@@ -112,7 +116,7 @@ public final class JsonUtils {
     }
 
     public static LocalDate getDate(JsonNode data, String field, LocalDate defaultValue) {
-        if (data.has(field)) {
+        if (data.has(field) && !data.get(field).isNull()) {
             return JDKLocalDateDeserializer.parse(data.path(field).asText());
         } else {
             return defaultValue;

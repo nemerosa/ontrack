@@ -36,6 +36,11 @@ public class DefaultResourceContext implements ResourceContext {
         return securityService.isProjectFunctionGranted(projectId, fn);
     }
 
+    @Override
+    public boolean isGlobalFunctionGranted(Class<? extends GlobalFunction> fn) {
+        return securityService.isGlobalFunctionGranted(fn);
+    }
+
     protected class DefaultLinksBuilder implements LinksBuilder {
 
         private final Map<String, Link> links = new LinkedHashMap<>();

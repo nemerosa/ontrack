@@ -12,9 +12,9 @@ allprojects {
  * Common versions
  */
 
-def springBootVersion = '1.1.4.RELEASE'
-def springVersion = '4.0.6.RELEASE'
-def springSecurityVersion = '3.2.4.RELEASE'
+def springBootVersion = '1.1.8.RELEASE'
+def springVersion = '4.1.1.RELEASE'
+def springSecurityVersion = '3.2.5.RELEASE'
 def httpClientVersion = '4.3.4'
 def slf4jVersion = '1.7.7'
 
@@ -58,6 +58,7 @@ ext {
 
             // Groovy
             groovy                      : 'org.codehaus.groovy:groovy-all:2.3.3',
+            groovy_sandbox              : 'org.kohsuke:groovy-sandbox:1.7',
 
             // Logging
             slf4j_api                   : "org.slf4j:slf4j-api:${slf4jVersion}",

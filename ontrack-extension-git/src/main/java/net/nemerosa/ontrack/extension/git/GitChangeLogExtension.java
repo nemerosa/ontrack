@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.git;
 import net.nemerosa.ontrack.extension.api.BuildDiffExtension;
 import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
-import net.nemerosa.ontrack.model.security.Action;
+import net.nemerosa.ontrack.model.support.Action;
 import net.nemerosa.ontrack.model.structure.Branch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

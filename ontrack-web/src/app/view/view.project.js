@@ -54,6 +54,48 @@ angular.module('ot.view.project', [
                     },
                     {
                         condition: function () {
+                            return $scope.project._disable;
+                        },
+                        id: 'disableProject',
+                        name: "Disable project",
+                        cls: 'ot-command-project-disable',
+                        action: function () {
+                            ot.pageCall($http.put($scope.project._disable)).then(loadProject);
+                        }
+                    },
+                    {
+                        condition: function () {
+                            return $scope.project._enable;
+                        },
+                        id: 'enableProject',
+                        name: "Enable project",
+                        cls: 'ot-command-project-enable',
+                        action: function () {
+                            ot.pageCall($http.put($scope.project._enable)).then(loadProject);
+                        }
+                    }, {
+                        id: 'showDisabled',
+                        name: "Show disabled items",
+                        cls: 'ot-command-show-disabled',
+                        condition: function () {
+                            return !$scope.showDisabled;
+                        },
+                        action: function () {
+                            $scope.showDisabled = true;
+                        }
+                    }, {
+                        id: 'hideDisabled',
+                        name: "Hide disabled items",
+                        cls: 'ot-command-hide-disabled',
+                        condition: function () {
+                            return $scope.showDisabled;
+                        },
+                        action: function () {
+                            $scope.showDisabled = false;
+                        }
+                    },
+                    {
+                        condition: function () {
                             return $scope.project._permissions;
                         },
                         id: 'permissionsProject',
@@ -115,5 +157,8 @@ angular.module('ot.view.project', [
 
         // Initialization
         loadProject();
+
+        // Reload callback available in the scope
+        $scope.reloadProject = loadProject;
     })
 ;

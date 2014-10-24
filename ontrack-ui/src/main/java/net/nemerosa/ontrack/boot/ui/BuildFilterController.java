@@ -78,7 +78,7 @@ public class BuildFilterController extends AbstractResourceController {
      */
     @RequestMapping(value = "branches/{branchId}/filters", method = RequestMethod.POST)
     public Ack createFilter(@PathVariable ID branchId, @RequestBody @Valid BuildFilterInput input) {
-        return buildFilterService.saveFilter(branchId, input.getName(), input.getType(), input.getData());
+        return buildFilterService.saveFilter(branchId, input.isShared(), input.getName(), input.getType(), input.getData());
     }
 
     /**
@@ -89,7 +89,7 @@ public class BuildFilterController extends AbstractResourceController {
         if (!StringUtils.equals(name, input.getName())) {
             throw new IllegalArgumentException("The input name must be identical to the one in the URI.");
         }
-        return buildFilterService.saveFilter(branchId, name, input.getType(), input.getData());
+        return buildFilterService.saveFilter(branchId, input.isShared(), name, input.getType(), input.getData());
     }
 
     /**

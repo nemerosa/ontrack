@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.model.structure;
 
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -30,4 +31,28 @@ public class NameDescription {
         return new NameDescription(name, description);
     }
 
+    public NameDescriptionState asState() {
+        return asState(false);
+    }
+
+    public NameDescriptionState asState(boolean disabled) {
+        return new NameDescriptionState(name, description, disabled);
+    }
+
+    /**
+     * Makes sure the given <code>name</code> is escaped properly before being used as a valid name.
+     *
+     * @param name Name to convert
+     * @return Name which is safe to use
+     * @see #NAME
+     */
+    public static String escapeName(String name) {
+        if (StringUtils.isBlank(name)) {
+            throw new IllegalArgumentException("Blank or null is not a valid name.");
+        } else if (java.util.regex.Pattern.matches(NAME, name)) {
+            return name;
+        } else {
+            return name.replaceAll("[^A-Za-z0-9\\.\\-_]", "_");
+        }
+    }
 }

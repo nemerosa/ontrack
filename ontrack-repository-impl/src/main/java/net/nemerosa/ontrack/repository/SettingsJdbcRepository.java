@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.repository;
 
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
-import net.nemerosa.ontrack.security.EncryptionService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -13,12 +12,9 @@ import java.util.function.Function;
 @Repository
 public class SettingsJdbcRepository extends AbstractJdbcRepository implements SettingsRepository {
 
-    private final EncryptionService encryptionService;
-
     @Autowired
-    public SettingsJdbcRepository(DataSource dataSource, EncryptionService encryptionService) {
+    public SettingsJdbcRepository(DataSource dataSource) {
         super(dataSource);
-        this.encryptionService = encryptionService;
     }
 
     @Override
@@ -47,19 +43,19 @@ public class SettingsJdbcRepository extends AbstractJdbcRepository implements Se
     }
 
     @Override
-    public String getPassword(Class<?> category, String name, String defaultValue) {
+    public String getPassword(Class<?> category, String name, String defaultValue, Function<String, String> decryptService) {
         return getValue(
                 category,
                 name,
-                encryptionService::decrypt,
+                decryptService,
                 defaultValue
         );
     }
 
     @Override
-    public void setPassword(Class<?> category, String name, String plain, boolean dontSaveIfBlank) {
+    public void setPassword(Class<?> category, String name, String plain, boolean dontSaveIfBlank, Function<String, String> encryptService) {
         if (!StringUtils.isBlank(plain) || !dontSaveIfBlank) {
-            setValue(category, name, encryptionService.encrypt(plain));
+            setValue(category, name, encryptService.apply(plain));
         }
     }
 

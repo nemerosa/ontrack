@@ -28,6 +28,11 @@ public interface Job {
     String getDescription();
 
     /**
+     * State of the job
+     */
+    boolean isDisabled();
+
+    /**
      * Interval (in minutes) between each run
      */
     int getInterval();
@@ -46,6 +51,7 @@ public interface Job {
                 getCategory(),
                 getId(),
                 getDescription(),
+                isDisabled(),
                 getInterval()
         );
     }

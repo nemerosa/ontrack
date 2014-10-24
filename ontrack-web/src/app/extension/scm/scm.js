@@ -87,6 +87,13 @@ angular.module('ontrack.extension.scm', [
                             types: ''
                         });
                     };
+                    // Removing a group
+                    $scope.removeGroup = function (groups, group) {
+                        var idx = groups.indexOf(group);
+                        if (idx >= 0) {
+                            groups.splice(idx, 1);
+                        }
+                    };
 
                     // Export generation
                     $scope.doExport = function () {

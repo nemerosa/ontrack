@@ -49,7 +49,7 @@ public class ProjectController extends AbstractResourceController {
 
     @RequestMapping(value = "create", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public Project newProject(@RequestBody @Valid NameDescription nameDescription) {
+    public Project newProject(@RequestBody @Valid NameDescriptionState nameDescription) {
         // Creates a new project instance
         Project project = Project.of(nameDescription);
         // Saves it into the repository
@@ -82,11 +82,35 @@ public class ProjectController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "{projectId}/update", method = RequestMethod.PUT)
-    public Project saveProject(@PathVariable ID projectId, @RequestBody @Valid NameDescription nameDescription) {
+    public Project saveProject(@PathVariable ID projectId, @RequestBody @Valid NameDescriptionState nameDescription) {
         // Gets from the repository
         Project project = structureService.getProject(projectId);
         // Updates
         project = project.update(nameDescription);
+        // Saves in repository
+        structureService.saveProject(project);
+        // As resource
+        return project;
+    }
+
+    @RequestMapping(value = "{projectId}/enable", method = RequestMethod.PUT)
+    public Project enableProject(@PathVariable ID projectId) {
+        // Gets from the repository
+        Project project = structureService.getProject(projectId);
+        // Updates
+        project = project.withDisabled(false);
+        // Saves in repository
+        structureService.saveProject(project);
+        // As resource
+        return project;
+    }
+
+    @RequestMapping(value = "{projectId}/disable", method = RequestMethod.PUT)
+    public Project disableProject(@PathVariable ID projectId) {
+        // Gets from the repository
+        Project project = structureService.getProject(projectId);
+        // Updates
+        project = project.withDisabled(true);
         // Saves in repository
         structureService.saveProject(project);
         // As resource

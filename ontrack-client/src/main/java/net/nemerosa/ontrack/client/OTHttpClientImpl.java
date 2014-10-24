@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.client;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.*;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -41,16 +42,25 @@ public class OTHttpClientImpl implements OTHttpClient {
     }
 
     protected String getUrl(String path, Object... parameters) {
-        return format(
-                "%s%s",
-                stripEnd(url.toString(), "/"),
-                prependIfMissing(format(path, parameters), "/")
-        );
+        if (StringUtils.startsWith(path, "http")) {
+            return format(path, parameters);
+        } else {
+            return format(
+                    "%s%s",
+                    stripEnd(url.toString(), "/"),
+                    prependIfMissing(format(path, parameters), "/")
+            );
+        }
     }
 
     @Override
     public <T> T get(ResponseParser<T> responseParser, String path, Object... parameters) {
         return request(new HttpGet(getUrl(path, parameters)), responseParser);
+    }
+
+    @Override
+    public <T> T delete(ResponseParser<T> responseParser, String path, Object... parameters) {
+        return request(new HttpDelete(getUrl(path, parameters)), responseParser);
     }
 
     @Override

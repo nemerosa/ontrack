@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.ui.resource;
 
+import net.nemerosa.ontrack.model.security.GlobalFunction;
 import net.nemerosa.ontrack.model.security.ProjectFunction;
+import net.nemerosa.ontrack.model.structure.ProjectEntity;
 
 import java.net.URI;
 
@@ -21,4 +23,17 @@ public interface ResourceContext {
      * for the <code>projectId</code> project.
      */
     boolean isProjectFunctionGranted(int projectId, Class<? extends ProjectFunction> fn);
+
+    /**
+     * Checks if the <code>fn</code> function is granted for the current user
+     * for the <code>projectEntity</code>'s project.
+     */
+    default boolean isProjectFunctionGranted(ProjectEntity projectEntity, Class<? extends ProjectFunction> fn) {
+        return isProjectFunctionGranted(projectEntity.projectId(), fn);
+    }
+
+    /**
+     * Checks if the <code>fn</code> function is granted for the current user.
+     */
+    boolean isGlobalFunctionGranted(Class<? extends GlobalFunction> fn);
 }

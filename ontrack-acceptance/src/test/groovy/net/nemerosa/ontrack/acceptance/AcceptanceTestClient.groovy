@@ -1,8 +1,12 @@
 package net.nemerosa.ontrack.acceptance
 
 import com.fasterxml.jackson.databind.JsonNode
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
-abstract class AcceptanceTestClient extends AcceptanceSupport {
+class AcceptanceTestClient extends AcceptanceSupport {
+
+    private final Logger logger = LoggerFactory.getLogger(AcceptanceTestClient)
 
     JsonNode doCreateProject() {
         doCreateProject(nameDescription())
@@ -10,6 +14,14 @@ abstract class AcceptanceTestClient extends AcceptanceSupport {
 
     JsonNode doCreateProject(JsonNode nameDescription) {
         admin().post(nameDescription, "structure/projects/create").get()
+    }
+
+    def doDeleteProject(String name) {
+        logger.debug "Deleting project ${name}"
+        def project = admin().get("structure/entity/project/$name").get()
+        def link = project._delete.asText()
+        logger.debug "Deleting project at ${link}"
+        admin().delete(link).get()
     }
 
     JsonNode doCreateBranch() {
@@ -28,5 +40,16 @@ abstract class AcceptanceTestClient extends AcceptanceSupport {
 
     JsonNode doCreateBuild(int branchId, JsonNode nameDescription) {
         admin().post(nameDescription, "structure/branches/$branchId/builds/create").get()
+    }
+
+    def withProject(Closure closure) {
+        def p = doCreateProject()
+        int id = p.id.asInt()
+        String name = p.name.asText()
+        try {
+            closure(id, name)
+        } finally {
+            doDeleteProject name
+        }
     }
 }

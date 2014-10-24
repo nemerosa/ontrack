@@ -4,19 +4,15 @@ import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.Project;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class StructureJdbcRepositoryIT extends AbstractRepositoryTestSupport {
 
-    @Autowired
-    private StructureRepository repository;
-
     @Test(expected = IllegalArgumentException.class)
     public void create_branch_project_not_defined() {
-        repository.newBranch(Branch.of(
+        structureRepository.newBranch(Branch.of(
                 Project.of(nameDescription()),
                 nameDescription()
         ));
@@ -27,10 +23,26 @@ public class StructureJdbcRepositoryIT extends AbstractRepositoryTestSupport {
         // Creates a project
         Project project = do_create_project();
         // Creates a branch for this project
-        Branch branch = repository.newBranch(Branch.of(project, nameDescription()));
+        Branch branch = structureRepository.newBranch(Branch.of(project, nameDescription()));
         // Checks
         assertNotNull("Branch is defined", branch);
         assertTrue("Branch ID is defined", ID.isDefined(branch.getId()));
+    }
+
+    @Test
+    public void save_branch_disabled() {
+        // Creates a project
+        Project project = do_create_project();
+        // Creates a branch for this project
+        Branch branch = structureRepository.newBranch(Branch.of(project, nameDescription()));
+        // Disables it
+        branch = branch.withDisabled(true);
+        // Saves it
+        structureRepository.saveBranch(branch);
+        // Retrieves it
+        branch = structureRepository.getBranch(branch.getId());
+        // Checks it is disabled
+        assertTrue("Branch must be disabled", branch.isDisabled());
     }
 
     @Test
@@ -40,8 +52,13 @@ public class StructureJdbcRepositoryIT extends AbstractRepositoryTestSupport {
         assertTrue("Project ID is defined", ID.isDefined(p.getId()));
     }
 
-    private Project do_create_project() {
-        return repository.newProject(Project.of(nameDescription()));
+    @Test
+    public void save_project_disabled() {
+        Project p = do_create_project();
+        p = p.withDisabled(true);
+        structureRepository.saveProject(p);
+        p = structureRepository.getProject(p.getId());
+        assertTrue("Project must be disabled", p.isDisabled());
     }
 
 }

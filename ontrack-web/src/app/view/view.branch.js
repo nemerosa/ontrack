@@ -6,6 +6,7 @@ angular.module('ot.view.branch', [
     'ot.service.structure',
     'ot.service.buildfilter',
     'ot.service.copy',
+    'ot.service.template',
     'ot.dialog.validationStampRunView',
     'ot.dialog.promotionRuns'
 ])
@@ -16,7 +17,7 @@ angular.module('ot.view.branch', [
             controller: 'BranchCtrl'
         });
     })
-    .controller('BranchCtrl', function ($state, $scope, $stateParams, $http, $modal, $location, ot, otFormService, otStructureService, otBuildFilterService, otAlertService, otTaskService, otNotificationService, otCopyService) {
+    .controller('BranchCtrl', function ($state, $scope, $stateParams, $http, $modal, $location, ot, otFormService, otStructureService, otBuildFilterService, otAlertService, otTaskService, otNotificationService, otCopyService, otTemplateService) {
         var view = ot.view();
         // Branch's id
         var branchId = $stateParams.branchId;
@@ -63,8 +64,7 @@ angular.module('ot.view.branch', [
         // Loading the build view
         function loadBuildView() {
             // Parameters for the call
-            // TODO Use '_view' link from the branch
-            var uri = 'structure/branches/' + branchId + '/view';
+            var uri = $scope.branch._view;
             var config = {};
             // Adds the filter parameters
             var currentBuildFilterResource = otBuildFilterService.getCurrentFilter(branchId);
@@ -177,6 +177,77 @@ angular.module('ot.view.branch', [
                     },
                     {
                         condition: function () {
+                            return branchResource._templateDefinition;
+                        },
+                        id: 'templateDefinitionBranch',
+                        name: "Template definition",
+                        cls: 'ot-command-branch-template-definition',
+                        action: function () {
+                            otTemplateService.templateDefinition(branchResource._templateDefinition).then(loadBranch);
+                        }
+                    },
+                    {
+                        condition: function () {
+                            return branchResource._templateSync;
+                        },
+                        id: 'templateSyncBranch',
+                        name: "Sync. template",
+                        cls: 'ot-command-branch-template-sync',
+                        action: function () {
+                            otTemplateService.templateSync(branchResource._templateSync);
+                        }
+                    },
+                    {
+                        condition: function () {
+                            return branchResource._templateInstance;
+                        },
+                        id: 'templateInstanceBranch',
+                        name: "Create template instance",
+                        cls: 'ot-command-branch-template-instance',
+                        action: function () {
+                            otTemplateService.createTemplateInstance(branchResource._templateInstance).then(
+                                function (instance) {
+                                    $state.go('branch', {branchId: instance.id});
+                                }
+                            );
+                        }
+                    },
+                    {
+                        condition: function () {
+                            return branchResource._templateInstanceDisconnect;
+                        },
+                        id: 'templateInstanceDisconnect',
+                        name: "Disconnect from template",
+                        cls: 'ot-command-branch-template-instance-disconnect',
+                        action: function () {
+                            otTemplateService.templateInstanceDisconnect(branchResource._templateInstanceDisconnect)
+                                .then(loadBranch);
+                        }
+                    },
+                    {
+                        condition: function () {
+                            return branchResource._disable;
+                        },
+                        id: 'disableBranch',
+                        name: "Disable branch",
+                        cls: 'ot-command-branch-disable',
+                        action: function () {
+                            ot.pageCall($http.put(branchResource._disable)).then(loadBranch);
+                        }
+                    },
+                    {
+                        condition: function () {
+                            return branchResource._enable;
+                        },
+                        id: 'enableBranch',
+                        name: "Enable branch",
+                        cls: 'ot-command-branch-enable',
+                        action: function () {
+                            ot.pageCall($http.put(branchResource._enable)).then(loadBranch);
+                        }
+                    },
+                    {
+                        condition: function () {
                             return branchResource._update;
                         },
                         id: 'updateBranch',
@@ -229,6 +300,9 @@ angular.module('ot.view.branch', [
         loadPermalink();
         loadBranch();
 
+        // Reload callback available in the scope
+        $scope.reloadBranch = loadBranch;
+
         // Gets the list of tools for a branch
         function getTools(branch) {
             var tools = [];
@@ -248,8 +322,21 @@ angular.module('ot.view.branch', [
                     action: copyFromBranch
                 });
             }
+            // Bulk update
+            if (branch._bulkUpdate) {
+                tools.push({
+                    id: 'branch-bulk-update',
+                    name: "Bulk update",
+                    action: bulkUpdateBranch
+                });
+            }
             // OK
             return tools;
+        }
+
+        // Bulk update of a branch
+        function bulkUpdateBranch() {
+            otCopyService.bulkUpdate($scope.branch).then(loadBranch);
         }
 
         // Cloning a branch
@@ -403,12 +490,18 @@ angular.module('ot.view.branch', [
         };
 
         /**
+         * Sharing a saved filter
+         */
+        $scope.buildFilterShare = function (buildFilterResource) {
+            otBuildFilterService.shareFilter($scope.branch, buildFilterResource).then(loadBuildFilters);
+        };
+
+        /**
          * Permalink to the current filter
          */
         $scope.buildFilterLink = function () {
             var currentFilter = otBuildFilterService.getCurrentFilter(branchId);
             if (currentFilter) {
-                // TODO Special case: shared filter (only the name is needed)
                 var jsonFilter = JSON.stringify(currentFilter);
                 $location.hash(jsonFilter);
             }
@@ -423,13 +516,11 @@ angular.module('ot.view.branch', [
                 // Parsing the JSON
                 try {
                     var json = JSON.parse(jsonFilter);
-                    // TODO Special case: shared filter (only the name is needed)
                     // Applies the filter
                     otBuildFilterService.storeCurrent(branchId, json);
                     // Removes the hash after use
                     $location.hash('');
                 } catch (e) {
-                    // TODO Ignoring the error, just logging it
                     otNotificationService.error("Cannot get the filter from the permalink.");
                 }
             }

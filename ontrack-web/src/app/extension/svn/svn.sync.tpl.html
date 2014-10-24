@@ -1,34 +1,12 @@
 <ot-view>
-
-    <div class="row">
-        <div class="col-md-12">
-            <div>Press the button below to synchronise the builds from Subversion.</div>
-
-            <div class="alert alert-danger">
-                The synchronisation settings are set to override builds in case they already exist.
-                This will discard any previous information attached to them, like the validation
-                and promotion runs.
-            </div>
-
-            <div>
-                <button class="btn btn-danger" ng-click="sync()" ng-disabled="synchronising">
-                    <img src="assets/ajax-loader.gif" ng-show="synchronising"/>
-                    Synchronise
-                </button>
-                <a href="#/branch/{{syncInfo.branch.id}}" class="btn btn-link">Cancel</a>
-            </div>
-
-            <div class="alert alert-info" ng-show="synchronising && !syncInfoStatus.message">
-                The synchronisation works in background. You can come leave this page at any moment
-                by going back to the <a href="#/branch/{{syncInfo.branch.id}}">branch</a> for example. You will
-                be notified of the progress by looking in the application information messages in
-                upper right corner of the page.
-            </div>
-
-            <div class="alert alert-warning" ng-show="syncInfoStatus.message">
-                {{syncInfoStatus.message}}
-            </div>
-        </div>
-    </div>
-
+    <p>Click on the button below to create builds from the tags in Subversion:</p>
+    <p>
+        <button class="btn btn-primary" ng-click="launchSync()">
+            <span class="fa fa-tags"></span>
+            Synchronise builds with tags
+        </button>
+    </p>
+    <p class="alert alert-info">
+        The synchronisation will occur in the background and this page will be closed.
+    </p>
 </ot-view>

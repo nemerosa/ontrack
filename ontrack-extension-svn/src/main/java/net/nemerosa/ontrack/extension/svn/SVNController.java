@@ -20,7 +20,6 @@ import net.nemerosa.ontrack.model.buildfilter.BuildDiff;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.ui.resource.Link;
@@ -356,17 +355,6 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
                 ),
                 uri(on(getClass()).revisionInfo(configuration, revision))
         ).withView(Build.class);
-    }
-
-    /**
-     * Gets the synchronisation information for a branch.
-     */
-    @RequestMapping(value = "sync/{branchId}", method = RequestMethod.GET)
-    public Resource<SVNSyncInfo> getSyncInfo(@PathVariable ID branchId) {
-        return Resource.of(
-                svnService.getSyncInfo(branchId),
-                uri(on(getClass()).getSyncInfo(branchId))
-        ).withView(Branch.class);
     }
 
     /**

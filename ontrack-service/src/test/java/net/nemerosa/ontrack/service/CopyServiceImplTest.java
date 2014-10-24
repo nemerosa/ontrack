@@ -1,22 +1,21 @@
 package net.nemerosa.ontrack.service;
 
-import net.nemerosa.ontrack.extension.general.LinkProperty;
-import net.nemerosa.ontrack.extension.general.LinkPropertyType;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.security.ProjectEdit;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.service.support.property.TestProperty;
+import net.nemerosa.ontrack.service.support.property.TestPropertyType;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Optional;
+import java.util.function.Function;
 
-import static net.nemerosa.ontrack.json.JsonUtils.array;
 import static net.nemerosa.ontrack.json.JsonUtils.object;
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd;
-import static org.junit.Assert.assertEquals;
+import static net.nemerosa.ontrack.model.structure.Replacement.replacementFn;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -34,40 +33,6 @@ public class CopyServiceImplTest {
         securityService = mock(SecurityService.class);
         BuildFilterService buildFilterService = mock(BuildFilterService.class);
         service = new CopyServiceImpl(structureService, propertyService, securityService, buildFilterService);
-    }
-
-    @Test
-    public void applyReplacements_none() {
-        assertEquals("branches/11.7", CopyServiceImpl.applyReplacements("branches/11.7", Collections.emptyList()));
-    }
-
-    @Test
-    public void applyReplacements_null() {
-        assertEquals("branches/11.7", CopyServiceImpl.applyReplacements("branches/11.7", Arrays.asList(
-                new Replacement(null, "any")
-        )));
-    }
-
-    @Test
-    public void applyReplacements_blank() {
-        assertEquals("branches/11.7", CopyServiceImpl.applyReplacements("branches/11.7", Arrays.asList(
-                new Replacement("", "any")
-        )));
-    }
-
-    @Test
-    public void applyReplacements_direct() {
-        assertEquals("branches/11.8", CopyServiceImpl.applyReplacements("branches/11.7", Arrays.asList(
-                new Replacement("11.7", "11.8")
-        )));
-    }
-
-    @Test
-    public void applyReplacements_several() {
-        assertEquals("Release pipeline for branches/11.7", CopyServiceImpl.applyReplacements("Pipeline for trunk", Arrays.asList(
-                new Replacement("trunk", "branches/11.7"),
-                new Replacement("Pipeline", "Release pipeline")
-        )));
     }
 
     @Test
@@ -89,8 +54,8 @@ public class CopyServiceImplTest {
         when(propertyService.getProperties(sourceBranch)).thenReturn(
                 Arrays.asList(
                         Property.of(
-                                new LinkPropertyType(),
-                                LinkProperty.of("test", "http://wiki/B1")
+                                new TestPropertyType(),
+                                TestProperty.of("http://wiki/B1")
                         )
                 )
         );
@@ -99,8 +64,8 @@ public class CopyServiceImplTest {
         when(propertyService.getProperties(sourceProject)).thenReturn(
                 Arrays.asList(
                         Property.of(
-                                new LinkPropertyType(),
-                                LinkProperty.of("test", "http://wiki/P1")
+                                new TestPropertyType(),
+                                TestProperty.of("http://wiki/P1")
                         )
                 )
         );
@@ -132,28 +97,18 @@ public class CopyServiceImplTest {
         // Checks the copy of properties for the project
         verify(propertyService, times(1)).editProperty(
                 eq(createdProject),
-                eq(LinkPropertyType.class.getName()),
+                eq(TestPropertyType.class.getName()),
                 eq(object()
-                        .with("links", array()
-                                .with(object()
-                                        .with("name", "test")
-                                        .with("value", "http://wiki/P2")
-                                        .end())
-                                .end())
+                        .with("value", "http://wiki/P2")
                         .end())
         );
 
         // Checks the copy of properties for the branch
         verify(propertyService, times(1)).editProperty(
                 eq(createdBranch),
-                eq(LinkPropertyType.class.getName()),
+                eq(TestPropertyType.class.getName()),
                 eq(object()
-                        .with("links", array()
-                                .with(object()
-                                        .with("name", "test")
-                                        .with("value", "http://wiki/B2")
-                                        .end())
-                                .end())
+                        .with("value", "http://wiki/B2")
                         .end())
         );
     }
@@ -174,8 +129,8 @@ public class CopyServiceImplTest {
         when(propertyService.getProperties(sourceBranch)).thenReturn(
                 Arrays.asList(
                         Property.of(
-                                new LinkPropertyType(),
-                                LinkProperty.of("test", "http://wiki/B1")
+                                new TestPropertyType(),
+                                TestProperty.of("http://wiki/B1")
                         )
                 )
         );
@@ -198,14 +153,52 @@ public class CopyServiceImplTest {
         // Checks the copy of properties for the branch
         verify(propertyService, times(1)).editProperty(
                 eq(targetBranch.withId(ID.of(2))),
-                eq(LinkPropertyType.class.getName()),
+                eq(TestPropertyType.class.getName()),
                 eq(object()
-                        .with("links", array()
-                                .with(object()
-                                        .with("name", "test")
-                                        .with("value", "http://wiki/B2")
-                                        .end())
-                                .end())
+                        .with("value", "http://wiki/B2")
+                        .end())
+        );
+    }
+
+    @Test
+    public void bulkUpdateBranch() {
+        Project project = Project.of(nd("P1", "")).withId(ID.of(1));
+        Branch branch = Branch.of(project, nd("B1", "Branch B1")).withId(ID.of(1));
+        // Request
+        BranchBulkUpdateRequest request = new BranchBulkUpdateRequest(
+                Arrays.asList(
+                        new Replacement("B1", "B2")
+                )
+        );
+
+        // Branch properties
+        when(propertyService.getProperties(branch)).thenReturn(
+                Arrays.asList(
+                        Property.of(
+                                new TestPropertyType(),
+                                TestProperty.of("http://wiki/B1")
+                        )
+                )
+        );
+
+        // Updated branch
+        Branch updatedBranch = branch.withDescription("Branch B2");
+
+        // Edition of the property must be allowed
+        when(securityService.isProjectFunctionGranted(updatedBranch, ProjectEdit.class)).thenReturn(true);
+
+        // Updating
+        service.update(branch, request);
+
+        // Checks the branch is updated
+        verify(structureService, times(1)).saveBranch(updatedBranch);
+
+        // Checks the copy of properties for the branch
+        verify(propertyService, times(1)).editProperty(
+                eq(updatedBranch),
+                eq(TestPropertyType.class.getName()),
+                eq(object()
+                        .with("value", "http://wiki/B2")
                         .end())
         );
     }
@@ -215,8 +208,7 @@ public class CopyServiceImplTest {
         Branch sourceBranch = Branch.of(Project.of(nd("P1", "")).withId(ID.of(1)), nd("B1", "")).withId(ID.of(1));
         Branch targetBranch = Branch.of(Project.of(nd("P2", "")).withId(ID.of(2)), nd("B2", "")).withId(ID.of(2));
         // Request
-        BranchCopyRequest request = new BranchCopyRequest(
-                ID.of(1),
+        Function<String, String> replacementFn = replacementFn(
                 Arrays.asList(
                         new Replacement("P1", "P2")
                 )
@@ -226,8 +218,8 @@ public class CopyServiceImplTest {
         when(propertyService.getProperties(sourceBranch)).thenReturn(
                 Arrays.asList(
                         Property.of(
-                                new LinkPropertyType(),
-                                LinkProperty.of("test", "http://wiki/P1")
+                                new TestPropertyType(),
+                                TestProperty.of("http://wiki/P1")
                         )
                 )
         );
@@ -236,19 +228,14 @@ public class CopyServiceImplTest {
         when(securityService.isProjectFunctionGranted(targetBranch, ProjectEdit.class)).thenReturn(true);
 
         // Copy
-        service.doCopy(sourceBranch, targetBranch, request);
+        service.doCopy(sourceBranch, targetBranch, replacementFn, SyncPolicy.COPY);
 
         // Checks the copy of properties for the branch
         verify(propertyService, times(1)).editProperty(
                 eq(targetBranch),
-                eq(LinkPropertyType.class.getName()),
+                eq(TestPropertyType.class.getName()),
                 eq(object()
-                        .with("links", array()
-                                .with(object()
-                                        .with("name", "test")
-                                        .with("value", "http://wiki/P2")
-                                        .end())
-                                .end())
+                        .with("value", "http://wiki/P2")
                         .end())
         );
     }
@@ -258,8 +245,7 @@ public class CopyServiceImplTest {
         Branch sourceBranch = Branch.of(Project.of(nd("P1", "")).withId(ID.of(1)), nd("B1", "")).withId(ID.of(1));
         Branch targetBranch = Branch.of(Project.of(nd("P2", "")).withId(ID.of(2)), nd("B2", "")).withId(ID.of(2));
         // Request
-        BranchCopyRequest request = new BranchCopyRequest(
-                ID.of(1),
+        Function<String, String> replacementFn = replacementFn(
                 Arrays.asList(
                         new Replacement("P1", "P2")
                 )
@@ -285,8 +271,8 @@ public class CopyServiceImplTest {
         when(propertyService.getProperties(sourcePromotionLevel)).thenReturn(
                 Arrays.asList(
                         Property.of(
-                                new LinkPropertyType(),
-                                LinkProperty.of("test", "http://wiki/P1")
+                                new TestPropertyType(),
+                                TestProperty.of("http://wiki/P1")
                         )
                 )
         );
@@ -295,21 +281,16 @@ public class CopyServiceImplTest {
         when(securityService.isProjectFunctionGranted(targetPromotionLevel, ProjectEdit.class)).thenReturn(true);
 
         // Copy
-        service.doCopyPromotionLevels(sourceBranch, targetBranch, request);
+        service.doCopyPromotionLevels(sourceBranch, targetBranch, replacementFn, SyncPolicy.COPY);
 
         // Checks the promotion level was created
         verify(structureService, times(1)).newPromotionLevel(targetPromotionLevel);
         // Checks the copy of properties for the promotion levels
         verify(propertyService, times(1)).editProperty(
                 eq(targetPromotionLevel),
-                eq(LinkPropertyType.class.getName()),
+                eq(TestPropertyType.class.getName()),
                 eq(object()
-                        .with("links", array()
-                                .with(object()
-                                        .with("name", "test")
-                                        .with("value", "http://wiki/P2")
-                                        .end())
-                                .end())
+                        .with("value", "http://wiki/P2")
                         .end())
         );
     }
@@ -319,8 +300,7 @@ public class CopyServiceImplTest {
         Branch sourceBranch = Branch.of(Project.of(nd("P1", "")).withId(ID.of(1)), nd("B1", "")).withId(ID.of(1));
         Branch targetBranch = Branch.of(Project.of(nd("P2", "")).withId(ID.of(2)), nd("B2", "")).withId(ID.of(2));
         // Request
-        BranchCopyRequest request = new BranchCopyRequest(
-                ID.of(1),
+        Function<String, String> replacementFn = replacementFn(
                 Arrays.asList(
                         new Replacement("P1", "P2")
                 )
@@ -346,8 +326,8 @@ public class CopyServiceImplTest {
         when(propertyService.getProperties(sourceValidationStamp)).thenReturn(
                 Arrays.asList(
                         Property.of(
-                                new LinkPropertyType(),
-                                LinkProperty.of("test", "http://wiki/P1")
+                                new TestPropertyType(),
+                                TestProperty.of("http://wiki/P1")
                         )
                 )
         );
@@ -356,21 +336,16 @@ public class CopyServiceImplTest {
         when(securityService.isProjectFunctionGranted(targetValidationStamp, ProjectEdit.class)).thenReturn(true);
 
         // Copy
-        service.doCopyValidationStamps(sourceBranch, targetBranch, request);
+        service.doCopyValidationStamps(sourceBranch, targetBranch, replacementFn, SyncPolicy.COPY);
 
         // Checks the validation stamp was created
         verify(structureService, times(1)).newValidationStamp(targetValidationStamp);
         // Checks the copy of properties for the validation stamps
         verify(propertyService, times(1)).editProperty(
                 eq(targetValidationStamp),
-                eq(LinkPropertyType.class.getName()),
+                eq(TestPropertyType.class.getName()),
                 eq(object()
-                        .with("links", array()
-                                .with(object()
-                                        .with("name", "test")
-                                        .with("value", "http://wiki/P2")
-                                        .end())
-                                .end())
+                        .with("value", "http://wiki/P2")
                         .end())
         );
     }

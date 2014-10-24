@@ -8,6 +8,9 @@ import net.nemerosa.ontrack.model.structure.Decorator;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import org.junit.Test;
 
+import java.util.Collections;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
@@ -26,7 +29,8 @@ public class DecorationServiceImplTest {
 
         SecurityService securityService = mock(SecurityService.class);
 
-        DecorationServiceImpl service = new DecorationServiceImpl(extensionManager, securityService);
+        List<Decorator> builtinDecorators = Collections.emptyList();
+        DecorationServiceImpl service = new DecorationServiceImpl(extensionManager, builtinDecorators, securityService);
 
         Decoration decoration = service.getDecoration(projectEntity, decorator);
         assertNotNull(decoration);
@@ -44,7 +48,8 @@ public class DecorationServiceImplTest {
 
         SecurityService securityService = mock(SecurityService.class);
 
-        DecorationServiceImpl service = new DecorationServiceImpl(extensionManager, securityService);
+        List<Decorator> builtinDecorators = Collections.emptyList();
+        DecorationServiceImpl service = new DecorationServiceImpl(extensionManager, builtinDecorators, securityService);
 
         Decoration decoration = service.getDecoration(projectEntity, decorator);
         assertNotNull(decoration);

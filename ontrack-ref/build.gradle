@@ -1,5 +1,0 @@
-dependencies {
-    compile project(':ontrack-model')
-    compile libraries.spring_context
-    compile libraries.slf4j_api
-}

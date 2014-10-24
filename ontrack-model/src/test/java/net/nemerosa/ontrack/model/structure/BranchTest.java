@@ -26,11 +26,15 @@ public class BranchTest {
                                 .with("id", 0)
                                 .with("name", "B1")
                                 .with("description", "Branch 1")
+                                .with("disabled", false)
+                                .with("type", "CLASSIC")
                                 .end())
                         .with(object()
                                 .with("id", 0)
                                 .with("name", "B2")
                                 .with("description", "Branch 2")
+                                .with("disabled", false)
+                                .with("type", "CLASSIC")
                                 .end())
                         .end(),
                 branches,
@@ -48,10 +52,13 @@ public class BranchTest {
                         .with("id", 0)
                         .with("name", "B")
                         .with("description", "Branch")
+                        .with("disabled", false)
+                        .with("type", "CLASSIC")
                         .with("project", object()
                                 .with("id", 0)
                                 .with("name", "PRJ")
                                 .with("description", "Project")
+                                .with("disabled", false)
                                 .end())
                         .end(),
                 branch,

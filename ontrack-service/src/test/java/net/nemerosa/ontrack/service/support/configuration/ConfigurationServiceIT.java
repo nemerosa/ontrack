@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.service.support.configuration;
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
-import net.nemerosa.ontrack.security.EncryptionService;
+import net.nemerosa.ontrack.model.security.EncryptionService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

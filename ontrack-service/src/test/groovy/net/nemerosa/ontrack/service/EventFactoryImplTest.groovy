@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.service
 
-import net.nemerosa.ontrack.extension.general.LinkPropertyType
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventCannotRenderEntityException
 import net.nemerosa.ontrack.model.events.EventFactory
@@ -8,6 +7,7 @@ import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.NameValue
 import net.nemerosa.ontrack.service.events.EventFactoryImpl
+import net.nemerosa.ontrack.service.support.property.TestPropertyType
 import org.junit.Test
 
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd
@@ -160,38 +160,38 @@ public class EventFactoryImplTest {
 
     @Test
     void propertyChange_on_promotion_level() {
-        Event e = factory.propertyChange(promotionLevel(), new LinkPropertyType());
+        Event e = factory.propertyChange(promotionLevel(), new TestPropertyType());
         assert e != null
         assert e.signature == null
         assert e.entities.size() == 2
-        assert e.renderText() == "Links property has changed for promotion level COPPER."
+        assert e.renderText() == "Value property has changed for promotion level COPPER."
     }
 
     @Test
     void propertyDelete_on_promotion_level() {
-        Event e = factory.propertyDelete(promotionLevel(), new LinkPropertyType());
+        Event e = factory.propertyDelete(promotionLevel(), new TestPropertyType());
         assert e != null
         assert e.signature == null
         assert e.entities.size() == 2
-        assert e.renderText() == "Links property has been removed from promotion level COPPER."
+        assert e.renderText() == "Value property has been removed from promotion level COPPER."
     }
 
     @Test
     void propertyChange_on_project() {
-        Event e = factory.propertyChange(project(), new LinkPropertyType());
+        Event e = factory.propertyChange(project(), new TestPropertyType());
         assert e != null
         assert e.signature == null
         assert e.entities.size() == 1
-        assert e.renderText() == "Links property has changed for project P."
+        assert e.renderText() == "Value property has changed for project P."
     }
 
     @Test
     void propertyDelete_on_project() {
-        Event e = factory.propertyDelete(project(), new LinkPropertyType());
+        Event e = factory.propertyDelete(project(), new TestPropertyType());
         assert e != null
         assert e.signature == null
         assert e.entities.size() == 1
-        assert e.renderText() == "Links property has been removed from project P."
+        assert e.renderText() == "Value property has been removed from project P."
     }
 
     private static PromotionRun promotionRun() {

@@ -24,7 +24,8 @@ public class JobStatusResourceDecorator extends AbstractResourceDecorator<JobSta
                 .link(
                         "_launch",
                         on(AdminController.class).launchJob(jobStatus.getId()),
-                        ApplicationManagement.class
+                        resourceContext.isGlobalFunctionGranted(ApplicationManagement.class)
+                                && !jobStatus.getDescriptor().isDisabled()
                 )
                         // OK
                 .build();

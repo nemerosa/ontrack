@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.structure.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public interface StructureRepository {
@@ -48,6 +49,8 @@ public interface StructureRepository {
     Optional<Build> getBuildByName(String project, String branch, String build);
 
     Optional<Build> findBuildAfterUsingNumericForm(ID branchId, String buildName);
+
+    int getBuildCount(Branch branch);
 
     /**
      * Iterates over the builds of the branch, from the newest to the oldest, until
@@ -119,13 +122,13 @@ public interface StructureRepository {
 
     // Validation runs
 
-    ValidationRun newValidationRun(ValidationRun validationRun);
+    ValidationRun newValidationRun(ValidationRun validationRun, Function<String,ValidationRunStatusID> validationRunStatusService);
 
-    ValidationRun getValidationRun(ID validationRunId);
+    ValidationRun getValidationRun(ID validationRunId, Function<String,ValidationRunStatusID> validationRunStatusService);
 
-    List<ValidationRun> getValidationRunsForBuild(Build build);
+    List<ValidationRun> getValidationRunsForBuild(Build build, Function<String,ValidationRunStatusID> validationRunStatusService);
 
-    List<ValidationRun> getValidationRunsForValidationStamp(ValidationStamp validationStamp, int offset, int count);
+    List<ValidationRun> getValidationRunsForValidationStamp(ValidationStamp validationStamp, int offset, int count, Function<String,ValidationRunStatusID> validationRunStatusService);
 
     ValidationRun newValidationRunStatus(ValidationRun validationRun, ValidationRunStatus runStatus);
 }

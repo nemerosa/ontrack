@@ -17,4 +17,6 @@ public class BuildFilterInput {
     @NotNull(message = "The build filter data is required.")
     private final JsonNode data;
 
+    private final boolean shared;
+
 }

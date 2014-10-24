@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.experimental.Wither;
 import net.nemerosa.ontrack.model.form.Form;
 
 @Data
@@ -18,6 +19,7 @@ public class PromotionLevel implements ProjectEntity {
 
     private final ID id;
     private final String name;
+    @Wither
     private final String description;
     @JsonView({PromotionLevel.class, PromotionView.class, PromotionRunView.class})
     private final Branch branch;
