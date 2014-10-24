@@ -14,9 +14,11 @@ var ontrack = angular.module('ontrack', [
         'ot.directive.field',
         'ot.directive.properties',
         // Services
+        'ot.service.core',
         'ot.service.user',
         'ot.service.info',
         'ot.service.task',
+        'ot.service.form',
         // Views
         'ot.view.home',
         'ot.view.search',
@@ -73,7 +75,7 @@ var ontrack = angular.module('ontrack', [
             $urlRouterProvider.otherwise("/home");
         })
         // Main controller
-        .controller('AppCtrl', function ($log, $scope, $rootScope, $state, otUserService, otInfoService, otTaskService) {
+        .controller('AppCtrl', function ($log, $scope, $rootScope, $state, $http, ot, otUserService, otInfoService, otTaskService, otFormService) {
 
             /**
              * User mgt
@@ -129,6 +131,18 @@ var ontrack = angular.module('ontrack', [
             };
             $scope.closeNotification = function () {
                 $rootScope.notification = undefined;
+            };
+
+            // User menu actions
+
+            $scope.showActionForm = function (action) {
+                otFormService.display({
+                    title: action.name,
+                    uri: action.uri,
+                    submit: function (data) {
+                        return ot.call($http.post(action.uri));
+                    }
+                });
             };
 
             /**
