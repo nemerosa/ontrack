@@ -18,9 +18,11 @@
 }
 
 .ot-extension-git-label {
+  .ot-extension-git-make-height(@otExtensionGitCommitHeight - 2);
   padding: 2px 4px;
   font-size: 80%;
   border-radius: @border-radius-base;
+  margin-left: 2px;
 }
 
 .ot-extension-git-changelog-code {
@@ -29,17 +31,27 @@
   color: @code-color;
   background-color: @code-bg;
 }
+
 .ot-extension-git-changelog-author {
   .ot-extension-git-label;
   color: @label-color;
   background-color: @label-default-bg;
 }
+
 .ot-extension-git-changelog-date {
   .ot-extension-git-label;
   color: @label-color;
   background-color: @label-info-bg;
 }
 
+.ot-extension-git-changelog-message {
+  font-size: 80%;
+  margin-left: 2px;
+}
+
 .ot-extension-git-changelog-commit {
   .ot-extension-git-make-height(@otExtensionGitCommitHeight);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
