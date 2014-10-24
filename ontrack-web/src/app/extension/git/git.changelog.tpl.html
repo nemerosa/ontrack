@@ -88,14 +88,14 @@
                                  ng-repeat="gitUICommit in commits.log.commits">
                                 <span class="ot-extension-git-changelog-code" ng-if="!gitUICommit.link">{{gitUICommit.commit.shortId}}</span>
                                 <span class="ot-extension-git-changelog-code" ng-if="gitUICommit.link"><a href="{{gitUICommit.link}}" target="_blank">{{gitUICommit.commit.shortId}}</a></span>
-                                    <span class="ot-extension-git-changelog-author">
-                                        {{gitUICommit.commit.author.name}}
-                                    </span>
-                                    <span class="ot-extension-git-changelog-date">
-                                        {{gitUICommit.commit.commitTime | date:'mediumDate'}}
-                                        {{gitUICommit.commit.commitTime | date:'shortTime'}}
-                                    </span>
                                 <span class="ot-extension-git-changelog-message" ng-bind-html="gitUICommit.annotatedMessage"></span>
+                                <span class="ot-extension-git-changelog-author">
+                                    {{gitUICommit.commit.author.name}}
+                                </span>
+                                <span class="ot-extension-git-changelog-date">
+                                    {{gitUICommit.commit.commitTime | date:'mediumDate'}}
+                                    {{gitUICommit.commit.commitTime | date:'shortTime'}}
+                                </span>
                             </div>
                         </div>
                     </div>
