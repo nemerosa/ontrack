@@ -322,8 +322,21 @@ angular.module('ot.view.branch', [
                     action: copyFromBranch
                 });
             }
+            // Bulk update
+            if (branch._bulkUpdate) {
+                tools.push({
+                    id: 'branch-bulk-update',
+                    name: "Bulk update",
+                    action: bulkUpdateBranch
+                });
+            }
             // OK
             return tools;
+        }
+
+        // Bulk update of a branch
+        function bulkUpdateBranch() {
+            otCopyService.bulkUpdate($scope.branch).then(loadBranch);
         }
 
         // Cloning a branch
