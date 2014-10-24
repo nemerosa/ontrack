@@ -27,6 +27,8 @@
   font-size: 80%;
   border-radius: @border-radius-base;
   margin-left: 2px;
+  color: #222222;
+  background-color: #EEEEEE;
 }
 
 .ot-extension-git-changelog-code {
@@ -38,14 +40,10 @@
 
 .ot-extension-git-changelog-author {
   .ot-extension-git-label;
-  color: @label-color;
-  background-color: @label-default-bg;
 }
 
 .ot-extension-git-changelog-date {
   .ot-extension-git-label;
-  color: @label-color;
-  background-color: @label-info-bg;
 }
 
 .ot-extension-git-changelog-message {
@@ -58,4 +56,7 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+  + .ot-extension-git-changelog-commit {
+    border-top: solid 1px #EEEEEE;
+  }
 }
