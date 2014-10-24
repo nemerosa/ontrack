@@ -6,16 +6,26 @@
 
 @otExtensionGitCommitHeight: 23px;
 
+.make-height(@height) {
+  height: @height;
+  min-height: @height;
+  max-height: @height;
+}
+
 .ot-extension-git-changelog-commit {
   .panel;
   .panel-default;
-  max-height: @otExtensionGitCommitHeight !important;
-  min-height: @otExtensionGitCommitHeight !important;
+  .make-height(@otExtensionGitCommitHeight);
   height: @otExtensionGitCommitHeight !important;
   line-height: @otExtensionGitCommitHeight;
   margin-top: 1px;
   margin-bottom: 1px;
+  > * {
+    .make-height(@otExtensionGitCommitHeight - 2);
+  }
   code {
+    clear: left;
+    float: left;
     margin-right: 0.5em;
     padding-left: 0.5em;
     padding-right: 0.5em;
@@ -23,12 +33,12 @@
   .ot-extension-git-changelog-message {
     white-space: nowrap;
     text-overflow: ellipsis;
-    display: block;
+    float: left;
     overflow: hidden;
-    margin-left: 80px;
   }
   .ot-extension-git-changelog-meta {
-    .pull-right;
+    clear:right;
+    float: right;
     .ot-extension-git-changelog-author {
       .label;
       .label-default;
