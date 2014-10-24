@@ -30,6 +30,7 @@ public class ResourceAccountTest {
                                 .with("authenticationSource", object()
                                         .with("id", "none")
                                         .with("name", "Not defined")
+                                        .with("allowingPasswordChange", false)
                                         .end())
                                 .with("role", "ADMINISTRATOR")
                                 .with("accountGroups", array().end())
