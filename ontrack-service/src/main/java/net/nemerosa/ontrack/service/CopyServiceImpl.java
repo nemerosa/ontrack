@@ -114,8 +114,15 @@ public class CopyServiceImpl implements CopyService {
 
     @Override
     public Branch update(Branch branch, BranchBulkUpdateRequest request) {
-        // FIXME Method net.nemerosa.ontrack.service.CopyServiceImpl.update
-        return null;
+        // Replacement function
+        Function<String, String> replacementFn = replacementFn(request.getReplacements());
+        // Updating
+        doCopy(branch, branch, replacementFn, new SyncPolicy(
+                SyncPolicy.TargetPresentPolicy.REPLACE,
+                SyncPolicy.UnknownTargetPolicy.IGNORE
+        ));
+        // Reloads the branch
+        return structureService.getBranch(branch.getId());
     }
 
     protected void doCopy(Branch sourceBranch, Branch targetBranch, Function<String, String> replacementFn, SyncPolicy syncPolicy) {
