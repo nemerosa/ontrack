@@ -12,14 +12,45 @@
   max-height: @height;
 }
 
+table.ot-extension-git-changelog-commit-list {
+  border-spacing: 0px;
+  border-collapse: collapse;
+  td {
+    // TODO Remove debug code
+    // border: solid 1px red;
+  }
+  tr {
+    .make-height(@otExtensionGitCommitHeight);
+    td.ot-extension-git-changelog-commit-graph {
+      vertical-align: top;
+    }
+    td.ot-extension-git-changelog-message {
+      width: 75%;
+      > div {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+    }
+    td.ot-extension-git-changelog-author, td.ot-extension-git-changelog-date {
+      white-space: nowrap;
+    }
+  }
+}
+
+/*
 .ot-extension-git-changelog-commit {
   .panel;
   .panel-default;
+  text-align: right;
   .make-height(@otExtensionGitCommitHeight);
   height: @otExtensionGitCommitHeight !important;
   line-height: @otExtensionGitCommitHeight;
   margin-top: 1px;
   margin-bottom: 1px;
+  * {
+    border: solid 1px red;
+  }
   > * {
     .make-height(@otExtensionGitCommitHeight - 2);
   }
@@ -37,11 +68,11 @@
     overflow: hidden;
   }
   .ot-extension-git-changelog-meta {
-    clear:right;
-    float: right;
+    display: inline-block;
     .ot-extension-git-changelog-author {
       .label;
       .label-default;
     }
   }
 }
+*/
