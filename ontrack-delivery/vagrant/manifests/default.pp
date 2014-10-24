@@ -1,0 +1,3 @@
+user { 'ontrack':
+	ensure => present,
+}
