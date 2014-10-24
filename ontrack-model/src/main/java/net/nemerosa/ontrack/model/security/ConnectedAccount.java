@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.nemerosa.ontrack.model.structure.Entity;
+import net.nemerosa.ontrack.model.support.Action;
 
 import java.util.ArrayList;
 import java.util.List;

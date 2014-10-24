@@ -8,7 +8,7 @@ import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.exceptions.BranchNotTemplateDefinitionException;
 import net.nemerosa.ontrack.model.form.*;
-import net.nemerosa.ontrack.model.security.Action;
+import net.nemerosa.ontrack.model.support.Action;
 import net.nemerosa.ontrack.model.security.BranchCreate;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;

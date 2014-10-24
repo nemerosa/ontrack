@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.svn;
 import net.nemerosa.ontrack.extension.api.ProjectEntityActionExtension;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType;
-import net.nemerosa.ontrack.model.security.Action;
+import net.nemerosa.ontrack.model.support.Action;
 import net.nemerosa.ontrack.model.security.BuildCreate;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.Branch;

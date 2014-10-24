@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.github;
 
 import net.nemerosa.ontrack.extension.api.UserMenuExtension;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
-import net.nemerosa.ontrack.model.security.Action;
+import net.nemerosa.ontrack.model.support.Action;
 import net.nemerosa.ontrack.model.security.GlobalFunction;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.extension.api.BuildDiffExtension;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType;
 import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationPropertyType;
-import net.nemerosa.ontrack.model.security.Action;
+import net.nemerosa.ontrack.model.support.Action;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.PropertyService;
 import org.springframework.beans.factory.annotation.Autowired;

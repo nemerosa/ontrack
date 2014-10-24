@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.model.structure;
 
 import lombok.Data;
-import net.nemerosa.ontrack.model.security.Action;
+import net.nemerosa.ontrack.model.support.Action;
 
 import java.util.List;
 

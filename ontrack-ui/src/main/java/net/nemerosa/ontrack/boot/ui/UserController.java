@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.api.UserMenuExtension;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Password;
 import net.nemerosa.ontrack.model.security.*;
+import net.nemerosa.ontrack.model.support.Action;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

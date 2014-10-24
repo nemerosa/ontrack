@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.api;
 
-import net.nemerosa.ontrack.model.security.Action;
+import net.nemerosa.ontrack.model.support.Action;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 
 import java.util.Optional;

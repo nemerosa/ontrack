@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.model.security;
+package net.nemerosa.ontrack.model.support;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -12,14 +12,15 @@ public class Action {
 
     private final String id;
     private final String name;
+    private final ActionType type;
     private final String uri;
 
     public static Action of(String id, String name, String uri, Object... parameters) {
-        return new Action(id, name, String.format(uri, parameters));
+        return new Action(id, name, ActionType.LINK, String.format(uri, parameters));
     }
 
     public static Action form(String id, String name, URI formUri) {
-        return of(id, name, "form:%s", formUri);
+        return new Action(id, name, ActionType.FORM, formUri.toString());
     }
 
     public Action withUri(String uri) {
