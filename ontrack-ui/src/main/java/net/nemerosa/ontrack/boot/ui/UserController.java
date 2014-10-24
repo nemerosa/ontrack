@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
 
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+
 @RestController
 @RequestMapping("/user")
 public class UserController extends AbstractResourceController {
@@ -101,7 +103,16 @@ public class UserController extends AbstractResourceController {
         if (securityService.isGlobalFunctionGranted(GlobalSettings.class)) {
             user.add(Action.of("settings", "Settings", "settings"));
         }
-        // TODO Profile
+        // Changing his password
+        if (user.getAccount().getAuthenticationSource().isAllowingPasswordChange()) {
+            user.add(
+                    Action.form(
+                            "user-password",
+                            "Change password",
+                            uri(on(getClass()).getChangePasswordForm())
+                    )
+            );
+        }
         // Account management
         if (securityService.isGlobalFunctionGranted(AccountManagement.class)) {
             user.add(Action.of("admin-accounts", "Account management", "admin-accounts"));
