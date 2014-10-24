@@ -140,7 +140,7 @@ var ontrack = angular.module('ontrack', [
                     title: action.name,
                     uri: action.uri,
                     submit: function (data) {
-                        return ot.call($http.post(action.uri));
+                        return ot.call($http.post(action.uri, data));
                     }
                 });
             };
