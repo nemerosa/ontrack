@@ -161,6 +161,49 @@ public class CopyServiceImplTest {
     }
 
     @Test
+    public void bulkUpdateBranch() {
+        Project project = Project.of(nd("P1", "")).withId(ID.of(1));
+        Branch branch = Branch.of(project, nd("B1", "Branch B1")).withId(ID.of(1));
+        // Request
+        BranchBulkUpdateRequest request = new BranchBulkUpdateRequest(
+                Arrays.asList(
+                        new Replacement("B1", "B2")
+                )
+        );
+
+        // Branch properties
+        when(propertyService.getProperties(branch)).thenReturn(
+                Arrays.asList(
+                        Property.of(
+                                new TestPropertyType(),
+                                TestProperty.of("http://wiki/B1")
+                        )
+                )
+        );
+
+        // Updated branch
+        Branch updatedBranch = branch.withDescription("Branch B2");
+
+        // Edition of the property must be allowed
+        when(securityService.isProjectFunctionGranted(updatedBranch, ProjectEdit.class)).thenReturn(true);
+
+        // Updating
+        service.update(branch, request);
+
+        // Checks the branch is updated
+        verify(structureService, times(1)).saveBranch(updatedBranch);
+
+        // Checks the copy of properties for the branch
+        verify(propertyService, times(1)).editProperty(
+                eq(updatedBranch),
+                eq(TestPropertyType.class.getName()),
+                eq(object()
+                        .with("value", "http://wiki/B2")
+                        .end())
+        );
+    }
+
+    @Test
     public void doCopyBranchProperties() {
         Branch sourceBranch = Branch.of(Project.of(nd("P1", "")).withId(ID.of(1)), nd("B1", "")).withId(ID.of(1));
         Branch targetBranch = Branch.of(Project.of(nd("P2", "")).withId(ID.of(2)), nd("B2", "")).withId(ID.of(2));

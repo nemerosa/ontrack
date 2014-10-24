@@ -116,8 +116,13 @@ public class CopyServiceImpl implements CopyService {
     public Branch update(Branch branch, BranchBulkUpdateRequest request) {
         // Replacement function
         Function<String, String> replacementFn = replacementFn(request.getReplacements());
+        // Description update
+        Branch updatedBranch = branch.withDescription(
+                replacementFn.apply(branch.getDescription())
+        );
+        structureService.saveBranch(updatedBranch);
         // Updating
-        doCopy(branch, branch, replacementFn, new SyncPolicy(
+        doCopy(branch, updatedBranch, replacementFn, new SyncPolicy(
                 SyncPolicy.TargetPresentPolicy.REPLACE,
                 SyncPolicy.UnknownTargetPolicy.IGNORE
         ));
