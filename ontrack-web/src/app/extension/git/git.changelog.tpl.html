@@ -80,31 +80,24 @@
                                 <ot-loading>Commits are loading...</ot-loading>
                             </div>
                         </div>
-                        <table ng-show="commits" class="ot-extension-git-changelog-commit-list">
-                            <tbody>
-                            <tr ng-repeat="gitUICommit in commits.log.commits">
-                                <td ng-if="$first"
-                                    rowspan="{{commits.log.commits.length}}"
-                                    class="ot-extension-git-changelog-commit-graph">
-                                    <canvas git-plot="commits.log.plot"></canvas>
-                                </td>
-                                <td class="ot-extension-git-changelog-commit-code">
-                                    <code ng-if="!gitUICommit.link">{{gitUICommit.commit.shortId}}</code>
-                                    <code ng-if="gitUICommit.link"><a href="{{gitUICommit.link}}" target="_blank">{{gitUICommit.commit.shortId}}</a></code>
-                                </td>
-                                <td class="ot-extension-git-changelog-message">
-                                    <div ng-bind-html="gitUICommit.annotatedMessage"></div>
-                                </td>
-                                <td class="ot-extension-git-changelog-author">
-                                    {{gitUICommit.commit.author.name}}
-                                </td>
-                                <td class="ot-extension-git-changelog-date">
-                                    {{gitUICommit.commit.commitTime | date:'mediumDate'}}
-                                    {{gitUICommit.commit.commitTime | date:'shortTime'}}
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
+                        <div class="panel-body ot-extension-git-changelog-commit-container" ng-if="commits">
+                            <div class="ot-extension-git-changelog-commit-graph">
+                                <canvas git-plot="commits.log.plot"></canvas>
+                            </div>
+                            <div class="ot-extension-git-changelog-commit"
+                                 ng-repeat="gitUICommit in commits.log.commits">
+                                <span class="ot-extension-git-changelog-code" ng-if="!gitUICommit.link">{{gitUICommit.commit.shortId}}</span>
+                                <span class="ot-extension-git-changelog-code" ng-if="gitUICommit.link"><a href="{{gitUICommit.link}}" target="_blank">{{gitUICommit.commit.shortId}}</a></span>
+                                    <span class="ot-extension-git-changelog-author">
+                                        {{gitUICommit.commit.author.name}}
+                                    </span>
+                                    <span class="ot-extension-git-changelog-date">
+                                        {{gitUICommit.commit.commitTime | date:'mediumDate'}}
+                                        {{gitUICommit.commit.commitTime | date:'shortTime'}}
+                                    </span>
+                                <span class="ot-extension-git-changelog-message" ng-bind-html="gitUICommit.annotatedMessage"></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

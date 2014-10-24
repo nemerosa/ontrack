@@ -4,75 +4,42 @@
 @import '../../vendor/bootstrap/less/utilities';
 @import 'variables.less';
 
-@otExtensionGitCommitHeight: 23px;
+@otExtensionGitCommitHeight: 24px;
 
-.make-height(@height) {
+.ot-extension-git-changelog-commit-graph {
+  float: left;
+}
+
+.ot-extension-git-make-height(@height) {
   height: @height;
   min-height: @height;
   max-height: @height;
+  line-height: @height;
 }
 
-table.ot-extension-git-changelog-commit-list {
-  border-spacing: 0px;
-  border-collapse: collapse;
-  td {
-    // TODO Remove debug code
-    // border: solid 1px red;
-  }
-  tr {
-    .make-height(@otExtensionGitCommitHeight);
-    td.ot-extension-git-changelog-commit-graph {
-      vertical-align: top;
-    }
-    td.ot-extension-git-changelog-message {
-      width: 75%;
-      > div {
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
-      }
-    }
-    td.ot-extension-git-changelog-author, td.ot-extension-git-changelog-date {
-      white-space: nowrap;
-    }
-  }
+.ot-extension-git-label {
+  padding: 2px 4px;
+  font-size: 80%;
+  border-radius: @border-radius-base;
 }
 
-/*
+.ot-extension-git-changelog-code {
+  .ot-extension-git-label;
+  font-family: monospace;
+  color: @code-color;
+  background-color: @code-bg;
+}
+.ot-extension-git-changelog-author {
+  .ot-extension-git-label;
+  color: @label-color;
+  background-color: @label-default-bg;
+}
+.ot-extension-git-changelog-date {
+  .ot-extension-git-label;
+  color: @label-color;
+  background-color: @label-info-bg;
+}
+
 .ot-extension-git-changelog-commit {
-  .panel;
-  .panel-default;
-  text-align: right;
-  .make-height(@otExtensionGitCommitHeight);
-  height: @otExtensionGitCommitHeight !important;
-  line-height: @otExtensionGitCommitHeight;
-  margin-top: 1px;
-  margin-bottom: 1px;
-  * {
-    border: solid 1px red;
-  }
-  > * {
-    .make-height(@otExtensionGitCommitHeight - 2);
-  }
-  code {
-    clear: left;
-    float: left;
-    margin-right: 0.5em;
-    padding-left: 0.5em;
-    padding-right: 0.5em;
-  }
-  .ot-extension-git-changelog-message {
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    float: left;
-    overflow: hidden;
-  }
-  .ot-extension-git-changelog-meta {
-    display: inline-block;
-    .ot-extension-git-changelog-author {
-      .label;
-      .label-default;
-    }
-  }
+  .ot-extension-git-make-height(@otExtensionGitCommitHeight);
 }
-*/
