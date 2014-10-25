@@ -34,6 +34,6 @@ To rerun the provisioning:
 * [ ] Configuring SSL
 * [ ] Find a better way to include modules
 * [x] Extract installation of Java in a module
-* [ ] Extract installation of ontrack in a module
+* [x] Extract installation of ontrack in a module
 * [ ] Write Wiki documentation
 * [ ] Write blog about this
