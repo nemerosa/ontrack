@@ -35,3 +35,12 @@ exec {
     before => Package["oracle-java8-installer"],
     logoutput => true,
 }
+
+## Installation ontrack
+## TODO Extract in a module
+
+file { '/opt/ontrack':
+  ensure => 'present',
+  group => 'ontrack',
+  owner => 'ontrack',
+}
