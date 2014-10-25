@@ -33,6 +33,7 @@ To rerun the provisioning:
 * [ ] Installing nginx as proxy
 * [ ] Configuring SSL
 * [ ] Find a better way to include modules
+* [ ] `/opt/ontrack` as home directory for the `ontrack` user
 * [x] Extract installation of Java in a module
 * [x] Extract installation of ontrack in a module
 * [ ] Write Wiki documentation
