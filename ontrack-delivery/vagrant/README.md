@@ -26,7 +26,7 @@ To rerun the provisioning:
 * [x] Running an empty machine
 * [x] Running puppet apply
 * [x] Installing Java
-* [ ] Installing ontrack
+* [x] Installing ontrack
 * [ ] Script to start ontrack on boot
 * [ ] Passing parameters to download ontrack
 * [ ] Open port in Vagrant
