@@ -61,4 +61,14 @@ class ontrack {
     content  => template('ontrack/start.erb'),
   }
 
+  file { 'ontrack-stop':
+    require  => Exec['ontrack-install'],
+    path     => '/opt/ontrack/stop.sh',
+    ensure   => 'file',
+    group    => 'ontrack',
+    owner    => 'ontrack',
+    mode     => 'ug=rx',
+    content  => template('ontrack/stop.erb'),
+  }
+
 }
