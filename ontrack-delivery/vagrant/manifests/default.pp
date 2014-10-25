@@ -1,12 +1,4 @@
-## User used to run ontrack
-
-user { 'ontrack':
-  ensure => present,
-}
-
-## Installation of the JDK8
-
-include java
+include ontrack
 
 #include apt
 #
