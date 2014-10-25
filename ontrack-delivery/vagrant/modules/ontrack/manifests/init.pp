@@ -51,7 +51,7 @@ class ontrack {
   }
 
 # Shell scripts for starting and stopping
-  file { 'ontrack-startup':
+  file { 'ontrack-start':
     require  => Exec['ontrack-install'],
     path     => '/opt/ontrack/start.sh',
     ensure   => 'file',
@@ -69,6 +69,18 @@ class ontrack {
     owner    => 'ontrack',
     mode     => 'ug=rx',
     content  => template('ontrack/stop.erb'),
+  }
+
+# init.d script for ontrack
+  file { 'ontrack-init.d':
+    require  => [
+      File['ontrack-start'],
+      File['ontrack-stop'],
+    ],
+    path     => '/etc/init.d/ontrack',
+    ensure   => 'file',
+    content  => template('ontrack/init.erb'),
+    mode     => '0755',
   }
 
 }

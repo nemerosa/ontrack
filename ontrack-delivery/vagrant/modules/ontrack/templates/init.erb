@@ -1,0 +1,10 @@
+#!/bin/sh
+case $1 in
+    start)
+        su ci -c "cd /opt/ontrack; sh start.sh"
+        ;;
+    stop)
+        sh /opt/ontrack/stop.sh
+        ;;
+esac
+exit 0
