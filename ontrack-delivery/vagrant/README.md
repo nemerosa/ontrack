@@ -27,6 +27,7 @@ To rerun the provisioning:
 * [x] Running puppet apply
 * [x] Installing Java
 * [ ] Installing ontrack
+* [ ] Passing parameters to download ontrack
 * [ ] Open port in Vagrant
 * [ ] Installing nginx as proxy
 * [ ] Configuring SSL
