@@ -25,7 +25,7 @@ To rerun the provisioning:
 
 * [x] Running an empty machine
 * [x] Running puppet apply
-* [ ] Installing Java
+* [x] Installing Java
 * [ ] Installing ontrack
 * [ ] Open port in Vagrant
 * [ ] Installing nginx as proxy
