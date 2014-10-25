@@ -31,6 +31,8 @@ To rerun the provisioning:
 * [ ] Open port in Vagrant
 * [ ] Installing nginx as proxy
 * [ ] Configuring SSL
+* [ ] Find a better way to include modules
+* [ ] Extract installation of Java in a module
+* [ ] Extract installation of ontrack in a module
 * [ ] Write Wiki documentation
 * [ ] Write blog about this
-* [ ] Find a better way to include modules
