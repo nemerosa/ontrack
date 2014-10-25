@@ -32,3 +32,4 @@ To rerun the provisioning:
 * [ ] Configuring SSL
 * [ ] Write Wiki documentation
 * [ ] Write blog about this
+* [ ] Find a better way to include modules
