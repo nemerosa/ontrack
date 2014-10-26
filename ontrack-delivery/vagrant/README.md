@@ -32,7 +32,7 @@ Spring Boot init.d:
 * [x] Running puppet apply
 * [x] Installing Java
 * [x] Installing ontrack
-* [ ] Script to start ontrack on boot
+* [x] Script to start ontrack on boot
 * [ ] Passing parameters to download ontrack
 * [ ] Open port in Vagrant
 * [ ] Installing nginx as proxy

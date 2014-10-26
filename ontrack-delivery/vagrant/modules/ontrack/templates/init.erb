@@ -40,8 +40,10 @@ status)
     if check_pid_running
     then
         echo "Process is running (" $PID ")"
+        exit 0
     else
         echo "Process not running"
+        exit 1
     fi
     ;;
 

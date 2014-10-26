@@ -63,8 +63,9 @@ class ontrack {
   service { 'ontrack-service':
     name       => 'ontrack',
     require    => File['ontrack-init.d'],
+    subscribe  => Exec['ontrack-install'],
     enable     => true,
-    ensure     => 'running',
+    ensure     => running,
   }
 
 }
