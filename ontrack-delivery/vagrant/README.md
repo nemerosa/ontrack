@@ -21,6 +21,11 @@ To rerun the provisioning:
 * http://www.linux.com/learn/tutorials/696255-jumpstart-your-linux-development-environment-with-puppet-and-vagrant
 * https://docs.vagrantup.com/v2/provisioning/puppet_apply.html
 
+Spring Boot init.d:
+
+* https://github.com/rburgst/spring-boot-initscript/tree/master
+* http://thoughtfulsoftware.wordpress.com/2014/06/01/running-spring-boot-part-ii/ (more up to date)
+
 ## Actions
 
 * [x] Running an empty machine

@@ -50,33 +50,9 @@ class ontrack {
       creates   => '/opt/ontrack/ontrack.jar',
   }
 
-# Shell scripts for starting and stopping
-  file { 'ontrack-start':
-    require  => Exec['ontrack-install'],
-    path     => '/opt/ontrack/start.sh',
-    ensure   => 'file',
-    group    => 'ontrack',
-    owner    => 'ontrack',
-    mode     => 'ug=rx',
-    content  => template('ontrack/start.erb'),
-  }
-
-  file { 'ontrack-stop':
-    require  => Exec['ontrack-install'],
-    path     => '/opt/ontrack/stop.sh',
-    ensure   => 'file',
-    group    => 'ontrack',
-    owner    => 'ontrack',
-    mode     => 'ug=rx',
-    content  => template('ontrack/stop.erb'),
-  }
-
 # init.d script for ontrack
   file { 'ontrack-init.d':
-    require  => [
-      File['ontrack-start'],
-      File['ontrack-stop'],
-    ],
+    require  => Exec['ontrack-install'],
     path     => '/etc/init.d/ontrack',
     ensure   => 'file',
     content  => template('ontrack/init.erb'),
