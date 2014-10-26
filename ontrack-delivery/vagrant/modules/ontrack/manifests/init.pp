@@ -45,7 +45,7 @@ class ontrack {
       path      => "/usr/bin/:/bin/",
       logoutput => true,
     # TODO ontrack could be available through the Web, or locally, for acceptance tests
-     command   => 'curl --location https://github.com/nemerosa/ontrack/releases/download/2.0.0-rc-101/ontrack.jar --output ontrack.jar',
+      command   => 'curl --location https://github.com/nemerosa/ontrack/releases/download/2.0.0-rc-101/ontrack.jar --output ontrack.jar',
     # TODO Wrong: this output does not take the version in account
       creates   => '/opt/ontrack/ontrack.jar',
   }
@@ -58,5 +58,7 @@ class ontrack {
     content  => template('ontrack/init.erb'),
     mode     => '0755',
   }
+
+# ontrack service
 
 }

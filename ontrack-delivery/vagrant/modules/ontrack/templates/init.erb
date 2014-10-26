@@ -78,7 +78,7 @@ start)
         echo "Process already running"
         exit 1
     fi
-    COMMAND="java -jar $JARFile --spring.profiles.active=prod --logging.path=${LOGDir}/ > /dev/null 2>&1 &"
+    COMMAND="cd /opt/ontrack; java -jar $JARFile --spring.profiles.active=prod --logging.path=${LOGDir}/ > /dev/null 2>&1 &"
     su --command "$COMMAND" ontrack
     echo "Process started"
     ;;
