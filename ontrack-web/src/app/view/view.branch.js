@@ -162,6 +162,14 @@ angular.module('ot.view.branch', [
                 // TODO view.description = branchResource.description;
                 view.breadcrumbs = ot.projectBreadcrumbs(branchResource.project);
                 // TODO view.decorationsEntity = branchResource;
+                // Branch template instance details
+                if ($scope.branch._templateInstance) {
+                    ot.call($http.get($scope.branch._templateInstance)).then(function (templateInstance) {
+                        return otStructureService.getBranch(templateInstance.templateDefinitionId);
+                    }).then(function (templateDefinition) {
+                        $scope.templateDefinition = templateDefinition;
+                    });
+                }
                 // Branch commands
                 view.commands = [
                     {
