@@ -1,3 +1,5 @@
+import com.sun.tools.internal.ws.resources.WscompileMessages
+
 apply plugin: 'groovy'
 
 dependencies {
@@ -10,6 +12,23 @@ dependencies {
     testRuntime libraries.slf4j_log4j
     testRuntime libraries.log4j
 }
+
+/**
+ * Packaging
+ */
+
+task testJar(type: Jar) {
+    classifier = 'tests'
+    from sourceSets.test.output
+}
+
+artifacts {
+    archives testJar
+}
+
+/**
+ * Local test definitions
+ */
 
 ext {
     ontrackUrl = 'http://localhost:8080'
