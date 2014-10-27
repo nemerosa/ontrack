@@ -28,15 +28,6 @@ dependencies {
 task testJar(type: Jar) {
     classifier = 'test'
     from sourceSets.test.output
-    doFirst {
-        manifest {
-            attributes(
-                    'Main-Class': 'net.nemerosa.ontrack.acceptance.Start',
-                    'Implementation-Version': version,
-                    'Class-Path': configurations.testRuntime.collect { 'lib/' + it.getName() }.join(' ')
-            )
-        }
-    }
 }
 
 artifacts {
