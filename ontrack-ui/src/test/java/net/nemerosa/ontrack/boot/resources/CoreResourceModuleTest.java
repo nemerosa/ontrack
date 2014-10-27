@@ -199,6 +199,7 @@ public class CoreResourceModuleTest {
                         .with("_buildFilterForms", "urn:test:net.nemerosa.ontrack.boot.ui.BuildFilterController#buildFilterForms:1")
                         .with("_buildFilterSave", "urn:test:net.nemerosa.ontrack.boot.ui.BuildFilterController#createFilter:1,")
                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:BRANCH,1,0,10")
+                        .with("_templateInstance", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getTemplateInstance:1")
                         .with("_templateInstanceDisconnect", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#disconnectTemplateInstance:1")
                         .end(),
                 b
@@ -299,7 +300,7 @@ public class CoreResourceModuleTest {
                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:BRANCH,1,0,10")
                         .with("_templateDefinition", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getTemplateDefinition:1")
                         .with("_templateSync", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#syncTemplateDefinition:1")
-                        .with("_templateInstance", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#singleTemplateInstanceForm:1")
+                        .with("_templateInstanceCreate", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#singleTemplateInstanceForm:1")
                         .end(),
                 b
         );
