@@ -11,4 +11,11 @@ class AcceptanceConfig {
 
     String url = "http://localhost:8080"
 
+    String getUrl() {
+        return url
+    }
+
+    void setUrl(String url) {
+        this.url = url
+    }
 }
