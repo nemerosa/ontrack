@@ -18,4 +18,8 @@ class AcceptanceConfig {
     void setUrl(String url) {
         this.url = url
     }
+
+    def setSystemProperties() {
+        System.setProperty('ontrack.url', url)
+    }
 }

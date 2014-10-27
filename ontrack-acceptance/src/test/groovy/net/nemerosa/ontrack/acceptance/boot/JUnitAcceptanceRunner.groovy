@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.acceptance.boot
 
+import net.nemerosa.ontrack.acceptance.ACCBrowserBasic
+import org.junit.runner.JUnitCore
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,5 +21,17 @@ class JUnitAcceptanceRunner implements AcceptanceRunner {
     void run() throws Exception {
         logger.info "Starting acceptance tests."
         logger.info "Config: ${config}"
+
+        // Config as system properties
+        config.setSystemProperties()
+
+        JUnitCore junit = new JUnitCore()
+        // TODO Filtering on tests
+        junit.run(
+                ACCBrowserBasic,
+//                ACCSearch,
+//                ACCStructure
+        )
+
     }
 }
