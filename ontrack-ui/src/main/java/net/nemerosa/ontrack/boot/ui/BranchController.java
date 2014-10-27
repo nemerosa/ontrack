@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.exceptions.BranchNotTemplateDefinitionException;
+import net.nemerosa.ontrack.model.exceptions.BranchNotTemplateInstanceException;
 import net.nemerosa.ontrack.model.form.*;
 import net.nemerosa.ontrack.model.security.BranchCreate;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -415,6 +416,15 @@ public class BranchController extends AbstractResourceController {
     @RequestMapping(value = "branches/{branchId}/template", method = RequestMethod.PUT)
     public Branch createTemplateInstance(@PathVariable ID branchId, @RequestBody @Valid BranchTemplateInstanceSingleRequest request) {
         return branchTemplateService.createTemplateInstance(branchId, request);
+    }
+
+    /**
+     * Gets the template instance for a branch
+     */
+    @RequestMapping(value = "branches/{branchId}/template/instance", method = RequestMethod.GET)
+    public TemplateInstance getTemplateInstance(@PathVariable ID branchId) {
+        return branchTemplateService.getTemplateInstance(branchId)
+                .orElseThrow(() -> new BranchNotTemplateInstanceException(branchId));
     }
 
     /**
