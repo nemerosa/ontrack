@@ -158,10 +158,7 @@ angular.module('ot.view.branch', [
             otStructureService.getBranch(branchId).then(function (branchResource) {
                 $scope.branch = branchResource;
                 // View settings
-                // TODO view.title = branchResource.name;
-                // TODO view.description = branchResource.description;
                 view.breadcrumbs = ot.projectBreadcrumbs(branchResource.project);
-                // TODO view.decorationsEntity = branchResource;
                 // Branch template instance details
                 if ($scope.branch._templateInstance) {
                     ot.call($http.get($scope.branch._templateInstance)).then(function (templateInstance) {
