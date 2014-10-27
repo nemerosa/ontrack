@@ -1,5 +1,3 @@
-import com.sun.tools.internal.ws.resources.WscompileMessages
-
 apply plugin: 'groovy'
 
 dependencies {
@@ -20,6 +18,12 @@ dependencies {
 task testJar(type: Jar) {
     classifier = 'tests'
     from sourceSets.test.output
+    manifest {
+        attributes(
+                'Main-Class': 'net.nemerosa.ontrack.acceptance.Start',
+                'Implementation-Version': version
+        )
+    }
 }
 
 artifacts {
