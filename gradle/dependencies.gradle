@@ -46,6 +46,7 @@ ext {
 
             // Spring boot
             spring_boot                 : "org.springframework.boot:spring-boot:${springBootVersion}",
+            spring_boot_starter         : "org.springframework.boot:spring-boot-starter:${springBootVersion}",
             spring_boot_starter_jdbc    : "org.springframework.boot:spring-boot-starter-jdbc:${springBootVersion}",
             spring_boot_starter_web     : "org.springframework.boot:spring-boot-starter-web:${springBootVersion}",
             spring_boot_starter_actuator: "org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}",

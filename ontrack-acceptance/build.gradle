@@ -14,10 +14,10 @@ dependencies {
     testCompile project(':ontrack-client')
     testCompile project(':ontrack-test-utils')
     testCompile libraries.groovy
+    testCompile libraries.spring_boot_starter
 
     testCompile 'org.seleniumhq.selenium:selenium-java:2.43.1'
 
-    testRuntime libraries.slf4j_log4j
     testRuntime libraries.log4j
 }
 
@@ -35,7 +35,7 @@ artifacts {
 }
 
 bootRepackage {
-    mainClass = 'net.nemerosa.ontrack.acceptance.Start'
+    mainClass = 'net.nemerosa.ontrack.acceptance.boot.Start'
     classifier = 'test'
     withJarTask = 'testJar'
     customConfiguration = 'testRuntime'
