@@ -48,7 +48,6 @@ public class PropertyController extends AbstractProjectEntityController {
                     property,
                     uri(on(getClass()).getPropertyValue(entity.getProjectEntityType(), entity.getId(), property.getType().getClass().getName()))
             );
-            // TODO Obfuscation of sensitive data
             // Update
             resource = resource.with(
                     Link.UPDATE,

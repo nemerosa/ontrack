@@ -94,7 +94,6 @@ public class ExtensionManagerImpl implements ExtensionManager, StartupService {
     }
 
     // TODO Disabling features
-    // TODO Promotes to the API
     private boolean isExtensionFeatureEnabled(String id) {
         return true;
     }

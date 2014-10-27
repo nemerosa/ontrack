@@ -42,7 +42,6 @@ public class SCMChangeLog<S, T> extends BuildDiff {
     }
 
     public static <S, T> SCMChangeLog<S, T> of(Branch branch, S scmBranch, SCMBuildView<T> from, SCMBuildView<T> to) {
-        // TODO Checks the order of the builds
         return new SCMChangeLog<>(
                 UUID.randomUUID().toString(),
                 branch,
