@@ -1,5 +1,19 @@
 <ot-view>
 
+    <div class="row">
+        <div class="col-md-12 ot-view-title">
+            {{branch.name}}
+            <ot-entity-decorations entity="branch"></ot-entity-decorations>
+            <!--<div ng-if="branch.type == 'TEMPLATE_INSTANCE'">-->
+                <!--<span class="fa fa-share fa-flip-vertical">-->
+                <!--</span>-->
+            <!--</div>-->
+            <div ng-if="branch.description" class="ot-description">
+                {{branch.description}}
+            </div>
+        </div>
+    </div>
+
     <ot-entity-disabled entity="branch" callback="reloadBranch()">
         The branch is disabled.
     </ot-entity-disabled>
