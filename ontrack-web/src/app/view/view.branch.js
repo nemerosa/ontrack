@@ -199,13 +199,13 @@ angular.module('ot.view.branch', [
                     },
                     {
                         condition: function () {
-                            return branchResource._templateInstance;
+                            return branchResource._templateInstanceCreate;
                         },
                         id: 'templateInstanceBranch',
                         name: "Create template instance",
                         cls: 'ot-command-branch-template-instance',
                         action: function () {
-                            otTemplateService.createTemplateInstance(branchResource._templateInstance).then(
+                            otTemplateService.createTemplateInstance(branchResource._templateInstanceCreate).then(
                                 function (instance) {
                                     $state.go('branch', {branchId: instance.id});
                                 }

@@ -155,7 +155,7 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                 )
                         // Template instance creation
                 .link(
-                        "_templateInstance",
+                        "_templateInstanceCreate",
                         on(BranchController.class).singleTemplateInstanceForm(branch.getId()),
                         branch.getType() == BranchType.TEMPLATE_DEFINITION
                                 && resourceContext.isProjectFunctionGranted(branch, BranchTemplateMgt.class)
