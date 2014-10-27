@@ -1,4 +1,14 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.1.8.RELEASE")
+    }
+}
+
 apply plugin: 'groovy'
+apply plugin: 'spring-boot'
 
 dependencies {
     testCompile project(':ontrack-client')
@@ -31,6 +41,13 @@ task testJar(type: Jar) {
 
 artifacts {
     archives testJar
+}
+
+bootRepackage {
+    mainClass = 'net.nemerosa.ontrack.acceptance.Start'
+    classifier = 'test'
+    withJarTask = 'testJar'
+    customConfiguration = 'testRuntime'
 }
 
 /**
