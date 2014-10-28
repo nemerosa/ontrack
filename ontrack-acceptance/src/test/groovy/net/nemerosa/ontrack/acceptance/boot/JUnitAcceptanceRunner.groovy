@@ -24,7 +24,8 @@ class JUnitAcceptanceRunner implements AcceptanceRunner {
     @Override
     boolean run() throws Exception {
         logger.info "Starting acceptance tests."
-        logger.info "Config: ${config}"
+        logger.info "Config URL    : ${config.url}"
+        logger.info "Config context: ${config.context}"
 
         // Config as system properties
         config.setSystemProperties()
@@ -39,8 +40,10 @@ class JUnitAcceptanceRunner implements AcceptanceRunner {
         // Gets all the acceptance suites
         def suites = applicationContext.getBeansWithAnnotation(AcceptanceTestSuite).values().collect { it.class }
 
+        // TODO Filters on classes
+
         // Creates the runners
-        def runners = suites.collect { new AcceptanceTestRunner(it) }
+        def runners = suites.collect { new AcceptanceTestRunner(it, config) }
 
         // Running the tests
         boolean ok = runners

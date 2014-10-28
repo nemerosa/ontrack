@@ -9,7 +9,8 @@ import org.springframework.stereotype.Component
 @ToString(includeNames = true)
 class AcceptanceConfig {
 
-    String url = "http://localhost:8080"
+    private String url = "http://localhost:8080"
+    private Set<String> context = [] as Set
 
     String getUrl() {
         return url
@@ -17,6 +18,14 @@ class AcceptanceConfig {
 
     void setUrl(String url) {
         this.url = url
+    }
+
+    Set<String> getContext() {
+        return context
+    }
+
+    void setContext(Set<String> context) {
+        this.context = context
     }
 
     def setSystemProperties() {

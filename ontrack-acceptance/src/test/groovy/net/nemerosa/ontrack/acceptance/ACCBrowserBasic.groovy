@@ -24,11 +24,13 @@ class ACCBrowserBasic extends AcceptanceTestClient {
     }
 
     @Test
+    @AcceptanceTest(excludes = "production")
     void 'Admin login'() {
         browser { browser -> loginAsAdmin(browser) }
     }
 
     @Test
+    @AcceptanceTest(excludes = "production")
     void 'Project creation'() {
         browser { browser ->
             HomePage home = loginAsAdmin(browser)
@@ -45,6 +47,7 @@ class ACCBrowserBasic extends AcceptanceTestClient {
     }
 
     @Test
+    @AcceptanceTest(excludes = "production")
     void 'Branch creation'() {
         browser { browser ->
             withProject { id, name ->
