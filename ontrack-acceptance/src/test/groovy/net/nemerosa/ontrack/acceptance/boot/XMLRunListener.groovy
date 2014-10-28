@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.acceptance.boot
 
 import groovy.xml.MarkupBuilder
+import org.apache.commons.lang3.exception.ExceptionUtils
 import org.junit.runner.Description
 import org.junit.runner.Result
 import org.junit.runner.notification.Failure
@@ -114,10 +115,20 @@ class XMLRunListener extends RunListener {
                 ) {
                     if (run.ignored) {
                         skipped()
+                    } else if (run.error) {
+                        failure(
+                                message: run.error.message,
+                                type: run.error.class.name,
+                                errorMessage(run.error)
+                        )
                     }
                 }
             }
         }
+    }
+
+    protected static String errorMessage(Failure failure) {
+        ExceptionUtils.getStackTrace(failure.exception)
     }
 
 }
