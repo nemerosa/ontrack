@@ -27,6 +27,10 @@ class XMLRunListener extends RunListener {
             this.start = System.currentTimeMillis()
         }
 
+        long getTime() {
+            end - start
+        }
+
         void end() {
             end = System.currentTimeMillis()
         }
@@ -78,7 +82,15 @@ class XMLRunListener extends RunListener {
                 failures: runs.values().count { it.failure },
                 errors: runs.values().count { it.error },
                 time: (runEnd - runStart) / 1000
-        )
+        ) {
+            runs.values().each { run ->
+                testcase(
+                        name: run.description.methodName,
+                        classname: run.description.className,
+                        time: (run.time) / 1000
+                )
+            }
+        }
     }
 
 }

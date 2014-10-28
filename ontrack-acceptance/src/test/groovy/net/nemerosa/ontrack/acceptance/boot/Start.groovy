@@ -18,16 +18,6 @@ class Start {
         def ctx = SpringApplication.run(Start.class, args);
         def runners = ctx.getBeansOfType(AcceptanceRunner).values()
         runners.each { it -> it.run() }
-        /*
-
-        JUnitCore junit = new JUnitCore()
-        // TODO Filtering on tests
-        junit.run(
-                ACCBrowserBasic,
-//                ACCSearch,
-//                ACCStructure
-        )
-        */
     }
 
 }
