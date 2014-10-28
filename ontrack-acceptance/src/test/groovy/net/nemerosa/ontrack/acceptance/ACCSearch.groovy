@@ -12,6 +12,7 @@ import static net.nemerosa.ontrack.json.JsonUtils.object
  * Search acceptance tests.
  */
 @AcceptanceTestSuite
+@AcceptanceTest(excludes = 'production')
 class ACCSearch extends AcceptanceTestClient {
 
     @Test
