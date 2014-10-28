@@ -19,7 +19,8 @@ class JUnitAcceptanceRunner implements AcceptanceRunner {
         this.config = config
     }
 
-    void run() throws Exception {
+    @Override
+    boolean run() throws Exception {
         logger.info "Starting acceptance tests."
         logger.info "Config: ${config}"
 
@@ -32,13 +33,15 @@ class JUnitAcceptanceRunner implements AcceptanceRunner {
         junit.addListener(xmlRunListener)
         // FIXME Detection of classes
         // TODO Filtering on tests
-        junit.run(
+        def result = junit.run(
 //                ACCBrowserBasic,
                 ACCSearch,
                 ACCStructure
         )
         // XML output
         xmlRunListener.render(new File('ontrack-acceptance.xml'))
+        // Result
+        result.wasSuccessful()
 
     }
 }

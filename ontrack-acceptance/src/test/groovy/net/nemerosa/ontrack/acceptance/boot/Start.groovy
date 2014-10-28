@@ -14,10 +14,11 @@ class Start {
     @Autowired
     private AcceptanceConfig config
 
-    static void main(String... args) {
+    static int main(String... args) {
         def ctx = SpringApplication.run(Start.class, args);
         def runners = ctx.getBeansOfType(AcceptanceRunner).values()
-        runners.each { it -> it.run() }
+        boolean allOK = runners.collect { it -> it.run() }.every()
+        return allOK ? 0 : 1
     }
 
 }
