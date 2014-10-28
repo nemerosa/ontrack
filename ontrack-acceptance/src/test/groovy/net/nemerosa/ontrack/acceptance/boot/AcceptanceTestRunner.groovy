@@ -18,13 +18,9 @@ class AcceptanceTestRunner extends BlockJUnit4ClassRunner {
     @Override
     protected void runChild(FrameworkMethod method, RunNotifier notifier) {
         def acceptanceTest = method.getAnnotation(AcceptanceTest)
-        if (acceptanceTest) {
-            def context = new HashSet<>(config.context)
-            def excludes = acceptanceTest.excludes()
-            if (!context.disjoint(excludes as Set)) {
-                notifier.fireTestIgnored(describeChild(method))
-                return
-            }
+        if (acceptanceTest && !config.acceptTest(acceptanceTest)) {
+            notifier.fireTestIgnored(describeChild(method))
+            return
         }
         // Default
         super.runChild(method, notifier)

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.acceptance.boot
 
 import groovy.transform.ToString
+import net.nemerosa.ontrack.acceptance.support.AcceptanceTest
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component
 
@@ -30,5 +31,10 @@ class AcceptanceConfig {
 
     def setSystemProperties() {
         System.setProperty('ontrack.url', url)
+    }
+
+    boolean acceptTest(AcceptanceTest acceptanceTest) {
+        def excludes = acceptanceTest.excludes()
+        context.disjoint(excludes as Set)
     }
 }

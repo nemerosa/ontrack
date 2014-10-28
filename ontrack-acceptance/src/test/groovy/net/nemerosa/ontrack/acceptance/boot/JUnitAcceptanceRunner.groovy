@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.acceptance.boot
 
+import net.nemerosa.ontrack.acceptance.support.AcceptanceTest
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import org.junit.runner.JUnitCore
 import org.slf4j.Logger
@@ -38,12 +39,19 @@ class JUnitAcceptanceRunner implements AcceptanceRunner {
         junit.addListener(xmlRunListener)
 
         // Gets all the acceptance suites
-        def suites = applicationContext.getBeansWithAnnotation(AcceptanceTestSuite).values().collect { it.class }
+        def suites = applicationContext.getBeansWithAnnotation(AcceptanceTestSuite)
 
-        // TODO Filters on classes
+        // Filters on classes
+        suites = suites.findAll { name, bean ->
+            def acceptanceTest = applicationContext.findAnnotationOnBean(name, AcceptanceTest)
+            return acceptanceTest == null || config.acceptTest(acceptanceTest)
+        }
+
+        // Class names
+        def classes = suites.values().collect { it.class }
 
         // Creates the runners
-        def runners = suites.collect { new AcceptanceTestRunner(it, config) }
+        def runners = classes.collect { new AcceptanceTestRunner(it, config) }
 
         // Running the tests
         boolean ok = runners
