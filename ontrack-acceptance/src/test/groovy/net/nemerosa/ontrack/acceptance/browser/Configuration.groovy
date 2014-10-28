@@ -17,6 +17,8 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 import java.util.function.Consumer
 
+import static net.nemerosa.ontrack.acceptance.AcceptanceSupport.env
+
 public class Configuration {
 
     private static final Logger logger = LoggerFactory.getLogger(Configuration.class);
@@ -139,30 +141,6 @@ public class Configuration {
 
     static String getAdminPassword() {
         env('ontrack.admin', false, 'admin', "Admin password")
-    }
-
-    public static String env(String property, boolean required, String defaultValue, String name) {
-        String sys = System.getProperty(property);
-        if (StringUtils.isNotBlank(sys)) {
-            return sys;
-        } else {
-            String envName = property.toUpperCase().replace(".", "_");
-            String env = System.getenv(envName);
-            if (StringUtils.isNotBlank(env)) {
-                return env;
-            } else if (required) {
-                throw new IllegalStateException(
-                        String.format(
-                                "The %s system property or %s environment variable is required (%s)",
-                                property,
-                                envName,
-                                name
-                        )
-                );
-            } else {
-                return defaultValue;
-            }
-        }
     }
 
     public static WebDriver initDriver() throws IOException {
