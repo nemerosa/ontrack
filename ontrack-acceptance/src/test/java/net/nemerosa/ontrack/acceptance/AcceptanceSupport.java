@@ -59,7 +59,7 @@ public abstract class AcceptanceSupport {
     }
 
     protected Client admin() {
-        String adminPassword = env("acceptance.admin.password", false, "admin", "Acceptance admin password");
+        String adminPassword = env("ontrack.admin", false, "admin", "Acceptance admin password");
         return client(() -> clientBuilder().withCredentials("admin", adminPassword).build());
     }
 
