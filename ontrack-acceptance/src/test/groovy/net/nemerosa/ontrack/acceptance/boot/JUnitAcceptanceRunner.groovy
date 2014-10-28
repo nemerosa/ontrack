@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.acceptance.boot
 
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import org.junit.runner.JUnitCore
-import org.junit.runner.Request
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -40,19 +39,19 @@ class JUnitAcceptanceRunner implements AcceptanceRunner {
         // Gets all the acceptance suites
         def suites = applicationContext.getBeansWithAnnotation(AcceptanceTestSuite).values().collect { it.class }
 
-        // TODO Filtering on tests
-
-        // Suite as array
-        Class[] classes = suites
+        // Creates the runners
+        def runners = suites.collect { new AcceptanceTestRunner(it) }
 
         // Running the tests
-        def result = junit.run(Request.classes(classes))
+        boolean ok = runners
+                .collect { junit.run(it) }
+                .every { it.wasSuccessful() }
 
         // XML output
         xmlRunListener.render(new File('ontrack-acceptance.xml'))
 
         // Result
-        result.wasSuccessful()
+        ok
 
     }
 }

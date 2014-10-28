@@ -49,7 +49,7 @@ class XMLRunListener extends RunListener {
 
     @Override
     void testRunStarted(Description description) throws Exception {
-        trace "Starting tests..."
+        trace "Starting tests in ${description.className}..."
         runStart = System.currentTimeMillis()
     }
 
