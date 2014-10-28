@@ -28,26 +28,32 @@ Perfect to setup a VM, configure it, and discard it afterwards. The Puppet scrip
 Vagrant since they can be used as-is for the production-like deployment. If both use cases use the same
 provisioning mechanism, we can guarantee that the acceptance tests validate also the production deployment.
 
-## Open points
-
-### Portable acceptance tests
-
-The acceptance tests are easy to run at build time, because of their link to the sources, but they need
-actually to run outside of any source context, when run against remote acceptance servers and production.
-
-### Java installation
+#### Java installation
 
 There is no clean built-in JDK8 image for Vagrant, and setup of the JDK8 using Puppet, even with the official
 images remains complex. Switching back to a pure `apt-get` installation.
 
-### nginx installation
+#### Java installation (bis)
+
+Downloading and installation of the JDK8 is not cached and takes too much time for a local and discardable
+installation.
+
+#### nginx installation
 
 The official `nginx` puppet scripts seem to be in infancy stage and very unstable. Reverting also to a pure
 `apt-get` installation and configuration.
 
 This can prove to be difficult when dealing with certificates.
 
-### Vagrant vs. Puppet
+#### Vagrant vs. Puppet
 
 We want the Puppet scripts to be independent from Vagrant. For the moment, the Puppet scripts are in the 
 `vagrant` folder but should be extracted in their own folder.
+
+
+## Open points
+
+### Portable acceptance tests
+
+The acceptance tests are easy to run at build time, because of their link to the sources, but they need
+actually to run outside of any source context, when run against remote acceptance servers and production.
