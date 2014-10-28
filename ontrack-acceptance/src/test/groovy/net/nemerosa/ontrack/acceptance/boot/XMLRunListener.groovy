@@ -8,6 +8,7 @@ import org.junit.runner.notification.RunListener
 
 class XMLRunListener extends RunListener {
 
+    private final PrintStream stream
     private long runStart;
     private long runEnd;
 
@@ -37,18 +38,37 @@ class XMLRunListener extends RunListener {
 
     }
 
+    XMLRunListener(PrintStream stream) {
+        this.stream = stream
+    }
+
+    protected void trace(String message) {
+        stream.println message
+    }
+
     @Override
     void testRunStarted(Description description) throws Exception {
+        trace "Starting tests..."
         runStart = System.currentTimeMillis()
     }
 
     @Override
     void testRunFinished(Result result) throws Exception {
         runEnd = System.currentTimeMillis()
+        if (result.wasSuccessful()) {
+            trace ''
+            trace "Tests OK (${result.runCount} test${result.runCount > 1 ? 's' : ''})"
+
+        } else {
+            trace ''
+            trace 'FAILED!'
+            trace "Tests run: ${result.runCount}, Failures: ${result.failureCount}"
+        }
     }
 
     @Override
     void testStarted(Description description) throws Exception {
+        trace "Running test: ${description.className}: ${description.methodName}"
         runs.put description, new TestRun(description)
     }
 
