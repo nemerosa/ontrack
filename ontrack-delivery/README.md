@@ -57,3 +57,23 @@ We want the Puppet scripts to be independent from Vagrant. For the moment, the P
 
 The acceptance tests are easy to run at build time, because of their link to the sources, but they need
 actually to run outside of any source context, when run against remote acceptance servers and production.
+
+## Usage
+
+### Vagrant
+
+Use cases:
+* remote acceptance tests
+
+Usage:
+
+    # Set-up the machine
+    ./vagrant-setup.sh \
+        --jar=<path to Ontrack JAR>
+    # Launches integration tests
+    ./acceptance.sh \
+        --jar=<path to Ontrack Acceptance JAR> \
+        --ontrack-url=http://localhost:3000
+    # Getting rid of the VM (or not)
+    cd vagrant-local
+    vagrant destroy -f

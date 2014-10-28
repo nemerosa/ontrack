@@ -1,20 +1,14 @@
-class ontrack {
+# Class ontrack
+#
+# Parameters:
+#
+# * ontrackJar - path on the guest to the Ontrack JAR to install
+class ontrack($ontrackJar = undef) {
 
-# Apt for tools
-  include apt
-  exec { 'apt-get-update':
-    command => '/usr/bin/apt-get update',
+# Check
+  if (!$ontrackJar) {
+    fail('Path to the Ontrack JAR must be set ($ontrackJar).')
   }
-
-# Tools
-  package { [
-    "curl",
-    "git-core",
-    "bash"]:
-    ensure  => present,
-    require => Exec["apt-get-update"],
-  }
-
 
 # Ontrack user
   user { 'ontrack':
@@ -36,23 +30,19 @@ class ontrack {
 # Or gets the version in the downloaded file, and uses it as an output of the Exec task below
 # Note that in this case, the start-up template must be adapted
 
-# Ontrack download
-  exec {
-    "ontrack-install":
-      require   => File['/opt/ontrack'],
-      user      => 'ontrack',
-      cwd       => '/opt/ontrack',
-      path      => "/usr/bin/:/bin/",
-      logoutput => true,
-    # TODO ontrack could be available through the Web, or locally, for acceptance tests
-      command   => 'curl --location https://github.com/nemerosa/ontrack/releases/download/2.0.0-rc-101/ontrack.jar --output ontrack.jar',
-    # TODO Wrong: this output does not take the version in account
-      creates   => '/opt/ontrack/ontrack.jar',
+# Ontrack application JAR
+  file { 'ontrack-install':
+    name      =>'/opt/ontrack/ontrack.jar',
+    require   => File['/opt/ontrack'],
+    ensure    => 'present',
+    group     => 'ontrack',
+    owner     => 'ontrack',
+    source    => $ontrackJar,
   }
 
 # init.d script for ontrack
   file { 'ontrack-init.d':
-    require  => Exec['ontrack-install'],
+    require  => File['ontrack-install'],
     path     => '/etc/init.d/ontrack',
     ensure   => 'file',
     content  => template('ontrack/init.erb'),
@@ -63,7 +53,7 @@ class ontrack {
   service { 'ontrack-service':
     name       => 'ontrack',
     require    => File['ontrack-init.d'],
-    subscribe  => Exec['ontrack-install'],
+    subscribe  => File['ontrack-install'],
     enable     => true,
     ensure     => running,
   }

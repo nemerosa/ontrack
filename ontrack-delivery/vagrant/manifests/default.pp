@@ -1,2 +1,4 @@
 # Just install Ontrack
-include ontrack
+class { 'ontrack':
+  ontrackJar => '/home/vagrant/ontrack.jar',
+}

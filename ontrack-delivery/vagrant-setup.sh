@@ -92,6 +92,13 @@ then
     cp -r ${VAGRANT_SOURCE}/* ${VAGRANT_LOCAL}
 fi
 
+# Preparing the source JAR
+
+echo Copying the Ontrack JAR at the correct location
+mkdir -p ${VAGRANT_LOCAL}/sources
+rm -rf ${VAGRANT_LOCAL}/sources/*.jar
+cp ${ONTRACK_JAR} ${VAGRANT_LOCAL}/sources/ontrack.jar
+
 # Launching Vagrant
 
 echo Creating the VM
