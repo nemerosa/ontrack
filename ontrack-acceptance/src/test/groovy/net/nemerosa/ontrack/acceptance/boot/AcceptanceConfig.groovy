@@ -10,7 +10,8 @@ import org.springframework.stereotype.Component
 @ToString(includeNames = true)
 class AcceptanceConfig {
 
-    private String url = "http://localhost:8080"
+    private String url = 'http://localhost:8080'
+    private String admin = 'admin'
     private Set<String> context = [] as Set
 
     String getUrl() {
@@ -30,7 +31,16 @@ class AcceptanceConfig {
     }
 
     def setSystemProperties() {
-        System.setProperty('ontrack.url', url)
+        System.setProperty 'ontrack.url', url
+        System.setProperty 'ontrack.admin', admin
+    }
+
+    String getAdmin() {
+        return admin
+    }
+
+    void setAdmin(String admin) {
+        this.admin = admin
     }
 
     boolean acceptTest(AcceptanceTest acceptanceTest) {
