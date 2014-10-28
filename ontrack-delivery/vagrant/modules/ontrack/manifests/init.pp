@@ -26,10 +26,6 @@ class ontrack($ontrackJar = undef) {
     require => User['ontrack']
   }
 
-# TODO Stores version in a file, gets it as a fact, in order to avoid doing the download each time
-# Or gets the version in the downloaded file, and uses it as an output of the Exec task below
-# Note that in this case, the start-up template must be adapted
-
 # Ontrack application JAR
   file { 'ontrack-install':
     name      =>'/opt/ontrack/ontrack.jar',
@@ -37,6 +33,7 @@ class ontrack($ontrackJar = undef) {
     ensure    => 'present',
     group     => 'ontrack',
     owner     => 'ontrack',
+    # Note that the resource will be update when checksum changes
     source    => $ontrackJar,
   }
 
