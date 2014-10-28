@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.acceptance.boot
 
+import groovy.xml.MarkupBuilder
 import org.junit.runner.Description
 import org.junit.runner.Result
 import org.junit.runner.notification.Failure
@@ -17,6 +18,7 @@ class XMLRunListener extends RunListener {
         private final Description description
         private long start
         private long end
+        Failure error
         Failure failure
         boolean ignored
 
@@ -53,7 +55,7 @@ class XMLRunListener extends RunListener {
 
     @Override
     void testFailure(Failure failure) throws Exception {
-        runs[failure.description].failure = failure
+        runs[failure.description].error = failure
     }
 
     @Override
@@ -67,7 +69,16 @@ class XMLRunListener extends RunListener {
     }
 
     void render(File file) {
-
+        // Output
+        def writer = new FileWriter(file)
+        def xml = new MarkupBuilder(writer)
+        xml.testsuite(
+                tests: runs.size(),
+                skipped: runs.values().count { it.ignored },
+                failures: runs.values().count { it.failure },
+                errors: runs.values().count { it.error },
+                time: (runEnd - runStart) / 1000
+        )
     }
 
 }
