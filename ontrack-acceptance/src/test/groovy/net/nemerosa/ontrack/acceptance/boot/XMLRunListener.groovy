@@ -29,7 +29,7 @@ class XMLRunListener extends RunListener {
         }
 
         long getTime() {
-            end - start
+            ignored ? 0 : (end - start)
         }
 
         void end() {
@@ -89,7 +89,10 @@ class XMLRunListener extends RunListener {
 
     @Override
     void testIgnored(Description description) throws Exception {
-        runs[description].ignored = true
+        trace "(*) Ignoring test: ${description.className}: ${description.methodName}"
+        def run = new TestRun(description)
+        run.ignored = true
+        runs.put description, run
     }
 
     void render(File file) {
@@ -108,7 +111,11 @@ class XMLRunListener extends RunListener {
                         name: run.description.methodName,
                         classname: run.description.className,
                         time: (run.time) / 1000
-                )
+                ) {
+                    if (run.ignored) {
+                        skipped()
+                    }
+                }
             }
         }
     }

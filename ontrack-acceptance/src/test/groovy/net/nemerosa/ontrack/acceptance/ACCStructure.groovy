@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.acceptance
 
+import org.junit.Ignore
 import org.junit.Test
 
 import static net.nemerosa.ontrack.json.JsonUtils.object
@@ -12,6 +13,7 @@ class ACCStructure extends AcceptanceTestClient {
     }
 
     @Test
+    @Ignore
     void 'Empty name for a project is invalid'() {
         validationMessage({
             doCreateProject(object().with('name', '').end())
