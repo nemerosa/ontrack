@@ -26,12 +26,18 @@ class JUnitAcceptanceRunner implements AcceptanceRunner {
         config.setSystemProperties()
 
         JUnitCore junit = new JUnitCore()
+        // XML reporting
+        XMLRunListener xmlRunListener = new XMLRunListener()
+        junit.addListener(xmlRunListener)
+        // FIXME Detection of classes
         // TODO Filtering on tests
         junit.run(
                 ACCBrowserBasic,
 //                ACCSearch,
 //                ACCStructure
         )
+        // XML output
+        xmlRunListener.render(new File('ontrack-acceptance.xml'))
 
     }
 }
