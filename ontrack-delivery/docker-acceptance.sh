@@ -1,5 +1,6 @@
 #!/bin/sh
 # Runs the acceptance tests in a VM created using Docker
+# The results of the acceptance tests will be in JUnit XML format in local `ontrack-acceptance.xml` file
 
 # Help function
 function show_help {
