@@ -74,7 +74,6 @@ echo "Ontrack data at:        ${MOUNT}"
 
 ./docker-setup.sh \
     --docker-image=ontrack \
-    --port=8080 \
     --mount=${MOUNT} \
     --run \
     --jar=${ONTRACK_JAR}
@@ -82,6 +81,14 @@ echo "Ontrack data at:        ${MOUNT}"
 ONTRACK_CID=`cat ontrack.cid`
 
 echo "[ACCEPTANCE] Ontrack container created: ${ONTRACK_CID}"
+
+# TODO Get the running URL
+
+# ONTRACK_URL="http://${DOCKER_HOST}"
+
+# TODO Running the acceptance tests
+
+# echo "[ACCEPTANCE] Running acceptance tests against ${ONTRACK_URL}"
 
 # Docker Ontrack VM down
 # TODO Docker nginx VM down
