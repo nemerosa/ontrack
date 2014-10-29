@@ -79,12 +79,14 @@ def uploadAsset(File file, String name, int releaseId, String githubToken) {
  */
 task githubReleaseAssets(dependsOn: 'githubReleaseCreate') << {
     int id = project.tasks.githubReleaseCreate.releaseId
-    File file = new File(releasePath() as String, "${ontrackBuild()}.jar")
-    println "Publishing ${file} to release ${ontrackBuild()} ($id)..."
-    if (!file.exists()) {
-        throw new GradleException("File ${file} cannot be published because it does not exist.")
-    } else {
-        uploadAsset file, 'ontrack.jar', id, githubToken() as String
+    ['ontrack-ui', 'ontrack-acceptance'].each { name ->
+        File file = new File(releasePath() as String, "${name}-${ontrackBuild()}.jar")
+        println "Publishing ${file} to release ${ontrackBuild()} ($id)..."
+        if (!file.exists()) {
+            throw new GradleException("File ${file} cannot be published because it does not exist.")
+        } else {
+            uploadAsset file, "${name}.jar", id, githubToken() as String
+        }
     }
 }
 
