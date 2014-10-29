@@ -50,6 +50,25 @@ This can prove to be difficult when dealing with certificates.
 We want the Puppet scripts to be independent from Vagrant. For the moment, the Puppet scripts are in the 
 `vagrant` folder but should be extracted in their own folder.
 
+### Docker
+
+Docker has a big advantage when used in CI and compared to Vagrant + Puppet: it is tremendously fast!
+
+#### Installation of ontrack
+
+To build the `ontrack` image:
+
+    ./docker-setup --docker-image=nemerosa/ontrack --jar=<path to Ontrack JAR>
+
+This will create a `nemerosa/ontrack` Docker image whose version is computed from the JAR name (it can also
+be forced using `--docker-version=<version>`. This image can be listed using `docker images` and deleted using
+`docker rmi <image id>`.
+
+#### nginx link
+
+*To be continued.*
+
+> The idea is to have `nginx` run as a separate container that links to the `ontrack` container.
 
 ## Open points
 

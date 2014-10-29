@@ -13,8 +13,8 @@ RUN apt-get install -y oracle-java8-set-default
 # Directory set-up
 RUN mkdir -p /opt/ontrack
 
-# TODO App copy
-# ADD ontrack.jar @ONTRACK_SRC@
+# Copies the Ontrack JAR
+ADD ontrack/ontrack.jar /opt/ontrack/
 
 # Exposing the port
 EXPOSE 8080
