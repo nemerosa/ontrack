@@ -79,7 +79,7 @@ def uploadAsset(File file, String name, int releaseId, String githubToken) {
  */
 task githubReleaseAssets(dependsOn: 'githubReleaseCreate') << {
     int id = project.tasks.githubReleaseCreate.releaseId
-    ['ontrack-ui', 'ontrack-acceptance'].each { name ->
+    ['ontrack-ui', 'ontrack-acceptance', 'ontrack-delivery-docker'].each { name ->
         File file = new File(releasePath() as String, "${name}-${ontrackBuild()}.jar")
         println "Publishing ${file} to release ${ontrackBuild()} ($id)..."
         if (!file.exists()) {
