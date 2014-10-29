@@ -10,3 +10,4 @@ build
 /.gradle
 *.txt
 *.pid
+ontrack-acceptance.xml

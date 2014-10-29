@@ -1,15 +1,49 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.1.8.RELEASE")
+    }
+}
+
 apply plugin: 'groovy'
+apply plugin: 'spring-boot'
 
 dependencies {
     testCompile project(':ontrack-client')
     testCompile project(':ontrack-test-utils')
     testCompile libraries.groovy
+    testCompile libraries.spring_boot_starter
 
     testCompile 'org.seleniumhq.selenium:selenium-java:2.43.1'
 
-    testRuntime libraries.slf4j_log4j
     testRuntime libraries.log4j
 }
+
+/**
+ * Packaging
+ */
+
+task testJar(type: Jar) {
+    classifier = 'test'
+    from sourceSets.test.output
+}
+
+artifacts {
+    archives testJar
+}
+
+bootRepackage {
+    mainClass = 'net.nemerosa.ontrack.acceptance.boot.Start'
+    classifier = 'test'
+    withJarTask = 'testJar'
+    customConfiguration = 'testRuntime'
+}
+
+/**
+ * Local test definitions
+ */
 
 ext {
     ontrackUrl = 'http://localhost:8080'

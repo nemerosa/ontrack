@@ -1,0 +1,6 @@
+[submodule "ontrack-delivery/vagrant/modules/apt"]
+	path = ontrack-delivery/vagrant/modules/apt
+	url = https://github.com/puppetlabs/puppetlabs-apt.git
+[submodule "ontrack-delivery/vagrant/modules/stdlib"]
+	path = ontrack-delivery/vagrant/modules/stdlib
+	url = https://github.com/puppetlabs/puppetlabs-stdlib.git

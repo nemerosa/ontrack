@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.acceptance
 
 import net.nemerosa.ontrack.acceptance.browser.pages.HomePage
 import net.nemerosa.ontrack.acceptance.browser.pages.ProjectPage
+import net.nemerosa.ontrack.acceptance.support.AcceptanceTest
+import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import org.junit.Test
 
 import static net.nemerosa.ontrack.acceptance.browser.Browser.browser
@@ -11,6 +13,7 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
 /**
  * Basic GUI tests
  */
+@AcceptanceTestSuite
 class ACCBrowserBasic extends AcceptanceTestClient {
 
     @Test
@@ -21,11 +24,13 @@ class ACCBrowserBasic extends AcceptanceTestClient {
     }
 
     @Test
+    @AcceptanceTest(excludes = "production")
     void 'Admin login'() {
         browser { browser -> loginAsAdmin(browser) }
     }
 
     @Test
+    @AcceptanceTest(excludes = "production")
     void 'Project creation'() {
         browser { browser ->
             HomePage home = loginAsAdmin(browser)
@@ -42,6 +47,7 @@ class ACCBrowserBasic extends AcceptanceTestClient {
     }
 
     @Test
+    @AcceptanceTest(excludes = "production")
     void 'Branch creation'() {
         browser { browser ->
             withProject { id, name ->
