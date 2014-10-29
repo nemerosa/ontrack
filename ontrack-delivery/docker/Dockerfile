@@ -27,5 +27,5 @@ EXPOSE 8080
 COPY ontrack/ontrack.jar /opt/ontrack/
 
 # Running the application
-# WORKDIR /opt/ontrack/mount
-# CMD ["java", "-jar", "/opt/ontrack/ontrack.jar", "--spring.profiles.active=prod", "--logging.path=log/"]
+WORKDIR /opt/ontrack/mount
+CMD ["java", "-jar", "/opt/ontrack/ontrack.jar", "--spring.profiles.active=prod", "--logging.path=log/"]
