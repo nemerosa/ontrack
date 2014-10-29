@@ -1,19 +1,31 @@
-## Prerequisites
+Vagrant + Puppet
+================
 
-Installing Vagrant.
+Perfect to setup a VM, configure it, and discard it afterwards. The Puppet scripts must be independent from 
+Vagrant since they can be used as-is for the production-like deployment. If both use cases use the same
+provisioning mechanism, we can guarantee that the acceptance tests validate also the production deployment.
 
-	vagrant box add hashicorp/precise64
-	# for VM Fusion
-	
-## Running
+## Java installation
 
-The very first time the machine is created:
+There is no clean built-in JDK8 image for Vagrant, and setup of the JDK8 using Puppet, even with the official
+images remains complex. Switching back to a pure `apt-get` installation.
 
-    vagrant up
+## Java installation (bis)
 
-To rerun the provisioning:
+Downloading and installation of the JDK8 is not cached and takes too much time for a local and discardable
+installation.
 
-    vagrant provision
+## nginx installation
+
+The official `nginx` puppet scripts seem to be in infancy stage and very unstable. Reverting also to a pure
+`apt-get` installation and configuration.
+
+This can prove to be difficult when dealing with certificates.
+
+## Vagrant vs. Puppet
+
+We want the Puppet scripts to be independent from Vagrant. For the moment, the Puppet scripts are in the 
+`vagrant` folder but should be extracted in their own folder.
 
 ## Resources
 
@@ -25,21 +37,3 @@ Spring Boot init.d:
 
 * https://github.com/rburgst/spring-boot-initscript/tree/master
 * http://thoughtfulsoftware.wordpress.com/2014/06/01/running-spring-boot-part-ii/ (more up to date)
-
-## Actions
-
-* [x] Running an empty machine
-* [x] Running puppet apply
-* [x] Installing Java
-* [x] Installing ontrack
-* [x] Script to start ontrack on boot
-* [ ] Passing parameters to download ontrack
-* [ ] Open port in Vagrant
-* [ ] Installing nginx as proxy
-* [ ] Configuring SSL
-* [ ] Find a better way to include modules
-* [ ] `/opt/ontrack` as home directory for the `ontrack` user
-* [x] Extract installation of Java in a module
-* [x] Extract installation of ontrack in a module
-* [ ] Write Wiki documentation
-* [ ] Write blog about this
