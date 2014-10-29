@@ -82,7 +82,7 @@ echo "Ontrack JAR          = ${ONTRACK_JAR}"
 
 # Setup the Docker environment locally
 
-mkdir ${DOCKER_SOURCE}/ontrack
+mkdir -p ${DOCKER_SOURCE}/ontrack
 cp ${ONTRACK_JAR} ${DOCKER_SOURCE}/ontrack/ontrack.jar
 
 # Launching Docker
