@@ -11,7 +11,7 @@ function show_help {
 	echo "Input:"
 	echo "    -j, --jar                     (* required) Path to the ontrack JAR"
 	echo "    -a, --acceptance              (* required) Path to the acceptance test JAR"
-	echo "    -h, --host                    Address of the Docker container (defaults to 'localhost')"
+	echo "    -h, --host                    Address of the Docker container (defaults to 'localhost' or IP in 'DOCKER_HOST')"
 	echo "Control:"
 	echo "    -k, --keep                    If set, the container is not destroyed after"
 }
@@ -28,7 +28,12 @@ function check {
 
 # Defaults
 
-ONTRACK_HOST=localhost
+if [ "${DOCKER_HOST}" == "" ]
+then
+    ONTRACK_HOST=localhost
+else
+    ONTRACK_HOST=`echo ${DOCKER_HOST} | sed -E 's/.*\/([0-9\.]+):.*/\1/'`
+fi
 
 # TODO Supports https: through nginx
 ONTRACK_PROTOCOL=http
