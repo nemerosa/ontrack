@@ -17,11 +17,19 @@ RUN apt-get install -y oracle-java8-set-default
 # Directory set-up
 RUN mkdir -p /opt/ontrack
 
+# External volume set-up and links
+RUN mkdir -p /opt/ontrack/mount/database
+RUN mkdir -p /opt/ontrack/mount/work
+VOLUME /opt/ontrack/mount
+RUN ln -s /opt/ontrack/mount/database /opt/ontrack/database
+RUN ln -s /opt/ontrack/mount/work /opt/ontrack/work
+
 # Exposing the port
 EXPOSE 8080
 
 # Copies the Ontrack JAR
 COPY ontrack/ontrack.jar /opt/ontrack/
 
-# TODO Running the application
-# CMD ["java", "-jar", "/opt/ontrack/ontrack.jar", "--spring.profiles.active=prod", "--logging.path=/opt/ontrack/log/"]
+# Running the application
+# WORKDIR /opt/ontrack
+# CMD ["java", "-jar", "ontrack.jar", "--spring.profiles.active=prod", "--logging.path=log/"]
