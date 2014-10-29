@@ -3,8 +3,7 @@ task clean << {
 }
 
 task docker(type: Zip) {
-    baseName = "${project.name}-docker"
-    extension = 'jar'
+    archiveName = "${project.name}-docker-${project.version}.jar"
     destinationDir = buildDir
     from projectDir
     include 'docker/**'

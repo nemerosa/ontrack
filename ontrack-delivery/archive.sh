@@ -68,6 +68,8 @@ echo -n .
 ${MV} ontrack-ui/build/libs/ontrack-ui-*.jar ${DESTINATION}
 echo -n .
 ${MV} ontrack-acceptance/build/libs/ontrack-acceptance-*.jar ${DESTINATION}
+echo -n .
+${MV} ontrack-delivery/build/ontrack-delivery-docker.jar ${DESTINATION}
 
 echo
 echo "Artifacts have been copied"
