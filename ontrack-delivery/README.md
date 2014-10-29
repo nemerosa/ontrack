@@ -61,8 +61,19 @@ To build the `ontrack` image:
     ./docker-setup --docker-image=nemerosa/ontrack --jar=<path to Ontrack JAR>
 
 This will create a `nemerosa/ontrack` Docker image whose version is computed from the JAR name (it can also
-be forced using `--docker-version=<version>`. This image can be listed using `docker images` and deleted using
-`docker rmi <image id>`.
+be forced using `--docker-version=<version>`.
+
+This image can be listed using `docker images` and deleted using `docker rmi <image id>`.
+
+To run the created image and connect to it: `docker run -t -i ontrack:<version> /bin/bash`. Warning: this will create
+a container that you can list using `docker ps -a` and delete using `docker rm <container id>`.
+ 
+To run the image in _real mode_:
+
+* `docker run -d -P ontrack:<version>` will publish the container's 8080 port on the host 8080 port
+* `docker run -d -p <port>:8080 ontrack:<version>` will publish the container's 8080 port on the host `<port>` port
+
+The created docker container can be listed using `docker ps -a` and deleted using `docker rm <container id>`.
 
 #### nginx link
 
