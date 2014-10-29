@@ -124,7 +124,8 @@ ACCEPTANCE_RESULT=-1
 
 # Waits until the application is started
 echo -n "[ACCEPTANCE] Waiting for Ontrack to start (max: ${CONTROL_DELAY} s)"
-ONSTART_STARTED=no
+ONTRACK_STARTED=no
+ONTRACK_START_DURATION=0
 for i in `seq 1 ${CONTROL_DELAY}`
 do
     curl --silent --fail "${ONTRACK_URL}/info"
@@ -133,16 +134,23 @@ do
         echo -n "."
         sleep 1
     else
-        ONSTART_STARTED=yes
+        ONTRACK_STARTED=yes
+        if [ "${ONTRACK_START_DURATION}" == "0" ]
+        then
+            ONTRACK_START_DURATION=${i}
+        fi
     fi
 done
 echo
 
 # Has Ontrack started correctly?
-if [ "${ONSTART_STARTED}" == "yes" ]
+if [ "${ONTRACK_STARTED}" == "yes" ]
 then
 
+    echo "[ACCEPTANCE] Ontrack has started in ${ONTRACK_START_DURATION} s"
+
     # Running the acceptance tests
+    echo "[ACCEPTANCE] Starting acceptance tests..."
     ./acceptance.sh \
         --ontrack-url=${ONTRACK_URL} \
         --jar=${ONTRACK_ACCEPTANCE_JAR}
