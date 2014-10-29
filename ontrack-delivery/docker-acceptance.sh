@@ -11,6 +11,7 @@ function show_help {
 	echo "Input:"
 	echo "    -j, --jar                     (* required) Path to the ontrack JAR"
 	echo "    -a, --acceptance              (* required) Path to the acceptance test JAR"
+	echo "    -h, --host                    Address of the Docker container (defaults to 'localhost')"
 	echo "Control:"
 	echo "    -k, --keep                    If set, the container is not destroyed after"
 }
@@ -27,6 +28,10 @@ function check {
 
 # Defaults
 
+ONTRACK_HOST=localhost
+
+# TODO Supports https: through nginx
+ONTRACK_PROTOCOL=http
 ONTRACK_JAR=
 
 CONTROL_KEEP=no
@@ -39,6 +44,9 @@ do
 		-h|--help)
 			show_help
 			exit 0
+			;;
+		-h=*|--host=*)
+            ONTRACK_HOST=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
 			;;
 		-j=*|--jar=*)
             ONTRACK_JAR=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
@@ -59,6 +67,8 @@ done
 check "$ONTRACK_JAR" "Ontrack JAR (--jar) is required."
 
 # Logging
+echo "Docker host:            ${ONTRACK_HOST}"
+echo "Ontrack protocol:       ${ONTRACK_PROTOCOL}"
 echo "Ontrack JAR:            ${ONTRACK_JAR}"
 echo "Keeping containers:     ${CONTROL_KEEP}"
 
@@ -87,13 +97,12 @@ echo "[ACCEPTANCE] Ontrack container created: ${ONTRACK_CID}"
 ONTRACK_PORT=`docker port ${ONTRACK_CID} 8080 | sed -E 's/.*:(.*)/\1/'`
 echo "[ACCEPTANCE] Ontrack available in container at port ${ONTRACK_PORT}"
 
-# TODO Get the running URL
+# Get the running URL
 
-# ONTRACK_URL="http://${DOCKER_HOST}"
+ONTRACK_URL="${ONTRACK_PROTOCOL}://${ONTRACK_HOST}:${ONTRACK_PORT}"
+echo "[ACCEPTANCE] Running acceptance tests against ${ONTRACK_URL}"
 
 # TODO Running the acceptance tests
-
-# echo "[ACCEPTANCE] Running acceptance tests against ${ONTRACK_URL}"
 
 # Docker Ontrack VM down
 # TODO Docker nginx VM down
