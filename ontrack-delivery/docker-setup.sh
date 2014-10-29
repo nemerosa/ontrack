@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Setup a Docker container for Ontrack
 
 # Help function
