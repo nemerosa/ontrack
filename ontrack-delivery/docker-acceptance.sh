@@ -15,6 +15,7 @@ function show_help {
 	echo "    -h, --host                    Address of the Docker container (defaults to 'localhost' or IP in 'DOCKER_HOST')"
 	echo "Control:"
 	echo "    -k, --keep                    If set, the container is not destroyed after"
+	echo "    -d, --delay                   Number of seconds to wait for Ontrack to start (defaults to 120)"
 }
 
 # Check function
@@ -42,6 +43,7 @@ ONTRACK_JAR=
 ONTRACK_ACCEPTANCE_JAR=
 
 CONTROL_KEEP=no
+CONTROL_DELAY=120
 
 # Command central
 
@@ -60,6 +62,9 @@ do
 			;;
 		-a=*|--acceptance=*)
             ONTRACK_ACCEPTANCE_JAR=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
+			;;
+		-d=*|--delay=*)
+            CONTROL_DELAY=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
 			;;
 		-k|--keep)
             CONTROL_KEEP=yes
@@ -81,6 +86,7 @@ check "$ONTRACK_ACCEPTANCE_JAR" "Ontrack Acceptance JAR (--acceptance) is requir
 echo "Docker host:            ${ONTRACK_HOST}"
 echo "Ontrack protocol:       ${ONTRACK_PROTOCOL}"
 echo "Ontrack JAR:            ${ONTRACK_JAR}"
+echo "Startup delay:          ${CONTROL_DELAY} s"
 echo "Keeping containers:     ${CONTROL_KEEP}"
 
 # Mount point
@@ -117,9 +123,9 @@ echo "[ACCEPTANCE] Running acceptance tests against ${ONTRACK_URL}"
 ACCEPTANCE_RESULT=-1
 
 # Waits until the application is started
-echo -n "[ACCEPTANCE] Waiting for Ontrack to start"
+echo -n "[ACCEPTANCE] Waiting for Ontrack to start (max: ${CONTROL_DELAY} s)"
 ONSTART_STARTED=no
-for i in {1..30}
+for i in `seq 1 ${CONTROL_DELAY}`
 do
     curl --silent --fail "${ONTRACK_URL}/info"
     if [ "$?" != "0" ]
@@ -147,7 +153,7 @@ then
 
 else
     ACCEPTANCE_RESULT=1
-    echo "[ACCEPTANCE] Ontrack could not start in time."
+    echo "[ACCEPTANCE] Ontrack could not start in less than ${CONTROL_DELAY} s."
 fi
 
 # Docker Ontrack VM down
