@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Runs the acceptance tests in a VM created using Docker
 # The results of the acceptance tests will be in JUnit XML format in local `ontrack-acceptance.xml` file
 
@@ -113,10 +113,42 @@ echo "[ACCEPTANCE] Ontrack available in container at port ${ONTRACK_PORT}"
 ONTRACK_URL="${ONTRACK_PROTOCOL}://${ONTRACK_HOST}:${ONTRACK_PORT}"
 echo "[ACCEPTANCE] Running acceptance tests against ${ONTRACK_URL}"
 
-# TODO Running the acceptance tests
-./acceptance.sh \
-    --ontrack-url=${ONTRACK_URL} \
-    --jar=${ONTRACK_ACCEPTANCE_JAR}
+# Result of the acceptance tests
+ACCEPTANCE_RESULT=-1
+
+# Waits until the application is started
+echo -n "[ACCEPTANCE] Waiting for Ontrack to start"
+ONSTART_STARTED=no
+for i in {1..30}
+do
+    curl --silent --fail "${ONTRACK_URL}/info"
+    if [ "$?" != "0" ]
+    then
+        echo -n "."
+        sleep 1
+    else
+        ONSTART_STARTED=yes
+    fi
+done
+echo
+
+# Has Ontrack started correctly?
+if [ "${ONSTART_STARTED}" == "yes" ]
+then
+
+    # Running the acceptance tests
+    ./acceptance.sh \
+        --ontrack-url=${ONTRACK_URL} \
+        --jar=${ONTRACK_ACCEPTANCE_JAR}
+
+    # Result of the acceptance tests
+    ACCEPTANCE_RESULT=$?
+    echo "[ACCEPTANCE] Results: ${ACCEPTANCE_RESULT}"
+
+else
+    ACCEPTANCE_RESULT=1
+    echo "[ACCEPTANCE] Ontrack could not start in time."
+fi
 
 # Docker Ontrack VM down
 # TODO Docker nginx VM down
@@ -126,3 +158,6 @@ then
     echo "[ACCEPTANCE] Removing Ontrack container at: ${ONTRACK_CID}"
     docker rm -f ${ONTRACK_CID}
 fi
+
+# Result
+exit ${ACCEPTANCE_RESULT}
