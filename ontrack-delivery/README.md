@@ -22,37 +22,8 @@ of the acceptance tests can be run against the production server upon deployment
 
 ## Technologies
 
-### Vagrant + Puppet
-
-Perfect to setup a VM, configure it, and discard it afterwards. The Puppet scripts must be independent from 
-Vagrant since they can be used as-is for the production-like deployment. If both use cases use the same
-provisioning mechanism, we can guarantee that the acceptance tests validate also the production deployment.
-
-#### Java installation
-
-There is no clean built-in JDK8 image for Vagrant, and setup of the JDK8 using Puppet, even with the official
-images remains complex. Switching back to a pure `apt-get` installation.
-
-#### Java installation (bis)
-
-Downloading and installation of the JDK8 is not cached and takes too much time for a local and discardable
-installation.
-
-#### nginx installation
-
-The official `nginx` puppet scripts seem to be in infancy stage and very unstable. Reverting also to a pure
-`apt-get` installation and configuration.
-
-This can prove to be difficult when dealing with certificates.
-
-#### Vagrant vs. Puppet
-
-We want the Puppet scripts to be independent from Vagrant. For the moment, the Puppet scripts are in the 
-`vagrant` folder but should be extracted in their own folder.
-
-### Docker
-
-See [Ontrack Docker documentation](docker/README.md).
+* [Vagrant + Puppet](vagrant/README.md)
+* [Docker](docker/README.md).
 
 ## Open points
 
@@ -60,6 +31,8 @@ See [Ontrack Docker documentation](docker/README.md).
 
 The acceptance tests are easy to run at build time, because of their link to the sources, but they need
 actually to run outside of any source context, when run against remote acceptance servers and production.
+
+See [acceptance tests](../ontrack-acceptance/README.md) for more details.
 
 ## Usage
 
