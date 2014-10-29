@@ -14,6 +14,7 @@ function show_help {
 	echo "    -v, --docker-version=<version>  Version of the Docker image to create (by default, computed from the JAR name)"
 	echo "Ontrack:"
 	echo "    -j, --jar=<path>                (* required) Path to the Ontrack JAR"
+	echo "    -p, --port=<port>               The host port to forward the container's 8080 port to"
 	echo "Control:"
 	echo "    -r, --run                       If set, runs the container automatically"
 	echo "                                    * the container ID will be written in the local 'ontrack.cid' file (see also --cid)"
@@ -43,6 +44,7 @@ DOCKER_VERSION=
 
 ONTRACK_JAR=
 ONTRACK_MOUNT=`pwd`/mount
+ONTRACK_PORT=
 
 CONTROL_RUN=no
 CONTROL_BASH=no
@@ -76,6 +78,9 @@ do
 		-c=*|--cid=*)
             CONTROL_CID=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
 			;;
+		-p=*|--port=*)
+            ONTRACK_PORT=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
+			;;
 	    -r|--run)
 	        CONTROL_RUN=yes
 	        ;;
@@ -106,6 +111,7 @@ echo "Docker source        = ${DOCKER_SOURCE}"
 echo "Docker image name    = ${DOCKER_IMAGE}"
 echo "Docker image version = ${DOCKER_VERSION}"
 echo "Ontrack JAR          = ${ONTRACK_JAR}"
+echo "Ontrack port         = ${ONTRACK_PORT}"
 echo "Ontrack mount        = ${ONTRACK_MOUNT}"
 echo "Running auto         = ${CONTROL_RUN}"
 echo "Running bash         = ${CONTROL_BASH}"
@@ -129,10 +135,18 @@ then
     rm -f ${CONTROL_CID}
     if [ "${CONTROL_BASH}" != "yes" ]
     then
-        docker run -d -P \
-            -v ${ONTRACK_MOUNT}:/opt/ontrack/mount \
-            --cidfile=${CONTROL_CID} \
-            ${DOCKER_IMAGE}:${DOCKER_VERSION}
+        if [ "${ONTRACK_PORT}" != "" ]
+        then
+            docker run -d --publish=${ONTRACK_PORT}:8080 \
+                -v ${ONTRACK_MOUNT}:/opt/ontrack/mount \
+                --cidfile=${CONTROL_CID} \
+                ${DOCKER_IMAGE}:${DOCKER_VERSION}
+        else
+            docker run -d -P \
+                -v ${ONTRACK_MOUNT}:/opt/ontrack/mount \
+                --cidfile=${CONTROL_CID} \
+                ${DOCKER_IMAGE}:${DOCKER_VERSION}
+        fi
     else
         docker run -t -i -P \
             -v ${ONTRACK_MOUNT}:/opt/ontrack/mount \

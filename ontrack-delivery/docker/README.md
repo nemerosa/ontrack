@@ -18,8 +18,8 @@ that links to the `ontrack` container, in a pure Docker fashion.
 
 ## Remaining actions
 
-* [ ] Startup on the `ontrack` application using `CMD` and `WORKDIR`
+* [x] Startup on the `ontrack` application using `CMD` and `WORKDIR`
 * [ ] Specific `ontrack` user
-* [ ] Use a volume for the database (linked to `application.properties` since the DB path is referred into this file)
-* [ ] Use a volume for the working files (linked to `application.properties`?)
+* [x] Use a volume for the database (linked to `application.properties` since the DB path is referred into this file)
+* [x] Use a volume for the working files (linked to `application.properties`?)
 * [ ] Host specification in `application.properties`
