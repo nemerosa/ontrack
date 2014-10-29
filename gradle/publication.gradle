@@ -64,6 +64,7 @@ task githubReleaseCreate << {
 }
 
 def uploadAsset(File file, String name, int releaseId, String githubToken) {
+    println "Publishing ${file} as ${name}..."
     def url = "https://uploads.github.com/repos/${githubRepository}/releases/${releaseId}/assets?name=${name}"
     def http = new HTTPBuilder(url)
     http.request(Method.POST) { req ->
