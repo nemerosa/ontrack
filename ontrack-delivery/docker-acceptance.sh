@@ -82,6 +82,11 @@ ONTRACK_CID=`cat ontrack.cid`
 
 echo "[ACCEPTANCE] Ontrack container created: ${ONTRACK_CID}"
 
+# Getting the public facing port
+
+ONTRACK_PORT=`docker port ${ONTRACK_CID} 8080 | sed -E 's/.*:(.*)/\1/'`
+echo "[ACCEPTANCE] Ontrack available in container at port ${ONTRACK_PORT}"
+
 # TODO Get the running URL
 
 # ONTRACK_URL="http://${DOCKER_HOST}"
