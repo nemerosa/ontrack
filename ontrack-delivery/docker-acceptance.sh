@@ -38,6 +38,7 @@ fi
 # TODO Supports https: through nginx
 ONTRACK_PROTOCOL=http
 ONTRACK_JAR=
+ONTRACK_ACCEPTANCE_JAR=
 
 CONTROL_KEEP=no
 
@@ -56,6 +57,9 @@ do
 		-j=*|--jar=*)
             ONTRACK_JAR=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
 			;;
+		-a=*|--acceptance=*)
+            ONTRACK_ACCEPTANCE_JAR=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
+			;;
 		-k|--keep)
             CONTROL_KEEP=yes
 			;;
@@ -70,6 +74,7 @@ done
 # Checks
 
 check "$ONTRACK_JAR" "Ontrack JAR (--jar) is required."
+check "$ONTRACK_ACCEPTANCE_JAR" "Ontrack Acceptance JAR (--acceptance) is required."
 
 # Logging
 echo "Docker host:            ${ONTRACK_HOST}"
@@ -108,6 +113,9 @@ ONTRACK_URL="${ONTRACK_PROTOCOL}://${ONTRACK_HOST}:${ONTRACK_PORT}"
 echo "[ACCEPTANCE] Running acceptance tests against ${ONTRACK_URL}"
 
 # TODO Running the acceptance tests
+./acceptance.sh \
+    --ontrack-url=${ONTRACK_URL} \
+    --jar=${ONTRACK_ACCEPTANCE_JAR}
 
 # Docker Ontrack VM down
 # TODO Docker nginx VM down
