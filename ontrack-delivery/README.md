@@ -75,6 +75,22 @@ To run the image in _real mode_:
 
 The created docker container can be listed using `docker ps -a` and deleted using `docker rm <container id>`.
 
+#### Integration
+
+In order to have a fully running image, one needs the `/opt/ontrack/mount` volume to be mounted:
+
+    docker run \
+        -d \
+        -P \
+        -v `pwd`/mount:/opt/ontrack/mount \
+        --cidfile=ontrack.cid \
+        ontrack:<version>
+
+This creates a local `ontrack.cid` file that can be used to control the container in an automated way, for example,
+to remove it:
+
+    docker rm -f `cat ontrack.cid`
+
 #### nginx link
 
 *To be continued.*
