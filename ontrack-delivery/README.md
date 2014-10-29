@@ -58,10 +58,11 @@ Docker has a big advantage when used in CI and compared to Vagrant + Puppet: it 
 
 To build the `ontrack` image:
 
-    ./docker-setup --docker-image=nemerosa/ontrack --jar=<path to Ontrack JAR>
+    ./docker-setup.sh --jar=<path to Ontrack JAR>
 
-This will create a `nemerosa/ontrack` Docker image whose version is computed from the JAR name (it can also
-be forced using `--docker-version=<version>`.
+This will create na `ontrack` Docker image whose version is computed from the JAR name (it can also
+be forced using `--docker-version=<version>`. The image name can be changed using for example
+`--docker-image=nemerosa/ontrack`.
 
 This image can be listed using `docker images` and deleted using `docker rmi <image id>`.
 
@@ -90,6 +91,13 @@ This creates a local `ontrack.cid` file that can be used to control the containe
 to remove it:
 
     docker rm -f `cat ontrack.cid`
+    
+Note that the setup sccript can be used to create the image and run it immediately:
+
+    ./docker-setup.sh --jar=<path to Ontrack JAR> --run
+
+Persistent data for Ontrack will be stored in a local `mount` directory (this can be overridden using
+`--mount=<dir>`). The created container ID is stored in a local `ontrack.cid` like above.
 
 #### nginx link
 
