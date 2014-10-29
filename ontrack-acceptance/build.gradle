@@ -26,7 +26,6 @@ dependencies {
  */
 
 task testJar(type: Jar) {
-    classifier = 'test'
     from sourceSets.test.output
 }
 
@@ -36,7 +35,6 @@ artifacts {
 
 bootRepackage {
     mainClass = 'net.nemerosa.ontrack.acceptance.boot.Start'
-    classifier = 'test'
     withJarTask = 'testJar'
     customConfiguration = 'testRuntime'
 }
@@ -58,6 +56,11 @@ acceptanceTest {
 
 // Disable unit tests (none in this project)
 test {
+    enabled = false
+}
+
+// Disable normal JAR creation
+jar {
     enabled = false
 }
 
