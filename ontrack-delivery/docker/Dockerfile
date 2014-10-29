@@ -12,13 +12,12 @@ RUN apt-get install -y oracle-java8-set-default
 
 # Directory set-up
 RUN mkdir -p /opt/ontrack
-ADD application.properties /opt/ontrack/application.properties
 
-# App copy
-ADD ontrack.jar @ONTRACK_SRC@
+# TODO App copy
+# ADD ontrack.jar @ONTRACK_SRC@
 
 # Exposing the port
 EXPOSE 8080
 
-# Running the application
-CMD ["java", "-jar", "/opt/ontrack/ontrack.jar", "--spring.profiles.active=prod", "--logging.path=/opt/ontrack/log/"]
+# TODO Running the application
+# CMD ["java", "-jar", "/opt/ontrack/ontrack.jar", "--spring.profiles.active=prod", "--logging.path=/opt/ontrack/log/"]
