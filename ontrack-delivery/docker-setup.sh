@@ -22,6 +22,7 @@ function show_help {
 	echo "                                    * Note that this directory will be created automatically by Docker if it does not exist."
 	echo "                                    * This directory is used only when running the container immediately (--run)."
 	echo "    -c, --cid=<file>                Path to the file that will contain the contained ID (defaults to 'ontrack.cid')"
+	echo "    -b, --bash                      If set, runs the container and start a bash session."
 }
 
 # Check function
@@ -44,6 +45,7 @@ ONTRACK_JAR=
 ONTRACK_MOUNT=`pwd`/mount
 
 CONTROL_RUN=no
+CONTROL_BASH=no
 CONTROL_CID=ontrack.cid
 
 
@@ -77,6 +79,9 @@ do
 	    -r|--run)
 	        CONTROL_RUN=yes
 	        ;;
+	    -b|--bash)
+	        CONTROL_BASH=yes
+	        ;;
 		*)
 			echo "Unknown option: $i"
 			show_help
@@ -103,6 +108,7 @@ echo "Docker image version = ${DOCKER_VERSION}"
 echo "Ontrack JAR          = ${ONTRACK_JAR}"
 echo "Ontrack mount        = ${ONTRACK_MOUNT}"
 echo "Running auto         = ${CONTROL_RUN}"
+echo "Running bash         = ${CONTROL_BASH}"
 echo "Container ID file    = ${CONTROL_CID}"
 
 # Setup the Docker environment locally
@@ -121,8 +127,17 @@ docker build -t="${DOCKER_IMAGE}:${DOCKER_VERSION}" ${DOCKER_SOURCE}
 if [ "${CONTROL_RUN}" == "yes" ]
 then
     rm -f ${CONTROL_CID}
-    docker run -d -P \
-        -v ${ONTRACK_MOUNT}:/opt/ontrack/mount \
-        --cidfile=${CONTROL_CID} \
-        ${DOCKER_IMAGE}:${DOCKER_VERSION}
+    if [ "${CONTROL_BASH}" != "yes" ]
+    then
+        docker run -d -P \
+            -v ${ONTRACK_MOUNT}:/opt/ontrack/mount \
+            --cidfile=${CONTROL_CID} \
+            ${DOCKER_IMAGE}:${DOCKER_VERSION}
+    else
+        docker run -t -i -P \
+            -v ${ONTRACK_MOUNT}:/opt/ontrack/mount \
+            --cidfile=${CONTROL_CID} \
+            ${DOCKER_IMAGE}:${DOCKER_VERSION} \
+            /bin/bash
+    fi
 fi
