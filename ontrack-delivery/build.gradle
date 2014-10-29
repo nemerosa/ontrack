@@ -1,0 +1,17 @@
+task clean << {
+    delete buildDir
+}
+
+task docker(type: Zip) {
+    baseName = "${project.name}-docker"
+    extension = 'jar'
+    destinationDir = buildDir
+    from projectDir
+    include 'docker/**'
+    exclude 'docker/ontrack/**'
+    include 'docker*.sh'
+    include 'acceptance.sh'
+    include 'README.md'
+}
+
+task build(dependsOn: ['docker'])
