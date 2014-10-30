@@ -15,5 +15,18 @@ angular.module('ot.view.api', [
 
         // Link to display
         $scope.link = $location.search().link;
+
+        // Loading the API
+        function loadAPI(link) {
+            $scope.apiLoading = true;
+            ot.pageCall($http.get(link)).then(function (resource) {
+
+            }).finally(function () {
+                $scope.apiLoading = false;
+            });
+        }
+
+        // Loads the API
+        loadAPI($scope.link);
     })
 ;
