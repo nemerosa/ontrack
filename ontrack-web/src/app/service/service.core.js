@@ -33,6 +33,18 @@ angular.module('ot.service.core', [
         };
 
         /**
+         * API command
+         */
+        self.viewApiCommand = function (link) {
+            return {
+                id: 'api',
+                name: "API",
+                cls: "ot-command-api",
+                link: "api?link=" + link
+            };
+        };
+
+        /**
          * Defines a command that list some actions in a select.
          *
          * The list of actions is returned by a call to the URI in parameter.

@@ -137,6 +137,7 @@ angular.module('ot.view.project', [
                             });
                         }
                     },
+                    ot.viewApiCommand($scope.project._self),
                     ot.viewCloseCommand('/home')
                 ];
             });
@@ -150,6 +151,7 @@ angular.module('ot.view.project', [
                 view.title = projectResource.name;
                 view.description = projectResource.description;
                 view.decorationsEntity = projectResource;
+                view.api = projectResource._self;
                 // Loads the branches
                 loadBranches();
             });
