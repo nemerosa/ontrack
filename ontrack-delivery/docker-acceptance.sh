@@ -16,6 +16,7 @@ function show_help {
 	echo "Control:"
 	echo "    -k, --keep                    If set, the container is not destroyed after"
 	echo "    -d, --delay                   Number of seconds to wait for Ontrack to start (defaults to 120)"
+	echo "    -u, --docker-user=<user>      Docker user UID or name to use (defaults to none, can be computed using 'id -u <user>')"
 }
 
 # Check function
@@ -44,6 +45,7 @@ ONTRACK_ACCEPTANCE_JAR=
 
 CONTROL_KEEP=no
 CONTROL_DELAY=120
+CONTROL_USER=
 
 # Command central
 
@@ -69,6 +71,9 @@ do
 		-k|--keep)
             CONTROL_KEEP=yes
 			;;
+		-u=*|--docker-user=*)
+            CONTROL_USER=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
+			;;
 		*)
 			echo "Unknown option: $i"
 			show_help
@@ -84,6 +89,7 @@ check "$ONTRACK_ACCEPTANCE_JAR" "Ontrack Acceptance JAR (--acceptance) is requir
 
 # Logging
 echo "Docker host:            ${ONTRACK_HOST}"
+echo "Docker user:            ${CONTROL_USER}"
 echo "Ontrack protocol:       ${ONTRACK_PROTOCOL}"
 echo "Ontrack JAR:            ${ONTRACK_JAR}"
 echo "Startup delay:          ${CONTROL_DELAY} s"
@@ -99,9 +105,17 @@ echo "Ontrack data at:        ${MOUNT}"
 # Docker Ontrack VM up
 # TODO Docker nginx VM up
 
+DOCKER_OPTIONS=
+if [ "${CONTROL_USER}" != "" ]
+then
+    DOCKER_OPTIONS="${DOCKER_OPTIONS} --docker-user=${CONTROL_USER}"
+fi
+echo "Docker options:         ${DOCKER_OPTIONS}"
+
 ./docker-setup.sh \
     --docker-image=ontrack \
     --mount=${MOUNT} \
+    ${DOCKER_OPTIONS} \
     --run \
     --jar=${ONTRACK_JAR}
 

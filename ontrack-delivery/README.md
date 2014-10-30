@@ -62,10 +62,12 @@ Then, just run:
     ./docker-acceptance.sh \
         --jar=<path on Ontrack Application JAR> \
         --acceptance=<path to Ontrack Acceptance JAR> \
+        --docker-user=`id -u <user>`
 
 This will:
 
 1. create an Ontrack container
+1. make sure the local `acceptance` folder, which contains Ontrack data is accessible to the local `<user>` account
 1. execute the acceptance tests against the Ontrack container
 1. output the JUnit XML report in the local _ontrack-acceptance.xml_ file
 
