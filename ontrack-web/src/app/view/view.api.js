@@ -1,6 +1,7 @@
 angular.module('ot.view.api', [
     'ui.router',
-    'ot.service.core'
+    'ot.service.core',
+    'ot.directive.api'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('api', {
@@ -20,7 +21,7 @@ angular.module('ot.view.api', [
         function loadAPI(link) {
             $scope.apiLoading = true;
             ot.pageCall($http.get(link)).then(function (resource) {
-
+                $scope.resource = resource;
             }).finally(function () {
                 $scope.apiLoading = false;
             });
