@@ -9,8 +9,11 @@ angular.module('ot.view.api', [
             controller: 'APICtrl'
         });
     })
-    .controller('APICtrl', function ($http, $state, $stateParams, ot) {
+    .controller('APICtrl', function ($http, $location, $scope, $state, ot) {
         var view = ot.view();
         view.title = "API";
+
+        // Link to display
+        $scope.link = $location.search().link;
     })
 ;
