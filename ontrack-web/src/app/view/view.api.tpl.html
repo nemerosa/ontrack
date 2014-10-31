@@ -1,16 +1,15 @@
 <ot-view>
     <div class="row">
         <div class="col-md-12 alert alert-info ot-api-header">
-            <span class="ot-api-get">GET</span>
             <span class="ot-api-link">
                 {{link}}
             </span>
             <span class="ot-loading-indicator" ng-show="apiLoading"></span>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-12">
-            {{apiPath}}
+            <p ng-repeat="method in description.methods" class="ot-api-method">
+                <span ng-repeat="m in method.methods" class="ot-api-{{m | lowercase}}">{{m}}</span>
+                <span class="ot-api-method-name">{{method.name}}</span>
+                <span ng-if="method.description" class="ot-api-method-description"> - {{method.description}}</span>
+            </p>
         </div>
     </div>
     <div class="row" ng-show="resource">

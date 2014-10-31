@@ -11,10 +11,35 @@ table.ot-api-resource {
   border-left: solid @table-border-color 0.5em;
 }
 
-.ot-api-get {
+.ot-api-verb {
   .label;
   .label-default;
-  background-color: green;
+}
+
+.ot-api-get {
+  .ot-api-verb;
+  background-color: @brand-success;
+}
+
+.ot-api-put {
+  .ot-api-verb;
+  background-color: @brand-info;
+}
+
+.ot-api-post {
+  .ot-api-verb;
+  background-color: @brand-warning;
+}
+
+.ot-api-delete {
+  .ot-api-verb;
+  background-color: @brand-danger;
+}
+
+.ot-api-method {
+  .ot-api-method-description {
+    .ot-description;
+  }
 }
 
 .ot-api-resource-item-name {

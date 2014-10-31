@@ -30,6 +30,7 @@ angular.module('ot.view.api', [
 
             ot.pageCall($http.get("api/describe", {params: {path: path}}))
                 .then(function (description) {
+                    $scope.description = description;
                     return ot.pageCall($http.get(link));
                 })
                 .then(function (resource) {
