@@ -28,4 +28,12 @@
             <ot-api-resource-object resource="item.value"></ot-api-resource-object>
         </div>
     </div>
+    <div class="row ot-api-resource-item ot-api-resource-array" ng-if="item.type == 'array'">
+        <div class="col-md-2 ot-api-resource-item-name">
+            {{item.name}}
+        </div>
+        <div class="col-md-10 ot-api-resource-item-value">
+            <ot-api-resource-object resource="child" ng-repeat="child in item.value"></ot-api-resource-object>
+        </div>
+    </div>
 </div>

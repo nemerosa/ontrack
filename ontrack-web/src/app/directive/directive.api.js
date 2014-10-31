@@ -12,13 +12,25 @@ angular.module('ot.directive.api', [
                     if (scope.resource) {
                         var items = [];
                         angular.forEach(scope.resource, function (value, field) {
+                            // Field names to exclude
+                            if (field.charAt(0) == '$') {
+                                // Excluding
+                            }
                             // Link
-                            if (field.charAt(0) == '_' && angular.isString(value)) {
+                            else if (field.charAt(0) == '_' && angular.isString(value)) {
                                 var linkName = field.substring(1);
                                 items.push({
                                     type: 'link',
                                     name: linkName,
                                     link: value
+                                });
+                            }
+                            // Array value
+                            else if (angular.isArray(value)) {
+                                items.push({
+                                    type: 'array',
+                                    name: field,
+                                    value: value
                                 });
                             }
                             // Object value
@@ -28,10 +40,6 @@ angular.module('ot.directive.api', [
                                     name: field,
                                     value: value
                                 });
-                            }
-                            // TODO Array value
-                            else if (angular.isArray(value)) {
-
                             }
                             // Simple value
                             else {
