@@ -1,39 +1,23 @@
-<div>
-    <b>DEBUG</b>
-
-    <div class="ot-description">{{resource}}</div>
-</div>
-<div ng-repeat="item in items">
-    <div class="row ot-api-resource-item ot-api-resource-link" ng-if="item.type == 'link'">
-        <div class="col-md-2 ot-api-resource-item-name">
+<table class="table table-hover table-condensed">
+    <tbody>
+    <tr ng-repeat="item in items" class="ot-api-resource-item ot-api-resource-{{item.type}}">
+        <td class="ot-api-resource-item-name">
             {{item.name}}
-        </div>
-        <div class="col-md-10 ot-api-resource-item-value">
-            <a ng-click="followResource(item.link)">{{item.link}}</a>
-        </div>
-    </div>
-    <div class="row ot-api-resource-item ot-api-resource-simple" ng-if="item.type == 'simple'">
-        <div class="col-md-2 ot-api-resource-item-name">
-            {{item.name}}
-        </div>
-        <div class="col-md-10 ot-api-resource-item-value">
-            {{item.value}}
-        </div>
-    </div>
-    <div class="row ot-api-resource-item ot-api-resource-object" ng-if="item.type == 'object'">
-        <div class="col-md-2 ot-api-resource-item-name">
-            {{item.name}}
-        </div>
-        <div class="col-md-10 ot-api-resource-item-value">
-            <ot-api-resource-object resource="item.value"></ot-api-resource-object>
-        </div>
-    </div>
-    <div class="row ot-api-resource-item ot-api-resource-array" ng-if="item.type == 'array'">
-        <div class="col-md-2 ot-api-resource-item-name">
-            {{item.name}}
-        </div>
-        <div class="col-md-10 ot-api-resource-item-value">
-            <ot-api-resource-object resource="child" ng-repeat="child in item.value"></ot-api-resource-object>
-        </div>
-    </div>
-</div>
+        </td>
+        <td class="ot-api-resource-item-value">
+            <div ng-if="item.type == 'link'">
+                <a ng-click="followResource(item.link)">{{item.link}}</a>
+            </div>
+            <div ng-if="item.type == 'simple'">
+                {{item.value}}
+            </div>
+            <div ng-if="item.type == 'object'">
+                <ot-api-resource-object resource="item.value"></ot-api-resource-object>
+            </div>
+            <div ng-if="item.type == 'array'">
+                <ot-api-resource-object resource="child" ng-repeat="child in item.value"></ot-api-resource-object>
+            </div>
+        </td>
+    </tr>
+    </tbody>
+</table>
