@@ -12,34 +12,32 @@
   background-color: green;
 }
 
-.ot-api-resource-simple, .ot-api-resource-object, .ot-api-resource-array {
-  .ot-api-resource-item-name {
-    font-weight: bold;
-  }
+.ot-api-resource-item-name {
+  font-weight: bold;
 }
 
 .ot-api-resource-object {
-  .ot-api-resource-item-name {
-//    &:before {
-//      content: '* ';
-//    }
+  > .ot-api-resource-item-name {
+    &:after {
+      content: ' /';
+    }
   }
 }
 
 .ot-api-resource-array {
-  .ot-api-resource-item-name {
-//    > &:after {
-//      content: ' []';
-//    }
+  > .ot-api-resource-item-name {
+    &:after {
+      content: ' [*]';
+    }
   }
 }
 
 .ot-api-resource-link {
-  .ot-api-resource-item-name {
+  > .ot-api-resource-item-name {
     text-decoration: underline;
     .text-muted;
   }
-  .ot-api-resource-item-value {
+  > .ot-api-resource-item-value {
     a {
       cursor: pointer;
     }
