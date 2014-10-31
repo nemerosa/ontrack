@@ -18,6 +18,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
@@ -71,12 +72,29 @@ public class APIController extends AbstractResourceController {
 
     private String getAPIName(Class<?> controllerClass) {
         // TODO Use annotations
-        return StringUtils.removeEnd(controllerClass.getSimpleName(), "Controller");
+        return capitalize(
+                asDisplayName(
+                        StringUtils.removeEnd(controllerClass.getSimpleName(), "Controller")
+                )
+        );
+
+    }
+
+    private static String asDisplayName(CharSequence name) {
+        StringBuilder s = new StringBuilder();
+        name.codePoints().forEach(c -> {
+            if (s.length() > 0 && !Character.isUpperCase(s.codePointAt(s.length() - 1)) && Character.isUpperCase(c)) {
+                s.append(' ').append(Character.toChars(Character.toLowerCase(c)));
+            } else {
+                s.append(Character.toChars(c));
+            }
+        });
+        return s.toString();
     }
 
     private String getAPIMethodName(Method method) {
         // TODO Use annotations
-        return method.getName();
+        return capitalize(asDisplayName(method.getName()));
     }
 
     protected APIMethodInfo collectAPIMethodInfo(
