@@ -27,6 +27,7 @@ angular.module('ot.extension.github.configuration', [
                         cls: 'ot-command-new',
                         action: $scope.createConfiguration
                     },
+                    ot.viewApiCommand(configurations._self),
                     ot.viewCloseCommand('/home')
                 ];
             });
