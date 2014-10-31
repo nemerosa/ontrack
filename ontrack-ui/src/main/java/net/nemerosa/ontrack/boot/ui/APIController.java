@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import net.nemerosa.ontrack.boot.support.APIDescription;
 import net.nemerosa.ontrack.boot.support.APIInfo;
 import net.nemerosa.ontrack.boot.support.APIMethodInfo;
 import net.nemerosa.ontrack.model.exceptions.APIMethodInfoNotFoundException;
@@ -46,7 +47,7 @@ public class APIController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "/describe", method = RequestMethod.GET)
-    public APIMethodInfo describe(HttpServletRequest request, @RequestParam String path) throws Exception {
+    public APIDescription describe(HttpServletRequest request, @RequestParam String path) throws Exception {
         HandlerExecutionChain executionChain = handlerMapping.getHandler(
                 new HttpServletRequestWrapper(request) {
                     @Override
@@ -69,12 +70,22 @@ public class APIController extends AbstractResourceController {
             // Gets all the infos
             List<APIInfo> apiInfos = getApiInfos();
             // Looking for any GET mapping
-            return apiInfos.stream()
+            APIMethodInfo get = apiInfos.stream()
                     .flatMap(i -> i.getMethods().stream())
                     .filter(mi -> StringUtils.equals(type, mi.getApiInfo().getType())
                             && StringUtils.equals(method, mi.getMethod()))
                     .findFirst()
                     .orElseThrow(() -> new APIMethodInfoNotFoundException(path));
+            // Gets all methods with the same path pattern
+            List<APIMethodInfo> methods = apiInfos.stream()
+                    .flatMap(i -> i.getMethods().stream())
+                    .filter(mi -> StringUtils.equals(get.getPath(), mi.getPath()))
+                    .collect(Collectors.toList());
+            // OK
+            return new APIDescription(
+                    path,
+                    methods
+            );
         } else {
             throw new APIMethodInfoNotFoundException(path);
         }
