@@ -32,6 +32,7 @@ angular.module('ot.view.validationRun', [
                 loadValidationStamp();
                 // Commands
                 view.commands = [
+                    ot.viewApiCommand(validationRunResource._self),
                     ot.viewCloseCommand('/build/' + validationRunResource.build.id)
                 ];
             });

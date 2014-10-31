@@ -65,6 +65,7 @@ angular.module('ot.view.validationStamp', [
                             });
                         }
                     },
+                    ot.viewApiCommand($scope.validationStamp._self),
                     ot.viewCloseCommand('/branch/' + $scope.validationStamp.branch.id)
                 ];
                 // Loading the validation runs
