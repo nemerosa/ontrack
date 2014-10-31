@@ -20,11 +20,23 @@ angular.module('ot.view.api', [
         // Loading the API
         function loadAPI(link) {
             $scope.apiLoading = true;
-            ot.pageCall($http.get(link)).then(function (resource) {
-                $scope.resource = resource;
-            }).finally(function () {
-                $scope.apiLoading = false;
-            });
+
+            // Gets the relative path (neat!)
+            var a = document.createElement('a');
+            a.href = link;
+            var path = a.pathname;
+
+            // Calls
+
+            ot.pageCall($http.get("api/describe", {params: {path: path}}))
+                .then(function (description) {
+                    return ot.pageCall($http.get(link));
+                })
+                .then(function (resource) {
+                    $scope.resource = resource;
+                }).finally(function () {
+                    $scope.apiLoading = false;
+                });
         }
 
         // Loads the API
