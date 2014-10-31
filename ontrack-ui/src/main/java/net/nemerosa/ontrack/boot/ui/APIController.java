@@ -4,8 +4,11 @@ import net.nemerosa.ontrack.boot.support.APIDescription;
 import net.nemerosa.ontrack.boot.support.APIInfo;
 import net.nemerosa.ontrack.boot.support.APIMethodInfo;
 import net.nemerosa.ontrack.model.exceptions.APIMethodInfoNotFoundException;
+import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Resources;
+import net.nemerosa.ontrack.ui.support.API;
+import net.nemerosa.ontrack.ui.support.APIMethod;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -27,6 +30,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static net.nemerosa.ontrack.model.structure.NameDescription.nd;
 import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -132,13 +136,18 @@ public class APIController extends AbstractResourceController {
         return apiInfos;
     }
 
-    private String getAPIName(Class<?> controllerClass) {
-        // TODO Use annotations
-        return capitalize(
-                asDisplayName(
-                        StringUtils.removeEnd(controllerClass.getSimpleName(), "Controller")
-                )
-        );
+    private NameDescription getAPIName(Class<?> controllerClass) {
+        API api = AnnotationUtils.findAnnotation(controllerClass, API.class);
+        return api != null ?
+                nd(api.value(), api.description()) :
+                nd(
+                        capitalize(
+                                asDisplayName(
+                                        StringUtils.removeEnd(controllerClass.getSimpleName(), "Controller")
+                                )
+                        ),
+                        ""
+                );
 
     }
 
@@ -154,9 +163,11 @@ public class APIController extends AbstractResourceController {
         return s.toString();
     }
 
-    private String getAPIMethodName(Method method) {
-        // TODO Use annotations
-        return capitalize(asDisplayName(method.getName()));
+    private NameDescription getAPIMethodName(Method method) {
+        APIMethod api = AnnotationUtils.findAnnotation(method, APIMethod.class);
+        return api != null ?
+                nd(api.value(), api.description()) :
+                nd(capitalize(asDisplayName(method.getName())), "");
     }
 
     protected APIMethodInfo collectAPIMethodInfo(

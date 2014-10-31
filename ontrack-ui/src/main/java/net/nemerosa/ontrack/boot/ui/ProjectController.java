@@ -10,6 +10,8 @@ import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resources;
+import net.nemerosa.ontrack.ui.support.API;
+import net.nemerosa.ontrack.ui.support.APIMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +22,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 @RestController
 @RequestMapping("/structure/projects")
+@API("Management of projects")
 public class ProjectController extends AbstractResourceController {
 
     private final StructureService structureService;
@@ -77,11 +80,13 @@ public class ProjectController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "{projectId}/update", method = RequestMethod.GET)
+    @APIMethod(value = "Project update form", description = "Get the form for the project update")
     public Form saveProjectForm(@PathVariable ID projectId) {
         return structureService.getProject(projectId).asForm();
     }
 
     @RequestMapping(value = "{projectId}/update", method = RequestMethod.PUT)
+    @APIMethod(value = "Updates project")
     public Project saveProject(@PathVariable ID projectId, @RequestBody @Valid NameDescriptionState nameDescription) {
         // Gets from the repository
         Project project = structureService.getProject(projectId);
