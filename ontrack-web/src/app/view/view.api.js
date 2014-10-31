@@ -13,6 +13,9 @@ angular.module('ot.view.api', [
     .controller('APICtrl', function ($http, $location, $scope, $state, $stateParams, ot) {
         var view = ot.view();
         view.title = "API";
+        view.commands = [
+            ot.viewCloseCommand('home')
+        ];
 
         // Link to display
         $scope.link = decodeURIComponent($stateParams.link);
