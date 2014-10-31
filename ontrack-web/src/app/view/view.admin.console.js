@@ -14,14 +14,15 @@ angular.module('ot.view.admin.console', [
         var view = ot.view();
         view.title = "Administration console";
         view.description = "Tools for the general management of ontrack";
-        view.commands = [
-            ot.viewCloseCommand('/home')
-        ];
 
         // Loads the jobs
         function loadJobs() {
             ot.call($http.get('admin/jobs')).then(function (jobs) {
                 $scope.jobs = jobs;
+                view.commands = [
+                    ot.viewApiCommand(jobs._self),
+                    ot.viewCloseCommand('/home')
+                ];
             });
         }
 

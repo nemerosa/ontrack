@@ -13,21 +13,22 @@ angular.module('ot.view.admin.accounts', [
     .controller('AdminAccountsCtrl', function ($scope, $http, ot, otFormService, otAlertService) {
         var view = ot.view();
         view.title = "Account management";
-        view.commands = [
-            {
-                id: 'admin-global-acl',
-                name: "Global permissions",
-                cls: 'ot-command-admin-global-acl',
-                link: '/admin-global-acl'
-
-            },
-            ot.viewCloseCommand('/home')
-        ];
 
         // Loading the accounts
         function load() {
             ot.call($http.get('accounts')).then(function (accounts) {
                 $scope.accounts = accounts;
+                view.commands = [
+                    {
+                        id: 'admin-global-acl',
+                        name: "Global permissions",
+                        cls: 'ot-command-admin-global-acl',
+                        link: '/admin-global-acl'
+
+                    },
+                    ot.viewApiCommand(accounts._self),
+                    ot.viewCloseCommand('/home')
+                ];
                 return ot.call($http.get('accounts/groups'));
             }).then(function (groups) {
                 $scope.groups = groups;

@@ -13,9 +13,6 @@ angular.module('ot.view.admin.global-acl', [
     .controller('AdminGlobalACLCtrl', function ($scope, $http, $interpolate, ot) {
         var view = ot.view();
         view.title = "Global permissions";
-        view.commands = [
-            ot.viewCloseCommand('/admin-accounts')
-        ];
 
         $scope.form = {
         };
@@ -24,6 +21,10 @@ angular.module('ot.view.admin.global-acl', [
         function load() {
             ot.pageCall($http.get("accounts/permissions/globals")).then(function (globalPermissions) {
                 $scope.globalPermissions = globalPermissions;
+                view.commands = [
+                    ot.viewApiCommand(globalPermissions._self),
+                    ot.viewCloseCommand('/admin-accounts')
+                ];
                 return ot.pageCall($http.get(globalPermissions._globalRoles));
             }).then(function (globalRoles) {
                 $scope.globalRoles = globalRoles;
