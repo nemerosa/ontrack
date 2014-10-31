@@ -10,7 +10,7 @@ class APIControllerIT extends AbstractWebTestSupport {
 
     @Test
     void 'Mappings'() {
-        def resources = apiController.show()
+        def resources = apiController.list()
         resources.resources.each { apiInfo ->
             println "* API: ${apiInfo.name}"
             apiInfo.methods.each { apiMethodInfo ->

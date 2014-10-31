@@ -2,18 +2,26 @@ package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.boot.support.APIInfo;
 import net.nemerosa.ontrack.boot.support.APIMethodInfo;
+import net.nemerosa.ontrack.model.exceptions.APIMethodInfoNotFoundException;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.HandlerExecutionChain;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -26,36 +34,83 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 public class APIController extends AbstractResourceController {
 
     private final ApplicationContext applicationContext;
+    private final RequestMappingHandlerMapping handlerMapping;
 
     @Autowired
-    public APIController(ApplicationContext applicationContext) {
+    public APIController(
+            ApplicationContext applicationContext,
+            @Qualifier("requestMappingHandlerMapping")
+            RequestMappingHandlerMapping handlerMapping) {
         this.applicationContext = applicationContext;
+        this.handlerMapping = handlerMapping;
     }
 
-    @RequestMapping(value = "/handlers", method = RequestMethod.GET)
-    public Resources<APIInfo> show() {
+    @RequestMapping(value = "/describe", method = RequestMethod.GET)
+    public APIMethodInfo describe(HttpServletRequest request, @RequestParam String path) throws Exception {
+        HandlerExecutionChain executionChain = handlerMapping.getHandler(
+                new HttpServletRequestWrapper(request) {
+                    @Override
+                    public String getRequestURI() {
+                        return path;
+                    }
+
+                    @Override
+                    public String getServletPath() {
+                        return path;
+                    }
+                }
+        );
+        // Gets the handler
+        Object handler = executionChain.getHandler();
+        if (handler instanceof HandlerMethod) {
+            HandlerMethod handlerMethod = (HandlerMethod) handler;
+            String type = handlerMethod.getBeanType().getName();
+            String method = handlerMethod.getMethod().getName();
+            // Gets all the infos
+            List<APIInfo> apiInfos = getApiInfos();
+            // Looking for any GET mapping
+            return apiInfos.stream()
+                    .flatMap(i -> i.getMethods().stream())
+                    .filter(mi -> StringUtils.equals(type, mi.getApiInfo().getType())
+                            && StringUtils.equals(method, mi.getMethod()))
+                    .findFirst()
+                    .orElseThrow(() -> new APIMethodInfoNotFoundException(path));
+        } else {
+            throw new APIMethodInfoNotFoundException(path);
+        }
+    }
+
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public Resources<APIInfo> list() {
+        return Resources.of(
+                getApiInfos(),
+                uri(on(getClass()).list())
+        );
+    }
+
+    private List<APIInfo> getApiInfos() {
         List<APIInfo> apiInfos = new ArrayList<>();
         Collection<Object> controllers = applicationContext.getBeansWithAnnotation(Controller.class).values();
         controllers.forEach(controller -> {
-            APIInfo apiInfo = new APIInfo(getAPIName(controller.getClass()));
+            APIInfo apiInfo = new APIInfo(
+                    controller.getClass().getName(),
+                    getAPIName(controller.getClass())
+            );
             // Root request mapping
             RequestMapping typeAnnotation = AnnotationUtils.findAnnotation(controller.getClass(), RequestMapping.class);
             // Gets all the methods
             ReflectionUtils.doWithMethods(
                     controller.getClass(),
-                    new ReflectionUtils.MethodCallback() {
-                        @Override
-                        public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
-                            RequestMapping methodAnnotation = AnnotationUtils.findAnnotation(method, RequestMapping.class);
-                            if (methodAnnotation != null) {
-                                APIMethodInfo apiMethodInfo = collectAPIMethodInfo(
-                                        controller,
-                                        method,
-                                        typeAnnotation,
-                                        methodAnnotation
-                                );
-                                apiInfo.add(apiMethodInfo);
-                            }
+                    method -> {
+                        RequestMapping methodAnnotation = AnnotationUtils.findAnnotation(method, RequestMapping.class);
+                        if (methodAnnotation != null) {
+                            APIMethodInfo apiMethodInfo = collectAPIMethodInfo(
+                                    apiInfo,
+                                    method,
+                                    typeAnnotation,
+                                    methodAnnotation
+                            );
+                            apiInfo.add(apiMethodInfo);
                         }
                     },
                     ReflectionUtils.USER_DECLARED_METHODS
@@ -63,11 +118,7 @@ public class APIController extends AbstractResourceController {
             // OK for this API
             apiInfos.add(apiInfo);
         });
-        // Resources
-        return Resources.of(
-                apiInfos,
-                uri(on(getClass()).show())
-        );
+        return apiInfos;
     }
 
     private String getAPIName(Class<?> controllerClass) {
@@ -98,7 +149,7 @@ public class APIController extends AbstractResourceController {
     }
 
     protected APIMethodInfo collectAPIMethodInfo(
-            Object controller,
+            APIInfo apiInfo,
             Method method,
             RequestMapping typeAnnotation,
             RequestMapping methodAnnotation) {
@@ -115,7 +166,7 @@ public class APIController extends AbstractResourceController {
             methods = requestMethods.stream().map(Enum::name).collect(Collectors.toList());
         }
         // OK
-        return APIMethodInfo.of(getAPIMethodName(method), path.toString(), methods);
+        return APIMethodInfo.of(apiInfo, method.getName(), getAPIMethodName(method), path.toString(), methods);
     }
 
     private void appendPath(RequestMapping requestMapping, StringBuilder builder) {
