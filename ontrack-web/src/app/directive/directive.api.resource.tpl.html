@@ -17,6 +17,12 @@
             <div ng-if="item.type == 'array'">
                 <ot-api-resource-object resource="child" ng-repeat="child in item.value"></ot-api-resource-object>
             </div>
+            <div ng-if="item.type == 'array-simple'">
+                <ul>
+                    <li ng-repeat="child in item.value">{{child}}</li>
+                </ul>
+
+            </div>
         </td>
     </tr>
     </tbody>

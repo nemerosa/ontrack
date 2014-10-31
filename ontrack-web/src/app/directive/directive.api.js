@@ -27,11 +27,19 @@ angular.module('ot.directive.api', [
                             }
                             // Array value
                             else if (angular.isArray(value)) {
-                                items.push({
-                                    type: 'array',
-                                    name: field,
-                                    value: value
-                                });
+                                if (value.length > 0 && angular.isObject(value[0])) {
+                                    items.push({
+                                        type: 'array',
+                                        name: field,
+                                        value: value
+                                    });
+                                } else {
+                                    items.push({
+                                        type: 'array-simple',
+                                        name: field,
+                                        value: value
+                                    });
+                                }
                             }
                             // Object value
                             else if (angular.isObject(value)) {
