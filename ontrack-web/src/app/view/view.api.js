@@ -5,17 +5,17 @@ angular.module('ot.view.api', [
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('api', {
-            url: '/api',
+            url: '/api/{link}',
             templateUrl: 'app/view/view.api.tpl.html',
             controller: 'APICtrl'
         });
     })
-    .controller('APICtrl', function ($http, $location, $scope, $state, ot) {
+    .controller('APICtrl', function ($http, $location, $scope, $state, $stateParams, ot) {
         var view = ot.view();
         view.title = "API";
 
         // Link to display
-        $scope.link = $location.search().link;
+        $scope.link = decodeURIComponent($stateParams.link);
 
         // Loading the API
         function loadAPI(link) {

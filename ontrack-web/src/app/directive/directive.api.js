@@ -1,6 +1,6 @@
 angular.module('ot.directive.api', [
 ])
-    .directive('otApiResource', function () {
+    .directive('otApiResource', function ($state) {
         return {
             restrict: 'E',
             templateUrl: 'app/directive/directive.api.resource.tpl.html',
@@ -54,7 +54,7 @@ angular.module('ot.directive.api', [
                     }
                 });
                 scope.followResource = function (link) {
-                    location.href = '#/api?link=' + link;
+                    $state.go('api', {link: encodeURIComponent(link)});
                 };
             }
         };
