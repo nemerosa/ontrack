@@ -21,9 +21,13 @@ angular.module('ot.directive.api', [
                                     link: value
                                 });
                             }
-                            // TODO Object value
+                            // Object value
                             else if (angular.isObject(value)) {
-
+                                items.push({
+                                    type: 'object',
+                                    name: field,
+                                    value: value
+                                });
                             }
                             // TODO Array value
                             else if (angular.isArray(value)) {
@@ -44,6 +48,22 @@ angular.module('ot.directive.api', [
                 scope.followResource = function (link) {
                     location.href = '#/api?link=' + link;
                 };
+            }
+        };
+    })
+    .directive('otApiResourceObject', function ($compile) {
+        return {
+            restrict: 'E',
+            template: '<div></div>',
+            scope: {
+                resource: '='
+            },
+            link: function (scope, element) {
+                if (angular.isDefined(scope.resource)) {
+                    $compile('<ot-api-resource resource="resource"></ot-api-resource>')(scope, function (cloned, scope) {
+                        element.append(cloned);
+                    });
+                }
             }
         };
     })

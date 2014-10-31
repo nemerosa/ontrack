@@ -1,5 +1,6 @@
 <div>
     <b>DEBUG</b>
+
     <div class="ot-description">{{resource}}</div>
 </div>
 <div ng-repeat="item in items">
@@ -17,6 +18,14 @@
         </div>
         <div class="col-md-10 ot-api-resource-item-value">
             {{item.value}}
+        </div>
+    </div>
+    <div class="row ot-api-resource-item ot-api-resource-object" ng-if="item.type == 'object'">
+        <div class="col-md-2 ot-api-resource-item-name">
+            {{item.name}}
+        </div>
+        <div class="col-md-10 ot-api-resource-item-value">
+            <ot-api-resource-object resource="item.value"></ot-api-resource-object>
         </div>
     </div>
 </div>
