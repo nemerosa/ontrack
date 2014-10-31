@@ -7,8 +7,27 @@ angular.module('ot.directive.api', [
             scope: {
                 resource: '='
             },
-            controller: function ($scope) {
-
+            link: function (scope) {
+                scope.$watch('resource', function () {
+                    if (scope.resource) {
+                        var items = [];
+                        angular.forEach(scope.resource, function (value, field) {
+                            // Link
+                            if (field.charAt(0) == '_' && angular.isString(value)) {
+                                var linkName = field.substring(1);
+                                items.push({
+                                    type: 'link',
+                                    name: linkName,
+                                    link: value
+                                });
+                            }
+                        });
+                        scope.items = items;
+                    }
+                });
+                scope.followResource = function (link) {
+                    location.href = '#/api?link=' + link;
+                };
             }
         };
     })

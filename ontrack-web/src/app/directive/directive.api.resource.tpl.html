@@ -1,1 +1,10 @@
-API
+<div ng-repeat="item in items">
+    <div class="row ot-api-resource-item ot-api-resource-link" ng-if="item.type == 'link'">
+        <div class="col-md-2 ot-api-resource-item-name">
+            {{item.name}}
+        </div>
+        <div class="col-md-10 ot-api-resource-item-value">
+            <a ng-click="followResource(item.link)">{{item.link}}</a>
+        </div>
+    </div>
+</div>
