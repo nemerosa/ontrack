@@ -16,9 +16,6 @@ angular.module('ot.view.admin.project-acl', [
         var projectId = $stateParams.projectId;
         var view = ot.view();
         view.title = "Project permissions";
-        view.commands = [
-            ot.viewCloseCommand('/project/' + projectId)
-        ];
 
         // Target/role association form
         $scope.form = {
@@ -30,6 +27,10 @@ angular.module('ot.view.admin.project-acl', [
                 view.breadcrumbs = ot.projectBreadcrumbs(project);
                 return ot.pageCall($http.get('accounts/permissions/projects/' + projectId));
             }).then(function (projectPermissions) {
+                view.commands = [
+                    ot.viewApiCommand(projectPermissions._self),
+                    ot.viewCloseCommand('/project/' + projectId)
+                ];
                 $scope.projectPermissions = projectPermissions;
                 return ot.pageCall($http.get(projectPermissions._projectRoles));
             }).then(function (projectRoles) {

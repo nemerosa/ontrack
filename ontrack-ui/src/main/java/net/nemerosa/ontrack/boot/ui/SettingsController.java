@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.settings.LDAPSettings;
 import net.nemerosa.ontrack.model.settings.SecuritySettings;
 import net.nemerosa.ontrack.model.settings.SettingsService;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
+import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +39,7 @@ public class SettingsController extends AbstractResourceController {
      * List of forms to configure.
      */
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public List<DescribedForm> configuration() {
+    public Resources<DescribedForm> configuration() {
         List<DescribedForm> forms = new ArrayList<>();
         // Security settings
         forms.add(getSecuritySettingsForm());
@@ -51,7 +52,10 @@ public class SettingsController extends AbstractResourceController {
                         .collect(Collectors.toList())
         );
         // OK
-        return forms;
+        return Resources.of(
+                forms,
+                uri(on(getClass()).configuration())
+        );
     }
 
     /**

@@ -14,19 +14,20 @@ angular.module('ot.view.settings', [
         var view = ot.view();
         view.title = "Settings";
         view.description = "General settings for the ontrack application";
-        view.commands = [
-            ot.viewCloseCommand('/home')
-        ];
 
         // Loading of the settings
         function loadSettings() {
             ot.call($http.get('settings')).then(function (forms) {
+                view.commands = [
+                    ot.viewApiCommand(forms._self),
+                    ot.viewCloseCommand('/home')
+                ];
                 // Preparation of all forms
-                angular.forEach(forms, function (describedForm) {
+                angular.forEach(forms.resources, function (describedForm) {
                     describedForm.data = otFormService.prepareForDisplay(describedForm.form);
                 });
                 // Displays the forms
-                $scope.forms = forms;
+                $scope.forms = forms.resources;
             });
         }
 

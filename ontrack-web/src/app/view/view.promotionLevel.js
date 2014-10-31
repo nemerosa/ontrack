@@ -65,6 +65,7 @@ angular.module('ot.view.promotionLevel', [
                             });
                         }
                     },
+                    ot.viewApiCommand($scope.promotionLevel._self),
                     ot.viewCloseCommand('/branch/' + $scope.promotionLevel.branch.id)
                 ];
                 // Loads the runs
