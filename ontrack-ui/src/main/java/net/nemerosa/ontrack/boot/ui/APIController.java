@@ -1,6 +1,9 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import net.nemerosa.ontrack.boot.support.APIInfo;
 import net.nemerosa.ontrack.boot.support.APIMethodInfo;
+import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
+import net.nemerosa.ontrack.ui.resource.Resources;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -12,15 +15,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
 @RequestMapping("/api")
-public class APIController {
+public class APIController extends AbstractResourceController {
 
     private final ApplicationContext applicationContext;
 
@@ -30,10 +32,11 @@ public class APIController {
     }
 
     @RequestMapping(value = "/handlers", method = RequestMethod.GET)
-    public String show() {
+    public Resources<APIInfo> show() {
+        List<APIInfo> apiInfos = new ArrayList<>();
         Collection<Object> controllers = applicationContext.getBeansWithAnnotation(Controller.class).values();
         controllers.forEach(controller -> {
-            System.out.format("* %s%n", controller.getClass().getName());
+            APIInfo apiInfo = new APIInfo(getAPIName(controller.getClass()));
             // Root request mapping
             RequestMapping typeAnnotation = AnnotationUtils.findAnnotation(controller.getClass(), RequestMapping.class);
             // Gets all the methods
@@ -50,18 +53,30 @@ public class APIController {
                                         typeAnnotation,
                                         methodAnnotation
                                 );
-                                System.out.format(
-                                        "\t* %s %s%n",
-                                        apiMethodInfo.getPath(),
-                                        apiMethodInfo.getMethods()
-                                );
+                                apiInfo.add(apiMethodInfo);
                             }
                         }
                     },
                     ReflectionUtils.USER_DECLARED_METHODS
             );
+            // OK for this API
+            apiInfos.add(apiInfo);
         });
-        return "ok";
+        // Resources
+        return Resources.of(
+                apiInfos,
+                uri(on(getClass()).show())
+        );
+    }
+
+    private String getAPIName(Class<?> controllerClass) {
+        // TODO Use annotations
+        return StringUtils.removeEnd(controllerClass.getSimpleName(), "Controller");
+    }
+
+    private String getAPIMethodName(Method method) {
+        // TODO Use annotations
+        return method.getName();
     }
 
     protected APIMethodInfo collectAPIMethodInfo(
@@ -82,7 +97,7 @@ public class APIController {
             methods = requestMethods.stream().map(Enum::name).collect(Collectors.toList());
         }
         // OK
-        return APIMethodInfo.of(path.toString(), methods);
+        return APIMethodInfo.of(getAPIMethodName(method), path.toString(), methods);
     }
 
     private void appendPath(RequestMapping requestMapping, StringBuilder builder) {
