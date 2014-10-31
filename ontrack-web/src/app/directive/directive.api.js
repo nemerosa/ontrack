@@ -21,6 +21,22 @@ angular.module('ot.directive.api', [
                                     link: value
                                 });
                             }
+                            // TODO Object value
+                            else if (angular.isObject(value)) {
+
+                            }
+                            // TODO Array value
+                            else if (angular.isArray(value)) {
+
+                            }
+                            // Simple value
+                            else {
+                                items.push({
+                                    type: 'simple',
+                                    name: field,
+                                    value: value
+                                });
+                            }
                         });
                         scope.items = items;
                     }
