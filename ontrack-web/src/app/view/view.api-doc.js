@@ -14,8 +14,41 @@ angular.module('ot.view.api-doc', [
         var view = ot.view();
         view.title = "API Documentation";
         view.commands = [
+            {
+                condition: function () {
+                    return $scope.show != 'root+api';
+                },
+                name: "Show roots with accessible API only",
+                cls: 'ot-command-api-show',
+                action: function () {
+                    $scope.show = 'root+api';
+                }
+            },
+            {
+                condition: function () {
+                    return $scope.show != 'root';
+                },
+                name: "Show roots only",
+                cls: 'ot-command-api-show',
+                action: function () {
+                    $scope.show = 'root';
+                }
+            },
+            {
+                condition: function () {
+                    return $scope.show != 'all';
+                },
+                name: "Show all",
+                cls: 'ot-command-api-show',
+                action: function () {
+                    $scope.show = 'all';
+                }
+            },
             ot.viewCloseCommand('home')
         ];
+
+        // Display flags
+        $scope.show = 'root+api';
 
         // Loading the whole API
         function loadApi() {
@@ -32,6 +65,9 @@ angular.module('ot.view.api-doc', [
                         });
                         apiInfo.root = apiInfo.methods.some(function (apiMethodInfo) {
                             return apiMethodInfo.root;
+                        });
+                        apiInfo.getMethod = apiInfo.methods.some(function (apiMethodInfo) {
+                            return apiMethodInfo.getMethod;
                         });
                     });
                     $scope.list = list;

@@ -6,7 +6,9 @@
         </div>
     </div>
     <table class="table table-hover table-condensed ot-api-doc">
-        <tbody ng-repeat="apiInfo in list.resources | orderBy: 'name'">
+        <tbody
+                ng-repeat="apiInfo in list.resources | orderBy: 'name'"
+                ng-show="(show == 'all') || (show == 'root' && apiInfo.root) || (show == 'root+api' && apiInfo.root && apiInfo.getMethod)">
         <tr>
             <th colspan="4">
                 <span class="ot-api-doc-title">{{apiInfo.name}}</span>
@@ -16,7 +18,9 @@
                 </span>
             </th>
         </tr>
-        <tr ng-repeat="apiMethodInfo in apiInfo.methods">
+        <tr
+                ng-repeat="apiMethodInfo in apiInfo.methods"
+                ng-show="(show == 'all') || (show == 'root' && apiMethodInfo.root) || (show == 'root+api' && apiMethodInfo.root && apiMethodInfo.getMethod)">
             <td>
                 <span class="ot-api-doc-method-root" ng-if="apiMethodInfo.root"></span>
             </td>
