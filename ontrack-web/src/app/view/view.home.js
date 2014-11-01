@@ -60,6 +60,10 @@ angular.module('ot.view.home', [
                         action: function () {
                             $scope.showDisabled = false;
                         }
+                    }, {
+                        name: "API",
+                        cls: 'ot-command-api',
+                        link: '/api-doc'
                     }
                 ];
             });
