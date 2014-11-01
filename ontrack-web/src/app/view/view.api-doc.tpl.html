@@ -22,7 +22,9 @@
                 ng-repeat="apiMethodInfo in apiInfo.methods"
                 ng-show="(show == 'all') || (show == 'root' && apiMethodInfo.root) || (show == 'root+api' && apiMethodInfo.root && apiMethodInfo.getMethod)">
             <td>
-                <span class="ot-api-doc-method-root" ng-if="apiMethodInfo.root"></span>
+                <span class="ot-api-doc-method-root-api" ng-if="apiMethodInfo.root && apiMethodInfo.getMethod"></span>
+                <span class="ot-api-doc-method-root" ng-if="apiMethodInfo.root && !apiMethodInfo.getMethod"></span>
+                <span class="ot-api-doc-method-no-root" ng-if="!apiMethodInfo.root"></span>
             </td>
             <td>
                 <span class="ot-api-doc-method-name">{{apiMethodInfo.name}}</span>
