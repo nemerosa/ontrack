@@ -16,5 +16,20 @@ angular.module('ot.view.api-doc', [
         view.commands = [
             ot.viewCloseCommand('home')
         ];
+
+        // Loading the whole API
+        function loadApi() {
+            $scope.apiLoading = true;
+            ot.pageCall($http.get('api/list'))
+                .then(function (list) {
+                    $scope.list = list;
+                })
+                .finally(function () {
+                    $scope.apiLoading = false;
+                });
+        }
+
+        loadApi();
+
     })
 ;
