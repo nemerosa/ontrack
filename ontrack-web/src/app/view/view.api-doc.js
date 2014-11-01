@@ -10,7 +10,7 @@ angular.module('ot.view.api-doc', [
             controller: 'APIDocCtrl'
         });
     })
-    .controller('APIDocCtrl', function ($http, $scope, ot) {
+    .controller('APIDocCtrl', function ($http, $state, $scope, ot) {
         var view = ot.view();
         view.title = "API Documentation";
         view.commands = [
@@ -28,6 +28,7 @@ angular.module('ot.view.api-doc', [
                     angular.forEach(list.resources, function (apiInfo) {
                         angular.forEach(apiInfo.methods, function (apiMethodInfo) {
                             apiMethodInfo.root = (apiMethodInfo.path.indexOf('{') < 0);
+                            apiMethodInfo.getMethod = (apiMethodInfo.methods.indexOf('GET') >= 0);
                         });
                         apiInfo.root = apiInfo.methods.some(function (apiMethodInfo) {
                             return apiMethodInfo.root;
@@ -41,6 +42,17 @@ angular.module('ot.view.api-doc', [
         }
 
         loadApi();
+
+        // Accessing the decsription of an API
+        $scope.followApi = function (path) {
+            var a = document.createElement('a');
+            a.href = path;
+            var link = a.href;
+            $state.go(
+                'api',
+                {link: encodeURIComponent(link)}
+            );
+        };
 
     })
 ;

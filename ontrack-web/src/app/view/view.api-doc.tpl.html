@@ -30,7 +30,10 @@
             <td class="ot-api-doc-method-methods">
                 <span ng-repeat="m in apiMethodInfo.methods" class="ot-api-{{m | lowercase}}">{{m}}</span>
             </td>
-            <td class="ot-api-doc-method-path">{{apiMethodInfo.path}}</td>
+            <td class="ot-api-doc-method-path">
+                <a ng-if="apiMethodInfo.root && apiMethodInfo.getMethod" ng-click="followApi(apiMethodInfo.path)">{{apiMethodInfo.path}}</a>
+                <span ng-if="!apiMethodInfo.root || !apiMethodInfo.getMethod">{{apiMethodInfo.path}}</span>
+            </td>
         </tr>
         </tbody>
     </table>
