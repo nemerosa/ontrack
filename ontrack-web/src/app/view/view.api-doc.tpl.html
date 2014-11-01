@@ -5,4 +5,30 @@
             Loading the API...
         </div>
     </div>
+    <table class="table table-hover table-condensed">
+        <tbody ng-repeat="apiInfo in list.resources | orderBy: 'name'">
+        <tr>
+            <th colspan="3">
+                <span class="ot-api-doc-title">{{apiInfo.name}}</span>
+                <span ng-if="apiInfo.description" class="ot-api-doc-description">
+                    <br/>
+                    {{apiInfo.description}}
+                </span>
+            </th>
+        </tr>
+        <tr ng-repeat="apiMethodInfo in apiInfo.methods">
+            <td class="ot-api-doc-method-name">
+                {{apiMethodInfo.name}}
+                <span ng-if="apiMethodInfo.description" class="ot-api-doc-method-description">
+                    <br/>
+                    {{apiMethodInfo.description}}
+                </span>
+            </td>
+            <td class="ot-api-doc-method-methods">
+                <span ng-repeat="m in apiMethodInfo.methods" class="ot-api-{{m | lowercase}}">{{m}}</span>
+            </td>
+            <td class="ot-api-doc-method-path">{{apiMethodInfo.path}}</td>
+        </tr>
+        </tbody>
+    </table>
 </ot-view>
