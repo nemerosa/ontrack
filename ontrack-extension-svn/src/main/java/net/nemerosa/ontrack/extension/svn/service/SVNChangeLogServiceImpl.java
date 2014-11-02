@@ -305,7 +305,7 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
                 );
                 // Gets the revision
                 return lastCopyEvent != null ?
-                        OptionalLong.of(lastCopyEvent.getRevision()) :
+                        OptionalLong.of(lastCopyEvent.getCopyFromRevision()) :
                         OptionalLong.empty();
             }
         }
