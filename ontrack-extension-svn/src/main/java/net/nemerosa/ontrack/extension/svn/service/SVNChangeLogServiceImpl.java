@@ -95,7 +95,7 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
                             repository,
                             SVNUtils.toURL(repository.getUrl(reference.getPath())),
                             SVNRevision.create(reference.getEnd()),
-                            SVNRevision.create(reference.getStart()),
+                            SVNRevision.create(reference.getStart() + 1),
                             SVNRevision.create(reference.getEnd()),
                             true, // Stops on copy
                             false, // No path discovering (yet)
