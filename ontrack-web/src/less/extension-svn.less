@@ -1,3 +1,5 @@
+@import '../../vendor/bootstrap/less/labels';
+@import '../../vendor/bootstrap/less/mixins';
 @import 'variables.less';
 
 .ot-svn-command-indexation {
@@ -7,5 +9,14 @@
 table.ot-extension-svn-changelog-revisions {
   td.ot-extension-svn-changelog-revisions-date {
     white-space: nowrap;
+  }
+}
+
+.net-nemerosa-ontrack-extension-svn-SVNRevisionDecorationExtension-revision > span {
+  border: dotted gray 1px !important;
+  color: @text-muted !important;
+  background-color: white !important;
+  .ot-decoration-label-image {
+    display: none;
   }
 }

@@ -32,15 +32,15 @@ public class SVNRevisionDecorationExtension extends AbstractExtension implements
     @Override
     public Decoration getDecoration(ProjectEntity entity) {
         if (entity instanceof Build) {
-            Build build = (Build) entity;
             // Gets the revision for this build
             OptionalLong revision = svnChangeLogService.getBuildRevision((Build) entity);
             if (revision.isPresent()) {
+                String name = String.valueOf(revision.getAsLong());
                 return Decoration.of(
                         this,
                         "revision",
-                        String.valueOf(revision.getAsLong())
-                );
+                        name
+                ).withName(name);
             } else {
                 return null;
             }
