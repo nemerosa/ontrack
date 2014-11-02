@@ -122,6 +122,12 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
                     }
                 }
             }
+            // Sorting the revisions
+            Collections.sort(
+                    revisions,
+                    // From the newest revision to the oldest
+                    (o1, o2) -> Long.compare(o2.getRevision(), o1.getRevision())
+            );
             // OK
             return new SVNChangeLogRevisions(revisions);
         }
