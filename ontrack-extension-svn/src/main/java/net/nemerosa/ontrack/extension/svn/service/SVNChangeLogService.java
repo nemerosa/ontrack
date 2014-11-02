@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.ID;
 
 import java.util.Collection;
+import java.util.OptionalLong;
 
 public interface SVNChangeLogService {
 
@@ -22,4 +23,9 @@ public interface SVNChangeLogService {
     SVNHistory getBuildSVNHistory(SVNRepository svnRepository, Build build);
 
     Collection<ExportFormat> changeLogExportFormats(ID branchId);
+
+    /**
+     * Gets the optional revision for a build
+     */
+    OptionalLong getBuildRevision(Build build);
 }

@@ -274,6 +274,20 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
     }
 
     @Override
+    public OptionalLong getBuildRevision(Build build) {
+        try (Transaction ignored = transactionService.start()) {
+            // Repository
+            SVNRepository svnRepository = getSVNRepository(build.getBranch());
+            // Gets the build path for the branch
+            String svnBuildPath = getSVNBuildPath(build);
+            // Gets the reference
+            return OptionalLong.of(svnClient.getReference(svnRepository, svnBuildPath).getRevision());
+        } catch (MissingSVNProjectConfigurationException ex) {
+            return OptionalLong.empty();
+        }
+    }
+
+    @Override
     public SVNHistory getBuildSVNHistory(SVNRepository svnRepository, Build build) {
         // Gets the build path for the branch
         String svnBuildPath = getSVNBuildPath(build);

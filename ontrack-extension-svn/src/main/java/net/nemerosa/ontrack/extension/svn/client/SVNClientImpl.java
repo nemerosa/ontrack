@@ -238,7 +238,8 @@ public class SVNClientImpl implements SVNClient {
         }
     }
 
-    private SVNReference getReference(SVNRepository repository, String path) {
+    @Override
+    public SVNReference getReference(SVNRepository repository, String path) {
         Matcher matcher = pathWithRevision.matcher(path);
         if (matcher.matches()) {
             String pathOnly = matcher.group(1);

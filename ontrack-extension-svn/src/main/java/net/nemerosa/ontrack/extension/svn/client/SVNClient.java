@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.svn.client;
 
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.model.SVNHistory;
+import net.nemerosa.ontrack.extension.svn.model.SVNReference;
 import net.nemerosa.ontrack.extension.svn.model.SVNRevisionPath;
 import org.tmatesoft.svn.core.ISVNLogEntryHandler;
 import org.tmatesoft.svn.core.SVNURL;
@@ -26,6 +27,8 @@ public interface SVNClient {
     boolean isTag(SVNRepository repository, String path);
 
     List<Long> getMergedRevisions(SVNRepository repository, SVNURL url, long revision);
+
+    SVNReference getReference(SVNRepository repository, String path);
 
     SVNHistory getHistory(SVNRepository repository, String path);
 
