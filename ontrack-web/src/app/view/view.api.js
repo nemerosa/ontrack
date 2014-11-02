@@ -10,7 +10,7 @@ angular.module('ot.view.api', [
             controller: 'APICtrl'
         });
     })
-    .controller('APICtrl', function ($http, $location, $scope, $state, $stateParams, ot) {
+    .controller('APICtrl', function ($q, $http, $location, $scope, $state, $stateParams, ot) {
         var view = ot.view();
         view.title = "API";
         view.commands = [
@@ -34,7 +34,20 @@ angular.module('ot.view.api', [
             ot.pageCall($http.get("api/describe", {params: {path: path}}))
                 .then(function (description) {
                     $scope.description = description;
-                    return ot.pageCall($http.get(link));
+                    var d = $q.defer();
+                    $http.get(link)
+                        .success(function (resource) {
+                            d.resolve(resource);
+                        })
+                        .error(function (response) {
+                            if (response.status == 403) {
+                                $scope.message = "The API you tried to access is not authorised.";
+                            } else {
+                                $scope.message = "The API could not be accessed: " + response.message;
+                            }
+                            d.reject();
+                        });
+                    return d.promise;
                 })
                 .then(function (resource) {
                     $scope.resource = resource;
