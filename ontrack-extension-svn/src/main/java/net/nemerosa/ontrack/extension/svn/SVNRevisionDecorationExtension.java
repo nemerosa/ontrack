@@ -39,7 +39,10 @@ public class SVNRevisionDecorationExtension extends AbstractExtension implements
                 return Decoration.of(
                         this,
                         "revision",
-                        name
+                        String.format(
+                                "Revision %s",
+                                name
+                        )
                 ).withName(name);
             } else {
                 return null;
