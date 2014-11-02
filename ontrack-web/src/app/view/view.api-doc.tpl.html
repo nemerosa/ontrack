@@ -5,6 +5,29 @@
             Loading the API...
         </div>
     </div>
+    <div class="row">
+        <div class="col-md-12 alert alert-info" ng-show="showHelp">
+            <p>
+                <span class="ot-api-doc-method-root-api"></span>
+                This method can be accessed without any parameter and can be navigated through
+                by clicking on the associated link.
+            </p>
+            <p>
+                <span class="ot-api-doc-method-root"></span>
+                This method can be accessed without any parameter but is not navigable (but can
+                accessed through other navigable APIs).
+            </p>
+            <p>
+                <span class="ot-api-doc-method-no-root"></span>
+                This method needs parameters to be called, is not navigable as such, but can be
+                accessed through other navigable APIs.
+            </p>
+            <p>
+                <span class="ot-api-doc-method-warning"></span>
+                Some navigable methods may not be accessible according to your authorisations.
+            </p>
+        </div>
+    </div>
     <table class="table table-hover table-condensed ot-api-doc">
         <tbody
                 ng-repeat="apiInfo in list.resources | orderBy: 'name'"

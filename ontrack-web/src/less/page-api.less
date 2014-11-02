@@ -85,18 +85,6 @@ table.ot-api-doc {
       .ot-description;
     }
   }
-  .ot-api-doc-method-root-api {
-    .ot-icon-x(@fa-var-circle);
-    color: @brand-success;
-  }
-  .ot-api-doc-method-root {
-    .ot-icon-x(@fa-var-circle);
-    color: @brand-warning;
-  }
-  .ot-api-doc-method-no-root {
-    .ot-icon-x(@fa-var-circle);
-    color: @brand-danger;
-  }
   .ot-api-doc-method-name {
     font-weight: bold;
   }
@@ -112,6 +100,27 @@ table.ot-api-doc {
   }
 }
 
+.ot-api-doc-method-root-api {
+  .ot-icon-x(@fa-var-circle);
+  color: @brand-success;
+}
+.ot-api-doc-method-root {
+  .ot-icon-x(@fa-var-circle);
+  color: @brand-warning;
+}
+.ot-api-doc-method-no-root {
+  .ot-icon-x(@fa-var-circle);
+  color: @brand-danger;
+}
+.ot-api-doc-method-warning {
+  .ot-icon-x(@fa-var-warning);
+  color: @brand-danger;
+}
+
 .ot-command-api-show {
   .ot-icon-x(@fa-var-eye);
+}
+
+.ot-command-api-help {
+  .ot-icon-x(@fa-var-question-circle);
 }

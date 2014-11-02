@@ -44,6 +44,13 @@ angular.module('ot.view.api-doc', [
                     $scope.show = 'all';
                 }
             },
+            {
+                name: "Show/hide help",
+                cls: 'ot-command-api-help',
+                action: function () {
+                    $scope.showHelp = !$scope.showHelp;
+                }
+            },
             ot.viewCloseCommand('home')
         ];
 
