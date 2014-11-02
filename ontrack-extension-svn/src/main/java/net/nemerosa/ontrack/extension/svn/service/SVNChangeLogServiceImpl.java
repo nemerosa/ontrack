@@ -8,11 +8,15 @@ import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepr
 import net.nemerosa.ontrack.extension.scm.model.SCMBuildView;
 import net.nemerosa.ontrack.extension.scm.service.AbstractSCMChangeLogService;
 import net.nemerosa.ontrack.extension.svn.client.SVNClient;
+import net.nemerosa.ontrack.extension.svn.db.SVNEventDao;
 import net.nemerosa.ontrack.extension.svn.db.SVNIssueRevisionDao;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
+import net.nemerosa.ontrack.extension.svn.db.TCopyEvent;
 import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty;
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType;
+import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationProperty;
+import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationPropertyType;
 import net.nemerosa.ontrack.extension.svn.support.SVNLogEntryCollector;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
 import net.nemerosa.ontrack.model.structure.*;
@@ -38,6 +42,7 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
     private final SVNService svnService;
     private final SVNClient svnClient;
     private final TransactionService transactionService;
+    private final SVNEventDao eventDao;
 
     @Autowired
     public SVNChangeLogServiceImpl(
@@ -46,12 +51,13 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
             SVNIssueRevisionDao issueRevisionDao,
             SVNService svnService,
             SVNClient svnClient,
-            TransactionService transactionService) {
+            TransactionService transactionService, SVNEventDao eventDao) {
         super(structureService, propertyService);
         this.issueRevisionDao = issueRevisionDao;
         this.svnService = svnService;
         this.svnClient = svnClient;
         this.transactionService = transactionService;
+        this.eventDao = eventDao;
     }
 
     @Override
@@ -275,15 +281,33 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
 
     @Override
     public OptionalLong getBuildRevision(Build build) {
-        try (Transaction ignored = transactionService.start()) {
-            // Repository
-            SVNRepository svnRepository = getSVNRepository(build.getBranch());
-            // Gets the build path for the branch
-            String svnBuildPath = getSVNBuildPath(build);
-            // Gets the reference
-            return OptionalLong.of(svnClient.getReference(svnRepository, svnBuildPath).getRevision());
-        } catch (MissingSVNProjectConfigurationException ex) {
+        // Gets the branch SVN information
+        Property<SVNBranchConfigurationProperty> branchConfigurationProperty = propertyService.getProperty(build.getBranch(), SVNBranchConfigurationPropertyType.class);
+        Property<SVNProjectConfigurationProperty> projectConfigurationProperty = propertyService.getProperty(build.getBranch().getProject(), SVNProjectConfigurationPropertyType.class);
+        if (branchConfigurationProperty.isEmpty() || projectConfigurationProperty.isEmpty()) {
             return OptionalLong.empty();
+        } else {
+            // Gets the build path definition
+            String buildPathDefinition = branchConfigurationProperty.getValue().getBuildPath();
+            // Revision path
+            if (SVNUtils.isPathRevision(buildPathDefinition)) {
+                return OptionalLong.empty();
+            } else {
+                // Expands the build path
+                String buildPath = expandBuildPath(buildPathDefinition, build);
+                // Repository
+                SVNRepository svnRepository = getSVNRepository(build.getBranch());
+                // Gets the copy event for this build
+                TCopyEvent lastCopyEvent = eventDao.getLastCopyEvent(
+                        svnRepository.getId(),
+                        buildPath,
+                        Long.MAX_VALUE
+                );
+                // Gets the revision
+                return lastCopyEvent != null ?
+                        OptionalLong.of(lastCopyEvent.getRevision()) :
+                        OptionalLong.empty();
+            }
         }
     }
 
