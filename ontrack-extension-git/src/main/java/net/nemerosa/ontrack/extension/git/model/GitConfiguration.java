@@ -12,7 +12,9 @@ import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static net.nemerosa.ontrack.model.form.Form.defaultNameField;
@@ -172,7 +174,7 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
                 "",
                 "",
                 "master",
-                "",
+                "*",
                 "",
                 "",
                 "",
@@ -198,15 +200,56 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
     }
 
     public boolean isValidTagName(String name) {
-        return StringUtils.isBlank(tagPattern) || Pattern.matches(StringUtils.replace(tagPattern, "*", ".*"), name);
+        return StringUtils.isBlank(tagPattern) || createRegex().matcher(name).matches();
     }
 
-    public String getBuildNameFromTagName(String tagName) {
+    public Optional<String> getBuildNameFromTagName(String tagName) {
         if (StringUtils.isBlank(tagPattern)) {
-            return tagName;
+            return Optional.of(tagName);
         } else {
-            return StringUtils.replace(tagPattern, "*", tagName);
+            Matcher matcher = createRegex().matcher(tagName);
+            if (matcher.matches()) {
+                if (matcher.groupCount() > 0) {
+                    return Optional.of(matcher.group(1));
+                } else {
+                    return Optional.of(matcher.group(0));
+                }
+            } else {
+                return Optional.empty();
+            }
         }
+    }
+
+    public Optional<String> getTagNameFromBuildName(String buildName) {
+        if (StringUtils.isBlank(tagPattern)) {
+            return Optional.of(buildName);
+        } else {
+            // Extraction of the build pattern, if any
+            String buildPartRegex = "\\((.*\\*/*)\\)";
+            Pattern buildPartPattern = Pattern.compile(buildPartRegex);
+            Matcher buildPartMatcher = buildPartPattern.matcher(tagPattern);
+            if (buildPartMatcher.find()) {
+                String buildPart = buildPartMatcher.group(1);
+                if (Pattern.matches(buildPart, buildName)) {
+                    StringBuffer tag = new StringBuffer();
+                    do {
+                        buildPartMatcher.appendReplacement(tag, buildName);
+                    } while (buildPartMatcher.find());
+                    buildPartMatcher.appendTail(tag);
+                    return Optional.of(tag.toString());
+                } else {
+                    return Optional.empty();
+                }
+            } else if (createRegex().matcher(buildName).matches()) {
+                return Optional.of(buildName);
+            } else {
+                return Optional.empty();
+            }
+        }
+    }
+
+    private Pattern createRegex() {
+        return Pattern.compile(StringUtils.replace(tagPattern, "*", ".*"));
     }
 
     @Override

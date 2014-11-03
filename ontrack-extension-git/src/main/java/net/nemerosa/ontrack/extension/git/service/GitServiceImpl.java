@@ -33,8 +33,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -147,14 +145,11 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         // Gets the configuration
         GitConfiguration gitConfiguration = changeLog.getScmBranch();
         // Gets the tag boundaries
-        String tagFrom = changeLog.getFrom().getBuild().getName();
-        String tagTo = changeLog.getTo().getBuild().getName();
-        // Tag pattern
-        String tagPattern = gitConfiguration.getTagPattern();
-        if (StringUtils.isNotBlank(tagPattern)) {
-            tagFrom = StringUtils.replace(tagPattern, "*", tagFrom);
-            tagTo = StringUtils.replace(tagPattern, "*", tagTo);
-        }
+        String buildFrom = changeLog.getFrom().getBuild().getName();
+        String buildTo = changeLog.getTo().getBuild().getName();
+        // Tags
+        String tagFrom = gitConfiguration.getTagNameFromBuildName(buildFrom).get();
+        String tagTo = gitConfiguration.getTagNameFromBuildName(buildTo).get();
         // Gets the commits
         GitLog log = gitClient.log(tagFrom, tagTo);
         List<GitCommit> commits = log.getCommits();
@@ -215,14 +210,11 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         // Gets the configuration
         GitConfiguration gitConfiguration = gitClient.getConfiguration();
         // Gets the tag boundaries
-        String tagFrom = changeLog.getFrom().getBuild().getName();
-        String tagTo = changeLog.getTo().getBuild().getName();
-        // Tag pattern
-        String tagPattern = gitConfiguration.getTagPattern();
-        if (StringUtils.isNotBlank(tagPattern)) {
-            tagFrom = StringUtils.replace(tagPattern, "*", tagFrom);
-            tagTo = StringUtils.replace(tagPattern, "*", tagTo);
-        }
+        String buildFrom = changeLog.getFrom().getBuild().getName();
+        String buildTo = changeLog.getTo().getBuild().getName();
+        // Tags
+        String tagFrom = gitConfiguration.getTagNameFromBuildName(buildFrom).get();
+        String tagTo = gitConfiguration.getTagNameFromBuildName(buildTo).get();
         // Diff
         final GitDiff diff = gitClient.diff(tagFrom, tagTo);
         // File change links
@@ -363,9 +355,9 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                 // If a tag is provided, gets the corresponding build name
                 if (StringUtils.isNotBlank(tagName)) {
                     // Gets the build name from the tag (we usually do otherwise)
-                    String buildName = configuration.getBuildNameFromTagName(tagName);
-                    // Gets the build from the ontrack database
-                    Optional<Build> buildOpt = structureService.findBuildByName(branch.getProject().getName(), branch.getName(), buildName);
+                    // and gets the build from the ontrack database
+                    Optional<Build> buildOpt = configuration.getBuildNameFromTagName(tagName)
+                            .flatMap(buildName -> structureService.findBuildByName(branch.getProject().getName(), branch.getName(), buildName));
                     // Build found
                     if (buildOpt.isPresent()) {
                         // Gets the build view
@@ -564,67 +556,59 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         // Gets the branch Git client
         GitClient gitClient = gitClientFactory.getClient(configuration);
         // Configuration for the sync
-        boolean override = false;
         Property<GitBranchConfigurationProperty> confProperty = propertyService.getProperty(branch, GitBranchConfigurationPropertyType.class);
-        if (!confProperty.isEmpty()) {
-            override = confProperty.getValue().isOverride();
-        }
+        boolean override = !confProperty.isEmpty() && confProperty.getValue().isOverride();
         // Makes sure of synchronization
         info.post("Synchronizing before importing");
         gitClient.sync(info::post);
         // Gets the list of tags
         info.post("Getting list of tags");
         Collection<GitTag> tags = gitClient.getTags();
-        // Pattern for the tags
-        String tagExpression = "(.*)";
-        if (StringUtils.isNotBlank(configuration.getTagPattern())) {
-            tagExpression = configuration.getTagPattern().replace("*", "(.*)");
-        }
-        final Pattern tagPattern = Pattern.compile(tagExpression);
         // Creates the builds
         info.post("Creating builds from tags");
         for (GitTag tag : tags) {
             String tagName = tag.getName();
             // Filters the tags according to the branch tag pattern
-            Matcher matcher = tagPattern.matcher(tagName);
-            if (matcher.matches()) {
+            if (configuration.isValidTagName(tagName)) {
                 // Build name
                 info.post(format("Creating build for tag %s", tagName));
-                String buildName = matcher.group(1);
-                info.post(format("Build %s from tag %s", buildName, tagName));
-                // Existing build?
-                boolean createBuild;
-                Optional<Build> build = structureService.findBuildByName(branch.getProject().getName(), branch.getName(), buildName);
-                if (build.isPresent()) {
-                    if (override) {
-                        // Deletes the build
-                        info.post(format("Deleting existing build %s", buildName));
-                        structureService.deleteBuild(build.get().getId());
-                        createBuild = true;
+                configuration.getBuildNameFromTagName(tagName).ifPresent(buildName -> {
+
+                    info.post(format("Build %s from tag %s", buildName, tagName));
+                    // Existing build?
+                    boolean createBuild;
+                    Optional<Build> build = structureService.findBuildByName(branch.getProject().getName(), branch.getName(), buildName);
+                    if (build.isPresent()) {
+                        if (override) {
+                            // Deletes the build
+                            info.post(format("Deleting existing build %s", buildName));
+                            structureService.deleteBuild(build.get().getId());
+                            createBuild = true;
+                        } else {
+                            // Keeps the build
+                            info.post(format("Build %s already exists", buildName));
+                            createBuild = false;
+                        }
                     } else {
-                        // Keeps the build
-                        info.post(format("Build %s already exists", buildName));
-                        createBuild = false;
+                        createBuild = true;
                     }
-                } else {
-                    createBuild = true;
-                }
-                // Actual creation
-                if (createBuild) {
-                    info.post(format("Creating build %s from tag %s", buildName, tagName));
-                    structureService.newBuild(
-                            Build.of(
-                                    branch,
-                                    new NameDescription(
-                                            buildName,
-                                            "Imported from Git tag " + tagName
-                                    ),
-                                    securityService.getCurrentSignature().withTime(
-                                            tag.getTime()
-                                    )
-                            )
-                    );
-                }
+                    // Actual creation
+                    if (createBuild) {
+                        info.post(format("Creating build %s from tag %s", buildName, tagName));
+                        structureService.newBuild(
+                                Build.of(
+                                        branch,
+                                        new NameDescription(
+                                                buildName,
+                                                "Imported from Git tag " + tagName
+                                        ),
+                                        securityService.getCurrentSignature().withTime(
+                                                tag.getTime()
+                                        )
+                                )
+                        );
+                    }
+                });
             }
         }
     }
