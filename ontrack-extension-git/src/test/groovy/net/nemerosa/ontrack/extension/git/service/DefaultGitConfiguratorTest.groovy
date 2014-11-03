@@ -41,7 +41,7 @@ class DefaultGitConfiguratorTest {
 
         assert configuration != null
         assert configuration.branch == 'master'
-        assert configuration.tagPattern == ''
+        assert configuration.tagPattern == '*'
     }
 
     @Test
@@ -110,7 +110,7 @@ class DefaultGitConfiguratorTest {
 
         assert configuration != null
         assert configuration.branch == 'master'
-        assert configuration.tagPattern == ''
+        assert configuration.tagPattern == '*'
     }
 
     @Test
