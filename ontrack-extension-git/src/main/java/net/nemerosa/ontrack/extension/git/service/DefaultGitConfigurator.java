@@ -24,21 +24,20 @@ public class DefaultGitConfigurator implements GitConfigurator {
 
     @Override
     public GitConfiguration configure(GitConfiguration configuration, Branch branch) {
+        GitConfiguration thisConfig = configuration;
         // Project Git configuration?
         Property<GitProjectConfigurationProperty> projectConfig = propertyService.getProperty(branch.getProject(), GitProjectConfigurationPropertyType.class);
         if (!projectConfig.isEmpty()) {
             // Merge the project configuration
-            GitConfiguration thisConfig = configuration.merge(projectConfig.getValue().getConfiguration());
-            // ... and the branch's
-            Property<GitBranchConfigurationProperty> branchConfig = propertyService.getProperty(branch, GitBranchConfigurationPropertyType.class);
-            if (!branchConfig.isEmpty()) {
-                thisConfig = thisConfig.withBranch(branchConfig.getValue().getBranch());
-                thisConfig = thisConfig.withTagPattern(branchConfig.getValue().getTagPattern());
-            }
-            // OK
-            return thisConfig;
-        } else {
-            return configuration;
+            thisConfig = thisConfig.merge(projectConfig.getValue().getConfiguration());
         }
+        // ... and the branch's
+        Property<GitBranchConfigurationProperty> branchConfig = propertyService.getProperty(branch, GitBranchConfigurationPropertyType.class);
+        if (!branchConfig.isEmpty()) {
+            thisConfig = thisConfig.withBranch(branchConfig.getValue().getBranch());
+            thisConfig = thisConfig.withTagPattern(branchConfig.getValue().getTagPattern());
+        }
+        // OK
+        return thisConfig;
     }
 }
