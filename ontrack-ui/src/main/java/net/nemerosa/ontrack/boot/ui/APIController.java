@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.boot.ui;
 import net.nemerosa.ontrack.boot.support.APIDescription;
 import net.nemerosa.ontrack.boot.support.APIInfo;
 import net.nemerosa.ontrack.boot.support.APIMethodInfo;
+import net.nemerosa.ontrack.common.RunProfile;
 import net.nemerosa.ontrack.model.exceptions.APIMethodInfoNotFoundException;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
@@ -13,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.ReflectionUtils;
@@ -36,6 +38,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 @RestController
 @RequestMapping("/api")
+@Profile({RunProfile.DEV, RunProfile.ACC, RunProfile.PROD})
 public class APIController extends AbstractResourceController {
 
     private final ApplicationContext applicationContext;
