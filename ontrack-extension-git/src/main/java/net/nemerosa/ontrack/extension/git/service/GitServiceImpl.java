@@ -559,7 +559,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         };
     }
 
-    private void buildSync(Branch branch, GitConfiguration configuration, JobInfoListener info) {
+    protected void buildSync(Branch branch, GitConfiguration configuration, JobInfoListener info) {
         info.post(format("Git build/tag sync for %s/%s", branch.getProject().getName(), branch.getName()));
         // Gets the branch Git client
         GitClient gitClient = gitClientFactory.getClient(configuration);
