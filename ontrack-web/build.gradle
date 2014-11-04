@@ -3,6 +3,8 @@ task npmInstall(type: Exec) {
 }
 
 task bowerInstall(type: Exec) {
+    inputs.file "${projectDir}/bower.json"
+    outputs.dir "${projectDir}/vendor"
     commandLine 'bower', 'install', '--force-latest'
 }
 
@@ -49,10 +51,18 @@ task build(dependsOn: ['setup', 'gruntDev']) {
 }
 
 task gruntProd(type: Exec) {
+    inputs.dir "${projectDir}/src"
+    inputs.dir "${projectDir}/vendor"
+    inputs.file "${projectDir}/bower.json"
+    outputs.dir "${project.buildDir}/grunt/prod"
     commandLine 'grunt', 'prod'
 }
 
 task gruntDev(type: Exec) {
+    inputs.dir "${projectDir}/src"
+    inputs.dir "${projectDir}/vendor"
+    inputs.file "${projectDir}/bower.json"
+    outputs.dir "${project.buildDir}/grunt/dev"
     commandLine 'grunt', 'dev'
 }
 

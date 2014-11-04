@@ -467,7 +467,6 @@ module.exports = function (grunt) {
      * The `dev` task gets your app ready to run for development and testing.
      */
     grunt.registerTask('dev', [
-        'clean',
         'jshint',
         'less:dev',
         'copy:dev_assets',
@@ -485,7 +484,6 @@ module.exports = function (grunt) {
      * minifying your code.
      */
     grunt.registerTask('prod', [
-        'clean',
         'less:prod',
         'copy:prod_assets',
         'html2js:prod',
