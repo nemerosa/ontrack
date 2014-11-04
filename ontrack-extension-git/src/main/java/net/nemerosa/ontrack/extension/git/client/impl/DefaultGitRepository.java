@@ -83,7 +83,7 @@ public class DefaultGitRepository implements GitRepository {
                         .setWorkTree(wd)
                         .build();
             } catch (IOException e) {
-                throw new GitIOException(e);
+                throw new GitException(e);
             }
             // Gets the Git
             git = new Git(repository);
@@ -102,7 +102,7 @@ public class DefaultGitRepository implements GitRepository {
                 walk.release();
             }
         } catch (IOException e) {
-            throw new GitIOException(e);
+            throw new GitException(e);
         }
     }
 
