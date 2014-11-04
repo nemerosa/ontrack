@@ -69,15 +69,13 @@ public class SCMBranchesTemplateSynchronisationSourceConfig {
                         Memo.of("includes")
                                 .label("Includes")
                                 .optional()
-                                .help("List of branches to include - one pattern per line, where " +
-                                        "* can be used as a wildcard.")
+                                .help("@file:extension/scm/help.net.nemerosa.ontrack.extension.scm.model.SCMBranchesTemplateSynchronisationSourceConfig.includes.tpl.html")
                 )
                 .with(
                         Memo.of("excludes")
                                 .label("Excludes")
                                 .optional()
-                                .help("List of branches to exclude - one pattern per line, where " +
-                                        "* can be used as a wildcard.")
+                                .help("@file:extension/scm/help.net.nemerosa.ontrack.extension.scm.model.SCMBranchesTemplateSynchronisationSourceConfig.excludes.tpl.html")
                 )
                 ;
     }

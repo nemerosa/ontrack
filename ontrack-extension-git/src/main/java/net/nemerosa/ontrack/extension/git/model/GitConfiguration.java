@@ -138,9 +138,7 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
                                 .min(0)
                                 .max(60 * 24)
                                 .value(0)
-                                .help("Interval (in minutes) between each indexation of the Git repository. A " +
-                                        "zero value indicates that no indexation must take place automatically and they " +
-                                        "have to be triggered manually.")
+                                .help("@file:extension/git/help.net.nemerosa.ontrack.extension.git.model.GitConfiguration.indexationInterval.tpl.html")
                 )
                 .with(
                         Selection.of("issueServiceConfigurationIdentifier")

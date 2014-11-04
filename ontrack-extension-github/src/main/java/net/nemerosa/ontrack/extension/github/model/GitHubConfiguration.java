@@ -107,9 +107,7 @@ public class GitHubConfiguration implements UserPasswordConfiguration<GitHubConf
                                 .min(0)
                                 .max(60 * 24)
                                 .value(0)
-                                .help("Interval (in minutes) between each indexation of the GitHub repository. A " +
-                                        "zero value indicates that no indexation must take place automatically and they " +
-                                        "have to be triggered manually.")
+                                .help("@file:extension/github/help.net.nemerosa.ontrack.extension.github.model.GitHubConfiguration.indexationInterval.tpl.html")
                 );
     }
 
