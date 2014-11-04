@@ -54,12 +54,7 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
                 .with(
                         Text.of("tagPattern")
                                 .label("Tag pattern")
-                                .help("Expression that describes the relationship between the tag names and" +
-                                        "the build names. It is an expression where * can be used as a placeholder. " +
-                                        "If using (...), the part in parenthesis if the build name. " +
-                                        "If no parenthesis is used, the whole match " +
-                                        "is meant as build name. It defaults to *, meaning that we have a 1:1 " +
-                                        "relationship between the tag and the build name.")
+                                .help("@file:extension/git/help.net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType.tagPattern.tpl.html")
                                 .value(value != null ? value.getTagPattern() : "*")
                 )
                 .with(

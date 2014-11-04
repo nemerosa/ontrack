@@ -12,6 +12,20 @@ angular.module('ot.directive.field', [
                 data: '=',
                 field: '=',
                 formRoot: '='
+            },
+            controller: function ($scope) {
+                $scope.helpFile = function (helpString) {
+                    if (helpString) {
+                        var m = helpString.match(/^@file:(.*)/);
+                        if (m) {
+                            return m[1];
+                        } else {
+                            return '';
+                        }
+                    } else {
+                        return '';
+                    }
+                };
             }
         };
     })
