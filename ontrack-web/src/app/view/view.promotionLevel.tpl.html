@@ -4,6 +4,10 @@
             <ot-entity-image entity="promotionLevel">
                 {{promotionLevel.name}}
             </ot-entity-image>
+            <ot-entity-decorations entity="promotionLevel"></ot-entity-decorations>
+            <div ng-show="promotionLevel.description" class="ot-description">
+                {{promotionLevel.description}}
+            </div>
         </div>
     </div>
     <table class="table table-condensed table-hover">
