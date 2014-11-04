@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.git;
 
 import lombok.Data;
 import net.nemerosa.ontrack.extension.api.SearchExtension;
+import net.nemerosa.ontrack.extension.git.client.impl.GitException;
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
@@ -9,6 +10,7 @@ import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
 import net.nemerosa.ontrack.model.structure.Branch;
+import net.nemerosa.ontrack.model.structure.BranchType;
 import net.nemerosa.ontrack.model.structure.SearchProvider;
 import net.nemerosa.ontrack.model.structure.SearchResult;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
@@ -65,15 +67,17 @@ public class GitIssueSearchExtension extends AbstractExtension implements Search
             super(uriBuilder);
             branchSearchConfigurations = new ArrayList<>();
             gitService.forEachConfiguredBranch((branch, config) -> {
-                String issueServiceConfigurationIdentifier = config.getIssueServiceConfigurationIdentifier();
-                if (StringUtils.isNotBlank(issueServiceConfigurationIdentifier)) {
-                    ConfiguredIssueService configuredIssueService = issueServiceRegistry.getConfiguredIssueService(issueServiceConfigurationIdentifier);
-                    if (configuredIssueService != null) {
-                        branchSearchConfigurations.add(new BranchSearchConfiguration(
-                                branch,
-                                config,
-                                configuredIssueService
-                        ));
+                if (branch.getType() != BranchType.TEMPLATE_DEFINITION) {
+                    String issueServiceConfigurationIdentifier = config.getIssueServiceConfigurationIdentifier();
+                    if (StringUtils.isNotBlank(issueServiceConfigurationIdentifier)) {
+                        ConfiguredIssueService configuredIssueService = issueServiceRegistry.getConfiguredIssueService(issueServiceConfigurationIdentifier);
+                        if (configuredIssueService != null) {
+                            branchSearchConfigurations.add(new BranchSearchConfiguration(
+                                    branch,
+                                    config,
+                                    configuredIssueService
+                            ));
+                        }
                     }
                 }
             });
@@ -93,7 +97,13 @@ public class GitIssueSearchExtension extends AbstractExtension implements Search
             // For all the configurations
             for (BranchSearchConfiguration c : branchSearchConfigurations) {
                 // ... searches for the issue token in the git repository
-                boolean found = gitService.scanCommits(c.getGitConfiguration(), commit -> scanIssue(c, commit, token));
+                boolean found;
+                try {
+                    found = gitService.scanCommits(c.getGitConfiguration(), commit -> scanIssue(c, commit, token));
+                } catch (GitException ignored) {
+                    // Silent failure in case of problems with the Git repository
+                    found = false;
+                }
                 // ... and if found
                 if (found) {
                     // ... loads the issue

@@ -121,7 +121,7 @@ public class DefaultGitClient implements GitClient {
             );
 
         } catch (IOException e) {
-            throw new GitIOException(e);
+            throw new GitException(e);
         }
     }
 
@@ -167,7 +167,7 @@ public class DefaultGitClient implements GitClient {
                     ));
 
         } catch (IOException e) {
-            throw new GitIOException(e);
+            throw new GitException(e);
         } catch (GitAPIException e) {
             throw translationException(e);
         }
@@ -178,7 +178,7 @@ public class DefaultGitClient implements GitClient {
         try {
             return repository.git().getRepository().resolve(commit + "^0") != null;
         } catch (IOException e) {
-            throw new GitIOException(e);
+            throw new GitException(e);
         }
     }
 
@@ -227,10 +227,8 @@ public class DefaultGitClient implements GitClient {
             }
             // Default behaviour
             return false;
-        } catch (GitAPIException e) {
+        } catch (GitAPIException | IOException e) {
             throw new GitException(e);
-        } catch (IOException e) {
-            throw new GitIOException(e);
         }
     }
 
