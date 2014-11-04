@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.model.form;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
@@ -54,6 +53,16 @@ public abstract class AbstractField<F extends AbstractField<F>> implements Field
         return (F) this;
     }
 
+    /**
+     * Adds some help text to the field. If the help text is long or needs some HTML formatting,
+     * use the <code>@file:</code> prefix and append the path to an HTML fragment file. The path
+     * to this file is relative to the <i>src/app</i> of the static Web application.
+     * <p>
+     * For an extension, prefix the path with the extension path, for example <i>extension/git/</i>.
+     * <p>
+     * For the actual HTML file, use the <i>html.$class.$field.tpl.html</i> format, for example:
+     * <i>help.net.nemerosa.ontrack.extension.git.model.GitConfiguration.indexationInterval.tpl.html</i>.
+     */
     public F help(String value) {
         this.help = value;
         //noinspection unchecked
