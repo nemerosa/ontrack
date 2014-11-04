@@ -69,13 +69,7 @@ public class SVNBranchConfigurationPropertyType extends AbstractPropertyType<SVN
                 .with(
                         Text.of("buildPath")
                                 .label("Build path")
-                                        // TODO Allows the use of an HTML fragment for complex documentation
-                                .help("Path of a tag in the Subversion repository using a build name. The path is " +
-                                        "computed relative to the root of the repository. The {build} placeholder is used " +
-                                        "to define the location where to replace the path fragment by the build name. An" +
-                                        "option expression can follow the build keyword: {build:expression}. In this case " +
-                                        "the build name must match the expression, where * stands for any character. For example: " +
-                                        "{build:2.7.*} will match build 2.7.0-15, but not 2.8.0")
+                                .help("@file:extension/svn/help.net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType.buildPath.tpl.html")
                                 .value(value != null ? value.getBuildPath() : "/project/tags/{build}")
                 );
     }
