@@ -1,4 +1,4 @@
-<div ng-bind-html="value.bodyHtml" class="well"></div>
+<div ng-if="value.bodyHtml" ng-bind-html="value.bodyHtml" class="well"></div>
 <div>
     State:
     <span class="ot-extension-github-state ot-extension-github-state-{{value.state}}">{{value.state}}</span>
