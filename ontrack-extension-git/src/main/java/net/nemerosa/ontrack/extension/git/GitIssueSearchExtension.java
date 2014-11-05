@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
 import net.nemerosa.ontrack.model.structure.Branch;
+import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.SearchProvider;
 import net.nemerosa.ontrack.model.structure.SearchResult;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
@@ -19,9 +20,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Set;
+import java.util.*;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -90,45 +89,49 @@ public class GitIssueSearchExtension extends AbstractExtension implements Search
 
         @Override
         public Collection<SearchResult> search(String token) {
-            Collection<SearchResult> results = new ArrayList<>();
+            // Map of results per project, with the first result being the one for the first corresponding branch
+            Map<ID, SearchResult> projectResults = new LinkedHashMap<>();
             // For all the configurations
             for (BranchSearchConfiguration c : branchSearchConfigurations) {
-                // ... searches for the issue token in the git repository
-                boolean found;
-                try {
-                    found = gitService.scanCommits(c.getGitConfiguration(), commit -> scanIssue(c, commit, token));
-                } catch (GitException ignored) {
-                    // Silent failure in case of problems with the Git repository
-                    found = false;
-                }
-                // ... and if found
-                if (found) {
-                    // ... loads the issue
-                    Issue issue = c.getConfiguredIssueService().getIssue(token);
-                    // ... and creates a result entry
-                    results.add(
-                            new SearchResult(
-                                    issue.getDisplayKey(),
-                                    String.format("Issue %s in Git repository %s for branch %s/%s",
-                                            issue.getKey(),
-                                            c.getGitConfiguration().getName(),
-                                            c.getBranch().getProject().getName(),
-                                            c.getBranch().getName()
-                                    ),
-                                    uri(on(GitController.class).issueInfo(
-                                            c.getBranch().getId(),
-                                            issue.getKey()
-                                    )),
-                                    String.format("extension/git/%d/issue/%s",
-                                            c.getBranch().id(),
-                                            issue.getKey()),
-                                    100
-                            )
-                    );
+                ID projectId = c.getBranch().getProjectId();
+                // Skipping if associated project is already associated with the issue
+                if (!projectResults.containsKey(projectId)) {
+                    // ... searches for the issue token in the git repository
+                    boolean found;
+                    try {
+                        found = gitService.scanCommits(c.getGitConfiguration(), commit -> scanIssue(c, commit, token));
+                    } catch (GitException ignored) {
+                        // Silent failure in case of problems with the Git repository
+                        found = false;
+                    }
+                    // ... and if found
+                    if (found) {
+                        // ... loads the issue
+                        Issue issue = c.getConfiguredIssueService().getIssue(token);
+                        // Saves the result for the project
+                        projectResults.put(
+                                projectId,
+                                new SearchResult(
+                                        issue.getDisplayKey(),
+                                        String.format("Issue %s found in project %s",
+                                                issue.getKey(),
+                                                c.getBranch().getProject().getName()
+                                        ),
+                                        uri(on(GitController.class).issueInfo(
+                                                c.getBranch().getId(),
+                                                issue.getKey()
+                                        )),
+                                        String.format("extension/git/%d/issue/%s",
+                                                c.getBranch().id(),
+                                                issue.getKey()),
+                                        100
+                                )
+                        );
+                    }
                 }
             }
             // OK
-            return results;
+            return projectResults.values();
         }
 
         private boolean scanIssue(BranchSearchConfiguration c, RevCommit commit, String key) {
