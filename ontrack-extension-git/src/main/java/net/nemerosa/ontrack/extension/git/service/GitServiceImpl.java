@@ -362,12 +362,15 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                             .flatMap(buildName -> structureService.findBuildByName(branch.getProject().getName(), branch.getName(), buildName));
                     // Build found
                     if (buildOpt.isPresent()) {
+                        Build build = buildOpt.get();
                         // Gets the build view
-                        BuildView buildView = structureService.getBuildView(buildOpt.get());
+                        BuildView buildView = structureService.getBuildView(build);
                         // Adds it to the list
                         buildViews.add(buildView);
                         // Collects the promotions for the branch
-                        branchStatusViews.add(structureService.getBranchStatusView(branch));
+                        branchStatusViews.add(
+                                structureService.getEarliestPromotionsAfterBuild(build)
+                        );
                     }
                 }
             }

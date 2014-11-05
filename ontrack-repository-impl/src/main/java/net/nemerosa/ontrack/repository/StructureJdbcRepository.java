@@ -526,6 +526,20 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         );
     }
 
+    @Override
+    public Optional<PromotionRun> getEarliestPromotionRunAfterBuild(PromotionLevel promotionLevel, Build build) {
+        return getOptional(
+                "SELECT * FROM PROMOTION_RUNS WHERE PROMOTIONLEVELID = :promotionLevelId AND BUILDID >= :buildId ORDER BY CREATION DESC",
+                params("promotionLevelId", promotionLevel.id())
+                        .addValue("buildId", build.id()),
+                (rs, num) -> toPromotionRun(
+                        rs,
+                        this::getBuild,
+                        (x) -> promotionLevel
+                )
+        );
+    }
+
     protected PromotionRun toPromotionRun(ResultSet rs,
                                           Function<ID, Build> buildLoader,
                                           Function<ID, PromotionLevel> promotionLevelLoader) throws SQLException {

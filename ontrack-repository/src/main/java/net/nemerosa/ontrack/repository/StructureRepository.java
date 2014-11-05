@@ -100,6 +100,8 @@ public interface StructureRepository {
 
     List<PromotionRun> getPromotionRunsForPromotionLevel(PromotionLevel promotionLevel);
 
+    Optional<PromotionRun> getEarliestPromotionRunAfterBuild(PromotionLevel promotionLevel, Build build);
+
     // Validation stamps
 
     List<ValidationStamp> getValidationStampListForBranch(ID branchId);

@@ -46,6 +46,8 @@ public interface StructureService {
 
     Optional<Build> findBuildByName(String project, String branch, String build);
 
+    BranchStatusView getEarliestPromotionsAfterBuild(Build build);
+
     /**
      * Finds a build on a branch whose name is the closest. It assumes that build names
      * are in a numeric format.
@@ -107,6 +109,8 @@ public interface StructureService {
     PromotionRunView getPromotionRunView(PromotionLevel promotionLevel);
 
     Ack deletePromotionRun(ID promotionRunId);
+
+    Optional<PromotionRun> getEarliestPromotionRunAfterBuild(PromotionLevel promotionLevel, Build build);
 
     // Validation stamps
 

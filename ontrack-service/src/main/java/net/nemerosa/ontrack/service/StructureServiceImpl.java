@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.common.CachedSupplier;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterResult;
+import net.nemerosa.ontrack.model.buildfilter.DefaultBuildFilter;
 import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.exceptions.BranchTemplateCannotHaveBuildException;
@@ -196,6 +197,12 @@ public class StructureServiceImpl implements StructureService {
         securityService.checkProjectFunction(promotionRun, PromotionRunDelete.class);
         eventPostService.post(eventFactory.deletePromotionRun(promotionRun));
         return structureRepository.deletePromotionRun(promotionRunId);
+    }
+
+    @Override
+    public Optional<PromotionRun> getEarliestPromotionRunAfterBuild(PromotionLevel promotionLevel, Build build) {
+        securityService.checkProjectFunction(promotionLevel.projectId(), ProjectView.class);
+        return structureRepository.getEarliestPromotionRunAfterBuild(promotionLevel, build);
     }
 
     @Override
@@ -506,6 +513,25 @@ public class StructureServiceImpl implements StructureService {
     public Optional<Build> findBuildByName(String project, String branch, String build) {
         return structureRepository.getBuildByName(project, branch, build)
                 .filter(b -> securityService.isProjectFunctionGranted(b, ProjectView.class));
+    }
+
+    @Override
+    public BranchStatusView getEarliestPromotionsAfterBuild(Build build) {
+        return new BranchStatusView(
+                build.getBranch(),
+                getFilteredBuilds(
+                        build.getBranch().getId(),
+                        new DefaultBuildFilter(1)
+                ).get(0),
+                getPromotionLevelListForBranch(build.getBranch().getId()).stream()
+                        .map(promotionLevel ->
+                                        new PromotionView(
+                                                promotionLevel,
+                                                getEarliestPromotionRunAfterBuild(promotionLevel, build).orElse(null)
+                                        )
+                        )
+                        .collect(Collectors.toList())
+        );
     }
 
     @Override

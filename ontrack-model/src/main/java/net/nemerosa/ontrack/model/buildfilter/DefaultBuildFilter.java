@@ -1,7 +1,5 @@
-package net.nemerosa.ontrack.service;
+package net.nemerosa.ontrack.model.buildfilter;
 
-import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
-import net.nemerosa.ontrack.model.buildfilter.BuildFilterResult;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.BuildView;
@@ -12,9 +10,16 @@ import java.util.function.Supplier;
 public final class DefaultBuildFilter implements BuildFilter {
 
     public static final int MAX_COUNT = 10;
-    public static final BuildFilter INSTANCE = new DefaultBuildFilter();
+    public static final BuildFilter INSTANCE = new DefaultBuildFilter(MAX_COUNT);
 
-    private DefaultBuildFilter() {
+    private final int maxCount;
+
+    public DefaultBuildFilter(int maxCount) {
+        this.maxCount = maxCount;
+    }
+
+    public int getMaxCount() {
+        return maxCount;
     }
 
     @Override
