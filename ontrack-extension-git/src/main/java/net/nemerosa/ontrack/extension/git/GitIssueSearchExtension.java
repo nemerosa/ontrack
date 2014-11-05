@@ -10,7 +10,6 @@ import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
 import net.nemerosa.ontrack.model.structure.Branch;
-import net.nemerosa.ontrack.model.structure.BranchType;
 import net.nemerosa.ontrack.model.structure.SearchProvider;
 import net.nemerosa.ontrack.model.structure.SearchResult;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
@@ -67,17 +66,15 @@ public class GitIssueSearchExtension extends AbstractExtension implements Search
             super(uriBuilder);
             branchSearchConfigurations = new ArrayList<>();
             gitService.forEachConfiguredBranch((branch, config) -> {
-                if (branch.getType() != BranchType.TEMPLATE_DEFINITION) {
-                    String issueServiceConfigurationIdentifier = config.getIssueServiceConfigurationIdentifier();
-                    if (StringUtils.isNotBlank(issueServiceConfigurationIdentifier)) {
-                        ConfiguredIssueService configuredIssueService = issueServiceRegistry.getConfiguredIssueService(issueServiceConfigurationIdentifier);
-                        if (configuredIssueService != null) {
-                            branchSearchConfigurations.add(new BranchSearchConfiguration(
-                                    branch,
-                                    config,
-                                    configuredIssueService
-                            ));
-                        }
+                String issueServiceConfigurationIdentifier = config.getIssueServiceConfigurationIdentifier();
+                if (StringUtils.isNotBlank(issueServiceConfigurationIdentifier)) {
+                    ConfiguredIssueService configuredIssueService = issueServiceRegistry.getConfiguredIssueService(issueServiceConfigurationIdentifier);
+                    if (configuredIssueService != null) {
+                        branchSearchConfigurations.add(new BranchSearchConfiguration(
+                                branch,
+                                config,
+                                configuredIssueService
+                        ));
                     }
                 }
             });
