@@ -54,7 +54,7 @@ public interface GitService {
     GitChangeLogFiles getChangeLogFiles(GitChangeLog changeLog);
 
     /**
-     * Loops over each correctly configured branch.
+     * Loops over each correctly configured branch. Branch template definitions are excluded.
      */
     void forEachConfiguredBranch(BiConsumer<Branch, GitConfiguration> consumer);
 
