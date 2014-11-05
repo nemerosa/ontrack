@@ -16,12 +16,12 @@ import org.junit.Test
  * * e7c13f8 (HEAD, master) Commit 13
  * * e7c13f8 Commit 12
  * * e7c13f8 Commit 11
- * * e7c13f8 (tag: 1.2.0) Commit 10
+ * * e7c13f8 (tag: 1.0) Commit 10
  * * d7bd568 Commit 9
- * * a01269a (tag: 1.1.0) Commit 8
+ * * a01269a (tag: 1.0-rc) Commit 8
  * * 92cd6e2 Commit 7
  * * 7e8bea2 Commit 6
- * | * fca8d9a (tag: 1.0.1, 1.0) Commit 5
+ * | * fca8d9a (tag: 1.0-beta-1, 1.0) Commit 5
  * |/
  * * 95ccffb Commit 4
  * * ff4ff7c Commit 3
@@ -57,7 +57,7 @@ class GitClientEarliestTagIT {
             // 1.0 branch and tag
             run('git', 'checkout', '-b', '1.0')
             commit(5)
-            run('git', 'tag', '1.0.1')
+            run('git', 'tag', '1.0-beta-1')
 
             // Going further with the master
             run('git', 'checkout', 'master')
@@ -66,10 +66,10 @@ class GitClientEarliestTagIT {
             commit(6)
             commit(7)
             commit(8)
-            run('git', 'tag', '1.1.0')
+            run('git', 'tag', '1.0-rc')
             commit(9)
             commit(10)
-            run('git', 'tag', '1.2.0')
+            run('git', 'tag', '1.0')
             commit(11)
             commit(12)
             commit(13)
@@ -115,7 +115,7 @@ class GitClientEarliestTagIT {
         // Call
         def tag = gitClient.getEarliestTagForCommit(commit, { true })
         // Check
-        assert tag == '1.1.0'
+        assert tag == '1.0-rc'
     }
 
     /**
@@ -130,7 +130,7 @@ class GitClientEarliestTagIT {
         // Call
         def tag = gitClient.getEarliestTagForCommit(commit, { true })
         // Check
-        assert tag == '1.1.0'
+        assert tag == '1.0-rc'
     }
 
     /**
@@ -145,7 +145,7 @@ class GitClientEarliestTagIT {
         // Call
         def tag = gitClient.getEarliestTagForCommit(commit, { true })
         // Check
-        assert tag == '1.0.1'
+        assert tag == '1.0-beta-1'
     }
 
     /**
