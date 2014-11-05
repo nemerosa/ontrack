@@ -75,7 +75,7 @@ class GitClientEarliestTagIT {
             commit(13)
 
             // Log
-            run('git', 'log', '--oneline', '--graph', '--decorate', 'master', '1.0')
+            run('git', 'log', '--oneline', '--graph', '--decorate', '--all')
 
         }
     }

@@ -56,7 +56,7 @@ public final class Utils {
             // In case of error
             if (exit != 0) {
                 String error = IOUtils.toString(process.getErrorStream());
-                throw new RuntimeException(error);
+                throw new ProcessExitException(exit, error);
             } else {
                 return IOUtils.toString(process.getInputStream());
             }

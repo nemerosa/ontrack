@@ -198,18 +198,15 @@ public class DefaultGitClient implements GitClient {
     }
 
     /**
-     * Gets the earliest commit that contains the commit. Uses the <code>git tag --contains</code> command.
+     * Gets the earliest commit that contains the commit. Uses the <code>git describe --contains</code> command.
+     *
+     * @see net.nemerosa.ontrack.extension.git.client.support.GitClientSupport#tagContains(java.io.File, String)
      */
     @Override
     public String getEarliestTagForCommit(String gitCommitId, Predicate<String> tagNamePredicate) {
-        List<String> tagNames = GitClientSupport.tagContains(repository.wd(), gitCommitId).stream()
+        return GitClientSupport.tagContains(repository.wd(), gitCommitId)
                 .filter(tagNamePredicate)
-                .collect(Collectors.toList());
-        if (tagNames.isEmpty()) {
-            return null;
-        } else {
-            return tagNames.get(0);
-        }
+                .orElse(null);
     }
 
     @Override
