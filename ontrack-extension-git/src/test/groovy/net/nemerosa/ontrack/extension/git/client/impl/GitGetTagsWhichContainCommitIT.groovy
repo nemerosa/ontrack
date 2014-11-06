@@ -8,7 +8,7 @@ import org.junit.BeforeClass
 import org.junit.Test
 
 /**
- * Integration test for looking earliest tags for a commit in a Git repository.
+ * Integration test for searching tags that contain a commit in a Git repository.
  *
  * The integration test creates the following Git history for the tests:
  *
@@ -31,7 +31,7 @@ import org.junit.Test
  *
  * (the commit SHA are for illustration purpose only, they cannot be relied upon)
  */
-class GitClientEarliestTagIT {
+class GitGetTagsWhichContainCommitIT {
 
     private static GitTestUtils repo
 
@@ -113,9 +113,9 @@ class GitClientEarliestTagIT {
         // Identifying SHA for "Commit 8"
         def commit = repo.commitLookup('Commit 8')
         // Call
-        def tag = gitClient.getEarliestTagForCommit(commit, { true })
-        // Check
-        assert tag == '1.0-rc'
+        def tags = gitClient.getTagsWhichContainCommit(commit)
+        // Check (unordered)
+        assert tags as Set == ['1.0-rc', '1.0'] as Set
     }
 
     /**
@@ -128,9 +128,9 @@ class GitClientEarliestTagIT {
         // Identifying SHA for "Commit 6"
         def commit = repo.commitLookup('Commit 6')
         // Call
-        def tag = gitClient.getEarliestTagForCommit(commit, { true })
-        // Check
-        assert tag == '1.0-rc'
+        def tags = gitClient.getTagsWhichContainCommit(commit)
+        // Check (unordered)
+        assert tags as Set == ['1.0-rc', '1.0'] as Set
     }
 
     /**
@@ -143,9 +143,9 @@ class GitClientEarliestTagIT {
         // Identifying SHA for "Commit 3"
         def commit = repo.commitLookup('Commit 3')
         // Call
-        def tag = gitClient.getEarliestTagForCommit(commit, { true })
-        // Check
-        assert tag == '1.0-beta-1'
+        def tags = gitClient.getTagsWhichContainCommit(commit)
+        // Check (unordered)
+        assert tags as Set == ['1.0-beta-1', '1.0-rc', '1.0'] as Set
     }
 
     /**
@@ -158,9 +158,9 @@ class GitClientEarliestTagIT {
         // Identifying SHA for "Commit 11"
         def commit = repo.commitLookup('Commit 11')
         // Call
-        def tag = gitClient.getEarliestTagForCommit(commit, { true })
+        def tags = gitClient.getTagsWhichContainCommit(commit)
         // Check
-        assert tag == null
+        assert tags == []
     }
 
 }
