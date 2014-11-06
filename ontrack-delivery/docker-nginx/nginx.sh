@@ -13,16 +13,10 @@ function show_help {
 	echo "    -h, --host=<host>             Host of the target (defaults to '127.0.0.1')"
 	echo "    -p, --port=<port>             Port on the target (defaults to '8080')"
 	echo "    -n, --name=<name>             Server name (defaults to 'untitled')"
-}
-
-# Check function
-
-function check {
-	if [ "$1" == "" ]
-	then
-		echo $2
-		exit 1
-	fi
+	echo "Certificates options:"
+	echo "    -cp, --cert-prm=<pem>         Copies the PEM file (--copy-key must also be provided)"
+	echo "    -ck, --cert-key=<key>         Copies the Key file (--copy-pem must also be provided)"
+	echo "    -cg, --cert-generate          Generates the certificates (default)"
 }
 
 # Defaults
@@ -32,6 +26,9 @@ FILE=nginx.conf
 HOST=127.0.0.1
 PORT=8080
 NAME=untitled
+CERT_PEM=
+CERT_KEY=
+CERT_GENERATE=yes
 
 # Command central
 
@@ -57,6 +54,15 @@ do
 		-n=*|--name=*)
 			NAME=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
 			;;
+		-cp=*|--cert-pem=*)
+			CERT_PEM=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
+			;;
+		-ck=*|--cert-key=*)
+			CERT_KEY=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
+			;;
+		-cg|--cert-generate)
+			CERT_GENERATE=yes
+			;;
 		*)
 			echo "Unknown option: $i"
 			show_help
@@ -67,15 +73,51 @@ done
 
 # Checking
 
+if [ "${CERT_PEM}" != "" ]
+then
+	if [ "${CERT_KEY}" == "" ]
+	then
+		echo "--cert-key is required when --cert-pem is given."
+		exit 1
+	fi
+	if [ ! -e "${CERT_PEM}" ]
+	then
+		echo "PEM file does not exist: ${CERT_PEM}"
+		exit 1
+	fi
+	CERT_GENERATE=no
+fi
+if [ "${CERT_KEY}" != "" ]
+then
+	if [ "${CERT_PEM}" == "" ]
+	then
+		echo "--cert-pem is required when --cert-key is given."
+		exit 1
+	fi
+	if [ ! -e "${CERT_KEY}" ]
+	then
+		echo "KEY file does not exist: ${CERT_KEY}"
+		exit 1
+	fi
+	CERT_GENERATE=no
+fi
+
 # check "$ACCEPTANCE_JAR" "Acceptance JAR (--jar) is required."
 
 # Logging
 
-echo "Target directory      = ${TARGET}"
-echo "Target file           = ${FILE}"
-echo "Target host           = ${HOST}"
-echo "Target port           = ${PORT}"
-echo "Server name           = ${NAME}"
+echo "Target directory       = ${TARGET}"
+echo "Target file            = ${FILE}"
+echo "Target host            = ${HOST}"
+echo "Target port            = ${PORT}"
+echo "Server name            = ${NAME}"
+if [ "${CERT_GENERATE}" == "no" ]
+then
+	echo "Certificate PEM file   = ${CERT_PEM}"
+	echo "Certificate KEY file   = ${CERT_KEY}"
+else
+	echo "Certificate generation = yes"
+fi
 
 # Environment preparation
 
