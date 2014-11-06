@@ -39,8 +39,7 @@ else
     ONTRACK_HOST=`echo ${DOCKER_HOST} | sed -E 's/.*\/([0-9\.]+):.*/\1/'`
 fi
 
-# TODO Supports https: through nginx
-ONTRACK_PROTOCOL=http
+ONTRACK_PROTOCOL=https
 ONTRACK_JAR=
 ONTRACK_ACCEPTANCE_JAR=
 
@@ -161,12 +160,12 @@ echo "[ACCEPTANCE] Nginx container created: ${NGINX_CID}"
 
 # Getting the public facing port
 
-ONTRACK_PORT=`docker port ${ONTRACK_CID} 8080 | sed -E 's/.*:(.*)/\1/'`
-echo "[ACCEPTANCE] Ontrack available in container at port ${ONTRACK_PORT}"
+NGINX_PORT=`docker port ${NGINX_CID} 443 | sed -E 's/.*:(.*)/\1/'`
+echo "[ACCEPTANCE] Ontrack available in host at port ${NGINX_PORT}"
 
 # Get the running URL
 
-ONTRACK_URL="${ONTRACK_PROTOCOL}://${ONTRACK_HOST}:${ONTRACK_PORT}"
+ONTRACK_URL="${ONTRACK_PROTOCOL}://${ONTRACK_HOST}:${NGINX_PORT}"
 echo "[ACCEPTANCE] Running acceptance tests against ${ONTRACK_URL}"
 
 # Result of the acceptance tests
@@ -178,7 +177,7 @@ ONTRACK_STARTED=no
 ONTRACK_START_DURATION=0
 for i in `seq 1 ${CONTROL_DELAY}`
 do
-    curl --silent --fail "${ONTRACK_URL}/info"
+    curl --silent --fail --insecure "${ONTRACK_URL}/info"
     if [ "$?" != "0" ]
     then
         echo -n "."
@@ -189,6 +188,7 @@ do
         then
             ONTRACK_START_DURATION=${i}
         fi
+        break
     fi
 done
 echo
