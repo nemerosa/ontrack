@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.git.client.GitCommit;
 import net.nemerosa.ontrack.extension.git.model.GitUICommit;
 import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
+import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.SearchProvider;
 import net.nemerosa.ontrack.model.structure.SearchResult;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
@@ -12,8 +13,9 @@ import net.nemerosa.ontrack.ui.support.AbstractSearchProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -55,35 +57,42 @@ public class GitCommitSearchExtension extends AbstractExtension implements Searc
 
         @Override
         public Collection<SearchResult> search(String token) {
-            Collection<SearchResult> results = new ArrayList<>();
+            // Map of results per project, with the first result being the one for the first corresponding branch
+            Map<ID, SearchResult> projectResults = new LinkedHashMap<>();
             // For all Git-configured branches
             gitService.forEachConfiguredBranch((branch, config) -> {
-                // ... scans for the commit
-                Optional<GitUICommit> commit = gitService.lookupCommit(config, token);
-                // ... and if found
-                if (commit.isPresent()) {
-                    GitCommit theCommit = commit.get().getCommit();
-                    // ... creates a result entry
-                    results.add(
-                            new SearchResult(
-                                    String.format("%s %s",
-                                            theCommit.getId(),
-                                            theCommit.getShortMessage()),
-                                    String.format("%s - %s",
-                                            theCommit.getAuthor().getName(),
-                                            commit.get().getFullAnnotatedMessage()),
-                                    uri(on(GitController.class)
-                                            .commitInfo(branch.getId(), theCommit.getId())),
-                                    String.format("extension/git/%d/commit/%s",
-                                            branch.id(),
-                                            theCommit.getId()),
-                                    100
-                            )
-                    );
+                ID projectId = branch.getProjectId();
+                // Skipping if associated project is already associated with the issue
+                if (!projectResults.containsKey(projectId)) {
+                    // ... scans for the commit
+                    Optional<GitUICommit> commit = gitService.lookupCommit(config, token);
+                    // ... and if found
+                    if (commit.isPresent()) {
+                        GitCommit theCommit = commit.get().getCommit();
+                        // ... creates a result entry
+                        projectResults.put(
+                                projectId,
+                                new SearchResult(
+                                        String.format("[%s] %s %s",
+                                                branch.getProject().getName(),
+                                                theCommit.getId(),
+                                                theCommit.getShortMessage()),
+                                        String.format("%s - %s",
+                                                theCommit.getAuthor().getName(),
+                                                commit.get().getFullAnnotatedMessage()),
+                                        uri(on(GitController.class)
+                                                .commitInfo(branch.getId(), theCommit.getId())),
+                                        String.format("extension/git/%d/commit/%s",
+                                                branch.id(),
+                                                theCommit.getId()),
+                                        100
+                                )
+                        );
+                    }
                 }
             });
             // OK
-            return results;
+            return projectResults.values();
         }
     }
 }
