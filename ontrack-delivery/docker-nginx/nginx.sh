@@ -12,7 +12,8 @@ function show_help {
 	echo "Configuration options:"
 	echo "    -h, --host=<host>             Host of the target (defaults to '127.0.0.1')"
 	echo "    -p, --port=<port>             Port on the target (defaults to '8080')"
-	echo "    -n, --name=<name>             Server name (defaults to 'untitled')"
+	echo "    -pn, --proxy-name=<name>      Name of the proxy server (defaults to hostname value command)"
+	echo "    -pp, --proxy-port=<port>      Port of the proxy server (defaults to 443)"
 	echo "Certificates options:"
 	echo "    -cp, --cert-prm=<pem>         Copies the PEM file (--copy-key must also be provided)"
 	echo "    -ck, --cert-key=<key>         Copies the Key file (--copy-pem must also be provided)"
@@ -26,7 +27,8 @@ TARGET=build
 FILE=nginx.conf
 HOST=127.0.0.1
 PORT=8080
-NAME=untitled
+PROXY_NAME=`hostname`
+PROXY_PORT=443
 CERT_PEM=
 CERT_KEY=
 CERT_GENERATE=yes
@@ -55,8 +57,11 @@ do
 		-p=*|--port=*)
 			PORT=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
 			;;
-		-n=*|--name=*)
-			NAME=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
+		-pn=*|--proxy-name=*)
+			PROXY_NAME=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
+			;;
+		-pp=*|--proxy-port=*)
+			PROXY_PORT=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
 			;;
 		-cp=*|--cert-pem=*)
 			CERT_PEM=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
@@ -117,7 +122,8 @@ echo "Target directory       = ${TARGET}"
 echo "Target file            = ${FILE}"
 echo "Target host            = ${HOST}"
 echo "Target port            = ${PORT}"
-echo "Server name            = ${NAME}"
+echo "Proxy name             = ${PROXY_NAME}"
+echo "Proxy port             = ${PROXY_PORT}"
 if [ "${CERT_GENERATE}" == "no" ]
 then
 	echo "Certificate PEM file   = ${CERT_PEM}"
@@ -161,7 +167,7 @@ upstream app_server {
 
 server {
     listen 443 ssl;
-    server_name ${NAME};
+    server_name ${PROXY_NAME};
 
     # ssl on;
     ssl_certificate /etc/nginx/ssl/${CERT_FILE};
@@ -172,8 +178,8 @@ server {
     location / {
         proxy_set_header Host \$http_host;
         proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-Host ${NAME};
-        proxy_set_header X-Forwarded-Port 443;
+        proxy_set_header X-Forwarded-Host ${PROXY_NAME};
+        proxy_set_header X-Forwarded-Port ${PROXY_PORT};
         proxy_set_header X-Forwarded-Proto https;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_redirect http:// https://;

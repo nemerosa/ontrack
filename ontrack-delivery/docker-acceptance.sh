@@ -139,13 +139,13 @@ echo "[ACCEPTANCE] Ontrack container created: ${ONTRACK_CID} (${ONTRACK_NAME})"
 echo "[ACCEPTANCE] Preparation of the nginx image"
 
 # Generation of the nginx configuration and generation of self-signed certificates
+# TODO Proxy port?
 docker-nginx/nginx.sh \
 	--target=`pwd`/docker-nginx/build \
 	--host=ontrack \
 	--port=8080 \
-	--name=${ONTRACK_HOST} \
+	--proxy-name=${ONTRACK_HOST} \
 	--cert-subject="/C=BE/L=Brussel/CN=ontrack"
-
 
 # Generation of the Nginx image
 echo "[ACCEPTANCE] Building the nginx image..."
