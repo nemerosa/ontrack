@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.git.service
 
+import net.nemerosa.ontrack.extension.git.client.GitClient
 import net.nemerosa.ontrack.extension.git.client.GitClientFactory
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration
 import net.nemerosa.ontrack.extension.git.model.GitConfigurator
@@ -20,8 +21,9 @@ import static org.mockito.Mockito.when
 
 class GitServiceImplTest {
 
-    private GitService gitService
+    private GitServiceImpl gitService
     private StructureService structureService
+    private PropertyService propertyService
 
     @Before
     void 'Git service'() {
@@ -39,9 +41,11 @@ class GitServiceImplTest {
                 }
         )
 
+        propertyService = mock(PropertyService)
+
         gitService = new GitServiceImpl(
                 structureService,
-                mock(PropertyService),
+                propertyService,
                 [gitConfigurator],
                 mock(GitClientFactory),
                 mock(IssueServiceRegistry),
@@ -70,6 +74,48 @@ class GitServiceImplTest {
         gitService.forEachConfiguredBranch { branch, config -> branches.add(branch.name) }
 
         assert branches == ['B11', 'B12', 'B20']
+    }
+
+    @Test
+    void 'Getting the earliest build after a commit'() {
+
+        // Structure
+        Project project = Project.of(nd('P1', "Project 1")).withId(ID.of(1))
+        Branch branch = Branch.of(project, nd('B1', "Branch 1")).withId(ID.of(10))
+
+        // Builds
+        (1..15).each {
+            when(structureService.findBuildByName('P1', 'B1', "1.0.${it}")).thenReturn(
+                    Optional.of(
+                            Build.of(
+                                    branch,
+                                    nd("1.0.${it}", "Build 1.0.${it}"),
+                                    Signature.of('test')
+                            ).withId(ID.of(it))
+                    )
+            )
+        }
+
+        // Git configuration
+        GitConfiguration gitConfiguration = GitConfiguration.empty()
+                .withTagPattern('1.0.*')
+
+        // Git client
+        GitClient gitClient = mock(GitClient)
+        when(gitClient.getTagsWhichContainCommit('abcdef')).thenReturn(['1.0.12', '1.0.11', '1.0.10'])
+
+        // Gets the earliest build
+        def build = gitService.getEarliestBuildAfterCommit(
+                'abcdef',
+                branch,
+                gitConfiguration,
+                gitClient
+        )
+
+        // Checks
+        assert build.present
+        assert build.get().name == '1.0.10'
+
     }
 
 }

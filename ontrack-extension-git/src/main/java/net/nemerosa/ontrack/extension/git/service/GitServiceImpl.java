@@ -350,23 +350,8 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                     theConfiguration.set(configuration);
                 }
                 // Gets the earliest build on this branch that contains this commit
-                // ... get all the tags that contain the commit
-                gitClient.getTagsWhichContainCommit(commit).stream()
-                        // ... filter on valid tags only
-                        .filter(configuration::isValidTagName)
-                                // ... get build names
-                        .map(configuration::getBuildNameFromTagName)
-                                // ... filter on defined build names
-                        .filter(Optional::isPresent).map(Optional::get)
-                        // ... gets the builds
-                        .map(buildName -> structureService.findBuildByName(branch.getProject().getName(), branch.getName(), buildName))
-                                // ... filter on existing builds
-                        .filter(Optional::isPresent).map(Optional::get)
-                        // ... sort by decreasing date
-                        .sorted((o1, o2) -> (o1.id() - o2.id()))
-                                // ... takes the first build
-                        .findFirst()
-                                // ... and it present collect its data
+                getEarliestBuildAfterCommit(commit, branch, configuration, gitClient)
+                        // ... and it present collect its data
                         .ifPresent(build -> {
                             // Gets the build view
                             BuildView buildView = structureService.getBuildView(build);
@@ -401,6 +386,25 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             throw new GitCommitNotFoundException(commit);
         }
 
+    }
+
+    protected Optional<Build> getEarliestBuildAfterCommit(String commit, Branch branch, GitConfiguration configuration, GitClient gitClient) {
+        // ... get all the tags that contain the commit
+        return gitClient.getTagsWhichContainCommit(commit).stream()
+                // ... filter on valid tags only
+                .filter(configuration::isValidTagName)
+                        // ... get build names
+                .map(configuration::getBuildNameFromTagName)
+                        // ... filter on defined build names
+                .filter(Optional::isPresent).map(Optional::get)
+                        // ... gets the builds
+                .map(buildName -> structureService.findBuildByName(branch.getProject().getName(), branch.getName(), buildName))
+                        // ... filter on existing builds
+                .filter(Optional::isPresent).map(Optional::get)
+                        // ... sort by decreasing date
+                .sorted((o1, o2) -> (o1.id() - o2.id()))
+                        // ... takes the first build
+                .findFirst();
     }
 
     private String getDiffUrl(GitDiff diff, GitDiffEntry entry, String fileChangeLinkFormat) {
