@@ -65,6 +65,12 @@ angular.module('ot.directive.api', [
                 scope.followResource = function (link) {
                     $state.go('api', {link: encodeURIComponent(link)});
                 };
+                scope.toggleCollapsed = function (item) {
+                    if (['object', 'array', 'array-simple'].indexOf(item.type) >= 0) {
+                        console.log('toggle: ', item);
+                        item.collapsed = !item.collapsed;
+                    }
+                };
             }
         };
     })

@@ -3,10 +3,16 @@
     <tr ng-repeat="item in items"
         ng-show="showLinks || item.type != 'link'"
         class="ot-api-resource-item ot-api-resource-{{item.type}}">
-        <td class="ot-api-resource-item-name">
+        <td
+                class="ot-api-resource-item-name"
+                ng-click="toggleCollapsed(item)"
+                >
             {{item.name}}
         </td>
-        <td class="ot-api-resource-item-value">
+        <td class="ot-api-resource-item-value" ng-show="item.collapsed">
+            <span class="ot-api-resource-item-collapsed" ng-click="toggleCollapsed(item)">...</span>
+        </td>
+        <td class="ot-api-resource-item-value" ng-show="!item.collapsed">
             <div ng-if="item.type == 'link'">
                 <a ng-click="followResource(item.link)">{{item.link}}</a>
             </div>
