@@ -121,7 +121,7 @@ echo "Docker options:         ${DOCKER_OPTIONS}"
 # Ontrack container
 
 echo "Starting the Ontrack container"
-
+# TODO Do not expose Ontrack port
 ./docker-setup.sh \
     --docker-image=ontrack \
     --mount=${MOUNT} \
@@ -130,8 +130,10 @@ echo "Starting the Ontrack container"
     --jar=${ONTRACK_JAR}
 
 ONTRACK_CID=`cat ontrack.cid`
+ONTRACK_NAME=`docker inspect -f "{{ .Name }}" ${ONTRACK_CID}`
+ONTRACK_NAME="${ONTRACK_NAME:1}"
 
-echo "[ACCEPTANCE] Ontrack container created: ${ONTRACK_CID}"
+echo "[ACCEPTANCE] Ontrack container created: ${ONTRACK_CID} (${ONTRACK_NAME})"
 
 # nginx container
 
@@ -152,7 +154,7 @@ docker build -t="ontrack-nginx" docker-nginx/
 
 # Creating the Nginx container
 echo "[ACCEPTANCE] Starting the nginx container..."
-docker run -d -P --cidfile=nginx.cid ontrack-nginx
+docker run -d -P  --cidfile=nginx.cid ontrack-nginx
 NGINX_CID=`cat nginx.cid`
 echo "[ACCEPTANCE] Nginx container created: ${NGINX_CID}"
 
