@@ -107,8 +107,7 @@ rm -f ${MOUNT}
 mkdir -p ${MOUNT}
 echo "Ontrack data at:        ${MOUNT}"
 
-# Docker Ontrack VM up
-# TODO Docker nginx VM up
+# Docker Options
 
 DOCKER_OPTIONS=
 if [ "${CONTROL_USER}" != "" ]
