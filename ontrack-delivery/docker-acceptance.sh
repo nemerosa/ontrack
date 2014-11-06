@@ -143,7 +143,7 @@ docker-nginx/nginx.sh \
 	--target=`pwd`/docker-nginx/build \
 	--host=ontrack \
 	--port=8080 \
-	--name=ontrack \
+	--name=${ONTRACK_HOST} \
 	--cert-subject="/C=BE/L=Brussel/CN=ontrack"
 
 
@@ -154,7 +154,7 @@ docker build -t="ontrack-nginx" docker-nginx/
 # Creating the Nginx container
 echo "[ACCEPTANCE] Starting the nginx container..."
 rm -f nginx.cid
-docker run -d -P --link ${ONTRACK_NAME}:ontrack  --cidfile=nginx.cid ontrack-nginx
+docker run -d -P --link ${ONTRACK_NAME}:ontrack --cidfile=nginx.cid ontrack-nginx
 NGINX_CID=`cat nginx.cid`
 echo "[ACCEPTANCE] Nginx container created: ${NGINX_CID}"
 
