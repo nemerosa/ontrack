@@ -15,13 +15,11 @@ RUN \
   && chown -R www-data:www-data /var/lib/nginx
 
 # Sets the configuration file
-ADD proxy.conf /etc/nginx/sites-enabled/
+ADD build/nginx.conf /etc/nginx/sites-enabled/
 
 # Sets the certificates
 RUN mkdir /etc/nginx/ssl
-ADD build/*.crt /etc/nginx/ssl
-ADD build/*.key /etc/nginx/ssl
-ADD build/*.pem /etc/nginx/ssl
+ADD build/server.* /etc/nginx/ssl/
 
 # Exposing port
 EXPOSE 443

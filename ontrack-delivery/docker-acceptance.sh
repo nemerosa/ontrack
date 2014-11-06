@@ -112,6 +112,10 @@ then
 fi
 echo "Docker options:         ${DOCKER_OPTIONS}"
 
+# Ontrack container
+
+echo "Starting the Ontrack container"
+
 ./docker-setup.sh \
     --docker-image=ontrack \
     --mount=${MOUNT} \
@@ -122,6 +126,21 @@ echo "Docker options:         ${DOCKER_OPTIONS}"
 ONTRACK_CID=`cat ontrack.cid`
 
 echo "[ACCEPTANCE] Ontrack container created: ${ONTRACK_CID}"
+
+# nginx container
+
+echo "Preparation of the nginx container"
+
+# Generation of the nginx configuration and generation of self-signed certificates
+docker-nginx/nginx.sh \
+	--target=`pwd`/docker-nginx/build \
+	--host=ontrack \
+	--port=8080 \
+	--name=ontrack \
+	--cert-subject="/C=BE/L=Brussel/CN=ontrack"
+
+# Generation of the Nginx image
+docker build -t="ontrack-nginx" docker-nginx/
 
 # Getting the public facing port
 
