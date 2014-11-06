@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component
 class AcceptanceConfig {
 
     private String url = 'http://localhost:8080'
+    private boolean disableSSL = false
     private String admin = 'admin'
     private Set<String> context = [] as Set
 
@@ -20,6 +21,14 @@ class AcceptanceConfig {
 
     void setUrl(String url) {
         this.url = url
+    }
+
+    boolean getDisableSSL() {
+        return disableSSL
+    }
+
+    void setDisableSSL(boolean disableSSL) {
+        this.disableSSL = disableSSL
     }
 
     Set<String> getContext() {
@@ -33,6 +42,7 @@ class AcceptanceConfig {
     def setSystemProperties() {
         System.setProperty 'ontrack.url', url
         System.setProperty 'ontrack.admin', admin
+        System.setProperty 'ontrack.disableSSL', "${disableSSL}"
     }
 
     String getAdmin() {
