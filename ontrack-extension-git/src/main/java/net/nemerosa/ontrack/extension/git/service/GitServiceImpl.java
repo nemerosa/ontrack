@@ -349,35 +349,41 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                     theCommit.set(gitCommit);
                     theConfiguration.set(configuration);
                 }
-                // Gets the earliest tag on this branch that contains this commit
-                String tagName = gitClient.getEarliestTagForCommit(
-                        commit,
-                        configuration::isValidTagName
-                );
-                // If a tag is provided, gets the corresponding build name
-                if (StringUtils.isNotBlank(tagName)) {
-                    // Gets the build name from the tag (we usually do otherwise)
-                    // and gets the build from the ontrack database
-                    Optional<Build> buildOpt = configuration.getBuildNameFromTagName(tagName)
-                            .flatMap(buildName -> structureService.findBuildByName(branch.getProject().getName(), branch.getName(), buildName));
-                    // Build found
-                    if (buildOpt.isPresent()) {
-                        Build build = buildOpt.get();
-                        // Gets the build view
-                        BuildView buildView = structureService.getBuildView(build);
-                        // Adds it to the list
-                        buildViews.add(buildView);
-                        // Collects the promotions for the branch
-                        branchStatusViews.add(
-                                structureService.getEarliestPromotionsAfterBuild(build)
-                        );
-                    }
-                }
+                // Gets the earliest build on this branch that contains this commit
+                // ... get all the tags that contain the commit
+                gitClient.getTagsWhichContainCommit(commit).stream()
+                        // ... filter on valid tags only
+                        .filter(configuration::isValidTagName)
+                                // ... get build names
+                        .map(configuration::getBuildNameFromTagName)
+                                // ... filter on defined build names
+                        .filter(Optional::isPresent).map(Optional::get)
+                        // ... gets the builds
+                        .map(buildName -> structureService.findBuildByName(branch.getProject().getName(), branch.getName(), buildName))
+                                // ... filter on existing builds
+                        .filter(Optional::isPresent).map(Optional::get)
+                        // ... sort by decreasing date
+                        .sorted((o1, o2) -> (o1.id() - o2.id()))
+                                // ... takes the first build
+                        .findFirst()
+                                // ... and it present collect its data
+                        .ifPresent(build -> {
+                            // Gets the build view
+                            BuildView buildView = structureService.getBuildView(build);
+                            // Adds it to the list
+                            buildViews.add(buildView);
+                            // Collects the promotions for the branch
+                            branchStatusViews.add(
+                                    structureService.getEarliestPromotionsAfterBuild(build)
+                            );
+                        });
             }
         });
 
         // OK
-        if (theCommit.get() != null) {
+        if (theCommit.get() != null)
+
+        {
             String commitLink = theConfiguration.get().getCommitLink();
             List<? extends MessageAnnotator> messageAnnotators = getMessageAnnotators(theConfiguration.get());
             return new OntrackGitCommitInfo(
@@ -389,9 +395,12 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                     buildViews,
                     branchStatusViews
             );
-        } else {
+        } else
+
+        {
             throw new GitCommitNotFoundException(commit);
         }
+
     }
 
     private String getDiffUrl(GitDiff diff, GitDiffEntry entry, String fileChangeLinkFormat) {

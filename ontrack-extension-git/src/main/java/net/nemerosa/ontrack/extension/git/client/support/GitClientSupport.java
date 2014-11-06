@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.extension.git.client.support;
 
-import net.nemerosa.ontrack.common.ProcessExitException;
 import net.nemerosa.ontrack.common.Utils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
-import java.util.Optional;
+import java.util.List;
+
+import static net.nemerosa.ontrack.common.Utils.run;
 
 /**
  * Utility classes that use the Git command line when the JGit client is not enough.
@@ -13,32 +13,21 @@ import java.util.Optional;
 public class GitClientSupport {
 
     /**
-     * Returns the first tag a commit belongs to.
+     * Returns the list of tags a commit belongs to.
      * <p>
      * Same as:
      * <pre>
-     *     git describe --contains $commitId --abbrev=0
+     *     git tag --contains $commitId
      * </pre>
+     * <p>
+     * <b>Note</b>: the returned list of tags is <i>not</i> ordered.
      *
      * @param wd       Repository directory
      * @param commitId Commit to search
-     * @return Tag name
+     * @return List of tag names
      */
-    public static Optional<String> tagContains(File wd, String commitId) {
-        try {
-            String output = Utils.run(wd, "git", "describe", "--contains", commitId, "--abbrev=0");
-            if (StringUtils.isNotBlank(output)) {
-                return Optional.of(output.trim().replaceAll("([^~]*)(~\\d+)?$", "$1"));
-            } else {
-                return Optional.empty();
-            }
-        } catch (ProcessExitException ex) {
-            if (ex.getExit() == 128) {
-                return Optional.empty();
-            } else {
-                throw ex;
-            }
-        }
+    public static List<String> tagContains(File wd, String commitId) {
+        return Utils.asList(run(wd, "git", "tag", "--contains", commitId));
     }
 
 }

@@ -26,7 +26,15 @@ public interface GitClient {
 
     GitCommit getCommitFor(String commit);
 
-    String getEarliestTagForCommit(String gitCommitId, Predicate<String> tagNamePredicate);
+    /**
+     * Gets the earliest commit that contains the commit.
+     * <p>
+     * Uses the <code>git tag --contains</code> command to get all tags that contains the given
+     * {@code gitCommitId}.
+     * <p>
+     * <b>Note</b>: returned tags are <i>not</i> ordered.
+     */
+    Collection<String> getTagsWhichContainCommit(String gitCommitId);
 
     /**
      * Scans the whole history.
