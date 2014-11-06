@@ -128,6 +128,10 @@ mkdir -p ${TARGET}
 if [ "${CERT_GENERATE}" == "yes" ]
 then
 	echo "Generation of certificates..."
+	openssl req -x509 -nodes -days 365 \
+		-newkey rsa:2048 \
+		-keyout ${TARGET}/server.key \
+		-out ${TARGET}/server.crt
 
 # Copy of certificates
 else
