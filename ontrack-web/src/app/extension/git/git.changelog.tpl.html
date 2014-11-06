@@ -180,22 +180,19 @@
                         <div class="panel-body ot-description" ng-show="filesLoading">
                             <ot-loading>File changes are loading...</ot-loading>
                         </div>
-                        <table class="table table-condensed table-hover" ng-show="files" width="100%">
-                            <tbody>
-                            <tr ng-repeat="changeLogFile in files.list">
-                                <td>
-                                    <span class="ot-scm-changelog-revision ot-scm-changetype-{{changeLogFile.changeType | lowercase}}">
-                                        <span class="ot-scm-changetype-icon" title="{{changeLogFile.changeType | lowercase}}"></span>
-                                    </span>
-                                    <a href="{{changeLogFile.url}}">{{changeLogFile.oldPath | otExtensionScmTruncatePath:50}}</a>
-                                    <span ng-if="changeLogFile.newPath">
-                                        <span class="fa fa-arrow-right"></span>
-                                        {{changeLogFile.newPath | otExtensionScmTruncatePath:50}}
-                                    </span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
+                        <div class="panel-body ot-extension-git-changelog-files" ng-show="files">
+                            <div class="ot-extension-git-changelog-file"
+                                 ng-repeat="changeLogFile in files.list">
+                                <span class="ot-scm-changelog-revision ot-scm-changetype-{{changeLogFile.changeType | lowercase}}">
+                                    <span class="ot-scm-changetype-icon" title="{{changeLogFile.changeType | lowercase}}"></span>
+                                </span>
+                                <a href="{{changeLogFile.url}}">{{changeLogFile.oldPath}}</a>
+                                <span ng-if="changeLogFile.newPath">
+                                    <span class="fa fa-arrow-right"></span>
+                                    {{changeLogFile.newPath}}
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
