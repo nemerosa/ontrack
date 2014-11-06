@@ -11,9 +11,32 @@ angular.module('ot.view.api', [
         });
     })
     .controller('APICtrl', function ($q, $http, $location, $scope, $state, $stateParams, ot) {
+        $scope.showLinks = true;
         var view = ot.view();
         view.title = "API";
         view.commands = [
+            {
+                condition: function () {
+                    return !$scope.showLinks;
+                },
+                id: 'api-show-links',
+                name: "Show links",
+                cls: 'ot-command-api-show',
+                action: function () {
+                    $scope.showLinks = true;
+                }
+            },
+            {
+                condition: function () {
+                    return $scope.showLinks;
+                },
+                id: 'api-hide-links',
+                name: "Hide links",
+                cls: 'ot-command-api-hide',
+                action: function () {
+                    $scope.showLinks = false;
+                }
+            },
             ot.viewCloseCommand('home')
         ];
 

@@ -5,7 +5,8 @@ angular.module('ot.directive.api', [
             restrict: 'E',
             templateUrl: 'app/directive/directive.api.resource.tpl.html',
             scope: {
-                resource: '='
+                resource: '=',
+                showLinks: '='
             },
             link: function (scope) {
                 scope.$watch('resource', function () {
@@ -72,11 +73,12 @@ angular.module('ot.directive.api', [
             restrict: 'E',
             template: '<div></div>',
             scope: {
-                resource: '='
+                resource: '=',
+                showLinks: '='
             },
             link: function (scope, element) {
                 if (angular.isDefined(scope.resource)) {
-                    $compile('<ot-api-resource resource="resource"></ot-api-resource>')(scope, function (cloned, scope) {
+                    $compile('<ot-api-resource resource="resource" show-links="showLinks"></ot-api-resource>')(scope, function (cloned, scope) {
                         element.append(cloned);
                     });
                 }
