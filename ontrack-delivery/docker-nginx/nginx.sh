@@ -6,6 +6,8 @@ function show_help {
 	echo ""
 	echo "Available options are:"
 	echo "    -h, --help                    Displays this help"
+	echo "    -t, --target=<dir>            Target directory for the generated file (defaults to 'build')"
+	echo "    -f, --file=<file>             Name of the generated file (defaults to 'nginx.conf')"
 }
 
 # Check function
@@ -20,6 +22,8 @@ function check {
 
 # Defaults
 
+TARGET=build
+FILE=nginx.conf
 
 # Command central
 
@@ -30,8 +34,11 @@ do
 			show_help
 			exit 0
 			;;
-		-u=*|--ontrack-url=*)
-			ONTRACK_URL=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
+		-t=*|--target=*)
+			TARGET=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
+			;;
+		-f=*|--file=*)
+			FILE=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
 			;;
 		*)
 			echo "Unknown option: $i"
@@ -47,17 +54,16 @@ done
 
 # Logging
 
-#echo "Ontrack URL      = ${ONTRACK_URL}"
-#echo "Ontrack context  = ${ONTRACK_CONTEXT}"
-#echo "Acceptance JAR   = ${ACCEPTANCE_JAR}"
+echo "Target directory      = ${TARGET}"
+echo "Target file           = ${FILE}"
 
 # Environment preparation
 
-mkdir -p build
+mkdir -p ${TARGET}
 
 # Generation
 
-cat << EOF > build/nginx.conf
+cat << EOF > ${TARGET}/${FILE}
 upstream app_server {
     # TODO Configurable target port
     server 127.0.0.1:8080 fail_timeout=0;
