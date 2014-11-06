@@ -210,7 +210,9 @@ public class SVNServiceImpl implements SVNService {
                             // Adds it to the list
                             buildViews.add(buildView);
                             // Collects the promotions for the branch
-                            branchStatusViews.add(structureService.getBranchStatusView(branch));
+                            branchStatusViews.add(
+                                    structureService.getEarliestPromotionsAfterBuild(build.get())
+                            );
                         }
                     }
                 }
