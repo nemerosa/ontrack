@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.boot.resources;
 
+import net.nemerosa.ontrack.boot.ui.DecorationsController;
+import net.nemerosa.ontrack.boot.ui.PropertyController;
 import net.nemerosa.ontrack.boot.ui.ValidationRunController;
 import net.nemerosa.ontrack.boot.ui.ValidationStampController;
 import net.nemerosa.ontrack.model.security.ValidationRunStatusChange;
@@ -39,6 +41,11 @@ public class ValidationRunResourceDecorator extends AbstractResourceDecorator<Va
                                 ValidationRunStatusChange.class
                         ) && !validationRun.getLastStatus().getStatusID().getFollowingStatuses().isEmpty()
                 )
+                        // Actual properties for this entity
+                .link("_properties", on(PropertyController.class).getProperties(validationRun.getProjectEntityType(), validationRun.getId()))
+                        // Decorations
+                .link("_decorations", on(DecorationsController.class).getDecorations(validationRun.getProjectEntityType(), validationRun.getId()))
+                        // OK
                 .build();
     }
 
