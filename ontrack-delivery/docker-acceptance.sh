@@ -210,6 +210,7 @@ then
 		echo "[ACCEPTANCE] Starting acceptance tests..."
 		./acceptance.sh \
 			--ontrack-url=${ONTRACK_URL} \
+			--no-ssl \
 			--jar=${ONTRACK_ACCEPTANCE_JAR}
 		# Result of the acceptance tests
 		ACCEPTANCE_RESULT=$?

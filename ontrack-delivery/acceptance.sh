@@ -12,7 +12,8 @@ function show_help {
 	echo "    -p, --ontrack-password        Password for the administrator (defaults to 'admin')"
 	echo "    -c, --ontrack-context         Text context (defaults to 'default')"
 	echo "Test setup:"
-	echo "    -j, --jar                     (* required) Path to the acceptance test JAR"
+	echo "    -j, --jar=<file>              (* required) Path to the acceptance test JAR"
+	echo "    -ns, --no-ssl                 Set to disable SSL checks (use only for acceptance testing)"
 }
 
 # Check function
@@ -32,6 +33,7 @@ ONTRACK_PASSWORD=admin
 ONTRACK_CONTEXT=default
 
 ACCEPTANCE_JAR=
+ACCEPTANCE_DISABLE_SSL=no
 
 # Command central
 
@@ -54,6 +56,9 @@ do
 		-j=*|--jar=*)
             ACCEPTANCE_JAR=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
 			;;
+		-ns|--no-ssl)
+            ACCEPTANCE_DISABLE_SSL=yes
+			;;
 		*)
 			echo "Unknown option: $i"
 			show_help
@@ -71,11 +76,12 @@ check "$ACCEPTANCE_JAR" "Acceptance JAR (--jar) is required."
 echo "Ontrack URL      = ${ONTRACK_URL}"
 echo "Ontrack context  = ${ONTRACK_CONTEXT}"
 echo "Acceptance JAR   = ${ACCEPTANCE_JAR}"
+echo "Disabling SSL    = ${ACCEPTANCE_DISABLE_SSL}"
 
 # Execution of the tests
 
 java -jar ${ACCEPTANCE_JAR} \
     --ontrack.url=${ONTRACK_URL} \
     --ontrack.admin=${ONTRACK_PASSWORD} \
+    --ontrack.disableSSL=${ACCEPTANCE_DISABLE_SSL} \
     --ontrack.context=${ONTRACK_CONTEXT}
-
