@@ -5,3 +5,4 @@ public class OTHttpClientSSLSetupException extends ClientException {
         super(ex, "Cannot setup SSL client");
     }
 }
+
