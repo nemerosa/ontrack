@@ -12,6 +12,7 @@ function show_help {
 	echo "Configuration options:"
 	echo "    -h, --host=<host>             Host of the target (defaults to '127.0.0.1')"
 	echo "    -p, --port=<port>             Port on the target (defaults to '8080')"
+	echo "    -n, --name=<name>             Server name (defaults to 'untitled')"
 }
 
 # Check function
@@ -30,6 +31,7 @@ TARGET=build
 FILE=nginx.conf
 HOST=127.0.0.1
 PORT=8080
+NAME=untitled
 
 # Command central
 
@@ -52,6 +54,9 @@ do
 		-p=*|--port=*)
 			PORT=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
 			;;
+		-n=*|--name=*)
+			NAME=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
+			;;
 		*)
 			echo "Unknown option: $i"
 			show_help
@@ -70,6 +75,7 @@ echo "Target directory      = ${TARGET}"
 echo "Target file           = ${FILE}"
 echo "Target host           = ${HOST}"
 echo "Target port           = ${PORT}"
+echo "Server name           = ${NAME}"
 
 # Environment preparation
 
@@ -84,8 +90,7 @@ upstream app_server {
 
 server {
     listen 443 ssl;
-    # TODO Configurable server name
-    server_name ontrack.nemerosa.net;
+    server_name ${NAME};
 
     # ssl on;
     # TODO Configurable certificates
@@ -97,8 +102,7 @@ server {
     location / {
         proxy_set_header Host \$http_host;
         proxy_set_header X-Real-IP \$remote_addr;
-        # TODO Configurable server name
-        proxy_set_header X-Forwarded-Host ontrack.nemerosa.net;
+        proxy_set_header X-Forwarded-Host ${NAME};
         proxy_set_header X-Forwarded-Port 443;
         proxy_set_header X-Forwarded-Proto https;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
