@@ -154,7 +154,8 @@ docker build -t="ontrack-nginx" docker-nginx/
 
 # Creating the Nginx container
 echo "[ACCEPTANCE] Starting the nginx container..."
-docker run -d -P  --cidfile=nginx.cid ontrack-nginx
+rm -f nginx.cid
+docker run -d -P --link ${ONTRACK_NAME}:ontrack  --cidfile=nginx.cid ontrack-nginx
 NGINX_CID=`cat nginx.cid`
 echo "[ACCEPTANCE] Nginx container created: ${NGINX_CID}"
 
@@ -227,6 +228,9 @@ then
     docker rm -f ${ONTRACK_CID}
     echo "[ACCEPTANCE] Removing Nginx container at: ${NGINX_CID}"
     docker rm -f ${NGINX_CID}
+else
+	echo "[ACCEPTANCE] Keeping Ontrack container at: ${ONTRACK_CID}"
+    echo "[ACCEPTANCE] Keeping Nginx container at: ${NGINX_CID}"
 fi
 
 # Result
