@@ -123,7 +123,20 @@ fi
 
 mkdir -p ${TARGET}
 
-# Generation
+# Generation of the certificates
+
+if [ "${CERT_GENERATE}" == "yes" ]
+then
+	echo "Generation of certificates..."
+
+# Copy of certificates
+else
+	echo "Copy of certificates..."
+	cp ${CERT_PEM} ${TARGET}/server.pem
+	cp ${CERT_KEY} ${TARGET}/server.key
+fi
+
+# Generation of the confiration file
 
 cat << EOF > ${TARGET}/${FILE}
 upstream app_server {
