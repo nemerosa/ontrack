@@ -32,6 +32,8 @@ CERT_KEY=
 CERT_GENERATE=yes
 CERT_SUBJECT=/C=BE/L=Brussel/CN=www.example.com
 
+CERT_FILE=
+
 # Command central
 
 for i in "$@"
@@ -139,12 +141,14 @@ then
 		-subj "${CERT_SUBJECT}" \
 		-keyout ${TARGET}/server.key \
 		-out ${TARGET}/server.crt
+	CERT_FILE=server.crt
 
 # Copy of certificates
 else
 	echo "Copy of certificates..."
 	cp ${CERT_PEM} ${TARGET}/server.pem
 	cp ${CERT_KEY} ${TARGET}/server.key
+	CERT_FILE=server.pem
 fi
 
 # Generation of the confiration file
@@ -159,7 +163,7 @@ server {
     server_name ${NAME};
 
     # ssl on;
-    ssl_certificate /etc/nginx/ssl/server.pem;
+    ssl_certificate /etc/nginx/ssl/${CERT_FILE};
     ssl_certificate_key /etc/nginx/ssl/server.key;
 
     error_log /var/log/nginx/nginx.vhost.error.log;
