@@ -142,6 +142,9 @@ docker-nginx/nginx.sh \
 # Generation of the Nginx image
 docker build -t="ontrack-nginx" docker-nginx/
 
+# Creating the Nginx container
+docker run -d -P --cidfile=nginx.cid ontrack-nginx
+
 # Getting the public facing port
 
 ONTRACK_PORT=`docker port ${ONTRACK_CID} 8080 | sed -E 's/.*:(.*)/\1/'`
