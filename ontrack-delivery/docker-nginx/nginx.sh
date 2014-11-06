@@ -17,6 +17,7 @@ function show_help {
 	echo "    -cp, --cert-prm=<pem>         Copies the PEM file (--copy-key must also be provided)"
 	echo "    -ck, --cert-key=<key>         Copies the Key file (--copy-pem must also be provided)"
 	echo "    -cg, --cert-generate          Generates the certificates (default)"
+	echo "    -cs, --cert-subject           Subject of the certificate (defaults to /C=BE/L=Brussel/CN=www.example.com)"
 }
 
 # Defaults
@@ -29,6 +30,7 @@ NAME=untitled
 CERT_PEM=
 CERT_KEY=
 CERT_GENERATE=yes
+CERT_SUBJECT=/C=BE/L=Brussel/CN=www.example.com
 
 # Command central
 
@@ -59,6 +61,9 @@ do
 			;;
 		-ck=*|--cert-key=*)
 			CERT_KEY=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
+			;;
+		-cs=*|--cert-subject=*)
+			CERT_SUBJECT=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
 			;;
 		-cg|--cert-generate)
 			CERT_GENERATE=yes
@@ -117,6 +122,7 @@ then
 	echo "Certificate KEY file   = ${CERT_KEY}"
 else
 	echo "Certificate generation = yes"
+	echo "Certificate subject    = ${CERT_SUBJECT}"
 fi
 
 # Environment preparation
@@ -130,6 +136,7 @@ then
 	echo "Generation of certificates..."
 	openssl req -x509 -nodes -days 365 \
 		-newkey rsa:2048 \
+		-subj "${CERT_SUBJECT}" \
 		-keyout ${TARGET}/server.key \
 		-out ${TARGET}/server.crt
 
