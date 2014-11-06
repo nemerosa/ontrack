@@ -16,6 +16,8 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.*;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
@@ -32,18 +34,22 @@ import java.util.function.Supplier;
 
 public class OTHttpClientBuilder {
 
-    public static OTHttpClientBuilder create(String url) {
-        return new OTHttpClientBuilder(url);
+    private static final Logger logger = LoggerFactory.getLogger(OTHttpClient.class);
+
+    public static OTHttpClientBuilder create(String url, boolean disableSsl) {
+        return new OTHttpClientBuilder(url, disableSsl);
     }
 
     private final URL url;
+    private final boolean disableSsl;
     private final HttpHost host;
     private String username;
     private String password;
 
-    protected OTHttpClientBuilder(String url) {
+    protected OTHttpClientBuilder(String url, boolean disableSsl) {
         try {
             this.url = new URL(url);
+            this.disableSsl = disableSsl;
         } catch (MalformedURLException e) {
             throw new ClientURLException(url, e);
         }
@@ -83,35 +89,40 @@ public class OTHttpClientBuilder {
         CookieStore cookieStore = new BasicCookieStore();
         httpContext.setCookieStore(cookieStore);
 
-        //
-        // SSLConnectionSocketFactory sslSocketFactory = SSLConnectionSocketFactory.getSocketFactory();
+        // SSL setup
+        SSLConnectionSocketFactory sslSocketFactory;
+        if (disableSsl) {
+            logger.warn("Disabling SSL checks!");
+            SSLContext ctx;
+            try {
+                X509TrustManager x509TrustManager = new X509TrustManager() {
+                    @Override
+                    public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+                    }
 
-        SSLContext ctx;
-        try {
-            X509TrustManager x509TrustManager = new X509TrustManager() {
-                @Override
-                public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-                }
+                    @Override
+                    public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+                    }
 
-                @Override
-                public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-                }
+                    @Override
+                    public X509Certificate[] getAcceptedIssuers() {
+                        return null;
+                    }
+                };
+                ctx = SSLContext.getInstance("TLS");
+                ctx.init(new KeyManager[0], new TrustManager[]{x509TrustManager}, new SecureRandom());
+            } catch (NoSuchAlgorithmException | KeyManagementException e) {
+                throw new OTHttpClientSSLSetupException(e);
+            }
 
-                @Override
-                public X509Certificate[] getAcceptedIssuers() {
-                    return null;
-                }
-            };
-            ctx = SSLContext.getInstance("TLS");
-            ctx.init(new KeyManager[0], new TrustManager[]{x509TrustManager}, new SecureRandom());
-        } catch (NoSuchAlgorithmException | KeyManagementException e) {
-            throw new OTHttpClientSSLSetupException(e);
+            sslSocketFactory = new SSLConnectionSocketFactory(
+                    ctx,
+                    SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER
+            );
+        } else {
+            logger.debug("Using default secure SSL socket factory.");
+            sslSocketFactory = SSLConnectionSocketFactory.getSocketFactory();
         }
-
-        SSLConnectionSocketFactory sslSocketFactory = new SSLConnectionSocketFactory(
-                ctx,
-                SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER
-        );
 
         Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()
                 .register("http", PlainConnectionSocketFactory.getSocketFactory())
