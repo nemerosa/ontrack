@@ -14,3 +14,13 @@ RUN \
   && echo "\ndaemon off;" >> /etc/nginx/nginx.conf \
   && chown -R www-data:www-data /var/lib/nginx
 
+# Sets the configuration file
+ADD proxy.conf /etc/nginx/sites-enabled/
+
+# TODO Sets the certificates
+
+# Exposing port
+EXPOSE 443
+
+# Starts Nginx
+CMD ["nginx"]
