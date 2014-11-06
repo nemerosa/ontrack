@@ -93,9 +93,8 @@ server {
     server_name ${NAME};
 
     # ssl on;
-    # TODO Configurable certificates
-    ssl_certificate /etc/nginx/ssl/ontrack_nemerosa_net.pem;
-    ssl_certificate_key /etc/nginx/ssl/ontrack_nemerosa_net.key;
+    ssl_certificate /etc/nginx/ssl/server.pem;
+    ssl_certificate_key /etc/nginx/ssl/server.key;
 
     error_log /var/log/nginx/nginx.vhost.error.log;
 
