@@ -84,7 +84,6 @@ public class ResourceObjectMapperFactory {
 
         @Override
         public void write(JsonGenerator jgen, Object o, Class<?> view) throws IOException {
-            // TODO Sets the view in the resource context
             getObjectWriter(view).writeValue(jgen, o);
         }
     }
