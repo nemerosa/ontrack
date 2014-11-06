@@ -13,6 +13,7 @@ function show_help {
 	echo "    -j, --jar                     (* required) Path to the ontrack JAR"
 	echo "    -a, --acceptance              (* required) Path to the acceptance test JAR"
 	echo "    -h, --host                    Address of the Docker container (defaults to 'localhost' or IP in 'DOCKER_HOST')"
+	echo "    --dry-run                     Does not run the acceptance tests"
 	echo "Control:"
 	echo "    -k, --keep                    If set, the container is not destroyed after"
 	echo "    -d, --delay                   Number of seconds to wait for Ontrack to start (defaults to 120)"
@@ -46,6 +47,7 @@ ONTRACK_ACCEPTANCE_JAR=
 CONTROL_KEEP=no
 CONTROL_DELAY=120
 CONTROL_USER=
+CONTROL_DRY_RUN=no
 
 # Command central
 
@@ -71,6 +73,9 @@ do
 		-k|--keep)
             CONTROL_KEEP=yes
 			;;
+		--dry-run)
+            CONTROL_DRY_RUN=yes
+			;;
 		-u=*|--docker-user=*)
             CONTROL_USER=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
 			;;
@@ -94,6 +99,7 @@ echo "Ontrack protocol:       ${ONTRACK_PROTOCOL}"
 echo "Ontrack JAR:            ${ONTRACK_JAR}"
 echo "Startup delay:          ${CONTROL_DELAY} s"
 echo "Keeping containers:     ${CONTROL_KEEP}"
+echo "Dry run:                ${CONTROL_DRY_RUN}"
 
 # Mount point
 
@@ -129,7 +135,7 @@ echo "[ACCEPTANCE] Ontrack container created: ${ONTRACK_CID}"
 
 # nginx container
 
-echo "Preparation of the nginx container"
+echo "[ACCEPTANCE] Preparation of the nginx image"
 
 # Generation of the nginx configuration and generation of self-signed certificates
 docker-nginx/nginx.sh \
@@ -139,11 +145,16 @@ docker-nginx/nginx.sh \
 	--name=ontrack \
 	--cert-subject="/C=BE/L=Brussel/CN=ontrack"
 
+
 # Generation of the Nginx image
+echo "[ACCEPTANCE] Building the nginx image..."
 docker build -t="ontrack-nginx" docker-nginx/
 
 # Creating the Nginx container
+echo "[ACCEPTANCE] Starting the nginx container..."
 docker run -d -P --cidfile=nginx.cid ontrack-nginx
+NGINX_CID=`cat nginx.cid`
+echo "[ACCEPTANCE] Nginx container created: ${NGINX_CID}"
 
 # Getting the public facing port
 
@@ -185,15 +196,21 @@ then
 
     echo "[ACCEPTANCE] Ontrack has started in ${ONTRACK_START_DURATION} s"
 
-    # Running the acceptance tests
-    echo "[ACCEPTANCE] Starting acceptance tests..."
-    ./acceptance.sh \
-        --ontrack-url=${ONTRACK_URL} \
-        --jar=${ONTRACK_ACCEPTANCE_JAR}
-
-    # Result of the acceptance tests
-    ACCEPTANCE_RESULT=$?
-    echo "[ACCEPTANCE] Results: ${ACCEPTANCE_RESULT}"
+    # Dry run
+	if [ "${CONTROL_DRY_RUN}" == "yes" ]
+	then
+		echo "[ACCEPTANCE] DRYRUN - not running the acceptance tests."
+		ACCEPTANCE_RESULT=0
+	else
+		# Running the acceptance tests
+		echo "[ACCEPTANCE] Starting acceptance tests..."
+		./acceptance.sh \
+			--ontrack-url=${ONTRACK_URL} \
+			--jar=${ONTRACK_ACCEPTANCE_JAR}
+		# Result of the acceptance tests
+		ACCEPTANCE_RESULT=$?
+		echo "[ACCEPTANCE] Results: ${ACCEPTANCE_RESULT}"
+    fi
 
 else
     ACCEPTANCE_RESULT=1
@@ -201,12 +218,13 @@ else
 fi
 
 # Docker Ontrack VM down
-# TODO Docker nginx VM down
 
 if [ "${CONTROL_KEEP}" == "no" ]
 then
     echo "[ACCEPTANCE] Removing Ontrack container at: ${ONTRACK_CID}"
     docker rm -f ${ONTRACK_CID}
+    echo "[ACCEPTANCE] Removing Nginx container at: ${NGINX_CID}"
+    docker rm -f ${NGINX_CID}
 fi
 
 # Result
