@@ -17,7 +17,11 @@ RUN \
 # Sets the configuration file
 ADD proxy.conf /etc/nginx/sites-enabled/
 
-# TODO Sets the certificates
+# Sets the certificates
+RUN mkdir /etc/nginx/ssl
+ADD build/*.crt /etc/nginx/ssl
+ADD build/*.key /etc/nginx/ssl
+ADD build/*.pem /etc/nginx/ssl
 
 # Exposing port
 EXPOSE 443

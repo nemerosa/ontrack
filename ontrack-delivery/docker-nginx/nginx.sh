@@ -129,6 +129,7 @@ fi
 
 # Environment preparation
 
+rm -rf ${TARGET}
 mkdir -p ${TARGET}
 
 # Generation of the certificates
