@@ -168,6 +168,7 @@ NGINX_PORT=`docker port ${NGINX_CID} 443 | sed -E 's/.*:(.*)/\1/'`
 echo "[ACCEPTANCE] Nginx proxy available in host ${ONTRACK_HOST} at port ${NGINX_PORT}"
 
 # Generation of the nginx configuration and generation of self-signed certificates
+echo "[ACCEPTANCE] Generating the Nginx configuration for ${ONTRACK_HOST}:${NGINX_PORT} in ${NGINX_MOUNT}..."
 docker-nginx/nginx.sh \
 	--target=${NGINX_MOUNT} \
 	--host=ontrack \
@@ -231,6 +232,12 @@ then
 		# Result of the acceptance tests
 		ACCEPTANCE_RESULT=$?
 		echo "[ACCEPTANCE] Results: ${ACCEPTANCE_RESULT}"
+		if [ "${ACCEPTANCE_RESULT}" == "0" ]
+		then
+			echo "[ACCEPTANCE] Acceptance tests were OK."
+		else
+			echo "[ACCEPTANCE] Acceptance tests have FAILED!"
+		fi
     fi
 
 else
