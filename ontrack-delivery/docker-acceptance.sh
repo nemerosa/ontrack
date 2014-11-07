@@ -108,6 +108,7 @@ echo "[ACCEPTANCE] Dry run:                ${CONTROL_DRY_RUN}"
 MOUNT=`pwd`/acceptance
 rm -rf ${MOUNT}
 mkdir -p ${MOUNT}
+mkdir -p ${MOUNT}/nginx
 echo "[ACCEPTANCE] Ontrack data at:        ${MOUNT}"
 
 # Docker Options
@@ -149,10 +150,11 @@ echo "[ACCEPTANCE] Building the nginx ${NGINX_IMAGE} image..."
 docker build -t="${NGINX_IMAGE}" docker-nginx/
 
 # Mounting directories for Nginx
-NGINX_MOUNT=`pwd`/docker-nginx/build
+NGINX_MOUNT=${MOUNT}/nginx
 rm -rf ${NGINX_MOUNT}
 mkdir -p ${NGINX_MOUNT}/ssl
 mkdir -p ${NGINX_MOUNT}/sites-enabled
+mkdir -p ${NGINX_MOUNT}/logs
 
 # Starting the nginx container
 echo "[ACCEPTANCE] Initialising the nginx container..."
@@ -163,6 +165,7 @@ docker run ${DOCKER_OPTIONS} \
 	--link ${ONTRACK_NAME}:ontrack \
 	--volume ${NGINX_MOUNT}/ssl:/etc/nginx/ssl \
 	--volume ${NGINX_MOUNT}/sites-enabled:/etc/nginx/sites-enabled \
+	--volume ${NGINX_MOUNT}/logs:/var/log/nginx \
 	--cidfile nginx.cid \
 	${NGINX_IMAGE}
 NGINX_CID=`cat nginx.cid`

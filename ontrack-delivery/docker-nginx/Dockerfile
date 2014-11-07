@@ -17,6 +17,7 @@ RUN \
 # Mount points
 VOLUME /etc/nginx/sites-enabled
 VOLUME /etc/nginx/ssl
+VOLUME /var/log/nginx
 
 # Exposing port
 EXPOSE 443
