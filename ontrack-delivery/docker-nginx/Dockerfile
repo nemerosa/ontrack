@@ -4,6 +4,11 @@ FROM ubuntu:14.04
 # Meta-information
 MAINTAINER Damien Coraboeuf <damien.coraboeuf@gmail.com>
 
+# Mount points
+VOLUME /etc/nginx/sites-enabled
+VOLUME /etc/nginx/ssl
+VOLUME /var/log/nginx
+
 # Install Nginx
 RUN \
   apt-get update \
@@ -13,11 +18,6 @@ RUN \
   && apt-get install -y nginx \
   && echo "\ndaemon off;" >> /etc/nginx/nginx.conf \
   && chown -R www-data:www-data /var/lib/nginx
-
-# Mount points
-VOLUME /etc/nginx/sites-enabled
-VOLUME /etc/nginx/ssl
-VOLUME /var/log/nginx
 
 # Exposing port
 EXPOSE 443
