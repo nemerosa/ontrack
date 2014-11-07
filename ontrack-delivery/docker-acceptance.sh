@@ -112,11 +112,14 @@ echo "[ACCEPTANCE] Ontrack data at:        ${MOUNT}"
 
 # Docker Options
 
+ONTRACK_DOCKER_OPTIONS=
 DOCKER_OPTIONS=
 if [ "${CONTROL_USER}" != "" ]
 then
-    DOCKER_OPTIONS="${DOCKER_OPTIONS} --docker-user=${CONTROL_USER}"
+    ONTRACK_DOCKER_OPTIONS="${ONTRACK_DOCKER_OPTIONS} --docker-user=${CONTROL_USER}"
+    DOCKER_OPTIONS="${DOCKER_OPTIONS} --user=${CONTROL_USER}"
 fi
+echo "[ACCEPTANCE] Ontrack Docker options: ${ONTRACK_DOCKER_OPTIONS}"
 echo "[ACCEPTANCE] Docker options:         ${DOCKER_OPTIONS}"
 
 # Ontrack container
@@ -126,7 +129,7 @@ echo "Starting the Ontrack container"
     --docker-image=ontrack \
     --port=no \
     --mount=${MOUNT} \
-    ${DOCKER_OPTIONS} \
+    ${ONTRACK_DOCKER_OPTIONS} \
     --run \
     --jar=${ONTRACK_JAR}
 
@@ -154,7 +157,7 @@ mkdir -p ${NGINX_MOUNT}/sites-enabled
 # Starting the nginx container
 echo "[ACCEPTANCE] Initialising the nginx container..."
 rm -f nginx.cid
-docker run \
+docker run ${DOCKER_OPTIONS} \
 	-d \
 	-P \
 	--link ${ONTRACK_NAME}:ontrack \
