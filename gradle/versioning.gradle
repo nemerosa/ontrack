@@ -11,41 +11,30 @@
  * The way this information is collected depends on the environment:
  *
  * - if not .git information is available, we cannot determine the version:
- *     - base = projectVersion (from the gradle.properties file)
- *     - build = NA
- *     - <full> = <base>-<build>
- *     - commit = NONE
- *     - source = na
+ *     - base = LOCAL
+ *     - build = <none>
+ *     - full = LOCAL
+ *     - commit = <none>
+ *     - source = <none>
  *
  * - from a tag (we want to build from a tag)
  *     - the working copy is associated with a tag
- *     - the information is computed from the tag name: <full> = <base>-<build>
- *     - commit = current commit
- *     - source = tag
+ *     - base = TAG
+ *     - build = <abbrev. sha1>
+ *     - full = TAG
+ *     - commit = <sha1>
+ *     - source = 'tag'
  *
- * - in a build environment:
- *     - the working copy is not associated with a tag
- *     - the BUILD_NUMBER environment variable is available
- *     - base = projectVersion (from the gradle.properties file)
- *     - build = BUILD_NUMBER
- *     - <full> = <base>-<build>
- *     - commit = current commit
- *     - source = build
- *
- * - in development mode
- *     - the working copy is not associated with a tag
- *     - the BUILD_NUMBER environment variable is not available
- *     - base = projectVersion (from the gradle.properties file)
- *     - build = DEV
- *     - <full> = <base>-<build>
- *     - commit = current commit
- *     - source = dev
- *
- * - from a tag (we want to build from a tag)
+ * - from a branch <b>:
+ *     - base = <b>
+ *     - build = <abbrev. sha1>
+ *     - full = <base>-<build>
+ *     - commit = <sha1>
+ *     - source = <b>
  */
 
 // Information to collect
-def versionBase = projectVersion
+def versionBase
 def versionBuild
 def versionFull
 def versionCommit
@@ -55,41 +44,33 @@ boolean hasGit = project.file('.git').exists()
 
 // No git information
 if (!hasGit) {
-    versionBuild = 'NA'
-    versionFull = "${versionBase}-${versionBuild}"
-    versionCommit = 'NONE'
-    versionSource = 'na'
+    versionBase = 'LOCAL'
+    versionBuild = ''
+    versionFull = 'LOCAL'
+    versionCommit = ''
+    versionSource = ''
 }
 
 // We can use git
 else {
-    // Gets the current commit
+    // Gets the current commit (short hash)
+    versionBuild = 'git log -1 --format=%H'.execute().text.trim()
+    // Gets the current commit (full hash)
     versionCommit = 'git log -1 --format=%H'.execute().text.trim()
     // Gets the tag info
-    def tagInfo = 'git describe --exact-match'.execute().text
+    def tagInfo = 'git describe --exact-match'.execute().text.trim()
     // We have a tag info
     if (tagInfo) {
+        versionBase = tagInfo
         versionFull = tagInfo
         versionSource = 'tag'
-
-        def versionRegex = /(.*)-([0-9]+)/
-        versionBase = versionFull.find(versionRegex) { it[1] }
-        versionBuild = versionFull.find(versionRegex) { it[2] }
     }
     // We do not have tag info
     else {
-        // ... but we have a build number
-        if (System.env.BUILD_NUMBER) {
-            versionBuild = System.env.BUILD_NUMBER
-            versionFull = "${versionBase}-${versionBuild}"
-            versionSource = 'build'
-        }
-        // ... or not (we are a developer)
-        else {
-            versionBuild = 'DEV'
-            versionFull = "${versionBase}-${versionBuild}"
-            versionSource = 'dev'
-        }
+        // Gets the current branch
+        versionBase = 'git rev-parse --abbrev-ref HEAD'.execute().text.trim()
+        versionFull = "${versionBase}-${versionBuild}"
+        versionSource = versionBase
     }
 }
 
@@ -99,3 +80,14 @@ project.ext.versionBase = versionBase
 project.ext.versionFull = versionFull
 project.ext.versionCommit = versionCommit
 project.ext.versionSource = versionSource
+
+/**
+ * Task to display the version information
+ */
+task displayVersion << {
+    println "ontrack.version.full = ${project.version}"
+    println "ontrack.version.base = ${project.versionBase}"
+    println "ontrack.version.build = ${project.versionBuild}"
+    println "ontrack.version.commit = ${project.versionCommit}"
+    println "ontrack.version.source = ${project.versionSource}"
+}
