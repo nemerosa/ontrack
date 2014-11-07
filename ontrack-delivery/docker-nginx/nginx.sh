@@ -113,18 +113,18 @@ fi
 
 # Logging
 
-echo "Target directory       = ${TARGET}"
-echo "Target host            = ${HOST}"
-echo "Target port            = ${PORT}"
-echo "Proxy name             = ${PROXY_NAME}"
-echo "Proxy port             = ${PROXY_PORT}"
+echo "[NGINX] Target directory       = ${TARGET}"
+echo "[NGINX] Target host            = ${HOST}"
+echo "[NGINX] Target port            = ${PORT}"
+echo "[NGINX] Proxy name             = ${PROXY_NAME}"
+echo "[NGINX] Proxy port             = ${PROXY_PORT}"
 if [ "${CERT_GENERATE}" == "no" ]
 then
-	echo "Certificate PEM file   = ${CERT_PEM}"
-	echo "Certificate KEY file   = ${CERT_KEY}"
+	echo "[NGINX] Certificate PEM file   = ${CERT_PEM}"
+	echo "[NGINX] Certificate KEY file   = ${CERT_KEY}"
 else
-	echo "Certificate generation = yes"
-	echo "Certificate subject    = ${CERT_SUBJECT}"
+	echo "[NGINX] Certificate generation = yes"
+	echo "[NGINX] Certificate subject    = ${CERT_SUBJECT}"
 fi
 
 # Environment preparation
@@ -137,7 +137,7 @@ mkdir -p ${TARGET}/sites-enabled
 
 if [ "${CERT_GENERATE}" == "yes" ]
 then
-	echo "Generation of certificates..."
+	echo "[NGINX] Generation of certificates..."
 	openssl req -x509 -nodes -days 365 \
 		-newkey rsa:2048 \
 		-subj "${CERT_SUBJECT}" \
@@ -147,7 +147,7 @@ then
 
 # Copy of certificates
 else
-	echo "Copy of certificates..."
+	echo "[NGINX] Copy of certificates..."
 	cp ${CERT_PEM} ${TARGET}/ssl/server.pem
 	cp ${CERT_KEY} ${TARGET}/ssl/server.key
 	CERT_FILE=server.pem
@@ -155,6 +155,7 @@ fi
 
 # Generation of the confiration file
 
+echo "[NGINX] Generating the configuration file at ${TARGET}/sites-enabled/nginx.conf..."
 cat << EOF > ${TARGET}/sites-enabled/nginx.conf
 upstream app_server {
     server ${HOST}:${PORT} fail_timeout=0;

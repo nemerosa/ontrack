@@ -112,16 +112,16 @@ fi
 
 # Logging
 
-echo "Docker source        = ${DOCKER_SOURCE}"
-echo "Docker image name    = ${DOCKER_IMAGE}"
-echo "Docker image version = ${DOCKER_VERSION}"
-echo "Docker user          = ${DOCKER_USER}"
-echo "Ontrack JAR          = ${ONTRACK_JAR}"
-echo "Ontrack port         = ${ONTRACK_PORT}"
-echo "Ontrack mount        = ${ONTRACK_MOUNT}"
-echo "Running auto         = ${CONTROL_RUN}"
-echo "Running bash         = ${CONTROL_BASH}"
-echo "Container ID file    = ${CONTROL_CID}"
+echo "[ONTRACK] Docker source        = ${DOCKER_SOURCE}"
+echo "[ONTRACK] Docker image name    = ${DOCKER_IMAGE}"
+echo "[ONTRACK] Docker image version = ${DOCKER_VERSION}"
+echo "[ONTRACK] Docker user          = ${DOCKER_USER}"
+echo "[ONTRACK] Ontrack JAR          = ${ONTRACK_JAR}"
+echo "[ONTRACK] Ontrack port         = ${ONTRACK_PORT}"
+echo "[ONTRACK] Ontrack mount        = ${ONTRACK_MOUNT}"
+echo "[ONTRACK] Running auto         = ${CONTROL_RUN}"
+echo "[ONTRACK] Running bash         = ${CONTROL_BASH}"
+echo "[ONTRACK] Container ID file    = ${CONTROL_CID}"
 
 # Setup the Docker environment locally
 
@@ -130,7 +130,7 @@ cp ${ONTRACK_JAR} ${DOCKER_SOURCE}/ontrack/ontrack.jar
 
 # Creating the Docker image
 
-echo Building the Docker Ontrack image
+echo "[ONTRACK] Building the Docker Ontrack image"
 
 docker build -t="${DOCKER_IMAGE}:${DOCKER_VERSION}" ${DOCKER_SOURCE}
 
@@ -144,7 +144,7 @@ then
     then
         DOCKER_OPTIONS="${DOCKER_OPTIONS} --user=${DOCKER_USER}"
     fi
-    echo "Docker options       = ${DOCKER_OPTIONS}"
+    echo "[ONTRACK] Docker options       = ${DOCKER_OPTIONS}"
 
     rm -f ${CONTROL_CID}
     if [ "${CONTROL_BASH}" != "yes" ]
@@ -153,27 +153,27 @@ then
         then
         	if [ "${ONTRACK_PORT}" == "no" ]
         	then
-        		echo "Running with port    = (not exposed)"
+        		echo "[ONTRACK] Running with port    = (not exposed)"
 				docker run ${DOCKER_OPTIONS} -d \
 					-v ${ONTRACK_MOUNT}:/opt/ontrack/mount \
 					--cidfile=${CONTROL_CID} \
 					${DOCKER_IMAGE}:${DOCKER_VERSION}
         	else
-				echo "Running with port    = ${ONTRACK_PORT}"
+				echo "[ONTRACK] Running with port    = ${ONTRACK_PORT}"
 				docker run ${DOCKER_OPTIONS} -d --publish=${ONTRACK_PORT}:8080 \
 					-v ${ONTRACK_MOUNT}:/opt/ontrack/mount \
 					--cidfile=${CONTROL_CID} \
 					${DOCKER_IMAGE}:${DOCKER_VERSION}
 			fi
         else
-            echo "Running with auto port"
+            echo "[ONTRACK] Running with auto port"
             docker run ${DOCKER_OPTIONS} -d -P \
                 -v ${ONTRACK_MOUNT}:/opt/ontrack/mount \
                 --cidfile=${CONTROL_CID} \
                 ${DOCKER_IMAGE}:${DOCKER_VERSION}
         fi
     else
-        echo "Running for Bash"
+        echo "[ONTRACK] Running for Bash"
         docker run ${DOCKER_OPTIONS} -t -i -P \
             -v ${ONTRACK_MOUNT}:/opt/ontrack/mount \
             --cidfile=${CONTROL_CID} \

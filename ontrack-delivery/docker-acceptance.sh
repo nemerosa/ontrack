@@ -92,20 +92,20 @@ check "$ONTRACK_JAR" "Ontrack JAR (--jar) is required."
 check "$ONTRACK_ACCEPTANCE_JAR" "Ontrack Acceptance JAR (--acceptance) is required."
 
 # Logging
-echo "Docker host:            ${ONTRACK_HOST}"
-echo "Docker user:            ${CONTROL_USER}"
-echo "Ontrack protocol:       ${ONTRACK_PROTOCOL}"
-echo "Ontrack JAR:            ${ONTRACK_JAR}"
-echo "Startup delay:          ${CONTROL_DELAY} s"
-echo "Keeping containers:     ${CONTROL_KEEP}"
-echo "Dry run:                ${CONTROL_DRY_RUN}"
+echo "[ACCEPTANCE] Docker host:            ${ONTRACK_HOST}"
+echo "[ACCEPTANCE] Docker user:            ${CONTROL_USER}"
+echo "[ACCEPTANCE] Ontrack protocol:       ${ONTRACK_PROTOCOL}"
+echo "[ACCEPTANCE] Ontrack JAR:            ${ONTRACK_JAR}"
+echo "[ACCEPTANCE] Startup delay:          ${CONTROL_DELAY} s"
+echo "[ACCEPTANCE] Keeping containers:     ${CONTROL_KEEP}"
+echo "[ACCEPTANCE] Dry run:                ${CONTROL_DRY_RUN}"
 
 # Mount point
 
 MOUNT=`pwd`/acceptance
 rm -rf ${MOUNT}
 mkdir -p ${MOUNT}
-echo "Ontrack data at:        ${MOUNT}"
+echo "[ACCEPTANCE] Ontrack data at:        ${MOUNT}"
 
 # Docker Options
 
@@ -114,7 +114,7 @@ if [ "${CONTROL_USER}" != "" ]
 then
     DOCKER_OPTIONS="${DOCKER_OPTIONS} --docker-user=${CONTROL_USER}"
 fi
-echo "Docker options:         ${DOCKER_OPTIONS}"
+echo "[ACCEPTANCE] Docker options:         ${DOCKER_OPTIONS}"
 
 # Ontrack container
 
@@ -190,7 +190,7 @@ echo "[ACCEPTANCE] Running acceptance tests against ${ONTRACK_URL}"
 ACCEPTANCE_RESULT=-1
 
 # Waits until the application is started
-echo -n "[ACCEPTANCE] Waiting for Ontrack to start (max: ${CONTROL_DELAY} s)"
+echo "[ACCEPTANCE] Waiting for Ontrack to start (max: ${CONTROL_DELAY} s)"
 ONTRACK_STARTED=no
 ONTRACK_START_DURATION=0
 for i in `seq 1 ${CONTROL_DELAY}`
