@@ -15,7 +15,7 @@ function show_help {
 	echo "    -u, --docker-user=<user>        Docker user UID or name to use (defaults to none, can be computed using 'id -u <user>')"
 	echo "Ontrack:"
 	echo "    -j, --jar=<path>                (* required) Path to the Ontrack JAR"
-	echo "    -p, --port=<port>               The host port to forward the container's 8080 port to"
+	echo "    -p, --port=<port>               The host port to forward the container's 8080 port to (can be set to 'no' to not expose it)"
 	echo "Control:"
 	echo "    -r, --run                       If set, runs the container automatically"
 	echo "                                    * the container ID will be written in the local 'ontrack.cid' file (see also --cid)"
@@ -151,11 +151,20 @@ then
     then
         if [ "${ONTRACK_PORT}" != "" ]
         then
-            echo "Running with port    = ${ONTRACK_PORT}"
-            docker run ${DOCKER_OPTIONS} -d --publish=${ONTRACK_PORT}:8080 \
-                -v ${ONTRACK_MOUNT}:/opt/ontrack/mount \
-                --cidfile=${CONTROL_CID} \
-                ${DOCKER_IMAGE}:${DOCKER_VERSION}
+        	if [ "${ONTRACK_PORT}" == "no" ]
+        	then
+        		echo "Running with port    = (not exposed)"
+				docker run ${DOCKER_OPTIONS} -d \
+					-v ${ONTRACK_MOUNT}:/opt/ontrack/mount \
+					--cidfile=${CONTROL_CID} \
+					${DOCKER_IMAGE}:${DOCKER_VERSION}
+        	else
+				echo "Running with port    = ${ONTRACK_PORT}"
+				docker run ${DOCKER_OPTIONS} -d --publish=${ONTRACK_PORT}:8080 \
+					-v ${ONTRACK_MOUNT}:/opt/ontrack/mount \
+					--cidfile=${CONTROL_CID} \
+					${DOCKER_IMAGE}:${DOCKER_VERSION}
+			fi
         else
             echo "Running with auto port"
             docker run ${DOCKER_OPTIONS} -d -P \

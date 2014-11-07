@@ -103,6 +103,7 @@ echo "Dry run:                ${CONTROL_DRY_RUN}"
 # Mount point
 
 MOUNT=`pwd`/acceptance
+# TODO Delete the mount point first
 rm -f ${MOUNT}
 mkdir -p ${MOUNT}
 echo "Ontrack data at:        ${MOUNT}"
@@ -119,9 +120,9 @@ echo "Docker options:         ${DOCKER_OPTIONS}"
 # Ontrack container
 
 echo "Starting the Ontrack container"
-# TODO Do not expose Ontrack port
 ./docker-setup.sh \
     --docker-image=ontrack \
+    --port=no \
     --mount=${MOUNT} \
     ${DOCKER_OPTIONS} \
     --run \
