@@ -91,11 +91,14 @@ done
 check "$ONTRACK_JAR" "Ontrack JAR (--jar) is required."
 check "$ONTRACK_ACCEPTANCE_JAR" "Ontrack Acceptance JAR (--acceptance) is required."
 
+ONTRACK_VERSION=`basename ${ONTRACK_JAR} | sed -E 's/ontrack(-ui)?-(.*)\.jar/\2/'`
+
 # Logging
 echo "[ACCEPTANCE] Docker host:            ${ONTRACK_HOST}"
 echo "[ACCEPTANCE] Docker user:            ${CONTROL_USER}"
 echo "[ACCEPTANCE] Ontrack protocol:       ${ONTRACK_PROTOCOL}"
 echo "[ACCEPTANCE] Ontrack JAR:            ${ONTRACK_JAR}"
+echo "[ACCEPTANCE] Ontrack version:        ${ONTRACK_VERSION}"
 echo "[ACCEPTANCE] Startup delay:          ${CONTROL_DELAY} s"
 echo "[ACCEPTANCE] Keeping containers:     ${CONTROL_KEEP}"
 echo "[ACCEPTANCE] Dry run:                ${CONTROL_DRY_RUN}"
@@ -138,9 +141,9 @@ echo "[ACCEPTANCE] Ontrack container created: ${ONTRACK_CID} (${ONTRACK_NAME})"
 echo "[ACCEPTANCE] Preparation of nginx..."
 
 # Generation of the Nginx image
-# TODO Versioning of the image
-echo "[ACCEPTANCE] Building the nginx image..."
-docker build -t="ontrack-nginx" docker-nginx/
+NGINX_IMAGE="ontrack-nginx:${ONTRACK_VERSION}"
+echo "[ACCEPTANCE] Building the nginx ${NGINX_IMAGE} image..."
+docker build -t="${NGINX_IMAGE}" docker-nginx/
 
 # Mounting directories for Nginx
 NGINX_MOUNT=`pwd`/docker-nginx/build
@@ -158,7 +161,7 @@ docker run \
 	--volume ${NGINX_MOUNT}/ssl:/etc/nginx/ssl \
 	--volume ${NGINX_MOUNT}/sites-enabled:/etc/nginx/sites-enabled \
 	--cidfile nginx.cid \
-	ontrack-nginx
+	${NGINX_IMAGE}
 NGINX_CID=`cat nginx.cid`
 echo "[ACCEPTANCE] Nginx container created: ${NGINX_CID}"
 
