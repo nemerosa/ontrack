@@ -19,7 +19,7 @@ public class DefaultClientFactory implements ClientFactory {
 
     @Override
     public OTHttpClient getHttpClient(ClientConnection clientConnection) {
-        return OTHttpClientBuilder.create(clientConnection.getUrl())
+        return OTHttpClientBuilder.create(clientConnection.getUrl(), false)
                 // Basic credentials
                 .withCredentials(clientConnection.getUser(), clientConnection.getPassword())
                         // OK
