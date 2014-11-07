@@ -42,6 +42,10 @@ def versionSource
 
 boolean hasGit = project.file('.git').exists()
 
+def normalise(String value) {
+    value.replaceAll(/[^A-Za-z0-9\.\-_]/, '-')
+}
+
 // No git information
 if (!hasGit) {
     versionBase = 'LOCAL'
@@ -61,14 +65,14 @@ else {
     def tagInfo = 'git describe --exact-match --tags'.execute().text.trim()
     // We have a tag info
     if (tagInfo) {
-        versionBase = tagInfo
-        versionFull = tagInfo
+        versionBase = normalise(tagInfo)
+        versionFull = versionBase
         versionSource = 'tag'
     }
     // We do not have tag info
     else {
         // Gets the current branch
-        versionBase = 'git rev-parse --abbrev-ref HEAD'.execute().text.trim()
+        versionBase = normalise('git rev-parse --abbrev-ref HEAD'.execute().text.trim())
         versionFull = "${versionBase}-${versionBuild}"
         versionSource = versionBase
     }
