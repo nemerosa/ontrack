@@ -103,8 +103,7 @@ echo "Dry run:                ${CONTROL_DRY_RUN}"
 # Mount point
 
 MOUNT=`pwd`/acceptance
-# TODO Delete the mount point first
-rm -f ${MOUNT}
+rm -rf ${MOUNT}
 mkdir -p ${MOUNT}
 echo "Ontrack data at:        ${MOUNT}"
 
