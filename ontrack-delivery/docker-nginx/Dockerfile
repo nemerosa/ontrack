@@ -14,12 +14,9 @@ RUN \
   && echo "\ndaemon off;" >> /etc/nginx/nginx.conf \
   && chown -R www-data:www-data /var/lib/nginx
 
-# Sets the configuration file
-ADD build/nginx.conf /etc/nginx/sites-enabled/
-
-# Sets the certificates
-RUN mkdir /etc/nginx/ssl
-ADD build/server.* /etc/nginx/ssl/
+# Mount points
+VOLUME /etc/nginx/sites-enabled
+VOLUME /etc/nginx/ssl
 
 # Exposing port
 EXPOSE 443

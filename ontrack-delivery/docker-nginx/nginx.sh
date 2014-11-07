@@ -8,7 +8,6 @@ function show_help {
 	echo "    -h, --help                    Displays this help"
 	echo "Generation options:"
 	echo "    -t, --target=<dir>            Target directory for the generated file (defaults to 'build')"
-	echo "    -f, --file=<file>             Name of the generated file (defaults to 'nginx.conf')"
 	echo "Configuration options:"
 	echo "    -h, --host=<host>             Host of the target (defaults to '127.0.0.1')"
 	echo "    -p, --port=<port>             Port on the target (defaults to '8080')"
@@ -24,7 +23,6 @@ function show_help {
 # Defaults
 
 TARGET=build
-FILE=nginx.conf
 HOST=127.0.0.1
 PORT=8080
 PROXY_NAME=`hostname`
@@ -47,9 +45,6 @@ do
 			;;
 		-t=*|--target=*)
 			TARGET=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
-			;;
-		-f=*|--file=*)
-			FILE=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
 			;;
 		-h=*|--host=*)
 			HOST=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
@@ -119,7 +114,6 @@ fi
 # Logging
 
 echo "Target directory       = ${TARGET}"
-echo "Target file            = ${FILE}"
 echo "Target host            = ${HOST}"
 echo "Target port            = ${PORT}"
 echo "Proxy name             = ${PROXY_NAME}"
@@ -136,7 +130,8 @@ fi
 # Environment preparation
 
 rm -rf ${TARGET}
-mkdir -p ${TARGET}
+mkdir -p ${TARGET}/ssl
+mkdir -p ${TARGET}/sites-enabled
 
 # Generation of the certificates
 
@@ -146,21 +141,21 @@ then
 	openssl req -x509 -nodes -days 365 \
 		-newkey rsa:2048 \
 		-subj "${CERT_SUBJECT}" \
-		-keyout ${TARGET}/server.key \
-		-out ${TARGET}/server.crt
+		-keyout ${TARGET}/ssl/server.key \
+		-out ${TARGET}/ssl/server.crt
 	CERT_FILE=server.crt
 
 # Copy of certificates
 else
 	echo "Copy of certificates..."
-	cp ${CERT_PEM} ${TARGET}/server.pem
-	cp ${CERT_KEY} ${TARGET}/server.key
+	cp ${CERT_PEM} ${TARGET}/ssl/server.pem
+	cp ${CERT_KEY} ${TARGET}/ssl/server.key
 	CERT_FILE=server.pem
 fi
 
 # Generation of the confiration file
 
-cat << EOF > ${TARGET}/${FILE}
+cat << EOF > ${TARGET}/sites-enabled/nginx.conf
 upstream app_server {
     server ${HOST}:${PORT} fail_timeout=0;
 }
