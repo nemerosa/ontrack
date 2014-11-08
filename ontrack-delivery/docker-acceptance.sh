@@ -110,6 +110,7 @@ rm -rf ${MOUNT}
 mkdir -p ${MOUNT}
 mkdir -p ${MOUNT}/nginx
 echo "[ACCEPTANCE] Ontrack data at:        ${MOUNT}"
+echo "[ACCEPTANCE] Nginx data at:          ${MOUNT}/nginx"
 
 # Docker Options
 
@@ -145,13 +146,10 @@ echo "[ACCEPTANCE] Ontrack container created: ${ONTRACK_CID} (${ONTRACK_NAME})"
 echo "[ACCEPTANCE] Preparation of nginx..."
 
 # Generation of the Nginx image
-NGINX_IMAGE="ontrack-nginx:${ONTRACK_VERSION}"
-echo "[ACCEPTANCE] Building the nginx ${NGINX_IMAGE} image..."
-docker build -t="${NGINX_IMAGE}" docker-nginx/
+NGINX_IMAGE="dockerfile/nginx"
 
 # Mounting directories for Nginx
 NGINX_MOUNT=${MOUNT}/nginx
-rm -rf ${NGINX_MOUNT}
 mkdir -p ${NGINX_MOUNT}/ssl
 mkdir -p ${NGINX_MOUNT}/sites-enabled
 mkdir -p ${NGINX_MOUNT}/logs
@@ -178,7 +176,7 @@ echo "[ACCEPTANCE] Nginx proxy available in host ${ONTRACK_HOST} at port ${NGINX
 
 # Generation of the nginx configuration and generation of self-signed certificates
 echo "[ACCEPTANCE] Generating the Nginx configuration for ${ONTRACK_HOST}:${NGINX_PORT} in ${NGINX_MOUNT}..."
-docker-nginx/nginx.sh \
+./nginx.sh \
 	--target=${NGINX_MOUNT} \
 	--host=ontrack \
 	--port=8080 \
