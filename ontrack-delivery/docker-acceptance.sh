@@ -146,7 +146,9 @@ echo "[ACCEPTANCE] Ontrack container created: ${ONTRACK_CID} (${ONTRACK_NAME})"
 echo "[ACCEPTANCE] Preparation of nginx..."
 
 # Generation of the Nginx image
-NGINX_IMAGE="dockerfile/nginx"
+NGINX_IMAGE="ontrack-nginx:${ONTRACK_VERSION}"
+echo "[ACCEPTANCE] Building the nginx ${NGINX_IMAGE} image..."
+docker build -t="${NGINX_IMAGE}" docker-nginx
 
 # Mounting directories for Nginx
 NGINX_MOUNT=${MOUNT}/nginx
