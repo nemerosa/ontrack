@@ -6,6 +6,8 @@ task docker(type: Zip) {
     archiveName = "${project.name}-docker-${project.version}.jar"
     destinationDir = buildDir
     from projectDir
+    // Nginx
+    include 'docker-nginx/Dockerfile'
     // Ontrack docker
     include 'docker/Dockerfile'
     include 'docker/*.md'
