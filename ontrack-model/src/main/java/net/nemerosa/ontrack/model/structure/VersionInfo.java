@@ -34,4 +34,8 @@ public class VersionInfo {
      * Source of the version. It can be a tag (correct for a real release) or a developer environment.
      */
     private final String source;
+    /**
+     * Type of source for the version.
+     */
+    private final String sourceType;
 }

@@ -7,6 +7,7 @@
  *      - the build version - the build number
  *      - the commit - the commit for this version
  *      - the source - where the version was computed from
+ *      - the source type - tag or branch
  *
  * The way this information is collected depends on the environment:
  *
@@ -16,21 +17,24 @@
  *     - full = LOCAL
  *     - commit = <none>
  *     - source = <none>
+ *     - source type = 'local'
  *
  * - from a tag (we want to build from a tag)
  *     - the working copy is associated with a tag
- *     - base = TAG
+ *     - base = TAG (normalised)
  *     - build = <abbrev. sha1>
  *     - full = TAG
  *     - commit = <sha1>
- *     - source = 'tag'
+ *     - source = TAG
+ *     - source type = 'tag'
  *
  * - from a branch <b>:
- *     - base = <b>
+ *     - base = <b> (normalised)
  *     - build = <abbrev. sha1>
  *     - full = <base>-<build>
  *     - commit = <sha1>
  *     - source = <b>
+ *     - source type = 'branch'
  */
 
 // Information to collect
@@ -39,6 +43,7 @@ def versionBuild
 def versionFull
 def versionCommit
 def versionSource
+def versionSourceType
 
 boolean hasGit = project.file('.git').exists()
 
@@ -53,6 +58,7 @@ if (!hasGit) {
     versionFull = 'LOCAL'
     versionCommit = ''
     versionSource = ''
+    versionSourceType = 'local'
 }
 
 // We can use git
@@ -68,6 +74,7 @@ else {
         versionBase = normalise(tagInfo)
         versionFull = versionBase
         versionSource = tagInfo
+        versionSourceType = 'tag'
     }
     // We do not have tag info
     else {
@@ -76,6 +83,13 @@ else {
         versionBase = normalise(branchName)
         versionFull = "${versionBase}-${versionBuild}"
         versionSource = branchName
+        // Source type
+        int pos = versionSource.indexOf('/')
+        if (pos > 0) {
+            versionSourceType = versionSource.substring(0, pos)
+        } else {
+            versionSourceType = versionSource
+        }
     }
 }
 
@@ -85,6 +99,7 @@ project.ext.versionBase = versionBase
 project.ext.versionFull = versionFull
 project.ext.versionCommit = versionCommit
 project.ext.versionSource = versionSource
+project.ext.versionSourceType = versionSourceType
 
 /**
  * Task to display the version information
@@ -95,6 +110,7 @@ task displayVersion << {
     println "ontrack.version.build = ${project.versionBuild}"
     println "ontrack.version.commit = ${project.versionCommit}"
     println "ontrack.version.source = ${project.versionSource}"
+    println "ontrack.version.sourceType = ${project.versionSourceType}"
 }
 
 /**
@@ -107,5 +123,6 @@ ONTRACK_VERSION_BASE = ${project.versionBase}
 ONTRACK_VERSION_BUILD = ${project.versionBuild}
 ONTRACK_VERSION_COMMIT = ${project.versionCommit}
 ONTRACK_VERSION_SOURCE = ${project.versionSource}
+ONTRACK_VERSION_SOURCE_TYPE = ${project.versionSourceType}
 """
 }

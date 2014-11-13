@@ -46,6 +46,10 @@ public class VersionInfoConfig {
      * Source of the version. It can be a tag (correct for a real release) or a developer environment.
      */
     private String source = "source";
+    /**
+     * Type of source for the version.
+     */
+    private String sourceType = "sourceType";
 
     /**
      * Gets the representation of the version
@@ -57,7 +61,8 @@ public class VersionInfoConfig {
                 base,
                 build,
                 commit,
-                source
+                source,
+                sourceType
         );
     }
 
