@@ -6,11 +6,12 @@ task docker(type: Zip) {
     archiveName = "${project.name}-docker-${project.version}.jar"
     destinationDir = buildDir
     from projectDir
-    include 'docker/**'
-    exclude 'docker/ontrack/**'
-    include 'docker*.sh'
-    include 'acceptance.sh'
-    include 'README.md'
+    // Ontrack docker
+    include 'docker/Dockerfile'
+    include 'docker/*.md'
+    // Root
+    include '*.sh'
+    include '*.md'
 }
 
 task build(dependsOn: ['docker'])

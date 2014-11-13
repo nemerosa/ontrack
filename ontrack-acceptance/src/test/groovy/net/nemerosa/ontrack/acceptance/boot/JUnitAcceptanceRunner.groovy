@@ -27,6 +27,7 @@ class JUnitAcceptanceRunner implements AcceptanceRunner {
         logger.info "Starting acceptance tests."
         logger.info "Config URL    : ${config.url}"
         logger.info "Config context: ${config.context}"
+        logger.info "Disabling SSL : ${config.disableSSL}"
 
         // Config as system properties
         config.setSystemProperties()

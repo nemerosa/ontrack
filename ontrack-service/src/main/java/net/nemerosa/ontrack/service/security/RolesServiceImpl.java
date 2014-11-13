@@ -84,6 +84,14 @@ public class RolesServiceImpl implements RolesService, StartupService {
                 getProjectFunctions().stream().filter(t -> !ProjectDelete.class.isAssignableFrom(t)).collect(Collectors.toList())
         );
 
+        // Participant
+        register("PARTICIPANT", "Participant",
+                "A participant in a project is allowed to change statuses in validation runs.",
+                Arrays.asList(
+                        ValidationRunStatusChange.class
+                )
+        );
+
         // Validation manager
         List<Class<? extends ProjectFunction>> validationManagerFunctions = Arrays.asList(
                 ValidationStampCreate.class,
@@ -100,7 +108,8 @@ public class RolesServiceImpl implements RolesService, StartupService {
         // Promoter
         List<Class<? extends ProjectFunction>> promoterFunctions = Arrays.asList(
                 PromotionRunCreate.class,
-                PromotionRunDelete.class
+                PromotionRunDelete.class,
+                ValidationRunStatusChange.class
         );
         register("PROMOTER", "Promoter",
                 "The promoter can promote existing builds.",
