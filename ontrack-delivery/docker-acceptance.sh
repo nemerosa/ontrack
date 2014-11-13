@@ -115,14 +115,11 @@ echo "[ACCEPTANCE] Nginx data at:          ${MOUNT}/nginx"
 # Docker Options
 
 ONTRACK_DOCKER_OPTIONS=
-DOCKER_OPTIONS=
 if [ "${CONTROL_USER}" != "" ]
 then
     ONTRACK_DOCKER_OPTIONS="${ONTRACK_DOCKER_OPTIONS} --docker-user=${CONTROL_USER}"
-    DOCKER_OPTIONS="${DOCKER_OPTIONS} --user=${CONTROL_USER}"
 fi
 echo "[ACCEPTANCE] Ontrack Docker options: ${ONTRACK_DOCKER_OPTIONS}"
-echo "[ACCEPTANCE] Docker options:         ${DOCKER_OPTIONS}"
 
 # Ontrack container
 
@@ -152,18 +149,18 @@ docker build -t="${NGINX_IMAGE}" docker-nginx
 
 # Mounting directories for Nginx
 NGINX_MOUNT=${MOUNT}/nginx
-mkdir -p ${NGINX_MOUNT}/ssl
+mkdir -p ${NGINX_MOUNT}/certs
 mkdir -p ${NGINX_MOUNT}/sites-enabled
 mkdir -p ${NGINX_MOUNT}/logs
 
 # Starting the nginx container
 echo "[ACCEPTANCE] Initialising the nginx container..."
 rm -f nginx.cid
-docker run ${DOCKER_OPTIONS} \
+docker run \
 	-d \
 	-P \
 	--link ${ONTRACK_NAME}:ontrack \
-	--volume ${NGINX_MOUNT}/ssl:/etc/nginx/ssl \
+	--volume ${NGINX_MOUNT}/certs:/etc/nginx/certs \
 	--volume ${NGINX_MOUNT}/sites-enabled:/etc/nginx/sites-enabled \
 	--volume ${NGINX_MOUNT}/logs:/var/log/nginx \
 	--cidfile nginx.cid \

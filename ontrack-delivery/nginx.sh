@@ -142,15 +142,15 @@ then
 	openssl req -x509 -nodes -days 365 \
 		-newkey rsa:2048 \
 		-subj "${CERT_SUBJECT}" \
-		-keyout ${TARGET}/ssl/server.key \
-		-out ${TARGET}/ssl/server.crt
+		-keyout ${TARGET}/certs/server.key \
+		-out ${TARGET}/certs/server.crt
 	CERT_FILE=server.crt
 
 # Copy of certificates
 else
 	echo "[NGINX] Copy of certificates..."
-	cp ${CERT_PEM} ${TARGET}/ssl/server.pem
-	cp ${CERT_KEY} ${TARGET}/ssl/server.key
+	cp ${CERT_PEM} ${TARGET}/certs/server.pem
+	cp ${CERT_KEY} ${TARGET}/certs/server.key
 	CERT_FILE=server.pem
 fi
 
@@ -167,8 +167,8 @@ server {
     server_name ${PROXY_NAME};
 
     # ssl on;
-    ssl_certificate /etc/nginx/ssl/${CERT_FILE};
-    ssl_certificate_key /etc/nginx/ssl/server.key;
+    ssl_certificate /etc/nginx/certs/${CERT_FILE};
+    ssl_certificate_key /etc/nginx/certs/server.key;
 
     error_log /var/log/nginx/nginx.vhost.error.log;
 
