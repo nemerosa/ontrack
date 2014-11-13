@@ -67,14 +67,15 @@ else {
     if (tagInfo) {
         versionBase = normalise(tagInfo)
         versionFull = versionBase
-        versionSource = 'tag'
+        versionSource = tagInfo
     }
     // We do not have tag info
     else {
+        def branchName = 'git rev-parse --abbrev-ref HEAD'.execute().text.trim()
         // Gets the current branch
-        versionBase = normalise('git rev-parse --abbrev-ref HEAD'.execute().text.trim())
+        versionBase = normalise(branchName)
         versionFull = "${versionBase}-${versionBuild}"
-        versionSource = versionBase
+        versionSource = branchName
     }
 }
 
