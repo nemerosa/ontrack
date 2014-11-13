@@ -95,3 +95,16 @@ task displayVersion << {
     println "ontrack.version.commit = ${project.versionCommit}"
     println "ontrack.version.source = ${project.versionSource}"
 }
+
+/**
+ * Task to write the information down into a `version.properties` file
+ */
+task writeVersion << {
+    project.file('version.properties').text = """\
+ONTRACK_VERSION_FULL = ${project.version}
+ONTRACK_VERSION_BASE = ${project.versionBase}
+ONTRACK_VERSION_BUILD = ${project.versionBuild}
+ONTRACK_VERSION_COMMIT = ${project.versionCommit}
+ONTRACK_VERSION_SOURCE = ${project.versionSource}
+"""
+}
