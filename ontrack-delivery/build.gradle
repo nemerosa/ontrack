@@ -8,6 +8,7 @@ task docker(type: Zip) {
     from projectDir
     // Nginx
     include 'docker-nginx/Dockerfile'
+    include 'docker-nginx/*.conf'
     // Ontrack docker
     include 'docker/Dockerfile'
     include 'docker/*.md'
