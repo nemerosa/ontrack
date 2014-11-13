@@ -49,10 +49,15 @@
                                 <span class="fa fa-arrow-right"></span>
                                 <a href="#/build/{{branchStatusView.lastPromotionView.promotionRun.build.id}}">{{branchStatusView.lastPromotionView.promotionRun.build.name}}</a>
                             </span>
-                            <span ng-if="!branchStatusView.lastPromotionView" class="ot-home-branch-promotion">
+                            <span ng-if="!branchStatusView.lastPromotionView && branchStatusView.latestBuild" class="ot-home-branch-promotion">
+                                <span class="ot-description">Latest</span>
+                                <span class="fa fa-arrow-right"></span>
+                                <a href="#/build/{{branchStatusView.latestBuild.id}}">{{branchStatusView.latestBuild.name}}</a>
+                            </span>
+                            <span ng-if="!branchStatusView.lastPromotionView && !branchStatusView.latestBuild" class="ot-home-branch-promotion">
                                 <span class="fa fa-ban"></span>
                                 <span class="ot-description">
-                                    No promotion yet
+                                    No build yet
                                 </span>
                             </span>
                         </div>
