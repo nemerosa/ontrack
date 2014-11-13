@@ -130,7 +130,7 @@ fi
 # Environment preparation
 
 rm -rf ${TARGET}
-mkdir -p ${TARGET}/ssl
+mkdir -p ${TARGET}/certs
 mkdir -p ${TARGET}/sites-enabled
 mkdir -p ${TARGET}/logs
 
