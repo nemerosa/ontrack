@@ -12,6 +12,7 @@ task docker(type: Zip) {
     // Root
     include '*.sh'
     include '*.md'
+    include 'publication.*'
 }
 
 task build(dependsOn: ['docker'])
