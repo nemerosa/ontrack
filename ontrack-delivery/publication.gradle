@@ -30,6 +30,8 @@ String githubToken() { param('githubToken') }
 
 String ontrackVersion() { param('ontrackVersion') }
 
+String ontrackBuild() { param('ontrackBuild') }
+
 String ontrackCommit() { param('ontrackCommit') }
 
 String ontrackBranch() { param('ontrackBranch') }
@@ -137,7 +139,7 @@ task ontrackChangeLog << {
  */
 task ontrackPromote << {
     // Gets the build ID from ontrack
-    def http = new HTTPBuilder("${ontrackUrl}/structure/entity/build/${ontrackProject}/${ontrackBranch()}/${ontrackVersion()}")
+    def http = new HTTPBuilder("${ontrackUrl}/structure/entity/build/${ontrackProject}/${ontrackBranch()}/${ontrackBuild()}")
     http.auth.basic ontrackUserName(), ontrackUserPassword()
     def buildId = http.get(contentType: ContentType.JSON).id
     println "Build ${ontrackVersion()} has ID ${buildId}"
