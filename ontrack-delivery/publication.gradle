@@ -26,11 +26,17 @@ def param(String name) {
     else return properties[name]
 }
 
-String githubToken () { param('githubToken') }
-String ontrackBuild () { param('ontrackBuild') }
-String ontrackUserName () { param('ontrackUserName') }
-String ontrackUserPassword () { param('ontrackUserPassword') }
-String releasePath () { param('releasePath') }
+String githubToken() { param('githubToken') }
+
+String ontrackVersion() { param('ontrackVersion') }
+
+String ontrackCommit() { param('ontrackCommit') }
+
+String ontrackUserName() { param('ontrackUserName') }
+
+String ontrackUserPassword() { param('ontrackUserPassword') }
+
+String releasePath() { param('releasePath') }
 
 /**
  * Optional properties
@@ -51,13 +57,14 @@ task githubReleaseCreate << {
         headers['Authorization'] = "token ${githubToken()}"
         headers['User-Agent'] = "${githubRepository}"
         body = [
-                tag_name  : "${ontrackBuild()}".toString(),
-                name      : "v${ontrackBuild()}".toString(),
-                prerelease: true
+                tag_name        : "${ontrackVersion()}".toString(),
+                target_commitish: "${ontrackCommit()}".toString(),
+                name            : "${ontrackVersion()}".toString(),
+                prerelease      : true
         ]
         response.success = { resp, json ->
             int id = json.id as int
-            println "Release v${ontrackBuild()} created with ID = $id"
+            println "Release ${ontrackVersion()} created with ID = $id"
             project.tasks.githubReleaseCreate.ext.releaseId = id
         }
     }
@@ -82,8 +89,8 @@ task githubReleaseAssets(dependsOn: 'githubReleaseCreate') << {
     int id = project.tasks.githubReleaseCreate.releaseId
     // ['ontrack-ui', 'ontrack-acceptance', 'ontrack-delivery-docker'].each { name ->
     ['ontrack-ui'].each { name ->
-        File file = new File(releasePath() as String, "${name}-${ontrackBuild()}.jar")
-        println "Publishing ${file} to release ${ontrackBuild()} ($id)..."
+        File file = new File(releasePath() as String, "${name}-${ontrackVersion()}.jar")
+        println "Publishing ${file} to release ${ontrackVersion()} ($id)..."
         if (!file.exists()) {
             throw new GradleException("File ${file} cannot be published because it does not exist.")
         } else {
@@ -121,10 +128,10 @@ task ontrackChangeLog << {
  */
 task ontrackPromote << {
     // Gets the build ID from ontrack
-    def http = new HTTPBuilder("${ontrackUrl}/structure/entity/build/${ontrackProject}/${ontrackBranch}/${ontrackBuild()}")
+    def http = new HTTPBuilder("${ontrackUrl}/structure/entity/build/${ontrackProject}/${ontrackBranch}/${ontrackVersion()}")
     http.auth.basic ontrackUserName(), ontrackUserPassword()
     def buildId = http.get(contentType: ContentType.JSON).id
-    println "Build ${ontrackBuild()} has ID ${buildId}"
+    println "Build ${ontrackVersion()} has ID ${buildId}"
     // Gets the promotion level for RELEASE
     http = new HTTPBuilder("${ontrackUrl}/structure/entity/promotionLevel/${ontrackProject}/${ontrackBranch}/RELEASE")
     http.auth.basic ontrackUserName(), ontrackUserPassword()
@@ -141,7 +148,7 @@ task ontrackPromote << {
                 properties    : []
         ]
     }
-    println "Build ${ontrackBuild()} is promoted to RELEASE."
+    println "Build ${ontrackVersion()} is promoted to RELEASE."
 }
 ontrackPromote.mustRunAfter ontrackChangeLog
 
