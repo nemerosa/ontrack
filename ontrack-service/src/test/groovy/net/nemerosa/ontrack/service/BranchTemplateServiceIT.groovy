@@ -267,13 +267,13 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
             def results = templateService.sync(template.id)
             assert results.branches.size() == 3
             BRANCHES.each { sourceName ->
-                def branchName = sourceName.replace('/', '_')
-                assert results.branches.find { it.branchName == branchName }.type == BranchTemplateSyncType.CREATED
+                def branchName = sourceName.replace('/', '-')
+                assert results.branches.find { it.branchName == branchName }?.type == BranchTemplateSyncType.CREATED
             }
 
             // Checks the branches have been created
             BRANCHES.each { sourceName ->
-                def branchName = sourceName.replace('/', '_')
+                def branchName = sourceName.replace('/', '-')
                 def branch = structureService.findBranchByName(template.project.name, branchName)
                 assert branch.present
                 // Gets its template instance
@@ -304,9 +304,9 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
         asUser().with(template, BranchTemplateMgt).call {
             def results = templateService.sync(template.id)
             assert results.branches.size() == 3
-            assert results.branches.find { it.branchName == 'feature_19' }.type == BranchTemplateSyncType.CREATED
-            assert results.branches.find { it.branchName == 'feature_22' }.type == BranchTemplateSyncType.CREATED
-            assert results.branches.find { it.branchName == 'master' }.type == BranchTemplateSyncType.EXISTING_CLASSIC
+            assert results.branches.find { it.branchName == 'feature-19' }?.type == BranchTemplateSyncType.CREATED
+            assert results.branches.find { it.branchName == 'feature-22' }?.type == BranchTemplateSyncType.CREATED
+            assert results.branches.find { it.branchName == 'master' }?.type == BranchTemplateSyncType.EXISTING_CLASSIC
         }
     }
 
@@ -331,11 +331,11 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
         asUser().with(template, BranchTemplateMgt).call {
             def results = templateService.sync(template.id)
             assert results.branches.size() == 3
-            assert results.branches.find { it.branchName == 'feature_19' }.type == BranchTemplateSyncType.CREATED
-            assert results.branches.find { it.branchName == 'feature_22' }.type == BranchTemplateSyncType.CREATED
+            assert results.branches.find { it.branchName == 'feature-19' }?.type == BranchTemplateSyncType.CREATED
+            assert results.branches.find { it.branchName == 'feature-22' }?.type == BranchTemplateSyncType.CREATED
             assert results.branches.find {
                 it.branchName == 'master'
-            }.type == BranchTemplateSyncType.EXISTING_DEFINITION
+            }?.type == BranchTemplateSyncType.EXISTING_DEFINITION
         }
     }
 
@@ -349,14 +349,14 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
         asUser().with(anotherTemplate, BranchTemplateMgt).call {
             def results = templateService.sync(anotherTemplate.id)
             assert results.branches.size() == 1
-            assert results.branches.find { it.branchName == 'master' }.type == BranchTemplateSyncType.CREATED
+            assert results.branches.find { it.branchName == 'master' }?.type == BranchTemplateSyncType.CREATED
         }
         // Sync
         asUser().with(template, BranchTemplateMgt).call {
             def results = templateService.sync(template.id)
             assert results.branches.size() == 3
-            assert results.branches.find { it.branchName == 'feature_19' }.type == BranchTemplateSyncType.CREATED
-            assert results.branches.find { it.branchName == 'feature_22' }.type == BranchTemplateSyncType.CREATED
+            assert results.branches.find { it.branchName == 'feature-19' }?.type == BranchTemplateSyncType.CREATED
+            assert results.branches.find { it.branchName == 'feature-22' }?.type == BranchTemplateSyncType.CREATED
             results.branches.find { it.branchName == 'master' } with {
                 assert type == BranchTemplateSyncType.EXISTING_INSTANCE_FROM_OTHER
                 assert otherTemplateName == 'anotherTemplate'
@@ -376,8 +376,8 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
             def results = templateService.sync(template.id)
             assert results.branches.size() == 3
             BRANCHES.each { sourceName ->
-                def branchName = sourceName.replace('/', '_')
-                assert results.branches.find { it.branchName == branchName }.type == BranchTemplateSyncType.UPDATED
+                def branchName = sourceName.replace('/', '-')
+                assert results.branches.find { it.branchName == branchName }?.type == BranchTemplateSyncType.UPDATED
             }
         }
 
@@ -446,12 +446,12 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
             // Relaunching sync. with one existing branch outside of the sync.
             def results = templateService.sync(template.id)
             assert results.branches.size() == 3
-            assert results.branches.find { it.branchName == 'feature_19' }.type == BranchTemplateSyncType.UPDATED
-            assert results.branches.find { it.branchName == 'feature_22' }.type == BranchTemplateSyncType.DISABLED
-            assert results.branches.find { it.branchName == 'master' }.type == BranchTemplateSyncType.UPDATED
+            assert results.branches.find { it.branchName == 'feature-19' }?.type == BranchTemplateSyncType.UPDATED
+            assert results.branches.find { it.branchName == 'feature-22' }?.type == BranchTemplateSyncType.DISABLED
+            assert results.branches.find { it.branchName == 'master' }?.type == BranchTemplateSyncType.UPDATED
             // Checks the branch has been disabled
-            assert structureService.findBranchByName(template.project.name, 'feature_22').present
-            assert structureService.findBranchByName(template.project.name, 'feature_22').get().disabled
+            assert structureService.findBranchByName(template.project.name, 'feature-22').present
+            assert structureService.findBranchByName(template.project.name, 'feature-22').get().disabled
         }
 
     }
@@ -471,11 +471,11 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
             // Relaunching sync. with one existing branch outside of the sync.
             def results = templateService.sync(template.id)
             assert results.branches.size() == 3
-            assert results.branches.find { it.branchName == 'feature_19' }.type == BranchTemplateSyncType.UPDATED
-            assert results.branches.find { it.branchName == 'feature_22' }.type == BranchTemplateSyncType.DELETED
-            assert results.branches.find { it.branchName == 'master' }.type == BranchTemplateSyncType.UPDATED
+            assert results.branches.find { it.branchName == 'feature-19' }?.type == BranchTemplateSyncType.UPDATED
+            assert results.branches.find { it.branchName == 'feature-22' }?.type == BranchTemplateSyncType.DELETED
+            assert results.branches.find { it.branchName == 'master' }?.type == BranchTemplateSyncType.UPDATED
             // Checks the branch has been disabled
-            assert !structureService.findBranchByName(template.project.name, 'feature_22').present
+            assert !structureService.findBranchByName(template.project.name, 'feature-22').present
         }
 
     }
@@ -486,19 +486,19 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
         asUser().with(template, BranchTemplateMgt).call {
             // Launching synchronisation, once
             def results = templateService.sync(template.id)
-            assert results.branches.find { it.branchName == 'mybranch' }.type == BranchTemplateSyncType.CREATED
+            assert results.branches.find { it.branchName == 'mybranch' }?.type == BranchTemplateSyncType.CREATED
             // Gets the branch instance
             def branch = structureService.findBranchByName(template.project.name, 'mybranch').get()
-            assert branch.type == BranchType.TEMPLATE_INSTANCE
+            assert branch?.type == BranchType.TEMPLATE_INSTANCE
             // Disconnects it
             branch = templateService.disconnectTemplateInstance(branch.id)
-            assert branch.type == BranchType.CLASSIC
+            assert branch?.type == BranchType.CLASSIC
             // Relaunches sync
             results = templateService.sync(template.id)
-            assert results.branches.find { it.branchName == 'mybranch' }.type == BranchTemplateSyncType.EXISTING_CLASSIC
+            assert results.branches.find { it.branchName == 'mybranch' }?.type == BranchTemplateSyncType.EXISTING_CLASSIC
             // Checks it is untouched
             branch = structureService.findBranchByName(template.project.name, 'mybranch').get()
-            assert branch.type == BranchType.CLASSIC
+            assert branch?.type == BranchType.CLASSIC
         }
     }
 
@@ -507,7 +507,7 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
     }
 
     protected void checkBranchTemplateInstance(Branch instance, String branch) {
-        assert instance.type == BranchType.TEMPLATE_INSTANCE
+        assert instance?.type == BranchType.TEMPLATE_INSTANCE
         assert instance.description == 'Branch instance'
 
         // Checks the branch properties
@@ -606,7 +606,7 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
                         new TemplateParameter(
                                 'BRANCH',
                                 "Display name for the branch",
-                                '${sourceName.toUpperCase().replaceAll("/","_")}'
+                                '${sourceName.toUpperCase().replaceAll("/","-")}'
                         ),
                         new TemplateParameter(
                                 'SCM',
