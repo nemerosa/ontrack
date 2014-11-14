@@ -11,4 +11,5 @@ build
 *.txt
 *.pid
 ontrack-acceptance.xml
-version.properties
+/version.properties
+/release.sh
