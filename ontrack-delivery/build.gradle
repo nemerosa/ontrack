@@ -5,14 +5,13 @@ task clean << {
 task docker(type: Zip) {
     archiveName = "${project.name}-docker-${project.version}.jar"
     destinationDir = buildDir
-    from projectDir
-    // Ontrack docker
-    include 'docker/Dockerfile'
-    include 'docker/*.md'
-    // Root
-    include '*.sh'
-    include '*.md'
-    include 'publication.*'
+    from(projectDir) {
+        // Ontrack docker
+        include 'docker/Dockerfile'
+        // Root
+        include '*.sh'
+        include 'publication.*'
+    }
     // Wrapper
     from(rootDir) {
         include 'gradlew.*'
