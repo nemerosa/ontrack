@@ -32,6 +32,8 @@ String ontrackVersion() { param('ontrackVersion') }
 
 String ontrackCommit() { param('ontrackCommit') }
 
+String ontrackBranch() { param('ontrackBranch') }
+
 String ontrackUserName() { param('ontrackUserName') }
 
 String ontrackUserPassword() { param('ontrackUserPassword') }
@@ -44,7 +46,6 @@ String releasePath() { param('releasePath') }
 
 if (!hasProperty('ontrackUrl')) ext { ontrackUrl = 'https://ontrack.nemerosa.net' }
 if (!hasProperty('ontrackProject')) ext { ontrackProject = 'ontrack' }
-if (!hasProperty('ontrackBranch')) ext { ontrackBranch = '2.0' }
 if (!hasProperty('githubRepository')) ext { githubRepository = 'nemerosa/ontrack' }
 
 /**
@@ -104,9 +105,9 @@ task githubReleaseAssets(dependsOn: 'githubReleaseCreate') << {
  */
 task ontrackChangeLog << {
     // Gets the branch ID
-    def http = new HTTPBuilder("${ontrackUrl}/structure/entity/branch/${ontrackProject}/${ontrackBranch}")
+    def http = new HTTPBuilder("${ontrackUrl}/structure/entity/branch/${ontrackProject}/${ontrackBranch()}")
     def branchId = http.get(contentType: ContentType.JSON).id
-    println "Branch ${ontrackBranch} has ID ${branchId}"
+    println "Branch ${ontrackBranch()} has ID ${branchId}"
     // Gets the change log
     http = new HTTPBuilder("${ontrackUrl}/structure/branches/${branchId}/view/net.nemerosa.ontrack.service.StandardBuildFilterProvider?afterDate=&beforeDate=&count=100&sincePromotionLevel=RELEASE")
     def branchBuildView = http.get(contentType: ContentType.JSON)
@@ -128,12 +129,12 @@ task ontrackChangeLog << {
  */
 task ontrackPromote << {
     // Gets the build ID from ontrack
-    def http = new HTTPBuilder("${ontrackUrl}/structure/entity/build/${ontrackProject}/${ontrackBranch}/${ontrackVersion()}")
+    def http = new HTTPBuilder("${ontrackUrl}/structure/entity/build/${ontrackProject}/${ontrackBranch()}/${ontrackVersion()}")
     http.auth.basic ontrackUserName(), ontrackUserPassword()
     def buildId = http.get(contentType: ContentType.JSON).id
     println "Build ${ontrackVersion()} has ID ${buildId}"
     // Gets the promotion level for RELEASE
-    http = new HTTPBuilder("${ontrackUrl}/structure/entity/promotionLevel/${ontrackProject}/${ontrackBranch}/RELEASE")
+    http = new HTTPBuilder("${ontrackUrl}/structure/entity/promotionLevel/${ontrackProject}/${ontrackBranch()}/RELEASE")
     http.auth.basic ontrackUserName(), ontrackUserPassword()
     def promotionLevelId = http.get(contentType: ContentType.JSON).id
     println "Promotion level RELEASE has ID ${promotionLevelId}"
