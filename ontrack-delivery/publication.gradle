@@ -121,8 +121,6 @@ task ontrackChangeLog << {
     // Gets the change log
     http = new HTTPBuilder("${ontrackUrl}/structure/branches/${branchId}/view/net.nemerosa.ontrack.service.StandardBuildFilterProvider?afterDate=&beforeDate=&count=100&sincePromotionLevel=RELEASE")
     def branchBuildView = http.get(contentType: ContentType.JSON)
-    // URI for the change log
-    def changelogUri = branchBuildView.buildDiffActions[0].uri
     // Boundaries
     def lastBuildId = branchBuildView.buildViews[0].build.id
     def lastReleaseBuildId = branchBuildView.buildViews[branchBuildView.buildViews.size() - 1].build.id
