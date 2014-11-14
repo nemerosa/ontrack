@@ -35,12 +35,12 @@ class NameDescriptionTest {
 
     @Test
     void 'Escaping: special characters'() {
-        assert '2.0.0-feature-accentu_e' == escapeName('2.0.0-feature-accentuée')
+        assert '2.0.0-feature-accentu-e' == escapeName('2.0.0-feature-accentuée')
     }
 
     @Test
     void 'Escaping: slashes'() {
-        assert 'feature_templating' == escapeName('feature/templating')
+        assert 'feature-templating' == escapeName('feature/templating')
     }
 
 }
