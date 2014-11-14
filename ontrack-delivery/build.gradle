@@ -13,6 +13,11 @@ task docker(type: Zip) {
     include '*.sh'
     include '*.md'
     include 'publication.*'
+    // Wrapper
+    from(rootDir) {
+        include 'gradlew.*'
+        include 'gradle/wrapper/**'
+    }
 }
 
 task build(dependsOn: ['docker'])
