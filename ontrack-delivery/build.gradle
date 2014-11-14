@@ -14,7 +14,7 @@ task docker(type: Zip) {
     }
     // Wrapper
     from(rootDir) {
-        include 'gradlew.*'
+        include 'gradlew*'
         include 'gradle/wrapper/**'
     }
 }
