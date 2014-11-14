@@ -96,11 +96,8 @@ task testReport(type: TestReport) {
 
 /**
  * Release task.
- *
- * Use the full version to create a tag.
  */
-task release(type: Exec, dependsOn: ['displayVersion']) {
-    commandLine 'git', 'tag', version
+task release(dependsOn: ['displayVersion']) {
 }
 
 /**
