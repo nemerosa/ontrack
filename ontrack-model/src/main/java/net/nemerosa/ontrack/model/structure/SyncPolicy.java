@@ -71,7 +71,7 @@ public class SyncPolicy {
             // Gets a corresponding item
             T targetItem = targetMap.get(itemId);
             // If present
-            if (targetItem != null) {
+            if (targetItem != null && config.isTargetItemPresent(targetItem)) {
                 // This depends on the policy
                 switch (targetPresentPolicy) {
                     case IGNORE:

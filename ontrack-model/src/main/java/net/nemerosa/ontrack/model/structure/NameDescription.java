@@ -52,7 +52,7 @@ public class NameDescription {
         } else if (java.util.regex.Pattern.matches(NAME, name)) {
             return name;
         } else {
-            return name.replaceAll("[^A-Za-z0-9\\.\\-_]", "_");
+            return name.replaceAll("[^A-Za-z0-9\\.\\-_]", "-");
         }
     }
 }

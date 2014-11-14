@@ -18,4 +18,7 @@ public interface SyncConfig<T, D> {
 
     void deleteTargetItem(T target);
 
+    default boolean isTargetItemPresent(T targetItem) {
+        return targetItem != null;
+    }
 }

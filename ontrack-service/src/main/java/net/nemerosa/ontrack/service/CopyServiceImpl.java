@@ -248,6 +248,11 @@ public class CopyServiceImpl implements CopyService {
                     public void deleteTargetItem(Property<?> targetProperty) {
                         propertyService.deleteProperty(target, targetProperty.getType().getTypeName());
                     }
+
+                    @Override
+                    public boolean isTargetItemPresent(Property<?> targetItem) {
+                        return targetItem != null && !targetItem.isEmpty();
+                    }
                 }
         );
     }
