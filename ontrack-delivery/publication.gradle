@@ -75,12 +75,22 @@ def uploadAsset(File file, String name, int releaseId, String githubToken) {
     println "Publishing ${file} as ${name}..."
     def url = "https://uploads.github.com/repos/${githubRepository}/releases/${releaseId}/assets?name=${name}"
     def http = new HTTPBuilder(url)
+    http.ignoreSSLIssues()
     http.request(Method.POST) { req ->
         headers['Authorization'] = "token ${githubToken}"
         headers['User-Agent'] = "${githubRepository}"
         headers['Content-Type'] = 'application/zip'
         send ContentType.BINARY, file.bytes
     }
+}
+
+task upload << {
+    uploadAsset(
+            new File('README.md'),
+            'README.md',
+            705274,
+            '7b035624ad59866d34a6e83cd0c09decacb527be'
+    )
 }
 
 /**
