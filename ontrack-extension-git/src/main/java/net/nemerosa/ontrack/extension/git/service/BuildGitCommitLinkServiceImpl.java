@@ -14,6 +14,7 @@ public class BuildGitCommitLinkServiceImpl implements BuildGitCommitLinkService 
 
     @Autowired
     public BuildGitCommitLinkServiceImpl(List<BuildGitCommitLink<?>> links) {
+        // TODO Fetches extensions
         this.links = links;
     }
 

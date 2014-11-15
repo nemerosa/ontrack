@@ -4,16 +4,16 @@ import net.nemerosa.ontrack.extension.git.model.BuildGitCommitLink;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TagPatternBuildNameGitCommitLink implements BuildGitCommitLink<TagPattern> {
+public class CommitBuildNameGitCommitLink implements BuildGitCommitLink<NoConfig> {
 
     @Override
     public String getId() {
-        return "tagPattern";
+        return "commit";
     }
 
     @Override
     public String getName() {
-        return "Tag pattern";
+        return "Commit";
     }
 
 }
