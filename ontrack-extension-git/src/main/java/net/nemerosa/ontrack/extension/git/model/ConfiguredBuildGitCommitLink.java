@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.git.model;
 
 import lombok.Data;
 import net.nemerosa.ontrack.model.structure.Build;
+import net.nemerosa.ontrack.model.structure.ServiceConfiguration;
 
 import java.util.function.Function;
 
@@ -23,5 +24,12 @@ public class ConfiguredBuildGitCommitLink<T> {
 
     public String getCommitFromBuild(Build build) {
         return link.getCommitFromBuild(build, data);
+    }
+
+    public ServiceConfiguration toServiceConfiguration() {
+        return new ServiceConfiguration(
+                link.getId(),
+                link.toJson(data)
+        );
     }
 }

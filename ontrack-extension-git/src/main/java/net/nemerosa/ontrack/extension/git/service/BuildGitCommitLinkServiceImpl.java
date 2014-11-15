@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.extension.git.service;
 
 import net.nemerosa.ontrack.extension.git.model.BuildGitCommitLink;
-import net.nemerosa.ontrack.extension.git.model.BuildGitCommitLinkNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BuildGitCommitLinkServiceImpl implements BuildGitCommitLinkService {
@@ -24,10 +24,9 @@ public class BuildGitCommitLinkServiceImpl implements BuildGitCommitLinkService 
     }
 
     @Override
-    public BuildGitCommitLink<?> getLink(String id) {
+    public Optional<BuildGitCommitLink<?>> getOptionalLink(String id) {
         return links.stream()
                 .filter(s -> id.equals(s.getId()))
-                .findFirst()
-                .orElseThrow(() -> new BuildGitCommitLinkNotFoundException(id));
+                .findFirst();
     }
 }

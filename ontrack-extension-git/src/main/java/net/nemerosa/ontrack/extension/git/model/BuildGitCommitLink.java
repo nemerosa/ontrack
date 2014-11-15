@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.git.model;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.structure.Build;
 
 import java.util.function.Function;
@@ -35,4 +37,19 @@ public interface BuildGitCommitLink<T> {
      * @return Committish (short or long SHA, tag, head, etc.)
      */
     String getCommitFromBuild(Build build, T data);
+
+    /**
+     * Parses the configuration from a JSON node
+     */
+    T parseData(JsonNode node);
+
+    /**
+     * Formats the configuration data as JSON
+     */
+    JsonNode toJson(T data);
+
+    /**
+     * Creates a form for the edition of the link configuration.
+     */
+    Form getForm();
 }

@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropert
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationPropertyType
+import net.nemerosa.ontrack.extension.git.support.TagBuildNameGitCommitLink
 import net.nemerosa.ontrack.model.structure.*
 import org.junit.Test
 
@@ -21,6 +22,8 @@ class DefaultGitConfiguratorTest {
 
         GitConfigurationService gitConfigurationService = mock(GitConfigurationService)
 
+        BuildGitCommitLinkService buildGitCommitLinkService = mock(BuildGitCommitLinkService)
+
         PropertyService propertyService = mock(PropertyService)
         when(propertyService.getProperty(project, GitProjectConfigurationPropertyType)).thenReturn(
                 Property.of(
@@ -30,7 +33,7 @@ class DefaultGitConfiguratorTest {
         )
         when(propertyService.getProperty(branch, GitBranchConfigurationPropertyType)).thenReturn(
                 Property.of(
-                        new GitBranchConfigurationPropertyType(),
+                        new GitBranchConfigurationPropertyType(buildGitCommitLinkService),
                         null
                 )
         )
@@ -51,6 +54,8 @@ class DefaultGitConfiguratorTest {
 
         GitConfigurationService gitConfigurationService = mock(GitConfigurationService)
 
+        BuildGitCommitLinkService buildGitCommitLinkService = mock(BuildGitCommitLinkService)
+
         PropertyService propertyService = mock(PropertyService)
         when(propertyService.getProperty(project, GitProjectConfigurationPropertyType)).thenReturn(
                 Property.of(
@@ -60,10 +65,11 @@ class DefaultGitConfiguratorTest {
         )
         when(propertyService.getProperty(branch, GitBranchConfigurationPropertyType)).thenReturn(
                 Property.of(
-                        new GitBranchConfigurationPropertyType(),
+                        new GitBranchConfigurationPropertyType(buildGitCommitLinkService),
                         new GitBranchConfigurationProperty(
                                 '2.1',
                                 '2.1.*',
+                                TagBuildNameGitCommitLink.DEFAULT.toServiceConfiguration(),
                                 true,
                                 0
                         )
@@ -86,6 +92,8 @@ class DefaultGitConfiguratorTest {
 
         GitConfigurationService gitConfigurationService = mock(GitConfigurationService)
 
+        BuildGitCommitLinkService buildGitCommitLinkService = mock(BuildGitCommitLinkService)
+
         GitConfiguration gitConfiguration = GitConfiguration.empty()
 
         PropertyService propertyService = mock(PropertyService)
@@ -99,7 +107,7 @@ class DefaultGitConfiguratorTest {
         )
         when(propertyService.getProperty(branch, GitBranchConfigurationPropertyType)).thenReturn(
                 Property.of(
-                        new GitBranchConfigurationPropertyType(),
+                        new GitBranchConfigurationPropertyType(buildGitCommitLinkService),
                         null
                 )
         )
@@ -120,6 +128,8 @@ class DefaultGitConfiguratorTest {
 
         GitConfigurationService gitConfigurationService = mock(GitConfigurationService)
 
+        BuildGitCommitLinkService buildGitCommitLinkService = mock(BuildGitCommitLinkService)
+
         GitConfiguration gitConfiguration = GitConfiguration.empty()
 
         PropertyService propertyService = mock(PropertyService)
@@ -133,10 +143,11 @@ class DefaultGitConfiguratorTest {
         )
         when(propertyService.getProperty(branch, GitBranchConfigurationPropertyType)).thenReturn(
                 Property.of(
-                        new GitBranchConfigurationPropertyType(),
+                        new GitBranchConfigurationPropertyType(buildGitCommitLinkService),
                         new GitBranchConfigurationProperty(
                                 '2.1',
                                 '2.1.*',
+                                TagBuildNameGitCommitLink.DEFAULT.toServiceConfiguration(),
                                 true,
                                 0
                         )

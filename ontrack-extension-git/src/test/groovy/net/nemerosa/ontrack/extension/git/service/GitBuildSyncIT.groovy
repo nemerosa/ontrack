@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.git.client.GitTag
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
+import net.nemerosa.ontrack.extension.git.support.TagBuildNameGitCommitLink
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
 import net.nemerosa.ontrack.model.job.JobQueueService
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -62,13 +63,16 @@ class GitBuildSyncIT {
         Project project = Project.of(nd('P', "Project")).withId(ID.of(1))
         Branch branch = Branch.of(project, nd('1.2', "Branch 1.2")).withId(ID.of(2))
 
+        BuildGitCommitLinkService buildGitCommitLinkService = mock(BuildGitCommitLinkService)
+
         when(structureService.findBuildByName(eq('P'), eq('1.2'), anyString())).thenReturn(Optional.empty())
         when(propertyService.getProperty(branch, GitBranchConfigurationPropertyType)).thenReturn(
                 Property.of(
-                        new GitBranchConfigurationPropertyType(),
+                        new GitBranchConfigurationPropertyType(buildGitCommitLinkService),
                         new GitBranchConfigurationProperty(
                                 'master',
                                 '1.2.*',
+                                TagBuildNameGitCommitLink.DEFAULT.toServiceConfiguration(),
                                 true,
                                 0
                         )
