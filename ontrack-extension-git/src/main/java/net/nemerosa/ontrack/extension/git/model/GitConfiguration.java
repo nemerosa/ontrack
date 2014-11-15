@@ -44,7 +44,9 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
 
     /**
      * Tag pattern configuration
+     * @deprecated See #163
      */
+    @Deprecated
     @Wither
     private final String tagPattern;
 
@@ -197,10 +199,18 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
         );
     }
 
+    /**
+     * @deprecated See #163
+     */
+    @Deprecated
     public boolean isValidTagName(String name) {
         return StringUtils.isBlank(tagPattern) || createRegex().matcher(name).matches();
     }
 
+    /**
+     * @deprecated See #163
+     */
+    @Deprecated
     public Optional<String> getBuildNameFromTagName(String tagName) {
         if (StringUtils.isBlank(tagPattern)) {
             return Optional.of(tagName);
@@ -218,6 +228,10 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
         }
     }
 
+    /**
+     * @deprecated See #163
+     */
+    @Deprecated
     public Optional<String> getTagNameFromBuildName(String buildName) {
         if (StringUtils.isBlank(tagPattern)) {
             return Optional.of(buildName);
