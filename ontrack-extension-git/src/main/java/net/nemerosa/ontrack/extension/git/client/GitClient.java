@@ -14,6 +14,13 @@ public interface GitClient {
 
     GitConfiguration getConfiguration();
 
+    /**
+     * Gets a Git log between two boundaries.
+     *
+     * @param from Commitish string
+     * @param to   Commitish string
+     * @return Git log
+     */
     GitLog log(String from, String to);
 
     GitCommit toCommit(RevCommit revCommit);
@@ -21,8 +28,6 @@ public interface GitClient {
     void sync(Consumer<String> logger);
 
     GitDiff diff(String from, String to);
-
-    boolean isCommitDefined(String commit);
 
     GitCommit getCommitFor(String commit);
 

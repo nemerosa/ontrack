@@ -174,15 +174,6 @@ public class DefaultGitClient implements GitClient {
     }
 
     @Override
-    public boolean isCommitDefined(String commit) {
-        try {
-            return repository.git().getRepository().resolve(commit + "^0") != null;
-        } catch (IOException e) {
-            throw new GitException(e);
-        }
-    }
-
-    @Override
     public GitCommit getCommitFor(String commit) {
         try {
             Repository repo = repository.git().getRepository();
