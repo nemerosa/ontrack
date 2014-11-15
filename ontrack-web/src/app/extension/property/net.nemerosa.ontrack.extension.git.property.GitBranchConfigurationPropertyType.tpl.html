@@ -1,4 +1,6 @@
-<p>{{property.value.branch}} <code>{{property.value.tagPattern}}</code></p>
+<p>{{property.value.branch}}</p>
+<p ng-include="'app/extension/git/buildCommitLink/' + property.value.buildCommitLink.id + '.tpl.html'">
+</p>
 <p>
     <span ng-if="!property.value.buildTagInterval">No automatic synchronisation.</span>
     <span ng-if="property.value.buildTagInterval">Synchronisation every {{property.value.buildTagInterval}} minute(s).</span>
