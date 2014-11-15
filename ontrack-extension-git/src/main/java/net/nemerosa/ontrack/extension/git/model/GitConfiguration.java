@@ -239,38 +239,6 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
         }
     }
 
-    /**
-     * @deprecated See #163
-     */
-    @Deprecated
-    public Optional<String> getTagNameFromBuildName(String buildName) {
-        if (StringUtils.isBlank(tagPattern)) {
-            return Optional.of(buildName);
-        } else {
-            // Extraction of the build pattern, if any
-            String buildPartRegex = "\\((.*\\*/*)\\)";
-            Pattern buildPartPattern = Pattern.compile(buildPartRegex);
-            Matcher buildPartMatcher = buildPartPattern.matcher(tagPattern);
-            if (buildPartMatcher.find()) {
-                String buildPart = buildPartMatcher.group(1);
-                if (Pattern.matches(buildPart, buildName)) {
-                    StringBuffer tag = new StringBuffer();
-                    do {
-                        buildPartMatcher.appendReplacement(tag, buildName);
-                    } while (buildPartMatcher.find());
-                    buildPartMatcher.appendTail(tag);
-                    return Optional.of(tag.toString());
-                } else {
-                    return Optional.empty();
-                }
-            } else if (createRegex().matcher(buildName).matches()) {
-                return Optional.of(buildName);
-            } else {
-                return Optional.empty();
-            }
-        }
-    }
-
     private Pattern createRegex() {
         return Pattern.compile(StringUtils.replace(tagPattern, "*", ".*"));
     }
