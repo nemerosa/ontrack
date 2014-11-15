@@ -38,7 +38,7 @@ class DefaultGitConfiguratorTest {
                 )
         )
 
-        DefaultGitConfigurator configurator = new DefaultGitConfigurator(propertyService)
+        DefaultGitConfigurator configurator = new DefaultGitConfigurator(propertyService, buildGitCommitLinkService)
 
         def configuration = configurator.configure(GitConfiguration.empty(), branch)
 
@@ -55,6 +55,7 @@ class DefaultGitConfiguratorTest {
         GitConfigurationService gitConfigurationService = mock(GitConfigurationService)
 
         BuildGitCommitLinkService buildGitCommitLinkService = mock(BuildGitCommitLinkService)
+        when(buildGitCommitLinkService.getLink("tag")).thenReturn(new TagBuildNameGitCommitLink())
 
         PropertyService propertyService = mock(PropertyService)
         when(propertyService.getProperty(project, GitProjectConfigurationPropertyType)).thenReturn(
@@ -76,7 +77,7 @@ class DefaultGitConfiguratorTest {
                 )
         )
 
-        DefaultGitConfigurator configurator = new DefaultGitConfigurator(propertyService)
+        DefaultGitConfigurator configurator = new DefaultGitConfigurator(propertyService, buildGitCommitLinkService)
 
         def configuration = configurator.configure(GitConfiguration.empty(), branch)
 
@@ -112,7 +113,7 @@ class DefaultGitConfiguratorTest {
                 )
         )
 
-        DefaultGitConfigurator configurator = new DefaultGitConfigurator(propertyService)
+        DefaultGitConfigurator configurator = new DefaultGitConfigurator(propertyService, buildGitCommitLinkService)
 
         def configuration = configurator.configure(GitConfiguration.empty(), branch)
 
@@ -129,6 +130,7 @@ class DefaultGitConfiguratorTest {
         GitConfigurationService gitConfigurationService = mock(GitConfigurationService)
 
         BuildGitCommitLinkService buildGitCommitLinkService = mock(BuildGitCommitLinkService)
+        when(buildGitCommitLinkService.getLink("tag")).thenReturn(new TagBuildNameGitCommitLink())
 
         GitConfiguration gitConfiguration = GitConfiguration.empty()
 
@@ -154,7 +156,7 @@ class DefaultGitConfiguratorTest {
                 )
         )
 
-        DefaultGitConfigurator configurator = new DefaultGitConfigurator(propertyService)
+        DefaultGitConfigurator configurator = new DefaultGitConfigurator(propertyService, buildGitCommitLinkService)
 
         def configuration = configurator.configure(GitConfiguration.empty(), branch)
 
