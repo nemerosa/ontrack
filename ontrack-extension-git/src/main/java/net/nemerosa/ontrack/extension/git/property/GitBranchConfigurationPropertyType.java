@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.git.property;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.git.model.BuildGitCommitLink;
 import net.nemerosa.ontrack.extension.git.service.BuildGitCommitLinkService;
+import net.nemerosa.ontrack.extension.git.support.TagBuildNameGitCommitLink;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.form.*;
@@ -115,7 +116,9 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
         return new GitBranchConfigurationProperty(
                 JsonUtils.get(node, "branch", "master"),
                 JsonUtils.get(node, "tagPattern", "*"),
-                ServiceConfiguration.of(node.get("buildCommitLink")),
+                node.has("buildCommitLink") ?
+                        ServiceConfiguration.of(node.get("buildCommitLink")) :
+                        TagBuildNameGitCommitLink.DEFAULT.toServiceConfiguration(),
                 JsonUtils.getBoolean(node, "override", false),
                 JsonUtils.getInt(node, "buildTagInterval", 0)
         );
