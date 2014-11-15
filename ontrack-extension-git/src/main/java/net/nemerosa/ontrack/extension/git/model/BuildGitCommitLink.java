@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.git.model;
 
+import java.util.function.Function;
+
 /**
  * Defines the way to link builds to Git commits, in order to manage the change logs, the Git searches
  * and synchronisations.
@@ -17,4 +19,9 @@ public interface BuildGitCommitLink<T> {
      * Display name for the link
      */
     String getName();
+
+    /**
+     * Clones the configuration.
+     */
+    T clone(T data, Function<String, String> replacementFunction);
 }

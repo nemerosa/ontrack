@@ -1,21 +1,30 @@
 package net.nemerosa.ontrack.extension.git.support;
 
 import net.nemerosa.ontrack.extension.git.model.BuildGitCommitLink;
+import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Function;
 
 @Component
-public class CommitBuildNameGitCommitLink implements BuildGitCommitLink<NoConfig> {
+public class TagBuildNameGitCommitLink implements BuildGitCommitLink<NoConfig> {
+
+    /**
+     * Available as default
+     */
+    public static final ConfiguredBuildGitCommitLink<NoConfig> DEFAULT = new ConfiguredBuildGitCommitLink<>(
+            new TagBuildNameGitCommitLink(),
+            NoConfig.INSTANCE
+    );
 
     @Override
     public String getId() {
-        return "commit";
+        return "tag";
     }
 
     @Override
     public String getName() {
-        return "Commit as name";
+        return "Tag as name";
     }
 
     @Override

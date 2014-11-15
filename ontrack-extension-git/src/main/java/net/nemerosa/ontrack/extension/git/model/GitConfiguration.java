@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Wither;
+import net.nemerosa.ontrack.extension.git.support.TagBuildNameGitCommitLink;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
 import net.nemerosa.ontrack.extension.support.UserPasswordConfiguration;
 import net.nemerosa.ontrack.model.form.*;
@@ -44,11 +45,18 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
 
     /**
      * Tag pattern configuration
+     *
      * @deprecated See #163
      */
     @Deprecated
     @Wither
     private final String tagPattern;
+
+    /**
+     * Configured link
+     */
+    @Wither
+    private final ConfiguredBuildGitCommitLink<?> buildCommitLink;
 
     /**
      * User name
@@ -175,6 +183,7 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
                 "",
                 "master",
                 "*",
+                TagBuildNameGitCommitLink.DEFAULT,
                 "",
                 "",
                 "",
@@ -190,6 +199,7 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
                 defaultIfBlank(configuration.remote, remote),
                 defaultIfBlank(configuration.branch, branch),
                 defaultIfBlank(configuration.tagPattern, tagPattern),
+                buildCommitLink == TagBuildNameGitCommitLink.DEFAULT ? configuration.buildCommitLink : buildCommitLink,
                 defaultIfBlank(configuration.user, user),
                 defaultIfBlank(configuration.password, password),
                 defaultIfBlank(configuration.commitLink, commitLink),
@@ -271,6 +281,7 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
                 replacementFunction.apply(remote),
                 replacementFunction.apply(branch),
                 replacementFunction.apply(tagPattern),
+                buildCommitLink.clone(replacementFunction),
                 replacementFunction.apply(user),
                 password,
                 replacementFunction.apply(commitLink),
