@@ -1,10 +1,13 @@
 package net.nemerosa.ontrack.extension.git.property;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
+import lombok.experimental.Wither;
 import net.nemerosa.ontrack.model.structure.ServiceConfiguration;
 
 @Data
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class GitBranchConfigurationProperty {
 
     /**
@@ -23,6 +26,7 @@ public class GitBranchConfigurationProperty {
     /**
      * Build link
      */
+    @Wither
     private final ServiceConfiguration buildCommitLink;
 
     /**
