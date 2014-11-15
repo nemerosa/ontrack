@@ -146,14 +146,14 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         GitClient gitClient = gitClientFactory.getClient(changeLog.getScmBranch());
         // Gets the configuration
         GitConfiguration gitConfiguration = changeLog.getScmBranch();
-        // Gets the tag boundaries
-        String buildFrom = changeLog.getFrom().getBuild().getName();
-        String buildTo = changeLog.getTo().getBuild().getName();
-        // Tags
-        String tagFrom = gitConfiguration.getTagNameFromBuildName(buildFrom).get();
-        String tagTo = gitConfiguration.getTagNameFromBuildName(buildTo).get();
+        // Gets the build boundaries
+        Build buildFrom = changeLog.getFrom().getBuild();
+        Build buildTo = changeLog.getTo().getBuild();
+        // Commit boundaries
+        String commitFrom = gitConfiguration.getCommitFromBuild(buildFrom);
+        String commitTo = gitConfiguration.getCommitFromBuild(buildTo);
         // Gets the commits
-        GitLog log = gitClient.log(tagFrom, tagTo);
+        GitLog log = gitClient.log(commitFrom, commitTo);
         List<GitCommit> commits = log.getCommits();
         List<GitUICommit> uiCommits = toUICommits(gitConfiguration, commits);
         return new GitChangeLogCommits(

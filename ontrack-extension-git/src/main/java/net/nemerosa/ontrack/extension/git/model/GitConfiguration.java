@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.extension.git.support.TagBuildNameGitCommitLink;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
 import net.nemerosa.ontrack.extension.support.UserPasswordConfiguration;
 import net.nemerosa.ontrack.model.form.*;
+import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import org.apache.commons.lang3.StringUtils;
 
@@ -289,5 +290,9 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
                 indexationInterval,
                 issueServiceConfigurationIdentifier
         );
+    }
+
+    public String getCommitFromBuild(Build build) {
+        return buildCommitLink.getCommitFromBuild(build);
     }
 }

@@ -97,32 +97,4 @@ class GitConfigurationTest {
         assert !configuration.getBuildNameFromTagName('ontrack-2.1.0').present
     }
 
-    @Test
-    void 'Tag name from build: default'() {
-        GitConfiguration configuration = GitConfiguration.empty()
-        assert configuration.getTagNameFromBuildName('any').get() == 'any'
-        assert configuration.getTagNameFromBuildName('2.0.0').get() == '2.0.0'
-    }
-
-    @Test
-    void 'Tag name from build: simple'() {
-        GitConfiguration configuration = GitConfiguration.empty().withTagPattern('2.0.*')
-        assert !configuration.getTagNameFromBuildName('any').present
-        assert configuration.getTagNameFromBuildName('2.0.0').get() == '2.0.0'
-        assert configuration.getTagNameFromBuildName('2.0.1').get() == '2.0.1'
-        assert configuration.getTagNameFromBuildName('2.0.12').get() == '2.0.12'
-        assert !configuration.getTagNameFromBuildName('v2.0.12').present
-        assert !configuration.getTagNameFromBuildName('2.1.0').present
-    }
-
-    @Test
-    void 'Tag name from build: capturing group'() {
-        GitConfiguration configuration = GitConfiguration.empty().withTagPattern('ontrack-(2.0.*)')
-        assert !configuration.getTagNameFromBuildName('any').present
-        assert configuration.getTagNameFromBuildName('2.0.0').get() == 'ontrack-2.0.0'
-        assert configuration.getTagNameFromBuildName('2.0.1').get() == 'ontrack-2.0.1'
-        assert configuration.getTagNameFromBuildName('2.0.12').get() == 'ontrack-2.0.12'
-        assert !configuration.getTagNameFromBuildName('2.1.0').present
-    }
-
 }
