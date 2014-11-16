@@ -21,12 +21,14 @@ import org.eclipse.jgit.treewalk.AbstractTreeIterator;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 public class DefaultGitClient implements GitClient {
 
@@ -97,20 +99,17 @@ public class DefaultGitClient implements GitClient {
     @Override
     public Stream<GitCommit> rawLog(String from, String to) {
         try {
-            GitRange range = range(from, to);
-            RevWalk walk = new RevWalk(repository.git().getRepository());
+            Repository gitRepository = repository.git().getRepository();
+            ObjectId oFrom = gitRepository.resolve(from);
+            ObjectId oTo = gitRepository.resolve(to);
 
-            // Log
-            walk.markStart(walk.lookupCommit(range.getFrom().getId()));
-            walk.markUninteresting(walk.lookupCommit(range.getTo().getId()));
+            return Lists.newArrayList(
+                    repository.git().log()
+                            .addRange(oFrom, oTo)
+                            .call()
+            ).stream().map(this::toCommit);
 
-            // Iteration
-            return StreamSupport.stream(
-                    Spliterators.spliteratorUnknownSize(walk.iterator(), Spliterator.ORDERED),
-                    false
-            ).map(this::toCommit);
-
-        } catch (IOException e) {
+        } catch (IOException | GitAPIException e) {
             throw new GitException(e);
         }
     }

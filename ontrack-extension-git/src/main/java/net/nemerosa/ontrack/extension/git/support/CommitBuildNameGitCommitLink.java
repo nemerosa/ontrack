@@ -64,13 +64,15 @@ public class CommitBuildNameGitCommitLink implements BuildGitCommitLink<CommitLi
     @Override
     public Stream<String> getBuildCandidateReferences(String commit, GitClient gitClient, CommitLinkConfig data) {
         return gitClient.rawLog(
-                commit,
-                gitClient.getConfiguration().getBranch()
-        ).map(
-                gitCommit -> data.isAbbreviated() ?
-                        gitCommit.getShortId() :
-                        gitCommit.getId()
-        );
+                String.format("%s~1", commit),
+                "HEAD"
+        )
+                .sorted()
+                .map(
+                        gitCommit -> data.isAbbreviated() ?
+                                gitCommit.getShortId() :
+                                gitCommit.getId()
+                );
     }
 
     @Override
