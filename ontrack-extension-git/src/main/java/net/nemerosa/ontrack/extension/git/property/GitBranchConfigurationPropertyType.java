@@ -14,6 +14,7 @@ import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.structure.ServiceConfiguration;
 import net.nemerosa.ontrack.model.structure.ServiceConfigurationSource;
 
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.Function;
@@ -70,7 +71,11 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
                                                         link -> new ServiceConfigurationSource(
                                                                 link.getId(),
                                                                 link.getName(),
-                                                                link.getForm()
+                                                                link.getForm(),
+                                                                Collections.singletonMap(
+                                                                        "indexationAvailable",
+                                                                        link.isIndexationAvailable()
+                                                                )
                                                         )
                                                 )
                                                 .collect(Collectors.toList())
@@ -87,6 +92,7 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
                                 .help("Can the existing builds be overridden by a synchronisation? If yes, " +
                                         "the existing validation and promotion runs would be lost as well.")
                                 .value(value != null && value.isOverride())
+                                .visibleIf("buildCommitLink.extra.indexationAvailable")
                 )
                 .with(
                         Int.of("buildTagInterval")
@@ -96,6 +102,7 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
                                 .help("Interval in minutes for the synchronisation between builds and tags. " +
                                         "If 0, the synchronisation must be done manually")
                                 .value(value != null ? value.getBuildTagInterval() : 0)
+                                .visibleIf("buildCommitLink.extra.indexationAvailable")
                 );
     }
 

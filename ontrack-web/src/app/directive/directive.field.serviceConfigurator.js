@@ -77,6 +77,12 @@ angular.module('ot.directive.field.serviceConfigurator', [
                                 data: data
                             }
                         ];
+                        // Sets the data
+                        $scope.data[$scope.field.name] = {
+                            id: sourceId,
+                            data: data,
+                            extra: source.extra
+                        };
                     } else {
                         $scope.formEntries = [];
                     }
