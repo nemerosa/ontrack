@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.git.service;
 
+import com.google.common.collect.Lists;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.git.client.*;
 import net.nemerosa.ontrack.extension.git.model.*;
@@ -254,46 +255,85 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         }
         // Gets the details about the issue
         Issue issue = configuredIssueService.getIssue(key);
-        // Gets the client for the branch
-        GitClient gitClient = gitClientFactory.getClient(configuration);
-        // Gets the commit link
-        String commitLink = configuration.getCommitLink();
-        // Issue-based annotations
-        List<? extends MessageAnnotator> messageAnnotators = getMessageAnnotators(configuration);
-        // Gets the commit log
-        List<GitUICommit> commits = new ArrayList<>();
-        gitClient.scanCommits(revCommit -> {
-            String message = revCommit.getFullMessage();
-            Set<String> keys = configuredIssueService.extractIssueKeysFromMessage(message);
-            if (configuredIssueService.containsIssueKey(key, keys)) {
-                commits.add(
-                        toUICommit(
-                                commitLink,
-                                messageAnnotators,
-                                gitClient.toCommit(revCommit)
-                        )
-                );
-            }
-            return false; // Scanning all commits
-        });
 
-        // Anomaly if commit not found
-        if (commits.isEmpty()) {
-            throw new GitIssueNotFoundException(key);
-        }
-
-        // Gets the last commits (which is the first in the list)
-        GitUICommit firstCommit = commits.get(0);
-        OntrackGitCommitInfo commitInfo = getOntrackGitCommitInfo(firstCommit.getCommit().getId());
+        // Collects commits per branches
+        List<OntrackGitIssueCommitInfo> commitInfos = collectIssueCommitInfos(key);
 
         // OK
         return new OntrackGitIssueInfo(
                 configuration,
                 configuredIssueService.getIssueServiceConfigurationRepresentation(),
                 issue,
-                commitInfo,
-                commits
+                commitInfos
         );
+    }
+
+    private List<OntrackGitIssueCommitInfo> collectIssueCommitInfos(String key) {
+        // Index of commit infos
+        Map<String, OntrackGitIssueCommitInfo> commitInfos = new LinkedHashMap<>();
+        // For all configured branches
+        forEachConfiguredBranch((branch, configuration) -> {
+            // Gets the Git client for this branch
+            GitClient gitClient = gitClientFactory.getClient(configuration);
+            // Issue service
+            ConfiguredIssueService configuredIssueService = issueServiceRegistry.getConfiguredIssueService(configuration.getIssueServiceConfigurationIdentifier());
+            if (configuredIssueService != null) {
+                // List of commits for this branch
+                List<RevCommit> revCommits = new ArrayList<>();
+                // Scanning this branch's repository for the commit
+                gitClient.scanCommits(revCommit -> {
+                    String message = revCommit.getFullMessage();
+                    Set<String> keys = configuredIssueService.extractIssueKeysFromMessage(message);
+                    if (configuredIssueService.containsIssueKey(key, keys)) {
+                        // We have a commit for this branch!
+                        revCommits.add(revCommit);
+                    }
+                    return false; // Scanning all commits
+                });
+                // If at least one commit
+                if (revCommits.size() > 0) {
+                    // Gets the last commit (which is the first in the list)
+                    RevCommit revCommit = revCommits.get(0);
+                    // Commit explained (independent from the branch)
+                    GitCommit commit = gitClient.toCommit(revCommit);
+                    String commitId = commit.getId();
+                    // Gets any existing commit info
+                    OntrackGitIssueCommitInfo commitInfo = commitInfos.get(commitId);
+                    // If not defined, creates an entry
+                    if (commitInfo == null) {
+                        // UI commit (independent from the branch)
+                        GitUICommit uiCommit = toUICommit(
+                                configuration.getCommitLink(),
+                                getMessageAnnotators(configuration),
+                                commit
+                        );
+                        // Commit info
+                        commitInfo = OntrackGitIssueCommitInfo.of(uiCommit);
+                        // Indexation
+                        commitInfos.put(commitId, commitInfo);
+                    }
+                    // Collects branch info
+                    OntrackGitIssueCommitBranchInfo branchInfo = OntrackGitIssueCommitBranchInfo.of(branch);
+                    // Gets the last build for this branch
+                    Optional<Build> buildAfterCommit = getEarliestBuildAfterCommit(commitId, branch, configuration, gitClient);
+                    if (buildAfterCommit.isPresent()) {
+                        Build build = buildAfterCommit.get();
+                        // Gets the build view
+                        BuildView buildView = structureService.getBuildView(build);
+                        // Adds it to the list
+                        branchInfo = branchInfo.withBuildView(buildView);
+                        // Collects the promotions for the branch
+                        branchInfo = branchInfo.withBranchStatusView(
+                                structureService.getEarliestPromotionsAfterBuild(build)
+                        );
+                    }
+                    // Adds the info
+                    commitInfo.add(branchInfo);
+                }
+            }
+        });
+        // OK
+        return Lists.newArrayList(commitInfos.values());
     }
 
     @Override

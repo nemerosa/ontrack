@@ -217,7 +217,7 @@ public class DefaultGitClient implements GitClient {
         Git git = repository.git();
         // All commits
         try {
-            Iterable<RevCommit> commits = git.log().all().call();
+            Iterable<RevCommit> commits = git.log().add(git.getRepository().resolve("HEAD")).call();
             for (RevCommit commit : commits) {
                 if (scanFunction.test(commit)) {
                     // Not going on

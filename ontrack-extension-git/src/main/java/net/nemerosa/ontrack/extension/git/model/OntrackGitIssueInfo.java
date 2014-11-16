@@ -30,13 +30,8 @@ public class OntrackGitIssueInfo {
     private final Issue issue;
 
     /**
-     * Primary commit information
+     * Last commit per branch
      */
-    private final OntrackGitCommitInfo commitInfo;
-
-    /**
-     * Log
-     */
-    private final List<GitUICommit> log;
+    private final List<OntrackGitIssueCommitInfo> commitInfos;
 
 }
