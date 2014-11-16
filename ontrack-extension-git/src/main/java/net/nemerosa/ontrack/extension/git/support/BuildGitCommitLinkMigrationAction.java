@@ -47,24 +47,25 @@ public class BuildGitCommitLinkMigrationAction implements DBMigrationAction {
                                 JsonNode node = objectMapper.readTree(json);
                                 // Gets any existing tag pattern
                                 String tagPattern = JsonUtils.get(node, "tagPattern", "*");
-                                // Parses into the new configuration
-                                GitBranchConfigurationProperty property =
-                                        objectMapper.treeToValue(node, GitBranchConfigurationProperty.class);
                                 // Creates the commit link
+                                ServiceConfiguration buildCommitLink;
                                 if ("*".equals(tagPattern)) {
-                                    property = property.withBuildCommitLink(
-                                            TagBuildNameGitCommitLink.DEFAULT.toServiceConfiguration()
-                                    );
+                                    buildCommitLink = TagBuildNameGitCommitLink.DEFAULT.toServiceConfiguration();
                                 } else {
-                                    property = property.withBuildCommitLink(
-                                            new ServiceConfiguration(
-                                                    "tagPattern",
-                                                    JsonUtils.object()
-                                                            .with("tagPattern", tagPattern)
-                                                            .end()
-                                            )
+                                    buildCommitLink = new ServiceConfiguration(
+                                            "tagPattern",
+                                            JsonUtils.object()
+                                                    .with("tagPattern", tagPattern)
+                                                    .end()
                                     );
                                 }
+                                // Creates the new property
+                                GitBranchConfigurationProperty property = new GitBranchConfigurationProperty(
+                                        JsonUtils.get(node, "branch"),
+                                        buildCommitLink,
+                                        JsonUtils.getBoolean(node, "override"),
+                                        JsonUtils.getInt(node, "buildTagInterval")
+                                );
                                 // Saves the data back
                                 rsProperty.updateString("json", objectMapper.writeValueAsString(property));
                                 rsProperty.updateRow();

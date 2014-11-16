@@ -7,7 +7,6 @@ import lombok.experimental.Wither;
 import net.nemerosa.ontrack.model.structure.ServiceConfiguration;
 
 @Data
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class GitBranchConfigurationProperty {
 
     /**
@@ -16,17 +15,8 @@ public class GitBranchConfigurationProperty {
     private final String branch;
 
     /**
-     * Tag pattern
-     *
-     * @deprecated See #163
-     */
-    @Deprecated
-    private final String tagPattern;
-
-    /**
      * Build link
      */
-    @Wither
     private final ServiceConfiguration buildCommitLink;
 
     /**

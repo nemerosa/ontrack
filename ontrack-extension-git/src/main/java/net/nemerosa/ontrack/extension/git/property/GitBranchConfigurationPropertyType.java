@@ -60,13 +60,6 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
                                 .label("Git branch")
                                 .value(value != null ? value.getBranch() : "master")
                 )
-                        // FIXME #163 Remove tag pattern
-                .with(
-                        Text.of("tagPattern")
-                                .label("Tag pattern")
-                                .help("@file:extension/git/help.net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType.tagPattern.tpl.html")
-                                .value(value != null ? value.getTagPattern() : "*")
-                )
                 .with(
                         ServiceConfigurator.of("buildCommitLink")
                                 .label("Build commit link")
@@ -115,7 +108,6 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
     public GitBranchConfigurationProperty fromStorage(JsonNode node) {
         return new GitBranchConfigurationProperty(
                 JsonUtils.get(node, "branch", "master"),
-                JsonUtils.get(node, "tagPattern", "*"),
                 node.has("buildCommitLink") ?
                         ServiceConfiguration.of(node.get("buildCommitLink")) :
                         TagBuildNameGitCommitLink.DEFAULT.toServiceConfiguration(),
@@ -133,7 +125,6 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
     public GitBranchConfigurationProperty replaceValue(GitBranchConfigurationProperty value, Function<String, String> replacementFunction) {
         return new GitBranchConfigurationProperty(
                 replacementFunction.apply(value.getBranch()),
-                replacementFunction.apply(value.getTagPattern()),
                 replaceBuildCommitLink(value.getBuildCommitLink(), replacementFunction),
                 value.isOverride(),
                 value.getBuildTagInterval()

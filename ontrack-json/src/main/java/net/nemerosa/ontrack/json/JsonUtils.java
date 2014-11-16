@@ -91,25 +91,55 @@ public final class JsonUtils {
         return builder.end();
     }
 
+    public static String get(JsonNode data, String field) {
+        return get(data, field, true, null);
+    }
+
     public static String get(JsonNode data, String field, String defaultValue) {
+        return get(data, field, false, defaultValue);
+    }
+
+    public static String get(JsonNode data, String field, boolean required, String defaultValue) {
         if (data.has(field)) {
             return data.path(field).textValue();
+        } else if (required) {
+            throw new JsonMissingFieldException(field);
         } else {
             return defaultValue;
         }
+    }
+
+    public static int getInt(JsonNode data, String field) {
+        return getInt(data, field, true, 0);
     }
 
     public static int getInt(JsonNode data, String field, int defaultValue) {
+        return getInt(data, field, false, defaultValue);
+    }
+
+    public static int getInt(JsonNode data, String field, boolean required, int defaultValue) {
         if (data.has(field)) {
             return data.path(field).asInt();
+        } else if (required) {
+            throw new JsonMissingFieldException(field);
         } else {
             return defaultValue;
         }
     }
 
+    public static boolean getBoolean(JsonNode data, String field) {
+        return getBoolean(data, field, true, false);
+    }
+
     public static boolean getBoolean(JsonNode data, String field, boolean defaultValue) {
+        return getBoolean(data, field, false, defaultValue);
+    }
+
+    public static boolean getBoolean(JsonNode data, String field, boolean required, boolean defaultValue) {
         if (data.has(field)) {
             return data.path(field).asBoolean();
+        } else if (required) {
+            throw new JsonMissingFieldException(field);
         } else {
             return defaultValue;
         }
