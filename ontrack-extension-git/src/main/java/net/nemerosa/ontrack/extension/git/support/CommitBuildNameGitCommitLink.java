@@ -79,4 +79,12 @@ public class CommitBuildNameGitCommitLink implements BuildGitCommitLink<CommitLi
     public boolean isBuildEligible(Build build, CommitLinkConfig data) {
         return true;
     }
+
+    /**
+     * No indexation is possible for links based on commits.
+     */
+    @Override
+    public boolean isIndexationAvailable() {
+        return false;
+    }
 }

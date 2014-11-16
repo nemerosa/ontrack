@@ -74,4 +74,12 @@ public interface BuildGitCommitLink<T> {
      * @return <code>true</code> if the build is linked to the configuration
      */
     boolean isBuildEligible(Build build, T data);
+
+    /**
+     * Is indexation available?
+     *
+     * For some categories of link, it might be impossible to get the list of builds from Git. For example,
+     * when the link is based on commits or properties, the link cannot be deducted from a list of tags.
+     */
+    boolean isIndexationAvailable();
 }

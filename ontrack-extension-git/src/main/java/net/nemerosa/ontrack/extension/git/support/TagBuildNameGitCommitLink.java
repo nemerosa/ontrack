@@ -70,4 +70,9 @@ public class TagBuildNameGitCommitLink implements BuildGitCommitLink<NoConfig> {
     public boolean isBuildEligible(Build build, NoConfig data) {
         return true;
     }
+
+    @Override
+    public boolean isIndexationAvailable() {
+        return true;
+    }
 }

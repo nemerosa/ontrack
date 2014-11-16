@@ -79,4 +79,9 @@ public class TagPatternBuildNameGitCommitLink implements BuildGitCommitLink<TagP
     public boolean isBuildEligible(Build build, TagPattern data) {
         return true;
     }
+
+    @Override
+    public boolean isIndexationAvailable() {
+        return true;
+    }
 }
