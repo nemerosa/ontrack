@@ -272,7 +272,8 @@ public class DefaultGitClient implements GitClient {
         }
     }
 
-    private String getId(RevCommit revCommit) {
+    @Override
+    public String getId(RevCommit revCommit) {
         return revCommit.getId().getName();
     }
 

@@ -33,6 +33,8 @@ public interface GitClient {
      */
     GitLog log(String from, String to);
 
+    String getId(RevCommit revCommit);
+
     GitCommit toCommit(RevCommit revCommit);
 
     void sync(Consumer<String> logger);
