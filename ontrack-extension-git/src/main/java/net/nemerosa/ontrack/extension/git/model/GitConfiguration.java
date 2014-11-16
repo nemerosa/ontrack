@@ -14,10 +14,7 @@ import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static net.nemerosa.ontrack.model.form.Form.defaultNameField;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
@@ -43,15 +40,6 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
      */
     @Wither
     private final String branch;
-
-    /**
-     * Tag pattern configuration
-     *
-     * @deprecated See #163
-     */
-    @Deprecated
-    @Wither
-    private final String tagPattern;
 
     /**
      * Configured link
@@ -183,7 +171,6 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
                 "",
                 "",
                 "master",
-                "*",
                 TagBuildNameGitCommitLink.DEFAULT,
                 "",
                 "",
@@ -199,7 +186,6 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
                 name,
                 defaultIfBlank(configuration.remote, remote),
                 defaultIfBlank(configuration.branch, branch),
-                defaultIfBlank(configuration.tagPattern, tagPattern),
                 buildCommitLink == TagBuildNameGitCommitLink.DEFAULT ? configuration.buildCommitLink : buildCommitLink,
                 defaultIfBlank(configuration.user, user),
                 defaultIfBlank(configuration.password, password),
@@ -210,46 +196,12 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
         );
     }
 
-    /**
-     * @deprecated See #163
-     */
-    @Deprecated
-    public boolean isValidTagName(String name) {
-        return StringUtils.isBlank(tagPattern) || createRegex().matcher(name).matches();
-    }
-
-    /**
-     * @deprecated See #163
-     */
-    @Deprecated
-    public Optional<String> getBuildNameFromTagName(String tagName) {
-        if (StringUtils.isBlank(tagPattern)) {
-            return Optional.of(tagName);
-        } else {
-            Matcher matcher = createRegex().matcher(tagName);
-            if (matcher.matches()) {
-                if (matcher.groupCount() > 0) {
-                    return Optional.of(matcher.group(1));
-                } else {
-                    return Optional.of(matcher.group(0));
-                }
-            } else {
-                return Optional.empty();
-            }
-        }
-    }
-
-    private Pattern createRegex() {
-        return Pattern.compile(StringUtils.replace(tagPattern, "*", ".*"));
-    }
-
     @Override
     public GitConfiguration clone(String targetConfigurationName, Function<String, String> replacementFunction) {
         return new GitConfiguration(
                 targetConfigurationName,
                 replacementFunction.apply(remote),
                 replacementFunction.apply(branch),
-                replacementFunction.apply(tagPattern),
                 buildCommitLink.clone(replacementFunction),
                 replacementFunction.apply(user),
                 password,

@@ -86,7 +86,6 @@ class GitBuildSyncIT {
 
         def gitConfiguration = GitConfiguration.empty()
                 .withBranch('master')
-                .withTagPattern('1.2.*')
                 .withBuildCommitLink(configuredBuildGitCommitLink)
         when(gitClientFactory.getClient(gitConfiguration)).thenReturn(gitClient)
 

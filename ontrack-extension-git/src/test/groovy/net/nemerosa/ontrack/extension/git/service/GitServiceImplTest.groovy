@@ -98,7 +98,6 @@ class GitServiceImplTest {
 
         // Git configuration
         GitConfiguration gitConfiguration = GitConfiguration.empty()
-                .withTagPattern('1.0.*')
 
         // Git client
         GitClient gitClient = mock(GitClient)
