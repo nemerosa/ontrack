@@ -57,7 +57,7 @@ public class TagPatternBuildNameGitCommitLink implements BuildGitCommitLink<TagP
     public Form getForm() {
         return Form.create()
                 .with(
-                        Text.of("tagPattern")
+                        Text.of("pattern")
                                 .label("Tag pattern")
                                 .help("@file:extension/git/help.net.nemerosa.ontrack.extension.git.support.TagPatternBuildNameGitCommitLink.tagPattern.tpl.html")
                 )
