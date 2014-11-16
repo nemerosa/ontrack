@@ -55,7 +55,7 @@ public class BuildGitCommitLinkMigrationAction implements DBMigrationAction {
                                     buildCommitLink = new ServiceConfiguration(
                                             "tagPattern",
                                             JsonUtils.object()
-                                                    .with("tagPattern", tagPattern)
+                                                    .with("pattern", tagPattern)
                                                     .end()
                                     );
                                 }
