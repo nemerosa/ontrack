@@ -3,7 +3,33 @@ package net.nemerosa.ontrack.extension.git.client.impl
 import net.nemerosa.ontrack.extension.git.client.GitClient
 import org.junit.Test
 
+import java.util.stream.Collectors
+
 class GitClientIT {
+
+    @Test
+    void 'Raw log: between HEAD and a commit ~ 1'() {
+        def repo = new GitTestUtils()
+        try {
+            repo.with {
+                run 'git', 'init'
+                (1..6).each {
+                    commit it
+                }
+
+                run('git', 'log', '--oneline', '--graph', '--decorate', '--all')
+            }
+
+            GitClient gitClient = repo.gitClient()
+
+            def commit4 = repo.commitLookup('Commit 4')
+            def log = gitClient.rawLog("${commit4}~1", 'HEAD').collect(Collectors.toList())
+            assert log.collect { it.shortMessage } == ['Commit 6', 'Commit 5', 'Commit 4']
+
+        } finally {
+            repo.close()
+        }
+    }
 
     @Test
     void 'Log: between commits'() {
