@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.git.property;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.git.model.BuildGitCommitLink;
+import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink;
 import net.nemerosa.ontrack.extension.git.service.BuildGitCommitLinkService;
 import net.nemerosa.ontrack.extension.git.support.TagBuildNameGitCommitLink;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
@@ -113,13 +114,35 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
 
     @Override
     public GitBranchConfigurationProperty fromStorage(JsonNode node) {
+        ConfiguredBuildGitCommitLink<?> configuredBuildGitCommitLink;
+        if (node.has("buildCommitLink")) {
+            JsonNode linkNode = node.get("buildCommitLink");
+            configuredBuildGitCommitLink = parseBuildCommitLink(linkNode);
+        } else {
+            configuredBuildGitCommitLink = TagBuildNameGitCommitLink.DEFAULT;
+        }
+        boolean indexationAvailable = configuredBuildGitCommitLink.getLink().isIndexationAvailable();
         return new GitBranchConfigurationProperty(
                 JsonUtils.get(node, "branch", "master"),
-                node.has("buildCommitLink") ?
-                        ServiceConfiguration.of(node.get("buildCommitLink")) :
-                        TagBuildNameGitCommitLink.DEFAULT.toServiceConfiguration(),
-                JsonUtils.getBoolean(node, "override", false),
-                JsonUtils.getInt(node, "buildTagInterval", 0)
+                configuredBuildGitCommitLink.toServiceConfiguration(),
+                indexationAvailable && JsonUtils.getBoolean(node, "override", false),
+                indexationAvailable ? JsonUtils.getInt(node, "buildTagInterval", 0) : 0
+        );
+    }
+
+    private <T> ConfiguredBuildGitCommitLink<T> parseBuildCommitLink(JsonNode linkNode) {
+        String linkId = JsonUtils.get(linkNode, "id");
+        // Gets the link data
+        JsonNode linkDataNode = linkNode.get("data");
+        // Gets the link
+        @SuppressWarnings("unchecked")
+        BuildGitCommitLink<T> link = (BuildGitCommitLink<T>) buildGitCommitLinkService.getLink(linkId);
+        // Parses the data (for validation)
+        T linkData = link.parseData(linkDataNode);
+        // OK
+        return new ConfiguredBuildGitCommitLink<>(
+                link,
+                linkData
         );
     }
 
