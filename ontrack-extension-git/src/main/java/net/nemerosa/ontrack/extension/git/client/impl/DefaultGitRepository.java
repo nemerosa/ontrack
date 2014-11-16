@@ -112,6 +112,7 @@ public class DefaultGitRepository implements GitRepository {
                 .setCredentialsProvider(credentialsProvider)
                 .setDirectory(wd)
                 .setURI(remote)
+                .setBranch(branch)
                 .setBranchesToClone(Collections.singleton(branch))
                 .call();
         // Check
