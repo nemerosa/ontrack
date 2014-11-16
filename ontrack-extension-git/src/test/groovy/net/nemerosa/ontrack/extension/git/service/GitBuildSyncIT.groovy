@@ -71,7 +71,7 @@ class GitBuildSyncIT {
                         new GitBranchConfigurationPropertyType(buildGitCommitLinkService),
                         new GitBranchConfigurationProperty(
                                 'master',
-                                '1.2.*',
+                                // '1.2.*',
                                 TagBuildNameGitCommitLink.DEFAULT.toServiceConfiguration(),
                                 true,
                                 0

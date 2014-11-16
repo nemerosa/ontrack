@@ -1,11 +1,13 @@
 package net.nemerosa.ontrack.extension.git.service
 
+import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationPropertyType
-import net.nemerosa.ontrack.extension.git.support.TagBuildNameGitCommitLink
+import net.nemerosa.ontrack.extension.git.support.TagPattern
+import net.nemerosa.ontrack.extension.git.support.TagPatternBuildNameGitCommitLink
 import net.nemerosa.ontrack.model.structure.*
 import org.junit.Test
 
@@ -44,7 +46,7 @@ class DefaultGitConfiguratorTest {
 
         assert configuration != null
         assert configuration.branch == 'master'
-        assert configuration.tagPattern == '*'
+        assert configuration.buildCommitLink.link.id == 'tag'
     }
 
     @Test
@@ -55,7 +57,7 @@ class DefaultGitConfiguratorTest {
         GitConfigurationService gitConfigurationService = mock(GitConfigurationService)
 
         BuildGitCommitLinkService buildGitCommitLinkService = mock(BuildGitCommitLinkService)
-        when(buildGitCommitLinkService.getLink("tag")).thenReturn(new TagBuildNameGitCommitLink())
+        when(buildGitCommitLinkService.getLink("tagPattern")).thenReturn(new TagPatternBuildNameGitCommitLink())
 
         PropertyService propertyService = mock(PropertyService)
         when(propertyService.getProperty(project, GitProjectConfigurationPropertyType)).thenReturn(
@@ -69,8 +71,10 @@ class DefaultGitConfiguratorTest {
                         new GitBranchConfigurationPropertyType(buildGitCommitLinkService),
                         new GitBranchConfigurationProperty(
                                 '2.1',
-                                '2.1.*',
-                                TagBuildNameGitCommitLink.DEFAULT.toServiceConfiguration(),
+                                new ConfiguredBuildGitCommitLink<>(
+                                        new TagPatternBuildNameGitCommitLink(),
+                                        new TagPattern("2.1.*")
+                                ).toServiceConfiguration(),
                                 true,
                                 0
                         )
@@ -83,7 +87,8 @@ class DefaultGitConfiguratorTest {
 
         assert configuration != null
         assert configuration.branch == '2.1'
-        assert configuration.tagPattern == '2.1.*'
+        assert configuration.buildCommitLink.link.id == 'tagPattern'
+        assert configuration.buildCommitLink.data == new TagPattern("2.1.*")
     }
 
     @Test
@@ -119,7 +124,7 @@ class DefaultGitConfiguratorTest {
 
         assert configuration != null
         assert configuration.branch == 'master'
-        assert configuration.tagPattern == '*'
+        assert configuration.buildCommitLink.link.id == 'tag'
     }
 
     @Test
@@ -130,7 +135,7 @@ class DefaultGitConfiguratorTest {
         GitConfigurationService gitConfigurationService = mock(GitConfigurationService)
 
         BuildGitCommitLinkService buildGitCommitLinkService = mock(BuildGitCommitLinkService)
-        when(buildGitCommitLinkService.getLink("tag")).thenReturn(new TagBuildNameGitCommitLink())
+        when(buildGitCommitLinkService.getLink("tagPattern")).thenReturn(new TagPatternBuildNameGitCommitLink())
 
         GitConfiguration gitConfiguration = GitConfiguration.empty()
 
@@ -148,8 +153,10 @@ class DefaultGitConfiguratorTest {
                         new GitBranchConfigurationPropertyType(buildGitCommitLinkService),
                         new GitBranchConfigurationProperty(
                                 '2.1',
-                                '2.1.*',
-                                TagBuildNameGitCommitLink.DEFAULT.toServiceConfiguration(),
+                                new ConfiguredBuildGitCommitLink<>(
+                                        new TagPatternBuildNameGitCommitLink(),
+                                        new TagPattern("2.1.*")
+                                ).toServiceConfiguration(),
                                 true,
                                 0
                         )
@@ -162,7 +169,8 @@ class DefaultGitConfiguratorTest {
 
         assert configuration != null
         assert configuration.branch == '2.1'
-        assert configuration.tagPattern == '2.1.*'
+        assert configuration.buildCommitLink.link.id == 'tagPattern'
+        assert configuration.buildCommitLink.data == new TagPattern("2.1.*")
     }
 
 }
