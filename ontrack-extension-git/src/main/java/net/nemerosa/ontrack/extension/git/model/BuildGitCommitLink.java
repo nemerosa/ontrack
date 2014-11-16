@@ -1,10 +1,12 @@
 package net.nemerosa.ontrack.extension.git.model;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.extension.git.client.GitClient;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.structure.Build;
 
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * Defines the way to link builds to Git commits, in order to manage the change logs, the Git searches
@@ -52,4 +54,24 @@ public interface BuildGitCommitLink<T> {
      * Creates a form for the edition of the link configuration.
      */
     Form getForm();
+
+    /**
+     * Gets the list of build names from Git reference candidates
+     *
+     * @param commit    The commit to start from
+     * @param gitClient The Git client to use for the connection
+     * @param data      Configuration data
+     * @return Candidate build names
+     */
+    Stream<String> getBuildCandidateReferences(String commit, GitClient gitClient, T data);
+
+    /**
+     * Checks if a build is eligible after it has been loaded from a
+     * {@linkplain #getBuildCandidateReferences(String, net.nemerosa.ontrack.extension.git.client.GitClient, Object) candidate reference}.
+     *
+     * @param build Build to check
+     * @param data  Configuration data
+     * @return <code>true</code> if the build is linked to the configuration
+     */
+    boolean isBuildEligible(Build build, T data);
 }

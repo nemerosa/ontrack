@@ -19,6 +19,27 @@ public class TagPattern {
         );
     }
 
+    public boolean isValidTagName(String name) {
+        return StringUtils.isBlank(pattern) || createRegex().matcher(name).matches();
+    }
+
+    public Optional<String> getBuildNameFromTagName(String tagName) {
+        if (StringUtils.isBlank(pattern)) {
+            return Optional.of(tagName);
+        } else {
+            Matcher matcher = createRegex().matcher(tagName);
+            if (matcher.matches()) {
+                if (matcher.groupCount() > 0) {
+                    return Optional.of(matcher.group(1));
+                } else {
+                    return Optional.of(matcher.group(0));
+                }
+            } else {
+                return Optional.empty();
+            }
+        }
+    }
+
     public Optional<String> getTagNameFromBuildName(String buildName) {
         if (StringUtils.isBlank(pattern)) {
             return Optional.of(buildName);

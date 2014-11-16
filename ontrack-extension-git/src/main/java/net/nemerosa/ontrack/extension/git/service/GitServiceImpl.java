@@ -388,19 +388,19 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
 
     }
 
-    protected Optional<Build> getEarliestBuildAfterCommit(String commit, Branch branch, GitConfiguration configuration, GitClient gitClient) {
-        // ... get all the tags that contain the commit
-        return gitClient.getTagsWhichContainCommit(commit).stream()
-                // ... filter on valid tags only
-                .filter(configuration::isValidTagName)
-                        // ... get build names
-                .map(configuration::getBuildNameFromTagName)
-                        // ... filter on defined build names
-                .filter(Optional::isPresent).map(Optional::get)
+    protected <T> Optional<Build> getEarliestBuildAfterCommit(String commit, Branch branch, GitConfiguration configuration, GitClient gitClient) {
+        @SuppressWarnings("unchecked")
+        ConfiguredBuildGitCommitLink<T> configuredBuildGitCommitLink = (ConfiguredBuildGitCommitLink<T>) configuration.getBuildCommitLink();
+        // Delegates to the build commit link...
+        return configuredBuildGitCommitLink.getLink()
+                // ... by getting candidate references
+                .getBuildCandidateReferences(commit, gitClient, configuredBuildGitCommitLink.getData())
                         // ... gets the builds
                 .map(buildName -> structureService.findBuildByName(branch.getProject().getName(), branch.getName(), buildName))
                         // ... filter on existing builds
                 .filter(Optional::isPresent).map(Optional::get)
+                        // ... filter the builds using the link
+                .filter(build -> configuredBuildGitCommitLink.getLink().isBuildEligible(build, configuredBuildGitCommitLink.getData()))
                         // ... sort by decreasing date
                 .sorted((o1, o2) -> (o1.id() - o2.id()))
                         // ... takes the first build

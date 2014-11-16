@@ -21,13 +21,12 @@ import org.eclipse.jgit.treewalk.AbstractTreeIterator;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class DefaultGitClient implements GitClient {
 
@@ -93,6 +92,27 @@ public class DefaultGitClient implements GitClient {
         }
 
         return new GitRange(commitFrom, commitTo);
+    }
+
+    @Override
+    public Stream<GitCommit> rawLog(String from, String to) {
+        try {
+            GitRange range = range(from, to);
+            RevWalk walk = new RevWalk(repository.git().getRepository());
+
+            // Log
+            walk.markStart(walk.lookupCommit(range.getFrom().getId()));
+            walk.markUninteresting(walk.lookupCommit(range.getTo().getId()));
+
+            // Iteration
+            return StreamSupport.stream(
+                    Spliterators.spliteratorUnknownSize(walk.iterator(), Spliterator.ORDERED),
+                    false
+            ).map(this::toCommit);
+
+        } catch (IOException e) {
+            throw new GitException(e);
+        }
     }
 
     @Override
