@@ -8,9 +8,10 @@ angular.module('ontrack.extension.git', [
     .directive('otExtensionGitCommitSummary', function () {
         return {
             restrict: 'E',
+            transclude: true,
             templateUrl: 'app/extension/git/directive.commit.summary.tpl.html',
             scope: {
-                commitInfo: '=',
+                uiCommit: '=',
                 title: '@'
             }
         };
