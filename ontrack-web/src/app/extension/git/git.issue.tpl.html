@@ -33,37 +33,6 @@
             <!-- Promotions for the commits -->
             <ot-extension-git-commit-promotions commit-info="ontrackGitIssueInfo.commitInfo"></ot-extension-git-commit-promotions>
 
-            <!-- All other commits -->
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    All commits for this issue
-                </div>
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th>Commit</th>
-                        <th>Author</th>
-                        <th>Date</th>
-                        <th>Message</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr ng-repeat="uiCommit in ontrackGitIssueInfo.log" ng-class="{'success': $first}">
-                        <td>
-                            <a href="{{uiCommit.link}}"><code title="{{uiCommit.commit.id}}">{{uiCommit.commit.shortId}}</code></a>
-                        </td>
-                        <td>
-                            {{uiCommit.commit.author.name}}
-                        </td>
-                        <td>
-                            {{uiCommmit.commit.commitData | date:'mediumDate'}}
-                        </td>
-                        <td ng-bind-html="uiCommit.annotatedMessage"></td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-
         </div>
     </div>
 
