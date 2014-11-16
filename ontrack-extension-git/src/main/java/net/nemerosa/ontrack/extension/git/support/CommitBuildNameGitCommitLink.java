@@ -58,6 +58,7 @@ public class CommitBuildNameGitCommitLink implements BuildGitCommitLink<CommitLi
                         YesNo.of("abbreviated")
                                 .label("Abbreviated")
                                 .help("Using abbreviated commit hashes or not.")
+                                .value(true)
                 );
     }
 
