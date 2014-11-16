@@ -2,18 +2,19 @@ package net.nemerosa.ontrack.extension.git.support;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.git.client.GitClient;
-import net.nemerosa.ontrack.extension.git.model.BuildGitCommitLink;
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink;
+import net.nemerosa.ontrack.extension.git.model.IndexableBuildGitCommitLink;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.structure.Build;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 @Component
-public class TagBuildNameGitCommitLink implements BuildGitCommitLink<NoConfig> {
+public class TagBuildNameGitCommitLink implements IndexableBuildGitCommitLink<NoConfig> {
 
     /**
      * Available as default
@@ -64,6 +65,11 @@ public class TagBuildNameGitCommitLink implements BuildGitCommitLink<NoConfig> {
     @Override
     public Stream<String> getBuildCandidateReferences(String commit, GitClient gitClient, NoConfig data) {
         return gitClient.getTagsWhichContainCommit(commit).stream();
+    }
+
+    @Override
+    public Optional<String> getBuildNameFromTagName(String tagName, NoConfig data) {
+        return Optional.of(tagName);
     }
 
     @Override

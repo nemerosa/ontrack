@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.git.support;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.git.client.GitClient;
-import net.nemerosa.ontrack.extension.git.model.BuildGitCommitLink;
+import net.nemerosa.ontrack.extension.git.model.IndexableBuildGitCommitLink;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.exceptions.JsonParsingException;
 import net.nemerosa.ontrack.model.form.Form;
@@ -16,7 +16,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 @Component
-public class TagPatternBuildNameGitCommitLink implements BuildGitCommitLink<TagPattern> {
+public class TagPatternBuildNameGitCommitLink implements IndexableBuildGitCommitLink<TagPattern> {
 
     @Override
     public String getId() {
@@ -73,6 +73,11 @@ public class TagPatternBuildNameGitCommitLink implements BuildGitCommitLink<TagP
                 .map(data::getBuildNameFromTagName)
                         // ... filters on defined build names
                 .filter(Optional::isPresent).map(Optional::get);
+    }
+
+    @Override
+    public Optional<String> getBuildNameFromTagName(String tagName, TagPattern data) {
+        return data.getBuildNameFromTagName(tagName);
     }
 
     @Override

@@ -622,10 +622,15 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         };
     }
 
-    protected void buildSync(Branch branch, GitConfiguration configuration, JobInfoListener info) {
+    protected <T> void buildSync(Branch branch, GitConfiguration configuration, JobInfoListener info) {
         info.post(format("Git build/tag sync for %s/%s", branch.getProject().getName(), branch.getName()));
         // Gets the branch Git client
         GitClient gitClient = gitClientFactory.getClient(configuration);
+        // Link
+        @SuppressWarnings("unchecked")
+        IndexableBuildGitCommitLink<T> link = (IndexableBuildGitCommitLink<T>) configuration.getBuildCommitLink().getLink();
+        @SuppressWarnings("unchecked")
+        T linkData = (T) configuration.getBuildCommitLink().getData();
         // Configuration for the sync
         Property<GitBranchConfigurationProperty> confProperty = propertyService.getProperty(branch, GitBranchConfigurationPropertyType.class);
         boolean override = !confProperty.isEmpty() && confProperty.getValue().isOverride();
@@ -640,47 +645,43 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         for (GitTag tag : tags) {
             String tagName = tag.getName();
             // Filters the tags according to the branch tag pattern
-            if (configuration.isValidTagName(tagName)) {
-                // Build name
-                info.post(format("Creating build for tag %s", tagName));
-                configuration.getBuildNameFromTagName(tagName).ifPresent(buildName -> {
-
-                    info.post(format("Build %s from tag %s", buildName, tagName));
-                    // Existing build?
-                    boolean createBuild;
-                    Optional<Build> build = structureService.findBuildByName(branch.getProject().getName(), branch.getName(), buildName);
-                    if (build.isPresent()) {
-                        if (override) {
-                            // Deletes the build
-                            info.post(format("Deleting existing build %s", buildName));
-                            structureService.deleteBuild(build.get().getId());
-                            createBuild = true;
-                        } else {
-                            // Keeps the build
-                            info.post(format("Build %s already exists", buildName));
-                            createBuild = false;
-                        }
-                    } else {
+            link.getBuildNameFromTagName(tagName, linkData).ifPresent(buildNameCandidate -> {
+                String buildName = NameDescription.escapeName(buildNameCandidate);
+                info.post(format("Build %s from tag %s", buildName, tagName));
+                // Existing build?
+                boolean createBuild;
+                Optional<Build> build = structureService.findBuildByName(branch.getProject().getName(), branch.getName(), buildName);
+                if (build.isPresent()) {
+                    if (override) {
+                        // Deletes the build
+                        info.post(format("Deleting existing build %s", buildName));
+                        structureService.deleteBuild(build.get().getId());
                         createBuild = true;
+                    } else {
+                        // Keeps the build
+                        info.post(format("Build %s already exists", buildName));
+                        createBuild = false;
                     }
-                    // Actual creation
-                    if (createBuild) {
-                        info.post(format("Creating build %s from tag %s", buildName, tagName));
-                        structureService.newBuild(
-                                Build.of(
-                                        branch,
-                                        new NameDescription(
-                                                buildName,
-                                                "Imported from Git tag " + tagName
-                                        ),
-                                        securityService.getCurrentSignature().withTime(
-                                                tag.getTime()
-                                        )
-                                )
-                        );
-                    }
-                });
-            }
+                } else {
+                    createBuild = true;
+                }
+                // Actual creation
+                if (createBuild) {
+                    info.post(format("Creating build %s from tag %s", buildName, tagName));
+                    structureService.newBuild(
+                            Build.of(
+                                    branch,
+                                    new NameDescription(
+                                            buildName,
+                                            "Imported from Git tag " + tagName
+                                    ),
+                                    securityService.getCurrentSignature().withTime(
+                                            tag.getTime()
+                                    )
+                            )
+                    );
+                }
+            });
         }
     }
 

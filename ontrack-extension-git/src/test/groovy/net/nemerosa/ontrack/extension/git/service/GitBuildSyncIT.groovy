@@ -3,10 +3,12 @@ package net.nemerosa.ontrack.extension.git.service
 import net.nemerosa.ontrack.extension.git.client.GitClient
 import net.nemerosa.ontrack.extension.git.client.GitClientFactory
 import net.nemerosa.ontrack.extension.git.client.GitTag
+import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
-import net.nemerosa.ontrack.extension.git.support.TagBuildNameGitCommitLink
+import net.nemerosa.ontrack.extension.git.support.TagPattern
+import net.nemerosa.ontrack.extension.git.support.TagPatternBuildNameGitCommitLink
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
 import net.nemerosa.ontrack.model.job.JobQueueService
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -66,13 +68,16 @@ class GitBuildSyncIT {
         BuildGitCommitLinkService buildGitCommitLinkService = mock(BuildGitCommitLinkService)
 
         when(structureService.findBuildByName(eq('P'), eq('1.2'), anyString())).thenReturn(Optional.empty())
+
+        def configuredBuildGitCommitLink = new ConfiguredBuildGitCommitLink<>(
+                new TagPatternBuildNameGitCommitLink(),
+                new TagPattern("1.2.*"))
         when(propertyService.getProperty(branch, GitBranchConfigurationPropertyType)).thenReturn(
                 Property.of(
                         new GitBranchConfigurationPropertyType(buildGitCommitLinkService),
                         new GitBranchConfigurationProperty(
                                 'master',
-                                // '1.2.*',
-                                TagBuildNameGitCommitLink.DEFAULT.toServiceConfiguration(),
+                                configuredBuildGitCommitLink.toServiceConfiguration(),
                                 true,
                                 0
                         )
@@ -82,6 +87,7 @@ class GitBuildSyncIT {
         def gitConfiguration = GitConfiguration.empty()
                 .withBranch('master')
                 .withTagPattern('1.2.*')
+                .withBuildCommitLink(configuredBuildGitCommitLink)
         when(gitClientFactory.getClient(gitConfiguration)).thenReturn(gitClient)
 
         when(gitClient.getTags()).thenReturn([
