@@ -96,7 +96,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             Property<GitBranchConfigurationProperty> branchConfigurationProperty = propertyService.getProperty(branch, GitBranchConfigurationPropertyType.class);
             if (!branchConfigurationProperty.isEmpty()
                     && branchConfigurationProperty.getValue().getBuildTagInterval() > 0
-                    && configuration.getBuildCommitLink().getLink().isIndexationAvailable()) {
+                    && configuration.getBuildCommitLink().getLink() instanceof IndexableBuildGitCommitLink) {
                 jobs.add(createBuildSyncJob(branch, configuration));
             }
         });
@@ -115,7 +115,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         // Gets its configuration
         GitConfiguration configuration = getBranchConfiguration(branch);
         // If valid, launches a job
-        if (configuration.isValid() && configuration.getBuildCommitLink().getLink().isIndexationAvailable()) {
+        if (configuration.isValid() && configuration.getBuildCommitLink().getLink() instanceof IndexableBuildGitCommitLink) {
             return jobQueueService.queue(createBuildSyncJob(branch, configuration));
         }
         // Else, nothing has happened

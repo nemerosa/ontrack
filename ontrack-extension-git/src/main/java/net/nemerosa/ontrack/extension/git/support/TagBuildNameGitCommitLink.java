@@ -71,8 +71,4 @@ public class TagBuildNameGitCommitLink implements BuildGitCommitLink<NoConfig> {
         return true;
     }
 
-    @Override
-    public boolean isIndexationAvailable() {
-        return true;
-    }
 }

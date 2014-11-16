@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.git.property;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.git.model.BuildGitCommitLink;
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink;
+import net.nemerosa.ontrack.extension.git.model.IndexableBuildGitCommitLink;
 import net.nemerosa.ontrack.extension.git.service.BuildGitCommitLinkService;
 import net.nemerosa.ontrack.extension.git.support.TagBuildNameGitCommitLink;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
@@ -75,7 +76,7 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
                                                                 link.getForm(),
                                                                 Collections.singletonMap(
                                                                         "indexationAvailable",
-                                                                        link.isIndexationAvailable()
+                                                                        link instanceof IndexableBuildGitCommitLink
                                                                 )
                                                         )
                                                 )
@@ -121,7 +122,7 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
         } else {
             configuredBuildGitCommitLink = TagBuildNameGitCommitLink.DEFAULT;
         }
-        boolean indexationAvailable = configuredBuildGitCommitLink.getLink().isIndexationAvailable();
+        boolean indexationAvailable = configuredBuildGitCommitLink.getLink() instanceof IndexableBuildGitCommitLink;
         return new GitBranchConfigurationProperty(
                 JsonUtils.get(node, "branch", "master"),
                 configuredBuildGitCommitLink.toServiceConfiguration(),

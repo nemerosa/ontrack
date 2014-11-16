@@ -80,8 +80,4 @@ public class TagPatternBuildNameGitCommitLink implements BuildGitCommitLink<TagP
         return true;
     }
 
-    @Override
-    public boolean isIndexationAvailable() {
-        return true;
-    }
 }
