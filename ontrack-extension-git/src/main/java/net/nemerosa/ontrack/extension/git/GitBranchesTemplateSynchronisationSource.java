@@ -53,6 +53,8 @@ public class GitBranchesTemplateSynchronisationSource extends AbstractTemplateSy
     public List<String> getBranchNames(Branch branch, GitBranchesTemplateSynchronisationSourceConfig config) {
         // Gets the Git configuration
         GitConfiguration gitConfiguration = gitService.getBranchConfiguration(branch);
+        // Overrides the branch name to master (#166)
+        gitConfiguration = gitConfiguration.withBranch("master");
         // Inclusion predicate
         Predicate<String> filter = config.getFilter();
         // Gets the list of branches

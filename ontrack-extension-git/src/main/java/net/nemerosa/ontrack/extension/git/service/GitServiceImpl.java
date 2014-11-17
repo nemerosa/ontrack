@@ -404,7 +404,9 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
 
     @Override
     public List<String> getRemoteBranches(GitConfiguration gitConfiguration) {
-        return gitClientFactory.getClient(gitConfiguration).getRemoteBranches();
+        GitClient gitClient = gitClientFactory.getClient(gitConfiguration);
+        gitClient.sync(logger::debug);
+        return gitClient.getRemoteBranches();
     }
 
     private OntrackGitCommitInfo getOntrackGitCommitInfo(String commit) {
