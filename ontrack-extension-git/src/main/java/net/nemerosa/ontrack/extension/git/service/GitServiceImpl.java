@@ -184,6 +184,14 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         String commitTo = gitConfiguration.getCommitFromBuild(buildTo);
         // Gets the commits
         GitLog log = gitClient.log(commitFrom, commitTo);
+        // If log empty, inverts the boundaries
+        if (log.getCommits().isEmpty()) {
+            String t = commitFrom;
+            commitFrom = commitTo;
+            commitTo = t;
+            log = gitClient.log(commitFrom, commitTo);
+        }
+        // Consolidation
         List<GitCommit> commits = log.getCommits();
         List<GitUICommit> uiCommits = toUICommits(gitConfiguration, commits);
         return new GitChangeLogCommits(

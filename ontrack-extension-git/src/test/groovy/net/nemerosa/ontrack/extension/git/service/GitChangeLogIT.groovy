@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.git.service
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
 import net.nemerosa.ontrack.extension.git.client.impl.GitTestUtils
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
-import net.nemerosa.ontrack.extension.git.model.GitChangeLog
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
@@ -87,7 +86,7 @@ class GitChangeLogIT extends AbstractServiceTestSupport {
                                 'master',
                                 new ConfiguredBuildGitCommitLink<>(
                                         new CommitBuildNameGitCommitLink(),
-                                        new CommitLinkConfig(false)
+                                        new CommitLinkConfig(true)
                                 ).toServiceConfiguration(),
                                 false, 0
                         )
@@ -118,6 +117,14 @@ class GitChangeLogIT extends AbstractServiceTestSupport {
                 buildDiffRequest.from = structureService.findBuildByName(project.name, branch.name, commits['5'] as String).get().id
                 buildDiffRequest.to = structureService.findBuildByName(project.name, branch.name, commits['7'] as String).get().id
                 def changeLog = gitService.changeLog(buildDiffRequest)
+
+                // Getting the commits
+                def changeLogCommits = gitService.getChangeLogCommits(changeLog)
+
+                // Checks the commits
+                changeLogCommits.log.commits.collect { it.commit }.each { commit ->
+                    println "${commit.shortId} ${commit.fullMessage}"
+                }
 
             }
 
