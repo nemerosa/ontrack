@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
 import net.nemerosa.ontrack.model.job.JobQueueService
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.support.ApplicationLogService
 import net.nemerosa.ontrack.tx.TransactionService
 import org.junit.Before
 import org.junit.Test
@@ -51,7 +52,8 @@ class GitServiceImplTest {
                 mock(IssueServiceRegistry),
                 mock(JobQueueService),
                 mock(SecurityService),
-                mock(TransactionService)
+                mock(TransactionService),
+                mock(ApplicationLogService)
         )
     }
 
@@ -98,7 +100,6 @@ class GitServiceImplTest {
 
         // Git configuration
         GitConfiguration gitConfiguration = GitConfiguration.empty()
-                .withTagPattern('1.0.*')
 
         // Git client
         GitClient gitClient = mock(GitClient)

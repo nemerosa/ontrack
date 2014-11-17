@@ -5,17 +5,16 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Wither;
+import net.nemerosa.ontrack.extension.git.support.TagBuildNameGitCommitLink;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
 import net.nemerosa.ontrack.extension.support.UserPasswordConfiguration;
 import net.nemerosa.ontrack.model.form.*;
+import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static net.nemerosa.ontrack.model.form.Form.defaultNameField;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
@@ -43,10 +42,10 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
     private final String branch;
 
     /**
-     * Tag pattern configuration
+     * Configured link
      */
     @Wither
-    private final String tagPattern;
+    private final ConfiguredBuildGitCommitLink<?> buildCommitLink;
 
     /**
      * User name
@@ -172,7 +171,7 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
                 "",
                 "",
                 "master",
-                "*",
+                TagBuildNameGitCommitLink.DEFAULT,
                 "",
                 "",
                 "",
@@ -187,7 +186,7 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
                 name,
                 defaultIfBlank(configuration.remote, remote),
                 defaultIfBlank(configuration.branch, branch),
-                defaultIfBlank(configuration.tagPattern, tagPattern),
+                buildCommitLink == TagBuildNameGitCommitLink.DEFAULT ? configuration.buildCommitLink : buildCommitLink,
                 defaultIfBlank(configuration.user, user),
                 defaultIfBlank(configuration.password, password),
                 defaultIfBlank(configuration.commitLink, commitLink),
@@ -197,66 +196,13 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
         );
     }
 
-    public boolean isValidTagName(String name) {
-        return StringUtils.isBlank(tagPattern) || createRegex().matcher(name).matches();
-    }
-
-    public Optional<String> getBuildNameFromTagName(String tagName) {
-        if (StringUtils.isBlank(tagPattern)) {
-            return Optional.of(tagName);
-        } else {
-            Matcher matcher = createRegex().matcher(tagName);
-            if (matcher.matches()) {
-                if (matcher.groupCount() > 0) {
-                    return Optional.of(matcher.group(1));
-                } else {
-                    return Optional.of(matcher.group(0));
-                }
-            } else {
-                return Optional.empty();
-            }
-        }
-    }
-
-    public Optional<String> getTagNameFromBuildName(String buildName) {
-        if (StringUtils.isBlank(tagPattern)) {
-            return Optional.of(buildName);
-        } else {
-            // Extraction of the build pattern, if any
-            String buildPartRegex = "\\((.*\\*/*)\\)";
-            Pattern buildPartPattern = Pattern.compile(buildPartRegex);
-            Matcher buildPartMatcher = buildPartPattern.matcher(tagPattern);
-            if (buildPartMatcher.find()) {
-                String buildPart = buildPartMatcher.group(1);
-                if (Pattern.matches(buildPart, buildName)) {
-                    StringBuffer tag = new StringBuffer();
-                    do {
-                        buildPartMatcher.appendReplacement(tag, buildName);
-                    } while (buildPartMatcher.find());
-                    buildPartMatcher.appendTail(tag);
-                    return Optional.of(tag.toString());
-                } else {
-                    return Optional.empty();
-                }
-            } else if (createRegex().matcher(buildName).matches()) {
-                return Optional.of(buildName);
-            } else {
-                return Optional.empty();
-            }
-        }
-    }
-
-    private Pattern createRegex() {
-        return Pattern.compile(StringUtils.replace(tagPattern, "*", ".*"));
-    }
-
     @Override
     public GitConfiguration clone(String targetConfigurationName, Function<String, String> replacementFunction) {
         return new GitConfiguration(
                 targetConfigurationName,
                 replacementFunction.apply(remote),
                 replacementFunction.apply(branch),
-                replacementFunction.apply(tagPattern),
+                buildCommitLink.clone(replacementFunction),
                 replacementFunction.apply(user),
                 password,
                 replacementFunction.apply(commitLink),
@@ -264,5 +210,9 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
                 indexationInterval,
                 issueServiceConfigurationIdentifier
         );
+    }
+
+    public String getCommitFromBuild(Build build) {
+        return buildCommitLink.getCommitFromBuild(build);
     }
 }

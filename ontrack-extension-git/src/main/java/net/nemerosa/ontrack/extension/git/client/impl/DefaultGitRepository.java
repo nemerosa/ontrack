@@ -66,7 +66,7 @@ public class DefaultGitRepository implements GitRepository {
         // Clone or update?
         if (new File(wd, ".git").exists()) {
             // Fetch
-            fetch(logger);
+            pull(logger);
         } else {
             // Clone
             cloneRemote(logger);
@@ -112,6 +112,7 @@ public class DefaultGitRepository implements GitRepository {
                 .setCredentialsProvider(credentialsProvider)
                 .setDirectory(wd)
                 .setURI(remote)
+                .setBranch(branch)
                 .setBranchesToClone(Collections.singleton(branch))
                 .call();
         // Check
@@ -122,10 +123,10 @@ public class DefaultGitRepository implements GitRepository {
         logger.accept(format("[git] Clone done for %s", remote));
     }
 
-    protected synchronized void fetch(Consumer<String> logger) throws GitAPIException {
-        logger.accept(format("[git] Fetching %s into %s", remote, wd));
-        git().fetch().setCredentialsProvider(credentialsProvider).call();
-        logger.accept(format("[git] Fetching done for %s", remote));
+    protected synchronized void pull(Consumer<String> logger) throws GitAPIException {
+        logger.accept(format("[git] Pulling %s into %s", remote, wd));
+        git().pull().setCredentialsProvider(credentialsProvider).call();
+        logger.accept(format("[git] Pulling done for %s", remote));
     }
 
 }

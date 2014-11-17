@@ -12,13 +12,24 @@ angular.module('ot.directive.form', [
             },
             controller: function ($scope) {
                 // Checking if a field is visible or not
-                $scope.isFieldVisible = function (data, field) {
+                $scope.isFieldVisible = isFieldVisible;
+                function isFieldVisible(data, field) {
                     if (field.visibleIf) {
-                        return data[field.visibleIf];
+                        var pos = field.visibleIf.indexOf('.');
+                        if (pos > 0) {
+                            var fieldName = field.visibleIf.substring(0, pos);
+                            var fieldProperty = field.visibleIf.substring(pos + 1);
+                            var dataField = data[fieldName];
+                            return dataField && isFieldVisible(dataField, {
+                                    visibleIf: fieldProperty
+                                });
+                        } else {
+                            return data[field.visibleIf];
+                        }
                     } else {
                         return true;
                     }
-                };
+                }
             }
         };
     })

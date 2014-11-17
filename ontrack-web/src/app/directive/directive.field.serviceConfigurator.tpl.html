@@ -10,7 +10,7 @@
                 </select>
             </div>
         </div>
-        <div class="row" ng-repeat="formEntry in formEntries">
+        <div class="row" ng-repeat="formEntry in formEntries" ng-if="formEntry.form.fields.length > 0">
             <div class="col-md-11 ot-field-service-configurator-form">
                 <ot-field-service-configurator-form form="formEntry.form" data="formEntry.data" form-root="formRoot"></ot-field-service-configurator-form>
             </div>

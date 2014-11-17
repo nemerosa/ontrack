@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 public interface GitClient {
 
@@ -14,15 +15,31 @@ public interface GitClient {
 
     GitConfiguration getConfiguration();
 
+    /**
+     * Gets a Git log between two boundaries.
+     *
+     * @param from Commitish string
+     * @param to   Commitish string
+     * @return Stream of commits
+     */
+    Stream<GitCommit> rawLog(String from, String to);
+
+    /**
+     * Gets a Git log between two boundaries.
+     *
+     * @param from Commitish string
+     * @param to   Commitish string
+     * @return Git log
+     */
     GitLog log(String from, String to);
+
+    String getId(RevCommit revCommit);
 
     GitCommit toCommit(RevCommit revCommit);
 
     void sync(Consumer<String> logger);
 
     GitDiff diff(String from, String to);
-
-    boolean isCommitDefined(String commit);
 
     GitCommit getCommitFor(String commit);
 

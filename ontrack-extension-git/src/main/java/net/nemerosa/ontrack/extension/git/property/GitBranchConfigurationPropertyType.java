@@ -1,22 +1,34 @@
 package net.nemerosa.ontrack.extension.git.property;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.extension.git.model.BuildGitCommitLink;
+import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink;
+import net.nemerosa.ontrack.extension.git.model.IndexableBuildGitCommitLink;
+import net.nemerosa.ontrack.extension.git.service.BuildGitCommitLinkService;
+import net.nemerosa.ontrack.extension.git.support.TagBuildNameGitCommitLink;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
 import net.nemerosa.ontrack.json.JsonUtils;
-import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.form.Int;
-import net.nemerosa.ontrack.model.form.Text;
-import net.nemerosa.ontrack.model.form.YesNo;
+import net.nemerosa.ontrack.model.form.*;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
+import net.nemerosa.ontrack.model.structure.ServiceConfiguration;
+import net.nemerosa.ontrack.model.structure.ServiceConfigurationSource;
 
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class GitBranchConfigurationPropertyType extends AbstractPropertyType<GitBranchConfigurationProperty> {
+
+    private final BuildGitCommitLinkService buildGitCommitLinkService;
+
+    public GitBranchConfigurationPropertyType(BuildGitCommitLinkService buildGitCommitLinkService) {
+        this.buildGitCommitLinkService = buildGitCommitLinkService;
+    }
 
     @Override
     public String getName() {
@@ -52,10 +64,29 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
                                 .value(value != null ? value.getBranch() : "master")
                 )
                 .with(
-                        Text.of("tagPattern")
-                                .label("Tag pattern")
-                                .help("@file:extension/git/help.net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType.tagPattern.tpl.html")
-                                .value(value != null ? value.getTagPattern() : "*")
+                        ServiceConfigurator.of("buildCommitLink")
+                                .label("Build commit link")
+                                .help("Link between the builds and the Git commits.")
+                                .sources(
+                                        buildGitCommitLinkService.getLinks().stream()
+                                                .map(
+                                                        link -> new ServiceConfigurationSource(
+                                                                link.getId(),
+                                                                link.getName(),
+                                                                link.getForm(),
+                                                                Collections.singletonMap(
+                                                                        "indexationAvailable",
+                                                                        link instanceof IndexableBuildGitCommitLink
+                                                                )
+                                                        )
+                                                )
+                                                .collect(Collectors.toList())
+                                )
+                                .value(
+                                        value != null ?
+                                                value.getBuildCommitLink() :
+                                                null
+                                )
                 )
                 .with(
                         YesNo.of("override")
@@ -63,6 +94,7 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
                                 .help("Can the existing builds be overridden by a synchronisation? If yes, " +
                                         "the existing validation and promotion runs would be lost as well.")
                                 .value(value != null && value.isOverride())
+                                .visibleIf("buildCommitLink.extra.indexationAvailable")
                 )
                 .with(
                         Int.of("buildTagInterval")
@@ -72,6 +104,7 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
                                 .help("Interval in minutes for the synchronisation between builds and tags. " +
                                         "If 0, the synchronisation must be done manually")
                                 .value(value != null ? value.getBuildTagInterval() : 0)
+                                .visibleIf("buildCommitLink.extra.indexationAvailable")
                 );
     }
 
@@ -82,11 +115,35 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
 
     @Override
     public GitBranchConfigurationProperty fromStorage(JsonNode node) {
+        ConfiguredBuildGitCommitLink<?> configuredBuildGitCommitLink;
+        if (node.has("buildCommitLink")) {
+            JsonNode linkNode = node.get("buildCommitLink");
+            configuredBuildGitCommitLink = parseBuildCommitLink(linkNode);
+        } else {
+            configuredBuildGitCommitLink = TagBuildNameGitCommitLink.DEFAULT;
+        }
+        boolean indexationAvailable = configuredBuildGitCommitLink.getLink() instanceof IndexableBuildGitCommitLink;
         return new GitBranchConfigurationProperty(
                 JsonUtils.get(node, "branch", "master"),
-                JsonUtils.get(node, "tagPattern", "*"),
-                JsonUtils.getBoolean(node, "override", false),
-                JsonUtils.getInt(node, "buildTagInterval", 0)
+                configuredBuildGitCommitLink.toServiceConfiguration(),
+                indexationAvailable && JsonUtils.getBoolean(node, "override", false),
+                indexationAvailable ? JsonUtils.getInt(node, "buildTagInterval", 0) : 0
+        );
+    }
+
+    private <T> ConfiguredBuildGitCommitLink<T> parseBuildCommitLink(JsonNode linkNode) {
+        String linkId = JsonUtils.get(linkNode, "id");
+        // Gets the link data
+        JsonNode linkDataNode = linkNode.get("data");
+        // Gets the link
+        @SuppressWarnings("unchecked")
+        BuildGitCommitLink<T> link = (BuildGitCommitLink<T>) buildGitCommitLinkService.getLink(linkId);
+        // Parses the data (for validation)
+        T linkData = link.parseData(linkDataNode);
+        // OK
+        return new ConfiguredBuildGitCommitLink<>(
+                link,
+                linkData
         );
     }
 
@@ -99,9 +156,22 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
     public GitBranchConfigurationProperty replaceValue(GitBranchConfigurationProperty value, Function<String, String> replacementFunction) {
         return new GitBranchConfigurationProperty(
                 replacementFunction.apply(value.getBranch()),
-                replacementFunction.apply(value.getTagPattern()),
+                replaceBuildCommitLink(value.getBuildCommitLink(), replacementFunction),
                 value.isOverride(),
                 value.getBuildTagInterval()
+        );
+    }
+
+    protected <T> ServiceConfiguration replaceBuildCommitLink(ServiceConfiguration configuration, Function<String, String> replacementFunction) {
+        String linkId = configuration.getId();
+        @SuppressWarnings("unchecked")
+        BuildGitCommitLink<T> link = (BuildGitCommitLink<T>) buildGitCommitLinkService.getLink(linkId);
+        T linkData = link.parseData(configuration.getData());
+        T clonedData = link.clone(linkData, replacementFunction);
+        JsonNode node = link.toJson(clonedData);
+        return new ServiceConfiguration(
+                linkId,
+                node
         );
     }
 }

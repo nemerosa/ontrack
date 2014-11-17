@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class DefaultGitClient implements GitClient {
 
@@ -75,31 +76,53 @@ public class DefaultGitClient implements GitClient {
         return configuration;
     }
 
+    protected GitRange range(String from, String to) throws IOException {
+        Repository gitRepository = repository.git().getRepository();
+
+        ObjectId oFrom = gitRepository.resolve(from);
+        ObjectId oTo = gitRepository.resolve(to);
+
+        RevWalk walk = new RevWalk(gitRepository);
+
+        RevCommit commitFrom = walk.parseCommit(oFrom);
+        RevCommit commitTo = walk.parseCommit(oTo);
+
+        if (commitFrom.getCommitTime() < commitTo.getCommitTime()) {
+            RevCommit t = commitFrom;
+            commitFrom = commitTo;
+            commitTo = t;
+        }
+
+        return new GitRange(commitFrom, commitTo);
+    }
+
+    @Override
+    public Stream<GitCommit> rawLog(String from, String to) {
+        try {
+            Repository gitRepository = repository.git().getRepository();
+            ObjectId oFrom = gitRepository.resolve(from);
+            ObjectId oTo = gitRepository.resolve(to);
+
+            return Lists.newArrayList(
+                    repository.git().log()
+                            .addRange(oFrom, oTo)
+                            .call()
+            ).stream().map(this::toCommit);
+
+        } catch (IOException | GitAPIException e) {
+            throw new GitException(e);
+        }
+    }
+
     @Override
     public GitLog log(String from, String to) {
         try {
-            // Client
-            Git git = repository.git();
-            Repository gitRepository = git.getRepository();
-            // Gets boundaries
-            Ref oFrom = gitRepository.getTags().get(from);
-            Ref oTo = gitRepository.getTags().get(to);
-
-            // Corresponding commits
-            RevCommit commitFrom = repository.getCommitForTag(oFrom);
-            RevCommit commitTo = repository.getCommitForTag(oTo);
-
-            // Ordering of commits
-            if (commitFrom.getCommitTime() < commitTo.getCommitTime()) {
-                RevCommit t = commitFrom;
-                commitFrom = commitTo;
-                commitTo = t;
-            }
+            GitRange range = range(from, to);
+            PlotWalk walk = new PlotWalk(repository.git().getRepository());
 
             // Log
-            PlotWalk walk = new PlotWalk(gitRepository);
-            walk.markStart(walk.lookupCommit(commitFrom.getId()));
-            walk.markUninteresting(walk.lookupCommit(commitTo.getId()));
+            walk.markStart(walk.lookupCommit(range.getFrom().getId()));
+            walk.markUninteresting(walk.lookupCommit(range.getTo().getId()));
             PlotCommitList<PlotLane> commitList = new PlotCommitList<>();
             commitList.source(walk);
             commitList.fillTo(1000); // TODO How to set the maximum? See RevWalkUtils#count ?
@@ -130,33 +153,20 @@ public class DefaultGitClient implements GitClient {
         try {
             // Client
             Git git = repository.git();
-            Repository gitRepository = git.getRepository();
-            // Gets boundaries
-            Ref oFrom = gitRepository.getTags().get(from);
-            Ref oTo = gitRepository.getTags().get(to);
 
-            // Corresponding commits
-            RevCommit commitFrom = repository.getCommitForTag(oFrom);
-            RevCommit commitTo = repository.getCommitForTag(oTo);
-
-            // Ordering of commits
-            if (commitFrom.getCommitTime() > commitTo.getCommitTime()) {
-                RevCommit t = commitFrom;
-                commitFrom = commitTo;
-                commitTo = t;
-            }
+            GitRange range = range(from, to);
 
             // Diff command
             List<DiffEntry> entries = git.diff()
                     .setShowNameAndStatusOnly(true)
-                    .setOldTree(getTreeIterator(commitFrom.getId()))
-                    .setNewTree(getTreeIterator(commitTo.getId()))
+                    .setOldTree(getTreeIterator(range.getFrom().getId()))
+                    .setNewTree(getTreeIterator(range.getTo().getId()))
                     .call();
 
             // OK
             return new GitDiff(
-                    commitFrom,
-                    commitTo,
+                    range.getFrom(),
+                    range.getTo(),
                     Lists.transform(
                             entries,
                             diff -> new GitDiffEntry(
@@ -170,15 +180,6 @@ public class DefaultGitClient implements GitClient {
             throw new GitException(e);
         } catch (GitAPIException e) {
             throw translationException(e);
-        }
-    }
-
-    @Override
-    public boolean isCommitDefined(String commit) {
-        try {
-            return repository.git().getRepository().resolve(commit + "^0") != null;
-        } catch (IOException e) {
-            throw new GitException(e);
         }
     }
 
@@ -199,7 +200,7 @@ public class DefaultGitClient implements GitClient {
 
     /**
      * {@inheritDoc}
-     *
+     * <p>
      * <b>Note</b>: the JGit library does not support the <code>git-describe</code> command yet, hence
      * the use of the command line.
      *
@@ -216,7 +217,7 @@ public class DefaultGitClient implements GitClient {
         Git git = repository.git();
         // All commits
         try {
-            Iterable<RevCommit> commits = git.log().all().call();
+            Iterable<RevCommit> commits = git.log().add(git.getRepository().resolve("HEAD")).call();
             for (RevCommit commit : commits) {
                 if (scanFunction.test(commit)) {
                     // Not going on
@@ -271,7 +272,8 @@ public class DefaultGitClient implements GitClient {
         }
     }
 
-    private String getId(RevCommit revCommit) {
+    @Override
+    public String getId(RevCommit revCommit) {
         return revCommit.getId().getName();
     }
 

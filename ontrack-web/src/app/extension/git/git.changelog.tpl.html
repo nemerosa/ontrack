@@ -29,6 +29,10 @@
                         <span class="ot-extension-scm-changelog-command-loading"></span>
                         {{filesCommand}}
                     </button>
+                    <b class="text-danger" ng-if="changeLog.syncError">
+                        <span class="fa fa-warning"></span>
+                        The Git repository could not be synchronised - this may result in inaccurate results.
+                    </b>
                 </div>
             </div>
 
@@ -37,11 +41,57 @@
             <div class="row">
                 <div class="col-md-6">
                     <a name="buildFrom"></a>
-                    <ot-scm-changelog-build scm-build-view="changeLog.scmBuildFrom"></ot-scm-changelog-build>
+                    <ot-scm-changelog-build scm-build-view="changeLog.scmBuildFrom">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h3>
+                                    <small>Build info</small>
+                                </h3>
+                                <ul class="fa-ul">
+                                    <li>
+                                        <span class="fa fa-li fa-clock-o"></span>
+                                        {{changeLog.scmBuildFrom.buildView.build.signature.time | date:'mediumDate' }}
+                                        {{changeLog.scmBuildFrom.buildView.build.signature.time | date:'shortTime' }}
+                                    </li>
+                                    <li>
+                                        <span class="fa fa-li fa-user"></span>
+                                        {{changeLog.scmBuildFrom.buildView.build.signature.user.name}}
+                                    </li>
+                                    <li ng-if="changeLog.scmBuildFrom.buildView.build.description">
+                                        <span class="fa fa-li fa-file-text-o"></span>
+                                        {{changeLog.scmBuildFrom.buildView.build.description}}
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </ot-scm-changelog-build>
                 </div>
                 <div class="col-md-6">
                     <a id="buildTo"></a>
-                    <ot-scm-changelog-build scm-build-view="changeLog.scmBuildTo"></ot-scm-changelog-build>
+                    <ot-scm-changelog-build scm-build-view="changeLog.scmBuildTo">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h3>
+                                    <small>Build info</small>
+                                </h3>
+                                <ul class="fa-ul">
+                                    <li>
+                                        <span class="fa fa-li fa-clock-o"></span>
+                                        {{changeLog.scmBuildTo.buildView.build.signature.time | date:'mediumDate' }}
+                                        {{changeLog.scmBuildTo.buildView.build.signature.time | date:'shortTime' }}
+                                    </li>
+                                    <li>
+                                        <span class="fa fa-li fa-user"></span>
+                                        {{changeLog.scmBuildTo.buildView.build.signature.user.name}}
+                                    </li>
+                                    <li>
+                                        <span class="fa fa-li fa-file-text-o"></span>
+                                        {{changeLog.scmBuildTo.buildView.build.description}}
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </ot-scm-changelog-build>
                 </div>
             </div>
 

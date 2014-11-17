@@ -7,5 +7,7 @@ dependencies {
     compile libraries.spring_tx
     compile libraries.commons_io
 
+    testCompile project(':ontrack-it-utils')
     testCompile libraries.groovy
+    testRuntime project(':ontrack-service')
 }

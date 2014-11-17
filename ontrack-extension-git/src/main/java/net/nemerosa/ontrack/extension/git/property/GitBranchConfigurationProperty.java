@@ -1,7 +1,10 @@
 package net.nemerosa.ontrack.extension.git.property;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
+import lombok.experimental.Wither;
+import net.nemerosa.ontrack.model.structure.ServiceConfiguration;
 
 @Data
 public class GitBranchConfigurationProperty {
@@ -12,9 +15,9 @@ public class GitBranchConfigurationProperty {
     private final String branch;
 
     /**
-     * Tag pattern
+     * Build link
      */
-    private final String tagPattern;
+    private final ServiceConfiguration buildCommitLink;
 
     /**
      * Build overriding policy when synchronizing

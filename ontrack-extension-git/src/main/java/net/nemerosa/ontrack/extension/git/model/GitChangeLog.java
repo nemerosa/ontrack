@@ -18,13 +18,17 @@ public class GitChangeLog extends SCMChangeLog<GitConfiguration, GitBuildInfo> {
     @JsonIgnore // Not sent to the client
     private GitChangeLogFiles files;
 
+    private final boolean syncError;
+
     public GitChangeLog(
             String uuid,
             Branch branch,
             GitConfiguration configuration,
             SCMBuildView<GitBuildInfo> scmBuildFrom,
-            SCMBuildView<GitBuildInfo> scmBuildTo) {
+            SCMBuildView<GitBuildInfo> scmBuildTo,
+            boolean syncError) {
         super(uuid, branch, configuration, scmBuildFrom, scmBuildTo);
+        this.syncError = syncError;
     }
 
     public GitChangeLog withCommits(GitChangeLogCommits commits) {
