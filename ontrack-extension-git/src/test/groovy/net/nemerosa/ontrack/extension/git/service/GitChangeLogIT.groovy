@@ -1,7 +1,9 @@
 package net.nemerosa.ontrack.extension.git.service
 
+import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
 import net.nemerosa.ontrack.extension.git.client.impl.GitTestUtils
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
+import net.nemerosa.ontrack.extension.git.model.GitChangeLog
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
@@ -12,6 +14,7 @@ import net.nemerosa.ontrack.extension.git.support.CommitLinkConfig
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectEdit
+import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.structure.*
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,7 +24,7 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
 /**
  * Integration tests for Git support.
  */
-class GitIT extends AbstractServiceTestSupport {
+class GitChangeLogIT extends AbstractServiceTestSupport {
 
     @Autowired
     private GitConfigurationService gitConfigurationService
@@ -31,6 +34,9 @@ class GitIT extends AbstractServiceTestSupport {
 
     @Autowired
     private PropertyService propertyService
+
+    @Autowired
+    private GitService gitService
 
     @Test
     void 'Change log based on commits'() {
@@ -48,7 +54,7 @@ class GitIT extends AbstractServiceTestSupport {
             // Identifies the commits
             def commits = [:]
             (1..10).each {
-                commits[it] = repo.commitLookup("Commit $it")
+                commits[it as String] = repo.commitLookup("Commit $it")
             }
 
             // Create a Git configuration
@@ -92,14 +98,27 @@ class GitIT extends AbstractServiceTestSupport {
             asUser().with(project, ProjectEdit).call {
                 [2, 5, 7, 8].each {
                     sleep 100 // Some delay to get correct timestamps in builds
+                    def buildName = commits[it as String] as String
+                    println "Creating build $buildName"
                     structureService.newBuild(
                             Build.of(
                                     branch,
-                                    NameDescription.nd(commits[it] as String, "Build $it"),
+                                    NameDescription.nd(buildName, "Build $it"),
                                     Signature.of('test')
                             )
                     )
                 }
+            }
+
+            // Getting the change log between build 5 and 7
+            asUser().with(project, ProjectView).call {
+
+                BuildDiffRequest buildDiffRequest = new BuildDiffRequest()
+                buildDiffRequest.branch = branch.id
+                buildDiffRequest.from = structureService.findBuildByName(project.name, branch.name, commits['5'] as String).get().id
+                buildDiffRequest.to = structureService.findBuildByName(project.name, branch.name, commits['7'] as String).get().id
+                def changeLog = gitService.changeLog(buildDiffRequest)
+
             }
 
         } finally {
