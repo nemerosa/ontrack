@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationProper
 import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.support.CommitBuildNameGitCommitLink
 import net.nemerosa.ontrack.extension.git.support.CommitLinkConfig
+import net.nemerosa.ontrack.extension.git.support.TagBuildNameGitCommitLink
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectEdit
@@ -116,6 +117,106 @@ class GitChangeLogIT extends AbstractServiceTestSupport {
                 buildDiffRequest.branch = branch.id
                 buildDiffRequest.from = structureService.findBuildByName(project.name, branch.name, commits['5'] as String).get().id
                 buildDiffRequest.to = structureService.findBuildByName(project.name, branch.name, commits['7'] as String).get().id
+                def changeLog = gitService.changeLog(buildDiffRequest)
+
+                // Getting the commits
+                def changeLogCommits = gitService.getChangeLogCommits(changeLog)
+
+                // Checks the commits
+                def messages = changeLogCommits.log.commits.collect { it.commit.shortMessage }
+                assert messages == ['Commit 7', 'Commit 6']
+
+            }
+
+        } finally {
+            repo.close()
+        }
+
+    }
+
+    @Test
+    void 'Change log based on tags'() {
+
+        def repo = new GitTestUtils()
+        try {
+
+            def tags = [2, 5, 7, 8]
+
+            // Creates a Git repository with 10 commits
+            repo.with {
+                run 'git', 'init'
+                (1..10).each {
+                    commit it
+                    if (it in tags) {
+                        run 'git', 'tag', "v$it"
+                    }
+                }
+                run 'git', 'log', '--oneline', '--decorate'
+            }
+
+            // Identifies the commits
+            def commits = [:]
+            (1..10).each {
+                commits[it as String] = repo.commitLookup("Commit $it")
+            }
+
+            // Create a Git configuration
+            String gitConfigurationName = uid('C')
+            GitConfiguration gitConfiguration = asUser().with(GlobalSettings).call {
+                gitConfigurationService.newConfiguration(
+                        GitConfiguration.empty()
+                                .withName(gitConfigurationName)
+                                .withRemote("file://${repo.dir.absolutePath}")
+                                .withBuildCommitLink(null)
+                )
+            }
+
+            // Creates a project and branch
+            Branch branch = doCreateBranch()
+            Project project = branch.project
+
+            // Configures the project
+            asUser().with(project, ProjectEdit).call {
+                propertyService.editProperty(
+                        project,
+                        GitProjectConfigurationPropertyType,
+                        new GitProjectConfigurationProperty(gitConfiguration)
+                )
+                // ...  & the branch with a link based on commits
+                propertyService.editProperty(
+                        branch,
+                        GitBranchConfigurationPropertyType,
+                        new GitBranchConfigurationProperty(
+                                'master',
+                                TagBuildNameGitCommitLink.DEFAULT.toServiceConfiguration(),
+                                false, 0
+                        )
+                )
+            }
+
+            // Creates builds for some tags
+            asUser().with(project, ProjectEdit).call {
+                tags.each {
+                    sleep 100 // Some delay to get correct timestamps in builds
+                    def buildName = "v$it"
+                    println "Creating build $buildName"
+                    structureService.newBuild(
+                            Build.of(
+                                    branch,
+                                    NameDescription.nd(buildName, "Build $it"),
+                                    Signature.of('test')
+                            )
+                    )
+                }
+            }
+
+            // Getting the change log between build 5 and 7
+            asUser().with(project, ProjectView).call {
+
+                BuildDiffRequest buildDiffRequest = new BuildDiffRequest()
+                buildDiffRequest.branch = branch.id
+                buildDiffRequest.from = structureService.findBuildByName(project.name, branch.name, 'v5').get().id
+                buildDiffRequest.to = structureService.findBuildByName(project.name, branch.name, 'v7').get().id
                 def changeLog = gitService.changeLog(buildDiffRequest)
 
                 // Getting the commits
