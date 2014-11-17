@@ -13,6 +13,7 @@ import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
 import net.nemerosa.ontrack.model.job.JobQueueService
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.support.ApplicationLogService
 import net.nemerosa.ontrack.model.support.Time
 import net.nemerosa.ontrack.tx.TransactionService
 import org.junit.Before
@@ -56,7 +57,8 @@ class GitBuildSyncIT {
                 mock(IssueServiceRegistry),
                 mock(JobQueueService),
                 securityService,
-                mock(TransactionService), applicationLogService
+                mock(TransactionService),
+                mock(ApplicationLogService)
         )
     }
 
