@@ -122,9 +122,8 @@ class GitChangeLogIT extends AbstractServiceTestSupport {
                 def changeLogCommits = gitService.getChangeLogCommits(changeLog)
 
                 // Checks the commits
-                changeLogCommits.log.commits.collect { it.commit }.each { commit ->
-                    println "${commit.shortId} ${commit.fullMessage}"
-                }
+                def messages = changeLogCommits.log.commits.collect { it.commit.shortMessage }
+                assert messages == ['Commit 7', 'Commit 6']
 
             }
 
