@@ -51,7 +51,7 @@ class GitServiceImplTest {
                 mock(IssueServiceRegistry),
                 mock(JobQueueService),
                 mock(SecurityService),
-                mock(TransactionService)
+                mock(TransactionService), applicationLogService
         )
     }
 

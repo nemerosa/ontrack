@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.git.service;
 import com.google.common.collect.Lists;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.git.client.*;
+import net.nemerosa.ontrack.extension.git.client.impl.GitException;
 import net.nemerosa.ontrack.extension.git.model.*;
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty;
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType;
@@ -18,6 +19,7 @@ import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.job.*;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.model.support.ApplicationLogService;
 import net.nemerosa.ontrack.model.support.MessageAnnotationUtils;
 import net.nemerosa.ontrack.model.support.MessageAnnotator;
 import net.nemerosa.ontrack.tx.Transaction;
@@ -49,6 +51,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     private final JobQueueService jobQueueService;
     private final SecurityService securityService;
     private final TransactionService transactionService;
+    private final ApplicationLogService applicationLogService;
 
     @Autowired
     public GitServiceImpl(
@@ -59,7 +62,8 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             IssueServiceRegistry issueServiceRegistry,
             JobQueueService jobQueueService,
             SecurityService securityService,
-            TransactionService transactionService) {
+            TransactionService transactionService,
+            ApplicationLogService applicationLogService) {
         super(structureService, propertyService);
         this.configurators = configurators;
         this.gitClientFactory = gitClientFactory;
@@ -68,6 +72,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         this.jobQueueService = jobQueueService;
         this.securityService = securityService;
         this.transactionService = transactionService;
+        this.applicationLogService = applicationLogService;
     }
 
     @Override
@@ -131,14 +136,36 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             Branch branch = structureService.getBranch(request.getBranch());
             GitConfiguration configuration = getBranchConfiguration(branch);
             // Forces Git sync before
-            gitClientFactory.getClient(configuration).sync(logger::debug);
+            boolean syncError;
+            try {
+                gitClientFactory.getClient(configuration).sync(logger::debug);
+                syncError = false;
+            } catch (GitException ex) {
+                applicationLogService.error(
+                        ex,
+                        GitService.class,
+                        branch.getId().toString(),
+                        String.format(
+                                "Change log for %s",
+                                branch.getName()
+                        ),
+                        String.format(
+                                "%s (%s -> %s)",
+                                branch.getName(),
+                                request.getFrom(),
+                                request.getTo()
+                        )
+                );
+                syncError = true;
+            }
             // Change log computation
             return new GitChangeLog(
                     UUID.randomUUID().toString(),
                     branch,
                     configuration,
                     getSCMBuildView(request.getFrom()),
-                    getSCMBuildView(request.getTo())
+                    getSCMBuildView(request.getTo()),
+                    syncError
             );
         }
     }

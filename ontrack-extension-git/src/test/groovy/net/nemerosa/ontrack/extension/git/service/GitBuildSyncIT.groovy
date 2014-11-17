@@ -56,7 +56,7 @@ class GitBuildSyncIT {
                 mock(IssueServiceRegistry),
                 mock(JobQueueService),
                 securityService,
-                mock(TransactionService)
+                mock(TransactionService), applicationLogService
         )
     }
 

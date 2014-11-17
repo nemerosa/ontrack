@@ -29,6 +29,10 @@
                         <span class="ot-extension-scm-changelog-command-loading"></span>
                         {{filesCommand}}
                     </button>
+                    <b class="text-danger" ng-if="changeLog.syncError">
+                        <span class="fa fa-warning"></span>
+                        The Git repository could not be synchronised - this may result in inaccurate results.
+                    </b>
                 </div>
             </div>
 
