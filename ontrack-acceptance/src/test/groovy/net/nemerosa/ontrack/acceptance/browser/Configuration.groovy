@@ -58,6 +58,10 @@ public class Configuration {
         return driver;
     }
 
+    String getBaseUrl() {
+        return baseUrl
+    }
+
     public void closeConfiguration() {
         driver.quit();
     }
