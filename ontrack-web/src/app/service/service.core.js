@@ -5,7 +5,7 @@ angular.module('ot.service.core', [
 /**
  * Basic services
  */
-    .service('ot', function ($q, $rootScope, $http, $state, otNotificationService) {
+    .service('ot', function ($log, $q, $rootScope, $http, $state, otNotificationService) {
         var self = {};
 
         /**
@@ -41,6 +41,7 @@ angular.module('ot.service.core', [
                 name: "API",
                 cls: "ot-command-api",
                 action: function () {
+                    $log.debug("[api] Going to API page for ", link);
                     $state.go('api', {link: encodeURIComponent(link)});
                 }
             };
