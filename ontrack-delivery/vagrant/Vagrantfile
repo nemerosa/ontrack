@@ -16,6 +16,11 @@ Vagrant.configure('2') do |config|
     provider.size = ENV['DO_SIZE']
   end
 
+  # Virtual box provider
+  config.vm.provider "virtualbox" do |vm|
+    vm.name = ENV['VAGRANT_HOST']
+  end
+
   # TODO Upload of ontrack.jar
   # TODO Installation of ontrack
   # TODO Installation and configuration of nginx
