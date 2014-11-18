@@ -193,11 +193,16 @@ div.ot-view {
       text-decoration: underline;
     }
   }
-  .ot-version-warning {
+  .ot-version-label {
     font-weight: bold;
     .label;
-    .label-danger;
-    text-decoration: no-underline !important;
+    .label-default;
+    &.ot-version-release {
+      .label-success;
+    }
+    &.ot-version-warning {
+      .label-danger;
+    }
   }
 }
 

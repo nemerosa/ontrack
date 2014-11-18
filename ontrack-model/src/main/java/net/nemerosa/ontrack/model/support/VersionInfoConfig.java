@@ -27,27 +27,29 @@ public class VersionInfoConfig {
      */
     private String date;
     /**
-     * Full version string, including the build number
+     * Full version string, including the build number. Example: release-2.0-10a1bb7
      */
-    private String full = "SOURCE";
+    private String full = "n/a";
     /**
-     * Base version string, without the build number
+     * Base version string, without the build number. Example: release-2.0
      */
-    private String base = "SOURCE";
+    private String base = "n/a";
     /**
-     * Build number
+     * Build number. Example: 10a1bb7
      */
     private String build = "0";
     /**
-     * Associated commit (hash)
+     * Associated commit (hash). Example: 10a1bb77276321bef16abd7dcf19a5533ab8bd97
      */
     private String commit = "NA";
     /**
      * Source of the version. It can be a tag (correct for a real release) or a developer environment.
+     * Example: release/2.0
      */
     private String source = "source";
     /**
      * Type of source for the version.
+     * Example: release
      */
     private String sourceType = "sourceType";
 
