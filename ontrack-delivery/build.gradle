@@ -8,6 +8,8 @@ task docker(type: Zip) {
     from(projectDir) {
         // Ontrack docker
         include 'docker/Dockerfile'
+        // Ontrack vagrant
+        include 'vagrant/Vagrantfile'
         // Root
         include '*.sh'
         include 'publication.*'
