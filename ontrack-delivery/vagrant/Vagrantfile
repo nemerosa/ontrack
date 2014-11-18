@@ -2,8 +2,8 @@ Vagrant.configure('2') do |config|
   config.vm.box = "hashicorp/precise64"
   # config.vm.forward_port 8080, 3000
 
-  # TODO Configurable VM name
-  config.vm.hostname = 'ontrack-acceptance-2'
+  # Configurable VM name
+  config.vm.hostname = ENV['VAGRANT_HOST']
 
   # Digital Ocean provider
   config.vm.provider "digital_ocean" do |provider, override|

@@ -9,6 +9,7 @@ function show_help {
 	echo "Available options are:"
 	echo "    -h, --help                          Displays this help"
 	echo "    -vg, --vagrant=<dir>                Directory that contains the Vagrant file (default: 'vagrant')"
+	echo "    -vgh, --vagrant-host=<host>         Name to give to the VM (default: 'ontrack-vagrant')"
 	echo "    -vgp, --vagrant-provider=<provider> Provider for Vagrant (default: 'virtualbox')"
 	echo "Digital Ocean specific options are:"
 	echo "    -dot, --do-token=<token>            Personal Access Token (required)"
@@ -30,6 +31,7 @@ function check {
 # Default values
 
 VAGRANT_DIR=vagrant
+VAGRANT_HOST="ontrack-vagrant"
 VAGRANT_PROVIDER=virtualbox
 
 DO_TOKEN=
@@ -48,6 +50,9 @@ do
 			;;
 		-vg=*|--vagrant=*)
             VAGRANT_DIR=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
+			;;
+		-vgh=*|--vagrant-host=*)
+            VAGRANT_HOST=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
 			;;
 		-vgp=*|--vagrant-provider=*)
             VAGRANT_PROVIDER=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
@@ -83,6 +88,7 @@ fi
 # Logging
 
 echo "Vagrant directory:   ${VAGRANT_DIR}"
+echo "Vagrant VM host:     ${VAGRANT_HOST}"
 echo "Vagrant provider:    ${VAGRANT_PROVIDER}"
 if [ "${VAGRANT_PROVIDER}" == "digital_ocean" ]
 then
@@ -96,6 +102,8 @@ fi
 
 export VAGRANT_CWD=${VAGRANT_DIR}
 rm -rf ${VAGRANT_DIR}/.vagrant
+
+export VAGRANT_HOST
 
 if [ "${VAGRANT_PROVIDER}" == "digital_ocean" ]
 then
