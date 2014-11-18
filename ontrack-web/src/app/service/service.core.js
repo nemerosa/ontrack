@@ -42,7 +42,7 @@ angular.module('ot.service.core', [
                 cls: "ot-command-api",
                 action: function () {
                     $log.debug("[api] Going to API page for ", link);
-                    $state.go('api', {link: encodeURIComponent(link)});
+                    $state.go('api', {'link': encodeURIComponent(link)});
                 }
             };
         };
