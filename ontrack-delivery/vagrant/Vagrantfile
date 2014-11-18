@@ -1,6 +1,20 @@
-Vagrant::Config.run do |config|
+Vagrant.configure('2') do |config|
   config.vm.box = "hashicorp/precise64"
   # config.vm.forward_port 8080, 3000
+
+  # TODO Configurable VM name
+  config.vm.hostname = 'ontrack-acceptance-2'
+
+  # Digital Ocean provider
+  config.vm.provider "digital_ocean" do |provider, override|
+    override.ssh.private_key_path = '~/.ssh/id_rsa'
+    override.vm.box = 'digital_ocean'
+    override.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
+    provider.token = ENV['DO_TOKEN']
+    provider.image = "Docker 1.3.1 on 14.04"
+    provider.region = ENV['DO_REGION']
+    provider.size = ENV['DO_SIZE']
+  end
 
   # TODO Upload of ontrack.jar
   # TODO Installation of ontrack
@@ -12,5 +26,5 @@ Vagrant::Config.run do |config|
   #   file.source = 'sources/ontrack.jar'
   #   file.destination = 'ontrack.jar'
   # end
-  
+
 end
