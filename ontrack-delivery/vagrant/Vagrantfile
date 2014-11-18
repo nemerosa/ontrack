@@ -11,7 +11,7 @@ Vagrant.configure('2') do |config|
     override.vm.box = 'digital_ocean'
     override.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
     provider.token = ENV['DO_TOKEN']
-    provider.image = "Docker 1.3.1 on 14.04"
+    provider.image = ENV['DO_IMAGE']
     provider.region = ENV['DO_REGION']
     provider.size = ENV['DO_SIZE']
   end

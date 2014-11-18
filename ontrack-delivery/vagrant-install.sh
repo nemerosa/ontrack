@@ -14,6 +14,7 @@ function show_help {
 	echo "    -dot, --do-token=<token>            Personal Access Token (required)"
 	echo "    -dor, --do-region=<region>          Region (required, for example: ams2 or nyc2)"
 	echo "    -dos, --do-size=<size>              Droplet size (default: '512m')"
+	echo "    -doi, --do-image=<image>            Droplet image that contains Docker (default: 'Docker 1.3.1 on 14.04')"
 }
 
 # Check function
@@ -34,6 +35,7 @@ VAGRANT_PROVIDER=virtualbox
 DO_TOKEN=
 DO_REGION=
 DO_SIZE=512mb
+DO_IMAGE="Docker 1.3.1 on 14.04"
 
 # Command central
 
@@ -58,6 +60,9 @@ do
 			;;
 		-dos=*|--do-size=*)
             DO_SIZE=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
+			;;
+		-doi=*|--do-image=*)
+            DO_IMAGE=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
 			;;
 		*)
 			echo "Unknown option: $i"
@@ -84,6 +89,7 @@ then
 	echo "Digital Ocean Personal Access Token:   ***"
 	echo "Digital Ocean region:                  ${DO_REGION}"
 	echo "Digital Ocean size:                    ${DO_SIZE}"
+	echo "Digital Ocean image:                   ${DO_IMAGE}"
 fi
 
 # Sets the vagrant environment
@@ -96,6 +102,7 @@ then
 	export DO_TOKEN
 	export DO_REGION
 	export DO_SIZE
+	export DO_IMAGE
 fi
 
 # Creating the machine
