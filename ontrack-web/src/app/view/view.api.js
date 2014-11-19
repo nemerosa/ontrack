@@ -5,7 +5,7 @@ angular.module('ot.view.api', [
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('api', {
-            url: '/api/{link}',
+            url: '/api/:link',
             templateUrl: 'app/view/view.api.tpl.html',
             controller: 'APICtrl'
         });
