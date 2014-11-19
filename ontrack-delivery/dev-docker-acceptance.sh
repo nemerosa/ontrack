@@ -35,3 +35,10 @@ then
 fi
 echo "Found Acceptance JAR at $ACCEPTANCE"
 
+# Running the docker acceptance tests
+cd ${PROJECT}/ontrack-delivery
+./docker-acceptance.sh \
+	--jar=${PROJECT}/${UI} \
+	--acceptance=${PROJECT}/${ACCEPTANCE} \
+	$*
+
