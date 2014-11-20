@@ -28,7 +28,7 @@ def merge_into_master(options):
     print "[publish] Checks the master out"
     utils.run_command('git', ['checkout', 'master'])
     # Merging the release branch
-    print "[publish] Merging branch %s" % (options.branch)
+    print "[publish] Merging branch %s" % options.branch
     utils.run_command('git', ['merge', '--no-ff', options.branch])
 
 
@@ -42,8 +42,10 @@ def build():
 def tag_and_build(options):
     # TODO Gets the release from the branch
     options.release = '2.0-rc'
-    # TODO Tagging
-    print "[publish] Tagging into %s" % (options.release)
+    print "[publish] Preparing release %s" % options.release
+    # Tagging
+    print "[publish] Tagging into %s" % options.release
+    utils.run_command('git', ['tag', options.release])
     # Building
     build()
 
@@ -51,7 +53,7 @@ def tag_and_build(options):
 # Deploying in acceptance
 def acceptance_deploy(options):
     # TODO Deploying in acceptance
-    print "[publish] Deploying %s in acceptance" % (options.release)
+    print "[publish] Deploying %s in acceptance" % options.release
 
 
 # Publication in GitHub
@@ -60,7 +62,7 @@ def github_publish(options):
     utils.run_command('git', ['push', 'origin', 'master'])
     utils.run_command('git', ['push', 'origin', options.release])
     # Creation of the release
-    print "[publish] Creation of GitHub release %s" % (options.release)
+    print "[publish] Creation of GitHub release %s" % options.release
     releaseid = github.createRelease(options, options.release)
     print "[publish] Release ID is %d" % releaseid
     # Attach artifacts to the release
