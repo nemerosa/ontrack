@@ -55,7 +55,9 @@ def acceptance_deploy(options):
 
 # Publication in GitHub
 def github_publish(options):
-    # TODO Pushes the tag
+    # Pushes the master and pushes the tag
+    utils.run_command('git', ['push', 'origin', 'master'])
+    utils.run_command('git', ['push', 'origin', options.release])
     # Creation of the release
     print "[publish] Creation of GitHub release %s" % (options.release)
     releaseid = github.createRelease(options, options.release)
@@ -99,6 +101,6 @@ if __name__ == '__main__':
     parser.add_argument('--github-token', required=True,
                         help='GitHub password or API token used to publish the release')
     # Parsing of arguments
-    options = parser.parse_args()
+    _options = parser.parse_args()
     # Calling the publication
-    publish(options)
+    publish(_options)
