@@ -56,23 +56,15 @@ def githubPublish(options):
     # TODO Pushes the tag
     # Creation of the release
     print "[publish] Creation of GitHub release %s" % (options.release)
-    response = github.callGithub(
-        options,
-        "https://api.github.com/repos/%s/releases" % options.github_repository,
-        {
-            'tag_name': options.release,
-            'name': options.release
-        }
-    )
-    releaseId = json.load(response)['id']
-    print "[publish] Release ID is %d" % releaseId
+    releaseid = github.createRelease(options, options.release)
+    print "[publish] Release ID is %d" % releaseid
     # Attach artifacts to the release
-    github.uploadGithubArtifact(options, releaseId, 'ontrack-ui.jar', 'application/zip',
+    github.uploadGithubArtifact(options, releaseid, 'ontrack-ui.jar', 'application/zip',
                                 "%s/ontrack-ui/build/libs/ontrack-ui-%s.jar" % (options.dir, options.release))
     # Gets the change log since last release
     changeLog = ontrack.getChangeLog(options.ontrack_url, 'master', 'RELEASE')
     # Attach change log to the release
-    github.setReleaseDescription(options, releaseId, changeLog)
+    github.setReleaseDescription(options, releaseid, changeLog)
 
 
 # Publication main method

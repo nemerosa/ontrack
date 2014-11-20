@@ -51,3 +51,15 @@ def setReleaseDescription(options, releaseId, description):
             'body': description
         }
     )
+
+
+def createRelease(options, release):
+    response = callGithub(
+        options,
+        "https://api.github.com/repos/%s/releases" % options.github_repository,
+        {
+            'tag_name': release,
+            'name': release
+        }
+    )
+    return json.load(response)['id']
