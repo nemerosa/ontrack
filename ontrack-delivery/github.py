@@ -3,6 +3,7 @@ import hashlib
 import json
 import urllib2
 
+
 def callGithub(options, url, form, type='application/json'):
     req = urllib2.Request(url)
     req.add_header('Content-Type', type)
@@ -39,4 +40,14 @@ def uploadGithubArtifact(options, releaseId, name, type, path):
             options.github_user, releaseId, name),
         data,
         type
+    )
+
+
+def setReleaseDescription(options, releaseId, description):
+    callGithub(
+        options,
+        "https://api.github.com/repos/%s/releases/%d" % (options.github_repository, releaseId),
+        {
+            'body': description
+        }
     )

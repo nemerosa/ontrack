@@ -71,7 +71,8 @@ def githubPublish(options):
                                 "%s/ontrack-ui/build/libs/ontrack-ui-%s.jar" % (options.dir, options.release))
     # Gets the change log since last release
     changeLog = ontrack.getChangeLog(options.ontrack_url, 'master', 'RELEASE')
-    # TODO Attach change log to the release
+    # Attach change log to the release
+    github.setReleaseDescription(options, releaseId, changeLog)
 
 
 # Publication main method
