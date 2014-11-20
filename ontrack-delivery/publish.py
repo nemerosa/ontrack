@@ -1,14 +1,13 @@
 #!/usr/bin/python
 
 import argparse
-import json
 
 import github
 import ontrack
 
-# Preparing the working environment
 
-def prepareEnvironment(options):
+# Preparing the working environment
+def prepare_environment(options):
     print "[publish] Preparing environment"
     # TODO Prepare local working directory
     # TODO Checks out the code
@@ -17,8 +16,7 @@ def prepareEnvironment(options):
 
 
 # Merging the branch into the master
-
-def mergeIntoMaster(options):
+def merge_into_master(options):
     # TODO Checking the master out
     print "[publish] Checks the master out"
     # TODO Merging the release branch
@@ -26,15 +24,13 @@ def mergeIntoMaster(options):
 
 
 # Building
-
 def build(options):
     # TODO Building
     print "[publish] Building from tag"
 
 
 # Tagging and building
-
-def tagAndBuild(options):
+def tag_and_build(options):
     # TODO Gets the release from the branch
     options.release = '2.0-rc'
     # TODO Tagging
@@ -44,15 +40,13 @@ def tagAndBuild(options):
 
 
 # Deploying in acceptance
-
-def acceptanceDeploy(options):
+def acceptance_deploy(options):
     # TODO Deploying in acceptance
     print "[publish] Deploying %s in acceptance" % (options.release)
 
 
 # Publication in GitHub
-
-def githubPublish(options):
+def github_publish(options):
     # TODO Pushes the tag
     # Creation of the release
     print "[publish] Creation of GitHub release %s" % (options.release)
@@ -68,19 +62,18 @@ def githubPublish(options):
 
 
 # Publication main method
-
 def publish(options):
     # Preparing the environment
-    prepareEnvironment(options)
+    prepare_environment(options)
     # Merging into the master
-    mergeIntoMaster(options)
+    merge_into_master(options)
     # Tagging and building
-    tagAndBuild(options)
+    tag_and_build(options)
     # Deploys in acceptance and run acceptance tests
-    acceptanceDeploy(options)
+    acceptance_deploy(options)
     # TODO acceptanceTest(options)
     # Publication in GitHub
-    githubPublish(options)
+    github_publish(options)
     # Deploys in production and run smoke tests
     # TODO productionDeploy(options)
     # TODO productionTest(options)
@@ -88,7 +81,6 @@ def publish(options):
     print "[publish] End."
 
 # Entry point
-
 if __name__ == '__main__':
     # Argument definitions
     parser = argparse.ArgumentParser(description='Ontrack publication')
