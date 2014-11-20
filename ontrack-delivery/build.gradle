@@ -12,7 +12,7 @@ task docker(type: Zip) {
         include 'vagrant/Vagrantfile'
         // Root
         include '*.sh'
-        include 'publication.*'
+        include '*.py'
     }
     // Wrapper
     from(rootDir) {
