@@ -2,6 +2,7 @@
 
 import argparse
 import os
+import re
 
 import github
 import ontrack
@@ -74,9 +75,11 @@ def github_publish(options):
 
 def get_release_name(branch):
     """Extracts the release name from the name of the branch"""
-    # TODO get_release_name
-    # TODO Checks this is actually a release branch
-    return '2.0-rc'
+    matcher = re.match('release/(.*)', branch)
+    if matcher is not None:
+        return matcher.group(1)
+    else:
+        raise Exception('Can only release... releases.')
 
 
 # Publication main method
