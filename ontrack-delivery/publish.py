@@ -4,7 +4,7 @@ import argparse
 import json
 
 import github
-
+import ontrack
 
 # Preparing the working environment
 
@@ -69,6 +69,8 @@ def githubPublish(options):
     # Attach artifacts to the release
     github.uploadGithubArtifact(options, releaseId, 'ontrack-ui.jar', 'application/zip',
                                 "%s/ontrack-ui/build/libs/ontrack-ui-%s.jar" % (options.dir, options.release))
+    # Gets the change log since last release
+    changeLog = ontrack.getChangeLog(options.ontrack_url, 'master', 'RELEASE')
     # TODO Attach change log to the release
 
 

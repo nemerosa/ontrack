@@ -48,7 +48,10 @@ Deploy in acceptance and run the acceptance tests (see above).
 
 Publication of the release in GitHub:
 
-    TODO
+* creating the release
+* attaching the _ontrack-ui_ JAR file
+* getting the change log from Ontrack @ Ontrack and attaching it to the release as description - we get the change log
+since the last _Release_ promoted build on the _master_ branch
 
 Optional deployment in production and running smoke tests:
 
