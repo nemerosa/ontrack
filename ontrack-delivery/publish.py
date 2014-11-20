@@ -7,8 +7,8 @@ import github
 import ontrack
 
 
-# Preparing the working environment
 def prepare_environment(options):
+    """Preparing the working environment"""
     print "[publish] Preparing environment"
     # Prepare local working directory
     options.dir = os.path.join(os.getcwd(), 'release')
@@ -16,19 +16,23 @@ def prepare_environment(options):
     if os.path.exists(options.dir):
         os.rmdir(options.dir)
     os.mkdir(options.dir)
-    # TODO Checks out the code
+    # Checks out the code
+    os.chdir(options.dir)
+    co_code = os.spawnv(os.P_WAIT, 'git', ['clone', "git@github.com:%s.git" % options.github_repository, options.dir])
+    if co_code != 0:
+        raise Exception("Could not check out the code: %d" % co_code)
 
 
-# Merging the branch into the master
 def merge_into_master(options):
+    """Merging the branch into the master"""
     # TODO Checking the master out
     print "[publish] Checks the master out"
     # TODO Merging the release branch
     print "[publish] Merging branch %s" % (options.branch)
 
 
-# Building
 def build(options):
+    """Building"""
     # TODO Building
     print "[publish] Building from tag"
 
