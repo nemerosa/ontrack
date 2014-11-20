@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import argparse
+import os
 
 import github
 import ontrack
@@ -9,10 +10,13 @@ import ontrack
 # Preparing the working environment
 def prepare_environment(options):
     print "[publish] Preparing environment"
-    # TODO Prepare local working directory
+    # Prepare local working directory
+    options.dir = os.path.join(os.getcwd(), 'release')
+    print "[publish] Local environment at %s" % (os.path.abspath(options.dir))
+    if os.path.exists(options.dir):
+        os.rmdir(options.dir)
+    os.mkdir(options.dir)
     # TODO Checks out the code
-    # TODO Returns the prepared directory
-    # options.dir = ...
 
 
 # Merging the branch into the master
