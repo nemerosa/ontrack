@@ -1,4 +1,5 @@
 import base64
+import hashlib
 import json
 import urllib2
 
@@ -17,3 +18,25 @@ def callGithub(options, url, form, type='application/json'):
     except urllib2.HTTPError as e:
         raise ("GitHub error:\n%s\n" % e)
 
+
+def uploadGithubArtifact(options, releaseId, name, type, path):
+    # Opens the artifact
+    data = open(path, 'rb').read()
+    # Computes the SHA1 for this file
+    h = hashlib.sha1(data).hexdigest()
+    # Uploads the SHA1 file
+    response = callGithub(
+        options,
+        "https://uploads.github.com/repos/%s/ontrack/releases/%s/assets?name=%s.sha1" % (
+            options.github_user, releaseId, name),
+        h,
+        "text/plain"
+    )
+    # Uploads the artifact
+    callGithub(
+        options,
+        "https://uploads.github.com/repos/%s/ontrack/releases/%s/assets?name=%s" % (
+            options.github_user, releaseId, name),
+        data,
+        type
+    )

@@ -1,10 +1,10 @@
 #!/usr/bin/python
 
 import argparse
-import base64
 import json
-import urllib2
+
 import github
+
 
 # Preparing the working environment
 
@@ -13,6 +13,7 @@ def prepareEnvironment(options):
     # TODO Prepare local working directory
     # TODO Checks out the code
     # TODO Returns the prepared directory
+    # options.dir = ...
 
 
 # Merging the branch into the master
@@ -65,7 +66,9 @@ def githubPublish(options):
     )
     releaseId = json.load(response)['id']
     print "[publish] Release ID is %d" % releaseId
-    # TODO Attach artifacts to the release
+    # Attach artifacts to the release
+    github.uploadGithubArtifact(options, releaseId, 'ontrack-ui.jar', 'application/zip',
+                                "%s/ontrack-ui/build/libs/ontrack-ui-%s.jar" % (options.dir, options.release))
     # TODO Attach change log to the release
 
 
