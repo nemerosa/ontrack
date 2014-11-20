@@ -31,7 +31,7 @@ def merge_into_master(options):
     utils.run_command('git', ['checkout', 'master'])
     # Merging the release branch
     print "[publish] Merging branch %s" % options.branch
-    utils.run_command('git', ['merge', '--no-ff', options.branch])
+    utils.run_command('git', ['merge', '--no-ff', "origin/%s" % options.branch, '--message', "Release %s" % options.release])
 
 
 def build():
