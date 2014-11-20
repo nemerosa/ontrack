@@ -3,6 +3,7 @@
 import argparse
 import os
 import re
+import shutil
 
 import github
 import ontrack
@@ -16,7 +17,7 @@ def prepare_environment(options):
     options.dir = os.path.join(os.getcwd(), 'release')
     print "[publish] Local environment at %s" % (os.path.abspath(options.dir))
     if os.path.exists(options.dir):
-        os.rmdir(options.dir)
+        shutil.rmtree(options.dir)
     os.mkdir(options.dir)
     # Checks out the code
     os.chdir(options.dir)
