@@ -83,7 +83,7 @@ def get_release_name(branch):
 def publish(options):
     # Gets the release from the branch
     options.release = get_release_name(options.branch)
-    print "[publish] Release %d" % options.release
+    print "[publish] Release %s" % options.release
     # Preparing the environment
     prepare_environment(options)
     # Merging into the master
