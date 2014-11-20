@@ -7,6 +7,7 @@ import github
 import ontrack
 import utils
 
+
 def prepare_environment(options):
     """Preparing the working environment"""
     print "[publish] Preparing environment"
@@ -31,10 +32,10 @@ def merge_into_master(options):
     utils.run_command('git', ['merge', '--no-ff', options.branch])
 
 
-def build(options):
+def build():
     """Building"""
-    # TODO Building
     print "[publish] Building from tag"
+    utils.run_command('gradlew', ['clean', 'release'])
 
 
 # Tagging and building
@@ -44,7 +45,7 @@ def tag_and_build(options):
     # TODO Tagging
     print "[publish] Tagging into %s" % (options.release)
     # Building
-    build(options)
+    build()
 
 
 # Deploying in acceptance
