@@ -40,8 +40,6 @@ def build():
 
 # Tagging and building
 def tag_and_build(options):
-    # TODO Gets the release from the branch
-    options.release = '2.0-rc'
     print "[publish] Preparing release %s" % options.release
     # Tagging
     print "[publish] Tagging into %s" % options.release
@@ -74,8 +72,18 @@ def github_publish(options):
     github.setReleaseDescription(options, releaseid, changeLog)
 
 
+def get_release_name(branch):
+    """Extracts the release name from the name of the branch"""
+    # TODO get_release_name
+    # TODO Checks this is actually a release branch
+    return '2.0-rc'
+
+
 # Publication main method
 def publish(options):
+    # Gets the release from the branch
+    options.release = get_release_name(options.branch)
+    print "[publish] Release %d" % options.release
     # Preparing the environment
     prepare_environment(options)
     # Merging into the master
