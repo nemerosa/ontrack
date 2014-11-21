@@ -98,6 +98,7 @@ The next steps are:
     * stopping the old one
     * running a new container by pulling `nemerosa/ontrack:R.x`
     * setting the `R.X` build as `PRODUCTION` in Ontrack @ Ontrack
+    * smoke tests
 
 ## Housekeeping
 
