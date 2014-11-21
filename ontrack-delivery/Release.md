@@ -30,7 +30,25 @@ For `master` branch:
 
 ## Acceptance deployment and tests
 
-    TODO
+After the local acceptance tests for a `b` branch, a local Docker image has been created: `ontrack:b-ddd`.
+
+This image must first be published on Docker Hub:
+
+    docker tag ontrack:b-ddd nemerosa/ontrack:b-ddd
+    docker login --email="" --username="" --password=""
+    docker push nemerosa/ontrack:b-ddd
+    docker logout
+
+Then, using Vagrant @ Digital Ocean, we can provision the machine:
+
+    ./vagrant-install.sh \
+        --vagrant-provider=digital_ocean \
+        --vagrant-host=ontrack-acceptance-b-ddd
+        ...
+
+and then run the acceptance tests against this machine:
+
+    ./acceptance.sh --ontrack-url=https://... --acceptance=...
 
 ## Release and publication
 
@@ -67,3 +85,8 @@ since the last _Release_ promoted build on the _master_ branch
 Optional deployment in production and running smoke tests:
 
     TODO
+
+## Housekeeping
+
+* unreleased images in Docker Hub
+* unreleased images in Jenkins
