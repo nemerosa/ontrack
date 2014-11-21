@@ -20,12 +20,18 @@ For all branches:
 * packaging
 * local acceptance tests (using a local Docker image)
 
+For `release/*` and `master` branches:
+
+* Docker publication
+* deploying in a acceptance server (automated for those branches, manual for the others)
+
 For `release/*` branches:
 
-* deploying in a acceptance server
+* release phase - preparing the `master` branch
 
 For `master` branch:
 
+* publication - GitHub
 * deploying in production (manual, optional)
 
 ## Acceptance deployment and tests
@@ -50,7 +56,11 @@ and then run the acceptance tests against this machine:
 
     ./acceptance.sh --ontrack-url=https://... --acceptance=...
 
+The _Acceptance @ Digital Ocean_ step in the _Acceptance_ phase is automated for the `release/*` and `master` branches and manual for the other types of branches.
+
 ## Release and publication
+
+### Preparing the master
 
 Merging the release into the master:
 
@@ -63,12 +73,18 @@ Tagging and pushing:
     git push origin master
     git push origin R.X
 
-This will trigger a pipeline for the `master` branch, using `R.X` as version since built from a tag.
+This is done during the optional _Release_ phase of the pipeline for _any_ branch, which follows the _Acceptance @ Digital Ocean_ phase. This is included into the `release.sh` script.
+
+### Master pipeline
+
+When done, this triggers a pipeline for the `master` branch, using `R.X` as version since built from a tag.
 
 In the end, we have:
 
 * a tested image in Docker Hub: `nemerosa/ontrack:R.x`
 * a Digital Ocean acceptance machine: `ontrack-acceptance-R.X`
+
+### Publishing the release
 
 The next steps are:
 
