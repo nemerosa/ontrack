@@ -1,43 +1,53 @@
 #!/usr/bin/python
 
 import argparse
-import os
 import re
-import shutil
 
 import github
 import ontrack
 import utils
 
 
+def get_release_name(branch):
+    """Extracts the release name from the name of the branch"""
+    matcher = re.match('release/(.*)', branch)
+    if matcher is not None:
+        return matcher.group(1)
+    else:
+        raise Exception('Can only release... releases.')
+
+
 def prepare_environment(options):
     """Preparing the working environment"""
     print "[publish] Preparing environment"
-    # Prepare local working directory
-    options.dir = os.path.join(os.getcwd(), 'release')
-    print "[publish] Local environment at %s" % (os.path.abspath(options.dir))
-    if os.path.exists(options.dir):
-        shutil.rmtree(options.dir)
-    os.mkdir(options.dir)
-    # Checks out the code
-    os.chdir(options.dir)
-    utils.run_command('git', ['clone', "git@github.com:%s.git" % options.github_repository, options.dir])
+    # We must assume being on the release branch already, in order to get access to this file
+    # Gets the current branch
+    options.branch = utils.run_command('git', ['rev-parse', '--abbrev-ref', 'HEAD'])
+    print "[publish] Current branch is %s" % options.branch
+    # Checks the current branch
+    options.release = get_release_name(options.branch)
+    print "[publish] Release %s" % options.release
 
 
 def merge_into_master(options):
     """Merging the branch into the master"""
+    # Removes any extra change
+    utils.run_command('git', ['checkout', '--', '.'])
+    # Cleans the workspace
+    utils.run_command('git', ['clean', '-df'])
     # Checking the master out
     print "[publish] Checks the master out"
     utils.run_command('git', ['checkout', 'master'])
     # Merging the release branch
     print "[publish] Merging branch %s" % options.branch
-    utils.run_command('git', ['merge', '--no-ff', "origin/%s" % options.branch, '--message', "Release %s" % options.release])
+    utils.run_command('git',
+                      ['merge', '--no-ff', "origin/%s" % options.branch, '--message', "Release %s" % options.release])
 
 
 def build():
     """Building"""
     print "[publish] Building from tag"
-    utils.run_command('gradlew', ['clean', 'release'])
+    utils.run_command('./gradlew', ['clean', 'release'])
 
 
 # Tagging and building
@@ -74,20 +84,8 @@ def github_publish(options):
     github.setReleaseDescription(options, releaseid, changeLog)
 
 
-def get_release_name(branch):
-    """Extracts the release name from the name of the branch"""
-    matcher = re.match('release/(.*)', branch)
-    if matcher is not None:
-        return matcher.group(1)
-    else:
-        raise Exception('Can only release... releases.')
-
-
 # Publication main method
 def publish(options):
-    # Gets the release from the branch
-    options.release = get_release_name(options.branch)
-    print "[publish] Release %s" % options.release
     # Preparing the environment
     prepare_environment(options)
     # Merging into the master
@@ -109,7 +107,6 @@ def publish(options):
 if __name__ == '__main__':
     # Argument definitions
     parser = argparse.ArgumentParser(description='Ontrack publication')
-    parser.add_argument('--branch', required=True, help='Release branch to release')
     parser.add_argument('--github-repository', required=False, help='GitHub repository', default='nemerosa/ontrack')
     parser.add_argument('--ontrack-url', required=True, help='ontrack URL')
     parser.add_argument('--github-user', required=True, help='GitHub user used to publish the release')
