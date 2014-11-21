@@ -86,8 +86,7 @@ def github_publish(options):
 
 def acceptance_local(options):
     print "[publish] Local acceptance tests..."
-    # TODO Running acceptance tests using Python
-
+    utils.run_command('local-docker-acceptance.sh', [])
 
 def publish(options):
     # Preparing the environment
