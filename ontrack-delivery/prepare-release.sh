@@ -114,7 +114,14 @@ fi
 # Merging the branch
 
 cd ${DIR}
-git merge -no-ff --message "Release ${BRANCH}" "origin/${BRANCH}"
+git checkout master
+git merge --no-ff --message "Release ${BRANCH}" "origin/${BRANCH}"
+if [ "$?" != "0" ]
+then
+	echo "Could not merge ${BRANCH}"
+	exit 1
+fi
+
 
 # Tagging
 
@@ -130,6 +137,8 @@ then
 	git push origin master
 	git push origin "${TAG}"
 	echo "The master branch has been pushed."
+else
+	echo "The master branch has NOT been pushed."
 fi
 
 # End
