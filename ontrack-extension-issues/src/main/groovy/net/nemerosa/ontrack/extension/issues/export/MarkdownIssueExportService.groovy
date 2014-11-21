@@ -6,10 +6,10 @@ import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 import org.springframework.stereotype.Component
 
 @Component
-class TextIssueExportService extends AbstractTextIssueExportService {
+class MarkdownIssueExportService extends AbstractTextIssueExportService {
 
-    TextIssueExportService() {
-        super(ExportFormat.TEXT)
+    MarkdownIssueExportService() {
+        super(ExportFormat.MARKDOWN)
     }
 
     @Override
@@ -17,11 +17,11 @@ class TextIssueExportService extends AbstractTextIssueExportService {
         groupedIssues.each { groupName, issues ->
             // Group header
             if (groupName) {
-                s << "${groupName}\n\n"
+                s << "### ${groupName}\n\n"
             }
             // List of issues
             issues.each { issue ->
-                s << "* ${issue.displayKey} ${issue.summary}\n"
+                s << "* [${issue.displayKey}](${issue.url}) ${issue.summary}\n"
             }
             // Group separator
             s << '\n'
