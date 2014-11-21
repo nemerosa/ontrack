@@ -73,7 +73,7 @@ Tagging and pushing:
     git push origin master
     git push origin R.X
 
-This is done during the optional _Release_ phase of the pipeline for _any_ branch, which follows the _Acceptance @ Digital Ocean_ phase. This is included into the `release.sh` script.
+This is done during the optional _Release_ phase of the pipeline for _any_ branch, which follows the _Acceptance @ Digital Ocean_ phase. This is included into the `prepare-release.sh` script.
 
 ### Master pipeline
 
