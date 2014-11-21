@@ -57,36 +57,34 @@ Merging the release into the master:
     git checkout master
     git merge --no-ff release/R.X
 
-Tagging and building:
+Tagging and pushing:
 
     git tag R.X
-    ./gradlew clean release
+    git push origin master
+    git push origin R.X
 
-Local Docker setup and acceptance tests:
+This will trigger a pipeline for the `master` branch, using `R.X` as version since built from a tag.
 
-    ./local-docker-acceptance.sh
+In the end, we have:
 
-Pushing the Docker image(s):
+* a tested image in Docker Hub: `nemerosa/ontrack:R.x`
+* a Digital Ocean acceptance machine: `ontrack-acceptance-R.X`
 
-    docker tag ontrack:R.x nemerosa/ontrack:R.x
-    docker login --email="" --username="" --password=""
-    docker push nemerosa/ontrack:R.x
-    docker logout
+The next steps are:
 
-Deploy in acceptance and run the acceptance tests (see above).
-
-Publication of the release in GitHub:
-
-* creating the release
-* attaching the _ontrack-ui_ JAR file
-* getting the change log from Ontrack @ Ontrack and attaching it to the release as description - we get the change log
-since the last _Release_ promoted build on the _master_ branch
-
-Optional deployment in production and running smoke tests:
-
-    TODO
+* releasing in GitHub:
+  * creating a release `R.X`
+  * uploading the `ontrack-ui.jar`
+  * getting the change log from Ontrack @ Ontrack and setting it as description into the GitHub release
+  * setting the new `R.X` build as `RELEASED` in Ontrack @ Ontrack
+* deploying in production:
+  * updating the Docker container at Ontrack @ Ontrack
+    * stopping the old one
+    * running a new container by pulling `nemerosa/ontrack:R.x`
+    * setting the `R.X` build as `PRODUCTION` in Ontrack @ Ontrack
 
 ## Housekeeping
 
 * unreleased images in Docker Hub
 * unreleased images in Jenkins
+* stopped containers at Ontrack @ Ontrack
