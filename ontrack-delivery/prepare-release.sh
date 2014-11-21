@@ -105,6 +105,11 @@ fi
 # Cloning the repository
 
 git clone ${GIT_REPO} ${DIR}
+if [ "$?" != "0" ]
+then
+	echo "Could not clone repository"
+	exit 1
+fi
 
 # Merging the branch
 
@@ -128,3 +133,4 @@ then
 fi
 
 # End
+
