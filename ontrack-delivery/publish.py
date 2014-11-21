@@ -84,7 +84,11 @@ def github_publish(options):
     github.setReleaseDescription(options, releaseid, changeLog)
 
 
-# Publication main method
+def acceptance_local(options):
+    print "[publish] Local acceptance tests..."
+    # TODO Running acceptance tests using Python
+
+
 def publish(options):
     # Preparing the environment
     prepare_environment(options)
@@ -92,6 +96,8 @@ def publish(options):
     merge_into_master(options)
     # Tagging and building
     tag_and_build(options)
+    # Runs acceptance locally and builds the Docker image
+    acceptance_local(options)
     # Deploys in acceptance and run acceptance tests
     acceptance_deploy(options)
     # TODO acceptanceTest(options)
