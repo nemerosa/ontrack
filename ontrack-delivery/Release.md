@@ -44,6 +44,15 @@ Tagging and building:
     git tag R.X
     ./gradlew clean release
 
+Local Docker setup and acceptance tests:
+
+    TODO
+
+Pushing the Docker image(s):
+
+    TODO Rename the Docker image
+    TODO Logs in & pushes the Docker image
+
 Deploy in acceptance and run the acceptance tests (see above).
 
 Publication of the release in GitHub:
