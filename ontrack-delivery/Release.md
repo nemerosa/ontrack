@@ -46,12 +46,14 @@ Tagging and building:
 
 Local Docker setup and acceptance tests:
 
-    TODO
+    ./local-docker-acceptance.sh
 
 Pushing the Docker image(s):
 
-    TODO Rename the Docker image
-    TODO Logs in & pushes the Docker image
+    docker tag ontrack:R.x nemerosa/ontrack:R.x
+    docker login --email="" --username="" --password=""
+    docker push nemerosa/ontrack:R.x
+    docker logout
 
 Deploy in acceptance and run the acceptance tests (see above).
 
