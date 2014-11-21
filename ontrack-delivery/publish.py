@@ -22,7 +22,7 @@ def prepare_environment(options):
     print "[publish] Preparing environment"
     # We must assume being on the release branch already, in order to get access to this file
     # Gets the current branch
-    options.branch = utils.run_command('git', ['rev-parse', '--abbrev-ref', 'HEAD'])
+    options.branch = utils.run_command('git', ['rev-parse', '--abbrev-ref', 'HEAD']).strip()
     print "[publish] Current branch is %s" % options.branch
     # Checks the current branch
     options.release = get_release_name(options.branch)
