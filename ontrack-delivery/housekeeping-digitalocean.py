@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import argparse
+import datetime
 import json
 import re
 import urllib2
@@ -23,6 +24,16 @@ def housekeeping(options):
         print "[%s] %s" % (id, name)
         if re.match(options.pattern, name):
             print "  Pattern match."
+            creation = datetime.datetime.strptime(droplet['created_at'], '%Y-%m-%dT%H:%M:%SZ')
+            now = datetime.datetime.today()
+            days = (now - creation).days
+            print "  Creation time: %s" % creation
+            print "  Since %d days" % days
+            # TODO to_delete = (days > 2)
+            to_delete = (days >= 0)
+            if to_delete:
+                print "  Deleting droplet [%s] %s" % (id, name)
+                # delete_droplet(id)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Ontrack Digital Ocean housekeeping')
