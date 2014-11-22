@@ -8,7 +8,6 @@
 # TODO Unreleased images in Docker Hub
 # TODO Unreleased images in Jenkins
 # TODO Stopped containers at Ontrack @ Ontrack
-# TODO Obsolete acceptance images in Digital Ocean
 
 # Help function
 function show_help {
