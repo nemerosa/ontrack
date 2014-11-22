@@ -2,6 +2,7 @@
 
 import argparse
 import datetime
+import httplib
 import json
 import re
 import urllib2
@@ -13,6 +14,15 @@ def do_get(url, token):
     req.add_header('Accept', 'application/json')
     req.add_header("Authorization", "Bearer %s" % token)
     return urllib2.urlopen(req)
+
+
+def delete_droplet(id, token):
+    conn = httplib.HTTPSConnection('api.digitalocean.com')
+    conn.putrequest('DELETE', "/v2/droplets/%s" % id)
+    conn.putheader("Authorization", "Bearer %s" % token)
+    conn.endheaders()
+    resp = conn.getresponse()
+    resp.read()
 
 
 def housekeeping(options):
@@ -29,11 +39,10 @@ def housekeeping(options):
             days = (now - creation).days
             print "  Creation time: %s" % creation
             print "  Since %d days" % days
-            # TODO to_delete = (days > 2)
-            to_delete = (days >= 0)
+            to_delete = (days > 2)
             if to_delete:
                 print "  Deleting droplet [%s] %s" % (id, name)
-                # delete_droplet(id)
+                delete_droplet(id, options.token)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Ontrack Digital Ocean housekeeping')
