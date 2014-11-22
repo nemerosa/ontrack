@@ -45,7 +45,17 @@ You can leave it using the _exit_ command.
 
 #### Back up of Ontrack data
 
-**TODO**
+     ssh root@<ip> "docker run --volumes-from ontrack-data --volume /root:/backup ubuntu tar czvf /backup/backup.tgz /opt/ontrack/mount"
+     scp root@<ip>:backup.tgz .
+
+where IP is the assigned one to the droplet.
+
+The backup file, _backup.tgz_, contains:
+
+* the database files
+* the logs
+* the key file
+* the working files
 
 #### Looking at the logs live
 
