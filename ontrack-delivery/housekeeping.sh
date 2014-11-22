@@ -20,6 +20,7 @@ function show_help {
 	echo "    -do, --digital-ocean          Digital Ocean housekeeping"
 	echo "Digital Ocean specific options are:"
 	echo "    -dot, --do-token=<token>      Personal Access Token (required)"
+	echo "    -dop, --do-pattern=<pattern>  Regex to use to identify droplets to clean (default: 'ontrack-acceptance.*')"
 }
 
 # Check function
@@ -39,6 +40,7 @@ DRYRUN=no
 DIGITAL_OCEAN=no
 
 DO_TOKEN=
+DO_PATTERN="ontrack-acceptance.*"
 
 # Command central
 
@@ -58,6 +60,9 @@ do
 		-dot=*|--do-token=*)
             DO_TOKEN=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
 			;;
+		-dop=*|--do-pattern=*)
+            DO_PATTERN=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
+			;;
 		*)
 			echo "Unknown option: $i"
 			show_help
@@ -75,15 +80,17 @@ fi
 
 # Logging
 
-echo "Dry run          = ${DRYRUN}"
-echo "Digital Ocean    = ${DIGITAL_OCEAN}"
+echo "Dry run                = ${DRYRUN}"
+echo "Digital Ocean          = ${DIGITAL_OCEAN}"
+echo "Digital Ocean pattern  = ${DO_PATTERN}"
 
 # Housekeeping procedures
 
 function digital_ocean {
     echo "Digital Ocean housekeeping"
     ./housekeeping-digitalocean.py \
-        --token "${DO_TOKEN}"
+        --token "${DO_TOKEN}" \
+        --pattern "${DO_PATTERN}"
 }
 # Housekeeping script
 
