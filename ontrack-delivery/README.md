@@ -5,6 +5,10 @@ Automated deployment
 
 See [[Release]].
 
+## Operations
+
+See [[Operations]].
+
 ## Use cases
 
 ### Local acceptance tests

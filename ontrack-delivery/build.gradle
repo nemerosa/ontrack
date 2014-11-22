@@ -13,6 +13,7 @@ task docker(type: Zip) {
         // Root
         include '*.sh'
         include '*.py'
+        include '*.md'
     }
     // Wrapper
     from(rootDir) {
