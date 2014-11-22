@@ -49,4 +49,6 @@ You can leave it using the _exit_ command.
 
 #### Looking at the logs live
 
-**TODO**
+    ssh root@<ip> "docker exec -it ontrack tail -f /opt/ontrack/mount/log/spring.log"
+
+where IP is the assigned one to the droplet.
