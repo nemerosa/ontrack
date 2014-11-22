@@ -11,11 +11,14 @@ function show_help {
 	echo "    -vg, --vagrant=<dir>                Directory that contains the Vagrant file (default: 'vagrant')"
 	echo "    -vgh, --vagrant-host=<host>         Name to give to the VM (default: 'ontrack-vagrant')"
 	echo "    -vgp, --vagrant-provider=<provider> Provider for Vagrant (default: 'virtualbox')"
+	echo "Docker options are:"
+	echo "    -i, --image=<image>                 Docker image to pull (default: 'nemerosa/ontrack:latest')"
 	echo "Digital Ocean specific options are:"
 	echo "    -dot, --do-token=<token>            Personal Access Token (required)"
 	echo "    -dor, --do-region=<region>          Region (required, for example: ams2 or nyc2)"
 	echo "    -dos, --do-size=<size>              Droplet size (default: '512m')"
 	echo "    -doi, --do-image=<image>            Droplet image that contains Docker (default: 'Docker 1.3.1 on 14.04')"
+	echo "    -dok, --do-key=<name>               Name of the SSH Key in DO (default: 'Vagrant')"
 }
 
 # Check function
@@ -34,10 +37,13 @@ VAGRANT_DIR=vagrant
 VAGRANT_HOST="ontrack-vagrant"
 VAGRANT_PROVIDER=virtualbox
 
+DOCKER_IMAGE_ONTRACK="nemerosa/ontrack:latest"
+
 DO_TOKEN=
 DO_REGION=
 DO_SIZE=512mb
 DO_IMAGE="Docker 1.3.1 on 14.04"
+DO_KEY_NAME="Vagrant"
 
 # Command central
 
@@ -57,6 +63,9 @@ do
 		-vgp=*|--vagrant-provider=*)
             VAGRANT_PROVIDER=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
 			;;
+		-i=*|--image=*)
+            DOCKER_IMAGE_ONTRACK=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
+			;;
 		-dot=*|--do-token=*)
             DO_TOKEN=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
 			;;
@@ -68,6 +77,9 @@ do
 			;;
 		-doi=*|--do-image=*)
             DO_IMAGE=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
+			;;
+		-dok=*|--do-key=*)
+            DO_KEY_NAME=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
 			;;
 		*)
 			echo "Unknown option: $i"
@@ -87,15 +99,17 @@ fi
 
 # Logging
 
-echo "Vagrant directory:   ${VAGRANT_DIR}"
-echo "Vagrant VM host:     ${VAGRANT_HOST}"
-echo "Vagrant provider:    ${VAGRANT_PROVIDER}"
+echo "Vagrant directory:    ${VAGRANT_DIR}"
+echo "Vagrant VM host:      ${VAGRANT_HOST}"
+echo "Vagrant provider:     ${VAGRANT_PROVIDER}"
+echo "Docker Ontrack image: ${DOCKER_IMAGE_ONTRACK}"
 if [ "${VAGRANT_PROVIDER}" == "digital_ocean" ]
 then
 	echo "Digital Ocean Personal Access Token:   ***"
 	echo "Digital Ocean region:                  ${DO_REGION}"
 	echo "Digital Ocean size:                    ${DO_SIZE}"
 	echo "Digital Ocean image:                   ${DO_IMAGE}"
+	echo "Digital Ocean key name:                ${DO_KEY_NAME}"
 fi
 
 # Sets the vagrant environment
@@ -103,7 +117,10 @@ fi
 export VAGRANT_CWD=${VAGRANT_DIR}
 rm -rf ${VAGRANT_DIR}/.vagrant
 
+# Configuration of the Vagrant file
+
 export VAGRANT_HOST
+export DOCKER_IMAGE_ONTRACK
 
 if [ "${VAGRANT_PROVIDER}" == "digital_ocean" ]
 then
@@ -111,6 +128,7 @@ then
 	export DO_REGION
 	export DO_SIZE
 	export DO_IMAGE
+	export DO_KEY_NAME
 fi
 
 # Creating the machine

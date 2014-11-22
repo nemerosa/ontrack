@@ -14,6 +14,14 @@ Vagrant.configure('2') do |config|
     provider.image = ENV['DO_IMAGE']
     provider.region = ENV['DO_REGION']
     provider.size = ENV['DO_SIZE']
+
+    # SSH Key name
+    do_key_name = ENV["DO_KEY_NAME"]
+    if do_key_name.nil?
+      # Default value
+      do_key_name = 'Vagrant'
+    end
+    provider.ssh_key_name = do_key_name
   end
 
   # Virtual box provider
@@ -21,15 +29,21 @@ Vagrant.configure('2') do |config|
     vm.name = ENV['VAGRANT_HOST']
   end
 
-  # TODO Upload of ontrack.jar
-  # TODO Installation of ontrack
+  # Docker provisioning
+
+  config.vm.provision "docker" do |docker|
+
+    # Pulling all images
+    docker.pull_images ENV['DOCKER_IMAGE_ONTRACK']
+
+    # Running Ontrack
+    docker.run "ontrack",
+               image: ENV['DOCKER_IMAGE_ONTRACK']
+    # TODO Volume /opt/ontrack/mount - to be in a separate volume
+  end
+
   # TODO Installation and configuration of nginx
 
   # TODO Upgrade of ontrack container?
-
-  # config.vm.provision :file do |file|
-  #   file.source = 'sources/ontrack.jar'
-  #   file.destination = 'ontrack.jar'
-  # end
 
 end
