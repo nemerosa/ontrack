@@ -58,7 +58,7 @@ Vagrant.configure('2') do |config|
 
     docker.run "nginx",
                 image: "dockerfile/nginx",
-                args: '--link ontrack:ontrack --volume /root/nginx/certs:/etc/nginx/certs --volume /root/nginx/sites-enabled:/etc/nginx/sites-enabled'
+                args: '--publish 443:443 --link ontrack:ontrack --volume /root/nginx/certs:/etc/nginx/certs --volume /root/nginx/sites-enabled:/etc/nginx/sites-enabled'
 
   end
 
