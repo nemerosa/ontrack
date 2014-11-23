@@ -16,6 +16,7 @@ function show_help {
 	echo "    -i, --image=<image>                 Docker image to pull (default: 'nemerosa/ontrack:latest')"
 	echo "Nginx options are:"
 	echo "    -nc, --nginx-certs=<dir>            Directory where to get the Nginx certificates from (default: './nginx/certs')"
+	echo "    -ns, --nginx-sites-enabled=<dir>    Directory where to get the Nginx configuration files from (default: './nginx/sites-enabled')"
 	echo "Digital Ocean specific options are:"
 	echo "    -dot, --do-token=<token>            Personal Access Token (required)"
 	echo "    -dor, --do-region=<region>          Region (required, for example: ams2 or nyc2)"
@@ -43,6 +44,7 @@ VAGRANT_PROVIDER=virtualbox
 AUTHORIZED_KEY=
 DOCKER_IMAGE_ONTRACK="nemerosa/ontrack:latest"
 NGINX_CERTS="./nginx/certs"
+NGINX_SITES_ENABLED="./nginx/sites-enabled"
 
 DO_TOKEN=
 DO_REGION=
@@ -76,6 +78,9 @@ do
 			;;
 		-nc=*|--nginx-certs=*)
             NGINX_CERTS=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
+			;;
+		-ns=*|--nginx-sites-enabled=*)
+            NGINX_SITES_ENABLED=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
 			;;
 		-dot=*|--do-token=*)
             DO_TOKEN=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
@@ -115,6 +120,7 @@ echo "Vagrant VM host:       ${VAGRANT_HOST}"
 echo "Vagrant provider:      ${VAGRANT_PROVIDER}"
 echo "Docker Ontrack image:  ${DOCKER_IMAGE_ONTRACK}"
 echo "Nginx certificates at: ${NGINX_CERTS}"
+echo "Nginx sites at:        ${NGINX_SITES_ENABLED}"
 if [ "${VAGRANT_PROVIDER}" == "digital_ocean" ]
 then
 	echo "Digital Ocean Personal Access Token:   ***"
@@ -134,6 +140,7 @@ rm -rf ${VAGRANT_DIR}/.vagrant
 export VAGRANT_HOST
 export DOCKER_IMAGE_ONTRACK
 export NGINX_CERTS
+export NGINX_SITES_ENABLED
 
 if [ "${AUTHORIZED_KEY}" != "" ]
 then

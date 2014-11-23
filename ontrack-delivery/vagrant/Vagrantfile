@@ -34,6 +34,7 @@ Vagrant.configure('2') do |config|
   # Getting certificates
 
   config.vm.provision "file", source: (ENV["NGINX_CERTS"] || 'nginx/certs'), destination: 'nginx/certs'
+  config.vm.provision "file", source: (ENV["NGINX_SITES_ENABLED"] || 'nginx/sites-enabled'), destination: 'nginx/sites-enabled'
 
   # Docker provisioning
 
@@ -52,6 +53,13 @@ Vagrant.configure('2') do |config|
     docker.run "ontrack",
                 image: ENV['DOCKER_IMAGE_ONTRACK'],
                 args: '--volumes-from ontrack-data'
+
+    # Running Nginx
+
+    docker.run "nginx",
+                image: "dockerfile/nginx",
+                args: '--link ontrack:ontrack --volume /root/nginx/certs:/etc/nginx/certs --volume /root/nginx/sites-enabled:/etc/nginx/sites-enabled'
+
   end
 
   # TODO Installation and configuration of nginx
