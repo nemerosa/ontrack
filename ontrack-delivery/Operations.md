@@ -19,7 +19,14 @@ When the machine has been created in DO, you can connect to it as `root` using:
 
     ssh root@<ip>
 
-where IP is the assigned one to the droplet.
+where IP is the assigned one to the droplet. The connection uses the SSH key that was used to create the droplet and
+this can lead to problems.
+
+For example, if the droplet was created on Jenkins using its key, you cannot connect to this machine from, let's say,
+your laptop, because you are using another key.
+
+**TODO** A user must be created to allow SSH connections from anywhere, and not only from the machine which
+created the droplet.
 
 ### Docker management
 
