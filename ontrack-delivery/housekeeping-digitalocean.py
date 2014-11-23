@@ -5,15 +5,8 @@ import datetime
 import httplib
 import json
 import re
-import urllib2
 
-
-def do_get(url, token):
-    req = urllib2.Request(url)
-    req.add_header('Content-Type', 'application/json')
-    req.add_header('Accept', 'application/json')
-    req.add_header("Authorization", "Bearer %s" % token)
-    return urllib2.urlopen(req)
+import digitalocean
 
 
 def delete_droplet(id, token):
@@ -27,7 +20,7 @@ def delete_droplet(id, token):
 
 def housekeeping(options):
     # Gets the list of droplets
-    response = json.load(do_get("https://api.digitalocean.com/v2/droplets?page=1&per_page=100", options.token))
+    response = json.load(digitalocean.do_get("https://api.digitalocean.com/v2/droplets?page=1&per_page=100", options.token))
     for droplet in response['droplets']:
         id = droplet['id']
         name = droplet['name']
