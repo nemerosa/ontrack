@@ -25,8 +25,8 @@ this can lead to problems.
 For example, if the droplet was created on Jenkins using its key, you cannot connect to this machine from, let's say,
 your laptop, because you are using another key.
 
-**TODO** A user must be created to allow SSH connections from anywhere, and not only from the machine which
-created the droplet.
+When the droplet is created using the `vagrant-install.sh` script, add the `--authorized-key=<path>` option to
+indicate the path of a key to be copied over into the guest's _authorized_keys_ file.
 
 ### Docker management
 

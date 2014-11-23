@@ -11,6 +11,7 @@ function show_help {
 	echo "    -vg, --vagrant=<dir>                Directory that contains the Vagrant file (default: 'vagrant')"
 	echo "    -vgh, --vagrant-host=<host>         Name to give to the VM (default: 'ontrack-vagrant')"
 	echo "    -vgp, --vagrant-provider=<provider> Provider for Vagrant (default: 'virtualbox')"
+	echo "    -k, --authorized-key=<file>         Path to a file that contains a public key to add to the authorized keys of the VM being created (default: none)"
 	echo "Docker options are:"
 	echo "    -i, --image=<image>                 Docker image to pull (default: 'nemerosa/ontrack:latest')"
 	echo "Nginx options are:"
@@ -39,8 +40,8 @@ VAGRANT_DIR=vagrant
 VAGRANT_HOST="ontrack-vagrant"
 VAGRANT_PROVIDER=virtualbox
 
+AUTHORIZED_KEY=
 DOCKER_IMAGE_ONTRACK="nemerosa/ontrack:latest"
-
 NGINX_CERTS="./nginx/certs"
 
 DO_TOKEN=
@@ -66,6 +67,9 @@ do
 			;;
 		-vgp=*|--vagrant-provider=*)
             VAGRANT_PROVIDER=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
+			;;
+		-k=*|--authorized-key=*)
+            AUTHORIZED_KEY=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
 			;;
 		-i=*|--image=*)
             DOCKER_IMAGE_ONTRACK=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
@@ -131,6 +135,11 @@ export VAGRANT_HOST
 export DOCKER_IMAGE_ONTRACK
 export NGINX_CERTS
 
+if [ "${AUTHORIZED_KEY}" != "" ]
+then
+	export AUTHORIZED_KEY
+fi
+
 if [ "${VAGRANT_PROVIDER}" == "digital_ocean" ]
 then
 	export DO_TOKEN
@@ -142,5 +151,4 @@ fi
 
 # Creating the machine
 
-vagrant up \
-    --provider ${VAGRANT_PROVIDER}
+vagrant up --provider ${VAGRANT_PROVIDER}

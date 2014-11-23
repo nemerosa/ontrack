@@ -24,6 +24,13 @@ Vagrant.configure('2') do |config|
     vm.name = ENV['VAGRANT_HOST']
   end
 
+  # Authorized key
+  authorized_key_file = ENV['AUTHORIZED_KEY']
+  unless authorized_key_file.nil?
+    config.vm.provision "file", source: authorized_key_file, destination: 'authorized_key_file'
+    config.vm.provision "shell", inline: "cat authorized_key_file >> .ssh/authorized_keys"
+  end
+
   # Getting certificates
 
   config.vm.provision "file", source: (ENV["NGINX_CERTS"] || 'nginx/certs'), destination: 'nginx/certs'
