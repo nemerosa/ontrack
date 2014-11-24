@@ -1,14 +1,69 @@
-Vagrant::Config.run do |config|
+Vagrant.configure('2') do |config|
   config.vm.box = "hashicorp/precise64"
-  config.vm.forward_port 8080, 3000
+  # config.vm.forward_port 8080, 3000
 
-  config.vm.provision :file do |file|
-    file.source = 'sources/ontrack.jar'
-    file.destination = 'ontrack.jar'
+  # Configurable VM name
+  config.vm.hostname = ENV['VAGRANT_HOST']
+
+  # Digital Ocean provider
+  config.vm.provider "digital_ocean" do |provider, override|
+    override.ssh.private_key_path = '~/.ssh/id_rsa'
+    override.vm.box = 'digital_ocean'
+    override.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
+    provider.token = ENV['DO_TOKEN']
+    provider.image = ENV['DO_IMAGE']
+    provider.region = ENV['DO_REGION']
+    provider.size = ENV['DO_SIZE']
+
+    # SSH Key name
+    provider.ssh_key_name = (ENV["DO_KEY_NAME"] || 'Vagrant')
   end
-  
-  config.vm.provision :puppet do |puppet|
-    puppet.module_path = "modules"
-    puppet.options = "--verbose --debug"
+
+  # Virtual box provider
+  config.vm.provider "virtualbox" do |vm|
+    vm.name = ENV['VAGRANT_HOST']
   end
+
+  # Authorized key
+  authorized_key_file = ENV['AUTHORIZED_KEY']
+  unless authorized_key_file.nil?
+    config.vm.provision "file", source: authorized_key_file, destination: 'authorized_key_file'
+    config.vm.provision "shell", inline: "cat authorized_key_file >> .ssh/authorized_keys"
+  end
+
+  # Getting certificates
+
+  config.vm.provision "file", source: (ENV["NGINX_CERTS"] || 'nginx/certs'), destination: 'nginx/certs'
+  config.vm.provision "file", source: (ENV["NGINX_SITES_ENABLED"] || 'nginx/sites-enabled'), destination: 'nginx/sites-enabled'
+
+  # Docker provisioning
+
+  config.vm.provision "docker" do |docker|
+
+    # Pulling all images
+    docker.pull_images 'ubuntu:14.04'
+    docker.pull_images ENV['DOCKER_IMAGE_ONTRACK']
+
+    # Mounting a volume for Ontrack
+    docker.run "ontrack-data",
+                image: 'ubuntu:14.04',
+                args: '--volume /opt/ontrack/mount'
+
+    # Running Ontrack
+    docker.run "ontrack",
+                image: ENV['DOCKER_IMAGE_ONTRACK'],
+                args: '--volumes-from ontrack-data'
+
+    # Running Nginx
+
+    docker.run "nginx",
+                image: "dockerfile/nginx",
+                args: '--publish 443:443 --link ontrack:ontrack --volume /root/nginx/certs:/etc/nginx/certs --volume /root/nginx/sites-enabled:/etc/nginx/sites-enabled'
+
+  end
+
+  # TODO Installation and configuration of nginx
+
+  # TODO Upgrade of ontrack container?
+
 end

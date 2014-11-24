@@ -14,6 +14,10 @@ public class Browser {
         this.configuration = configuration;
     }
 
+    Configuration getConfiguration() {
+        configuration
+    }
+
     public <P extends Page> P goTo(Class<P> pageClass, Map<String, Object> parameters) {
         P page = page(pageClass)
         String path = page.getPath(parameters);

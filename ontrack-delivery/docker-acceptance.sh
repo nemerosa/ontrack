@@ -94,14 +94,14 @@ check "$ONTRACK_ACCEPTANCE_JAR" "Ontrack Acceptance JAR (--acceptance) is requir
 ONTRACK_VERSION=`basename ${ONTRACK_JAR} | sed -E 's/ontrack(-ui)?-(.*)\.jar/\2/'`
 
 # Logging
-echo "[ACCEPTANCE] Docker host:            ${ONTRACK_HOST}"
-echo "[ACCEPTANCE] Docker user:            ${CONTROL_USER}"
-echo "[ACCEPTANCE] Ontrack protocol:       ${ONTRACK_PROTOCOL}"
-echo "[ACCEPTANCE] Ontrack JAR:            ${ONTRACK_JAR}"
-echo "[ACCEPTANCE] Ontrack version:        ${ONTRACK_VERSION}"
-echo "[ACCEPTANCE] Startup delay:          ${CONTROL_DELAY} s"
-echo "[ACCEPTANCE] Keeping containers:     ${CONTROL_KEEP}"
-echo "[ACCEPTANCE] Dry run:                ${CONTROL_DRY_RUN}"
+echo "[LOCAL] Docker host:            ${ONTRACK_HOST}"
+echo "[LOCAL] Docker user:            ${CONTROL_USER}"
+echo "[LOCAL] Ontrack protocol:       ${ONTRACK_PROTOCOL}"
+echo "[LOCAL] Ontrack JAR:            ${ONTRACK_JAR}"
+echo "[LOCAL] Ontrack version:        ${ONTRACK_VERSION}"
+echo "[LOCAL] Startup delay:          ${CONTROL_DELAY} s"
+echo "[LOCAL] Keeping containers:     ${CONTROL_KEEP}"
+echo "[LOCAL] Dry run:                ${CONTROL_DRY_RUN}"
 
 # Mount point
 
@@ -109,8 +109,8 @@ MOUNT=`pwd`/acceptance
 rm -rf ${MOUNT}
 mkdir -p ${MOUNT}
 mkdir -p ${MOUNT}/nginx
-echo "[ACCEPTANCE] Ontrack data at:        ${MOUNT}"
-echo "[ACCEPTANCE] Nginx data at:          ${MOUNT}/nginx"
+echo "[LOCAL] Ontrack data at:        ${MOUNT}"
+echo "[LOCAL] Nginx data at:          ${MOUNT}/nginx"
 
 # Docker Options
 
@@ -119,7 +119,7 @@ if [ "${CONTROL_USER}" != "" ]
 then
     ONTRACK_DOCKER_OPTIONS="${ONTRACK_DOCKER_OPTIONS} --docker-user=${CONTROL_USER}"
 fi
-echo "[ACCEPTANCE] Ontrack Docker options: ${ONTRACK_DOCKER_OPTIONS}"
+echo "[LOCAL] Ontrack Docker options: ${ONTRACK_DOCKER_OPTIONS}"
 
 # Ontrack container
 
@@ -136,11 +136,11 @@ ONTRACK_CID=`cat ontrack.cid`
 ONTRACK_NAME=`docker inspect -f "{{ .Name }}" ${ONTRACK_CID}`
 ONTRACK_NAME="${ONTRACK_NAME:1}"
 
-echo "[ACCEPTANCE] Ontrack container created: ${ONTRACK_CID} (${ONTRACK_NAME})"
+echo "[LOCAL] Ontrack container created: ${ONTRACK_CID} (${ONTRACK_NAME})"
 
 # nginx container
 
-echo "[ACCEPTANCE] Preparation of nginx..."
+echo "[LOCAL] Preparation of nginx..."
 
 # Generation of the Nginx image
 NGINX_IMAGE="dockerfile/nginx"
@@ -152,7 +152,7 @@ mkdir -p ${NGINX_MOUNT}/sites-enabled
 mkdir -p ${NGINX_MOUNT}/logs
 
 # Starting the nginx container
-echo "[ACCEPTANCE] Initialising the nginx container..."
+echo "[LOCAL] Initialising the nginx container..."
 rm -f nginx.cid
 docker run \
 	-d \
@@ -164,15 +164,15 @@ docker run \
 	--cidfile nginx.cid \
 	${NGINX_IMAGE}
 NGINX_CID=`cat nginx.cid`
-echo "[ACCEPTANCE] Nginx container created: ${NGINX_CID}"
+echo "[LOCAL] Nginx container created: ${NGINX_CID}"
 
 # Getting the public facing port
 
 NGINX_PORT=`docker port ${NGINX_CID} 443 | sed -E 's/.*:(.*)/\1/'`
-echo "[ACCEPTANCE] Nginx proxy available in host ${ONTRACK_HOST} at port ${NGINX_PORT}"
+echo "[LOCAL] Nginx proxy available in host ${ONTRACK_HOST} at port ${NGINX_PORT}"
 
 # Generation of the nginx configuration and generation of self-signed certificates
-echo "[ACCEPTANCE] Generating the Nginx configuration for ${ONTRACK_HOST}:${NGINX_PORT} in ${NGINX_MOUNT}..."
+echo "[LOCAL] Generating the Nginx configuration for ${ONTRACK_HOST}:${NGINX_PORT} in ${NGINX_MOUNT}..."
 ./nginx.sh \
 	--target=${NGINX_MOUNT} \
 	--host=ontrack \
@@ -182,84 +182,50 @@ echo "[ACCEPTANCE] Generating the Nginx configuration for ${ONTRACK_HOST}:${NGIN
 	--cert-subject="/C=BE/L=Brussel/CN=ontrack"
 
 # Creating the Nginx container
-echo "[ACCEPTANCE] Reloading nginx's configuration in ${NGINX_CID} container..."
+echo "[LOCAL] Reloading nginx's configuration in ${NGINX_CID} container..."
 docker kill --signal="HUP" ${NGINX_CID}
 
 # Get the running URL
 
 ONTRACK_URL="${ONTRACK_PROTOCOL}://${ONTRACK_HOST}:${NGINX_PORT}"
-echo "[ACCEPTANCE] Running acceptance tests against ${ONTRACK_URL}"
+echo "[LOCAL] Running acceptance tests against ${ONTRACK_URL}"
 
-# Result of the acceptance tests
-ACCEPTANCE_RESULT=-1
-
-# Waits until the application is started
-echo "[ACCEPTANCE] Waiting for Ontrack to start (max: ${CONTROL_DELAY} s)"
-ONTRACK_STARTED=no
-ONTRACK_START_DURATION=0
-for i in `seq 1 ${CONTROL_DELAY}`
-do
-    curl --silent --fail --insecure "${ONTRACK_URL}/info"
-    if [ "$?" != "0" ]
-    then
-        echo -n "."
-        sleep 1
-    else
-        ONTRACK_STARTED=yes
-        if [ "${ONTRACK_START_DURATION}" == "0" ]
-        then
-            ONTRACK_START_DURATION=${i}
-        fi
-        break
-    fi
-done
-echo
-
-# Has Ontrack started correctly?
-if [ "${ONTRACK_STARTED}" == "yes" ]
+# Dry-run option for the acceptance tests
+ACCEPTANCE_OPTIONS=
+if [ "${CONTROL_DRY_RUN}" == "yes" ]
 then
+	echo "[LOCAL] Running in Dry run mode"
+	ACCEPTANCE_OPTIONS="--dry-run"
+fi
 
-    echo "[ACCEPTANCE] Ontrack has started in ${ONTRACK_START_DURATION} s"
-
-    # Dry run
-	if [ "${CONTROL_DRY_RUN}" == "yes" ]
-	then
-		echo "[ACCEPTANCE] DRYRUN - not running the acceptance tests."
-		ACCEPTANCE_RESULT=0
-	else
-		# Running the acceptance tests
-		echo "[ACCEPTANCE] Starting acceptance tests..."
-		./acceptance.sh \
-			--ontrack-url=${ONTRACK_URL} \
-			--no-ssl \
-			--jar=${ONTRACK_ACCEPTANCE_JAR}
-		# Result of the acceptance tests
-		ACCEPTANCE_RESULT=$?
-		echo "[ACCEPTANCE] Results: ${ACCEPTANCE_RESULT}"
-		if [ "${ACCEPTANCE_RESULT}" == "0" ]
-		then
-			echo "[ACCEPTANCE] Acceptance tests were OK."
-		else
-			echo "[ACCEPTANCE] Acceptance tests have FAILED!"
-		fi
-    fi
-
+# Starting the acceptance tests
+echo "[LOCAL] Starting acceptance tests..."
+./acceptance.sh ${ACCEPTANCE_OPTIONS} \
+	--ontrack-url=${ONTRACK_URL} \
+	--no-ssl \
+	--jar=${ONTRACK_ACCEPTANCE_JAR} \
+	--delay=${CONTROL_DELAY}
+# Result of the acceptance tests
+ACCEPTANCE_RESULT=$?
+echo "[LOCAL] Results: ${ACCEPTANCE_RESULT}"
+if [ "${ACCEPTANCE_RESULT}" == "0" ]
+then
+	echo "[LOCAL] Acceptance tests were OK."
 else
-    ACCEPTANCE_RESULT=1
-    echo "[ACCEPTANCE] Ontrack could not start in less than ${CONTROL_DELAY} s."
+	echo "[LOCAL] Acceptance tests have FAILED!"
 fi
 
 # Docker Ontrack VM down
 
 if [ "${CONTROL_KEEP}" == "no" ]
 then
-    echo "[ACCEPTANCE] Removing Ontrack container at: ${ONTRACK_CID}"
+    echo "[LOCAL] Removing Ontrack container at: ${ONTRACK_CID}"
     docker rm -f ${ONTRACK_CID}
-    echo "[ACCEPTANCE] Removing Nginx container at: ${NGINX_CID}"
+    echo "[LOCAL] Removing Nginx container at: ${NGINX_CID}"
     docker rm -f ${NGINX_CID}
 else
-	echo "[ACCEPTANCE] Keeping Ontrack container at: ${ONTRACK_CID}"
-    echo "[ACCEPTANCE] Keeping Nginx container at: ${NGINX_CID}"
+	echo "[LOCAL] Keeping Ontrack container at: ${ONTRACK_CID}"
+    echo "[LOCAL] Keeping Nginx container at: ${NGINX_CID}"
 fi
 
 # Result

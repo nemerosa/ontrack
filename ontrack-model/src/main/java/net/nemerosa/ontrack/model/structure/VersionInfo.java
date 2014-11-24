@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.model.structure;
 
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDateTime;
 
@@ -34,4 +35,49 @@ public class VersionInfo {
      * Source of the version. It can be a tag (correct for a real release) or a developer environment.
      */
     private final String source;
+    /**
+     * Type of source for the version.
+     */
+    private final String sourceType;
+
+    /**
+     * Version to display
+     */
+    public String getMarketingVersion() {
+        if ("release".equals(sourceType)) {
+            return StringUtils.substringAfter(source, "/");
+        } else if ("tag".equals(sourceType)) {
+            return full;
+        } else if (source.indexOf("/") > 0) {
+            return StringUtils.substringAfter(source, "/");
+        } else {
+            return source;
+        }
+    }
+
+    /**
+     * Is this a release?
+     */
+    public boolean isRelease() {
+        return "tag".equals(sourceType);
+    }
+
+    /**
+     * Label for the source type
+     */
+    public String getLabel() {
+        if ("release".equals(sourceType)) {
+            return "RC";
+        } else if ("tag".equals(sourceType)) {
+            return "Release";
+        } else if ("develop".equals(sourceType)) {
+            return "Dev";
+        } else if ("feature".equals(sourceType)) {
+            return "Feature";
+        } else if ("hotfix".equals(sourceType)) {
+            return "Hot fix";
+        } else {
+            return StringUtils.capitalize(sourceType);
+        }
+    }
 }

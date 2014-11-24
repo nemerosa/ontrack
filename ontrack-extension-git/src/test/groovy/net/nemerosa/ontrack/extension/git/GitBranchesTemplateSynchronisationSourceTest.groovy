@@ -19,13 +19,16 @@ class GitBranchesTemplateSynchronisationSourceTest {
     ExtensionManager extensionManager
     GitService gitService
     GitBranchesTemplateSynchronisationSource source
+    GitConfiguration gitConfiguration
     Branch branch
 
     @Before
     void before() {
         branch = Branch.of(Project.of(nd('P', "Project")), nd('B', "Branch"))
+        gitConfiguration = GitConfiguration.empty().withBranch('${sourceName}')
         extensionManager = mock(ExtensionManager)
         gitService = mock(GitService)
+        when(gitService.getBranchConfiguration(branch)).thenReturn(gitConfiguration)
         when(gitService.getRemoteBranches(any(GitConfiguration))).thenReturn(
                 ['master', 'feature/ontrack-40-templating', 'feature/ontrack-111-project-manager', 'fix/ontrack-110']
         )

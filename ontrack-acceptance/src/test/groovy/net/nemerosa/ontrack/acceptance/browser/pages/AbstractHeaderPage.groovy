@@ -30,4 +30,8 @@ public abstract class AbstractHeaderPage extends AbstractPage {
         header.login(user, password);
     }
 
+    APIPage goToAPI() {
+        $('.ot-command-api').click()
+        browser.at(APIPage)
+    }
 }

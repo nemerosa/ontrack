@@ -1,6 +1,14 @@
 Automated deployment
 ====================
 
+## Release cycle
+
+See [[Release]].
+
+## Operations
+
+See [[Operations]].
+
 ## Use cases
 
 ### Local acceptance tests
@@ -29,7 +37,6 @@ See [acceptance tests](../ontrack-acceptance/README.md) for more details.
 
 ## Technologies
 
-* [Vagrant + Puppet](vagrant/README.md)
 * [Docker](docker/README.md).
 
 ## Usage
@@ -71,20 +78,3 @@ This will:
 1. execute the acceptance tests against the Ontrack container
 1. output the JUnit XML report in the local _ontrack-acceptance.xml_ file
 
-### Vagrant
-
-Use cases:
-* remote acceptance tests
-
-Usage:
-
-    # Set-up the machine
-    ./vagrant-setup.sh \
-        --jar=<path to Ontrack JAR>
-    # Launches integration tests
-    ./acceptance.sh \
-        --jar=<path to Ontrack Acceptance JAR> \
-        --ontrack-url=http://localhost:3000
-    # Getting rid of the VM (or not)
-    cd vagrant-local
-    vagrant destroy -f

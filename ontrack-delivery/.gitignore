@@ -4,3 +4,5 @@ ontrack-acceptance.xml
 mount
 acceptance
 *.cid
+*.pyc
+sample-*

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.acceptance
 
+import net.nemerosa.ontrack.acceptance.browser.pages.APIPage
 import net.nemerosa.ontrack.acceptance.browser.pages.HomePage
 import net.nemerosa.ontrack.acceptance.browser.pages.ProjectPage
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTest
@@ -63,6 +64,25 @@ class ACCBrowserBasic extends AcceptanceTestClient {
                 }
                 // Checks the branch is created
                 assert projectPage.isBranchPresent(branchName)
+            }
+        }
+    }
+
+    @Test
+    @AcceptanceTest(excludes = "production")
+    void 'Project API page must be accessible'() {
+        browser { browser ->
+            withProject { id, name ->
+                // Goes to the home page and logs in browser ->
+                HomePage home = loginAsAdmin(browser)
+                // Goes to the project
+                ProjectPage projectPage = home.goToProject(name)
+                // Goes to the API page
+                APIPage apiPage = projectPage.goToAPI()
+                // Gets the link of the page
+                def link = apiPage.apiLink
+                // Checks the link
+                assert link == "${browser.configuration.baseUrl}/structure/projects/${id}"
             }
         }
     }
