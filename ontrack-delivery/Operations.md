@@ -72,6 +72,12 @@ where IP is the assigned one to the droplet.
 
 ### Production setup
 
+#### Upgrade (automated)
+
+An upgrade is done by replacing the existing ontrack container by a new one from a more recent image.
+
+Through SSH on the production machine, run the `production-update.sh` script with the `--version` parameter.
+
 #### Installation (manual)
 
 ##### Preparing Nginx
@@ -207,10 +213,6 @@ In all cases, you'll have the following structure:
 1. Perform the migration
 1. Shut down the old machine
 1. Adjust DNS settings
-
-#### Upgrade (automated)
-
-TODO
 
 #### Connectivity
 
