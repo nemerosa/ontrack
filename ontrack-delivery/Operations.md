@@ -202,6 +202,12 @@ In all cases, you'll have the following structure:
         --volume /root/nginx/sites-enabled:/etc/nginx/sites-enabled \
         dockerfile/nginx
 
+##### DNS switch from old machine
+
+1. Perform the migration
+1. Shut down the old machine
+1. Adjust DNS settings
+
 #### Upgrade (automated)
 
 TODO
@@ -213,3 +219,6 @@ SSH key is lost, you have a serious problem because you cannot connect any longe
 
 In parallel of this SSH key connection, you can setup a user/password connection:
 
+    adduser ontrack
+    visudo
+    # ontrack ALL=(ALL:ALL) ALL
