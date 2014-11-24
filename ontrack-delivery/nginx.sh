@@ -14,8 +14,8 @@ function show_help {
 	echo "    -pn, --proxy-name=<name>      Name of the proxy server (defaults to hostname value command)"
 	echo "    -pp, --proxy-port=<port>      Port of the proxy server (defaults to 443)"
 	echo "Certificates options:"
-	echo "    -cp, --cert-prm=<pem>         Copies the PEM file (--copy-key must also be provided)"
-	echo "    -ck, --cert-key=<key>         Copies the Key file (--copy-pem must also be provided)"
+	echo "    -cp, --cert-pem=<pem>         Copies the PEM file (--cert-key must also be provided)"
+	echo "    -ck, --cert-key=<key>         Copies the Key file (--cert-pem must also be provided)"
 	echo "    -cg, --cert-generate          Generates the certificates (default)"
 	echo "    -cs, --cert-subject           Subject of the certificate (defaults to /C=BE/L=Brussel/CN=www.example.com)"
 }

@@ -69,3 +69,77 @@ The backup file, _backup.tgz_, contains:
     ssh root@<ip> "docker exec -it ontrack tail -f /opt/ontrack/mount/log/spring.log"
 
 where IP is the assigned one to the droplet.
+
+### Production setup
+
+#### Installation (manual)
+
+##### Preparing Nginx
+
+In order to set-up a production like machine for Ontrack, you'll have to generate or produce some SSH keys. Store
+them in a _./conf/certs_ directory.
+
+Generate the Nginx configuration files using:
+
+    ./nginx.sh --host=ontrack --proxy-name=\$host
+
+if the Nginx host is not bound to a known DNS entry or, for example:
+
+    ./nginx.sh --host=ontrack --proxy-name=ontrack.nemerosa.net
+
+By default, SSH keys are generated and auto-signed, but in case of a real production like server, use additionally:
+
+    ... --cert-pem=<path to .pem file> --cert-key=<path to .key file>
+
+to prepare the keys.
+
+In all cases, you'll have the following structure:
+
+    ./build/
+       |-- certs/
+       |     |-- server.pem (or server.crt)
+       |     |-- server.key
+       |-- sites-enabled/
+             |-- nginx.conf
+
+##### Installation on local virtual box
+
+    ./vagrant-install.sh \
+        --vagrant-host=ontrack-production \
+        --authorized-key=~/.ssh/id_rss.pub \
+        --nginx-certs=build/certs \
+        --nginx-sites-enabled=build/sites-enabled \
+        --image=nemerosa/ontrack:<tag>
+
+##### Installation on Digital Ocean
+
+    ./vagrant-install.sh \
+        --vagrant-provider=digital_ocean \
+        --do-token=<DOToken> \
+        --do-region=ams2 \
+        --do-size=1024mb \
+        --do-key=<DOKey> \
+        --vagrant-host=ontrack-production \
+        --authorized-key=~/.ssh/id_rsa.pub \
+        --nginx-certs=build/certs \
+        --nginx-sites-enabled=build/sites-enabled \
+        --image=nemerosa/ontrack:<tag>
+
+#### Migration (manual)
+
+Create an Ontrack Docker host as indicated above.
+
+* Migration of Nginx keys
+  * Connect to the Docker host (see above)
+  * Copy the SSH keys to ...  (TODO)
+  * Adjust the Nginx configuration
+
+* Migration of Ontrack data
+  * Connect to the Docker host (see above)
+  * Stop the `ontrack`container: `docker stop ontrack`
+  * Migrate database and security file (TODO)
+  * Restart the `ontrack`container: `docker start ontrack`
+
+#### Upgrade (automated)
+
+TODO
