@@ -12,6 +12,10 @@
 # Built-in
 # * ${WORKSPACE}
 
+# Misc.
+# * Running with Xvfb (1024x768x24, offset: 1)
+# * Post action: JUnit tests with ontrack-acceptance.xml
+
 # Script
 # Environment
 
@@ -51,3 +55,10 @@ DROPLET_IP=`python digitalocean-ip.py --name ontrack-acceptance-${ONTRACK_VERSIO
 
 echo "Droplet IP to test: ${DROPLET_IP}"
 
+# Running the acceptance tests
+
+cd ${WORKSPACE}
+${WORKSPACE}/acceptance.sh \
+    --jar=${REPOSITORY}/ontrack-acceptance-${ONTRACK_VERSION_FULL}.jar \
+    --no-ssl \
+    --ontrack-url=https://${DROPLET_IP}
