@@ -152,12 +152,64 @@ In all cases, you'll have the following structure:
 
 ##### Ontrack data migration (manual)
 
-* Migration of Ontrack data
-  * Connect to the Docker host (see above)
-  * Stop the `ontrack`container: `docker stop ontrack`
-  * Migrate database and security file (TODO)
-  * Restart the `ontrack`container: `docker start ontrack`
+1. Connect to the Docker host (see above).
+2. Stop and remove the `ontrack` container and `nginx`
+
+    docker stop ontrack
+    docker rm ontrack
+    docker stop nginx
+    docker rm nginx
+
+3. Prepare the data:
+
+    rm -rf migration
+    mkdir -p migration/work/files/security
+    mkdir -p migration/database
+    scp -r install@ontrack.nemerosa.net:/opt/ontrack/work/files/security/* migration/work/files/security
+    scp -r install@ontrack.nemerosa.net:/opt/ontrack/database/data.mv.db migration/database
+    cd migration
+    tar zcvf ../migration.tgz .
+
+4. Start and connect to the `ontrack-data` volumes:
+
+    docker run -it --volumes-from ontrack-data ubuntu:14.04 /bin/bash
+
+5. And execute the following commands:
+
+    cd /opt/ontrack/mount
+    rm -rf *
+    tar xzvf /migration/migration.tgz
+    exit
+
+6. Clean the container list
+
+    docker rm $(docker ps -l | grep ubuntu  | awk "{print \$1}")
+
+7. Remove the `ontrack` old container:
+
+    docker rm ontrack
+
+8. Recreate the `ontrack` container from your favourite version:
+
+    docker run -d --name ontrack-<version> --volumes-from ontrack-data nemerosa/ontrack:<version>
+
+9. Recreate the Nginx container:
+
+    docker run -d \
+        --publish 443:443 \
+        --link ontrack-<version>:ontrack \
+        --volume /root/nginx/certs:/etc/nginx/certs \
+        --volume /root/nginx/sites-enabled:/etc/nginx/sites-enabled \
+        dockerfile/nginx
 
 #### Upgrade (automated)
 
 TODO
+
+#### Connectivity
+
+The production machine is accessible as `root` using the SSH key(s) that was(were) setup at creation time. In this
+SSH key is lost, you have a serious problem because you cannot connect any longer to the machine.
+
+In parallel of this SSH key connection, you can setup a user/password connection:
+
