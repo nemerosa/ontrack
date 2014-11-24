@@ -69,16 +69,17 @@ else {
     versionCommit = 'git log -1 --format=%H'.execute().text.trim()
     // Gets the tag info
     def tagInfo = 'git describe --exact-match --tags'.execute().text.trim()
+    // Gets the branch info
+    def branchName = 'git rev-parse --abbrev-ref HEAD'.execute().text.trim()
     // We have a tag info
     if (tagInfo) {
-        versionBase = normalise(tagInfo)
-        versionFull = versionBase
+        versionBase = normalise(branchName)
+        versionFull = normalise(tagInfo)
         versionSource = tagInfo
         versionSourceType = 'tag'
     }
     // We do not have tag info
     else {
-        def branchName = 'git rev-parse --abbrev-ref HEAD'.execute().text.trim()
         // Gets the current branch
         versionBase = normalise(branchName)
         versionFull = "${versionBase}-${versionBuild}"
