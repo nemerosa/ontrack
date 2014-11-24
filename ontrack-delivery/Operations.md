@@ -127,12 +127,30 @@ In all cases, you'll have the following structure:
 
 #### Migration (manual)
 
-Create an Ontrack Docker host as indicated above.
+##### Nginx setup migration
 
-* Migration of Nginx keys
-  * Connect to the Docker host (see above)
-  * Copy the SSH keys to ...  (TODO)
-  * Adjust the Nginx configuration
+1. Connect to the Docker host (see above).
+2. Copy the SSH keys from another location:
+
+    rm -f /root/nginx/certs/*
+    scp user@host:/etc/nginx/ssl/* /root/nginx/certs
+
+3. You now have a _.pem_ and a _.key_  file in _/root/nginx/certs_.
+4. Update the _/root/nginx/sites-enabled/nginx.conf_  file with the new key location and the new host file (if needed):
+
+    ...
+    server_name ontrack.nemerosa.net;
+    ...
+    ssl_certificate /etc/nginx/certs/my.pem;
+    ssl_certificate_key /etc/nginx/certs/my.key;
+    ...
+    proxy_set_header X-Forwarded-Host ontrack.nemerosa.net;
+
+5. Restart the `nginx` container:
+
+    docker restart nginx
+
+##### Ontrack data migration (manual)
 
 * Migration of Ontrack data
   * Connect to the Docker host (see above)
