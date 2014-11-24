@@ -21,8 +21,8 @@
  *
  * - from a tag (we want to build from a tag)
  *     - the working copy is associated with a tag
- *     - base = TAG (normalised)
- *     - build = <abbrev. sha1>
+ *     - base = branch name (normalised)
+ *     - build = TAG (normalised)
  *     - full = TAG
  *     - commit = <sha1>
  *     - source = TAG
@@ -63,8 +63,6 @@ if (!hasGit) {
 
 // We can use git
 else {
-    // Gets the current commit (short hash)
-    versionBuild = 'git log -1 --format=%h'.execute().text.trim()
     // Gets the current commit (full hash)
     versionCommit = 'git log -1 --format=%H'.execute().text.trim()
     // Gets the tag info
@@ -75,11 +73,14 @@ else {
     if (tagInfo) {
         versionBase = normalise(branchName)
         versionFull = normalise(tagInfo)
+        versionBuild = versionFull
         versionSource = tagInfo
         versionSourceType = 'tag'
     }
     // We do not have tag info
     else {
+        // Gets the current commit (short hash)
+        versionBuild = 'git log -1 --format=%h'.execute().text.trim()
         // Gets the current branch
         versionBase = normalise(branchName)
         versionFull = "${versionBase}-${versionBuild}"
