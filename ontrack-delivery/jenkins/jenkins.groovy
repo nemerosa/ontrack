@@ -5,6 +5,20 @@
 job {
     name 'ontrack-2-trigger'
     logRotator(numToKeep = 40)
+    scm {
+        git {
+            remote {
+                url 'git@github.com:nemerosa/ontrack.git'
+            }
+            branch '*/feature/*'
+            branch '*/release/*'
+            branch '*/hotfix/*'
+            branch '*/master'
+        }
+    }
+    triggers {
+        scm 'H/5 * * * *'
+    }
 }
 
 /**
