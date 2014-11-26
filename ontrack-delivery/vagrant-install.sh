@@ -21,7 +21,7 @@ function show_help {
 	echo "    -dot, --do-token=<token>            Personal Access Token (required)"
 	echo "    -dor, --do-region=<region>          Region (required, for example: ams2 or nyc2)"
 	echo "    -dos, --do-size=<size>              Droplet size (default: '512m')"
-	echo "    -doi, --do-image=<image>            Droplet image that contains Docker (default: 'Docker 1.3.1 on 14.04')"
+	echo "    -doi, --do-image=<image>            Droplet image that contains Docker (default: 'Docker 1.3.2 on 14.04')"
 	echo "    -dok, --do-key=<name>               Name of the SSH Key in DO (default: 'Vagrant')"
 }
 
@@ -49,7 +49,7 @@ NGINX_SITES_ENABLED="./nginx/sites-enabled"
 DO_TOKEN=
 DO_REGION=
 DO_SIZE=512mb
-DO_IMAGE="Docker 1.3.1 on 14.04"
+DO_IMAGE="Docker 1.3.2 on 14.04"
 DO_KEY_NAME="Vagrant"
 
 # Command central
