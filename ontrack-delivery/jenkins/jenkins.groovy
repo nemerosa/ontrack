@@ -49,6 +49,35 @@ job {
     name 'ontrack-2-quick'
     logRotator(numToKeep = 40)
     deliveryPipelineConfiguration('Commit', 'Quick check')
+    parameters {
+        stringParam('LOCAL_BRANCH', 'master', '')
+        stringParam('REMOTE_BRANCH', 'origin/master', '')
+    }
+    jdk 'JDK8u20'
+    scm {
+        git {
+            remote {
+                url 'git@github.com:nemerosa/ontrack.git'
+            }
+            branch '${REMOTE_BRANCH}'
+            localBranch '${LOCAL_BRANCH}'
+        }
+    }
+    wrappers {
+        buildName '${ENV,var="LOCAL_BRANCH"}'
+    }
+    steps {
+        gradle """\
+displayVersion writeVersion test --info
+"""
+    }
+    publishers {
+        downstreamParameterized {
+            trigger('ontrack-2-package') {
+                currentBuild()
+            }
+        }
+    }
 }
 
 job {
