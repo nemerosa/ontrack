@@ -19,6 +19,26 @@ job {
     triggers {
         scm 'H/5 * * * *'
     }
+    wrappers {
+        buildName '${GIT_BRANCH}'
+    }
+    steps {
+        shell """\
+echo \$GIT_BRANCH
+LOCAL_BRANCH=`echo \$GIT_BRANCH | sed 's|origin/||'`
+rm -f branch.properties
+echo LOCAL_BRANCH=\$LOCAL_BRANCH >> branch.properties
+echo REMOTE_BRANCH=\$GIT_BRANCH >> branch.properties
+"""
+    }
+    publishers {
+        downstreamParameterized {
+            trigger('ontrack-2-quick') {
+                gitRevision(true)
+                propertiesFile('branch.properties')
+            }
+        }
+    }
 }
 
 /**
