@@ -5,34 +5,32 @@ Ontrack release cycle
 
 The release cycle goes about:
 
-1. developments are done on the `develop` and the `feature/*` branches
-1. developments targeted for the next release must be merged into the `develop` branch
-1. when release `R.X` is ready for stabilisation, create the `release/R.X` branch from the `develop` one
+1. developments are done on the `master` and the `feature/*` branches
+1. developments targeted for the next release must be merged into the `master` branch
+1. when release `R.X` is ready for stabilisation, create the `release/R.X` branch from the `master` one
 1. fix any remaining issue on the `release/R.X` branch
-1. when ready to actually release, merge the `release/R.X` branch into the `master`, tag, build and publish.
+1. when ready to actually release, publish and release from the `release/R.X` branch
+1. keep the `release/R.X` branch for maintenance
 
-Merge regularly the `release/*` branches into the `develop` branch.
+Merge regularly the `release/*` branches into the `master` branch.
 
-## Pipelines
+Always merge from the most stable release branch to the least one:
 
-For all branches:
+```
+release/2.1
+   \--> release/2.2
+         \--> release/2.3
+               \--> master
+```
 
-* packaging
-* local acceptance tests (using a local Docker image)
+## Pipeline
 
-For `release/*` and `master` branches:
-
-* Docker publication
-* deploying in a acceptance server (automated for those branches, manual for the others)
-
-For `release/*` branches:
-
-* release phase - preparing the `master` branch
-
-For `master` branch:
-
-* publication - GitHub
-* deploying in production (manual, optional)
+* Packaging - all branches
+* Local acceptance tests and Docker image build - all branches
+* Docker image publication - auto. for `release/*` and `master` branches, optional for the other
+* Digital Ocean acceptance deployment and tests - auto. for `release/*` and `master` branches, optional for the other
+* Publication of release in GitHub and Ontrack - optional, for `release/*` branches only
+* Deployment in production  - optional, for `release/*` branches only
 
 ## Acceptance deployment and tests
 
@@ -58,50 +56,28 @@ and then run the acceptance tests against this machine:
 
 The _Acceptance @ Digital Ocean_ step in the _Acceptance_ phase is automated for the `release/*` and `master` branches and manual for the other types of branches.
 
-## Release and publication
+## Publication
 
-### Preparing the master
+For a `release/R` branch:
 
-Merging the release into the master:
+* creating a release `R` in GitHub
+* uploading the `ontrack-ui.jar`
+* getting the change log from Ontrack @ Ontrack and setting it as description into the GitHub release
+* setting the new `R` build as `RELEASED` in Ontrack @ Ontrack
 
-    git checkout master
-    git merge --no-ff release/R.X
+Getting the change is an issue because we do not have one unique branch to take into account. We want to get a change log between the current build and the last `RELEASE` build, overall on the project.
 
-Tagging and pushing:
+**Ontrack does not allow yet** to get a change log between two builds on different branches. See issue [#172](https://github.com/nemerosa/ontrack/issues/172) for a status on this feature.
 
-    git tag R.X
-    git push origin master
-    git push origin R.X
+In the meantime, the change log has to be collected manually.
 
-This is done during the optional _Release_ phase of the pipeline for _any_ branch, which follows the _Acceptance @ Digital Ocean_ phase. This is included into the `prepare-release.sh` script.
+## Production deployment
 
-### Master pipeline
-
-When done, this triggers a pipeline for the `master` branch, using `R.X` as version since built from a tag.
-
-In the end, we have:
-
-* a tested image in Docker Hub: `nemerosa/ontrack:R.x`
-* a Digital Ocean acceptance machine: `ontrack-acceptance-R.X`
-
-### Publishing the release
-
-The next steps are:
-
-* releasing in GitHub:
-  * creating a release `R.X`
-  * uploading the `ontrack-ui.jar`
-  * getting the change log from Ontrack @ Ontrack and setting it as description into the GitHub release
-  * setting the new `R.X` build as `RELEASED` in Ontrack @ Ontrack
-* deploying in production:
-  * updating the Docker container at Ontrack @ Ontrack
-    * stopping the old one
-    * running a new container by pulling `nemerosa/ontrack:R.x`
-    * setting the `R.X` build as `PRODUCTION` in Ontrack @ Ontrack
-    * smoke tests
+See [[Operations]].
 
 ## Housekeeping
 
 * unreleased images in Docker Hub
 * unreleased images in Jenkins
 * stopped containers at Ontrack @ Ontrack
+* old acceptance droplets in Digital Ocean

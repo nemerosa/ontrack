@@ -15,12 +15,12 @@ def publish(options):
     print "[publish] Uploading ontrack-ui.jar..."
     github.uploadGithubArtifact(options, release_id, 'ontrack-ui.jar', 'application/zip',
                                 "%s/ontrack-ui-%s.jar" % (options.repository, options.release))
-    # Gets the change log since last release
-    print "[publish] Getting the change log from Ontrack..."
-    change_log = ontrack.getChangeLog(options.ontrack_url, 'master', 'RELEASE')
-    # Attach change log to the release
-    print "[publish] Setting the change log as description in the release..."
-    github.setReleaseDescription(options, release_id, change_log)
+    # TODO #172 Gets the change log since last release
+    # print "[publish] Getting the change log from Ontrack..."
+    # change_log = ontrack.getChangeLog(options.ontrack_url, 'master', 'RELEASE')
+    # TODO #172 Attach change log to the release
+    # print "[publish] Setting the change log as description in the release..."
+    # github.setReleaseDescription(options, release_id, change_log)
     # OK
     print "[publish] End."
 
