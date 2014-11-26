@@ -64,6 +64,150 @@ class GitClientIT {
         }
     }
 
+    /**
+     * What is the change log for 2.2 since 2.1?
+     * <pre>
+     *     | * C11 (v2.2, 2.2)
+     *     * | C10
+     *     | * C9
+     *     | * C8
+     *     |/
+     *     * C7
+     *     * M6
+     *     |\
+     *     | * C5 (v2.1, 2.1)
+     *     * | C4
+     *     | * C3
+     *     |/
+     *     * C2
+     *     * C1
+     * </pre>
+     *
+     * We expect C4, M6, C7, C8, C10, C11
+     */
+    @Test
+    void 'Log: between tags on different branches'() {
+        def repo = new GitTestUtils()
+        try {
+            repo.with {
+                run 'git', 'init'
+                commit 1
+                commit 2
+                run 'git', 'checkout', '-b', '2.1'
+                commit 3
+                run 'git', 'checkout', 'master'
+                commit 4
+                run 'git', 'checkout', '2.1'
+                commit 5
+                run 'git', 'tag', 'v2.1'
+                run 'git', 'checkout', 'master'
+                run 'git', 'merge', '--no-ff', '2.1', '--message', 'Merge 2.1' // M6
+                commit 7
+                run 'git', 'checkout', '-b', '2.2'
+                commit 8
+                commit 9
+                run 'git', 'checkout', 'master'
+                commit 10
+                run 'git', 'checkout', '2.2'
+                commit 11
+                run 'git', 'tag', 'v2.2'
+
+                run 'git', 'log', '--oneline', '--graph', '--decorate', '--all'
+            }
+
+
+            GitClient gitClient = repo.gitClient()
+
+            def log = gitClient.log('v2.2', 'v2.1')
+            assert log.commits.collect { it.shortMessage } == ['Commit 11', 'Commit 9', 'Commit 8', 'Commit 7', 'Merge 2.1', 'Commit 4']
+
+        } finally {
+            repo.close()
+        }
+    }
+
+    /**
+     * What is the change log for 2.2 since 2.1?
+     * <pre>
+     *     | * C14 (v2.2, 2.2)
+     *     * | C13
+     *     | * Merge 2.1->2.2
+     *     | |\_________________
+     *     | |                  \
+     *     | |                  * C12 (v2.1, 2.1)
+     *     | * C11              |
+     *     | * C10              |
+     *     |/                   |
+     *     |                    * C9
+     *     * C8                 |
+     *     * C7                 |
+     *     |                    |
+     *     |                    * C6
+     *     |                    * C5
+     *     *                    | C4
+     *     |                    * C3
+     *     |--------------------/
+     *     * C2
+     *     * C1
+     * </pre>
+     *
+     * We expect C4, C7, C8, C10, C11, Merge 2.1->2.2, C14
+     */
+    @Test
+    void 'Log: between tags on different hierarchical branches'() {
+        def repo = new GitTestUtils()
+        try {
+            repo.with {
+                run 'git', 'init'
+                commit 1
+                commit 2
+                run 'git', 'checkout', '-b', '2.1'
+                commit 3
+                run 'git', 'checkout', 'master'
+                commit 4
+                run 'git', 'checkout', '2.1'
+                commit 5
+                commit 6
+                run 'git', 'checkout', 'master'
+                commit 7
+                commit 8
+                run 'git', 'checkout', '2.1'
+                commit 9
+                run 'git', 'checkout', '-b', '2.2', 'master'
+                commit 10
+                commit 11
+                run 'git', 'checkout', '2.1'
+                commit 12
+                run 'git', 'tag', 'v2.1'
+                run 'git', 'checkout', '2.2'
+                run 'git', 'merge', '--no-ff', '2.1', '--message', 'Merge 2.1->2.2'
+                run 'git', 'checkout', 'master'
+                commit 13
+                run 'git', 'checkout', '2.2'
+                commit 14
+                run 'git', 'tag', 'v2.2'
+
+                run 'git', 'log', '--oneline', '--graph', '--decorate', '--all'
+            }
+
+
+            GitClient gitClient = repo.gitClient()
+
+            def log = gitClient.log('v2.2', 'v2.1')
+            assert log.commits.collect { it.shortMessage } == [
+                    'Commit 14',
+                    'Merge 2.1->2.2',
+                    'Commit 11',
+                    'Commit 10',
+                    'Commit 8',
+                    'Commit 7',
+                    'Commit 4']
+
+        } finally {
+            repo.close()
+        }
+    }
+
     @Test
     void 'Log: between tags'() {
         def repo = new GitTestUtils()
