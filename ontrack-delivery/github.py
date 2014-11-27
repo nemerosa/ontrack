@@ -20,7 +20,7 @@ def callGithub(options, url, form, type='application/json'):
         raise Exception("GitHub error:\n%s\n" % e)
 
 
-def uploadGithubArtifact(options, releaseId, name, type, path):
+def upload_github_artifact(options, releaseId, name, type, path):
     # Opens the artifact
     data = open(path, 'rb').read()
     # Computes the SHA1 for this file
@@ -53,11 +53,12 @@ def setReleaseDescription(options, releaseId, description):
     )
 
 
-def createRelease(options, release):
+def create_release(options, commit, release):
     response = callGithub(
         options,
         "https://api.github.com/repos/%s/releases" % options.github_repository,
         {
+            'target_commitish': commit,
             'tag_name': release,
             'name': release
         }

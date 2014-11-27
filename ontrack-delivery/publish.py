@@ -8,11 +8,11 @@ import github
 def publish(options):
     # Creation of the release
     print "[publish] Creation of GitHub release %s" % options.version_release
-    release_id = github.createRelease(options, options.version_release)
+    release_id = github.create_release(options, options.version_commit, options.version_release)
     print "[publish] Release ID is %d" % release_id
     # Attach artifacts to the release
     print "[publish] Uploading ontrack-ui.jar..."
-    github.uploadGithubArtifact(options, release_id, 'ontrack-ui.jar', 'application/zip',
+    github.upload_github_artifact(options, release_id, 'ontrack-ui.jar', 'application/zip',
                                 "%s/ontrack-ui-%s.jar" % (options.repository, options.version_full))
     # TODO #172 Gets the change log since last release
     # print "[publish] Getting the change log from Ontrack..."
@@ -27,6 +27,7 @@ def publish(options):
 if __name__ == '__main__':
     # Argument definitions
     parser = argparse.ArgumentParser(description='Ontrack publication')
+    parser.add_argument('--version-commit', required=True, help='Commit to release')
     parser.add_argument('--version-full', required=True, help='Version to release')
     parser.add_argument('--version-release', required=True, help='Release to create')
     parser.add_argument('--repository', required=True, help='Directory that contains the artifacts')
