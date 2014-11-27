@@ -61,8 +61,14 @@ public class EnvServiceImpl implements EnvService {
 
     @PostConstruct
     public void init() throws FileNotFoundException {
-        logger.info("[env] With JDK:      {}", System.getProperty("java.version"));
-        logger.info("[env] With profiles: {}", profiles);
-        logger.info("[env] With version:  {}", version);
+        logger.info("[env] With JDK:        {}", System.getProperty("java.version"));
+        logger.info("[env] With profiles:   {}", profiles);
+        logger.info("[version] Display:     {}", version.getDisplay());
+        logger.info("[version] Full:        {}", version.getFull());
+        logger.info("[version] Branch:      {}", version.getBranch());
+        logger.info("[version] Build:       {}", version.getBuild());
+        logger.info("[version] Commit:      {}", version.getCommit());
+        logger.info("[version] Source:      {}", version.getSource());
+        logger.info("[version] Source type: {}", version.getSourceType());
     }
 }

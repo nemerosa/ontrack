@@ -69,15 +69,16 @@ task copyWebResourcesBuild(dependsOn: ':ontrack-web:build') << {
     }
 }
 
-task generationVersionInfo << {
+task generateVersionInfo << {
     // Amends the application.properties file with version information
     File file = project.file('src/main/resources/application.properties')
     file.text = """\
 # This file is generated at build time to contain version information
 # Do not edit it, do not commit it
 ontrack.version.date = ${new Date().format("yyyy-MM-dd'T'HH:mm:ss")}
-ontrack.version.full = ${project.version}
-ontrack.version.base = ${rootProject.versionBase}
+ontrack.version.display = ${project.versionDisplay}
+ontrack.version.full = ${project.versionFull}
+ontrack.version.branch = ${rootProject.versionBranch}
 ontrack.version.build = ${rootProject.versionBuild}
 ontrack.version.commit = ${rootProject.versionCommit}
 ontrack.version.source = ${rootProject.versionSource}
@@ -86,13 +87,13 @@ ontrack.version.sourceType = ${rootProject.versionSourceType}
 }
 
 release.dependsOn copyWebResourcesRelease
-release.dependsOn generationVersionInfo
+release.dependsOn generateVersionInfo
 
 if (!('release' in gradle.startParameter.taskNames)) {
     build.dependsOn copyWebResourcesBuild
-    build.dependsOn generationVersionInfo
+    build.dependsOn generateVersionInfo
 }
 
 processResources.mustRunAfter copyWebResourcesRelease
 processResources.mustRunAfter copyWebResourcesBuild
-processResources.mustRunAfter generationVersionInfo
+processResources.mustRunAfter generateVersionInfo
