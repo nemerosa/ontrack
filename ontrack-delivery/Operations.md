@@ -178,7 +178,7 @@ In all cases, you'll have the following structure:
 
 4. Start and connect to the `ontrack-data` volumes:
 
-    docker run -it --volumes-from ontrack-data ubuntu:14.04 /bin/bash
+    docker run -it --volumes-from ontrack-data --volume /root/migration:/migration ubuntu:14.04 /bin/bash
 
 5. And execute the following commands:
 
@@ -189,7 +189,7 @@ In all cases, you'll have the following structure:
 
 6. Clean the container list
 
-    docker rm $(docker ps -l | grep ubuntu  | awk "{print \$1}")
+    docker rm $(docker ps -l | grep ubuntu  | awk '{print $1}')
 
 7. Remove the `ontrack` old container:
 
@@ -197,13 +197,13 @@ In all cases, you'll have the following structure:
 
 8. Recreate the `ontrack` container from your favourite version:
 
-    docker run -d --name ontrack-<version> --volumes-from ontrack-data nemerosa/ontrack:<version>
+    docker run -d --name ontrack-$VERSION --volumes-from ontrack-data nemerosa/ontrack:$VERSION
 
 9. Recreate the Nginx container:
 
     docker run -d \
         --publish 443:443 \
-        --link ontrack-<version>:ontrack \
+        --link ontrack-$VERSION:ontrack \
         --volume /root/nginx/certs:/etc/nginx/certs \
         --volume /root/nginx/sites-enabled:/etc/nginx/sites-enabled \
         dockerfile/nginx

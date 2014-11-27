@@ -57,25 +57,37 @@ echo "[PRODUCTION] Version         = ${VERSION}"
 
 # Removes the Nginx container
 
-NGINX_CID=`docker ps | grep "dockerfile/nginx" | awk "{print \$1}"`
-docker stop ${NGINX_CID}
-docker rm ${NGINX_CID}
+echo "[PRODUCTION] Stopping Nginx container..."
+NGINX_CID=`docker ps | grep "dockerfile/nginx" | awk '{print $1}'`
+if [ "${NGINX_CID}" != "" ]
+then
+	docker stop ${NGINX_CID}
+	docker rm ${NGINX_CID}
+fi
 
 # Stops the old version of Ontrack
 
-docker stop $(docker ps docker ps | grep "nemerosa/ontrack" | awk "{print \$1}")
+echo "[PRODUCTION] Stopping Ontrack container..."
+ONTRACK_CID=`docker ps docker ps | grep "nemerosa/ontrack" | awk '{print $1}'`
+if [ "${ONTRACK_CID}" != "" ]
+then
+	docker stop ${ONTRACK_CID}
+fi
 
 # Backup of the data
 
+echo "[PRODUCTION] Backuping Ontrack data..."
 TIMESTAMP=`date +%F-%T`
 docker run --volumes-from ontrack-data --volume /root:/backup ubuntu tar czvf /backup/backup-${TIMESTAMP}.tgz /opt/ontrack/mount
 
 # Installs the new version of Ontrack
 
+echo "[PRODUCTION] Starting new Ontrack version ${VERSION}..."
 docker run -d --name ontrack-${VERSION} --volumes-from ontrack-data nemerosa/ontrack:${VERSION}
 
 # Recreate the Nginx container:
 
+echo "[PRODUCTION] Starting the Nginx proxy container..."
 docker run -d \
     --publish 443:443 \
     --link ontrack-${VERSION}:ontrack \
@@ -84,3 +96,4 @@ docker run -d \
     dockerfile/nginx
 
 # End
+echo "[PRODUCTION] End of deployment."
