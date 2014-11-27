@@ -84,7 +84,7 @@ fi
 
 echo "[PRODUCTION] Backuping Ontrack data..."
 TIMESTAMP=`date +%F-%T`
-docker run --volumes-from ontrack-data --volume /root:/backup ubuntu tar czvf /backup/backup-${TIMESTAMP}.tgz /opt/ontrack/mount
+docker run --volumes-from ontrack-data --volume /root:/backup ubuntu tar czvf /backup/backup-${TIMESTAMP}.tgz --exclude='work/files/git/*' /opt/ontrack/mount
 
 # Installs the new version of Ontrack
 
