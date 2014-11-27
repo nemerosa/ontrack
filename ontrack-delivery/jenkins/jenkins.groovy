@@ -119,6 +119,15 @@ integrationTest
 --info
 --profile
 """
+        conditionalSteps {
+            condition {
+                status('SUCCESS', 'SUCCESS')
+            }
+            shell """\
+# Copies the JAR to a local directory
+ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=/var/lib/jenkins/repository/ontrack/2.0
+"""
+        }
     }
 }
 
