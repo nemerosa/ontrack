@@ -3,18 +3,17 @@
 import argparse
 
 import github
-import ontrack
 
 
 def publish(options):
     # Creation of the release
-    print "[publish] Creation of GitHub release %s" % options.release
-    release_id = github.createRelease(options, options.release)
+    print "[publish] Creation of GitHub release %s" % options.version_release
+    release_id = github.createRelease(options, options.version_release)
     print "[publish] Release ID is %d" % release_id
     # Attach artifacts to the release
     print "[publish] Uploading ontrack-ui.jar..."
     github.uploadGithubArtifact(options, release_id, 'ontrack-ui.jar', 'application/zip',
-                                "%s/ontrack-ui-%s.jar" % (options.repository, options.release))
+                                "%s/ontrack-ui-%s.jar" % (options.repository, options.version_full))
     # TODO #172 Gets the change log since last release
     # print "[publish] Getting the change log from Ontrack..."
     # change_log = ontrack.getChangeLog(options.ontrack_url, 'master', 'RELEASE')
@@ -28,7 +27,8 @@ def publish(options):
 if __name__ == '__main__':
     # Argument definitions
     parser = argparse.ArgumentParser(description='Ontrack publication')
-    parser.add_argument('--release', required=True, help='Release to create')
+    parser.add_argument('--version-full', required=True, help='Version to release')
+    parser.add_argument('--version-release', required=True, help='Release to create')
     parser.add_argument('--repository', required=True, help='Directory that contains the artifacts')
     parser.add_argument('--ontrack-url', required=True, help='ontrack URL')
     parser.add_argument('--github-repository', required=False, help='GitHub repository', default='nemerosa/ontrack')
