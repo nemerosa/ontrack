@@ -26,6 +26,27 @@ def normalise(String value) {
     value.replaceAll(/[^A-Za-z0-9\.\-_]/, '-')
 }
 
+def getDisplayVersion(base) {
+    def tags = "git log master..HEAD --pretty=format:%d".execute().text.trim().readLines()
+    def baseTagPattern = /tag: (${base}\.[\d+])/
+    def baseTags = tags.collect { tag ->
+        def m = tag =~ baseTagPattern
+        if (m.find()) {
+            m.group(1)
+        } else {
+            ''
+        }
+    }.findAll { it != '' }
+    if (baseTags.empty) {
+        return "${base}.0"
+    } else {
+        def lastTag = baseTags[0].trim()
+        def lastNumber = (lastTag =~ /${base}\.([\d+])/)[0][1] as int
+        def newNumber = lastNumber + 1
+        return "${base}.${newNumber}"
+    }
+}
+
 // No git information
 if (!hasGit) {
     versionDisplay = 'local'
@@ -58,7 +79,7 @@ else {
     versionFull = "${versionBranch}-${versionBuild}"
     // Display version
     if (versionSourceType == 'release') {
-        versionDisplay = versionSource.substring(pos + 1)
+        versionDisplay = getDisplayVersion(versionSource.substring(pos + 1))
     } else {
         versionDisplay = versionBranch
     }
