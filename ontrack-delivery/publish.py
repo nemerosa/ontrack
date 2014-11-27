@@ -11,9 +11,9 @@ def publish(options):
     release_id = github.create_release(options, options.version_commit, options.version_release)
     print "[publish] Release ID is %d" % release_id
     # Attach artifacts to the release
-    print "[publish] Uploading ontrack-ui.jar..."
-    github.upload_github_artifact(options, release_id, 'ontrack-ui.jar', 'application/zip',
-                                "%s/ontrack-ui-%s.jar" % (options.repository, options.version_full))
+    ui_jar = "%s/ontrack-ui-%s.jar" % (options.repository, options.version_full)
+    print "[publish] Uploading ontrack-ui.jar at %s..." % ui_jar
+    github.upload_github_artifact(options, release_id, 'ontrack-ui.jar', 'application/zip', ui_jar)
     # TODO #172 Gets the change log since last release
     # print "[publish] Getting the change log from Ontrack..."
     # change_log = ontrack.getChangeLog(options.ontrack_url, 'master', 'RELEASE')

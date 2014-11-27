@@ -1,10 +1,9 @@
 import base64
-import hashlib
 import json
 import urllib2
 
 
-def callGithub(options, url, form, type='application/json'):
+def call_github(options, url, form, type='application/json'):
     req = urllib2.Request(url)
     req.add_header('Content-Type', type)
     req.add_header('Accept', 'application/vnd.github.manifold-preview')
@@ -23,28 +22,18 @@ def callGithub(options, url, form, type='application/json'):
 def upload_github_artifact(options, releaseId, name, type, path):
     # Opens the artifact
     data = open(path, 'rb').read()
-    # Computes the SHA1 for this file
-    h = hashlib.sha1(data).hexdigest()
-    # Uploads the SHA1 file
-    response = callGithub(
-        options,
-        "https://uploads.github.com/repos/%s/ontrack/releases/%s/assets?name=%s.sha1" % (
-            options.github_user, releaseId, name),
-        h,
-        "text/plain"
-    )
     # Uploads the artifact
-    callGithub(
+    call_github(
         options,
-        "https://uploads.github.com/repos/%s/ontrack/releases/%s/assets?name=%s" % (
-            options.github_user, releaseId, name),
+        "https://uploads.github.com/repos/%s/releases/%s/assets?name=%s" % (
+            options.github_repository, releaseId, name),
         data,
         type
     )
 
 
 def setReleaseDescription(options, releaseId, description):
-    callGithub(
+    call_github(
         options,
         "https://api.github.com/repos/%s/releases/%d" % (options.github_repository, releaseId),
         {
@@ -54,7 +43,7 @@ def setReleaseDescription(options, releaseId, description):
 
 
 def create_release(options, commit, release):
-    response = callGithub(
+    response = call_github(
         options,
         "https://api.github.com/repos/%s/releases" % options.github_repository,
         {
