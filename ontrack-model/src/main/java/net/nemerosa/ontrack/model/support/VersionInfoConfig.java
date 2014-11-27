@@ -27,13 +27,17 @@ public class VersionInfoConfig {
      */
     private String date;
     /**
+     * Display version. Example: 2.3 or master or feature/158-my-feature
+     */
+    private String display = "n/a";
+    /**
      * Full version string, including the build number. Example: release-2.0-10a1bb7
      */
     private String full = "n/a";
     /**
-     * Base version string, without the build number. Example: release-2.0
+     * Branch for the version. Example: release-2.0 or master
      */
-    private String base = "n/a";
+    private String branch = "n/a";
     /**
      * Build number. Example: 10a1bb7
      */
@@ -43,7 +47,7 @@ public class VersionInfoConfig {
      */
     private String commit = "NA";
     /**
-     * Source of the version. It can be a tag (correct for a real release) or a developer environment.
+     * Source of the version.
      * Example: release/2.0
      */
     private String source = "source";
@@ -59,8 +63,9 @@ public class VersionInfoConfig {
     public VersionInfo toInfo() {
         return new VersionInfo(
                 parseDate(date),
+                display,
                 full,
-                base,
+                branch,
                 build,
                 commit,
                 source,

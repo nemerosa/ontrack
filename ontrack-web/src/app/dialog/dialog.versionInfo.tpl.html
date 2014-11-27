@@ -1,11 +1,11 @@
 <div class="modal-header">
     <h3>
-        ontrack {{data.marketingVersion}}
-        <span ng-if="!data.release" class="fa fa-warning text-warning"></span>
+        ontrack {{data.display}}
+        <span ng-if="data.sourceType != 'release'" class="fa fa-warning text-warning"></span>
     </h3>
 </div>
 <div class="modal-body">
-    <div ng-if="!data.release" class="alert alert-warning">
+    <div ng-if="data.sourceType != 'release'" class="alert alert-warning">
         <span class="fa fa-warning text-warning"></span>
         This version is not a release! Please use with care.
     </div>
@@ -13,7 +13,7 @@
         <tbody>
         <tr>
             <th>Version</th>
-            <td>{{data.marketingVersion}}</td>
+            <td>{{data.display}}</td>
         </tr>
         <tr>
             <th>Full version</th>
@@ -24,12 +24,12 @@
             <td>{{data.source}}</td>
         </tr>
         <tr>
-            <th>Commit</th>
-            <td>{{data.commit}}</td>
+            <th>Type</th>
+            <td>{{data.sourceType}}</td>
         </tr>
         <tr>
-            <th>Label</th>
-            <td>{{data.label}}</td>
+            <th>Commit</th>
+            <td>{{data.commit}}</td>
         </tr>
         <tr>
             <th>Date</th>

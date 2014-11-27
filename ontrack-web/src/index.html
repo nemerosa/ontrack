@@ -139,14 +139,14 @@
                 <p>
                     <!-- Displays a popup with information version and a link to ontrack -->
                     <span class="ot-version" ng-click="displayVersionInfo(info.version)">
-                        {{info.version.marketingVersion}}
+                        {{info.version.display}}
                     </span>
-                    <span ng-if="info.version.release" class="ot-version-label ot-version-release">
-                        {{info.version.label}}
+                    <span ng-if="info.version.sourceType == 'release'" class="ot-version-label ot-version-release">
+                        Release
                     </span>
-                    <span ng-if="!info.version.release" class="ot-version-label ot-version-warning"
+                    <span ng-if="info.version.sourceType != 'release'" class="ot-version-label ot-version-warning"
                           title="This version is not a release! Please use with care.">
-                        {{info.version.label}}
+                        <span class="fa fa-warning"></span>
                     </span>
                 </p>
             </div>
