@@ -17,7 +17,7 @@ def callGithub(options, url, form, type='application/json'):
             data = form
         return urllib2.urlopen(req, data)
     except urllib2.HTTPError as e:
-        raise ("GitHub error:\n%s\n" % e)
+        raise Exception("GitHub error:\n%s\n" % e)
 
 
 def uploadGithubArtifact(options, releaseId, name, type, path):
