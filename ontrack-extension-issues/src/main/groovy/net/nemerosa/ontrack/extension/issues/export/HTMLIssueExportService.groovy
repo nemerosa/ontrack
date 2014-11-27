@@ -8,17 +8,14 @@ import org.springframework.stereotype.Component
 import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4
 
 @Component
-class HTMLIssueExportService implements IssueExportService {
+class HTMLIssueExportService extends AbstractTextIssueExportService {
 
-    @Override
-    ExportFormat getExportFormat() {
-        ExportFormat.HTML
+    HTMLIssueExportService() {
+        super(ExportFormat.HTML)
     }
 
     @Override
-    ExportedIssues export(IssueServiceExtension issueServiceExtension, IssueServiceConfiguration issueServiceConfiguration, Map<String, List<Issue>> groupedIssues) {
-        StringBuilder s = new StringBuilder()
-
+    void exportAsText(IssueServiceExtension issueServiceExtension, IssueServiceConfiguration issueServiceConfiguration, Map<String, List<Issue>> groupedIssues, StringBuilder s) {
         groupedIssues.each { groupName, issues ->
             // One section per group
             s << '<section class="ontrack-issue-group">\n'
@@ -38,10 +35,5 @@ class HTMLIssueExportService implements IssueExportService {
             s << '</section>\n'
 
         }
-
-        new ExportedIssues(
-                exportFormat.type,
-                s.toString()
-        )
     }
 }
