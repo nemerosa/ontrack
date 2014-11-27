@@ -23,6 +23,19 @@ release/2.1
                \--> master
 ```
 
+## Versioning
+
+Version component   | `release/R`       | `other/abc`
+--------------------| ------------------|-------
+**Display version** | R                 | other-abc
+Full version        | release-R-1234567 | other-abc-1234567
+Branch              | release-R         | other-abc
+Build               | 1234567           | 1234567
+Source              | release/R         | other/abc
+Source type         | release           | other
+Commit              | 1234567...        | 1234567...
+
+
 ## Pipeline
 
 * Packaging - all branches
