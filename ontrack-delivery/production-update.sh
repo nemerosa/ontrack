@@ -11,6 +11,7 @@ function show_help {
 	echo "Available options are:"
 	echo "    -h, --help                    Displays this help"
 	echo "    -v, --version=<version>       Version to deploy (required)"
+	echo "    -d, --delay                   Number of seconds to wait for Ontrack to start (defaults to 300, 0 means no wait)"
 }
 
 # Check function
@@ -26,6 +27,7 @@ function check {
 # Defaults
 
 VERSION=
+ONTRACK_DELAY=300
 
 # Command central
 
@@ -38,6 +40,9 @@ do
 			;;
 		-v=*|--version=*)
 			VERSION=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
+			;;
+		-d=*|--delay=*)
+            ONTRACK_DELAY=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
 			;;
 		*)
 			echo "Unknown option: $i"
@@ -54,6 +59,7 @@ check "${VERSION}" "Version (--version) is required."
 # Logging
 
 echo "[PRODUCTION] Version         = ${VERSION}"
+echo "[PRODUCTION] Startup delay   = ${ONTRACK_DELAY}"
 
 # Removes the Nginx container
 
@@ -94,6 +100,35 @@ docker run -d \
     --volume /root/nginx/certs:/etc/nginx/certs \
     --volume /root/nginx/sites-enabled:/etc/nginx/sites-enabled \
     dockerfile/nginx
+
+# Waiting for the application to start
+
+echo "[PRODUCTION] Waiting for Ontrack to start (max: ${ONTRACK_DELAY} s)"
+ONTRACK_STARTED=no
+ONTRACK_START_DURATION=0
+for i in `seq 1 ${ONTRACK_DELAY}`
+do
+    curl --silent --fail --insecure "https://localhost/info"
+    if [ "$?" != "0" ]
+    then
+        echo -n "."
+        sleep 1
+    else
+        ONTRACK_STARTED=yes
+        if [ "${ONTRACK_START_DURATION}" == "0" ]
+        then
+            ONTRACK_START_DURATION=${i}
+        fi
+        break
+    fi
+done
+echo
+
+if [ "${ONTRACK_STARTED}" != "yes" ]
+then
+	echo "[PRODUCTION] Ontrack could not start is less than ${ONTRACK_DELAY}s"
+	exit 1
+fi
 
 # End
 echo "[PRODUCTION] End of deployment."
