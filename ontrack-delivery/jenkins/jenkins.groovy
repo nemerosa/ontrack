@@ -1,4 +1,10 @@
 /**
+ * List of global parameters:
+ *
+ * - JDK8u20
+ */
+
+/**
  * Trigger job
  */
 
@@ -84,6 +90,36 @@ job {
     name 'ontrack-2-package'
     logRotator(numToKeep = 40)
     deliveryPipelineConfiguration('Commit', 'Package')
+    parameters {
+        stringParam('LOCAL_BRANCH', 'master', '')
+        stringParam('REMOTE_BRANCH', 'origin/master', '')
+    }
+    jdk 'JDK8u20'
+    scm {
+        git {
+            remote {
+                url 'git@github.com:nemerosa/ontrack.git'
+            }
+            branch '${REMOTE_BRANCH}'
+            localBranch '${LOCAL_BRANCH}'
+        }
+    }
+    wrappers {
+        buildName '${ENV,var="LOCAL_BRANCH"}'
+    }
+    // TODO Xvfb
+    steps {
+        gradle """\
+clean
+displayVersion
+writeVersion
+test
+release
+integrationTest
+--info
+--profile
+"""
+    }
 }
 
 /**
