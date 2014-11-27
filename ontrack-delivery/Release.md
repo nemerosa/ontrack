@@ -27,7 +27,7 @@ release/2.1
 
 Version component   | `release/R`       | `other/abc`
 --------------------| ------------------|-------
-**Display version** | R                 | other-abc
+**Display version** | (see below)       | other-abc
 Full version        | release-R-1234567 | other-abc-1234567
 Branch              | release-R         | other-abc
 Build               | 1234567           | 1234567
@@ -35,6 +35,11 @@ Source              | release/R         | other/abc
 Source type         | release           | other
 Commit              | 1234567...        | 1234567...
 
+When getting the _display version_ for a `release/R` branch, we get the last tag on this branch which start with `R.` and increment the last digit. If not tag is found, we use `.0`.
+
+For example, for the `release/2.0` branch, the first time we publish the release, there is no tag and we'll use `2.0.0` as _display version_. The second time, we find `2.0.0` and the new _display version_ will be `2.0.1`.
+
+This allows an automatic incremental version on release branches.
 
 ## Pipeline
 
