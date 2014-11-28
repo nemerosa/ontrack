@@ -12,9 +12,17 @@
                     No branch has been created yet.
                 </ot-noentry>
                 <div class="col-md-12" ng-if="branchCollection.resources">
+                    <div class="ot-project-branch-filter input-group col-md-4"
+                            ng-show="branchCollection.resources.length > 5">
+                        <input class="form-control"
+                               type="text"
+                               ng-model="branchNameFilter"
+                               placeholder="Filter on branch names"/>
+                        <span class="input-group-addon"><span class="fa fa-search"></span></span>
+                    </div>
                     <table class="ot-project-branches">
                         <tbody>
-                        <tr ng-repeat="branch in branchCollection.resources"
+                        <tr ng-repeat="branch in branchCollection.resources | filter:{name:branchNameFilter}"
                             ng-show="showDisabled || !(branch.disabled || branch.type == 'TEMPLATE_DEFINITION')">
                             <td ng-class="{'ot-entity-disabled': branch.disabled}">
                                 <a href="#/branch/{{branch.id}}">
