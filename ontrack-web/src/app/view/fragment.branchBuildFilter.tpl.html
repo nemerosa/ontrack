@@ -65,6 +65,12 @@
             </a>
         </li>
         <li class="divider" ng-if="buildFilterResources"></li>
+        <li ng-if="currentBuildFilterResource && !currentBuildFilterResource.name">
+            <a ng-click="buildFilterEdit(currentBuildFilterResource)">
+                <span class="fa fa-pencil"></span>
+                Edit filter
+            </a>
+        </li>
         <li ng-if="currentBuildFilterResource">
             <a ng-click="buildFilterErase()">
                 <span class="fa fa-eraser"></span>
