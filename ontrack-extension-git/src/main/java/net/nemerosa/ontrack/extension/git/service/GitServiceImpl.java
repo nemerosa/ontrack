@@ -587,6 +587,18 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     @Override
+    public GitConfiguration getProjectConfiguration(Project project) {
+        // Empty configuration
+        GitConfiguration configuration = GitConfiguration.empty();
+        // Configurators{
+        for (GitConfigurator configurator : configurators) {
+            configuration = configurator.configureProject(configuration, project);
+        }
+        // OK
+        return configuration;
+    }
+
+    @Override
     @Deprecated
     public GitConfiguration getBranchConfiguration(Branch branch) {
         // Empty configuration

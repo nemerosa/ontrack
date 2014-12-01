@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.git.model.*;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ID;
+import net.nemerosa.ontrack.model.structure.Project;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import java.util.List;
@@ -18,6 +19,11 @@ public interface GitService {
      * Tests if a branch is correctly configured for Git.
      */
     boolean isBranchConfiguredForGit(Branch branch);
+
+    /**
+     * Gets the configuration for a project.
+     */
+    GitConfiguration getProjectConfiguration(Project project);
 
     /**
      * Gets the configuration for a branch

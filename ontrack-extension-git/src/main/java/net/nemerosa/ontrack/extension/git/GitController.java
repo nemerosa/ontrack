@@ -21,10 +21,7 @@ import net.nemerosa.ontrack.model.buildfilter.BuildDiff;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.structure.Branch;
-import net.nemerosa.ontrack.model.structure.Build;
-import net.nemerosa.ontrack.model.structure.ID;
-import net.nemerosa.ontrack.model.structure.StructureService;
+import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
@@ -202,8 +199,12 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
     public ResponseEntity<String> changeLog(IssueChangeLogExportRequest request) {
         // Gets the change log
         GitChangeLog changeLog = gitService.changeLog(request);
+        // Gets the associated project
+        Project project = changeLog.getProject();
+        // Gets the configuration for the project
+        GitConfiguration gitConfiguration = gitService.getProjectConfiguration(project);
         // Gets the issue service
-        String issueServiceConfigurationIdentifier = changeLog.getScm().getIssueServiceConfigurationIdentifier();
+        String issueServiceConfigurationIdentifier = gitConfiguration.getIssueServiceConfigurationIdentifier();
         if (StringUtils.isBlank(issueServiceConfigurationIdentifier)) {
             return new ResponseEntity<>(
                     "The branch is not configured for issues",
