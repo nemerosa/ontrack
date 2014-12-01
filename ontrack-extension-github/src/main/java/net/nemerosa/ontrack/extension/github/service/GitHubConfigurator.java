@@ -5,7 +5,9 @@ import net.nemerosa.ontrack.extension.git.model.GitConfigurator;
 import net.nemerosa.ontrack.extension.github.model.GitHubConfiguration;
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationProperty;
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType;
+import net.nemerosa.ontrack.git.GitRepository;
 import net.nemerosa.ontrack.model.structure.Branch;
+import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.Property;
 import net.nemerosa.ontrack.model.structure.PropertyService;
 import org.apache.commons.lang3.StringUtils;
@@ -52,6 +54,34 @@ public class GitHubConfigurator implements GitConfigurator {
             return gitHubConfig;
         } else {
             return configuration;
+        }
+    }
+
+    @Override
+    public GitRepository configure(GitRepository repository, Project project) {
+        // Project GitHub configuration
+        Property<GitHubProjectConfigurationProperty> projectConfig = propertyService.getProperty(project, GitHubProjectConfigurationPropertyType.class);
+        if (!projectConfig.isEmpty()) {
+            // GitHub configuration
+            GitHubConfiguration gitHub = projectConfig.getValue().getConfiguration();
+            // Merge the project configuration
+            GitRepository gitHubRepo = repository.withRemote(gitHub.getRemote());
+            // User / password
+            String oAuth2Token = gitHub.getOauth2Token();
+            String user = gitHub.getUser();
+            if (StringUtils.isNotBlank(oAuth2Token)) {
+                gitHubRepo = gitHubRepo
+                        .withUser(oAuth2Token)
+                        .withPassword("x-oauth-basic");
+            } else if (StringUtils.isNotBlank(user)) {
+                gitHubRepo = gitHubRepo
+                        .withUser(gitHub.getUser())
+                        .withPassword(gitHub.getPassword());
+            }
+            // OK
+            return gitHubRepo;
+        } else {
+            return repository;
         }
     }
 }

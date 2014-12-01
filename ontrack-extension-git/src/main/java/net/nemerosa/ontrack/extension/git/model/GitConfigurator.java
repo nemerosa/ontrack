@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.git.model;
 
+import net.nemerosa.ontrack.git.GitRepository;
 import net.nemerosa.ontrack.model.structure.Branch;
+import net.nemerosa.ontrack.model.structure.Project;
 
 /**
  * A <code>GitConfigurator</code> is a component that can adjust a
@@ -9,6 +11,8 @@ import net.nemerosa.ontrack.model.structure.Branch;
  */
 public interface GitConfigurator {
 
+    @Deprecated
     GitConfiguration configure(GitConfiguration configuration, Branch branch);
 
+    GitRepository configure(GitRepository repository, Project project);
 }

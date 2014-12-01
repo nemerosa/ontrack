@@ -8,10 +8,8 @@ import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropert
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType;
 import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationProperty;
 import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationPropertyType;
-import net.nemerosa.ontrack.model.structure.Branch;
-import net.nemerosa.ontrack.model.structure.Property;
-import net.nemerosa.ontrack.model.structure.PropertyService;
-import net.nemerosa.ontrack.model.structure.ServiceConfiguration;
+import net.nemerosa.ontrack.git.GitRepository;
+import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -45,6 +43,22 @@ public class DefaultGitConfigurator implements GitConfigurator {
         }
         // OK
         return thisConfig;
+    }
+
+    @Override
+    public GitRepository configure(final GitRepository repository, Project project) {
+        GitRepository thisRepo = repository;
+        // Project Git configuration?
+        Property<GitProjectConfigurationProperty> projectConfig = propertyService.getProperty(project, GitProjectConfigurationPropertyType.class);
+        if (!projectConfig.isEmpty()) {
+            // Merge the project configuration
+            thisRepo = thisRepo
+                    .withRemote(projectConfig.getValue().getConfiguration().getRemote())
+                    .withUser(projectConfig.getValue().getConfiguration().getUser())
+                    .withUser(projectConfig.getValue().getConfiguration().getPassword());
+        }
+        // OK
+        return thisRepo;
     }
 
     private <T> ConfiguredBuildGitCommitLink<T> toConfiguredBuildGitCommitLink(ServiceConfiguration serviceConfiguration) {
