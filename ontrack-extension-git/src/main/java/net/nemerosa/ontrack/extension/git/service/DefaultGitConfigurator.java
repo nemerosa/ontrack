@@ -46,7 +46,7 @@ public class DefaultGitConfigurator implements GitConfigurator {
     }
 
     @Override
-    public GitRepository configure(final GitRepository repository, Project project) {
+    public GitRepository configureRepository(final GitRepository repository, Project project) {
         GitRepository thisRepo = repository;
         // Project Git configuration?
         Property<GitProjectConfigurationProperty> projectConfig = propertyService.getProperty(project, GitProjectConfigurationPropertyType.class);

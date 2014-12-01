@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropert
 import net.nemerosa.ontrack.extension.git.support.TagPattern
 import net.nemerosa.ontrack.extension.git.support.TagPatternBuildNameGitCommitLink
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
+import net.nemerosa.ontrack.git.GitRepositoryClientFactory
 import net.nemerosa.ontrack.model.job.JobQueueService
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
@@ -58,7 +59,8 @@ class GitBuildSyncIT {
                 mock(JobQueueService),
                 securityService,
                 mock(TransactionService),
-                mock(ApplicationLogService), gitRepositoryClientFactory
+                mock(ApplicationLogService),
+                mock(GitRepositoryClientFactory)
         )
     }
 

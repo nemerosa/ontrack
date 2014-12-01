@@ -14,5 +14,5 @@ public interface GitConfigurator {
     @Deprecated
     GitConfiguration configure(GitConfiguration configuration, Branch branch);
 
-    GitRepository configure(GitRepository repository, Project project);
+    GitRepository configureRepository(GitRepository repository, Project project);
 }

@@ -58,7 +58,7 @@ public class GitHubConfigurator implements GitConfigurator {
     }
 
     @Override
-    public GitRepository configure(GitRepository repository, Project project) {
+    public GitRepository configureRepository(GitRepository repository, Project project) {
         // Project GitHub configuration
         Property<GitHubProjectConfigurationProperty> projectConfig = propertyService.getProperty(project, GitHubProjectConfigurationPropertyType.class);
         if (!projectConfig.isEmpty()) {

@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.git.client.GitClientFactory
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration
 import net.nemerosa.ontrack.extension.git.model.GitConfigurator
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
+import net.nemerosa.ontrack.git.GitRepositoryClientFactory
 import net.nemerosa.ontrack.model.job.JobQueueService
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
@@ -53,7 +54,8 @@ class GitServiceImplTest {
                 mock(JobQueueService),
                 mock(SecurityService),
                 mock(TransactionService),
-                mock(ApplicationLogService), gitRepositoryClientFactory
+                mock(ApplicationLogService),
+                mock(GitRepositoryClientFactory)
         )
     }
 
