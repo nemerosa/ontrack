@@ -33,6 +33,7 @@ public class SVNChangeLogTest {
 
         SVNChangeLog changeLog = new SVNChangeLog(
                 UUID.randomUUID().toString(),
+                branch.getProject(),
                 branch,
                 repository,
                 scmBuildFrom,
@@ -90,6 +91,7 @@ public class SVNChangeLogTest {
 
         SVNChangeLog changeLog = new SVNChangeLog(
                 UUID.randomUUID().toString(),
+                branch.getProject(),
                 branch,
                 repository,
                 scmBuildFrom,
@@ -138,6 +140,7 @@ public class SVNChangeLogTest {
 
         SVNChangeLog changeLog = new SVNChangeLog(
                 UUID.randomUUID().toString(),
+                branch.getProject(),
                 branch,
                 repository,
                 scmBuildFrom,

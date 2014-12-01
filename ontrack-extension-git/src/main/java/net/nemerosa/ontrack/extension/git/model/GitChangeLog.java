@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import net.nemerosa.ontrack.extension.scm.model.SCMBuildView;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLog;
 import net.nemerosa.ontrack.model.structure.Branch;
+import net.nemerosa.ontrack.model.structure.Project;
 
 @EqualsAndHashCode(callSuper = false)
 @Data
@@ -22,12 +23,13 @@ public class GitChangeLog extends SCMChangeLog<GitConfiguration, GitBuildInfo> {
 
     public GitChangeLog(
             String uuid,
+            Project project,
             Branch branch,
             GitConfiguration configuration,
             SCMBuildView<GitBuildInfo> scmBuildFrom,
             SCMBuildView<GitBuildInfo> scmBuildTo,
             boolean syncError) {
-        super(uuid, branch, configuration, scmBuildFrom, scmBuildTo);
+        super(uuid, project, branch, configuration, scmBuildFrom, scmBuildTo);
         this.syncError = syncError;
     }
 

@@ -169,6 +169,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             // Change log computation
             return new GitChangeLog(
                     UUID.randomUUID().toString(),
+                    branch.getProject(),
                     branch,
                     configuration,
                     getSCMBuildView(request.getFrom()),
@@ -586,6 +587,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     @Override
+    @Deprecated
     public GitConfiguration getBranchConfiguration(Branch branch) {
         // Empty configuration
         GitConfiguration configuration = GitConfiguration.empty();

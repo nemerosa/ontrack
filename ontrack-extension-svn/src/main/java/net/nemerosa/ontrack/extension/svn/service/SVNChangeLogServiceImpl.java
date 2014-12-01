@@ -68,6 +68,7 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
             SVNRepository svnRepository = getSVNRepository(branch);
             return new SVNChangeLog(
                     UUID.randomUUID().toString(),
+                    branch.getProject(),
                     branch,
                     svnRepository,
                     getSCMBuildView(svnRepository, request.getFrom()),

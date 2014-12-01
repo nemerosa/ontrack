@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.buildfilter.BuildDiff;
 import net.nemerosa.ontrack.model.structure.BuildView;
+import net.nemerosa.ontrack.model.structure.Project;
 
 import java.util.UUID;
 
@@ -23,8 +24,8 @@ public class SCMChangeLog<S, T> extends BuildDiff {
     private final SCMBuildView<T> scmBuildFrom;
     private final SCMBuildView<T> scmBuildTo;
 
-    protected SCMChangeLog(String uuid, Branch branch, S scmBranch, SCMBuildView<T> scmBuildFrom, SCMBuildView<T> scmBuildTo) {
-        super(branch);
+    protected SCMChangeLog(String uuid, Project project, Branch branch, S scmBranch, SCMBuildView<T> scmBuildFrom, SCMBuildView<T> scmBuildTo) {
+        super(project, branch);
         this.uuid = uuid;
         this.scmBranch = scmBranch;
         this.scmBuildFrom = scmBuildFrom;
@@ -41,9 +42,10 @@ public class SCMChangeLog<S, T> extends BuildDiff {
         return scmBuildTo.getBuildView();
     }
 
-    public static <S, T> SCMChangeLog<S, T> of(Branch branch, S scmBranch, SCMBuildView<T> from, SCMBuildView<T> to) {
+    public static <S, T> SCMChangeLog<S, T> of(Project project, Branch branch, S scmBranch, SCMBuildView<T> from, SCMBuildView<T> to) {
         return new SCMChangeLog<>(
                 UUID.randomUUID().toString(),
+                project,
                 branch,
                 scmBranch,
                 from,

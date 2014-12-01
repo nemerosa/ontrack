@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.scm.model.SCMBuildView;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLog;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.model.structure.Branch;
+import net.nemerosa.ontrack.model.structure.Project;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,11 +28,12 @@ public class SVNChangeLog extends SCMChangeLog<SVNRepository, SVNHistory> {
 
     public SVNChangeLog(
             String uuid,
+            Project project,
             Branch branch,
             SVNRepository scmBranch,
             SCMBuildView<SVNHistory> scmBuildFrom,
             SCMBuildView<SVNHistory> scmBuildTo) {
-        super(uuid, branch, scmBranch, scmBuildFrom, scmBuildTo);
+        super(uuid, project, branch, scmBranch, scmBuildFrom, scmBuildTo);
     }
 
 
