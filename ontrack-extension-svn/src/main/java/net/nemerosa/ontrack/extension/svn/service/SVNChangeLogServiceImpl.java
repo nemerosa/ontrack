@@ -94,7 +94,7 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
             List<SVNChangeLogRevision> revisions = new ArrayList<>();
             for (SVNChangeLogReference reference : references) {
                 if (!reference.isNone()) {
-                    SVNRepository repository = changeLog.getScmBranch();
+                    SVNRepository repository = changeLog.getScm();
                     // List of log entries
                     SVNLogEntryCollector logEntryCollector = new SVNLogEntryCollector();
                     // SVN change log
@@ -150,7 +150,7 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
         // In a transaction
         try (Transaction ignored = transactionService.start()) {
             // Repository
-            SVNRepository repository = changeLog.getScmBranch();
+            SVNRepository repository = changeLog.getScm();
             // Index of issues, sorted by keys
             Map<String, SVNChangeLogIssue> issues = new TreeMap<>();
             // For all revisions in this revision log
@@ -194,7 +194,7 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
                 // Takes into account only the unmerged revisions
                 if (changeLogRevision.getLevel() == 0) {
                     long revision = changeLogRevision.getRevision();
-                    collectFilesForRevision(changeLog.getScmBranch(), files, revision);
+                    collectFilesForRevision(changeLog.getScm(), files, revision);
                 }
             }
             // List of files

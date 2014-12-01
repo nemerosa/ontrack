@@ -33,7 +33,7 @@ public class SVNRevisionChangeLogIssueValidator extends AbstractSVNChangeLogIssu
             if (validatorConfig.getClosedStatuses().contains(issue.getIssue().getStatus().getName())) {
                 // Last revision for this issue
                 OptionalLong lastRevision = issueRevisionDao.findLastRevisionByIssue(
-                        changeLog.getScmBranch().getId(),
+                        changeLog.getScm().getId(),
                         issue.getIssue().getKey()
                 );
                 if (lastRevision.isPresent()) {

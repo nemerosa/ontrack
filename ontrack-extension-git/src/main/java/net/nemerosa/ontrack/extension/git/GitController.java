@@ -203,7 +203,7 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
         // Gets the change log
         GitChangeLog changeLog = gitService.changeLog(request);
         // Gets the issue service
-        String issueServiceConfigurationIdentifier = changeLog.getScmBranch().getIssueServiceConfigurationIdentifier();
+        String issueServiceConfigurationIdentifier = changeLog.getScm().getIssueServiceConfigurationIdentifier();
         if (StringUtils.isBlank(issueServiceConfigurationIdentifier)) {
             return new ResponseEntity<>(
                     "The branch is not configured for issues",

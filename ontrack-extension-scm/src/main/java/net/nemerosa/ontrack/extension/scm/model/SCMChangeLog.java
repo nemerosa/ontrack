@@ -20,14 +20,14 @@ public class SCMChangeLog<S, T> extends BuildDiff {
 
     private final String uuid;
     @JsonIgnore
-    private final S scmBranch;
+    private final S scm;
     private final SCMBuildView<T> scmBuildFrom;
     private final SCMBuildView<T> scmBuildTo;
 
-    protected SCMChangeLog(String uuid, Project project, Branch branch, S scmBranch, SCMBuildView<T> scmBuildFrom, SCMBuildView<T> scmBuildTo) {
+    protected SCMChangeLog(String uuid, Project project, Branch branch, S scm, SCMBuildView<T> scmBuildFrom, SCMBuildView<T> scmBuildTo) {
         super(project, branch);
         this.uuid = uuid;
-        this.scmBranch = scmBranch;
+        this.scm = scm;
         this.scmBuildFrom = scmBuildFrom;
         this.scmBuildTo = scmBuildTo;
     }

@@ -192,9 +192,9 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     @Override
     public GitChangeLogCommits getChangeLogCommits(GitChangeLog changeLog) {
         // Gets the client client for this branch
-        GitClient gitClient = gitClientFactory.getClient(changeLog.getScmBranch());
+        GitClient gitClient = gitClientFactory.getClient(changeLog.getScm());
         // Gets the configuration
-        GitConfiguration gitConfiguration = changeLog.getScmBranch();
+        GitConfiguration gitConfiguration = changeLog.getScm();
         // Gets the build boundaries
         Build buildFrom = changeLog.getFrom().getBuild();
         Build buildTo = changeLog.getTo().getBuild();
@@ -230,7 +230,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         // In a transaction
         try (Transaction ignored = transactionService.start()) {
             // Configuration
-            GitConfiguration configuration = changeLog.getScmBranch();
+            GitConfiguration configuration = changeLog.getScm();
             // Issue service
             ConfiguredIssueService configuredIssueService = issueServiceRegistry.getConfiguredIssueService(configuration.getIssueServiceConfigurationIdentifier());
             if (configuredIssueService == null) {
@@ -265,7 +265,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     @Override
     public GitChangeLogFiles getChangeLogFiles(GitChangeLog changeLog) {
         // Gets the client client for this branch
-        GitClient gitClient = gitClientFactory.getClient(changeLog.getScmBranch());
+        GitClient gitClient = gitClientFactory.getClient(changeLog.getScm());
         // Gets the configuration
         GitConfiguration gitConfiguration = gitClient.getConfiguration();
         // Gets the build boundaries

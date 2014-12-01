@@ -22,7 +22,7 @@ public class GitChangeLogResourceDecorator extends AbstractResourceDecorator<Git
     public List<Link> links(GitChangeLog changeLog, ResourceContext resourceContext) {
         return resourceContext.links()
                 .link("_commits", on(GitController.class).changeLogCommits(changeLog.getUuid()))
-                .link("_issues", on(GitController.class).changeLogIssues(changeLog.getUuid()), StringUtils.isNotBlank(changeLog.getScmBranch().getIssueServiceConfigurationIdentifier()))
+                .link("_issues", on(GitController.class).changeLogIssues(changeLog.getUuid()), StringUtils.isNotBlank(changeLog.getScm().getIssueServiceConfigurationIdentifier()))
                 .link("_files", on(GitController.class).changeLogFiles(changeLog.getUuid()))
                 .link("_exportFormats", on(GitController.class).changeLogExportFormats(changeLog.getBranch().getId()))
                 .link("_exportIssues", on(GitController.class).changeLog(new IssueChangeLogExportRequest()))
