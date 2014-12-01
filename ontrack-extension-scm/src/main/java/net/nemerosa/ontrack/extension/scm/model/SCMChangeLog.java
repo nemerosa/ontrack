@@ -20,6 +20,7 @@ public class SCMChangeLog<S, T> extends BuildDiff {
 
     private final String uuid;
     @JsonIgnore
+    @Deprecated
     private final S scm;
     private final SCMBuildView<T> scmBuildFrom;
     private final SCMBuildView<T> scmBuildTo;
