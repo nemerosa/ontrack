@@ -39,12 +39,14 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
      * Default branch
      */
     @Wither
+    @Deprecated
     private final String branch;
 
     /**
      * Configured link
      */
     @Wither
+    @Deprecated
     private final ConfiguredBuildGitCommitLink<?> buildCommitLink;
 
     /**
