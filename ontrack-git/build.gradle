@@ -3,11 +3,9 @@ apply plugin: 'groovy'
 description = "Git client for Ontrack."
 
 dependencies {
-    compile project(':ontrack-tx')
     compile 'org.eclipse.jgit:org.eclipse.jgit:3.5.1.201410131835-r'
     compile libraries.spring_tx
     compile libraries.commons_io
 
-    testCompile project(':ontrack-it-utils')
     testCompile libraries.groovy
 }
