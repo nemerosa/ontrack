@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.git.model;
 
-import net.nemerosa.ontrack.git.GitRepository;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Project;
 
@@ -16,6 +15,4 @@ public interface GitConfigurator {
 
     GitConfiguration configureProject(GitConfiguration configuration, Project project);
 
-    @Deprecated
-    GitRepository configureRepository(GitRepository repository, Project project);
 }

@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropert
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType;
 import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationProperty;
 import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationPropertyType;
-import net.nemerosa.ontrack.git.GitRepository;
 import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -27,14 +26,7 @@ public class DefaultGitConfigurator implements GitConfigurator {
 
     @Override
     public GitConfiguration configure(GitConfiguration configuration, Branch branch) {
-        GitConfiguration thisConfig = configuration;
-        // Project Git configuration?
-        Property<GitProjectConfigurationProperty> projectConfig = propertyService.getProperty(branch.getProject(), GitProjectConfigurationPropertyType.class);
-        if (!projectConfig.isEmpty()) {
-            // Merge the project configuration
-            thisConfig = thisConfig.merge(projectConfig.getValue().getConfiguration());
-        }
-        // ... and the branch's
+        GitConfiguration thisConfig = configureProject(configuration, branch.getProject());
         Property<GitBranchConfigurationProperty> branchConfig = propertyService.getProperty(branch, GitBranchConfigurationPropertyType.class);
         if (!branchConfig.isEmpty()) {
             thisConfig = thisConfig.withBranch(branchConfig.getValue().getBranch());
@@ -56,24 +48,6 @@ public class DefaultGitConfigurator implements GitConfigurator {
         }
         // OK
         return thisConfig;
-    }
-
-
-
-    @Override
-    public GitRepository configureRepository(final GitRepository repository, Project project) {
-        GitRepository thisRepo = repository;
-        // Project Git configuration?
-        Property<GitProjectConfigurationProperty> projectConfig = propertyService.getProperty(project, GitProjectConfigurationPropertyType.class);
-        if (!projectConfig.isEmpty()) {
-            // Merge the project configuration
-            thisRepo = thisRepo
-                    .withRemote(projectConfig.getValue().getConfiguration().getRemote())
-                    .withUser(projectConfig.getValue().getConfiguration().getUser())
-                    .withUser(projectConfig.getValue().getConfiguration().getPassword());
-        }
-        // OK
-        return thisRepo;
     }
 
     private <T> ConfiguredBuildGitCommitLink<T> toConfiguredBuildGitCommitLink(ServiceConfiguration serviceConfiguration) {

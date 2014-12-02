@@ -8,6 +8,7 @@ import lombok.experimental.Wither;
 import net.nemerosa.ontrack.extension.git.support.TagBuildNameGitCommitLink;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
 import net.nemerosa.ontrack.extension.support.UserPasswordConfiguration;
+import net.nemerosa.ontrack.git.GitRepository;
 import net.nemerosa.ontrack.model.form.*;
 import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
@@ -216,5 +217,14 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
 
     public String getCommitFromBuild(Build build) {
         return buildCommitLink.getCommitFromBuild(build);
+    }
+
+
+    public GitRepository toRepository() {
+        return new GitRepository(
+                remote,
+                user,
+                password
+        );
     }
 }

@@ -180,12 +180,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     protected GitRepositoryClient getGitRepositoryClient(Project project) {
-        GitRepository repository = GitRepository.empty();
-        // Configurators{
-        for (GitConfigurator configurator : configurators) {
-            repository = configurator.configureRepository(repository, project);
-        }
-        // Gets the client
+        GitRepository repository = getProjectConfiguration(project).toRepository();
         return gitRepositoryClientFactory.getClient(repository);
     }
 
