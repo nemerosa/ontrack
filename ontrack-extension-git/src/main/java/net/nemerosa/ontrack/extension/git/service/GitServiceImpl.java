@@ -58,6 +58,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     private final ApplicationLogService applicationLogService;
     private final GitRepositoryClientFactory gitRepositoryClientFactory;
     private final BuildGitCommitLinkService buildGitCommitLinkService;
+    private final GitConfigurationService gitConfigurationService;
 
     @Autowired
     public GitServiceImpl(
@@ -71,7 +72,8 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             TransactionService transactionService,
             ApplicationLogService applicationLogService,
             GitRepositoryClientFactory gitRepositoryClientFactory,
-            BuildGitCommitLinkService buildGitCommitLinkService) {
+            BuildGitCommitLinkService buildGitCommitLinkService,
+            GitConfigurationService gitConfigurationService) {
         super(structureService, propertyService);
         this.configurators = configurators;
         this.gitClientFactory = gitClientFactory;
@@ -83,6 +85,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         this.applicationLogService = applicationLogService;
         this.gitRepositoryClientFactory = gitRepositoryClientFactory;
         this.buildGitCommitLinkService = buildGitCommitLinkService;
+        this.gitConfigurationService = gitConfigurationService;
     }
 
     @Override
@@ -113,7 +116,10 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     @Override
     public Collection<Job> getJobs() {
         Collection<Job> jobs = new ArrayList<>();
-        // FIXME Indexation of repositories
+        // Indexation of repositories
+        gitConfigurationService.getConfigurations().forEach(configuration -> {
+            jobs.add(createIndexationJob(configuration));
+        });
         // Synchronisation of branch builds with tags when applicable
         forEachConfiguredBranch((branch, branchConfiguration) -> {
             GitConfiguration configuration = branchConfiguration.getConfiguration();
@@ -709,10 +715,8 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         };
     }
 
-    @Deprecated
-    private Job createIndexationJob(Branch branch, GitConfiguration config) {
-        return new BranchJob(branch) {
-
+    private Job createIndexationJob(GitConfiguration config) {
+        return new Job() {
             @Override
             public String getCategory() {
                 return "GitIndexation";
@@ -729,6 +733,11 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                         "Git indexation for %s",
                         config.getName()
                 );
+            }
+
+            @Override
+            public boolean isDisabled() {
+                return false;
             }
 
             @Override
@@ -809,7 +818,6 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         }
     }
 
-    @Deprecated
     private void index(GitConfiguration config, JobInfoListener info) {
         info.post(format("Git sync for %s", config.getName()));
         // Gets the client for this configuration
