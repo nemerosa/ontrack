@@ -64,7 +64,8 @@ public class GitIssueSearchExtension extends AbstractExtension implements Search
         public GitIssueSearchProvider() {
             super(uriBuilder);
             branchSearchConfigurations = new ArrayList<>();
-            gitService.forEachConfiguredBranch((branch, config) -> {
+            gitService.forEachConfiguredBranch((branch, branchConfiguration) -> {
+                GitConfiguration config = branchConfiguration.getConfiguration();
                 String issueServiceConfigurationIdentifier = config.getIssueServiceConfigurationIdentifier();
                 if (StringUtils.isNotBlank(issueServiceConfigurationIdentifier)) {
                     ConfiguredIssueService configuredIssueService = issueServiceRegistry.getConfiguredIssueService(issueServiceConfigurationIdentifier);

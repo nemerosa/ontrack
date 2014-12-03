@@ -71,7 +71,7 @@ public interface GitService {
     /**
      * Loops over each correctly configured branch. Branch template definitions are excluded.
      */
-    void forEachConfiguredBranch(BiConsumer<Branch, GitConfiguration> consumer);
+    void forEachConfiguredBranch(BiConsumer<Branch, GitBranchConfiguration> consumer);
 
     /**
      * Scans the whole history of a repository.

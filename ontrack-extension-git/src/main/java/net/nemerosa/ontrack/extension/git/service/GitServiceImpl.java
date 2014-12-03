@@ -86,12 +86,12 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     @Override
-    public void forEachConfiguredBranch(BiConsumer<Branch, GitConfiguration> consumer) {
+    public void forEachConfiguredBranch(BiConsumer<Branch, GitBranchConfiguration> consumer) {
         for (Project project : structureService.getProjectList()) {
             structureService.getBranchesForProject(project.getId()).stream()
                     .filter(branch -> branch.getType() != BranchType.TEMPLATE_DEFINITION)
                     .forEach(branch -> {
-                        GitConfiguration configuration = getBranchConfiguration(branch);
+                        GitBranchConfiguration configuration = getGitBranchConfiguration(branch);
                         if (configuration.isValid()) {
                             consumer.accept(branch, configuration);
                         }
@@ -102,7 +102,8 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     @Override
     public Collection<Job> getJobs() {
         Collection<Job> jobs = new ArrayList<>();
-        forEachConfiguredBranch((branch, configuration) -> {
+        forEachConfiguredBranch((branch, branchConfiguration) -> {
+            GitConfiguration configuration = branchConfiguration.getConfiguration();
             // Indexation job
             if (configuration.getIndexationInterval() > 0) {
                 jobs.add(createIndexationJob(branch, configuration));
@@ -111,7 +112,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             Property<GitBranchConfigurationProperty> branchConfigurationProperty = propertyService.getProperty(branch, GitBranchConfigurationPropertyType.class);
             if (!branchConfigurationProperty.isEmpty()
                     && branchConfigurationProperty.getValue().getBuildTagInterval() > 0
-                    && configuration.getBuildCommitLink().getLink() instanceof IndexableBuildGitCommitLink) {
+                    && branchConfiguration.getBuildCommitLink().getLink() instanceof IndexableBuildGitCommitLink) {
                 jobs.add(createBuildSyncJob(branch, configuration));
             }
         });
@@ -327,7 +328,8 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         // Index of commit infos
         Map<String, OntrackGitIssueCommitInfo> commitInfos = new LinkedHashMap<>();
         // For all configured branches
-        forEachConfiguredBranch((branch, configuration) -> {
+        forEachConfiguredBranch((branch, branchConfiguration) -> {
+            GitConfiguration configuration = branchConfiguration.getConfiguration();
             // Gets the Git client for this branch
             GitClient gitClient = gitClientFactory.getClient(configuration);
             // Issue service
@@ -435,7 +437,8 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         Collection<BuildView> buildViews = new ArrayList<>();
         Collection<BranchStatusView> branchStatusViews = new ArrayList<>();
         // For all configured branches
-        forEachConfiguredBranch((branch, configuration) -> {
+        forEachConfiguredBranch((branch, branchConfiguration) -> {
+            GitConfiguration configuration = branchConfiguration.getConfiguration();
             // Gets the client client for this branch
             GitClient gitClient = gitClientFactory.getClient(configuration);
             // Scan for this commit in this branch

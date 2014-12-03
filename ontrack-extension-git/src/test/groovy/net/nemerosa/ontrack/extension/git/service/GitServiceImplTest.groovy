@@ -4,6 +4,8 @@ import net.nemerosa.ontrack.extension.git.client.GitClient
 import net.nemerosa.ontrack.extension.git.client.GitClientFactory
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration
 import net.nemerosa.ontrack.extension.git.model.GitConfigurator
+import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
+import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory
 import net.nemerosa.ontrack.model.job.JobQueueService
@@ -32,6 +34,15 @@ class GitServiceImplTest {
         structureService = mock(StructureService)
 
         def gitConfigurator = mock(GitConfigurator)
+        when(gitConfigurator.configureProject(any(GitConfiguration), any(Project))).thenAnswer(
+                new Answer<Object>() {
+                    @Override
+                    Object answer(InvocationOnMock invocation) throws Throwable {
+                        GitConfiguration gitConfiguration = (GitConfiguration) invocation.arguments[0]
+                        return gitConfiguration.withRemote("remote").withName('MyGitConfig')
+                    }
+                }
+        )
         when(gitConfigurator.configure(any(GitConfiguration), any(Branch))).thenAnswer(
                 new Answer<Object>() {
                     @Override
@@ -55,7 +66,8 @@ class GitServiceImplTest {
                 mock(SecurityService),
                 mock(TransactionService),
                 mock(ApplicationLogService),
-                mock(GitRepositoryClientFactory), buildGitCommitLinkService
+                mock(GitRepositoryClientFactory),
+                mock(BuildGitCommitLinkService)
         )
     }
 
@@ -73,6 +85,18 @@ class GitServiceImplTest {
         when(structureService.getProjectList()).thenReturn([p1, p2])
         when(structureService.getBranchesForProject(ID.of(1))).thenReturn([b10, b11, b12])
         when(structureService.getBranchesForProject(ID.of(2))).thenReturn([b20])
+
+
+        def buildGitCommitLinkService = mock(BuildGitCommitLinkService)
+        [b11, b12, b20].each { branch ->
+            when(propertyService.getProperty(branch, GitBranchConfigurationPropertyType)).thenReturn(
+                    new Property<GitBranchConfigurationProperty>(
+                            new GitBranchConfigurationPropertyType(buildGitCommitLinkService),
+                            null,
+                            false
+                    )
+            )
+        }
 
         List<String> branches = []
         gitService.forEachConfiguredBranch { branch, config -> branches.add(branch.name) }
