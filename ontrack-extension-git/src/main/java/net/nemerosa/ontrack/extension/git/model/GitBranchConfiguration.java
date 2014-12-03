@@ -26,6 +26,16 @@ public class GitBranchConfiguration {
     @Wither
     private final ConfiguredBuildGitCommitLink<?> buildCommitLink;
 
+    /**
+     * Build overriding policy when synchronizing
+     */
+    private final boolean override;
+
+    /**
+     * Interval in minutes for build/tag synchronization
+     */
+    private final int buildTagInterval;
+
     @JsonIgnore
     public boolean isValid() {
         return configuration.isValid();
