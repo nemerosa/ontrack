@@ -86,6 +86,17 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     @Override
+    public void forEachConfiguredProject(BiConsumer<Project, GitConfiguration> consumer) {
+        structureService.getProjectList().stream()
+                .forEach(project -> {
+                    GitConfiguration configuration = getProjectConfiguration(project);
+                    if (configuration.isValid()) {
+                        consumer.accept(project, configuration);
+                    }
+                });
+    }
+
+    @Override
     public void forEachConfiguredBranch(BiConsumer<Branch, GitBranchConfiguration> consumer) {
         for (Project project : structureService.getProjectList()) {
             structureService.getBranchesForProject(project.getId()).stream()
