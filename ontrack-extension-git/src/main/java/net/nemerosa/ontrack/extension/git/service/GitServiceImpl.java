@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.git.client.impl.GitException;
 import net.nemerosa.ontrack.extension.git.model.*;
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty;
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType;
+import net.nemerosa.ontrack.extension.git.support.TagBuildNameGitCommitLink;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
@@ -56,6 +57,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     private final TransactionService transactionService;
     private final ApplicationLogService applicationLogService;
     private final GitRepositoryClientFactory gitRepositoryClientFactory;
+    private final BuildGitCommitLinkService buildGitCommitLinkService;
 
     @Autowired
     public GitServiceImpl(
@@ -68,7 +70,8 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             SecurityService securityService,
             TransactionService transactionService,
             ApplicationLogService applicationLogService,
-            GitRepositoryClientFactory gitRepositoryClientFactory) {
+            GitRepositoryClientFactory gitRepositoryClientFactory,
+            BuildGitCommitLinkService buildGitCommitLinkService) {
         super(structureService, propertyService);
         this.configurators = configurators;
         this.gitClientFactory = gitClientFactory;
@@ -79,6 +82,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         this.transactionService = transactionService;
         this.applicationLogService = applicationLogService;
         this.gitRepositoryClientFactory = gitRepositoryClientFactory;
+        this.buildGitCommitLinkService = buildGitCommitLinkService;
     }
 
     @Override
@@ -585,12 +589,47 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     public GitConfiguration getProjectConfiguration(Project project) {
         // Empty configuration
         GitConfiguration configuration = GitConfiguration.empty();
-        // Configurators{
+        // Configurators
         for (GitConfigurator configurator : configurators) {
             configuration = configurator.configureProject(configuration, project);
         }
         // OK
         return configuration;
+    }
+
+    @Override
+    public GitBranchConfiguration getGitBranchConfiguration(Branch branch) {
+        // Get the configuration for the project
+        GitConfiguration projectConfiguration = getProjectConfiguration(branch.getProject());
+        // Gets the configuration for a branch
+        String gitBranch;
+        ConfiguredBuildGitCommitLink<?> buildCommitLink;
+        Property<GitBranchConfigurationProperty> branchConfig = propertyService.getProperty(branch, GitBranchConfigurationPropertyType.class);
+        if (!branchConfig.isEmpty()) {
+            gitBranch = branchConfig.getValue().getBranch();
+            buildCommitLink = toConfiguredBuildGitCommitLink(
+                    branchConfig.getValue().getBuildCommitLink()
+            );
+        } else {
+            gitBranch = "master";
+            buildCommitLink = TagBuildNameGitCommitLink.DEFAULT;
+        }
+        // OK
+        return new GitBranchConfiguration(
+                projectConfiguration,
+                gitBranch,
+                buildCommitLink
+        );
+    }
+
+    private <T> ConfiguredBuildGitCommitLink<T> toConfiguredBuildGitCommitLink(ServiceConfiguration serviceConfiguration) {
+        @SuppressWarnings("unchecked")
+        BuildGitCommitLink<T> link = (BuildGitCommitLink<T>) buildGitCommitLinkService.getLink(serviceConfiguration.getId());
+        T linkData = link.parseData(serviceConfiguration.getData());
+        return new ConfiguredBuildGitCommitLink<>(
+                link,
+                linkData
+        );
     }
 
     @Override

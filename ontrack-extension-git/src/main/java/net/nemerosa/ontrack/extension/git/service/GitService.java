@@ -29,9 +29,18 @@ public interface GitService {
      * Gets the configuration for a branch
      *
      * @param branch Branch to check
+     * @return Configuration.
+     */
+    GitBranchConfiguration getGitBranchConfiguration(Branch branch);
+
+    /**
+     * Gets the configuration for a branch
+     *
+     * @param branch Branch to check
      * @return Configuration. Never null but can be
      * {@link net.nemerosa.ontrack.extension.git.model.GitConfiguration#isValid() invalid}.
      */
+    @Deprecated
     GitConfiguration getBranchConfiguration(Branch branch);
 
     /**
