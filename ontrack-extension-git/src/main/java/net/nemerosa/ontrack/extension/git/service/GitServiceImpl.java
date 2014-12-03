@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.git.service;
 import com.google.common.collect.Lists;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.git.client.*;
-import net.nemerosa.ontrack.extension.git.client.impl.GitException;
 import net.nemerosa.ontrack.extension.git.model.*;
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty;
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType;
@@ -19,6 +18,7 @@ import net.nemerosa.ontrack.extension.scm.service.AbstractSCMChangeLogService;
 import net.nemerosa.ontrack.git.GitRepository;
 import net.nemerosa.ontrack.git.GitRepositoryClient;
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory;
+import net.nemerosa.ontrack.git.exceptions.GitRepositorySyncException;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.job.*;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -165,9 +165,9 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             // Forces Git sync before
             boolean syncError;
             try {
-                gitClientFactory.getClient(configuration).sync(logger::debug);
+                client.sync(logger::debug);
                 syncError = false;
-            } catch (GitException ex) {
+            } catch (GitRepositorySyncException ex) {
                 applicationLogService.error(
                         ex,
                         GitService.class,
@@ -821,7 +821,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     private void index(GitConfiguration config, JobInfoListener info) {
         info.post(format("Git sync for %s", config.getName()));
         // Gets the client for this configuration
-        GitClient client = gitClientFactory.getClient(config);
+        GitRepositoryClient client = gitRepositoryClientFactory.getClient(config.toRepository());
         // Launches the synchronisation
         client.sync(info::post);
     }
