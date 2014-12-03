@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.git;
 
 import lombok.Data;
 
+import java.util.Objects;
+
 /**
  * Coordinates for a remote repository.
  */
@@ -22,5 +24,9 @@ public class GitRepository {
      * Password
      */
     private final String password;
+
+    public String getId() {
+        return remote.replaceAll("[:\\.\\\\/@]", "_");
+    }
 
 }

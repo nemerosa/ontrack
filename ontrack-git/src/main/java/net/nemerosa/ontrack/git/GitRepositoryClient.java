@@ -14,4 +14,9 @@ public interface GitRepositoryClient {
      */
     void sync(Consumer<String> logger);
 
+    /**
+     * Checks if the given repository is compatible with this client. The remote, user name
+     * and password must be checked.
+     */
+    boolean isCompatible(GitRepository repository);
 }

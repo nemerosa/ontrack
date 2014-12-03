@@ -205,16 +205,17 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
 
     @Override
     public GitChangeLogCommits getChangeLogCommits(GitChangeLog changeLog) {
-        // Gets the client client for this branch
-        GitClient gitClient = gitClientFactory.getClient(changeLog.getScm());
         // Gets the configuration
-        GitConfiguration gitConfiguration = changeLog.getScm();
+        GitConfiguration gitConfiguration = getProjectConfiguration(changeLog.getProject());
+        // Gets the client client for this branch
+        GitClient gitClient = gitClientFactory.getClient(gitConfiguration);
+        gitClient.sync(logger::debug);
         // Gets the build boundaries
         Build buildFrom = changeLog.getFrom().getBuild();
         Build buildTo = changeLog.getTo().getBuild();
         // Commit boundaries
-        String commitFrom = gitConfiguration.getCommitFromBuild(buildFrom);
-        String commitTo = gitConfiguration.getCommitFromBuild(buildTo);
+        String commitFrom = getCommitFromBuild(buildFrom);
+        String commitTo = getCommitFromBuild(buildTo);
         // Gets the commits
         GitLog log = gitClient.log(commitFrom, commitTo);
         // If log empty, inverts the boundaries
@@ -233,6 +234,10 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                         uiCommits
                 )
         );
+    }
+
+    protected String getCommitFromBuild(Build build) {
+        return getGitBranchConfiguration(build.getBranch()).getBuildCommitLink().getCommitFromBuild(build);
     }
 
     @Override
@@ -286,8 +291,8 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         Build buildFrom = changeLog.getFrom().getBuild();
         Build buildTo = changeLog.getTo().getBuild();
         // Commit boundaries
-        String commitFrom = gitConfiguration.getCommitFromBuild(buildFrom);
-        String commitTo = gitConfiguration.getCommitFromBuild(buildTo);
+        String commitFrom = getCommitFromBuild(buildFrom);
+        String commitTo = getCommitFromBuild(buildTo);
         // Diff
         final GitDiff diff = gitClient.diff(commitFrom, commitTo);
         // File change links
@@ -761,9 +766,9 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         GitClient gitClient = gitClientFactory.getClient(configuration);
         // Link
         @SuppressWarnings("unchecked")
-        IndexableBuildGitCommitLink<T> link = (IndexableBuildGitCommitLink<T>) configuration.getBuildCommitLink().getLink();
+        IndexableBuildGitCommitLink<T> link = (IndexableBuildGitCommitLink<T>) branchConfiguration.getBuildCommitLink().getLink();
         @SuppressWarnings("unchecked")
-        T linkData = (T) configuration.getBuildCommitLink().getData();
+        T linkData = (T) branchConfiguration.getBuildCommitLink().getData();
         // Configuration for the sync
         Property<GitBranchConfigurationProperty> confProperty = propertyService.getProperty(branch, GitBranchConfigurationPropertyType.class);
         boolean override = !confProperty.isEmpty() && confProperty.getValue().isOverride();

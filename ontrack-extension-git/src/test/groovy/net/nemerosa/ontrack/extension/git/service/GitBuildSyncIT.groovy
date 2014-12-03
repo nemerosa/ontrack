@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.git.client.GitClient
 import net.nemerosa.ontrack.extension.git.client.GitClientFactory
 import net.nemerosa.ontrack.extension.git.client.GitTag
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
+import net.nemerosa.ontrack.extension.git.model.GitBranchConfiguration
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
@@ -61,7 +62,8 @@ class GitBuildSyncIT {
                 mock(TransactionService),
                 mock(ApplicationLogService),
                 mock(GitRepositoryClientFactory),
-                mock(BuildGitCommitLinkService), gitConfigurationService
+                mock(BuildGitCommitLinkService),
+                mock(GitConfigurationService)
         )
     }
 
@@ -90,8 +92,13 @@ class GitBuildSyncIT {
         )
 
         def gitConfiguration = GitConfiguration.empty()
-                .withBranch('master')
-                .withBuildCommitLink(configuredBuildGitCommitLink)
+        def gitBranchConfiguration = new GitBranchConfiguration(
+                gitConfiguration,
+                'master',
+                configuredBuildGitCommitLink,
+                false,
+                0
+        )
         when(gitClientFactory.getClient(gitConfiguration)).thenReturn(gitClient)
 
         when(gitClient.getTags()).thenReturn([
@@ -104,7 +111,7 @@ class GitBuildSyncIT {
 
         gitService.buildSync(
                 branch,
-                gitConfiguration,
+                gitBranchConfiguration,
                 { message -> println message }
         )
 
