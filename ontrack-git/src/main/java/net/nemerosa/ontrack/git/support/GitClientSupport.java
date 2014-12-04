@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.git.client.support;
+package net.nemerosa.ontrack.git.support;
 
 import net.nemerosa.ontrack.common.Utils;
 

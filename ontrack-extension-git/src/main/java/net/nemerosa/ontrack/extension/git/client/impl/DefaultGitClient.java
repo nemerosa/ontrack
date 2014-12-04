@@ -6,7 +6,7 @@ import net.nemerosa.ontrack.git.model.GitLog;
 import net.nemerosa.ontrack.git.model.GitRange;
 import net.nemerosa.ontrack.git.model.plot.GPlot;
 import net.nemerosa.ontrack.git.model.plot.GitPlotRenderer;
-import net.nemerosa.ontrack.extension.git.client.support.GitClientSupport;
+import net.nemerosa.ontrack.git.support.GitClientSupport;
 import net.nemerosa.ontrack.extension.git.model.FormerGitConfiguration;
 import net.nemerosa.ontrack.git.model.GitCommit;
 import net.nemerosa.ontrack.git.model.GitPerson;
@@ -208,7 +208,7 @@ public class DefaultGitClient implements GitClient {
      * <b>Note</b>: the JGit library does not support the <code>git-describe</code> command yet, hence
      * the use of the command line.
      *
-     * @see net.nemerosa.ontrack.extension.git.client.support.GitClientSupport#tagContains(java.io.File, String)
+     * @see net.nemerosa.ontrack.git.support.GitClientSupport#tagContains(java.io.File, String)
      */
     @Override
     public Collection<String> getTagsWhichContainCommit(String gitCommitId) {

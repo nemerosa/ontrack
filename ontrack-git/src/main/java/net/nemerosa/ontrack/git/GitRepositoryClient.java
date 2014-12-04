@@ -4,8 +4,10 @@ import net.nemerosa.ontrack.git.model.GitCommit;
 import net.nemerosa.ontrack.git.model.GitLog;
 import org.eclipse.jgit.revwalk.RevCommit;
 
+import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * Defines a client for a Git repository.
@@ -24,6 +26,16 @@ public interface GitRepositoryClient {
      * and password must be checked.
      */
     boolean isCompatible(GitRepository repository);
+
+
+    /**
+     * Gets a Git log between two boundaries.
+     *
+     * @param from Commitish string
+     * @param to   Commitish string
+     * @return Stream of commits
+     */
+    Stream<GitCommit> log(String from, String to);
 
     /**
      * Gets a graph Git log between two boundaries.
@@ -59,4 +71,19 @@ public interface GitRepositoryClient {
      * @return <code>true</code> if at least one call to <code>scanFunction</code> has returned <code>true</code>.
      */
     boolean scanCommits(String branch, Predicate<RevCommit> scanFunction);
+
+    /**
+     * Gets the reference string for a branch given with its local name.
+     */
+    String getBranchRef(String branch);
+
+    /**
+     * Gets the earliest commit that contains the commit.
+     * <p>
+     * Uses the <code>git tag --contains</code> command to get all tags that contains the given
+     * {@code gitCommitId}.
+     * <p>
+     * <b>Note</b>: returned tags are <i>not</i> ordered.
+     */
+    Collection<String> getTagsWhichContainCommit(String gitCommitId);
 }

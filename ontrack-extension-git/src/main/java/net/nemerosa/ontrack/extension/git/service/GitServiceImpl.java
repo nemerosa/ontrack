@@ -391,21 +391,21 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                     }
                     // Collects branch info
                     OntrackGitIssueCommitBranchInfo branchInfo = OntrackGitIssueCommitBranchInfo.of(branch);
-                    // FIXME Gets the last build for this branch
-//                    Optional<Build> buildAfterCommit = getEarliestBuildAfterCommit(commitId, branch, configuration, gitClient);
-//                    if (buildAfterCommit.isPresent()) {
-//                        Build build = buildAfterCommit.get();
-//                        // Gets the build view
-//                        BuildView buildView = structureService.getBuildView(build);
-//                        // Adds it to the list
-//                        branchInfo = branchInfo.withBuildView(buildView);
-//                        // Collects the promotions for the branch
-//                        branchInfo = branchInfo.withBranchStatusView(
-//                                structureService.getEarliestPromotionsAfterBuild(build)
-//                        );
-//                    }
-                    // FIXME Adds the info
-//                    commitInfo.add(branchInfo);
+                    // Gets the last build for this branch
+                    Optional<Build> buildAfterCommit = getEarliestBuildAfterCommit(commitId, branch, branchConfiguration, client);
+                    if (buildAfterCommit.isPresent()) {
+                        Build build = buildAfterCommit.get();
+                        // Gets the build view
+                        BuildView buildView = structureService.getBuildView(build);
+                        // Adds it to the list
+                        branchInfo = branchInfo.withBuildView(buildView);
+                        // Collects the promotions for the branch
+                        branchInfo = branchInfo.withBranchStatusView(
+                                structureService.getEarliestPromotionsAfterBuild(build)
+                        );
+                    }
+                    // Adds the info
+                    commitInfo.add(branchInfo);
                 }
             }
         });
@@ -516,24 +516,23 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
 
     }
 
-    protected <T> Optional<Build> getEarliestBuildAfterCommit(String commit, Branch branch, GitBranchConfiguration branchConfiguration, GitRepositoryClient gitClient) {
+    protected <T> Optional<Build> getEarliestBuildAfterCommit(String commit, Branch branch, GitBranchConfiguration branchConfiguration, GitRepositoryClient client) {
         @SuppressWarnings("unchecked")
         ConfiguredBuildGitCommitLink<T> configuredBuildGitCommitLink = (ConfiguredBuildGitCommitLink<T>) branchConfiguration.getBuildCommitLink();
-        // FIXME Delegates to the build commit link...
-//        return configuredBuildGitCommitLink.getLink()
-//                // ... by getting candidate references
-//                .getBuildCandidateReferences(commit, gitClient, configuredBuildGitCommitLink.getData())
-//                        // ... gets the builds
-//                .map(buildName -> structureService.findBuildByName(branch.getProject().getName(), branch.getName(), buildName))
-//                        // ... filter on existing builds
-//                .filter(Optional::isPresent).map(Optional::get)
-//                        // ... filter the builds using the link
-//                .filter(build -> configuredBuildGitCommitLink.getLink().isBuildEligible(build, configuredBuildGitCommitLink.getData()))
-//                        // ... sort by decreasing date
-//                .sorted((o1, o2) -> (o1.id() - o2.id()))
-//                        // ... takes the first build
-//                .findFirst();
-        throw new RuntimeException("NYI");
+        // Delegates to the build commit link...
+        return configuredBuildGitCommitLink.getLink()
+                // ... by getting candidate references
+                .getBuildCandidateReferences(commit, client, branchConfiguration, configuredBuildGitCommitLink.getData())
+                        // ... gets the builds
+                .map(buildName -> structureService.findBuildByName(branch.getProject().getName(), branch.getName(), buildName))
+                        // ... filter on existing builds
+                .filter(Optional::isPresent).map(Optional::get)
+                        // ... filter the builds using the link
+                .filter(build -> configuredBuildGitCommitLink.getLink().isBuildEligible(build, configuredBuildGitCommitLink.getData()))
+                        // ... sort by decreasing date
+                .sorted((o1, o2) -> (o1.id() - o2.id()))
+                        // ... takes the first build
+                .findFirst();
     }
 
     private String getDiffUrl(GitDiff diff, GitDiffEntry entry, String fileChangeLinkFormat) {

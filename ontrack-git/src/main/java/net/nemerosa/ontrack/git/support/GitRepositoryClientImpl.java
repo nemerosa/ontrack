@@ -32,10 +32,12 @@ import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 
@@ -117,6 +119,26 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
     }
 
     @Override
+    public Stream<GitCommit> log(String from, String to) {
+        try {
+            Repository gitRepository = git.getRepository();
+            ObjectId oFrom = gitRepository.resolve(from);
+            ObjectId oTo = gitRepository.resolve(to);
+
+            return Lists.newArrayList(
+                    git.log()
+                            .addRange(oFrom, oTo)
+                            .call()
+            ).stream().map(this::toCommit);
+
+        } catch (GitAPIException e) {
+            throw new GitRepositoryAPIException(repository.getRemote(), e);
+        } catch (IOException e) {
+            throw new GitRepositoryIOException(repository.getRemote(), e);
+        }
+    }
+
+    @Override
     public GitLog graph(String from, String to) {
         try {
             GitRange range = range(from, to);
@@ -153,7 +175,7 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
     public boolean scanCommits(String branch, Predicate<RevCommit> scanFunction) {
         // All commits
         try {
-            Iterable<RevCommit> commits = git.log().add(git.getRepository().resolve("origin/" + branch)).call();
+            Iterable<RevCommit> commits = git.log().add(git.getRepository().resolve(getBranchRef(branch))).call();
             for (RevCommit commit : commits) {
                 if (scanFunction.test(commit)) {
                     // Not going on
@@ -167,6 +189,24 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
         } catch (IOException e) {
             throw new GitRepositoryIOException(repository.getRemote(), e);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * <b>Note</b>: the JGit library does not support the <code>git-describe</code> command yet, hence
+     * the use of the command line.
+     *
+     * @see net.nemerosa.ontrack.git.support.GitClientSupport#tagContains(java.io.File, String)
+     */
+    @Override
+    public Collection<String> getTagsWhichContainCommit(String gitCommitId) {
+        return GitClientSupport.tagContains(repositoryDir, gitCommitId);
+    }
+
+    @Override
+    public String getBranchRef(String branch) {
+        return String.format("origin/%s", branch);
     }
 
     @Override

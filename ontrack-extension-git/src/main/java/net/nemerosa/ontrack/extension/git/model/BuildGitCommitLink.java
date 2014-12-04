@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.git.model;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import net.nemerosa.ontrack.extension.git.client.GitClient;
+import net.nemerosa.ontrack.git.GitRepositoryClient;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.structure.Build;
 
@@ -58,21 +58,22 @@ public interface BuildGitCommitLink<T> {
     /**
      * Gets the list of build names from Git reference candidates
      *
-     * @param commit    The commit to start from
-     * @param gitClient The Git client to use for the connection
-     * @param data      Configuration data
+     * @param commit              The commit to start from
+     * @param gitClient           The Git client to use for the connection
+     * @param branchConfiguration Git branch configuration
+     * @param data                Configuration data
      * @return Candidate build names
      */
-    Stream<String> getBuildCandidateReferences(String commit, GitClient gitClient, T data);
+    Stream<String> getBuildCandidateReferences(String commit, GitRepositoryClient gitClient, GitBranchConfiguration branchConfiguration, T data);
 
     /**
      * Checks if a build is eligible after it has been loaded from a
-     * {@linkplain #getBuildCandidateReferences(String, net.nemerosa.ontrack.extension.git.client.GitClient, Object) candidate reference}.
+     * {@linkplain #getBuildCandidateReferences(String, net.nemerosa.ontrack.git.GitRepositoryClient, GitBranchConfiguration, Object)}
      *
      * @param build Build to check
      * @param data  Configuration data
      * @return <code>true</code> if the build is linked to the configuration
      */
     boolean isBuildEligible(Build build, T data);
-    
+
 }
