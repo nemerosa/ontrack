@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.common;
 
-public class ProcessExitException extends BaseException {
+public class ProcessExitException extends ProcessException {
 
     private final int exit;
 

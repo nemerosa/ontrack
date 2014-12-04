@@ -56,7 +56,7 @@ public class SVNRevisionJdbcDao extends AbstractJdbcRepository implements SVNRev
     public void addMergedRevisions(int repositoryId, long revision, List<Long> mergedRevisions) {
         NamedParameterJdbcTemplate t = getNamedParameterJdbcTemplate();
         for (long mergedRevision : mergedRevisions) {
-            t.update("INSERT INTO SVN_EXT_MERGE_REVISION (REPOSITORY, REVISION, TARGET) " +
+            t.update("INSERT INTO EXT_SVN_MERGE_REVISION (REPOSITORY, REVISION, TARGET) " +
                             "VALUES (:repository, :mergedRevision, :revision)",
                     params("mergedRevision", mergedRevision)
                             .addValue("repository", repositoryId)
