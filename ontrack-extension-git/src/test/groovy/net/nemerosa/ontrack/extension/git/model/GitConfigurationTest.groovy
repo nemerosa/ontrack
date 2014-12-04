@@ -9,13 +9,13 @@ class GitConfigurationTest {
 
     @Test
     void user_password_none() {
-        GitConfiguration configuration = GitConfiguration.empty();
+        FormerGitConfiguration configuration = FormerGitConfiguration.empty();
         assertFalse(configuration.getUserPasswordSupplier().get().isPresent());
     }
 
     @Test
     void user_password_with_user_only() {
-        GitConfiguration configuration = GitConfiguration.empty()
+        FormerGitConfiguration configuration = FormerGitConfiguration.empty()
                 .withUser("test");
         Optional<UserPassword> userPasswordOptional = configuration.getUserPasswordSupplier().get();
         assertTrue(userPasswordOptional.isPresent());
@@ -25,7 +25,7 @@ class GitConfigurationTest {
 
     @Test
     void user_password() {
-        GitConfiguration configuration = GitConfiguration.empty()
+        FormerGitConfiguration configuration = FormerGitConfiguration.empty()
                 .withUser("test")
                 .withPassword("xxx");
         Optional<UserPassword> userPasswordOptional = configuration.getUserPasswordSupplier().get();

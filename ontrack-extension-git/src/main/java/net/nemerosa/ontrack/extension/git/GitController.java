@@ -87,7 +87,7 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
      * Gets the configurations
      */
     @RequestMapping(value = "configurations", method = RequestMethod.GET)
-    public Resources<GitConfiguration> getConfigurations() {
+    public Resources<FormerGitConfiguration> getConfigurations() {
         return Resources.of(
                 configurationService.getConfigurations(),
                 uri(on(getClass()).getConfigurations())
@@ -101,14 +101,14 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
      */
     @RequestMapping(value = "configurations/create", method = RequestMethod.GET)
     public Form getConfigurationForm() {
-        return GitConfiguration.form(issueServiceRegistry.getAvailableIssueServiceConfigurations());
+        return FormerGitConfiguration.form(issueServiceRegistry.getAvailableIssueServiceConfigurations());
     }
 
     /**
      * Creating a configuration
      */
     @RequestMapping(value = "configurations/create", method = RequestMethod.POST)
-    public GitConfiguration newConfiguration(@RequestBody GitConfiguration configuration) {
+    public FormerGitConfiguration newConfiguration(@RequestBody FormerGitConfiguration configuration) {
         return configurationService.newConfiguration(configuration);
     }
 
@@ -116,7 +116,7 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
      * Gets one configuration
      */
     @RequestMapping(value = "configurations/{name}", method = RequestMethod.GET)
-    public GitConfiguration getConfiguration(@PathVariable String name) {
+    public FormerGitConfiguration getConfiguration(@PathVariable String name) {
         return configurationService.getConfiguration(name);
     }
 
@@ -142,7 +142,7 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
      * Updating one configuration
      */
     @RequestMapping(value = "configurations/{name}/update", method = RequestMethod.PUT)
-    public GitConfiguration updateConfiguration(@PathVariable String name, @RequestBody GitConfiguration configuration) {
+    public FormerGitConfiguration updateConfiguration(@PathVariable String name, @RequestBody FormerGitConfiguration configuration) {
         configurationService.updateConfiguration(name, configuration);
         return getConfiguration(name);
     }
@@ -175,7 +175,7 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
         // Gets the branch
         Branch branch = structureService.getBranch(branchId);
         // Gets the configuration for the branch
-        GitConfiguration configuration = gitService.getBranchConfiguration(branch);
+        FormerGitConfiguration configuration = gitService.getBranchConfiguration(branch);
         if (configuration.isValid()) {
             ConfiguredIssueService configuredIssueService = issueServiceRegistry.getConfiguredIssueService(configuration.getIssueServiceConfigurationIdentifier());
             if (configuredIssueService != null) {
@@ -202,7 +202,7 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
         // Gets the associated project
         Project project = changeLog.getProject();
         // Gets the configuration for the project
-        GitConfiguration gitConfiguration = gitService.getProjectConfiguration(project);
+        FormerGitConfiguration gitConfiguration = gitService.getProjectConfiguration(project);
         // Gets the issue service
         String issueServiceConfigurationIdentifier = gitConfiguration.getIssueServiceConfigurationIdentifier();
         if (StringUtils.isBlank(issueServiceConfigurationIdentifier)) {

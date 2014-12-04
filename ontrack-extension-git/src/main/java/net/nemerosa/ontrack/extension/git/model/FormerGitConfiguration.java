@@ -22,7 +22,8 @@ import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class GitConfiguration implements UserPasswordConfiguration<GitConfiguration> {
+@Deprecated
+public class FormerGitConfiguration implements UserPasswordConfiguration<FormerGitConfiguration> {
 
     /**
      * Name of this configuration
@@ -96,7 +97,7 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
     }
 
     @Override
-    public GitConfiguration obfuscate() {
+    public FormerGitConfiguration obfuscate() {
         return this;
     }
 
@@ -169,8 +170,8 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
         return StringUtils.isNotBlank(name) && StringUtils.isNotBlank(remote);
     }
 
-    public static GitConfiguration empty() {
-        return new GitConfiguration(
+    public static FormerGitConfiguration empty() {
+        return new FormerGitConfiguration(
                 "",
                 "",
                 "master",
@@ -184,8 +185,8 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
         );
     }
 
-    public GitConfiguration merge(GitConfiguration configuration) {
-        return new GitConfiguration(
+    public FormerGitConfiguration merge(FormerGitConfiguration configuration) {
+        return new FormerGitConfiguration(
                 name,
                 defaultIfBlank(configuration.remote, remote),
                 defaultIfBlank(configuration.branch, branch),
@@ -200,8 +201,8 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
     }
 
     @Override
-    public GitConfiguration clone(String targetConfigurationName, Function<String, String> replacementFunction) {
-        return new GitConfiguration(
+    public FormerGitConfiguration clone(String targetConfigurationName, Function<String, String> replacementFunction) {
+        return new FormerGitConfiguration(
                 targetConfigurationName,
                 replacementFunction.apply(remote),
                 replacementFunction.apply(branch),

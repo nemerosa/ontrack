@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.git.client;
 
-import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
+import net.nemerosa.ontrack.extension.git.model.FormerGitConfiguration;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import java.util.Collection;
@@ -13,7 +13,7 @@ public interface GitClient {
 
     Collection<GitTag> getTags();
 
-    GitConfiguration getConfiguration();
+    FormerGitConfiguration getConfiguration();
 
     /**
      * Gets a Git log between two boundaries.

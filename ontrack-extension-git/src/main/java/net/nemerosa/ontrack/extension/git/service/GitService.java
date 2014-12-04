@@ -23,7 +23,7 @@ public interface GitService {
     /**
      * Gets the configuration for a project.
      */
-    GitConfiguration getProjectConfiguration(Project project);
+    FormerGitConfiguration getProjectConfiguration(Project project);
 
     /**
      * Gets the configuration for a branch
@@ -38,10 +38,10 @@ public interface GitService {
      *
      * @param branch Branch to check
      * @return Configuration. Never null but can be
-     * {@link net.nemerosa.ontrack.extension.git.model.GitConfiguration#isValid() invalid}.
+     * {@link net.nemerosa.ontrack.extension.git.model.FormerGitConfiguration#isValid() invalid}.
      */
     @Deprecated
-    GitConfiguration getBranchConfiguration(Branch branch);
+    FormerGitConfiguration getBranchConfiguration(Branch branch);
 
     /**
      * Launches the build/tag synchronisation for a branch
@@ -71,7 +71,7 @@ public interface GitService {
     /**
      * Loops over each correctly configured project.
      */
-    void forEachConfiguredProject(BiConsumer<Project, GitConfiguration> consumer);
+    void forEachConfiguredProject(BiConsumer<Project, FormerGitConfiguration> consumer);
 
     /**
      * Loops over each correctly configured branch. Branch template definitions are excluded.
@@ -86,7 +86,7 @@ public interface GitService {
      *                      must not go on, <code>false</code> otherwise.
      * @return <code>true</code> if at least one call to <code>scanFunction</code> has returned <code>true</code>.
      */
-    boolean scanCommits(GitConfiguration configuration, Predicate<RevCommit> scanFunction);
+    boolean scanCommits(FormerGitConfiguration configuration, Predicate<RevCommit> scanFunction);
 
     /**
      * Gets information about an issue in a Git-configured branch
@@ -99,7 +99,7 @@ public interface GitService {
      * @param id Commit long or short ID
      * @return The content of a commit if it exists, empty otherwise.
      */
-    Optional<GitUICommit> lookupCommit(GitConfiguration configuration, String id);
+    Optional<GitUICommit> lookupCommit(FormerGitConfiguration configuration, String id);
 
     /**
      * Gets information about a commit in a Git-configured branch.
@@ -109,5 +109,5 @@ public interface GitService {
     /**
      * Gets the list of remote branches, as defined under <code>ref/heads</code>.
      */
-    List<String> getRemoteBranches(GitConfiguration gitConfiguration);
+    List<String> getRemoteBranches(FormerGitConfiguration gitConfiguration);
 }

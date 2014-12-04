@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.extension.git.client.*;
 import net.nemerosa.ontrack.extension.git.client.plot.GPlot;
 import net.nemerosa.ontrack.extension.git.client.plot.GitPlotRenderer;
 import net.nemerosa.ontrack.extension.git.client.support.GitClientSupport;
-import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
+import net.nemerosa.ontrack.extension.git.model.FormerGitConfiguration;
 import net.nemerosa.ontrack.model.support.Time;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
@@ -33,7 +33,7 @@ import java.util.stream.Stream;
 public class DefaultGitClient implements GitClient {
 
     private final GitRepository repository;
-    private final GitConfiguration configuration;
+    private final FormerGitConfiguration configuration;
 
     private GitTag getGitTagFromRef(Ref ref) {
         RevCommit commit = repository.getCommitForTag(ref);
@@ -44,7 +44,7 @@ public class DefaultGitClient implements GitClient {
         );
     }
 
-    public DefaultGitClient(GitRepository repository, GitConfiguration configuration) {
+    public DefaultGitClient(GitRepository repository, FormerGitConfiguration configuration) {
         this.repository = repository;
         this.configuration = configuration;
     }
@@ -72,7 +72,7 @@ public class DefaultGitClient implements GitClient {
     }
 
     @Override
-    public GitConfiguration getConfiguration() {
+    public FormerGitConfiguration getConfiguration() {
         return configuration;
     }
 

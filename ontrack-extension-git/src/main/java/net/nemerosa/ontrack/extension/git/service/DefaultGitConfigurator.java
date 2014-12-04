@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.git.service;
 
 import net.nemerosa.ontrack.extension.git.model.BuildGitCommitLink;
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink;
-import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
+import net.nemerosa.ontrack.extension.git.model.FormerGitConfiguration;
 import net.nemerosa.ontrack.extension.git.model.GitConfigurator;
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty;
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType;
@@ -25,8 +25,8 @@ public class DefaultGitConfigurator implements GitConfigurator {
     }
 
     @Override
-    public GitConfiguration configure(GitConfiguration configuration, Branch branch) {
-        GitConfiguration thisConfig = configureProject(configuration, branch.getProject());
+    public FormerGitConfiguration configure(FormerGitConfiguration configuration, Branch branch) {
+        FormerGitConfiguration thisConfig = configureProject(configuration, branch.getProject());
         Property<GitBranchConfigurationProperty> branchConfig = propertyService.getProperty(branch, GitBranchConfigurationPropertyType.class);
         if (!branchConfig.isEmpty()) {
             thisConfig = thisConfig.withBranch(branchConfig.getValue().getBranch());
@@ -38,8 +38,8 @@ public class DefaultGitConfigurator implements GitConfigurator {
     }
 
     @Override
-    public GitConfiguration configureProject(GitConfiguration configuration, Project project) {
-        GitConfiguration thisConfig = configuration;
+    public FormerGitConfiguration configureProject(FormerGitConfiguration configuration, Project project) {
+        FormerGitConfiguration thisConfig = configuration;
         // Project Git configuration?
         Property<GitProjectConfigurationProperty> projectConfig = propertyService.getProperty(project, GitProjectConfigurationPropertyType.class);
         if (!projectConfig.isEmpty()) {

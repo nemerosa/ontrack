@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.extension.git.client.GitClientFactory
 import net.nemerosa.ontrack.extension.git.client.GitTag
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
 import net.nemerosa.ontrack.extension.git.model.GitBranchConfiguration
-import net.nemerosa.ontrack.extension.git.model.GitConfiguration
+import net.nemerosa.ontrack.extension.git.model.FormerGitConfiguration
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.support.TagPattern
@@ -91,7 +91,7 @@ class GitBuildSyncIT {
                 )
         )
 
-        def gitConfiguration = GitConfiguration.empty()
+        def gitConfiguration = FormerGitConfiguration.empty()
         def gitBranchConfiguration = new GitBranchConfiguration(
                 gitConfiguration,
                 'master',

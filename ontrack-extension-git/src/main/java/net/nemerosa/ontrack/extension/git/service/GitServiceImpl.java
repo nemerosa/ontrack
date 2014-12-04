@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 
 @Service
-public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration, GitBuildInfo, GitChangeLogIssue> implements GitService, JobProvider {
+public class GitServiceImpl extends AbstractSCMChangeLogService<FormerGitConfiguration, GitBuildInfo, GitChangeLogIssue> implements GitService, JobProvider {
 
     private final Logger logger = LoggerFactory.getLogger(GitService.class);
     private final Collection<GitConfigurator> configurators;
@@ -89,10 +89,10 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     @Override
-    public void forEachConfiguredProject(BiConsumer<Project, GitConfiguration> consumer) {
+    public void forEachConfiguredProject(BiConsumer<Project, FormerGitConfiguration> consumer) {
         structureService.getProjectList().stream()
                 .forEach(project -> {
-                    GitConfiguration configuration = getProjectConfiguration(project);
+                    FormerGitConfiguration configuration = getProjectConfiguration(project);
                     if (configuration.isValid()) {
                         consumer.accept(project, configuration);
                     }
@@ -123,7 +123,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         });
         // Synchronisation of branch builds with tags when applicable
         forEachConfiguredBranch((branch, branchConfiguration) -> {
-            GitConfiguration configuration = branchConfiguration.getConfiguration();
+            FormerGitConfiguration configuration = branchConfiguration.getConfiguration();
             // Build/tag sync job
             if (branchConfiguration.isValid()
                     && branchConfiguration.getBuildTagInterval() > 0
@@ -162,7 +162,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             Branch branch = structureService.getBranch(request.getBranch());
             Project project = branch.getProject();
             GitRepositoryClient client = getGitRepositoryClient(project);
-            GitConfiguration configuration = getBranchConfiguration(branch);
+            FormerGitConfiguration configuration = getBranchConfiguration(branch);
             // Forces Git sync before
             boolean syncError;
             try {
@@ -207,7 +207,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     @Override
     public GitChangeLogCommits getChangeLogCommits(GitChangeLog changeLog) {
         // Gets the configuration
-        GitConfiguration gitConfiguration = getProjectConfiguration(changeLog.getProject());
+        FormerGitConfiguration gitConfiguration = getProjectConfiguration(changeLog.getProject());
         // Gets the client client for this branch
         GitClient gitClient = gitClientFactory.getClient(gitConfiguration);
         gitClient.sync(logger::debug);
@@ -250,7 +250,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         // In a transaction
         try (Transaction ignored = transactionService.start()) {
             // Configuration
-            GitConfiguration configuration = changeLog.getScm();
+            FormerGitConfiguration configuration = changeLog.getScm();
             // Issue service
             ConfiguredIssueService configuredIssueService = issueServiceRegistry.getConfiguredIssueService(configuration.getIssueServiceConfigurationIdentifier());
             if (configuredIssueService == null) {
@@ -287,7 +287,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         // Gets the client client for this branch
         GitClient gitClient = gitClientFactory.getClient(changeLog.getScm());
         // Gets the configuration
-        GitConfiguration gitConfiguration = gitClient.getConfiguration();
+        FormerGitConfiguration gitConfiguration = gitClient.getConfiguration();
         // Gets the build boundaries
         Build buildFrom = changeLog.getFrom().getBuild();
         Build buildTo = changeLog.getTo().getBuild();
@@ -309,7 +309,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     @Override
-    public boolean scanCommits(GitConfiguration configuration, Predicate<RevCommit> scanFunction) {
+    public boolean scanCommits(FormerGitConfiguration configuration, Predicate<RevCommit> scanFunction) {
         // Gets the client client for this branch
         GitClient gitClient = gitClientFactory.getClient(configuration);
         // Scanning
@@ -320,7 +320,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     public OntrackGitIssueInfo getIssueInfo(ID branchId, String key) {
         Branch branch = structureService.getBranch(branchId);
         // Configuration
-        GitConfiguration configuration = getBranchConfiguration(branch);
+        FormerGitConfiguration configuration = getBranchConfiguration(branch);
         if (!configuration.isValid()) {
             throw new GitBranchNotConfiguredException(branchId);
         }
@@ -349,7 +349,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         Map<String, OntrackGitIssueCommitInfo> commitInfos = new LinkedHashMap<>();
         // For all configured branches
         forEachConfiguredBranch((branch, branchConfiguration) -> {
-            GitConfiguration configuration = branchConfiguration.getConfiguration();
+            FormerGitConfiguration configuration = branchConfiguration.getConfiguration();
             // Gets the Git client for this branch
             GitClient gitClient = gitClientFactory.getClient(configuration);
             // Issue service
@@ -414,7 +414,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     @Override
-    public Optional<GitUICommit> lookupCommit(GitConfiguration configuration, String id) {
+    public Optional<GitUICommit> lookupCommit(FormerGitConfiguration configuration, String id) {
         // Gets the client client for this configuration
         GitClient gitClient = gitClientFactory.getClient(configuration);
         // Gets the commit
@@ -443,7 +443,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     @Override
-    public List<String> getRemoteBranches(GitConfiguration gitConfiguration) {
+    public List<String> getRemoteBranches(FormerGitConfiguration gitConfiguration) {
         GitClient gitClient = gitClientFactory.getClient(gitConfiguration);
         gitClient.sync(logger::debug);
         return gitClient.getRemoteBranches();
@@ -452,13 +452,13 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     private OntrackGitCommitInfo getOntrackGitCommitInfo(String commit) {
         // Reference data
         AtomicReference<GitCommit> theCommit = new AtomicReference<>();
-        AtomicReference<GitConfiguration> theConfiguration = new AtomicReference<>();
+        AtomicReference<FormerGitConfiguration> theConfiguration = new AtomicReference<>();
         // Data to collect
         Collection<BuildView> buildViews = new ArrayList<>();
         Collection<BranchStatusView> branchStatusViews = new ArrayList<>();
         // For all configured branches
         forEachConfiguredBranch((branch, branchConfiguration) -> {
-            GitConfiguration configuration = branchConfiguration.getConfiguration();
+            FormerGitConfiguration configuration = branchConfiguration.getConfiguration();
             // Gets the client client for this branch
             GitClient gitClient = gitClientFactory.getClient(configuration);
             // Scan for this commit in this branch
@@ -519,7 +519,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
 
     }
 
-    protected <T> Optional<Build> getEarliestBuildAfterCommit(String commit, Branch branch, GitConfiguration configuration, GitClient gitClient) {
+    protected <T> Optional<Build> getEarliestBuildAfterCommit(String commit, Branch branch, FormerGitConfiguration configuration, GitClient gitClient) {
         @SuppressWarnings("unchecked")
         ConfiguredBuildGitCommitLink<T> configuredBuildGitCommitLink = (ConfiguredBuildGitCommitLink<T>) configuration.getBuildCommitLink();
         // Delegates to the build commit link...
@@ -561,7 +561,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         }
     }
 
-    private List<GitUICommit> toUICommits(GitConfiguration gitConfiguration, List<GitCommit> commits) {
+    private List<GitUICommit> toUICommits(FormerGitConfiguration gitConfiguration, List<GitCommit> commits) {
         // Link?
         String commitLink = gitConfiguration.getCommitLink();
         // Issue-based annotations
@@ -581,7 +581,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         );
     }
 
-    private List<? extends MessageAnnotator> getMessageAnnotators(GitConfiguration gitConfiguration) {
+    private List<? extends MessageAnnotator> getMessageAnnotators(FormerGitConfiguration gitConfiguration) {
         List<? extends MessageAnnotator> messageAnnotators;
         String issueServiceConfigurationIdentifier = gitConfiguration.getIssueServiceConfigurationIdentifier();
         if (StringUtils.isNotBlank(issueServiceConfigurationIdentifier)) {
@@ -609,9 +609,9 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     @Override
-    public GitConfiguration getProjectConfiguration(Project project) {
+    public FormerGitConfiguration getProjectConfiguration(Project project) {
         // Empty configuration
-        GitConfiguration configuration = GitConfiguration.empty();
+        FormerGitConfiguration configuration = FormerGitConfiguration.empty();
         // Configurators
         for (GitConfigurator configurator : configurators) {
             configuration = configurator.configureProject(configuration, project);
@@ -623,7 +623,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     @Override
     public GitBranchConfiguration getGitBranchConfiguration(Branch branch) {
         // Get the configuration for the project
-        GitConfiguration projectConfiguration = getProjectConfiguration(branch.getProject());
+        FormerGitConfiguration projectConfiguration = getProjectConfiguration(branch.getProject());
         // Gets the configuration for a branch
         String gitBranch;
         ConfiguredBuildGitCommitLink<?> buildCommitLink;
@@ -665,9 +665,9 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
 
     @Override
     @Deprecated
-    public GitConfiguration getBranchConfiguration(Branch branch) {
+    public FormerGitConfiguration getBranchConfiguration(Branch branch) {
         // Empty configuration
-        GitConfiguration configuration = GitConfiguration.empty();
+        FormerGitConfiguration configuration = FormerGitConfiguration.empty();
         // Configurators{
         for (GitConfigurator configurator : configurators) {
             configuration = configurator.configure(configuration, branch);
@@ -721,7 +721,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         };
     }
 
-    private Job createIndexationJob(GitConfiguration config) {
+    private Job createIndexationJob(FormerGitConfiguration config) {
         return new Job() {
             @Override
             public String getCategory() {
@@ -762,7 +762,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
 
     protected <T> void buildSync(Branch branch, GitBranchConfiguration branchConfiguration, JobInfoListener info) {
         info.post(format("Git build/tag sync for %s/%s", branch.getProject().getName(), branch.getName()));
-        GitConfiguration configuration = branchConfiguration.getConfiguration();
+        FormerGitConfiguration configuration = branchConfiguration.getConfiguration();
         // Gets the branch Git client
         GitClient gitClient = gitClientFactory.getClient(configuration);
         // Link
@@ -824,7 +824,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         }
     }
 
-    private void index(GitConfiguration config, JobInfoListener info) {
+    private void index(FormerGitConfiguration config, JobInfoListener info) {
         info.post(format("Git sync for %s", config.getName()));
         // Gets the client for this configuration
         GitRepositoryClient client = gitRepositoryClientFactory.getClient(config.toRepository());

@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.github.service;
 
-import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
+import net.nemerosa.ontrack.extension.git.model.FormerGitConfiguration;
 import net.nemerosa.ontrack.extension.git.model.GitConfigurator;
 import net.nemerosa.ontrack.extension.github.model.GitHubConfiguration;
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationProperty;
@@ -24,19 +24,19 @@ public class GitHubConfigurator implements GitConfigurator {
     }
 
     @Override
-    public GitConfiguration configure(GitConfiguration configuration, Branch branch) {
+    public FormerGitConfiguration configure(FormerGitConfiguration configuration, Branch branch) {
         return configureProject(configuration, branch.getProject());
     }
 
     @Override
-    public GitConfiguration configureProject(GitConfiguration configuration, Project project) {
+    public FormerGitConfiguration configureProject(FormerGitConfiguration configuration, Project project) {
         // Project GitHub configuration
         Property<GitHubProjectConfigurationProperty> projectConfig = propertyService.getProperty(project, GitHubProjectConfigurationPropertyType.class);
         if (!projectConfig.isEmpty()) {
             // GitHub configuration
             GitHubConfiguration gitHub = projectConfig.getValue().getConfiguration();
             // Merge the project configuration
-            GitConfiguration gitHubConfig = configuration
+            FormerGitConfiguration gitHubConfig = configuration
                     .withRemote(gitHub.getRemote())
                     .withIndexationInterval(gitHub.getIndexationInterval())
                     .withCommitLink(gitHub.getCommitLink())

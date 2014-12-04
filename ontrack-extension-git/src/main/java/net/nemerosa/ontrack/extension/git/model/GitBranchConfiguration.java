@@ -12,7 +12,7 @@ public class GitBranchConfiguration {
     /**
      * Main project's configuration
      */
-    private final GitConfiguration configuration;
+    private final FormerGitConfiguration configuration;
 
     /**
      * Default branch

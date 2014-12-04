@@ -17,7 +17,7 @@ public class OntrackGitIssueInfo {
      * Associated repository configuration
      */
     @JsonIgnore
-    private final GitConfiguration configuration;
+    private final FormerGitConfiguration configuration;
 
     /**
      * Associated issue configuration

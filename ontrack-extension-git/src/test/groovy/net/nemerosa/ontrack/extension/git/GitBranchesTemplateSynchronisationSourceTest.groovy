@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.git
 
 import net.nemerosa.ontrack.extension.api.ExtensionManager
-import net.nemerosa.ontrack.extension.git.model.GitConfiguration
+import net.nemerosa.ontrack.extension.git.model.FormerGitConfiguration
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Project
@@ -19,17 +19,17 @@ class GitBranchesTemplateSynchronisationSourceTest {
     ExtensionManager extensionManager
     GitService gitService
     GitBranchesTemplateSynchronisationSource source
-    GitConfiguration gitConfiguration
+    FormerGitConfiguration gitConfiguration
     Branch branch
 
     @Before
     void before() {
         branch = Branch.of(Project.of(nd('P', "Project")), nd('B', "Branch"))
-        gitConfiguration = GitConfiguration.empty().withBranch('${sourceName}')
+        gitConfiguration = FormerGitConfiguration.empty().withBranch('${sourceName}')
         extensionManager = mock(ExtensionManager)
         gitService = mock(GitService)
         when(gitService.getBranchConfiguration(branch)).thenReturn(gitConfiguration)
-        when(gitService.getRemoteBranches(any(GitConfiguration))).thenReturn(
+        when(gitService.getRemoteBranches(any(FormerGitConfiguration))).thenReturn(
                 ['master', 'feature/ontrack-40-templating', 'feature/ontrack-111-project-manager', 'fix/ontrack-110']
         )
         source = new GitBranchesTemplateSynchronisationSource(

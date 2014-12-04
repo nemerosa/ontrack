@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.git.client.impl
 
 import net.nemerosa.ontrack.common.Utils
 import net.nemerosa.ontrack.extension.git.client.GitClient
-import net.nemerosa.ontrack.extension.git.model.GitConfiguration
+import net.nemerosa.ontrack.extension.git.model.FormerGitConfiguration
 
 class GitTestUtils {
 
@@ -51,7 +51,7 @@ class GitTestUtils {
                 "id",
                 { Optional.empty() }
         )
-        GitConfiguration gitConfiguration = GitConfiguration.empty()
+        FormerGitConfiguration gitConfiguration = FormerGitConfiguration.empty()
         new DefaultGitClient(gitRepository, gitConfiguration)
     }
 

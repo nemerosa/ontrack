@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.git.service
 
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
-import net.nemerosa.ontrack.extension.git.model.GitConfiguration
+import net.nemerosa.ontrack.extension.git.model.FormerGitConfiguration
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationProperty
@@ -42,7 +42,7 @@ class DefaultGitConfiguratorTest {
 
         DefaultGitConfigurator configurator = new DefaultGitConfigurator(propertyService, buildGitCommitLinkService)
 
-        def configuration = configurator.configure(GitConfiguration.empty(), branch)
+        def configuration = configurator.configure(FormerGitConfiguration.empty(), branch)
 
         assert configuration != null
         assert configuration.branch == 'master'
@@ -83,7 +83,7 @@ class DefaultGitConfiguratorTest {
 
         DefaultGitConfigurator configurator = new DefaultGitConfigurator(propertyService, buildGitCommitLinkService)
 
-        def configuration = configurator.configure(GitConfiguration.empty(), branch)
+        def configuration = configurator.configure(FormerGitConfiguration.empty(), branch)
 
         assert configuration != null
         assert configuration.branch == '2.1'
@@ -100,7 +100,7 @@ class DefaultGitConfiguratorTest {
 
         BuildGitCommitLinkService buildGitCommitLinkService = mock(BuildGitCommitLinkService)
 
-        GitConfiguration gitConfiguration = GitConfiguration.empty()
+        FormerGitConfiguration gitConfiguration = FormerGitConfiguration.empty()
 
         PropertyService propertyService = mock(PropertyService)
         when(propertyService.getProperty(project, GitProjectConfigurationPropertyType)).thenReturn(
@@ -120,7 +120,7 @@ class DefaultGitConfiguratorTest {
 
         DefaultGitConfigurator configurator = new DefaultGitConfigurator(propertyService, buildGitCommitLinkService)
 
-        def configuration = configurator.configure(GitConfiguration.empty(), branch)
+        def configuration = configurator.configure(FormerGitConfiguration.empty(), branch)
 
         assert configuration != null
         assert configuration.branch == 'master'
@@ -137,7 +137,7 @@ class DefaultGitConfiguratorTest {
         BuildGitCommitLinkService buildGitCommitLinkService = mock(BuildGitCommitLinkService)
         when(buildGitCommitLinkService.getLink("tagPattern")).thenReturn(new TagPatternBuildNameGitCommitLink())
 
-        GitConfiguration gitConfiguration = GitConfiguration.empty()
+        FormerGitConfiguration gitConfiguration = FormerGitConfiguration.empty()
 
         PropertyService propertyService = mock(PropertyService)
         when(propertyService.getProperty(project, GitProjectConfigurationPropertyType)).thenReturn(
@@ -165,7 +165,7 @@ class DefaultGitConfiguratorTest {
 
         DefaultGitConfigurator configurator = new DefaultGitConfigurator(propertyService, buildGitCommitLinkService)
 
-        def configuration = configurator.configure(GitConfiguration.empty(), branch)
+        def configuration = configurator.configure(FormerGitConfiguration.empty(), branch)
 
         assert configuration != null
         assert configuration.branch == '2.1'

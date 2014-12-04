@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.git;
 
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
-import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
+import net.nemerosa.ontrack.extension.git.model.FormerGitConfiguration;
 import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.structure.Branch;
@@ -52,7 +52,7 @@ public class GitBranchesTemplateSynchronisationSource extends AbstractTemplateSy
     @Override
     public List<String> getBranchNames(Branch branch, GitBranchesTemplateSynchronisationSourceConfig config) {
         // Gets the Git configuration
-        GitConfiguration gitConfiguration = gitService.getBranchConfiguration(branch);
+        FormerGitConfiguration gitConfiguration = gitService.getBranchConfiguration(branch);
         // Overrides the branch name to master (#166)
         gitConfiguration = gitConfiguration.withBranch("master");
         // Inclusion predicate

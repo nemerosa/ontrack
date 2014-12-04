@@ -5,14 +5,14 @@ import net.nemerosa.ontrack.model.structure.Project;
 
 /**
  * A <code>GitConfigurator</code> is a component that can adjust a
- * {@link net.nemerosa.ontrack.extension.git.model.GitConfiguration} according to the properties
+ * {@link FormerGitConfiguration} according to the properties
  * found on a branch.
  */
 public interface GitConfigurator {
 
     @Deprecated
-    GitConfiguration configure(GitConfiguration configuration, Branch branch);
+    FormerGitConfiguration configure(FormerGitConfiguration configuration, Branch branch);
 
-    GitConfiguration configureProject(GitConfiguration configuration, Project project);
+    FormerGitConfiguration configureProject(FormerGitConfiguration configuration, Project project);
 
 }

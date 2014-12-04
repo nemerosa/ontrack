@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.git.resource;
 
 import net.nemerosa.ontrack.extension.git.GitController;
-import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
+import net.nemerosa.ontrack.extension.git.model.FormerGitConfiguration;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
@@ -12,12 +12,12 @@ import java.util.List;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
-public class GitConfigurationResourceDecorator extends AbstractResourceDecorator<GitConfiguration> {
+public class GitConfigurationResourceDecorator extends AbstractResourceDecorator<FormerGitConfiguration> {
 
     private final SecurityService securityService;
 
     public GitConfigurationResourceDecorator(SecurityService securityService) {
-        super(GitConfiguration.class);
+        super(FormerGitConfiguration.class);
         this.securityService = securityService;
     }
 
@@ -25,12 +25,12 @@ public class GitConfigurationResourceDecorator extends AbstractResourceDecorator
      * Obfuscates the password
      */
     @Override
-    public GitConfiguration decorateBeforeSerialization(GitConfiguration bean) {
+    public FormerGitConfiguration decorateBeforeSerialization(FormerGitConfiguration bean) {
         return bean.obfuscate();
     }
 
     @Override
-    public List<Link> links(GitConfiguration configuration, ResourceContext resourceContext) {
+    public List<Link> links(FormerGitConfiguration configuration, ResourceContext resourceContext) {
         boolean globalSettingsGranted = securityService.isGlobalFunctionGranted(GlobalSettings.class);
         return resourceContext.links()
                 .self(on(GitController.class).getConfiguration(configuration.getName()))

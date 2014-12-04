@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.git.client.impl
 
 import net.nemerosa.ontrack.extension.git.client.GitClient
-import net.nemerosa.ontrack.extension.git.model.GitConfiguration
+import net.nemerosa.ontrack.extension.git.model.FormerGitConfiguration
 import org.junit.AfterClass
 import org.junit.Before
 import org.junit.BeforeClass
@@ -99,7 +99,7 @@ class GitGetTagsWhichContainCommitIT {
                 "id",
                 { Optional.empty() }
         )
-        GitConfiguration gitConfiguration = GitConfiguration.empty()
+        FormerGitConfiguration gitConfiguration = FormerGitConfiguration.empty()
         gitClient = new DefaultGitClient(gitRepository, gitConfiguration)
     }
 

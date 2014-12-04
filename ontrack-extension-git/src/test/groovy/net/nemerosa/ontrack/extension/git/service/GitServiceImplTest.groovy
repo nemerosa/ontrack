@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.git.service
 
 import net.nemerosa.ontrack.extension.git.client.GitClient
 import net.nemerosa.ontrack.extension.git.client.GitClientFactory
-import net.nemerosa.ontrack.extension.git.model.GitConfiguration
+import net.nemerosa.ontrack.extension.git.model.FormerGitConfiguration
 import net.nemerosa.ontrack.extension.git.model.GitConfigurator
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
@@ -34,20 +34,20 @@ class GitServiceImplTest {
         structureService = mock(StructureService)
 
         def gitConfigurator = mock(GitConfigurator)
-        when(gitConfigurator.configureProject(any(GitConfiguration), any(Project))).thenAnswer(
+        when(gitConfigurator.configureProject(any(FormerGitConfiguration), any(Project))).thenAnswer(
                 new Answer<Object>() {
                     @Override
                     Object answer(InvocationOnMock invocation) throws Throwable {
-                        GitConfiguration gitConfiguration = (GitConfiguration) invocation.arguments[0]
+                        FormerGitConfiguration gitConfiguration = (FormerGitConfiguration) invocation.arguments[0]
                         return gitConfiguration.withRemote("remote").withName('MyGitConfig')
                     }
                 }
         )
-        when(gitConfigurator.configure(any(GitConfiguration), any(Branch))).thenAnswer(
+        when(gitConfigurator.configure(any(FormerGitConfiguration), any(Branch))).thenAnswer(
                 new Answer<Object>() {
                     @Override
                     Object answer(InvocationOnMock invocation) throws Throwable {
-                        GitConfiguration gitConfiguration = (GitConfiguration) invocation.arguments[0]
+                        FormerGitConfiguration gitConfiguration = (FormerGitConfiguration) invocation.arguments[0]
                         Branch branch = (Branch) invocation.arguments[1]
                         return gitConfiguration.withRemote("remote").withBranch(branch.name)
                     }
@@ -126,7 +126,7 @@ class GitServiceImplTest {
         }
 
         // Git configuration
-        GitConfiguration gitConfiguration = GitConfiguration.empty()
+        FormerGitConfiguration gitConfiguration = FormerGitConfiguration.empty()
 
         // Git client
         GitClient gitClient = mock(GitClient)

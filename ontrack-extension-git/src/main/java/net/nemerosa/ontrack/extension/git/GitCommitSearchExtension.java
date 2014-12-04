@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.git;
 
 import net.nemerosa.ontrack.extension.api.SearchExtension;
 import net.nemerosa.ontrack.extension.git.client.GitCommit;
-import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
+import net.nemerosa.ontrack.extension.git.model.FormerGitConfiguration;
 import net.nemerosa.ontrack.extension.git.model.GitUICommit;
 import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
@@ -62,7 +62,7 @@ public class GitCommitSearchExtension extends AbstractExtension implements Searc
             Map<ID, SearchResult> projectResults = new LinkedHashMap<>();
             // For all Git-configured branches
             gitService.forEachConfiguredBranch((branch, branchConfiguration) -> {
-                GitConfiguration config = branchConfiguration.getConfiguration();
+                FormerGitConfiguration config = branchConfiguration.getConfiguration();
                 ID projectId = branch.getProjectId();
                 // Skipping if associated project is already associated with the issue
                 if (!projectResults.containsKey(projectId)) {
