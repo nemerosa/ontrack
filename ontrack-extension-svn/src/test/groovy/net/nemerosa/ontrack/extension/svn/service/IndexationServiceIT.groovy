@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.svn.service
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository
 import net.nemerosa.ontrack.extension.svn.db.SVNRepositoryDao
 import net.nemerosa.ontrack.extension.svn.db.SVNRevisionDao
+import net.nemerosa.ontrack.extension.svn.support.SVNProfileValueSource
 import net.nemerosa.ontrack.extension.svn.support.SVNTestRepo
 import net.nemerosa.ontrack.extension.svn.support.SVNTestUtils
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
@@ -12,10 +13,13 @@ import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.test.annotation.IfProfileValue
+import org.springframework.test.annotation.ProfileValueSourceConfiguration
 
 /**
  * Indexation service integration tests.
  */
+@ProfileValueSourceConfiguration(SVNProfileValueSource)
 class IndexationServiceIT extends AbstractServiceTestSupport {
 
     private static SVNTestRepo repo
@@ -40,6 +44,7 @@ class IndexationServiceIT extends AbstractServiceTestSupport {
     private SVNRevisionDao revisionDao
 
     @Test
+    @IfProfileValue(name = "svn", value = "true")
     void 'Indexation of merge info'() {
 
         /**
