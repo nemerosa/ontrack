@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.git.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.nemerosa.ontrack.git.GitRepository;
 import net.nemerosa.ontrack.model.support.UserPassword;
 
@@ -54,6 +55,7 @@ public interface GitConfiguration {
     /**
      * Gets the Git repository for this configuration
      */
+    @JsonIgnore
     default GitRepository getGitRepository() {
         Optional<UserPassword> credentials = getCredentials();
         return new GitRepository(

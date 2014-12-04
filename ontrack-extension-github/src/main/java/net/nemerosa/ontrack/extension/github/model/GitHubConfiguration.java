@@ -54,6 +54,7 @@ public class GitHubConfiguration implements GitConfiguration, UserPasswordConfig
     private final int indexationInterval;
 
     @Override
+    @JsonIgnore
     public ConfigurationDescriptor getDescriptor() {
         return new ConfigurationDescriptor(
                 name,
@@ -160,11 +161,13 @@ public class GitHubConfiguration implements GitConfiguration, UserPasswordConfig
     }
 
     @Override
+    @JsonIgnore
     public String getType() {
         return "github";
     }
 
     @Override
+    @JsonIgnore
     public Optional<UserPassword> getCredentials() {
         if (StringUtils.isNotBlank(oauth2Token)) {
             return Optional.of(
@@ -186,6 +189,7 @@ public class GitHubConfiguration implements GitConfiguration, UserPasswordConfig
     }
 
     @Override
+    @JsonIgnore
     public String getIssueServiceConfigurationIdentifier() {
         return toIdentifier().format();
     }
