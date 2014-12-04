@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.model.support;
+package net.nemerosa.ontrack.common;
 
 import org.apache.commons.lang3.StringUtils;
 

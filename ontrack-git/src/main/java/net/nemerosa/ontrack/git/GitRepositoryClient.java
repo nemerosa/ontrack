@@ -1,5 +1,9 @@
 package net.nemerosa.ontrack.git;
 
+import net.nemerosa.ontrack.git.model.GitCommit;
+import net.nemerosa.ontrack.git.model.GitLog;
+import org.eclipse.jgit.revwalk.RevCommit;
+
 import java.util.function.Consumer;
 
 /**
@@ -19,4 +23,28 @@ public interface GitRepositoryClient {
      * and password must be checked.
      */
     boolean isCompatible(GitRepository repository);
+
+    /**
+     * Gets a graph Git log between two boundaries.
+     *
+     * @param from Commitish string
+     * @param to   Commitish string
+     * @return Git log
+     */
+    GitLog graph(String from, String to);
+
+    /**
+     * Gets the full hash for a commit
+     */
+    String getId(RevCommit revCommit);
+
+    /**
+     * Gets the abbreviated hash for a commit
+     */
+    String getShortId(RevCommit revCommit);
+
+    /**
+     * Consolidation for a commit
+     */
+    GitCommit toCommit(RevCommit revCommit);
 }

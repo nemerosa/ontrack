@@ -19,6 +19,7 @@ import net.nemerosa.ontrack.git.GitRepositoryClient;
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory;
 import net.nemerosa.ontrack.git.exceptions.GitRepositorySyncException;
 import net.nemerosa.ontrack.git.model.GitCommit;
+import net.nemerosa.ontrack.git.model.GitLog;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.job.*;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -214,17 +215,16 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<FormerGitConfigu
         String commitFrom = getCommitFromBuild(buildFrom);
         String commitTo = getCommitFromBuild(buildTo);
         // Gets the commits
-        GitLog
-//        GitLog log = gitClient.log(commitFrom, commitTo);
-//        // If log empty, inverts the boundaries
-//        if (log.getCommits().isEmpty()) {
-//            String t = commitFrom;
-//            commitFrom = commitTo;
-//            commitTo = t;
-//            log = gitClient.log(commitFrom, commitTo);
-//        }
-        // Consolidation
-//        List<GitCommit> commits = log.getCommits();
+        GitLog log = client.graph(commitFrom, commitTo);
+        // If log empty, inverts the boundaries
+        if (log.getCommits().isEmpty()) {
+            String t = commitFrom;
+            commitFrom = commitTo;
+            commitTo = t;
+            log = client.graph(commitFrom, commitTo);
+        }
+        // FIXME Consolidation to UI
+        List<GitCommit> commits = log.getCommits();
 //        List<GitUICommit> uiCommits = toUICommits(gitConfiguration, commits);
 //        return new GitChangeLogCommits(
 //                new GitUILog(

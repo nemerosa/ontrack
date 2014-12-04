@@ -16,7 +16,7 @@ import net.nemerosa.ontrack.model.job.JobQueueService
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.ApplicationLogService
-import net.nemerosa.ontrack.model.support.Time
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.tx.TransactionService
 import org.junit.Before
 import org.junit.Test

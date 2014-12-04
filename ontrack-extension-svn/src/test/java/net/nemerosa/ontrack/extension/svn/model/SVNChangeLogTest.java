@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.svn.model;
 import net.nemerosa.ontrack.extension.scm.model.SCMBuildView;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.model.support.Time;
+import net.nemerosa.ontrack.common.Time;
 import org.junit.Test;
 
 import java.util.Collection;

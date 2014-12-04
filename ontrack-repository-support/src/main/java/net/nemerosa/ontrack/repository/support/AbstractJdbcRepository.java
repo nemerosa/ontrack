@@ -8,7 +8,7 @@ import net.nemerosa.ontrack.model.exceptions.JsonParsingException;
 import net.nemerosa.ontrack.model.exceptions.JsonWritingException;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.Signature;
-import net.nemerosa.ontrack.model.support.Time;
+import net.nemerosa.ontrack.common.Time;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
