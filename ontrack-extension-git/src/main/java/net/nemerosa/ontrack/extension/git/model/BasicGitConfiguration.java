@@ -3,17 +3,20 @@ package net.nemerosa.ontrack.extension.git.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Wither;
+import net.nemerosa.ontrack.extension.support.UserPasswordConfiguration;
+import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import net.nemerosa.ontrack.model.support.UserPassword;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * Git configuration based on direct definition.
  */
 @Data
 @AllArgsConstructor
-public class BasicGitConfiguration implements GitConfiguration {
+public class BasicGitConfiguration implements GitConfiguration, UserPasswordConfiguration<BasicGitConfiguration> {
 
     /**
      * Name of this configuration
@@ -74,5 +77,32 @@ public class BasicGitConfiguration implements GitConfiguration {
         return StringUtils.isNotBlank(user) ?
                 Optional.of(new UserPassword(user, password)) :
                 Optional.empty();
+    }
+
+    @Override
+    public BasicGitConfiguration obfuscate() {
+        return this;
+    }
+
+    @Override
+    public ConfigurationDescriptor getDescriptor() {
+        return new ConfigurationDescriptor(
+                name,
+                String.format("%s (%s)", name, remote)
+        );
+    }
+
+    @Override
+    public BasicGitConfiguration clone(String targetConfigurationName, Function<String, String> replacementFunction) {
+        return new BasicGitConfiguration(
+                targetConfigurationName,
+                replacementFunction.apply(remote),
+                replacementFunction.apply(user),
+                password,
+                replacementFunction.apply(commitLink),
+                replacementFunction.apply(fileAtCommitLink),
+                indexationInterval,
+                issueServiceConfigurationIdentifier
+        );
     }
 }
