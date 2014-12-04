@@ -1,11 +1,16 @@
 package net.nemerosa.ontrack.extension.svn.service
 
+import net.nemerosa.ontrack.extension.svn.db.SVNRepository
+import net.nemerosa.ontrack.extension.svn.db.SVNRepositoryDao
 import net.nemerosa.ontrack.extension.svn.support.SVNTestRepo
+import net.nemerosa.ontrack.extension.svn.support.SVNTestUtils
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.model.security.GlobalSettings
 import org.apache.commons.io.FileUtils
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Test
+import org.springframework.beans.factory.annotation.Autowired
 
 /**
  * Indexation service integration tests.
@@ -24,8 +29,19 @@ class IndexationServiceIT extends AbstractServiceTestSupport {
         repo.stop()
     }
 
+    @Autowired
+    private IndexationService indexationService
+
+    @Autowired
+    private SVNRepositoryDao repositoryDao
+
     @Test
     void 'Indexation of merge info'() {
+
+        /**
+         * Preparation of a SVN project with branch merged into the trunk
+         */
+
         File wd = new File('build/work/IndexationServiceIT/IndexationOfMergeInfo')
         FileUtils.forceMkdir(wd)
         // Few commits on the trunk
@@ -38,6 +54,23 @@ class IndexationServiceIT extends AbstractServiceTestSupport {
         (7..9).each { repo.mkdir "IndexationOfMergeInfo/trunk/$it", "$it" }
         // Merges the branch into the trunk
         repo.merge wd, 'IndexationOfMergeInfo/branches/MyBranch', 'IndexationOfMergeInfo/trunk', 'Merge'
+
+        /**
+         * Definition of the repository
+         */
+
+        def configuration = SVNTestUtils.repository().configuration
+        def repositoryId = repositoryDao.getOrCreateByName(configuration.name)
+        def repository = SVNRepository.of(repositoryId, configuration, null)
+
+        /**
+         * Indexation of this repository
+         */
+
+        asUser().with(GlobalSettings).call {
+            ((IndexationServiceImpl) indexationService).indexFromLatest(repository, { println it })
+        }
+
     }
 
 }
