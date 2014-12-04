@@ -371,24 +371,24 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                 if (revCommits.size() > 0) {
                     // Gets the last commit (which is the first in the list)
                     RevCommit revCommit = revCommits.get(0);
-                    // FIXME Commit explained (independent from the branch)
-//                    GitCommit commit = gitClient.toCommit(revCommit);
-//                    String commitId = commit.getId();
-//                    // Gets any existing commit info
-//                    OntrackGitIssueCommitInfo commitInfo = commitInfos.get(commitId);
-//                    // If not defined, creates an entry
-//                    if (commitInfo == null) {
-//                        // UI commit (independent from the branch)
-//                        GitUICommit uiCommit = toUICommit(
-//                                configuration.getCommitLink(),
-//                                getMessageAnnotators(configuration),
-//                                commit
-//                        );
-//                        // Commit info
-//                        commitInfo = OntrackGitIssueCommitInfo.of(uiCommit);
-//                        // Indexation
-//                        commitInfos.put(commitId, commitInfo);
-//                    }
+                    // Commit explained (independent from the branch)
+                    GitCommit commit = client.toCommit(revCommit);
+                    String commitId = commit.getId();
+                    // Gets any existing commit info
+                    OntrackGitIssueCommitInfo commitInfo = commitInfos.get(commitId);
+                    // If not defined, creates an entry
+                    if (commitInfo == null) {
+                        // UI commit (independent from the branch)
+                        GitUICommit uiCommit = toUICommit(
+                                configuration.getCommitLink(),
+                                getMessageAnnotators(configuration),
+                                commit
+                        );
+                        // Commit info
+                        commitInfo = OntrackGitIssueCommitInfo.of(uiCommit);
+                        // Indexation
+                        commitInfos.put(commitId, commitInfo);
+                    }
                     // Collects branch info
                     OntrackGitIssueCommitBranchInfo branchInfo = OntrackGitIssueCommitBranchInfo.of(branch);
                     // FIXME Gets the last build for this branch
