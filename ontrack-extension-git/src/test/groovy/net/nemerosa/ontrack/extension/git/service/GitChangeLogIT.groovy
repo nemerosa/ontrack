@@ -2,8 +2,8 @@ package net.nemerosa.ontrack.extension.git.service
 
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
 import net.nemerosa.ontrack.extension.git.client.impl.GitTestUtils
+import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
-import net.nemerosa.ontrack.extension.git.model.FormerGitConfiguration
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationProperty
@@ -59,12 +59,11 @@ class GitChangeLogIT extends AbstractServiceTestSupport {
 
             // Create a Git configuration
             String gitConfigurationName = uid('C')
-            FormerGitConfiguration gitConfiguration = asUser().with(GlobalSettings).call {
+            BasicGitConfiguration gitConfiguration = asUser().with(GlobalSettings).call {
                 gitConfigurationService.newConfiguration(
-                        FormerGitConfiguration.empty()
+                        BasicGitConfiguration.empty()
                                 .withName(gitConfigurationName)
                                 .withRemote("file://${repo.dir.absolutePath}")
-                                .withBuildCommitLink(null)
                 )
             }
 
@@ -162,12 +161,11 @@ class GitChangeLogIT extends AbstractServiceTestSupport {
 
             // Create a Git configuration
             String gitConfigurationName = uid('C')
-            FormerGitConfiguration gitConfiguration = asUser().with(GlobalSettings).call {
+            BasicGitConfiguration gitConfiguration = asUser().with(GlobalSettings).call {
                 gitConfigurationService.newConfiguration(
-                        FormerGitConfiguration.empty()
+                        BasicGitConfiguration.empty()
                                 .withName(gitConfigurationName)
                                 .withRemote("file://${repo.dir.absolutePath}")
-                                .withBuildCommitLink(null)
                 )
             }
 

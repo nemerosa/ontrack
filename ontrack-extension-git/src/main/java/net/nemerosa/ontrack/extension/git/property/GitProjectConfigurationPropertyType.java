@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.git.property;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.common.MapBuilder;
+import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration;
 import net.nemerosa.ontrack.extension.git.model.FormerGitConfiguration;
 import net.nemerosa.ontrack.extension.git.service.GitConfigurationService;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
@@ -70,7 +71,7 @@ public class GitProjectConfigurationPropertyType extends AbstractPropertyType<Gi
     public GitProjectConfigurationProperty fromStorage(JsonNode node) {
         String configurationName = node.path("configuration").asText();
         // Looks the configuration up
-        FormerGitConfiguration configuration = configurationService.getConfiguration(configurationName);
+        BasicGitConfiguration configuration = configurationService.getConfiguration(configurationName);
         // OK
         return new GitProjectConfigurationProperty(
                 configuration

@@ -87,7 +87,7 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
      * Gets the configurations
      */
     @RequestMapping(value = "configurations", method = RequestMethod.GET)
-    public Resources<FormerGitConfiguration> getConfigurations() {
+    public Resources<BasicGitConfiguration> getConfigurations() {
         return Resources.of(
                 configurationService.getConfigurations(),
                 uri(on(getClass()).getConfigurations())
@@ -101,14 +101,14 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
      */
     @RequestMapping(value = "configurations/create", method = RequestMethod.GET)
     public Form getConfigurationForm() {
-        return FormerGitConfiguration.form(issueServiceRegistry.getAvailableIssueServiceConfigurations());
+        return BasicGitConfiguration.form(issueServiceRegistry.getAvailableIssueServiceConfigurations());
     }
 
     /**
      * Creating a configuration
      */
     @RequestMapping(value = "configurations/create", method = RequestMethod.POST)
-    public FormerGitConfiguration newConfiguration(@RequestBody FormerGitConfiguration configuration) {
+    public BasicGitConfiguration newConfiguration(@RequestBody BasicGitConfiguration configuration) {
         return configurationService.newConfiguration(configuration);
     }
 
@@ -116,7 +116,7 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
      * Gets one configuration
      */
     @RequestMapping(value = "configurations/{name}", method = RequestMethod.GET)
-    public FormerGitConfiguration getConfiguration(@PathVariable String name) {
+    public BasicGitConfiguration getConfiguration(@PathVariable String name) {
         return configurationService.getConfiguration(name);
     }
 
@@ -142,7 +142,7 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
      * Updating one configuration
      */
     @RequestMapping(value = "configurations/{name}/update", method = RequestMethod.PUT)
-    public FormerGitConfiguration updateConfiguration(@PathVariable String name, @RequestBody FormerGitConfiguration configuration) {
+    public BasicGitConfiguration updateConfiguration(@PathVariable String name, @RequestBody BasicGitConfiguration configuration) {
         configurationService.updateConfiguration(name, configuration);
         return getConfiguration(name);
     }

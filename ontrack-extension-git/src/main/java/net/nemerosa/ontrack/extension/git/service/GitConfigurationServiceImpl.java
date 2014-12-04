@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.git.service;
 
-import net.nemerosa.ontrack.extension.git.model.FormerGitConfiguration;
+import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration;
 import net.nemerosa.ontrack.extension.support.AbstractConfigurationService;
 import net.nemerosa.ontrack.model.security.EncryptionService;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -11,11 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-public class GitConfigurationServiceImpl extends AbstractConfigurationService<FormerGitConfiguration> implements GitConfigurationService {
+public class GitConfigurationServiceImpl extends AbstractConfigurationService<BasicGitConfiguration> implements GitConfigurationService {
 
     @Autowired
     public GitConfigurationServiceImpl(ConfigurationRepository configurationRepository, SecurityService securityService, EncryptionService encryptionService) {
-        super(FormerGitConfiguration.class, configurationRepository, securityService, encryptionService);
+        super(BasicGitConfiguration.class, configurationRepository, securityService, encryptionService);
     }
 
 }

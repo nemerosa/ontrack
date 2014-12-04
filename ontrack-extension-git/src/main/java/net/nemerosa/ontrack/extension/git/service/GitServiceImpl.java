@@ -48,7 +48,6 @@ import static java.lang.String.format;
 public class GitServiceImpl extends AbstractSCMChangeLogService<FormerGitConfiguration, GitBuildInfo, GitChangeLogIssue> implements GitService, JobProvider {
 
     private final Logger logger = LoggerFactory.getLogger(GitService.class);
-    private final Collection<GitConfigurator> configurators;
     private final GitClientFactory gitClientFactory;
     private final PropertyService propertyService;
     private final IssueServiceRegistry issueServiceRegistry;
@@ -64,7 +63,6 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<FormerGitConfigu
     public GitServiceImpl(
             StructureService structureService,
             PropertyService propertyService,
-            Collection<GitConfigurator> configurators,
             GitClientFactory gitClientFactory,
             IssueServiceRegistry issueServiceRegistry,
             JobQueueService jobQueueService,
@@ -75,7 +73,6 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<FormerGitConfigu
             BuildGitCommitLinkService buildGitCommitLinkService,
             GitConfigurationService gitConfigurationService) {
         super(structureService, propertyService);
-        this.configurators = configurators;
         this.gitClientFactory = gitClientFactory;
         this.propertyService = propertyService;
         this.issueServiceRegistry = issueServiceRegistry;
@@ -612,10 +609,6 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<FormerGitConfigu
     public FormerGitConfiguration getProjectConfiguration(Project project) {
         // Empty configuration
         FormerGitConfiguration configuration = FormerGitConfiguration.empty();
-        // Configurators
-        for (GitConfigurator configurator : configurators) {
-            configuration = configurator.configureProject(configuration, project);
-        }
         // OK
         return configuration;
     }
@@ -668,10 +661,6 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<FormerGitConfigu
     public FormerGitConfiguration getBranchConfiguration(Branch branch) {
         // Empty configuration
         FormerGitConfiguration configuration = FormerGitConfiguration.empty();
-        // Configurators{
-        for (GitConfigurator configurator : configurators) {
-            configuration = configurator.configure(configuration, branch);
-        }
         // Unique name
         if (StringUtils.isNotBlank(configuration.getRemote())) {
             configuration = configuration.withName(

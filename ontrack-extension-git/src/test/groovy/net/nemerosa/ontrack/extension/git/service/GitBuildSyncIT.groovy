@@ -54,7 +54,6 @@ class GitBuildSyncIT {
         gitService = new GitServiceImpl(
                 structureService,
                 propertyService,
-                [],
                 gitClientFactory,
                 mock(IssueServiceRegistry),
                 mock(JobQueueService),

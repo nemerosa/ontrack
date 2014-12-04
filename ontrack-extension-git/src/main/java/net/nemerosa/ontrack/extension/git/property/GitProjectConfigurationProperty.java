@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.git.property;
 
 import lombok.Data;
-import net.nemerosa.ontrack.extension.git.model.FormerGitConfiguration;
+import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration;
 
 @Data
 public class GitProjectConfigurationProperty {
@@ -9,6 +9,6 @@ public class GitProjectConfigurationProperty {
     /**
      * Link to the Git configuration
      */
-    private final FormerGitConfiguration configuration;
+    private final BasicGitConfiguration configuration;
 
 }
