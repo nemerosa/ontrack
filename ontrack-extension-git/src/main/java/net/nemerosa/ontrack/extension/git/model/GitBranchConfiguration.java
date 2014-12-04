@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.git.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Wither;
+import net.nemerosa.ontrack.extension.git.support.TagBuildNameGitCommitLink;
 
 @Data
 @AllArgsConstructor
@@ -35,4 +36,13 @@ public class GitBranchConfiguration {
      */
     private final int buildTagInterval;
 
+    public static GitBranchConfiguration of(GitConfiguration configuration, String branch) {
+        return new GitBranchConfiguration(
+                configuration,
+                branch,
+                TagBuildNameGitCommitLink.DEFAULT,
+                false,
+                0
+        );
+    }
 }

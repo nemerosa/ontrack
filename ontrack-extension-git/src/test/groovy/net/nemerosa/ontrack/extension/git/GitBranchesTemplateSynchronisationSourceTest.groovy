@@ -1,7 +1,8 @@
 package net.nemerosa.ontrack.extension.git
 
 import net.nemerosa.ontrack.extension.api.ExtensionManager
-import net.nemerosa.ontrack.extension.git.model.FormerGitConfiguration
+import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
+import net.nemerosa.ontrack.extension.git.model.GitConfiguration
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Project
@@ -9,7 +10,6 @@ import org.junit.Before
 import org.junit.Test
 
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd
-import static org.mockito.Matchers.any
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when
 
@@ -19,17 +19,19 @@ class GitBranchesTemplateSynchronisationSourceTest {
     ExtensionManager extensionManager
     GitService gitService
     GitBranchesTemplateSynchronisationSource source
-    FormerGitConfiguration gitConfiguration
+    GitConfiguration gitConfiguration
     Branch branch
+    Project project
 
     @Before
     void before() {
-        branch = Branch.of(Project.of(nd('P', "Project")), nd('B', "Branch"))
-        gitConfiguration = FormerGitConfiguration.empty().withBranch('${sourceName}')
+        project = Project.of(nd('P', "Project"))
+        branch = Branch.of(project, nd('B', "Branch"))
+        gitConfiguration = BasicGitConfiguration.empty()
         extensionManager = mock(ExtensionManager)
         gitService = mock(GitService)
-        when(gitService.getBranchConfiguration(branch)).thenReturn(gitConfiguration)
-        when(gitService.getRemoteBranches(any(FormerGitConfiguration))).thenReturn(
+        when(gitService.getProjectConfiguration(project)).thenReturn(Optional.of(gitConfiguration))
+        when(gitService.getRemoteBranches(gitConfiguration)).thenReturn(
                 ['master', 'feature/ontrack-40-templating', 'feature/ontrack-111-project-manager', 'fix/ontrack-110']
         )
         source = new GitBranchesTemplateSynchronisationSource(
