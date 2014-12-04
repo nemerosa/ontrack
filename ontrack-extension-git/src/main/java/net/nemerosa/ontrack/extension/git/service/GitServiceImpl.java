@@ -615,8 +615,8 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<FormerGitConfigu
         return gitConfigurators.stream()
                 .map(c -> c.getConfiguration(project))
                 .filter(Optional::isPresent)
-                .findFirst()
-                .get();
+                .map(Optional::get)
+                .findFirst();
     }
 
     protected GitBranchConfiguration getRequiredBranchConfiguration(Branch branch) {
