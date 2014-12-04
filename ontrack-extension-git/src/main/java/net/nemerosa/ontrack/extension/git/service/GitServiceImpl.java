@@ -2,7 +2,10 @@ package net.nemerosa.ontrack.extension.git.service;
 
 import com.google.common.collect.Lists;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
-import net.nemerosa.ontrack.extension.git.client.*;
+import net.nemerosa.ontrack.extension.git.client.GitCommit;
+import net.nemerosa.ontrack.extension.git.client.GitDiff;
+import net.nemerosa.ontrack.extension.git.client.GitDiffEntry;
+import net.nemerosa.ontrack.extension.git.client.GitTag;
 import net.nemerosa.ontrack.extension.git.model.*;
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty;
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType;
@@ -47,7 +50,6 @@ import static java.lang.String.format;
 public class GitServiceImpl extends AbstractSCMChangeLogService<FormerGitConfiguration, GitBuildInfo, GitChangeLogIssue> implements GitService, JobProvider {
 
     private final Logger logger = LoggerFactory.getLogger(GitService.class);
-    private final GitClientFactory gitClientFactory;
     private final PropertyService propertyService;
     private final IssueServiceRegistry issueServiceRegistry;
     private final JobQueueService jobQueueService;
@@ -63,7 +65,6 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<FormerGitConfigu
     public GitServiceImpl(
             StructureService structureService,
             PropertyService propertyService,
-            GitClientFactory gitClientFactory,
             IssueServiceRegistry issueServiceRegistry,
             JobQueueService jobQueueService,
             SecurityService securityService,
@@ -74,7 +75,6 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<FormerGitConfigu
             GitConfigurationService gitConfigurationService,
             Collection<GitConfigurator> gitConfigurators) {
         super(structureService, propertyService);
-        this.gitClientFactory = gitClientFactory;
         this.propertyService = propertyService;
         this.issueServiceRegistry = issueServiceRegistry;
         this.jobQueueService = jobQueueService;
@@ -116,10 +116,9 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<FormerGitConfigu
     public Collection<Job> getJobs() {
         Collection<Job> jobs = new ArrayList<>();
         // Indexation of repositories, based on projects actually linked
-        // FIXME Groups the configurations per name and remote
-//        forEachConfiguredProject((project, configuration) -> {
-//            jobs.add(createIndexationJob(configuration));
-//        });
+        forEachConfiguredProject((project, configuration) -> {
+            jobs.add(createIndexationJob(configuration));
+        });
         // Synchronisation of branch builds with tags when applicable
         forEachConfiguredBranch((branch, branchConfiguration) -> {
             // Build/tag sync job
@@ -708,7 +707,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<FormerGitConfigu
         };
     }
 
-    private Job createIndexationJob(FormerGitConfiguration config) {
+    private Job createIndexationJob(GitConfiguration config) {
         return new Job() {
             @Override
             public String getCategory() {
@@ -717,7 +716,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<FormerGitConfigu
 
             @Override
             public String getId() {
-                return config.getName();
+                return config.getGitRepository().getId();
             }
 
             @Override
@@ -812,10 +811,10 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<FormerGitConfigu
         }
     }
 
-    private void index(FormerGitConfiguration config, JobInfoListener info) {
+    private void index(GitConfiguration config, JobInfoListener info) {
         info.post(format("Git sync for %s", config.getName()));
         // Gets the client for this configuration
-        GitRepositoryClient client = gitRepositoryClientFactory.getClient(config.toRepository());
+        GitRepositoryClient client = gitRepositoryClientFactory.getClient(config.getGitRepository());
         // Launches the synchronisation
         client.sync(info::post);
     }
