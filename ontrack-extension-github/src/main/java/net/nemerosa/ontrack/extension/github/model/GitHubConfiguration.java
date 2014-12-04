@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.github.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.github.GitHubIssueServiceExtension;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.support.UserPasswordConfiguration;
@@ -10,14 +11,17 @@ import net.nemerosa.ontrack.model.form.Int;
 import net.nemerosa.ontrack.model.form.Password;
 import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
+import net.nemerosa.ontrack.model.support.UserPassword;
+import org.apache.commons.lang3.StringUtils;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 import static java.lang.String.format;
 import static net.nemerosa.ontrack.model.form.Form.defaultNameField;
 
 @Data
-public class GitHubConfiguration implements UserPasswordConfiguration<GitHubConfiguration>, IssueServiceConfiguration {
+public class GitHubConfiguration implements GitConfiguration, UserPasswordConfiguration<GitHubConfiguration>, IssueServiceConfiguration {
 
     /**
      * Name of this configuration
@@ -153,5 +157,36 @@ public class GitHubConfiguration implements UserPasswordConfiguration<GitHubConf
                 oauth2Token,
                 indexationInterval
         );
+    }
+
+    @Override
+    public String getType() {
+        return "github";
+    }
+
+    @Override
+    public Optional<UserPassword> getCredentials() {
+        if (StringUtils.isNotBlank(oauth2Token)) {
+            return Optional.of(
+                    new UserPassword(
+                            oauth2Token,
+                            "x-oauth-basic"
+                    )
+            );
+        } else if (StringUtils.isNotBlank(user)) {
+            return Optional.of(
+                    new UserPassword(
+                            user,
+                            password
+                    )
+            );
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public String getIssueServiceConfigurationIdentifier() {
+        return toIdentifier().format();
     }
 }
