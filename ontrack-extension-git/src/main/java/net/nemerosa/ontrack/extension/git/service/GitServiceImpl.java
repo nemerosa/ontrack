@@ -357,16 +357,16 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             if (configuredIssueService != null) {
                 // List of commits for this branch
                 List<RevCommit> revCommits = new ArrayList<>();
-                // FIXME Scanning this branch's repository for the commit
-//                gitClient.scanCommits(revCommit -> {
-//                    String message = revCommit.getFullMessage();
-//                    Set<String> keys = configuredIssueService.extractIssueKeysFromMessage(message);
-//                    if (configuredIssueService.containsIssueKey(key, keys)) {
-//                        // We have a commit for this branch!
-//                        revCommits.add(revCommit);
-//                    }
-//                    return false; // Scanning all commits
-//                });
+                // Scanning this branch's repository for the commit
+                client.scanCommits(branchConfiguration.getBranch(), revCommit -> {
+                    String message = revCommit.getFullMessage();
+                    Set<String> keys = configuredIssueService.extractIssueKeysFromMessage(message);
+                    if (configuredIssueService.containsIssueKey(key, keys)) {
+                        // We have a commit for this branch!
+                        revCommits.add(revCommit);
+                    }
+                    return false; // Scanning all commits
+                });
                 // If at least one commit
                 if (revCommits.size() > 0) {
                     // Gets the last commit (which is the first in the list)

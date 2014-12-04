@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.git.model.GitLog;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * Defines a client for a Git repository.
@@ -47,4 +48,15 @@ public interface GitRepositoryClient {
      * Consolidation for a commit
      */
     GitCommit toCommit(RevCommit revCommit);
+
+
+    /**
+     * Scans the whole history.
+     *
+     * @param branch       Branch to follow
+     * @param scanFunction Function that scans the commits. Returns <code>true</code> if the scan
+     *                     must not go on, <code>false</code> otherwise.
+     * @return <code>true</code> if at least one call to <code>scanFunction</code> has returned <code>true</code>.
+     */
+    boolean scanCommits(String branch, Predicate<RevCommit> scanFunction);
 }

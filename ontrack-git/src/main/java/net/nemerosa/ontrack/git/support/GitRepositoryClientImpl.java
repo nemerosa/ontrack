@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import static java.lang.String.format;
 
@@ -143,6 +144,26 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
                     commits
             );
 
+        } catch (IOException e) {
+            throw new GitRepositoryIOException(repository.getRemote(), e);
+        }
+    }
+
+    @Override
+    public boolean scanCommits(String branch, Predicate<RevCommit> scanFunction) {
+        // All commits
+        try {
+            Iterable<RevCommit> commits = git.log().add(git.getRepository().resolve("origin/" + branch)).call();
+            for (RevCommit commit : commits) {
+                if (scanFunction.test(commit)) {
+                    // Not going on
+                    return true;
+                }
+            }
+            // Default behaviour
+            return false;
+        } catch (GitAPIException e) {
+            throw new GitRepositoryAPIException(repository.getRemote(), e);
         } catch (IOException e) {
             throw new GitRepositoryIOException(repository.getRemote(), e);
         }
