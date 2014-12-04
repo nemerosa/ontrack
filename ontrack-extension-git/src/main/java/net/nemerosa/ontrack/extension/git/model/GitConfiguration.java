@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.git.model;
 
+import net.nemerosa.ontrack.git.GitRepository;
 import net.nemerosa.ontrack.model.support.UserPassword;
 
 import java.util.Optional;
@@ -49,5 +50,19 @@ public interface GitConfiguration {
      * with this repository.
      */
     String getIssueServiceConfigurationIdentifier();
+
+    /**
+     * Gets the Git repository for this configuration
+     */
+    default GitRepository getGitRepository() {
+        Optional<UserPassword> credentials = getCredentials();
+        return new GitRepository(
+                getType(),
+                getName(),
+                getRemote(),
+                credentials.map(UserPassword::getUser).orElse(""),
+                credentials.map(UserPassword::getPassword).orElse("")
+        );
+    }
 
 }
