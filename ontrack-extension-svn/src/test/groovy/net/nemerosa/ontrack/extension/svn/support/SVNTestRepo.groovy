@@ -21,9 +21,10 @@ class SVNTestRepo {
     }
 
     long start() {
-        repo = new File("build/repo/$repoName")
+        repo = new File("build/repo/$repoName").absoluteFile
         FileUtils.deleteQuietly(repo)
         repo.mkdirs()
+        println "SVN Test repo at ${repo.absolutePath}"
         // Creates the repository
         run repo, "svnadmin", "create", repo.absolutePath
         // Configuration file
