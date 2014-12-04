@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.svn.service
 
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository
 import net.nemerosa.ontrack.extension.svn.db.SVNRepositoryDao
+import net.nemerosa.ontrack.extension.svn.db.SVNRevisionDao
 import net.nemerosa.ontrack.extension.svn.support.SVNTestRepo
 import net.nemerosa.ontrack.extension.svn.support.SVNTestUtils
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
@@ -35,6 +36,9 @@ class IndexationServiceIT extends AbstractServiceTestSupport {
     @Autowired
     private SVNRepositoryDao repositoryDao
 
+    @Autowired
+    private SVNRevisionDao revisionDao
+
     @Test
     void 'Indexation of merge info'() {
 
@@ -52,7 +56,7 @@ class IndexationServiceIT extends AbstractServiceTestSupport {
         (4..6).each { repo.mkdir "IndexationOfMergeInfo/branches/MyBranch/$it", "Branch $it" }
         // Few commits on the trunk
         (7..9).each { repo.mkdir "IndexationOfMergeInfo/trunk/$it", "$it" }
-        // Merges the branch into the trunk
+        // Merges the branch into the trunk (revision = 11)
         repo.merge wd, 'IndexationOfMergeInfo/branches/MyBranch', 'IndexationOfMergeInfo/trunk', 'Merge'
 
         /**
@@ -69,6 +73,14 @@ class IndexationServiceIT extends AbstractServiceTestSupport {
 
         asUser().with(GlobalSettings).call {
             ((IndexationServiceImpl) indexationService).indexFromLatest(repository, { println it })
+        }
+
+        /**
+         * Makes sure the merge is registered
+         */
+
+        (5..7).each {
+            assert revisionDao.getMergesForRevision(repositoryId, it) == [12]
         }
 
     }
