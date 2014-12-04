@@ -11,6 +11,11 @@ import java.util.Objects;
 public class GitRepository {
 
     /**
+     * Type of repository (source of information)
+     */
+    private final String type;
+
+    /**
      * Name of the repository
      */
     private final String name;
@@ -31,7 +36,7 @@ public class GitRepository {
     private final String password;
 
     public String getId() {
-        return (name + "_" + remote).replaceAll("[:\\.\\\\/@]", "_");
+        return (type + "_" + name + "_" + remote).replaceAll("[:\\.\\\\/@]", "_");
     }
 
 }

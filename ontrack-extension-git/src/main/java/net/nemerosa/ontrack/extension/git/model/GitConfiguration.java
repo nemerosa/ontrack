@@ -222,6 +222,8 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
 
     public GitRepository toRepository() {
         return new GitRepository(
+                // FIXME Type of configuration
+                "type",
                 name,
                 remote,
                 user,
