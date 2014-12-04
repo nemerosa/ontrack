@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.git.client.plot;
+package net.nemerosa.ontrack.git.model.plot;
 
 public abstract class AbstractGItem implements GItem {
 

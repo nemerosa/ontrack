@@ -2,10 +2,7 @@ package net.nemerosa.ontrack.extension.git.service;
 
 import com.google.common.collect.Lists;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
-import net.nemerosa.ontrack.extension.git.client.GitCommit;
-import net.nemerosa.ontrack.extension.git.client.GitDiff;
-import net.nemerosa.ontrack.extension.git.client.GitDiffEntry;
-import net.nemerosa.ontrack.extension.git.client.GitTag;
+import net.nemerosa.ontrack.extension.git.client.*;
 import net.nemerosa.ontrack.extension.git.model.*;
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty;
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType;
@@ -21,6 +18,7 @@ import net.nemerosa.ontrack.extension.scm.service.AbstractSCMChangeLogService;
 import net.nemerosa.ontrack.git.GitRepositoryClient;
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory;
 import net.nemerosa.ontrack.git.exceptions.GitRepositorySyncException;
+import net.nemerosa.ontrack.git.model.GitCommit;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.job.*;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -215,7 +213,8 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<FormerGitConfigu
         // Commit boundaries
         String commitFrom = getCommitFromBuild(buildFrom);
         String commitTo = getCommitFromBuild(buildTo);
-        // FIXME Gets the commits
+        // Gets the commits
+        GitLog
 //        GitLog log = gitClient.log(commitFrom, commitTo);
 //        // If log empty, inverts the boundaries
 //        if (log.getCommits().isEmpty()) {

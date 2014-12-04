@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.git.client.plot;
+package net.nemerosa.ontrack.git.model.plot;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.git;
 
 import net.nemerosa.ontrack.extension.api.SearchExtension;
-import net.nemerosa.ontrack.extension.git.client.GitCommit;
+import net.nemerosa.ontrack.git.model.GitCommit;
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.git.model.GitUICommit;
 import net.nemerosa.ontrack.extension.git.service.GitService;

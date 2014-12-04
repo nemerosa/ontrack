@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.git.client.plot;
+package net.nemerosa.ontrack.git.model.plot;
 
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revplot.AbstractPlotRenderer;

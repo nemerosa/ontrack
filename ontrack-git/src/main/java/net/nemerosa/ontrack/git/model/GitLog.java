@@ -1,7 +1,8 @@
-package net.nemerosa.ontrack.extension.git.client;
+package net.nemerosa.ontrack.git.model;
 
 import lombok.Data;
-import net.nemerosa.ontrack.extension.git.client.plot.GPlot;
+import net.nemerosa.ontrack.git.model.plot.GPlot;
+import net.nemerosa.ontrack.git.model.GitCommit;
 
 import java.util.List;
 
