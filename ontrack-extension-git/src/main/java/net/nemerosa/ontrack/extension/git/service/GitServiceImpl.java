@@ -116,8 +116,9 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     @Override
     public Collection<Job> getJobs() {
         Collection<Job> jobs = new ArrayList<>();
-        // Indexation of repositories
-        gitConfigurationService.getConfigurations().forEach(configuration -> {
+        // Indexation of repositories, based on projects actually linked
+        // FIXME Groups the configurations per name and remote
+        forEachConfiguredProject((project, configuration) -> {
             jobs.add(createIndexationJob(configuration));
         });
         // Synchronisation of branch builds with tags when applicable

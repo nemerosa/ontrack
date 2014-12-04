@@ -222,6 +222,7 @@ public class GitConfiguration implements UserPasswordConfiguration<GitConfigurat
 
     public GitRepository toRepository() {
         return new GitRepository(
+                name,
                 remote,
                 user,
                 password
