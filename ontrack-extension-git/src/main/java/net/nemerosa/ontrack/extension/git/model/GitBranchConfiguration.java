@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.git.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Wither;
@@ -12,7 +11,7 @@ public class GitBranchConfiguration {
     /**
      * Main project's configuration
      */
-    private final FormerGitConfiguration configuration;
+    private final GitConfiguration configuration;
 
     /**
      * Default branch
@@ -36,8 +35,4 @@ public class GitBranchConfiguration {
      */
     private final int buildTagInterval;
 
-    @JsonIgnore
-    public boolean isValid() {
-        return configuration.isValid();
-    }
 }

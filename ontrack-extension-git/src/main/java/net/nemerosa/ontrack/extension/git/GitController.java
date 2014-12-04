@@ -35,6 +35,7 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -174,10 +175,10 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
     public Resources<ExportFormat> changeLogExportFormats(@PathVariable ID branchId) {
         // Gets the branch
         Branch branch = structureService.getBranch(branchId);
-        // Gets the configuration for the branch
-        FormerGitConfiguration configuration = gitService.getBranchConfiguration(branch);
-        if (configuration.isValid()) {
-            ConfiguredIssueService configuredIssueService = issueServiceRegistry.getConfiguredIssueService(configuration.getIssueServiceConfigurationIdentifier());
+        // Gets the configuration for the project
+        Optional<GitConfiguration> configuration = gitService.getProjectConfiguration(branch.getProject());
+        if (configuration.isPresent()) {
+            ConfiguredIssueService configuredIssueService = issueServiceRegistry.getConfiguredIssueService(configuration.get().getIssueServiceConfigurationIdentifier());
             if (configuredIssueService != null) {
                 return Resources.of(
                         configuredIssueService.getIssueServiceExtension().exportFormats(),
@@ -202,7 +203,8 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
         // Gets the associated project
         Project project = changeLog.getProject();
         // Gets the configuration for the project
-        FormerGitConfiguration gitConfiguration = gitService.getProjectConfiguration(project);
+        GitConfiguration gitConfiguration = gitService.getProjectConfiguration(project)
+                .orElseThrow(() -> new GitProjectNotConfiguredException(project.getId()));
         // Gets the issue service
         String issueServiceConfigurationIdentifier = gitConfiguration.getIssueServiceConfigurationIdentifier();
         if (StringUtils.isBlank(issueServiceConfigurationIdentifier)) {

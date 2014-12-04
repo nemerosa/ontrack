@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.git;
 
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
-import net.nemerosa.ontrack.extension.git.model.FormerGitConfiguration;
+import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.structure.Branch;
@@ -9,7 +9,9 @@ import net.nemerosa.ontrack.model.support.AbstractTemplateSynchronisationSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -51,17 +53,18 @@ public class GitBranchesTemplateSynchronisationSource extends AbstractTemplateSy
 
     @Override
     public List<String> getBranchNames(Branch branch, GitBranchesTemplateSynchronisationSourceConfig config) {
-        // Gets the Git configuration
-        FormerGitConfiguration gitConfiguration = gitService.getBranchConfiguration(branch);
-        // Overrides the branch name to master (#166)
-        gitConfiguration = gitConfiguration.withBranch("master");
-        // Inclusion predicate
-        Predicate<String> filter = config.getFilter();
-        // Gets the list of branches
-        return gitService.getRemoteBranches(gitConfiguration).stream()
-                .filter(filter)
-                .sorted()
-                .collect(Collectors.toList());
+        Optional<GitConfiguration> projectConfiguration = gitService.getProjectConfiguration(branch.getProject());
+        if (projectConfiguration.isPresent()) {
+            // Inclusion predicate
+            Predicate<String> filter = config.getFilter();
+            // Gets the list of branches
+            return gitService.getRemoteBranches(projectConfiguration.get()).stream()
+                    .filter(filter)
+                    .sorted()
+                    .collect(Collectors.toList());
+        } else {
+            return Collections.emptyList();
+        }
     }
 
 }

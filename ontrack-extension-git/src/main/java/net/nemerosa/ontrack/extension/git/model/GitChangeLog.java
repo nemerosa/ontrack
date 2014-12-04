@@ -25,11 +25,11 @@ public class GitChangeLog extends SCMChangeLog<FormerGitConfiguration, GitBuildI
             String uuid,
             Project project,
             Branch branch,
-            FormerGitConfiguration configuration,
             SCMBuildView<GitBuildInfo> scmBuildFrom,
             SCMBuildView<GitBuildInfo> scmBuildTo,
             boolean syncError) {
-        super(uuid, project, branch, configuration, scmBuildFrom, scmBuildTo);
+        // FIXME No need for the SCM info any longer
+        super(uuid, project, branch, null, scmBuildFrom, scmBuildTo);
         this.syncError = syncError;
     }
 

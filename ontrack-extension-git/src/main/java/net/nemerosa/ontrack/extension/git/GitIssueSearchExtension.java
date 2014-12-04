@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.git;
 import lombok.Data;
 import net.nemerosa.ontrack.extension.api.SearchExtension;
 import net.nemerosa.ontrack.extension.git.client.impl.GitException;
-import net.nemerosa.ontrack.extension.git.model.FormerGitConfiguration;
+import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
@@ -52,7 +52,7 @@ public class GitIssueSearchExtension extends AbstractExtension implements Search
     protected static class BranchSearchConfiguration {
 
         private final Branch branch;
-        private final FormerGitConfiguration gitConfiguration;
+        private final GitConfiguration gitConfiguration;
         private final ConfiguredIssueService configuredIssueService;
 
     }
@@ -65,7 +65,7 @@ public class GitIssueSearchExtension extends AbstractExtension implements Search
             super(uriBuilder);
             branchSearchConfigurations = new ArrayList<>();
             gitService.forEachConfiguredBranch((branch, branchConfiguration) -> {
-                FormerGitConfiguration config = branchConfiguration.getConfiguration();
+                GitConfiguration config = branchConfiguration.getConfiguration();
                 String issueServiceConfigurationIdentifier = config.getIssueServiceConfigurationIdentifier();
                 if (StringUtils.isNotBlank(issueServiceConfigurationIdentifier)) {
                     ConfiguredIssueService configuredIssueService = issueServiceRegistry.getConfiguredIssueService(issueServiceConfigurationIdentifier);
