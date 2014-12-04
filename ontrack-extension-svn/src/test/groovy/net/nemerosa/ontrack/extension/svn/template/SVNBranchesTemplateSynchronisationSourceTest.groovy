@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.svn.template
 import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.extension.svn.SVNExtensionFeature
 import net.nemerosa.ontrack.extension.svn.service.SVNService
+import net.nemerosa.ontrack.extension.svn.support.SVNTestUtils
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.tx.TransactionService
