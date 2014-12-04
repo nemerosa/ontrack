@@ -2,7 +2,9 @@ package net.nemerosa.ontrack.extension.git.service;
 
 import com.google.common.collect.Lists;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
-import net.nemerosa.ontrack.extension.git.client.*;
+import net.nemerosa.ontrack.extension.git.client.GitDiff;
+import net.nemerosa.ontrack.extension.git.client.GitDiffEntry;
+import net.nemerosa.ontrack.extension.git.client.GitTag;
 import net.nemerosa.ontrack.extension.git.model.*;
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty;
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType;
@@ -223,16 +225,15 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<FormerGitConfigu
             commitTo = t;
             log = client.graph(commitFrom, commitTo);
         }
-        // FIXME Consolidation to UI
+        // Consolidation to UI
         List<GitCommit> commits = log.getCommits();
-//        List<GitUICommit> uiCommits = toUICommits(gitConfiguration, commits);
-//        return new GitChangeLogCommits(
-//                new GitUILog(
-//                        log.getPlot(),
-//                        uiCommits
-//                )
-//        );
-        throw new RuntimeException("NYI");
+        List<GitUICommit> uiCommits = toUICommits(getRequiredProjectConfiguration(changeLog.getProject()), commits);
+        return new GitChangeLogCommits(
+                new GitUILog(
+                        log.getPlot(),
+                        uiCommits
+                )
+        );
     }
 
     protected String getCommitFromBuild(Build build) {
@@ -452,7 +453,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<FormerGitConfigu
     private OntrackGitCommitInfo getOntrackGitCommitInfo(String commit) {
         // Reference data
         AtomicReference<GitCommit> theCommit = new AtomicReference<>();
-        AtomicReference<FormerGitConfiguration> theConfiguration = new AtomicReference<>();
+        AtomicReference<GitConfiguration> theConfiguration = new AtomicReference<>();
         // Data to collect
         Collection<BuildView> buildViews = new ArrayList<>();
         Collection<BranchStatusView> branchStatusViews = new ArrayList<>();
@@ -475,10 +476,10 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<FormerGitConfigu
             // If present...
             RevCommit revCommit = revCommitRef.get();
             if (revCommit != null) {
-                // FIXME Reference
+                // Reference
                 if (theCommit.get() == null) {
-//                    theCommit.set(gitClient.toCommit(revCommit));
-//                    theConfiguration.set(configuration);
+                    theCommit.set(gitClient.toCommit(revCommit));
+                    theConfiguration.set(configuration);
                 }
                 // Gets the earliest build on this branch that contains this commit
                 getEarliestBuildAfterCommit(commit, branch, branchConfiguration, gitClient)
@@ -497,9 +498,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<FormerGitConfigu
         });
 
         // OK
-        if (theCommit.get() != null)
-
-        {
+        if (theCommit.get() != null) {
             String commitLink = theConfiguration.get().getCommitLink();
             List<? extends MessageAnnotator> messageAnnotators = getMessageAnnotators(theConfiguration.get());
             return new OntrackGitCommitInfo(
@@ -511,9 +510,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<FormerGitConfigu
                     buildViews,
                     branchStatusViews
             );
-        } else
-
-        {
+        } else {
             throw new GitCommitNotFoundException(commit);
         }
 
@@ -562,7 +559,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<FormerGitConfigu
         }
     }
 
-    private List<GitUICommit> toUICommits(FormerGitConfiguration gitConfiguration, List<GitCommit> commits) {
+    private List<GitUICommit> toUICommits(GitConfiguration gitConfiguration, List<GitCommit> commits) {
         // Link?
         String commitLink = gitConfiguration.getCommitLink();
         // Issue-based annotations
@@ -582,7 +579,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<FormerGitConfigu
         );
     }
 
-    private List<? extends MessageAnnotator> getMessageAnnotators(FormerGitConfiguration gitConfiguration) {
+    private List<? extends MessageAnnotator> getMessageAnnotators(GitConfiguration gitConfiguration) {
         List<? extends MessageAnnotator> messageAnnotators;
         String issueServiceConfigurationIdentifier = gitConfiguration.getIssueServiceConfigurationIdentifier();
         if (StringUtils.isNotBlank(issueServiceConfigurationIdentifier)) {
