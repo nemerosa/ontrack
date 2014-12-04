@@ -48,7 +48,7 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 
 @Service
-public class GitServiceImpl extends AbstractSCMChangeLogService<FormerGitConfiguration, GitBuildInfo, GitChangeLogIssue> implements GitService, JobProvider {
+public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration, GitBuildInfo, GitChangeLogIssue> implements GitService, JobProvider {
 
     private final Logger logger = LoggerFactory.getLogger(GitService.class);
     private final PropertyService propertyService;
