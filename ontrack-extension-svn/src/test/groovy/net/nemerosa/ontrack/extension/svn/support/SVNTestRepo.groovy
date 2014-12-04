@@ -63,4 +63,11 @@ class SVNTestRepo {
         // Commit
         run wd, 'svn', 'commit', '--message', message, wd.absolutePath, '--username', 'user', '--password', 'test', '--no-auth-cache'
     }
+
+    /**
+     * Remote copy of {@code from} into {@code into} using the {@code message} message.
+     */
+    def copy(String from, String into, String message) {
+        run repo, 'svn', 'copy', '--parents', "svn://localhost/${from}", "svn://localhost/${into}", '--message', message, '--username', 'user', '--password', 'test', '--no-auth-cache'
+    }
 }
