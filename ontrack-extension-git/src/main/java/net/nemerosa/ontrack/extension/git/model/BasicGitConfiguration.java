@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.git.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Wither;
@@ -68,11 +69,13 @@ public class BasicGitConfiguration implements GitConfiguration, UserPasswordConf
     private final String issueServiceConfigurationIdentifier;
 
     @Override
+    @JsonIgnore
     public String getType() {
         return "basic";
     }
 
     @Override
+    @JsonIgnore
     public Optional<UserPassword> getCredentials() {
         return StringUtils.isNotBlank(user) ?
                 Optional.of(new UserPassword(user, password)) :
@@ -85,6 +88,7 @@ public class BasicGitConfiguration implements GitConfiguration, UserPasswordConf
     }
 
     @Override
+    @JsonIgnore
     public ConfigurationDescriptor getDescriptor() {
         return new ConfigurationDescriptor(
                 name,
