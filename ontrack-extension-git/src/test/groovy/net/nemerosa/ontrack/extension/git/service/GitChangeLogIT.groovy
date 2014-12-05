@@ -113,7 +113,6 @@ class GitChangeLogIT extends AbstractServiceTestSupport {
             asUser().with(project, ProjectView).call {
 
                 BuildDiffRequest buildDiffRequest = new BuildDiffRequest()
-                buildDiffRequest.branch = branch.id
                 buildDiffRequest.from = structureService.findBuildByName(project.name, branch.name, commits['5'] as String).get().id
                 buildDiffRequest.to = structureService.findBuildByName(project.name, branch.name, commits['7'] as String).get().id
                 def changeLog = gitService.changeLog(buildDiffRequest)
@@ -212,7 +211,6 @@ class GitChangeLogIT extends AbstractServiceTestSupport {
             asUser().with(project, ProjectView).call {
 
                 BuildDiffRequest buildDiffRequest = new BuildDiffRequest()
-                buildDiffRequest.branch = branch.id
                 buildDiffRequest.from = structureService.findBuildByName(project.name, branch.name, 'v5').get().id
                 buildDiffRequest.to = structureService.findBuildByName(project.name, branch.name, 'v7').get().id
                 def changeLog = gitService.changeLog(buildDiffRequest)
