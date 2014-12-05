@@ -145,6 +145,24 @@ class GitRepositoryClientImplTest {
         }
     }
 
+    /**
+     * Getting the tag for a commit
+     */
+    @Test
+    void 'Tag containing a commit'() {
+        prepare { prepareBranches it } withClone { GitRepositoryClient client, GitTestRepo clientRepo, origin ->
+            client.sync({println it})
+            // No further tag
+            assert client.getTagsWhichContainCommit(clientRepo.commitLookup('Commit 13')) == []
+            // Exact tag
+            assert client.getTagsWhichContainCommit(clientRepo.commitLookup('Commit 14')) == ['v2.2']
+            // Several tags, including current commit
+            assert client.getTagsWhichContainCommit(clientRepo.commitLookup('Commit 12')) == ['v2.1', 'v2.2']
+            // Several tags
+            assert client.getTagsWhichContainCommit(clientRepo.commitLookup('Commit 9')) == ['v2.1', 'v2.2']
+        }
+    }
+
     @Test
     void 'Log: between tags'() {
         prepare {
