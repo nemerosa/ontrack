@@ -1,17 +1,18 @@
-package net.nemerosa.ontrack.git
+package net.nemerosa.ontrack.git.support
 
 import net.nemerosa.ontrack.common.Utils
-import net.nemerosa.ontrack.git.support.GitRepositoryClientImpl
+import net.nemerosa.ontrack.git.GitRepository
+import net.nemerosa.ontrack.git.GitRepositoryClient
 
-class GitTestRepo {
+class GitRepo {
 
     private final File dir
 
-    GitTestRepo() {
+    GitRepo() {
         this(File.createTempDir('ontrack-git', '') as File)
     }
 
-    GitTestRepo(File dir) {
+    GitRepo(File dir) {
         this.dir = dir
     }
 
@@ -39,7 +40,7 @@ class GitTestRepo {
     }
 
     void commit(def no) {
-        def fileName = "file${no}"
+        String fileName = "file${no}"
         cmd 'touch', fileName
         git 'add', fileName
         git 'commit', '-m', "Commit $no"

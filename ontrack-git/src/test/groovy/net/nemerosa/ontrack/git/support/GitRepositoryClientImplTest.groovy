@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.git.support
 
 import net.nemerosa.ontrack.git.GitRepository
 import net.nemerosa.ontrack.git.GitRepositoryClient
-import net.nemerosa.ontrack.git.GitTestRepo
 import org.junit.Test
 
 import java.util.stream.Collectors
@@ -110,7 +109,7 @@ class GitRepositoryClientImplTest {
      *
      * We expect C4, C7, C8, C10, C11, Merge 2.1->2.2, C14
      *
-     * @see #prepareBranches(net.nemerosa.ontrack.git.GitTestRepo)
+     * @see #prepareBranches(GitRepo)
      */
     @Test
     void 'Log: between tags on different hierarchical branches'() {
@@ -132,7 +131,7 @@ class GitRepositoryClientImplTest {
     /**
      * Scanning commits on a branch.
      *
-     * @see #prepareBranches(net.nemerosa.ontrack.git.GitTestRepo)
+     * @see #prepareBranches(GitRepo)
      */
     @Test
     void 'Scanning: on a branch'() {
@@ -150,7 +149,7 @@ class GitRepositoryClientImplTest {
      */
     @Test
     void 'Tag containing a commit'() {
-        prepare { prepareBranches it } withClone { GitRepositoryClient client, GitTestRepo clientRepo, origin ->
+        prepare { prepareBranches it } withClone { GitRepositoryClient client, GitRepo clientRepo, origin ->
             client.sync({ println it })
             // No further tag
             assert client.getTagsWhichContainCommit(clientRepo.commitLookup('Commit 13')) == []
@@ -258,7 +257,7 @@ class GitRepositoryClientImplTest {
      * Preparing a repository
      */
     def static prepare(Closure preparation) {
-        def origin = new GitTestRepo()
+        def origin = new GitRepo()
         preparation.delegate = origin
         preparation(origin)
         [
@@ -269,7 +268,7 @@ class GitRepositoryClientImplTest {
                             // Client
                             def client = cloneRepo(wd, origin)
                             // Utility test access
-                            def clientRepo = new GitTestRepo(wd)
+                            def clientRepo = new GitRepo(wd)
                             // Runs the action
                             clientAction(client, clientRepo, origin)
                         } finally {
@@ -288,7 +287,7 @@ class GitRepositoryClientImplTest {
     /**
      * Cloning a local test repository
      */
-    static GitRepositoryClient cloneRepo(File wd, GitTestRepo origin) {
+    static GitRepositoryClient cloneRepo(File wd, GitRepo origin) {
         // Repository definition for the `origin` repository
         GitRepository originRepository = new GitRepository(
                 'file',
@@ -328,7 +327,7 @@ class GitRepositoryClientImplTest {
      *     * C1
      * </pre>
      */
-    protected void prepareBranches(GitTestRepo repo) {
+    protected void prepareBranches(GitRepo repo) {
         repo.with {
             git 'init'
             commit 1

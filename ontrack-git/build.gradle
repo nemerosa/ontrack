@@ -8,6 +8,5 @@ dependencies {
     compile libraries.commons_io
     compile libraries.guava
     compile project(':ontrack-common')
-
-    testCompile libraries.groovy
+    compile libraries.groovy
 }

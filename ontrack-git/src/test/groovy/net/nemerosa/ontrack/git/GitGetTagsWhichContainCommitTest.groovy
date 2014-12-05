@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.git
 
+import net.nemerosa.ontrack.git.support.GitRepo
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Test
@@ -30,7 +31,7 @@ import org.junit.Test
  */
 class GitGetTagsWhichContainCommitTest {
 
-    private static GitTestRepo repo
+    private static GitRepo repo
 
     /**
      * Preparation of the Git repository
@@ -38,7 +39,7 @@ class GitGetTagsWhichContainCommitTest {
     @BeforeClass
     static void 'Git repository'() {
         // Gets a repository
-        repo = new GitTestRepo()
+        repo = new GitRepo()
         println "Git repo at $repo"
 
         repo.with {
