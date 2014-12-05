@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.git.support;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import net.nemerosa.ontrack.extension.git.client.GitClient;
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink;
 import net.nemerosa.ontrack.extension.git.model.GitBranchConfiguration;
 import net.nemerosa.ontrack.extension.git.model.IndexableBuildGitCommitLink;
