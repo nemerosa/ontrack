@@ -10,17 +10,17 @@ class BasicGitConfigurationTest {
     @Test
     void user_password_none() {
         BasicGitConfiguration configuration = BasicGitConfiguration.empty();
-        assertFalse(configuration.getUserPasswordSupplier().get().isPresent());
+        assertFalse(configuration.credentials.present);
     }
 
     @Test
     void user_password_with_user_only() {
         BasicGitConfiguration configuration = BasicGitConfiguration.empty()
                 .withUser("test");
-        Optional<UserPassword> userPasswordOptional = configuration.getUserPasswordSupplier().get();
-        assertTrue(userPasswordOptional.isPresent());
-        assertEquals("test", userPasswordOptional.get().getUser());
-        assertEquals("", userPasswordOptional.get().getPassword());
+        Optional<UserPassword> userPasswordOptional = configuration.credentials;
+        assertTrue(userPasswordOptional.present);
+        assertEquals("test", userPasswordOptional.get().user);
+        assertEquals("", userPasswordOptional.get().password);
     }
 
     @Test
@@ -28,10 +28,10 @@ class BasicGitConfigurationTest {
         BasicGitConfiguration configuration = BasicGitConfiguration.empty()
                 .withUser("test")
                 .withPassword("xxx");
-        Optional<UserPassword> userPasswordOptional = configuration.getUserPasswordSupplier().get();
-        assertTrue(userPasswordOptional.isPresent());
-        assertEquals("test", userPasswordOptional.get().getUser());
-        assertEquals("xxx", userPasswordOptional.get().getPassword());
+        Optional<UserPassword> userPasswordOptional = configuration.credentials;
+        assertTrue(userPasswordOptional.present);
+        assertEquals("test", userPasswordOptional.get().user);
+        assertEquals("xxx", userPasswordOptional.get().password);
     }
 
 }
