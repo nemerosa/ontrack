@@ -415,21 +415,21 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     public Optional<GitUICommit> lookupCommit(GitConfiguration configuration, String id) {
         // Gets the client client for this configuration
         GitRepositoryClient gitClient = gitRepositoryClientFactory.getClient(configuration.getGitRepository());
-        // FIXME Gets the commit
-//        GitCommit gitCommit = gitClient.getCommitFor(id);
-//        if (gitCommit != null) {
-//            String commitLink = configuration.getCommitLink();
-//            List<? extends MessageAnnotator> messageAnnotators = getMessageAnnotators(configuration);
-//            return Optional.of(
-//                    toUICommit(
-//                            commitLink,
-//                            messageAnnotators,
-//                            gitCommit
-//                    )
-//            );
-//        } else {
-        return Optional.empty();
-//        }
+        // Gets the commit
+        Optional<GitCommit> optGitCommit = gitClient.getCommitFor(id);
+        if (optGitCommit.isPresent()) {
+            String commitLink = configuration.getCommitLink();
+            List<? extends MessageAnnotator> messageAnnotators = getMessageAnnotators(configuration);
+            return Optional.of(
+                    toUICommit(
+                            commitLink,
+                            messageAnnotators,
+                            optGitCommit.get()
+                    )
+            );
+        } else {
+            return Optional.empty();
+        }
     }
 
     @Override

@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -247,6 +248,21 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
             throw new GitRepositoryAPIException(repository.getRemote(), e);
         } catch (IOException e) {
             throw new GitRepositoryIOException(repository.getRemote(), e);
+        }
+    }
+
+    @Override
+    public Optional<GitCommit> getCommitFor(String id) {
+        try {
+            Repository repo = git.getRepository();
+            ObjectId objectId = repo.resolve(id + "^0");
+            if (objectId != null) {
+                return Optional.of(toCommit(new RevWalk(repo).parseCommit(objectId)));
+            } else {
+                return Optional.empty();
+            }
+        } catch (IOException e) {
+            return Optional.empty();
         }
     }
 
