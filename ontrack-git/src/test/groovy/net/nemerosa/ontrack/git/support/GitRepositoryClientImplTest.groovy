@@ -137,7 +137,11 @@ class GitRepositoryClientImplTest {
     @Test
     void 'Scanning: on a branch'() {
         prepare { prepareBranches it } withClone { client, clientRepo, origin ->
-            println client
+            client.sync({println it})
+            def result = client.scanCommits('2.1', { revCommit ->
+                revCommit.shortMessage == 'Commit 6'
+            })
+            assert result
         }
     }
 
