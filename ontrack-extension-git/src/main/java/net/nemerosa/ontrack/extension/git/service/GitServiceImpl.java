@@ -533,9 +533,13 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     private String getDiffUrl(GitDiff diff, GitDiffEntry entry, String fileChangeLinkFormat) {
-        return fileChangeLinkFormat
-                .replace("{commit}", entry.getReferenceId(diff.getFrom(), diff.getTo()))
-                .replace("{path}", entry.getReferencePath());
+        if (StringUtils.isNotBlank(fileChangeLinkFormat)) {
+            return fileChangeLinkFormat
+                    .replace("{commit}", entry.getReferenceId(diff.getFrom(), diff.getTo()))
+                    .replace("{path}", entry.getReferencePath());
+        } else {
+            return "";
+        }
     }
 
     private GitChangeLogFile toChangeLogFile(GitDiffEntry entry) {
