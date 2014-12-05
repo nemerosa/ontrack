@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.git.support
 
+import net.nemerosa.ontrack.git.GitRepository
+import net.nemerosa.ontrack.git.GitRepositoryClient
 import net.nemerosa.ontrack.git.GitTestRepo
 import org.junit.Test
 
@@ -270,6 +272,72 @@ class GitRepositoryClientImplTest {
 
         } finally {
             repo.close()
+        }
+    }
+
+    @Test
+    void 'Clone and fetch'() {
+        def origin = new GitTestRepo()
+        try {
+            origin.with {
+                // Initialises a Git repository
+                git 'init'
+                // Commits 1..4
+                (1..4).each {
+                    commit it
+                }
+            }
+
+            // Repository definition for the `origin` repository
+            GitRepository originRepository = new GitRepository(
+                    'file',
+                    'test',
+                    origin.dir.absolutePath,
+                    '', ''
+            )
+
+            // Gets a directory for the local working copy
+            File wd = File.createTempDir('ontrack-git', '')
+            try {
+
+                // Creates the client
+                GitRepositoryClient clone = new GitRepositoryClientImpl(
+                        wd,
+                        originRepository
+                )
+
+                // Test client
+                GitTestRepo cloneRepo = new GitTestRepo(wd)
+
+                // First sync (clone)
+                clone.sync({ println it })
+
+                // Gets the commits
+                (1..4).each {
+                    assert cloneRepo.commitLookup("Commit $it") != null
+                }
+
+                // Adds some commits on the origin repo
+                origin.with {
+                    (5..8).each {
+                        commit it
+                    }
+                }
+
+                // Second sync (fetch)
+                clone.sync({ println it })
+
+                // Gets the commits
+                (5..8).each {
+                    assert cloneRepo.commitLookup("Commit $it") != null
+                }
+
+            } finally {
+                wd.deleteDir()
+            }
+
+        } finally {
+            origin.close()
         }
     }
 

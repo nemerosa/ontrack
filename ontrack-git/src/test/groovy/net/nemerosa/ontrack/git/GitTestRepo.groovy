@@ -5,7 +5,15 @@ import net.nemerosa.ontrack.git.support.GitRepositoryClientImpl
 
 class GitTestRepo {
 
-    private final File dir = File.createTempDir('ontrack-git', '')
+    private final File dir
+
+    GitTestRepo() {
+        this(File.createTempDir('ontrack-git', '') as File)
+    }
+
+    GitTestRepo(File dir) {
+        this.dir = dir
+    }
 
     @Override
     String toString() {
@@ -38,7 +46,7 @@ class GitTestRepo {
     }
 
     String commitLookup(String message) {
-        def info = git 'log', '-g', '--grep', message, '--pretty=format:%h'
+        def info = git 'log', '--all', '--grep', message, '--pretty=format:%h'
         if (info) {
             info.trim()
         } else {
