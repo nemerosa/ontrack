@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.git.support;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import net.nemerosa.ontrack.extension.git.model.FormerGitConfiguration;
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty;
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType;
 import net.nemerosa.ontrack.json.JsonUtils;
@@ -45,7 +44,7 @@ public class BuildGitCommitLinkMigrationAction implements DBMigrationAction {
     private void migrateGitConfigurations(Connection connection) throws SQLException, IOException {
         // For all Git configurations
         try (PreparedStatement ps = connection.prepareStatement("SELECT * FROM CONFIGURATIONS WHERE TYPE = ?", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE)) {
-            ps.setString(1, FormerGitConfiguration.class.getName());
+            ps.setString(1, "net.nemerosa.ontrack.extension.git.model.GitConfiguration");
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     String name = rs.getString("NAME");

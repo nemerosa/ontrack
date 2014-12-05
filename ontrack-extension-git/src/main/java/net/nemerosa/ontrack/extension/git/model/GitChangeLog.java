@@ -10,7 +10,7 @@ import net.nemerosa.ontrack.model.structure.Project;
 
 @EqualsAndHashCode(callSuper = false)
 @Data
-public class GitChangeLog extends SCMChangeLog<FormerGitConfiguration, GitBuildInfo> {
+public class GitChangeLog extends SCMChangeLog<GitConfiguration, GitBuildInfo> {
 
     @JsonIgnore // Not sent to the client
     private GitChangeLogCommits commits;

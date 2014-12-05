@@ -25,7 +25,7 @@ public class GitResourceModule extends AbstractResourceModule {
     @Override
     public Collection<ResourceDecorator<?>> decorators() {
         return Arrays.asList(
-                new GitConfigurationResourceDecorator(securityService),
+                new BasicGitConfigurationResourceDecorator(securityService),
                 new GitChangeLogResourceDecorator()
         );
     }

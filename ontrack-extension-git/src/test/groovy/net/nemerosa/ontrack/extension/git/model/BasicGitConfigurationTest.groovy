@@ -5,17 +5,17 @@ import org.junit.Test
 
 import static org.junit.Assert.*
 
-class GitConfigurationTest {
+class BasicGitConfigurationTest {
 
     @Test
     void user_password_none() {
-        FormerGitConfiguration configuration = FormerGitConfiguration.empty();
+        BasicGitConfiguration configuration = BasicGitConfiguration.empty();
         assertFalse(configuration.getUserPasswordSupplier().get().isPresent());
     }
 
     @Test
     void user_password_with_user_only() {
-        FormerGitConfiguration configuration = FormerGitConfiguration.empty()
+        BasicGitConfiguration configuration = BasicGitConfiguration.empty()
                 .withUser("test");
         Optional<UserPassword> userPasswordOptional = configuration.getUserPasswordSupplier().get();
         assertTrue(userPasswordOptional.isPresent());
@@ -25,7 +25,7 @@ class GitConfigurationTest {
 
     @Test
     void user_password() {
-        FormerGitConfiguration configuration = FormerGitConfiguration.empty()
+        BasicGitConfiguration configuration = BasicGitConfiguration.empty()
                 .withUser("test")
                 .withPassword("xxx");
         Optional<UserPassword> userPasswordOptional = configuration.getUserPasswordSupplier().get();
