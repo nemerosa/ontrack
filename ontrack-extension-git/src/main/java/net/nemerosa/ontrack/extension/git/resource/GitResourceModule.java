@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.git.resource;
 
+import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceModule;
 import net.nemerosa.ontrack.ui.resource.ResourceDecorator;
@@ -15,10 +16,12 @@ import java.util.Collection;
 @Component
 public class GitResourceModule extends AbstractResourceModule {
 
+    private final GitService gitService;
     private final SecurityService securityService;
 
     @Autowired
-    public GitResourceModule(SecurityService securityService) {
+    public GitResourceModule(GitService gitService, SecurityService securityService) {
+        this.gitService = gitService;
         this.securityService = securityService;
     }
 
@@ -26,7 +29,7 @@ public class GitResourceModule extends AbstractResourceModule {
     public Collection<ResourceDecorator<?>> decorators() {
         return Arrays.asList(
                 new BasicGitConfigurationResourceDecorator(securityService),
-                new GitChangeLogResourceDecorator()
+                new GitChangeLogResourceDecorator(gitService)
         );
     }
 

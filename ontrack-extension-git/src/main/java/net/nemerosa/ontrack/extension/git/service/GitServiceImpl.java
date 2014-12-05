@@ -177,7 +177,6 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             return new GitChangeLog(
                     UUID.randomUUID().toString(),
                     branch.getProject(),
-                    branch,
                     getSCMBuildView(request.getFrom()),
                     getSCMBuildView(request.getTo()),
                     syncError

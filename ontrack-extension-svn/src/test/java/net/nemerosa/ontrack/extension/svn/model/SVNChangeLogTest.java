@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.extension.svn.model;
 
+import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.extension.scm.model.SCMBuildView;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.common.Time;
 import org.junit.Test;
 
 import java.util.Collection;
@@ -34,7 +34,6 @@ public class SVNChangeLogTest {
         SVNChangeLog changeLog = new SVNChangeLog(
                 UUID.randomUUID().toString(),
                 branch.getProject(),
-                branch,
                 repository,
                 scmBuildFrom,
                 scmBuildFrom
@@ -92,7 +91,6 @@ public class SVNChangeLogTest {
         SVNChangeLog changeLog = new SVNChangeLog(
                 UUID.randomUUID().toString(),
                 branch.getProject(),
-                branch,
                 repository,
                 scmBuildFrom,
                 scmBuildTo
@@ -141,7 +139,6 @@ public class SVNChangeLogTest {
         SVNChangeLog changeLog = new SVNChangeLog(
                 UUID.randomUUID().toString(),
                 branch.getProject(),
-                branch,
                 repository,
                 scmBuildFrom,
                 scmBuildTo

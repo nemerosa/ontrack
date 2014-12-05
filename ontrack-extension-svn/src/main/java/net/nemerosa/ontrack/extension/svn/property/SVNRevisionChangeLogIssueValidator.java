@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLog;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogIssueValidation;
 import net.nemerosa.ontrack.extension.svn.db.SVNIssueRevisionDao;
-import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
+import net.nemerosa.ontrack.extension.svn.model.SVNChangeLog;
 import net.nemerosa.ontrack.extension.svn.model.SVNChangeLogIssue;
 import net.nemerosa.ontrack.extension.svn.model.SVNHistory;
 import net.nemerosa.ontrack.json.JsonUtils;
@@ -27,13 +27,14 @@ public class SVNRevisionChangeLogIssueValidator extends AbstractSVNChangeLogIssu
     }
 
     @Override
-    public void validate(SCMChangeLog<SVNRepository, SVNHistory> changeLog, SVNChangeLogIssue issue, SVNRevisionChangeLogIssueValidatorConfig validatorConfig) {
-        if (canApplyTo(changeLog.getBranch())) {
+    public void validate(SCMChangeLog<SVNHistory> changeLog, SVNChangeLogIssue issue, SVNRevisionChangeLogIssueValidatorConfig validatorConfig) {
+        SVNChangeLog svnChangeLog = (SVNChangeLog) changeLog;
+        if (canApplyTo(svnChangeLog.getBranch())) {
             // Closed issue?
             if (validatorConfig.getClosedStatuses().contains(issue.getIssue().getStatus().getName())) {
                 // Last revision for this issue
                 OptionalLong lastRevision = issueRevisionDao.findLastRevisionByIssue(
-                        changeLog.getScm().getId(),
+                        svnChangeLog.getRepository().getId(),
                         issue.getIssue().getKey()
                 );
                 if (lastRevision.isPresent()) {

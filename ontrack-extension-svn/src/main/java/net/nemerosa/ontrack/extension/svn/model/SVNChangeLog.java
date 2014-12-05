@@ -17,7 +17,7 @@ import java.util.Map;
 
 @EqualsAndHashCode(callSuper = false)
 @Data
-public class SVNChangeLog extends SCMChangeLog<SVNRepository, SVNHistory> {
+public class SVNChangeLog extends SCMChangeLog<SVNHistory> {
 
     @JsonIgnore // Not sent to the client
     private SVNChangeLogRevisions revisions;
@@ -25,17 +25,18 @@ public class SVNChangeLog extends SCMChangeLog<SVNRepository, SVNHistory> {
     private SVNChangeLogIssues issues;
     @JsonIgnore // Not sent to the client
     private SVNChangeLogFiles files;
+    @JsonIgnore // Not sent to the client
+    private final SVNRepository repository;
 
     public SVNChangeLog(
             String uuid,
             Project project,
-            Branch branch,
-            SVNRepository scmBranch,
+            SVNRepository repository,
             SCMBuildView<SVNHistory> scmBuildFrom,
             SCMBuildView<SVNHistory> scmBuildTo) {
-        super(uuid, project, branch, scmBranch, scmBuildFrom, scmBuildTo);
+        super(uuid, project, scmBuildFrom, scmBuildTo);
+        this.repository = repository;
     }
-
 
     public SVNChangeLog withRevisions(SVNChangeLogRevisions revisions) {
         this.revisions = revisions;
@@ -104,5 +105,13 @@ public class SVNChangeLog extends SCMChangeLog<SVNRepository, SVNHistory> {
 
         // OK
         return references;
+    }
+
+    /**
+     * A SVN change log works always on the same branch.
+     */
+    @JsonIgnore
+    public Branch getBranch() {
+        return getFrom().getBuild().getBranch();
     }
 }

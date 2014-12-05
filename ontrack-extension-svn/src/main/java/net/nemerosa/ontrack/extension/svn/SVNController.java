@@ -224,7 +224,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
         // Gets the change log
         SVNChangeLog changeLog = changeLogService.changeLog(request);
         // Gets the issue service
-        ConfiguredIssueService configuredIssueService = changeLog.getScm().getConfiguredIssueService();
+        ConfiguredIssueService configuredIssueService = changeLog.getRepository().getConfiguredIssueService();
         if (configuredIssueService == null) {
             return new ResponseEntity<>(
                     "The branch is not configured for issues",

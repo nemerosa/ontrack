@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.svn.service;
 
+import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.issues.export.ExportFormat;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
@@ -20,7 +21,6 @@ import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationProper
 import net.nemerosa.ontrack.extension.svn.support.SVNLogEntryCollector;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
 import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.tx.Transaction;
 import net.nemerosa.ontrack.tx.TransactionService;
 import org.apache.commons.lang3.StringUtils;
@@ -69,7 +69,6 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
             return new SVNChangeLog(
                     UUID.randomUUID().toString(),
                     branch.getProject(),
-                    branch,
                     svnRepository,
                     getSCMBuildView(svnRepository, request.getFrom()),
                     getSCMBuildView(svnRepository, request.getTo())
@@ -94,7 +93,7 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
             List<SVNChangeLogRevision> revisions = new ArrayList<>();
             for (SVNChangeLogReference reference : references) {
                 if (!reference.isNone()) {
-                    SVNRepository repository = changeLog.getScm();
+                    SVNRepository repository = changeLog.getRepository();
                     // List of log entries
                     SVNLogEntryCollector logEntryCollector = new SVNLogEntryCollector();
                     // SVN change log
@@ -150,7 +149,7 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
         // In a transaction
         try (Transaction ignored = transactionService.start()) {
             // Repository
-            SVNRepository repository = changeLog.getScm();
+            SVNRepository repository = changeLog.getRepository();
             // Index of issues, sorted by keys
             Map<String, SVNChangeLogIssue> issues = new TreeMap<>();
             // For all revisions in this revision log
@@ -190,13 +189,13 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
             // Index of files, indexed by path
             Map<String, SVNChangeLogFile> files = new TreeMap<>();
             // For each revision
-            for (SVNChangeLogRevision changeLogRevision : changeLog.getRevisions().getList()) {
-                // Takes into account only the unmerged revisions
-                if (changeLogRevision.getLevel() == 0) {
-                    long revision = changeLogRevision.getRevision();
-                    collectFilesForRevision(changeLog.getScm(), files, revision);
-                }
-            }
+            // Takes into account only the unmerged revisions
+            changeLog.getRevisions().getList().stream()
+                    .filter(changeLogRevision -> changeLogRevision.getLevel() == 0)
+                    .forEach(changeLogRevision -> {
+                        long revision = changeLogRevision.getRevision();
+                        collectFilesForRevision(changeLog.getRepository(), files, revision);
+                    });
             // List of files
             return new SVNChangeLogFiles(new ArrayList<>(files.values()));
         }

@@ -5,12 +5,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.nemerosa.ontrack.extension.scm.model.SCMBuildView;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLog;
-import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Project;
 
 @EqualsAndHashCode(callSuper = false)
 @Data
-public class GitChangeLog extends SCMChangeLog<GitConfiguration, GitBuildInfo> {
+public class GitChangeLog extends SCMChangeLog<GitBuildInfo> {
 
     @JsonIgnore // Not sent to the client
     private GitChangeLogCommits commits;
@@ -24,12 +23,10 @@ public class GitChangeLog extends SCMChangeLog<GitConfiguration, GitBuildInfo> {
     public GitChangeLog(
             String uuid,
             Project project,
-            Branch branch,
             SCMBuildView<GitBuildInfo> scmBuildFrom,
             SCMBuildView<GitBuildInfo> scmBuildTo,
             boolean syncError) {
-        // FIXME No need for the SCM info any longer
-        super(uuid, project, branch, null, scmBuildFrom, scmBuildTo);
+        super(uuid, project, scmBuildFrom, scmBuildTo);
         this.syncError = syncError;
     }
 
