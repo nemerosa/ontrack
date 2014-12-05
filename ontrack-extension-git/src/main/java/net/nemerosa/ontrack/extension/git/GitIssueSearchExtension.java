@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.git;
 
 import lombok.Data;
 import net.nemerosa.ontrack.extension.api.SearchExtension;
-import net.nemerosa.ontrack.extension.git.client.impl.GitException;
 import net.nemerosa.ontrack.extension.git.model.GitBranchConfiguration;
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.git.service.GitService;
@@ -10,6 +9,7 @@ import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
+import net.nemerosa.ontrack.git.exceptions.GitRepositoryException;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.SearchProvider;
@@ -102,7 +102,7 @@ public class GitIssueSearchExtension extends AbstractExtension implements Search
                     boolean found;
                     try {
                         found = gitService.scanCommits(c.getGitBranchConfiguration(), commit -> scanIssue(c, commit, token));
-                    } catch (GitException ignored) {
+                    } catch (GitRepositoryException ignored) {
                         // Silent failure in case of problems with the Git repository
                         found = false;
                     }

@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.git.service
 
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
-import net.nemerosa.ontrack.extension.git.client.impl.GitTestUtils
 import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty

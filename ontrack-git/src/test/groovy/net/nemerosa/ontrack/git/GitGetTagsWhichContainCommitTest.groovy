@@ -1,9 +1,6 @@
-package net.nemerosa.ontrack.extension.git.client.impl
+package net.nemerosa.ontrack.git
 
-import net.nemerosa.ontrack.extension.git.client.GitClient
-import net.nemerosa.ontrack.extension.git.model.FormerGitConfiguration
 import org.junit.AfterClass
-import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Test
 
@@ -31,9 +28,9 @@ import org.junit.Test
  *
  * (the commit SHA are for illustration purpose only, they cannot be relied upon)
  */
-class GitGetTagsWhichContainCommitIT {
+class GitGetTagsWhichContainCommitTest {
 
-    private static GitTestUtils repo
+    private static GitTestRepo repo
 
     /**
      * Preparation of the Git repository
@@ -41,13 +38,13 @@ class GitGetTagsWhichContainCommitIT {
     @BeforeClass
     static void 'Git repository'() {
         // Gets a repository
-        repo = new GitTestUtils()
+        repo = new GitTestRepo()
         println "Git repo at $repo"
 
         repo.with {
 
             // Initialises a Git repository
-            run('git', 'init')
+            git 'init'
 
             // Commits 1..4
             (1..4).each {
@@ -55,27 +52,27 @@ class GitGetTagsWhichContainCommitIT {
             }
 
             // 1.0 branch and tag
-            run('git', 'checkout', '-b', '1.0')
+            git 'checkout', '-b', '1.0'
             commit(5)
-            run('git', 'tag', '1.0-beta-1')
+            git 'tag', '1.0-beta-1'
 
             // Going further with the master
-            run('git', 'checkout', 'master')
+            git 'checkout', 'master'
 
             // Commits and tags
             commit(6)
             commit(7)
             commit(8)
-            run('git', 'tag', '1.0-rc')
+            git 'tag', '1.0-rc'
             commit(9)
             commit(10)
-            run('git', 'tag', '1.0')
+            git 'tag', '1.0'
             commit(11)
             commit(12)
             commit(13)
 
             // Log
-            run('git', 'log', '--oneline', '--graph', '--decorate', '--all')
+            git 'log', '--oneline', '--graph', '--decorate', '--all'
 
         }
     }
@@ -88,21 +85,6 @@ class GitGetTagsWhichContainCommitIT {
         repo.close()
     }
 
-    private GitClient gitClient
-
-    @Before
-    void 'Git client'() {
-        GitRepository gitRepository = new DefaultGitRepository(
-                repo.dir,
-                "",
-                "master",
-                "id",
-                { Optional.empty() }
-        )
-        FormerGitConfiguration gitConfiguration = FormerGitConfiguration.empty()
-        gitClient = new DefaultGitClient(gitRepository, gitConfiguration)
-    }
-
     /**
      * When a tag is <i>on</i> the commit.
      *
@@ -113,7 +95,7 @@ class GitGetTagsWhichContainCommitIT {
         // Identifying SHA for "Commit 8"
         def commit = repo.commitLookup('Commit 8')
         // Call
-        def tags = gitClient.getTagsWhichContainCommit(commit)
+        def tags = repo.client.getTagsWhichContainCommit(commit)
         // Check (unordered)
         assert tags as Set == ['1.0-rc', '1.0'] as Set
     }
@@ -128,7 +110,7 @@ class GitGetTagsWhichContainCommitIT {
         // Identifying SHA for "Commit 6"
         def commit = repo.commitLookup('Commit 6')
         // Call
-        def tags = gitClient.getTagsWhichContainCommit(commit)
+        def tags = repo.client.getTagsWhichContainCommit(commit)
         // Check (unordered)
         assert tags as Set == ['1.0-rc', '1.0'] as Set
     }
@@ -143,7 +125,7 @@ class GitGetTagsWhichContainCommitIT {
         // Identifying SHA for "Commit 3"
         def commit = repo.commitLookup('Commit 3')
         // Call
-        def tags = gitClient.getTagsWhichContainCommit(commit)
+        def tags = repo.client.getTagsWhichContainCommit(commit)
         // Check (unordered)
         assert tags as Set == ['1.0-beta-1', '1.0-rc', '1.0'] as Set
     }
@@ -158,7 +140,7 @@ class GitGetTagsWhichContainCommitIT {
         // Identifying SHA for "Commit 11"
         def commit = repo.commitLookup('Commit 11')
         // Call
-        def tags = gitClient.getTagsWhichContainCommit(commit)
+        def tags = repo.client.getTagsWhichContainCommit(commit)
         // Check
         assert tags == []
     }
