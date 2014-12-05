@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.git.client;
 
 import net.nemerosa.ontrack.extension.git.model.FormerGitConfiguration;
 import net.nemerosa.ontrack.git.model.GitCommit;
+import net.nemerosa.ontrack.git.model.GitDiff;
 import net.nemerosa.ontrack.git.model.GitLog;
 import org.eclipse.jgit.revwalk.RevCommit;
 

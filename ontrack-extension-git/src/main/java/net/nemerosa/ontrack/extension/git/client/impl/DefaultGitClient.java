@@ -2,14 +2,11 @@ package net.nemerosa.ontrack.extension.git.client.impl;
 
 import com.google.common.collect.Lists;
 import net.nemerosa.ontrack.extension.git.client.*;
-import net.nemerosa.ontrack.git.model.GitLog;
-import net.nemerosa.ontrack.git.model.GitRange;
+import net.nemerosa.ontrack.git.model.*;
 import net.nemerosa.ontrack.git.model.plot.GPlot;
 import net.nemerosa.ontrack.git.model.plot.GitPlotRenderer;
 import net.nemerosa.ontrack.git.support.GitClientSupport;
 import net.nemerosa.ontrack.extension.git.model.FormerGitConfiguration;
-import net.nemerosa.ontrack.git.model.GitCommit;
-import net.nemerosa.ontrack.git.model.GitPerson;
 import net.nemerosa.ontrack.common.Time;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;

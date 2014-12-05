@@ -8,17 +8,16 @@ import net.nemerosa.ontrack.git.exceptions.GitRepositoryAPIException;
 import net.nemerosa.ontrack.git.exceptions.GitRepositoryCannotCloneException;
 import net.nemerosa.ontrack.git.exceptions.GitRepositoryIOException;
 import net.nemerosa.ontrack.git.exceptions.GitRepositoryInitException;
-import net.nemerosa.ontrack.git.model.GitCommit;
-import net.nemerosa.ontrack.git.model.GitLog;
-import net.nemerosa.ontrack.git.model.GitPerson;
-import net.nemerosa.ontrack.git.model.GitRange;
+import net.nemerosa.ontrack.git.model.*;
 import net.nemerosa.ontrack.git.model.plot.GPlot;
 import net.nemerosa.ontrack.git.model.plot.GitPlotRenderer;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revplot.PlotCommitList;
@@ -29,6 +28,8 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.eclipse.jgit.treewalk.AbstractTreeIterator;
+import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 
 import java.io.File;
 import java.io.IOException;
@@ -218,6 +219,38 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
     }
 
     @Override
+    public GitDiff diff(String from, String to) {
+        try {
+            GitRange range = range(from, to);
+
+            // Diff command
+            List<DiffEntry> entries = git.diff()
+                    .setShowNameAndStatusOnly(true)
+                    .setOldTree(getTreeIterator(range.getFrom().getId()))
+                    .setNewTree(getTreeIterator(range.getTo().getId()))
+                    .call();
+
+            // OK
+            return new GitDiff(
+                    range.getFrom(),
+                    range.getTo(),
+                    Lists.transform(
+                            entries,
+                            diff -> new GitDiffEntry(
+                                    toChangeType(diff.getChangeType()),
+                                    diff.getOldPath(),
+                                    diff.getNewPath()
+                            )
+                    ));
+
+        } catch (GitAPIException e) {
+            throw new GitRepositoryAPIException(repository.getRemote(), e);
+        } catch (IOException e) {
+            throw new GitRepositoryIOException(repository.getRemote(), e);
+        }
+    }
+
+    @Override
     public String getBranchRef(String branch) {
         return String.format("origin/%s", branch);
     }
@@ -254,6 +287,36 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
                 ident.getName(),
                 ident.getEmailAddress()
         );
+    }
+
+    protected GitChangeType toChangeType(DiffEntry.ChangeType changeType) {
+        switch (changeType) {
+            case ADD:
+                return GitChangeType.ADD;
+            case COPY:
+                return GitChangeType.COPY;
+            case DELETE:
+                return GitChangeType.DELETE;
+            case MODIFY:
+                return GitChangeType.MODIFY;
+            case RENAME:
+                return GitChangeType.RENAME;
+            default:
+                throw new IllegalArgumentException("Unknown diff change type: " + changeType);
+        }
+    }
+
+    protected AbstractTreeIterator getTreeIterator(ObjectId id)
+            throws IOException {
+        final CanonicalTreeParser p = new CanonicalTreeParser();
+        Repository db = git.getRepository();
+        final ObjectReader or = db.newObjectReader();
+        try {
+            p.reset(or, new RevWalk(db).parseTree(id));
+            return p;
+        } finally {
+            or.release();
+        }
     }
 
     protected GitRange range(String from, String to) throws IOException {

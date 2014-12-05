@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.git;
 
 import net.nemerosa.ontrack.git.model.GitCommit;
+import net.nemerosa.ontrack.git.model.GitDiff;
 import net.nemerosa.ontrack.git.model.GitLog;
 import org.eclipse.jgit.revwalk.RevCommit;
 
@@ -92,4 +93,9 @@ public interface GitRepositoryClient {
      * Gets the list of remote branches, as defined under <code>ref/heads</code>.
      */
     List<String> getRemoteBranches();
+
+    /**
+     * Difference between two commit-ish boundaries
+     */
+    GitDiff diff(String from, String to);
 }

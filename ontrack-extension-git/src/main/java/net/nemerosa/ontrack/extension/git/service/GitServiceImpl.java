@@ -2,8 +2,8 @@ package net.nemerosa.ontrack.extension.git.service;
 
 import com.google.common.collect.Lists;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
-import net.nemerosa.ontrack.extension.git.client.GitDiff;
-import net.nemerosa.ontrack.extension.git.client.GitDiffEntry;
+import net.nemerosa.ontrack.git.model.GitDiff;
+import net.nemerosa.ontrack.git.model.GitDiffEntry;
 import net.nemerosa.ontrack.extension.git.client.GitTag;
 import net.nemerosa.ontrack.extension.git.model.*;
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty;
@@ -295,19 +295,18 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         // Commit boundaries
         String commitFrom = getCommitFromBuild(buildFrom);
         String commitTo = getCommitFromBuild(buildTo);
-        // FIXME Diff
-        // final GitDiff diff = client.diff(commitFrom, commitTo);
-        // FIXME File change links
-        // String fileChangeLinkFormat = gitConfiguration.getFileAtCommitLink();
+        // Diff
+        final GitDiff diff = client.diff(commitFrom, commitTo);
+        // File change links
+        String fileChangeLinkFormat = configuration.getFileAtCommitLink();
         // OK
-//        return new GitChangeLogFiles(
-//                diff.getEntries().stream()
-//                        .map(entry -> toChangeLogFile(entry).withUrl(
-//                                getDiffUrl(diff, entry, fileChangeLinkFormat)
-//                        ))
-//                        .collect(Collectors.toList())
-//        );
-        throw new RuntimeException("NYI");
+        return new GitChangeLogFiles(
+                diff.getEntries().stream()
+                        .map(entry -> toChangeLogFile(entry).withUrl(
+                                getDiffUrl(diff, entry, fileChangeLinkFormat)
+                        ))
+                        .collect(Collectors.toList())
+        );
     }
 
     @Override
