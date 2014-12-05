@@ -28,11 +28,13 @@ public class SCMChangeLog<T> extends BuildDiff {
     }
 
     @Override
+    @JsonIgnore
     public BuildView getFrom() {
         return scmBuildFrom.getBuildView();
     }
 
     @Override
+    @JsonIgnore
     public BuildView getTo() {
         return scmBuildTo.getBuildView();
     }
@@ -42,7 +44,7 @@ public class SCMChangeLog<T> extends BuildDiff {
         return getFrom().getBuild().getBranch().id() == getTo().getBuild().getBranch().id();
     }
 
-    public static <S, T> SCMChangeLog<T> of(Project project, SCMBuildView<T> from, SCMBuildView<T> to) {
+    public static <T> SCMChangeLog<T> of(Project project, SCMBuildView<T> from, SCMBuildView<T> to) {
         return new SCMChangeLog<>(
                 UUID.randomUUID().toString(),
                 project,

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.git.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.nemerosa.ontrack.extension.scm.model.SCMBuildView;
@@ -9,6 +10,7 @@ import net.nemerosa.ontrack.model.structure.Project;
 
 @EqualsAndHashCode(callSuper = false)
 @Data
+@JsonPropertyOrder(alphabetic = true)
 public class GitChangeLog extends SCMChangeLog<GitBuildInfo> {
 
     @JsonIgnore // Not sent to the client
