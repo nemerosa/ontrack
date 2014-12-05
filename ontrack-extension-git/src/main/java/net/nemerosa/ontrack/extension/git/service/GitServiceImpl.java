@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.git.service;
 
 import com.google.common.collect.Lists;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
-import net.nemerosa.ontrack.git.model.GitTag;
 import net.nemerosa.ontrack.extension.git.model.*;
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty;
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType;
@@ -18,10 +17,7 @@ import net.nemerosa.ontrack.extension.scm.service.AbstractSCMChangeLogService;
 import net.nemerosa.ontrack.git.GitRepositoryClient;
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory;
 import net.nemerosa.ontrack.git.exceptions.GitRepositorySyncException;
-import net.nemerosa.ontrack.git.model.GitCommit;
-import net.nemerosa.ontrack.git.model.GitDiff;
-import net.nemerosa.ontrack.git.model.GitDiffEntry;
-import net.nemerosa.ontrack.git.model.GitLog;
+import net.nemerosa.ontrack.git.model.*;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.job.*;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -59,7 +55,6 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     private final ApplicationLogService applicationLogService;
     private final GitRepositoryClientFactory gitRepositoryClientFactory;
     private final BuildGitCommitLinkService buildGitCommitLinkService;
-    private final GitConfigurationService gitConfigurationService;
     private final Collection<GitConfigurator> gitConfigurators;
 
     @Autowired
@@ -73,7 +68,6 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             ApplicationLogService applicationLogService,
             GitRepositoryClientFactory gitRepositoryClientFactory,
             BuildGitCommitLinkService buildGitCommitLinkService,
-            GitConfigurationService gitConfigurationService,
             Collection<GitConfigurator> gitConfigurators) {
         super(structureService, propertyService);
         this.propertyService = propertyService;
@@ -84,7 +78,6 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         this.applicationLogService = applicationLogService;
         this.gitRepositoryClientFactory = gitRepositoryClientFactory;
         this.buildGitCommitLinkService = buildGitCommitLinkService;
-        this.gitConfigurationService = gitConfigurationService;
         this.gitConfigurators = gitConfigurators;
     }
 
@@ -117,9 +110,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     public Collection<Job> getJobs() {
         Collection<Job> jobs = new ArrayList<>();
         // Indexation of repositories, based on projects actually linked
-        forEachConfiguredProject((project, configuration) -> {
-            jobs.add(createIndexationJob(configuration));
-        });
+        forEachConfiguredProject((project, configuration) -> jobs.add(createIndexationJob(configuration)));
         // Synchronisation of branch builds with tags when applicable
         forEachConfiguredBranch((branch, branchConfiguration) -> {
             // Build/tag sync job
