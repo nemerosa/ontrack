@@ -41,11 +41,10 @@ public class GitChangeLogResourceDecorator extends AbstractResourceDecorator<Git
                         issues
                 )
                 .link("_files", on(GitController.class).changeLogFiles(changeLog.getUuid()))
-                        // FIXME Export formats from the project
-//                .link(
-//                        "_exportFormats",
-//                        on(GitController.class).changeLogExportFormats(changeLog.getBranch().getId())
-//                )
+                .link(
+                        "_exportFormats",
+                        on(GitController.class).changeLogExportFormats(changeLog.getProject().getId())
+                )
                 .link("_exportIssues", on(GitController.class).changeLog(new IssueChangeLogExportRequest()))
                 .build();
     }

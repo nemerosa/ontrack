@@ -34,11 +34,10 @@ public class GitChangeLogResourceDecoratorTest {
 
     private ResourceObjectMapper mapper;
     private GitService gitService;
-    private SecurityService securityService;
 
     @Before
     public void before() {
-        securityService = mock(SecurityService.class);
+        SecurityService securityService = mock(SecurityService.class);
         gitService = mock(GitService.class);
         mapper = new ResourceObjectMapperFactory().resourceObjectMapper(
                 Arrays.asList(
@@ -140,6 +139,7 @@ public class GitChangeLogResourceDecoratorTest {
                         .with("_commits", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLogCommits:uuid")
                         .with("_issues", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLogIssues:uuid")
                         .with("_files", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLogFiles:uuid")
+                        .with("_exportFormats", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLogExportFormats:1")
                         .with("_exportIssues", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLog:IssueChangeLogExportRequest%28format%3Dtext%2C+grouping%3D%2C+exclude%3D%2C+altGroup%3DOther%29")
 
                         .end(),
@@ -238,6 +238,7 @@ public class GitChangeLogResourceDecoratorTest {
                         .with("uuid", "uuid")
                         .with("_commits", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLogCommits:uuid")
                         .with("_files", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLogFiles:uuid")
+                        .with("_exportFormats", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLogExportFormats:1")
                         .with("_exportIssues", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLog:IssueChangeLogExportRequest%28format%3Dtext%2C+grouping%3D%2C+exclude%3D%2C+altGroup%3DOther%29")
 
                         .end(),
