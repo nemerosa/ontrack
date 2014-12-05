@@ -2,8 +2,6 @@ package net.nemerosa.ontrack.extension.git.service;
 
 import com.google.common.collect.Lists;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
-import net.nemerosa.ontrack.git.model.GitDiff;
-import net.nemerosa.ontrack.git.model.GitDiffEntry;
 import net.nemerosa.ontrack.extension.git.client.GitTag;
 import net.nemerosa.ontrack.extension.git.model.*;
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty;
@@ -21,6 +19,8 @@ import net.nemerosa.ontrack.git.GitRepositoryClient;
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory;
 import net.nemerosa.ontrack.git.exceptions.GitRepositorySyncException;
 import net.nemerosa.ontrack.git.model.GitCommit;
+import net.nemerosa.ontrack.git.model.GitDiff;
+import net.nemerosa.ontrack.git.model.GitDiffEntry;
 import net.nemerosa.ontrack.git.model.GitLog;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.job.*;
@@ -310,12 +310,11 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     @Override
-    public boolean scanCommits(GitConfiguration configuration, Predicate<RevCommit> scanFunction) {
+    public boolean scanCommits(GitBranchConfiguration branchConfiguration, Predicate<RevCommit> scanFunction) {
         // Gets the client
-        GitRepositoryClient client = gitRepositoryClientFactory.getClient(configuration.getGitRepository());
-        // FIXME Scanning
-//        return client.scanCommits(scanFunction);
-        throw new RuntimeException("NYI");
+        GitRepositoryClient client = gitRepositoryClientFactory.getClient(branchConfiguration.getConfiguration().getGitRepository());
+        // Scanning
+        return client.scanCommits(branchConfiguration.getBranch(), scanFunction);
     }
 
     @Override

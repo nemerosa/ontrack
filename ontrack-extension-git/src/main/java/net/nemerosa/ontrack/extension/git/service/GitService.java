@@ -71,12 +71,12 @@ public interface GitService {
     /**
      * Scans the whole history of a repository.
      *
-     * @param configuration Repository to scan
+     * @param branchConfiguration Repository branch to scan
      * @param scanFunction  Function that scans the commits. Returns <code>true</code> if the scan
      *                      must not go on, <code>false</code> otherwise.
      * @return <code>true</code> if at least one call to <code>scanFunction</code> has returned <code>true</code>.
      */
-    boolean scanCommits(GitConfiguration configuration, Predicate<RevCommit> scanFunction);
+    boolean scanCommits(GitBranchConfiguration branchConfiguration, Predicate<RevCommit> scanFunction);
 
     /**
      * Gets information about an issue in a Git-configured branch
