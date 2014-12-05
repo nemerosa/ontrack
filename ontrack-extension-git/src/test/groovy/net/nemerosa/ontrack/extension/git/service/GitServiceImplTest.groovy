@@ -56,7 +56,6 @@ class GitServiceImplTest {
                 mock(ApplicationLogService),
                 mock(GitRepositoryClientFactory),
                 mock(BuildGitCommitLinkService),
-                mock(GitConfigurationService),
                 [gitConfigurator]
         )
     }
