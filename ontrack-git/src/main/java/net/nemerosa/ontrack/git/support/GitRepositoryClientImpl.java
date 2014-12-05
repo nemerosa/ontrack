@@ -31,7 +31,11 @@ import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -45,6 +49,7 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
     private final GitRepository repository;
     private final Git git;
     private final CredentialsProvider credentialsProvider;
+    private final ReentrantLock sync = new ReentrantLock();
 
     public GitRepositoryClientImpl(File repositoryDir, GitRepository repository) {
         this.repositoryDir = repositoryDir;
@@ -54,6 +59,7 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
         try {
             gitRepository = new FileRepositoryBuilder()
                     .setWorkTree(repositoryDir)
+                    .findGitDir(repositoryDir)
                     .build();
         } catch (IOException e) {
             throw new GitRepositoryInitException(e);
@@ -70,13 +76,21 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
 
     @Override
     public void sync(Consumer<String> logger) {
-        // Clone or update?
-        if (new File(repositoryDir, ".git").exists()) {
-            // Fetch
-            fetch(logger);
+        if (sync.tryLock()) {
+            try {
+                // Clone or update?
+                if (new File(repositoryDir, ".git").exists()) {
+                    // Fetch
+                    fetch(logger);
+                } else {
+                    // Clone
+                    cloneRemote(logger);
+                }
+            } finally {
+                sync.unlock();
+            }
         } else {
-            // Clone
-            cloneRemote(logger);
+            logger.accept(format("[git] %s is already synchronising, trying later", repositoryDir));
         }
     }
 

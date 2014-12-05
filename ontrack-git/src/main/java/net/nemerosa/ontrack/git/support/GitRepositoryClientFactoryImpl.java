@@ -59,9 +59,6 @@ public class GitRepositoryClientFactoryImpl implements GitRepositoryClientFactor
         File repositoryDir = new File(root, repositoryId);
         // Makes sure the directory is ready
         try {
-            if (repositoryDir.exists()) {
-                FileUtils.deleteDirectory(repositoryDir);
-            }
             FileUtils.forceMkdir(repositoryDir);
         } catch (IOException ex) {
             throw new GitRepositoryDirException(repositoryDir, ex);
