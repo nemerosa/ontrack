@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
@@ -149,6 +150,7 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
             walk.markUninteresting(walk.lookupCommit(range.getTo().getId()));
             PlotCommitList<PlotLane> commitList = new PlotCommitList<>();
             commitList.source(walk);
+            commitList.fillTo(Integer.MAX_VALUE);
 
             // Rendering
             GitPlotRenderer renderer = new GitPlotRenderer(commitList);
@@ -202,6 +204,17 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
     @Override
     public Collection<String> getTagsWhichContainCommit(String gitCommitId) {
         return GitClientSupport.tagContains(repositoryDir, gitCommitId);
+    }
+
+    @Override
+    public List<String> getRemoteBranches() {
+        try {
+            return git.lsRemote().setHeads(true).call().stream()
+                    .map(ref -> StringUtils.removeStart(ref.getName(), "refs/heads/"))
+                    .collect(Collectors.toList());
+        } catch (GitAPIException e) {
+            throw new GitRepositoryAPIException(repository.getRemote(), e);
+        }
     }
 
     @Override

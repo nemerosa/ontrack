@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.git.model.GitLog;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -86,4 +87,9 @@ public interface GitRepositoryClient {
      * <b>Note</b>: returned tags are <i>not</i> ordered.
      */
     Collection<String> getTagsWhichContainCommit(String gitCommitId);
+
+    /**
+     * Gets the list of remote branches, as defined under <code>ref/heads</code>.
+     */
+    List<String> getRemoteBranches();
 }
