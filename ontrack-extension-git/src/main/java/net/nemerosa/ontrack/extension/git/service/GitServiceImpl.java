@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.git.service;
 
 import com.google.common.collect.Lists;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
+import net.nemerosa.ontrack.extension.api.model.BuildDiffRequestDifferenceProjectException;
 import net.nemerosa.ontrack.extension.git.model.*;
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty;
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType;
@@ -147,8 +148,16 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     @Transactional
     public GitChangeLog changeLog(BuildDiffRequest request) {
         try (Transaction ignored = transactionService.start()) {
-            Branch branch = structureService.getBranch(request.getBranch());
-            Project project = branch.getProject();
+            // Gets the two builds
+            Build buildFrom = structureService.getBuild(request.getFrom());
+            Build buildTo = structureService.getBuild(request.getTo());
+            // Gets the two associated projects
+            Project project = buildFrom.getBranch().getProject();
+            Project otherProject = buildTo.getBranch().getProject();
+            // Checks the project
+            if (project.id() != otherProject.id()) {
+                throw new BuildDiffRequestDifferenceProjectException();
+            }
             GitRepositoryClient client = getGitRepositoryClient(project);
             // Forces Git sync before
             boolean syncError;
@@ -159,16 +168,18 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                 applicationLogService.error(
                         ex,
                         GitService.class,
-                        branch.getId().toString(),
+                        project.getName(),
                         String.format(
                                 "Change log for %s",
-                                branch.getName()
+                                project.getName()
                         ),
                         String.format(
-                                "%s (%s -> %s)",
-                                branch.getName(),
-                                request.getFrom(),
-                                request.getTo()
+                                "%s (%s/%s -> %s/%s)",
+                                project.getName(),
+                                buildFrom.getBranch().getName(),
+                                buildFrom.getName(),
+                                buildTo.getBranch().getName(),
+                                buildTo.getName()
                         )
                 );
                 syncError = true;
@@ -176,7 +187,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             // Change log computation
             return new GitChangeLog(
                     UUID.randomUUID().toString(),
-                    branch.getProject(),
+                    project,
                     getSCMBuildView(request.getFrom()),
                     getSCMBuildView(request.getTo()),
                     syncError

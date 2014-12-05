@@ -64,11 +64,20 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
     @Transactional
     public SVNChangeLog changeLog(BuildDiffRequest request) {
         try (Transaction ignored = transactionService.start()) {
-            Branch branch = structureService.getBranch(request.getBranch());
-            SVNRepository svnRepository = getSVNRepository(branch);
+            // Gets the two builds
+            Build buildFrom = structureService.getBuild(request.getFrom());
+            Build buildTo = structureService.getBuild(request.getTo());
+            // Gets the two branches, for each build
+            Branch branchFrom = buildFrom.getBranch();
+            Branch branchTo = buildTo.getBranch();
+            // Checks the branch is the same
+            if (branchFrom.id() != branchTo.id()) {
+                throw new SVNChangeLogDifferentBranchException();
+            }
+            SVNRepository svnRepository = getSVNRepository(branchFrom);
             return new SVNChangeLog(
                     UUID.randomUUID().toString(),
-                    branch.getProject(),
+                    branchFrom.getProject(),
                     svnRepository,
                     getSCMBuildView(svnRepository, request.getFrom()),
                     getSCMBuildView(svnRepository, request.getTo())
