@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.git.client;
+package net.nemerosa.ontrack.git.model;
 
 import lombok.Data;
 

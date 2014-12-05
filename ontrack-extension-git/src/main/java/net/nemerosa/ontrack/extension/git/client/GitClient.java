@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.git.model.FormerGitConfiguration;
 import net.nemerosa.ontrack.git.model.GitCommit;
 import net.nemerosa.ontrack.git.model.GitDiff;
 import net.nemerosa.ontrack.git.model.GitLog;
+import net.nemerosa.ontrack.git.model.GitTag;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import java.util.Collection;

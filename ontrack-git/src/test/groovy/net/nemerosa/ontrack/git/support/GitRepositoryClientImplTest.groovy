@@ -137,7 +137,7 @@ class GitRepositoryClientImplTest {
     @Test
     void 'Scanning: on a branch'() {
         prepare { prepareBranches it } withClone { client, clientRepo, origin ->
-            client.sync({println it})
+            client.sync({ println it })
             def result = client.scanCommits('2.1', { revCommit ->
                 revCommit.shortMessage == 'Commit 6'
             })
@@ -151,7 +151,7 @@ class GitRepositoryClientImplTest {
     @Test
     void 'Tag containing a commit'() {
         prepare { prepareBranches it } withClone { GitRepositoryClient client, GitTestRepo clientRepo, origin ->
-            client.sync({println it})
+            client.sync({ println it })
             // No further tag
             assert client.getTagsWhichContainCommit(clientRepo.commitLookup('Commit 13')) == []
             // Exact tag
@@ -207,6 +207,14 @@ class GitRepositoryClientImplTest {
                 // Checks the list
                 assert branches.sort() == (1..4).collect { "feature/$it" } + ["master"]
             }
+        }
+    }
+
+    @Test
+    void 'Get tags'() {
+        prepare { prepareBranches it } withClone { GitRepositoryClient client, clientRepo, origin ->
+            client.sync({println it})
+            assert client.tags.collect { it.name } == ['v2.1', 'v2.2']
         }
     }
 

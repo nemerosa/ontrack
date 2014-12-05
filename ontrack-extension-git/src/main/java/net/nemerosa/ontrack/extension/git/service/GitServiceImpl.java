@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.git.service;
 
 import com.google.common.collect.Lists;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
-import net.nemerosa.ontrack.extension.git.client.GitTag;
+import net.nemerosa.ontrack.git.model.GitTag;
 import net.nemerosa.ontrack.extension.git.model.*;
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty;
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType;
@@ -753,10 +753,9 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         // Makes sure of synchronization
         info.post("Synchronizing before importing");
         gitClient.sync(info::post);
-        // FIXME Gets the list of tags
+        // Gets the list of tags
         info.post("Getting list of tags");
-        // Collection<GitTag> tags = gitClient.getTags();
-        Collection<GitTag> tags = Collections.emptyList();
+        Collection<GitTag> tags = gitClient.getTags();
         // Creates the builds
         info.post("Creating builds from tags");
         for (GitTag tag : tags) {

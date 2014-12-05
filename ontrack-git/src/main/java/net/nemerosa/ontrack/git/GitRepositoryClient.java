@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.git;
 import net.nemerosa.ontrack.git.model.GitCommit;
 import net.nemerosa.ontrack.git.model.GitDiff;
 import net.nemerosa.ontrack.git.model.GitLog;
+import net.nemerosa.ontrack.git.model.GitTag;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import java.util.Collection;
@@ -104,4 +105,9 @@ public interface GitRepositoryClient {
      * Looks for a commit using its hash
      */
     Optional<GitCommit> getCommitFor(String id);
+
+    /**
+     * List of all tags
+     */
+    Collection<GitTag> getTags();
 }
