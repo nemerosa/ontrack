@@ -7,7 +7,7 @@ angular.module('ot.extension.svn.changelog', [
     .config(function ($stateProvider) {
         // SVN configurations
         $stateProvider.state('svn-changelog', {
-            url: '/extension/svn/changelog?branch&from&to',
+            url: '/extension/svn/changelog?from&to',
             templateUrl: 'app/extension/svn/svn.changelog.tpl.html',
             controller: 'SVNChangeLogCtrl'
         });
@@ -16,7 +16,6 @@ angular.module('ot.extension.svn.changelog', [
 
         // The build request
         $scope.buildDiffRequest = {
-            branch: $stateParams.branch,
             from: $stateParams.from,
             to: $stateParams.to
         };
@@ -24,11 +23,6 @@ angular.module('ot.extension.svn.changelog', [
         // The view
         var view = ot.view();
         view.title = "Subversion change log";
-
-        // Loading the branch
-        otStructureService.getBranch($stateParams.branch).then(function (branch) {
-            view.breadcrumbs = ot.branchBreadcrumbs(branch);
-        });
 
         /**
          * The REST end point to contact is contained by the current path, with the leading
@@ -42,6 +36,8 @@ angular.module('ot.extension.svn.changelog', [
 
         ot.pageCall($http.get(path, {params: $scope.buildDiffRequest})).then(function (changeLog) {
             $scope.changeLog = changeLog;
+
+            view.breadcrumbs = ot.projectBreadcrumbs(changeLog.project);
 
             $scope.revisionsCommand = "Revisions";
             $scope.issuesCommand = "Issues";
