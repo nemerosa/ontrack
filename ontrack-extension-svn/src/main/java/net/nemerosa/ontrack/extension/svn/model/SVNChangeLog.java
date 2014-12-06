@@ -10,10 +10,7 @@ import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Project;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @EqualsAndHashCode(callSuper = false)
 @Data
@@ -59,6 +56,11 @@ public class SVNChangeLog extends SCMChangeLog<SVNHistory> {
         // Gets the two histories
         SVNHistory historyFrom = getScmBuildFrom().getScm();
         SVNHistory historyTo = getScmBuildTo().getScm();
+
+        // Empty references?
+        if (historyFrom.getReferences().isEmpty() || historyTo.getReferences().isEmpty()) {
+            return Collections.emptyList();
+        }
 
         // Sort them from->to with 'to' having the highest revision
         {
