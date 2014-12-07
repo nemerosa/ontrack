@@ -260,9 +260,11 @@ docker logout
             }
             publishers {
                 archiveJunit('ontrack-acceptance.xml')
-                buildPipelineTrigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-21-publish") {
-                    parameters {
-                        currentBuild()
+                if (branchType == 'release') {
+                    buildPipelineTrigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-21-publish") {
+                        parameters {
+                            currentBuild()
+                        }
                     }
                 }
             }
