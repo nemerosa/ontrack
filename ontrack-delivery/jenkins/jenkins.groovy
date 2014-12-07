@@ -6,6 +6,7 @@
  * List of global passwords:
  *
  * - DOCKER_PASSWORD
+ * - GITHUB_TOKEN
  *
  * List of plug-ins:
  *
@@ -317,6 +318,42 @@ docker logout
                         'branch'(NAME)
                         'build'('${ONTRACK_VERSION_BUILD}')
                         'validationStamp'('RELEASE')
+                    }
+                }
+            }
+
+            // Production deployment
+
+            job {
+                name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-22-production"
+                logRotator(numToKeep = 40)
+                deliveryPipelineConfiguration('Release', 'Production')
+                jdk 'JDK8u20'
+                parameters {
+                    stringParam('ONTRACK_VERSION_FULL', '', '')
+                    stringParam('ONTRACK_VERSION_COMMIT', '', '')
+                    stringParam('ONTRACK_VERSION_BUILD', '', '')
+                    stringParam('ONTRACK_VERSION_DISPLAY', '', '')
+                }
+                wrappers {
+                    injectPasswords()
+                }
+                steps {
+                    shell readFileFromWorkspace('ontrack-delivery/jenkins/production.sh')
+                }
+                publishers {
+                    downstreamParameterized {
+                        trigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-23-acceptance-production", 'SUCCESS', false) {
+                            currentBuild()
+                        }
+                    }
+                }
+                configure { node ->
+                    node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
+                        'project'('ontrack')
+                        'branch'(NAME)
+                        'build'('${ONTRACK_VERSION_BUILD}')
+                        'validationStamp'('ONTRACK')
                     }
                 }
             }
