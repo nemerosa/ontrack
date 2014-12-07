@@ -84,7 +84,7 @@ branches.each {
             publishers {
                 archiveJunit("**/build/test-results/*.xml")
                 downstreamParameterized {
-                    trigger("${PROJECT}/${PROJECT}_${NAME}/${PROJECT}_${NAME}-02-package", 'SUCCESS', false) {
+                    trigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-02-package", 'SUCCESS', false) {
                         gitRevision(true)
                     }
                 }
@@ -126,7 +126,7 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
             publishers {
                 archiveJunit("**/build/test-results/*.xml")
                 downstreamParameterized {
-                    trigger("${PROJECT}/${PROJECT}_${NAME}/${PROJECT}_${NAME}-11-acceptance-local", 'SUCCESS', false) {
+                    trigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-11-acceptance-local", 'SUCCESS', false) {
                         propertiesFile('version.properties')
                     }
                 }
