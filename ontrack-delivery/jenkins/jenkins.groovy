@@ -358,6 +358,43 @@ docker logout
                 }
             }
 
+            // Production acceptance test
+
+            job {
+                name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-13-acceptance-production"
+                logRotator(numToKeep = 40)
+                deliveryPipelineConfiguration('Release', 'Production acceptance')
+                jdk 'JDK8u20'
+                parameters {
+                    stringParam('ONTRACK_VERSION_FULL', '', '')
+                    stringParam('ONTRACK_VERSION_COMMIT', '', '')
+                    stringParam('ONTRACK_VERSION_BUILD', '', '')
+                    stringParam('ONTRACK_VERSION_DISPLAY', '', '')
+                }
+                wrappers {
+                    injectPasswords()
+                }
+                steps {
+                    shell readFileFromWorkspace('ontrack-delivery/jenkins/do-acceptance.sh')
+                }
+                publishers {
+                    archiveJunit('ontrack-acceptance.xml')
+                }
+                configure { node ->
+                    node / 'buildWrappers' / 'org.jenkinsci.plugins.xvfb.XvfbBuildWrapper' {
+                        'installationName'('default')
+                        'screen'('1024x768x24')
+                        'displayNameOffset'('1')
+                    }
+                    node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
+                        'project'('ontrack')
+                        'branch'(NAME)
+                        'build'('${ONTRACK_VERSION_BUILD}')
+                        'validationStamp'('ONTRACK.SMOKE')
+                    }
+                }
+            }
+
         }
 
         // Pipeline view
