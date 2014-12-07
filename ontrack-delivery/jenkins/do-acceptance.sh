@@ -1,22 +1,3 @@
-#!/bin/bash
-
-# Parameters
-# * ONTRACK_VERSION_FULL
-# * ONTRACK_VERSION_COMMIT
-# * ONTRACK_VERSION_BASE
-# * ONTRACK_VERSION_BUILD
-
-# Globals
-# * DO_TOKEN - Digital Ocean Personal Access Token
-
-# Built-in
-# * ${WORKSPACE}
-
-# Misc.
-# * Running with Xvfb (1024x768x24, offset: 1)
-# * Post action: JUnit tests with ontrack-acceptance.xml
-
-# Script
 # Environment
 
 REPOSITORY=/var/lib/jenkins/repository/ontrack/2.0
@@ -35,7 +16,7 @@ unzip ${REPOSITORY}/ontrack-delivery-docker-${ONTRACK_VERSION_FULL}.jar -d ${WOR
     --host=ontrack \
     --proxy-name=\$host
 
-export VAGRANT_LOG=debug
+# export VAGRANT_LOG=debug
 
 ./vagrant-install.sh \
     --vagrant-host="ontrack-acceptance-${ONTRACK_VERSION_FULL}" \
@@ -62,3 +43,4 @@ ${WORKSPACE}/acceptance.sh \
     --jar=${REPOSITORY}/ontrack-acceptance-${ONTRACK_VERSION_FULL}.jar \
     --no-ssl \
     --ontrack-url=https://${DROPLET_IP}
+

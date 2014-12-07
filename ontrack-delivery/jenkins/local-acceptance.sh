@@ -1,20 +1,3 @@
-#!/bin/bash
-
-# Parameters
-# * ONTRACK_VERSION_FULL
-# * ONTRACK_VERSION_COMMIT
-# * ONTRACK_VERSION_BASE
-# * ONTRACK_VERSION_BUILD
-
-# Built-in
-# * ${WORKSPACE}
-
-# Misc.
-# * Running with Xvfb (1024x768x24, offset: 1)
-# * Post action: JUnit tests with ontrack-acceptance.xml
-
-# Script
-
 # Environment
 
 REPOSITORY=/var/lib/jenkins/repository/ontrack/2.0

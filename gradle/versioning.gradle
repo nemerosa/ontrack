@@ -27,7 +27,7 @@ def normalise(String value) {
 }
 
 def getDisplayVersion(base) {
-    def tags = "git log master..HEAD --pretty=format:%d".execute().text.trim().readLines()
+    def tags = "git log HEAD --pretty=format:%d".execute().text.trim().readLines()
     def baseTagPattern = /tag: (${base}\.[\d+])/
     def baseTags = tags.collect { tag ->
         def m = tag =~ baseTagPattern
