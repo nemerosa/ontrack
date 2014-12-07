@@ -10,6 +10,7 @@
  * - Parameterized trigger
  * - Git
  * - Folders
+ * - Set build name
  */
 
 /**
@@ -55,6 +56,42 @@ branches.each {
         folder {
             name "${PROJECT}/${PROJECT}-${NAME}"
         }
+
+        // Quick check job
+        job {
+            name name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-01-quick"
+            logRotator(numToKeep = 40)
+            deliveryPipelineConfiguration('Commit', 'Quick check')
+            parameters {
+                stringParam('LOCAL_BRANCH', '...', '')
+                stringParam('REMOTE_BRANCH', 'origin/...', '')
+            }
+            scm {
+                git {
+                    remote {
+                        url 'git@github.com:nemerosa/ontrack.git'
+                        branch '${REMOTE_BRANCH}'
+                        localBranch '${LOCAL_BRANCH}'
+                    }
+                }
+            }
+            wrappers {
+                buildName '${ENV,var="LOCAL_BRANCH"}'
+            }
+            steps {
+                gradle 'displayVersion writeVersion test --info'
+            }
+            publishers {
+                archiveJunit("**/build/test-results/*.xml")
+                downstreamParameterized {
+                    trigger("${PROJECT}/${PROJECT}_${NAME}/${PROJECT}_${NAME}-02-package", 'SUCCESS', false) {
+                        currentBuild()
+                    }
+                }
+            }
+        }
+
+
     } else {
         println "\tSkipping."
     }
