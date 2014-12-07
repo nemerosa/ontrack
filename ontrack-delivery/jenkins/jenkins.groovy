@@ -222,9 +222,11 @@ docker push nemerosa/ontrack:\${ONTRACK_VERSION_FULL}
 docker logout
 """
             }
-            downstreamParameterized {
-                trigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-13-acceptance-do", 'SUCCESS', false) {
-                    currentBuild()
+            publishers {
+                downstreamParameterized {
+                    trigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-13-acceptance-do", 'SUCCESS', false) {
+                        currentBuild()
+                    }
                 }
             }
             configure { node ->
