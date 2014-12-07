@@ -24,6 +24,18 @@ def PROJECT = 'ontrack'
 def LOCAL_REPOSITORY = '/var/lib/jenkins/repository/ontrack/2.0'
 
 /**
+ * XVfb set-up
+ */
+
+def xvfb (node) {
+    node / 'buildWrappers' / 'org.jenkinsci.plugins.xvfb.XvfbBuildWrapper' {
+        'installationName'('default')
+        'screen'('1024x768x24')
+        'displayNameOffset'('1')
+    }
+}
+
+/**
  * Folder for the project (making sure)
  */
 
@@ -132,11 +144,7 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
                 }
             }
             configure { node ->
-                node / 'buildWrappers' / 'org.jenkinsci.plugins.xvfb.XvfbBuildWrapper' {
-                    'installationName'('default')
-                    'screen'('1024x768x24')
-                    'displayNameOffset'('1')
-                }
+                xvfb(node)
                 node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackBuildNotifier' {
                     'project'('ontrack')
                     'branch'(NAME)
@@ -144,6 +152,52 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
                 }
             }
         }
+
+        // Local acceptance job
+
+        job {
+            name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-11-acceptance-local"
+            logRotator(numToKeep = 40)
+            deliveryPipelineConfiguration('Acceptance', 'Local acceptance')
+            jdk 'JDK8u20'
+            parameters {
+                stringParam('ONTRACK_VERSION_FULL', '', '')
+                stringParam('ONTRACK_VERSION_COMMIT', '', '')
+                stringParam('ONTRACK_VERSION_BUILD', '', '')
+                stringParam('ONTRACK_VERSION_DISPLAY', '', '')
+            }
+            steps {
+                shell readFileFromWorkspace('local-acceptance.sh')
+                if (branchType == 'release') {
+                    conditionalSteps {
+                        condition {
+                            status('SUCCESS', 'SUCCESS')
+                        }
+                        runner('Fail')
+                        downstreamParameterized {
+                            trigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-12-docker-push", 'SUCCESS', false) {
+                                currentBuild()
+                            }
+                        }
+                    }
+                }
+            }
+            publishers {
+                archiveJunit('ontrack-acceptance.xml')
+                if (branchType != 'release') {
+                    downstreamParameterized {
+                        trigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-12-docker-push", 'SUCCESS', false) {
+                            currentBuild()
+                        }
+                    }
+                }
+            }
+            configure { node ->
+                xvfb(node)
+            }
+        }
+
+        // Pipeline view
 
         view(type: DeliveryPipelineView) {
             name "${PROJECT}/${PROJECT}-${NAME}/Pipeline"
