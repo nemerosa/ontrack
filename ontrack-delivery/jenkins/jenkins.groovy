@@ -283,6 +283,46 @@ docker logout
             }
         }
 
+        if (branchType == 'release') {
+
+            // Publish job
+
+            job {
+                name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-21-publish"
+                logRotator(numToKeep = 40)
+                deliveryPipelineConfiguration('Release', 'Publish')
+                jdk 'JDK8u20'
+                parameters {
+                    stringParam('ONTRACK_VERSION_FULL', '', '')
+                    stringParam('ONTRACK_VERSION_COMMIT', '', '')
+                    stringParam('ONTRACK_VERSION_BUILD', '', '')
+                    stringParam('ONTRACK_VERSION_DISPLAY', '', '')
+                }
+                wrappers {
+                    injectPasswords()
+                }
+                steps {
+                    shell readFileFromWorkspace('ontrack-delivery/jenkins/publish.sh')
+                }
+                publishers {
+                    buildPipelineTrigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-22-production") {
+                        parameters {
+                            currentBuild()
+                        }
+                    }
+                }
+                configure { node ->
+                    node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
+                        'project'('ontrack')
+                        'branch'(NAME)
+                        'build'('${ONTRACK_VERSION_BUILD}')
+                        'validationStamp'('RELEASE')
+                    }
+                }
+            }
+
+        }
+
         // Pipeline view
 
         view(type: DeliveryPipelineView) {
