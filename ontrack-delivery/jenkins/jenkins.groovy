@@ -24,18 +24,6 @@ def PROJECT = 'ontrack'
 def LOCAL_REPOSITORY = '/var/lib/jenkins/repository/ontrack/2.0'
 
 /**
- * XVfb set-up
- */
-
-def xvfb (node) {
-    node / 'buildWrappers' / 'org.jenkinsci.plugins.xvfb.XvfbBuildWrapper' {
-        'installationName'('default')
-        'screen'('1024x768x24')
-        'displayNameOffset'('1')
-    }
-}
-
-/**
  * Folder for the project (making sure)
  */
 
@@ -144,7 +132,11 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
                 }
             }
             configure { node ->
-                xvfb(node)
+                node / 'buildWrappers' / 'org.jenkinsci.plugins.xvfb.XvfbBuildWrapper' {
+                    'installationName'('default')
+                    'screen'('1024x768x24')
+                    'displayNameOffset'('1')
+                }
                 node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackBuildNotifier' {
                     'project'('ontrack')
                     'branch'(NAME)
@@ -193,7 +185,11 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
                 }
             }
             configure { node ->
-                xvfb(node)
+                node / 'buildWrappers' / 'org.jenkinsci.plugins.xvfb.XvfbBuildWrapper' {
+                    'installationName'('default')
+                    'screen'('1024x768x24')
+                    'displayNameOffset'('1')
+                }
             }
         }
 
