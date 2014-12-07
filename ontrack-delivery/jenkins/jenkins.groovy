@@ -141,6 +141,18 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
             }
         }
 
+        view(type: DeliveryPipelineView) {
+            name "${PROJECT}/${PROJECT}-${NAME}/Pipeline"
+            pipelineInstances(4)
+            enableManualTriggers()
+            showChangeLog()
+            updateInterval(5)
+            pipelines {
+                component("ontrack-${NAME}", "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-01-quick")
+            }
+        }
+
+
 
     } else {
         println "\tSkipping."
