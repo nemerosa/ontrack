@@ -190,6 +190,12 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
                     'screen'('1024x768x24')
                     'displayNameOffset'('1')
                 }
+                node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
+                    'project'('ontrack')
+                    'branch'(NAME)
+                    'build'('${ONTRACK_VERSION_BUILD}')
+                    'validationStamp'('ACCEPTANCE')
+                }
             }
         }
 
