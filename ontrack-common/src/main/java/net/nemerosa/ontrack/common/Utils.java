@@ -61,7 +61,7 @@ public final class Utils {
                 return IOUtils.toString(process.getInputStream());
             }
         } catch (IOException | InterruptedException ex) {
-            throw new RuntimeException("Error while executing " + cmd + " command", ex);
+            throw new ProcessRunException("Error while executing " + cmd + " command: " + ex.getMessage());
         }
     }
 

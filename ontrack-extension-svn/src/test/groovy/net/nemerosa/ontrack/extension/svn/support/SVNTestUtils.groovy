@@ -1,7 +1,8 @@
-package net.nemerosa.ontrack.extension.svn.template
+package net.nemerosa.ontrack.extension.svn.support
 
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository
 import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration
+import org.apache.commons.io.FileUtils
 
 final class SVNTestUtils {
 

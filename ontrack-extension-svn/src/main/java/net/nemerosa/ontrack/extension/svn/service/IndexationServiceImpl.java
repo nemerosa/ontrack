@@ -248,7 +248,7 @@ public class IndexationServiceImpl implements IndexationService, JobProvider {
         }
     }
 
-    private void indexFromLatest(SVNRepository repository, JobInfoListener infoListener) {
+    protected void indexFromLatest(SVNRepository repository, JobInfoListener infoListener) {
         securityService.checkGlobalFunction(GlobalSettings.class);
         try (Transaction ignored = transactionService.start()) {
             // Loads the repository information

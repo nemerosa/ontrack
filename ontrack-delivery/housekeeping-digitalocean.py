@@ -32,7 +32,7 @@ def housekeeping(options):
             days = (now - creation).days
             print "  Creation time: %s" % creation
             print "  Since %d days" % days
-            to_delete = (days > 2)
+            to_delete = (days > 0)
             if to_delete:
                 print "  Deleting droplet [%s] %s" % (id, name)
                 delete_droplet(id, options.token)

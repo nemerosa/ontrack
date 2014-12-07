@@ -22,6 +22,13 @@ public class PlainEventRenderer implements EventRenderer {
                 return ((Build) projectEntity).getName();
             case VALIDATION_RUN:
                 return "#" + ((ValidationRun) projectEntity).getRunOrder();
+            case PROMOTION_RUN:
+                PromotionRun promotionRun = (PromotionRun) projectEntity;
+                return String.format(
+                        "%s->%s",
+                        promotionRun.getBuild().getName(),
+                        promotionRun.getPromotionLevel().getName()
+                );
             default:
                 throw new EventCannotRenderEntityException(event.getEventType().getTemplate(), projectEntity);
         }
