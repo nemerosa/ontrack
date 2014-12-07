@@ -3,6 +3,10 @@
  *
  * - JDK8u20
  *
+ * List of global passwords:
+ *
+ * - DOCKER_PASSWORD
+ *
  * List of plug-ins:
  *
  * - Delivery pipeline
@@ -190,6 +194,45 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
                     'branch'(NAME)
                     'build'('${ONTRACK_VERSION_BUILD}')
                     'validationStamp'('ACCEPTANCE')
+                }
+            }
+        }
+
+        // Docker push
+
+        job {
+            name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-12-docker-push"
+            logRotator(numToKeep = 40)
+            deliveryPipelineConfiguration('Acceptance', 'Docker push')
+            jdk 'JDK8u20'
+            parameters {
+                stringParam('ONTRACK_VERSION_FULL', '', '')
+                stringParam('ONTRACK_VERSION_COMMIT', '', '')
+                stringParam('ONTRACK_VERSION_BUILD', '', '')
+                stringParam('ONTRACK_VERSION_DISPLAY', '', '')
+            }
+            wrappers {
+                injectPasswords()
+            }
+            steps {
+                shell """\
+docker tag ontrack:\${ONTRACK_VERSION_FULL} nemerosa/ontrack:\${ONTRACK_VERSION_FULL}
+docker login --email="damien.coraboeuf+nemerosa@gmail.com" --username="nemerosa" --password="${DOCKER_PASSWORD}"
+docker push nemerosa/ontrack:\${ONTRACK_VERSION_FULL}
+docker logout
+"""
+            }
+            downstreamParameterized {
+                trigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-13-acceptance-do", 'SUCCESS', false) {
+                    currentBuild()
+                }
+            }
+            configure { node ->
+                node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
+                    'project'('ontrack')
+                    'branch'(NAME)
+                    'build'('${ONTRACK_VERSION_BUILD}')
+                    'validationStamp'('DOCKER')
                 }
             }
         }
