@@ -113,6 +113,7 @@ branches.each {
                     condition {
                         status('SUCCESS', 'SUCCESS')
                     }
+                    runner('Fail')
                     shell """\
 # Copies the JAR to a local directory
 ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSITORY}
@@ -154,7 +155,6 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
                 component("ontrack-${NAME}", "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-01-quick")
             }
         }
-
 
 
     } else {
