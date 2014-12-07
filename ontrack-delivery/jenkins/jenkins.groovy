@@ -167,7 +167,7 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
                 stringParam('ONTRACK_VERSION_DISPLAY', '', '')
             }
             steps {
-                shell readFileFromWorkspace('local-acceptance.sh')
+                shell readFileFromWorkspace('ontrack-delivery/jenkins/local-acceptance.sh')
                 if (branchType == 'release') {
                     conditionalSteps {
                         condition {
