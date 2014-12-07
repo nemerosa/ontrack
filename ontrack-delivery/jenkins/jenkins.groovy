@@ -11,6 +11,8 @@
  * - Git
  * - Folders
  * - Set build name
+ * - Xvfb
+ * - Ontrack
  */
 
 /**
@@ -19,6 +21,7 @@
 
 def REPOSITORY = 'nemerosa/ontrack'
 def PROJECT = 'ontrack'
+def LOCAL_REPOSITORY = '/var/lib/jenkins/repository/ontrack/2.0'
 
 /**
  * Folder for the project (making sure)
@@ -62,21 +65,15 @@ branches.each {
             name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-01-quick"
             logRotator(numToKeep = 40)
             deliveryPipelineConfiguration('Commit', 'Quick check')
-            parameters {
-                stringParam('LOCAL_BRANCH', '...', '')
-                stringParam('REMOTE_BRANCH', 'origin/...', '')
-            }
+            jdk 'JDK8u20'
             scm {
                 git {
                     remote {
                         url 'git@github.com:nemerosa/ontrack.git'
-                        branch '${REMOTE_BRANCH}'
-                        localBranch '${LOCAL_BRANCH}'
+                        branch "origin/${BRANCH}"
                     }
+                    localBranch "${BRANCH}"
                 }
-            }
-            wrappers {
-                buildName '${ENV,var="LOCAL_BRANCH"}'
             }
             steps {
                 gradle 'displayVersion writeVersion test --info'
@@ -85,8 +82,61 @@ branches.each {
                 archiveJunit("**/build/test-results/*.xml")
                 downstreamParameterized {
                     trigger("${PROJECT}/${PROJECT}_${NAME}/${PROJECT}_${NAME}-02-package", 'SUCCESS', false) {
-                        currentBuild()
+                        gitRevision(true)
                     }
+                }
+            }
+        }
+
+        // Package job
+        job {
+            name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-02-package"
+            logRotator(numToKeep = 40)
+            deliveryPipelineConfiguration('Commit', 'Package')
+            jdk 'JDK8u20'
+            scm {
+                git {
+                    remote {
+                        url 'git@github.com:nemerosa/ontrack.git'
+                        branch "origin/${BRANCH}"
+                    }
+                    wipeOutWorkspace()
+                    localBranch "${BRANCH}"
+                }
+            }
+            steps {
+                gradle 'clean displayVersion writeVersion test integrationTest release  --info --profile'
+                conditionalSteps {
+                    condition {
+                        status('SUCCESS', 'SUCCESS')
+                    }
+                    shell """\
+# Copies the JAR to a local directory
+ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSITORY}
+"""
+                }
+                environmentVariables {
+                    propertiesFile 'version.properties'
+                }
+            }
+            publishers {
+                archiveJunit("**/build/test-results/*.xml")
+                downstreamParameterized {
+                    trigger("${PROJECT}/${PROJECT}_${NAME}/${PROJECT}_${NAME}-11-acceptance-local", 'SUCCESS', false) {
+                        propertiesFile('version.properties')
+                    }
+                }
+            }
+            configure { node ->
+                node / 'buildWrappers' / 'org.jenkinsci.plugins.xvfb.XvfbBuildWrapper' {
+                    'installationName'('default')
+                    'screen'('1024x768x24')
+                    'displayNameOffset'('1')
+                }
+                node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackBuildNotifier' {
+                    'project'('ontrack')
+                    'branch'(NAME)
+                    'build'('${ONTRACK_VERSION_BUILD}')
                 }
             }
         }
