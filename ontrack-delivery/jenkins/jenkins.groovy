@@ -2,169 +2,48 @@
  * List of global parameters:
  *
  * - JDK8u20
+ *
+ * List of plug-ins:
+ *
+ * - Delivery pipeline
+ * - Build pipeline
+ * - Parameterized trigger
+ * - Git
+ * - Folders
  */
 
 /**
- * Trigger job
+ * Variables
  */
 
-job {
-    name 'ontrack-2-trigger'
-    logRotator(numToKeep = 40)
-    scm {
-        git {
-            remote {
-                url 'git@github.com:nemerosa/ontrack.git'
-            }
-            branch '*/feature/*'
-            branch '*/release/*'
-            branch '*/hotfix/*'
-            branch '*/master'
-        }
+String repository = 'nemerosa/ontrack'
+String project = 'ontrack'
+
+/**
+ * Pipeline for a branch
+ */
+def generateBranch(String branchName) {
+    // Normalised branch name
+    def name = branchName.replaceAll(/[^A-Za-z0-9\.\-_]/, '-')
+    // Folder for the branch
+    folder {
+        name "${project}/${project}-${name}"
     }
-    triggers {
-        scm 'H/5 * * * *'
-    }
-    wrappers {
-        buildName '${GIT_BRANCH}'
-    }
-    steps {
-        shell """\
-echo \$GIT_BRANCH
-LOCAL_BRANCH=`echo \$GIT_BRANCH | sed 's|origin/||'`
-rm -f branch.properties
-echo LOCAL_BRANCH=\$LOCAL_BRANCH >> branch.properties
-echo REMOTE_BRANCH=\$GIT_BRANCH >> branch.properties
-"""
-    }
-    publishers {
-        downstreamParameterized {
-            trigger('ontrack-2-quick') {
-                gitRevision(true)
-                propertiesFile('branch.properties')
-            }
-        }
-    }
+//    job {
+//        name "${project}-${branchName}".replaceAll('/','-')
+//        scm {
+//            git("git://github.com/${project}.git", branchName)
+//        }
+//    }
 }
 
 /**
- * Commit phase
+ * Generation for all branches
  */
 
-job {
-    name 'ontrack-2-quick'
-    logRotator(numToKeep = 40)
-    deliveryPipelineConfiguration('Commit', 'Quick check')
-    parameters {
-        stringParam('LOCAL_BRANCH', 'master', '')
-        stringParam('REMOTE_BRANCH', 'origin/master', '')
-    }
-    jdk 'JDK8u20'
-    scm {
-        git {
-            remote {
-                url 'git@github.com:nemerosa/ontrack.git'
-            }
-            branch '${REMOTE_BRANCH}'
-            localBranch '${LOCAL_BRANCH}'
-        }
-    }
-    wrappers {
-        buildName '${ENV,var="LOCAL_BRANCH"}'
-    }
-    steps {
-        gradle """\
-displayVersion writeVersion test --info
-"""
-    }
-    publishers {
-        downstreamParameterized {
-            trigger('ontrack-2-package') {
-                currentBuild()
-            }
-        }
-    }
-}
+String branchApi = new URL("https://api.github.com/repos/${repository}/branches")
+def branches = new groovy.json.JsonSlurper().parse(branchApi.newReader())
 
-job {
-    name 'ontrack-2-package'
-    logRotator(numToKeep = 40)
-    deliveryPipelineConfiguration('Commit', 'Package')
-    parameters {
-        stringParam('LOCAL_BRANCH', 'master', '')
-        stringParam('REMOTE_BRANCH', 'origin/master', '')
-    }
-    jdk 'JDK8u20'
-    scm {
-        git {
-            remote {
-                url 'git@github.com:nemerosa/ontrack.git'
-            }
-            branch '${REMOTE_BRANCH}'
-            localBranch '${LOCAL_BRANCH}'
-        }
-    }
-    wrappers {
-        buildName '${ENV,var="LOCAL_BRANCH"}'
-    }
-    // TODO Xvfb
-    steps {
-        gradle """\
-clean
-displayVersion
-writeVersion
-test
-release
-integrationTest
---info
---profile
-"""
-        conditionalSteps {
-            condition {
-                status('SUCCESS', 'SUCCESS')
-            }
-            shell """\
-# Copies the JAR to a local directory
-ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=/var/lib/jenkins/repository/ontrack/2.0
-"""
-        }
-    }
-}
-
-/**
- * Acceptance phase
- */
-
-job {
-    name 'ontrack-2-acceptance-local'
-    logRotator(numToKeep = 40)
-    deliveryPipelineConfiguration('Acceptance', 'Local acceptance')
-}
-
-job {
-    name 'ontrack-2-docker'
-    logRotator(numToKeep = 40)
-    deliveryPipelineConfiguration('Acceptance', 'Docker publication')
-}
-
-job {
-    name 'ontrack-2-acceptance-do'
-    logRotator(numToKeep = 40)
-    deliveryPipelineConfiguration('Acceptance', 'Digital Ocean acceptance')
-}
-
-/**
- * Release phase
- */
-
-job {
-    name 'ontrack-2-publish'
-    logRotator(numToKeep = 40)
-    deliveryPipelineConfiguration('Release', 'Publication')
-}
-
-job {
-    name 'ontrack-2-production'
-    logRotator(numToKeep = 40)
-    deliveryPipelineConfiguration('Release', 'Production deployment')
+branches.each {
+    generateBranch it.name
 }
