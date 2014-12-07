@@ -59,7 +59,7 @@ branches.each {
 
         // Quick check job
         job {
-            name name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-01-quick"
+            name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-01-quick"
             logRotator(numToKeep = 40)
             deliveryPipelineConfiguration('Commit', 'Quick check')
             parameters {
