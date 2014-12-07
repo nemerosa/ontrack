@@ -361,7 +361,7 @@ docker logout
             // Production acceptance test
 
             job {
-                name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-13-acceptance-production"
+                name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-23-acceptance-production"
                 logRotator(numToKeep = 40)
                 deliveryPipelineConfiguration('Release', 'Production acceptance')
                 jdk 'JDK8u20'
