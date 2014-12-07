@@ -132,11 +132,6 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
                 }
             }
             configure { node ->
-                node / 'buildWrappers' / 'org.jenkinsci.plugins.xvfb.XvfbBuildWrapper' {
-                    'installationName'('default')
-                    'screen'('1024x768x24')
-                    'displayNameOffset'('1')
-                }
                 node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackBuildNotifier' {
                     'project'('ontrack')
                     'branch'(NAME)
