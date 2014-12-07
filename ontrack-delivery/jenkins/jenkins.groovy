@@ -237,6 +237,48 @@ docker logout
             }
         }
 
+        // Digital Ocean acceptance job
+
+        job {
+            name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-13-acceptance-do"
+            logRotator(numToKeep = 40)
+            deliveryPipelineConfiguration('Acceptance', 'Digital Ocean')
+            jdk 'JDK8u20'
+            parameters {
+                stringParam('ONTRACK_VERSION_FULL', '', '')
+                stringParam('ONTRACK_VERSION_COMMIT', '', '')
+                stringParam('ONTRACK_VERSION_BUILD', '', '')
+                stringParam('ONTRACK_VERSION_DISPLAY', '', '')
+            }
+            wrappers {
+                injectPasswords()
+            }
+            steps {
+                shell readFileFromWorkspace('ontrack-delivery/jenkins/do-acceptance.sh')
+            }
+            publishers {
+                archiveJunit('ontrack-acceptance.xml')
+                buildPipelineTrigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-21-publish") {
+                    parameters {
+                        currentBuild()
+                    }
+                }
+            }
+            configure { node ->
+                node / 'buildWrappers' / 'org.jenkinsci.plugins.xvfb.XvfbBuildWrapper' {
+                    'installationName'('default')
+                    'screen'('1024x768x24')
+                    'displayNameOffset'('1')
+                }
+                node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
+                    'project'('ontrack')
+                    'branch'(NAME)
+                    'build'('${ONTRACK_VERSION_BUILD}')
+                    'validationStamp'('ACCEPTANCE.DO')
+                }
+            }
+        }
+
         // Pipeline view
 
         view(type: DeliveryPipelineView) {
