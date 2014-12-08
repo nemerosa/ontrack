@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.svn.support
 
 import org.apache.commons.io.FileUtils
+import org.junit.Assert
 
 import static net.nemerosa.ontrack.common.Utils.run
 
@@ -34,11 +35,23 @@ class SVNTestRepo {
         // Starts serving the repository
         def pidFile = new File(repo, 'pid')
         run repo, "svnserve", "--daemon", "--root", repo.absolutePath, "--pid-file", pidFile.absolutePath
-        // Reads the PID file
-        this.pid = pidFile.text as long
-        println "SVN server started in $repo with pid=$pid"
-        // OK
-        pid
+        // Waits until the PID is created
+        boolean pidExists = pidFile.exists()
+        int tries = 0
+        while (!pidExists && tries < 5) {
+            println "Waiting for SVN repo at ${repo.absolutePath} to start..."
+            sleep 1000
+            pidExists = pidFile.exists()
+            tries++
+        }
+        if (!pidExists) {
+            Assert.fail "The SVN repo at ${repo.absolutePath} could not start in 5 seconds."
+        } else {
+            this.pid = pidFile.text as long
+            println "SVN server started in $repo with pid=$pid"
+            // OK
+            pid
+        }
     }
 
     void stop() {
