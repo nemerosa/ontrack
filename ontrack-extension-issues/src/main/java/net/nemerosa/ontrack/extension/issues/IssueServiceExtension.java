@@ -108,4 +108,12 @@ public interface IssueServiceExtension extends Extension {
      */
     ExportedIssues exportIssues(IssueServiceConfiguration issueServiceConfiguration, List<? extends Issue> issues, IssueChangeLogExportRequest request);
 
+    /**
+     * Normalises a string into a valid issue key if possible, in order for it to be useable in a search.
+     *
+     * @param issueServiceConfiguration Configuration for the service
+     * @param token                     Token to transform into a key
+     * @return Valid token or same token is not valid
+     */
+    String getIssueId(IssueServiceConfiguration issueServiceConfiguration, String token);
 }

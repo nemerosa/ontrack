@@ -63,6 +63,25 @@ class MockIssueServiceExtension extends AbstractIssueServiceExtension {
     }
 
     @Override
+    public String getIssueId(IssueServiceConfiguration issueServiceConfiguration, String token) {
+        return String.valueOf(getIssueId(token));
+    }
+
+    protected static int getIssueId(String issueKey) {
+        return Integer.parseInt(StringUtils.stripStart(issueKey, "#"), 10);
+    }
+
+    @Override
+    public boolean containsIssueKey(IssueServiceConfiguration issueServiceConfiguration, String key, Set<String> keys) {
+        // Searchable key?
+        if (StringUtils.isNumeric(key) || validIssueToken(key)) {
+            keys.collect { getIssueId(it) }.contains(getIssueId(key))
+        } else {
+            return false;
+        }
+    }
+
+    @Override
     Optional<MessageAnnotator> getMessageAnnotator(IssueServiceConfiguration issueServiceConfiguration) {
         return Optional.of(
                 new RegexMessageAnnotator(
