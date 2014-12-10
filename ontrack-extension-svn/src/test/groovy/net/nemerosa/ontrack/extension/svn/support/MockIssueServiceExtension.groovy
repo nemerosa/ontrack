@@ -17,6 +17,8 @@ import java.util.regex.Pattern
 @Component
 class MockIssueServiceExtension extends AbstractIssueServiceExtension {
 
+    public static final String ISSUE_PATTERN = "#(\\d+)";
+
     @Autowired
     public MockIssueServiceExtension(MockIssueServiceFeature extensionFeature, IssueExportServiceFactory issueExportServiceFactory) {
         super(extensionFeature, "mock", "Mock issue", issueExportServiceFactory)
@@ -43,14 +45,14 @@ class MockIssueServiceExtension extends AbstractIssueServiceExtension {
 
     @Override
     boolean validIssueToken(String token) {
-        token != null && /#\d+/ ==~ token
+        return Pattern.matches(ISSUE_PATTERN, token);
     }
 
     @Override
     Set<String> extractIssueKeysFromMessage(IssueServiceConfiguration issueServiceConfiguration, String message) {
         Set<String> result = new HashSet<>()
         if (StringUtils.isNotBlank(message)) {
-            Matcher matcher = Pattern.compile('#(\\d+)').matcher(message)
+            Matcher matcher = Pattern.compile(ISSUE_PATTERN).matcher(message)
             while (matcher.find()) {
                 // Gets the issue
                 String issueKey = matcher.group(1);
@@ -63,8 +65,12 @@ class MockIssueServiceExtension extends AbstractIssueServiceExtension {
     }
 
     @Override
-    public String getIssueId(IssueServiceConfiguration issueServiceConfiguration, String token) {
-        return String.valueOf(getIssueId(token));
+    public Optional<String> getIssueId(IssueServiceConfiguration issueServiceConfiguration, String token) {
+        if (StringUtils.isNumeric(token) || validIssueToken(token)) {
+            return Optional.of(String.valueOf(getIssueId(token)));
+        } else {
+            return Optional.empty();
+        }
     }
 
     protected static int getIssueId(String issueKey) {

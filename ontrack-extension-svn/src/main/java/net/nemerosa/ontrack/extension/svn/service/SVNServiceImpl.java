@@ -98,8 +98,9 @@ public class SVNServiceImpl implements SVNService {
     public Optional<SVNRepositoryIssue> searchIssues(SVNRepository repository, String token) {
         ConfiguredIssueService configuredIssueService = repository.getConfiguredIssueService();
         if (configuredIssueService != null) {
-            String normalizedToken = configuredIssueService.getIssueId(token);
-            return issueRevisionDao.findIssueByKey(repository.getId(), normalizedToken)
+            return configuredIssueService
+                    .getIssueId(token)
+                    .flatMap(searchKey -> issueRevisionDao.findIssueByKey(repository.getId(), searchKey))
                     .map(key -> new SVNRepositoryIssue(
                                     repository,
                                     configuredIssueService.getIssue(key)

@@ -116,8 +116,12 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
     }
 
     @Override
-    public String getIssueId(IssueServiceConfiguration issueServiceConfiguration, String token) {
-        return String.valueOf(getIssueId(token));
+    public Optional<String> getIssueId(IssueServiceConfiguration issueServiceConfiguration, String token) {
+        if (StringUtils.isNumeric(token) || validIssueToken(token)) {
+            return Optional.of(String.valueOf(getIssueId(token)));
+        } else {
+            return Optional.empty();
+        }
     }
 
     protected int getIssueId(String token) {

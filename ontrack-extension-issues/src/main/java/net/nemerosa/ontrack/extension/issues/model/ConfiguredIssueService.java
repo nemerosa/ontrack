@@ -53,7 +53,7 @@ public class ConfiguredIssueService {
         return issueServiceExtension.containsIssueKey(issueServiceConfiguration, key, keys);
     }
 
-    public String getIssueId(String token) {
+    public Optional<String> getIssueId(String token) {
         return issueServiceExtension.getIssueId(issueServiceConfiguration, token);
     }
 }

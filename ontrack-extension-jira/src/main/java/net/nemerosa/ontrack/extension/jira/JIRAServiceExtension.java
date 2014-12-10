@@ -58,8 +58,8 @@ public class JIRAServiceExtension extends AbstractIssueServiceExtension {
     }
 
     @Override
-    public String getIssueId(IssueServiceConfiguration issueServiceConfiguration, String token) {
-        return token;
+    public Optional<String> getIssueId(IssueServiceConfiguration issueServiceConfiguration, String token) {
+        return validIssueToken(token) ? Optional.of(token) : Optional.empty();
     }
 
     @Override
