@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 @Component
 class MockIssueServiceExtension extends AbstractIssueServiceExtension {
@@ -49,7 +50,7 @@ class MockIssueServiceExtension extends AbstractIssueServiceExtension {
     Set<String> extractIssueKeysFromMessage(IssueServiceConfiguration issueServiceConfiguration, String message) {
         Set<String> result = new HashSet<>()
         if (StringUtils.isNotBlank(message)) {
-            Matcher matcher = /#(\d+)/ =~ message
+            Matcher matcher = Pattern.compile('#(\\d+)').matcher(message)
             while (matcher.find()) {
                 // Gets the issue
                 String issueKey = matcher.group(1);
