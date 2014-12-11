@@ -28,7 +28,7 @@ class AbstractResource {
         if (parameters.empty) {
             url
         } else {
-            "${url}?${parameters.collect { k, v -> "$k=$v" }.join('?')}"
+            "${url}?${parameters.collect { k, v -> "$k=${URLEncoder.encode(v as String, 'UTF-8')}" }.join('&')}"
         }
     }
 

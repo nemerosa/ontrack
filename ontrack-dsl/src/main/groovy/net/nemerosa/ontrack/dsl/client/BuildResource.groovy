@@ -28,4 +28,13 @@ class BuildResource extends AbstractProjectResource implements Build {
         ])
         this
     }
+
+    @Override
+    Build validate(String validationStamp, String validationStampStatus) {
+        post(link('validate'), [
+                validationStamp      : ontrack.validationStamp(project, branch, validationStamp).id,
+                validationRunStatusId: validationStampStatus
+        ])
+        this
+    }
 }

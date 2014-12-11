@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.dsl.client
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.dsl.Branch
-import net.nemerosa.ontrack.dsl.Build
-import net.nemerosa.ontrack.dsl.Ontrack
-import net.nemerosa.ontrack.dsl.PromotionLevel
+import net.nemerosa.ontrack.dsl.*
 import net.nemerosa.ontrack.json.JsonUtils
 
 class BranchResource extends AbstractProjectResource implements Branch {
@@ -42,6 +39,17 @@ class BranchResource extends AbstractProjectResource implements Branch {
         new PromotionLevelResource(
                 ontrack,
                 post(link('createPromotionLevel'), [
+                        name       : name,
+                        description: description
+                ])
+        )
+    }
+
+    @Override
+    ValidationStamp validationStamp(String name, String description) {
+        new ValidationStampResource(
+                ontrack,
+                post(link('createValidationStamp'), [
                         name       : name,
                         description: description
                 ])

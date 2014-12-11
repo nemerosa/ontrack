@@ -42,7 +42,6 @@ class ACCDSL extends AcceptanceTestClient {
         // Getting the last promoted builds
         def results = branch.lastPromotedBuilds
         assert results.collect { it.name } == ['3', '2', '1']
-
     }
 
     @Test
@@ -51,11 +50,28 @@ class ACCDSL extends AcceptanceTestClient {
         // Filtering builds on promotion
         def results = branch.standardFilter withPromotionLevel: 'BRONZE'
         assert results.collect { it.name } == ['2']
+    }
 
+    @Test
+    void 'Validating some builds and filtering on it'() {
+        def branch = createBuildsAndPromotions()
+        // Validating builds
+        ontrack.build(branch.project, branch.name, '1').validate('SMOKE', 'FAILED')
+        ontrack.build(branch.project, branch.name, '2').validate('SMOKE', 'PASSED')
+        // Filtering on validation
+        assert branch.standardFilter(withValidationStamp: 'SMOKE').collect { it.name } == ['2', '1']
+        // Filtering on validation status
+        assert branch.standardFilter(withValidationStamp: 'SMOKE', withValidationStampStatus: 'PASSED').collect {
+            it.name
+        } == ['2']
+        // Filtering since validation status
+        assert branch.standardFilter(sinceValidationStamp: 'SMOKE', sinceValidationStampStatus: 'PASSED').collect {
+            it.name
+        } == ['3', '2']
     }
 
     protected Branch createBuildsAndPromotions() {
-// Creating a branch
+        // Creating a branch
         def testBranch = doCreateBranch()
         def projectName = testBranch.project.name.asText()
         def branchName = testBranch.name.asText()
@@ -66,10 +82,14 @@ class ACCDSL extends AcceptanceTestClient {
         assert branch.project == projectName
         assert branch.name == branchName
 
-        // Creating some some promotion levels using the DSL
+        // Creating some promotion levels using the DSL
         branch.promotionLevel 'COPPER', 'Copper promotion'
         branch.promotionLevel 'BRONZE', 'Bronze promotion'
         branch.promotionLevel 'GOLD', 'Gold promotion'
+
+        // Creating some validation stamps
+        branch.validationStamp 'SMOKE', 'Smoke tests'
+        branch.validationStamp 'REGRESSION', 'Regression tests'
 
         // Creating some builds
         def build1 = branch.build('1', 'Build 1')
@@ -80,6 +100,8 @@ class ACCDSL extends AcceptanceTestClient {
         build1.promote 'GOLD'
         build2.promote 'BRONZE'
         build3.promote 'COPPER'
+
+        // OK
         branch
     }
 

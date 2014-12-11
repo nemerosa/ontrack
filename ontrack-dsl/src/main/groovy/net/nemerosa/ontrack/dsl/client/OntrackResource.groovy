@@ -2,10 +2,7 @@ package net.nemerosa.ontrack.dsl.client
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.client.JsonClient
-import net.nemerosa.ontrack.dsl.Branch
-import net.nemerosa.ontrack.dsl.Ontrack
-import net.nemerosa.ontrack.dsl.OntrackConnector
-import net.nemerosa.ontrack.dsl.PromotionLevel
+import net.nemerosa.ontrack.dsl.*
 
 /**
  * Entry point for the DSL.
@@ -37,6 +34,22 @@ class OntrackResource implements Ontrack, OntrackConnector {
         new PromotionLevelResource(
                 this,
                 get("structure/entity/promotionLevel/${project}/${branch}/${promotionLevel}")
+        )
+    }
+
+    @Override
+    ValidationStamp validationStamp(String project, String branch, String validationStamp) {
+        new ValidationStampResource(
+                this,
+                get("structure/entity/validationStamp/${project}/${branch}/${validationStamp}")
+        )
+    }
+
+    @Override
+    Build build(String project, String branch, String build) {
+        new BuildResource(
+                this,
+                get("structure/entity/build/${project}/${branch}/${build}")
         )
     }
 

@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.dsl
 
-interface Build {
+interface ValidationStamp {
 
     int getId()
 
@@ -11,9 +11,5 @@ interface Build {
     String getName()
 
     String geDescription()
-
-    Build promote(String promotion)
-
-    Build validate(String validationStamp, String validationStampStatus)
 
 }

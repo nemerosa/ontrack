@@ -14,6 +14,8 @@ interface Branch {
 
     PromotionLevel promotionLevel(String name, String description)
 
+    ValidationStamp validationStamp(String name, String description)
+
     Build build(String name, String description)
 
     // Filters
