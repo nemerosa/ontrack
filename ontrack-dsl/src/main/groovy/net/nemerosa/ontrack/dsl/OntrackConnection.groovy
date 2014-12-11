@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.client.JsonClient
 import net.nemerosa.ontrack.client.JsonClientImpl
 import net.nemerosa.ontrack.client.OTHttpClient
 import net.nemerosa.ontrack.client.OTHttpClientBuilder
-import net.nemerosa.ontrack.dsl.client.OntrackClient
+import net.nemerosa.ontrack.dsl.client.OntrackResource
 import org.apache.commons.lang3.StringUtils
 
 class OntrackConnection {
@@ -44,6 +44,6 @@ class OntrackConnection {
         // Json client
         JsonClient jsonClient = new JsonClientImpl(otHttpClient)
         // Ontrack client
-        new OntrackClient(jsonClient)
+        new OntrackResource(jsonClient)
     }
 }

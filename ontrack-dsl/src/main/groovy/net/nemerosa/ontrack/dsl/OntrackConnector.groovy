@@ -6,4 +6,6 @@ interface OntrackConnector {
 
     JsonNode get(String url)
 
+    JsonNode post(String url, data)
+
 }

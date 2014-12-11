@@ -6,34 +6,15 @@ import net.nemerosa.ontrack.dsl.Build
 import net.nemerosa.ontrack.dsl.OntrackConnector
 import net.nemerosa.ontrack.json.JsonUtils
 
-class BranchClient implements Branch {
+class BranchResource extends AbstractProjectResource implements Branch {
 
-    private final OntrackConnector connector
-    private final JsonNode node
-
-    BranchClient(OntrackConnector connector, JsonNode node) {
-        this.connector = connector
-        this.node = node
-    }
-
-    @Override
-    int getId() {
-        JsonUtils.getInt(node, 'id')
+    BranchResource(OntrackConnector connector, JsonNode node) {
+        super(connector, node)
     }
 
     @Override
     String getProject() {
         JsonUtils.get(node.path('project'), 'name')
-    }
-
-    @Override
-    String getName() {
-        return JsonUtils.get(node, 'name')
-    }
-
-    @Override
-    String geDescription() {
-        return JsonUtils.get(node, 'description')
     }
 
     @Override
@@ -52,8 +33,11 @@ class BranchClient implements Branch {
 
     @Override
     Branch promotionLevel(String name, String description) {
-        // FIXME Method net.nemerosa.ontrack.dsl.Branch.promotionLevel
-        return null
+        post(link('createPromotionLevel'), [
+                name       : name,
+                description: description
+        ])
+        this
     }
 
     @Override

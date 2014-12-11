@@ -9,7 +9,7 @@ import net.nemerosa.ontrack.dsl.OntrackConnector
 /**
  * Entry point for the DSL.
  */
-class OntrackClient implements Ontrack, OntrackConnector {
+class OntrackResource implements Ontrack, OntrackConnector {
 
     /**
      * JSON client
@@ -19,7 +19,7 @@ class OntrackClient implements Ontrack, OntrackConnector {
     /**
      * Construction of the Ontrack client, based on a raw JSON client
      */
-    OntrackClient(JsonClient jsonClient) {
+    OntrackResource(JsonClient jsonClient) {
         this.jsonClient = jsonClient
     }
 
@@ -28,7 +28,7 @@ class OntrackClient implements Ontrack, OntrackConnector {
      */
     @Override
     Branch branch(String project, String branch) {
-        new BranchClient(
+        new BranchResource(
                 this,
                 get("structure/entity/branch/${project}/${branch}")
         )
@@ -36,5 +36,13 @@ class OntrackClient implements Ontrack, OntrackConnector {
 
     JsonNode get(String url) {
         jsonClient.get(url)
+    }
+
+    @Override
+    JsonNode post(String url, Object data) {
+        jsonClient.post(
+                jsonClient.toNode(data),
+                url
+        )
     }
 }
