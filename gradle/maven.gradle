@@ -25,16 +25,43 @@ def exporting = [
  */
 
 exporting.each { path ->
-    project(path) {
+    project(path).with {
 
         // Maven tasks available
         apply plugin: 'maven-publish'
+
+        // Signing available
+        apply plugin: 'signing'
+
+        // Javadoc generation
+        task javadocJar(type: Jar) {
+            classifier = 'javadoc'
+            from javadoc
+        }
+
+        // Source generation
+        task sourceJar(type: Jar) {
+            classifier = 'sources'
+            from sourceSets.main.allSource
+        }
+
+        // Archives for Javadoc and Sources
+        artifacts {
+            archives javadocJar, sourceJar
+        }
+
+        // Scope of the signatures
+        signing {
+            sign configurations.archives
+        }
 
         // Publication settings
         publishing {
             publications {
                 mavenJava(MavenPublication) {
                     from components.java
+                    artifact javadocJar
+                    artifact sourceJar
                     pom.withXml {
                         asNode().appendNode('url', 'http://nemerosa.github.io/ontrack')
                     }

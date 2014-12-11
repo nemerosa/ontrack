@@ -13,7 +13,7 @@ import java.util.Collections;
  * This introspector is plugged into a Jackson {@link com.fasterxml.jackson.databind.ObjectMapper} in order
  * to setup artificially a {@link com.fasterxml.jackson.annotation.JsonCreator} on constructors generated
  * by <a href="http://projectlombok.org/">Lombok</a> using the {@link lombok.Data} annotation.
- * <p/>
+ * <p>
  * It uses the fact that Lombok adds the {@link java.beans.ConstructorProperties} annotations on the generated constructors.
  *
  * @see ObjectMapperFactory
