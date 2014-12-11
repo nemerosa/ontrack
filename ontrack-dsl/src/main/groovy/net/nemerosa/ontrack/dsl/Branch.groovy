@@ -12,7 +12,7 @@ interface Branch {
 
     // Branch structure
 
-    Branch promotionLevel(String name, String description)
+    PromotionLevel promotionLevel(String name, String description)
 
     Build build(String name, String description)
 

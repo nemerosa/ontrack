@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.dsl.Branch
 import net.nemerosa.ontrack.dsl.Build
 import net.nemerosa.ontrack.dsl.Ontrack
+import net.nemerosa.ontrack.dsl.PromotionLevel
 import net.nemerosa.ontrack.json.JsonUtils
 
 class BranchResource extends AbstractProjectResource implements Branch {
@@ -32,12 +33,14 @@ class BranchResource extends AbstractProjectResource implements Branch {
     }
 
     @Override
-    Branch promotionLevel(String name, String description) {
-        post(link('createPromotionLevel'), [
-                name       : name,
-                description: description
-        ])
-        this
+    PromotionLevel promotionLevel(String name, String description) {
+        new PromotionLevelResource(
+                ontrack,
+                post(link('createPromotionLevel'), [
+                        name       : name,
+                        description: description
+                ])
+        )
     }
 
     @Override

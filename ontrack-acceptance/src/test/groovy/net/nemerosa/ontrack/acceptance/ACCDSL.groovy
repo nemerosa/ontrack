@@ -49,22 +49,24 @@ class ACCDSL extends AcceptanceTestClient {
         assert branch.name == branchName
 
         // Creating some some promotion levels using the DSL
-        def promotions = ['COPPER', 'BRONZE', 'GOLD']
-
-        promotions.each { branch.promotionLevel(it, "$it promotion") }
+        def copper = branch.promotionLevel('COPPER', 'Copper promotion')
+        def bronze = branch.promotionLevel('BRONZE', 'Bronze promotion')
+        def gold = branch.promotionLevel('GOLD', 'Gold promotion')
 
         // Creating some builds
-        def builds = (1..3).collect { branch.build("$it", "Build $it") }
+        def build1 = branch.build('1', 'Build 1')
+        def build2 = branch.build('2', 'Build 2')
+        def build3 = branch.build('3', 'Build 3')
 
         // Promoting the builds
-        (0..2).each { builds[it].promote(promotions[it]) }
+        build1.promote(gold)
+        build2.promote(bronze)
+        build3.promote(copper)
 
         // Getting the last promoted builds
         def results = branch.lastPromotedBuilds
-        assert results.size() == 3
-        assert results[0].name == '1'
-        assert results[1].name == '2'
-        assert results[2].name == '3'
+        assert results.collect { it.name } == ['3', '2', '1']
+
     }
 
 }
