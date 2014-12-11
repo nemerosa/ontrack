@@ -44,6 +44,9 @@ class ACCDSL extends AcceptanceTestClient {
 
         // Gets the branch
         def branch = ontrack.branch(projectName, branchName)
+        assert branch.id > 0
+        assert branch.project == projectName
+        assert branch.name == branchName
 
         // Creating some some promotion levels using the DSL
         def promotions = ['COPPER', 'BRONZE', 'GOLD']
