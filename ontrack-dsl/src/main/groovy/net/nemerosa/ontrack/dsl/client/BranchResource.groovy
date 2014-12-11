@@ -24,7 +24,7 @@ class BranchResource extends AbstractProjectResource implements Branch {
                 "${link('view')}/${filterType}",
                 filterConfig
         )
-        list(url).collect { BuildClient.of(client, it) }
+        get(url).buildViews.collect { new BuildResource(ontrack, it.build) }
     }
 
     @Override
