@@ -20,7 +20,7 @@ class BranchResource extends AbstractProjectResource implements Branch {
     @Override
     List<Build> filter(String filterType, Map<String, ?> filterConfig) {
         def url = query(
-                "${link('_view')}/${filterType}",
+                "${link('view')}/${filterType}",
                 filterConfig
         )
         list(url).collect { BuildClient.of(client, it) }
@@ -42,7 +42,12 @@ class BranchResource extends AbstractProjectResource implements Branch {
 
     @Override
     Build build(String name, String description) {
-        // FIXME Method net.nemerosa.ontrack.dsl.Branch.build
-        return null
+        new BuildResource(
+                connector,
+                post(link('createBuild'), [
+                        name       : name,
+                        description: description
+                ])
+        )
     }
 }

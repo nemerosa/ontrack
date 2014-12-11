@@ -16,7 +16,7 @@ class AbstractResource {
     }
 
     protected String link(String name) {
-        String linkName = '_' + name
+        String linkName = name.startsWith('_') ? name : '_' + name
         if (node.has(linkName)) {
             JsonUtils.get(node, linkName)
         } else {
@@ -24,7 +24,23 @@ class AbstractResource {
         }
     }
 
-    protected def post(String url, data) {
+    protected static String query(String url, Map<String, ?> parameters) {
+        if (parameters.empty) {
+            url
+        } else {
+            "${url}?${parameters.collect { k, v -> "$k=$v" }.join('?')}"
+        }
+    }
+
+    protected List<JsonNode> list(String url) {
+        connector.get(url).resources as List
+    }
+
+    protected JsonNode get(String url) {
+        connector.get(url)
+    }
+
+    protected JsonNode post(String url, data) {
         connector.post(url, data)
     }
 
