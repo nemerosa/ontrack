@@ -35,6 +35,9 @@ exporting.each { path ->
             publications {
                 mavenJava(MavenPublication) {
                     from components.java
+                    pom.withXml {
+                        asNode().appendNode('url', 'http://nemerosa.github.io/ontrack')
+                    }
                 }
             }
         }
