@@ -1,17 +1,17 @@
 package net.nemerosa.ontrack.dsl.client
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.dsl.OntrackConnector
+import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.ResourceMissingLinkException
 import net.nemerosa.ontrack.json.JsonUtils
 
 class AbstractResource {
 
-    protected final OntrackConnector connector
+    protected final Ontrack ontrack
     protected final JsonNode node
 
-    AbstractResource(OntrackConnector connector, JsonNode node) {
-        this.connector = connector
+    AbstractResource(Ontrack ontrack, JsonNode node) {
+        this.ontrack = ontrack
         this.node = node
     }
 
@@ -33,15 +33,15 @@ class AbstractResource {
     }
 
     protected List<JsonNode> list(String url) {
-        connector.get(url).resources as List
+        ontrack.get(url).resources as List
     }
 
     protected JsonNode get(String url) {
-        connector.get(url)
+        ontrack.get(url)
     }
 
     protected JsonNode post(String url, data) {
-        connector.post(url, data)
+        ontrack.post(url, data)
     }
 
 }

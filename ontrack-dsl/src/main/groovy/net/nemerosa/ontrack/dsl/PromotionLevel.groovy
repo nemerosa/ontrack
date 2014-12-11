@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.dsl
 
-interface Build {
+interface PromotionLevel {
 
     int getId()
 
@@ -11,7 +11,5 @@ interface Build {
     String getName()
 
     String geDescription()
-
-    Build promote(String promotion)
 
 }

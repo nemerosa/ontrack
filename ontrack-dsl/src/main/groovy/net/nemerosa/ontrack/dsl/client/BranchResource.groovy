@@ -3,13 +3,13 @@ package net.nemerosa.ontrack.dsl.client
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.dsl.Branch
 import net.nemerosa.ontrack.dsl.Build
-import net.nemerosa.ontrack.dsl.OntrackConnector
+import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.json.JsonUtils
 
 class BranchResource extends AbstractProjectResource implements Branch {
 
-    BranchResource(OntrackConnector connector, JsonNode node) {
-        super(connector, node)
+    BranchResource(Ontrack ontrack, JsonNode node) {
+        super(ontrack, node)
     }
 
     @Override
@@ -43,7 +43,7 @@ class BranchResource extends AbstractProjectResource implements Branch {
     @Override
     Build build(String name, String description) {
         new BuildResource(
-                connector,
+                ontrack,
                 post(link('createBuild'), [
                         name       : name,
                         description: description

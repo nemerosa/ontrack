@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.client.JsonClient
 import net.nemerosa.ontrack.dsl.Branch
 import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.OntrackConnector
+import net.nemerosa.ontrack.dsl.PromotionLevel
 
 /**
  * Entry point for the DSL.
@@ -23,14 +24,19 @@ class OntrackResource implements Ontrack, OntrackConnector {
         this.jsonClient = jsonClient
     }
 
-    /**
-     * Gets a branch in a project by its name
-     */
     @Override
     Branch branch(String project, String branch) {
         new BranchResource(
                 this,
                 get("structure/entity/branch/${project}/${branch}")
+        )
+    }
+
+    @Override
+    PromotionLevel promotionLevel(String project, String branch, String promotionLevel) {
+        new PromotionLevelResource(
+                this,
+                get("structure/entity/promotionLevel/${project}/${branch}/${promotionLevel}")
         )
     }
 

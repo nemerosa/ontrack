@@ -1,13 +1,13 @@
 package net.nemerosa.ontrack.dsl.client
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.dsl.OntrackConnector
+import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.json.JsonUtils
 
 class AbstractProjectResource extends AbstractResource {
 
-    AbstractProjectResource(OntrackConnector connector, JsonNode node) {
-        super(connector, node)
+    AbstractProjectResource(Ontrack ontrack, JsonNode node) {
+        super(ontrack, node)
     }
 
     int getId() {

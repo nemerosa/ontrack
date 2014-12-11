@@ -1,13 +1,13 @@
 package net.nemerosa.ontrack.dsl.client
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.dsl.Build
 import net.nemerosa.ontrack.dsl.Ontrack
+import net.nemerosa.ontrack.dsl.PromotionLevel
 import net.nemerosa.ontrack.json.JsonUtils
 
-class BuildResource extends AbstractProjectResource implements Build {
+class PromotionLevelResource extends AbstractProjectResource implements PromotionLevel {
 
-    BuildResource(Ontrack ontrack, JsonNode node) {
+    PromotionLevelResource(Ontrack ontrack, JsonNode node) {
         super(ontrack, node)
     }
 
@@ -21,11 +21,4 @@ class BuildResource extends AbstractProjectResource implements Build {
         JsonUtils.get(node.path('project').path('branch'), 'name')
     }
 
-    @Override
-    Build promote(String promotion) {
-        post(link('promote'), [
-                promotionLevel: ontrack.promotionLevel(project, branch, promotion).id,
-        ])
-        this
-    }
 }
