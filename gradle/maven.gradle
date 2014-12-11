@@ -1,0 +1,43 @@
+/**
+ * Management of the module exportation for DSL-related modules of Ontrack.
+ *
+ * Hints:
+ *
+ * In order to publish to the local repository:
+ *
+ *      ./gradlew publishToMavenLocal
+ *
+ */
+
+/**
+ * List of modules to export
+ */
+
+def exporting = [
+        ':ontrack-dsl',
+        ':ontrack-client',
+        ':ontrack-json',
+        ':ontrack-common',
+]
+
+/**
+ * Configuration Maven for all the modules to export
+ */
+
+exporting.each { path ->
+    project(path) {
+
+        // Maven tasks available
+        apply plugin: 'maven-publish'
+
+        // Publication settings
+        publishing {
+            publications {
+                mavenJava(MavenPublication) {
+                    from components.java
+                }
+            }
+        }
+
+    }
+}
