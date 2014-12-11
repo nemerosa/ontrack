@@ -12,6 +12,6 @@ interface Build {
 
     String geDescription()
 
-    Build promote(PromotionLevel promotionLevel)
+    Build promote(String promotion)
 
 }
