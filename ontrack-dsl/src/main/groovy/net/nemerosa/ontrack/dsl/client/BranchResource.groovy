@@ -28,6 +28,11 @@ class BranchResource extends AbstractProjectResource implements Branch {
     }
 
     @Override
+    List<Build> standardFilter(Map<String, ?> filterConfig) {
+        filter('net.nemerosa.ontrack.service.StandardBuildFilterProvider', filterConfig)
+    }
+
+    @Override
     List<Build> getLastPromotedBuilds() {
         filter('net.nemerosa.ontrack.service.PromotionLevelBuildFilterProvider', [:])
     }

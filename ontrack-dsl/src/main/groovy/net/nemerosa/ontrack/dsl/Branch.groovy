@@ -20,5 +20,7 @@ interface Branch {
 
     List<Build> filter(String filterType, Map<String, ?> filterConfig)
 
+    List<Build> standardFilter(Map<String, ?> filterConfig)
+
     List<Build> getLastPromotedBuilds()
 }

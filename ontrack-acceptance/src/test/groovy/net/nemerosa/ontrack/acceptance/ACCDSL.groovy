@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.acceptance
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTest
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import net.nemerosa.ontrack.client.ClientNotFoundException
+import net.nemerosa.ontrack.dsl.Branch
 import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.OntrackConnection
 import org.junit.Before
@@ -37,7 +38,24 @@ class ACCDSL extends AcceptanceTestClient {
 
     @Test
     void 'Getting last promoted build'() {
-        // Creating a branch
+        def branch = createBuildsAndPromotions()
+        // Getting the last promoted builds
+        def results = branch.lastPromotedBuilds
+        assert results.collect { it.name } == ['3', '2', '1']
+
+    }
+
+    @Test
+    void 'Filtering build on promotion'() {
+        Branch branch = createBuildsAndPromotions()
+        // Filtering builds on promotion
+        def results = branch.standardFilter withPromotionLevel: 'BRONZE'
+        assert results.collect { it.name } == ['2']
+
+    }
+
+    protected Branch createBuildsAndPromotions() {
+// Creating a branch
         def testBranch = doCreateBranch()
         def projectName = testBranch.project.name.asText()
         def branchName = testBranch.name.asText()
@@ -62,11 +80,7 @@ class ACCDSL extends AcceptanceTestClient {
         build1.promote 'GOLD'
         build2.promote 'BRONZE'
         build3.promote 'COPPER'
-
-        // Getting the last promoted builds
-        def results = branch.lastPromotedBuilds
-        assert results.collect { it.name } == ['3', '2', '1']
-
+        branch
     }
 
 }
