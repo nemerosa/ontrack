@@ -9,7 +9,7 @@ import java.util.List;
 public class OntrackGitIssueCommitInfo {
 
     private final GitUICommit uiCommit;
-    private final List<OntrackGitIssueCommitBranchInfo> branchInfos;
+    private final List<SCMIssueCommitBranchInfo> branchInfos;
 
     public static OntrackGitIssueCommitInfo of(GitUICommit uiCommit) {
         return new OntrackGitIssueCommitInfo(
@@ -18,7 +18,7 @@ public class OntrackGitIssueCommitInfo {
         );
     }
 
-    public void add(OntrackGitIssueCommitBranchInfo branchInfo) {
+    public void add(SCMIssueCommitBranchInfo branchInfo) {
         branchInfos.add(branchInfo);
     }
 }
