@@ -164,6 +164,8 @@ public class SVNServiceImpl implements SVNService {
                 repository.getConfiguration(),
                 repository.getConfiguredIssueService().getIssueServiceConfigurationRepresentation(),
                 issue,
+                // FIXME #192 List of last revisions per branch
+                Collections.emptyList(),
                 revisionInfo,
                 mergedRevisionInfos,
                 revisions

@@ -21,6 +21,7 @@ public class OntrackSVNIssueInfo {
                 configuration,
                 null,
                 null,
+                Collections.emptyList(),
                 null,
                 Collections.emptyList(),
                 Collections.emptyList()
@@ -43,18 +44,26 @@ public class OntrackSVNIssueInfo {
     private final Issue issue;
 
     /**
+     * Last revision per branch
+     */
+    private final List<OntrackSVNIssueRevisionInfo> revisionInfos;
+
+    /**
      * Primary revision information
      */
+    @Deprecated
     private final OntrackSVNRevisionInfo revisionInfo;
 
     /**
      * Merged revision information
      */
+    @Deprecated
     private final List<OntrackSVNRevisionInfo> mergedRevisionInfos;
 
     /**
      * Other revisions
      */
+    @Deprecated
     private final List<SVNChangeLogRevision> revisions;
 
 }
