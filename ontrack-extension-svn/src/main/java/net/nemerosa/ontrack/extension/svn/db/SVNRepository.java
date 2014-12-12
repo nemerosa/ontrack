@@ -26,7 +26,7 @@ public class SVNRepository {
         if (StringUtils.isNotBlank(branchPattern)) {
             return branchPattern;
         } else {
-            return ".*/branches/.+";
+            return ".*/branches/[^/]+";
         }
     }
 
@@ -35,7 +35,7 @@ public class SVNRepository {
         if (StringUtils.isNotBlank(tagPattern)) {
             return tagPattern;
         } else {
-            return ".*/tags/.+";
+            return ".*/tags/[^/]+";
         }
     }
 
