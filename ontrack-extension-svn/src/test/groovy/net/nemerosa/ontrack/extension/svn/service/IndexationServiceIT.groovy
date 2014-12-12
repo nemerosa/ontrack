@@ -84,8 +84,15 @@ class IndexationServiceIT extends AbstractServiceTestSupport {
          * Makes sure the merge is registered
          */
 
-        (5..7).each {
+        (5..8).each {
             assert revisionDao.getMergesForRevision(repositoryId, it) == [12]
+        }
+
+        /**
+         * Checks the branch extraction
+         */
+        (6..8).each {
+            assert revisionDao.get(repositoryId, it).branch == '/IndexationOfMergeInfo/branches/MyBranch'
         }
 
     }
