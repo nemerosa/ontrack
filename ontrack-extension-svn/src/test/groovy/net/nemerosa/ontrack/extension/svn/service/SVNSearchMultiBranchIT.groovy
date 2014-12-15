@@ -103,7 +103,7 @@ class SVNSearchMultiBranchIT extends AbstractServiceTestSupport {
         repo.copy "${testName}/trunk", "${testName}/tags/v1.2.0", 'v1.2.0' // 4
 
         // Feature branch
-        repo.copy "${testName}/trunk", "${testName}/branches/feature-1", 'Feature 1' // 5
+        repo.copy "${testName}/trunk", "${testName}/branches/1.2", 'Feature 1' // 5
         repo.mkdir "${testName}/branches/1.2/3", 'Commit 3 for #1' // 6
         repo.mkdir "${testName}/branches/1.2/4", 'Commit 4 for #1' // 7
         repo.copy "${testName}/branches/1.2", "${testName}/tags/v1.2.1", 'v1.2.1' // 8
