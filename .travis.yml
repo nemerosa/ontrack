@@ -10,4 +10,4 @@ before_install:
   - npm install -g bower
 
 script:
-  - ./gradlew test integrationTest --stacktrace
+  - ./gradlew test integrationTest --info --stacktrace
