@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.svn.db;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface SVNRevisionDao {
 
@@ -16,4 +17,6 @@ public interface SVNRevisionDao {
     TRevision get(int repositoryId, long revision);
 
     List<Long> getMergesForRevision(int repositoryId, long revision);
+
+    Optional<TRevision> getLastRevisionOnBranch(int repositoryId, String branch);
 }

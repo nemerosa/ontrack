@@ -15,7 +15,7 @@ public class OntrackSVNIssueRevisionInfo {
     /**
      * Revision information
      */
-    private final SVNRevisionInfo revisionInfo;
+    private final SVNChangeLogRevision revisionInfo;
 
     /**
      * List of associated branches
@@ -25,7 +25,7 @@ public class OntrackSVNIssueRevisionInfo {
     /**
      * Builder
      */
-    public static OntrackSVNIssueRevisionInfo of(SVNRevisionInfo revisionInfo) {
+    public static OntrackSVNIssueRevisionInfo of(SVNChangeLogRevision revisionInfo) {
         return new OntrackSVNIssueRevisionInfo(
                 revisionInfo,
                 new ArrayList<>()
