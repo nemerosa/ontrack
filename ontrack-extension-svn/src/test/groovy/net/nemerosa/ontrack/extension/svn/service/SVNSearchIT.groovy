@@ -64,7 +64,7 @@ class SVNSearchIT extends AbstractServiceTestSupport {
         (1..10).each {
             def key = ((it / 3) + 1) as int
             def message = "Commit $it for #$key"
-            repo.mkdir "${test}/trunk/${it}", message
+            repo.mkdir "${test}/trunk/${it}", message // Revision = it + 1
         }
     }
 
@@ -91,6 +91,30 @@ class SVNSearchIT extends AbstractServiceTestSupport {
             assert issue.issue.key == "${it}"
             assert issue.issue.displayKey == "#${it}"
             assert issue.repository.configuration.name == configuration.name
+        }
+
+    }
+
+    @Test
+    void 'SVN: Search revision'() {
+        def testName = 'SVNSearchRevision'
+
+        /**
+         * Initialisation
+         */
+
+        init testName
+        SVNConfiguration configuration = initConfiguration()
+        configureBranch(configuration, testName)
+
+        /**
+         * Looking for commits
+         */
+
+        (2..11).each { revision ->
+            def key = (((revision - 1) / 3) + 1) as int
+            def revisionInfo = svnService.getOntrackRevisionInfo(svnService.getRepository(configuration.name), revision)
+            assert revisionInfo.revisionInfo.message == "Commit ${revision - 1} for #${key}"
         }
 
     }
