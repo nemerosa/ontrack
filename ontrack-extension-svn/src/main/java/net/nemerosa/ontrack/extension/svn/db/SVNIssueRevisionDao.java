@@ -16,4 +16,6 @@ public interface SVNIssueRevisionDao {
 
     OptionalLong findLastRevisionByIssue(int repositoryId, String issueKey);
 
+    OptionalLong findLastRevisionByIssueAndBranch(int repositoryId, String issueKey, String branch);
+
 }

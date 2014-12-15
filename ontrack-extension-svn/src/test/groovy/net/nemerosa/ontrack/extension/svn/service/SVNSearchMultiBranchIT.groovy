@@ -143,23 +143,23 @@ class SVNSearchMultiBranchIT extends AbstractServiceTestSupport {
          * Search for issue #1
          */
 
-        def info = svnService.getIssueInfo(configuration.name, '1')
+        def info = asUser().with(project, ProjectEdit).call { svnService.getIssueInfo(configuration.name, '1') }
         assert info.issue.displayKey == '#1'
 
         // Last revisions on the branches
         assert info.revisionInfos.collect { it.revisionInfo.revision } == [7, 9]
-        assert info.revisionInfos.collect { it.branchInfos*.branch.name } == ['1.2', '1.3']
-        assert info.revisionInfos.collect { it.branchInfos*.buildView.build.name } == ['1.2.1', '1.3.0']
+        assert info.revisionInfos.collect { it.branchInfos.branch.name } == [[branch12.name], [branch13.name]]
+        assert info.revisionInfos.collect { it.branchInfos.buildView.build.name } == [['v1.2.1'], ['v1.3.0']]
 
         // Checks earliest promotions for each branch
         // Rev. 7 --> 1.2
         def promotions = info.revisionInfos[0].branchInfos.branchStatusView.promotions
-        assert promotions.collect { it.promotionLevel.name } == ['COPPER', 'BRONZE']
-        assert promotions.collect { it.promotionRun.build.name } == ['1.2.1', '1.2.1']
+        assert promotions.collect { it.promotionLevel.name } == [['COPPER', 'BRONZE']]
+        assert promotions.collect { it.promotionRun.build.name } == [['v1.2.1', 'v1.2.1']]
         // Rev. 9 --> 1.3
         promotions = info.revisionInfos[1].branchInfos.branchStatusView.promotions
-        assert promotions.collect { it.promotionLevel.name } == ['COPPER', 'BRONZE']
-        assert promotions.collect { it.promotionRun.build.name } == ['1.3.0', '1.3.0']
+        assert promotions.collect { it.promotionLevel.name } == [['COPPER', 'BRONZE']]
+        assert promotions.collect { it.promotionRun.build.name } == [['v1.3.0', 'v1.3.0']]
 
     }
 

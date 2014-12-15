@@ -133,8 +133,11 @@ public class SVNServiceImpl implements SVNService {
                 (branch, branchConfig) -> {
                     String branchPath = branchConfig.getBranchPath();
                     // Gets the last raw revision on this branch
-                    Optional<TRevision> oRevision = revisionDao.getLastRevisionOnBranch(repository.getId(), branchPath);
-                    oRevision.ifPresent(t -> branchRevisions.put(branchPath, new BranchRevision(branchPath, t.getRevision(), false)));
+                    issueRevisionDao.findLastRevisionByIssueAndBranch(
+                            repository.getId(),
+                            issueKey,
+                            branchPath
+                    ).ifPresent(revision -> branchRevisions.put(branchPath, new BranchRevision(branchPath, revision, false)));
                 }
         );
 
@@ -155,11 +158,8 @@ public class SVNServiceImpl implements SVNService {
                     String branch = t.getBranch();
                     // Existing branch revision?
                     BranchRevision existingBranchRevision = branchRevisions.get(branch);
-                    if (existingBranchRevision != null) {
-                        // If merge is more recent, use it
-                        if (t.getRevision() > existingBranchRevision.getRevision()) {
-                            branchRevisions.put(branch, new BranchRevision(branch, t.getRevision(), true));
-                        }
+                    if (existingBranchRevision == null || t.getRevision() > existingBranchRevision.getRevision()) {
+                        branchRevisions.put(branch, new BranchRevision(branch, t.getRevision(), true));
                     }
                 });
             });
