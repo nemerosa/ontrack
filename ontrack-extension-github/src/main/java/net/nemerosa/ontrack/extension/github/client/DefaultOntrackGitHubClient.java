@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.github.client;
 
 import net.nemerosa.ontrack.extension.github.model.*;
-import net.nemerosa.ontrack.model.support.Time;
+import net.nemerosa.ontrack.common.Time;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;

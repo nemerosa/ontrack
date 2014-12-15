@@ -108,4 +108,15 @@ public interface IssueServiceExtension extends Extension {
      */
     ExportedIssues exportIssues(IssueServiceConfiguration issueServiceConfiguration, List<? extends Issue> issues, IssueChangeLogExportRequest request);
 
+    /**
+     * Normalises a string into a valid issue key if possible, in order for it to be useable in a search. This allows
+     * for services to adjust the token for cases where the <i>representation</i> of an issue might be different
+     * from its actual <i>indexed</i> value. For example, in GitHub, the representation might <code>#12</code>
+     * while the value to search on is <code>12</code>.
+     *
+     * @param issueServiceConfiguration Configuration for the service
+     * @param token                     Token to transform into a key
+     * @return Valid token or {@link java.util.Optional#empty()}.
+     */
+    Optional<String> getIssueId(IssueServiceConfiguration issueServiceConfiguration, String token);
 }

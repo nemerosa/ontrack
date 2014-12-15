@@ -58,6 +58,11 @@ public class JIRAServiceExtension extends AbstractIssueServiceExtension {
     }
 
     @Override
+    public Optional<String> getIssueId(IssueServiceConfiguration issueServiceConfiguration, String token) {
+        return validIssueToken(token) ? Optional.of(token) : Optional.empty();
+    }
+
+    @Override
     public boolean validIssueToken(String token) {
         return StringUtils.isNotBlank(token) && JIRAConfiguration.ISSUE_PATTERN.matcher(token).matches();
     }

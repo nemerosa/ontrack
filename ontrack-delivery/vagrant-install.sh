@@ -49,7 +49,7 @@ NGINX_SITES_ENABLED="./nginx/sites-enabled"
 DO_TOKEN=
 DO_REGION=
 DO_SIZE=512mb
-DO_IMAGE="Docker 1.3.2 on 14.04"
+DO_IMAGE="Docker 1.4.0 on 14.04"
 DO_KEY_NAME="Vagrant"
 
 # Command central

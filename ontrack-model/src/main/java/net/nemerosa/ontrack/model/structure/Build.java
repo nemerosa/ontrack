@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.model.structure;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Data;
+import net.nemerosa.ontrack.model.buildfilter.BuildDiff;
 import net.nemerosa.ontrack.model.form.Form;
 
 @Data
@@ -11,7 +12,7 @@ public class Build implements ProjectEntity {
     private final String name;
     private final String description;
     private final Signature signature;
-    @JsonView({Build.class, PromotionRun.class, ValidationRun.class})
+    @JsonView({Build.class, PromotionRun.class, ValidationRun.class, BuildDiff.class})
     private final Branch branch;
 
     public static Build of(Branch branch, NameDescription nameDescription, Signature signature) {

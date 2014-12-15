@@ -1,20 +1,21 @@
 package net.nemerosa.ontrack.extension.git.service
 
-import net.nemerosa.ontrack.extension.git.client.GitClient
-import net.nemerosa.ontrack.extension.git.client.GitClientFactory
-import net.nemerosa.ontrack.extension.git.client.GitTag
+import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
-import net.nemerosa.ontrack.extension.git.model.GitConfiguration
+import net.nemerosa.ontrack.extension.git.model.GitBranchConfiguration
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.support.TagPattern
 import net.nemerosa.ontrack.extension.git.support.TagPatternBuildNameGitCommitLink
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
+import net.nemerosa.ontrack.git.GitRepositoryClient
+import net.nemerosa.ontrack.git.GitRepositoryClientFactory
+import net.nemerosa.ontrack.git.model.GitTag
 import net.nemerosa.ontrack.model.job.JobQueueService
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.ApplicationLogService
-import net.nemerosa.ontrack.model.support.Time
 import net.nemerosa.ontrack.tx.TransactionService
 import org.junit.Before
 import org.junit.Test
@@ -32,16 +33,16 @@ class GitBuildSyncIT {
     private GitServiceImpl gitService
     private StructureService structureService
     private PropertyService propertyService
-    private GitClientFactory gitClientFactory
-    private GitClient gitClient
+    private GitRepositoryClientFactory gitClientFactory
+    private GitRepositoryClient gitClient
 
     /**
      * Service
      */
     @Before
     void 'Git service'() {
-        gitClientFactory = mock(GitClientFactory)
-        gitClient = mock(GitClient)
+        gitClientFactory = mock(GitRepositoryClientFactory)
+        gitClient = mock(GitRepositoryClient)
 
         structureService = mock(StructureService)
         propertyService = mock(PropertyService)
@@ -52,13 +53,14 @@ class GitBuildSyncIT {
         gitService = new GitServiceImpl(
                 structureService,
                 propertyService,
-                [],
-                gitClientFactory,
                 mock(IssueServiceRegistry),
                 mock(JobQueueService),
                 securityService,
                 mock(TransactionService),
-                mock(ApplicationLogService)
+                mock(ApplicationLogService),
+                gitClientFactory,
+                mock(BuildGitCommitLinkService),
+                []
         )
     }
 
@@ -86,10 +88,15 @@ class GitBuildSyncIT {
                 )
         )
 
-        def gitConfiguration = GitConfiguration.empty()
-                .withBranch('master')
-                .withBuildCommitLink(configuredBuildGitCommitLink)
-        when(gitClientFactory.getClient(gitConfiguration)).thenReturn(gitClient)
+        def gitConfiguration = BasicGitConfiguration.empty()
+        def gitBranchConfiguration = new GitBranchConfiguration(
+                gitConfiguration,
+                'master',
+                configuredBuildGitCommitLink,
+                false,
+                0
+        )
+        when(gitClientFactory.getClient(gitConfiguration.gitRepository)).thenReturn(gitClient)
 
         when(gitClient.getTags()).thenReturn([
                 new GitTag('1.1.6', Time.now()),
@@ -101,17 +108,17 @@ class GitBuildSyncIT {
 
         gitService.buildSync(
                 branch,
-                gitConfiguration,
+                gitBranchConfiguration,
                 { message -> println message }
         )
 
-        ['1.2.0', '1.2.1', '1.2.2'].each { tagName ->
+        ['1.2.0', '1.2.1', '1.2.2'].each { String tagName ->
             verify(structureService, times(3)).newBuild(
                     Build.of(
                             branch,
-                            new NameDescription(
+                            nd(
                                     tagName,
-                                    "Imported from Git tag " + tagName
+                                    "Imported from Git tag ${tagName}"
                             ),
                             any(Signature)
                     )

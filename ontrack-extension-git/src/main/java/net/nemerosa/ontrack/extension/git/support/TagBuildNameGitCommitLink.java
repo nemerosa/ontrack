@@ -1,9 +1,10 @@
 package net.nemerosa.ontrack.extension.git.support;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import net.nemerosa.ontrack.extension.git.client.GitClient;
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink;
+import net.nemerosa.ontrack.extension.git.model.GitBranchConfiguration;
 import net.nemerosa.ontrack.extension.git.model.IndexableBuildGitCommitLink;
+import net.nemerosa.ontrack.git.GitRepositoryClient;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.structure.Build;
@@ -63,7 +64,7 @@ public class TagBuildNameGitCommitLink implements IndexableBuildGitCommitLink<No
      * Returns all tags starting from the {@code commit}.
      */
     @Override
-    public Stream<String> getBuildCandidateReferences(String commit, GitClient gitClient, NoConfig data) {
+    public Stream<String> getBuildCandidateReferences(String commit, GitRepositoryClient gitClient, GitBranchConfiguration branchConfiguration, NoConfig data) {
         return gitClient.getTagsWhichContainCommit(commit).stream();
     }
 

@@ -1,10 +1,14 @@
 package net.nemerosa.ontrack.extension.git.service
 
-import net.nemerosa.ontrack.extension.git.client.GitClient
-import net.nemerosa.ontrack.extension.git.client.GitClientFactory
+import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
+import net.nemerosa.ontrack.extension.git.model.GitBranchConfiguration
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration
 import net.nemerosa.ontrack.extension.git.model.GitConfigurator
+import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
+import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
+import net.nemerosa.ontrack.git.GitRepositoryClient
+import net.nemerosa.ontrack.git.GitRepositoryClientFactory
 import net.nemerosa.ontrack.model.job.JobQueueService
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
@@ -12,11 +16,11 @@ import net.nemerosa.ontrack.model.support.ApplicationLogService
 import net.nemerosa.ontrack.tx.TransactionService
 import org.junit.Before
 import org.junit.Test
+import org.mockito.Mockito
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd
-import static org.mockito.Matchers.any
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when
 
@@ -30,30 +34,29 @@ class GitServiceImplTest {
     void 'Git service'() {
         structureService = mock(StructureService)
 
+        propertyService = mock(PropertyService)
+
         def gitConfigurator = mock(GitConfigurator)
-        when(gitConfigurator.configure(any(GitConfiguration), any(Branch))).thenAnswer(
-                new Answer<Object>() {
+        when(gitConfigurator.getConfiguration(Mockito.any(Project))).thenAnswer(
+                new Answer<Optional<GitConfiguration>>() {
                     @Override
-                    Object answer(InvocationOnMock invocation) throws Throwable {
-                        GitConfiguration gitConfiguration = (GitConfiguration) invocation.arguments[0]
-                        Branch branch = (Branch) invocation.arguments[1]
-                        return gitConfiguration.withRemote("remote").withBranch(branch.name)
+                    Optional<GitConfiguration> answer(InvocationOnMock invocation) throws Throwable {
+                        return Optional.of(BasicGitConfiguration.empty().withRemote("remote").withName('MyGitConfig'))
                     }
                 }
         )
 
-        propertyService = mock(PropertyService)
-
         gitService = new GitServiceImpl(
                 structureService,
                 propertyService,
-                [gitConfigurator],
-                mock(GitClientFactory),
                 mock(IssueServiceRegistry),
                 mock(JobQueueService),
                 mock(SecurityService),
                 mock(TransactionService),
-                mock(ApplicationLogService)
+                mock(ApplicationLogService),
+                mock(GitRepositoryClientFactory),
+                mock(BuildGitCommitLinkService),
+                [gitConfigurator]
         )
     }
 
@@ -71,6 +74,18 @@ class GitServiceImplTest {
         when(structureService.getProjectList()).thenReturn([p1, p2])
         when(structureService.getBranchesForProject(ID.of(1))).thenReturn([b10, b11, b12])
         when(structureService.getBranchesForProject(ID.of(2))).thenReturn([b20])
+
+
+        def buildGitCommitLinkService = mock(BuildGitCommitLinkService)
+        [b11, b12, b20].each { branch ->
+            when(propertyService.getProperty(branch, GitBranchConfigurationPropertyType)).thenReturn(
+                    new Property<GitBranchConfigurationProperty>(
+                            new GitBranchConfigurationPropertyType(buildGitCommitLinkService),
+                            null,
+                            false
+                    )
+            )
+        }
 
         List<String> branches = []
         gitService.forEachConfiguredBranch { branch, config -> branches.add(branch.name) }
@@ -99,17 +114,21 @@ class GitServiceImplTest {
         }
 
         // Git configuration
-        GitConfiguration gitConfiguration = GitConfiguration.empty()
+        BasicGitConfiguration gitConfiguration = BasicGitConfiguration.empty()
+        GitBranchConfiguration branchConfiguration = GitBranchConfiguration.of(
+                gitConfiguration,
+                branch.name
+        )
 
         // Git client
-        GitClient gitClient = mock(GitClient)
+        GitRepositoryClient gitClient = mock(GitRepositoryClient)
         when(gitClient.getTagsWhichContainCommit('abcdef')).thenReturn(['1.0.12', '1.0.11', '1.0.10'])
 
         // Gets the earliest build
         def build = gitService.getEarliestBuildAfterCommit(
                 'abcdef',
                 branch,
-                gitConfiguration,
+                branchConfiguration,
                 gitClient
         )
 

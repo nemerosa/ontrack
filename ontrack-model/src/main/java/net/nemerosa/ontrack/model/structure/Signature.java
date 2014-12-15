@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.model.structure;
 
 import lombok.Data;
-import net.nemerosa.ontrack.model.support.Time;
+import net.nemerosa.ontrack.common.Time;
 
 import java.time.LocalDateTime;
 

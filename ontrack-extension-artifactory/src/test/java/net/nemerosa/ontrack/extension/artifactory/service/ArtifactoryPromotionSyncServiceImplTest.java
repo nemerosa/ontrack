@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClient;
 import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClientFactory;
 import net.nemerosa.ontrack.extension.artifactory.model.ArtifactoryStatus;
 import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.model.support.Time;
+import net.nemerosa.ontrack.common.Time;
 import org.junit.Before;
 import org.junit.Test;
 

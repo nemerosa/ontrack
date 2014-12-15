@@ -2,8 +2,9 @@ package net.nemerosa.ontrack.extension.git.support;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import net.nemerosa.ontrack.extension.git.client.GitClient;
 import net.nemerosa.ontrack.extension.git.model.BuildGitCommitLink;
+import net.nemerosa.ontrack.extension.git.model.GitBranchConfiguration;
+import net.nemerosa.ontrack.git.GitRepositoryClient;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.exceptions.JsonParsingException;
 import net.nemerosa.ontrack.model.form.Form;
@@ -63,10 +64,10 @@ public class CommitBuildNameGitCommitLink implements BuildGitCommitLink<CommitLi
     }
 
     @Override
-    public Stream<String> getBuildCandidateReferences(String commit, GitClient gitClient, CommitLinkConfig data) {
-        return gitClient.rawLog(
+    public Stream<String> getBuildCandidateReferences(String commit, GitRepositoryClient gitClient, GitBranchConfiguration branchConfiguration, CommitLinkConfig data) {
+        return gitClient.log(
                 String.format("%s~1", commit),
-                "HEAD"
+                gitClient.getBranchRef(branchConfiguration.getBranch())
         )
                 .sorted()
                 .map(

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.svn.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -33,6 +34,7 @@ public class SVNHistory {
         return new SVNHistory(references.subList(index + 1, references.size()));
     }
 
+    @JsonIgnore
     public long getRevision() {
         return references.get(0).getRevision();
     }

@@ -7,10 +7,6 @@ import net.nemerosa.ontrack.model.structure.ID;
 public class BuildDiffRequest {
 
     /**
-     * Branch to get the diff on
-     */
-    private ID branch;
-    /**
      * Build ID
      */
     private ID from;

@@ -2,8 +2,9 @@ package net.nemerosa.ontrack.extension.git.support;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import net.nemerosa.ontrack.extension.git.client.GitClient;
+import net.nemerosa.ontrack.extension.git.model.GitBranchConfiguration;
 import net.nemerosa.ontrack.extension.git.model.IndexableBuildGitCommitLink;
+import net.nemerosa.ontrack.git.GitRepositoryClient;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.exceptions.JsonParsingException;
 import net.nemerosa.ontrack.model.form.Form;
@@ -65,7 +66,7 @@ public class TagPatternBuildNameGitCommitLink implements IndexableBuildGitCommit
     }
 
     @Override
-    public Stream<String> getBuildCandidateReferences(String commit, GitClient gitClient, TagPattern data) {
+    public Stream<String> getBuildCandidateReferences(String commit, GitRepositoryClient gitClient, GitBranchConfiguration branchConfiguration, TagPattern data) {
         return gitClient.getTagsWhichContainCommit(commit).stream()
                 // ... filter on valid tags only
                 .filter(data::isValidTagName)

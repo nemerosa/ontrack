@@ -12,6 +12,6 @@ import net.nemerosa.ontrack.model.structure.PropertyType;
  */
 public interface SCMChangeLogIssueValidator<T, S, B, I extends SCMChangeLogIssue> extends PropertyType<T> {
 
-    void validate(SCMChangeLog<S, B> changeLog, I issue, T validatorConfig);
+    void validate(SCMChangeLog<B> changeLog, I issue, T validatorConfig);
 
 }
