@@ -15,13 +15,15 @@ import net.nemerosa.ontrack.extension.svn.support.SVNTestUtils
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectEdit
-import net.nemerosa.ontrack.model.structure.Branch
-import net.nemerosa.ontrack.model.structure.PropertyService
+import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.structure.*
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.annotation.ProfileValueSourceConfiguration
+
+import static net.nemerosa.ontrack.model.structure.NameDescription.nd
 
 /**
  * Integration tests for the search and collection of issues and revisions.
@@ -51,6 +53,12 @@ class SVNSearchIT extends AbstractServiceTestSupport {
     private PropertyService propertyService
 
     @Autowired
+    private StructureService structureService
+
+    @Autowired
+    private SecurityService securityService
+
+    @Autowired
     private SVNConfigurationService svnConfigurationService
 
     @Autowired
@@ -58,15 +66,6 @@ class SVNSearchIT extends AbstractServiceTestSupport {
 
     @Autowired
     private SVNRepositoryDao repositoryDao
-
-    protected static void init(String test) {
-        repo.mkdir "${test}/trunk", 'Trunk'
-        (1..10).each {
-            def key = ((it / 3) + 1) as int
-            def message = "Commit $it for #$key"
-            repo.mkdir "${test}/trunk/${it}", message // Revision = it + 1
-        }
-    }
 
     @Test
     void 'SVN: Search issue'() {
@@ -104,31 +103,102 @@ class SVNSearchIT extends AbstractServiceTestSupport {
          */
 
         init testName
+
+        // Creates some tags
+        repo.copy "${testName}/trunk@5", "${testName}/tags/1.0.1", 'v1.0.1'
+        repo.copy "${testName}/trunk@8", "${testName}/tags/1.0.2", 'v1.0.2'
+        repo.copy "${testName}/trunk@11", "${testName}/tags/1.0.3", 'v1.0.3'
+
+        // Saves the configuration
         SVNConfiguration configuration = initConfiguration()
-        configureBranch(configuration, testName)
+        def branch = configureBranch(configuration, testName)
 
         /**
-         * Looking for commits
+         * Promotions
          */
 
-        (2..11).each { revision ->
-            def key = (((revision - 1) / 3) + 1) as int
-            def revisionInfo = svnService.getOntrackRevisionInfo(svnService.getRepository(configuration.name), revision)
-            assert revisionInfo.revisionInfo.message == "Commit ${revision - 1} for #${key}"
+        asUser().with(branch, ProjectEdit).call {
+            def info = svnService.getOntrackRevisionInfo(svnService.getRepository(configuration.name), 4)
+            assert info.revisionInfo.message == "Commit 3 for #2"
+            assert info.buildViews.collect { it.build.name } == ['1.0.1']
+            assert info.branchStatusViews.size() == 1
+            def branchStatusView = info.branchStatusViews[0]
+            def promotions = branchStatusView.promotions
+            assert promotions.collect { it.promotionLevel.name } == ['COPPER', 'BRONZE']
+            assert promotions.collect { it.promotionRun.build.name } == ['1.0.2', '1.0.3']
         }
 
+        asUser().with(branch, ProjectEdit).call {
+            def info = svnService.getOntrackRevisionInfo(svnService.getRepository(configuration.name), 8)
+            assert info.revisionInfo.message == "Commit 7 for #3"
+            assert info.buildViews.collect { it.build.name } == ['1.0.2']
+            assert info.branchStatusViews.size() == 1
+            def branchStatusView = info.branchStatusViews[0]
+            def promotions = branchStatusView.promotions
+            assert promotions.collect { it.promotionLevel.name } == ['COPPER', 'BRONZE']
+            assert promotions.collect { it.promotionRun.build.name } == ['1.0.2', '1.0.3']
+        }
+
+        asUser().with(branch, ProjectEdit).call {
+            def info = svnService.getOntrackRevisionInfo(svnService.getRepository(configuration.name), 10)
+            assert info.revisionInfo.message == "Commit 9 for #4"
+            assert info.buildViews.collect { it.build.name } == ['1.0.3']
+            assert info.branchStatusViews.size() == 1
+            def branchStatusView = info.branchStatusViews[0]
+            def promotions = branchStatusView.promotions
+            assert promotions.collect { it.promotionLevel.name } == ['COPPER', 'BRONZE']
+            assert promotions.collect { it.promotionRun.build.name } == ['1.0.3', '1.0.3']
+        }
+
+    }
+
+    protected static void init(String test) {
+        repo.mkdir "${test}/trunk", 'Trunk'
+        (1..10).each {
+            def key = ((it / 3) + 1) as int
+            def message = "Commit $it for #$key"
+            repo.mkdir "${test}/trunk/${it}", message // Revision = it + 1
+        }
     }
 
     protected Branch configureBranch(SVNConfiguration configuration, String testName) {
         Branch branch = doCreateBranch()
         asUser().with(branch, ProjectEdit).call {
+            // Project's configuration
             propertyService.editProperty(branch.project, SVNProjectConfigurationPropertyType, new SVNProjectConfigurationProperty(
                     configuration,
                     "/${testName}/trunk"
             ))
+            // Branch's configuration
             propertyService.editProperty(branch, SVNBranchConfigurationPropertyType, new SVNBranchConfigurationProperty(
                     "/${testName}/trunk",
                     "/${testName}/tags/{build}"
+            ))
+            // Two promotion levels
+            PromotionLevel copper = structureService.newPromotionLevel(PromotionLevel.of(branch, nd('COPPER', 'Copper promotion')))
+            PromotionLevel bronze = structureService.newPromotionLevel(PromotionLevel.of(branch, nd('BRONZE', 'Bronze promotion')))
+            // Builds
+            structureService.newBuild(Build.of(branch, nd('1.0.1', 'Build 1'), securityService.currentSignature))
+            def build2 = structureService.newBuild(Build.of(branch, nd('1.0.2', 'Build 2'), securityService.currentSignature))
+            def build3 = structureService.newBuild(Build.of(branch, nd('1.0.3', 'Build 3'), securityService.currentSignature))
+            // Promotions
+            structureService.newPromotionRun(PromotionRun.of(
+                    build2,
+                    copper,
+                    securityService.currentSignature,
+                    'Promotion of 1.0.2 to Copper'
+            ))
+            structureService.newPromotionRun(PromotionRun.of(
+                    build3,
+                    copper,
+                    securityService.currentSignature,
+                    'Promotion of 1.0.3 to Copper'
+            ))
+            structureService.newPromotionRun(PromotionRun.of(
+                    build3,
+                    bronze,
+                    securityService.currentSignature,
+                    'Promotion of 1.0.3 to Bronze'
             ))
         }
         branch
