@@ -1,9 +1,8 @@
 package net.nemerosa.ontrack.extension.git.service
 
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
-import net.nemerosa.ontrack.extension.git.client.impl.GitTestUtils
+import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
-import net.nemerosa.ontrack.extension.git.model.GitConfiguration
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationProperty
@@ -11,6 +10,7 @@ import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationProper
 import net.nemerosa.ontrack.extension.git.support.CommitBuildNameGitCommitLink
 import net.nemerosa.ontrack.extension.git.support.CommitLinkConfig
 import net.nemerosa.ontrack.extension.git.support.TagBuildNameGitCommitLink
+import net.nemerosa.ontrack.git.support.GitRepo
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectEdit
@@ -41,14 +41,14 @@ class GitChangeLogIT extends AbstractServiceTestSupport {
     @Test
     void 'Change log based on commits'() {
 
-        def repo = new GitTestUtils()
+        def repo = new GitRepo()
         try {
 
             // Creates a Git repository with 10 commits
             repo.with {
-                run 'git', 'init'
+                git 'init'
                 (1..10).each { commit it }
-                run 'git', 'log', '--oneline'
+                git 'log', '--oneline'
             }
 
             // Identifies the commits
@@ -59,12 +59,11 @@ class GitChangeLogIT extends AbstractServiceTestSupport {
 
             // Create a Git configuration
             String gitConfigurationName = uid('C')
-            GitConfiguration gitConfiguration = asUser().with(GlobalSettings).call {
+            BasicGitConfiguration gitConfiguration = asUser().with(GlobalSettings).call {
                 gitConfigurationService.newConfiguration(
-                        GitConfiguration.empty()
+                        BasicGitConfiguration.empty()
                                 .withName(gitConfigurationName)
                                 .withRemote("file://${repo.dir.absolutePath}")
-                                .withBuildCommitLink(null)
                 )
             }
 
@@ -114,7 +113,6 @@ class GitChangeLogIT extends AbstractServiceTestSupport {
             asUser().with(project, ProjectView).call {
 
                 BuildDiffRequest buildDiffRequest = new BuildDiffRequest()
-                buildDiffRequest.branch = branch.id
                 buildDiffRequest.from = structureService.findBuildByName(project.name, branch.name, commits['5'] as String).get().id
                 buildDiffRequest.to = structureService.findBuildByName(project.name, branch.name, commits['7'] as String).get().id
                 def changeLog = gitService.changeLog(buildDiffRequest)
@@ -137,21 +135,21 @@ class GitChangeLogIT extends AbstractServiceTestSupport {
     @Test
     void 'Change log based on tags'() {
 
-        def repo = new GitTestUtils()
+        def repo = new GitRepo()
         try {
 
             def tags = [2, 5, 7, 8]
 
             // Creates a Git repository with 10 commits
             repo.with {
-                run 'git', 'init'
+                git 'init'
                 (1..10).each {
                     commit it
                     if (it in tags) {
-                        run 'git', 'tag', "v$it"
+                        git 'tag', "v$it"
                     }
                 }
-                run 'git', 'log', '--oneline', '--decorate'
+                git 'log', '--oneline', '--decorate'
             }
 
             // Identifies the commits
@@ -162,12 +160,11 @@ class GitChangeLogIT extends AbstractServiceTestSupport {
 
             // Create a Git configuration
             String gitConfigurationName = uid('C')
-            GitConfiguration gitConfiguration = asUser().with(GlobalSettings).call {
+            BasicGitConfiguration gitConfiguration = asUser().with(GlobalSettings).call {
                 gitConfigurationService.newConfiguration(
-                        GitConfiguration.empty()
+                        BasicGitConfiguration.empty()
                                 .withName(gitConfigurationName)
                                 .withRemote("file://${repo.dir.absolutePath}")
-                                .withBuildCommitLink(null)
                 )
             }
 
@@ -214,7 +211,6 @@ class GitChangeLogIT extends AbstractServiceTestSupport {
             asUser().with(project, ProjectView).call {
 
                 BuildDiffRequest buildDiffRequest = new BuildDiffRequest()
-                buildDiffRequest.branch = branch.id
                 buildDiffRequest.from = structureService.findBuildByName(project.name, branch.name, 'v5').get().id
                 buildDiffRequest.to = structureService.findBuildByName(project.name, branch.name, 'v7').get().id
                 def changeLog = gitService.changeLog(buildDiffRequest)

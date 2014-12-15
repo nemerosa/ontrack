@@ -28,16 +28,21 @@ public abstract class AbstractSCMChangeLogService<S, T, I extends SCMChangeLogIs
     }
 
 
-    protected void validateIssues(List<I> issuesList, SCMChangeLog<S, T> changeLog) {
-        // Gets the list of validators for this branch
-        List<Property<?>> properties = propertyService.getProperties(changeLog.getBranch()).stream()
-                .filter(property -> !property.isEmpty() && property.getType() instanceof SCMChangeLogIssueValidator)
-                .collect(Collectors.toList());
-        // Validates each issues
-        issuesList.forEach(issue -> validateIssue(issue, properties, changeLog));
+    protected void validateIssues(List<I> issuesList, SCMChangeLog<T> changeLog) {
+        // Same branch only
+        if (changeLog.isSameBranch()) {
+            // Gets the branch
+            Branch branch = changeLog.getFrom().getBuild().getBranch();
+            // Gets the list of validators for this branch
+            List<Property<?>> properties = propertyService.getProperties(branch).stream()
+                    .filter(property -> !property.isEmpty() && property.getType() instanceof SCMChangeLogIssueValidator)
+                    .collect(Collectors.toList());
+            // Validates each issues
+            issuesList.forEach(issue -> validateIssue(issue, properties, changeLog));
+        }
     }
 
-    protected void validateIssue(I issue, List<Property<?>> properties, SCMChangeLog<S, T> changeLog) {
+    protected void validateIssue(I issue, List<Property<?>> properties, SCMChangeLog<T> changeLog) {
         for (Property<?> property : properties) {
             if (!property.isEmpty()) {
                 validateIssue(issue, property, changeLog);
@@ -45,7 +50,7 @@ public abstract class AbstractSCMChangeLogService<S, T, I extends SCMChangeLogIs
         }
     }
 
-    private <C> void validateIssue(I issue, Property<C> property, SCMChangeLog<S, T> changeLog) {
+    private <C> void validateIssue(I issue, Property<C> property, SCMChangeLog<T> changeLog) {
         SCMChangeLogIssueValidator<C, S, T, I> validator = (SCMChangeLogIssueValidator<C, S, T, I>) property.getType();
         validator.validate(changeLog, issue, property.getValue());
     }

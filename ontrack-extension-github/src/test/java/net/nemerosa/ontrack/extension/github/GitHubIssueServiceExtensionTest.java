@@ -10,11 +10,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 public class GitHubIssueServiceExtensionTest {
@@ -44,6 +43,26 @@ public class GitHubIssueServiceExtensionTest {
                 "",
                 0
         );
+    }
+
+    @Test
+    public void getIssueId_full() {
+        Optional<String> o = extension.getIssueId(configuration, "#12");
+        assertTrue(o.isPresent());
+        assertEquals("12", o.get());
+    }
+
+    @Test
+    public void getIssueId_numeric() {
+        Optional<String> o = extension.getIssueId(configuration, "12");
+        assertTrue(o.isPresent());
+        assertEquals("12", o.get());
+    }
+
+    @Test
+    public void getIssueId_not_valid() {
+        Optional<String> o = extension.getIssueId(configuration, "mm");
+        assertFalse(o.isPresent());
     }
 
     @Test

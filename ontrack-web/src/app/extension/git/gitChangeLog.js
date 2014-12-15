@@ -7,7 +7,7 @@ angular.module('ot.extension.git.changelog', [
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('git-changelog', {
-            url: '/extension/git/changelog?branch&from&to',
+            url: '/extension/git/changelog?from&to',
             templateUrl: 'app/extension/git/git.changelog.tpl.html',
             controller: 'GitChangeLogCtrl'
         });
@@ -16,7 +16,6 @@ angular.module('ot.extension.git.changelog', [
 
         // The build request
         $scope.buildDiffRequest = {
-            branch: $stateParams.branch,
             from: $stateParams.from,
             to: $stateParams.to
         };
@@ -24,11 +23,6 @@ angular.module('ot.extension.git.changelog', [
         // The view
         var view = ot.view();
         view.title = "Git change log";
-
-        // Loading the branch
-        otStructureService.getBranch($stateParams.branch).then(function (branch) {
-            view.breadcrumbs = ot.branchBreadcrumbs(branch);
-        });
 
         /**
          * The REST end point to contact is contained by the current path, with the leading
@@ -42,6 +36,8 @@ angular.module('ot.extension.git.changelog', [
 
         ot.pageCall($http.get(path, {params: $scope.buildDiffRequest})).then(function (changeLog) {
             $scope.changeLog = changeLog;
+
+            view.breadcrumbs = ot.projectBreadcrumbs(changeLog.project);
 
             $scope.commitsCommand = "Commits";
             $scope.issuesCommand = "Issues";

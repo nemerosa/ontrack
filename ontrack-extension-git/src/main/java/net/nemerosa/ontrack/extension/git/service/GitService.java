@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.git.model.*;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ID;
+import net.nemerosa.ontrack.model.structure.Project;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import java.util.List;
@@ -20,13 +21,17 @@ public interface GitService {
     boolean isBranchConfiguredForGit(Branch branch);
 
     /**
+     * Gets the configuration for a project.
+     */
+    Optional<GitConfiguration> getProjectConfiguration(Project project);
+
+    /**
      * Gets the configuration for a branch
      *
      * @param branch Branch to check
-     * @return Configuration. Never null but can be
-     * {@link net.nemerosa.ontrack.extension.git.model.GitConfiguration#isValid() invalid}.
+     * @return Configuration.
      */
-    GitConfiguration getBranchConfiguration(Branch branch);
+    Optional<GitBranchConfiguration> getBranchConfiguration(Branch branch);
 
     /**
      * Launches the build/tag synchronisation for a branch
@@ -54,19 +59,24 @@ public interface GitService {
     GitChangeLogFiles getChangeLogFiles(GitChangeLog changeLog);
 
     /**
+     * Loops over each correctly configured project.
+     */
+    void forEachConfiguredProject(BiConsumer<Project, GitConfiguration> consumer);
+
+    /**
      * Loops over each correctly configured branch. Branch template definitions are excluded.
      */
-    void forEachConfiguredBranch(BiConsumer<Branch, GitConfiguration> consumer);
+    void forEachConfiguredBranch(BiConsumer<Branch, GitBranchConfiguration> consumer);
 
     /**
      * Scans the whole history of a repository.
      *
-     * @param configuration Repository to scan
+     * @param branchConfiguration Repository branch to scan
      * @param scanFunction  Function that scans the commits. Returns <code>true</code> if the scan
      *                      must not go on, <code>false</code> otherwise.
      * @return <code>true</code> if at least one call to <code>scanFunction</code> has returned <code>true</code>.
      */
-    boolean scanCommits(GitConfiguration configuration, Predicate<RevCommit> scanFunction);
+    boolean scanCommits(GitBranchConfiguration branchConfiguration, Predicate<RevCommit> scanFunction);
 
     /**
      * Gets information about an issue in a Git-configured branch

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.model.support;
 
 import lombok.Data;
+import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.model.structure.VersionInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

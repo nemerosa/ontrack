@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.svn.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.experimental.Wither;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
 import net.nemerosa.ontrack.extension.support.UserPasswordConfiguration;
 import net.nemerosa.ontrack.model.form.*;
@@ -13,6 +15,7 @@ import java.util.function.Function;
 import static net.nemerosa.ontrack.model.form.Form.defaultNameField;
 
 @Data
+@AllArgsConstructor
 public class SVNConfiguration implements UserPasswordConfiguration<SVNConfiguration> {
 
     private final String name;
@@ -28,6 +31,7 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
     private final String browserForChange;
     private final int indexationInterval;
     private final long indexationStart;
+    @Wither
     private final String issueServiceConfigurationIdentifier;
 
     public static Form form(List<IssueServiceConfigurationRepresentation> availableIssueServiceConfigurations) {

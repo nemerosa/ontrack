@@ -1,0 +1,284 @@
+package net.nemerosa.ontrack.extension.git.resource;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration;
+import net.nemerosa.ontrack.extension.git.model.GitBuildInfo;
+import net.nemerosa.ontrack.extension.git.model.GitChangeLog;
+import net.nemerosa.ontrack.extension.git.service.GitService;
+import net.nemerosa.ontrack.extension.scm.model.SCMBuildView;
+import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.ui.controller.MockURIBuilder;
+import net.nemerosa.ontrack.ui.resource.DefaultResourceContext;
+import net.nemerosa.ontrack.ui.resource.ResourceObjectMapper;
+import net.nemerosa.ontrack.ui.resource.ResourceObjectMapperFactory;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static net.nemerosa.ontrack.json.JsonUtils.array;
+import static net.nemerosa.ontrack.json.JsonUtils.object;
+import static net.nemerosa.ontrack.model.structure.NameDescription.nd;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+public class GitChangeLogResourceDecoratorTest {
+
+    private ResourceObjectMapper mapper;
+    private GitService gitService;
+
+    @Before
+    public void before() {
+        SecurityService securityService = mock(SecurityService.class);
+        gitService = mock(GitService.class);
+        mapper = new ResourceObjectMapperFactory().resourceObjectMapper(
+                Arrays.asList(
+                        new GitResourceModule(gitService, securityService)
+                ),
+                new DefaultResourceContext(new MockURIBuilder(), securityService)
+        );
+    }
+
+    @Test
+    public void gitChangeLogWithIssues() throws JsonProcessingException {
+        Project project = Project.of(nd("P", "Project")).withId(ID.of(1));
+        Branch branch = Branch.of(project, nd("B", "Branch")).withId(ID.of(10));
+
+        List<BuildView> buildView = Arrays.asList(1, 2).stream()
+                .map(it -> new BuildView(
+                                Build.of(
+                                        branch,
+                                        nd(String.valueOf(it), "Build " + it),
+                                        Signature.of(LocalDateTime.of(2014, 12, 5, 21, 53), "user")
+                                ).withId(ID.of(it)),
+                                Collections.emptyList(),
+                                Collections.emptyList()
+                        )
+                )
+                .collect(Collectors.toList());
+
+        GitChangeLog changeLog = new GitChangeLog(
+                "uuid",
+                project,
+                new SCMBuildView<>(
+                        buildView.get(0),
+                        GitBuildInfo.INSTANCE
+                ),
+                new SCMBuildView<>(
+                        buildView.get(1),
+                        GitBuildInfo.INSTANCE
+                ),
+                false
+        );
+
+        when(gitService.getProjectConfiguration(project)).thenReturn(
+                Optional.of(
+                        BasicGitConfiguration.empty().withName("MyConfig").withIssueServiceConfigurationIdentifier("jira:MyJIRA")
+                )
+        );
+
+        assertResourceJson(
+                mapper,
+                object()
+                        .with("project", object()
+                                .with("id", 1)
+                                .with("name", "P")
+                                .with("description", "Project")
+                                .with("disabled", false)
+                                .end())
+                        .with("scmBuildFrom", object()
+                                .with("buildView", object()
+                                        .with("build", object()
+                                                .with("id", 1)
+                                                .with("name", "1")
+                                                .with("description", "Build 1")
+                                                .with("signature", object()
+                                                        .with("time", "2014-12-05T21:53:00Z")
+                                                        .with("user", object()
+                                                                .with("name", "user")
+                                                                .end())
+                                                        .end())
+                                                .with("branch", object()
+                                                        .with("id", 10)
+                                                        .with("name", "B")
+                                                        .with("description", "Branch")
+                                                        .with("disabled", false)
+                                                        .with("type", "CLASSIC")
+                                                        .end())
+                                                .end())
+                                        .with("promotionRuns", array().end())
+                                        .with("validationStampRunViews", array().end())
+                                        .end())
+                                .with("scm", object()
+                                        .with("placeholder", "")
+                                        .end())
+                                .end())
+                        .with("scmBuildTo", object()
+                                .with("buildView", object()
+                                        .with("build", object()
+                                                .with("id", 2)
+                                                .with("name", "2")
+                                                .with("description", "Build 2")
+                                                .with("signature", object()
+                                                        .with("time", "2014-12-05T21:53:00Z")
+                                                        .with("user", object()
+                                                                .with("name", "user")
+                                                                .end())
+                                                        .end())
+                                                .with("branch", object()
+                                                        .with("id", 10)
+                                                        .with("name", "B")
+                                                        .with("description", "Branch")
+                                                        .with("disabled", false)
+                                                        .with("type", "CLASSIC")
+                                                        .end())
+                                                .end())
+                                        .with("promotionRuns", array().end())
+                                        .with("validationStampRunViews", array().end())
+                                        .end())
+                                .with("scm", object()
+                                        .with("placeholder", "")
+                                        .end())
+                                .end())
+                        .with("syncError", false)
+                        .with("uuid", "uuid")
+                        .with("_commits", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLogCommits:uuid")
+                        .with("_issues", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLogIssues:uuid")
+                        .with("_files", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLogFiles:uuid")
+                        .with("_exportFormats", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLogExportFormats:1")
+                        .with("_exportIssues", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLog:IssueChangeLogExportRequest%28format%3Dtext%2C+grouping%3D%2C+exclude%3D%2C+altGroup%3DOther%29")
+
+                        .end(),
+                changeLog
+        );
+    }
+
+    @Test
+    public void gitChangeLogWithoutIssues() throws JsonProcessingException {
+        Project project = Project.of(nd("P", "Project")).withId(ID.of(1));
+        Branch branch = Branch.of(project, nd("B", "Branch")).withId(ID.of(10));
+
+        List<BuildView> buildView = Arrays.asList(1, 2).stream()
+                .map(it -> new BuildView(
+                                Build.of(
+                                        branch,
+                                        nd(String.valueOf(it), "Build " + it),
+                                        Signature.of(LocalDateTime.of(2014, 12, 5, 21, 53), "user")
+                                ).withId(ID.of(it)),
+                                Collections.emptyList(),
+                                Collections.emptyList()
+                        )
+                )
+                .collect(Collectors.toList());
+
+        GitChangeLog changeLog = new GitChangeLog(
+                "uuid",
+                project,
+                new SCMBuildView<>(
+                        buildView.get(0),
+                        GitBuildInfo.INSTANCE
+                ),
+                new SCMBuildView<>(
+                        buildView.get(1),
+                        GitBuildInfo.INSTANCE
+                ),
+                false
+        );
+
+        when(gitService.getProjectConfiguration(project)).thenReturn(
+                Optional.of(
+                        BasicGitConfiguration.empty().withName("MyConfig")
+                )
+        );
+
+        assertResourceJson(
+                mapper,
+                object()
+                        .with("project", object()
+                                .with("id", 1)
+                                .with("name", "P")
+                                .with("description", "Project")
+                                .with("disabled", false)
+                                .end())
+                        .with("scmBuildFrom", object()
+                                .with("buildView", object()
+                                        .with("build", object()
+                                                .with("id", 1)
+                                                .with("name", "1")
+                                                .with("description", "Build 1")
+                                                .with("signature", object()
+                                                        .with("time", "2014-12-05T21:53:00Z")
+                                                        .with("user", object()
+                                                                .with("name", "user")
+                                                                .end())
+                                                        .end())
+                                                .with("branch", object()
+                                                        .with("id", 10)
+                                                        .with("name", "B")
+                                                        .with("description", "Branch")
+                                                        .with("disabled", false)
+                                                        .with("type", "CLASSIC")
+                                                        .end())
+                                                .end())
+                                        .with("promotionRuns", array().end())
+                                        .with("validationStampRunViews", array().end())
+                                        .end())
+                                .with("scm", object()
+                                        .with("placeholder", "")
+                                        .end())
+                                .end())
+                        .with("scmBuildTo", object()
+                                .with("buildView", object()
+                                        .with("build", object()
+                                                .with("id", 2)
+                                                .with("name", "2")
+                                                .with("description", "Build 2")
+                                                .with("signature", object()
+                                                        .with("time", "2014-12-05T21:53:00Z")
+                                                        .with("user", object()
+                                                                .with("name", "user")
+                                                                .end())
+                                                        .end())
+                                                .with("branch", object()
+                                                        .with("id", 10)
+                                                        .with("name", "B")
+                                                        .with("description", "Branch")
+                                                        .with("disabled", false)
+                                                        .with("type", "CLASSIC")
+                                                        .end())
+                                                .end())
+                                        .with("promotionRuns", array().end())
+                                        .with("validationStampRunViews", array().end())
+                                        .end())
+                                .with("scm", object()
+                                        .with("placeholder", "")
+                                        .end())
+                                .end())
+                        .with("syncError", false)
+                        .with("uuid", "uuid")
+                        .with("_commits", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLogCommits:uuid")
+                        .with("_files", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLogFiles:uuid")
+                        .with("_exportFormats", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLogExportFormats:1")
+                        .with("_exportIssues", "urn:test:net.nemerosa.ontrack.extension.git.GitController#changeLog:IssueChangeLogExportRequest%28format%3Dtext%2C+grouping%3D%2C+exclude%3D%2C+altGroup%3DOther%29")
+
+                        .end(),
+                changeLog
+        );
+    }
+
+    static void assertResourceJson(ResourceObjectMapper mapper, JsonNode expectedJson, Object o) throws JsonProcessingException {
+        assertEquals(
+                mapper.getObjectMapper().writeValueAsString(expectedJson),
+                mapper.write(o)
+        );
+    }
+
+}

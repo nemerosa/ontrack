@@ -3,49 +3,51 @@ package net.nemerosa.ontrack.extension.scm.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.buildfilter.BuildDiff;
 import net.nemerosa.ontrack.model.structure.BuildView;
+import net.nemerosa.ontrack.model.structure.Project;
 
 import java.util.UUID;
 
 /**
- * @param <S> Type of SCM data associated with the branch
  * @param <T> Type of SCM data associated with a build
  */
 @EqualsAndHashCode(callSuper = false)
 @Data
-public class SCMChangeLog<S, T> extends BuildDiff {
+public class SCMChangeLog<T> extends BuildDiff {
 
     private final String uuid;
-    @JsonIgnore
-    private final S scmBranch;
     private final SCMBuildView<T> scmBuildFrom;
     private final SCMBuildView<T> scmBuildTo;
 
-    protected SCMChangeLog(String uuid, Branch branch, S scmBranch, SCMBuildView<T> scmBuildFrom, SCMBuildView<T> scmBuildTo) {
-        super(branch);
+    protected SCMChangeLog(String uuid, Project project, SCMBuildView<T> scmBuildFrom, SCMBuildView<T> scmBuildTo) {
+        super(project);
         this.uuid = uuid;
-        this.scmBranch = scmBranch;
         this.scmBuildFrom = scmBuildFrom;
         this.scmBuildTo = scmBuildTo;
     }
 
     @Override
+    @JsonIgnore
     public BuildView getFrom() {
         return scmBuildFrom.getBuildView();
     }
 
     @Override
+    @JsonIgnore
     public BuildView getTo() {
         return scmBuildTo.getBuildView();
     }
 
-    public static <S, T> SCMChangeLog<S, T> of(Branch branch, S scmBranch, SCMBuildView<T> from, SCMBuildView<T> to) {
+    @JsonIgnore
+    public boolean isSameBranch() {
+        return getFrom().getBuild().getBranch().id() == getTo().getBuild().getBranch().id();
+    }
+
+    public static <T> SCMChangeLog<T> of(Project project, SCMBuildView<T> from, SCMBuildView<T> to) {
         return new SCMChangeLog<>(
                 UUID.randomUUID().toString(),
-                branch,
-                scmBranch,
+                project,
                 from,
                 to
         );

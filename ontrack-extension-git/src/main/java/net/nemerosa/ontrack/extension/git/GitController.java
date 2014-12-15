@@ -21,9 +21,9 @@ import net.nemerosa.ontrack.model.buildfilter.BuildDiff;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.ID;
+import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.StructureService;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
@@ -38,6 +38,7 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -90,7 +91,7 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
      * Gets the configurations
      */
     @RequestMapping(value = "configurations", method = RequestMethod.GET)
-    public Resources<GitConfiguration> getConfigurations() {
+    public Resources<BasicGitConfiguration> getConfigurations() {
         return Resources.of(
                 configurationService.getConfigurations(),
                 uri(on(getClass()).getConfigurations())
@@ -104,14 +105,14 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
      */
     @RequestMapping(value = "configurations/create", method = RequestMethod.GET)
     public Form getConfigurationForm() {
-        return GitConfiguration.form(issueServiceRegistry.getAvailableIssueServiceConfigurations());
+        return BasicGitConfiguration.form(issueServiceRegistry.getAvailableIssueServiceConfigurations());
     }
 
     /**
      * Creating a configuration
      */
     @RequestMapping(value = "configurations/create", method = RequestMethod.POST)
-    public GitConfiguration newConfiguration(@RequestBody GitConfiguration configuration) {
+    public BasicGitConfiguration newConfiguration(@RequestBody BasicGitConfiguration configuration) {
         return configurationService.newConfiguration(configuration);
     }
 
@@ -119,7 +120,7 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
      * Gets one configuration
      */
     @RequestMapping(value = "configurations/{name}", method = RequestMethod.GET)
-    public GitConfiguration getConfiguration(@PathVariable String name) {
+    public BasicGitConfiguration getConfiguration(@PathVariable String name) {
         return configurationService.getConfiguration(name);
     }
 
@@ -145,7 +146,7 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
      * Updating one configuration
      */
     @RequestMapping(value = "configurations/{name}/update", method = RequestMethod.PUT)
-    public GitConfiguration updateConfiguration(@PathVariable String name, @RequestBody GitConfiguration configuration) {
+    public BasicGitConfiguration updateConfiguration(@PathVariable String name, @RequestBody BasicGitConfiguration configuration) {
         configurationService.updateConfiguration(name, configuration);
         return getConfiguration(name);
     }
@@ -173,25 +174,25 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
     /**
      * Change log export, list of formats
      */
-    @RequestMapping(value = "changelog/export/{branchId}/formats", method = RequestMethod.GET)
-    public Resources<ExportFormat> changeLogExportFormats(@PathVariable ID branchId) {
-        // Gets the branch
-        Branch branch = structureService.getBranch(branchId);
-        // Gets the configuration for the branch
-        GitConfiguration configuration = gitService.getBranchConfiguration(branch);
-        if (configuration.isValid()) {
-            ConfiguredIssueService configuredIssueService = issueServiceRegistry.getConfiguredIssueService(configuration.getIssueServiceConfigurationIdentifier());
+    @RequestMapping(value = "changelog/export/{projectId}/formats", method = RequestMethod.GET)
+    public Resources<ExportFormat> changeLogExportFormats(@PathVariable ID projectId) {
+        // Gets the project
+        Project project = structureService.getProject(projectId);
+        // Gets the configuration for the project
+        Optional<GitConfiguration> configuration = gitService.getProjectConfiguration(project);
+        if (configuration.isPresent()) {
+            ConfiguredIssueService configuredIssueService = issueServiceRegistry.getConfiguredIssueService(configuration.get().getIssueServiceConfigurationIdentifier());
             if (configuredIssueService != null) {
                 return Resources.of(
                         configuredIssueService.getIssueServiceExtension().exportFormats(),
-                        uri(on(GitController.class).changeLogExportFormats(branchId))
+                        uri(on(GitController.class).changeLogExportFormats(projectId))
                 );
             }
         }
         // No configured issues
         return Resources.of(
                 Collections.<ExportFormat>emptyList(),
-                uri(on(GitController.class).changeLogExportFormats(branchId))
+                uri(on(GitController.class).changeLogExportFormats(projectId))
         );
     }
 
@@ -202,8 +203,13 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
     public ResponseEntity<String> changeLog(IssueChangeLogExportRequest request) {
         // Gets the change log
         GitChangeLog changeLog = gitService.changeLog(request);
+        // Gets the associated project
+        Project project = changeLog.getProject();
+        // Gets the configuration for the project
+        GitConfiguration gitConfiguration = gitService.getProjectConfiguration(project)
+                .orElseThrow(() -> new GitProjectNotConfiguredException(project.getId()));
         // Gets the issue service
-        String issueServiceConfigurationIdentifier = changeLog.getScmBranch().getIssueServiceConfigurationIdentifier();
+        String issueServiceConfigurationIdentifier = gitConfiguration.getIssueServiceConfigurationIdentifier();
         if (StringUtils.isBlank(issueServiceConfigurationIdentifier)) {
             return new ResponseEntity<>(
                     "The branch is not configured for issues",
