@@ -52,7 +52,7 @@ You can leave it using the _exit_ command.
 
 #### Back up of Ontrack data
 
-     ssh root@<ip> "docker run --volumes-from ontrack-data --volume /root:/backup ubuntu tar czvf /backup/backup.tgz /opt/ontrack/mount"
+     ssh root@<ip> "docker run --volumes-from ontrack-data --volume /root:/backup ubuntu tar czvf /backup/backup.tgz --exclude='work/files/git/*' /opt/ontrack/mount"
      scp root@<ip>:backup.tgz .
 
 where IP is the assigned one to the droplet.
