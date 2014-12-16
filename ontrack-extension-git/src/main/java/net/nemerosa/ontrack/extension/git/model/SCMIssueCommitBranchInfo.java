@@ -10,7 +10,7 @@ import net.nemerosa.ontrack.model.structure.BuildView;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class OntrackGitIssueCommitBranchInfo {
+public class SCMIssueCommitBranchInfo {
 
     private final Branch branch;
     @Wither
@@ -18,7 +18,7 @@ public class OntrackGitIssueCommitBranchInfo {
     @Wither
     private final BranchStatusView branchStatusView;
 
-    public static OntrackGitIssueCommitBranchInfo of(Branch branch) {
-        return new OntrackGitIssueCommitBranchInfo(branch, null, null);
+    public static SCMIssueCommitBranchInfo of(Branch branch) {
+        return new SCMIssueCommitBranchInfo(branch, null, null);
     }
 }

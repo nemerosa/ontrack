@@ -70,11 +70,30 @@ public class SVNIssueRevisionJdbcDao extends AbstractJdbcRepository implements S
                 "SELECT REVISION FROM EXT_SVN_REVISION_ISSUE WHERE REPOSITORY = :repository AND ISSUE = :key ORDER BY REVISION DESC LIMIT 1",
                 params("key", issueKey).addValue("repository", repositoryId),
                 Long.class);
+        return optionalLong(revision);
+    }
+
+    private OptionalLong optionalLong(Long revision) {
         if (revision != null) {
             return OptionalLong.of(revision);
         } else {
             return OptionalLong.empty();
         }
+    }
+
+    @Override
+    public OptionalLong findLastRevisionByIssueAndBranch(int repositoryId, String issueKey, String branch) {
+        Long revision = getFirstItem(
+                "SELECT RI.REVISION FROM EXT_SVN_REVISION_ISSUE RI " +
+                        "INNER JOIN EXT_SVN_REVISION R ON R.REPOSITORY = RI.REPOSITORY AND R.REVISION = RI.REVISION " +
+                        "WHERE RI.ISSUE = :key " +
+                        "AND R.BRANCH = :branch " +
+                        "ORDER BY RI.REVISION DESC " +
+                        "LIMIT 1",
+                params("key", issueKey).addValue("repository", repositoryId).addValue("branch", branch),
+                Long.class
+        );
+        return optionalLong(revision);
     }
 
 }

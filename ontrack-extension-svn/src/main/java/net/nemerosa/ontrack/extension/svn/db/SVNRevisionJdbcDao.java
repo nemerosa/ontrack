@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Repository
 public class SVNRevisionJdbcDao extends AbstractJdbcRepository implements SVNRevisionDao {
@@ -103,6 +104,15 @@ public class SVNRevisionJdbcDao extends AbstractJdbcRepository implements SVNRev
                 "SELECT TARGET FROM EXT_SVN_MERGE_REVISION WHERE REPOSITORY = :repository AND REVISION = :revision ORDER BY TARGET",
                 params("revision", revision).addValue("repository", repositoryId),
                 Long.class
+        );
+    }
+
+    @Override
+    public Optional<TRevision> getLastRevisionOnBranch(int repositoryId, String branch) {
+        return getOptional(
+                "SELECT * FROM EXT_SVN_REVISION WHERE REPOSITORY = :repository AND BRANCH = :branch ORDER BY REVISION DESC LIMIT 1",
+                params("repository", repositoryId).addValue("branch", branch),
+                (rs, rowNum) -> toRevision(rs)
         );
     }
 }

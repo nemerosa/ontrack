@@ -389,7 +389,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                         commitInfos.put(commitId, commitInfo);
                     }
                     // Collects branch info
-                    OntrackGitIssueCommitBranchInfo branchInfo = OntrackGitIssueCommitBranchInfo.of(branch);
+                    SCMIssueCommitBranchInfo branchInfo = SCMIssueCommitBranchInfo.of(branch);
                     // Gets the last build for this branch
                     Optional<Build> buildAfterCommit = getEarliestBuildAfterCommit(commitId, branch, branchConfiguration, client);
                     if (buildAfterCommit.isPresent()) {
