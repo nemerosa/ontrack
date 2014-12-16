@@ -20,6 +20,15 @@ angular.module('ontrack.extension.scm', [
             }
         };
     })
+    .directive('otExtensionScmIssueCommitBranchInfos', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'app/extension/scm/directive.scmIssueCommitBranchInfos.tpl.html',
+            scope: {
+                infos: '='
+            }
+        };
+    })
 /**
  * Truncates the start of a path
  */

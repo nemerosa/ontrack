@@ -22,23 +22,21 @@
                 </div>
             </div>
 
-            <!-- Summary for the revision -->
-            <ot-extension-svn-revision-summary
-                    revision-info="ontrackSVNIssueInfo.revisionInfo.revisionInfo"
-                    title="true"
-                    ></ot-extension-svn-revision-summary>
+            <!-- For each revision info -->
+            <div class="row" ng-repeat="ontrackSVNIssueRevisionInfo in ontrackSVNIssueInfo.revisionInfos">
+                <div class="col-md-12">
 
-            <!-- Builds for the revision -->
-            <ot-extension-svn-revision-builds
-                    ontrack-svn-revision-info="ontrackSVNIssueInfo.revisionInfo"
-                    merged-revision-infos="ontrackSVNIssueInfo.mergedRevisionInfos"
-                    ></ot-extension-svn-revision-builds>
+                    <!-- Summary for the revision -->
+                    <ot-extension-svn-revision-summary
+                            revision-info="ontrackSVNIssueRevisionInfo.revisionInfo"
+                            title="true"
+                            >
+                        <ot-extension-scm-issue-commit-branch-infos
+                                infos="ontrackSVNIssueRevisionInfo.branchInfos"></ot-extension-scm-issue-commit-branch-infos>
+                    </ot-extension-svn-revision-summary>
 
-            <!-- Promotions for the revisions -->
-            <ot-extension-svn-revision-promotions
-                    ontrack-svn-revision-info="ontrackSVNIssueInfo.revisionInfo"
-                    merged-revision-infos="ontrackSVNIssueInfo.mergedRevisionInfos"
-                    ></ot-extension-svn-revision-promotions>
+                </div>
+            </div>
 
             <!-- All other revisions -->
             <div class="panel panel-default">

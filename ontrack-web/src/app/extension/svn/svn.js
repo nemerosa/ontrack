@@ -96,6 +96,7 @@ angular.module('ontrack.extension.svn', [
         return {
             restrict: 'E',
             templateUrl: 'app/extension/svn/directive.revision.summary.tpl.html',
+            transclude: true,
             scope: {
                 revisionInfo: '=',
                 title: '@'
