@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.client.ClientNotFoundException
 import net.nemerosa.ontrack.dsl.Branch
 import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.OntrackConnection
-import net.nemerosa.ontrack.test.TestUtils
 import org.junit.Before
 import org.junit.Test
 
@@ -75,12 +74,47 @@ class ACCDSL extends AcceptanceTestClient {
 
     @Test
     void 'Definition of a project and a branch'() {
-        ontrack.project(uid('P')) {
+        def project = uid('P')
+        ontrack.project(project) {
             branch('1.0') {
                 promotionLevel 'COPPER', 'Copper promotion'
                 validationStamp 'SMOKE', 'Smoke tests'
             }
         }
+        // Checks the branch does exist
+        assert ontrack.branch(project, '1.0').name == '1.0'
+        // Checks the structure
+        assert ontrack.promotionLevel(project, '1.0', 'COPPER').name == 'COPPER'
+        assert ontrack.validationStamp(project, '1.0', 'SMOKE').name == 'SMOKE'
+    }
+
+    @Test
+    void 'Definition of a template with parameters'() {
+        // GitHub configuration
+        ontrack.configure {
+            gitHub 'ontrack', repository: 'nemerosa/ontrack', indexationInterval: 0
+        }
+        // Project and branch template
+        def project = uid('P')
+        ontrack.project(project) {
+            // TODO GitHub project
+            branch('template') {
+                promotionLevel 'COPPER', 'Copper promotion'
+                promotionLevel 'BRONZE', 'Bronze promotion'
+                validationStamp 'SMOKE', 'Smoke tests'
+                // TODO Git branch
+                // TODO Template definition
+            }
+        }
+        // TODO Creates an instance
+        // ontrack.branch(project, 'template').instance 'TEST', [
+        //     gitBranch: 'feature/test'
+        // ]
+        // Checks the created instance
+        def instance = ontrack.branch(project, 'TEST')
+        assert instance.id > 0
+        assert instance.name == 'TEST'
+        // TODO Checks the Git branch of the instance
     }
 
     protected Branch createBuildsAndPromotions() {
