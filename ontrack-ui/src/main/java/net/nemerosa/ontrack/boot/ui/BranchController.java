@@ -272,6 +272,7 @@ public class BranchController extends AbstractResourceController {
                                         .with(
                                                 Text.of("expression")
                                                         .label("Expression")
+                                                        .optional()
                                                         .help(
                                                                 "Those expressions are defined for the synchronisation between " +
                                                                         "template definitions and template instances. They bind " +
