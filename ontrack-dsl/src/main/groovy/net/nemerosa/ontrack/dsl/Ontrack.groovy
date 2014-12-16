@@ -2,6 +2,16 @@ package net.nemerosa.ontrack.dsl
 
 interface Ontrack extends OntrackConnector {
 
+    /**
+     * Gets a project by its name, or creates it if it does not exist
+     */
+    Project project(String name)
+
+    /**
+     * Gets a project by its name, or creates it if it does not exist
+     */
+    Project project(String name, Closure closure)
+
     Branch branch(String project, String branch)
 
     PromotionLevel promotionLevel(String project, String branch, String promotionLevel)

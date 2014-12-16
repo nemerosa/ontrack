@@ -22,6 +22,41 @@ class OntrackResource implements Ontrack, OntrackConnector {
     }
 
     @Override
+    Project project(String name) {
+        // Gets the list of projects and looks for an existing project
+        def projectNode = get("structure/projects").resources.find {
+            it.name == name
+        }
+        // If project exists, loads it
+        if (projectNode) {
+            new ProjectResource(
+                    this,
+                    get(projectNode._self)
+            )
+        }
+        // If it does not exist, creates it
+        else {
+            new ProjectResource(
+                    this,
+                    post(
+                            'structure/projects/create',
+                            [
+                                    name       : name,
+                                    description: ''
+                            ]
+                    )
+            )
+        }
+    }
+
+    @Override
+    Project project(String name, Closure closure) {
+        def project = project(name)
+        project.call(closure)
+        project
+    }
+
+    @Override
     Branch branch(String project, String branch) {
         new BranchResource(
                 this,

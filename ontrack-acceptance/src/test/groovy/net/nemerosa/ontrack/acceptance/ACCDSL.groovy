@@ -6,8 +6,11 @@ import net.nemerosa.ontrack.client.ClientNotFoundException
 import net.nemerosa.ontrack.dsl.Branch
 import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.OntrackConnection
+import net.nemerosa.ontrack.test.TestUtils
 import org.junit.Before
 import org.junit.Test
+
+import static net.nemerosa.ontrack.test.TestUtils.uid
 
 /**
  * Ontrack DSL tests.
@@ -68,6 +71,16 @@ class ACCDSL extends AcceptanceTestClient {
         assert branch.standardFilter(sinceValidationStamp: 'SMOKE', sinceValidationStampStatus: 'PASSED').collect {
             it.name
         } == ['3', '2']
+    }
+
+    @Test
+    void 'Definition of a project and a branch'() {
+        ontrack.project(uid('P')) {
+            branch('1.0') {
+                promotionLevel 'COPPER', 'Copper promotion'
+                validationStamp 'SMOKE', 'Smoke tests'
+            }
+        }
     }
 
     protected Branch createBuildsAndPromotions() {
