@@ -22,7 +22,6 @@ public class OntrackSVNIssueInfo {
                 null,
                 null,
                 Collections.emptyList(),
-                Collections.emptyList(),
                 Collections.emptyList()
         );
     }
@@ -48,15 +47,8 @@ public class OntrackSVNIssueInfo {
     private final List<OntrackSVNIssueRevisionInfo> revisionInfos;
 
     /**
-     * Merged revision information
-     */
-    @Deprecated
-    private final List<OntrackSVNRevisionInfo> mergedRevisionInfos;
-
-    /**
      * Other revisions
      */
-    @Deprecated
     private final List<SVNChangeLogRevision> revisions;
 
 }
