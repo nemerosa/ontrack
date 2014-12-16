@@ -5,6 +5,8 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.Optional;
+
 /**
  * Property value, associated with its type.
  */
@@ -40,6 +42,13 @@ public class Property<T> {
      */
     public boolean isEmpty() {
         return value == null;
+    }
+
+    /**
+     * As an option
+     */
+    public Optional<T> option() {
+        return Optional.ofNullable(value);
     }
 
     /**

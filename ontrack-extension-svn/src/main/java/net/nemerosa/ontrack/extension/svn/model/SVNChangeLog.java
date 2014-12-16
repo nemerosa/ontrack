@@ -8,15 +8,13 @@ import net.nemerosa.ontrack.extension.scm.model.SCMBuildView;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLog;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.model.structure.Branch;
+import net.nemerosa.ontrack.model.structure.Project;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @EqualsAndHashCode(callSuper = false)
 @Data
-public class SVNChangeLog extends SCMChangeLog<SVNRepository, SVNHistory> {
+public class SVNChangeLog extends SCMChangeLog<SVNHistory> {
 
     @JsonIgnore // Not sent to the client
     private SVNChangeLogRevisions revisions;
@@ -24,16 +22,18 @@ public class SVNChangeLog extends SCMChangeLog<SVNRepository, SVNHistory> {
     private SVNChangeLogIssues issues;
     @JsonIgnore // Not sent to the client
     private SVNChangeLogFiles files;
+    @JsonIgnore // Not sent to the client
+    private final SVNRepository repository;
 
     public SVNChangeLog(
             String uuid,
-            Branch branch,
-            SVNRepository scmBranch,
+            Project project,
+            SVNRepository repository,
             SCMBuildView<SVNHistory> scmBuildFrom,
             SCMBuildView<SVNHistory> scmBuildTo) {
-        super(uuid, branch, scmBranch, scmBuildFrom, scmBuildTo);
+        super(uuid, project, scmBuildFrom, scmBuildTo);
+        this.repository = repository;
     }
-
 
     public SVNChangeLog withRevisions(SVNChangeLogRevisions revisions) {
         this.revisions = revisions;
@@ -56,6 +56,11 @@ public class SVNChangeLog extends SCMChangeLog<SVNRepository, SVNHistory> {
         // Gets the two histories
         SVNHistory historyFrom = getScmBuildFrom().getScm();
         SVNHistory historyTo = getScmBuildTo().getScm();
+
+        // Empty references?
+        if (historyFrom.getReferences().isEmpty() || historyTo.getReferences().isEmpty()) {
+            return Collections.emptyList();
+        }
 
         // Sort them from->to with 'to' having the highest revision
         {
@@ -102,5 +107,13 @@ public class SVNChangeLog extends SCMChangeLog<SVNRepository, SVNHistory> {
 
         // OK
         return references;
+    }
+
+    /**
+     * A SVN change log works always on the same branch.
+     */
+    @JsonIgnore
+    public Branch getBranch() {
+        return getFrom().getBuild().getBranch();
     }
 }

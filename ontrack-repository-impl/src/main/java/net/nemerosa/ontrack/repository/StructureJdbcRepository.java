@@ -529,7 +529,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     @Override
     public Optional<PromotionRun> getEarliestPromotionRunAfterBuild(PromotionLevel promotionLevel, Build build) {
         return getOptional(
-                "SELECT * FROM PROMOTION_RUNS WHERE PROMOTIONLEVELID = :promotionLevelId AND BUILDID >= :buildId ORDER BY CREATION DESC",
+                "SELECT * FROM PROMOTION_RUNS WHERE PROMOTIONLEVELID = :promotionLevelId AND BUILDID >= :buildId ORDER BY CREATION ASC, ID ASC LIMIT 1",
                 params("promotionLevelId", promotionLevel.id())
                         .addValue("buildId", build.id()),
                 (rs, num) -> toPromotionRun(

@@ -29,7 +29,14 @@ import java.util.regex.Pattern;
 @Component
 public class ExpressionEngineImpl implements ExpressionEngine {
 
-    public static final Pattern PATTERN = Pattern.compile("\\$\\{(.+)\\}");
+    /**
+     * Any <code>${...} expression</code>. Any curved bracket in the expression must be escaped
+     * using <code>$\</code>.
+     */
+    public static final Pattern PATTERN = Pattern.compile("\\$\\{([^\\}]+)\\}");
+
+    public static final String ESCAPE_RIGHT = "@@@@@";
+    public static final String ESCAPE_LEFT = "&&&&&";
 
     @Override
     public String render(String template, Map<String, ?> parameters) {
@@ -37,11 +44,13 @@ public class ExpressionEngineImpl implements ExpressionEngine {
         if (template == null) {
             return null;
         }
-        // Parsing and resolution
-        Matcher matcher = PATTERN.matcher(template);
+        // Escaping the curved brackets
+        String escapedTemplate = template.replace("\\}", ESCAPE_RIGHT).replace("\\{", ESCAPE_LEFT);
+        // Pattern matching
+        Matcher matcher = PATTERN.matcher(escapedTemplate);
         StringBuffer buffer = new StringBuffer();
         while (matcher.find()) {
-            String expression = matcher.group(1);
+            String expression = matcher.group(1).replace(ESCAPE_RIGHT, "}").replace(ESCAPE_LEFT, "{");
             String resolution = resolve(expression, parameters);
             matcher.appendReplacement(buffer, resolution);
         }

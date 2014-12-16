@@ -9,7 +9,7 @@ import net.nemerosa.ontrack.extension.svn.model.SVNReference;
 import net.nemerosa.ontrack.extension.svn.model.SVNRevisionPath;
 import net.nemerosa.ontrack.extension.svn.support.SVNLogEntryCollector;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
-import net.nemerosa.ontrack.model.support.Time;
+import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.tx.Transaction;
 import net.nemerosa.ontrack.tx.TransactionService;
 import org.apache.commons.lang3.StringUtils;

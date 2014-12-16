@@ -1,15 +1,17 @@
 package net.nemerosa.ontrack.extension.git.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.nemerosa.ontrack.extension.scm.model.SCMBuildView;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLog;
-import net.nemerosa.ontrack.model.structure.Branch;
+import net.nemerosa.ontrack.model.structure.Project;
 
 @EqualsAndHashCode(callSuper = false)
 @Data
-public class GitChangeLog extends SCMChangeLog<GitConfiguration, GitBuildInfo> {
+@JsonPropertyOrder(alphabetic = true)
+public class GitChangeLog extends SCMChangeLog<GitBuildInfo> {
 
     @JsonIgnore // Not sent to the client
     private GitChangeLogCommits commits;
@@ -22,12 +24,11 @@ public class GitChangeLog extends SCMChangeLog<GitConfiguration, GitBuildInfo> {
 
     public GitChangeLog(
             String uuid,
-            Branch branch,
-            GitConfiguration configuration,
+            Project project,
             SCMBuildView<GitBuildInfo> scmBuildFrom,
             SCMBuildView<GitBuildInfo> scmBuildTo,
             boolean syncError) {
-        super(uuid, branch, configuration, scmBuildFrom, scmBuildTo);
+        super(uuid, project, scmBuildFrom, scmBuildTo);
         this.syncError = syncError;
     }
 

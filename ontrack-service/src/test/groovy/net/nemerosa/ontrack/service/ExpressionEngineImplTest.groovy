@@ -41,6 +41,26 @@ class ExpressionEngineImplTest {
     }
 
     @Test
+    void 'Concatenation'() {
+        assert engine.render("\${sourceName + '-test'}", [sourceName: '2.0']) == '2.0-test'
+    }
+
+    @Test
+    void 'Escaping the curved bracket'() {
+        assert engine.render("\${sourceName + '-\\{test\\}'}", [sourceName: '2.0']) == '2.0-{test}'
+    }
+
+    @Test
+    void 'Escaping the curved bracket - outside the expression is not needed'() {
+        assert engine.render("{} --> \${sourceName + '-\\{test\\}'}", [sourceName: '2.0']) == '{} --> 2.0-{test}'
+    }
+
+    @Test
+    void 'Embedded expression'() {
+        assert engine.render('/my/project/tags/{build:${sourceName}*}', [sourceName: '1.0.2']) == '/my/project/tags/{build:1.0.2*}'
+    }
+
+    @Test
     void 'Uppercase expression'() {
         assert engine.render('${sourceName.toUpperCase()}', [sourceName: 'ontrack-xx']) == 'ONTRACK-XX'
     }

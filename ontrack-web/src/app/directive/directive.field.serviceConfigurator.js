@@ -50,10 +50,17 @@ angular.module('ot.directive.field.serviceConfigurator', [
                     // Collects the data
                     if ($scope.formEntries) {
                         var formEntry = $scope.formEntries[0];
-                        data[$scope.field.name] = {
-                            id: formEntry.sourceId,
-                            data: formEntry.data
-                        };
+                        if (formEntry && formEntry.sourceId) {
+                            data[$scope.field.name] = {
+                                id: formEntry.sourceId,
+                                data: formEntry.data
+                            };
+                        } else {
+                            data[$scope.field.name] = {
+                                id: '',
+                                data: {}
+                            };
+                        }
                     }
                 };
 

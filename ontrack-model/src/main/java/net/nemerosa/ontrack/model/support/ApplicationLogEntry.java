@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.model.support;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import net.nemerosa.ontrack.common.Time;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.time.LocalDateTime;

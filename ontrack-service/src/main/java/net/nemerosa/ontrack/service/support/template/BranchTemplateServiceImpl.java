@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.security.BranchTemplateMgt;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.repository.BranchTemplateRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +68,13 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
         }
         // Compiles the template definition for anomalies
         templateDefinition.checkCompilation(expressionEngine);
+        // Checks that at least one parameter is defined or a sync. source is defined
+        if (templateDefinition.getParameters().isEmpty()
+                && (
+                templateDefinition.getSynchronisationSourceConfig() == null
+                        || StringUtils.isBlank(templateDefinition.getSynchronisationSourceConfig().getId()))) {
+            throw new BranchInvalidTemplateDefinitionException();
+        }
         // Saves the definition
         branchTemplateRepository.setTemplateDefinition(branchId, templateDefinition);
         // Reloads the branch

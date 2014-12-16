@@ -26,6 +26,7 @@ unzip ${REPOSITORY}/ontrack-delivery-docker-${ONTRACK_VERSION_FULL}.jar -d ${WOR
     --authorized-key=/var/lib/jenkins/repository/ontrack/keys/mac.key \
     --nginx-certs=${WORKSPACE}/build/certs \
     --nginx-sites-enabled=${WORKSPACE}/build/sites-enabled \
+    --do-image="Docker 1.4.0 on 14.04" \
     --do-token=${DO_TOKEN} \
     --do-region=ams2 \
     --do-size=512mb

@@ -2,6 +2,7 @@ apply plugin: 'groovy'
 
 dependencies {
     compile project(':ontrack-extension-scm')
+    compile project(':ontrack-git')
     compile project(':ontrack-tx')
     compile 'org.eclipse.jgit:org.eclipse.jgit:3.5.1.201410131835-r'
     compile libraries.spring_tx
@@ -11,4 +12,5 @@ dependencies {
     testCompile libraries.groovy
     testRuntime project(':ontrack-service')
     testRuntime project(':ontrack-repository-impl')
+    testRuntime libraries.spring_boot_starter_web
 }

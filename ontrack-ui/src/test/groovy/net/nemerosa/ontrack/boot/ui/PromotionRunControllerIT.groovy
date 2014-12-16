@@ -9,7 +9,7 @@ import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.structure.PromotionRunRequest
 import net.nemerosa.ontrack.model.structure.PropertyCreationRequest
 import net.nemerosa.ontrack.model.structure.PropertyService
-import net.nemerosa.ontrack.model.support.Time
+import net.nemerosa.ontrack.common.Time
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 

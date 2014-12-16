@@ -272,6 +272,7 @@ public class BranchController extends AbstractResourceController {
                                         .with(
                                                 Text.of("expression")
                                                         .label("Expression")
+                                                        .optional()
                                                         .help(
                                                                 "Those expressions are defined for the synchronisation between " +
                                                                         "template definitions and template instances. They bind " +
@@ -292,6 +293,7 @@ public class BranchController extends AbstractResourceController {
                 .with(
                         ServiceConfigurator.of("synchronisationSourceConfig")
                                 .label("Sync. source")
+                                .optional()
                                 .help("Source names when synchronising")
                                 .sources(
                                         templateSynchronisationService.getSynchronisationSources().stream()

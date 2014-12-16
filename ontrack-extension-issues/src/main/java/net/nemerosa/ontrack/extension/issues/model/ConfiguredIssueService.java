@@ -52,4 +52,8 @@ public class ConfiguredIssueService {
     public boolean containsIssueKey(String key, Set<String> keys) {
         return issueServiceExtension.containsIssueKey(issueServiceConfiguration, key, keys);
     }
+
+    public Optional<String> getIssueId(String token) {
+        return issueServiceExtension.getIssueId(issueServiceConfiguration, token);
+    }
 }

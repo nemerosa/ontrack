@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.model.job.Job;
 import net.nemerosa.ontrack.model.job.JobDescriptor;
 import net.nemerosa.ontrack.model.job.JobTask;
 import net.nemerosa.ontrack.model.support.ApplicationInfo;
-import net.nemerosa.ontrack.model.support.Time;
+import net.nemerosa.ontrack.common.Time;
 
 import java.time.Duration;
 import java.time.LocalDateTime;

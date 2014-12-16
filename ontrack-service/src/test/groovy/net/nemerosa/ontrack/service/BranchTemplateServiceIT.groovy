@@ -37,6 +37,62 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
 
         // Template definition
         TemplateDefinition templateDefinition = new TemplateDefinition(
+                [
+                        new TemplateParameter('NAME', 'Name parameter', '')
+                ],
+                new ServiceConfiguration(
+                        'test',
+                        JsonUtils.object().end()
+                ),
+                TemplateSynchronisationAbsencePolicy.DELETE,
+                10
+        )
+        // Saves the template
+        Branch savedBranch = asUser().with(branch, BranchTemplateMgt).call({
+            templateService.setTemplateDefinition(branch.id, templateDefinition)
+        })
+        // Checks
+        assert savedBranch.id == branch.id
+        assert savedBranch.type == BranchType.TEMPLATE_DEFINITION
+    }
+
+    @Test
+    void 'Making a branch a template: only parameters'() {
+        // Creates a branch
+        Branch branch = doCreateBranch()
+        // Normal branch
+        assert branch.type == BranchType.CLASSIC
+
+        // Template definition
+        TemplateDefinition templateDefinition = new TemplateDefinition(
+                [
+                        new TemplateParameter('NAME', 'Name parameter', '')
+                ],
+                new ServiceConfiguration(
+                        '',
+                        JsonUtils.object().end()
+                ),
+                TemplateSynchronisationAbsencePolicy.DELETE,
+                10
+        )
+        // Saves the template
+        Branch savedBranch = asUser().with(branch, BranchTemplateMgt).call({
+            templateService.setTemplateDefinition(branch.id, templateDefinition)
+        })
+        // Checks
+        assert savedBranch.id == branch.id
+        assert savedBranch.type == BranchType.TEMPLATE_DEFINITION
+    }
+
+    @Test
+    void 'Making a branch a template: only sync source'() {
+        // Creates a branch
+        Branch branch = doCreateBranch()
+        // Normal branch
+        assert branch.type == BranchType.CLASSIC
+
+        // Template definition
+        TemplateDefinition templateDefinition = new TemplateDefinition(
                 [],
                 new ServiceConfiguration(
                         'test',
@@ -52,6 +108,29 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
         // Checks
         assert savedBranch.id == branch.id
         assert savedBranch.type == BranchType.TEMPLATE_DEFINITION
+    }
+
+    @Test(expected = BranchInvalidTemplateDefinitionException)
+    void 'Making a branch a template: required parameters or sync source'() {
+        // Creates a branch
+        Branch branch = doCreateBranch()
+        // Normal branch
+        assert branch.type == BranchType.CLASSIC
+
+        // Template definition
+        TemplateDefinition templateDefinition = new TemplateDefinition(
+                [],
+                new ServiceConfiguration(
+                        '',
+                        JsonUtils.object().end()
+                ),
+                TemplateSynchronisationAbsencePolicy.DELETE,
+                10
+        )
+        // Saves the template
+        asUser().with(branch, BranchTemplateMgt).call({
+            templateService.setTemplateDefinition(branch.id, templateDefinition)
+        })
     }
 
     @Test

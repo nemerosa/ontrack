@@ -236,7 +236,8 @@
                                 <span class="ot-scm-changelog-revision ot-scm-changetype-{{changeLogFile.changeType | lowercase}}">
                                     <span class="ot-scm-changetype-icon" title="{{changeLogFile.changeType | lowercase}}"></span>
                                 </span>
-                                <a href="{{changeLogFile.url}}">{{changeLogFile.oldPath}}</a>
+                                <a ng-if="changeLogFile.url" href="{{changeLogFile.url}}">{{changeLogFile.oldPath}}</a>
+                                <span ng-if="!changeLogFile.url">{{changeLogFile.oldPath}}</span>
                                 <span ng-if="changeLogFile.newPath">
                                     <span class="fa fa-arrow-right"></span>
                                     {{changeLogFile.newPath}}
