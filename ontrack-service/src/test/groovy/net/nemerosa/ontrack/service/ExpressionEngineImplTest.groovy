@@ -47,7 +47,12 @@ class ExpressionEngineImplTest {
 
     @Test
     void 'Escaping the curved bracket'() {
-        assert engine.render("\${sourceName + '-{test}'}", [sourceName: '2.0']) == '2.0-{test}'
+        assert engine.render("\${sourceName + '-\\{test\\}'}", [sourceName: '2.0']) == '2.0-{test}'
+    }
+
+    @Test
+    void 'Escaping the curved bracket - outside the expression is not needed'() {
+        assert engine.render("{} --> \${sourceName + '-\\{test\\}'}", [sourceName: '2.0']) == '{} --> 2.0-{test}'
     }
 
     @Test
