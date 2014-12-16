@@ -70,8 +70,9 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
         templateDefinition.checkCompilation(expressionEngine);
         // Checks that at least one parameter is defined or a sync. source is defined
         if (templateDefinition.getParameters().isEmpty()
-                || templateDefinition.getSynchronisationSourceConfig() == null
-                || StringUtils.isBlank(templateDefinition.getSynchronisationSourceConfig().getId())) {
+                && (
+                templateDefinition.getSynchronisationSourceConfig() == null
+                        || StringUtils.isBlank(templateDefinition.getSynchronisationSourceConfig().getId()))) {
             throw new BranchInvalidTemplateDefinitionException();
         }
         // Saves the definition
