@@ -8,6 +8,8 @@ node_js:
 
 before_install:
   - npm install -g bower
+  - git config --global user.email "notifications@travis-ci.org"
+  - git config --global user.name "Travis CI"
 
 script:
   - ./gradlew test integrationTest --info --stacktrace
