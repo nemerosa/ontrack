@@ -16,6 +16,12 @@ class BranchResource extends AbstractProjectResource implements Branch {
     }
 
     @Override
+    def call(Closure closure) {
+        closure.delegate = this
+        closure()
+    }
+
+    @Override
     List<Build> filter(String filterType, Map<String, ?> filterConfig) {
         def url = query(
                 "${link('view')}/${filterType}",

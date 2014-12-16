@@ -10,6 +10,8 @@ interface Branch {
 
     String geDescription()
 
+    def call(Closure closure)
+
     // Branch structure
 
     PromotionLevel promotionLevel(String name, String description)

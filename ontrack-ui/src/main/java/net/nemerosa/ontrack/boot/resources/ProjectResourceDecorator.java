@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.boot.resources;
 
 import net.nemerosa.ontrack.boot.ui.*;
-import net.nemerosa.ontrack.model.security.ProjectAuthorisationMgt;
-import net.nemerosa.ontrack.model.security.ProjectCreation;
-import net.nemerosa.ontrack.model.security.ProjectDelete;
-import net.nemerosa.ontrack.model.security.ProjectEdit;
+import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
@@ -27,6 +24,12 @@ public class ProjectResourceDecorator extends AbstractResourceDecorator<Project>
                 .self(on(ProjectController.class).getProject(project.getId()))
                         // List of branches for this project
                 .link("_branches", on(BranchController.class).getBranchListForProject(project.getId()))
+                        // Creates a branch for this project
+                .link(
+                        "_createBranch",
+                        on(BranchController.class).newBranchForm(project.getId()),
+                        BranchCreate.class, project
+                )
                         // List of branches and their views
                 .link("_branchStatusViews", on(ProjectController.class).getBranchStatusViews(project.getId()))
                         // Actual properties for this project
