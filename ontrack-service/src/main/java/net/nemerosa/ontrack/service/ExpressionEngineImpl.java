@@ -29,7 +29,8 @@ import java.util.regex.Pattern;
 @Component
 public class ExpressionEngineImpl implements ExpressionEngine {
 
-    public static final Pattern PATTERN = Pattern.compile("\\$\\{(.+)\\}");
+    // FIXME Escaping curved bracket in expression
+    public static final Pattern PATTERN = Pattern.compile("\\$\\{([^\\}]+)\\}");
 
     @Override
     public String render(String template, Map<String, ?> parameters) {
