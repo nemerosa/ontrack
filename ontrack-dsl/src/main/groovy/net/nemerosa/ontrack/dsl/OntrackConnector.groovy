@@ -8,4 +8,6 @@ interface OntrackConnector {
 
     JsonNode post(String url, data)
 
+    JsonNode put(String url, data)
+
 }

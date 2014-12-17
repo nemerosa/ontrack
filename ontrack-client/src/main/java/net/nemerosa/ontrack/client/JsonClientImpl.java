@@ -47,6 +47,23 @@ public class JsonClientImpl implements JsonClient {
     }
 
     @Override
+    public JsonNode put(JsonNode data, String path, Object... parameters) {
+        try {
+            return httpClient.put(
+                    this::toJson,
+                    new StringEntity(
+                            objectMapper.writeValueAsString(data),
+                            ContentType.create("application/json", "UTF-8")
+                    ),
+                    path,
+                    parameters
+            );
+        } catch (JsonProcessingException e) {
+            throw new JsonClientMappingException(e);
+        }
+    }
+
+    @Override
     public JsonNode toNode(Object data) {
         return objectMapper.valueToTree(data);
     }

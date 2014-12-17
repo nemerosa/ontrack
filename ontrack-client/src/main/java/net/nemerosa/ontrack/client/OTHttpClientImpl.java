@@ -2,10 +2,7 @@ package net.nemerosa.ontrack.client;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.*;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.*;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
@@ -70,6 +67,15 @@ public class OTHttpClientImpl implements OTHttpClient {
             post.setEntity(data);
         }
         return request(post, responseParser);
+    }
+
+    @Override
+    public <T> T put(ResponseParser<T> responseParser, HttpEntity data, String path, Object... parameters) {
+        HttpPut put = new HttpPut(getUrl(path, parameters));
+        if (data != null) {
+            put.setEntity(data);
+        }
+        return request(put, responseParser);
     }
 
     @Override

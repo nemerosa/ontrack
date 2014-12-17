@@ -106,4 +106,12 @@ class OntrackResource implements Ontrack, OntrackConnector {
                 url
         )
     }
+
+    @Override
+    JsonNode put(String url, Object data) {
+        jsonClient.put(
+                jsonClient.toNode(data),
+                url
+        )
+    }
 }

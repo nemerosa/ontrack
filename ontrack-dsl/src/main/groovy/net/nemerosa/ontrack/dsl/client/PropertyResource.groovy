@@ -14,7 +14,7 @@ class PropertyResource extends AbstractResource {
         // Gets the update link
         def update = link('update')
         if (update) {
-            post(update, data)
+            put(update, data)
         } else {
             throw new PropertyNotEditableException(type)
         }

@@ -44,4 +44,8 @@ class AbstractResource {
         ontrack.post(url, data)
     }
 
+    protected JsonNode put(String url, data) {
+        ontrack.put(url, data)
+    }
+
 }
