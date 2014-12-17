@@ -25,4 +25,7 @@ interface Branch extends ProjectEntity {
     // Templating
 
     def template(Closure closure)
+
+    Branch instance(String sourceName, Map<String, String> params)
+
 }

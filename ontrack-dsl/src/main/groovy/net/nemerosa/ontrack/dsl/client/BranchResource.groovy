@@ -53,6 +53,18 @@ class BranchResource extends AbstractProjectResource implements Branch {
     }
 
     @Override
+    Branch instance(String sourceName, Map<String, String> params) {
+        new BranchResource(
+                ontrack,
+                put(link('templateInstanceCreate'), [
+                        name      : sourceName,
+                        manual    : (!params.empty),
+                        parameters: params
+                ])
+        )
+    }
+
+    @Override
     PromotionLevel promotionLevel(String name, String description) {
         new PromotionLevelResource(
                 ontrack,

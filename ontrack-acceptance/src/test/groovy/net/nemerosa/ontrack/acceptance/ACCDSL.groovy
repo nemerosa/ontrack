@@ -115,10 +115,10 @@ class ACCDSL extends AcceptanceTestClient {
                 }
             }
         }
-        // TODO Creates an instance
-        // ontrack.branch(project, 'template').instance 'TEST', [
-        //     gitBranch: 'feature/test'
-        // ]
+        // Creates an instance
+        ontrack.branch(project, 'template').instance 'TEST', [
+                gitBranch: 'feature/test'
+        ]
         // Checks the created instance
         def instance = ontrack.branch(project, 'TEST')
         assert instance.id > 0
