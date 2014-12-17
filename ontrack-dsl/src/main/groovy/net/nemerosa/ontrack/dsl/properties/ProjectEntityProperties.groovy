@@ -17,4 +17,8 @@ class ProjectEntityProperties {
         entity.property(type, data)
     }
 
+    def property(String type) {
+        entity.property(type)
+    }
+
 }

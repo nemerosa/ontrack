@@ -18,4 +18,11 @@ class BranchProperties extends ProjectEntityProperties {
                 [branch: branch] + params
         )
     }
+
+    /**
+     * Access to the Git branch property
+     */
+    def getGitBranch() {
+        property('net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType')
+    }
 }

@@ -123,7 +123,9 @@ class ACCDSL extends AcceptanceTestClient {
         def instance = ontrack.branch(project, 'TEST')
         assert instance.id > 0
         assert instance.name == 'TEST'
-        // TODO Checks the Git branch of the instance
+        // Checks the Git branch of the instance
+        def property = instance.properties.gitBranch
+        assert property.branch =='feature/test'
     }
 
     protected Branch createBuildsAndPromotions() {

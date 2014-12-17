@@ -35,10 +35,31 @@ abstract class AbstractProjectResource extends AbstractResource implements Proje
         // Gets the list of properties
         def properties = get(link('properties'))
         // Looks for the property
-        JsonNode propertyNode = properties.resources.find { it.typeDescriptor.typeName.asText() == type }
+        JsonNode propertyNode = properties.resources.find { it.typeDescriptor.typeName.asText() == type } as JsonNode
         // Found
         if (propertyNode != null) {
             new PropertyResource(ontrack, propertyNode).update(data)
+        }
+        // Not found
+        else {
+            throw new PropertyNotFoundException(type)
+        }
+    }
+
+    @Override
+    def property(String type) {
+        // Gets the list of properties
+        def properties = get(link('properties'))
+        // Looks for the property
+        JsonNode propertyNode = properties.resources.find { it.typeDescriptor.typeName.asText() == type } as JsonNode
+        // Found
+        if (propertyNode != null) {
+            JsonNode valueNode = propertyNode.path('value')
+            if (valueNode.missingNode || valueNode.null) {
+                throw new PropertyNotFoundException(type)
+            } else {
+                JsonUtils.toMap(valueNode)
+            }
         }
         // Not found
         else {

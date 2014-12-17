@@ -25,4 +25,9 @@ interface ProjectEntity {
      */
     def property(String type, data)
 
+    /**
+     * Gets a property
+     */
+    def property(String type)
+
 }
