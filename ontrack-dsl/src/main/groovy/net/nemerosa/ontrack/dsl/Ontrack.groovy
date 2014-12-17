@@ -19,4 +19,9 @@ interface Ontrack extends OntrackConnector {
     ValidationStamp validationStamp(String project, String branch, String validationStamp)
 
     Build build(String project, String branch, String build)
+
+    /**
+     * General configuration of Ontrack
+     */
+    def configure(Closure closure)
 }

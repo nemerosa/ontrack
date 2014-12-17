@@ -88,6 +88,13 @@ class OntrackResource implements Ontrack, OntrackConnector {
         )
     }
 
+    @Override
+    def configure(Closure closure) {
+        ConfigResource configResource = new ConfigResource(this)
+        closure.delegate = configResource
+        closure()
+    }
+
     JsonNode get(String url) {
         jsonClient.get(url)
     }
