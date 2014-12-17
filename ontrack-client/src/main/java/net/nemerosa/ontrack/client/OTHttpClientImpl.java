@@ -119,7 +119,8 @@ public class OTHttpClientImpl implements OTHttpClient {
         // Parses the response
         int statusCode = response.getStatusLine().getStatusCode();
         if (statusCode == HttpStatus.SC_OK ||
-                statusCode == HttpStatus.SC_CREATED) {
+                statusCode == HttpStatus.SC_CREATED ||
+                statusCode == HttpStatus.SC_ACCEPTED) {
             return entityParser.parse(entity);
         } else if (statusCode == HttpStatus.SC_BAD_REQUEST) {
             throw new ClientValidationException(getMessage(response));
