@@ -8,7 +8,7 @@ interface ProjectEntity {
 
     String getName()
 
-    String geDescription()
+    String getDescription()
 
     /**
      * Configuration of properties

@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.dsl.client
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.sun.javafx.fxml.PropertyNotFoundException
 import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.ProjectEntity
+import net.nemerosa.ontrack.dsl.PropertyNotFoundException
 import net.nemerosa.ontrack.json.JsonUtils
 
 abstract class AbstractProjectResource extends AbstractResource implements ProjectEntity {
@@ -20,7 +20,7 @@ abstract class AbstractProjectResource extends AbstractResource implements Proje
         return JsonUtils.get(node, 'name')
     }
 
-    String geDescription() {
+    String getDescription() {
         return JsonUtils.get(node, 'description')
     }
 
