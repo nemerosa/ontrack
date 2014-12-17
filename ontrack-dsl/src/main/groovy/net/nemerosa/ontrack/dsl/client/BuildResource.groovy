@@ -3,6 +3,8 @@ package net.nemerosa.ontrack.dsl.client
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.dsl.Build
 import net.nemerosa.ontrack.dsl.Ontrack
+import net.nemerosa.ontrack.dsl.properties.BuildProperties
+import net.nemerosa.ontrack.dsl.properties.ProjectEntityProperties
 import net.nemerosa.ontrack.json.JsonUtils
 
 class BuildResource extends AbstractProjectResource implements Build {
@@ -36,5 +38,10 @@ class BuildResource extends AbstractProjectResource implements Build {
                 validationRunStatusId: validationStampStatus
         ])
         this
+    }
+
+    @Override
+    ProjectEntityProperties getProperties() {
+        new BuildProperties(ontrack, this)
     }
 }

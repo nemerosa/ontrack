@@ -3,9 +3,10 @@ package net.nemerosa.ontrack.dsl.client
 import com.fasterxml.jackson.databind.JsonNode
 import com.sun.javafx.fxml.PropertyNotFoundException
 import net.nemerosa.ontrack.dsl.Ontrack
+import net.nemerosa.ontrack.dsl.ProjectEntity
 import net.nemerosa.ontrack.json.JsonUtils
 
-class AbstractProjectResource extends AbstractResource {
+abstract class AbstractProjectResource extends AbstractResource implements ProjectEntity {
 
     AbstractProjectResource(Ontrack ontrack, JsonNode node) {
         super(ontrack, node)
@@ -23,6 +24,13 @@ class AbstractProjectResource extends AbstractResource {
         return JsonUtils.get(node, 'description')
     }
 
+    @Override
+    def properties(Closure closure) {
+        closure.delegate = properties
+        closure()
+    }
+
+    @Override
     def property(String type, Object data) {
         // Gets the list of properties
         def properties = get(link('properties'))

@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.dsl.client
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.dsl.*
+import net.nemerosa.ontrack.dsl.properties.BranchProperties
+import net.nemerosa.ontrack.dsl.properties.ProjectEntityProperties
 import net.nemerosa.ontrack.json.JsonUtils
 
 class BranchResource extends AbstractProjectResource implements Branch {
@@ -71,5 +73,10 @@ class BranchResource extends AbstractProjectResource implements Branch {
                         description: description
                 ])
         )
+    }
+
+    @Override
+    ProjectEntityProperties getProperties() {
+        new BranchProperties(ontrack, this)
     }
 }

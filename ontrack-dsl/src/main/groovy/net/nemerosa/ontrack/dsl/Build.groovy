@@ -1,16 +1,10 @@
 package net.nemerosa.ontrack.dsl
 
-interface Build {
-
-    int getId()
+interface Build extends ProjectEntity {
 
     String getProject()
 
     String getBranch()
-
-    String getName()
-
-    String geDescription()
 
     Build promote(String promotion)
 

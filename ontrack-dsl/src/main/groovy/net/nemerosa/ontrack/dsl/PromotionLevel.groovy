@@ -1,15 +1,9 @@
 package net.nemerosa.ontrack.dsl
 
-interface PromotionLevel {
-
-    int getId()
+interface PromotionLevel extends ProjectEntity {
 
     String getProject()
 
     String getBranch()
-
-    String getName()
-
-    String geDescription()
 
 }

@@ -3,6 +3,8 @@ package net.nemerosa.ontrack.dsl.client
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.PromotionLevel
+import net.nemerosa.ontrack.dsl.properties.ProjectEntityProperties
+import net.nemerosa.ontrack.dsl.properties.PromotionLevelProperties
 import net.nemerosa.ontrack.json.JsonUtils
 
 class PromotionLevelResource extends AbstractProjectResource implements PromotionLevel {
@@ -21,4 +23,8 @@ class PromotionLevelResource extends AbstractProjectResource implements Promotio
         JsonUtils.get(node.path('project').path('branch'), 'name')
     }
 
+    @Override
+    ProjectEntityProperties getProperties() {
+        new PromotionLevelProperties(ontrack, this)
+    }
 }

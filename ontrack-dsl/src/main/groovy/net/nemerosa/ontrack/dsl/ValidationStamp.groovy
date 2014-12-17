@@ -1,15 +1,9 @@
 package net.nemerosa.ontrack.dsl
 
-interface ValidationStamp {
-
-    int getId()
+interface ValidationStamp extends ProjectEntity {
 
     String getProject()
 
     String getBranch()
-
-    String getName()
-
-    String geDescription()
 
 }

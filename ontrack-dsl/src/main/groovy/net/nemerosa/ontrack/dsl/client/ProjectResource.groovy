@@ -40,11 +40,4 @@ class ProjectResource extends AbstractProjectResource implements Project {
     ProjectProperties getProperties() {
         new ProjectProperties(ontrack, this)
     }
-
-    @Override
-    def properties(Closure closure) {
-        def p = properties
-        closure.delegate = p
-        closure()
-    }
 }

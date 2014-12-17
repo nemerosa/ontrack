@@ -1,14 +1,8 @@
 package net.nemerosa.ontrack.dsl
 
-interface Branch {
-
-    int getId()
+interface Branch extends ProjectEntity {
 
     String getProject()
-
-    String getName()
-
-    String geDescription()
 
     def call(Closure closure)
 

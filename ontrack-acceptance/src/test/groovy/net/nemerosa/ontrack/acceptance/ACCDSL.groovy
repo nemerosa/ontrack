@@ -104,7 +104,10 @@ class ACCDSL extends AcceptanceTestClient {
                 promotionLevel 'COPPER', 'Copper promotion'
                 promotionLevel 'BRONZE', 'Bronze promotion'
                 validationStamp 'SMOKE', 'Smoke tests'
-                // TODO Git branch
+                // Git branch
+                properties {
+                    gitBranch '${gitBranch}'
+                }
                 // TODO Template definition
             }
         }
