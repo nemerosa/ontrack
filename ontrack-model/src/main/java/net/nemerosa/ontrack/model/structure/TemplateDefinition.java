@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.model.structure;
 import com.google.common.collect.Maps;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -24,11 +25,13 @@ public class TemplateDefinition {
      *
      * @see TemplateSynchronisationSource#getId()
      */
+    @NotNull
     private final ServiceConfiguration synchronisationSourceConfig;
 
     /**
      * Policy to apply when a branch is configured but no longer available.
      */
+    @NotNull
     private final TemplateSynchronisationAbsencePolicy absencePolicy;
 
     /**

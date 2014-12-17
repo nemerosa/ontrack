@@ -21,4 +21,8 @@ interface Branch extends ProjectEntity {
     List<Build> standardFilter(Map<String, ?> filterConfig)
 
     List<Build> getLastPromotedBuilds()
+
+    // Templating
+
+    def template(Closure closure)
 }

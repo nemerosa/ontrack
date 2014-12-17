@@ -345,7 +345,7 @@ public class BranchController extends AbstractResourceController {
      * Sets this branch as a template definition, or updates the definition.
      */
     @RequestMapping(value = "branches/{branchId}/template/definition", method = RequestMethod.PUT)
-    public Branch setTemplateDefinition(@PathVariable ID branchId, @RequestBody TemplateDefinition templateDefinition) {
+    public Branch setTemplateDefinition(@PathVariable ID branchId, @RequestBody @Valid TemplateDefinition templateDefinition) {
         return branchTemplateService.setTemplateDefinition(branchId, templateDefinition);
     }
 
