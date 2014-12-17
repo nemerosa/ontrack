@@ -97,7 +97,9 @@ class ACCDSL extends AcceptanceTestClient {
         // Project and branch template
         def project = uid('P')
         ontrack.project(project) {
-            // TODO GitHub project
+            properties {
+                gitHub 'ontrack'
+            }
             branch('template') {
                 promotionLevel 'COPPER', 'Copper promotion'
                 promotionLevel 'BRONZE', 'Bronze promotion'

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.dsl.Branch
 import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.Project
+import net.nemerosa.ontrack.dsl.properties.ProjectProperties
 
 class ProjectResource extends AbstractProjectResource implements Project {
 
@@ -33,5 +34,17 @@ class ProjectResource extends AbstractProjectResource implements Project {
         def branch = branch(name)
         branch(closure)
         branch
+    }
+
+    @Override
+    ProjectProperties getProperties() {
+        new ProjectProperties(ontrack, this)
+    }
+
+    @Override
+    def properties(Closure closure) {
+        def p = properties
+        closure.delegate = p
+        closure()
     }
 }

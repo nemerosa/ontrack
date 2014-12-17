@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.dsl
 
+import net.nemerosa.ontrack.dsl.properties.ProjectProperties
+
 interface Project {
 
     int getId()
@@ -19,5 +21,12 @@ interface Project {
      * Creates a branch for the project and configures it
      */
     Branch branch(String name, Closure closure)
+
+    /**
+     * Configuration of properties
+     */
+    ProjectProperties getProperties()
+    def properties(Closure closure)
+    def property(String type, data)
 
 }
