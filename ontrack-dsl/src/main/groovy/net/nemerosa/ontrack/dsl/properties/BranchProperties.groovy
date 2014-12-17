@@ -12,7 +12,7 @@ class BranchProperties extends ProjectEntityProperties {
     /**
      * Git branch property
      */
-    def gitBranch(String branch, Map<String, ?> params) {
+    def gitBranch(String branch, Map<String, ?> params = [:]) {
         property(
                 'net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType',
                 [branch: branch] + params

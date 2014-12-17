@@ -105,7 +105,7 @@ class ACCDSL extends AcceptanceTestClient {
                 promotionLevel 'BRONZE', 'Bronze promotion'
                 validationStamp 'SMOKE', 'Smoke tests'
                 // Git branch
-                properties {
+                delegate.properties {
                     gitBranch '${gitBranch}'
                 }
                 // TODO Template definition
