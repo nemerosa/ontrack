@@ -105,8 +105,7 @@ class ACCDSL extends AcceptanceTestClient {
                 promotionLevel 'BRONZE', 'Bronze promotion'
                 validationStamp 'SMOKE', 'Smoke tests'
                 // Git branch
-                // TODO Why do we need the `delegate` here? The call to the `properties` is delegated to the project...
-                delegate.properties {
+                properties {
                     gitBranch '${gitBranch}'
                 }
                 // Template definition

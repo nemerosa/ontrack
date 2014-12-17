@@ -19,6 +19,7 @@ class BranchResource extends AbstractProjectResource implements Branch {
 
     @Override
     def call(Closure closure) {
+        closure.resolveStrategy = Closure.DELEGATE_FIRST
         closure.delegate = this
         closure()
     }

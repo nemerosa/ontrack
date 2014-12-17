@@ -26,6 +26,7 @@ abstract class AbstractProjectResource extends AbstractResource implements Proje
 
     @Override
     def properties(Closure closure) {
+        closure.resolveStrategy = Closure.DELEGATE_FIRST
         closure.delegate = properties
         closure()
     }

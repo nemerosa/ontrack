@@ -14,6 +14,7 @@ class ProjectResource extends AbstractProjectResource implements Project {
 
     @Override
     def call(Closure closure) {
+        closure.resolveStrategy = Closure.DELEGATE_FIRST
         closure.delegate = this
         closure()
     }
