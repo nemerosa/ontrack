@@ -28,7 +28,7 @@ exporting.each { path ->
     project(path).with {
 
         // Maven tasks available
-        apply plugin: 'maven-publish'
+        apply plugin: 'maven'
 
         // Signing available
         // apply plugin: 'signing'
@@ -55,19 +55,17 @@ exporting.each { path ->
         //    sign configurations.archives
         // }
 
-        // Publication settings
-        publishing {
-            publications {
-                mavenJava(MavenPublication) {
-                    from components.java
-                    artifact javadocJar
-                    artifact sourceJar
-                    pom.withXml {
-                        asNode().appendNode('url', 'http://nemerosa.github.io/ontrack')
-                    }
+        // Maven POM
+        task writePomFiles << {
+            pom {
+                project {
+                    url 'http://nemerosa.github.io/ontrack'
                 }
-            }
+            }.writeTo("${buildDir}/poms/${project.name}-${version}.pom")
         }
+
+        // Links with assembly
+        assemble.dependsOn writePomFiles
 
     }
 }
