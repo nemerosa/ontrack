@@ -5,7 +5,7 @@
  *
  * In order to publish to the local repository:
  *
- *      ./gradlew publishToMavenLocal
+ *      ./gradlew install
  *
  */
 
@@ -66,6 +66,11 @@ exporting.each { path ->
 
         // Links with assembly
         assemble.dependsOn writePomFiles
+
+        // Builds means install
+        if (rootProject.hasProperty('install')) {
+            build.dependsOn 'install'
+        }
 
     }
 }
