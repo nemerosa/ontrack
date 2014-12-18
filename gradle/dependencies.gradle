@@ -31,6 +31,7 @@ ext {
             guava                       : 'com.google.guava:guava:17.0',
             dbinit                      : 'net.sf.dbinit:dbinit:1.4.0',
             h2                          : 'com.h2database:h2:1.4.177',
+            args4j                      : 'args4j:args4j:2.0.29',
 
             // Spring
             spring_context              : "org.springframework:spring-context:${springVersion}",

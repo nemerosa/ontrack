@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.client.ClientNotFoundException
 import net.nemerosa.ontrack.dsl.Branch
 import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.OntrackConnection
+import net.nemerosa.ontrack.dsl.Shell
 import org.junit.Before
 import org.junit.Test
 
@@ -147,7 +148,7 @@ local.put('BUILD', build)
                 ontrack: ontrack,
                 local  : local,
                 project: projectName,
-                branch: branchName
+                branch : branchName
         ]);
 
         // Shell
@@ -157,7 +158,30 @@ local.put('BUILD', build)
         shell.evaluate(script)
 
         // Checks the result
-        assert local['BUILD'] == '3'
+        assert local.BUILD == '3'
+    }
+
+    @Test
+    void 'DSL shell: getting the last promoted build'() {
+        // Environment preparation
+        def branch = createBuildsAndPromotions()
+        def projectName = branch.project
+        def branchName = branch.name
+
+        // Script to execute
+        def script = '''\
+def build = ontrack.branch(project, branch).lastPromotedBuilds[0]?.name
+shell.put('BUILD', build)
+'''
+
+        // Script file
+        def file = File.createTempFile('ontrack', '.dsl')
+        file.text = script
+
+        // Shell call
+        def output = new StringWriter()
+        def shell = Shell.create().withOutput(output)
+        shell '--url', baseURL, '--user', 'admin', '--password', adminPassword, '--file', file.absolutePath
     }
 
     protected Branch createBuildsAndPromotions() {
