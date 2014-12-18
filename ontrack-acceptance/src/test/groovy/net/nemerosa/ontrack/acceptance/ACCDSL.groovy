@@ -124,7 +124,40 @@ class ACCDSL extends AcceptanceTestClient {
         assert instance.name == 'TEST'
         // Checks the Git branch of the instance
         def property = instance.properties.gitBranch
-        assert property.branch =='feature/test'
+        assert property.branch == 'feature/test'
+    }
+
+    @Test
+    void 'External script with local binding: getting the last promoted build'() {
+        // Environment preparation
+        def branch = createBuildsAndPromotions()
+        def projectName = branch.project
+        def branchName = branch.name
+
+        // Script to execute
+        def script = '''\
+def build = ontrack.branch(project, branch).lastPromotedBuilds[0]?.name
+local.put('BUILD', build)
+'''
+        // Local binding
+        def local = [:]
+
+        // Binding
+        def binding = new Binding([
+                ontrack: ontrack,
+                local  : local,
+                project: projectName,
+                branch: branchName
+        ]);
+
+        // Shell
+        def shell = new GroovyShell(binding)
+
+        // Running the script
+        shell.evaluate(script)
+
+        // Checks the result
+        assert local['BUILD'] == '3'
     }
 
     protected Branch createBuildsAndPromotions() {
