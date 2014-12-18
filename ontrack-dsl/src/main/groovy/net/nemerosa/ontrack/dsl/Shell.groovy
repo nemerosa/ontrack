@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.dsl
 
+import org.kohsuke.args4j.CmdLineException
 import org.kohsuke.args4j.CmdLineParser
 
 class Shell {
@@ -42,8 +43,18 @@ class Shell {
         // Reads the script
         def script = new File(options.path).text
 
+        // Parsing of values
+        def params = options.values.collectEntries { token ->
+            List<String> tokens = token.split(/=/).collect { it.trim() }
+            if (tokens.size() != 2) {
+                throw new CmdLineException("Wrong value: ${token}")
+            } else {
+                return [tokens[0], tokens[1]]
+            }
+        }
+
         // Runs the shell
-        run ontrack, local, script
+        run ontrack, local, script, params
 
         // Output values
         local.values.each { k, v ->
@@ -52,13 +63,13 @@ class Shell {
 
     }
 
-    static def run(Ontrack ontrack, ShellConnector connector, String script) {
+    static def run(Ontrack ontrack, ShellConnector connector, String script, Map<String, String> params) {
         // Binding
-        def binding = new Binding([
+        Map<String, ?> bindingMap = [
                 ontrack: ontrack,
                 shell  : connector
-                // TODO Other parameters
-        ]);
+        ] + params
+        def binding = new Binding(bindingMap);
 
         // Shell
         def gshell = new GroovyShell(binding)

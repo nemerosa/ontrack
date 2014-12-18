@@ -181,7 +181,13 @@ shell.put('BUILD', build)
         // Shell call
         def output = new StringWriter()
         def shell = Shell.create().withOutput(output)
-        shell '--url', baseURL, '--user', 'admin', '--password', adminPassword, '--file', file.absolutePath
+        shell '--url', baseURL, '--user', 'admin', '--password', adminPassword, '--file', file.absolutePath,
+                '--value', "project=${projectName}",
+                '--value', "branch=${branchName}"
+
+        // Gets the output
+        def text = output.toString()
+        assert text.trim() == 'BUILD=3'
     }
 
     protected Branch createBuildsAndPromotions() {
