@@ -19,4 +19,7 @@ class ShellOptions {
     @Option(name = "--value", aliases = "-v", usage = "Name/value to bind to the script, using name=value format")
     List<String> values = []
 
+    @Option(name = "--no-ssl", usage = "Disables SSL certificate checks")
+    boolean disableSsl = false
+
 }

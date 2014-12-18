@@ -20,6 +20,10 @@ class Shell {
     }
 
     def call(String... args) {
+        call(args as List)
+    }
+
+    def call(List<String> args) {
         // Parsing of options
         def options = new ShellOptions()
         new CmdLineParser(options).parseArgument(args)
@@ -30,8 +34,7 @@ class Shell {
     def call(ShellOptions options) {
 
         // Creates the Ontrack connector
-        def connection = OntrackConnection.create(options.url)
-        // TODO SSL support
+        def connection = OntrackConnection.create(options.url).disableSsl(options.disableSsl)
         if (options.user) {
             connection = connection.authenticate(options.user, options.password)
         }
