@@ -14,7 +14,6 @@ import java.net.URL;
 import java.util.function.Supplier;
 
 import static java.lang.String.format;
-import static org.apache.commons.lang3.StringUtils.prependIfMissing;
 import static org.apache.commons.lang3.StringUtils.stripEnd;
 
 public class OTHttpClientImpl implements OTHttpClient {
@@ -42,10 +41,14 @@ public class OTHttpClientImpl implements OTHttpClient {
         if (StringUtils.startsWith(path, "http")) {
             return format(path, parameters);
         } else {
+            String formattedPath = format(path, parameters);
+            if (!formattedPath.startsWith("/")) {
+                formattedPath = "/" + formattedPath;
+            }
             return format(
                     "%s%s",
                     stripEnd(url.toString(), "/"),
-                    prependIfMissing(format(path, parameters), "/")
+                    formattedPath
             );
         }
     }
