@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.service.support.template;
 
-import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.exceptions.*;
 import net.nemerosa.ontrack.model.job.*;
 import net.nemerosa.ontrack.model.security.BranchTemplateMgt;
@@ -32,17 +31,15 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
     private final BranchTemplateRepository branchTemplateRepository;
     private final ExpressionEngine expressionEngine;
     private final CopyService copyService;
-    private final EventPostService eventPostService;
     private final TemplateSynchronisationService templateSynchronisationService;
 
     @Autowired
-    public BranchTemplateServiceImpl(StructureService structureService, SecurityService securityService, BranchTemplateRepository branchTemplateRepository, ExpressionEngine expressionEngine, CopyService copyService, EventPostService eventPostService, TemplateSynchronisationService templateSynchronisationService) {
+    public BranchTemplateServiceImpl(StructureService structureService, SecurityService securityService, BranchTemplateRepository branchTemplateRepository, ExpressionEngine expressionEngine, CopyService copyService, TemplateSynchronisationService templateSynchronisationService) {
         this.structureService = structureService;
         this.securityService = securityService;
         this.branchTemplateRepository = branchTemplateRepository;
         this.expressionEngine = expressionEngine;
         this.copyService = copyService;
-        this.eventPostService = eventPostService;
         this.templateSynchronisationService = templateSynchronisationService;
     }
 
@@ -307,21 +304,7 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
         // Getting the list of names
         List<String> sourceNames = templateSynchronisationSource.getBranchNames(templateBranch, config);
         // Sync on those names
-        BranchTemplateSyncResults results = syncTemplateDefinition(templateBranch, templateDefinition, sourceNames, info);
-        // Reporting
-        syncReport(templateBranch, results);
-        // OK
-        return results;
-    }
-
-    private void syncReport(Branch templateBranch, BranchTemplateSyncResults results) {
-        for (BranchTemplateSyncResult result : results.getBranches()) {
-            syncReport(templateBranch, result);
-        }
-    }
-
-    private void syncReport(Branch templateBranch, BranchTemplateSyncResult result) {
-        eventPostService.post(result.event(structureService, templateBranch));
+        return syncTemplateDefinition(templateBranch, templateDefinition, sourceNames, info);
     }
 
     protected BranchTemplateSyncResults syncTemplateDefinition(

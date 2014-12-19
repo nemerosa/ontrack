@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Wither;
-import net.nemerosa.ontrack.model.events.Event;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -53,7 +52,4 @@ public class BranchTemplateSyncResult {
         return of(name, BranchTemplateSyncType.CREATED, sourceName, "Branch has been created.");
     }
 
-    public Event event(StructureService structureService, Branch templateBranch) {
-        return type.event(structureService, templateBranch, this);
-    }
 }

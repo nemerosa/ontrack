@@ -50,14 +50,6 @@ public class EventFactoryImpl implements EventFactory {
         register(PROPERTY_CHANGE);
         register(PROPERTY_DELETE);
 
-        register(SYNC_CREATED);
-        register(SYNC_UPDATED);
-        register(SYNC_IGNORED);
-        register(SYNC_DISABLED);
-        register(SYNC_DELETED);
-        register(SYNC_EXISTING_CLASSIC);
-        register(SYNC_EXISTING_DEFINITION);
-        register(SYNC_EXISTING_INSTANCE_FROM_OTHER);
     }
 
     private void register(EventType eventType) {

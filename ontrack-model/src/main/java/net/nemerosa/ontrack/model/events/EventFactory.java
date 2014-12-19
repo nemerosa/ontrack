@@ -40,46 +40,6 @@ public interface EventFactory {
     EventType PROPERTY_CHANGE = SimpleEventType.of("property_change", "${:property} property has changed for ${:entity} ${REF}.");
     EventType PROPERTY_DELETE = SimpleEventType.of("property_delete", "${:property} property has been removed from ${:entity} ${REF}.");
 
-    EventType SYNC_CREATED = SimpleEventType.of(
-            "sync_created",
-            "Branch ${BRANCH} has been created from template ${:template} using source ${:source} upon synchronisation."
-    );
-    EventType SYNC_UPDATED = SimpleEventType.of(
-            "sync_updated",
-            "Branch ${BRANCH} has been updated from template ${:template} using source ${:source} upon synchronisation."
-    );
-    EventType SYNC_DELETED = SimpleEventType.of(
-            "sync_deleted",
-            "Branch ${:branch} has been deleted upon synchronisation because it is no longer in sources of template ${:template}."
-    );
-    EventType SYNC_IGNORED = SimpleEventType.of(
-            "sync_ignored",
-            "Branch ${BRANCH} has been ignored upon synchronisation because it has already been disabled. You should " +
-                    "delete this branch or exclude it from the sources of the ${:template} template."
-    );
-    EventType SYNC_EXISTING_CLASSIC = SimpleEventType.of(
-            "sync_existing_classic",
-            "Branch ${BRANCH} cannot be synchronised with template ${:template} using source ${:source} " +
-                    "since it already exists. Either delete this branch or exclude it from the sources."
-    );
-    EventType SYNC_EXISTING_DEFINITION = SimpleEventType.of(
-            "sync_existing_definition",
-            "Branch ${BRANCH} cannot be synchronised with template ${:template} using source ${:source} " +
-                    "since it is a template definition itself. Either delete this branch or exclude " +
-                    "it from the sources."
-    );
-    EventType SYNC_EXISTING_INSTANCE_FROM_OTHER = SimpleEventType.of(
-            "sync_existing_instance_from_other",
-            "Branch ${BRANCH} cannot be synchronised with template ${:template} using source ${:source} " +
-                    "since it already an instance from the ${:otherTemplate} template. Either delete " +
-                    "this branch or exclude it from the sources."
-    );
-    EventType SYNC_DISABLED = SimpleEventType.of(
-            "sync_disabled",
-            "Branch ${BRANCH} has been disabled upon synchronisation because it is no longer in sources of template ${:template}. " +
-                    "It should either be deleted or excluded from the sources of the template."
-    );
-
 
     /**
      * Gets an event type using its {@linkplain EventType#getId()}  id}.
