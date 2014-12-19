@@ -182,6 +182,12 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
                             currentBuild()
                         }
                     }
+                } else {
+                    buildPipelineTrigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-12-docker-push") {
+                        parameters {
+                            currentBuild()
+                        }
+                    }
                 }
             }
             configure { node ->
