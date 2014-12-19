@@ -3,6 +3,19 @@
 import argparse
 
 import github
+from utils import run_command
+
+
+def maven_publish(options):
+    modules = ["common", "json", "client", "dsl"]
+    for module in modules:
+        run_command("mvn", [
+            "gpg:sign-and-deploy-file",
+            "-Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2/",
+            "-DrepositoryId=ossrh",
+            "-DpomFile=%s/ontrack-%s-%s.pom" % (options.repository, module, options.version_full),
+            "-Dfile=%s/ontrack-%s-%s.jar" % (options.repository, module, options.version_full)
+        ])
 
 
 def publish(options):
@@ -14,6 +27,9 @@ def publish(options):
     ui_jar = "%s/ontrack-ui-%s.jar" % (options.repository, options.version_full)
     print "[publish] Uploading ontrack-ui.jar at %s..." % ui_jar
     github.upload_github_artifact(options, release_id, 'ontrack-ui.jar', 'application/zip', ui_jar)
+    # Publication in the Maven Central repository
+    print "[publish] Publishing DSL libraries in OSSRH..."
+    maven_publish(options)
     # TODO #172 Gets the change log since last release
     # print "[publish] Getting the change log from Ontrack..."
     # change_log = ontrack.getChangeLog(options.ontrack_url, 'master', 'RELEASE')
