@@ -1,0 +1,11 @@
+apply plugin: 'groovy'
+
+dependencies {
+    compile project(':ontrack-client')
+    compile libraries.groovy
+    compile libraries.args4j
+}
+
+javadocJar {
+    from groovydoc
+}

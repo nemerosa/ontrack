@@ -85,6 +85,12 @@ configure(javaProjects) {
 }
 
 /**
+ * Publication in Maven repository
+ */
+
+apply from: 'gradle/maven.gradle'
+
+/**
  * General test report
  */
 

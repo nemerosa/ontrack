@@ -45,6 +45,12 @@ public class OTHttpClientBuilder {
     private final HttpHost host;
     private String username;
     private String password;
+    private OTHttpClientLogger clientLogger = new OTHttpClientLogger() {
+        @Override
+        public void trace(String message) {
+            logger.debug(message);
+        }
+    };
 
     protected OTHttpClientBuilder(String url, boolean disableSsl) {
         try {
@@ -58,6 +64,11 @@ public class OTHttpClientBuilder {
                 this.url.getPort(),
                 this.url.getProtocol()
         );
+    }
+
+    public OTHttpClientBuilder withLogger(OTHttpClientLogger httpClientLogger) {
+        this.clientLogger = httpClientLogger;
+        return this;
     }
 
     public OTHttpClientBuilder withCredentials(String username, String password) {
@@ -138,6 +149,6 @@ public class OTHttpClientBuilder {
             return builder.build();
         };
 
-        return new OTHttpClientImpl(url, host, httpClientSupplier, httpContext);
+        return new OTHttpClientImpl(url, host, httpClientSupplier, httpContext, clientLogger);
     }
 }

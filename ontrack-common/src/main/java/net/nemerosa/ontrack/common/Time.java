@@ -49,6 +49,9 @@ public final class Time {
 
     /**
      * Returns a UTC local date/time from an Epoch time in milliseconds
+     *
+     * @param epochMillis Epoch time in milliseconds
+     * @return UTC local date time
      */
     public static LocalDateTime from(long epochMillis) {
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(epochMillis), ZoneOffset.UTC);

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.json;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
@@ -161,5 +162,9 @@ public final class JsonUtils {
         } else {
             return null;
         }
+    }
+
+    public static String pretty(JsonNode node) throws JsonProcessingException {
+        return ObjectMapperFactory.create().writerWithDefaultPrettyPrinter().writeValueAsString(node);
     }
 }

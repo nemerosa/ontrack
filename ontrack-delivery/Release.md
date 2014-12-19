@@ -80,6 +80,7 @@ For a `release/R` branch:
 
 * creating a release `R` in GitHub
 * uploading the `ontrack-ui.jar`
+* [publishing DSL libraries](Publishing.md) in the Maven Central
 * getting the change log from Ontrack @ Ontrack and setting it as description into the GitHub release
 * setting the new `R` build as `RELEASED` in Ontrack @ Ontrack
 

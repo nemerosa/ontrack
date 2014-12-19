@@ -1,0 +1,76 @@
+/**
+ * Management of the module exportation for DSL-related modules of Ontrack.
+ *
+ * Hints:
+ *
+ * In order to publish to the local repository:
+ *
+ *      ./gradlew install
+ *
+ */
+
+/**
+ * List of modules to export
+ */
+
+def exporting = [
+        ':ontrack-dsl',
+        ':ontrack-client',
+        ':ontrack-json',
+        ':ontrack-common',
+]
+
+/**
+ * Configuration Maven for all the modules to export
+ */
+
+exporting.each { path ->
+    project(path).with {
+
+        // Maven tasks available
+        apply plugin: 'maven'
+
+        // Signing available
+        // apply plugin: 'signing'
+
+        // Javadoc generation
+        task javadocJar(type: Jar) {
+            classifier = 'javadoc'
+            from javadoc
+        }
+
+        // Source generation
+        task sourceJar(type: Jar) {
+            classifier = 'sources'
+            from sourceSets.main.allSource
+        }
+
+        // Archives for Javadoc and Sources
+        artifacts {
+            archives javadocJar, sourceJar
+        }
+
+        // Scope of the signatures
+        // signing {
+        //    sign configurations.archives
+        // }
+
+        // Maven POM
+        task writePomFiles << {
+            pom {
+                project {
+                    url 'http://nemerosa.github.io/ontrack'
+                }
+            }.writeTo("${buildDir}/poms/${project.name}-${version}.pom")
+        }
+
+        // Links with assembly
+        assemble.dependsOn writePomFiles
+
+        // Builds means install
+        if (rootProject.hasProperty('install')) {
+            build.dependsOn 'install'
+        }
+
+    }
+}

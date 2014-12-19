@@ -15,6 +15,8 @@ public interface OTHttpClient {
 
     <T> T post(ResponseParser<T> responseParser, HttpEntity data, String path, Object... parameters);
 
+    <T> T put(ResponseParser<T> responseParser, HttpEntity data, String path, Object... parameters);
+
     <T> T request(HttpRequestBase request, final ResponseParser<T> responseParser);
 
 }

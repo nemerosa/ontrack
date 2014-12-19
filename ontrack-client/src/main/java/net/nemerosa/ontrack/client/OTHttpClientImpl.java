@@ -2,38 +2,32 @@ package net.nemerosa.ontrack.client;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.*;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.*;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.function.Supplier;
 
 import static java.lang.String.format;
-import static org.apache.commons.lang3.StringUtils.prependIfMissing;
 import static org.apache.commons.lang3.StringUtils.stripEnd;
 
 public class OTHttpClientImpl implements OTHttpClient {
-
-    private static final Logger logger = LoggerFactory.getLogger(OTHttpClient.class);
 
     private final URL url;
     private final HttpHost host;
     private final Supplier<CloseableHttpClient> httpClientSupplier;
     private final HttpClientContext httpContext;
+    private final OTHttpClientLogger clientLogger;
 
-    public OTHttpClientImpl(URL url, HttpHost host, Supplier<CloseableHttpClient> httpClientSupplier, HttpClientContext httpContext) {
+    public OTHttpClientImpl(URL url, HttpHost host, Supplier<CloseableHttpClient> httpClientSupplier, HttpClientContext httpContext, OTHttpClientLogger clientLogger) {
         this.url = url;
         this.host = host;
         this.httpClientSupplier = httpClientSupplier;
         this.httpContext = httpContext;
+        this.clientLogger = clientLogger;
     }
 
     @Override
@@ -45,10 +39,14 @@ public class OTHttpClientImpl implements OTHttpClient {
         if (StringUtils.startsWith(path, "http")) {
             return format(path, parameters);
         } else {
+            String formattedPath = format(path, parameters);
+            if (!formattedPath.startsWith("/")) {
+                formattedPath = "/" + formattedPath;
+            }
             return format(
                     "%s%s",
                     stripEnd(url.toString(), "/"),
-                    prependIfMissing(format(path, parameters), "/")
+                    formattedPath
             );
         }
     }
@@ -73,6 +71,15 @@ public class OTHttpClientImpl implements OTHttpClient {
     }
 
     @Override
+    public <T> T put(ResponseParser<T> responseParser, HttpEntity data, String path, Object... parameters) {
+        HttpPut put = new HttpPut(getUrl(path, parameters));
+        if (data != null) {
+            put.setEntity(data);
+        }
+        return request(put, responseParser);
+    }
+
+    @Override
     public <T> T request(HttpRequestBase request, final ResponseParser<T> responseParser) {
         return request(
                 request,
@@ -87,12 +94,12 @@ public class OTHttpClientImpl implements OTHttpClient {
     }
 
     protected <T> T request(HttpRequestBase request, ResponseHandler<T> responseHandler) {
-        logger.debug("[request] {}", request);
+        clientLogger.trace("[request] " + request);
         // Executes the call
         try {
             try (CloseableHttpClient http = httpClientSupplier.get()) {
                 HttpResponse response = http.execute(host, request, httpContext);
-                logger.debug("[response] {}", response);
+                clientLogger.trace("[response] " + response);
                 // Entity response
                 HttpEntity entity = response.getEntity();
                 try {
@@ -113,7 +120,8 @@ public class OTHttpClientImpl implements OTHttpClient {
         // Parses the response
         int statusCode = response.getStatusLine().getStatusCode();
         if (statusCode == HttpStatus.SC_OK ||
-                statusCode == HttpStatus.SC_CREATED) {
+                statusCode == HttpStatus.SC_CREATED ||
+                statusCode == HttpStatus.SC_ACCEPTED) {
             return entityParser.parse(entity);
         } else if (statusCode == HttpStatus.SC_BAD_REQUEST) {
             throw new ClientValidationException(getMessage(response));
