@@ -48,4 +48,8 @@ class AbstractResource {
         ontrack.put(url, data)
     }
 
+    @Override
+    String toString() {
+        JsonUtils.pretty(node)
+    }
 }
