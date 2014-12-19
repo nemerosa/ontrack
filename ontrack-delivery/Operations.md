@@ -6,7 +6,7 @@ Operations
 Details of using Digital Ocean as a Vagrant provided are given in the
 [vagrant-digitalocean](see https://github.com/smdahlen/vagrant-digitalocean) plug-in documentation.
 
-* install the Digital Ocean plug-in for Vagrant:
+* install the Digital Ocean plug-in for Vagrant (at least version 0.7.1):
 
     vagrant plugin install vagrant-digitalocean
 
