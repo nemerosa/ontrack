@@ -176,7 +176,7 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
             }
             publishers {
                 archiveJunit('ontrack-acceptance.xml')
-                if (branchType != 'release') {
+                if (branchType == 'release') {
                     downstreamParameterized {
                         trigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-12-docker-push", 'SUCCESS', false) {
                             currentBuild()
