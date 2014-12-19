@@ -6,8 +6,6 @@ import org.apache.http.client.methods.*;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URL;
@@ -18,18 +16,18 @@ import static org.apache.commons.lang3.StringUtils.stripEnd;
 
 public class OTHttpClientImpl implements OTHttpClient {
 
-    private static final Logger logger = LoggerFactory.getLogger(OTHttpClient.class);
-
     private final URL url;
     private final HttpHost host;
     private final Supplier<CloseableHttpClient> httpClientSupplier;
     private final HttpClientContext httpContext;
+    private final OTHttpClientLogger clientLogger;
 
-    public OTHttpClientImpl(URL url, HttpHost host, Supplier<CloseableHttpClient> httpClientSupplier, HttpClientContext httpContext) {
+    public OTHttpClientImpl(URL url, HttpHost host, Supplier<CloseableHttpClient> httpClientSupplier, HttpClientContext httpContext, OTHttpClientLogger clientLogger) {
         this.url = url;
         this.host = host;
         this.httpClientSupplier = httpClientSupplier;
         this.httpContext = httpContext;
+        this.clientLogger = clientLogger;
     }
 
     @Override
@@ -96,12 +94,12 @@ public class OTHttpClientImpl implements OTHttpClient {
     }
 
     protected <T> T request(HttpRequestBase request, ResponseHandler<T> responseHandler) {
-        logger.debug("[request] {}", request);
+        clientLogger.trace("[request] " + request);
         // Executes the call
         try {
             try (CloseableHttpClient http = httpClientSupplier.get()) {
                 HttpResponse response = http.execute(host, request, httpContext);
-                logger.debug("[response] {}", response);
+                clientLogger.trace("[response] " + response);
                 // Entity response
                 HttpEntity entity = response.getEntity();
                 try {

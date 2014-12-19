@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.client.JsonClient
 import net.nemerosa.ontrack.client.JsonClientImpl
 import net.nemerosa.ontrack.client.OTHttpClient
 import net.nemerosa.ontrack.client.OTHttpClientBuilder
+import net.nemerosa.ontrack.client.OTHttpClientLogger
 import net.nemerosa.ontrack.dsl.client.OntrackResource
 import org.apache.commons.lang3.StringUtils
 
@@ -13,6 +14,7 @@ class OntrackConnection {
     private boolean disableSsl = false
     private String user
     private String password
+    private OTHttpClientLogger logger
 
     private OntrackConnection(String url) {
         this.url = url
@@ -27,6 +29,11 @@ class OntrackConnection {
         this
     }
 
+    OntrackConnection logger(OTHttpClientLogger logger) {
+        this.logger
+        this
+    }
+
     OntrackConnection authenticate(String user, String password) {
         this.user = user
         this.password = password
@@ -38,6 +45,10 @@ class OntrackConnection {
         // Credentials
         if (StringUtils.isNotBlank(user)) {
             builder = builder.withCredentials(user, password)
+        }
+        // Logger
+        if (logger) {
+            builder = builder.withLogger(logger)
         }
         // Basic client
         OTHttpClient otHttpClient = builder.build()
