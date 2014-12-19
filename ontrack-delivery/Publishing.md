@@ -34,3 +34,7 @@ Ontrack DSL in Maven Central
    </profiles>
 </settings>
 ```
+
+## Resources
+
+* See the [Nexus Staging Maven Plugin](http://books.sonatype.com/nexus-book/reference/staging-deployment.html)
