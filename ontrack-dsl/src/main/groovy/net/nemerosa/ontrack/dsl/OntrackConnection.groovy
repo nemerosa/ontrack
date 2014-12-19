@@ -30,7 +30,7 @@ class OntrackConnection {
     }
 
     OntrackConnection logger(OTHttpClientLogger logger) {
-        this.logger
+        this.logger = logger
         this
     }
 
