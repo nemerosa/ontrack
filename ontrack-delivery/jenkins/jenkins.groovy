@@ -160,19 +160,6 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
             }
             steps {
                 shell readFileFromWorkspace('ontrack-delivery/jenkins/local-acceptance.sh')
-                if (branchType == 'release') {
-                    conditionalSteps {
-                        condition {
-                            status('SUCCESS', 'SUCCESS')
-                        }
-                        runner('Fail')
-                        downstreamParameterized {
-                            trigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-12-docker-push", 'SUCCESS', false) {
-                                currentBuild()
-                            }
-                        }
-                    }
-                }
             }
             publishers {
                 archiveJunit('ontrack-acceptance.xml')
