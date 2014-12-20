@@ -38,3 +38,4 @@ Ontrack DSL in Maven Central
 ## Resources
 
 * See the [Nexus Staging Maven Plugin](http://books.sonatype.com/nexus-book/reference/staging-deployment.html)
+* See article at http://dev.solita.fi/2014/10/22/publishing-to-maven-central-repository.html
