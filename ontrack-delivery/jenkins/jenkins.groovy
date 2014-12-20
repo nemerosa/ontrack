@@ -294,6 +294,7 @@ docker logout
                 }
                 wrappers {
                     injectPasswords()
+                    toolenv('Maven-3.2.x')
                 }
                 steps {
                     shell readFileFromWorkspace('ontrack-delivery/jenkins/publish.sh')

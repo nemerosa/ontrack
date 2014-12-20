@@ -1,3 +1,15 @@
+#!/bin/bash
+
+# Maven environment
+
+if [ "${MAVEN_3_2_X_HOME}" == "" ]
+then
+    echo "MAVEN_3_2_X_HOME is not set"
+    exit 1
+fi
+export PATH=${MAVEN_3_2_X_HOME}/bin:$PATH
+mvn --version
+
 # Environment
 
 REPOSITORY=/var/lib/jenkins/repository/ontrack/2.0
