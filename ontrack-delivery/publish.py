@@ -9,6 +9,13 @@ from utils import run_command
 def maven_publish(options):
     modules = ["common", "json", "client", "dsl"]
     for module in modules:
+        # Update of POM to take into account the version
+        run_command("sed", [
+            "-i",
+            "s/%s/%s/g" % (options.version_full, options.version_release),
+            "%s/ontrack-%s-%s.pom" % (options.repository, module, options.version_full)
+        ])
+        # OSSRH publication
         run_command("mvn", [
             "gpg:sign-and-deploy-file",
             "-Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2/",
