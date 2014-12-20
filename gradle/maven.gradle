@@ -30,9 +30,6 @@ exporting.each { path ->
         // Maven tasks available
         apply plugin: 'maven'
 
-        // Signing available
-        // apply plugin: 'signing'
-
         // Javadoc generation
         task javadocJar(type: Jar) {
             classifier = 'javadoc'
@@ -49,11 +46,6 @@ exporting.each { path ->
         artifacts {
             archives javadocJar, sourceJar
         }
-
-        // Scope of the signatures
-        // signing {
-        //    sign configurations.archives
-        // }
 
         // Maven POM
         task writePomFiles << {

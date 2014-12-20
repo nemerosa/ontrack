@@ -7,15 +7,34 @@ from utils import run_command
 
 
 def maven_publish(options):
+    staging_dir = "%s/staging/%s" % (options.repository, options.version_full)
+    # Deploys each module separately
     modules = ["common", "json", "client", "dsl"]
     for module in modules:
+        # Update of POM to take into account the version
+        run_command("sed", [
+            "-i",
+            "s/%s/%s/g" % (options.version_full, options.version_release),
+            "%s/ontrack-%s-%s.pom" % (options.repository, module, options.version_full)
+        ])
+        # Deployment repository
+        run_command("mkdir", ["-p", staging_dir])
+        # Staging publication
         run_command("mvn", [
             "gpg:sign-and-deploy-file",
-            "-Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2/",
-            "-DrepositoryId=ossrh",
+            "-Durl=file://%s" % staging_dir,
             "-DpomFile=%s/ontrack-%s-%s.pom" % (options.repository, module, options.version_full),
             "-Dfile=%s/ontrack-%s-%s.jar" % (options.repository, module, options.version_full)
         ])
+    # Publication to OSSRH
+    run_command("mvn", [
+        "org.sonatype.plugins:nexus-staging-maven-plugin:1.6.5:deploy-staged-repository",
+        "-DrepositoryDirectory=%s" % staging_dir,
+        "-DnexusUrl=https://oss.sonatype.org",
+        "-DserverId=ossrh",
+        "-DautoReleaseAfterClose=true",
+        "-DstagingProfileId=%s" % options.ossrh_profile
+    ])
 
 
 def publish(options):
@@ -47,6 +66,7 @@ if __name__ == '__main__':
     parser.add_argument('--version-full', required=True, help='Version to release')
     parser.add_argument('--version-release', required=True, help='Release to create')
     parser.add_argument('--repository', required=True, help='Directory that contains the artifacts')
+    parser.add_argument('--ossrh-profile', required=True, help='ID of the staging profile in OSSRH')
     parser.add_argument('--ontrack-url', required=True, help='ontrack URL')
     parser.add_argument('--github-repository', required=False, help='GitHub repository', default='nemerosa/ontrack')
     parser.add_argument('--github-user', required=True, help='GitHub user used to publish the release')
