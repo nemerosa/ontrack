@@ -130,6 +130,11 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
             }
             publishers {
                 archiveJunit("**/build/test-results/*.xml")
+                tasks(
+                        '**/*.java,**/*.xml,**/*.html,**/*.js',
+                        '**/target/**,**/node_modules/**,**/vendor/**',
+                        'FIXME', 'TODO', '@Deprecated', true
+                )
                 downstreamParameterized {
                     trigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-11-acceptance-local", 'SUCCESS', false) {
                         propertiesFile('version.properties')
