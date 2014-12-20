@@ -131,7 +131,7 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
             publishers {
                 archiveJunit("**/build/test-results/*.xml")
                 tasks(
-                        '**/*.java,**/*.xml,**/*.html,**/*.js',
+                        '**/*.java,**/*.groovy,**/*.xml,**/*.html,**/*.js',
                         '**/target/**,**/node_modules/**,**/vendor/**',
                         'FIXME', 'TODO', '@Deprecated', true
                 )
