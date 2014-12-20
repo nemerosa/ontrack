@@ -306,11 +306,11 @@ docker logout
                     }
                 }
                 configure { node ->
-                    node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
+                    node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackPromotedRunNotifier' {
                         'project'('ontrack')
                         'branch'(NAME)
                         'build'('${ONTRACK_VERSION_BUILD}')
-                        'validationStamp'('RELEASE')
+                        'promotionLevel'('RELEASE')
                     }
                 }
             }
@@ -342,11 +342,11 @@ docker logout
                     }
                 }
                 configure { node ->
-                    node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
+                    node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackPromotedRunNotifier' {
                         'project'('ontrack')
                         'branch'(NAME)
                         'build'('${ONTRACK_VERSION_BUILD}')
-                        'validationStamp'('ONTRACK')
+                        'promotionLevel'('ONTRACK')
                     }
                 }
             }
