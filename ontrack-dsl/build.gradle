@@ -1,3 +1,5 @@
+description = "DSL for Ontrack."
+
 apply plugin: 'groovy'
 
 dependencies {
