@@ -50,7 +50,6 @@ exporting.each { path ->
 
         // Maven POM
         task writePomFiles << {
-            // Developer information missing
             pom {
                 project {
                     name = p.name
