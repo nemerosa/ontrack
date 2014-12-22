@@ -25,7 +25,8 @@ def exporting = [
  */
 
 exporting.each { path ->
-    project(path).with {
+    def p = project(path)
+    p.with {
 
         // Maven tasks available
         apply plugin: 'maven'
@@ -51,7 +52,28 @@ exporting.each { path ->
         task writePomFiles << {
             pom {
                 project {
+                    name = p.name
+                    description p.description
                     url 'http://nemerosa.github.io/ontrack'
+                    licenses {
+                        license {
+                            name 'The MIT License (MIT)'
+                            url 'http://opensource.org/licenses/MIT'
+                            distribution 'repo'
+                        }
+                    }
+                    scm {
+                        url = 'https://github.com/nemerosa/ontrack'
+                        connection = 'scm:git:git://github.com/nemerosa/ontrack'
+                        developerConnection = 'scm:git:git://github.com/nemerosa/ontrack'
+                    }
+                    developers {
+                        developer {
+                            id = 'dcoraboeuf'
+                            name = 'Damien Coraboeuf'
+                            email = 'damien.coraboeuf@gmail.com'
+                        }
+                    }
                 }
             }.writeTo("${buildDir}/poms/${project.name}-${version}.pom")
         }

@@ -20,11 +20,28 @@ def maven_publish(options):
         # Deployment repository
         run_command("mkdir", ["-p", staging_dir])
         # Staging publication
+        # ... of JAR
         run_command("mvn", [
             "gpg:sign-and-deploy-file",
             "-Durl=file://%s" % staging_dir,
             "-DpomFile=%s/ontrack-%s-%s.pom" % (options.repository, module, options.version_full),
             "-Dfile=%s/ontrack-%s-%s.jar" % (options.repository, module, options.version_full)
+        ])
+        # ... of sources
+        run_command("mvn", [
+            "gpg:sign-and-deploy-file",
+            "-Durl=file://%s" % staging_dir,
+            "-DpomFile=%s/ontrack-%s-%s.pom" % (options.repository, module, options.version_full),
+            "-Dfile=%s/ontrack-%s-%s-sources.jar" % (options.repository, module, options.version_full),
+            "-Dclassifier=sources"
+        ])
+        # ... of Javadoc
+        run_command("mvn", [
+            "gpg:sign-and-deploy-file",
+            "-Durl=file://%s" % staging_dir,
+            "-DpomFile=%s/ontrack-%s-%s.pom" % (options.repository, module, options.version_full),
+            "-Dfile=%s/ontrack-%s-%s-javadoc.jar" % (options.repository, module, options.version_full),
+            "-Dclassifier=javadoc"
         ])
     # Publication to OSSRH
     run_command("mvn", [

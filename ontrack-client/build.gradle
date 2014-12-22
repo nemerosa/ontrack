@@ -1,3 +1,5 @@
+description = "Generic customisable HTTP and JSON client."
+
 dependencies {
     compile project(':ontrack-common')
     compile project(':ontrack-json')
