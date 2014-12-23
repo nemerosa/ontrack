@@ -49,15 +49,15 @@ angular.module('ontrack.extension.scm', [
     .service('otScmChangeLogService', function ($http, $modal, $interpolate, ot) {
         var self = {};
 
-        function storeExportRequest(branchId, exportRequest) {
+        function storeExportRequest(projectId, exportRequest) {
             localStorage.setItem(
-                    'issueExportRequest_' + branchId,
+                    'issueExportConfig_' + projectId,
                 JSON.stringify(exportRequest)
             );
         }
 
-        function loadExportRequest(branchId) {
-            var json = localStorage.getItem('issueExportRequest_' + branchId);
+        function loadExportRequest(projectId) {
+            var json = localStorage.getItem('issueExportConfig_' + projectId);
             if (json) {
                 return JSON.parse(json);
             } else {
@@ -69,15 +69,14 @@ angular.module('ontrack.extension.scm', [
 
         self.displayChangeLogExport = function (config) {
 
-            var branchId = config.changeLog.branch.id;
+            var projectId = config.changeLog.project.id;
 
             $modal.open({
                 templateUrl: 'app/extension/scm/scmChangeLogExport.tpl.html',
                 controller: function ($scope, $modalInstance) {
                     $scope.config = config;
                     // Export request
-                    // TODO Loads it from the local storage, indexed by the branch ID
-                    $scope.exportRequest = loadExportRequest(branchId);
+                    $scope.exportRequest = loadExportRequest(projectId);
                     // Loading the export formats
                     ot.call($http.get(config.exportFormatsLink)).then(function (exportFormatsResources) {
                         $scope.exportFormats = exportFormatsResources.resources;
@@ -109,14 +108,13 @@ angular.module('ontrack.extension.scm', [
 
                         // Request
                         var request = {
-                            branch: branchId,
                             from: config.changeLog.scmBuildFrom.buildView.build.id,
                             to: config.changeLog.scmBuildTo.buildView.build.id
                         };
 
                         // Permalink
                         var url = config.exportIssuesLink;
-                        url += $interpolate('?branch={{branch}}&from={{from}}&to={{to}}')(request);
+                        url += $interpolate('?from={{from}}&to={{to}}')(request);
 
                         // Format
                         if ($scope.exportRequest.format) {
@@ -152,7 +150,7 @@ angular.module('ontrack.extension.scm', [
                             $scope.exportError = '';
                             $scope.exportContent = exportedIssues;
                             $scope.exportPermaLink = url;
-                            storeExportRequest(branchId, $scope.exportRequest);
+                            storeExportRequest(projectId, $scope.exportRequest);
                         }, function error(message) {
                             $scope.exportCalling = false;
                             $scope.exportError = message.content;
