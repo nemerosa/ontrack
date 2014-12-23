@@ -17,4 +17,14 @@ class ConfigResource {
                 params
         )
     }
+
+    def jenkins(String name, String url, String user = '', String password = '') {
+        ontrack.post(
+                'extension/jenkins/configurations/create', [
+                name    : name,
+                url     : url,
+                user    : user,
+                password: password
+        ])
+    }
 }

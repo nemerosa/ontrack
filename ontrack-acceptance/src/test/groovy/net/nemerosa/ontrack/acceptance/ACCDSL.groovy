@@ -90,6 +90,27 @@ class ACCDSL extends AcceptanceTestClient {
     }
 
     @Test
+    void 'Setting the Jenkins build property on a build'() {
+        // Jenkins configuration
+        ontrack.configure {
+            jenkins 'Local', 'http://jenkins'
+        }
+        // Creating a branch
+        def project = uid('P')
+        ontrack.project(project).branch('1.0')
+        // Creating a build
+        def build = ontrack.branch(project, '1.0').build('1', 'Build 1')
+        // Setting the Jenkins build property
+        build.properties {
+            jenkinsBuild 'Local', 'JOB', 1
+        }
+        // Gets its Jenkins build property
+        def property = build.properties.jenkinsBuild
+        assert property.job == 'JOB'
+        assert property.build == 1
+    }
+
+    @Test
     void 'Definition of a template with parameters'() {
         // GitHub configuration
         ontrack.configure {
