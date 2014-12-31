@@ -30,4 +30,23 @@ class BuildProperties extends ProjectEntityProperties {
         property('net.nemerosa.ontrack.extension.jenkins.JenkinsBuildPropertyType')
     }
 
+    /**
+     * Sets the Release property
+     */
+    def label(String name) {
+        property(
+                'net.nemerosa.ontrack.extension.general.ReleasePropertyType',
+                [
+                        name: name
+                ]
+        )
+    }
+
+    /**
+     * Gets the Release property
+     */
+    def getLabel() {
+        property('net.nemerosa.ontrack.extension.general.ReleasePropertyType').name
+    }
+
 }

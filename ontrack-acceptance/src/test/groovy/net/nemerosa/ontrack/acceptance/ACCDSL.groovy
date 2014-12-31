@@ -111,6 +111,21 @@ class ACCDSL extends AcceptanceTestClient {
     }
 
     @Test
+    void 'Setting the Release property on a build'() {
+        // Creating a branch
+        def project = uid('P')
+        ontrack.project(project).branch('1.0')
+        // Creating a build
+        def build = ontrack.branch(project, '1.0').build('1', 'Build 1')
+        // Setting the Label property
+        build.properties {
+            label 'RC'
+        }
+        // Gets its Label property
+        assert build.properties.label == 'RC'
+    }
+
+    @Test
     void 'Definition of a template with parameters'() {
         // GitHub configuration
         ontrack.configure {
