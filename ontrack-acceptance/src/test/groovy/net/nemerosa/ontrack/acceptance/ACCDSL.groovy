@@ -186,7 +186,7 @@ class ACCDSL extends AcceptanceTestClient {
                 }
                 // Template definition
                 template {
-                    parameter 'gitBranch', 'Name of the Git branch'
+                    parameter 'gitBranch', 'Name of the Git branch', 'release/${sourceName}'
                     fixedSource '1.0', '1.1'
                 }
             }
@@ -200,7 +200,7 @@ class ACCDSL extends AcceptanceTestClient {
             assert instance.name == it
             // Checks the Git branch of the instance
             def property = instance.properties.gitBranch
-            assert property.branch == it
+            assert property.branch == "release/${it}"
         }
     }
 
