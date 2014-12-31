@@ -54,6 +54,11 @@ class BranchResource extends AbstractProjectResource implements Branch {
     }
 
     @Override
+    def sync() {
+        post(link('templateSync'), [:])
+    }
+
+    @Override
     Branch instance(String sourceName, Map<String, String> params) {
         new BranchResource(
                 ontrack,

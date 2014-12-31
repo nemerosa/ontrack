@@ -165,6 +165,46 @@ class ACCDSL extends AcceptanceTestClient {
     }
 
     @Test
+    void 'Launching branch template synchronisation'() {
+        // GitHub configuration
+        ontrack.configure {
+            gitHub 'ontrack', repository: 'nemerosa/ontrack', indexationInterval: 0
+        }
+        // Project and branch template
+        def project = uid('P')
+        ontrack.project(project) {
+            properties {
+                gitHub 'ontrack'
+            }
+            branch('template') {
+                promotionLevel 'COPPER', 'Copper promotion'
+                promotionLevel 'BRONZE', 'Bronze promotion'
+                validationStamp 'SMOKE', 'Smoke tests'
+                // Git branch
+                properties {
+                    gitBranch '${gitBranch}'
+                }
+                // Template definition
+                template {
+                    parameter 'gitBranch', 'Name of the Git branch'
+                    fixedSource '1.0', '1.1'
+                }
+            }
+        }
+        // Sync. the template
+        ontrack.branch(project, 'template').sync()
+        // Checks the created instances
+        ['1.0', '1.1'].each {
+            def instance = ontrack.branch(project, it)
+            assert instance.id > 0
+            assert instance.name == it
+            // Checks the Git branch of the instance
+            def property = instance.properties.gitBranch
+            assert property.branch == it
+        }
+    }
+
+    @Test
     void 'External script with local binding: getting the last promoted build'() {
         // Environment preparation
         def branch = createBuildsAndPromotions()
