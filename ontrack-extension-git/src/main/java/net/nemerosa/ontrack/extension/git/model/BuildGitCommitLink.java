@@ -76,4 +76,8 @@ public interface BuildGitCommitLink<T> {
      */
     boolean isBuildEligible(Build build, T data);
 
+    /**
+     * Checks if a build name is valid for this configuration.
+     */
+    boolean isBuildNameValid(String name, T data);
 }

@@ -86,4 +86,8 @@ public class TagPatternBuildNameGitCommitLink implements IndexableBuildGitCommit
         return true;
     }
 
+    @Override
+    public boolean isBuildNameValid(String name, TagPattern data) {
+        return data.isValidTagName(name);
+    }
 }

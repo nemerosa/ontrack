@@ -1,12 +1,16 @@
 package net.nemerosa.ontrack.extension.git.service
 
 import net.nemerosa.ontrack.extension.api.model.BuildValidationException
+import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
+import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationProperty
+import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.support.TagPattern
 import net.nemerosa.ontrack.extension.git.support.TagPatternBuildNameGitCommitLink
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -17,6 +21,7 @@ import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd
+import static net.nemerosa.ontrack.test.TestUtils.uid
 
 /**
  * Tests for #187 - validation of the build name
@@ -31,6 +36,9 @@ class GitBuildValidationIT extends AbstractServiceTestSupport {
 
     @Autowired
     private SecurityService securityService
+
+    @Autowired
+    private GitConfigurationService gitConfigurationService
 
     /**
      * Validates a build according to the branch SCM policy.
@@ -87,10 +95,25 @@ class GitBuildValidationIT extends AbstractServiceTestSupport {
      */
     @Test(expected = BuildValidationException)
     void 'Build validation not OK with tag pattern'() {
+        // Git configuration
+        String gitConfigurationName = uid('C')
+        BasicGitConfiguration gitConfiguration = asUser().with(GlobalSettings).call {
+            gitConfigurationService.newConfiguration(
+                    BasicGitConfiguration.empty()
+                            .withName(gitConfigurationName)
+                            .withRemote("not.used")
+            )
+        }
         // Creates a branch
         def branch = doCreateBranch()
-        // Git branch configuration
         asUser().with(branch, ProjectEdit).call {
+            // Project configuration
+            propertyService.editProperty(
+                    branch.project,
+                    GitProjectConfigurationPropertyType,
+                    new GitProjectConfigurationProperty(gitConfiguration)
+            )
+            // Git branch configuration
             propertyService.editProperty(
                     branch,
                     GitBranchConfigurationPropertyType,
@@ -114,12 +137,27 @@ class GitBuildValidationIT extends AbstractServiceTestSupport {
      */
     @Test(expected = BuildValidationException)
     void 'Build validation not OK on rename'() {
+        // Git configuration
+        String gitConfigurationName = uid('C')
+        BasicGitConfiguration gitConfiguration = asUser().with(GlobalSettings).call {
+            gitConfigurationService.newConfiguration(
+                    BasicGitConfiguration.empty()
+                            .withName(gitConfigurationName)
+                            .withRemote("not.used")
+            )
+        }
         // Creates a branch
         def branch = doCreateBranch()
         // Creates a build BEFORE the branch configuration
         def build = doCreateBuild(branch, nd('1.1.0', 'Build 1.1.0'))
-        // Git branch configuration
         asUser().with(branch, ProjectEdit).call {
+            // Project configuration
+            propertyService.editProperty(
+                    branch.project,
+                    GitProjectConfigurationPropertyType,
+                    new GitProjectConfigurationProperty(gitConfiguration)
+            )
+            // Git branch configuration
             propertyService.editProperty(
                     branch,
                     GitBranchConfigurationPropertyType,

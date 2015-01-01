@@ -13,10 +13,14 @@ import net.nemerosa.ontrack.model.structure.Build;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 @Component
 public class CommitBuildNameGitCommitLink implements BuildGitCommitLink<CommitLinkConfig> {
+
+    private final Pattern abbreviatedPattern = Pattern.compile("[0-9a-f]{7}");
+    private final Pattern fullPattern = Pattern.compile("[0-9a-f]{40}");
 
     @Override
     public String getId() {
@@ -80,6 +84,15 @@ public class CommitBuildNameGitCommitLink implements BuildGitCommitLink<CommitLi
     @Override
     public boolean isBuildEligible(Build build, CommitLinkConfig data) {
         return true;
+    }
+
+    @Override
+    public boolean isBuildNameValid(String name, CommitLinkConfig data) {
+        if (data.isAbbreviated()) {
+            return abbreviatedPattern.matcher(name).matches();
+        } else {
+            return fullPattern.matcher(name).matches();
+        }
     }
 
 }

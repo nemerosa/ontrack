@@ -26,6 +26,10 @@ public class ConfiguredBuildGitCommitLink<T> {
         return link.getCommitFromBuild(build, data);
     }
 
+    public boolean isBuildNameValid(String name) {
+        return link.isBuildNameValid(name, data);
+    }
+
     public ServiceConfiguration toServiceConfiguration() {
         return new ServiceConfiguration(
                 link.getId(),

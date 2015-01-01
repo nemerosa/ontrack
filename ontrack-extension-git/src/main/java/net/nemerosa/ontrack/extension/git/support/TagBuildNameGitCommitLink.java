@@ -78,4 +78,8 @@ public class TagBuildNameGitCommitLink implements IndexableBuildGitCommitLink<No
         return true;
     }
 
+    @Override
+    public boolean isBuildNameValid(String name, NoConfig data) {
+        return true;
+    }
 }
