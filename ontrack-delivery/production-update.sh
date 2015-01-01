@@ -74,7 +74,7 @@ fi
 # Stops the old version of Ontrack
 
 echo "[PRODUCTION] Stopping Ontrack container..."
-ONTRACK_CID=`docker ps docker ps | grep "nemerosa/ontrack" | awk '{print $1}'`
+ONTRACK_CID=`docker ps | grep "nemerosa/ontrack" | awk '{print $1}'`
 if [ "${ONTRACK_CID}" != "" ]
 then
 	docker stop ${ONTRACK_CID}
