@@ -17,9 +17,13 @@ function show_help {
 	echo "    -h, --help                    Displays this help"
 	echo "    --dry-run                     Disable actual clean-up, just traces"
 	echo "    -do, --digital-ocean          Digital Ocean housekeeping"
+	echo "    -br, --binary-repository      Binary repository housekeeping"
 	echo "Digital Ocean specific options are:"
 	echo "    -dot, --do-token=<token>      Personal Access Token (required)"
 	echo "    -dop, --do-pattern=<pattern>  Regex to use to identify droplets to clean (default: 'ontrack-acceptance.*')"
+	echo "Binary repository specific options are:"
+	echo "    -brd, --br-dir=<dir>          Repository directory (required)"
+	echo "    -brt, --br-time=<days>        Number of retention days (default: 30 days)"
 }
 
 # Check function
@@ -37,9 +41,13 @@ function check {
 DRYRUN=no
 
 DIGITAL_OCEAN=no
+BINARY_REPOSITORY=no
 
 DO_TOKEN=
 DO_PATTERN="ontrack-acceptance.*"
+
+BINARY_REPOSITORY_DIR=
+BINARY_REPOSITORY_DAYS=30
 
 # Command central
 
@@ -62,6 +70,15 @@ do
 		-dop=*|--do-pattern=*)
             DO_PATTERN=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
 			;;
+		-br|--binary-repository)
+            BINARY_REPOSITORY=yes
+			;;
+		-brd=*|--br-dir=*)
+            BINARY_REPOSITORY_DIR=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
+			;;
+		-brt=*|--br-time=*)
+            BINARY_REPOSITORY_DAYS=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
+			;;
 		*)
 			echo "Unknown option: $i"
 			show_help
@@ -77,11 +94,21 @@ then
 	check "${DO_TOKEN}" "Digital Ocean Personal Access Token (--do-token) is required."
 fi
 
+if [ "${BINARY_REPOSITORY}" == "yes" ]
+then
+	check "${BINARY_REPOSITORY_DIR}" "Binary repository directory (--br-dir) is required."
+fi
+
 # Logging
 
 echo "Dry run                = ${DRYRUN}"
+echo "---------"
 echo "Digital Ocean          = ${DIGITAL_OCEAN}"
 echo "Digital Ocean pattern  = ${DO_PATTERN}"
+echo "---------"
+echo "Binary repository      = ${BINARY_REPOSITORY}"
+echo "Binary repository dir  = ${BINARY_REPOSITORY_DIR}"
+echo "Binary repository days = ${BINARY_REPOSITORY_DAYS}"
 
 # Housekeeping procedures
 
@@ -91,9 +118,20 @@ function digital_ocean {
         --token "${DO_TOKEN}" \
         --pattern "${DO_PATTERN}"
 }
+
+function binary_repository {
+	echo "Binary repository housekeeping"
+	find "${BINARY_REPOSITORY_DIR}" -ctime "+${BINARY_REPOSITORY_DAYS}" -exec rm -rf {} \;
+}
 # Housekeeping script
 
 if [ "${DIGITAL_OCEAN}" == "yes" ]
 then
     digital_ocean
+fi
+
+
+if [ "${BINARY_REPOSITORY}" == "yes" ]
+then
+    binary_repository
 fi
