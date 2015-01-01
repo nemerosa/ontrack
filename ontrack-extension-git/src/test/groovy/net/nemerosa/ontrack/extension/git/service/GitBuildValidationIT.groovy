@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.extension.git.service
 
+import net.nemerosa.ontrack.extension.api.model.BuildValidationException
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.support.TagPattern
 import net.nemerosa.ontrack.extension.git.support.TagPatternBuildNameGitCommitLink
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
-import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -85,7 +85,7 @@ class GitBuildValidationIT extends AbstractServiceTestSupport {
     /**
      * Validates a build according to the branch SCM policy.
      */
-    @Test(expected = BuildNotFoundException)
+    @Test(expected = BuildValidationException)
     void 'Build validation not OK with tag pattern'() {
         // Creates a branch
         def branch = doCreateBranch()
@@ -112,7 +112,7 @@ class GitBuildValidationIT extends AbstractServiceTestSupport {
     /**
      * Validates a build according to the branch SCM policy.
      */
-    @Test(expected = BuildNotFoundException)
+    @Test(expected = BuildValidationException)
     void 'Build validation not OK on rename'() {
         // Creates a branch
         def branch = doCreateBranch()

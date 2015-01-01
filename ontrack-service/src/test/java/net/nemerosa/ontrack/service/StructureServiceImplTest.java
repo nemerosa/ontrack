@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service;
 
+import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -29,13 +30,14 @@ public class StructureServiceImplTest {
         structureRepository = mock(StructureRepository.class);
         EventPostService eventService = mock(EventPostService.class);
         EventFactory eventFactory = mock(EventFactory.class);
+        ExtensionManager extensionManager = mock(ExtensionManager.class);
         service = new StructureServiceImpl(
                 securityService,
                 eventService,
                 eventFactory,
                 validationRunStatusService,
-                structureRepository
-        );
+                structureRepository,
+                extensionManager);
         // Model
         Project project = Project.of(nd("P", "Project")).withId(ID.of(1));
         Branch branch = Branch.of(project, nd("B", "Branch")).withId(ID.of(1));

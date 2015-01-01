@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.service;
 
 import net.nemerosa.ontrack.common.CachedSupplier;
+import net.nemerosa.ontrack.extension.api.BuildValidationExtension;
+import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterResult;
@@ -48,14 +50,16 @@ public class StructureServiceImpl implements StructureService {
     private final EventFactory eventFactory;
     private final ValidationRunStatusService validationRunStatusService;
     private final StructureRepository structureRepository;
+    private final ExtensionManager extensionManager;
 
     @Autowired
-    public StructureServiceImpl(SecurityService securityService, EventPostService eventPostService, EventFactory eventFactory, ValidationRunStatusService validationRunStatusService, StructureRepository structureRepository) {
+    public StructureServiceImpl(SecurityService securityService, EventPostService eventPostService, EventFactory eventFactory, ValidationRunStatusService validationRunStatusService, StructureRepository structureRepository, ExtensionManager extensionManager) {
         this.securityService = securityService;
         this.eventPostService = eventPostService;
         this.eventFactory = eventFactory;
         this.validationRunStatusService = validationRunStatusService;
         this.structureRepository = structureRepository;
+        this.extensionManager = extensionManager;
     }
 
     @Override
@@ -227,6 +231,12 @@ public class StructureServiceImpl implements StructureService {
         return structureRepository.deleteBuild(buildId);
     }
 
+    protected void validateBuild(Build build) {
+        extensionManager.getExtensions(BuildValidationExtension.class).forEach(
+                x -> x.validateBuild(build)
+        );
+    }
+
     @Override
     public Build newBuild(Build build) {
         // Validation
@@ -239,6 +249,8 @@ public class StructureServiceImpl implements StructureService {
         }
         // Security
         securityService.checkProjectFunction(build.getBranch().getProject().id(), BuildCreate.class);
+        // Build validation
+        validateBuild(build);
         // Repository
         Build newBuild = structureRepository.newBuild(build);
         // Event
@@ -255,6 +267,8 @@ public class StructureServiceImpl implements StructureService {
         isEntityDefined(build.getBranch().getProject(), "Project must be defined");
         // Security
         securityService.checkProjectFunction(build.getBranch().getProject().id(), BuildEdit.class);
+        // Build validation
+        validateBuild(build);
         // Repository
         Build savedBuild = structureRepository.saveBuild(build);
         // Event
