@@ -24,6 +24,7 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
     @SuppressWarnings("UnusedDeclaration")
     private final String password;
     private final String branchPattern;
+    @Wither
     private final String tagPattern;
     private final String tagFilterPattern;
     private final String browserForPath;
