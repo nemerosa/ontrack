@@ -367,11 +367,11 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
 
     @Override
     public Document getPromotionLevelImage(ID promotionLevelId) {
-        return getFirstItem(
+        return getOptional(
                 "SELECT IMAGETYPE, IMAGEBYTES FROM PROMOTION_LEVELS WHERE ID = :id",
                 params("id", promotionLevelId.getValue()),
                 (rs, rowNum) -> toDocument(rs)
-        );
+        ).orElse(Document.EMPTY);
     }
 
     @Override

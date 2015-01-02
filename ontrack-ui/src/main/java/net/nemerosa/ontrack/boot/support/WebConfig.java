@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
@@ -37,6 +38,8 @@ public class WebConfig extends WebMvcConfigurerAdapter {
         converters.clear();
         // Plain text
         converters.add(new StringHttpMessageConverter());
+        // Documents
+        converters.add(new DocumentHttpMessageConverter());
         // JSON
         converters.add(new ResourceHttpMessageConverter(uriBuilder, securityService, resourceModules));
     }
