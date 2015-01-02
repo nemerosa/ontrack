@@ -200,7 +200,7 @@ public class CopyServiceImpl implements CopyService {
                     private void copyPromotionLevelContent(PromotionLevel sourcePromotionLevel, PromotionLevel targetPromotionLevel) {
                         // Copy of the image
                         Document image = structureService.getPromotionLevelImage(sourcePromotionLevel.getId());
-                        if (image != null) {
+                        if (Document.isValid(image)) {
                             structureService.setPromotionLevelImage(targetPromotionLevel.getId(), image);
                         }
                         // Copy of properties
@@ -313,7 +313,7 @@ public class CopyServiceImpl implements CopyService {
                     private void copyValidationStampContent(ValidationStamp sourceValidationStamp, ValidationStamp targetValidationStamp) {
                         // Copy of the image
                         Document image = structureService.getValidationStampImage(sourceValidationStamp.getId());
-                        if (image != null) {
+                        if (Document.isValid(image)) {
                             structureService.setValidationStampImage(targetValidationStamp.getId(), image);
                         }
                         // Copy of properties

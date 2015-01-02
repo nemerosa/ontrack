@@ -14,4 +14,7 @@ public class Document {
         return "".equals(type) || content == null || content.length == 0;
     }
 
+    public static boolean isValid(Document document) {
+        return document != null && !document.isEmpty();
+    }
 }

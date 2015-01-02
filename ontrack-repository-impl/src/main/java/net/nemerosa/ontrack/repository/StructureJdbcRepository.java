@@ -622,8 +622,8 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         getNamedParameterJdbcTemplate().update(
                 "UPDATE VALIDATION_STAMPS SET IMAGETYPE = :type, IMAGEBYTES = :content WHERE ID = :id",
                 params("id", validationStampId.getValue())
-                        .addValue("type", document != null ? document.getType() : null)
-                        .addValue("content", document != null ? document.getContent() : null)
+                        .addValue("type", Document.isValid(document) ? document.getType() : null)
+                        .addValue("content", Document.isValid(document) ? document.getContent() : null)
         );
     }
 

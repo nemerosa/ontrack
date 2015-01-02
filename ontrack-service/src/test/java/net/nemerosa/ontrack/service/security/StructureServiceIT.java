@@ -84,7 +84,7 @@ public class StructureServiceIT extends AbstractServiceTestSupport {
     public void promotionLevel_image_none() throws Exception {
         PromotionLevel promotionLevel = doCreatePromotionLevel();
         Document image = view(promotionLevel, () -> structureService.getPromotionLevelImage(promotionLevel.getId()));
-        assertNull("No image", image);
+        assertTrue("No image", image.isEmpty());
     }
 
     @Test
@@ -122,7 +122,7 @@ public class StructureServiceIT extends AbstractServiceTestSupport {
     }
 
     @Test
-    public void promotionLevel_image_null() throws Exception {
+    public void promotionLevel_image_empty() throws Exception {
         PromotionLevel promotionLevel = doCreatePromotionLevel();
         // Gets an image
         Document image = new Document("image/png", TestUtils.resourceBytes("/promotionLevelImage1.png"));
@@ -137,7 +137,7 @@ public class StructureServiceIT extends AbstractServiceTestSupport {
         // Gets the image
         Document d = view(promotionLevel, () -> structureService.getPromotionLevelImage(promotionLevel.getId()));
         // Checks
-        assertNull(d);
+        assertTrue("Empty image", d.isEmpty());
     }
 
     @Test(expected = AccessDeniedException.class)
