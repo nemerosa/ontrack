@@ -29,23 +29,6 @@ angular.module('ontrack.extension.scm', [
             }
         };
     })
-/**
- * Truncates the start of a path
- */
-    .filter('otExtensionScmTruncatePath', function () {
-        return function (text, length) {
-            var prefix = '...';
-            if (isNaN(length)) {
-                length = 10;
-            }
-            if (text.length <= length || text.length - prefix.length <= length) {
-                return text;
-            }
-            else {
-                return prefix + String(text).substring(text.length - prefix.length - length, text.length);
-            }
-        };
-    })
     .service('otScmChangeLogService', function ($http, $modal, $interpolate, ot) {
         var self = {};
 

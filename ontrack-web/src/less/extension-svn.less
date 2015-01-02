@@ -20,3 +20,23 @@ table.ot-extension-svn-changelog-revisions {
     display: none;
   }
 }
+
+
+/**
+ * Files
+ */
+
+.ot-extension-svn-changelog-files {
+  .ot-extension-svn-changelog-file {
+    vertical-align: middle;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    &:hover {
+      background-color: @table-bg-hover;
+    }
+    + .ot-extension-svn-changelog-file {
+      border-top: solid 1px #EEEEEE;
+    }
+  }
+}
