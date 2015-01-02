@@ -9,10 +9,7 @@ import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -104,17 +101,8 @@ public class ValidationStampController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "validationStamps/{validationStampId}/image", method = RequestMethod.GET)
-    public ResponseEntity<byte[]> getValidationStampImage_(@PathVariable ID validationStampId) {
-        // Gets the file
-        Document file = structureService.getValidationStampImage(validationStampId);
-        if (file == null) {
-            return new ResponseEntity<>(new byte[0], HttpStatus.NO_CONTENT);
-        } else {
-            HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.setContentLength(file.getContent().length);
-            responseHeaders.setContentType(MediaType.parseMediaType(file.getType()));
-            return new ResponseEntity<>(file.getContent(), responseHeaders, HttpStatus.OK);
-        }
+    public Document getValidationStampImage_(@PathVariable ID validationStampId) {
+        return structureService.getValidationStampImage(validationStampId);
     }
 
     @RequestMapping(value = "validationStamps/{validationStampId}/image", method = RequestMethod.POST)

@@ -610,11 +610,11 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
 
     @Override
     public Document getValidationStampImage(ID validationStampId) {
-        return getFirstItem(
+        return getOptional(
                 "SELECT IMAGETYPE, IMAGEBYTES FROM VALIDATION_STAMPS WHERE ID = :id",
                 params("id", validationStampId.getValue()),
                 (rs, rowNum) -> toDocument(rs)
-        );
+        ).orElse(Document.EMPTY);
     }
 
     @Override
