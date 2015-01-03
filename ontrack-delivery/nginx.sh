@@ -180,8 +180,6 @@ server {
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_redirect http:// https://;
 
-        add_header Pragma "no-cache";
-
         proxy_pass http://app_server;
 
     }
