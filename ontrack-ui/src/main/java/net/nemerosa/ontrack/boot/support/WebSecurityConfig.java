@@ -42,6 +42,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .authorizeRequests()
                 .antMatchers("/**").permitAll()
                 .anyRequest().authenticated()
+            // Cache enabled
+            .and().headers().cacheControl().disable()
         ;
         // @formatter:on
     }
