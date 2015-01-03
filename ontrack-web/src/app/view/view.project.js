@@ -53,6 +53,12 @@ angular.module('ot.view.project', [
                         }
                     },
                     {
+                        id: 'searchBuild',
+                        name: "Search builds",
+                        cls: 'ot-command-project-search-builds',
+                        link: '/build-search/' + $scope.project.id
+                    },
+                    {
                         condition: function () {
                             return $scope.project._disable;
                         },
