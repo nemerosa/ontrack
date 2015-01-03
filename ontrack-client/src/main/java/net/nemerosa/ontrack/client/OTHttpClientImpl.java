@@ -93,6 +93,21 @@ public class OTHttpClientImpl implements OTHttpClient {
         );
     }
 
+    @Override
+    public CloseableHttpClient getHttpClient() {
+        return httpClientSupplier.get();
+    }
+
+    @Override
+    public HttpHost getHttpHost() {
+        return host;
+    }
+
+    @Override
+    public HttpClientContext getHttpClientContext() {
+        return httpContext;
+    }
+
     protected <T> T request(HttpRequestBase request, ResponseHandler<T> responseHandler) {
         clientLogger.trace("[request] " + request);
         // Executes the call
