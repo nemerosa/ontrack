@@ -31,6 +31,7 @@ var ontrack = angular.module('ontrack', [
         'ot.view.promotionLevel',
         'ot.view.validationStamp',
         'ot.view.validationRun',
+        'ot.view.buildSearch',
         'ot.view.admin.accounts',
         'ot.view.admin.global-acl',
         'ot.view.admin.project-acl',
