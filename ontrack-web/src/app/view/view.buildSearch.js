@@ -25,6 +25,7 @@ angular.module('ot.view.buildSearch', [
                 view.title = "Build search";
                 // View commands
                 view.commands = [
+                    ot.viewApiCommand(projectResource._buildSearch),
                     ot.viewCloseCommand('/project/' + projectResource.id)
                 ];
             });
