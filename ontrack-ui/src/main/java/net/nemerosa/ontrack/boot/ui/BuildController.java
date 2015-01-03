@@ -31,7 +31,7 @@ public class BuildController extends AbstractResourceController {
     public Form buildSearchForm(@PathVariable ID projectId) {
         return Form.create()
                 .with(
-                        Int.of("count")
+                        Int.of("maximumCount")
                                 .label("Maximum number")
                                 .help("Maximum number of builds to return.")
                                 .min(1)

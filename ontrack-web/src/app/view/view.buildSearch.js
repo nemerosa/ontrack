@@ -1,6 +1,7 @@
 angular.module('ot.view.buildSearch', [
     'ui.router',
     'ot.service.core',
+    'ot.service.form',
     'ot.service.structure',
     'ot.service.copy'
 ])
@@ -11,7 +12,7 @@ angular.module('ot.view.buildSearch', [
             controller: 'BuildSearchCtrl'
         });
     })
-    .controller('BuildSearchCtrl', function ($scope, $stateParams, $state, $http, ot, otStructureService, otAlertService, otCopyService) {
+    .controller('BuildSearchCtrl', function ($scope, $stateParams, $state, $http, ot, otStructureService, otFormService) {
         var view = ot.view();
         // Project's id
         var projectId = $stateParams.projectId;
@@ -28,6 +29,10 @@ angular.module('ot.view.buildSearch', [
                     ot.viewApiCommand(projectResource._buildSearch),
                     ot.viewCloseCommand('/project/' + projectResource.id)
                 ];
+                return ot.pageCall($http.get(projectResource._buildSearch));
+            }).then(function (searchForm) {
+                $scope.searchForm = searchForm;
+                $scope.searchData = otFormService.prepareForDisplay(searchForm);
             });
         }
 
