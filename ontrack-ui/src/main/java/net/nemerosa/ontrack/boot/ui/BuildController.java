@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.form.Int;
+import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
@@ -23,6 +25,43 @@ public class BuildController extends AbstractResourceController {
         this.structureService = structureService;
         this.propertyService = propertyService;
         this.securityService = securityService;
+    }
+
+    @RequestMapping(value = "project/{projectId}/builds", method = RequestMethod.GET)
+    public Form buildSearchForm(@PathVariable ID projectId) {
+        return Form.create()
+                .with(
+                        Int.of("count")
+                                .label("Maximum number")
+                                .help("Maximum number of builds to return.")
+                                .min(1)
+                                .value(10)
+                )
+                .with(
+                        Text.of("branchName")
+                                .label("Branch name")
+                                .help("Regular expression for the branch name")
+                                .optional()
+                )
+                .with(
+                        Text.of("buildName")
+                                .label("Build name")
+                                .help("Regular expression for the build name")
+                                .optional()
+                )
+                .with(
+                        Text.of("promotionName")
+                                .label("Promotion name")
+                                .help("Collects only builds which are promoted to this promotion level.")
+                                .optional()
+                )
+                .with(
+                        Text.of("validationStampName")
+                                .label("Validation stamp name")
+                                .help("Collects only builds which have `passed` this validation stamp.")
+                                .optional()
+                )
+                ;
     }
 
     @RequestMapping(value = "branches/{branchId}/builds/create", method = RequestMethod.GET)

@@ -32,6 +32,8 @@ public class ProjectResourceDecorator extends AbstractResourceDecorator<Project>
                 )
                         // List of branches and their views
                 .link("_branchStatusViews", on(ProjectController.class).getBranchStatusViews(project.getId()))
+                        // Build search
+                .link("_buildSearch", on(BuildController.class).buildSearchForm(project.getId()))
                         // Actual properties for this project
                 .link("_properties", on(PropertyController.class).getProperties(ProjectEntityType.PROJECT, project.getId()))
                         // Actions
