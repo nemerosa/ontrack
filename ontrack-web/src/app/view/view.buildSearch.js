@@ -1,7 +1,6 @@
 angular.module('ot.view.buildSearch', [
     'ui.router',
     'ot.service.core',
-    'ot.service.form',
     'ot.service.structure'
 ])
     .config(function ($stateProvider) {
@@ -11,7 +10,7 @@ angular.module('ot.view.buildSearch', [
             controller: 'BuildSearchCtrl'
         });
     })
-    .controller('BuildSearchCtrl', function ($scope, $stateParams, $state, $http, ot, otStructureService, otFormService) {
+    .controller('BuildSearchCtrl', function ($location, $scope, $stateParams, $state, $http, ot, otStructureService) {
         var view = ot.view();
         // Project's id
         var projectId = $stateParams.projectId;
@@ -39,7 +38,9 @@ angular.module('ot.view.buildSearch', [
                 if (json) {
                     $scope.data = JSON.parse(json);
                 } else {
-                    $scope.data = otFormService.prepareForDisplay(searchForm);
+                    $scope.data = {
+                        maximumCount: 10
+                    };
                 }
             });
         }
@@ -73,6 +74,12 @@ angular.module('ot.view.buildSearch', [
         // Toggle advanced search
         $scope.toggleAdvancedSearch = function () {
             $scope.advancedSearch = !$scope.advancedSearch;
+        };
+
+        // Displays the permalink
+        $scope.displayPermalink = function () {
+            var jsonFilter = JSON.stringify($scope.data);
+            $location.hash(jsonFilter);
         };
 
         // Selects a build
