@@ -2,11 +2,10 @@ package net.nemerosa.ontrack.extension.svn;
 
 import net.nemerosa.ontrack.extension.api.BuildDiffExtension;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
-import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType;
 import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationPropertyType;
-import net.nemerosa.ontrack.model.support.Action;
-import net.nemerosa.ontrack.model.structure.Branch;
+import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.PropertyService;
+import net.nemerosa.ontrack.model.support.Action;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,11 +26,10 @@ public class SVNChangeLogExtension extends AbstractExtension implements BuildDif
     }
 
     /**
-     * Checks that the branch is properly configured with a SVN configuration.
+     * Checks that the project is properly configured with a SVN configuration.
      */
     @Override
-    public boolean apply(Branch branch) {
-        return !propertyService.getProperty(branch, SVNBranchConfigurationPropertyType.class).isEmpty()
-                && !propertyService.getProperty(branch.getProject(), SVNProjectConfigurationPropertyType.class).isEmpty();
+    public boolean apply(Project project) {
+        return !propertyService.getProperty(project, SVNProjectConfigurationPropertyType.class).isEmpty();
     }
 }

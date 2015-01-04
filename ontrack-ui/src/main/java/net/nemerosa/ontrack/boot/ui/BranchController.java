@@ -445,7 +445,7 @@ public class BranchController extends AbstractResourceController {
         // Gets the list of build diff actions
         List<Action> buildDiffActions = extensionManager.getExtensions(BuildDiffExtension.class)
                 .stream()
-                .filter(extension -> extension.apply(branch))
+                .filter(extension -> extension.apply(branch.getProject()))
                 .map(this::resolveExtensionAction)
                 .collect(Collectors.toList());
         // Gets the views for each build
