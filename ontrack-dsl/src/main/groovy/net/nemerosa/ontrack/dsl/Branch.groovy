@@ -10,6 +10,8 @@ interface Branch extends ProjectEntity {
 
     PromotionLevel promotionLevel(String name, String description)
 
+    PromotionLevel promotionLevel(String name, String description, Closure closure)
+
     ValidationStamp validationStamp(String name, String description)
 
     Build build(String name, String description)

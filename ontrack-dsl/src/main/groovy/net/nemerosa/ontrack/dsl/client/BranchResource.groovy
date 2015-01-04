@@ -82,6 +82,13 @@ class BranchResource extends AbstractProjectResource implements Branch {
     }
 
     @Override
+    PromotionLevel promotionLevel(String name, String description, Closure closure) {
+        def pl = promotionLevel(name, description)
+        pl(closure)
+        pl
+    }
+
+    @Override
     ValidationStamp validationStamp(String name, String description) {
         new ValidationStampResource(
                 ontrack,

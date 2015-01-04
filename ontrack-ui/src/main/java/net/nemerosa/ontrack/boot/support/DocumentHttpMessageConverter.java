@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.boot.support;
 
-import net.nemerosa.ontrack.model.structure.Document;
+import net.nemerosa.ontrack.common.Document;
 import org.apache.commons.io.IOUtils;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;

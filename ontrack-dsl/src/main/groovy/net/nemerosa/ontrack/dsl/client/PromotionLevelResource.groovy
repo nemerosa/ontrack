@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.dsl.client
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.PromotionLevel
 import net.nemerosa.ontrack.dsl.properties.ProjectEntityProperties
@@ -24,7 +25,26 @@ class PromotionLevelResource extends AbstractProjectResource implements Promotio
     }
 
     @Override
+    def call(Closure closure) {
+        closure.resolveStrategy = Closure.DELEGATE_FIRST
+        closure.delegate = this
+        closure()
+    }
+
+    @Override
     ProjectEntityProperties getProperties() {
         new PromotionLevelProperties(ontrack, this)
+    }
+
+    @Override
+    def image(Object o) {
+        // FIXME Method net.nemerosa.ontrack.dsl.PromotionLevel.image
+        return null
+    }
+
+    @Override
+    Document getImage() {
+        // FIXME Method net.nemerosa.ontrack.dsl.PromotionLevel.getImage
+        return null
     }
 }

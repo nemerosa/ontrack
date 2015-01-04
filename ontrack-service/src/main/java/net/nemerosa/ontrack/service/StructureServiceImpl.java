@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service;
 
 import net.nemerosa.ontrack.common.CachedSupplier;
+import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.extension.api.BuildValidationExtension;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;

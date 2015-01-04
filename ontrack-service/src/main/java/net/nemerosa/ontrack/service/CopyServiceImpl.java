@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.security.BranchEdit;
 import net.nemerosa.ontrack.model.security.SecurityService;

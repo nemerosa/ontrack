@@ -125,6 +125,76 @@ class ACCDSL extends AcceptanceTestClient {
         assert build.properties.label == 'RC'
     }
 
+    protected static File getImageFile() {
+        def file = File.createTempFile('image', '.png')
+        file.bytes = ACCDSL.class.getResource('/gold.png').bytes
+        file
+    }
+
+    @Test
+    void 'Promotion level image: from file'() {
+        def project = uid('P')
+        ontrack.project(project) {
+            branch('1.0') {
+                promotionLevel('COPPER', 'Copper promotion') {
+                    image imageFile
+                }
+            }
+        }
+        // Downloading the image
+        def image = ontrack.promotionLevel(project, '1.0', 'COPPER').image
+        assert image.type == 'image/png'
+        assert image.content == imageFile.bytes
+    }
+
+    @Test
+    void 'Promotion level image: from path'() {
+        def project = uid('P')
+        ontrack.project(project) {
+            branch('1.0') {
+                promotionLevel('COPPER', 'Copper promotion') {
+                    image imageFile.absolutePath
+                }
+            }
+        }
+        // Downloading the image
+        def image = ontrack.promotionLevel(project, '1.0', 'COPPER').image
+        assert image.type == 'image/png'
+        assert image.content == imageFile.bytes
+    }
+
+    @Test
+    void 'Promotion level image: from URL'() {
+        def project = uid('P')
+        ontrack.project(project) {
+            branch('1.0') {
+                promotionLevel('COPPER', 'Copper promotion') {
+                    image ACCDSL.class.getResource('/gold.png')
+                }
+            }
+        }
+        // Downloading the image
+        def image = ontrack.promotionLevel(project, '1.0', 'COPPER').image
+        assert image.type == 'image/png'
+        assert image.content == imageFile.bytes
+    }
+
+    @Test
+    void 'Promotion level image: from URL path'() {
+        def project = uid('P')
+        ontrack.project(project) {
+            branch('1.0') {
+                promotionLevel('COPPER', 'Copper promotion') {
+                    image ACCDSL.class.getResource('/gold.png').toString()
+                }
+            }
+        }
+        // Downloading the image
+        def image = ontrack.promotionLevel(project, '1.0', 'COPPER').image
+        assert image.type == 'image/png'
+        assert image.content == imageFile.bytes
+    }
+
     @Test
     void 'Definition of a template with parameters'() {
         // GitHub configuration

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.model.structure;
 
+import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.SecurityService;
