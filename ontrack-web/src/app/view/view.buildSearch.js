@@ -64,9 +64,15 @@ angular.module('ot.view.buildSearch', [
         $scope.selectBuild = function (buildView) {
             if ($scope.selectedBuilds.indexOf(buildView) < 0) {
                 $scope.selectedBuilds.push(buildView);
+                // Auto selection
                 if ($scope.selectedBuilds.length == 2) {
                     $scope.selectedBuild.from = $scope.selectedBuilds[0].build.id;
                     $scope.selectedBuild.to = $scope.selectedBuilds[1].build.id;
+                }
+                // Removes from the list of results
+                var pos = $scope.buildViews.indexOf(buildView);
+                if (pos >= 0) {
+                    $scope.buildViews.splice(pos, 1);
                 }
             }
         };
