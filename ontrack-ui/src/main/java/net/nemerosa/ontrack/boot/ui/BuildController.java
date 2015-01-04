@@ -81,6 +81,7 @@ public class BuildController extends AbstractResourceController {
                         .map(structureService::getBuildView)
                         .collect(Collectors.toList()),
                 uri(on(getClass()).buildSearch(projectId, form)))
+                .forView(BuildView.class)
                 ;
     }
 

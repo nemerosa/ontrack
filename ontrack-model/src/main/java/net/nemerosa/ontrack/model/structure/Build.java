@@ -12,7 +12,7 @@ public class Build implements ProjectEntity {
     private final String name;
     private final String description;
     private final Signature signature;
-    @JsonView({Build.class, PromotionRun.class, ValidationRun.class, BuildDiff.class})
+    @JsonView({Build.class, BuildView.class, PromotionRun.class, ValidationRun.class, BuildDiff.class})
     private final Branch branch;
 
     public static Build of(Branch branch, NameDescription nameDescription, Signature signature) {
