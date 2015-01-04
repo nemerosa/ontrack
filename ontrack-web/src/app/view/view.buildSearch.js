@@ -10,7 +10,7 @@ angular.module('ot.view.buildSearch', [
             controller: 'BuildSearchCtrl'
         });
     })
-    .controller('BuildSearchCtrl', function ($location, $scope, $stateParams, $state, $http, ot, otStructureService) {
+    .controller('BuildSearchCtrl', function ($location, $scope, $stateParams, $state, $http, ot, otStructureService, otNotificationService) {
         var view = ot.view();
         // Project's id
         var projectId = $stateParams.projectId;
@@ -33,14 +33,26 @@ angular.module('ot.view.buildSearch', [
                 return ot.pageCall($http.get($scope.project._buildSearch));
             }).then(function (searchForm) {
                 $scope.searchForm = searchForm;
-                // Locally saved criteria
-                var json = localStorage.getItem('build_search_' + projectId);
-                if (json) {
-                    $scope.data = JSON.parse(json);
-                } else {
-                    $scope.data = {
-                        maximumCount: 10
-                    };
+                $scope.data = {
+                    maximumCount: 10
+                };
+                try {
+                    // Permalink
+                    var jsonLink = $location.hash();
+                    if (jsonLink) {
+                        // Parsing the JSON
+                        $scope.data = JSON.parse(jsonLink);
+                        // Removes the hash after use
+                        $location.hash('');
+                    } else {
+                        // Locally saved criteria
+                        var json = localStorage.getItem('build_search_' + projectId);
+                        if (json) {
+                            $scope.data = JSON.parse(json);
+                        }
+                    }
+                } catch (e) {
+                    otNotificationService.error("Cannot get the filter from the permalink.");
                 }
             });
         }
