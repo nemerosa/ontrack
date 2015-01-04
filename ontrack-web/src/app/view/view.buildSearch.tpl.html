@@ -38,8 +38,8 @@
                             <ot-build-promotion-runs promotion-runs="buildView.promotionRuns"></ot-build-promotion-runs>
                         </td>
                         <td>
-                            <span ng-repeat="validationStampRunView in buildView.validationStampRunViews">
-                                <ot-validation-stamp-run-view validation-stamp-run-view="validationStampRunView"></ot-validation-stamp-run-view>
+                            <span ng-repeat="validationStampRunView in buildView.validationStampRunViews" ng-if="validationStampRunView.passed">
+                                <ot-entity-image entity="validationStampRunView.validationStamp"></ot-entity-image>
                             </span>
                         </td>
                     </tr>
