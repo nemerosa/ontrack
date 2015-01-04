@@ -42,7 +42,9 @@ angular.module('ot.view.buildSearch', [
         // Search
         $scope.submitSearch = function () {
             var data = otFormService.prepareForSubmit($scope.searchForm, $scope.searchData);
-            ot.pageCall($http.get($scope.searchForm._search, {params: data}));
+            ot.pageCall($http.get($scope.searchForm._search, {params: data})).then(function (result) {
+                $scope.buildViews = result.resources;
+            });
         };
 
     })

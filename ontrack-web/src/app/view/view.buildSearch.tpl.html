@@ -17,6 +17,36 @@
                 </div>
             </form>
         </div>
+        <div class="col-md-9">
+            <div class="row" ng-show="buildViews">
+                <table class="table table-hover table-condensed">
+                    <thead>
+                    <tr>
+                        <th>Build</th>
+                        <th>Promotions</th>
+                        <th>Validations</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="buildView in buildViews" class="ot-build-search-build">
+                        <td>
+                            <a href="#/branch/{{buildView.build.branch.id}}">{{buildView.build.branch.name}}</a>
+                            /
+                            <a href="#/build/{{buildView.build.id}}">{{buildView.build.name}}</a>
+                        </td>
+                        <td>
+                            <ot-build-promotion-runs promotion-runs="buildView.promotionRuns"></ot-build-promotion-runs>
+                        </td>
+                        <td>
+                            <span ng-repeat="validationStampRunView in buildView.validationStampRunViews">
+                                <ot-validation-stamp-run-view validation-stamp-run-view="validationStampRunView"></ot-validation-stamp-run-view>
+                            </span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
 </ot-view>
