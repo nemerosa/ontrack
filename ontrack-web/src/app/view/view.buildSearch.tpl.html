@@ -56,6 +56,31 @@
                 </td>
             </tr>
             </tbody>
+            <!-- Selected builds -->
+            <tbody>
+            <tr ng-repeat="buildView in selectedBuilds" class="ot-build-search-build ot-build-search-build-selected">
+                <td>
+                    <a href="#/branch/{{buildView.build.branch.id}}">{{buildView.build.branch.name}}</a>
+                </td>
+                <td>
+                    <a href="#/build/{{buildView.build.id}}">{{buildView.build.name}}</a>
+                </td>
+                <td>
+                    <ot-build-promotion-runs promotion-runs="buildView.promotionRuns"></ot-build-promotion-runs>
+                </td>
+                <td>
+                <span ng-repeat="validationStampRunView in buildView.validationStampRunViews"
+                      ng-if="validationStampRunView.passed">
+                    <ot-entity-image entity="validationStampRunView.validationStamp"></ot-entity-image>
+                </span>
+                </td>
+                <td>
+                    <span class="fa fa-minus ot-command"
+                          ng-click="unselectBuild(buildView)"
+                          title="Unselect this build."></span>
+                </td>
+            </tr>
+            </tbody>
             <!-- Results -->
             <tbody ng-show="buildViews">
             <tr ng-repeat="buildView in buildViews" class="ot-build-search-build">
@@ -75,7 +100,9 @@
                 </span>
                 </td>
                 <td>
-                    &nbsp;
+                    <span class="fa fa-plus ot-command"
+                          ng-click="selectBuild(buildView)"
+                          title="Select this build."></span>
                 </td>
             </tr>
             </tbody>

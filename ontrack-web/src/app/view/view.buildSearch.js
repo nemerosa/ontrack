@@ -38,6 +38,9 @@ angular.module('ot.view.buildSearch', [
         // Initialization
         loadProject();
 
+        // Selected builds
+        $scope.selectedBuilds = [];
+
         // Search
         $scope.submitSearch = function () {
             ot.pageCall($http.get($scope.searchForm._search, {params: $scope.data})).then(function (result) {
@@ -48,6 +51,21 @@ angular.module('ot.view.buildSearch', [
         // Toggle advanced search
         $scope.toggleAdvancedSearch = function () {
             $scope.advancedSearch = !$scope.advancedSearch;
+        };
+
+        // Selects a build
+        $scope.selectBuild = function (buildView) {
+            if ($scope.selectedBuilds.indexOf(buildView) < 0) {
+                $scope.selectedBuilds.push(buildView);
+            }
+        };
+
+        // Unselects a build
+        $scope.unselectBuild = function (buildView) {
+            var pos = $scope.selectedBuilds.indexOf(buildView);
+            if (pos >= 0) {
+                $scope.selectedBuilds.splice(pos, 1);
+            }
         };
 
     })
