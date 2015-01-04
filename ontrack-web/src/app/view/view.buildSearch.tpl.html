@@ -1,52 +1,71 @@
 <ot-view>
 
-    <div class="row ot-build-search-form">
-        <div class="col-md-3">
-            <form name="buildSearchForm" ng-submit="submitSearch()">
-                <div
-                        ng-repeat="field in searchForm.fields"
-                        class="form-group">
-                    <label>{{field.label}}</label>
-                    <ot-field data="searchData" field="field" form-root="buildSearchForm"></ot-field>
-                </div>
-                <div>
-                    <button type="submit" class="btn btn-primary">
+    <form ng-submit="submitSearch()">
+        <table class="table table-hover table-condensed">
+            <thead>
+            <tr>
+                <th>Branch</th>
+                <th>Build</th>
+                <th>Promotions</th>
+                <th>Validations</th>
+                <th>&nbsp;</th>
+            </tr>
+            </thead>
+            <!-- Form -->
+            <tbody>
+            <tr>
+                <td>
+                    <input name="branchName" ng-model="data.branchName" class="form-control input-sm" type="text"
+                           placeholder="Branch name"/>
+                </td>
+                <td>
+                    <input name="buildName" ng-model="data.buildName" class="form-control input-sm" type="text"
+                           placeholder="Build name"/>
+                </td>
+                <td>
+                    <input name="promotionName" ng-model="data.promotionName" class="form-control input-sm" type="text"
+                           placeholder="Promotion name"/>
+                </td>
+                <td>
+                    <input name="validationStampName" ng-model="data.validationStampName" class="form-control input-sm"
+                           type="text"
+                           placeholder="Validation stamp name"/>
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-primary" type="submit">
                         <span class="fa fa-search"></span>
                         Search
                     </button>
-                </div>
-            </form>
-        </div>
-        <div class="col-md-9">
-            <div class="row" ng-show="buildViews">
-                <table class="table table-hover table-condensed">
-                    <thead>
-                    <tr>
-                        <th>Build</th>
-                        <th>Promotions</th>
-                        <th>Validations</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr ng-repeat="buildView in buildViews" class="ot-build-search-build">
-                        <td>
-                            <a href="#/branch/{{buildView.build.branch.id}}">{{buildView.build.branch.name}}</a>
-                            /
-                            <a href="#/build/{{buildView.build.id}}">{{buildView.build.name}}</a>
-                        </td>
-                        <td>
-                            <ot-build-promotion-runs promotion-runs="buildView.promotionRuns"></ot-build-promotion-runs>
-                        </td>
-                        <td>
-                            <span ng-repeat="validationStampRunView in buildView.validationStampRunViews" ng-if="validationStampRunView.passed">
-                                <ot-entity-image entity="validationStampRunView.validationStamp"></ot-entity-image>
-                            </span>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+                    <button class="btn btn-sm btn-link" type="button">
+                        Advanced
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+            <!-- Results -->
+            <tbody ng-show="buildViews">
+            <tr ng-repeat="buildView in buildViews" class="ot-build-search-build">
+                <td>
+                    <a href="#/branch/{{buildView.build.branch.id}}">{{buildView.build.branch.name}}</a>
+                </td>
+                <td>
+                    <a href="#/build/{{buildView.build.id}}">{{buildView.build.name}}</a>
+                </td>
+                <td>
+                    <ot-build-promotion-runs promotion-runs="buildView.promotionRuns"></ot-build-promotion-runs>
+                </td>
+                <td>
+                <span ng-repeat="validationStampRunView in buildView.validationStampRunViews"
+                      ng-if="validationStampRunView.passed">
+                    <ot-entity-image entity="validationStampRunView.validationStamp"></ot-entity-image>
+                </span>
+                </td>
+                <td>
+                    &nbsp;
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </form>
 
 </ot-view>
