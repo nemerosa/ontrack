@@ -40,6 +40,10 @@ angular.module('ot.view.buildSearch', [
 
         // Selected builds
         $scope.selectedBuilds = [];
+        $scope.selectedBuild = {
+            from: '',
+            to: ''
+        };
 
         // Search
         $scope.submitSearch = function () {

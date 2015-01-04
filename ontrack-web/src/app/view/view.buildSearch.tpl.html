@@ -36,6 +36,9 @@
                         <span class="fa fa-search"></span>
                         Search
                     </button>
+                    <button class="btn btn-sm btn-info" ng-disabled="!selectedBuild.from || !selectedBuild.to">
+                        Compare
+                    </button>
                     <button class="btn btn-sm btn-link" type="button"
                             ng-class="{'text-muted': advancedSearch}"
                             ng-click="toggleAdvancedSearch()">
@@ -78,6 +81,10 @@
                     <span class="fa fa-minus ot-command"
                           ng-click="unselectBuild(buildView)"
                           title="Unselect this build."></span>
+                    <input type="radio" id="build-from-{{buildView.build.id}}-selected" name="selectedBuildFrom"
+                           ng-model="selectedBuild.from" ng-value="buildView.build.id"/>
+                    <input type="radio" id="build-to-{{buildView.build.id}}-selected" name="selectedBuildTo"
+                           ng-model="selectedBuild.to" ng-value="buildView.build.id"/>
                 </td>
             </tr>
             </tbody>
