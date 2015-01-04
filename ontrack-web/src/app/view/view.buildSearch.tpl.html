@@ -36,9 +36,23 @@
                         <span class="fa fa-search"></span>
                         Search
                     </button>
-                    <button class="btn btn-sm btn-link" type="button">
+                    <button class="btn btn-sm btn-link" type="button"
+                            ng-class="{'text-muted': advancedSearch}"
+                            ng-click="toggleAdvancedSearch()">
                         Advanced
                     </button>
+                </td>
+            </tr>
+            <tr ng-show="advancedSearch">
+                <td colspan="1">
+                    Max. count
+                    <input name="maximumCount" ng-model="data.maximumCount"
+                           class="form-control input-sm"
+                           type="number" min="1"
+                           placeholder="Maximum count"/>
+                </td>
+                <td colspan="4">
+                    &nbsp;
                 </td>
             </tr>
             </tbody>

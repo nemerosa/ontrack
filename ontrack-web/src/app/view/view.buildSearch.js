@@ -45,5 +45,10 @@ angular.module('ot.view.buildSearch', [
             });
         };
 
+        // Toggle advanced search
+        $scope.toggleAdvancedSearch = function () {
+            $scope.advancedSearch = !$scope.advancedSearch;
+        };
+
     })
 ;
