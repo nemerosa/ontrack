@@ -58,6 +58,12 @@ public interface StructureRepository {
      */
     void builds(Branch branch, Predicate<Build> buildPredicate);
 
+    /**
+     * Iterates over the builds of the project, from the newest to the oldest, until
+     * the <code>buildPredicate</code> returns <code>false</code>.
+     */
+    void builds(Project project, Predicate<Build> buildPredicate);
+
     Build getLastBuildForBranch(Branch branch);
 
     Ack deleteBuild(ID buildId);

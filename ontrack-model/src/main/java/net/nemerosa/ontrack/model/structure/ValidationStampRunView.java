@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.model.structure;
 
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -43,6 +44,18 @@ public class ValidationStampRunView implements View {
         } else {
             return run.getLastStatus();
         }
+    }
+
+    /**
+     * Checks if the validation run view has the given validation stamp with the given status.
+     */
+    public boolean hasValidationStamp(String name, String status) {
+        return (StringUtils.equals(name, getValidationStamp().getName()))
+                && isRun()
+                && (
+                StringUtils.isBlank(status)
+                        || StringUtils.equals(status, getLastStatus().getStatusID().getId())
+        );
     }
 
 }

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service;
 
 import net.nemerosa.ontrack.common.CachedSupplier;
+import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.extension.api.BuildValidationExtension;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.Ack;
@@ -15,7 +16,6 @@ import net.nemerosa.ontrack.model.exceptions.ImageTypeNotAcceptedException;
 import net.nemerosa.ontrack.model.exceptions.ReorderingSizeException;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.repository.StructureRepository;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +28,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static net.nemerosa.ontrack.model.structure.Entity.isEntityDefined;
@@ -291,6 +294,53 @@ public class StructureServiceImpl implements StructureService {
         // Collects the builds associated with this predicate
         List<Build> builds = new ArrayList<>();
         structureRepository.builds(branch, build -> filterBuild(builds, branch, build, buildFilter));
+        return builds;
+    }
+
+    @Override
+    public List<Build> buildSearch(ID projectId, BuildSearchForm form) {
+        // Gets the project
+        Project project = getProject(projectId);
+        // Collects the builds for this project
+        final List<Build> builds = new ArrayList<>();
+        // Filter for the builds
+        Predicate<Build> buildPredicate = build -> {
+            // Build view
+            Supplier<BuildView> buildViewSupplier = CachedSupplier.of(() -> getBuildView(build));
+            // Branch name
+            boolean accept;
+            accept = !StringUtils.isNotBlank(form.getBranchName())
+                    || Pattern.matches(form.getBranchName(), build.getBranch().getName());
+            // Build name
+            if (accept && StringUtils.isNotBlank(form.getBuildName())) {
+                accept = Pattern.matches(form.getBuildName(), build.getName());
+            }
+            // Promotion name
+            if (accept && StringUtils.isNotBlank(form.getPromotionName())) {
+                BuildView buildView = buildViewSupplier.get();
+                accept = buildView.getPromotionRuns().stream()
+                        .filter(run -> form.getPromotionName().equals(run.getPromotionLevel().getName()))
+                        .findAny()
+                        .isPresent();
+            }
+            // Validation stamp name
+            if (accept && StringUtils.isNotBlank(form.getValidationStampName())) {
+                BuildView buildView = buildViewSupplier.get();
+                accept = buildView.getValidationStampRunViews().stream()
+                        .filter(validationStampRunView -> validationStampRunView.hasValidationStamp(form.getValidationStampName(), ValidationRunStatusID.PASSED))
+                        .findAny()
+                        .isPresent();
+            }
+            // Accepting the build into the list?
+            if (accept) {
+                builds.add(build);
+            }
+            // Maximum count reached?
+            return builds.size() < form.getMaximumCount();
+        };
+        // Query
+        structureRepository.builds(project, buildPredicate);
+        // OK
         return builds;
     }
 

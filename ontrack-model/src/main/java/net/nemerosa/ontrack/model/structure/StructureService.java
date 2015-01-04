@@ -70,6 +70,8 @@ public interface StructureService {
      */
     List<Build> getFilteredBuilds(ID branchId, BuildFilter buildFilter);
 
+    List<Build> buildSearch(ID projectId, BuildSearchForm form);
+
     List<ValidationStampRunView> getValidationStampRunViewsForBuild(Build build);
 
     // Promotion levels

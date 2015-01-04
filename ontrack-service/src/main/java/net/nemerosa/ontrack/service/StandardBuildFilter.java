@@ -111,12 +111,7 @@ public class StandardBuildFilter implements BuildFilter {
     }
 
     private boolean hasValidationStamp(ValidationStampRunView validationStampRunView, String name, String status) {
-        return (StringUtils.equals(name, validationStampRunView.getValidationStamp().getName()))
-                && validationStampRunView.isRun()
-                && (
-                StringUtils.isBlank(status)
-                        || StringUtils.equals(status, validationStampRunView.getLastStatus().getStatusID().getId())
-        );
+        return validationStampRunView.hasValidationStamp(name, status);
     }
 
 }

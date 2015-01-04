@@ -2,7 +2,7 @@
 
     <div class="row ot-build-search-form">
         <div class="col-md-3">
-            <form name="buildSearchForm">
+            <form name="buildSearchForm" ng-submit="submitSearch()">
                 <div
                         ng-repeat="field in searchForm.fields"
                         class="form-group">

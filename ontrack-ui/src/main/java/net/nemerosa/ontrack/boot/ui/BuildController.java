@@ -7,10 +7,15 @@ import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
+import net.nemerosa.ontrack.ui.resource.Resource;
+import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.stream.Collectors;
+
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
 @RequestMapping("/structure")
@@ -28,39 +33,54 @@ public class BuildController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "project/{projectId}/builds", method = RequestMethod.GET)
-    public Form buildSearchForm(@PathVariable ID projectId) {
-        return Form.create()
-                .with(
-                        Int.of("maximumCount")
-                                .label("Maximum number")
-                                .help("Maximum number of builds to return.")
-                                .min(1)
-                                .value(10)
-                )
-                .with(
-                        Text.of("branchName")
-                                .label("Branch name")
-                                .help("Regular expression for the branch name")
-                                .optional()
-                )
-                .with(
-                        Text.of("buildName")
-                                .label("Build name")
-                                .help("Regular expression for the build name")
-                                .optional()
-                )
-                .with(
-                        Text.of("promotionName")
-                                .label("Promotion name")
-                                .help("Collects only builds which are promoted to this promotion level.")
-                                .optional()
-                )
-                .with(
-                        Text.of("validationStampName")
-                                .label("Validation stamp name")
-                                .help("Collects only builds which have `passed` this validation stamp.")
-                                .optional()
-                )
+    public Resource<Form> buildSearchForm(@PathVariable ID projectId) {
+        return Resource.of(
+                Form.create()
+                        .with(
+                                Int.of("maximumCount")
+                                        .label("Maximum number")
+                                        .help("Maximum number of builds to return.")
+                                        .min(1)
+                                        .value(10)
+                        )
+                        .with(
+                                Text.of("branchName")
+                                        .label("Branch name")
+                                        .help("Regular expression for the branch name")
+                                        .optional()
+                        )
+                        .with(
+                                Text.of("buildName")
+                                        .label("Build name")
+                                        .help("Regular expression for the build name")
+                                        .optional()
+                        )
+                        .with(
+                                Text.of("promotionName")
+                                        .label("Promotion name")
+                                        .help("Collects only builds which are promoted to this promotion level.")
+                                        .optional()
+                        )
+                        .with(
+                                Text.of("validationStampName")
+                                        .label("Validation stamp name")
+                                        .help("Collects only builds which have `passed` this validation stamp.")
+                                        .optional()
+                        ),
+                uri(on(getClass()).buildSearchForm(projectId))
+        ).with("_search", uri(on(getClass()).buildSearch(projectId, null)));
+    }
+
+    /**
+     * Build search
+     */
+    @RequestMapping(value = "project/{projectId}/builds/search", method = RequestMethod.GET)
+    public Resources<BuildView> buildSearch(@PathVariable ID projectId, @Valid BuildSearchForm form) {
+        return Resources.of(
+                structureService.buildSearch(projectId, form).stream()
+                        .map(structureService::getBuildView)
+                        .collect(Collectors.toList()),
+                uri(on(getClass()).buildSearch(projectId, form)))
                 ;
     }
 
