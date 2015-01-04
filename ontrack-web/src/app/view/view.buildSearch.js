@@ -61,6 +61,10 @@ angular.module('ot.view.buildSearch', [
         $scope.selectBuild = function (buildView) {
             if ($scope.selectedBuilds.indexOf(buildView) < 0) {
                 $scope.selectedBuilds.push(buildView);
+                if ($scope.selectedBuilds.length == 2) {
+                    $scope.selectedBuild.from = $scope.selectedBuilds[0].build.id;
+                    $scope.selectedBuild.to = $scope.selectedBuilds[1].build.id;
+                }
             }
         };
 
@@ -69,6 +73,10 @@ angular.module('ot.view.buildSearch', [
             var pos = $scope.selectedBuilds.indexOf(buildView);
             if (pos >= 0) {
                 $scope.selectedBuilds.splice(pos, 1);
+                if ($scope.selectedBuilds.length == 1) {
+                    $scope.selectedBuild.from = '';
+                    $scope.selectedBuild.to = '';
+                }
             }
         };
 
