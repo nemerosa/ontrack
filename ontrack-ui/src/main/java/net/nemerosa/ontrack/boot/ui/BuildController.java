@@ -1,11 +1,14 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import net.nemerosa.ontrack.extension.api.BuildDiffExtension;
+import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Int;
 import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.model.support.Action;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
@@ -24,12 +27,14 @@ public class BuildController extends AbstractResourceController {
     private final StructureService structureService;
     private final PropertyService propertyService;
     private final SecurityService securityService;
+    private final ExtensionManager extensionManager;
 
     @Autowired
-    public BuildController(StructureService structureService, PropertyService propertyService, SecurityService securityService) {
+    public BuildController(StructureService structureService, PropertyService propertyService, SecurityService securityService, ExtensionManager extensionManager) {
         this.structureService = structureService;
         this.propertyService = propertyService;
         this.securityService = securityService;
+        this.extensionManager = extensionManager;
     }
 
     @RequestMapping(value = "project/{projectId}/builds", method = RequestMethod.GET)
@@ -83,6 +88,21 @@ public class BuildController extends AbstractResourceController {
                 uri(on(getClass()).buildSearch(projectId, form)))
                 .forView(BuildView.class)
                 ;
+    }
+
+    /**
+     * List of diff actions
+     */
+    @RequestMapping(value = "project/{projectId}/builds/diff", method = RequestMethod.GET)
+    public Resources<Action> buildDiffActions(@PathVariable ID projectId) {
+        return Resources.of(
+                extensionManager.getExtensions(BuildDiffExtension.class)
+                        .stream()
+                        .filter(extension -> extension.apply(structureService.getProject(projectId)))
+                        .map(this::resolveExtensionAction)
+                        .collect(Collectors.toList()),
+                uri(on(getClass()).buildDiffActions(projectId))
+        );
     }
 
     @RequestMapping(value = "branches/{branchId}/builds/create", method = RequestMethod.GET)
