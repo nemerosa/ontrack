@@ -32,13 +32,17 @@
                            placeholder="Validation stamp name"/>
                 </td>
                 <td>
-                    <button class="btn btn-sm btn-primary" type="submit">
+                    <button class="btn btn-sm btn-primary" type="submit" ng-hide="searching">
                         <span class="fa fa-search"></span>
                         Search
                     </button>
+                    <button class="btn btn-sm btn-primary" type="submit" ng-show="searching" disabled="disabled">
+                        <span class="fa fa-spinner fa-spin"></span>
+                        Searching
+                    </button>
                     <button class="btn btn-sm btn-info"
                             ng-repeat="buildDiffAction in buildDiffActions"
-                            ng-click="buildDiff(buildDiffAction)"
+                            ng-click="buildDiff(buildDiffAction"
                             ng-disabled="!selectedBuild.from || !selectedBuild.to">
                         {{buildDiffAction.name}}
                     </button>

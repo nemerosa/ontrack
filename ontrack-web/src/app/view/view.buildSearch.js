@@ -55,7 +55,9 @@ angular.module('ot.view.buildSearch', [
         };
 
         // Search
+        $scope.searching = false;
         $scope.submitSearch = function () {
+            $scope.searching = true;
             ot.pageCall($http.get($scope.searchForm._search, {params: $scope.data})).then(function (result) {
                 $scope.buildViews = result.resources;
                 // Stores
@@ -63,6 +65,8 @@ angular.module('ot.view.buildSearch', [
                     'build_search_' + projectId,
                     JSON.stringify($scope.data)
                 );
+            }).finally(function () {
+                $scope.searching = false;
             });
         };
 
