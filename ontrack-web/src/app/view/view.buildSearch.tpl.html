@@ -59,10 +59,10 @@
             <!-- Selected builds -->
             <tbody>
             <tr ng-repeat="buildView in selectedBuilds" class="ot-build-search-build ot-build-search-build-selected">
-                <td>
+                <td class="ot-build-search-build-name">
                     <a href="#/branch/{{buildView.build.branch.id}}">{{buildView.build.branch.name}}</a>
                 </td>
-                <td>
+                <td class="ot-build-search-build-name">
                     <a href="#/build/{{buildView.build.id}}">{{buildView.build.name}}</a>
                 </td>
                 <td>
