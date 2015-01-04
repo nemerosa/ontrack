@@ -34,7 +34,13 @@ angular.module('ot.view.buildSearch', [
                 return ot.pageCall($http.get($scope.project._buildSearch));
             }).then(function (searchForm) {
                 $scope.searchForm = searchForm;
-                $scope.data = otFormService.prepareForDisplay(searchForm);
+                // Locally saved criteria
+                var json = localStorage.getItem('build_search_' + projectId);
+                if (json) {
+                    $scope.data = JSON.parse(json);
+                } else {
+                    $scope.data = otFormService.prepareForDisplay(searchForm);
+                }
             });
         }
 
