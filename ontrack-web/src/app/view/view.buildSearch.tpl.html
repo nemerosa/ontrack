@@ -36,8 +36,11 @@
                         <span class="fa fa-search"></span>
                         Search
                     </button>
-                    <button class="btn btn-sm btn-info" ng-disabled="!selectedBuild.from || !selectedBuild.to">
-                        Compare
+                    <button class="btn btn-sm btn-info"
+                            ng-repeat="buildDiffAction in buildDiffActions"
+                            ng-click="buildDiff(buildDiffAction)"
+                            ng-disabled="!selectedBuild.from || !selectedBuild.to">
+                        {{buildDiffAction.name}}
                     </button>
                     <button class="btn btn-sm btn-link" type="button"
                             ng-class="{'text-muted': advancedSearch}"

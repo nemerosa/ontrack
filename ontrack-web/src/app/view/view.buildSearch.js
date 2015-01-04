@@ -11,7 +11,7 @@ angular.module('ot.view.buildSearch', [
             controller: 'BuildSearchCtrl'
         });
     })
-    .controller('BuildSearchCtrl', function ($scope, $stateParams, $http, ot, otStructureService, otFormService) {
+    .controller('BuildSearchCtrl', function ($scope, $stateParams, $state, $http, ot, otStructureService, otFormService) {
         var view = ot.view();
         // Project's id
         var projectId = $stateParams.projectId;
@@ -28,7 +28,10 @@ angular.module('ot.view.buildSearch', [
                     ot.viewApiCommand(projectResource._buildSearch),
                     ot.viewCloseCommand('/project/' + projectResource.id)
                 ];
-                return ot.pageCall($http.get(projectResource._buildSearch));
+                return ot.pageCall($http.get(projectResource._buildDiffActions));
+            }).then(function (diffActionResources) {
+                $scope.buildDiffActions = diffActionResources.resources;
+                return ot.pageCall($http.get($scope.project._buildSearch));
             }).then(function (searchForm) {
                 $scope.searchForm = searchForm;
                 $scope.data = otFormService.prepareForDisplay(searchForm);
@@ -77,6 +80,16 @@ angular.module('ot.view.buildSearch', [
                     $scope.selectedBuild.from = '';
                     $scope.selectedBuild.to = '';
                 }
+            }
+        };
+
+        // Change log between two builds
+        $scope.buildDiff = function (buildDiffAction) {
+            if ($scope.selectedBuild.from && $scope.selectedBuild.from && $scope.selectedBuild.from != $scope.selectedBuild.to) {
+                $state.go(buildDiffAction.id, {
+                    from: $scope.selectedBuild.from,
+                    to: $scope.selectedBuild.to
+                });
             }
         };
 
