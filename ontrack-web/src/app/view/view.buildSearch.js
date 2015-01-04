@@ -52,6 +52,11 @@ angular.module('ot.view.buildSearch', [
         $scope.submitSearch = function () {
             ot.pageCall($http.get($scope.searchForm._search, {params: $scope.data})).then(function (result) {
                 $scope.buildViews = result.resources;
+                // Stores
+                localStorage.setItem(
+                    'build_search_' + projectId,
+                    JSON.stringify($scope.data)
+                );
             });
         };
 
