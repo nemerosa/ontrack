@@ -38,12 +38,16 @@ class PromotionLevelResource extends AbstractProjectResource implements Promotio
 
     @Override
     def image(Object o) {
-        ontrack.upload(link('image'), 'file', o)
+        image(o, 'image/png')
+    }
+
+    @Override
+    def image(Object o, String contentType) {
+        ontrack.upload(link('image'), 'file', o, contentType)
     }
 
     @Override
     Document getImage() {
-        // FIXME Method net.nemerosa.ontrack.dsl.PromotionLevel.getImage
-        return null
+        ontrack.download(link('image'))
     }
 }

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.dsl
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.Document
 
 interface OntrackConnector {
 
@@ -14,4 +15,5 @@ interface OntrackConnector {
 
     void upload(String url, String name, Object o, String contentType)
 
+    Document download(String url)
 }

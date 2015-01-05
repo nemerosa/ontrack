@@ -175,4 +175,9 @@ class OntrackResource implements Ontrack, OntrackConnector {
                 url
         )
     }
+
+    @Override
+    Document download(String url) {
+        jsonClient.download(url)
+    }
 }

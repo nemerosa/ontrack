@@ -23,6 +23,11 @@ public interface OTHttpClient {
 
     <T> T upload(ResponseParser<T> responseParser, String name, Document file, String fileName, String path, Object... parameters);
 
+    /**
+     * Downloads a document
+     */
+    Document download(String path, Object... parameters);
+
     <T> T request(HttpRequestBase request, final ResponseParser<T> responseParser);
 
     /**

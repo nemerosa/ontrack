@@ -14,6 +14,7 @@ interface PromotionLevel extends ProjectEntity {
      * Sets the image
      */
     def image(Object o)
+    def image(Object o, String contentType)
 
     /**
      * Gets the image

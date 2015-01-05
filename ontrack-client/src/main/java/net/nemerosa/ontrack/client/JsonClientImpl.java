@@ -72,6 +72,11 @@ public class JsonClientImpl implements JsonClient {
     }
 
     @Override
+    public Document download(String path, Object... parameters) {
+        return httpClient.download(path, parameters);
+    }
+
+    @Override
     public JsonNode toNode(Object data) {
         return objectMapper.valueToTree(data);
     }

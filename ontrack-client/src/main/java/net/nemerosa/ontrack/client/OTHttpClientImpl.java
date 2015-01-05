@@ -101,6 +101,23 @@ public class OTHttpClientImpl implements OTHttpClient {
     }
 
     @Override
+    public Document download(String path, Object... parameters) {
+        HttpGet get = new HttpGet(getUrl(path));
+        return request(get, (request, response, entity) -> {
+            // Gets the content as bytes
+            byte[] bytes = EntityUtils.toByteArray(entity);
+            if (bytes == null || bytes.length == 0) {
+                return Document.EMPTY;
+            }
+            // OK
+            return new Document(
+                    entity.getContentType().getValue(),
+                    bytes
+            );
+        });
+    }
+
+    @Override
     public <T> T request(HttpRequestBase request, final ResponseParser<T> responseParser) {
         return request(
                 request,

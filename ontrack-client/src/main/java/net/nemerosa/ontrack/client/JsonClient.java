@@ -17,4 +17,5 @@ public interface JsonClient {
 
     JsonNode upload(String name, Document o, String fileName, String path, Object... parameters);
 
+    Document download(String path, Object... parameters);
 }
