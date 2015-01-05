@@ -137,7 +137,7 @@ class ACCDSL extends AcceptanceTestClient {
         ontrack.project(project) {
             branch('1.0') {
                 promotionLevel('COPPER', 'Copper promotion') {
-                    image imageFile
+                    image getImageFile()
                 }
             }
         }
@@ -153,7 +153,7 @@ class ACCDSL extends AcceptanceTestClient {
         ontrack.project(project) {
             branch('1.0') {
                 promotionLevel('COPPER', 'Copper promotion') {
-                    image imageFile.absolutePath
+                    image getImageFile().absolutePath
                 }
             }
         }
