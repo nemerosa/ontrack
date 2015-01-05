@@ -4,5 +4,6 @@ dependencies {
     compile project(':ontrack-common')
     compile project(':ontrack-json')
     compile libraries.http_client
+    compile libraries.http_mime
     compile libraries.slf4j_api
 }

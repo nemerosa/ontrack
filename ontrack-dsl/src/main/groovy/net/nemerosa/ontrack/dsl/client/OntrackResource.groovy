@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.dsl.client
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.client.JsonClient
+import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.dsl.*
 
 /**
@@ -111,6 +112,66 @@ class OntrackResource implements Ontrack, OntrackConnector {
     JsonNode put(String url, Object data) {
         jsonClient.put(
                 jsonClient.toNode(data),
+                url
+        )
+    }
+
+    @Override
+    void upload(String url, String name, Object o) {
+        upload(url, name, o, 'application/x-octet-stream')
+    }
+
+    @Override
+    void upload(String url, String name, Object o, String contentType) {
+        Document document
+        String fileName = 'file'
+        if (o instanceof Document) {
+            document = o as Document
+        } else if (o instanceof URL) {
+            URL u = o as URL
+            fileName = u.file
+            def connection = u.openConnection()
+            document = new Document(
+                    connection.getContentType(),
+                    connection.inputStream.bytes
+            )
+        } else if (o instanceof File) {
+            File file = o as File
+            fileName = file.name
+            document = new Document(
+                    contentType,
+                    file.bytes
+            )
+        } else if (o instanceof byte[]) {
+            document = new Document(
+                    contentType,
+                    o as byte[]
+            )
+        } else if (o instanceof String) {
+            def path = o as String
+            if (path.startsWith('classpath:')) {
+                path = path - 'classpath:'
+                URL u = getClass().getResource(path)
+                upload(url, name, u, contentType)
+                return
+            } else {
+                try {
+                    URL u = new URL(path)
+                    upload(url, name, u, contentType)
+                    return
+                } catch (MalformedURLException ignored) {
+                    File file = new File(path)
+                    upload(url, name, file, contentType)
+                    return
+                }
+            }
+        } else {
+            throw new IllegalArgumentException("Unsupported document type: ${o}")
+        }
+        jsonClient.upload(
+                name,
+                document,
+                fileName,
                 url
         )
     }

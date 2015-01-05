@@ -10,4 +10,8 @@ interface OntrackConnector {
 
     JsonNode put(String url, data)
 
+    void upload(String url, String name, Object o)
+
+    void upload(String url, String name, Object o, String contentType)
+
 }

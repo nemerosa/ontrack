@@ -1,9 +1,12 @@
 package net.nemerosa.ontrack.client;
 
+import net.nemerosa.ontrack.common.Document;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.*;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 
@@ -77,6 +80,24 @@ public class OTHttpClientImpl implements OTHttpClient {
             put.setEntity(data);
         }
         return request(put, responseParser);
+    }
+
+    @Override
+    public <T> T upload(ResponseParser<T> responseParser, String name, Document document, String fileName, String path, Object... parameters) {
+        HttpPost post = new HttpPost(getUrl(path));
+        // Sets the content
+        post.setEntity(
+                MultipartEntityBuilder.create()
+                        .addBinaryBody(
+                                name,
+                                document.getContent(),
+                                ContentType.parse(document.getType()),
+                                fileName
+                        )
+                        .build()
+        );
+        // OK
+        return request(post, responseParser);
     }
 
     @Override

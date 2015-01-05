@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.client;
 
+import net.nemerosa.ontrack.common.Document;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -20,6 +21,8 @@ public interface OTHttpClient {
 
     <T> T put(ResponseParser<T> responseParser, HttpEntity data, String path, Object... parameters);
 
+    <T> T upload(ResponseParser<T> responseParser, String name, Document file, String fileName, String path, Object... parameters);
+
     <T> T request(HttpRequestBase request, final ResponseParser<T> responseParser);
 
     /**
@@ -36,5 +39,4 @@ public interface OTHttpClient {
      * HTTP call context
      */
     HttpClientContext getHttpClientContext();
-
 }
