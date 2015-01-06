@@ -1,15 +1,16 @@
+plugins {
+    id 'net.nemerosa.versioning' version '1.0.0'
+}
+
 apply plugin: 'maven'
 
 /**
  * Meta information
  */
 
-
-apply from: "$rootDir/gradle/versioning.gradle"
-
 allprojects {
     group = 'net.nemerosa.ontrack'
-    version = rootProject.versionFull
+    version = versioning.info.display
 }
 
 /**
@@ -103,7 +104,7 @@ task testReport(type: TestReport) {
 /**
  * Release task.
  */
-task release(dependsOn: ['displayVersion']) {
+task release(dependsOn: ['versionDisplay']) {
 }
 
 /**
