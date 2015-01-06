@@ -8,7 +8,7 @@ rm -rf ${WORKSPACE}/*
 
 # Extract the Docker delivery JAR
 
-unzip ${REPOSITORY}/ontrack-delivery-docker-${ONTRACK_VERSION_FULL}.jar -d ${WORKSPACE}
+unzip ${REPOSITORY}/ontrack-delivery-docker-${VERSION_FULL}.jar -d ${WORKSPACE}
 
 # Nginx preparation of files
 
@@ -19,10 +19,10 @@ unzip ${REPOSITORY}/ontrack-delivery-docker-${ONTRACK_VERSION_FULL}.jar -d ${WOR
 # export VAGRANT_LOG=debug
 
 ./vagrant-install.sh \
-    --vagrant-host="ontrack-acceptance-${ONTRACK_VERSION_FULL}" \
+    --vagrant-host="ontrack-acceptance-${VERSION_FULL}" \
     --vagrant=${WORKSPACE}/vagrant \
     --vagrant-provider=digital_ocean \
-    --image=nemerosa/ontrack:${ONTRACK_VERSION_FULL} \
+    --image=nemerosa/ontrack:${VERSION_FULL} \
     --authorized-key=/var/lib/jenkins/repository/ontrack/keys/mac.key \
     --nginx-certs=${WORKSPACE}/build/certs \
     --nginx-sites-enabled=${WORKSPACE}/build/sites-enabled \
@@ -33,7 +33,7 @@ unzip ${REPOSITORY}/ontrack-delivery-docker-${ONTRACK_VERSION_FULL}.jar -d ${WOR
 
 # Gets the IP of the droplet
 
-DROPLET_IP=`python digitalocean-ip.py --name ontrack-acceptance-${ONTRACK_VERSION_FULL} --token ${DO_TOKEN}`
+DROPLET_IP=`python digitalocean-ip.py --name ontrack-acceptance-${VERSION_FULL} --token ${DO_TOKEN}`
 
 echo "Droplet IP to test: ${DROPLET_IP}"
 
@@ -41,7 +41,7 @@ echo "Droplet IP to test: ${DROPLET_IP}"
 
 cd ${WORKSPACE}
 ${WORKSPACE}/acceptance.sh \
-    --jar=${REPOSITORY}/ontrack-acceptance-${ONTRACK_VERSION_FULL}.jar \
+    --jar=${REPOSITORY}/ontrack-acceptance-${VERSION_FULL}.jar \
     --no-ssl \
     --ontrack-url=https://${DROPLET_IP}
 

@@ -84,7 +84,7 @@ branches.each {
                 scm 'H/5 * * * *'
             }
             steps {
-                gradle 'displayVersion writeVersion test --info'
+                gradle 'versionDisplay test --info'
             }
             publishers {
                 archiveJunit("**/build/test-results/*.xml")
@@ -113,7 +113,7 @@ branches.each {
                 }
             }
             steps {
-                gradle 'clean displayVersion writeVersion test integrationTest release  --info --profile'
+                gradle 'clean versionDisplay versionFile test integrationTest release  --info --profile'
                 conditionalSteps {
                     condition {
                         status('SUCCESS', 'SUCCESS')
@@ -125,7 +125,7 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
 """
                 }
                 environmentVariables {
-                    propertiesFile 'version.properties'
+                    propertiesFile 'build/version.properties'
                 }
             }
             publishers {
@@ -145,7 +145,7 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
                 node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackBuildNotifier' {
                     'project'('ontrack')
                     'branch'(NAME)
-                    'build'('${ONTRACK_VERSION_BUILD}')
+                    'build'('${VERSION_BUILD}')
                 }
             }
         }
@@ -158,10 +158,10 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
             deliveryPipelineConfiguration('Acceptance', 'Local acceptance')
             jdk 'JDK8u20'
             parameters {
-                stringParam('ONTRACK_VERSION_FULL', '', '')
-                stringParam('ONTRACK_VERSION_COMMIT', '', '')
-                stringParam('ONTRACK_VERSION_BUILD', '', '')
-                stringParam('ONTRACK_VERSION_DISPLAY', '', '')
+                stringParam('VERSION_FULL', '', '')
+                stringParam('VERSION_COMMIT', '', '')
+                stringParam('VERSION_BUILD', '', '')
+                stringParam('VERSION_DISPLAY', '', '')
             }
             steps {
                 shell readFileFromWorkspace('ontrack-delivery/jenkins/local-acceptance.sh')
@@ -191,7 +191,7 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
                 node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
                     'project'('ontrack')
                     'branch'(NAME)
-                    'build'('${ONTRACK_VERSION_BUILD}')
+                    'build'('${VERSION_BUILD}')
                     'validationStamp'('ACCEPTANCE')
                 }
             }
@@ -205,19 +205,19 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
             deliveryPipelineConfiguration('Acceptance', 'Docker push')
             jdk 'JDK8u20'
             parameters {
-                stringParam('ONTRACK_VERSION_FULL', '', '')
-                stringParam('ONTRACK_VERSION_COMMIT', '', '')
-                stringParam('ONTRACK_VERSION_BUILD', '', '')
-                stringParam('ONTRACK_VERSION_DISPLAY', '', '')
+                stringParam('VERSION_FULL', '', '')
+                stringParam('VERSION_COMMIT', '', '')
+                stringParam('VERSION_BUILD', '', '')
+                stringParam('VERSION_DISPLAY', '', '')
             }
             wrappers {
                 injectPasswords()
             }
             steps {
                 shell """\
-docker tag ontrack:\${ONTRACK_VERSION_FULL} nemerosa/ontrack:\${ONTRACK_VERSION_FULL}
+docker tag ontrack:\${VERSION_FULL} nemerosa/ontrack:\${VERSION_FULL}
 docker login --email="damien.coraboeuf+nemerosa@gmail.com" --username="nemerosa" --password="\${DOCKER_PASSWORD}"
-docker push nemerosa/ontrack:\${ONTRACK_VERSION_FULL}
+docker push nemerosa/ontrack:\${VERSION_FULL}
 docker logout
 """
             }
@@ -232,7 +232,7 @@ docker logout
                 node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
                     'project'('ontrack')
                     'branch'(NAME)
-                    'build'('${ONTRACK_VERSION_BUILD}')
+                    'build'('${VERSION_BUILD}')
                     'validationStamp'('DOCKER')
                 }
             }
@@ -246,10 +246,10 @@ docker logout
             deliveryPipelineConfiguration('Acceptance', 'Digital Ocean')
             jdk 'JDK8u20'
             parameters {
-                stringParam('ONTRACK_VERSION_FULL', '', '')
-                stringParam('ONTRACK_VERSION_COMMIT', '', '')
-                stringParam('ONTRACK_VERSION_BUILD', '', '')
-                stringParam('ONTRACK_VERSION_DISPLAY', '', '')
+                stringParam('VERSION_FULL', '', '')
+                stringParam('VERSION_COMMIT', '', '')
+                stringParam('VERSION_BUILD', '', '')
+                stringParam('VERSION_DISPLAY', '', '')
             }
             wrappers {
                 injectPasswords()
@@ -276,7 +276,7 @@ docker logout
                 node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
                     'project'('ontrack')
                     'branch'(NAME)
-                    'build'('${ONTRACK_VERSION_BUILD}')
+                    'build'('${VERSION_BUILD}')
                     'validationStamp'('ACCEPTANCE.DO')
                 }
             }
@@ -292,10 +292,10 @@ docker logout
                 deliveryPipelineConfiguration('Release', 'Publish')
                 jdk 'JDK8u20'
                 parameters {
-                    stringParam('ONTRACK_VERSION_FULL', '', '')
-                    stringParam('ONTRACK_VERSION_COMMIT', '', '')
-                    stringParam('ONTRACK_VERSION_BUILD', '', '')
-                    stringParam('ONTRACK_VERSION_DISPLAY', '', '')
+                    stringParam('VERSION_FULL', '', '')
+                    stringParam('VERSION_COMMIT', '', '')
+                    stringParam('VERSION_BUILD', '', '')
+                    stringParam('VERSION_DISPLAY', '', '')
                 }
                 wrappers {
                     injectPasswords()
@@ -315,7 +315,7 @@ docker logout
                     node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackPromotedRunNotifier' {
                         'project'('ontrack')
                         'branch'(NAME)
-                        'build'('${ONTRACK_VERSION_BUILD}')
+                        'build'('${VERSION_BUILD}')
                         'promotionLevel'('RELEASE')
                     }
                 }
@@ -329,10 +329,10 @@ docker logout
                 deliveryPipelineConfiguration('Release', 'Production')
                 jdk 'JDK8u20'
                 parameters {
-                    stringParam('ONTRACK_VERSION_FULL', '', '')
-                    stringParam('ONTRACK_VERSION_COMMIT', '', '')
-                    stringParam('ONTRACK_VERSION_BUILD', '', '')
-                    stringParam('ONTRACK_VERSION_DISPLAY', '', '')
+                    stringParam('VERSION_FULL', '', '')
+                    stringParam('VERSION_COMMIT', '', '')
+                    stringParam('VERSION_BUILD', '', '')
+                    stringParam('VERSION_DISPLAY', '', '')
                 }
                 wrappers {
                     injectPasswords()
@@ -351,7 +351,7 @@ docker logout
                     node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackPromotedRunNotifier' {
                         'project'('ontrack')
                         'branch'(NAME)
-                        'build'('${ONTRACK_VERSION_BUILD}')
+                        'build'('${VERSION_BUILD}')
                         'promotionLevel'('ONTRACK')
                     }
                 }
@@ -365,10 +365,10 @@ docker logout
                 deliveryPipelineConfiguration('Release', 'Production acceptance')
                 jdk 'JDK8u20'
                 parameters {
-                    stringParam('ONTRACK_VERSION_FULL', '', '')
-                    stringParam('ONTRACK_VERSION_COMMIT', '', '')
-                    stringParam('ONTRACK_VERSION_BUILD', '', '')
-                    stringParam('ONTRACK_VERSION_DISPLAY', '', '')
+                    stringParam('VERSION_FULL', '', '')
+                    stringParam('VERSION_COMMIT', '', '')
+                    stringParam('VERSION_BUILD', '', '')
+                    stringParam('VERSION_DISPLAY', '', '')
                 }
                 wrappers {
                     injectPasswords()
@@ -388,7 +388,7 @@ docker logout
                     node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
                         'project'('ontrack')
                         'branch'(NAME)
-                        'build'('${ONTRACK_VERSION_BUILD}')
+                        'build'('${VERSION_BUILD}')
                         'validationStamp'('ONTRACK.SMOKE')
                     }
                 }
@@ -411,6 +411,6 @@ docker logout
 
 
     } else {
-        println "\tSkipping."
+        println "\tSkipping ${BRANCH}."
     }
 }
