@@ -137,7 +137,7 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
                 )
                 downstreamParameterized {
                     trigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-11-acceptance-local", 'SUCCESS', false) {
-                        propertiesFile('version.properties')
+                        propertiesFile('build/version.properties')
                     }
                 }
             }
