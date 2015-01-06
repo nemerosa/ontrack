@@ -14,6 +14,8 @@ interface Branch extends ProjectEntity {
 
     ValidationStamp validationStamp(String name, String description)
 
+    ValidationStamp validationStamp(String name, String description, Closure closure)
+
     Build build(String name, String description)
 
     // Filters

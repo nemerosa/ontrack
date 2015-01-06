@@ -100,6 +100,13 @@ class BranchResource extends AbstractProjectResource implements Branch {
     }
 
     @Override
+    ValidationStamp validationStamp(String name, String description, Closure closure) {
+        def vs = validationStamp(name, description)
+        vs(closure)
+        vs
+    }
+
+    @Override
     Build build(String name, String description) {
         new BuildResource(
                 ontrack,

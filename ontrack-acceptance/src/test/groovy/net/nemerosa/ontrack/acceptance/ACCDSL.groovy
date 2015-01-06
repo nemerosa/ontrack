@@ -196,6 +196,70 @@ class ACCDSL extends AcceptanceTestClient {
     }
 
     @Test
+    void 'Validation stamp image: from file'() {
+        def project = uid('P')
+        ontrack.project(project) {
+            branch('1.0') {
+                validationStamp('SMOKE', 'Smoke tests') {
+                    image getImageFile()
+                }
+            }
+        }
+        // Downloading the image
+        def image = ontrack.validationStamp(project, '1.0', 'SMOKE').image
+        assert image.type == 'image/png'
+        assert image.content == imageFile.bytes
+    }
+
+    @Test
+    void 'Validation stamp image: from path'() {
+        def project = uid('P')
+        ontrack.project(project) {
+            branch('1.0') {
+                validationStamp('SMOKE', 'Smoke tests') {
+                    image getImageFile().absolutePath
+                }
+            }
+        }
+        // Downloading the image
+        def image = ontrack.validationStamp(project, '1.0', 'SMOKE').image
+        assert image.type == 'image/png'
+        assert image.content == imageFile.bytes
+    }
+
+    @Test
+    void 'Validation stamp image: from URL'() {
+        def project = uid('P')
+        ontrack.project(project) {
+            branch('1.0') {
+                validationStamp('SMOKE', 'Smoke tests') {
+                    image ACCDSL.class.getResource('/gold.png')
+                }
+            }
+        }
+        // Downloading the image
+        def image = ontrack.validationStamp(project, '1.0', 'SMOKE').image
+        assert image.type == 'image/png'
+        assert image.content == imageFile.bytes
+    }
+
+    @Test
+    void 'Validation stamp image: from URL path'() {
+        def project = uid('P')
+        ontrack.project(project) {
+            branch('1.0') {
+                validationStamp('SMOKE', 'Smoke tests') {
+                    image ACCDSL.class.getResource('/gold.png').toString()
+                }
+            }
+        }
+        // Downloading the image
+        def image = ontrack.validationStamp(project, '1.0', 'SMOKE').image
+        assert image.type == 'image/png'
+        assert image.content == imageFile.bytes
+    }
+
+    @Test
     void 'Definition of a template with parameters'() {
         // GitHub configuration
         ontrack.configure {
