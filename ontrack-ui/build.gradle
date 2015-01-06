@@ -76,13 +76,13 @@ task generateVersionInfo << {
 # This file is generated at build time to contain version information
 # Do not edit it, do not commit it
 ontrack.version.date = ${new Date().format("yyyy-MM-dd'T'HH:mm:ss")}
-ontrack.version.display = ${project.versionDisplay}
-ontrack.version.full = ${project.versionFull}
-ontrack.version.branch = ${rootProject.versionBranch}
-ontrack.version.build = ${rootProject.versionBuild}
-ontrack.version.commit = ${rootProject.versionCommit}
-ontrack.version.source = ${rootProject.versionSource}
-ontrack.version.sourceType = ${rootProject.versionSourceType}
+ontrack.version.display = ${rootProject.versioning.info.display}
+ontrack.version.full = ${rootProject.versioning.info.full}
+ontrack.version.branch = ${rootProject.versioning.info.branchId}
+ontrack.version.build = ${rootProject.versioning.info.build}
+ontrack.version.commit = ${rootProject.versioning.info.commit}
+ontrack.version.source = ${rootProject.versioning.info.branch}
+ontrack.version.sourceType = ${rootProject.versioning.info.branchType}
 """
 }
 
