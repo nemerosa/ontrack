@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.client.ClientNotFoundException;
 import net.nemerosa.ontrack.client.JsonClient;
 import net.nemerosa.ontrack.extension.jira.JIRAConfiguration;
 import net.nemerosa.ontrack.extension.jira.model.*;
+import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -78,12 +79,23 @@ public class JIRAClientImpl implements JIRAClient {
         // Issue links
         List<JIRALink> links = new ArrayList<>();
         for (JsonNode issueLinkNode : field(node, "issuelinks")) {
-            links.add(new JIRALink(
-                    issueLinkNode.path("outwardIssue").path("key").asText(),
-                    issueLinkNode.path("outwardIssue").path("self").asText(),
-                    getStatus(issueLinkNode.path("outwardIssue")),
-                    issueLinkNode.path("type").path("outward").asText()
-            ));
+            String inwardKey = issueLinkNode.path("inwardIssue").path("key").asText();
+            String outwardKey = issueLinkNode.path("outwardIssue").path("key").asText();
+            if (StringUtils.isNotBlank(inwardKey)) {
+                links.add(new JIRALink(
+                        inwardKey,
+                        issueLinkNode.path("inwardIssue").path("self").asText(),
+                        getStatus(issueLinkNode.path("inwardIssue")),
+                        issueLinkNode.path("type").path("inward").asText()
+                ));
+            } else if (StringUtils.isNotBlank(outwardKey)) {
+                links.add(new JIRALink(
+                        outwardKey,
+                        issueLinkNode.path("outwardIssue").path("self").asText(),
+                        getStatus(issueLinkNode.path("outwardIssue")),
+                        issueLinkNode.path("type").path("outward").asText()
+                ));
+            }
         }
 
         // JIRA issue

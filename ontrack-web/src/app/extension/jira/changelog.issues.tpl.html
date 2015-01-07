@@ -51,7 +51,7 @@
         <td>
             <span ng-repeat="link in changeLogIssue.issue.links">
                 {{link.link}}
-                <ot-extension-jira-issue-link issue="link"></ot-extension-jira-issue-link>
+                <ot-extension-jira-issue-link issue="link"></ot-extension-jira-issue-link><span ng-if="!$last">, </span>
             </span>
         </td>
     </tr>
