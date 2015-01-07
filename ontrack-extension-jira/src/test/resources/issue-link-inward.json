@@ -1,0 +1,165 @@
+{
+    "expand": "renderedFields,names,schema,transitions,operations,editmeta,changelog",
+    "id": "304767",
+    "self": "http://jira/rest/api/2/issue/304767",
+    "key": "PRJ-136",
+    "fields": {
+        "summary": "Issue summary",
+        "issuetype": {
+            "self": "http://jira/rest/api/2/issuetype/3",
+            "id": "3",
+            "description": "A task that needs to be done.",
+            "iconUrl": "http://jira/images/icons/issuetypes/task.png",
+            "name": "Task",
+            "subtask": false
+        },
+        "reporter": {
+            "self": "http://jira/rest/api/2/user?username=dcoraboeuf",
+            "name": "dcoraboeuf",
+            "emailAddress": "Damien.Coraboeuf@test.com",
+            "avatarUrls": {
+                "16x16": "http://jira/useravatar?size=xsmall&ownerId=dcoraboeuf&avatarId=12364",
+                "24x24": "http://jira/useravatar?size=small&ownerId=dcoraboeuf&avatarId=12364",
+                "32x32": "http://jira/useravatar?size=medium&ownerId=dcoraboeuf&avatarId=12364",
+                "48x48": "http://jira/useravatar?ownerId=dcoraboeuf&avatarId=12364"
+            },
+            "displayName": "Damien Coraboeuf",
+            "active": true
+        },
+        "updated": "2014-06-18T15:12:52.369+0000",
+        "created": "2014-04-23T14:16:06.913+0000",
+        "priority": {
+            "self": "http://jira/rest/api/2/priority/3",
+            "iconUrl": "http://jira/images/icons/priorities/major.png",
+            "name": "3 - Medium",
+            "id": "3"
+        },
+        "description": "Issue description",
+        "status": {
+            "self": "http://jira/rest/api/2/status/6",
+            "description": "The issue is considered finished, the resolution is correct. Issues which are closed can be reopened.",
+            "iconUrl": "http://jira/images/icons/statuses/closed.png",
+            "name": "Closed",
+            "id": "6"
+        },
+        "labels": [],
+        "project": {
+            "self": "http://jira/rest/api/2/project/PRJ",
+            "id": "12361",
+            "key": "PRJ",
+            "name": "PRJ",
+            "avatarUrls": {
+                "16x16": "http://jira/projectavatar?size=xsmall&pid=12361&avatarId=11753",
+                "24x24": "http://jira/projectavatar?size=small&pid=12361&avatarId=11753",
+                "32x32": "http://jira/projectavatar?size=medium&pid=12361&avatarId=11753",
+                "48x48": "http://jira/projectavatar?pid=12361&avatarId=11753"
+            }
+        },
+        "issuelinks": [
+            {
+                "id": "10203",
+                "self": "http://jira/rest/api/2/issueLink/10203",
+                "type": {
+                    "id": "10000",
+                    "name": "Blocks",
+                    "inward": "is blocked by",
+                    "outward": "blocks",
+                    "self": "http://jira/rest/api/2/issueLinkType/10000"
+                },
+                "inwardIssue": {
+                    "id": "10702",
+                    "key": "PRJ-900",
+                    "self": "https://jira/rest/api/2/issue/10702",
+                    "fields": {
+                        "summary": "Task 2",
+                        "status": {
+                            "self": "http://jira/rest/api/2/status/10002",
+                            "description": "",
+                            "iconUrl": "http://jira/images/icons/statuses/open.png",
+                            "name": "Open",
+                            "id": "10002"
+                        }
+                    }
+                }
+            }
+        ],
+        "fixVersions": [
+            {
+                "self": "http://jira/rest/api/2/version/27141",
+                "id": "27141",
+                "description": "Deployment & integration",
+                "name": "1.2",
+                "archived": false,
+                "released": false
+            }
+        ],
+        "resolution": {
+            "self": "http://jira/rest/api/2/resolution/1",
+            "id": "1",
+            "description": "A fix for this issue is checked into the tree and tested.",
+            "name": "Fixed"
+        },
+        "resolutiondate": "2014-06-18T15:12:42.312+0000",
+        "assignee": {
+            "self": "http://jira/rest/api/2/user?username=dcoraboeuf",
+            "name": "dcoraboeuf",
+            "emailAddress": "Damien.Coraboeuf@test.com",
+            "avatarUrls": {
+                "16x16": "http://jira/useravatar?size=xsmall&ownerId=dcoraboeuf&avatarId=12364",
+                "24x24": "http://jira/useravatar?size=small&ownerId=dcoraboeuf&avatarId=12364",
+                "32x32": "http://jira/useravatar?size=medium&ownerId=dcoraboeuf&avatarId=12364",
+                "48x48": "http://jira/useravatar?ownerId=dcoraboeuf&avatarId=12364"
+            },
+            "displayName": "Damien Coraboeuf",
+            "active": true
+        },
+        "versions": [
+            {
+                "self": "http://jira/rest/api/2/version/25638",
+                "id": "25638",
+                "description": "Support ",
+                "name": "1.0",
+                "archived": false,
+                "released": true,
+                "releaseDate": "2014-02-20"
+            }
+        ]
+    },
+    "names": {
+        "progress": "Progress",
+        "summary": "Summary",
+        "timetracking": "Time Tracking",
+        "issuetype": "Issue Type",
+        "timespent": "Time Spent",
+        "reporter": "Reporter",
+        "updated": "Updated",
+        "created": "Created",
+        "priority": "Priority",
+        "description": "Description",
+        "issuelinks": "Linked Issues",
+        "subtasks": "Sub-Tasks",
+        "status": "Status",
+        "labels": "Labels",
+        "workratio": "Work Ratio",
+        "project": "Project",
+        "environment": "Environment",
+        "aggregateprogress": "Σ Progress",
+        "lastViewed": "Last Viewed",
+        "components": "Component/s",
+        "comment": "Comment",
+        "timeoriginalestimate": "Original Estimate",
+        "fixVersions": "Fix Version/s",
+        "resolution": "Resolution",
+        "resolutiondate": "Resolved",
+        "aggregatetimeoriginalestimate": "Σ Original Estimate",
+        "duedate": "Due Date",
+        "watches": "Watchers",
+        "worklog": "Log Work",
+        "assignee": "Assignee",
+        "attachment": "Attachment",
+        "aggregatetimeestimate": "Σ Remaining Estimate",
+        "versions": "Affects Version/s",
+        "timeestimate": "Remaining Estimate",
+        "aggregatetimespent": "Σ Time Spent"
+    }
+}
