@@ -69,4 +69,13 @@ angular.module('ontrack.extension.jira', [
             }).then(loadJiraConfigurations);
         };
     })
+    .directive('otExtensionJiraIssueLink', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'app/extension/jira/directive.jiraIssueLink.tpl.html',
+            scope: {
+                issue: '='
+            }
+        };
+    })
 ;
