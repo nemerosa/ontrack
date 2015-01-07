@@ -55,5 +55,16 @@
             {{value.updateTime | date: 'mediumDate'}}
         </td>
     </tr>
+    <tr ng-if="value.links">
+        <td>
+            Links
+        </td>
+        <td>
+            <span ng-repeat="link in value.links">
+                {{link.link}}
+                <ot-extension-jira-issue-link issue="link"></ot-extension-jira-issue-link><span ng-if="!$last">, </span>
+            </span>
+        </td>
+    </tr>
     </tbody>
 </table>
