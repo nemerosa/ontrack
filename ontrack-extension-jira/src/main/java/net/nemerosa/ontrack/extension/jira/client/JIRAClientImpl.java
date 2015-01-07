@@ -5,10 +5,7 @@ import net.nemerosa.ontrack.client.ClientForbiddenException;
 import net.nemerosa.ontrack.client.ClientNotFoundException;
 import net.nemerosa.ontrack.client.JsonClient;
 import net.nemerosa.ontrack.extension.jira.JIRAConfiguration;
-import net.nemerosa.ontrack.extension.jira.model.JIRAField;
-import net.nemerosa.ontrack.extension.jira.model.JIRAIssue;
-import net.nemerosa.ontrack.extension.jira.model.JIRAStatus;
-import net.nemerosa.ontrack.extension.jira.model.JIRAVersion;
+import net.nemerosa.ontrack.extension.jira.model.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -73,14 +70,21 @@ public class JIRAClientImpl implements JIRAClient {
         List<JIRAVersion> fixVersions = toVersions(node, "fixVersions");
 
         // Status
-        JsonNode statusNode = field(node, "status");
-        JIRAStatus status = new JIRAStatus(
-                statusNode.path("name").asText(),
-                statusNode.path("iconUrl").asText()
-        );
+        JIRAStatus status = getStatus(node);
 
         // Key
         String key = node.path("key").asText();
+
+        // Issue links
+        List<JIRALink> links = new ArrayList<>();
+        for (JsonNode issueLinkNode : field(node, "issuelinks")) {
+            links.add(new JIRALink(
+                    issueLinkNode.path("outwardIssue").path("key").asText(),
+                    issueLinkNode.path("outwardIssue").path("self").asText(),
+                    getStatus(issueLinkNode.path("outwardIssue")),
+                    issueLinkNode.path("type").path("outward").asText()
+            ));
+        }
 
         // JIRA issue
         return new JIRAIssue(
@@ -93,7 +97,16 @@ public class JIRAClientImpl implements JIRAClient {
                 fields,
                 affectedVersions,
                 fixVersions,
-                field(node, "issuetype").path("name").asText()
+                field(node, "issuetype").path("name").asText(),
+                links
+        );
+    }
+
+    private static JIRAStatus getStatus(JsonNode node) {
+        JsonNode statusNode = field(node, "status");
+        return new JIRAStatus(
+                statusNode.path("name").asText(),
+                statusNode.path("iconUrl").asText()
         );
     }
 

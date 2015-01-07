@@ -19,5 +19,6 @@ public class JIRAIssue implements Issue {
     private final List<JIRAVersion> affectedVersions;
     private final List<JIRAVersion> fixVersions;
     private final String issueType;
+    private final List<JIRALink> links;
 
 }
