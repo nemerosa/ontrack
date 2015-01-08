@@ -86,6 +86,7 @@ public class JIRAClientImpl implements JIRAClient {
                         inwardKey,
                         issueLinkNode.path("inwardIssue").path("self").asText(),
                         getStatus(issueLinkNode.path("inwardIssue")),
+                        issueLinkNode.path("type").path("name").asText(),
                         issueLinkNode.path("type").path("inward").asText()
                 ));
             } else if (StringUtils.isNotBlank(outwardKey)) {
@@ -93,6 +94,7 @@ public class JIRAClientImpl implements JIRAClient {
                         outwardKey,
                         issueLinkNode.path("outwardIssue").path("self").asText(),
                         getStatus(issueLinkNode.path("outwardIssue")),
+                        issueLinkNode.path("type").path("name").asText(),
                         issueLinkNode.path("type").path("outward").asText()
                 ));
             }
