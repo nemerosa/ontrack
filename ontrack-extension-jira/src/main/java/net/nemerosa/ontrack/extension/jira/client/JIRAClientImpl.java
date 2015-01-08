@@ -12,10 +12,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class JIRAClientImpl implements JIRAClient {
 
@@ -122,6 +119,18 @@ public class JIRAClientImpl implements JIRAClient {
                 statusNode.path("name").asText(),
                 statusNode.path("iconUrl").asText()
         );
+    }
+
+    @Override
+    public void followLinks(JIRAConfiguration configuration, JIRAIssue seed, Set<String> linkNames, Map<String, JIRAIssue> collectedIssues) {
+        // Puts the seed into the list
+        collectedIssues.put(seed.getKey(), seed);
+        // Gets the linked issue keys
+        seed.getLinks().stream()
+                .filter(linkedIssue -> linkNames.contains(linkedIssue.getLinkName()))
+                .filter(linkedIssue -> !collectedIssues.containsKey(linkedIssue.getKey()))
+                .map(linkedIssue -> getIssue(linkedIssue.getKey(), configuration))
+                .forEach(linkedIssue -> followLinks(configuration, linkedIssue, linkNames, collectedIssues));
     }
 
     public static LocalDateTime parseFromJIRA(String value) {
