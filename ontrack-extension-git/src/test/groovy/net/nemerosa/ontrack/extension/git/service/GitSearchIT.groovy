@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationProper
 import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.support.CommitBuildNameGitCommitLink
 import net.nemerosa.ontrack.extension.git.support.CommitLinkConfig
+import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
 import net.nemerosa.ontrack.git.support.GitRepo
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.security.GlobalSettings
@@ -48,12 +49,15 @@ class GitSearchIT extends AbstractServiceTestSupport {
         } finally {
             repo.close()
         }
+        // Issue service
+        def issueServiceIdentifier = MockIssueServiceConfiguration.INSTANCE.toIdentifier().format()
         // Create a Git configuration
         String gitConfigurationName = uid('C')
         BasicGitConfiguration gitConfiguration = asUser().with(GlobalSettings).call {
             gitConfigurationService.newConfiguration(
                     BasicGitConfiguration.empty()
                             .withName(gitConfigurationName)
+                            .withIssueServiceConfigurationIdentifier(issueServiceIdentifier)
                             .withRemote("file://${repo.dir.absolutePath}")
             )
         }
