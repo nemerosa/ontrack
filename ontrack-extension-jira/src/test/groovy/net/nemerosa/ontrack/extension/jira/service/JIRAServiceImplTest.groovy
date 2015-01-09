@@ -46,7 +46,7 @@ class JIRAServiceImplTest {
         when(jiraClient.getIssue('TEST-4', config)).thenReturn(issue4)
 
         // Service
-        JIRAService jiraService = new JIRAServiceImpl(jiraClient)
+        // JIRAService jiraService = new JIRAServiceImpl(jiraClient)
 
         // Links from 1
         def issues = [:]

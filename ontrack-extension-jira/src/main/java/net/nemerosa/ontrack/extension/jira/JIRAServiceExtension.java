@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtension;
+import net.nemerosa.ontrack.extension.jira.client.JIRAClient;
 import net.nemerosa.ontrack.extension.jira.model.JIRAIssue;
 import net.nemerosa.ontrack.extension.jira.tx.JIRASession;
 import net.nemerosa.ontrack.extension.jira.tx.JIRASessionFactory;
@@ -133,6 +134,31 @@ public class JIRAServiceExtension extends AbstractIssueServiceExtension {
     protected Set<String> getIssueTypes(IssueServiceConfiguration issueServiceConfiguration, Issue issue) {
         JIRAIssue jiraIssue = (JIRAIssue) issue;
         return Collections.singleton(jiraIssue.getIssueType());
+    }
+
+    /**
+     * Given an issue seed, and a list of link names, follows the given links recursively and
+     * puts the associated issues into the {@code collectedIssues} map.
+     *
+     * @param configuration   JIRA configuration to use to load the issues
+     * @param seed            Issue to start from.
+     * @param linkNames       Links to follow
+     * @param collectedIssues Collected issues, indexed by their key
+     */
+    public void followLinks(JIRAConfiguration configuration, JIRAIssue seed, Set<String> linkNames, Map<String, JIRAIssue> collectedIssues) {
+        try (Transaction tx = transactionService.start()) {
+            JIRASession session = getJIRASession(tx, configuration);
+            // Gets the client from the current session
+            JIRAClient client = session.getClient();
+            // Puts the seed into the list
+            collectedIssues.put(seed.getKey(), seed);
+            // Gets the linked issue keys
+            seed.getLinks().stream()
+                    .filter(linkedIssue -> linkNames.contains(linkedIssue.getLinkName()))
+                    .filter(linkedIssue -> !collectedIssues.containsKey(linkedIssue.getKey()))
+                    .map(linkedIssue -> client.getIssue(linkedIssue.getKey(), configuration))
+                    .forEach(linkedIssue -> followLinks(configuration, linkedIssue, linkNames, collectedIssues));
+        }
     }
 
     public JIRAIssue getIssue(JIRAConfiguration configuration, String key) {
