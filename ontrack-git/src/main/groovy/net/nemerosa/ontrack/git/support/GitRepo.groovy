@@ -39,11 +39,12 @@ class GitRepo {
         return output
     }
 
-    void commit(def no) {
+    void commit(def no, def message = '') {
         String fileName = "file${no}"
         cmd 'touch', fileName
         git 'add', fileName
-        git 'commit', '-m', "Commit $no"
+        def commitMessage = message ?: "Commit $no"
+        git 'commit', '-m', commitMessage
     }
 
     String commitLookup(String message) {
