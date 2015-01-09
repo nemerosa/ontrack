@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.svn.service
 
+import jdk.nashorn.internal.ir.annotations.Ignore
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository
 import net.nemerosa.ontrack.extension.svn.db.SVNRepositoryDao
@@ -78,6 +79,64 @@ class SVNSearchIT extends AbstractServiceTestSupport {
     }
 
     @Test
+    void '0 - SVN: Search revision'() {
+        def testName = 'SVNSearchRevision'
+
+        /**
+         * Initialisation
+         */
+
+        init testName
+
+        // Creates some tags
+        repo.copy "${testName}/trunk@5", "${testName}/tags/1.0.1", 'v1.0.1'
+        repo.copy "${testName}/trunk@8", "${testName}/tags/1.0.2", 'v1.0.2'
+        repo.copy "${testName}/trunk@11", "${testName}/tags/1.0.3", 'v1.0.3'
+
+        // Saves the configuration
+        SVNConfiguration configuration = initConfiguration()
+        def branch = configureBranch(configuration, testName)
+
+        /**
+         * Promotions
+         */
+
+        asUser().with(branch, ProjectEdit).call {
+            def info = svnService.getOntrackRevisionInfo(svnService.getRepository(configuration.name), 4)
+            assert info.revisionInfo.message == "Commit 3 for #2"
+            assert info.buildViews.collect { it.build.name } == ['1.0.1']
+            assert info.branchStatusViews.size() == 1
+            def branchStatusView = info.branchStatusViews[0]
+            def promotions = branchStatusView.promotions
+            assert promotions.collect { it.promotionLevel.name } == ['COPPER', 'BRONZE']
+            assert promotions.collect { it.promotionRun.build.name } == ['1.0.2', '1.0.3']
+        }
+
+        asUser().with(branch, ProjectEdit).call {
+            def info = svnService.getOntrackRevisionInfo(svnService.getRepository(configuration.name), 8)
+            assert info.revisionInfo.message == "Commit 7 for #3"
+            assert info.buildViews.collect { it.build.name } == ['1.0.2']
+            assert info.branchStatusViews.size() == 1
+            def branchStatusView = info.branchStatusViews[0]
+            def promotions = branchStatusView.promotions
+            assert promotions.collect { it.promotionLevel.name } == ['COPPER', 'BRONZE']
+            assert promotions.collect { it.promotionRun.build.name } == ['1.0.2', '1.0.3']
+        }
+
+        asUser().with(branch, ProjectEdit).call {
+            def info = svnService.getOntrackRevisionInfo(svnService.getRepository(configuration.name), 10)
+            assert info.revisionInfo.message == "Commit 9 for #4"
+            assert info.buildViews.collect { it.build.name } == ['1.0.3']
+            assert info.branchStatusViews.size() == 1
+            def branchStatusView = info.branchStatusViews[0]
+            def promotions = branchStatusView.promotions
+            assert promotions.collect { it.promotionLevel.name } == ['COPPER', 'BRONZE']
+            assert promotions.collect { it.promotionRun.build.name } == ['1.0.3', '1.0.3']
+        }
+
+    }
+
+    @Test
     void 'SVN: Search issue'() {
         def testName = 'SVNSearchIssue'
 
@@ -144,61 +203,94 @@ class SVNSearchIT extends AbstractServiceTestSupport {
 
     }
 
+    /**
+     * Gets issue info accross two branches by following issue links.
+     *
+     * <pre>
+     *     |  |
+     *     *  | (5) Commit #3 (trunk)
+     *     |  |
+     *     |  * (4) Commit #2 (branches/1.0)
+     *     |  |
+     *     |  /
+     *     | /
+     *     * (2) Commit #1
+     * </pre>
+     *
+     * If issues #3 and #2 are linked, lLooking for issue #3 must bring two branches:
+     * trunk with revision 5, and branch 1.0 with revision 4
+     */
     @Test
-    void 'SVN: Search revision'() {
-        def testName = 'SVNSearchRevision'
+    @Ignore
+    void 'SVN: Search linked issues - links between branches, no merge'() {
+        def testName = 'SVNSearchLinkedIssuesMultiBranch'
 
         /**
          * Initialisation
          */
 
-        init testName
+        repo.mkdir "${testName}/trunk", 'Trunk'
+        repo.mkdir "${testName}/trunk/1", 'Commit for #1'
+        repo.copy "${testName}/trunk", "${testName}/branches/1.0", "Branch 1.0"
+        repo.mkdir "${testName}/branches/1.0/2", 'Commit for #2'
+        repo.mkdir "${testName}/trunk/3", 'Commit for #3'
 
-        // Creates some tags
-        repo.copy "${testName}/trunk@5", "${testName}/tags/1.0.1", 'v1.0.1'
-        repo.copy "${testName}/trunk@8", "${testName}/tags/1.0.2", 'v1.0.2'
-        repo.copy "${testName}/trunk@11", "${testName}/tags/1.0.3", 'v1.0.3'
-
-        // Saves the configuration
         SVNConfiguration configuration = initConfiguration()
-        def branch = configureBranch(configuration, testName)
 
         /**
-         * Promotions
+         * Branches
          */
 
-        asUser().with(branch, ProjectEdit).call {
-            def info = svnService.getOntrackRevisionInfo(svnService.getRepository(configuration.name), 4)
-            assert info.revisionInfo.message == "Commit 3 for #2"
-            assert info.buildViews.collect { it.build.name } == ['1.0.1']
-            assert info.branchStatusViews.size() == 1
-            def branchStatusView = info.branchStatusViews[0]
-            def promotions = branchStatusView.promotions
-            assert promotions.collect { it.promotionLevel.name } == ['COPPER', 'BRONZE']
-            assert promotions.collect { it.promotionRun.build.name } == ['1.0.2', '1.0.3']
+        // Project
+        Project project = doCreateProject()
+
+        // Configuration & branches
+        asUser().with(project, ProjectEdit).call {
+
+            propertyService.editProperty(project, SVNProjectConfigurationPropertyType, new SVNProjectConfigurationProperty(
+                    configuration,
+                    "/${testName}/trunk"
+            ))
+
+            // Trunk configuration
+            def trunk = doCreateBranch(project, nd('trunk', ''))
+            propertyService.editProperty(trunk, SVNBranchConfigurationPropertyType, new SVNBranchConfigurationProperty(
+                    "/${testName}/trunk",
+                    "/${testName}/tags/{build}"
+            ))
+
+            // Branch configuration
+            def branch10 = doCreateBranch(project, nd('1.0', ''))
+            propertyService.editProperty(branch10, SVNBranchConfigurationPropertyType, new SVNBranchConfigurationProperty(
+                    "/${testName}/branches/1.0",
+                    "/${testName}/tags/{build}"
+            ))
+
         }
 
-        asUser().with(branch, ProjectEdit).call {
-            def info = svnService.getOntrackRevisionInfo(svnService.getRepository(configuration.name), 8)
-            assert info.revisionInfo.message == "Commit 7 for #3"
-            assert info.buildViews.collect { it.build.name } == ['1.0.2']
-            assert info.branchStatusViews.size() == 1
-            def branchStatusView = info.branchStatusViews[0]
-            def promotions = branchStatusView.promotions
-            assert promotions.collect { it.promotionLevel.name } == ['COPPER', 'BRONZE']
-            assert promotions.collect { it.promotionRun.build.name } == ['1.0.2', '1.0.3']
-        }
+        /**
+         * Issues and links
+         */
+        def issue1 = new MockIssue(1, MockIssueStatus.OPEN, 'feature')
+        def issue2 = new MockIssue(2, MockIssueStatus.OPEN, 'feature')
+        def issue3 = new MockIssue(3, MockIssueStatus.OPEN, 'feature')
 
-        asUser().with(branch, ProjectEdit).call {
-            def info = svnService.getOntrackRevisionInfo(svnService.getRepository(configuration.name), 10)
-            assert info.revisionInfo.message == "Commit 9 for #4"
-            assert info.buildViews.collect { it.build.name } == ['1.0.3']
-            assert info.branchStatusViews.size() == 1
-            def branchStatusView = info.branchStatusViews[0]
-            def promotions = branchStatusView.promotions
-            assert promotions.collect { it.promotionLevel.name } == ['COPPER', 'BRONZE']
-            assert promotions.collect { it.promotionRun.build.name } == ['1.0.3', '1.0.3']
-        }
+        issue2.withLinks([issue3])
+        issue3.withLinks([issue2])
+
+        mockIssueServiceExtension.register(issue1, issue2, issue3)
+
+        /**
+         * Search
+         */
+
+        def info = asUser().with(project, ProjectView).call { svnService.getIssueInfo(configuration.name, '3') }
+        assert info.issue.key == '3'
+        assert info.issue.displayKey == '#3'
+
+        assert info.revisionInfos.size() == 2
+        assert info.revisionInfos.first().revisionInfo.message == 'Commit for #3'
+        assert info.revisionInfos.last().revisionInfo.message == 'Commit for #2'
 
     }
 
