@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtension
+import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.support.MessageAnnotation
 import net.nemerosa.ontrack.model.support.MessageAnnotator
 import net.nemerosa.ontrack.model.support.RegexMessageAnnotator
@@ -19,9 +20,28 @@ class MockIssueServiceExtension extends AbstractIssueServiceExtension {
 
     public static final String ISSUE_PATTERN = "#(\\d+)";
 
+    /**
+     * Issues registered for testing
+     */
+    private final Map<Integer, MockIssue> issues = [:]
+
     @Autowired
     public MockIssueServiceExtension(MockIssueServiceFeature extensionFeature, IssueExportServiceFactory issueExportServiceFactory) {
         super(extensionFeature, "mock", "Mock issue", issueExportServiceFactory)
+    }
+
+    /**
+     * Resets the list of registered issues
+     */
+    void resetIssues() {
+        issues.clear()
+    }
+
+    /**
+     * Registers some issues
+     */
+    void register(MockIssue... issues) {
+        issues.each { this.issues.put(it.key as int, it) }
     }
 
     @Override
@@ -108,10 +128,27 @@ class MockIssueServiceExtension extends AbstractIssueServiceExtension {
 
     @Override
     Issue getIssue(IssueServiceConfiguration issueServiceConfiguration, String issueKey) {
-        new MockIssue(
-                issueKey as int,
+        def key = issueKey as int
+        issues.get(key) ?: new MockIssue(
+                key,
                 MockIssueStatus.OPEN,
                 "bug"
         )
+    }
+
+    @Override
+    Collection<? extends Issue> getLinkedIssues(Project project, IssueServiceConfiguration issueServiceConfiguration, Issue issue) {
+        Map<Integer, MockIssue> issues = [:]
+        collectLinkedIssues issue as MockIssue, issues
+        issues.values()
+    }
+
+    static def collectLinkedIssues(MockIssue issue, Map<Integer, MockIssue> issues) {
+        issues.put(issue.key as int, issue)
+        issue.links.each { link ->
+            if (!issues.containsKey(link.key as int)) {
+                collectLinkedIssues link, issues
+            }
+        }
     }
 }
