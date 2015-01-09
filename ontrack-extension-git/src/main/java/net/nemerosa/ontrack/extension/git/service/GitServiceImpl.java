@@ -333,7 +333,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         Issue issue = configuredIssueService.getIssue(key);
 
         // Collects commits per branches
-        List<OntrackGitIssueCommitInfo> commitInfos = collectIssueCommitInfos(key);
+        List<OntrackGitIssueCommitInfo> commitInfos = collectIssueCommitInfos(issue);
 
         // OK
         return new OntrackGitIssueInfo(
@@ -343,7 +343,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         );
     }
 
-    private List<OntrackGitIssueCommitInfo> collectIssueCommitInfos(String key) {
+    private List<OntrackGitIssueCommitInfo> collectIssueCommitInfos(Issue issue) {
         // Index of commit infos
         Map<String, OntrackGitIssueCommitInfo> commitInfos = new LinkedHashMap<>();
         // For all configured branches
@@ -360,7 +360,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                 client.scanCommits(branchConfiguration.getBranch(), revCommit -> {
                     String message = revCommit.getFullMessage();
                     Set<String> keys = configuredIssueService.extractIssueKeysFromMessage(message);
-                    if (configuredIssueService.containsIssueKey(key, keys)) {
+                    if (configuredIssueService.containsIssueKey(issue.getKey(), keys)) {
                         // We have a commit for this branch!
                         revCommits.add(revCommit);
                     }
