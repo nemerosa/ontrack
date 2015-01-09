@@ -6,11 +6,10 @@ import net.nemerosa.ontrack.extension.issues.export.ExportFormat;
 import net.nemerosa.ontrack.extension.issues.export.ExportedIssues;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
+import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.support.MessageAnnotator;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Defines a generic service used to access issues from a ticketing system like
@@ -119,4 +118,19 @@ public interface IssueServiceExtension extends Extension {
      * @return Valid token or {@link java.util.Optional#empty()}.
      */
     Optional<String> getIssueId(IssueServiceConfiguration issueServiceConfiguration, String token);
+
+    /**
+     * Gets the list of linked issues that can be used to look for issues references (commits, revisions...)
+     * accross severak branches.
+     * <p>
+     * By default, returns a collection that contains only {@code issue}.
+     *
+     * @param branch                    Branch to use for any additional configuration
+     * @param issueServiceConfiguration Configuration for the service
+     * @param issue                     Root or seeding issue
+     * @return List of issues linked to {@code issue}. It must include the initial {@code issue}.
+     */
+    default Collection<? extends Issue> getLinkedIssues(Branch branch, IssueServiceConfiguration issueServiceConfiguration, Issue issue) {
+        return Collections.singleton(issue);
+    }
 }

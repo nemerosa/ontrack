@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.jira;
 
+import com.google.common.collect.Sets;
 import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
@@ -8,6 +9,8 @@ import net.nemerosa.ontrack.extension.jira.client.JIRAClient;
 import net.nemerosa.ontrack.extension.jira.model.JIRAIssue;
 import net.nemerosa.ontrack.extension.jira.tx.JIRASession;
 import net.nemerosa.ontrack.extension.jira.tx.JIRASessionFactory;
+import net.nemerosa.ontrack.model.structure.Branch;
+import net.nemerosa.ontrack.model.structure.PropertyService;
 import net.nemerosa.ontrack.model.support.MessageAnnotation;
 import net.nemerosa.ontrack.model.support.MessageAnnotator;
 import net.nemerosa.ontrack.model.support.RegexMessageAnnotator;
@@ -33,6 +36,7 @@ public class JIRAServiceExtension extends AbstractIssueServiceExtension {
     private final JIRAConfigurationService jiraConfigurationService;
     private final JIRASessionFactory jiraSessionFactory;
     private final TransactionService transactionService;
+    private final PropertyService propertyService;
 
     @Autowired
     public JIRAServiceExtension(
@@ -40,12 +44,13 @@ public class JIRAServiceExtension extends AbstractIssueServiceExtension {
             JIRAConfigurationService jiraConfigurationService,
             JIRASessionFactory jiraSessionFactory,
             TransactionService transactionService,
-            IssueExportServiceFactory issueExportServiceFactory
-    ) {
+            IssueExportServiceFactory issueExportServiceFactory,
+            PropertyService propertyService) {
         super(extensionFeature, SERVICE, "JIRA", issueExportServiceFactory);
         this.jiraConfigurationService = jiraConfigurationService;
         this.jiraSessionFactory = jiraSessionFactory;
         this.transactionService = transactionService;
+        this.propertyService = propertyService;
     }
 
     @Override
@@ -61,6 +66,23 @@ public class JIRAServiceExtension extends AbstractIssueServiceExtension {
     @Override
     public Optional<String> getIssueId(IssueServiceConfiguration issueServiceConfiguration, String token) {
         return validIssueToken(token) ? Optional.of(token) : Optional.empty();
+    }
+
+    @Override
+    public Collection<? extends Issue> getLinkedIssues(Branch branch, IssueServiceConfiguration issueServiceConfiguration, Issue issue) {
+        // Gets a list of link names to follow
+        return propertyService.getProperty(branch, JIRAFollowLinksPropertyType.class).option()
+                .map(property -> {
+                    Map<String, JIRAIssue> issues = new LinkedHashMap<>();
+                    followLinks(
+                            (JIRAConfiguration) issueServiceConfiguration,
+                            (JIRAIssue) issue,
+                            Sets.newHashSet(property.getLinkNames()),
+                            issues
+                    );
+                    return issues.values();
+                })
+                .orElse(Collections.singleton((JIRAIssue) issue));
     }
 
     @Override

@@ -360,7 +360,11 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                 client.scanCommits(branchConfiguration.getBranch(), revCommit -> {
                     String message = revCommit.getFullMessage();
                     Set<String> keys = configuredIssueService.extractIssueKeysFromMessage(message);
-                    if (configuredIssueService.containsIssueKey(issue.getKey(), keys)) {
+                    // Gets all linked issues
+                    boolean matching = configuredIssueService.getLinkedIssues(branch, issue).stream()
+                            .map(Issue::getKey)
+                            .anyMatch(key -> configuredIssueService.containsIssueKey(key, keys));
+                    if (matching) {
                         // We have a commit for this branch!
                         revCommits.add(revCommit);
                     }

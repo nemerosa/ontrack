@@ -13,6 +13,7 @@ import net.nemerosa.ontrack.extension.jira.model.JIRALink
 import net.nemerosa.ontrack.extension.jira.model.JIRAStatus
 import net.nemerosa.ontrack.extension.jira.tx.JIRASession
 import net.nemerosa.ontrack.extension.jira.tx.JIRASessionFactory
+import net.nemerosa.ontrack.model.structure.PropertyService
 import net.nemerosa.ontrack.model.support.MessageAnnotationUtils
 import net.nemerosa.ontrack.model.support.MessageAnnotator
 import net.nemerosa.ontrack.tx.DefaultTransactionService
@@ -44,12 +45,15 @@ public class JIRAServiceExtensionTest {
 
         IssueExportServiceFactory issueExportServiceFactory = mock(IssueExportServiceFactory.class);
 
+        PropertyService propertyService = mock(PropertyService)
+
         service = new JIRAServiceExtension(
                 new JIRAExtensionFeature(),
                 jiraConfigurationService,
                 jiraSessionFactory,
                 transactionService,
-                issueExportServiceFactory
+                issueExportServiceFactory,
+                propertyService
         );
     }
 
