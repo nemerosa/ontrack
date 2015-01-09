@@ -6,7 +6,7 @@ import net.nemerosa.ontrack.extension.issues.export.ExportFormat;
 import net.nemerosa.ontrack.extension.issues.export.ExportedIssues;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
-import net.nemerosa.ontrack.model.structure.Branch;
+import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.support.MessageAnnotator;
 
 import java.util.*;
@@ -125,12 +125,12 @@ public interface IssueServiceExtension extends Extension {
      * <p>
      * By default, returns a collection that contains only {@code issue}.
      *
-     * @param branch                    Branch to use for any additional configuration
+     * @param project                   Project to use for any additional configuration
      * @param issueServiceConfiguration Configuration for the service
      * @param issue                     Root or seeding issue
      * @return List of issues linked to {@code issue}. It must include the initial {@code issue}.
      */
-    default Collection<? extends Issue> getLinkedIssues(Branch branch, IssueServiceConfiguration issueServiceConfiguration, Issue issue) {
+    default Collection<? extends Issue> getLinkedIssues(Project project, IssueServiceConfiguration issueServiceConfiguration, Issue issue) {
         return Collections.singleton(issue);
     }
 }

@@ -361,7 +361,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                     String message = revCommit.getFullMessage();
                     Set<String> keys = configuredIssueService.extractIssueKeysFromMessage(message);
                     // Gets all linked issues
-                    boolean matching = configuredIssueService.getLinkedIssues(branch, issue).stream()
+                    boolean matching = configuredIssueService.getLinkedIssues(branch.getProject(), issue).stream()
                             .map(Issue::getKey)
                             .anyMatch(key -> configuredIssueService.containsIssueKey(key, keys));
                     if (matching) {

@@ -133,7 +133,7 @@ public class SVNServiceImpl implements SVNService {
                 (branch, branchConfig) -> {
                     String branchPath = branchConfig.getBranchPath();
                     // List of linked issues
-                    Collection<String> linkedIssues = configuredIssueService.getLinkedIssues(branch, issue).stream()
+                    Collection<String> linkedIssues = configuredIssueService.getLinkedIssues(branch.getProject(), issue).stream()
                             .map(Issue::getKey)
                             .collect(Collectors.toList());
                     // Gets the last raw revision on this branch

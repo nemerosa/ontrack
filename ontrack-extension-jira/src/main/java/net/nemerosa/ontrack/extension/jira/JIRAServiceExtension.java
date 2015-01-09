@@ -9,7 +9,7 @@ import net.nemerosa.ontrack.extension.jira.client.JIRAClient;
 import net.nemerosa.ontrack.extension.jira.model.JIRAIssue;
 import net.nemerosa.ontrack.extension.jira.tx.JIRASession;
 import net.nemerosa.ontrack.extension.jira.tx.JIRASessionFactory;
-import net.nemerosa.ontrack.model.structure.Branch;
+import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.PropertyService;
 import net.nemerosa.ontrack.model.support.MessageAnnotation;
 import net.nemerosa.ontrack.model.support.MessageAnnotator;
@@ -69,9 +69,9 @@ public class JIRAServiceExtension extends AbstractIssueServiceExtension {
     }
 
     @Override
-    public Collection<? extends Issue> getLinkedIssues(Branch branch, IssueServiceConfiguration issueServiceConfiguration, Issue issue) {
+    public Collection<? extends Issue> getLinkedIssues(Project project, IssueServiceConfiguration issueServiceConfiguration, Issue issue) {
         // Gets a list of link names to follow
-        return propertyService.getProperty(branch, JIRAFollowLinksPropertyType.class).option()
+        return propertyService.getProperty(project, JIRAFollowLinksPropertyType.class).option()
                 .map(property -> {
                     Map<String, JIRAIssue> issues = new LinkedHashMap<>();
                     followLinks(

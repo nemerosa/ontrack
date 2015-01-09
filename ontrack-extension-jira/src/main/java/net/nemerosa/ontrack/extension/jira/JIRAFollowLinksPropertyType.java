@@ -30,7 +30,7 @@ public class JIRAFollowLinksPropertyType extends AbstractPropertyType<JIRAFollow
 
     @Override
     public Set<ProjectEntityType> getSupportedEntityTypes() {
-        return EnumSet.of(ProjectEntityType.BRANCH);
+        return EnumSet.of(ProjectEntityType.PROJECT);
     }
 
     @Override
