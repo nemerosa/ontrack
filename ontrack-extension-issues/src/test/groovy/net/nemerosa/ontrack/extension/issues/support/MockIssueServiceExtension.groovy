@@ -1,9 +1,8 @@
-package net.nemerosa.ontrack.extension.svn.support
+package net.nemerosa.ontrack.extension.issues.support
 
 import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
-import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtension
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.support.MessageAnnotation
 import net.nemerosa.ontrack.model.support.MessageAnnotator

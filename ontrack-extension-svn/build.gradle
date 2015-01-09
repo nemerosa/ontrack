@@ -9,6 +9,7 @@ dependencies {
     compile 'org.tmatesoft.svnkit:svnkit:1.8.5'
 
     testCompile project(':ontrack-it-utils')
+    testCompile project (path: ":ontrack-extension-issues", configuration: 'testArtifacts')
     testCompile libraries.groovy
     testRuntime project(':ontrack-service')
     testRuntime project(':ontrack-repository-impl')

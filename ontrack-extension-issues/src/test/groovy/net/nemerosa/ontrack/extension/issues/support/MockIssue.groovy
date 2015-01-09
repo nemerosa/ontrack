@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.svn.support
+package net.nemerosa.ontrack.extension.issues.support
 
 import net.nemerosa.ontrack.extension.issues.model.Issue
 

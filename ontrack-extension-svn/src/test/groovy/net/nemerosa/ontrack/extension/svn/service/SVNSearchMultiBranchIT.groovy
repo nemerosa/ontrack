@@ -8,7 +8,7 @@ import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropert
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationPropertyType
-import net.nemerosa.ontrack.extension.svn.support.MockIssueServiceConfiguration
+import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
 import net.nemerosa.ontrack.extension.svn.support.SVNProfileValueSource
 import net.nemerosa.ontrack.extension.svn.support.SVNTestRepo
 import net.nemerosa.ontrack.extension.svn.support.SVNTestUtils

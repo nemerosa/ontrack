@@ -1,7 +1,10 @@
 package net.nemerosa.ontrack.extension.svn.service
 
-import jdk.nashorn.internal.ir.annotations.Ignore
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
+import net.nemerosa.ontrack.extension.issues.support.MockIssue
+import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
+import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceExtension
+import net.nemerosa.ontrack.extension.issues.support.MockIssueStatus
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository
 import net.nemerosa.ontrack.extension.svn.db.SVNRepositoryDao
 import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration
@@ -221,7 +224,6 @@ class SVNSearchIT extends AbstractServiceTestSupport {
      * trunk with revision 5, and branch 1.0 with revision 4
      */
     @Test
-    @Ignore
     void 'SVN: Search linked issues - links between branches, no merge'() {
         def testName = 'SVNSearchLinkedIssuesMultiBranch'
 
