@@ -1,1 +1,4 @@
 master
+feature/.*
+hotfix/.*
+release/.*
