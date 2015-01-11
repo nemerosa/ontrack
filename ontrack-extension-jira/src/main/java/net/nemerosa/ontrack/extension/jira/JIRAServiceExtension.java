@@ -1,12 +1,16 @@
 package net.nemerosa.ontrack.extension.jira;
 
+import com.google.common.collect.Sets;
 import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtension;
+import net.nemerosa.ontrack.extension.jira.client.JIRAClient;
 import net.nemerosa.ontrack.extension.jira.model.JIRAIssue;
 import net.nemerosa.ontrack.extension.jira.tx.JIRASession;
 import net.nemerosa.ontrack.extension.jira.tx.JIRASessionFactory;
+import net.nemerosa.ontrack.model.structure.Project;
+import net.nemerosa.ontrack.model.structure.PropertyService;
 import net.nemerosa.ontrack.model.support.MessageAnnotation;
 import net.nemerosa.ontrack.model.support.MessageAnnotator;
 import net.nemerosa.ontrack.model.support.RegexMessageAnnotator;
@@ -32,6 +36,7 @@ public class JIRAServiceExtension extends AbstractIssueServiceExtension {
     private final JIRAConfigurationService jiraConfigurationService;
     private final JIRASessionFactory jiraSessionFactory;
     private final TransactionService transactionService;
+    private final PropertyService propertyService;
 
     @Autowired
     public JIRAServiceExtension(
@@ -39,12 +44,13 @@ public class JIRAServiceExtension extends AbstractIssueServiceExtension {
             JIRAConfigurationService jiraConfigurationService,
             JIRASessionFactory jiraSessionFactory,
             TransactionService transactionService,
-            IssueExportServiceFactory issueExportServiceFactory
-    ) {
+            IssueExportServiceFactory issueExportServiceFactory,
+            PropertyService propertyService) {
         super(extensionFeature, SERVICE, "JIRA", issueExportServiceFactory);
         this.jiraConfigurationService = jiraConfigurationService;
         this.jiraSessionFactory = jiraSessionFactory;
         this.transactionService = transactionService;
+        this.propertyService = propertyService;
     }
 
     @Override
@@ -60,6 +66,23 @@ public class JIRAServiceExtension extends AbstractIssueServiceExtension {
     @Override
     public Optional<String> getIssueId(IssueServiceConfiguration issueServiceConfiguration, String token) {
         return validIssueToken(token) ? Optional.of(token) : Optional.empty();
+    }
+
+    @Override
+    public Collection<? extends Issue> getLinkedIssues(Project project, IssueServiceConfiguration issueServiceConfiguration, Issue issue) {
+        // Gets a list of link names to follow
+        return propertyService.getProperty(project, JIRAFollowLinksPropertyType.class).option()
+                .map(property -> {
+                    Map<String, JIRAIssue> issues = new LinkedHashMap<>();
+                    followLinks(
+                            (JIRAConfiguration) issueServiceConfiguration,
+                            (JIRAIssue) issue,
+                            Sets.newHashSet(property.getLinkNames()),
+                            issues
+                    );
+                    return issues.values();
+                })
+                .orElse(Collections.singleton((JIRAIssue) issue));
     }
 
     @Override
@@ -133,6 +156,31 @@ public class JIRAServiceExtension extends AbstractIssueServiceExtension {
     protected Set<String> getIssueTypes(IssueServiceConfiguration issueServiceConfiguration, Issue issue) {
         JIRAIssue jiraIssue = (JIRAIssue) issue;
         return Collections.singleton(jiraIssue.getIssueType());
+    }
+
+    /**
+     * Given an issue seed, and a list of link names, follows the given links recursively and
+     * puts the associated issues into the {@code collectedIssues} map.
+     *
+     * @param configuration   JIRA configuration to use to load the issues
+     * @param seed            Issue to start from.
+     * @param linkNames       Links to follow
+     * @param collectedIssues Collected issues, indexed by their key
+     */
+    public void followLinks(JIRAConfiguration configuration, JIRAIssue seed, Set<String> linkNames, Map<String, JIRAIssue> collectedIssues) {
+        try (Transaction tx = transactionService.start()) {
+            JIRASession session = getJIRASession(tx, configuration);
+            // Gets the client from the current session
+            JIRAClient client = session.getClient();
+            // Puts the seed into the list
+            collectedIssues.put(seed.getKey(), seed);
+            // Gets the linked issue keys
+            seed.getLinks().stream()
+                    .filter(linkedIssue -> linkNames.contains(linkedIssue.getLinkName()))
+                    .filter(linkedIssue -> !collectedIssues.containsKey(linkedIssue.getKey()))
+                    .map(linkedIssue -> client.getIssue(linkedIssue.getKey(), configuration))
+                    .forEach(linkedIssue -> followLinks(configuration, linkedIssue, linkNames, collectedIssues));
+        }
     }
 
     public JIRAIssue getIssue(JIRAConfiguration configuration, String key) {

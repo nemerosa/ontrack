@@ -1,12 +1,15 @@
 package net.nemerosa.ontrack.extension.jira.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.experimental.Wither;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
+@AllArgsConstructor
 public class JIRAIssue implements Issue {
 
     private final String url;
@@ -19,5 +22,7 @@ public class JIRAIssue implements Issue {
     private final List<JIRAVersion> affectedVersions;
     private final List<JIRAVersion> fixVersions;
     private final String issueType;
+    @Wither
+    private final List<JIRALink> links;
 
 }

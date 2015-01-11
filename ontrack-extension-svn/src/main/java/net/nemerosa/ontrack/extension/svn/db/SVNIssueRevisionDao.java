@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.svn.db;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
@@ -16,6 +17,6 @@ public interface SVNIssueRevisionDao {
 
     OptionalLong findLastRevisionByIssue(int repositoryId, String issueKey);
 
-    OptionalLong findLastRevisionByIssueAndBranch(int repositoryId, String issueKey, String branch);
+    OptionalLong findLastRevisionByIssuesAndBranch(int repositoryId, Collection<String> issueKeys, String branch);
 
 }

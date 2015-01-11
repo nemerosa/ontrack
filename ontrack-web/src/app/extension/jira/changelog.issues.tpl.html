@@ -9,6 +9,7 @@
         <th>Issue type</th>
         <th>Assignee</th>
         <th>Updated</th>
+        <th>Links</th>
     </tr>
     </thead>
     <tbody>
@@ -46,6 +47,12 @@
         </td>
         <td>
             {{changeLogIssue.issue.updateTime | date: 'mediumDate'}}
+        </td>
+        <td>
+            <span ng-repeat="link in changeLogIssue.issue.links">
+                {{link.link}}
+                <ot-extension-jira-issue-link issue="link"></ot-extension-jira-issue-link><span ng-if="!$last">, </span>
+            </span>
         </td>
     </tr>
     </tbody>

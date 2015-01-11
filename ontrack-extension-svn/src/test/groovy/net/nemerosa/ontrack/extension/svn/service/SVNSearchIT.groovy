@@ -1,6 +1,10 @@
 package net.nemerosa.ontrack.extension.svn.service
 
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
+import net.nemerosa.ontrack.extension.issues.support.MockIssue
+import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
+import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceExtension
+import net.nemerosa.ontrack.extension.issues.support.MockIssueStatus
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository
 import net.nemerosa.ontrack.extension.svn.db.SVNRepositoryDao
 import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration
@@ -8,16 +12,15 @@ import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropert
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationPropertyType
-import net.nemerosa.ontrack.extension.svn.support.MockIssueServiceConfiguration
-import net.nemerosa.ontrack.extension.svn.support.SVNProfileValueSource
-import net.nemerosa.ontrack.extension.svn.support.SVNTestRepo
-import net.nemerosa.ontrack.extension.svn.support.SVNTestUtils
+import net.nemerosa.ontrack.extension.svn.support.*
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectEdit
+import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import org.junit.AfterClass
+import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -67,35 +70,19 @@ class SVNSearchIT extends AbstractServiceTestSupport {
     @Autowired
     private SVNRepositoryDao repositoryDao
 
-    @Test
-    void 'SVN: Search issue'() {
-        def testName = 'SVNSearchIssue'
+    @Autowired
+    private MockIssueServiceExtension mockIssueServiceExtension
 
-        /**
-         * Initialisation
-         */
-
-        init testName
-        SVNConfiguration configuration = initConfiguration()
-        configureBranch(configuration, testName)
-
-        /**
-         * Looking for an existing issue
-         */
-
-        (1..4).each {
-            def optIssue = svnService.searchIssues(svnService.getRepository(configuration.name), "#${it}")
-            assert optIssue.present
-            def issue = optIssue.get()
-            assert issue.issue.key == "${it}"
-            assert issue.issue.displayKey == "#${it}"
-            assert issue.repository.configuration.name == configuration.name
-        }
-
+    /**
+     * Makes sure to reset the list of issues in the mock issue service
+     */
+    @Before
+    void 'Reset issues'() {
+        mockIssueServiceExtension.resetIssues()
     }
 
     @Test
-    void 'SVN: Search revision'() {
+    void '0 - SVN: Search revision'() {
         def testName = 'SVNSearchRevision'
 
         /**
@@ -152,10 +139,167 @@ class SVNSearchIT extends AbstractServiceTestSupport {
 
     }
 
+    @Test
+    void 'SVN: Search issue'() {
+        def testName = 'SVNSearchIssue'
+
+        /**
+         * Initialisation
+         */
+
+        init testName
+        SVNConfiguration configuration = initConfiguration()
+        configureBranch(configuration, testName)
+
+        /**
+         * Looking for an existing issue
+         */
+
+        (1..4).each {
+            def optIssue = svnService.searchIssues(svnService.getRepository(configuration.name), "#${it}")
+            assert optIssue.present
+            def issue = optIssue.get()
+            assert issue.issue.key == "${it}"
+            assert issue.issue.displayKey == "#${it}"
+            assert issue.repository.configuration.name == configuration.name
+        }
+
+    }
+
+    @Test
+    void 'SVN: Search linked issues - one branch only'() {
+        def testName = 'SVNSearchLinkedIssues'
+
+        /**
+         * Initialisation
+         */
+
+        init testName
+        SVNConfiguration configuration = initConfiguration()
+        def branch = configureBranch(configuration, testName)
+
+        /**
+         * Issues and links
+         */
+        def issue1 = new MockIssue(1, MockIssueStatus.OPEN, 'feature')
+        def issue2 = new MockIssue(2, MockIssueStatus.OPEN, 'feature')
+        def issue3 = new MockIssue(3, MockIssueStatus.OPEN, 'feature')
+        def issue4 = new MockIssue(4, MockIssueStatus.OPEN, 'feature')
+
+        issue1.withLinks([issue2, issue3])
+        issue2.withLinks([issue1, issue4])
+        issue3.withLinks([issue1])
+        issue4.withLinks([issue2])
+
+        mockIssueServiceExtension.register(issue1, issue2, issue3, issue4)
+
+        /**
+         * Looking for issue #1 must bring the last revision (for issue #4)
+         */
+
+        def info = asUser().with(branch, ProjectView).call { svnService.getIssueInfo(configuration.name, '1') }
+        assert info.issue.key == '1'
+        assert info.issue.displayKey == '#1'
+
+        assert info.revisionInfos.size() == 1
+        assert info.revisionInfos.first().revisionInfo.message == 'Commit 10 for #4'
+
+    }
+
+    /**
+     * Gets issue info accross two branches by following issue links.
+     *
+     * <pre>
+     *     |  |
+     *     *  | (5) Commit #3 (trunk)
+     *     |  |
+     *     |  * (4) Commit #2 (branches/1.0)
+     *     |  |
+     *     |  /
+     *     | /
+     *     * (2) Commit #1
+     * </pre>
+     *
+     * If issues #3 and #2 are linked, lLooking for issue #3 must bring two branches:
+     * trunk with revision 5, and branch 1.0 with revision 4
+     */
+    @Test
+    void 'SVN: Search linked issues - links between branches, no merge'() {
+        def testName = 'SVNSearchLinkedIssuesMultiBranch'
+
+        /**
+         * Initialisation
+         */
+
+        repo.mkdir "${testName}/trunk", 'Trunk'
+        repo.mkdir "${testName}/trunk/1", 'Commit for #1'
+        repo.copy "${testName}/trunk", "${testName}/branches/1.0", "Branch 1.0"
+        repo.mkdir "${testName}/branches/1.0/2", 'Commit for #2'
+        repo.mkdir "${testName}/trunk/3", 'Commit for #3'
+
+        SVNConfiguration configuration = initConfiguration()
+
+        /**
+         * Branches
+         */
+
+        // Project
+        Project project = doCreateProject()
+
+        // Configuration & branches
+        asUser().with(project, ProjectEdit).call {
+
+            propertyService.editProperty(project, SVNProjectConfigurationPropertyType, new SVNProjectConfigurationProperty(
+                    configuration,
+                    "/${testName}/trunk"
+            ))
+
+            // Trunk configuration
+            def trunk = doCreateBranch(project, nd('trunk', ''))
+            propertyService.editProperty(trunk, SVNBranchConfigurationPropertyType, new SVNBranchConfigurationProperty(
+                    "/${testName}/trunk",
+                    "/${testName}/tags/{build}"
+            ))
+
+            // Branch configuration
+            def branch10 = doCreateBranch(project, nd('1.0', ''))
+            propertyService.editProperty(branch10, SVNBranchConfigurationPropertyType, new SVNBranchConfigurationProperty(
+                    "/${testName}/branches/1.0",
+                    "/${testName}/tags/{build}"
+            ))
+
+        }
+
+        /**
+         * Issues and links
+         */
+        def issue1 = new MockIssue(1, MockIssueStatus.OPEN, 'feature')
+        def issue2 = new MockIssue(2, MockIssueStatus.OPEN, 'feature')
+        def issue3 = new MockIssue(3, MockIssueStatus.OPEN, 'feature')
+
+        issue2.withLinks([issue3])
+        issue3.withLinks([issue2])
+
+        mockIssueServiceExtension.register(issue1, issue2, issue3)
+
+        /**
+         * Search
+         */
+
+        def info = asUser().with(project, ProjectView).call { svnService.getIssueInfo(configuration.name, '3') }
+        assert info.issue.key == '3'
+        assert info.issue.displayKey == '#3'
+
+        assert info.revisionInfos.size() == 2
+        assert info.revisionInfos.first().revisionInfo.message == 'Commit for #3'
+        assert info.revisionInfos.last().revisionInfo.message == 'Commit for #2'
+
+    }
+
     protected static void init(String test) {
         repo.mkdir "${test}/trunk", 'Trunk'
         (1..10).each {
-            def key = ((it / 3) + 1) as int
+            def key = ((it / 3) + 1) as int // 1..4
             def message = "Commit $it for #$key"
             repo.mkdir "${test}/trunk/${it}", message // Revision = it + 1
         }

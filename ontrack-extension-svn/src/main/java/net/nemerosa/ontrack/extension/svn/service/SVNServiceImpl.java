@@ -132,10 +132,14 @@ public class SVNServiceImpl implements SVNService {
                 config -> Objects.equals(configurationName, config.getConfiguration().getName()),
                 (branch, branchConfig) -> {
                     String branchPath = branchConfig.getBranchPath();
+                    // List of linked issues
+                    Collection<String> linkedIssues = configuredIssueService.getLinkedIssues(branch.getProject(), issue).stream()
+                            .map(Issue::getKey)
+                            .collect(Collectors.toList());
                     // Gets the last raw revision on this branch
-                    issueRevisionDao.findLastRevisionByIssueAndBranch(
+                    issueRevisionDao.findLastRevisionByIssuesAndBranch(
                             repository.getId(),
-                            issueKey,
+                            linkedIssues,
                             branchPath
                     ).ifPresent(revision -> branchRevisions.put(branchPath, new BranchRevision(branchPath, revision, false)));
                 }

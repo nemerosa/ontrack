@@ -110,4 +110,12 @@ public interface GitRepositoryClient {
      * List of all tags
      */
     Collection<GitTag> getTags();
+
+    /**
+     * Checks if the {@code commitish} string can be parsed into this repository
+     *
+     * @param commitish Commitish string
+     * @return <code>true</code> if this is a valid commit-like entry, <code>false</code> otherwise
+     */
+    boolean isCommit(String commitish);
 }

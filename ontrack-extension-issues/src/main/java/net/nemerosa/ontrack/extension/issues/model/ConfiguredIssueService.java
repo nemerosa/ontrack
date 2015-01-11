@@ -2,13 +2,11 @@ package net.nemerosa.ontrack.extension.issues.model;
 
 import lombok.Data;
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtension;
+import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.support.MessageAnnotationUtils;
 import net.nemerosa.ontrack.model.support.MessageAnnotator;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Association between an {@link net.nemerosa.ontrack.extension.issues.IssueServiceExtension} and
@@ -55,5 +53,9 @@ public class ConfiguredIssueService {
 
     public Optional<String> getIssueId(String token) {
         return issueServiceExtension.getIssueId(issueServiceConfiguration, token);
+    }
+
+    public Collection<? extends Issue> getLinkedIssues(Project project, Issue issue) {
+        return issueServiceExtension.getLinkedIssues(project, issueServiceConfiguration, issue);
     }
 }

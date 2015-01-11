@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.model.form.YesNo;
 import net.nemerosa.ontrack.model.structure.Build;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -69,16 +70,20 @@ public class CommitBuildNameGitCommitLink implements BuildGitCommitLink<CommitLi
 
     @Override
     public Stream<String> getBuildCandidateReferences(String commit, GitRepositoryClient gitClient, GitBranchConfiguration branchConfiguration, CommitLinkConfig data) {
-        return gitClient.log(
-                String.format("%s~1", commit),
-                gitClient.getBranchRef(branchConfiguration.getBranch())
-        )
-                .sorted()
-                .map(
-                        gitCommit -> data.isAbbreviated() ?
-                                gitCommit.getShortId() :
-                                gitCommit.getId()
-                );
+        if (gitClient.isCommit(commit)) {
+            return gitClient.log(
+                    String.format("%s~1", commit),
+                    gitClient.getBranchRef(branchConfiguration.getBranch())
+            )
+                    .sorted()
+                    .map(
+                            gitCommit -> data.isAbbreviated() ?
+                                    gitCommit.getShortId() :
+                                    gitCommit.getId()
+                    );
+        } else {
+            return Collections.<String>emptyList().stream();
+        }
     }
 
     @Override

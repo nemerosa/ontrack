@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
@@ -82,15 +83,15 @@ public class SVNIssueRevisionJdbcDao extends AbstractJdbcRepository implements S
     }
 
     @Override
-    public OptionalLong findLastRevisionByIssueAndBranch(int repositoryId, String issueKey, String branch) {
+    public OptionalLong findLastRevisionByIssuesAndBranch(int repositoryId, Collection<String> issueKeys, String branch) {
         Long revision = getFirstItem(
                 "SELECT RI.REVISION FROM EXT_SVN_REVISION_ISSUE RI " +
                         "INNER JOIN EXT_SVN_REVISION R ON R.REPOSITORY = RI.REPOSITORY AND R.REVISION = RI.REVISION " +
-                        "WHERE RI.ISSUE = :key " +
+                        "WHERE RI.ISSUE IN (:keys) " +
                         "AND R.BRANCH = :branch " +
                         "ORDER BY RI.REVISION DESC " +
                         "LIMIT 1",
-                params("key", issueKey).addValue("repository", repositoryId).addValue("branch", branch),
+                params("keys", issueKeys).addValue("repository", repositoryId).addValue("branch", branch),
                 Long.class
         );
         return optionalLong(revision);
