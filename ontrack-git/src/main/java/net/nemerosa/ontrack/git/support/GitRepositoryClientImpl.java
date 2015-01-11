@@ -31,10 +31,7 @@ import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -136,12 +133,15 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
             Repository gitRepository = git.getRepository();
             ObjectId oFrom = gitRepository.resolve(from);
             ObjectId oTo = gitRepository.resolve(to);
-
-            return Lists.newArrayList(
-                    git.log()
-                            .addRange(oFrom, oTo)
-                            .call()
-            ).stream().map(this::toCommit);
+            if (oFrom == null || oTo == null) {
+                return Collections.<GitCommit>emptyList().stream();
+            } else {
+                return Lists.newArrayList(
+                        git.log()
+                                .addRange(oFrom, oTo)
+                                .call()
+                ).stream().map(this::toCommit);
+            }
 
         } catch (GitAPIException e) {
             throw new GitRepositoryAPIException(repository.getRemote(), e);
@@ -295,6 +295,16 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
                     })
                     .collect(Collectors.toList())
                     ;
+        } catch (IOException e) {
+            throw new GitRepositoryIOException(repository.getRemote(), e);
+        }
+    }
+
+    @Override
+    public boolean isCommit(String commitish) {
+        try {
+            Repository repo = git.getRepository();
+            return repo.resolve(commitish) != null;
         } catch (IOException e) {
             throw new GitRepositoryIOException(repository.getRemote(), e);
         }
