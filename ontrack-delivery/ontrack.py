@@ -26,6 +26,7 @@ def search_build(base_url, project_id, criteria):
 
 
 def get_change_log(base_url, branch, promotion_level):
+    print "Getting the change log on %s since last %s" % (branch, promotion_level)
     # Gets the project ID
     project_id = get_project_id(base_url)
     # Gets the last build on the branch to release
