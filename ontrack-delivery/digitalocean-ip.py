@@ -9,7 +9,9 @@ def get_ip(name, token):
     response = json.load(digitalocean.do_get("https://api.digitalocean.com/v2/droplets?page=1&per_page=100", token))
     for droplet in response['droplets']:
         if droplet['name'] == name:
-            return droplet['networks']['v4'][0]['ip_address']
+            for network in droplet['networks']['v4']:
+                if network['type'] == 'public':
+                    return network['ip_address']
     raise Exception('Could not find droplet with name %s' % name)
 
 
