@@ -22,7 +22,7 @@ def search_build(base_url, project_id, criteria):
     if len(resources) > 0:
         return resources[0]['build']['id']
     else:
-        raise Exception("No build was returned.")
+        raise Exception("No build was returned for %s" % criteria)
 
 
 def get_change_log(base_url, branch, promotion_level):
