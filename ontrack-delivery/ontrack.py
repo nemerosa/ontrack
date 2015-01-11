@@ -1,41 +1,62 @@
+import json
 import urllib2
 
 
-def ontrackGet(url):
+def ontrack_get(url):
     req = urllib2.Request(url)
     req.add_header('Accept', 'application/json')
     try:
-        return urllib2.urlopen(req)
+        res = urllib2.urlopen(req)
+        return json.load(res)
     except urllib2.HTTPError as e:
-        raise ("Ontrack error:\n%s\n" % e)
+        raise Exception("Ontrack error:\n%s\n" % e)
 
 
-def getBranchId(baseUrl, branch):
-    return ontrackGet("%s/structure/entity/branch/ontrack/%s" % (baseUrl, branch))
+def get_project_id(base_url):
+    return ontrack_get("%s/structure/entity/project/ontrack" % base_url)['id']
+
+
+def search_build(base_url, project_id, criteria):
+    resources = ontrack_get(
+        "%s/structure/project/%s/builds/search?maximumCount=1&%s" % (base_url, project_id, criteria)
+    )['resources']
+    if len(resources) > 0:
+        return resources[0]['build']['id']
+    else:
+        raise Exception("No build was returned.")
 
 
 def getBranchBuildView(baseurl, branchId, promotionLevel):
-    return ontrackGet(
+    return ontrack_get(
         "%s/structure/branches/%d/view/net.nemerosa.ontrack.service.StandardBuildFilterProvider?afterDate=&beforeDate=&count=500&sincePromotionLevel=%s" % (
-        baseurl, branchId, promotionLevel))
+            baseurl, branchId, promotionLevel))
 
 
-def getChangeLog(baseurl, branch, promotionLevel):
-    # Getting the branch ID
-    branchId = getBranchId(baseurl, branch)
+def get_change_log(base_url, branch, promotion_level):
+    # Gets the project ID
+    project_id = get_project_id(base_url)
+    # Gets the last build on the branch to release
+    last_build_id = search_build(base_url, project_id, 'branchName=%s' % branch)
+    print "Last build: %s" % last_build_id
+    # Gets the last release
+    last_release_id = search_build(base_url, project_id, 'promotionName=%s' % promotion_level)
+    print "Last release: %s" % last_release_id
 
-    # Gets the branch view
-    branchBuildView = getBranchBuildView(baseurl, branchId, promotionLevel)
-
-    # Boundaries
-    lastBuildId = branchBuildView.buildViews[0].build.id
-    lastReleaseId = branchBuildView.buildViews[branchBuildView.buildViews.size() - 1].build.id
-
-    # Gets the change log
-    url = "%s/extension/git/changelog/export?branch=%d&from=%d&to=%d&format=text&grouping=Features%%3Dfeature%%7CEnhancements%%3Denhancement%%7CBugs%%3Dbug&exclude=delivery,design" % (baseurl, branchId, lastReleaseId, lastBuildId)
-    req = urllib2.Request(url)
-    req.add_header('Accept', 'text/plain')
-    try:
-        return urllib2.urlopen(req)
-    except urllib2.HTTPError as e:
-        raise ("Ontrack error:\n%s\n" % e)
+# # Getting the branch ID
+# branchId = getBranchId(baseurl, branch)
+#
+# # Gets the branch view
+# branchBuildView = getBranchBuildView(baseurl, branchId, promotionLevel)
+#
+# # Boundaries
+# lastBuildId = branchBuildView.buildViews[0].build.id
+# lastReleaseId = branchBuildView.buildViews[branchBuildView.buildViews.size() - 1].build.id
+#
+# # Gets the change log
+# url = "%s/extension/git/changelog/export?branch=%d&from=%d&to=%d&format=text&grouping=Features%%3Dfeature%%7CEnhancements%%3Denhancement%%7CBugs%%3Dbug&exclude=delivery,design" % (baseurl, branchId, lastReleaseId, lastBuildId)
+# req = urllib2.Request(url)
+# req.add_header('Accept', 'text/plain')
+# try:
+# return urllib2.urlopen(req)
+# except urllib2.HTTPError as e:
+# raise ("Ontrack error:\n%s\n" % e)
