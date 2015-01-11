@@ -64,15 +64,15 @@ def publish(options):
     ui_jar = "%s/ontrack-ui-%s.jar" % (options.repository, options.version_full)
     print "[publish] Uploading ontrack-ui.jar at %s..." % ui_jar
     github.upload_github_artifact(options, release_id, 'ontrack-ui.jar', 'application/zip', ui_jar)
-    # Publication in the Maven Central repository
-    print "[publish] Publishing DSL libraries in OSSRH..."
-    maven_publish(options)
     # Gets the change log since last release
     print "[publish] Getting the change log from Ontrack..."
     change_log = ontrack.get_change_log(options.ontrack_url, options.ontrack_branch, 'RELEASE')
     # Attach change log to the release
     print "[publish] Setting the change log as description in the release..."
     github.set_release_description(options, release_id, change_log)
+    # Publication in the Maven Central repository
+    print "[publish] Publishing DSL libraries in OSSRH..."
+    maven_publish(options)
     # OK
     print "[publish] End."
 
