@@ -305,7 +305,7 @@ docker logout
             }
             steps {
                 environmentVariables {
-                    env 'VERSION_BRANCH', NAME
+                    env 'VERSION_BRANCHID', NAME
                 }
                 shell readFileFromWorkspace('seed/publish.sh')
             }
@@ -320,7 +320,7 @@ docker logout
                 node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackPromotedRunNotifier' {
                     'project'('ontrack')
                     'branch'(NAME)
-                    'build'('${VERSION_BUILD}')
+                    'build'('${VERSION_BUILDID}')
                     'promotionLevel'('RELEASE')
                 }
             }
