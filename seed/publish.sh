@@ -30,7 +30,7 @@ unzip ${REPOSITORY}/ontrack-delivery-docker-${VERSION_FULL}.jar -d ${WORKSPACE}
     --version-full=${VERSION_FULL} \
     --version-release=${VERSION_DISPLAY} \
     --ontrack-url=https://ontrack.nemerosa.net \
-    --ontrack-branch=${VERSION_BRANCH} \
+    --ontrack-branch=${VERSION_BRANCHID} \
     --github-user=dcoraboeuf \
     --github-token=${GITHUB_TOKEN} \
     --ossrh-profile=${OSSRH_PROFILE}
