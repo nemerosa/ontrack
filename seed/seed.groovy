@@ -305,7 +305,7 @@ docker logout
             }
             steps {
                 environmentVariables {
-                    env 'VERSION_BRANCH', BRANCH
+                    env 'VERSION_BRANCH', NAME
                 }
                 shell readFileFromWorkspace('seed/publish.sh')
             }
