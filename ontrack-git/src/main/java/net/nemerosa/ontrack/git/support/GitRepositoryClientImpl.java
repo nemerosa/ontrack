@@ -188,11 +188,14 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
     public boolean scanCommits(String branch, Predicate<RevCommit> scanFunction) {
         // All commits
         try {
-            Iterable<RevCommit> commits = git.log().add(git.getRepository().resolve(getBranchRef(branch))).call();
-            for (RevCommit commit : commits) {
-                if (scanFunction.test(commit)) {
-                    // Not going on
-                    return true;
+            ObjectId resolvedBranch = git.getRepository().resolve(getBranchRef(branch));
+            if (resolvedBranch != null) {
+                Iterable<RevCommit> commits = git.log().add(resolvedBranch).call();
+                for (RevCommit commit : commits) {
+                    if (scanFunction.test(commit)) {
+                        // Not going on
+                        return true;
+                    }
                 }
             }
             // Default behaviour
