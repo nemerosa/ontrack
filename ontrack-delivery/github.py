@@ -32,7 +32,7 @@ def upload_github_artifact(options, releaseId, name, type, path):
     )
 
 
-def setReleaseDescription(options, releaseId, description):
+def set_release_description(options, releaseId, description):
     call_github(
         options,
         "https://api.github.com/repos/%s/releases/%d" % (options.github_repository, releaseId),
