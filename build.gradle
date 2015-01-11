@@ -10,7 +10,7 @@ apply plugin: 'maven'
 
 allprojects {
     group = 'net.nemerosa.ontrack'
-    version = versioning.info.display
+    version = versioning.info.full
 }
 
 /**
