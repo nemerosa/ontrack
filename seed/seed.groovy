@@ -304,6 +304,9 @@ docker logout
                 toolenv('Maven-3.2.x')
             }
             steps {
+                environmentVariables {
+                    env 'VERSION_BRANCH', BRANCH
+                }
                 shell readFileFromWorkspace('seed/publish.sh')
             }
             publishers {
