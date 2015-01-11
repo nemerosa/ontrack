@@ -320,7 +320,7 @@ docker logout
                 node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackPromotedRunNotifier' {
                     'project'('ontrack')
                     'branch'(NAME)
-                    'build'('${VERSION_BUILDID}')
+                    'build'('${VERSION_BUILD}')
                     'promotionLevel'('RELEASE')
                 }
             }
