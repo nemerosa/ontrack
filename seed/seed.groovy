@@ -317,11 +317,23 @@ docker logout
                 }
             }
             configure { node ->
-                node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackPromotedRunNotifier' {
-                    'project'('ontrack')
-                    'branch'(NAME)
-                    'build'('${VERSION_BUILD}')
-                    'promotionLevel'('RELEASE')
+                node / 'publishers' {
+                    'net.nemerosa.ontrack.jenkins.OntrackPromotedRunNotifier' {
+                        'project'('ontrack')
+                        'branch'(NAME)
+                        'build'('${VERSION_BUILD}')
+                        'promotionLevel'('RELEASE')
+                    }
+                    'net.nemerosa.ontrack.jenkins.OntrackDSLNotifier' {
+                        'script' """\
+ontrack.build('ontrack', '${NAME}', VERSION_BUILD).properties {
+   label VERSION_DISPLAY
+}
+"""
+                        injectEnvironment 'VERSION_BUILD,VERSION_DISPLAY'
+                        injectProperties ''
+                        ontrackLog false
+                    }
                 }
             }
         }
