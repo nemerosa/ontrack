@@ -24,7 +24,7 @@ public class ITConfig {
 
     @Bean
     public DataSource dataSource() throws IOException {
-        String dbURL = "jdbc:h2:mem:ontrack;MODE=MYSQL";
+        String dbURL = "jdbc:h2:mem:ontrack;MODE=MYSQL;DB_CLOSE_ON_EXIT=FALSE;DEFRAG_ALWAYS=TRUE";
         logger.info("Using database at {}", dbURL);
         org.apache.tomcat.jdbc.pool.DataSource pool = new org.apache.tomcat.jdbc.pool.DataSource();
         pool.setDriverClassName("org.h2.Driver");
