@@ -48,8 +48,14 @@
                     </button>
                     <button class="btn btn-sm btn-link" type="button"
                             ng-class="{'text-muted': advancedSearch}"
+                            title="Displays additional search options."
                             ng-click="toggleAdvancedSearch()">
                         Advanced
+                    </button>
+                    <button class="btn btn-sm btn-link" type="button"
+                            title="Clears the search options."
+                            ng-click="resetForm()">
+                        Reset
                     </button>
                     <button class="btn btn-sm btn-link" type="button"
                             title="Displays the permalink in the address bar."

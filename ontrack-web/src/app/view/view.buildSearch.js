@@ -133,5 +133,13 @@ angular.module('ot.view.buildSearch', [
             }
         };
 
+        // Clearing the search options
+        $scope.resetForm = function () {
+            $scope.data = {
+                maximumCount: 10
+            };
+            $scope.advancedSearch = false;
+        };
+
     })
 ;
