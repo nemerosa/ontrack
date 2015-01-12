@@ -43,6 +43,8 @@ public class ArtifactoryPromotionSyncServiceImpl implements JobProvider {
         return structureService.getProjectList().stream()
                 // ... and their branches
                 .flatMap(project -> structureService.getBranchesForProject(project.getId()).stream())
+                        // ... only if not a template
+                .filter(branch -> branch.getType() != BranchType.TEMPLATE_DEFINITION)
                         // ... gets those with the sync. property
                 .filter(branch -> propertyService.hasProperty(branch, ArtifactoryPromotionSyncPropertyType.class))
                         // ... creates the job

@@ -1,16 +1,22 @@
 package net.nemerosa.ontrack.extension.artifactory.service;
 
+import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClient;
 import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClientFactory;
 import net.nemerosa.ontrack.extension.artifactory.model.ArtifactoryStatus;
+import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncProperty;
+import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncPropertyType;
+import net.nemerosa.ontrack.model.job.Job;
 import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.common.Time;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
@@ -19,14 +25,16 @@ public class ArtifactoryPromotionSyncServiceImplTest {
     private ArtifactoryPromotionSyncServiceImpl service;
     private StructureService structureService;
     private ArtifactoryClient artifactoryClient;
+    private Project project;
     private Branch branch;
     private PromotionLevel promotionLevel;
+    PropertyService propertyService;
     private Build build;
 
     @Before
     public void setup() {
         structureService = mock(StructureService.class);
-        PropertyService propertyService = mock(PropertyService.class);
+        propertyService = mock(PropertyService.class);
         ArtifactoryClientFactory artifactoryClientFactory = mock(ArtifactoryClientFactory.class);
         service = new ArtifactoryPromotionSyncServiceImpl(
                 structureService,
@@ -39,8 +47,9 @@ public class ArtifactoryPromotionSyncServiceImplTest {
         when(artifactoryClientFactory.getClient(any())).thenReturn(artifactoryClient);
 
         // Branch to sync
+        project = Project.of(new NameDescription("P", "Project")).withId(ID.of(1));
         branch = Branch.of(
-                Project.of(new NameDescription("P", "Project")).withId(ID.of(1)),
+                project,
                 new NameDescription("B", "Branch")
         ).withId(ID.of(10));
 
@@ -111,6 +120,39 @@ public class ArtifactoryPromotionSyncServiceImplTest {
         // Checks that a promotion has been created
         verify(structureService, times(1)).newPromotionRun(any());
 
+    }
+
+    @Test
+    public void syncBuildJobs_one_per_configured_branch() {
+        when(propertyService.hasProperty(branch, ArtifactoryPromotionSyncPropertyType.class)).thenReturn(true);
+        Property<ArtifactoryPromotionSyncProperty> property = Property.of(
+                new ArtifactoryPromotionSyncPropertyType(null),
+                new ArtifactoryPromotionSyncProperty(
+                        null,
+                        "",
+                        "",
+                        10
+                )
+        );
+        when(propertyService.getProperty(branch, ArtifactoryPromotionSyncPropertyType.class)).thenReturn(property);
+        when(structureService.getProjectList()).thenReturn(Collections.singletonList(project));
+        when(structureService.getBranchesForProject(project.getId())).thenReturn(Collections.singletonList(branch));
+        // Gets the list of jobs
+        Collection<Job> jobs = service.getJobs();
+        assertEquals(1, jobs.size());
+        assertEquals("10", jobs.stream().findFirst().get().getId());
+    }
+
+    @Test
+    public void syncBuildJobs_ignoring_templates() {
+        // Branch as template
+        branch = branch.withType(BranchType.TEMPLATE_DEFINITION);
+        when(propertyService.hasProperty(branch, ArtifactoryPromotionSyncPropertyType.class)).thenReturn(true);
+        when(structureService.getProjectList()).thenReturn(Collections.singletonList(project));
+        when(structureService.getBranchesForProject(project.getId())).thenReturn(Collections.singletonList(branch));
+        // Gets the list of jobs
+        Collection<Job> jobs = service.getJobs();
+        assertEquals(0, jobs.size());
     }
 
 }
