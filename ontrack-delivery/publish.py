@@ -10,7 +10,7 @@ from utils import run_command
 def maven_publish(options):
     staging_dir = "%s/staging/%s" % (options.repository, options.version_full)
     # Deploys each module separately
-    modules = ["common", "json", "client", "dsl"]
+    modules = ["dsl"]
     for module in modules:
         # Update of POM to take into account the version
         run_command("sed", [

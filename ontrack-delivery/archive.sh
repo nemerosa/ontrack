@@ -71,21 +71,7 @@ ${MV} ontrack-acceptance/build/libs/ontrack-acceptance-*.jar ${DESTINATION}
 echo -n .
 ${MV} ontrack-delivery/build/ontrack-delivery-docker-*.jar ${DESTINATION}
 echo -n .
-${MV} ontrack-common/build/libs/ontrack-common-*.jar ${DESTINATION}
-echo -n .
-${MV} ontrack-json/build/libs/ontrack-json-*.jar ${DESTINATION}
-echo -n .
-${MV} ontrack-client/build/libs/ontrack-client-*.jar ${DESTINATION}
-echo -n .
-${MV} ontrack-dsl/build/libs/ontrack-dsl-*.jar ${DESTINATION}
-echo -n .
-${MV} ontrack-common/build/poms/ontrack-common-*.pom ${DESTINATION}
-echo -n .
-${MV} ontrack-json/build/poms/ontrack-json-*.pom ${DESTINATION}
-echo -n .
-${MV} ontrack-client/build/poms/ontrack-client-*.pom ${DESTINATION}
-echo -n .
-${MV} ontrack-dsl/build/poms/ontrack-dsl-*.pom ${DESTINATION}
+${MV} ontrack-dsl/build/libs/ontrack-dsl-*.* ${DESTINATION}
 
 echo
 echo "Artifacts have been copied"

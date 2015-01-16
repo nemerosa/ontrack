@@ -15,9 +15,6 @@
 
 def exporting = [
         ':ontrack-dsl',
-        ':ontrack-client',
-        ':ontrack-json',
-        ':ontrack-common',
 ]
 
 /**
