@@ -1,9 +1,11 @@
 package net.nemerosa.ontrack.dsl.client
 
-import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.client.JsonClient
-import net.nemerosa.ontrack.common.Document
+import groovy.json.JsonBuilder
+import groovy.json.JsonSlurper
 import net.nemerosa.ontrack.dsl.*
+import net.nemerosa.ontrack.dsl.http.OTHttpClient
+import org.apache.http.entity.ContentType
+import org.apache.http.entity.StringEntity
 
 /**
  * Entry point for the DSL.
@@ -11,15 +13,16 @@ import net.nemerosa.ontrack.dsl.*
 class OntrackResource implements Ontrack, OntrackConnector {
 
     /**
-     * JSON client
+     * HTTP client
      */
-    private final JsonClient jsonClient
+    private final OTHttpClient httpClient
+    private final JsonSlurper jsonSlurper = new JsonSlurper()
 
     /**
-     * Construction of the Ontrack client, based on a raw JSON client
+     * Construction of the Ontrack client, based on a raw HTTP client
      */
-    OntrackResource(JsonClient jsonClient) {
-        this.jsonClient = jsonClient
+    OntrackResource(OTHttpClient httpClient) {
+        this.httpClient = httpClient
     }
 
     @Override
@@ -96,33 +99,40 @@ class OntrackResource implements Ontrack, OntrackConnector {
         closure()
     }
 
-    JsonNode get(String url) {
-        jsonClient.get(url)
+    @Override
+    def get(String url) {
+        httpClient.get(url) { jsonSlurper.parseText(it) }
     }
 
     @Override
-    JsonNode post(String url, Object data) {
-        jsonClient.post(
-                jsonClient.toNode(data),
-                url
-        )
+    def post(String url, Object data) {
+        httpClient.post(
+                url,
+                new StringEntity(
+                        new JsonBuilder(data).toPrettyString(),
+                        ContentType.create("application/json", "UTF-8")
+                )
+        ) { jsonSlurper.parseText(it) }
     }
 
     @Override
-    JsonNode put(String url, Object data) {
-        jsonClient.put(
-                jsonClient.toNode(data),
-                url
-        )
+    def put(String url, Object data) {
+        httpClient.put(
+                url,
+                new StringEntity(
+                        new JsonBuilder(data).toPrettyString(),
+                        ContentType.create("application/json", "UTF-8")
+                )
+        ) { jsonSlurper.parseText(it) }
     }
 
     @Override
-    void upload(String url, String name, Object o) {
+    def upload(String url, String name, Object o) {
         upload(url, name, o, 'application/x-octet-stream')
     }
 
     @Override
-    void upload(String url, String name, Object o, String contentType) {
+    def upload(String url, String name, Object o, String contentType) {
         Document document
         String fileName = 'file'
         if (o instanceof Document) {
@@ -168,16 +178,16 @@ class OntrackResource implements Ontrack, OntrackConnector {
         } else {
             throw new IllegalArgumentException("Unsupported document type: ${o}")
         }
-        jsonClient.upload(
+        httpClient.upload(
+                url,
                 name,
-                document,
                 fileName,
-                url
-        )
+                document,
+        ) { it ? jsonSlurper.parseText(it) : [:] }
     }
 
     @Override
     Document download(String url) {
-        jsonClient.download(url)
+        httpClient.download(url)
     }
 }

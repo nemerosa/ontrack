@@ -1,27 +1,25 @@
 package net.nemerosa.ontrack.dsl.client
 
-import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.ProjectEntity
 import net.nemerosa.ontrack.dsl.PropertyNotFoundException
-import net.nemerosa.ontrack.json.JsonUtils
 
 abstract class AbstractProjectResource extends AbstractResource implements ProjectEntity {
 
-    AbstractProjectResource(Ontrack ontrack, JsonNode node) {
+    AbstractProjectResource(Ontrack ontrack, Object node) {
         super(ontrack, node)
     }
 
     int getId() {
-        JsonUtils.getInt(node, 'id')
+        node['id'] as int
     }
 
     String getName() {
-        return JsonUtils.get(node, 'name')
+        node['name']
     }
 
     String getDescription() {
-        return JsonUtils.get(node, 'description')
+        node['description']
     }
 
     @Override
@@ -36,7 +34,7 @@ abstract class AbstractProjectResource extends AbstractResource implements Proje
         // Gets the list of properties
         def properties = get(link('properties'))
         // Looks for the property
-        JsonNode propertyNode = properties.resources.find { it.typeDescriptor.typeName.asText() == type } as JsonNode
+        def propertyNode = properties.resources.find { it.typeDescriptor.typeName as String == type }
         // Found
         if (propertyNode != null) {
             new PropertyResource(ontrack, propertyNode).update(data)
@@ -52,14 +50,14 @@ abstract class AbstractProjectResource extends AbstractResource implements Proje
         // Gets the list of properties
         def properties = get(link('properties'))
         // Looks for the property
-        JsonNode propertyNode = properties.resources.find { it.typeDescriptor.typeName.asText() == type } as JsonNode
+        def propertyNode = properties.resources.find { it.typeDescriptor.typeName as String == type }
         // Found
         if (propertyNode != null) {
-            JsonNode valueNode = propertyNode.path('value')
-            if (valueNode.missingNode || valueNode.null) {
-                throw new PropertyNotFoundException(type)
+            def valueNode = propertyNode['value']
+            if (valueNode) {
+                valueNode
             } else {
-                JsonUtils.toMap(valueNode)
+                throw new PropertyNotFoundException(type)
             }
         }
         // Not found

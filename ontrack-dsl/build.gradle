@@ -2,10 +2,16 @@ description = "DSL for Ontrack."
 
 apply plugin: 'groovy'
 
+tasks.withType(AbstractCompile) {
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.7
+}
+
 dependencies {
-    compile project(':ontrack-client')
     compile libraries.groovy
     compile libraries.args4j
+    compile libraries.http_client
+    compile libraries.http_mime
 }
 
 javadocJar {

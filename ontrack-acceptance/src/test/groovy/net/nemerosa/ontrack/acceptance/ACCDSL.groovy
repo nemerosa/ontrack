@@ -2,11 +2,12 @@ package net.nemerosa.ontrack.acceptance
 
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTest
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
-import net.nemerosa.ontrack.client.ClientNotFoundException
 import net.nemerosa.ontrack.dsl.Branch
 import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.OntrackConnection
 import net.nemerosa.ontrack.dsl.Shell
+import net.nemerosa.ontrack.dsl.http.OTHttpClientException
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 
@@ -29,14 +30,21 @@ class ACCDSL extends AcceptanceTestClient {
                 .build()
     }
 
-    @Test(expected = ClientNotFoundException)
-    void 'Branch not authorised'() {
+    @Test
+    void 'Branch not found'() {
         // Creating a branch
         def testBranch = doCreateBranch()
+        def projectName = testBranch.project.name.asText()
+        def branchName = testBranch.name.asText()
         // Anonymous client
         ontrack = OntrackConnection.create(baseURL).disableSsl(sslDisabled).build()
         // Branch cannot be found
-        ontrack.branch(testBranch.project.name.asText(), testBranch.name.asText())
+        try {
+            ontrack.branch(projectName, branchName)
+            Assert.fail "Branch access should have been forbidden"
+        } catch (OTHttpClientException ex) {
+            assert ex.message == "Branch not found: ${projectName}/${branchName}"
+        }
     }
 
     @Test

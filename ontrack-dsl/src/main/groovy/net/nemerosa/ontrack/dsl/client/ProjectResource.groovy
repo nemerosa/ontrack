@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.dsl.client
 
-import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.dsl.Branch
 import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.Project
@@ -8,7 +7,7 @@ import net.nemerosa.ontrack.dsl.properties.ProjectProperties
 
 class ProjectResource extends AbstractProjectResource implements Project {
 
-    ProjectResource(Ontrack ontrack, JsonNode node) {
+    ProjectResource(Ontrack ontrack, Object node) {
         super(ontrack, node)
     }
 

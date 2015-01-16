@@ -1,11 +1,7 @@
 package net.nemerosa.ontrack.dsl
 
-import net.nemerosa.ontrack.client.JsonClient
-import net.nemerosa.ontrack.client.JsonClientImpl
-import net.nemerosa.ontrack.client.OTHttpClient
-import net.nemerosa.ontrack.client.OTHttpClientBuilder
-import net.nemerosa.ontrack.client.OTHttpClientLogger
 import net.nemerosa.ontrack.dsl.client.OntrackResource
+import net.nemerosa.ontrack.dsl.http.OTHttpClientBuilder
 import org.apache.commons.lang3.StringUtils
 
 class OntrackConnection {
@@ -14,7 +10,7 @@ class OntrackConnection {
     private boolean disableSsl = false
     private String user
     private String password
-    private OTHttpClientLogger logger
+    private Closure logger
 
     private OntrackConnection(String url) {
         this.url = url
@@ -29,7 +25,7 @@ class OntrackConnection {
         this
     }
 
-    OntrackConnection logger(OTHttpClientLogger logger) {
+    OntrackConnection logger(Closure logger) {
         this.logger = logger
         this
     }
@@ -41,7 +37,7 @@ class OntrackConnection {
     }
 
     Ontrack build() {
-        def builder = OTHttpClientBuilder.create(url, disableSsl)
+        def builder = new OTHttpClientBuilder(url, disableSsl)
         // Credentials
         if (StringUtils.isNotBlank(user)) {
             builder = builder.withCredentials(user, password)
@@ -50,11 +46,7 @@ class OntrackConnection {
         if (logger) {
             builder = builder.withLogger(logger)
         }
-        // Basic client
-        OTHttpClient otHttpClient = builder.build()
-        // Json client
-        JsonClient jsonClient = new JsonClientImpl(otHttpClient)
         // Ontrack client
-        new OntrackResource(jsonClient)
+        new OntrackResource(builder.build())
     }
 }

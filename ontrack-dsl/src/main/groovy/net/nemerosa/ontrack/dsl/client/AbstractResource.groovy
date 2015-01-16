@@ -1,24 +1,22 @@
 package net.nemerosa.ontrack.dsl.client
 
-import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.ResourceMissingLinkException
-import net.nemerosa.ontrack.json.JsonUtils
 
 class AbstractResource {
 
     protected final Ontrack ontrack
-    protected final JsonNode node
+    protected final Object node
 
-    AbstractResource(Ontrack ontrack, JsonNode node) {
+    AbstractResource(Ontrack ontrack, Object node) {
         this.ontrack = ontrack
         this.node = node
     }
 
     protected String link(String name) {
         String linkName = name.startsWith('_') ? name : '_' + name
-        if (node.has(linkName)) {
-            JsonUtils.get(node, linkName)
+        if (node[linkName]) {
+            node[linkName]
         } else {
             throw new ResourceMissingLinkException(name);
         }
@@ -32,24 +30,24 @@ class AbstractResource {
         }
     }
 
-    protected List<JsonNode> list(String url) {
+    protected List<Object> list(String url) {
         ontrack.get(url).resources as List
     }
 
-    protected JsonNode get(String url) {
+    protected Object get(String url) {
         ontrack.get(url)
     }
 
-    protected JsonNode post(String url, data) {
+    protected Object post(String url, data) {
         ontrack.post(url, data)
     }
 
-    protected JsonNode put(String url, data) {
+    protected Object put(String url, data) {
         ontrack.put(url, data)
     }
 
     @Override
     String toString() {
-        JsonUtils.pretty(node)
+        node as String
     }
 }

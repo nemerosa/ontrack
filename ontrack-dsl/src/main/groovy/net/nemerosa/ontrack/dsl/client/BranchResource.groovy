@@ -1,20 +1,18 @@
 package net.nemerosa.ontrack.dsl.client
 
-import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.dsl.*
 import net.nemerosa.ontrack.dsl.properties.BranchProperties
 import net.nemerosa.ontrack.dsl.support.BranchTemplateDefinition
-import net.nemerosa.ontrack.json.JsonUtils
 
 class BranchResource extends AbstractProjectResource implements Branch {
 
-    BranchResource(Ontrack ontrack, JsonNode node) {
+    BranchResource(Ontrack ontrack, Object node) {
         super(ontrack, node)
     }
 
     @Override
     String getProject() {
-        JsonUtils.get(node.path('project'), 'name')
+        node?.project?.name
     }
 
     @Override

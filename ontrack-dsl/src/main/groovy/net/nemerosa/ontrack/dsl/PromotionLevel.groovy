@@ -1,7 +1,5 @@
 package net.nemerosa.ontrack.dsl
 
-import net.nemerosa.ontrack.common.Document
-
 interface PromotionLevel extends ProjectEntity {
 
     String getProject()
@@ -14,6 +12,7 @@ interface PromotionLevel extends ProjectEntity {
      * Sets the image
      */
     def image(Object o)
+
     def image(Object o, String contentType)
 
     /**
