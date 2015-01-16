@@ -1,7 +1,7 @@
 /**
  * List of global parameters:
  *
- * - JDK8u20
+ * - JDK8u25
  *
  * List of global passwords:
  *
@@ -72,7 +72,7 @@ if (['master', 'feature', 'release', 'hotfix'].contains(branchType)) {
         name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-01-quick"
         logRotator(numToKeep = 40)
         deliveryPipelineConfiguration('Commit', 'Quick check')
-        jdk 'JDK8u20'
+        jdk 'JDK8u25'
         scm {
             git {
                 remote {
@@ -103,7 +103,7 @@ if (['master', 'feature', 'release', 'hotfix'].contains(branchType)) {
         name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-02-package"
         logRotator(numToKeep = 40)
         deliveryPipelineConfiguration('Commit', 'Package')
-        jdk 'JDK8u20'
+        jdk 'JDK8u25'
         scm {
             git {
                 remote {
@@ -158,7 +158,7 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
         name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-11-acceptance-local"
         logRotator(numToKeep = 40)
         deliveryPipelineConfiguration('Acceptance', 'Local acceptance')
-        jdk 'JDK8u20'
+        jdk 'JDK8u25'
         parameters {
             stringParam('VERSION_FULL', '', '')
             stringParam('VERSION_COMMIT', '', '')
@@ -205,7 +205,7 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
         name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-12-docker-push"
         logRotator(numToKeep = 40)
         deliveryPipelineConfiguration('Acceptance', 'Docker push')
-        jdk 'JDK8u20'
+        jdk 'JDK8u25'
         parameters {
             stringParam('VERSION_FULL', '', '')
             stringParam('VERSION_COMMIT', '', '')
@@ -246,7 +246,7 @@ docker logout
         name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-13-acceptance-do"
         logRotator(numToKeep = 40)
         deliveryPipelineConfiguration('Acceptance', 'Digital Ocean')
-        jdk 'JDK8u20'
+        jdk 'JDK8u25'
         parameters {
             stringParam('VERSION_FULL', '', '')
             stringParam('VERSION_COMMIT', '', '')
@@ -292,7 +292,7 @@ docker logout
             name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-21-publish"
             logRotator(numToKeep = 40)
             deliveryPipelineConfiguration('Release', 'Publish')
-            jdk 'JDK8u20'
+            jdk 'JDK8u25'
             parameters {
                 stringParam('VERSION_FULL', '', '')
                 stringParam('VERSION_COMMIT', '', '')
@@ -342,7 +342,7 @@ ontrack.build('ontrack', '${NAME}', VERSION_BUILD).properties {
             name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-22-production"
             logRotator(numToKeep = 40)
             deliveryPipelineConfiguration('Release', 'Production')
-            jdk 'JDK8u20'
+            jdk 'JDK8u25'
             parameters {
                 stringParam('VERSION_FULL', '', '')
                 stringParam('VERSION_COMMIT', '', '')
@@ -378,7 +378,7 @@ ontrack.build('ontrack', '${NAME}', VERSION_BUILD).properties {
             name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-23-acceptance-production"
             logRotator(numToKeep = 40)
             deliveryPipelineConfiguration('Release', 'Production acceptance')
-            jdk 'JDK8u20'
+            jdk 'JDK8u25'
             parameters {
                 stringParam('VERSION_FULL', '', '')
                 stringParam('VERSION_COMMIT', '', '')
