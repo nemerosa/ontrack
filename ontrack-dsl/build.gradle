@@ -10,6 +10,7 @@ tasks.withType(AbstractCompile) {
 dependencies {
     compile libraries.groovy
     compile libraries.args4j
+    compile libraries.slf4j_api
     compile libraries.http_client
     compile libraries.http_mime
 }

@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.dsl.http
 
-import org.apache.commons.lang3.StringUtils
 import org.apache.http.HttpHost
 import org.apache.http.auth.AuthScope
 import org.apache.http.auth.UsernamePasswordCredentials
@@ -63,7 +62,7 @@ class OTHttpClientBuilder {
         HttpClientContext httpContext = HttpClientContext.create()
 
         // Basic authentication
-        if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
+        if (username && password) {
 
             CredentialsProvider credentialsProvider = new BasicCredentialsProvider()
             credentialsProvider.setCredentials(

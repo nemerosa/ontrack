@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.dsl
 
 import net.nemerosa.ontrack.dsl.client.OntrackResource
 import net.nemerosa.ontrack.dsl.http.OTHttpClientBuilder
-import org.apache.commons.lang3.StringUtils
 
 class OntrackConnection {
 
@@ -39,7 +38,7 @@ class OntrackConnection {
     Ontrack build() {
         def builder = new OTHttpClientBuilder(url, disableSsl)
         // Credentials
-        if (StringUtils.isNotBlank(user)) {
+        if (user) {
             builder = builder.withCredentials(user, password)
         }
         // Logger

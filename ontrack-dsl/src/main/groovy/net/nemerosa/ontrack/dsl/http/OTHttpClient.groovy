@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.dsl.http
 
 import groovy.json.JsonSlurper
 import net.nemerosa.ontrack.dsl.Document
-import org.apache.commons.lang3.StringUtils
 import org.apache.http.HttpEntity
 import org.apache.http.HttpHost
 import org.apache.http.HttpResponse
@@ -35,7 +34,7 @@ class OTHttpClient {
     }
 
     protected String getUrl(String path) {
-        if (StringUtils.startsWith(path, "http")) {
+        if (path ==~ /^http.*/) {
             path
         } else {
             String formattedPath = path
@@ -133,7 +132,7 @@ class OTHttpClient {
             return null
         } else if (statusCode == HttpStatus.SC_INTERNAL_SERVER_ERROR) {
             String content = getMessage(response)
-            if (StringUtils.isNotBlank(content)) {
+            if (content) {
                 throw new OTHttpClientException(content)
             } else {
                 // Generic error
