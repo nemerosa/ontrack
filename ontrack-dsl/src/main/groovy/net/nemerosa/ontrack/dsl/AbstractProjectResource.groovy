@@ -1,8 +1,4 @@
-package net.nemerosa.ontrack.dsl.client
-
-import net.nemerosa.ontrack.dsl.Ontrack
-import net.nemerosa.ontrack.dsl.ProjectEntity
-import net.nemerosa.ontrack.dsl.PropertyNotFoundException
+package net.nemerosa.ontrack.dsl
 
 abstract class AbstractProjectResource extends AbstractResource implements ProjectEntity {
 
@@ -37,7 +33,7 @@ abstract class AbstractProjectResource extends AbstractResource implements Proje
         def propertyNode = properties.resources.find { it.typeDescriptor.typeName as String == type }
         // Found
         if (propertyNode != null) {
-            new PropertyResource(ontrack, propertyNode).update(data)
+            new Property(ontrack, propertyNode).update(data)
         }
         // Not found
         else {

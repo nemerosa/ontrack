@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.dsl
 
-import net.nemerosa.ontrack.dsl.client.OntrackResource
 import net.nemerosa.ontrack.dsl.http.OTHttpClientBuilder
 
 class OntrackConnection {
@@ -46,6 +45,6 @@ class OntrackConnection {
             builder = builder.withLogger({ String it -> logger.trace(it) })
         }
         // Ontrack client
-        new OntrackResource(builder.build())
+        new Ontrack(builder.build())
     }
 }

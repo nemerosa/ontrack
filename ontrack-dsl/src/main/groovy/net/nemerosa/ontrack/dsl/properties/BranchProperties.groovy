@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.dsl.properties
 
-import net.nemerosa.ontrack.dsl.Branch
 import net.nemerosa.ontrack.dsl.Ontrack
+import net.nemerosa.ontrack.dsl.Branch
 
 class BranchProperties extends ProjectEntityProperties {
 

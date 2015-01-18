@@ -1,23 +1,41 @@
 package net.nemerosa.ontrack.dsl
 
-interface PromotionLevel extends ProjectEntity {
+import net.nemerosa.ontrack.dsl.properties.ProjectEntityProperties
+import net.nemerosa.ontrack.dsl.properties.PromotionLevelProperties
 
-    String getProject()
+class PromotionLevel extends AbstractProjectResource {
 
-    String getBranch()
+    PromotionLevel(Ontrack ontrack, Object node) {
+        super(ontrack, node)
+    }
 
-    def call(Closure closure)
+    String getProject() {
+        node?.branch?.project?.name
+    }
 
-    /**
-     * Sets the image
-     */
-    def image(Object o)
+    String getBranch() {
+        node?.branch?.name
+    }
 
-    def image(Object o, String contentType)
+    def call(Closure closure) {
+        closure.resolveStrategy = Closure.DELEGATE_FIRST
+        closure.delegate = this
+        closure()
+    }
 
-    /**
-     * Gets the image
-     */
-    Document getImage()
+    ProjectEntityProperties getProperties() {
+        new PromotionLevelProperties(ontrack, this)
+    }
 
+    def image(Object o) {
+        image(o, 'image/png')
+    }
+
+    def image(Object o, String contentType) {
+        ontrack.upload(link('image'), 'file', o, contentType)
+    }
+
+    Document getImage() {
+        ontrack.download(link('image'))
+    }
 }

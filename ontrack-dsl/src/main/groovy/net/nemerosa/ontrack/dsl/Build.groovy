@@ -1,13 +1,38 @@
 package net.nemerosa.ontrack.dsl
 
-interface Build extends ProjectEntity {
+import net.nemerosa.ontrack.dsl.properties.BuildProperties
+import net.nemerosa.ontrack.dsl.properties.ProjectEntityProperties
 
-    String getProject()
+class Build extends AbstractProjectResource {
 
-    String getBranch()
+    Build(Ontrack ontrack, Object node) {
+        super(ontrack, node)
+    }
 
-    Build promote(String promotion)
+    String getProject() {
+        node?.branch?.project?.name
+    }
 
-    Build validate(String validationStamp, String validationStampStatus)
+    String getBranch() {
+        node?.branch?.name
+    }
 
+    Build promote(String promotion) {
+        post(link('promote'), [
+                promotionLevel: ontrack.promotionLevel(project, branch, promotion).id,
+        ])
+        this
+    }
+
+    Build validate(String validationStamp, String validationStampStatus) {
+        post(link('validate'), [
+                validationStamp      : ontrack.validationStamp(project, branch, validationStamp).id,
+                validationRunStatusId: validationStampStatus
+        ])
+        this
+    }
+
+    ProjectEntityProperties getProperties() {
+        new BuildProperties(ontrack, this)
+    }
 }

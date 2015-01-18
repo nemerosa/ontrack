@@ -1,17 +1,38 @@
 package net.nemerosa.ontrack.dsl
 
-interface Project extends ProjectEntity {
+import net.nemerosa.ontrack.dsl.properties.ProjectProperties
 
-    def call(Closure closure)
+class Project extends AbstractProjectResource {
 
-    /**
-     * Creates a branch for the project
-     */
-    Branch branch(String name)
+    Project(Ontrack ontrack, Object node) {
+        super(ontrack, node)
+    }
 
-    /**
-     * Creates a branch for the project and configures it
-     */
-    Branch branch(String name, Closure closure)
+    def call(Closure closure) {
+        closure.resolveStrategy = Closure.DELEGATE_FIRST
+        closure.delegate = this
+        closure()
+    }
+
+    Branch branch(String name) {
+        new Branch(
+                ontrack,
+                post(link('createBranch'), [
+                        name       : name,
+                        description: ''
+                ])
+        )
+    }
+
+    Branch branch(String name, Closure closure) {
+        def branch = branch(name)
+        branch(closure)
+        branch
+    }
+
+    ProjectProperties getProperties() {
+        new ProjectProperties(ontrack, this)
+    }
+
 
 }

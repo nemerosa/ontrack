@@ -1,11 +1,8 @@
-package net.nemerosa.ontrack.dsl.client
+package net.nemerosa.ontrack.dsl
 
-import net.nemerosa.ontrack.dsl.Ontrack
-import net.nemerosa.ontrack.dsl.PropertyNotEditableException
+class Property extends AbstractResource {
 
-class PropertyResource extends AbstractResource {
-
-    PropertyResource(Ontrack ontrack, Object node) {
+    Property(Ontrack ontrack, Object node) {
         super(ontrack, node)
     }
 

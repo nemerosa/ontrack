@@ -1,12 +1,10 @@
-package net.nemerosa.ontrack.dsl.client
+package net.nemerosa.ontrack.dsl
 
-import net.nemerosa.ontrack.dsl.Ontrack
-
-class ConfigResource {
+class Config {
 
     private final Ontrack ontrack
 
-    ConfigResource(Ontrack ontrack) {
+    Config(Ontrack ontrack) {
         this.ontrack = ontrack
     }
 

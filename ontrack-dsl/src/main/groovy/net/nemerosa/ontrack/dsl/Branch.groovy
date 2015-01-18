@@ -1,37 +1,107 @@
 package net.nemerosa.ontrack.dsl
 
-interface Branch extends ProjectEntity {
+import net.nemerosa.ontrack.dsl.properties.BranchProperties
+import net.nemerosa.ontrack.dsl.support.BranchTemplateDefinition
 
-    String getProject()
+class Branch extends AbstractProjectResource {
 
-    def call(Closure closure)
+    Branch(Ontrack ontrack, Object node) {
+        super(ontrack, node)
+    }
 
-    // Branch structure
+    String getProject() {
+        node?.project?.name
+    }
 
-    PromotionLevel promotionLevel(String name, String description)
+    def call(Closure closure) {
+        closure.resolveStrategy = Closure.DELEGATE_FIRST
+        closure.delegate = this
+        closure()
+    }
 
-    PromotionLevel promotionLevel(String name, String description, Closure closure)
+    List<Build> filter(String filterType, Map<String, ?> filterConfig) {
+        def url = query(
+                "${link('view')}/${filterType}",
+                filterConfig
+        )
+        get(url).buildViews.collect { new Build(ontrack, it.build) }
+    }
 
-    ValidationStamp validationStamp(String name, String description)
+    List<Build> standardFilter(Map<String, ?> filterConfig) {
+        filter('net.nemerosa.ontrack.service.StandardBuildFilterProvider', filterConfig)
+    }
 
-    ValidationStamp validationStamp(String name, String description, Closure closure)
+    List<Build> getLastPromotedBuilds() {
+        filter('net.nemerosa.ontrack.service.PromotionLevelBuildFilterProvider', [:])
+    }
 
-    Build build(String name, String description)
+    def template(Closure closure) {
+        def definition = new BranchTemplateDefinition()
+        // Configuration
+        closure.delegate = definition
+        closure()
+        // When configured, send the template info
+        put(link('templateDefinition'), definition.data)
+    }
 
-    // Filters
+    def sync() {
+        post(link('templateSync'), [:])
+    }
 
-    List<Build> filter(String filterType, Map<String, ?> filterConfig)
+    Branch instance(String sourceName, Map<String, String> params) {
+        new Branch(
+                ontrack,
+                put(link('templateInstanceCreate'), [
+                        name      : sourceName,
+                        manual    : (!params.empty),
+                        parameters: params
+                ])
+        )
+    }
 
-    List<Build> standardFilter(Map<String, ?> filterConfig)
+    PromotionLevel promotionLevel(String name, String description) {
+        new PromotionLevel(
+                ontrack,
+                post(link('createPromotionLevel'), [
+                        name       : name,
+                        description: description
+                ])
+        )
+    }
 
-    List<Build> getLastPromotedBuilds()
+    PromotionLevel promotionLevel(String name, String description, Closure closure) {
+        def pl = promotionLevel(name, description)
+        pl(closure)
+        pl
+    }
 
-    // Templating
+    ValidationStamp validationStamp(String name, String description) {
+        new ValidationStamp(
+                ontrack,
+                post(link('createValidationStamp'), [
+                        name       : name,
+                        description: description
+                ])
+        )
+    }
 
-    def template(Closure closure)
+    ValidationStamp validationStamp(String name, String description, Closure closure) {
+        def vs = validationStamp(name, description)
+        vs(closure)
+        vs
+    }
 
-    def sync()
+    Build build(String name, String description) {
+        new Build(
+                ontrack,
+                post(link('createBuild'), [
+                        name       : name,
+                        description: description
+                ])
+        )
+    }
 
-    Branch instance(String sourceName, Map<String, String> params)
-
+    BranchProperties getProperties() {
+        new BranchProperties(ontrack, this)
+    }
 }

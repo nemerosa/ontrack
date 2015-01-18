@@ -1,7 +1,4 @@
-package net.nemerosa.ontrack.dsl.client
-
-import net.nemerosa.ontrack.dsl.Ontrack
-import net.nemerosa.ontrack.dsl.ResourceMissingLinkException
+package net.nemerosa.ontrack.dsl
 
 class AbstractResource {
 
