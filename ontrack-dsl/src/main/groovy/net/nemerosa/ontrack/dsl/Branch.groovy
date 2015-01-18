@@ -58,7 +58,7 @@ class Branch extends AbstractProjectResource {
         )
     }
 
-    PromotionLevel promotionLevel(String name, String description) {
+    PromotionLevel promotionLevel(String name, String description = '') {
         new PromotionLevel(
                 ontrack,
                 post(link('createPromotionLevel'), [
@@ -68,13 +68,13 @@ class Branch extends AbstractProjectResource {
         )
     }
 
-    PromotionLevel promotionLevel(String name, String description, Closure closure) {
+    PromotionLevel promotionLevel(String name, String description = '', Closure closure) {
         def pl = promotionLevel(name, description)
         pl(closure)
         pl
     }
 
-    ValidationStamp validationStamp(String name, String description) {
+    ValidationStamp validationStamp(String name, String description = '') {
         new ValidationStamp(
                 ontrack,
                 post(link('createValidationStamp'), [
@@ -84,13 +84,13 @@ class Branch extends AbstractProjectResource {
         )
     }
 
-    ValidationStamp validationStamp(String name, String description, Closure closure) {
+    ValidationStamp validationStamp(String name, String description = '', Closure closure) {
         def vs = validationStamp(name, description)
         vs(closure)
         vs
     }
 
-    Build build(String name, String description) {
+    Build build(String name, String description = '') {
         new Build(
                 ontrack,
                 post(link('createBuild'), [
