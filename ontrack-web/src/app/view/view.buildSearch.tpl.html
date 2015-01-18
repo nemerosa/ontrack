@@ -106,6 +106,16 @@
                 </td>
             </tr>
             </tbody>
+            <!-- No results -->
+            <tbody ng-show="searched && buildViews.length == 0">
+            <tr>
+                <td colspan="5">
+                    <div class="alert alert-warning">
+                        No build has been found.
+                    </div>
+                </td>
+            </tr>
+            </tbody>
             <!-- Results -->
             <tbody ng-show="buildViews">
             <tr ng-repeat="buildView in buildViews" class="ot-build-search-build">

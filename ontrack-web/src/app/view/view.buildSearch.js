@@ -68,6 +68,7 @@ angular.module('ot.view.buildSearch', [
         };
 
         // Search
+        $scope.searched = false;
         $scope.searching = false;
         $scope.submitSearch = function () {
             $scope.searching = true;
@@ -80,6 +81,7 @@ angular.module('ot.view.buildSearch', [
                 );
             }).finally(function () {
                 $scope.searching = false;
+                $scope.searched = true;
             });
         };
 
