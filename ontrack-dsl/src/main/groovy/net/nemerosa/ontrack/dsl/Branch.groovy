@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.dsl
 
 import net.nemerosa.ontrack.dsl.properties.BranchProperties
-import net.nemerosa.ontrack.dsl.support.BranchTemplateDefinition
 
 class Branch extends AbstractProjectResource {
 

@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.dsl.support
+package net.nemerosa.ontrack.dsl
 
 class BranchTemplateDefinition {
 
