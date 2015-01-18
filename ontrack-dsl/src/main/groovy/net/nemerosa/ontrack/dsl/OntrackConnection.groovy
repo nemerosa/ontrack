@@ -9,7 +9,7 @@ class OntrackConnection {
     private boolean disableSsl = false
     private String user
     private String password
-    private Closure logger
+    private OntrackLogger logger
 
     private OntrackConnection(String url) {
         this.url = url
@@ -24,7 +24,7 @@ class OntrackConnection {
         this
     }
 
-    OntrackConnection logger(Closure logger) {
+    OntrackConnection logger(OntrackLogger logger) {
         this.logger = logger
         this
     }
@@ -43,7 +43,7 @@ class OntrackConnection {
         }
         // Logger
         if (logger) {
-            builder = builder.withLogger(logger)
+            builder = builder.withLogger({ String it -> logger.trace(it) })
         }
         // Ontrack client
         new OntrackResource(builder.build())
