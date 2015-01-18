@@ -56,6 +56,27 @@ class ACCDSL extends AcceptanceTestClient {
     }
 
     @Test
+    void 'Build search: default'() {
+        Branch branch = createBuildsAndPromotions()
+        def builds = ontrack.project(branch.project).search()
+        assert builds.collect { it.name } == ['3', '2', '1']
+    }
+
+    @Test
+    void 'Build search: count'() {
+        Branch branch = createBuildsAndPromotions()
+        def builds = ontrack.project(branch.project).search(maximumCount: 1)
+        assert builds.collect { it.name } == ['3']
+    }
+
+    @Test
+    void 'Build search: promotion'() {
+        Branch branch = createBuildsAndPromotions()
+        def builds = ontrack.project(branch.project).search(promotionName: 'BRONZE')
+        assert builds.collect { it.name } == ['2']
+    }
+
+    @Test
     void 'Filtering build on promotion'() {
         Branch branch = createBuildsAndPromotions()
         // Filtering builds on promotion

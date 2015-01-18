@@ -20,7 +20,7 @@ class AbstractResource {
     }
 
     protected static String query(String url, Map<String, ?> parameters) {
-        if (parameters.empty) {
+        if (parameters == null || parameters.empty) {
             url
         } else {
             "${url}?${parameters.collect { k, v -> "$k=${URLEncoder.encode(v as String, 'UTF-8')}" }.join('&')}"

@@ -34,5 +34,13 @@ class Project extends AbstractProjectResource {
         new ProjectProperties(ontrack, this)
     }
 
+    List<Build> search(Map<String, ?> form) {
+        def url = query(
+                "${link('buildSearch')}/search",
+                form
+        )
+        get(url).resources.collect { new Build(ontrack, it.build) }
+    }
+
 
 }
