@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.service.support.template;
 import net.nemerosa.ontrack.model.exceptions.*;
 import net.nemerosa.ontrack.model.job.*;
 import net.nemerosa.ontrack.model.security.BranchTemplateMgt;
+import net.nemerosa.ontrack.model.security.BranchTemplateSync;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.repository.BranchTemplateRepository;
@@ -11,6 +12,7 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -277,6 +279,20 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
     }
 
     protected BranchTemplateSyncResults syncTemplateDefinition(ID branchId, JobInfoListener info) {
+        // Gets the branch
+        Branch branch = structureService.getBranch(branchId);
+        // Gets the rights on the project
+        if (securityService.isProjectFunctionGranted(branch, BranchTemplateMgt.class) ||
+                securityService.isProjectFunctionGranted(branch, BranchTemplateSync.class)) {
+            // Now, we have to "run as" admin since the permission to sync was granted
+            // but might not be enough to create branches and such.
+            return securityService.runAsAdmin(() -> doSyncTemplateDefinition(branchId, info)).get();
+        } else {
+            throw new AccessDeniedException("Cannot synchronise branches.");
+        }
+    }
+
+    private BranchTemplateSyncResults doSyncTemplateDefinition(ID branchId, JobInfoListener info) {
         // Loads the template definition
         info.post(format("Loading template definition for %s", branchId));
         TemplateDefinition templateDefinition = getTemplateDefinition(branchId)

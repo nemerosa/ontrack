@@ -153,15 +153,17 @@ public class RolesServiceImpl implements RolesService, StartupService {
 
         // Controller
         register("CONTROLLER", "Controller",
-                "A controller, is allowed to create builds, promotion runs and validation runs. This role is " +
-                        "typically granted to continuous integration tools.",
+                "A controller, is allowed to create builds, promotion runs and validation runs. He can also " +
+                        "synchronise templates. This role is typically granted to continuous integration tools.",
                 Arrays.asList(
                         // No global function
                 ),
                 Arrays.asList(
+                        ProjectView.class,
                         BuildCreate.class,
                         PromotionRunCreate.class,
-                        ValidationRunCreate.class
+                        ValidationRunCreate.class,
+                        BranchTemplateSync.class
                 )
         );
 

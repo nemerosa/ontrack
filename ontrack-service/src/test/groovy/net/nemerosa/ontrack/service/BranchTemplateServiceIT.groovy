@@ -3,15 +3,15 @@ package net.nemerosa.ontrack.service
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.exceptions.*
-import net.nemerosa.ontrack.model.security.BranchCreate
-import net.nemerosa.ontrack.model.security.BranchTemplateMgt
-import net.nemerosa.ontrack.model.security.ProjectEdit
+import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.service.support.property.TestProperty
 import net.nemerosa.ontrack.service.support.property.TestPropertyType
 import net.nemerosa.ontrack.service.support.template.FixedListTemplateSynchronisationSource
+import net.nemerosa.ontrack.test.TestUtils
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.access.AccessDeniedException
 
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd
 
@@ -27,6 +27,9 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
 
     @Autowired
     private PropertyService propertyService
+
+    @Autowired
+    private AccountService accountService
 
     @Test
     void 'Making a branch a template'() {
@@ -369,6 +372,76 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
 
     }
 
+    @Test(expected = AccessDeniedException)
+    void 'Sync - new branches, anonymous'() {
+        // Creating the template
+        Branch template = createBranchTemplateDefinition()
+
+        asUser().call {
+            // Launching synchronisation
+            templateService.sync(template.id)
+        }
+
+    }
+
+    @Test
+    void 'Sync - new branches, as controller'() {
+        // Creating the template
+        Branch template = createBranchTemplateDefinition()
+
+        // Creating a controller user
+        def account = createControllerAccount()
+
+        asAccount(account).call {
+            // Launching synchronisation
+            def results = templateService.sync(template.id)
+            assert results.branches.size() == 3
+            BRANCHES.each { sourceName ->
+                def branchName = sourceName.replace('/', '-')
+                assert results.branches.find { it.branchName == branchName }?.type == BranchTemplateSyncType.CREATED
+            }
+
+            // Checks the branches have been created
+            BRANCHES.each { sourceName ->
+                def branchName = sourceName.replace('/', '-')
+                def branch = structureService.findBranchByName(template.project.name, branchName)
+                assert branch.present
+                // Gets its template instance
+                def instanceOpt = templateService.getTemplateInstance(branch.get().id)
+                assert instanceOpt.present
+                def instance = instanceOpt.get()
+                assert instance.templateDefinitionId == template.id
+                assert instance.parameterValues == [
+                        new TemplateParameterValue('BRANCH', branchName.toUpperCase()),
+                        new TemplateParameterValue('SCM', sourceName)
+                ]
+            }
+        }
+
+    }
+
+    protected Account createControllerAccount() {
+        asUser().with(AccountManagement).call {
+            def account = accountService.create(new AccountInput(
+                    TestUtils.uid("A"),
+                    "Test account",
+                    "test@test.com",
+                    "secret",
+                    Collections.<Integer> emptyList()
+            ))
+            // Registers as controller for the project
+            accountService.saveGlobalPermission(
+                    PermissionTargetType.ACCOUNT,
+                    account.id(),
+                    new PermissionInput('CONTROLLER')
+            )
+            // Loads the ACL
+            account = accountService.withACL(account)
+            // OK
+            account
+        }
+    }
+
     @Test
     void 'Sync - existing branches'() {
         // Creating the template
@@ -381,6 +454,31 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
         }
         // Sync
         asUser().with(template, BranchTemplateMgt).call {
+            def results = templateService.sync(template.id)
+            assert results.branches.size() == 3
+            assert results.branches.find { it.branchName == 'feature-19' }?.type == BranchTemplateSyncType.CREATED
+            assert results.branches.find { it.branchName == 'feature-22' }?.type == BranchTemplateSyncType.CREATED
+            assert results.branches.find { it.branchName == 'master' }?.type == BranchTemplateSyncType.EXISTING_CLASSIC
+        }
+    }
+
+    @Test
+    void 'Sync - existing branches, as controller'() {
+        // Creating the template
+        Branch template = createBranchTemplateDefinition()
+
+        // Creating a controller user
+        def account = createControllerAccount()
+
+        // Creating a branch whose name is part of the list to sync with
+        asUser().with(template, BranchCreate).call {
+            structureService.newBranch(
+                    Branch.of(template.project, nd('master', "Existing branch"))
+            )
+        }
+
+        // Sync
+        asAccount(account).call {
             def results = templateService.sync(template.id)
             assert results.branches.size() == 3
             assert results.branches.find { it.branchName == 'feature-19' }?.type == BranchTemplateSyncType.CREATED
@@ -536,6 +634,38 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
     }
 
     @Test
+    void 'Sync - missing branches - disabled, as controller'() {
+        // Creating the template with all branches
+        Branch template = createBranchTemplateDefinition(BRANCHES)
+
+        // Creating a controller user
+        def account = createControllerAccount()
+
+        asUser().with(template, BranchTemplateMgt).call {
+            // Launching synchronisation, once
+            templateService.sync(template.id)
+            // Updates the sync template
+            templateService.setTemplateDefinition(template.id, createTemplateDefinition(
+                    BRANCHES - 'feature/22',
+                    TemplateSynchronisationAbsencePolicy.DISABLE
+            ))
+        }
+
+        asAccount(account).call {
+            // Relaunching sync. with one existing branch outside of the sync.
+            def results = templateService.sync(template.id)
+            assert results.branches.size() == 3
+            assert results.branches.find { it.branchName == 'feature-19' }?.type == BranchTemplateSyncType.UPDATED
+            assert results.branches.find { it.branchName == 'feature-22' }?.type == BranchTemplateSyncType.DISABLED
+            assert results.branches.find { it.branchName == 'master' }?.type == BranchTemplateSyncType.UPDATED
+            // Checks the branch has been disabled
+            assert structureService.findBranchByName(template.project.name, 'feature-22').present
+            assert structureService.findBranchByName(template.project.name, 'feature-22').get().disabled
+        }
+
+    }
+
+    @Test
     void 'Sync - missing branches - deleted'() {
         // Creating the template with all branches
         Branch template = createBranchTemplateDefinition(BRANCHES)
@@ -553,7 +683,37 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
             assert results.branches.find { it.branchName == 'feature-19' }?.type == BranchTemplateSyncType.UPDATED
             assert results.branches.find { it.branchName == 'feature-22' }?.type == BranchTemplateSyncType.DELETED
             assert results.branches.find { it.branchName == 'master' }?.type == BranchTemplateSyncType.UPDATED
-            // Checks the branch has been disabled
+            // Checks the branch has been deleted
+            assert !structureService.findBranchByName(template.project.name, 'feature-22').present
+        }
+
+    }
+
+    @Test
+    void 'Sync - missing branches - deleted, as controller'() {
+        // Creating the template with all branches
+        Branch template = createBranchTemplateDefinition(BRANCHES)
+
+        // Creating a controller user
+        def account = createControllerAccount()
+
+        asUser().with(template, BranchTemplateMgt).call {
+            // Launching synchronisation, once
+            templateService.sync(template.id)
+            // Updates the sync template
+            templateService.setTemplateDefinition(template.id, createTemplateDefinition(
+                    BRANCHES - 'feature/22',
+                    TemplateSynchronisationAbsencePolicy.DELETE
+            ))
+        }
+        asAccount(account).call {
+            // Relaunching sync. with one existing branch outside of the sync.
+            def results = templateService.sync(template.id)
+            assert results.branches.size() == 3
+            assert results.branches.find { it.branchName == 'feature-19' }?.type == BranchTemplateSyncType.UPDATED
+            assert results.branches.find { it.branchName == 'feature-22' }?.type == BranchTemplateSyncType.DELETED
+            assert results.branches.find { it.branchName == 'master' }?.type == BranchTemplateSyncType.UPDATED
+            // Checks the branch has been deleted
             assert !structureService.findBranchByName(template.project.name, 'feature-22').present
         }
 
@@ -574,7 +734,9 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
             assert branch?.type == BranchType.CLASSIC
             // Relaunches sync
             results = templateService.sync(template.id)
-            assert results.branches.find { it.branchName == 'mybranch' }?.type == BranchTemplateSyncType.EXISTING_CLASSIC
+            assert results.branches.find {
+                it.branchName == 'mybranch'
+            }?.type == BranchTemplateSyncType.EXISTING_CLASSIC
             // Checks it is untouched
             branch = structureService.findBranchByName(template.project.name, 'mybranch').get()
             assert branch?.type == BranchType.CLASSIC
