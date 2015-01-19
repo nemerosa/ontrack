@@ -333,7 +333,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         Issue issue = configuredIssueService.getIssue(key);
 
         // Collects commits per branches
-        List<OntrackGitIssueCommitInfo> commitInfos = collectIssueCommitInfos(issue);
+        List<OntrackGitIssueCommitInfo> commitInfos = collectIssueCommitInfos(branch.getProject(), issue);
 
         // OK
         return new OntrackGitIssueInfo(
@@ -343,11 +343,16 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         );
     }
 
-    private List<OntrackGitIssueCommitInfo> collectIssueCommitInfos(Issue issue) {
+    private List<OntrackGitIssueCommitInfo> collectIssueCommitInfos(Project project, Issue issue) {
         // Index of commit infos
         Map<String, OntrackGitIssueCommitInfo> commitInfos = new LinkedHashMap<>();
         // For all configured branches
         forEachConfiguredBranch((branch, branchConfiguration) -> {
+            // Filter per project
+            if (branch.projectId() != project.id()) {
+                return;
+            }
+            // Gets the branch configuration
             GitConfiguration configuration = branchConfiguration.getConfiguration();
             // Gets the Git client for this project
             GitRepositoryClient client = gitRepositoryClientFactory.getClient(configuration.getGitRepository());
