@@ -151,7 +151,9 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                         "_templateSync",
                         on(BranchController.class).syncTemplateDefinition(branch.getId()),
                         branch.getType() == BranchType.TEMPLATE_DEFINITION
-                                && resourceContext.isProjectFunctionGranted(branch, BranchTemplateMgt.class)
+                                && (resourceContext.isProjectFunctionGranted(branch, BranchTemplateMgt.class)
+                                || resourceContext.isProjectFunctionGranted(branch, BranchTemplateSync.class)
+                        )
                 )
                         // Template instance creation
                 .link(
