@@ -87,9 +87,18 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
         // Gets the template definition
         TemplateDefinition templateDefinition = branchTemplateRepository.getTemplateDefinition(branchId)
                 .orElseThrow(() -> new BranchNotTemplateDefinitionException(branchId));
-        // Checks the rights
-        securityService.checkProjectFunction(branch, BranchTemplateMgt.class);
+        // Gets the rights on the project
+        if (securityService.isProjectFunctionGranted(branch, BranchTemplateMgt.class) ||
+                securityService.isProjectFunctionGranted(branch, BranchTemplateSync.class)) {
+            // Now, we have to "run as" admin since the permission to sync was granted
+            // but might not be enough to create branches and such.
+            return securityService.runAsAdmin(() -> doCreateTemplateInstance(request, branch, templateDefinition)).get();
+        } else {
+            throw new AccessDeniedException("Cannot synchronise branches.");
+        }
+    }
 
+    private Branch doCreateTemplateInstance(BranchTemplateInstanceSingleRequest request, Branch branch, TemplateDefinition templateDefinition) {
         // Gets the existing branch
         String sourceName = request.getName();
         String branchName = NameDescription.escapeName(sourceName);
@@ -119,7 +128,7 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
             // Gets the linked definition
             ID linkedTemplateId = templateInstanceOptional.get().getTemplateDefinitionId();
             // If another definition, error
-            if (!Objects.equals(linkedTemplateId, branchId)) {
+            if (!Objects.equals(linkedTemplateId, branch.getId())) {
                 throw new BranchTemplateInstanceCannotUpdateBasedOnOtherDefinitionException(branchName);
             }
             // If same definition, updates the branch

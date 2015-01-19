@@ -59,6 +59,31 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
         assert savedBranch.type == BranchType.TEMPLATE_DEFINITION
     }
 
+    @Test(expected = AccessDeniedException)
+    void 'Making a branch a template - not granted for BranchTemplateSync only'() {
+        // Creates a branch
+        Branch branch = doCreateBranch()
+        // Normal branch
+        assert branch.type == BranchType.CLASSIC
+
+        // Template definition
+        TemplateDefinition templateDefinition = new TemplateDefinition(
+                [
+                        new TemplateParameter('NAME', 'Name parameter', '')
+                ],
+                new ServiceConfiguration(
+                        'test',
+                        JsonUtils.object().end()
+                ),
+                TemplateSynchronisationAbsencePolicy.DELETE,
+                10
+        )
+        // Saves the template
+        asUser().with(branch, BranchTemplateSync).call({
+            templateService.setTemplateDefinition(branch.id, templateDefinition)
+        })
+    }
+
     @Test
     void 'Making a branch a template: only parameters'() {
         // Creates a branch
@@ -157,6 +182,27 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
         checkBranchTemplateInstance(instance)
     }
 
+    @Test
+    void 'Creating a single template instance - mode auto for BranchTemplateSync'() {
+        // Creates the template definition
+        Branch templateBranch = createBranchTemplateDefinition()
+
+        // Creates a single template
+        Branch instance = asUser().with(templateBranch, BranchTemplateSync).call {
+            templateService.createTemplateInstance(
+                    templateBranch.id,
+                    new BranchTemplateInstanceSingleRequest(
+                            'instance',
+                            false, // Auto
+                            [:]
+                    )
+            )
+        }
+
+        // Checks the created branch
+        checkBranchTemplateInstance(instance)
+    }
+
     @Test(expected = BranchTemplateInstanceMissingParametersException)
     void 'Creating a single template instance - mode manual - missing parameters'() {
         // Creates the template definition
@@ -204,6 +250,30 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
 
         // Creates a single template
         Branch instance = asUser().with(templateBranch, BranchTemplateMgt).call {
+            templateService.createTemplateInstance(
+                    templateBranch.id,
+                    new BranchTemplateInstanceSingleRequest(
+                            'instance',
+                            true, // Manual
+                            [
+                                    'BRANCH': 'INSTANCE',
+                                    'SCM'   : 'master'
+                            ]
+                    )
+            )
+        }
+
+        // Checks the created branch
+        checkBranchTemplateInstance(instance)
+    }
+
+    @Test
+    void 'Creating a single template instance - mode manual for BranchTemplateSync'() {
+        // Creates the template definition
+        Branch templateBranch = createBranchTemplateDefinition()
+
+        // Creates a single template
+        Branch instance = asUser().with(templateBranch, BranchTemplateSync).call {
             templateService.createTemplateInstance(
                     templateBranch.id,
                     new BranchTemplateInstanceSingleRequest(
@@ -306,6 +376,47 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
 
         // Creates a single template - auto mode
         Branch instance = asUser().with(templateBranch, BranchTemplateMgt).call {
+            templateService.createTemplateInstance(
+                    templateBranch.id,
+                    new BranchTemplateInstanceSingleRequest(
+                            'instance',
+                            false, // Auto
+                            [:]
+                    )
+            )
+        }
+
+        // Checks the created branch
+        checkBranchTemplateInstance(instance)
+
+        // Updates this branch
+        asUser().with(templateBranch, BranchTemplateMgt).call {
+            templateService.createTemplateInstance(
+                    templateBranch.id,
+                    new BranchTemplateInstanceSingleRequest(
+                            'instance',
+                            true, // Manual
+                            [
+                                    'BRANCH': 'Updated instance',
+                                    'SCM'   : 'instance'
+                            ]
+                    )
+            )
+        }
+
+        // Checks the updated branch
+        checkBranchTemplateInstance(instance, 'Updated instance')
+
+    }
+
+    @Test
+    void 'Creating a single template instance - already existing and linked - for BranchTemplateSync'() {
+
+        // Creates a template definition
+        Branch templateBranch = createBranchTemplateDefinition()
+
+        // Creates a single template - auto mode
+        Branch instance = asUser().with(templateBranch, BranchTemplateSync).call {
             templateService.createTemplateInstance(
                     templateBranch.id,
                     new BranchTemplateInstanceSingleRequest(
