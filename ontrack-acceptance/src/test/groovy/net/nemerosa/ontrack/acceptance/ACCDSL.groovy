@@ -6,7 +6,7 @@ import net.nemerosa.ontrack.dsl.Branch
 import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.OntrackConnection
 import net.nemerosa.ontrack.dsl.Shell
-import net.nemerosa.ontrack.dsl.http.OTHttpClientException
+import net.nemerosa.ontrack.dsl.http.OTMessageClientException
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -42,7 +42,7 @@ class ACCDSL extends AcceptanceTestClient {
         try {
             ontrack.branch(projectName, branchName)
             Assert.fail "Branch access should have been forbidden"
-        } catch (OTHttpClientException ex) {
+        } catch (OTMessageClientException ex) {
             assert ex.message == "Branch not found: ${projectName}/${branchName}"
         }
     }
