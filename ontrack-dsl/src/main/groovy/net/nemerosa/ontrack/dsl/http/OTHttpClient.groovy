@@ -112,10 +112,10 @@ class OTHttpClient {
         )
     }
 
-    protected static Object baseHandleResponse(HttpRequestBase request, HttpResponse response, HttpEntity entity,
+    protected Object baseHandleResponse(HttpRequestBase request, HttpResponse response, HttpEntity entity,
                                                Closure entityParser) {
-        // Parses the response
         int statusCode = response.statusLine.statusCode;
+        clientLogger "[response] ${request} ${statusCode} ${response.statusLine.reasonPhrase}"
         if (statusCode == HttpStatus.SC_OK ||
                 statusCode == HttpStatus.SC_CREATED ||
                 statusCode == HttpStatus.SC_ACCEPTED) {
