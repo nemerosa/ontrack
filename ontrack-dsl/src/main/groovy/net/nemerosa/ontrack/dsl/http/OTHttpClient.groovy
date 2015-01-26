@@ -115,7 +115,7 @@ class OTHttpClient {
     protected Object baseHandleResponse(HttpRequestBase request, HttpResponse response, HttpEntity entity,
                                                Closure entityParser) {
         int statusCode = response.statusLine.statusCode;
-        clientLogger "[response] ${request} ${statusCode} ${response.statusLine.reasonPhrase}"
+        clientLogger "[ontrack][response] ${request} CODE ${statusCode} ${response.statusLine.reasonPhrase}"
         if (statusCode == HttpStatus.SC_OK ||
                 statusCode == HttpStatus.SC_CREATED ||
                 statusCode == HttpStatus.SC_ACCEPTED) {
@@ -159,13 +159,12 @@ class OTHttpClient {
     }
 
     protected Object doRequest(HttpRequestBase request, Closure responseHandler) {
-        clientLogger "[request] ${request}"
+        clientLogger "[ontrack][request] ${request}"
         // Executes the call
         try {
             CloseableHttpClient http = httpClientSupplier()
             try {
                 HttpResponse response = http.execute(host, request, httpContext)
-                clientLogger "[response] ${response}"
                 // Entity response
                 HttpEntity entity = response.entity
                 try {
