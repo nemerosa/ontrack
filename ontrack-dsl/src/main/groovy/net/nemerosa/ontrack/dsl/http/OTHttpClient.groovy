@@ -121,19 +121,19 @@ class OTHttpClient {
                 statusCode == HttpStatus.SC_ACCEPTED) {
             return entityParser(entity)
         } else if (statusCode == HttpStatus.SC_BAD_REQUEST) {
-            throw new OTHttpClientException(getMessage(response))
+            throw new OTMessageClientException(getMessage(response))
         } else if (statusCode == HttpStatus.SC_UNAUTHORIZED) {
-            throw new OTHttpClientException("Not authorised")
+            throw new OTMessageClientException("Not authorised")
         } else if (statusCode == HttpStatus.SC_FORBIDDEN) {
-            throw new OTHttpClientException("Forbidden")
+            throw new OTMessageClientException("Forbidden")
         } else if (statusCode == HttpStatus.SC_NOT_FOUND) {
-            throw new OTHttpClientException(getMessage(response))
+            throw new OTMessageClientException(getMessage(response))
         } else if (statusCode == HttpStatus.SC_NO_CONTENT) {
             return null
         } else if (statusCode == HttpStatus.SC_INTERNAL_SERVER_ERROR) {
             String content = getMessage(response)
             if (content) {
-                throw new OTHttpClientException(content)
+                throw new OTMessageClientException(content)
             } else {
                 // Generic error
                 throw new OTHttpClientException(
