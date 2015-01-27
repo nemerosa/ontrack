@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.artifactory.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.client.ClientNotFoundException;
 import net.nemerosa.ontrack.client.JsonClient;
 import net.nemerosa.ontrack.extension.artifactory.model.ArtifactoryStatus;
 import org.apache.commons.lang3.StringUtils;
@@ -8,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ArtifactoryClientImpl implements ArtifactoryClient {
@@ -20,15 +22,20 @@ public class ArtifactoryClientImpl implements ArtifactoryClient {
 
     @Override
     public List<String> getBuildNumbers(String buildName) {
-        JsonNode node = jsonClient.get("/api/build/%s", buildName);
-        List<String> numbers = new ArrayList<>();
-        node.path("buildsNumbers").forEach((JsonNode numberNode) -> {
-            String number = StringUtils.stripStart(numberNode.path("uri").asText(), "/");
-            if (StringUtils.isNotBlank(number)) {
-                numbers.add(number);
-            }
-        });
-        return numbers;
+        try {
+            JsonNode node = jsonClient.get("/api/build/%s", buildName);
+            List<String> numbers = new ArrayList<>();
+            node.path("buildsNumbers").forEach((JsonNode numberNode) -> {
+                String number = StringUtils.stripStart(numberNode.path("uri").asText(), "/");
+                if (StringUtils.isNotBlank(number)) {
+                    numbers.add(number);
+                }
+            });
+            return numbers;
+        } catch (ClientNotFoundException ex) {
+            // When the build is not defined, returns no build number
+            return Collections.emptyList();
+        }
     }
 
     @Override
