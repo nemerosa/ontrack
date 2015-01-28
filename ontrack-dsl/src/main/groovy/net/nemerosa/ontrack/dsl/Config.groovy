@@ -16,6 +16,14 @@ class Config {
         )
     }
 
+    def svn(Map<String, ?> parameters, String name) {
+        def params = parameters + [name: name]
+        ontrack.post(
+                'extension/svn/configurations/create',
+                params
+        )
+    }
+
     def jenkins(String name, String url, String user = '', String password = '') {
         ontrack.post(
                 'extension/jenkins/configurations/create', [

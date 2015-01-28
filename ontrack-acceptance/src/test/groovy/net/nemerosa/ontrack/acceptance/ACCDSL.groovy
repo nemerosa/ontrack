@@ -368,6 +368,13 @@ class ACCDSL extends AcceptanceTestClient {
     }
 
     @Test
+    void 'Configuration - SVN'() {
+        ontrack.configure {
+            svn 'test', url: 'svn://localhost'
+        }
+    }
+
+    @Test
     void 'External script with local binding: getting the last promoted build'() {
         // Environment preparation
         def branch = createBuildsAndPromotions()
