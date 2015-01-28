@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.dsl.Shell
 import net.nemerosa.ontrack.dsl.http.OTMessageClientException
 import org.junit.Assert
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 
 import static net.nemerosa.ontrack.test.TestUtils.uid
@@ -345,6 +346,7 @@ class ACCDSL extends AcceptanceTestClient {
     }
 
     @Test
+    @Ignore
     void 'Branch property - SVN Validator - closed issues'() {
         def name = uid('S')
         ontrack.configure {
