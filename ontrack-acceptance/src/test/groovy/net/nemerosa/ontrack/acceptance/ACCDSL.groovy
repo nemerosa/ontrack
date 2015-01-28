@@ -370,8 +370,21 @@ class ACCDSL extends AcceptanceTestClient {
     @Test
     void 'Configuration - SVN'() {
         ontrack.configure {
-            svn 'test', url: 'svn://localhost'
+            svn uid('S'), url: 'svn://localhost'
         }
+    }
+
+    @Test
+    void 'Configuration - SVN - update'() {
+        def name = uid('S')
+        ontrack.configure {
+            svn name, url: 'svn://localhost'
+        }
+        assert ontrack.config.svn.findAll { it == name} == [name]
+        ontrack.configure {
+            svn name, url: 'http://localhost'
+        }
+        assert ontrack.config.svn.findAll { it == name} == [name]
     }
 
     @Test

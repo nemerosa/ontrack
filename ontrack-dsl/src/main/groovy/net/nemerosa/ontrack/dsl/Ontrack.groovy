@@ -91,6 +91,10 @@ class Ontrack {
         closure()
     }
 
+    def getConfig() {
+        new Config(this)
+    }
+
     def get(String url) {
         httpClient.get(url) { jsonSlurper.parseText(it) }
     }

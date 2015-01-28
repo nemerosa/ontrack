@@ -24,6 +24,10 @@ class Config {
         )
     }
 
+    def getSvn() {
+        ontrack.get('extension/svn/configurations/descriptors').resources.collect { it.name }
+    }
+
     def jenkins(String name, String url, String user = '', String password = '') {
         ontrack.post(
                 'extension/jenkins/configurations/create', [
