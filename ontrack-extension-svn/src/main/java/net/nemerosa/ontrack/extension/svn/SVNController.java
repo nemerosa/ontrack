@@ -22,6 +22,7 @@ import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.ID;
+import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
@@ -91,6 +92,17 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
         )
                 .with(Link.CREATE, uri(on(getClass()).getConfigurationForm()))
                 ;
+    }
+
+    /**
+     * Gets the configuration descriptors
+     */
+    @RequestMapping(value = "configurations/descriptors", method = RequestMethod.GET)
+    public Resources<ConfigurationDescriptor> getConfigurationsDescriptors() {
+        return Resources.of(
+                svnConfigurationService.getConfigurationDescriptors(),
+                uri(on(getClass()).getConfigurationsDescriptors())
+        );
     }
 
     /**
