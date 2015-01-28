@@ -346,6 +346,28 @@ class ACCDSL extends AcceptanceTestClient {
     }
 
     @Test
+    void 'Branch property - SVN configuration'() {
+        def name = uid('S')
+        ontrack.configure {
+            svn name, url: 'svn://localhost'
+        }
+        def project = uid('P')
+        ontrack.project(project) {
+            properties {
+                svn name, '/project/trunk'
+            }
+            branch('mybranch') {
+                properties {
+                    svn '/project/branches/mybranch', '/project/tags/{build:mybranch-*}'
+                }
+            }
+        }
+        def cfg = ontrack.branch(project, 'mybranch').properties.svn
+        assert cfg.branchPath == '/project/branches/mybranch'
+        assert cfg.buildPath == '/project/tags/{build:mybranch-*}'
+    }
+
+    @Test
     @Ignore
     void 'Branch property - SVN Validator - closed issues'() {
         def name = uid('S')

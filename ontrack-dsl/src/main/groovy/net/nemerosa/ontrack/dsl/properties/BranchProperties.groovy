@@ -19,11 +19,23 @@ class BranchProperties extends ProjectEntityProperties {
         )
     }
 
-    /**
-     * Access to the Git branch property
-     */
     def getGitBranch() {
         property('net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType')
+    }
+
+    /**
+     * SVN branch property
+     */
+
+    def svn(String branchPath, String buildPath) {
+        property('net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType', [
+                branchPath: branchPath,
+                buildPath: buildPath
+        ])
+    }
+
+    def getSvn() {
+        property('net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType')
     }
 
     /**
