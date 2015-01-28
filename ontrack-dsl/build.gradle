@@ -1,6 +1,7 @@
 description = "DSL for Ontrack."
 
 apply plugin: 'groovy'
+apply plugin:'application'
 
 tasks.withType(AbstractCompile) {
     sourceCompatibility = 1.7
@@ -18,3 +19,7 @@ dependencies {
 javadocJar {
     from groovydoc
 }
+
+mainClassName = 'net.nemerosa.ontrack.dsl.Shell'
+
+build.dependsOn distZip

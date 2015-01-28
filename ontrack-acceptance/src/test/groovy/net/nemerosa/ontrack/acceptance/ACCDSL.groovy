@@ -328,6 +328,19 @@ class ACCDSL extends AcceptanceTestClient {
     }
 
     @Test
+    void 'Branch property - SVN Validator - closed issues'() {
+        def project = uid('P')
+        ontrack.project(project) {
+            branch('test') {
+                properties {
+                    svnValidatorClosedIssues ['Closed']
+                }
+            }
+        }
+        assert ontrack.branch(project, 'test').properties.svnValidatorClosedIssues.closedStatuses == ['Closed']
+    }
+
+    @Test
     void 'Launching branch template synchronisation'() {
         // GitHub configuration
         ontrack.configure {

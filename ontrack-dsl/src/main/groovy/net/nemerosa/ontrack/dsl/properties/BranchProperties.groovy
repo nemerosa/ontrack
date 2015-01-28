@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.dsl.properties
 
-import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.Branch
+import net.nemerosa.ontrack.dsl.Ontrack
 
 class BranchProperties extends ProjectEntityProperties {
 
@@ -25,4 +25,21 @@ class BranchProperties extends ProjectEntityProperties {
     def getGitBranch() {
         property('net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType')
     }
+
+    /**
+     * SVN revision change log issue validator
+     */
+    def svnValidatorClosedIssues(Collection<String> closedStatuses) {
+        property('net.nemerosa.ontrack.extension.svn.property.SVNRevisionChangeLogIssueValidator', [
+                closedStatuses: closedStatuses
+        ])
+    }
+
+    /**
+     * SVN revision change log issue validator
+     */
+    def getSvnValidatorClosedIssues() {
+        property('net.nemerosa.ontrack.extension.svn.property.SVNRevisionChangeLogIssueValidator')
+    }
+
 }
