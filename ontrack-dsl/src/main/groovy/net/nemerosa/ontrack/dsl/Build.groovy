@@ -9,6 +9,12 @@ class Build extends AbstractProjectResource {
         super(ontrack, node)
     }
 
+    def call(Closure closure) {
+        closure.resolveStrategy = Closure.DELEGATE_FIRST
+        closure.delegate = this
+        closure()
+    }
+
     String getProject() {
         node?.branch?.project?.name
     }

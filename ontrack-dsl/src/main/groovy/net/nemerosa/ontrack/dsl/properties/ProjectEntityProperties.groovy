@@ -21,4 +21,22 @@ class ProjectEntityProperties {
         entity.property(type)
     }
 
+    /**
+     * Links
+     */
+    def links(Map<String, String> links) {
+        property('net.nemerosa.ontrack.extension.general.LinkPropertyType', [
+                links: links.collect{ k, v -> [
+                        name: k,
+                        value: v,
+                ]}
+        ])
+    }
+
+    def getLinks() {
+        property('net.nemerosa.ontrack.extension.general.LinkPropertyType').links.collectEntries {
+            [ it.name, it.value ]
+        }
+    }
+
 }

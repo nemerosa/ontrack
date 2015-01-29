@@ -100,6 +100,12 @@ class Branch extends AbstractProjectResource {
         )
     }
 
+    Build build(String name, String description = '', Closure closure) {
+        def b = build(name, description)
+        b(closure)
+        b
+    }
+
     BranchProperties getConfig() {
         new BranchProperties(ontrack, this)
     }
