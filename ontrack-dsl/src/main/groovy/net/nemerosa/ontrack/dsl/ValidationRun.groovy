@@ -18,4 +18,8 @@ class ValidationRun extends AbstractProjectResource {
     ValidationRunProperties getConfig() {
         new ValidationRunProperties(ontrack, this)
     }
+
+    String getStatus() {
+        validationRunStatuses[0].statusID.id
+    }
 }

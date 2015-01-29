@@ -112,6 +112,9 @@ class ACCDSL extends AcceptanceTestClient {
         runs.each { assert it.validationStamp.name == 'SMOKE' }
         assert runs[0].validationRunStatuses[0].statusID.id == 'FAILED'
         assert runs[1].validationRunStatuses[0].statusID.id == 'PASSED'
+        // Shortcuts
+        assert runs[0].status == 'FAILED'
+        assert runs[1].status == 'PASSED'
     }
 
     @Test
