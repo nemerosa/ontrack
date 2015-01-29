@@ -501,6 +501,15 @@ class ACCDSL extends AcceptanceTestClient {
     }
 
     @Test
+    void 'Configuration - Artifactory'() {
+        def name = uid('A')
+        ontrack.configure {
+            artifactory name, 'http://artifactory'
+        }
+        assert ontrack.config.artifactory.find { it == name } != null
+    }
+
+    @Test
     void 'Configuration - SVN'() {
         ontrack.configure {
             svn uid('S'), url: 'svn://localhost'

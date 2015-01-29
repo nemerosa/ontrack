@@ -73,4 +73,22 @@ class Config {
     List<String> getJenkins() {
         ontrack.get('extension/jenkins/configurations/descriptors').resources.collect { it.id }
     }
+
+    /**
+     * Artifactory configuration
+     */
+
+    def artifactory(String name, String url, String user = '', String password = '') {
+        ontrack.post(
+                'extension/artifactory/configurations/create', [
+                name    : name,
+                url     : url,
+                user    : user,
+                password: password
+        ])
+    }
+
+    List<String> getArtifactory() {
+        ontrack.get('extension/artifactory/configurations/descriptors').resources.collect { it.id }
+    }
 }

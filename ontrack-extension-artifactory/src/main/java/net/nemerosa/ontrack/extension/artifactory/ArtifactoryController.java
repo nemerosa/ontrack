@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
@@ -22,13 +23,13 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 @RestController
 public class ArtifactoryController extends AbstractExtensionController<ArtifactoryExtensionFeature> {
 
-    private final ArtifactoryConfigurationService jenkinsService;
+    private final ArtifactoryConfigurationService configurationService;
     private final SecurityService securityService;
 
     @Autowired
-    public ArtifactoryController(ArtifactoryExtensionFeature feature, ArtifactoryConfigurationService jenkinsService, SecurityService securityService) {
+    public ArtifactoryController(ArtifactoryExtensionFeature feature, ArtifactoryConfigurationService configurationService, SecurityService securityService) {
         super(feature);
-        this.jenkinsService = jenkinsService;
+        this.configurationService = configurationService;
         this.securityService = securityService;
     }
 
@@ -49,11 +50,22 @@ public class ArtifactoryController extends AbstractExtensionController<Artifacto
     @RequestMapping(value = "configurations", method = RequestMethod.GET)
     public Resources<ArtifactoryConfiguration> getConfigurations() {
         return Resources.of(
-                jenkinsService.getConfigurations(),
+                configurationService.getConfigurations(),
                 uri(on(getClass()).getConfigurations())
         )
                 .with(Link.CREATE, uri(on(getClass()).getConfigurationForm()))
                 ;
+    }
+
+    /**
+     * Gets the configuration descriptors
+     */
+    @RequestMapping(value = "configurations/descriptors", method = RequestMethod.GET)
+    public Resources<ConfigurationDescriptor> getConfigurationsDescriptors() {
+        return Resources.of(
+                configurationService.getConfigurationDescriptors(),
+                uri(on(getClass()).getConfigurationsDescriptors())
+        );
     }
 
     /**
@@ -69,7 +81,7 @@ public class ArtifactoryController extends AbstractExtensionController<Artifacto
      */
     @RequestMapping(value = "configurations/create", method = RequestMethod.POST)
     public ArtifactoryConfiguration newConfiguration(@RequestBody ArtifactoryConfiguration configuration) {
-        return jenkinsService.newConfiguration(configuration);
+        return configurationService.newConfiguration(configuration);
     }
 
     /**
@@ -77,7 +89,7 @@ public class ArtifactoryController extends AbstractExtensionController<Artifacto
      */
     @RequestMapping(value = "configurations/{name}", method = RequestMethod.GET)
     public ArtifactoryConfiguration getConfiguration(@PathVariable String name) {
-        return jenkinsService.getConfiguration(name);
+        return configurationService.getConfiguration(name);
     }
 
     /**
@@ -86,7 +98,7 @@ public class ArtifactoryController extends AbstractExtensionController<Artifacto
     @RequestMapping(value = "configurations/{name}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Ack deleteConfiguration(@PathVariable String name) {
-        jenkinsService.deleteConfiguration(name);
+        configurationService.deleteConfiguration(name);
         return Ack.OK;
     }
 
@@ -95,7 +107,7 @@ public class ArtifactoryController extends AbstractExtensionController<Artifacto
      */
     @RequestMapping(value = "configurations/{name}/update", method = RequestMethod.GET)
     public Form updateConfigurationForm(@PathVariable String name) {
-        return jenkinsService.getConfiguration(name).asForm();
+        return configurationService.getConfiguration(name).asForm();
     }
 
     /**
@@ -103,7 +115,7 @@ public class ArtifactoryController extends AbstractExtensionController<Artifacto
      */
     @RequestMapping(value = "configurations/{name}/update", method = RequestMethod.PUT)
     public ArtifactoryConfiguration updateConfiguration(@PathVariable String name, @RequestBody ArtifactoryConfiguration configuration) {
-        jenkinsService.updateConfiguration(name, configuration);
+        configurationService.updateConfiguration(name, configuration);
         return getConfiguration(name);
     }
 
