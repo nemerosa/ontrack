@@ -26,6 +26,24 @@ class Config {
         ontrack.get('extension/github/configurations/descriptors').resources.collect { it.id }
     }
 
+    /**
+     * Creates or update a Git configuration
+     */
+    def git(Map<String, ?> parameters, String name) {
+        def params = parameters + [name: name]
+        ontrack.post(
+                'extension/git/configurations/create',
+                params
+        )
+    }
+
+    /**
+     * Gets the list of all Git configuration names
+     */
+    List<String> getGit() {
+        ontrack.get('extension/git/configurations/descriptors').resources.collect { it.id }
+    }
+
     def svn(Map<String, ?> parameters, String name) {
         def params = parameters + [name: name]
         ontrack.post(

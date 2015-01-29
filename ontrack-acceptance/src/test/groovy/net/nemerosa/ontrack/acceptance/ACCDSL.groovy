@@ -483,6 +483,15 @@ class ACCDSL extends AcceptanceTestClient {
     }
 
     @Test
+    void 'Configuration - Git'() {
+        def name = uid('G')
+        ontrack.configure {
+            git name, remote: 'https://github.com/nemerosa/ontrack.git', user: 'test', password: 'secret'
+        }
+        assert ontrack.config.git.find { it == name } != null
+    }
+
+    @Test
     void 'Configuration - SVN'() {
         ontrack.configure {
             svn uid('S'), url: 'svn://localhost'
