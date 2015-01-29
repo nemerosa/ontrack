@@ -427,16 +427,16 @@ class ACCDSL extends AcceptanceTestClient {
                 jenkinsBuild 'Jenkins', 'MyBuild', 1
             }
         }
-//        TODO build.promote('COPPER') {
-//            config {
-//                jenkinsBuild 'Jenkins', 'MyPromotion', 1
-//            }
-//        }
-//        TODO build.validate('TEST') {
-//            config {
-//                jenkinsBuild 'Jenkins', 'MyValidation', 1
-//            }
-//        }
+        build.promote('COPPER') {
+            config {
+                jenkinsBuild 'Jenkins', 'MyPromotion', 1
+            }
+        }
+        build.validate('TEST') {
+            config {
+                jenkinsBuild 'Jenkins', 'MyValidation', 1
+            }
+        }
 
         def j = ontrack.build(name, 'test', '1').config.jenkinsBuild
         assert j.configuration.name == 'Jenkins'
@@ -444,21 +444,21 @@ class ACCDSL extends AcceptanceTestClient {
         assert j.build == 1
         assert j.url == 'http://jenkins/job/MyBuild/1'
 
-        // TODO Promotion run build
+        // Promotion run build
 
-//        j = ontrack.build(name, 'test', '1').promotionRuns[0].config.jenkinsBuild
-//        assert j.configuration.name == 'Jenkins'
-//        assert j.job == 'MyPromotion'
-//        assert j.build == 1
-//        assert j.url == 'http://jenkins/job/MyPromotion/1'
+        j = ontrack.build(name, 'test', '1').promotionRuns[0].config.jenkinsBuild
+        assert j.configuration.name == 'Jenkins'
+        assert j.job == 'MyPromotion'
+        assert j.build == 1
+        assert j.url == 'http://jenkins/job/MyPromotion/1'
 
-        // TODO Validation run build
+        // Validation run build
 
-//        j = ontrack.build(name, 'test', '1').validationRuns[0].config.jenkinsBuild
-//        assert j.configuration.name == 'Jenkins'
-//        assert j.job == 'MyValidation'
-//        assert j.build == 1
-//        assert j.url == 'http://jenkins/job/MyValidation/1'
+        j = ontrack.build(name, 'test', '1').validationRuns[0].config.jenkinsBuild
+        assert j.configuration.name == 'Jenkins'
+        assert j.job == 'MyValidation'
+        assert j.build == 1
+        assert j.url == 'http://jenkins/job/MyValidation/1'
     }
 
     @Test
