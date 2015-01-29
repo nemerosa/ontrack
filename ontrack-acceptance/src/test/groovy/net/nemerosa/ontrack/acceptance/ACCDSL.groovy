@@ -368,7 +368,6 @@ class ACCDSL extends AcceptanceTestClient {
     }
 
     @Test
-    @Ignore
     void 'Branch property - SVN Validator - closed issues'() {
         def name = uid('S')
         ontrack.configure {
@@ -381,7 +380,8 @@ class ACCDSL extends AcceptanceTestClient {
             }
             branch('test') {
                 properties {
-                    svnValidatorClosedIssues ['Closed']
+                    svn '/project/branches/mybranch', '/project/tags/{build:mybranch-*}'
+                    svnValidatorClosedIssues(['Closed'])
                 }
             }
         }
