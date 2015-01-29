@@ -10,7 +10,7 @@ class Property extends AbstractResource {
         // Gets the update link
         def update = link('update')
         if (update) {
-            put(update, data)
+            ontrack.put(update, data)
         } else {
             throw new PropertyNotEditableException(type)
         }

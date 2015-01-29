@@ -17,7 +17,7 @@ class Project extends AbstractProjectResource {
     Branch branch(String name) {
         new Branch(
                 ontrack,
-                post(link('createBranch'), [
+                ontrack.post(link('createBranch'), [
                         name       : name,
                         description: ''
                 ])
@@ -39,7 +39,7 @@ class Project extends AbstractProjectResource {
                 "${link('buildSearch')}/search",
                 form
         )
-        get(url).resources.collect { new Build(ontrack, it.build) }
+        ontrack.get(url).resources.collect { new Build(ontrack, it.build) }
     }
 
 

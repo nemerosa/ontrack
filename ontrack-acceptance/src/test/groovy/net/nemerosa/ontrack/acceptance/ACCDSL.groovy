@@ -85,6 +85,18 @@ class ACCDSL extends AcceptanceTestClient {
     }
 
     @Test
+    void 'Promotion runs'() {
+        def branch = createBuildsAndPromotions()
+        // Creates a run
+        def run = ontrack.build(branch.project, branch.name, '2').promote('BRONZE')
+        assert run.promotionLevel.name == 'BRONZE'
+        // List of runs
+//        def runs = ontrack.build(branch.project, branch.name, '2').promotionRuns()
+//        assert runs.size() == 2
+//        runs.each { assert it.promotionLevel.name == 'BRONZE' }
+    }
+
+    @Test
     void 'Validating some builds and filtering on it'() {
         def branch = createBuildsAndPromotions()
         // Validating builds
@@ -380,32 +392,52 @@ class ACCDSL extends AcceptanceTestClient {
 
     @Test
     void 'Jenkins build property'() {
-        def project = uid('P')
         ontrack.configure {
             jenkins 'Jenkins', 'http://jenkins'
         }
-        ontrack.project(project) {
-            branch('test') {
-                promotionLevel('COPPER')
-                validationStamp('TEST')
-                build('1') {
-                    config {
-                        jenkinsBuild 'Jenkins', 'MyBuild', 1
-                    }
-                }
-                .promote('COPPER')
-                .validate('TEST')
+        def name = uid('P')
+        def project = ontrack.project(name)
+        def branch = project.branch('test') {
+            promotionLevel('COPPER')
+            validationStamp('TEST')
+        }
+        def build = branch.build('1') {
+            config {
+                jenkinsBuild 'Jenkins', 'MyBuild', 1
             }
         }
+//        TODO build.promote('COPPER') {
+//            config {
+//                jenkinsBuild 'Jenkins', 'MyPromotion', 1
+//            }
+//        }
+//        TODO build.validate('TEST') {
+//            config {
+//                jenkinsBuild 'Jenkins', 'MyValidation', 1
+//            }
+//        }
 
-        def j = ontrack.build(project, 'test', '1').config.jenkinsBuild
+        def j = ontrack.build(name, 'test', '1').config.jenkinsBuild
         assert j.configuration.name == 'Jenkins'
         assert j.job == 'MyBuild'
         assert j.build == 1
         assert j.url == 'http://jenkins/job/MyBuild/1'
 
         // TODO Promotion run build
+
+//        j = ontrack.build(name, 'test', '1').promotionRuns[0].config.jenkinsBuild
+//        assert j.configuration.name == 'Jenkins'
+//        assert j.job == 'MyPromotion'
+//        assert j.build == 1
+//        assert j.url == 'http://jenkins/job/MyPromotion/1'
+
         // TODO Validation run build
+
+//        j = ontrack.build(name, 'test', '1').validationRuns[0].config.jenkinsBuild
+//        assert j.configuration.name == 'Jenkins'
+//        assert j.job == 'MyValidation'
+//        assert j.build == 1
+//        assert j.url == 'http://jenkins/job/MyValidation/1'
     }
 
     @Test

@@ -23,7 +23,7 @@ class Branch extends AbstractProjectResource {
                 "${link('view')}/${filterType}",
                 filterConfig
         )
-        get(url).buildViews.collect { new Build(ontrack, it.build) }
+        ontrack.get(url).buildViews.collect { new Build(ontrack, it.build) }
     }
 
     List<Build> standardFilter(Map<String, ?> filterConfig) {
@@ -40,17 +40,17 @@ class Branch extends AbstractProjectResource {
         closure.delegate = definition
         closure()
         // When configured, send the template info
-        put(link('templateDefinition'), definition.data)
+        ontrack.put(link('templateDefinition'), definition.data)
     }
 
     def sync() {
-        post(link('templateSync'), [:])
+        ontrack.post(link('templateSync'), [:])
     }
 
     Branch instance(String sourceName, Map<String, String> params) {
         new Branch(
                 ontrack,
-                put(link('templateInstanceCreate'), [
+                ontrack.put(link('templateInstanceCreate'), [
                         name      : sourceName,
                         manual    : (!params.empty),
                         parameters: params
@@ -61,7 +61,7 @@ class Branch extends AbstractProjectResource {
     PromotionLevel promotionLevel(String name, String description = '') {
         new PromotionLevel(
                 ontrack,
-                post(link('createPromotionLevel'), [
+                ontrack.post(link('createPromotionLevel'), [
                         name       : name,
                         description: description
                 ])
@@ -77,7 +77,7 @@ class Branch extends AbstractProjectResource {
     ValidationStamp validationStamp(String name, String description = '') {
         new ValidationStamp(
                 ontrack,
-                post(link('createValidationStamp'), [
+                ontrack.post(link('createValidationStamp'), [
                         name       : name,
                         description: description
                 ])
@@ -93,7 +93,7 @@ class Branch extends AbstractProjectResource {
     Build build(String name, String description = '') {
         new Build(
                 ontrack,
-                post(link('createBuild'), [
+                ontrack.post(link('createBuild'), [
                         name       : name,
                         description: description
                 ])

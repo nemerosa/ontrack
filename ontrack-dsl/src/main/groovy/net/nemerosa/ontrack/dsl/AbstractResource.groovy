@@ -10,6 +10,10 @@ class AbstractResource {
         this.node = node
     }
 
+    def get(String name) {
+        node[name] ?: [:]
+    }
+
     protected String link(String name) {
         String linkName = name.startsWith('_') ? name : '_' + name
         if (node[linkName]) {
@@ -29,18 +33,6 @@ class AbstractResource {
 
     protected List<Object> list(String url) {
         ontrack.get(url).resources as List
-    }
-
-    protected Object get(String url) {
-        ontrack.get(url)
-    }
-
-    protected Object post(String url, data) {
-        ontrack.post(url, data)
-    }
-
-    protected Object put(String url, data) {
-        ontrack.put(url, data)
     }
 
     @Override

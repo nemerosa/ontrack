@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.dsl
 
 import net.nemerosa.ontrack.dsl.properties.BuildProperties
-import net.nemerosa.ontrack.dsl.properties.ProjectEntityProperties
 
 class Build extends AbstractProjectResource {
 
@@ -23,15 +22,23 @@ class Build extends AbstractProjectResource {
         node?.branch?.name
     }
 
-    Build promote(String promotion) {
-        post(link('promote'), [
-                promotionLevel: ontrack.promotionLevel(project, branch, promotion).id,
-        ])
-        this
+    PromotionRun promote(String promotion) {
+        new PromotionRun(
+                ontrack,
+                ontrack.post(link('promote'), [
+                        promotionLevel: ontrack.promotionLevel(project, branch, promotion).id,
+                ])
+        )
+    }
+
+    PromotionRun promote(String promotion, Closure closure) {
+        def run = promote(promotion)
+        run(closure)
+        run
     }
 
     Build validate(String validationStamp, String validationStampStatus = 'PASSED') {
-        post(link('validate'), [
+        ontrack.post(link('validate'), [
                 validationStamp      : ontrack.validationStamp(project, branch, validationStamp).id,
                 validationRunStatusId: validationStampStatus
         ])

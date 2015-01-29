@@ -28,7 +28,7 @@ abstract class AbstractProjectResource extends AbstractResource implements Proje
     @Override
     def property(String type, Object data) {
         // Gets the list of properties
-        def properties = get(link('properties'))
+        def properties = ontrack.get(link('properties'))
         // Looks for the property
         def propertyNode = properties.resources.find { it.typeDescriptor.typeName as String == type }
         // Found
@@ -44,7 +44,7 @@ abstract class AbstractProjectResource extends AbstractResource implements Proje
     @Override
     def property(String type) {
         // Gets the list of properties
-        def properties = get(link('properties'))
+        def properties = ontrack.get(link('properties'))
         // Looks for the property
         def propertyNode = properties.resources.find { it.typeDescriptor.typeName as String == type }
         // Found
