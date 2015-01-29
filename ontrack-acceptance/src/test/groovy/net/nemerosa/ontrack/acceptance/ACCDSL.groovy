@@ -97,6 +97,24 @@ class ACCDSL extends AcceptanceTestClient {
     }
 
     @Test
+    void 'Validation runs'() {
+        def branch = createBuildsAndPromotions()
+        // Creates one run
+        def run = ontrack.build(branch.project, branch.name, '2').validate('SMOKE', 'FAILED')
+        assert run.validationStamp.name == 'SMOKE'
+        assert run.validationRunStatuses[0].statusID.id == 'FAILED'
+        assert run.validationRunStatuses[0].statusID.name == 'Failed'
+        // Creates a second run
+        ontrack.build(branch.project, branch.name, '2').validate('SMOKE')
+        // List of runs
+        def runs = ontrack.build(branch.project, branch.name, '2').validationRuns
+        assert runs.size() == 2
+        runs.each { assert it.validationStamp.name == 'SMOKE' }
+        assert runs[0].validationRunStatuses[0].statusID.id == 'FAILED'
+        assert runs[1].validationRunStatuses[0].statusID.id == 'PASSED'
+    }
+
+    @Test
     void 'Validating some builds and filtering on it'() {
         def branch = createBuildsAndPromotions()
         // Validating builds

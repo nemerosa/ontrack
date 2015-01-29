@@ -37,17 +37,31 @@ class Build extends AbstractProjectResource {
         run
     }
 
-    Build validate(String validationStamp, String validationStampStatus = 'PASSED') {
-        ontrack.post(link('validate'), [
-                validationStamp      : ontrack.validationStamp(project, branch, validationStamp).id,
-                validationRunStatusId: validationStampStatus
-        ])
-        this
+    ValidationRun validate(String validationStamp, String validationStampStatus = 'PASSED') {
+        new ValidationRun(
+                ontrack,
+                ontrack.post(link('validate'), [
+                        validationStamp      : ontrack.validationStamp(project, branch, validationStamp).id,
+                        validationRunStatusId: validationStampStatus
+                ])
+        )
+    }
+
+    ValidationRun validate(String validationStamp, String validationStampStatus = 'PASSED', Closure closure) {
+        def run = validate(validationStamp, validationStampStatus)
+        run(closure)
+        run
     }
 
     List<PromotionRun> getPromotionRuns() {
         ontrack.get(link('promotionRuns')).resources.collect {
             new PromotionRun(ontrack, it)
+        }
+    }
+
+    List<ValidationRun> getValidationRuns() {
+        ontrack.get(link('validationRuns')).resources.collect {
+            new ValidationRun(ontrack, it)
         }
     }
 
