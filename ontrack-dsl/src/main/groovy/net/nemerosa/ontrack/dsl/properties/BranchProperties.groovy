@@ -30,7 +30,7 @@ class BranchProperties extends ProjectEntityProperties {
     def svn(String branchPath, String buildPath) {
         property('net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType', [
                 branchPath: branchPath,
-                buildPath: buildPath
+                buildPath : buildPath
         ])
     }
 
@@ -47,11 +47,23 @@ class BranchProperties extends ProjectEntityProperties {
         ])
     }
 
-    /**
-     * SVN revision change log issue validator
-     */
     def getSvnValidatorClosedIssues() {
         property('net.nemerosa.ontrack.extension.svn.property.SVNRevisionChangeLogIssueValidator')
+    }
+
+    /**
+     * SVN synchronisation
+     */
+
+    def svnSync(int interval = 0, boolean override = false) {
+        property('net.nemerosa.ontrack.extension.svn.property.SVNSyncPropertyType', [
+                override: override,
+                interval: interval,
+        ])
+    }
+
+    def getSvnSync() {
+        property('net.nemerosa.ontrack.extension.svn.property.SVNSyncPropertyType')
     }
 
 }

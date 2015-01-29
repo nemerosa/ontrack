@@ -389,6 +389,29 @@ class ACCDSL extends AcceptanceTestClient {
     }
 
     @Test
+    void 'Branch property - SVN sync'() {
+        def name = uid('S')
+        ontrack.configure {
+            svn name, url: 'svn://localhost'
+        }
+        def project = uid('P')
+        ontrack.project(project) {
+            config {
+                svn name, '/project/trunk'
+            }
+            branch('test') {
+                config {
+                    svn '/project/branches/mybranch', '/project/tags/{build:mybranch-*}'
+                    svnSync 30
+                }
+            }
+        }
+        def sync = ontrack.branch(project, 'test').config.svnSync
+        assert sync.override == false
+        assert sync.interval == 30
+    }
+
+    @Test
     void 'Launching branch template synchronisation'() {
         // GitHub configuration
         ontrack.configure {
