@@ -328,6 +328,17 @@ class ACCDSL extends AcceptanceTestClient {
     }
 
     @Test
+    void 'Project property - JIRA follow links'() {
+        def name = uid('P')
+        ontrack.project(name) {
+            config {
+                jiraFollowLinks 'Clones', 'Depends'
+            }
+        }
+        assert ontrack.project(name).config.jiraFollowLinks == ['Clones', 'Depends']
+    }
+
+    @Test
     void 'Project property - SVN configuration'() {
         def name = uid('S')
         ontrack.configure {

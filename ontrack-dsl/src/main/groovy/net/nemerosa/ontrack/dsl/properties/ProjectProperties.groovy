@@ -33,4 +33,22 @@ class ProjectProperties extends ProjectEntityProperties {
     def getSvn() {
         property('net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationPropertyType')
     }
+
+    /**
+     * JIRA Follow links
+     */
+    def jiraFollowLinks(String... linkNames) {
+        jiraFollowLinks(linkNames as List)
+    }
+
+    def jiraFollowLinks(Collection<String> linkNames) {
+        property('net.nemerosa.ontrack.extension.jira.JIRAFollowLinksPropertyType', [
+                linkNames: linkNames
+        ])
+    }
+
+    List<String> getJiraFollowLinks() {
+        property('net.nemerosa.ontrack.extension.jira.JIRAFollowLinksPropertyType').linkNames
+    }
+
 }
