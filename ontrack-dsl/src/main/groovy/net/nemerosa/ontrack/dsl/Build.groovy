@@ -45,6 +45,12 @@ class Build extends AbstractProjectResource {
         this
     }
 
+    List<PromotionRun> getPromotionRuns() {
+        ontrack.get(link('promotionRuns')).resources.collect {
+            new PromotionRun(ontrack, it)
+        }
+    }
+
     BuildProperties getConfig() {
         new BuildProperties(ontrack, this)
     }

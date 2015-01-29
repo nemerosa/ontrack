@@ -97,6 +97,8 @@ public interface StructureRepository {
 
     Ack deletePromotionRun(ID promotionRunId);
 
+    List<PromotionRun> getPromotionRunsForBuild(Build build);
+
     List<PromotionRun> getLastPromotionRunsForBuild(Build build);
 
     PromotionRun getLastPromotionRunForPromotionLevel(PromotionLevel promotionLevel);

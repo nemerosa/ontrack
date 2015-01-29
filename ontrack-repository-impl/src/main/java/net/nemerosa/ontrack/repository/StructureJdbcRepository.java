@@ -485,6 +485,18 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    public List<PromotionRun> getPromotionRunsForBuild(Build build) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT * FROM PROMOTION_RUNS WHERE BUILDID = :buildId ORDER BY CREATION DESC",
+                params("buildId", build.id()),
+                (rs, rowNum) -> toPromotionRun(rs,
+                        (id) -> build,
+                        this::getPromotionLevel
+                )
+        );
+    }
+
+    @Override
     public List<PromotionRun> getLastPromotionRunsForBuild(Build build) {
         // Branch
         Branch branch = build.getBranch();

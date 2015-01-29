@@ -101,6 +101,8 @@ public interface StructureService {
 
     Optional<PromotionLevel> findPromotionLevelByName(String project, String branch, String promotionLevel);
 
+    List<PromotionRun> getPromotionRunsForBuild(ID buildId);
+
     List<PromotionRun> getLastPromotionRunsForBuild(ID buildId);
 
     Optional<PromotionRun> getLastPromotionRunForBuildAndPromotionLevel(Build build, PromotionLevel promotionLevel);

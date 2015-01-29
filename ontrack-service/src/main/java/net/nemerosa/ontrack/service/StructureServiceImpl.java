@@ -520,6 +520,13 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public List<PromotionRun> getPromotionRunsForBuild(ID buildId) {
+        Build build = getBuild(buildId);
+        securityService.checkProjectFunction(build.getBranch().getProject().id(), ProjectView.class);
+        return structureRepository.getPromotionRunsForBuild(build);
+    }
+
+    @Override
     public List<PromotionRun> getLastPromotionRunsForBuild(ID buildId) {
         Build build = getBuild(buildId);
         securityService.checkProjectFunction(build.getBranch().getProject().id(), ProjectView.class);

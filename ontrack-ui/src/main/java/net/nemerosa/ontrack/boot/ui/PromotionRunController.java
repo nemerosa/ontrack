@@ -32,6 +32,14 @@ public class PromotionRunController extends AbstractResourceController {
         this.securityService = securityService;
     }
 
+    @RequestMapping(value = "builds/{buildId}/promotionRun", method = RequestMethod.GET)
+    public Resources<PromotionRun> getPromotionRuns(@PathVariable ID buildId) {
+        return Resources.of(
+                structureService.getPromotionRunsForBuild(buildId),
+                uri(on(getClass()).getPromotionRuns(buildId))
+        ).forView(Build.class);
+    }
+
     @RequestMapping(value = "builds/{buildId}/promotionRun/last", method = RequestMethod.GET)
     public Resources<PromotionRun> getLastPromotionRuns(@PathVariable ID buildId) {
         return Resources.of(

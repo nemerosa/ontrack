@@ -91,9 +91,9 @@ class ACCDSL extends AcceptanceTestClient {
         def run = ontrack.build(branch.project, branch.name, '2').promote('BRONZE')
         assert run.promotionLevel.name == 'BRONZE'
         // List of runs
-//        def runs = ontrack.build(branch.project, branch.name, '2').promotionRuns()
-//        assert runs.size() == 2
-//        runs.each { assert it.promotionLevel.name == 'BRONZE' }
+        def runs = ontrack.build(branch.project, branch.name, '2').promotionRuns
+        assert runs.size() == 2
+        runs.each { assert it.promotionLevel.name == 'BRONZE' }
     }
 
     @Test
