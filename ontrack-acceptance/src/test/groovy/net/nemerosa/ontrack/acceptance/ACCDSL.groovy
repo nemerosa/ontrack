@@ -492,6 +492,15 @@ class ACCDSL extends AcceptanceTestClient {
     }
 
     @Test
+    void 'Configuration - Jenkins'() {
+        def name = uid('J')
+        ontrack.configure {
+            jenkins name, 'http://jenkins'
+        }
+        assert ontrack.config.jenkins.find { it == name } != null
+    }
+
+    @Test
     void 'Configuration - SVN'() {
         ontrack.configure {
             svn uid('S'), url: 'svn://localhost'
