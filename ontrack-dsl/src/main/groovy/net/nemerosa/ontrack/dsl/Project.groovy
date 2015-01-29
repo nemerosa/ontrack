@@ -30,7 +30,7 @@ class Project extends AbstractProjectResource {
         branch
     }
 
-    ProjectProperties getProperties() {
+    ProjectProperties getConfig() {
         new ProjectProperties(ontrack, this)
     }
 

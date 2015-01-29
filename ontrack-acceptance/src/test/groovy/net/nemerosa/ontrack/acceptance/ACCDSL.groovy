@@ -131,11 +131,11 @@ class ACCDSL extends AcceptanceTestClient {
         // Creating a build
         def build = ontrack.branch(project, '1.0').build('1', 'Build 1')
         // Setting the Jenkins build property
-        build.properties {
+        build.config {
             jenkinsBuild 'Local', 'JOB', 1
         }
         // Gets its Jenkins build property
-        def property = build.properties.jenkinsBuild
+        def property = build.config.jenkinsBuild
         assert property.job == 'JOB'
         assert property.build == 1
     }
@@ -148,11 +148,11 @@ class ACCDSL extends AcceptanceTestClient {
         // Creating a build
         def build = ontrack.branch(project, '1.0').build('1', 'Build 1')
         // Setting the Label property
-        build.properties {
+        build.config {
             label 'RC'
         }
         // Gets its Label property
-        assert build.properties.label == 'RC'
+        assert build.config.label == 'RC'
     }
 
     protected static File getImageFile() {
@@ -298,7 +298,7 @@ class ACCDSL extends AcceptanceTestClient {
         // Project and branch template
         def project = uid('P')
         ontrack.project(project) {
-            properties {
+            config {
                 gitHub 'ontrack'
             }
             branch('template') {
@@ -306,7 +306,7 @@ class ACCDSL extends AcceptanceTestClient {
                 promotionLevel 'BRONZE', 'Bronze promotion'
                 validationStamp 'SMOKE', 'Smoke tests'
                 // Git branch
-                properties {
+                config {
                     gitBranch '${gitBranch}'
                 }
                 // Template definition
@@ -324,7 +324,7 @@ class ACCDSL extends AcceptanceTestClient {
         assert instance.id > 0
         assert instance.name == 'TEST'
         // Checks the Git branch of the instance
-        def property = instance.properties.gitBranch
+        def property = instance.config.gitBranch
         assert property.branch == 'feature/test'
     }
 
@@ -336,11 +336,11 @@ class ACCDSL extends AcceptanceTestClient {
         }
         def project = uid('P')
         ontrack.project(project) {
-            properties {
+            config {
                 svn name, '/project/trunk'
             }
         }
-        def cfg = ontrack.project(project).properties.svn
+        def cfg = ontrack.project(project).config.svn
         assert cfg.configuration.name == name
         assert cfg.projectPath == '/project/trunk'
     }
@@ -353,16 +353,16 @@ class ACCDSL extends AcceptanceTestClient {
         }
         def project = uid('P')
         ontrack.project(project) {
-            properties {
+            config {
                 svn name, '/project/trunk'
             }
             branch('mybranch') {
-                properties {
+                config {
                     svn '/project/branches/mybranch', '/project/tags/{build:mybranch-*}'
                 }
             }
         }
-        def cfg = ontrack.branch(project, 'mybranch').properties.svn
+        def cfg = ontrack.branch(project, 'mybranch').config.svn
         assert cfg.branchPath == '/project/branches/mybranch'
         assert cfg.buildPath == '/project/tags/{build:mybranch-*}'
     }
@@ -375,17 +375,17 @@ class ACCDSL extends AcceptanceTestClient {
         }
         def project = uid('P')
         ontrack.project(project) {
-            properties {
+            config {
                 svn name, '/project/trunk'
             }
             branch('test') {
-                properties {
+                config {
                     svn '/project/branches/mybranch', '/project/tags/{build:mybranch-*}'
                     svnValidatorClosedIssues(['Closed'])
                 }
             }
         }
-        assert ontrack.branch(project, 'test').properties.svnValidatorClosedIssues.closedStatuses == ['Closed']
+        assert ontrack.branch(project, 'test').config.svnValidatorClosedIssues.closedStatuses == ['Closed']
     }
 
     @Test
@@ -397,7 +397,7 @@ class ACCDSL extends AcceptanceTestClient {
         // Project and branch template
         def project = uid('P')
         ontrack.project(project) {
-            properties {
+            config {
                 gitHub 'ontrack'
             }
             branch('template') {
@@ -405,7 +405,7 @@ class ACCDSL extends AcceptanceTestClient {
                 promotionLevel 'BRONZE', 'Bronze promotion'
                 validationStamp 'SMOKE', 'Smoke tests'
                 // Git branch
-                properties {
+                config {
                     gitBranch '${gitBranch}'
                 }
                 // Template definition
@@ -423,7 +423,7 @@ class ACCDSL extends AcceptanceTestClient {
             assert instance.id > 0
             assert instance.name == it
             // Checks the Git branch of the instance
-            def property = instance.properties.gitBranch
+            def property = instance.config.gitBranch
             assert property.branch == "release/${it}"
         }
     }

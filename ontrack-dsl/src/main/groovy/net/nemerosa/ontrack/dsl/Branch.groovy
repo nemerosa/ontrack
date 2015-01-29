@@ -100,7 +100,7 @@ class Branch extends AbstractProjectResource {
         )
     }
 
-    BranchProperties getProperties() {
+    BranchProperties getConfig() {
         new BranchProperties(ontrack, this)
     }
 }

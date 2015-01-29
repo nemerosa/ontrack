@@ -23,7 +23,7 @@ class ValidationStamp extends AbstractProjectResource {
         closure()
     }
 
-    ProjectEntityProperties getProperties() {
+    ProjectEntityProperties getConfig() {
         new ValidationStampProperties(ontrack, this)
     }
 

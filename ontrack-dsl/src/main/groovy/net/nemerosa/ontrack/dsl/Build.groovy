@@ -32,7 +32,7 @@ class Build extends AbstractProjectResource {
         this
     }
 
-    ProjectEntityProperties getProperties() {
+    BuildProperties getConfig() {
         new BuildProperties(ontrack, this)
     }
 }

@@ -13,12 +13,12 @@ interface ProjectEntity {
     /**
      * Configuration of properties
      */
-    def properties(Closure closure)
+    def config(Closure closure)
 
     /**
      * Access to the properties
      */
-    ProjectEntityProperties getProperties()
+    ProjectEntityProperties getConfig()
 
     /**
      * Sets a property

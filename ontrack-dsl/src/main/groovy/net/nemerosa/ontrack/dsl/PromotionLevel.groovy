@@ -23,7 +23,7 @@ class PromotionLevel extends AbstractProjectResource {
         closure()
     }
 
-    ProjectEntityProperties getProperties() {
+    ProjectEntityProperties getConfig() {
         new PromotionLevelProperties(ontrack, this)
     }
 
