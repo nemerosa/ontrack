@@ -426,15 +426,15 @@ class ACCDSL extends AcceptanceTestClient {
             config {
                 jenkinsBuild 'Jenkins', 'MyBuild', 1
             }
-        }
-        build.promote('COPPER') {
-            config {
-                jenkinsBuild 'Jenkins', 'MyPromotion', 1
+            promote('COPPER') {
+                config {
+                    jenkinsBuild 'Jenkins', 'MyPromotion', 1
+                }
             }
-        }
-        build.validate('TEST') {
-            config {
-                jenkinsBuild 'Jenkins', 'MyValidation', 1
+            validate('TEST') {
+                config {
+                    jenkinsBuild 'Jenkins', 'MyValidation', 1
+                }
             }
         }
 
