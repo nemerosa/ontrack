@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
@@ -52,6 +53,17 @@ public class JIRAController extends AbstractExtensionController<JIRAExtensionFea
         )
                 .with(Link.CREATE, uri(on(getClass()).getConfigurationForm()))
                 ;
+    }
+
+    /**
+     * Gets the configuration descriptors
+     */
+    @RequestMapping(value = "configurations/descriptors", method = RequestMethod.GET)
+    public Resources<ConfigurationDescriptor> getConfigurationsDescriptors() {
+        return Resources.of(
+                jiraConfigurationService.getConfigurationDescriptors(),
+                uri(on(getClass()).getConfigurationsDescriptors())
+        );
     }
 
     /**

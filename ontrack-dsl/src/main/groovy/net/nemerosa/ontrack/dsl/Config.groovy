@@ -75,6 +75,24 @@ class Config {
     }
 
     /**
+     * JIRA configuration
+     */
+
+    def jira(String name, String url, String user = '', String password = '') {
+        ontrack.post(
+                'extension/jira/configurations/create', [
+                name    : name,
+                url     : url,
+                user    : user,
+                password: password
+        ])
+    }
+
+    List<String> getJira() {
+        ontrack.get('extension/jira/configurations/descriptors').resources.collect { it.id }
+    }
+
+    /**
      * Artifactory configuration
      */
 

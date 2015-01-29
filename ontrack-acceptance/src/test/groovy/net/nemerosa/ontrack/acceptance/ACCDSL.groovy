@@ -501,6 +501,25 @@ class ACCDSL extends AcceptanceTestClient {
     }
 
     @Test
+    void 'Configuration - JIRA'() {
+        def name = uid('J')
+        ontrack.configure {
+            jira name, 'http://jira'
+        }
+        assert ontrack.config.jira.find { it == name } != null
+    }
+
+    @Test
+    void 'Configuration - JIRA and Git'() {
+        def jiraName = uid('J')
+        def gitName = uid('G')
+        ontrack.configure {
+            jira jiraName, 'http://jira'
+            git gitName, remote: 'https://github.com/nemerosa/ontrack.git', user: 'test', password: 'secret', issueServiceConfigurationIdentifier: "jira:${jiraName}"
+        }
+    }
+
+    @Test
     void 'Configuration - Artifactory'() {
         def name = uid('A')
         ontrack.configure {
