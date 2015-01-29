@@ -14,22 +14,19 @@ class ProjectProperties extends ProjectEntityProperties {
      * @param name Configuration name
      */
     def gitHub(String name) {
-        property(
-                'net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType',
-                [
-                        configuration: name
-                ]
-        )
+        property('net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType', [
+                configuration: name
+        ])
     }
 
     /**
      * SVN configuration
      */
 
-    def svn (String name, String projectPath) {
+    def svn(String name, String projectPath) {
         property('net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationPropertyType', [
                 configuration: name,
-                projectPath: projectPath
+                projectPath  : projectPath
         ])
     }
 
