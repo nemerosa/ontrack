@@ -379,6 +379,36 @@ class ACCDSL extends AcceptanceTestClient {
     }
 
     @Test
+    void 'Jenkins build property'() {
+        def project = uid('P')
+        ontrack.configure {
+            jenkins 'Jenkins', 'http://jenkins'
+        }
+        ontrack.project(project) {
+            branch('test') {
+                promotionLevel('COPPER')
+                validationStamp('TEST')
+                build('1') {
+                    config {
+                        jenkinsBuild 'Jenkins', 'MyBuild', 1
+                    }
+                }
+                .promote('COPPER')
+                .validate('TEST')
+            }
+        }
+
+        def j = ontrack.build(project, 'test', '1').config.jenkinsBuild
+        assert j.configuration.name == 'Jenkins'
+        assert j.job == 'MyBuild'
+        assert j.build == 1
+        assert j.url == 'http://jenkins/job/MyBuild/1'
+
+        // TODO Promotion run build
+        // TODO Validation run build
+    }
+
+    @Test
     void 'Branch property - SVN configuration'() {
         def name = uid('S')
         ontrack.configure {

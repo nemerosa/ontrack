@@ -30,7 +30,7 @@ class Build extends AbstractProjectResource {
         this
     }
 
-    Build validate(String validationStamp, String validationStampStatus) {
+    Build validate(String validationStamp, String validationStampStatus = 'PASSED') {
         post(link('validate'), [
                 validationStamp      : ontrack.validationStamp(project, branch, validationStamp).id,
                 validationRunStatusId: validationStampStatus
