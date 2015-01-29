@@ -33,7 +33,7 @@ class ProjectEntityProperties {
         ])
     }
 
-    def getLinks() {
+    Map<String, String> getLinks() {
         property('net.nemerosa.ontrack.extension.general.LinkPropertyType').links.collectEntries {
             [ it.name, it.value ]
         }
