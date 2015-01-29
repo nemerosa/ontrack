@@ -25,6 +25,7 @@ import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.StructureService;
+import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
@@ -98,6 +99,17 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
         )
                 .with(Link.CREATE, uri(on(getClass()).getConfigurationForm()))
                 ;
+    }
+
+    /**
+     * Gets the configuration descriptors
+     */
+    @RequestMapping(value = "configurations/descriptors", method = RequestMethod.GET)
+    public Resources<ConfigurationDescriptor> getConfigurationsDescriptors() {
+        return Resources.of(
+                configurationService.getConfigurationDescriptors(),
+                uri(on(getClass()).getConfigurationsDescriptors())
+        );
     }
 
     /**

@@ -9,7 +9,6 @@ import net.nemerosa.ontrack.dsl.Shell
 import net.nemerosa.ontrack.dsl.http.OTMessageClientException
 import org.junit.Assert
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 
 import static net.nemerosa.ontrack.test.TestUtils.uid
@@ -475,6 +474,15 @@ class ACCDSL extends AcceptanceTestClient {
     }
 
     @Test
+    void 'Configuration - GitHub'() {
+        def name = uid('GH')
+        ontrack.configure {
+            gitHub name, repository: 'nemerosa/ontrack', indexationInterval: 0, oauth2Token: 'ABCDEF'
+        }
+        assert ontrack.config.gitHub.find { it == name } != null
+    }
+
+    @Test
     void 'Configuration - SVN'() {
         ontrack.configure {
             svn uid('S'), url: 'svn://localhost'
@@ -487,11 +495,11 @@ class ACCDSL extends AcceptanceTestClient {
         ontrack.configure {
             svn name, url: 'svn://localhost'
         }
-        assert ontrack.config.svn.findAll { it == name} == [name]
+        assert ontrack.config.svn.findAll { it == name } == [name]
         ontrack.configure {
             svn name, url: 'http://localhost'
         }
-        assert ontrack.config.svn.findAll { it == name} == [name]
+        assert ontrack.config.svn.findAll { it == name } == [name]
     }
 
     @Test

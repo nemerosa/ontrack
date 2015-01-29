@@ -8,12 +8,22 @@ class Config {
         this.ontrack = ontrack
     }
 
+    /**
+     * Creates or update a GitHub configuration.
+     */
     def gitHub(Map<String, ?> parameters, String name) {
         def params = parameters + [name: name]
         ontrack.post(
                 'extension/github/configurations/create',
                 params
         )
+    }
+
+    /**
+     * Gets the list of all GitHub configuration names
+     */
+    List<String> getGitHub() {
+        ontrack.get('extension/github/configurations/descriptors').resources.collect { it.id }
     }
 
     def svn(Map<String, ?> parameters, String name) {
@@ -25,7 +35,7 @@ class Config {
     }
 
     def getSvn() {
-        ontrack.get('extension/svn/configurations/descriptors').resources.collect { it.name }
+        ontrack.get('extension/svn/configurations/descriptors').resources.collect { it.id }
     }
 
     def jenkins(String name, String url, String user = '', String password = '') {
