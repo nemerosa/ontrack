@@ -389,6 +389,22 @@ class ACCDSL extends AcceptanceTestClient {
     }
 
     @Test
+    void 'Project property - Git configuration'() {
+        def name = uid('G')
+        ontrack.configure {
+            git name, remote: 'https://github.com/nemerosa/ontrack.git', user: 'test', password: 'secret'
+        }
+        def project = uid('P')
+        ontrack.project(project) {
+            config {
+                git name
+            }
+        }
+        def cfg = ontrack.project(project).config.git
+        assert cfg.configuration.name == name
+    }
+
+    @Test
     void 'Link property'() {
         def project = uid('P')
         ontrack.project(project) {

@@ -35,6 +35,20 @@ class ProjectProperties extends ProjectEntityProperties {
     }
 
     /**
+     * Git configuration
+     */
+
+    def git(String name) {
+        property('net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationPropertyType', [
+                configuration: name,
+        ])
+    }
+
+    def getGit() {
+        property('net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationPropertyType')
+    }
+
+    /**
      * JIRA Follow links
      */
     def jiraFollowLinks(String... linkNames) {
