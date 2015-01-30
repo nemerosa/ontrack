@@ -638,6 +638,27 @@ class ACCDSL extends AcceptanceTestClient {
     }
 
     @Test
+    void 'Branch property - Artifactory sync'() {
+        def name = uid('A')
+        ontrack.configure {
+            artifactory name, 'http://artifactory'
+        }
+        def project = uid('P')
+        ontrack.project(project) {
+            branch('test') {
+                config {
+                    artifactorySync name, 'test', 'test-*', 30
+                }
+            }
+        }
+        def sync = ontrack.branch(project, 'test').config.artifactorySync
+        assert sync.configuration.name == name
+        assert sync.buildName == 'test'
+        assert sync.buildNameFilter == 'test-*'
+        assert sync.interval == 30
+    }
+
+    @Test
     void 'Launching branch template synchronisation'() {
         // GitHub configuration
         ontrack.configure {

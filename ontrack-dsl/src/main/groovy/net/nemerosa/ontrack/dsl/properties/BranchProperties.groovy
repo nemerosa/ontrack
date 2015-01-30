@@ -66,4 +66,21 @@ class BranchProperties extends ProjectEntityProperties {
         property('net.nemerosa.ontrack.extension.svn.property.SVNSyncPropertyType')
     }
 
+    /**
+     * Artifactory synchronisation
+     */
+
+    def artifactorySync(String configuration, String buildName, String buildNameFilter = '*', int interval = 0) {
+        property('net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncPropertyType', [
+                configuration: configuration,
+                buildName: buildName,
+                buildNameFilter: buildNameFilter,
+                interval: interval
+        ])
+    }
+
+    def getArtifactorySync() {
+        property('net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncPropertyType')
+    }
+
 }
