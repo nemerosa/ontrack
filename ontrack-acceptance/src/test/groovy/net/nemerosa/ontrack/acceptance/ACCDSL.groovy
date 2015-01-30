@@ -511,6 +511,51 @@ class ACCDSL extends AcceptanceTestClient {
     }
 
     @Test
+    void 'Jenkins job property URL with folders'() {
+        ontrack.configure {
+            jenkins 'Jenkins', 'http://jenkins'
+        }
+        def name = uid('P')
+        ontrack.project(name) {
+            config {
+                jenkinsJob 'Jenkins', 'prj/prj-build'
+            }
+        }
+        assert ontrack.project(name).config.jenkinsJob.url == 'http://jenkins/job/prj/job/prj-build'
+        ontrack.project(name) {
+            config {
+                jenkinsJob 'Jenkins', 'prj/job/prj-build'
+            }
+        }
+        assert ontrack.project(name).config.jenkinsJob.url == 'http://jenkins/job/prj/job/prj-build'
+    }
+
+    @Test
+    void 'Jenkins build property URL with folders'() {
+        ontrack.configure {
+            jenkins 'Jenkins', 'http://jenkins'
+        }
+        def name = uid('P')
+        ontrack.project(name) {
+            branch('test') {
+                build('1') {
+                    config {
+                        jenkinsBuild 'Jenkins', 'prj/prj-test/prj-test-build', 1
+                    }
+                }
+            }
+        }
+        assert ontrack.build(name, 'test', '1').config.jenkinsBuild.url == 'http://jenkins/job/prj/job/prj-test/job/prj-test-build/1'
+
+        ontrack.branch(name, 'test').build('2') {
+            config {
+                jenkinsBuild 'Jenkins', 'prj/job/prj-test/job/prj-test-build', 2
+            }
+        }
+        assert ontrack.build(name, 'test', '2').config.jenkinsBuild.url == 'http://jenkins/job/prj/job/prj-test/job/prj-test-build/2'
+    }
+
+    @Test
     void 'Branch property - SVN configuration'() {
         def name = uid('S')
         ontrack.configure {

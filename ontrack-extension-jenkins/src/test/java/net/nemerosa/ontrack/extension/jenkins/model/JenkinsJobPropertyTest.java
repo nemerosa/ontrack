@@ -9,25 +9,62 @@ import static org.junit.Assert.assertEquals;
 
 public class JenkinsJobPropertyTest {
 
+    private JenkinsConfiguration configuration;
     private JenkinsJobProperty property;
 
     @Before
     public void before() {
-        JenkinsConfiguration configuration = new JenkinsConfiguration(
+        configuration = new JenkinsConfiguration(
                 "MyConfig",
                 "http://jenkins",
                 "user",
                 "secret"
         );
+    }
+
+    @Test
+    public void url_simple() {
         property = new JenkinsJobProperty(
                 configuration,
                 "MyJob"
         );
+        assertEquals("http://jenkins/job/MyJob", property.getUrl());
     }
 
     @Test
-    public void url() {
-        assertEquals("http://jenkins/job/MyJob", property.getUrl());
+    public void url_folder_1_slash() {
+        property = new JenkinsJobProperty(
+                configuration,
+                "prj/build"
+        );
+        assertEquals("http://jenkins/job/prj/job/build", property.getUrl());
+    }
+
+    @Test
+    public void url_folder_2_slash() {
+        property = new JenkinsJobProperty(
+                configuration,
+                "prj/branch/build"
+        );
+        assertEquals("http://jenkins/job/prj/job/branch/job/build", property.getUrl());
+    }
+
+    @Test
+    public void url_folder_1_job() {
+        property = new JenkinsJobProperty(
+                configuration,
+                "prj/job/build"
+        );
+        assertEquals("http://jenkins/job/prj/job/build", property.getUrl());
+    }
+
+    @Test
+    public void url_folder_2_job() {
+        property = new JenkinsJobProperty(
+                configuration,
+                "prj/job/branch/job/build"
+        );
+        assertEquals("http://jenkins/job/prj/job/branch/job/build", property.getUrl());
     }
 
 }
