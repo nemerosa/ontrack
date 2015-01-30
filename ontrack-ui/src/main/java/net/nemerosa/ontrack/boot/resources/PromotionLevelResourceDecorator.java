@@ -33,6 +33,8 @@ public class PromotionLevelResourceDecorator extends AbstractResourceDecorator<P
                         // TODO Previous promotion level
                         // Decorations
                 .link("_decorations", on(DecorationsController.class).getDecorations(promotionLevel.getProjectEntityType(), promotionLevel.getId()))
+                        // Actual properties for this item
+                .link("_properties", on(PropertyController.class).getProperties(promotionLevel.getProjectEntityType(), promotionLevel.getId()))
                         // Promotion runs
                 .link("_runs", on(PromotionLevelController.class).getPromotionRunView(promotionLevel.getId()))
                         // Events

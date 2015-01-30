@@ -4,7 +4,6 @@ import net.nemerosa.ontrack.boot.ui.PromotionLevelController;
 import net.nemerosa.ontrack.boot.ui.PromotionRunController;
 import net.nemerosa.ontrack.boot.ui.PropertyController;
 import net.nemerosa.ontrack.model.security.PromotionRunDelete;
-import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.structure.PromotionRun;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
 import net.nemerosa.ontrack.ui.resource.Link;
@@ -36,7 +35,7 @@ public class PromotionRunResourceDecorator extends AbstractResourceDecorator<Pro
                         // Deletion
                 .delete(on(PromotionRunController.class).deletePromotionRun(promotionRun.getId()), PromotionRunDelete.class, promotionRun.projectId())
                         // Actual properties for this item
-                .link("_properties", on(PropertyController.class).getProperties(ProjectEntityType.PROMOTION_RUN, promotionRun.getId()))
+                .link("_properties", on(PropertyController.class).getProperties(promotionRun.getProjectEntityType(), promotionRun.getId()))
                         // Image
                 .link(
                         Link.IMAGE_LINK,

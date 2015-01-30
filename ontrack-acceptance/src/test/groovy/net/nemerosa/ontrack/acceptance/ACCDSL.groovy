@@ -462,6 +462,55 @@ class ACCDSL extends AcceptanceTestClient {
     }
 
     @Test
+    void 'Jenkins job property'() {
+        ontrack.configure {
+            jenkins 'Jenkins', 'http://jenkins'
+        }
+        def name = uid('P')
+        ontrack.project(name) {
+            config {
+                jenkinsJob 'Jenkins', 'MyProject'
+            }
+            branch('test') {
+                config {
+                    jenkinsJob 'Jenkins', 'MyBranch'
+                }
+                promotionLevel('COPPER') {
+                    config {
+                        jenkinsJob 'Jenkins', 'MyPromotion'
+                    }
+                }
+                validationStamp('TEST') {
+                    config {
+                        jenkinsJob 'Jenkins', 'MyValidation'
+                    }
+                }
+            }
+        }
+
+        def j = ontrack.project(name).config.jenkinsJob
+        assert j.configuration.name == 'Jenkins'
+        assert j.job == 'MyProject'
+        assert j.url == 'http://jenkins/job/MyProject'
+
+        j = ontrack.branch(name, 'test').config.jenkinsJob
+        assert j.configuration.name == 'Jenkins'
+        assert j.job == 'MyBranch'
+        assert j.url == 'http://jenkins/job/MyBranch'
+
+        j = ontrack.promotionLevel(name, 'test', 'COPPER').config.jenkinsJob
+        assert j.configuration.name == 'Jenkins'
+        assert j.job == 'MyPromotion'
+        assert j.url == 'http://jenkins/job/MyPromotion'
+
+        j = ontrack.validationStamp(name, 'test', 'TEST').config.jenkinsJob
+        assert j.configuration.name == 'Jenkins'
+        assert j.job == 'MyValidation'
+        assert j.url == 'http://jenkins/job/MyValidation'
+
+    }
+
+    @Test
     void 'Branch property - SVN configuration'() {
         def name = uid('S')
         ontrack.configure {

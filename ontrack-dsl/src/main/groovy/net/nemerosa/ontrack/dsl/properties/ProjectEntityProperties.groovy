@@ -42,6 +42,21 @@ class ProjectEntityProperties {
     }
 
     /**
+     * Jenkins job
+     */
+
+    def jenkinsJob(String configuration, String job) {
+        property('net.nemerosa.ontrack.extension.jenkins.JenkinsJobPropertyType', [
+                configuration: configuration,
+                job          : job,
+        ])
+    }
+
+    def getJenkinsJob() {
+        property('net.nemerosa.ontrack.extension.jenkins.JenkinsJobPropertyType')
+    }
+
+    /**
      * Jenkins build
      */
 
