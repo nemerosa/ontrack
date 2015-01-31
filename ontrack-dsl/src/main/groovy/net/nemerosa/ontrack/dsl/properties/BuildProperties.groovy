@@ -49,4 +49,18 @@ class BuildProperties extends ProjectEntityProperties {
         property('net.nemerosa.ontrack.extension.general.ReleasePropertyType').name
     }
 
+    /**
+     * Git commit property
+     */
+
+    def gitCommit(String commit) {
+        property('net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType', [
+                commit: commit
+        ])
+    }
+
+    def getGitCommit() {
+        property('net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType').commit
+    }
+
 }

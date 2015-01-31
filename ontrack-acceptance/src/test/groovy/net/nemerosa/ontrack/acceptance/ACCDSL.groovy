@@ -428,6 +428,21 @@ class ACCDSL extends AcceptanceTestClient {
     }
 
     @Test
+    void 'Build Git commit property'() {
+        def name = uid('P')
+        ontrack.project(name) {
+            branch('test') {
+                build('1') {
+                    config {
+                        gitCommit 'adef13'
+                    }
+                }
+            }
+        }
+        assert ontrack.build(name, 'test', '1').config.gitCommit == 'adef13'
+    }
+
+    @Test
     void 'Jenkins build property'() {
         ontrack.configure {
             jenkins 'Jenkins', 'http://jenkins'
