@@ -45,6 +45,10 @@ public class JenkinsJobDecorationExtension extends AbstractExtension implements 
         if (property.isEmpty()) {
             return null;
         } else {
+            // Template branch? Decoration cannot be computed
+            if (entity instanceof Branch && ((Branch) entity).getType() == BranchType.TEMPLATE_DEFINITION) {
+                return null;
+            }
             // Gets a client
             JenkinsClient jenkinsClient = jenkinsClientFactory.getClient(property.getValue().getConfiguration());
             // Gets the Jenkins job
