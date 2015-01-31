@@ -58,6 +58,10 @@ class Branch extends AbstractProjectResource {
         )
     }
 
+    def unlink() {
+        ontrack.delete(link('templateInstanceDisconnect'))
+    }
+
     PromotionLevel promotionLevel(String name, String description = '') {
         new PromotionLevel(
                 ontrack,

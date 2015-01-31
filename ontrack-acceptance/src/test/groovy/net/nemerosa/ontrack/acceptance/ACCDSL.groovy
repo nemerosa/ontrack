@@ -361,6 +361,29 @@ class ACCDSL extends AcceptanceTestClient {
     }
 
     @Test
+    void 'Unlinking a template instance'() {
+        // Project and branch template
+        def project = uid('P')
+        ontrack.project(project) {
+            branch('template') {
+                template {
+                    parameter 'paramName', 'A parameter'
+                }
+            }
+        }
+        // Creates an instance
+        ontrack.branch(project, 'template').instance 'TEST', [
+                paramName: 'paramValue'
+        ]
+        // Checks the created instance
+        assert ontrack.branch(project, 'TEST').type == 'TEMPLATE_INSTANCE'
+        // Unlinks
+        ontrack.branch(project, 'TEST').unlink()
+        // Checks the unlinked instance
+        assert ontrack.branch(project, 'TEST').type == 'CLASSIC'
+    }
+
+    @Test
     void 'Project property - JIRA follow links'() {
         def name = uid('P')
         ontrack.project(name) {

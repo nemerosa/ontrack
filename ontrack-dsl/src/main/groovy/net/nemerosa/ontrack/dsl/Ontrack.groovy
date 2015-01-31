@@ -99,6 +99,10 @@ class Ontrack {
         httpClient.get(url) { jsonSlurper.parseText(it) }
     }
 
+    def delete(String url) {
+        httpClient.delete(url) { jsonSlurper.parseText(it) }
+    }
+
     def post(String url, Object data) {
         httpClient.post(
                 url,
