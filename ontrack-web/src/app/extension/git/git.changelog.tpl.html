@@ -206,6 +206,7 @@
                         <div class="panel-heading clearfix">
                             File changes
                             <div class="pull-right">
+                                <ot-extension-scm-changelog-filechangefilter ng-show="files" project="changelog.project"></ot-extension-scm-changelog-filechangefilter>
                                 <a class="btn btn-default btn-xs" ng-click="changeLogCommits()" ng-disabled="commitsLoading">
                                     <ot-loading ng-if="commitsLoading"></ot-loading>
                                     <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="commits || commitsLoading"></span>

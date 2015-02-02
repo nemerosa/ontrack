@@ -29,6 +29,15 @@ angular.module('ontrack.extension.scm', [
             }
         };
     })
+    .directive('otExtensionScmChangelogFilechangefilter', function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'app/extension/scm/directive.scmChangelogFilechangefilter.tpl.html',
+            scope: {
+                project: '='
+            }
+        };
+    })
     .service('otScmChangeLogService', function ($http, $modal, $interpolate, ot) {
         var self = {};
 
