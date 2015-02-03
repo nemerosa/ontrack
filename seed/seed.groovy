@@ -398,7 +398,7 @@ ontrack.build('ontrack', '${NAME}', VERSION_BUILD).properties {
                 injectPasswords()
             }
             steps {
-                shell readFileFromWorkspace('seed/do-acceptance.sh')
+                shell readFileFromWorkspace('seed/production-acceptance.sh')
             }
             publishers {
                 archiveJunit('ontrack-acceptance.xml')
