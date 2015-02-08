@@ -43,6 +43,14 @@ class AcceptanceTestClient extends AcceptanceSupport {
     }
 
     int doCreateController(String name, String password) {
+        doCreateAccountWithGlobalRole(name, password, 'CONTROLLER')
+    }
+
+    int doCreateCreator(String name, String password) {
+        doCreateAccountWithGlobalRole(name, password, 'CREATOR')
+    }
+
+    int doCreateAccountWithGlobalRole(String name, String password, String role) {
         def input = [
                 name    : name,
                 fullName: name,
@@ -51,7 +59,7 @@ class AcceptanceTestClient extends AcceptanceSupport {
         ]
         def account = admin().post(input, "accounts/create").get()
         def accountId = account['id'].asText() as int
-        admin().put([role: 'CONTROLLER'], "accounts/permissions/globals/ACCOUNT/${accountId}")
+        admin().put([role: role], "accounts/permissions/globals/ACCOUNT/${accountId}")
         return accountId
     }
 

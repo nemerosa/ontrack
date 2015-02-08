@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.dsl.Branch
 import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.OntrackConnection
 import net.nemerosa.ontrack.dsl.Shell
+import net.nemerosa.ontrack.dsl.http.OTForbiddenClientException
 import net.nemerosa.ontrack.dsl.http.OTMessageClientException
 import org.junit.Assert
 import org.junit.Before
@@ -162,8 +163,19 @@ class ACCDSL extends AcceptanceTestClient {
         assert ontrack.validationStamp(project, '1.0', 'SMOKE').name == 'SMOKE'
     }
 
+    @Test(expected = OTForbiddenClientException)
+    void 'Definition of a project is not granted for a controller'() {
+        // Creation of a controller
+        def userName = uid('A')
+        doCreateController(userName, 'pwd')
+        // Connects using this controller
+        ontrack = getOntrackAs(userName, 'pwd')
+        // Creation of the project and branch template
+        ontrack.project(uid('P'))
+    }
+
     @Test
-    void 'Definition of a project and a branch template as a controller'() {
+    void 'Definition of a project and a branch template as a creator'() {
         // GitHub configuration
         def configName = uid('GH')
         ontrack.configure {
@@ -171,7 +183,7 @@ class ACCDSL extends AcceptanceTestClient {
         }
         // Creation of a controller
         def userName = uid('A')
-        int id = doCreateController(userName, 'pwd')
+        doCreateCreator(userName, 'pwd')
         // Connects using this controller
         ontrack = getOntrackAs(userName, 'pwd')
         // Creation of the project and branch template
