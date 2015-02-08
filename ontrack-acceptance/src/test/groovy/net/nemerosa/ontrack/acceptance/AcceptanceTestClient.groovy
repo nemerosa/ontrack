@@ -46,6 +46,10 @@ class AcceptanceTestClient extends AcceptanceSupport {
         doCreateAccountWithGlobalRole(name, password, 'CONTROLLER')
     }
 
+    int doCreateAutomation(String name, String password) {
+        doCreateAccountWithGlobalRole(name, password, 'AUTOMATION')
+    }
+
     int doCreateCreator(String name, String password) {
         doCreateAccountWithGlobalRole(name, password, 'CREATOR')
     }

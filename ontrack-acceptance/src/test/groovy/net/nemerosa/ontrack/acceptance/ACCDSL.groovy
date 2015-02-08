@@ -175,6 +175,28 @@ class ACCDSL extends AcceptanceTestClient {
     }
 
     @Test
+    void 'Definition of a project is granted for a creator'() {
+        // Creation of a controller
+        def userName = uid('A')
+        doCreateCreator(userName, 'pwd')
+        // Connects using this controller
+        ontrack = getOntrackAs(userName, 'pwd')
+        // Creation of the project and branch template
+        assert ontrack.project(uid('P')).id > 0
+    }
+
+    @Test
+    void 'Definition of a project is granted for an automation role'() {
+        // Creation of a controller
+        def userName = uid('A')
+        doCreateAutomation(userName, 'pwd')
+        // Connects using this controller
+        ontrack = getOntrackAs(userName, 'pwd')
+        // Creation of the project and branch template
+        assert ontrack.project(uid('P')).id > 0
+    }
+
+    @Test
     void 'Definition of a project and a branch template as a creator'() {
         // GitHub configuration
         def configName = uid('GH')
