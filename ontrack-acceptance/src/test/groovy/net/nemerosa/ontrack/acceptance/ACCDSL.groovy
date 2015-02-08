@@ -170,8 +170,11 @@ class ACCDSL extends AcceptanceTestClient {
             gitHub configName, repository: 'nemerosa/ontrack', indexationInterval: 0
         }
         // Creation of a controller
-        int id = doCreateController(uid('A'), 'pwd')
-        // Creation of the project and branch template as a controller
+        def userName = uid('A')
+        int id = doCreateController(userName, 'pwd')
+        // Connects using this controller
+        ontrack = getOntrackAs(userName, 'pwd')
+        // Creation of the project and branch template
         def project = uid('P')
         ontrack.project(project) {
             config {
