@@ -24,8 +24,16 @@ class ACCDSL extends AcceptanceTestClient {
 
     @Before
     void init() {
-        ontrack = ontrackBuilder
-                .authenticate('admin', adminPassword)
+        ontrack = ontrackAsAdmin
+    }
+
+    protected Ontrack getOntrackAsAdmin() {
+        getOntrackAs('admin', adminPassword)
+    }
+
+    protected Ontrack getOntrackAs(String user, String password) {
+        ontrackBuilder
+                .authenticate(user, password)
                 .build()
     }
 
@@ -152,6 +160,48 @@ class ACCDSL extends AcceptanceTestClient {
         // Checks the structure
         assert ontrack.promotionLevel(project, '1.0', 'COPPER').name == 'COPPER'
         assert ontrack.validationStamp(project, '1.0', 'SMOKE').name == 'SMOKE'
+    }
+
+    @Test
+    void 'Definition of a project and a branch template as a controller'() {
+        // GitHub configuration
+        def configName = uid('GH')
+        ontrack.configure {
+            gitHub configName, repository: 'nemerosa/ontrack', indexationInterval: 0
+        }
+        // Creation of a controller
+        int id = doCreateController(uid('A'), 'pwd')
+        // Creation of the project and branch template as a controller
+        def project = uid('P')
+        ontrack.project(project) {
+            config {
+                gitHub configName
+            }
+            branch('template') {
+                promotionLevel 'COPPER', 'Copper promotion'
+                promotionLevel 'BRONZE', 'Bronze promotion'
+                validationStamp 'SMOKE', 'Smoke tests'
+                // Git branch
+                config {
+                    gitBranch '${gitBranch}'
+                }
+                // Template definition
+                template {
+                    parameter 'gitBranch', 'Name of the Git branch'
+                }
+            }
+        }
+        // Creates an instance
+        ontrack.branch(project, 'template').instance 'TEST', [
+                gitBranch: 'feature/test'
+        ]
+        // Checks the created instance
+        def instance = ontrack.branch(project, 'TEST')
+        assert instance.id > 0
+        assert instance.name == 'TEST'
+        // Checks the Git branch of the instance
+        def property = instance.config.gitBranch
+        assert property.branch == 'feature/test'
     }
 
     @Test

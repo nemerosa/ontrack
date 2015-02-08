@@ -33,7 +33,7 @@ public class JsonClientImpl implements JsonClient {
     }
 
     @Override
-    public JsonNode post(JsonNode data, String path, Object... parameters) {
+    public JsonNode post(Object data, String path, Object... parameters) {
         try {
             return httpClient.post(
                     this::toJson,
@@ -50,7 +50,7 @@ public class JsonClientImpl implements JsonClient {
     }
 
     @Override
-    public JsonNode put(JsonNode data, String path, Object... parameters) {
+    public JsonNode put(Object data, String path, Object... parameters) {
         try {
             return httpClient.put(
                     this::toJson,

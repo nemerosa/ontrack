@@ -95,8 +95,13 @@ public abstract class AcceptanceSupport {
             }
 
             @Override
-            public JsonResult post(JsonNode data, String path, Object... parameters) {
+            public JsonResult post(Object data, String path, Object... parameters) {
                 return new SimpleJsonResult(jsonClient.post(data, path, parameters));
+            }
+
+            @Override
+            public JsonResult put(Object data, String path, Object... parameters) {
+                return new SimpleJsonResult(jsonClient.put(data, path, parameters));
             }
         };
     }
@@ -120,7 +125,9 @@ public abstract class AcceptanceSupport {
 
         JsonResult delete(String path, Object... parameters);
 
-        JsonResult post(JsonNode data, String path, Object... parameters);
+        JsonResult post(Object data, String path, Object... parameters);
+
+        JsonResult put(Object data, String path, Object... parameters);
 
     }
 

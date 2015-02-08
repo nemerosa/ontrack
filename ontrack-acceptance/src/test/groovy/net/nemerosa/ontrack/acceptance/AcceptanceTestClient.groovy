@@ -42,6 +42,19 @@ class AcceptanceTestClient extends AcceptanceSupport {
         admin().post(nameDescription, "structure/branches/$branchId/builds/create").get()
     }
 
+    int doCreateController(String name, String password) {
+        def input = [
+                name    : name,
+                fullName: name,
+                email   : "${name}@test.com".toString(),
+                password: password,
+        ]
+        def account = admin().post(input, "accounts/create").get()
+        def accountId = account['id'].asText() as int
+        admin().put([role: 'CONTROLLER'], "accounts/permissions/globals/ACCOUNT/${accountId}")
+        return accountId
+    }
+
     def withProject(Closure closure) {
         def p = doCreateProject()
         int id = p.id.asInt()

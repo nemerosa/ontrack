@@ -11,9 +11,9 @@ public interface JsonClient {
 
     JsonNode delete(String path, Object... parameters);
 
-    JsonNode post(JsonNode data, String path, Object... parameters);
+    JsonNode post(Object data, String path, Object... parameters);
 
-    JsonNode put(JsonNode data, String path, Object... parameters);
+    JsonNode put(Object data, String path, Object... parameters);
 
     JsonNode upload(String name, Document o, String fileName, String path, Object... parameters);
 
