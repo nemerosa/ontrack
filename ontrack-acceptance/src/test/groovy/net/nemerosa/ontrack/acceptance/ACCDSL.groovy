@@ -24,10 +24,13 @@ class ACCDSL extends AcceptanceTestClient {
 
     @Before
     void init() {
-        ontrack = OntrackConnection.create(baseURL)
-                .disableSsl(sslDisabled)
+        ontrack = ontrackBuilder
                 .authenticate('admin', adminPassword)
                 .build()
+    }
+
+    protected OntrackConnection getOntrackBuilder() {
+        OntrackConnection.create(baseURL).disableSsl(sslDisabled)
     }
 
     @Test
@@ -37,7 +40,7 @@ class ACCDSL extends AcceptanceTestClient {
         def projectName = testBranch.project.name.asText()
         def branchName = testBranch.name.asText()
         // Anonymous client
-        ontrack = OntrackConnection.create(baseURL).disableSsl(sslDisabled).build()
+        ontrack = ontrackBuilder.build()
         // Branch cannot be found
         try {
             ontrack.branch(projectName, branchName)
