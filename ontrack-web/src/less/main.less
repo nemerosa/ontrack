@@ -452,10 +452,11 @@ table.ot-validation-runs {
   &:hover {
     opacity: 1.0;
   }
-  a {
-    text-decoration: none;
-    color: @text-color;
-  }
+}
+
+a.ot-command {
+  text-decoration: none;
+  color: @text-color;
 }
 
 .ot-command-group {
@@ -470,7 +471,6 @@ table.ot-validation-runs {
 }
 
 span.ot-view-command {
-  .ot-command;
   margin-left: 0.5em;
   .ot-view-command-name {
     text-wrap: none;
@@ -496,6 +496,10 @@ span.ot-view-command {
 
 .ot-command-actions {
   .ot-icon-x(@fa-var-wrench);
+}
+
+.ot-command-switch {
+  .ot-icon-x(@fa-var-exchange);
 }
 
 .ot-command-new {
