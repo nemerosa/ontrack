@@ -45,6 +45,6 @@ public class GlobalRole implements Serializable {
     }
 
     public boolean isProjectFunctionGranted(Class<? extends ProjectFunction> fn) {
-        return projectFunctions.contains(fn);
+        return projectFunctions.stream().anyMatch(fn::isAssignableFrom);
     }
 }
