@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.dsl.Branch
 import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.OntrackConnection
 import net.nemerosa.ontrack.dsl.Shell
+import net.nemerosa.ontrack.dsl.http.OTForbiddenClientException
 import net.nemerosa.ontrack.dsl.http.OTMessageClientException
 import org.junit.Assert
 import org.junit.Before
@@ -24,10 +25,21 @@ class ACCDSL extends AcceptanceTestClient {
 
     @Before
     void init() {
-        ontrack = OntrackConnection.create(baseURL)
-                .disableSsl(sslDisabled)
-                .authenticate('admin', adminPassword)
+        ontrack = ontrackAsAdmin
+    }
+
+    protected Ontrack getOntrackAsAdmin() {
+        getOntrackAs('admin', adminPassword)
+    }
+
+    protected Ontrack getOntrackAs(String user, String password) {
+        ontrackBuilder
+                .authenticate(user, password)
                 .build()
+    }
+
+    protected OntrackConnection getOntrackBuilder() {
+        OntrackConnection.create(baseURL).disableSsl(sslDisabled)
     }
 
     @Test
@@ -37,7 +49,7 @@ class ACCDSL extends AcceptanceTestClient {
         def projectName = testBranch.project.name.asText()
         def branchName = testBranch.name.asText()
         // Anonymous client
-        ontrack = OntrackConnection.create(baseURL).disableSsl(sslDisabled).build()
+        ontrack = ontrackBuilder.build()
         // Branch cannot be found
         try {
             ontrack.branch(projectName, branchName)
@@ -149,6 +161,84 @@ class ACCDSL extends AcceptanceTestClient {
         // Checks the structure
         assert ontrack.promotionLevel(project, '1.0', 'COPPER').name == 'COPPER'
         assert ontrack.validationStamp(project, '1.0', 'SMOKE').name == 'SMOKE'
+    }
+
+    @Test(expected = OTForbiddenClientException)
+    void 'Definition of a project is not granted for a controller'() {
+        // Creation of a controller
+        def userName = uid('A')
+        doCreateController(userName, 'pwd')
+        // Connects using this controller
+        ontrack = getOntrackAs(userName, 'pwd')
+        // Creation of the project and branch template
+        ontrack.project(uid('P'))
+    }
+
+    @Test
+    void 'Definition of a project is granted for a creator'() {
+        // Creation of a controller
+        def userName = uid('A')
+        doCreateCreator(userName, 'pwd')
+        // Connects using this controller
+        ontrack = getOntrackAs(userName, 'pwd')
+        // Creation of the project and branch template
+        assert ontrack.project(uid('P')).id > 0
+    }
+
+    @Test
+    void 'Definition of a project is granted for an automation role'() {
+        // Creation of a controller
+        def userName = uid('A')
+        doCreateAutomation(userName, 'pwd')
+        // Connects using this controller
+        ontrack = getOntrackAs(userName, 'pwd')
+        // Creation of the project and branch template
+        assert ontrack.project(uid('P')).id > 0
+    }
+
+    @Test
+    void 'Definition of a project and a branch template as a creator'() {
+        // GitHub configuration
+        def configName = uid('GH')
+        ontrack.configure {
+            gitHub configName, repository: 'nemerosa/ontrack', indexationInterval: 0
+        }
+        // Creation of a controller
+        def userName = uid('A')
+        doCreateCreator(userName, 'pwd')
+        // Connects using this controller
+        ontrack = getOntrackAs(userName, 'pwd')
+        // Creation of the project and branch template
+        def project = uid('P')
+        ontrack.project(project) {
+            config {
+                gitHub configName
+            }
+            branch('template') {
+                promotionLevel 'COPPER', 'Copper promotion'
+                promotionLevel 'BRONZE', 'Bronze promotion'
+                validationStamp 'SMOKE', 'Smoke tests'
+                // Git branch
+                config {
+                    gitBranch '${gitBranch}'
+                }
+                // Template definition
+                template {
+                    parameter 'gitBranch', 'Name of the Git branch'
+                }
+            }
+        }
+        // Creates an instance
+        ontrack.branch(project, 'template').instance 'TEST', [
+                gitBranch: 'feature/test'
+        ]
+        // Checks the created instance
+        def instance = ontrack.branch(project, 'TEST')
+        assert instance.id > 0
+        assert instance.name == 'TEST'
+        // Checks the Git branch of the instance
+        def property = instance.config.gitBranch
+        assert property.branch == 'feature/test'
     }
 
     @Test

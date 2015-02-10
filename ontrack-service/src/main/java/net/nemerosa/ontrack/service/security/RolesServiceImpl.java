@@ -151,6 +151,45 @@ public class RolesServiceImpl implements RolesService, StartupService {
                 getGlobalFunctions(),
                 getProjectFunctions());
 
+        // Creator
+        register("CREATOR", "Creator",
+                "A creator is allowed to create new projects and to configure it. Once done, its rights on the " +
+                        "project are revoked immediately.",
+                Arrays.asList(
+                        ProjectCreation.class
+                ),
+                Arrays.asList(
+                        // Structure creation functions only
+                        ProjectConfig.class,
+                        BranchCreate.class,
+                        BranchTemplateMgt.class,
+                        PromotionLevelCreate.class,
+                        ValidationStampCreate.class
+                )
+        );
+
+        // Creator
+        register("AUTOMATION", "Automation",
+                "This role can be assigned to users or groups which must automate Ontrack. It aggregates both the " +
+                        "Creator and the Controller roles into one.",
+                Arrays.asList(
+                        ProjectCreation.class
+                ),
+                Arrays.asList(
+                        // Structure creation functions only
+                        ProjectConfig.class,
+                        BranchCreate.class,
+                        BranchTemplateMgt.class,
+                        PromotionLevelCreate.class,
+                        ValidationStampCreate.class,
+                        ProjectView.class,
+                        BuildCreate.class,
+                        PromotionRunCreate.class,
+                        ValidationRunCreate.class,
+                        BranchTemplateSync.class
+                )
+        );
+
         // Controller
         register("CONTROLLER", "Controller",
                 "A controller, is allowed to create builds, promotion runs and validation runs. He can also " +

@@ -56,6 +56,7 @@ public class BuildFilterServiceIT extends AbstractServiceTestSupport {
         Branch branch = doCreateBranch();
         // Account for the tests
         Account account = doCreateAccount();
+        Account otherAccount = doCreateAccount();
 
         // Creates a filter for this account
         Ack ack = asAccount(account).call(() ->
@@ -79,7 +80,7 @@ public class BuildFilterServiceIT extends AbstractServiceTestSupport {
         // ... but it is not available for anybody else
         assertTrue(
                 "Account filter not available for everybody else",
-                asUser().withId(10).withView(branch).call(() ->
+                asAccount(otherAccount).withView(branch).call(() ->
                                 buildFilterService.getBuildFilters(branch.getId()).isEmpty()
                 )
         );

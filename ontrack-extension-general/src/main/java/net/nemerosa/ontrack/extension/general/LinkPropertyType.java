@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.NamedEntries;
+import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.ProjectEdit;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
@@ -36,7 +37,7 @@ public class LinkPropertyType extends AbstractPropertyType<LinkProperty> {
 
     @Override
     public boolean canEdit(ProjectEntity entity, SecurityService securityService) {
-        return securityService.isProjectFunctionGranted(entity, ProjectEdit.class);
+        return securityService.isProjectFunctionGranted(entity, ProjectConfig.class);
     }
 
     @Override

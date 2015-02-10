@@ -57,7 +57,7 @@ angular.module('ot.service.core', [
         self.viewActionsCommand = function (uri, actions) {
             var def = {
                 id: 'actions',
-                name: "",
+                name: "Tools",
                 cls: 'ot-command-actions',
                 group: true,
                 actions: actions ? actions : []

@@ -137,6 +137,7 @@ angular.module('ot.view.branch', [
                 view.commands.push({
                     id: 'switch-branch',
                     name: "Switch",
+                    cls: 'ot-command-switch',
                     group: true,
                     actions: branchCollection.resources
                         .filter(function (theBranch) {

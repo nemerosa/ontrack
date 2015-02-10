@@ -16,5 +16,6 @@ cd ${WORKSPACE}
 ${WORKSPACE}/acceptance.sh \
     --jar=${REPOSITORY}/ontrack-acceptance-${VERSION_FULL}.jar \
     --ontrack-context=production \
-    --ontrack-url=https://ontrack.nemerosa.net
+    --ontrack-url=https://ontrack.nemerosa.net \
+    --ontrack-context=production
 

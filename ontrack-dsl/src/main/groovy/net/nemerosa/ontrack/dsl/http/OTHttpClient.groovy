@@ -125,7 +125,7 @@ class OTHttpClient {
         } else if (statusCode == HttpStatus.SC_UNAUTHORIZED) {
             throw new OTMessageClientException("Not authorised")
         } else if (statusCode == HttpStatus.SC_FORBIDDEN) {
-            throw new OTMessageClientException("Forbidden")
+            throw new OTForbiddenClientException()
         } else if (statusCode == HttpStatus.SC_NOT_FOUND) {
             throw new OTMessageClientException(getMessage(response))
         } else if (statusCode == HttpStatus.SC_NO_CONTENT) {
