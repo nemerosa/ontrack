@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.service.security;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.support.StartupService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -11,6 +12,7 @@ import java.util.stream.Collectors;
  * Management of the roles and functions.
  */
 @Service
+@Transactional
 public class RolesServiceImpl implements RolesService, StartupService {
 
     /**
