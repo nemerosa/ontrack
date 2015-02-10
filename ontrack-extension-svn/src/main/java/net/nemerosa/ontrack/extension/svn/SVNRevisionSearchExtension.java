@@ -45,7 +45,12 @@ public class SVNRevisionSearchExtension extends AbstractExtension implements Sea
 
             @Override
             public boolean isTokenSearchable(String token) {
-                return StringUtils.isNumeric(token);
+                if (StringUtils.isNumeric(token)) {
+                    long value = Long.parseLong(token, 10);
+                    return value > 0 && value < Integer.MAX_VALUE;
+                } else {
+                    return false;
+                }
             }
 
             @Override
