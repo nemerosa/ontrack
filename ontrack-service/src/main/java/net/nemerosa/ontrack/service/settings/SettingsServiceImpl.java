@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.service.support.SettingsInternalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * This service delegates to an internal cached service in order to avoid the cyclic
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
  * and SettingsService --&gt; SettingsInternalService
  */
 @Service
+@Transactional
 public class SettingsServiceImpl implements SettingsService {
 
     private final SecurityService securityService;
