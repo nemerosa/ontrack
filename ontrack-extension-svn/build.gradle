@@ -4,7 +4,6 @@ dependencies {
     compile project(':ontrack-extension-scm')
     compile project(':ontrack-repository-support')
     compile project(':ontrack-tx')
-    compile libraries.spring_boot_starter_actuator
     compile libraries.spring_tx
 
     compile 'org.tmatesoft.svnkit:svnkit:1.8.5'
