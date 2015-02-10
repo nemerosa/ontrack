@@ -45,6 +45,16 @@ public class JIRAClientImpl implements JIRAClient {
 
     }
 
+    @Override
+    public List<String> getProjects() {
+        JsonNode node = jsonClient.get("/rest/api/2/project");
+        List<String> projects = new ArrayList<>();
+        for (JsonNode child : node) {
+            projects.add(child.path("key").asText());
+        }
+        return projects;
+    }
+
     protected static JIRAIssue toIssue(JIRAConfiguration configuration, JsonNode node) {
         // Translation of fields
         List<JIRAField> fields = new ArrayList<>();
