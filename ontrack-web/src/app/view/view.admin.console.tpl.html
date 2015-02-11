@@ -8,9 +8,37 @@
             <p>
                 Status of the applications Ontrack connects to.
             </p>
-            {{health}}
-            <table class="ot-admin-console-status">
-
+            <table class="table ot-admin-console-status">
+                <!-- Overall status -->
+                <tr class="info">
+                    <td>
+                        <ot-health-status value="health"></ot-health-status>
+                    </td>
+                    <td>
+                        Overall status
+                    </td>
+                </tr>
+                <!-- Per section -->
+                <tbody ng-repeat="(sectionName, section) in health" ng-if="sectionName != '_self' && sectionName != 'status'">
+                    <!-- Section status -->
+                    <tr class="active">
+                        <td>
+                            <ot-health-status value="section"></ot-health-status>
+                        </td>
+                        <td>
+                            {{sectionName}} status
+                        </td>
+                    </tr>
+                    <!-- Section details -->
+                    <tr ng-repeat="(configName, config) in section" ng-if="sectionName != 'dataSource' && sectionName != 'db' && configName != 'status'">
+                        <td>
+                            <ot-health-status value="config"></ot-health-status>
+                        </td>
+                        <td>
+                            {{configName}}
+                        </td>
+                    </tr>
+                </tbody>
             </table>
         </div>
     </div>
