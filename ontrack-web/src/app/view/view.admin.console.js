@@ -15,6 +15,13 @@ angular.module('ot.view.admin.console', [
         view.title = "Administration console";
         view.description = "Tools for the general management of ontrack";
 
+        // Loads the statuses
+        function loadHealth() {
+            ot.call($http.get('admin/status')).then(function (health) {
+                $scope.health = health;
+            });
+        }
+
         // Loads the jobs
         function loadJobs() {
             ot.call($http.get('admin/jobs')).then(function (jobs) {
@@ -41,6 +48,7 @@ angular.module('ot.view.admin.console', [
         // Initialisation
         loadJobs();
         loadLogs();
+        loadHealth();
 
         var interval = 10 * 1000; // 10 seconds
         otTaskService.register('Admin Console Load Jobs', loadJobs, interval);

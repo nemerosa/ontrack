@@ -3,6 +3,21 @@
     <div class="row">
         <div class="col-md-12">
             <h3>
+                Status
+            </h3>
+            <p>
+                Status of the applications Ontrack connects to.
+            </p>
+            {{health}}
+            <table class="ot-admin-console-status">
+
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <h3>
                 Jobs
                 <button class="btn btn-link pull-right" ng-show="!showDisabled" ng-click="showDisabled = true;">
                     <span class="ot-command-show-disabled"></span>

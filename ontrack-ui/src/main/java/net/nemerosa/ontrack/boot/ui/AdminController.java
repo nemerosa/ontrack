@@ -8,8 +8,11 @@ import net.nemerosa.ontrack.model.support.ApplicationLogService;
 import net.nemerosa.ontrack.model.support.Page;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Pagination;
+import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.endpoint.HealthEndpoint;
+import org.springframework.boot.actuate.health.Health;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,11 +28,24 @@ public class AdminController extends AbstractResourceController {
 
     private final JobService jobService;
     private final ApplicationLogService applicationLogService;
+    private final HealthEndpoint healthEndpoint;
 
     @Autowired
-    public AdminController(JobService jobService, ApplicationLogService applicationLogService) {
+    public AdminController(JobService jobService, ApplicationLogService applicationLogService, HealthEndpoint healthEndpoint) {
         this.jobService = jobService;
         this.applicationLogService = applicationLogService;
+        this.healthEndpoint = healthEndpoint;
+    }
+
+    /**
+     * Gets the health status
+     */
+    @RequestMapping(value = "status", method = RequestMethod.GET)
+    public Resource<Health> getStatus() {
+        return Resource.of(
+                healthEndpoint.invoke(),
+                uri(on(getClass()).getStatus())
+        );
     }
 
     /**
