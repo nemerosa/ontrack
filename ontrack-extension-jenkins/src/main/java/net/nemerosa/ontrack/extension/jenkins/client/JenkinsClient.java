@@ -4,4 +4,6 @@ public interface JenkinsClient {
 
     JenkinsJob getJob(String job, boolean details);
 
+    JenkinsInfo getInfo();
+
 }

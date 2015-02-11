@@ -93,6 +93,14 @@ public class DefaultJenkinsClient implements JenkinsClient {
         );
     }
 
+    @Override
+    public JenkinsInfo getInfo() {
+        JsonNode tree = getJsonNode("/api/json");
+        return new JenkinsInfo(
+                tree.path("slaveAgentPort").asInt()
+        );
+    }
+
     private String getJobPath(String job, boolean depth) {
         StringBuilder path = new StringBuilder();
         path.append("/job/").append(job);

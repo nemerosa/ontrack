@@ -10,6 +10,11 @@ import java.util.function.Function;
 
 public interface UserPasswordConfiguration<T extends UserPasswordConfiguration<T>> extends Configuration<T> {
 
+    /**
+     * Name of the configuration
+     */
+    String getName();
+
     String getUser();
 
     String getPassword();
