@@ -22,10 +22,9 @@ public class ArtifactoryClientImpl implements ArtifactoryClient {
 
     @Override
     public List<String> getBuildNames() {
-        // FIXME #240 Get build names
         JsonNode node = jsonClient.get("/api/build");
         List<String> names = new ArrayList<>();
-        node.path("buildNames").forEach((JsonNode numberNode) -> {
+        node.path("builds").forEach((JsonNode numberNode) -> {
             String name = StringUtils.stripStart(numberNode.path("uri").asText(), "/");
             if (StringUtils.isNotBlank(name)) {
                 names.add(name);
