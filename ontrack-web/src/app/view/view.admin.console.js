@@ -81,5 +81,15 @@ angular.module('ot.view.admin.console', [
             });
         };
 
+        // Showing the error for a status message
+        $scope.showError = function (config) {
+            config.errorShown = true;
+        };
+
+        // Showing the details for a status message
+        $scope.showDetails = function (config) {
+            config.detailsShown = true;
+        };
+
     })
 ;

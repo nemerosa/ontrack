@@ -41,7 +41,15 @@
                             {{configName}}
                         </td>
                         <td>
-
+                            <a ng-click="showDetails(config)" ng-if="!config.error" ng-hide="config.detailsShown" class="ot-action">Details</a>
+                            <a ng-click="showError(config)" ng-if="config.error" ng-hide="config.errorShown" class="ot-action">Error</a>
+                            <p ng-show="config.errorShown">
+                                {{config.error}}
+                            </p>
+                            <p ng-show="config.detailsShown" ng-repeat="(detailName, detail) in config" ng-if="detailName != 'status' && detailName != 'detailsShown'">
+                                <b>{{detailName}}</b>:
+                                {{detail}}
+                            </p>
                         </td>
                     </tr>
                 </tbody>
