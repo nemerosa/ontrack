@@ -8,13 +8,16 @@
             <p>
                 Status of the applications Ontrack connects to.
             </p>
-            <table class="table ot-admin-console-status">
+            <div class="alert alert-info" ng-hide="health">
+                Loading health indicators...
+            </div>
+            <table class="table ot-admin-console-status" ng-show="health">
                 <!-- Overall status -->
                 <tr class="info">
                     <td>
                         <ot-health-status value="health"></ot-health-status>
                     </td>
-                    <td>
+                    <td colspan="2">
                         Overall status
                     </td>
                 </tr>
@@ -25,7 +28,7 @@
                         <td>
                             <ot-health-status value="section"></ot-health-status>
                         </td>
-                        <td>
+                        <td colspan="2">
                             {{sectionName}} status
                         </td>
                     </tr>
@@ -36,6 +39,9 @@
                         </td>
                         <td>
                             {{configName}}
+                        </td>
+                        <td>
+
                         </td>
                     </tr>
                 </tbody>
