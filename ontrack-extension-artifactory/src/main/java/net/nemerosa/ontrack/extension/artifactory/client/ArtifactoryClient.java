@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface ArtifactoryClient {
 
+    List<String> getBuildNames();
+
     List<String> getBuildNumbers(String buildName);
 
     JsonNode getBuildInfo(String buildName, String buildNumber);
