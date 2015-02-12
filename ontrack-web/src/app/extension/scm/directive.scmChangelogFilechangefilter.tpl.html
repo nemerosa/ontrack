@@ -4,6 +4,14 @@
             <input class="form-control" type="text" ng-model="quickPattern" placeholder="ANT-like pattern" />
             <span class="input-group-addon ot-action" ng-click="submitQuickPattern()"><span class="fa fa-filter" title="Use this pattern to filter on file paths."></span></span>
         </div>
-        <button class="btn btn-default btn-sm" type="button"><span class="fa fa-pencil" title="Edit a pattern (name, multiple patterns...)"></span></button>
+        <button class="btn btn-default btn-sm" type="button" ng-disabled="!quickPattern"><span class="fa fa-save" title="Saves the quick pattern"></span></button>
+        <div class="input-group input-group-sm col-md-2">
+            <select class="form-control">
+                <option value=""></option>
+            </select>
+        </div>
+        <button class="btn btn-default btn-sm" type="button"><span class="fa fa-pencil" title="Edits the selected pattern"></span></button>
+        <button class="btn btn-default btn-sm" type="button"><span class="fa fa-minus" title="Deletes the selected pattern"></span></button>
+        <button class="btn btn-default btn-sm" type="button"><span class="fa fa-plus" title="Adds a pattern (name, multiple patterns...)"></span></button>
     </form>
 </span>
