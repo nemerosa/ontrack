@@ -52,6 +52,13 @@ angular.module('ontrack.extension.scm', [
                         $scope.selectedFilter = filter;
                     });
                 };
+                $scope.deleteFileFilter = function () {
+                    if ($scope.selectedFilter) {
+                        otScmChangelogFilechangefilterService.deleteFilter($scope.project, $scope.selectedFilter);
+                        $scope.filters.splice($scope.filters.indexOf($scope.selectedFilter), 1);
+                        $scope.selectedFilter = undefined;
+                    }
+                };
             }
         };
     })
@@ -94,6 +101,11 @@ angular.module('ontrack.extension.scm', [
                 }
             });
         };
+
+        self.deleteFilter = function (project, filter) {
+            // TODO Deletes the filter from the store
+        };
+
         return self;
     })
     .service('otScmChangeLogService', function ($http, $modal, $interpolate, ot) {
