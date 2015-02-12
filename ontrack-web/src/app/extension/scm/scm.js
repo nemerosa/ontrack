@@ -1,5 +1,5 @@
 angular.module('ontrack.extension.scm', [
-
+    'ot.service.form'
 ])
     .directive('otScmChangelogBuild', function () {
         return {
@@ -29,7 +29,7 @@ angular.module('ontrack.extension.scm', [
             }
         };
     })
-    .directive('otExtensionScmChangelogFilechangefilter', function () {
+    .directive('otExtensionScmChangelogFilechangefilter', function (otScmChangelogFilechangefilterService) {
         return {
             restrict: 'E',
             templateUrl: 'app/extension/scm/directive.scmChangelogFilechangefilter.tpl.html',
@@ -43,8 +43,41 @@ angular.module('ontrack.extension.scm', [
                         alert(pattern);
                     }
                 };
+                $scope.addFileFilter = function () {
+                    otScmChangelogFilechangefilterService.addFilter($scope.project).then(function (filter) {
+                        // TODO Adds the filter into the list and selects it
+                    });
+                };
             }
         };
+    })
+    .service('otScmChangelogFilechangefilterService', function (otFormService) {
+        var self = {};
+        self.addFilter = function (project) {
+            // Form configuration
+            var form = {
+                fields: [{
+                    name: 'name',
+                    type: 'text',
+                    label: "Name",
+                    help: "Name to use to save the filter.",
+                    required: true,
+                    regex: '.*'
+                }, {
+                    name: 'patterns',
+                    type: 'memo',
+                    label: "Filter(s)",
+                    help: "List of ANT-like patterns (one per line).",
+                    required: true
+                }]
+            };
+            // Shows the dialog
+            return otFormService.display({
+                form: form,
+                title: "Create file change filter"
+            });
+        };
+        return self;
     })
     .service('otScmChangeLogService', function ($http, $modal, $interpolate, ot) {
         var self = {};
