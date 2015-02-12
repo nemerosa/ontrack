@@ -51,7 +51,7 @@ angular.module('ontrack.extension.scm', [
             }
         };
     })
-    .service('otScmChangelogFilechangefilterService', function (otFormService) {
+    .service('otScmChangelogFilechangefilterService', function ($q, otFormService) {
         var self = {};
         self.addFilter = function (project) {
             // Form configuration
@@ -74,7 +74,20 @@ angular.module('ontrack.extension.scm', [
             // Shows the dialog
             return otFormService.display({
                 form: form,
-                title: "Create file change filter"
+                title: "Create file change filter",
+                submit: function (data) {
+                    // TODO Controlling the name
+                    // Parsing the patterns
+                    var patterns = data.patterns.split('\n').map(function (it) { return it.trim(); });
+                    // TODO Saves the filter
+                    // Returns the filter
+                    var d = $q.defer();
+                    d.resolve({
+                        name: data.name,
+                        patterns: patterns
+                    });
+                    return d.promise;
+                }
             });
         };
         return self;
