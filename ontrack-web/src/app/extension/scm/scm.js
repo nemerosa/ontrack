@@ -39,10 +39,11 @@ angular.module('ontrack.extension.scm', [
             controller: function ($scope) {
                 // TODO Loads the list of filters (async)
                 $scope.filters = [];
+                // Submitting a pattern
                 $scope.submitQuickPattern = function () {
                     var pattern = $scope.quickPattern;
                     if (pattern) {
-                        alert(pattern);
+                        $scope.submitPattern([pattern]);
                     }
                 };
                 $scope.addFileFilter = function () {
@@ -58,6 +59,16 @@ angular.module('ontrack.extension.scm', [
                         $scope.filters.splice($scope.filters.indexOf($scope.selectedFilter), 1);
                         $scope.selectedFilter = undefined;
                     }
+                };
+                $scope.$watch('selectedFilter', function () {
+                    if ($scope.selectedFilter) {
+                        $scope.submitPattern($scope.selectedFilter.patterns);
+                    } else {
+                        $scope.submitPattern(undefined);
+                    }
+                });
+                $scope.submitPattern = function (patterns) {
+                    // TODO Filtering based on the patterns
                 };
             }
         };
