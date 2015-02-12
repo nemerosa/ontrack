@@ -69,6 +69,12 @@ angular.module('ontrack.extension.scm', [
                 });
                 $scope.submitPattern = function (patterns) {
                     // TODO Filtering based on the patterns
+                    console.log('patterns=', patterns);
+                };
+                $scope.unselectPattern = function () {
+                    $scope.quickPattern = '';
+                    $scope.selectedFilter = undefined;
+                    $scope.submitPattern(undefined);
                 };
             }
         };
