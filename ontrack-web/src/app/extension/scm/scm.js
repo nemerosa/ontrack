@@ -53,6 +53,14 @@ angular.module('ontrack.extension.scm', [
                         $scope.selectedFilter = filter;
                     });
                 };
+                $scope.editFileFilter = function () {
+                    if ($scope.selectedFilter) {
+                        otScmChangelogFilechangefilterService.editFilter($scope.project, $scope.selectedFilter).then(function (filter) {
+                            $scope.selectedFilter.patterns = filter.patterns;
+                            $scope.submitPattern(filter.patterns);
+                        });
+                    }
+                };
                 $scope.deleteFileFilter = function () {
                     if ($scope.selectedFilter) {
                         otScmChangelogFilechangefilterService.deleteFilter($scope.project, $scope.selectedFilter);
@@ -81,6 +89,7 @@ angular.module('ontrack.extension.scm', [
     })
     .service('otScmChangelogFilechangefilterService', function ($q, otFormService) {
         var self = {};
+
         self.addFilter = function (project) {
             // Form configuration
             var form = {
@@ -112,6 +121,46 @@ angular.module('ontrack.extension.scm', [
                     var d = $q.defer();
                     d.resolve({
                         name: data.name,
+                        patterns: patterns
+                    });
+                    return d.promise;
+                }
+            });
+        };
+
+        self.editFilter = function (project, filter) {
+            // Form configuration
+            var form = {
+                fields: [{
+                    name: 'name',
+                    type: 'text',
+                    label: "Name",
+                    help: "Name to use to save the filter.",
+                    required: true,
+                    readOnly: true,
+                    regex: '.*',
+                    value: filter.name
+                }, {
+                    name: 'patterns',
+                    type: 'memo',
+                    label: "Filter(s)",
+                    help: "List of ANT-like patterns (one per line).",
+                    required: true,
+                    value: filter.patterns.join('\n')
+                }]
+            };
+            // Shows the dialog
+            return otFormService.display({
+                form: form,
+                title: "Edit file change filter",
+                submit: function (data) {
+                    // Parsing the patterns
+                    var patterns = data.patterns.split('\n').map(function (it) { return it.trim(); });
+                    // TODO Saves the filter
+                    // Returns the filter
+                    var d = $q.defer();
+                    d.resolve({
+                        name: filter.name,
                         patterns: patterns
                     });
                     return d.promise;
