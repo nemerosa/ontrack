@@ -6,11 +6,13 @@ import net.nemerosa.ontrack.model.structure.SearchResult;
 import net.nemerosa.ontrack.model.structure.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class SearchServiceImpl implements SearchService {
 
     private final Collection<SearchProvider> providers;

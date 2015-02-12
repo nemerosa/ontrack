@@ -13,6 +13,7 @@ var ontrack = angular.module('ontrack', [
         'ot.directive.entity',
         'ot.directive.field',
         'ot.directive.properties',
+        'ot.directive.health',
         // Services
         'ot.service.core',
         'ot.service.user',

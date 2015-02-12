@@ -1,6 +1,7 @@
 dependencies {
     compile project(':ontrack-repository')
     compile project(':ontrack-repository-support')
+    compile libraries.spring_boot_starter_actuator
     compile libraries.spring_context
     compile libraries.slf4j_api
 
