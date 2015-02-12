@@ -35,6 +35,14 @@ angular.module('ontrack.extension.scm', [
             templateUrl: 'app/extension/scm/directive.scmChangelogFilechangefilter.tpl.html',
             scope: {
                 project: '='
+            },
+            controller: function ($scope) {
+                $scope.submitQuickPattern = function () {
+                    var pattern = $scope.quickPattern;
+                    if (pattern) {
+                        alert(pattern);
+                    }
+                };
             }
         };
     })
