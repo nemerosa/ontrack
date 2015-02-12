@@ -10,6 +10,10 @@ class AbstractResource {
         this.node = node
     }
 
+    Object getNode() {
+        node
+    }
+
     protected String link(String name) {
         String linkName = name.startsWith('_') ? name : '_' + name
         if (node[linkName]) {
