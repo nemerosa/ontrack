@@ -47,8 +47,9 @@ angular.module('ontrack.extension.scm', [
                 };
                 $scope.addFileFilter = function () {
                     otScmChangelogFilechangefilterService.addFilter($scope.project).then(function (filter) {
-                        // TODO Adds the filter into the list and selects it
+                        // Adds the filter into the list and selects it
                         $scope.filters.push(filter);
+                        $scope.selectedFilter = filter;
                     });
                 };
             }
