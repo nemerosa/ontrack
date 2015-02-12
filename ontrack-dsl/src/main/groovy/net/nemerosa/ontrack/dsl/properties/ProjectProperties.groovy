@@ -23,10 +23,10 @@ class ProjectProperties extends ProjectEntityProperties {
      * SVN configuration
      */
 
-    def svn(def name, def projectPath) {
+    def svn(String name, String projectPath) {
         property('net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationPropertyType', [
-                configuration: name as String,
-                projectPath  : projectPath as String
+                configuration: name,
+                projectPath  : projectPath
         ])
     }
 

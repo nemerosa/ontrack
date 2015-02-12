@@ -869,12 +869,14 @@ local.put('BUILD', build)
 
         // Script to execute
         def script = '''\
+def confName = NAME
 ontrack.configure {
-    svn NAME, url: 'svn://localhost\'
+    svn confName, url: 'svn://localhost\'
 }
 ontrack.project(PROJECT) {
+    println "name=${confName}"
     config {
-        svn NAME, "/${NAME}/trunk"
+        svn confName, "/${confName}/trunk"
     }
 }
 '''
@@ -894,7 +896,7 @@ ontrack.project(PROJECT) {
         // Gets the project's configuration back
         def cfg = ontrack.project(project).config.svn
         assert cfg.configuration.name == name
-        assert cfg.projectPath == "${name}/trunk"
+        assert cfg.projectPath == "/${name}/trunk"
     }
 
     @Test
