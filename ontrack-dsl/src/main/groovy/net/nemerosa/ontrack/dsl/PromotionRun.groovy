@@ -18,4 +18,8 @@ class PromotionRun extends AbstractProjectResource {
     PromotionRunProperties getConfig() {
         new PromotionRunProperties(ontrack, this)
     }
+
+    def getPromotionLevel() {
+        node.promotionLevel
+    }
 }

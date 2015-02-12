@@ -502,6 +502,23 @@ class ACCDSL extends AcceptanceTestClient {
     }
 
     @Test
+    void 'Project property - SVN configuration with GString'() {
+        def name = uid('S')
+        ontrack.configure {
+            svn name, url: 'svn://localhost'
+        }
+        def project = uid('P')
+        ontrack.project(project) {
+            config {
+                svn name, "/${name}/trunk"
+            }
+        }
+        def cfg = ontrack.project(project).config.svn
+        assert cfg.configuration.name == name
+        assert cfg.projectPath == "/${name}/trunk"
+    }
+
+    @Test
     void 'Project property - Git configuration'() {
         def name = uid('G')
         ontrack.configure {
@@ -932,6 +949,43 @@ local.put('BUILD', build)
 
         // Checks the result
         assert local.BUILD == '3'
+    }
+
+    @Test
+    void 'External script with local binding: project template'() {
+        // Environment preparation
+        def name = uid('N')
+        def project = uid('P')
+
+        // Script to execute
+        def script = '''\
+ontrack.configure {
+    svn NAME, url: 'svn://localhost\'
+}
+ontrack.project(PROJECT) {
+    println "name=${NAME}"
+    config {
+        svn NAME, "/${NAME}/trunk"
+    }
+}
+'''
+        // Binding
+        def binding = new Binding([
+                ontrack: ontrack,
+                PROJECT: project,
+                NAME   : name
+        ]);
+
+        // Shell
+        def shell = new GroovyShell(binding)
+
+        // Running the script
+        shell.evaluate(script)
+
+        // Gets the project's configuration back
+        def cfg = ontrack.project(project).config.svn
+        assert cfg.configuration.name == name
+        assert cfg.projectPath == "/${name}/trunk"
     }
 
     @Test

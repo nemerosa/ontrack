@@ -22,4 +22,12 @@ class ValidationRun extends AbstractProjectResource {
     String getStatus() {
         validationRunStatuses[0].statusID.id
     }
+
+    def getValidationStamp() {
+        node.validationStamp
+    }
+
+    def getValidationRunStatuses() {
+        node.validationRunStatuses
+    }
 }

@@ -113,4 +113,8 @@ class Branch extends AbstractProjectResource {
     BranchProperties getConfig() {
         new BranchProperties(ontrack, this)
     }
+
+    String getType() {
+        node.type
+    }
 }

@@ -10,8 +10,8 @@ class AbstractResource {
         this.node = node
     }
 
-    def get(String name) {
-        node[name] ?: [:]
+    Object getNode() {
+        node
     }
 
     protected String link(String name) {
