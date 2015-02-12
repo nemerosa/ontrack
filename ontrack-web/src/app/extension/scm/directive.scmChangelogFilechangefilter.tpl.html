@@ -6,7 +6,8 @@
         </div>
         <button class="btn btn-default btn-sm" type="button" ng-disabled="!quickPattern"><span class="fa fa-save" title="Saves the quick pattern"></span></button>
         <div class="input-group input-group-sm col-md-2">
-            <select class="form-control">
+            <select class="form-control"
+                    ng-options="filter as filter.name for filter in filters">
                 <option value=""></option>
             </select>
         </div>

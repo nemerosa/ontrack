@@ -37,6 +37,8 @@ angular.module('ontrack.extension.scm', [
                 project: '='
             },
             controller: function ($scope) {
+                // TODO Loads the list of filters (async)
+                $scope.filters = [];
                 $scope.submitQuickPattern = function () {
                     var pattern = $scope.quickPattern;
                     if (pattern) {
@@ -46,6 +48,7 @@ angular.module('ontrack.extension.scm', [
                 $scope.addFileFilter = function () {
                     otScmChangelogFilechangefilterService.addFilter($scope.project).then(function (filter) {
                         // TODO Adds the filter into the list and selects it
+                        $scope.filters.push(filter);
                     });
                 };
             }
