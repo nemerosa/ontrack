@@ -10,10 +10,6 @@ class AbstractResource {
         this.node = node
     }
 
-    def get(String name) {
-        node[name] ?: [:]
-    }
-
     protected String link(String name) {
         String linkName = name.startsWith('_') ? name : '_' + name
         if (node[linkName]) {

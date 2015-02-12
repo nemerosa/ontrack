@@ -869,14 +869,13 @@ local.put('BUILD', build)
 
         // Script to execute
         def script = '''\
-def confName = NAME
 ontrack.configure {
-    svn confName, url: 'svn://localhost\'
+    svn NAME, url: 'svn://localhost\'
 }
 ontrack.project(PROJECT) {
-    println "name=${confName}"
+    println "name=${NAME}"
     config {
-        svn confName, "/${confName}/trunk"
+        svn NAME, "/${NAME}/trunk"
     }
 }
 '''
