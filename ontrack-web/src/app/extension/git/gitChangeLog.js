@@ -97,6 +97,11 @@ angular.module('ot.extension.git.changelog', [
                 }
             };
 
+            // Default change log filter
+            $scope.changeLogFileFilter = function (changeLogFile) {
+                return true;
+            };
+
             // Configuring the change log export
             $scope.changeLogExport = function () {
                 otScmChangeLogService.displayChangeLogExport({

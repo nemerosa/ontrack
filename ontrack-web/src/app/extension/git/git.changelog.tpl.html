@@ -236,7 +236,7 @@
                             </div>
                         <div class="panel-body ot-extension-git-changelog-files" ng-show="files">
                             <div class="ot-extension-git-changelog-file"
-                                 ng-repeat="changeLogFile in files.list">
+                                 ng-repeat="changeLogFile in files.list | filter:changeLogFileFilter">
                                 <span class="ot-scm-changelog-revision ot-scm-changetype-{{changeLogFile.changeType | lowercase}}">
                                     <span class="ot-scm-changetype-icon" title="{{changeLogFile.changeType | lowercase}}"></span>
                                 </span>
