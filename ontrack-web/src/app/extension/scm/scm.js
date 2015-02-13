@@ -37,9 +37,15 @@ angular.module('ontrack.extension.scm', [
                 project: '=',
                 filterCallback: '='
             },
+            link: function (scope) {
+                // Loads the list of filters (async)
+                scope.$watch('project', function () {
+                    if (scope.project) {
+                        scope.filters = otScmChangelogFilechangefilterService.loadFilters(scope.project);
+                    }
+                });
+            },
             controller: function ($scope) {
-                // TODO Loads the list of filters (async)
-                $scope.filters = [];
                 // Submitting a pattern
                 $scope.submitQuickPattern = function () {
                     var pattern = $scope.quickPattern;
@@ -117,6 +123,19 @@ angular.module('ontrack.extension.scm', [
             var rx = new RegExp(re);
             return rx.test(path);
         }
+
+        self.loadFilters = function (project) {
+            var store = loadStore(project);
+            var filters = [];
+            for (var name in store) {
+                var patterns = store[name];
+                filters.push({
+                    name: name,
+                    patterns: patterns
+                });
+            }
+            return filters;
+        };
 
         self.filterFunction = function (patterns) {
             return function (path) {
