@@ -107,9 +107,26 @@ angular.module('ontrack.extension.scm', [
             localStorage.setItem("fileChangeFilters_" + project.id, JSON.stringify(store));
         }
 
+        function patternMatch(pattern, path) {
+            var re = pattern
+                .replace(/\*\*/g, '$MULTI$')
+                .replace(/\*/g, '$SINGLE$')
+                .replace(/\$SINGLE\$/g, '[^\/]+')
+                .replace(/\$MULTI\$/g, '.*');
+            re = '^' + re + '$';
+            var rx = new RegExp(re);
+            return rx.test(path);
+        }
+
         self.filterFunction = function (patterns) {
-            return function (changeLogFile) {
-                return true;
+            return function (path) {
+                if (patterns) {
+                    return patterns.some(function (pattern) {
+                        return patternMatch(pattern, path);
+                    });
+                } else {
+                    return true;
+                }
             };
         };
 
