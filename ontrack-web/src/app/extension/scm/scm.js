@@ -34,7 +34,8 @@ angular.module('ontrack.extension.scm', [
             restrict: 'E',
             templateUrl: 'app/extension/scm/directive.scmChangelogFilechangefilter.tpl.html',
             scope: {
-                project: '='
+                project: '=',
+                filterCallback: '='
             },
             controller: function ($scope) {
                 // TODO Loads the list of filters (async)
@@ -76,8 +77,11 @@ angular.module('ontrack.extension.scm', [
                     }
                 });
                 $scope.submitPattern = function (patterns) {
-                    // TODO Filtering based on the patterns
-                    console.log('patterns=', patterns);
+                    // Sets the function on the callback
+                    if ($scope.filterCallback) {
+                        console.log('Calling callback with ', patterns);
+                        $scope.filterCallback(otScmChangelogFilechangefilterService.filterFunction(patterns));
+                    }
                 };
                 $scope.unselectPattern = function () {
                     $scope.quickPattern = '';
@@ -102,6 +106,12 @@ angular.module('ontrack.extension.scm', [
         function saveStore(project, store) {
             localStorage.setItem("fileChangeFilters_" + project.id, JSON.stringify(store));
         }
+
+        self.filterFunction = function (patterns) {
+            return function (changeLogFile) {
+                return true;
+            };
+        };
 
         self.addFilter = function (project) {
             // Form configuration

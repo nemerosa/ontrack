@@ -232,11 +232,11 @@
                         </div>
                         <div class="panel-body ot-extension-git-changelog-files" ng-show="files">
                             <div>
-                                <ot-extension-scm-changelog-filechangefilter project="changeLog.project"></ot-extension-scm-changelog-filechangefilter>
+                                <ot-extension-scm-changelog-filechangefilter project="changeLog.project" filter-callback="changeLogFileFilterConfig.callback"></ot-extension-scm-changelog-filechangefilter>
                             </div>
                         <div class="panel-body ot-extension-git-changelog-files" ng-show="files">
                             <div class="ot-extension-git-changelog-file"
-                                 ng-repeat="changeLogFile in files.list | filter:changeLogFileFilter">
+                                 ng-repeat="changeLogFile in files.list | filter:changeLogFileFilterConfig.filter">
                                 <span class="ot-scm-changelog-revision ot-scm-changetype-{{changeLogFile.changeType | lowercase}}">
                                     <span class="ot-scm-changetype-icon" title="{{changeLogFile.changeType | lowercase}}"></span>
                                 </span>

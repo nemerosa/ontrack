@@ -12,7 +12,8 @@ angular.module('ot.extension.git.changelog', [
             controller: 'GitChangeLogCtrl'
         });
     })
-    .controller('GitChangeLogCtrl', function ($q, $log, $interpolate, $anchorScroll, $location, $stateParams, $scope, $http, ot, otStructureService, otScmChangeLogService) {
+    .controller('GitChangeLogCtrl', function ($q, $log, $interpolate, $anchorScroll, $location, $stateParams, $scope, $http,
+                                              ot, otStructureService, otScmChangeLogService, otScmChangelogFilechangefilterService) {
 
         // The build request
         $scope.buildDiffRequest = {
@@ -97,9 +98,18 @@ angular.module('ot.extension.git.changelog', [
                 }
             };
 
-            // Default change log filter
-            $scope.changeLogFileFilter = function (changeLogFile) {
-                return true;
+            // Default filter
+            $scope.changeLogFileFilterConfig = {};
+            $scope.changeLogFileFilterConfig.callback = function (filterFunction) {
+                console.log('filterFunction=', filterFunction);
+                $scope.changeLogFileFilterConfig.filterFunction = filterFunction;
+            };
+            $scope.changeLogFileFilterConfig.filter = function (changeLogFile) {
+                if ($scope.changeLogFileFilterConfig.filterFunction) {
+                    return $scope.changeLogFileFilterConfig.filterFunction(changeLogFile.path);
+                } else {
+                    return true;
+                }
             };
 
             // Configuring the change log export
