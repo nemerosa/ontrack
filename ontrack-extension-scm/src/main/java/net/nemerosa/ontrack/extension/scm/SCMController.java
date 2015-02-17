@@ -78,4 +78,16 @@ public class SCMController extends AbstractResourceController {
         );
     }
 
+    /**
+     * Deletes a change log file filter
+     */
+    @RequestMapping(value = "changeLog/fileFilter/{projectId}/{name:.*}", method = RequestMethod.DELETE)
+    public Ack getChangeLogFileFilters(@PathVariable ID projectId, @PathVariable String name) {
+        securityService.checkProjectFunction(projectId.get(), ProjectConfig.class);
+        securityService.runAsAdmin(() -> {
+            entityDataService.delete(structureService.getProject(projectId), name);
+        });
+        return Ack.OK;
+    }
+
 }
