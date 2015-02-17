@@ -10,7 +10,9 @@ import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.StructureService;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
+import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -61,7 +63,35 @@ public class SCMController extends AbstractResourceController {
     @RequestMapping(value = "changeLog/fileFilter/{projectId}", method = RequestMethod.GET)
     public Resources<SCMFileChangeFilter> getChangeLogFileFilters(@PathVariable ID projectId) {
         // Gets the store
-        SCMFileChangeFilters config = securityService.asAdmin(() -> {
+        SCMFileChangeFilters config = loadStore(projectId);
+        // Resources
+        return Resources.of(
+                config.getFilters(),
+                uri(on(getClass()).getChangeLogFileFilters(projectId))
+        );
+    }
+
+    /**
+     * Get a change log file filter
+     */
+    @RequestMapping(value = "changeLog/fileFilter/{projectId}/{name}", method = RequestMethod.GET)
+    public Resource<SCMFileChangeFilter> getChangeLogFileFilter(@PathVariable ID projectId, @PathVariable String name) {
+        SCMFileChangeFilters config = loadStore(projectId);
+        // Resource
+        return config.getFilters().stream()
+                .filter(filter -> StringUtils.equals(name, filter.getName()))
+                .findFirst()
+                .map(filter ->
+                                Resource.of(
+                                        filter,
+                                        uri(on(getClass()).getChangeLogFileFilter(projectId, name))
+                                ).with("_delete", uri(on(getClass()).deleteChangeLogFileFilter(projectId, name)))
+                )
+                .orElseThrow(() -> new SCMFileChangeFilterNotFound(name));
+    }
+
+    private SCMFileChangeFilters loadStore(ID projectId) {
+        return securityService.asAdmin(() -> {
             // Loads the project
             Project project = structureService.getProject(projectId);
             // Loads the store
@@ -71,22 +101,15 @@ public class SCMController extends AbstractResourceController {
                     SCMFileChangeFilters.class
             );
         }).orElse(SCMFileChangeFilters.create());
-        // Resources
-        return Resources.of(
-                config.getFilters(),
-                uri(on(getClass()).getChangeLogFileFilters(projectId))
-        );
     }
 
     /**
      * Deletes a change log file filter
      */
     @RequestMapping(value = "changeLog/fileFilter/{projectId}/{name:.*}", method = RequestMethod.DELETE)
-    public Ack getChangeLogFileFilters(@PathVariable ID projectId, @PathVariable String name) {
+    public Ack deleteChangeLogFileFilter(@PathVariable ID projectId, @PathVariable String name) {
         securityService.checkProjectFunction(projectId.get(), ProjectConfig.class);
-        securityService.runAsAdmin(() -> {
-            entityDataService.delete(structureService.getProject(projectId), name);
-        });
+        securityService.runAsAdmin(() -> entityDataService.delete(structureService.getProject(projectId), name));
         return Ack.OK;
     }
 
