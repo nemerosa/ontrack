@@ -34,14 +34,16 @@ angular.module('ontrack.extension.scm', [
             restrict: 'E',
             templateUrl: 'app/extension/scm/directive.scmChangelogFilechangefilter.tpl.html',
             scope: {
-                project: '=',
+                changeLog: '=',
                 filterCallback: '='
             },
             link: function (scope) {
                 // Loads the list of filters (async)
-                scope.$watch('project', function () {
-                    if (scope.project) {
-                        scope.filters = otScmChangelogFilechangefilterService.loadFilters(scope.project);
+                scope.$watch('changeLog', function () {
+                    if (scope.changeLog) {
+                        otScmChangelogFilechangefilterService.loadFilters(scope.changeLog).then(function (filters) {
+                            scope.filters = filters;
+                        });
                     }
                 });
             },
@@ -54,7 +56,7 @@ angular.module('ontrack.extension.scm', [
                     }
                 };
                 $scope.addFileFilter = function () {
-                    otScmChangelogFilechangefilterService.addFilter($scope.project).then(function (filter) {
+                    otScmChangelogFilechangefilterService.addFilter($scope.changeLog).then(function (filter) {
                         // Adds the filter into the list and selects it
                         $scope.filters.push(filter);
                         $scope.selectedFilter = filter;
@@ -62,7 +64,7 @@ angular.module('ontrack.extension.scm', [
                 };
                 $scope.editFileFilter = function () {
                     if ($scope.selectedFilter) {
-                        otScmChangelogFilechangefilterService.editFilter($scope.project, $scope.selectedFilter).then(function (filter) {
+                        otScmChangelogFilechangefilterService.editFilter($scope.changeLog, $scope.selectedFilter).then(function (filter) {
                             $scope.selectedFilter.patterns = filter.patterns;
                             $scope.submitPattern(filter.patterns);
                         });
@@ -70,7 +72,7 @@ angular.module('ontrack.extension.scm', [
                 };
                 $scope.deleteFileFilter = function () {
                     if ($scope.selectedFilter) {
-                        otScmChangelogFilechangefilterService.deleteFilter($scope.project, $scope.selectedFilter);
+                        otScmChangelogFilechangefilterService.deleteFilter($scope.changeLog, $scope.selectedFilter);
                         $scope.filters.splice($scope.filters.indexOf($scope.selectedFilter), 1);
                         $scope.selectedFilter = undefined;
                     }
@@ -85,7 +87,6 @@ angular.module('ontrack.extension.scm', [
                 $scope.submitPattern = function (patterns) {
                     // Sets the function on the callback
                     if ($scope.filterCallback) {
-                        console.log('Calling callback with ', patterns);
                         $scope.filterCallback(otScmChangelogFilechangefilterService.filterFunction(patterns));
                     }
                 };
@@ -112,6 +113,18 @@ angular.module('ontrack.extension.scm', [
         function saveStore(project, store) {
             localStorage.setItem("fileChangeFilters_" + project.id, JSON.stringify(store));
         }
+        function loadLocalFilters(project) {
+            var store = loadStore(project);
+            var filters = [];
+            for (var name in store) {
+                var patterns = store[name];
+                filters.push({
+                    name: name,
+                    patterns: patterns
+                });
+            }
+            return filters;
+        }
 
         function patternMatch(pattern, path) {
             var re = pattern
@@ -124,17 +137,14 @@ angular.module('ontrack.extension.scm', [
             return rx.test(path);
         }
 
-        self.loadFilters = function (project) {
-            var store = loadStore(project);
-            var filters = [];
-            for (var name in store) {
-                var patterns = store[name];
-                filters.push({
-                    name: name,
-                    patterns: patterns
-                });
-            }
-            return filters;
+        self.loadFilters = function (changeLog) {
+            var d = $q.defer();
+            // Local filters
+            var localFilters = loadLocalFilters(changeLog.project);
+            // Remote filters
+            d.resolve(localFilters);
+            // OK
+            return d.promise;
         };
 
         self.filterFunction = function (patterns) {
@@ -149,7 +159,7 @@ angular.module('ontrack.extension.scm', [
             };
         };
 
-        self.addFilter = function (project) {
+        self.addFilter = function (changeLog) {
             // Form configuration
             var form = {
                 fields: [{
@@ -173,7 +183,7 @@ angular.module('ontrack.extension.scm', [
                 title: "Create file change filter",
                 submit: function (data) {
                     // Loads the store
-                    var store = loadStore(project);
+                    var store = loadStore(changeLog.project);
                     // Controlling the name
                     if (store[data.name]) {
                         return "Filter with name " + data.name + " already exists.";
@@ -182,7 +192,7 @@ angular.module('ontrack.extension.scm', [
                     var patterns = data.patterns.split('\n').map(function (it) { return it.trim(); });
                     // Saves the filter
                     store[data.name] = patterns;
-                    saveStore(project, store);
+                    saveStore(changeLog.project, store);
                     // Returns the filter
                     var d = $q.defer();
                     d.resolve({
@@ -194,7 +204,7 @@ angular.module('ontrack.extension.scm', [
             });
         };
 
-        self.editFilter = function (project, filter) {
+        self.editFilter = function (changeLog, filter) {
             // Form configuration
             var form = {
                 fields: [{
@@ -223,9 +233,9 @@ angular.module('ontrack.extension.scm', [
                     // Parsing the patterns
                     var patterns = data.patterns.split('\n').map(function (it) { return it.trim(); });
                     // Saves the filter
-                    var store = loadStore(project);
+                    var store = loadStore(changeLog.project);
                     store[filter.name] = patterns;
-                    saveStore(project, store);
+                    saveStore(changeLog.project, store);
                     // Returns the filter
                     var d = $q.defer();
                     d.resolve({
@@ -237,10 +247,10 @@ angular.module('ontrack.extension.scm', [
             });
         };
 
-        self.deleteFilter = function (project, filter) {
-            var store = loadStore(project);
+        self.deleteFilter = function (changeLog, filter) {
+            var store = loadStore(changeLog.project);
             delete store[filter.name];
-            saveStore(project, store);
+            saveStore(changeLog.project, store);
         };
 
         return self;
