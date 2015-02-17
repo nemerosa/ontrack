@@ -134,7 +134,7 @@ public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSuppor
                 return objectMapper.readTree(json);
             }
         } catch (IOException ex) {
-            throw new JsonParsingException(json, ex);
+            throw new JsonParsingException(ex);
         }
     }
 
@@ -147,7 +147,7 @@ public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSuppor
                 return objectMapper.readValue(json, type);
             }
         } catch (IOException ex) {
-            throw new JsonParsingException(json, ex);
+            throw new JsonParsingException(ex);
         }
     }
 

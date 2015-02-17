@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.model.structure;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.Optional;
-import java.util.OptionalInt;
 
 /**
  * This service allows to store and retrieve arbitrary data with some
@@ -22,6 +21,11 @@ public interface EntityDataService {
     void store(ProjectEntity entity, String key, int value);
 
     /**
+     * Stores string data
+     */
+    void store(ProjectEntity entity, String key, String value);
+
+    /**
      * Stores arbitrary data as JSON
      */
     void store(ProjectEntity entity, String key, Object value);
@@ -34,17 +38,22 @@ public interface EntityDataService {
     /**
      * Retrieves data as integer
      */
-    OptionalInt retrieveInteger(ProjectEntity entity, String key);
+    Optional<Integer> retrieveInteger(ProjectEntity entity, String key);
+
+    /**
+     * Retrieves arbitrary data as string
+     */
+    Optional<String> retrieve(ProjectEntity entity, String key);
 
     /**
      * Retrieves arbitrary data as JSON
      */
-    JsonNode retrieveJson(ProjectEntity entity, String key);
+    Optional<JsonNode> retrieveJson(ProjectEntity entity, String key);
 
     /**
      * Retrieves arbitrary data as JSON
      */
-    <T> T retrieve(ProjectEntity entity, String key, Class<T> type);
+    <T> Optional<T> retrieve(ProjectEntity entity, String key, Class<T> type);
 
     /**
      * Deletes data
