@@ -9,12 +9,16 @@ import net.nemerosa.ontrack.model.structure.EntityDataService;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.StructureService;
+import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
+import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+
 @RestController
 @RequestMapping("extension/scm")
-public class SCMController {
+public class SCMController extends AbstractResourceController {
 
     private final EntityDataService entityDataService;
     private final StructureService structureService;
@@ -49,6 +53,29 @@ public class SCMController {
             // OK
             return Ack.OK;
         });
+    }
+
+    /**
+     * Gets the list of change log file filters
+     */
+    @RequestMapping(value = "changeLog/fileFilter/{projectId}", method = RequestMethod.GET)
+    public Resources<SCMFileChangeFilter> getChangeLogFileFilters(@PathVariable ID projectId) {
+        // Gets the store
+        SCMFileChangeFilters config = securityService.asAdmin(() -> {
+            // Loads the project
+            Project project = structureService.getProject(projectId);
+            // Loads the store
+            return entityDataService.retrieve(
+                    project,
+                    SCMFileChangeFilters.class.getName(),
+                    SCMFileChangeFilters.class
+            );
+        }).orElse(SCMFileChangeFilters.create());
+        // Resources
+        return Resources.of(
+                config.getFilters(),
+                uri(on(getClass()).getChangeLogFileFilters(projectId))
+        );
     }
 
 }
