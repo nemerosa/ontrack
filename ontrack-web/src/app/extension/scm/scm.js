@@ -98,7 +98,7 @@ angular.module('ontrack.extension.scm', [
             }
         };
     })
-    .service('otScmChangelogFilechangefilterService', function ($q, otFormService) {
+    .service('otScmChangelogFilechangefilterService', function ($q, $http, ot, otFormService) {
         var self = {};
 
         function loadStore(project) {
@@ -112,18 +112,6 @@ angular.module('ontrack.extension.scm', [
 
         function saveStore(project, store) {
             localStorage.setItem("fileChangeFilters_" + project.id, JSON.stringify(store));
-        }
-        function loadLocalFilters(project) {
-            var store = loadStore(project);
-            var filters = [];
-            for (var name in store) {
-                var patterns = store[name];
-                filters.push({
-                    name: name,
-                    patterns: patterns
-                });
-            }
-            return filters;
         }
 
         function patternMatch(pattern, path) {
@@ -139,10 +127,32 @@ angular.module('ontrack.extension.scm', [
 
         self.loadFilters = function (changeLog) {
             var d = $q.defer();
-            // Local filters
-            var localFilters = loadLocalFilters(changeLog.project);
-            // Remote filters
-            d.resolve(localFilters);
+            // Loading shared filters
+            ot.pageCall($http.get(changeLog._changeLogFileFilters)).then(function (remoteFilters) {
+                // Local filters
+                var store = loadStore(changeLog.project);
+                // Expansion into objects
+                var index = {};
+                angular.forEach(store, function (patterns, name) {
+                    index[name] = {
+                        name: name,
+                        patterns: patterns
+                    };
+                });
+                // API
+                self.remoteFilters = remoteFilters;
+                // Remote filters
+                angular.forEach(remoteFilters.resources, function (filter) {
+                    index[filter.name] = filter;
+                });
+                // Flattening
+                var filters = [];
+                angular.forEach(index, function (filter) {
+                    filters.push(filter);
+                });
+                // OK
+                d.resolve(filters);
+            });
             // OK
             return d.promise;
         };
@@ -189,7 +199,9 @@ angular.module('ontrack.extension.scm', [
                         return "Filter with name " + data.name + " already exists.";
                     }
                     // Parsing the patterns
-                    var patterns = data.patterns.split('\n').map(function (it) { return it.trim(); });
+                    var patterns = data.patterns.split('\n').map(function (it) {
+                        return it.trim();
+                    });
                     // Saves the filter
                     store[data.name] = patterns;
                     saveStore(changeLog.project, store);
@@ -231,7 +243,9 @@ angular.module('ontrack.extension.scm', [
                 title: "Edit file change filter",
                 submit: function (data) {
                     // Parsing the patterns
-                    var patterns = data.patterns.split('\n').map(function (it) { return it.trim(); });
+                    var patterns = data.patterns.split('\n').map(function (it) {
+                        return it.trim();
+                    });
                     // Saves the filter
                     var store = loadStore(changeLog.project);
                     store[filter.name] = patterns;
@@ -260,7 +274,7 @@ angular.module('ontrack.extension.scm', [
 
         function storeExportRequest(projectId, exportRequest) {
             localStorage.setItem(
-                    'issueExportConfig_' + projectId,
+                'issueExportConfig_' + projectId,
                 JSON.stringify(exportRequest)
             );
         }
