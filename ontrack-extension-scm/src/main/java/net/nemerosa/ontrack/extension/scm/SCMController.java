@@ -51,7 +51,11 @@ public class SCMController extends AbstractResourceController {
                 config.getFilters().stream().map(f -> toResource(projectId, f)),
                 uri(on(getClass()).getChangeLogFileFilters(projectId))
         )
-                .with(Link.CREATE, uri(on(getClass()).createChangeLogFileFilterForm(projectId)))
+                .with(
+                        Link.CREATE,
+                        uri(on(getClass()).createChangeLogFileFilterForm(projectId)),
+                        securityService.isProjectFunctionGranted(projectId.get(), ProjectConfig.class)
+                )
                 ;
     }
 
@@ -139,12 +143,21 @@ public class SCMController extends AbstractResourceController {
     }
 
     private Resource<SCMFileChangeFilter> toResource(ID projectId, SCMFileChangeFilter filter) {
+        boolean granted = securityService.isProjectFunctionGranted(projectId.get(), ProjectConfig.class);
         return Resource.of(
                 filter,
                 uri(on(getClass()).getChangeLogFileFilter(projectId, filter.getName()))
         )
-                .with(Link.DELETE, uri(on(getClass()).deleteChangeLogFileFilter(projectId, filter.getName())))
-                .with(Link.UPDATE, uri(on(getClass()).saveChangeLogFileFilterForm(projectId, filter.getName())))
+                .with(
+                        Link.DELETE,
+                        uri(on(getClass()).deleteChangeLogFileFilter(projectId, filter.getName())),
+                        granted
+                )
+                .with(
+                        Link.UPDATE,
+                        uri(on(getClass()).saveChangeLogFileFilterForm(projectId, filter.getName())),
+                        granted
+                )
                 ;
     }
 
