@@ -150,6 +150,11 @@ angular.module('ontrack.extension.scm', [
                 angular.forEach(index, function (filter) {
                     filters.push(filter);
                 });
+                // Sharing flag
+                angular.forEach(filters, function (filter) {
+                    filter.canShare = !filter._update && remoteFilters._create;
+                    filter.canUnshare = filter._delete;
+                });
                 // OK
                 d.resolve(filters);
             });
