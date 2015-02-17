@@ -95,6 +95,7 @@ angular.module('ontrack.extension.scm', [
                     $scope.selectedFilter = undefined;
                     $scope.submitPattern(undefined);
                 };
+                $scope.shareFileFilter = otScmChangelogFilechangefilterService.shareFileFilter;
             }
         };
     })
@@ -160,6 +161,16 @@ angular.module('ontrack.extension.scm', [
             });
             // OK
             return d.promise;
+        };
+
+        self.shareFileFilter = function (filter) {
+            ot.pageCall($http.post(self.remoteFilters._create, {
+                name: filter.name,
+                patterns: filter.patterns
+            })).then(function () {
+                filter.canShare = false;
+                filter.canUnshare = true;
+            });
         };
 
         self.filterFunction = function (patterns) {
