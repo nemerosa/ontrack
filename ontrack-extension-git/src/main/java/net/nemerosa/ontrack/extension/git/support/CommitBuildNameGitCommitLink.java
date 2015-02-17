@@ -48,7 +48,7 @@ public class CommitBuildNameGitCommitLink implements BuildGitCommitLink<CommitLi
         try {
             return ObjectMapperFactory.create().treeToValue(node, CommitLinkConfig.class);
         } catch (JsonProcessingException e) {
-            throw new JsonParsingException("CommitLinkConfig json", e);
+            throw new JsonParsingException(e);
         }
     }
 
