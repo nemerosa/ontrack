@@ -145,6 +145,7 @@ angular.module('ontrack.extension.scm', [
                 // Remote filters
                 angular.forEach(remoteFilters.resources, function (filter) {
                     index[filter.name] = filter;
+                    filter.shared = true;
                 });
                 // Flattening
                 var filters = [];
@@ -155,6 +156,7 @@ angular.module('ontrack.extension.scm', [
                 angular.forEach(filters, function (filter) {
                     filter.canShare = !filter._update && remoteFilters._create;
                     filter.canUnshare = filter._delete;
+                    filter.displayName = filter.shared ? filter.name + " (*)" : filter.name;
                 });
                 // OK
                 d.resolve(filters);
@@ -170,6 +172,8 @@ angular.module('ontrack.extension.scm', [
             })).then(function () {
                 filter.canShare = false;
                 filter.canUnshare = true;
+                filter.shared = true;
+                filter.displayName = filter.name + " (*)";
             });
         };
 
