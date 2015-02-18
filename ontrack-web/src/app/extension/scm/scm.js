@@ -169,11 +169,10 @@ angular.module('ontrack.extension.scm', [
             ot.pageCall($http.post(self.remoteFilters._create, {
                 name: filter.name,
                 patterns: filter.patterns
-            })).then(function () {
-                filter.canShare = false;
-                filter.canUnshare = true;
-                filter.shared = true;
-                filter.displayName = filter.name + " (*)";
+            })).then(function (sharedFilter) {
+                angular.copy(sharedFilter, filter);
+                filter.displayName = filter.name + ' (*)';
+                $scope.selectedFilter = filter;
             });
         };
 
