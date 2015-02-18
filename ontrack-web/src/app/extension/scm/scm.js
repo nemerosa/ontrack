@@ -172,7 +172,7 @@ angular.module('ontrack.extension.scm', [
             })).then(function (sharedFilter) {
                 angular.copy(sharedFilter, filter);
                 filter.displayName = filter.name + ' (*)';
-                $scope.selectedFilter = filter;
+                $scope.selectedFilter.displayName = filter.displayName;
             });
         };
 
@@ -225,12 +225,10 @@ angular.module('ontrack.extension.scm', [
                     store[data.name] = patterns;
                     saveStore(changeLog.project, store);
                     // Returns the filter
-                    var d = $q.defer();
-                    d.resolve({
+                    return {
                         name: data.name,
                         patterns: patterns
-                    });
-                    return d.promise;
+                    };
                 }
             });
         };

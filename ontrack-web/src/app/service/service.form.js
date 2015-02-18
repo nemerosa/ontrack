@@ -228,6 +228,7 @@ angular.module('ot.service.form', [
          * <ol>
          *     <li>a <code>true</code> value</li>, which then closes the dialog
          *     <li>a <code>String</code> message, which is displayed as an error message and the dialog is not closed
+         *     <li>a <code>Object or Array</code> - the dialog is closed and this object is returned as a result
          *     <li>a <code>Promise</code> which is called and its success result is used to close the dialog
          *     whereas its error is displayed in the dialog without closing it.
          * </ol>
@@ -241,6 +242,9 @@ angular.module('ot.service.form', [
                 modalInstance.close('ok');
             } else if (angular.isString(submit)) {
                 messageContainer.message = submit;
+            } else if (angular.isObject(submit) || angular.isArray(submit)) {
+                modalInstance.close(submit);
+                d.resolve(submit);
             } else {
                 submit.then(
                     function success(data) {
