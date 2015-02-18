@@ -9,7 +9,7 @@
         <div class="input-group input-group-sm col-md-2">
             <select class="form-control"
                     ng-model="selectedFilter"
-                    ng-options="filter as filter.displayName for filter in filters">
+                    ng-options="filter as filterDisplayName(filter) for filter in filters">
                 <option value=""></option>
             </select>
         </div>
