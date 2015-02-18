@@ -78,7 +78,7 @@ public class SCMController extends AbstractResourceController {
      * Adding a change log file filter
      */
     @RequestMapping(value = "changeLog/fileFilter/{projectId}/create", method = RequestMethod.POST)
-    public Ack createChangeLogFileFilter(@PathVariable ID projectId, @RequestBody SCMFileChangeFilter filter) {
+    public Resource<SCMFileChangeFilter> createChangeLogFileFilter(@PathVariable ID projectId, @RequestBody SCMFileChangeFilter filter) {
         securityService.checkProjectFunction(projectId.get(), ProjectConfig.class);
         return securityService.asAdmin(() -> {
             // Loads the project
@@ -94,7 +94,7 @@ public class SCMController extends AbstractResourceController {
             // Saves the store back
             entityDataService.store(project, SCMFileChangeFilters.class.getName(), config);
             // OK
-            return Ack.OK;
+            return getChangeLogFileFilter(projectId, filter.getName());
         });
     }
 
@@ -121,7 +121,7 @@ public class SCMController extends AbstractResourceController {
      * Updating a change log file filter
      */
     @RequestMapping(value = "changeLog/fileFilter/{projectId}/{name}/update", method = RequestMethod.PUT)
-    public Ack saveChangeLogFileFilter(@PathVariable ID projectId, @PathVariable String name, @RequestBody SCMFileChangeFilter filter) {
+    public Resource<SCMFileChangeFilter> saveChangeLogFileFilter(@PathVariable ID projectId, @PathVariable String name, @RequestBody SCMFileChangeFilter filter) {
         if (!StringUtils.equals(name, filter.getName())) {
             throw new IllegalStateException("The name of the filter in the request body must match the one in the URL");
         }
