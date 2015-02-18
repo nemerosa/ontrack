@@ -62,6 +62,12 @@ angular.module('ontrack.extension.scm', [
                         return filter.name;
                     }
                 };
+                $scope.filterCanShare = function (filter) {
+                    return filter && !filter._update && otScmChangelogFilechangefilterService.remoteFilters._create;
+                };
+                $scope.filterCanUnshare = function (filter) {
+                    return filter && filter._delete;
+                };
                 $scope.addFileFilter = function () {
                     otScmChangelogFilechangefilterService.addFilter($scope.changeLog).then(function (filter) {
                         // Adds the filter into the list and selects it
@@ -159,11 +165,6 @@ angular.module('ontrack.extension.scm', [
                 var filters = [];
                 angular.forEach(index, function (filter) {
                     filters.push(filter);
-                });
-                // Sharing flag
-                angular.forEach(filters, function (filter) {
-                    filter.canShare = !filter._update && remoteFilters._create;
-                    filter.canUnshare = filter._delete;
                 });
                 // OK
                 d.resolve(filters);
