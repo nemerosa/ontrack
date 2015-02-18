@@ -101,7 +101,6 @@ angular.module('ot.extension.git.changelog', [
             // Default filter
             $scope.changeLogFileFilterConfig = {};
             $scope.changeLogFileFilterConfig.callback = function (filterFunction) {
-                console.log('filterFunction=', filterFunction);
                 $scope.changeLogFileFilterConfig.filterFunction = filterFunction;
             };
             $scope.changeLogFileFilterConfig.filter = function (changeLogFile) {

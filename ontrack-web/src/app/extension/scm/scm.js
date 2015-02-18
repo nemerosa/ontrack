@@ -165,7 +165,7 @@ angular.module('ontrack.extension.scm', [
             return d.promise;
         };
 
-        self.shareFileFilter = function (filter) {
+        self.shareFileFilter = function (changeLog, filter) {
             ot.pageCall($http.post(self.remoteFilters._create, {
                 name: filter.name,
                 patterns: filter.patterns
