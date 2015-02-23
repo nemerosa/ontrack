@@ -55,6 +55,12 @@ angular.module('ontrack.extension.scm', [
                         $scope.submitPattern([pattern]);
                     }
                 };
+                $scope.saveQuickFilter = function () {
+                    var pattern = $scope.quickPattern;
+                    if (pattern) {
+                        $scope.addFileFilter([pattern]);
+                    }
+                };
                 $scope.filterDisplayName = function (filter) {
                     if (filter.shared) {
                         return filter.name + " (*)";
@@ -68,11 +74,10 @@ angular.module('ontrack.extension.scm', [
                 $scope.filterCanUnshare = function (filter) {
                     return filter && filter._delete;
                 };
-                $scope.addFileFilter = function () {
-                    otScmChangelogFilechangefilterService.addFilter($scope.changeLog).then(function (filter) {
+                $scope.addFileFilter = function (patterns) {
+                    otScmChangelogFilechangefilterService.addFilter($scope.changeLog, patterns).then(function (filter) {
                         // Adds the filter into the list and selects it
                         $scope.filters.push(filter);
-                        console.log("add=", filter);
                         $scope.selectedFilter = filter;
                     });
                 };
@@ -195,7 +200,7 @@ angular.module('ontrack.extension.scm', [
             };
         };
 
-        self.addFilter = function (changeLog) {
+        self.addFilter = function (changeLog, patterns) {
             // Form configuration
             var form = {
                 fields: [{
@@ -210,7 +215,8 @@ angular.module('ontrack.extension.scm', [
                     type: 'memo',
                     label: "Filter(s)",
                     help: "List of ANT-like patterns (one per line).",
-                    required: true
+                    required: true,
+                    value: patterns ? patterns.join('\n') : ''
                 }]
             };
             // Shows the dialog
