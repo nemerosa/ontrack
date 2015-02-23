@@ -274,13 +274,16 @@ angular.module('ontrack.extension.scm', [
                     var store = loadStore(changeLog.project);
                     store[filter.name] = patterns;
                     saveStore(changeLog.project, store);
-                    // Returns the filter
-                    var d = $q.defer();
-                    d.resolve({
+                    var raw = {
                         name: filter.name,
                         patterns: patterns
-                    });
-                    return d.promise;
+                    };
+                    // Remote change
+                    if (filter._update) {
+                        ot.call($http.put(filter._update, raw));
+                    }
+                    // Returns the filter
+                    return raw;
                 }
             });
         };
