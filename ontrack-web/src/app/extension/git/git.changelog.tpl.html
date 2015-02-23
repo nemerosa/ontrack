@@ -230,10 +230,9 @@
                         <div class="panel-body ot-description" ng-show="filesLoading">
                             <ot-loading>File changes are loading...</ot-loading>
                         </div>
-                        <div class="panel-body ot-extension-git-changelog-files" ng-show="files">
-                            <div>
-                                <ot-extension-scm-changelog-filechangefilter change-log="changeLog" filter-callback="changeLogFileFilterConfig.callback"></ot-extension-scm-changelog-filechangefilter>
-                            </div>
+                        <div class="panel-body ot-extension-scm-changelog-filefilter" ng-show="files">
+                            <ot-extension-scm-changelog-filechangefilter change-log="changeLog" filter-callback="changeLogFileFilterConfig.callback"></ot-extension-scm-changelog-filechangefilter>
+                        </div>
                         <div class="panel-body ot-extension-git-changelog-files" ng-show="files">
                             <div class="ot-extension-git-changelog-file"
                                  ng-repeat="changeLogFile in files.list | filter:changeLogFileFilterConfig.filter">
