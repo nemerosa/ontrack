@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -25,6 +26,14 @@ public class SCMFileChangeFilters {
     }
 
     public SCMFileChangeFilters save(SCMFileChangeFilter filter) {
+        return with(store -> store.put(filter.getName(), filter));
+    }
+
+    public SCMFileChangeFilters remove(String name) {
+        return with(store -> store.remove(name));
+    }
+
+    protected SCMFileChangeFilters with(Consumer<Map<String, SCMFileChangeFilter>> action) {
         Map<String, SCMFileChangeFilter> store = new TreeMap<>(
                 filters.stream()
                         .collect(Collectors.toMap(
@@ -32,7 +41,7 @@ public class SCMFileChangeFilters {
                                 f -> f
                         ))
         );
-        store.put(filter.getName(), filter);
+        action.accept(store);
         return new SCMFileChangeFilters(Lists.newArrayList(store.values()));
     }
 }

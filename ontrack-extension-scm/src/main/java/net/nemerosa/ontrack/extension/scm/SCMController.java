@@ -180,7 +180,14 @@ public class SCMController extends AbstractResourceController {
     @RequestMapping(value = "changeLog/fileFilter/{projectId}/{name}/delete", method = RequestMethod.DELETE)
     public Ack deleteChangeLogFileFilter(@PathVariable ID projectId, @PathVariable String name) {
         securityService.checkProjectFunction(projectId.get(), ProjectConfig.class);
-        securityService.runAsAdmin(() -> entityDataService.delete(structureService.getProject(projectId), name));
+        securityService.asAdmin(() ->
+                        entityDataService.withData(
+                                structureService.getProject(projectId),
+                                SCMFileChangeFilters.class.getName(),
+                                SCMFileChangeFilters.class,
+                                (SCMFileChangeFilters filters) -> filters.remove(name)
+                        )
+        );
         return Ack.OK;
     }
 

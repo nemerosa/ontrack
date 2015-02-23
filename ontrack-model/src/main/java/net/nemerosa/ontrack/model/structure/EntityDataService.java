@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.model.structure;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.base.Function;
 
 import java.util.Optional;
 
@@ -62,5 +63,10 @@ public interface EntityDataService {
      * @param key    Key to delete
      */
     void delete(ProjectEntity entity, String key);
+
+    /**
+     * Loads some data, processes it and saves it back
+     */
+    <T> void withData(ProjectEntity entity, String key, Class<T> type, Function<T, T> processFn);
 
 }

@@ -286,9 +286,14 @@ angular.module('ontrack.extension.scm', [
         };
 
         self.deleteFilter = function (changeLog, filter) {
+            // Local changes
             var store = loadStore(changeLog.project);
             delete store[filter.name];
             saveStore(changeLog.project, store);
+            // Remote changes
+            if (filter._delete) {
+                ot.call($http.delete(filter._delete));
+            }
         };
 
         return self;

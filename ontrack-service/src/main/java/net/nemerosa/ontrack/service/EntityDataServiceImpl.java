@@ -105,4 +105,11 @@ public class EntityDataServiceImpl implements EntityDataService {
         securityService.checkProjectFunction(entity, ProjectConfig.class);
         repository.delete(entity, key);
     }
+
+    @Override
+    public <T> void withData(ProjectEntity entity, String key, Class<T> type, Function<T, T> processFn) {
+        retrieve(entity, key, type).ifPresent(data ->
+                store(entity, key, processFn.apply(data))
+        );
+    }
 }

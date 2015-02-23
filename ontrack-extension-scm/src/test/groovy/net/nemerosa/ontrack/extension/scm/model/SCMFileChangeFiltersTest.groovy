@@ -39,4 +39,21 @@ class SCMFileChangeFiltersTest {
         assert filters.filters[0].patterns == ['**/*.sql', '**/*.ddl']
     }
 
+    @Test
+    void 'Removing a filter from an empty list'() {
+        SCMFileChangeFilters filters = SCMFileChangeFilters.create().remove('SQL')
+        assert filters.filters.collect { it.name } == []
+    }
+
+    @Test
+    void 'Removing a filter from a list'() {SCMFileChangeFilters filters = SCMFileChangeFilters.create().save(new SCMFileChangeFilter(
+            'SQL',
+            ['**/*.sql']
+        )).save(new SCMFileChangeFilter(
+            'Build',
+            ['**/*.gradle']
+        )).remove('SQL')
+        assert filters.filters.collect { it.name } == ['Build']
+    }
+
 }
