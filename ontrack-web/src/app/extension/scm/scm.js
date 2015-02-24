@@ -145,6 +145,21 @@ angular.module('ontrack.extension.scm', [
             return rx.test(path);
         }
 
+        self.initFilterConfig = function () {
+            var changeLogFileFilterConfig = {};
+            changeLogFileFilterConfig.callback = function (filterFunction) {
+                changeLogFileFilterConfig.filterFunction = filterFunction;
+            };
+            changeLogFileFilterConfig.filter = function (changeLogFile) {
+                if (changeLogFileFilterConfig.filterFunction) {
+                    return changeLogFileFilterConfig.filterFunction(changeLogFile.path);
+                } else {
+                    return true;
+                }
+            };
+            return changeLogFileFilterConfig;
+        };
+
         self.loadFilters = function (changeLog) {
             var d = $q.defer();
             // Loading shared filters

@@ -98,18 +98,8 @@ angular.module('ot.extension.git.changelog', [
                 }
             };
 
-            // Default filter
-            $scope.changeLogFileFilterConfig = {};
-            $scope.changeLogFileFilterConfig.callback = function (filterFunction) {
-                $scope.changeLogFileFilterConfig.filterFunction = filterFunction;
-            };
-            $scope.changeLogFileFilterConfig.filter = function (changeLogFile) {
-                if ($scope.changeLogFileFilterConfig.filterFunction) {
-                    return $scope.changeLogFileFilterConfig.filterFunction(changeLogFile.path);
-                } else {
-                    return true;
-                }
-            };
+            // File filter configuration
+            $scope.changeLogFileFilterConfig = otScmChangelogFilechangefilterService.initFilterConfig();
 
             // Configuring the change log export
             $scope.changeLogExport = function () {
