@@ -4,21 +4,18 @@ import net.nemerosa.ontrack.model.support.DBMigrationAction;
 import net.nemerosa.ontrack.repository.support.AbstractDBInitConfig;
 import net.nemerosa.ontrack.repository.support.ConfiguredDBInit;
 import net.nemerosa.ontrack.repository.support.DBMigrationPatch;
-import net.sf.dbinit.DBInit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 public class MainDBInitConfig extends AbstractDBInitConfig {
 
-    public static final int VERSION = 12;
+    public static final int VERSION = 13;
 
     private final ApplicationContext applicationContext;
 
