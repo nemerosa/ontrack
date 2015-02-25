@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.git.GitController;
 import net.nemerosa.ontrack.extension.git.model.GitChangeLog;
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.git.service.GitService;
+import net.nemerosa.ontrack.extension.scm.SCMController;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.ResourceContext;
@@ -41,6 +42,7 @@ public class GitChangeLogResourceDecorator extends AbstractResourceDecorator<Git
                         issues
                 )
                 .link("_files", on(GitController.class).changeLogFiles(changeLog.getUuid()))
+                .link("_changeLogFileFilters", on(SCMController.class).getChangeLogFileFilters(changeLog.getProject().getId()))
                 .link(
                         "_exportFormats",
                         on(GitController.class).changeLogExportFormats(changeLog.getProject().getId())

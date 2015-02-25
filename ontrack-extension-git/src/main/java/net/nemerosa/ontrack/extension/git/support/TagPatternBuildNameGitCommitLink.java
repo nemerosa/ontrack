@@ -45,7 +45,7 @@ public class TagPatternBuildNameGitCommitLink implements IndexableBuildGitCommit
         try {
             return ObjectMapperFactory.create().treeToValue(node, TagPattern.class);
         } catch (JsonProcessingException e) {
-            throw new JsonParsingException("TagPattern json", e);
+            throw new JsonParsingException(e);
         }
     }
 

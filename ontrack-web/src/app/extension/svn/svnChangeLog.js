@@ -12,7 +12,8 @@ angular.module('ot.extension.svn.changelog', [
             controller: 'SVNChangeLogCtrl'
         });
     })
-    .controller('SVNChangeLogCtrl', function ($q, $log, $interpolate, $anchorScroll, $location, $stateParams, $scope, $http, ot, otStructureService, otScmChangeLogService) {
+    .controller('SVNChangeLogCtrl', function ($q, $log, $interpolate, $anchorScroll, $location, $stateParams, $scope, $http,
+                                              ot, otStructureService, otScmChangeLogService, otScmChangelogFilechangefilterService) {
 
         // The build request
         $scope.buildDiffRequest = {
@@ -96,6 +97,9 @@ angular.module('ot.extension.svn.changelog', [
                     $anchorScroll();
                 }
             };
+
+            // File filter configuration
+            $scope.changeLogFileFilterConfig = otScmChangelogFilechangefilterService.initFilterConfig();
 
             // Configuring the change log export
             $scope.changeLogExport = function () {

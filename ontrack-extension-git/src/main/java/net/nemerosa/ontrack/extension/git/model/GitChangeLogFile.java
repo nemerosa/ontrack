@@ -3,11 +3,13 @@ package net.nemerosa.ontrack.extension.git.model;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFile;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFileChangeType;
+import org.apache.commons.lang3.StringUtils;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class GitChangeLogFile {
+public class GitChangeLogFile implements SCMChangeLogFile {
 
     private final SCMChangeLogFileChangeType changeType;
     private final String oldPath;
@@ -24,5 +26,10 @@ public class GitChangeLogFile {
 
     public GitChangeLogFile withUrl(String url) {
         return new GitChangeLogFile(changeType, oldPath, newPath, url);
+    }
+
+    @Override
+    public String getPath() {
+        return StringUtils.isNotBlank(oldPath) ? oldPath : newPath;
     }
 }

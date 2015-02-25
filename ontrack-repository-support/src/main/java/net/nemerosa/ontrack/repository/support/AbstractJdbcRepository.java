@@ -3,12 +3,12 @@ package net.nemerosa.ontrack.repository.support;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.exceptions.JsonParsingException;
 import net.nemerosa.ontrack.model.exceptions.JsonWritingException;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.Signature;
-import net.nemerosa.ontrack.common.Time;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -62,6 +62,10 @@ public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSuppor
 
     protected <T> Optional<T> getOptional(String sql, MapSqlParameterSource criteria, RowMapper<T> rowMapper) {
         return Optional.ofNullable(getFirstItem(sql, criteria, rowMapper));
+    }
+
+    protected <T> Optional<T> getOptional(String sql, MapSqlParameterSource criteria, Class<T> type) {
+        return Optional.ofNullable(getFirstItem(sql, criteria, type));
     }
 
 
@@ -130,7 +134,7 @@ public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSuppor
                 return objectMapper.readTree(json);
             }
         } catch (IOException ex) {
-            throw new JsonParsingException(json, ex);
+            throw new JsonParsingException(ex);
         }
     }
 
@@ -143,7 +147,7 @@ public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSuppor
                 return objectMapper.readValue(json, type);
             }
         } catch (IOException ex) {
-            throw new JsonParsingException(json, ex);
+            throw new JsonParsingException(ex);
         }
     }
 

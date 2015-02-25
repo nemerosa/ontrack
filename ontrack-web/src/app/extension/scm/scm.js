@@ -1,5 +1,5 @@
 angular.module('ontrack.extension.scm', [
-
+    'ot.service.form'
 ])
     .directive('otScmChangelogBuild', function () {
         return {
@@ -29,12 +29,305 @@ angular.module('ontrack.extension.scm', [
             }
         };
     })
+    .directive('otExtensionScmChangelogFilechangefilter', function (otScmChangelogFilechangefilterService) {
+        return {
+            restrict: 'E',
+            templateUrl: 'app/extension/scm/directive.scmChangelogFilechangefilter.tpl.html',
+            scope: {
+                changeLog: '=',
+                filterCallback: '='
+            },
+            link: function (scope) {
+                // Loads the list of filters (async)
+                scope.$watch('changeLog', function () {
+                    if (scope.changeLog) {
+                        otScmChangelogFilechangefilterService.loadFilters(scope.changeLog).then(function (filters) {
+                            scope.filters = filters;
+                        });
+                    }
+                });
+            },
+            controller: function ($scope) {
+                // Submitting a pattern
+                $scope.submitQuickPattern = function () {
+                    var pattern = $scope.quickPattern;
+                    if (pattern) {
+                        $scope.submitPattern([pattern]);
+                    }
+                };
+                $scope.saveQuickFilter = function () {
+                    var pattern = $scope.quickPattern;
+                    if (pattern) {
+                        $scope.addFileFilter([pattern]);
+                    }
+                };
+                $scope.filterDisplayName = function (filter) {
+                    if (filter.shared) {
+                        return filter.name + " (*)";
+                    } else {
+                        return filter.name;
+                    }
+                };
+                $scope.filterCanShare = function (filter) {
+                    return filter && !filter._update && otScmChangelogFilechangefilterService.remoteFilters._create;
+                };
+                $scope.filterCanUnshare = function (filter) {
+                    return filter && filter._delete;
+                };
+                $scope.addFileFilter = function (patterns) {
+                    otScmChangelogFilechangefilterService.addFilter($scope.changeLog, patterns).then(function (filter) {
+                        // Adds the filter into the list and selects it
+                        $scope.filters.push(filter);
+                        $scope.selectedFilter = filter;
+                    });
+                };
+                $scope.editFileFilter = function () {
+                    if ($scope.selectedFilter) {
+                        otScmChangelogFilechangefilterService.editFilter($scope.changeLog, $scope.selectedFilter).then(function (filter) {
+                            $scope.selectedFilter.patterns = filter.patterns;
+                            $scope.submitPattern(filter.patterns);
+                        });
+                    }
+                };
+                $scope.deleteFileFilter = function () {
+                    if ($scope.selectedFilter) {
+                        otScmChangelogFilechangefilterService.deleteFilter($scope.changeLog, $scope.selectedFilter);
+                        $scope.filters.splice($scope.filters.indexOf($scope.selectedFilter), 1);
+                        $scope.selectedFilter = undefined;
+                    }
+                };
+                $scope.$watch('selectedFilter', function () {
+                    if ($scope.selectedFilter) {
+                        $scope.submitPattern($scope.selectedFilter.patterns);
+                    } else {
+                        $scope.submitPattern(undefined);
+                    }
+                });
+                $scope.submitPattern = function (patterns) {
+                    // Sets the function on the callback
+                    if ($scope.filterCallback) {
+                        $scope.filterCallback(otScmChangelogFilechangefilterService.filterFunction(patterns));
+                    }
+                };
+                $scope.unselectPattern = function () {
+                    $scope.quickPattern = '';
+                    $scope.selectedFilter = undefined;
+                    $scope.submitPattern(undefined);
+                };
+                $scope.shareFileFilter = otScmChangelogFilechangefilterService.shareFileFilter;
+            }
+        };
+    })
+    .service('otScmChangelogFilechangefilterService', function ($q, $http, ot, otFormService) {
+        var self = {};
+
+        function loadStore(project) {
+            var json = localStorage.getItem("fileChangeFilters_" + project.id);
+            if (json) {
+                return JSON.parse(json);
+            } else {
+                return {};
+            }
+        }
+
+        function saveStore(project, store) {
+            localStorage.setItem("fileChangeFilters_" + project.id, JSON.stringify(store));
+        }
+
+        function patternMatch(pattern, path) {
+            var re = pattern
+                .replace(/\*\*/g, '$MULTI$')
+                .replace(/\*/g, '$SINGLE$')
+                .replace(/\$SINGLE\$/g, '[^\/]+')
+                .replace(/\$MULTI\$/g, '.*');
+            re = '^' + re + '$';
+            var rx = new RegExp(re);
+            return rx.test(path);
+        }
+
+        self.initFilterConfig = function () {
+            var changeLogFileFilterConfig = {};
+            changeLogFileFilterConfig.callback = function (filterFunction) {
+                changeLogFileFilterConfig.filterFunction = filterFunction;
+            };
+            changeLogFileFilterConfig.filter = function (changeLogFile) {
+                if (changeLogFileFilterConfig.filterFunction) {
+                    return changeLogFileFilterConfig.filterFunction(changeLogFile.path);
+                } else {
+                    return true;
+                }
+            };
+            return changeLogFileFilterConfig;
+        };
+
+        self.loadFilters = function (changeLog) {
+            var d = $q.defer();
+            // Loading shared filters
+            ot.pageCall($http.get(changeLog._changeLogFileFilters)).then(function (remoteFilters) {
+                // Local filters
+                var store = loadStore(changeLog.project);
+                // Expansion into objects
+                var index = {};
+                angular.forEach(store, function (patterns, name) {
+                    index[name] = {
+                        name: name,
+                        patterns: patterns
+                    };
+                });
+                // API
+                self.remoteFilters = remoteFilters;
+                // Remote filters
+                angular.forEach(remoteFilters.resources, function (filter) {
+                    index[filter.name] = filter;
+                    filter.shared = true;
+                });
+                // Flattening
+                var filters = [];
+                angular.forEach(index, function (filter) {
+                    filters.push(filter);
+                });
+                // OK
+                d.resolve(filters);
+            });
+            // OK
+            return d.promise;
+        };
+
+        self.shareFileFilter = function (changeLog, filter) {
+            ot.pageCall($http.post(self.remoteFilters._create, {
+                name: filter.name,
+                patterns: filter.patterns
+            })).then(function (sharedFilter) {
+                angular.copy(sharedFilter, filter);
+                filter.shared = true;
+            });
+        };
+
+        self.filterFunction = function (patterns) {
+            return function (path) {
+                if (patterns) {
+                    return patterns.some(function (pattern) {
+                        return patternMatch(pattern, path);
+                    });
+                } else {
+                    return true;
+                }
+            };
+        };
+
+        self.addFilter = function (changeLog, patterns) {
+            // Form configuration
+            var form = {
+                fields: [{
+                    name: 'name',
+                    type: 'text',
+                    label: "Name",
+                    help: "Name to use to save the filter.",
+                    required: true,
+                    regex: '.*'
+                }, {
+                    name: 'patterns',
+                    type: 'memo',
+                    label: "Filter(s)",
+                    help: "List of ANT-like patterns (one per line).",
+                    required: true,
+                    value: patterns ? patterns.join('\n') : ''
+                }]
+            };
+            // Shows the dialog
+            return otFormService.display({
+                form: form,
+                title: "Create file change filter",
+                submit: function (data) {
+                    // Loads the store
+                    var store = loadStore(changeLog.project);
+                    // Controlling the name
+                    if (store[data.name]) {
+                        return "Filter with name " + data.name + " already exists.";
+                    }
+                    // Parsing the patterns
+                    var patterns = data.patterns.split('\n').map(function (it) {
+                        return it.trim();
+                    });
+                    // Saves the filter
+                    store[data.name] = patterns;
+                    saveStore(changeLog.project, store);
+                    // Returns the filter
+                    return {
+                        name: data.name,
+                        patterns: patterns
+                    };
+                }
+            });
+        };
+
+        self.editFilter = function (changeLog, filter) {
+            // Form configuration
+            var form = {
+                fields: [{
+                    name: 'name',
+                    type: 'text',
+                    label: "Name",
+                    help: "Name to use to save the filter.",
+                    required: true,
+                    readOnly: true,
+                    regex: '.*',
+                    value: filter.name
+                }, {
+                    name: 'patterns',
+                    type: 'memo',
+                    label: "Filter(s)",
+                    help: "List of ANT-like patterns (one per line).",
+                    required: true,
+                    value: filter.patterns.join('\n')
+                }]
+            };
+            // Shows the dialog
+            return otFormService.display({
+                form: form,
+                title: "Edit file change filter",
+                submit: function (data) {
+                    // Parsing the patterns
+                    var patterns = data.patterns.split('\n').map(function (it) {
+                        return it.trim();
+                    });
+                    // Saves the filter
+                    var store = loadStore(changeLog.project);
+                    store[filter.name] = patterns;
+                    saveStore(changeLog.project, store);
+                    var raw = {
+                        name: filter.name,
+                        patterns: patterns
+                    };
+                    // Remote change
+                    if (filter._update) {
+                        ot.call($http.put(filter._update, raw));
+                    }
+                    // Returns the filter
+                    return raw;
+                }
+            });
+        };
+
+        self.deleteFilter = function (changeLog, filter) {
+            // Local changes
+            var store = loadStore(changeLog.project);
+            delete store[filter.name];
+            saveStore(changeLog.project, store);
+            // Remote changes
+            if (filter._delete) {
+                ot.call($http.delete(filter._delete));
+            }
+        };
+
+        return self;
+    })
     .service('otScmChangeLogService', function ($http, $modal, $interpolate, ot) {
         var self = {};
 
         function storeExportRequest(projectId, exportRequest) {
             localStorage.setItem(
-                    'issueExportConfig_' + projectId,
+                'issueExportConfig_' + projectId,
                 JSON.stringify(exportRequest)
             );
         }
