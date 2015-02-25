@@ -19,12 +19,15 @@ svn commit $WC -m "Project structure" --username admin --password test
 # Initial commits by the user
 echo apply plugin: 'java' >> $TRUNK/build.gradle
 echo group = 'net.ontrack.test.svn' >> $TRUNK/build.gradle
+svn add $TRUNK/build.gradle
 svn mkdir $TRUNK/src/main/resources --parents
 echo log4j.rootLogger=warn, Console >> $TRUNK/src/main/resources/log4j.properties
+svn add $TRUNK/src/main/resources/log4j.properties
 svn commit $WC -m "PRJ-1 Project creation" --username user --password test
 
 # Other commits
 svn mkdir $TRUNK/doc
 echo First line of documentation >> $TRUNK/doc/README.md
+svn add $TRUNK/doc/README.md
 svn commit $WC -m "PRJ-1 Project documentation" --username user --password test
 
