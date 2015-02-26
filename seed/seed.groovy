@@ -334,7 +334,7 @@ docker logout
                 node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackDSLNotifier' {
                     'usingText' true
                     'scriptText' """\
-ontrack.build('ontrack', '${NAME}', VERSION_BUILD).properties {
+ontrack.build('ontrack', '${NAME}', VERSION_BUILD).config {
    label VERSION_DISPLAY
 }
 """
