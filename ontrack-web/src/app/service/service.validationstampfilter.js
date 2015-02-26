@@ -1,9 +1,30 @@
 angular.module('ot.service.validationstampfilter', [
     'ot.service.core',
-    'ot.service.form'
+    'ot.dialog.validationstampfilter'
 ])
-    .service('otValidationStampFilterService', function (ot, $q, $http, otFormService, otNotificationService) {
+    .service('otValidationStampFilterService', function (ot, $modal, $http) {
         var self = {};
+
+        /**
+         * Selection of the validation stamp filter
+         */
+        self.selectValidationStampFilter = function (branch) {
+            // Loading the validation stamps
+            return ot.call($http.get(branch._validationStamps)).then(function (validationStampsResources) {
+                // Displays the dialog
+                return $modal.open({
+                    templateUrl: 'app/dialog/dialog.validationstampfilter.tpl.html',
+                    controller: 'otDialogValidationStampFilter',
+                    resolve: {
+                        config: function () {
+                            return {
+                                validationStampsResources: validationStampsResources
+                            };
+                        }
+                    }
+                }).result;
+            });
+        };
 
         return self;
     })
