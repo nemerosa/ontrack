@@ -1,11 +1,22 @@
 <div class="modal-header">
     <h3>
-        Selection of validation stamps to display
-        for branch
+        Filter validation stamps
     </h3>
 </div>
 <form name="thisForm" class="form-horizontal" ng-submit="submit(thisForm.$valid)" novalidate="novalidate">
     <div class="modal-body">
+        <p>
+            Selection of validation stamps to display
+            for branch <b>{{config.branch.name}}</b>
+        </p>
+        <p>
+            <div ng-repeat="validationStamp in config.validationStamps"
+                class="ot-branch-build-view-validation-stamp-filter-item">
+                <ot-entity-image entity="validationStamp">
+                    {{validationStamp.name}}
+                </ot-entity-image>
+            </div>
+        </p>
     </div>
     <div class="modal-footer">
 

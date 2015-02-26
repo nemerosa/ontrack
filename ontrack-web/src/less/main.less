@@ -729,6 +729,21 @@ a.ot-application-info-error {
   }
 }
 
+.ot-branch-build-view-validation-stamp-filter-item {
+  margin-left: 2em;
+  margin-right: 2em;
+  padding: 0.25em;
+  border: solid 1px gray;
+  border-radius: 0.5em;
+  cursor: pointer;
+  &:hover {
+    background-color: @brand-info;
+  }
+  + .ot-branch-build-view-validation-stamp-filter-item {
+    margin-top: 0.5em;
+  }
+}
+
 .ot-branch-build-view-auto-refresh {
   .btn;
   &.ot-branch-build-view-auto-refresh-enabled {

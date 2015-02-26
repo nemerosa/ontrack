@@ -18,7 +18,8 @@ angular.module('ot.service.validationstampfilter', [
                     resolve: {
                         config: function () {
                             return {
-                                validationStampsResources: validationStampsResources
+                                validationStamps: validationStampsResources.resources,
+                                branch: branch
                             };
                         }
                     }
