@@ -295,7 +295,7 @@ class ACCDSL extends AcceptanceTestClient {
         }
         // Downloading the image
         def image = ontrack.promotionLevel(project, '1.0', 'COPPER').image
-        assert image.type == 'image/png'
+        assert image.type == 'image/png;charset=UTF-8'
         assert image.content == imageFile.bytes
     }
 
@@ -311,7 +311,7 @@ class ACCDSL extends AcceptanceTestClient {
         }
         // Downloading the image
         def image = ontrack.promotionLevel(project, '1.0', 'COPPER').image
-        assert image.type == 'image/png'
+        assert image.type == 'image/png;charset=UTF-8'
         assert image.content == imageFile.bytes
     }
 
@@ -327,7 +327,7 @@ class ACCDSL extends AcceptanceTestClient {
         }
         // Downloading the image
         def image = ontrack.promotionLevel(project, '1.0', 'COPPER').image
-        assert image.type == 'image/png'
+        assert image.type == 'image/png;charset=UTF-8'
         assert image.content == imageFile.bytes
     }
 
@@ -343,7 +343,7 @@ class ACCDSL extends AcceptanceTestClient {
         }
         // Downloading the image
         def image = ontrack.promotionLevel(project, '1.0', 'COPPER').image
-        assert image.type == 'image/png'
+        assert image.type == 'image/png;charset=UTF-8'
         assert image.content == imageFile.bytes
     }
 
@@ -359,7 +359,7 @@ class ACCDSL extends AcceptanceTestClient {
         }
         // Downloading the image
         def image = ontrack.validationStamp(project, '1.0', 'SMOKE').image
-        assert image.type == 'image/png'
+        assert image.type == 'image/png;charset=UTF-8'
         assert image.content == imageFile.bytes
     }
 
@@ -375,7 +375,7 @@ class ACCDSL extends AcceptanceTestClient {
         }
         // Downloading the image
         def image = ontrack.validationStamp(project, '1.0', 'SMOKE').image
-        assert image.type == 'image/png'
+        assert image.type == 'image/png;charset=UTF-8'
         assert image.content == imageFile.bytes
     }
 
@@ -391,7 +391,7 @@ class ACCDSL extends AcceptanceTestClient {
         }
         // Downloading the image
         def image = ontrack.validationStamp(project, '1.0', 'SMOKE').image
-        assert image.type == 'image/png'
+        assert image.type == 'image/png;charset=UTF-8'
         assert image.content == imageFile.bytes
     }
 
@@ -407,7 +407,7 @@ class ACCDSL extends AcceptanceTestClient {
         }
         // Downloading the image
         def image = ontrack.validationStamp(project, '1.0', 'SMOKE').image
-        assert image.type == 'image/png'
+        assert image.type == 'image/png;charset=UTF-8'
         assert image.content == imageFile.bytes
     }
 
