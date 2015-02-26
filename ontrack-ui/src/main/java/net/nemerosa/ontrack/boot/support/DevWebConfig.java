@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 @Configuration
@@ -28,10 +29,20 @@ public class DevWebConfig extends WebMvcConfigurerAdapter {
         String staticDir = devSettings.getStaticDir();
         log.info("Static web resources from: " + staticDir);
         String prefix = "file:";
-        registry.addResourceHandler("/app/**").addResourceLocations(prefix + staticDir + "/app/");
-        registry.addResourceHandler("/assets/**").addResourceLocations(prefix + staticDir + "/assets/");
-        registry.addResourceHandler("/fonts/**").addResourceLocations(prefix + staticDir + "/fonts/");
-        registry.addResourceHandler("/vendor/**").addResourceLocations(prefix + staticDir + "/vendor/");
-        registry.addResourceHandler("index.html").addResourceLocations(prefix + staticDir + "/index.html");
+        String dir = prefix + staticDir;
+        if (!dir.endsWith("/")) {
+            dir += "/";
+        }
+        registry.addResourceHandler("/app/**").addResourceLocations(dir + "app/");
+        registry.addResourceHandler("/assets/**").addResourceLocations(dir + "assets/");
+        registry.addResourceHandler("/fonts/**").addResourceLocations(dir + "fonts/");
+        registry.addResourceHandler("/vendor/**").addResourceLocations(dir + "vendor/");
+        registry.addResourceHandler("index.html").addResourceLocations(dir);
     }
+
+//    @Override
+//    public void addViewControllers(ViewControllerRegistry registry) {
+//        registry.addViewController("/").setViewName("forward:/index.html");
+//    }
+
 }
