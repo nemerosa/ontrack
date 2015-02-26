@@ -40,9 +40,9 @@ public class DevWebConfig extends WebMvcConfigurerAdapter {
         registry.addResourceHandler("index.html").addResourceLocations(dir);
     }
 
-//    @Override
-//    public void addViewControllers(ViewControllerRegistry registry) {
-//        registry.addViewController("/").setViewName("forward:/index.html");
-//    }
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        registry.addViewController("/").setViewName("forward:/index.html");
+    }
 
 }
