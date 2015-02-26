@@ -11,7 +11,12 @@
         </p>
         <p>
             <div ng-repeat="validationStamp in config.validationStamps"
-                class="ot-branch-build-view-validation-stamp-filter-item">
+                class="ot-branch-build-view-validation-stamp-filter-item"
+                ng-class="{
+                    'ot-branch-build-view-validation-stamp-filter-item-selected': validationStamp.selected
+                }"
+                ng-click="toggleValidationStampSelection(validationStamp)"
+            >
                 <ot-entity-image entity="validationStamp">
                     {{validationStamp.name}}
                 </ot-entity-image>
