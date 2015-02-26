@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.boot;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.actuate.system.ApplicationPidListener;
+import org.springframework.boot.actuate.system.ApplicationPidFileWriter;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +25,7 @@ public class Application {
 
         // Runs the application
         SpringApplication application = new SpringApplication(Application.class);
-        application.addListeners(new ApplicationPidListener(pid));
+        application.addListeners(new ApplicationPidFileWriter(pid));
         application.run(args);
     }
 
