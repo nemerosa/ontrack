@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.model.structure;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,7 @@ import net.nemerosa.ontrack.model.form.Form;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
+@JsonPropertyOrder({"id", "name", "description", "branch", "image"})
 public class PromotionLevel implements ProjectEntity {
 
     public static PromotionLevel of(Branch branch, NameDescription nameDescription) {
