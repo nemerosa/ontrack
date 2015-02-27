@@ -48,6 +48,7 @@ angular.module('ot.view.branch', [
         $scope.filterValidationStamps = function () {
             otValidationStampFilterService.selectValidationStampFilter($scope.branch, $scope.validationStampSelection).then(function (selection) {
                 $scope.validationStampSelection = selection;
+                otValidationStampFilterService.saveSelection($scope.branch, selection);
             });
         };
         $scope.validationStampFilter = function (validationStamp) {

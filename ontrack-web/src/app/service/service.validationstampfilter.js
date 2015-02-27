@@ -5,6 +5,15 @@ angular.module('ot.service.validationstampfilter', [
     .service('otValidationStampFilterService', function (ot, $modal, $http) {
         var self = {};
 
+        self.saveSelection = function (branch, selection) {
+            var key = "validationStampFilter_" + branch.id;
+            if (selection) {
+                localStorage.setItem(key, JSON.stringify(selection));
+            } else {
+                localStorage.removeItem(key);
+            }
+        };
+
         /**
          * Selection of the validation stamp filter
          */
