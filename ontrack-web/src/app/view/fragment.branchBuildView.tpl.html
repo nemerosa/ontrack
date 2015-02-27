@@ -24,6 +24,7 @@
             <!-- Validation stamp filtering -->
             <button class="ot-branch-build-view-validation-stamp-filter"
                     title="Filter the validation stamps"
+                    ng-if="validationStampCollection.resources.length > 10"
                     ng-class="{
                     'ot-branch-build-view-validation-stamp-filter-enabled': validationStampSelection,
                     'ot-branch-build-view-validation-stamp-filter-disabled': !validationStampSelection
