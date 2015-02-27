@@ -33,12 +33,17 @@ angular.module('ot.dialog.validationstampfilter', [
         // Submitting the dialog
         $scope.submit = function (isValid) {
             if (isValid) {
-                //otFormService.submitDialog(
-                //    config.submit,
-                //    $scope.data,
-                //    $modalInstance,
-                //    $scope
-                //);
+                // Collects the selected validation stamps
+                var selection = $scope.config.validationStamps
+                    .filter(function (stamp) { return stamp.selected; })
+                    .map(function (stamp) { return stamp.name; });
+                // Submit the selection
+                otFormService.submitDialog(
+                    config.submit,
+                    selection,
+                    $modalInstance,
+                    $scope
+                );
             }
         };
     })
