@@ -17,6 +17,8 @@ dependencies {
     compile libraries.spring_boot_starter_security
     compile libraries.spring_boot_starter_actuator
 
+    compile libraries.metrics_graphite
+
     runtime project(':ontrack-service')
     runtime project(':ontrack-repository-impl')
     runtime libraries.spring_boot_starter_aop
