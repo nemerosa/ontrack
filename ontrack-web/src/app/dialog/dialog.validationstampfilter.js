@@ -25,6 +25,11 @@ angular.module('ot.dialog.validationstampfilter', [
             });
         };
 
+        // No filter
+        $scope.selectNoValidationStampFilter = function () {
+            $modalInstance.close(undefined);
+        };
+
         // Cancelling the dialog
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
