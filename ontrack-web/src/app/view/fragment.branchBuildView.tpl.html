@@ -34,14 +34,14 @@
             </button>
         </th>
         <!-- All validation stamps -->
-        <th ng-repeat="validationStamp in validationStampCollection.resources" class="ot-branch-build-view-validation">
+        <th ng-repeat="validationStamp in validationStampCollection.resources | filter:validationStampFilter" class="ot-branch-build-view-validation">
             <ot-entity-image entity="validationStamp" link="#/validationStamp/{{validationStamp.id}}"></ot-entity-image>
         </th>
     </tr>
     <!-- Validation stamps decorations -->
     <tr>
         <!-- For each validation stamp -->
-        <th ng-repeat="validationStamp in validationStampCollection.resources" class="ot-branch-build-view-validation">
+        <th ng-repeat="validationStamp in validationStampCollection.resources | filter:validationStampFilter" class="ot-branch-build-view-validation">
             <ot-entity-decorations entity="validationStamp"></ot-entity-decorations>
         </th>
     </tr>
@@ -87,7 +87,7 @@
             </span>
         </td>
         <!-- Validation runs -->
-        <td ng-repeat="validationStampRunView in buildView.validationStampRunViews"
+        <td ng-repeat="validationStampRunView in buildView.validationStampRunViews | filter:validationStampRunViewFilter"
             class="ot-branch-build-view-validation">
             <!-- Not run and validation enabled -->
             <span ng-if="!validationStampRunView.run && buildView.build._validate" class="ot-command"
@@ -109,7 +109,7 @@
     </tbody>
     <tfoot>
     <tr>
-        <td colspan="{{3 + validationStampCollection.resources.length}}">
+        <td colspan="{{validationStampFilterCount(3)}}">
             <!-- Filter command -->
             <ng-include src="'app/view/fragment.branchBuildFilter.tpl.html'"></ng-include>
             <!-- Build diff extension commands -->

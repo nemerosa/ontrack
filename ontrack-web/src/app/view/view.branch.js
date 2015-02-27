@@ -47,8 +47,21 @@ angular.module('ot.view.branch', [
         // Filtering of the validation stamps
         $scope.filterValidationStamps = function () {
             otValidationStampFilterService.selectValidationStampFilter($scope.branch).then(function (selection) {
-                $scope.validationStampFilter = selection;
+                $scope.validationStampSelection = selection;
             });
+        };
+        $scope.validationStampFilter = function (validationStamp) {
+            return !$scope.validationStampSelection || $scope.validationStampSelection.indexOf(validationStamp.name) >= 0;
+        };
+        $scope.validationStampRunViewFilter = function (validationStampRunView) {
+            return $scope.validationStampFilter(validationStampRunView.validationStamp);
+        };
+        $scope.validationStampFilterCount = function (plus) {
+            if ($scope.validationStampCollection) {
+                return plus + $scope.validationStampCollection.resources.filter($scope.validationStampFilter).length;
+            } else {
+                return plus;
+            }
         };
 
         // Selected builds
