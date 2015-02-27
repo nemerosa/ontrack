@@ -192,6 +192,8 @@ angular.module('ot.view.branch', [
                         $scope.templateDefinition = templateDefinition;
                     });
                 }
+                // Initial validation stamp selection
+                $scope.validationStampSelection = otValidationStampFilterService.loadSelection($scope.branch);
                 // Branch commands
                 view.commands = [
                     {

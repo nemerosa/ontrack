@@ -5,6 +5,16 @@ angular.module('ot.service.validationstampfilter', [
     .service('otValidationStampFilterService', function (ot, $modal, $http) {
         var self = {};
 
+        self.loadSelection = function (branch) {
+            var key = "validationStampFilter_" + branch.id;
+            var json = localStorage.getItem(key);
+            if (json) {
+                return JSON.parse(json);
+            } else {
+                return undefined;
+            }
+        };
+
         self.saveSelection = function (branch, selection) {
             var key = "validationStampFilter_" + branch.id;
             if (selection) {
