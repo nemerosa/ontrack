@@ -8,9 +8,13 @@ angular.module('ot.service.validationstampfilter', [
         /**
          * Selection of the validation stamp filter
          */
-        self.selectValidationStampFilter = function (branch) {
+        self.selectValidationStampFilter = function (branch, validationStampSelection) {
             // Loading the validation stamps
             return ot.call($http.get(branch._validationStamps)).then(function (validationStampsResources) {
+                // Selected validation stamps
+                angular.forEach (validationStampsResources.resources, function (validationStamp) {
+                    validationStamp.selected = (validationStampSelection && validationStampSelection.indexOf(validationStamp.name) >= 0);
+                });
                 // Displays the dialog
                 return $modal.open({
                     templateUrl: 'app/dialog/dialog.validationstampfilter.tpl.html',
