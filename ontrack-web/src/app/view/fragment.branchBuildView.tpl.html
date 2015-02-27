@@ -22,8 +22,12 @@
                 <span class="fa fa-refresh"></span>
              </button>
             <!-- Validation stamp filtering -->
-            <button class="ot-branch-build-view-validation-stamp-filter ot-branch-build-view-validation-stamp-filter-disabled"
+            <button class="ot-branch-build-view-validation-stamp-filter"
                     title="Filter the validation stamps"
+                    ng-class="{
+                    'ot-branch-build-view-validation-stamp-filter-enabled': validationStampSelection,
+                    'ot-branch-build-view-validation-stamp-filter-disabled': !validationStampSelection
+                    }"
                     ng-click="filterValidationStamps()">
                 <span class="fa fa-filter"></span>
             </button>
