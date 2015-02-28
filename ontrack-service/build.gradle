@@ -14,6 +14,7 @@ dependencies {
     compile libraries.commons_io
     compile libraries.groovy
     compile libraries.groovy_sandbox
+    compile libraries.metrics_core
 
     testCompile project(':ontrack-it-utils')
     testRuntime project(':ontrack-repository-impl')

@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.service.job;
 
+import com.codahale.metrics.*;
+import com.codahale.metrics.Timer;
 import com.google.common.collect.Table;
 import com.google.common.collect.Tables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -11,6 +13,7 @@ import net.nemerosa.ontrack.model.support.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
@@ -35,6 +38,8 @@ public class JobServiceImpl implements ScheduledService,
     private final SecurityService securityService;
     private final ApplicationLogService applicationLogService;
     private final JobQueueAccessService jobQueueAccessService;
+    private final CounterService counterService;
+    private final MetricRegistry metricRegistry;
 
     private final AtomicLong syncCount = new AtomicLong();
     private final Table<String, String, RegisteredJob> registeredJobs = Tables.newCustomTable(
@@ -55,8 +60,10 @@ public class JobServiceImpl implements ScheduledService,
 
 
     @Autowired
-    public JobServiceImpl(ApplicationContext applicationContext, SecurityService securityService, ApplicationLogService applicationLogService, JobQueueAccessService jobQueueAccessService) {
+    public JobServiceImpl(ApplicationContext applicationContext, SecurityService securityService, ApplicationLogService applicationLogService, JobQueueAccessService jobQueueAccessService, CounterService counterService, MetricRegistry metricRegistry) {
         this.jobQueueAccessService = jobQueueAccessService;
+        this.counterService = counterService;
+        this.metricRegistry = metricRegistry;
         this.jobProviders = applicationContext.getBeansOfType(JobProvider.class).values();
         this.securityService = securityService;
         this.applicationLogService = applicationLogService;
@@ -244,7 +251,24 @@ public class JobServiceImpl implements ScheduledService,
                 );
             }
         };
+        // Metrics wrapper
+        Runnable monitoredTask = () -> {
+            String jobCategoryMetric = "job-category." + registeredJob.getJobCategory();
+            String jobMetric = "job";
+            Timer.Context jobTime = metricRegistry.timer(jobMetric).time();
+            Timer.Context jobCategoryTime = metricRegistry.timer(jobCategoryMetric).time();
+            try {
+                counterService.increment(jobMetric);
+                counterService.increment(jobCategoryMetric);
+                wrappedTask.run();
+            } finally {
+                counterService.decrement(jobMetric);
+                counterService.decrement(jobCategoryMetric);
+                jobTime.stop();
+                jobCategoryTime.stop();
+            }
+        };
         // Submitting the task
-        executor.submit(wrappedTask);
+        executor.submit(monitoredTask);
     }
 }

@@ -17,6 +17,7 @@ def springVersion = '4.1.4.RELEASE'
 def springSecurityVersion = '3.2.5.RELEASE'
 def httpClientVersion = '4.3.4'
 def slf4jVersion = '1.7.8'
+def metricsVersion = '3.1.0'
 
 /**
  * List of dependencies
@@ -68,7 +69,8 @@ ext {
             log4j                       : 'log4j:log4j:1.2.17',
 
             // Metrics
-            metrics_graphite            : 'io.dropwizard.metrics:metrics-graphite:3.1.0',
+            metrics_core                : "io.dropwizard.metrics:metrics-graphite:${metricsVersion}",
+            metrics_graphite            : "io.dropwizard.metrics:metrics-graphite:${metricsVersion}",
 
             // Test
             junit                       : 'junit:junit:4.11',

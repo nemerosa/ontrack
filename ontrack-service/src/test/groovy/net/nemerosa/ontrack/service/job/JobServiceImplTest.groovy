@@ -26,7 +26,7 @@ class JobServiceImplTest {
                 applicationContext,
                 securityService,
                 applicationLogService,
-                jobQueueAccessService
+                jobQueueAccessService, counterService, metricRegistry
         )
     }
 
