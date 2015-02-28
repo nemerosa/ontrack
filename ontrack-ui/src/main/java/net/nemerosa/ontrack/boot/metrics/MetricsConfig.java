@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.boot.support;
+package net.nemerosa.ontrack.boot.metrics;
 
 import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
