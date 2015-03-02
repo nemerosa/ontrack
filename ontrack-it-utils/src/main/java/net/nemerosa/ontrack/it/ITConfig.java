@@ -3,8 +3,10 @@ package net.nemerosa.ontrack.it;
 import net.nemerosa.ontrack.common.RunProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.actuate.autoconfigure.MetricRepositoryAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.convert.converter.ConverterRegistry;
 import org.springframework.core.convert.support.DefaultConversionService;
@@ -18,6 +20,7 @@ import java.io.IOException;
 @Configuration
 @Profile(RunProfile.UNIT_TEST)
 @EnableTransactionManagement
+@Import(MetricRepositoryAutoConfiguration.class)
 public class ITConfig {
 
     private final Logger logger = LoggerFactory.getLogger(ITConfig.class);
