@@ -16,7 +16,7 @@ def springBootVersion = '1.2.2.RELEASE'
 def springVersion = '4.1.5.RELEASE'
 def springSecurityVersion = '3.2.5.RELEASE'
 def httpClientVersion = '4.3.4'
-def slf4jVersion = '1.7.8'
+def slf4jVersion = '1.7.10'
 def metricsVersion = '3.1.0'
 
 /**
