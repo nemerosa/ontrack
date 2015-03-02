@@ -310,8 +310,8 @@ class ACCDSL extends AcceptanceTestClient {
                 gitHub configName
             }
             branch('template') {
-                promotionLevel 'COPPER', 'Copper promotion'
-                validationStamp 'SMOKE', 'Smoke tests'
+                promotionLevel 'COPPER', 'Copper promotion', true
+                validationStamp 'SMOKE', 'Smoke tests', true
                 // Git branch
                 config {
                     gitBranch '${gitBranch}'
@@ -340,12 +340,12 @@ class ACCDSL extends AcceptanceTestClient {
                 gitHub configName
             }
             branch('template', true) {
-                promotionLevel 'COPPER', 'Copper promotion'
-                promotionLevel 'BRONZE', 'Bronze promotion', {
+                promotionLevel 'COPPER', 'Copper promotion', true
+                promotionLevel 'BRONZE', 'Bronze promotion', true, {
                     image ACCDSL.class.getResource('/gold.png')
                 }
-                validationStamp 'SMOKE', 'Smoke tests'
-                validationStamp 'CI', 'CI tests', {
+                validationStamp 'SMOKE', 'Smoke tests', true
+                validationStamp 'CI', 'CI tests', true, {
                     image ACCDSL.class.getResource('/gold.png')
                 }
                 // Git branch

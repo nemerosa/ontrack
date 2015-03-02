@@ -31,10 +31,12 @@ class Project extends AbstractProjectResource {
         }
         if (branchNode) {
             // Gets the branch
-            new Branch(
+            def branch = new Branch(
                     ontrack,
                     ontrack.get(branchNode._self)
             )
+            branch(closure)
+            branch
         } else {
             // Creates the branch
             def branch = branch(name)
