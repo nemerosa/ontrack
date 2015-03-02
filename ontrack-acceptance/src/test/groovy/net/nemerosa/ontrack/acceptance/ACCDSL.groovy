@@ -242,6 +242,56 @@ class ACCDSL extends AcceptanceTestClient {
     }
 
     @Test
+    void 'Definition of a project and a branch template as an automator'() {
+        // GitHub configuration
+        def configName = uid('GH')
+        ontrack.configure {
+            gitHub configName, repository: 'nemerosa/ontrack', indexationInterval: 0
+        }
+        // Creation of a controller
+        def userName = uid('A')
+        doCreateAutomation(userName, 'pwd')
+        // Connects using this controller
+        ontrack = getOntrackAs(userName, 'pwd')
+        // Creation of the project and branch template
+        def project = uid('P')
+        ontrack.project(project) {
+            config {
+                gitHub configName
+            }
+            branch('template') {
+                promotionLevel 'COPPER', 'Copper promotion'
+                promotionLevel 'BRONZE', 'Bronze promotion', {
+                    image ACCDSL.class.getResource('/gold.png')
+                }
+                validationStamp 'SMOKE', 'Smoke tests'
+                validationStamp 'CI', 'CI tests', {
+                    image ACCDSL.class.getResource('/gold.png')
+                }
+                // Git branch
+                config {
+                    gitBranch '${gitBranch}'
+                }
+                // Template definition
+                template {
+                    parameter 'gitBranch', 'Name of the Git branch'
+                }
+            }
+        }
+        // Creates an instance
+        ontrack.branch(project, 'template').instance 'TEST', [
+                gitBranch: 'feature/test'
+        ]
+        // Checks the created instance
+        def instance = ontrack.branch(project, 'TEST')
+        assert instance.id > 0
+        assert instance.name == 'TEST'
+        // Checks the Git branch of the instance
+        def property = instance.config.gitBranch
+        assert property.branch == 'feature/test'
+    }
+
+    @Test
     void 'Setting the Jenkins build property on a build'() {
         // Jenkins configuration
         ontrack.configure {
