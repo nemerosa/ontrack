@@ -1,11 +1,13 @@
 package net.nemerosa.ontrack.service.job
 
+import com.codahale.metrics.MetricRegistry
 import net.nemerosa.ontrack.model.job.JobQueueAccessService
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.ApplicationLogService
 import net.nemerosa.ontrack.service.security.SecurityServiceTestUtils
 import org.junit.Before
 import org.junit.Test
+import org.springframework.boot.actuate.metrics.CounterService
 import org.springframework.context.ApplicationContext
 
 import static org.mockito.Mockito.mock
@@ -22,11 +24,15 @@ class JobServiceImplTest {
 
         ApplicationLogService applicationLogService = mock(ApplicationLogService)
         JobQueueAccessService jobQueueAccessService = mock(JobQueueAccessService)
+        CounterService counterService = mock(CounterService)
+        MetricRegistry metricRegistry = new MetricRegistry()
         service = new JobServiceImpl(
                 applicationContext,
                 securityService,
                 applicationLogService,
-                jobQueueAccessService, counterService, metricRegistry
+                jobQueueAccessService,
+                counterService,
+                metricRegistry
         )
     }
 
