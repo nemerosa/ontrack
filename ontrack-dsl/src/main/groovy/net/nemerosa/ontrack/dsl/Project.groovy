@@ -24,10 +24,23 @@ class Project extends AbstractProjectResource {
         )
     }
 
-    Branch branch(String name, Closure closure) {
-        def branch = branch(name)
-        branch(closure)
-        branch
+    Branch branch(String name, boolean updateIfExists = false, Closure closure) {
+        // Gets the list of branches and looks for an existing branch
+        def branchNode = ontrack.get(link('branches')).resources.find {
+            it.name == name
+        }
+        if (branchNode) {
+            // Gets the branch
+            new Branch(
+                    ontrack,
+                    ontrack.get(branchNode._self)
+            )
+        } else {
+            // Creates the branch
+            def branch = branch(name)
+            branch(closure)
+            branch
+        }
     }
 
     ProjectProperties getConfig() {
