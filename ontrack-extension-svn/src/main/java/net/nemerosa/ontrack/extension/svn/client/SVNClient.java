@@ -35,4 +35,6 @@ public interface SVNClient {
     List<SVNRevisionPath> getRevisionPaths(SVNRepository repository, long revision);
 
     List<String> getBranches(SVNRepository repository, SVNURL url);
+
+    String getDiff(SVNRepository repository, String path, List<Long> revisions);
 }

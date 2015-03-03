@@ -21,6 +21,8 @@ import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.wc.*;
 
+import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -224,6 +226,34 @@ public class SVNClientImpl implements SVNClient {
             throw translateSVNException(ex);
         }
         return results;
+    }
+
+    @Override
+    public String getDiff(SVNRepository repository, String path, List<Long> revisions) {
+        SVNRevision min = SVNRevision.create(revisions.stream().min(Long::compare).get());
+        SVNRevision max = SVNRevision.create(revisions.stream().max(Long::compare).get());
+
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+        try {
+            getDiffClient(repository).doDiff(
+                    SVNUtils.toURL(repository.getUrl(path)),
+                    max,
+                    min,
+                    max,
+                    SVNDepth.EMPTY,
+                    false,
+                    output
+            );
+        } catch (SVNException ex) {
+            throw translateSVNException(ex);
+        }
+
+        try {
+            return new String(output.toByteArray(), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new Error("UTF-8 unsupported.");
+        }
     }
 
     private SCMChangeLogFileChangeType toFileChangeType(SVNStatusType modificationType) {

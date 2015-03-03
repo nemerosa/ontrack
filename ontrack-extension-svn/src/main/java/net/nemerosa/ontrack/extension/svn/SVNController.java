@@ -4,6 +4,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
+import net.nemerosa.ontrack.extension.api.model.FileDiffChangeLogRequest;
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.export.ExportFormat;
@@ -12,6 +13,7 @@ import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogIssue;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogUUIDException;
+import net.nemerosa.ontrack.extension.scm.service.SCMService;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.extension.svn.service.*;
@@ -48,19 +50,21 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     private final SVNChangeLogService changeLogService;
     private final IssueServiceRegistry issueServiceRegistry;
     private final SVNService svnService;
+    private final SCMService scmService;
     private final SVNSyncService svnSyncService;
     private final SecurityService securityService;
 
     private final Cache<String, SVNChangeLog> logCache;
 
     @Autowired
-    public SVNController(SVNExtensionFeature feature, SVNConfigurationService svnConfigurationService, IndexationService indexationService, SVNChangeLogService changeLogService, IssueServiceRegistry issueServiceRegistry, SVNService svnService, SVNSyncService svnSyncService, SecurityService securityService) {
+    public SVNController(SVNExtensionFeature feature, SVNConfigurationService svnConfigurationService, IndexationService indexationService, SVNChangeLogService changeLogService, IssueServiceRegistry issueServiceRegistry, SVNService svnService, SCMService scmService, SVNSyncService svnSyncService, SecurityService securityService) {
         super(feature);
         this.svnConfigurationService = svnConfigurationService;
         this.indexationService = indexationService;
         this.changeLogService = changeLogService;
         this.issueServiceRegistry = issueServiceRegistry;
         this.svnService = svnService;
+        this.scmService = scmService;
         this.svnSyncService = svnSyncService;
         this.securityService = securityService;
         // Cache
@@ -261,6 +265,28 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
         responseHeaders.set("Content-Type", exportedChangeLogIssues.getFormat());
         // Body and headers
         return new ResponseEntity<>(exportedChangeLogIssues.getContent(), responseHeaders, HttpStatus.OK);
+    }
+
+    /**
+     * File diff change log
+     */
+    @RequestMapping(value = "changelog/diff", method = RequestMethod.GET)
+    public ResponseEntity<String> diff(FileDiffChangeLogRequest request) {
+        // Gets the change log
+        SVNChangeLog changeLog = changeLogService.changeLog(request);
+        // Gets the files
+        SVNChangeLogFiles changeLogFiles = changeLogFiles(changeLog.getUuid());
+        // Diff export
+        String diff = scmService.diff(
+                changeLogFiles.getList(),
+                request.getPatterns(),
+                changeLogFile -> changeLogService.getDiff(changeLog.getRepository(), changeLogFile)
+        );
+        // Content type
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("Content-Type", "text/plain");
+        // Body and headers
+        return new ResponseEntity<>(diff, responseHeaders, HttpStatus.OK);
     }
 
     /**

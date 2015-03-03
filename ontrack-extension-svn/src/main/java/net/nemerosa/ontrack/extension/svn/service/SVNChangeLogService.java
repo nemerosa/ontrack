@@ -28,4 +28,9 @@ public interface SVNChangeLogService {
      * Gets the optional revision for a build
      */
     OptionalLong getBuildRevision(Build build);
+
+    /**
+     * Gets the diff for a change
+     */
+    String getDiff(SVNRepository repository, SVNChangeLogFile changeLogFile);
 }

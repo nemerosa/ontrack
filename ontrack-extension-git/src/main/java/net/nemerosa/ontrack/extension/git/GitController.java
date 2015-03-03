@@ -4,6 +4,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
+import net.nemerosa.ontrack.extension.api.model.FileDiffChangeLogRequest;
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest;
 import net.nemerosa.ontrack.extension.git.model.*;
 import net.nemerosa.ontrack.extension.git.service.GitConfigurationService;
@@ -15,6 +16,7 @@ import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogIssue;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogUUIDException;
+import net.nemerosa.ontrack.extension.scm.service.SCMService;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.buildfilter.BuildDiff;
@@ -51,6 +53,7 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
 
     private final StructureService structureService;
     private final GitService gitService;
+    private final SCMService scmService;
     private final GitConfigurationService configurationService;
     private final IssueServiceRegistry issueServiceRegistry;
     private final SecurityService securityService;
@@ -61,12 +64,13 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
     public GitController(GitExtensionFeature feature,
                          StructureService structureService,
                          GitService gitService,
-                         GitConfigurationService configurationService,
+                         SCMService scmService, GitConfigurationService configurationService,
                          IssueServiceRegistry issueServiceRegistry,
                          SecurityService securityService) {
         super(feature);
         this.structureService = structureService;
         this.gitService = gitService;
+        this.scmService = scmService;
         this.configurationService = configurationService;
         this.issueServiceRegistry = issueServiceRegistry;
         this.securityService = securityService;
@@ -256,6 +260,29 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
         } else {
             throw new SCMChangeLogUUIDException(uuid);
         }
+    }
+
+    /**
+     * File diff change log
+     */
+    @RequestMapping(value = "changelog/diff", method = RequestMethod.GET)
+    public ResponseEntity<String> diff(FileDiffChangeLogRequest request) {
+        // Gets the change log
+        GitChangeLog changeLog = gitService.changeLog(request);
+        // Gets the files
+        GitChangeLogFiles changeLogFiles = changeLogFiles(changeLog.getUuid());
+        // FIXME Diff export
+        String diff = "";
+//        String diff = scmService.diff(
+//                changeLogFiles.getList(),
+//                request.getPatterns(),
+//                changeLogFile -> gitService.getDiff(changeLogFile)
+//        );
+        // Content type
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("Content-Type", "text/plain");
+        // Body and headers
+        return new ResponseEntity<>(diff, responseHeaders, HttpStatus.OK);
     }
 
     /**
