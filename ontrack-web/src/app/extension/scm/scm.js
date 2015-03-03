@@ -206,7 +206,12 @@ angular.module('ontrack.extension.scm', [
 
         self.diffFileFilter = function (changeLog, filter) {
             var patterns = filter ? filter.patterns : [];
-            console.log("patterns=", patterns);
+            ot.pageCall($http.get(changeLog._diff, {
+                params: {
+                    patterns: patterns.join(',')
+                }
+            }));
+            // TODO Displays the diff result
         };
 
         self.filterFunction = function (patterns) {
