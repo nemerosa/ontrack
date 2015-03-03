@@ -24,7 +24,7 @@ class Ontrack {
         this.httpClient = httpClient
     }
 
-    Project project(String name) {
+    Project project(String name, String description = '') {
         // Gets the list of projects and looks for an existing project
         def projectNode = get("structure/projects").resources.find {
             it.name == name
@@ -44,15 +44,15 @@ class Ontrack {
                             'structure/projects/create',
                             [
                                     name       : name,
-                                    description: ''
+                                    description: description
                             ]
                     )
             )
         }
     }
 
-    Project project(String name, Closure closure) {
-        def project = project(name)
+    Project project(String name, String description = '', Closure closure) {
+        def project = project(name, description)
         project.call(closure)
         project
     }

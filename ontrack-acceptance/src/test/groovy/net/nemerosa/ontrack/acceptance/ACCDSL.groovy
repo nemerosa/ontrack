@@ -156,8 +156,36 @@ class ACCDSL extends AcceptanceTestClient {
                 validationStamp 'SMOKE', 'Smoke tests'
             }
         }
+        // Checks the project does exist
+        def p = ontrack.project(project)
+        assert p.name == project
+        assert p.description == ''
         // Checks the branch does exist
-        assert ontrack.branch(project, '1.0').name == '1.0'
+        def branch = ontrack.branch(project, '1.0')
+        assert branch.name == '1.0'
+        assert branch.description == ''
+        // Checks the structure
+        assert ontrack.promotionLevel(project, '1.0', 'COPPER').name == 'COPPER'
+        assert ontrack.validationStamp(project, '1.0', 'SMOKE').name == 'SMOKE'
+    }
+
+    @Test
+    void 'Definition of a project and a branch with description'() {
+        def project = uid('P')
+        ontrack.project(project, 'My project') {
+            branch('1.0', 'My branch') {
+                promotionLevel 'COPPER', 'Copper promotion'
+                validationStamp 'SMOKE', 'Smoke tests'
+            }
+        }
+        // Checks the project does exist
+        def p = ontrack.project(project)
+        assert p.name == project
+        assert p.description == 'My project'
+        // Checks the branch does exist
+        def branch = ontrack.branch(project, '1.0')
+        assert branch.name == '1.0'
+        assert branch.description == 'My branch'
         // Checks the structure
         assert ontrack.promotionLevel(project, '1.0', 'COPPER').name == 'COPPER'
         assert ontrack.validationStamp(project, '1.0', 'SMOKE').name == 'SMOKE'
@@ -309,7 +337,7 @@ class ACCDSL extends AcceptanceTestClient {
             config {
                 gitHub configName
             }
-            branch('template') {
+            branch('template', '', true) {
                 promotionLevel 'COPPER', 'Copper promotion', true
                 validationStamp 'SMOKE', 'Smoke tests', true
                 // Git branch
@@ -339,7 +367,7 @@ class ACCDSL extends AcceptanceTestClient {
             config {
                 gitHub configName
             }
-            branch('template', true) {
+            branch('template', '', true) {
                 promotionLevel 'COPPER', 'Copper promotion', true
                 promotionLevel 'BRONZE', 'Bronze promotion', true, {
                     image ACCDSL.class.getResource('/gold.png')

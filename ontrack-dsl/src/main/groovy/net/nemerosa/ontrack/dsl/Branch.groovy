@@ -65,10 +65,14 @@ class Branch extends AbstractProjectResource {
     PromotionLevel promotionLevel(String name, String description = '', boolean updateIfExists = false) {
         def node = ontrack.get(link('promotionLevels')).resources.find { it.name == name }
         if (node) {
-            new PromotionLevel(
-                    ontrack,
-                    ontrack.get(node._self)
-            )
+            if (updateIfExists) {
+                new PromotionLevel(
+                        ontrack,
+                        ontrack.get(node._self)
+                )
+            } else {
+                throw new ObjectAlreadyExistsException("Promotion level ${name} already exists.")
+            }
         } else {
             new PromotionLevel(
                     ontrack,
@@ -89,10 +93,14 @@ class Branch extends AbstractProjectResource {
     ValidationStamp validationStamp(String name, String description = '', boolean updateIfExists = false) {
         def node = ontrack.get(link('validationStamps')).resources.find { it.name == name }
         if (node) {
-            new ValidationStamp(
-                    ontrack,
-                    ontrack.get(node._self)
-            )
+            if (updateIfExists) {
+                new ValidationStamp(
+                        ontrack,
+                        ontrack.get(node._self)
+                )
+            } else {
+                throw new ObjectAlreadyExistsException("Validation stamp ${name} already exists.")
+            }
         } else {
             new ValidationStamp(
                     ontrack,

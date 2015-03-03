@@ -14,35 +14,32 @@ class Project extends AbstractProjectResource {
         closure()
     }
 
-    Branch branch(String name) {
-        new Branch(
-                ontrack,
-                ontrack.post(link('createBranch'), [
-                        name       : name,
-                        description: ''
-                ])
-        )
+    Branch branch(String name, String description = '', boolean updateIfExists = false) {
+        def node = ontrack.get(link('branches')).resources.find { it.name == name }
+        if (node) {
+            if (updateIfExists) {
+                new Branch(
+                        ontrack,
+                        ontrack.get(node._self)
+                )
+            } else {
+                throw new ObjectAlreadyExistsException("Branch ${name} already exists.")
+            }
+        } else {
+            new Branch(
+                    ontrack,
+                    ontrack.post(link('createBranch'), [
+                            name       : name,
+                            description: description
+                    ])
+            )
+        }
     }
 
-    Branch branch(String name, boolean updateIfExists = false, Closure closure) {
-        // Gets the list of branches and looks for an existing branch
-        def branchNode = ontrack.get(link('branches')).resources.find {
-            it.name == name
-        }
-        if (branchNode) {
-            // Gets the branch
-            def branch = new Branch(
-                    ontrack,
-                    ontrack.get(branchNode._self)
-            )
-            branch(closure)
-            branch
-        } else {
-            // Creates the branch
-            def branch = branch(name)
-            branch(closure)
-            branch
-        }
+    Branch branch(String name, String description = '', boolean updateIfExists = false, Closure closure) {
+        Branch b = branch(name, description, updateIfExists)
+        b(closure)
+        b
     }
 
     ProjectProperties getConfig() {
