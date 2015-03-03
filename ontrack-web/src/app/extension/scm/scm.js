@@ -115,6 +115,7 @@ angular.module('ontrack.extension.scm', [
                     $scope.submitPattern(undefined);
                 };
                 $scope.shareFileFilter = otScmChangelogFilechangefilterService.shareFileFilter;
+                $scope.diffFileFilter = otScmChangelogFilechangefilterService.diffFileFilter;
             }
         };
     })
@@ -201,6 +202,11 @@ angular.module('ontrack.extension.scm', [
                 angular.copy(sharedFilter, filter);
                 filter.shared = true;
             });
+        };
+
+        self.diffFileFilter = function (changeLog, filter) {
+            var patterns = filter ? filter.patterns : [];
+            console.log("patterns=", patterns);
         };
 
         self.filterFunction = function (patterns) {
