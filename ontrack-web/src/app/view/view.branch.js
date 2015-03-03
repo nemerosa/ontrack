@@ -5,6 +5,7 @@ angular.module('ot.view.branch', [
     'ot.service.form',
     'ot.service.structure',
     'ot.service.buildfilter',
+    'ot.service.validationstampfilter',
     'ot.service.copy',
     'ot.service.template',
     'ot.dialog.validationStampRunView',
@@ -17,7 +18,9 @@ angular.module('ot.view.branch', [
             controller: 'BranchCtrl'
         });
     })
-    .controller('BranchCtrl', function ($state, $scope, $stateParams, $http, $modal, $location, ot, otFormService, otStructureService, otBuildFilterService, otAlertService, otTaskService, otNotificationService, otCopyService, otTemplateService) {
+    .controller('BranchCtrl', function ($state, $scope, $stateParams, $http, $modal, $location,
+                                        ot, otFormService, otStructureService, otAlertService, otTaskService, otNotificationService, otCopyService, otTemplateService,
+                                        otBuildFilterService, otValidationStampFilterService) {
         var view = ot.view();
         // Branch's id
         var branchId = $stateParams.branchId;
@@ -39,6 +42,27 @@ angular.module('ot.view.branch', [
         $scope.toggleAutoRefresh = function () {
             $scope.autoRefresh = !$scope.autoRefresh;
             localStorage.setItem('autoRefresh', $scope.autoRefresh);
+        };
+
+        // Filtering of the validation stamps
+        $scope.filterValidationStamps = function () {
+            otValidationStampFilterService.selectValidationStampFilter($scope.branch, $scope.validationStampSelection).then(function (selection) {
+                $scope.validationStampSelection = selection;
+                otValidationStampFilterService.saveSelection($scope.branch, selection);
+            });
+        };
+        $scope.validationStampFilter = function (validationStamp) {
+            return !$scope.validationStampSelection || $scope.validationStampSelection.indexOf(validationStamp.name) >= 0;
+        };
+        $scope.validationStampRunViewFilter = function (validationStampRunView) {
+            return $scope.validationStampFilter(validationStampRunView.validationStamp);
+        };
+        $scope.validationStampFilterCount = function (plus) {
+            if ($scope.validationStampCollection) {
+                return plus + $scope.validationStampCollection.resources.filter($scope.validationStampFilter).length;
+            } else {
+                return plus;
+            }
         };
 
         // Selected builds
@@ -168,6 +192,8 @@ angular.module('ot.view.branch', [
                         $scope.templateDefinition = templateDefinition;
                     });
                 }
+                // Initial validation stamp selection
+                $scope.validationStampSelection = otValidationStampFilterService.loadSelection($scope.branch);
                 // Branch commands
                 view.commands = [
                     {

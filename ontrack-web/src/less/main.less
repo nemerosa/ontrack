@@ -719,6 +719,34 @@ a.ot-application-info-error {
  * Branch build view
  */
 
+.ot-branch-build-view-validation-stamp-filter {
+  .btn;
+  &.ot-branch-build-view-validation-stamp-filter-enabled {
+    .btn-warning;
+  }
+  &.ot-branch-build-view-validation-stamp-filter-disabled {
+    .btn-default;
+  }
+}
+
+.ot-branch-build-view-validation-stamp-filter-item {
+  margin-left: 2em;
+  margin-right: 2em;
+  padding: 0.25em;
+  border: solid 1px gray;
+  border-radius: 0.5em;
+  cursor: pointer;
+  &.ot-branch-build-view-validation-stamp-filter-item-selected {
+    background-color: @brand-success;
+  }
+  &:hover {
+    background-color: @brand-info;
+  }
+  + .ot-branch-build-view-validation-stamp-filter-item {
+    margin-top: 0.5em;
+  }
+}
+
 .ot-branch-build-view-auto-refresh {
   .btn;
   &.ot-branch-build-view-auto-refresh-enabled {

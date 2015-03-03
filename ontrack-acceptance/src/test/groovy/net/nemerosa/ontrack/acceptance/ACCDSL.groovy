@@ -156,8 +156,36 @@ class ACCDSL extends AcceptanceTestClient {
                 validationStamp 'SMOKE', 'Smoke tests'
             }
         }
+        // Checks the project does exist
+        def p = ontrack.project(project)
+        assert p.name == project
+        assert p.description == ''
         // Checks the branch does exist
-        assert ontrack.branch(project, '1.0').name == '1.0'
+        def branch = ontrack.branch(project, '1.0')
+        assert branch.name == '1.0'
+        assert branch.description == ''
+        // Checks the structure
+        assert ontrack.promotionLevel(project, '1.0', 'COPPER').name == 'COPPER'
+        assert ontrack.validationStamp(project, '1.0', 'SMOKE').name == 'SMOKE'
+    }
+
+    @Test
+    void 'Definition of a project and a branch with description'() {
+        def project = uid('P')
+        ontrack.project(project, 'My project') {
+            branch('1.0', 'My branch') {
+                promotionLevel 'COPPER', 'Copper promotion'
+                validationStamp 'SMOKE', 'Smoke tests'
+            }
+        }
+        // Checks the project does exist
+        def p = ontrack.project(project)
+        assert p.name == project
+        assert p.description == 'My project'
+        // Checks the branch does exist
+        def branch = ontrack.branch(project, '1.0')
+        assert branch.name == '1.0'
+        assert branch.description == 'My branch'
         // Checks the structure
         assert ontrack.promotionLevel(project, '1.0', 'COPPER').name == 'COPPER'
         assert ontrack.validationStamp(project, '1.0', 'SMOKE').name == 'SMOKE'
@@ -239,6 +267,132 @@ class ACCDSL extends AcceptanceTestClient {
         // Checks the Git branch of the instance
         def property = instance.config.gitBranch
         assert property.branch == 'feature/test'
+    }
+
+    @Test
+    void 'Definition of a project and a branch template as an automator'() {
+        // GitHub configuration
+        def configName = uid('GH')
+        ontrack.configure {
+            gitHub configName, repository: 'nemerosa/ontrack', indexationInterval: 0
+        }
+        // Creation of a controller
+        def userName = uid('A')
+        doCreateAutomation(userName, 'pwd')
+        // Connects using this controller
+        ontrack = getOntrackAs(userName, 'pwd')
+        // Creation of the project and branch template
+        def project = uid('P')
+        ontrack.project(project) {
+            config {
+                gitHub configName
+            }
+            branch('template') {
+                promotionLevel 'COPPER', 'Copper promotion'
+                promotionLevel 'BRONZE', 'Bronze promotion', {
+                    image ACCDSL.class.getResource('/gold.png')
+                }
+                validationStamp 'SMOKE', 'Smoke tests'
+                validationStamp 'CI', 'CI tests', {
+                    image ACCDSL.class.getResource('/gold.png')
+                }
+                // Git branch
+                config {
+                    gitBranch '${gitBranch}'
+                }
+                // Template definition
+                template {
+                    parameter 'gitBranch', 'Name of the Git branch'
+                }
+            }
+        }
+        // Creates an instance
+        ontrack.branch(project, 'template').instance 'TEST', [
+                gitBranch: 'feature/test'
+        ]
+        // Checks the created instance
+        def instance = ontrack.branch(project, 'TEST')
+        assert instance.id > 0
+        assert instance.name == 'TEST'
+        // Checks the Git branch of the instance
+        def property = instance.config.gitBranch
+        assert property.branch == 'feature/test'
+    }
+
+    @Test
+    void 'Defining and updating a template'() {
+        // GitHub configuration
+        def configName = uid('GH')
+        ontrack.configure {
+            gitHub configName, repository: 'nemerosa/ontrack', indexationInterval: 0
+        }
+        // Creation of a controller
+        def userName = uid('A')
+        doCreateAutomation(userName, 'pwd')
+        // Connects using this controller
+        ontrack = getOntrackAs(userName, 'pwd')
+        // Creation of the project and branch template
+        def project = uid('P')
+        ontrack.project(project) {
+            config {
+                gitHub configName
+            }
+            branch('template', '', true) {
+                promotionLevel 'COPPER', 'Copper promotion', true
+                validationStamp 'SMOKE', 'Smoke tests', true
+                // Git branch
+                config {
+                    gitBranch '${gitBranch}'
+                }
+                // Template definition
+                template {
+                    parameter 'gitBranch', 'Name of the Git branch'
+                }
+            }
+        }
+        // Creates an instance
+        ontrack.branch(project, 'template').instance 'TEST', [
+                gitBranch: 'feature/test'
+        ]
+        // Checks the created instance
+        def instance = ontrack.branch(project, 'TEST')
+        assert instance.id > 0
+        assert instance.name == 'TEST'
+        // Checks the Git branch of the instance
+        def property = instance.config.gitBranch
+        assert property.branch == 'feature/test'
+
+        // Updates the template
+        ontrack.project(project) {
+            config {
+                gitHub configName
+            }
+            branch('template', '', true) {
+                promotionLevel 'COPPER', 'Copper promotion', true
+                promotionLevel 'BRONZE', 'Bronze promotion', true, {
+                    image ACCDSL.class.getResource('/gold.png')
+                }
+                validationStamp 'SMOKE', 'Smoke tests', true
+                validationStamp 'CI', 'CI tests', true, {
+                    image ACCDSL.class.getResource('/gold.png')
+                }
+                // Git branch
+                config {
+                    gitBranch '${gitBranch}'
+                }
+                // Template definition
+                template {
+                    parameter 'gitBranch', 'Name of the Git branch'
+                }
+            }
+        }
+
+        // Updating the instance
+        ontrack.branch(project, 'template').instance 'TEST', [
+                gitBranch: 'feature/test'
+        ]
+        assert ontrack.promotionLevel(project, 'TEST', 'BRONZE') != null
+        assert ontrack.validationStamp(project, 'TEST', 'CI') != null
     }
 
     @Test

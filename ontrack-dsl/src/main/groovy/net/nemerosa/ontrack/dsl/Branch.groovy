@@ -62,34 +62,58 @@ class Branch extends AbstractProjectResource {
         ontrack.delete(link('templateInstanceDisconnect'))
     }
 
-    PromotionLevel promotionLevel(String name, String description = '') {
-        new PromotionLevel(
-                ontrack,
-                ontrack.post(link('createPromotionLevel'), [
-                        name       : name,
-                        description: description
-                ])
-        )
+    PromotionLevel promotionLevel(String name, String description = '', boolean updateIfExists = false) {
+        def node = ontrack.get(link('promotionLevels')).resources.find { it.name == name }
+        if (node) {
+            if (updateIfExists) {
+                new PromotionLevel(
+                        ontrack,
+                        ontrack.get(node._self)
+                )
+            } else {
+                throw new ObjectAlreadyExistsException("Promotion level ${name} already exists.")
+            }
+        } else {
+            new PromotionLevel(
+                    ontrack,
+                    ontrack.post(link('createPromotionLevel'), [
+                            name       : name,
+                            description: description
+                    ])
+            )
+        }
     }
 
-    PromotionLevel promotionLevel(String name, String description = '', Closure closure) {
-        def pl = promotionLevel(name, description)
+    PromotionLevel promotionLevel(String name, String description = '', boolean updateIfExists = false, Closure closure) {
+        def pl = promotionLevel(name, description, updateIfExists)
         pl(closure)
         pl
     }
 
-    ValidationStamp validationStamp(String name, String description = '') {
-        new ValidationStamp(
-                ontrack,
-                ontrack.post(link('createValidationStamp'), [
-                        name       : name,
-                        description: description
-                ])
-        )
+    ValidationStamp validationStamp(String name, String description = '', boolean updateIfExists = false) {
+        def node = ontrack.get(link('validationStamps')).resources.find { it.name == name }
+        if (node) {
+            if (updateIfExists) {
+                new ValidationStamp(
+                        ontrack,
+                        ontrack.get(node._self)
+                )
+            } else {
+                throw new ObjectAlreadyExistsException("Validation stamp ${name} already exists.")
+            }
+        } else {
+            new ValidationStamp(
+                    ontrack,
+                    ontrack.post(link('createValidationStamp'), [
+                            name       : name,
+                            description: description
+                    ])
+            )
+        }
     }
 
-    ValidationStamp validationStamp(String name, String description = '', Closure closure) {
-        def vs = validationStamp(name, description)
+    ValidationStamp validationStamp(String name, String description = '', boolean updateIfExists = false, Closure closure) {
+        def vs = validationStamp(name, description, updateIfExists)
         vs(closure)
         vs
     }
