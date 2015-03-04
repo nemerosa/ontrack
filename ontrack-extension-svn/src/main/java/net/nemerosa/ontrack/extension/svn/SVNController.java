@@ -275,7 +275,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
         // Gets the change log
         SVNChangeLog changeLog = changeLogService.changeLog(request);
         // Gets the files
-        SVNChangeLogFiles changeLogFiles = changeLogFiles(changeLog.getUuid());
+        SVNChangeLogFiles changeLogFiles = changeLogService.getChangeLogFiles(changeLog);
         // Diff export
         String diff = scmService.diff(
                 changeLogFiles.getList(),

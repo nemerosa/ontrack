@@ -322,11 +322,13 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
 
     @Override
     public String getDiff(SVNRepository repository, SVNChangeLogFile changeLogFile) {
-        return svnClient.getDiff(
-                repository,
-                changeLogFile.getPath(),
-                changeLogFile.getChanges().stream().map(change -> change.getRevisionInfo().getRevision()).collect(Collectors.toList())
-        );
+        try (Transaction ignored = transactionService.start()) {
+            return svnClient.getDiff(
+                    repository,
+                    changeLogFile.getPath(),
+                    changeLogFile.getChanges().stream().map(change -> change.getRevisionInfo().getRevision()).collect(Collectors.toList())
+            );
+        }
     }
 
     @Override
