@@ -208,6 +208,8 @@ angular.module('ontrack.extension.scm', [
             var patterns = filter ? filter.patterns : [];
             ot.pageCall($http.get(changeLog._diff, {
                 params: {
+                    from: changeLog.scmBuildFrom.buildView.build.id,
+                    to: changeLog.scmBuildTo.buildView.build.id,
                     patterns: patterns.join(',')
                 }
             }));

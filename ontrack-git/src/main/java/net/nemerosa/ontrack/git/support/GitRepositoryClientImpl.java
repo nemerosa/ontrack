@@ -256,6 +256,7 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
 
             // Formatting
             DiffFormatter formatter = new DiffFormatter(output);
+            formatter.setRepository(git.getRepository());
             entries.forEach(entry -> formatDiffEntry(formatter, entry));
 
             // OK
