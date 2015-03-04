@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropert
 import net.nemerosa.ontrack.extension.git.support.TagPattern
 import net.nemerosa.ontrack.extension.git.support.TagPatternBuildNameGitCommitLink
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
+import net.nemerosa.ontrack.extension.scm.service.SCMService
 import net.nemerosa.ontrack.git.GitRepositoryClient
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory
 import net.nemerosa.ontrack.git.model.GitTag
@@ -60,7 +61,8 @@ class GitBuildSyncIT {
                 mock(ApplicationLogService),
                 gitClientFactory,
                 mock(BuildGitCommitLinkService),
-                [], scmService
+                [],
+                mock(SCMService)
         )
     }
 
