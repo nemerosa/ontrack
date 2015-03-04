@@ -120,7 +120,7 @@ angular.module('ontrack.extension.scm', [
             }
         };
     })
-    .service('otScmChangelogFilechangefilterService', function ($q, $http, $modal,
+    .service('otScmChangelogFilechangefilterService', function ($q, $http, $modal, $interpolate,
                                                                 ot, otFormService) {
         var self = {};
 
@@ -208,21 +208,23 @@ angular.module('ontrack.extension.scm', [
 
         self.diffFileFilter = function (changeLog, filter) {
             var patterns = filter ? filter.patterns : [];
-            ot.pageCall($http.get(changeLog._diff, {
-                params: {
-                    from: changeLog.scmBuildFrom.buildView.build.id,
-                    to: changeLog.scmBuildTo.buildView.build.id,
-                    patterns: patterns.join(',')
-                }
+            var params = {
+                from: changeLog.scmBuildFrom.buildView.build.id,
+                to: changeLog.scmBuildTo.buildView.build.id,
+                patterns: patterns.join(',')
+            };ot.pageCall($http.get(changeLog._diff, {
+                params: params
             })).then(function (diff) {
+                var link = changeLog._diff;
+                link += $interpolate('?from={{from}}&to={{to}}&patterns={{patterns}}')(params);
                 $modal.open({
                     templateUrl: 'app/extension/scm/dialog.scmDiff.tpl.html',
                     controller: 'otExtensionScmDialogDiff',
                     resolve: {
                         config: function () {
                             return {
-                                diff: diff
-                                // TODO Link
+                                diff: diff,
+                                link: link
                             };
                         }
                     }
