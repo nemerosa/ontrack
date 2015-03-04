@@ -72,8 +72,8 @@ public interface GitService {
      * Scans the whole history of a repository.
      *
      * @param branchConfiguration Repository branch to scan
-     * @param scanFunction  Function that scans the commits. Returns <code>true</code> if the scan
-     *                      must not go on, <code>false</code> otherwise.
+     * @param scanFunction        Function that scans the commits. Returns <code>true</code> if the scan
+     *                            must not go on, <code>false</code> otherwise.
      * @return <code>true</code> if at least one call to <code>scanFunction</code> has returned <code>true</code>.
      */
     boolean scanCommits(GitBranchConfiguration branchConfiguration, Predicate<RevCommit> scanFunction);
@@ -100,4 +100,9 @@ public interface GitService {
      * Gets the list of remote branches, as defined under <code>ref/heads</code>.
      */
     List<String> getRemoteBranches(GitConfiguration gitConfiguration);
+
+    /**
+     * Gets a diff on a list of file changes, filtering the changes using ANT-like patterns
+     */
+    String diff(GitChangeLog changeLog, List<String> patterns);
 }

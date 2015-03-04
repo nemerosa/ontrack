@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.git.support;
 
 import com.google.common.collect.Lists;
 import net.nemerosa.ontrack.common.Time;
+import net.nemerosa.ontrack.common.Utils;
 import net.nemerosa.ontrack.git.GitRepository;
 import net.nemerosa.ontrack.git.GitRepositoryClient;
 import net.nemerosa.ontrack.git.exceptions.GitRepositoryAPIException;
@@ -16,6 +17,7 @@ import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
+import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.lib.*;
 import org.eclipse.jgit.revplot.PlotCommitList;
 import org.eclipse.jgit.revplot.PlotLane;
@@ -28,6 +30,7 @@ import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.eclipse.jgit.treewalk.AbstractTreeIterator;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -228,6 +231,49 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
                     .collect(Collectors.toList());
         } catch (GitAPIException e) {
             throw new GitRepositoryAPIException(repository.getRemote(), e);
+        }
+    }
+
+    @Override
+    public String unifiedDiff(String from, String to, Predicate<String> pathFilter) {
+        try {
+            GitRange range = range(from, to);
+
+            // Diff command
+            List<DiffEntry> entries = git.diff()
+                    .setShowNameAndStatusOnly(true)
+                    .setOldTree(getTreeIterator(range.getFrom().getId()))
+                    .setNewTree(getTreeIterator(range.getTo().getId()))
+                    .call();
+
+            // Filtering the entries
+            entries = entries.stream()
+                    .filter(entry -> pathFilter.test(entry.getOldPath()) || pathFilter.test(entry.getNewPath()))
+                    .collect(Collectors.toList());
+
+            // Output
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+            // Formatting
+            DiffFormatter formatter = new DiffFormatter(output);
+            formatter.setRepository(git.getRepository());
+            entries.forEach(entry -> formatDiffEntry(formatter, entry));
+
+            // OK
+            return Utils.toString(output.toByteArray());
+
+        } catch (GitAPIException e) {
+            throw new GitRepositoryAPIException(repository.getRemote(), e);
+        } catch (IOException e) {
+            throw new GitRepositoryIOException(repository.getRemote(), e);
+        }
+    }
+
+    private void formatDiffEntry(DiffFormatter formatter, DiffEntry entry) {
+        try {
+            formatter.format(entry);
+        } catch (IOException e) {
+            throw new GitRepositoryIOException(repository.getRemote(), e);
         }
     }
 

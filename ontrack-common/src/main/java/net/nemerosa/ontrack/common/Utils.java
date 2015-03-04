@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -91,5 +92,16 @@ public final class Utils {
             buf.append(Integer.toHexString(b));
         }
         return buf.toString();
+    }
+
+    /**
+     * UTF-8 bytes as String
+     */
+    public static String toString(byte[] bytes) {
+        try {
+            return new String(bytes, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new Error("UTF-8 is unsupported.");
+        }
     }
 }

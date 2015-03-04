@@ -1,5 +1,6 @@
 angular.module('ontrack.extension.scm', [
-    'ot.service.form'
+    'ot.service.form',
+    'ontrack.extension.scm.dialog.diff'
 ])
     .directive('otScmChangelogBuild', function () {
         return {
@@ -115,10 +116,17 @@ angular.module('ontrack.extension.scm', [
                     $scope.submitPattern(undefined);
                 };
                 $scope.shareFileFilter = otScmChangelogFilechangefilterService.shareFileFilter;
+                $scope.diffFileFilter = function (changeLog, filter) {
+                    $scope.diffComputing = true;
+                    otScmChangelogFilechangefilterService.diffFileFilter(changeLog, filter).finally(function () {
+                        $scope.diffComputing = false;
+                    });
+                };
             }
         };
     })
-    .service('otScmChangelogFilechangefilterService', function ($q, $http, ot, otFormService) {
+    .service('otScmChangelogFilechangefilterService', function ($q, $http, $modal, $interpolate,
+                                                                ot, otFormService) {
         var self = {};
 
         function loadStore(project) {
@@ -200,6 +208,33 @@ angular.module('ontrack.extension.scm', [
             })).then(function (sharedFilter) {
                 angular.copy(sharedFilter, filter);
                 filter.shared = true;
+            });
+        };
+
+        self.diffFileFilter = function (changeLog, filter) {
+            var patterns = filter ? filter.patterns : [];
+            var params = {
+                from: changeLog.scmBuildFrom.buildView.build.id,
+                to: changeLog.scmBuildTo.buildView.build.id,
+                patterns: patterns.join(',')
+            };
+            return ot.pageCall($http.get(changeLog._diff, {
+                params: params
+            })).then(function (diff) {
+                var link = changeLog._diff;
+                link += $interpolate('?from={{from}}&to={{to}}&patterns={{patterns}}')(params);
+                $modal.open({
+                    templateUrl: 'app/extension/scm/dialog.scmDiff.tpl.html',
+                    controller: 'otExtensionScmDialogDiff',
+                    resolve: {
+                        config: function () {
+                            return {
+                                diff: diff,
+                                link: link
+                            };
+                        }
+                    }
+                });
             });
         };
 

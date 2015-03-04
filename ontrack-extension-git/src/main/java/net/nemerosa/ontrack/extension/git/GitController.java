@@ -4,6 +4,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
+import net.nemerosa.ontrack.extension.api.model.FileDiffChangeLogRequest;
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest;
 import net.nemerosa.ontrack.extension.git.model.*;
 import net.nemerosa.ontrack.extension.git.service.GitConfigurationService;
@@ -256,6 +257,25 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
         } else {
             throw new SCMChangeLogUUIDException(uuid);
         }
+    }
+
+    /**
+     * File diff change log
+     */
+    @RequestMapping(value = "changelog/diff", method = RequestMethod.GET)
+    public ResponseEntity<String> diff(FileDiffChangeLogRequest request) {
+        // Gets the change log
+        GitChangeLog changeLog = gitService.changeLog(request);
+        // Diff export
+        String diff = gitService.diff(
+                changeLog,
+                request.getPatterns()
+        );
+        // Content type
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("Content-Type", "text/plain");
+        // Body and headers
+        return new ResponseEntity<>(diff, responseHeaders, HttpStatus.OK);
     }
 
     /**

@@ -15,6 +15,7 @@ import net.nemerosa.ontrack.extension.issues.model.IssueServiceNotConfiguredExce
 import net.nemerosa.ontrack.extension.scm.model.SCMBuildView;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFileChangeType;
 import net.nemerosa.ontrack.extension.scm.service.AbstractSCMChangeLogService;
+import net.nemerosa.ontrack.extension.scm.service.SCMService;
 import net.nemerosa.ontrack.git.GitRepositoryClient;
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory;
 import net.nemerosa.ontrack.git.exceptions.GitRepositorySyncException;
@@ -57,6 +58,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     private final GitRepositoryClientFactory gitRepositoryClientFactory;
     private final BuildGitCommitLinkService buildGitCommitLinkService;
     private final Collection<GitConfigurator> gitConfigurators;
+    private final SCMService scmService;
 
     @Autowired
     public GitServiceImpl(
@@ -69,7 +71,8 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             ApplicationLogService applicationLogService,
             GitRepositoryClientFactory gitRepositoryClientFactory,
             BuildGitCommitLinkService buildGitCommitLinkService,
-            Collection<GitConfigurator> gitConfigurators) {
+            Collection<GitConfigurator> gitConfigurators,
+            SCMService scmService) {
         super(structureService, propertyService);
         this.propertyService = propertyService;
         this.issueServiceRegistry = issueServiceRegistry;
@@ -80,6 +83,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         this.gitRepositoryClientFactory = gitRepositoryClientFactory;
         this.buildGitCommitLinkService = buildGitCommitLinkService;
         this.gitConfigurators = gitConfigurators;
+        this.scmService = scmService;
     }
 
     @Override
@@ -454,6 +458,26 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     public List<String> getRemoteBranches(GitConfiguration configuration) {
         GitRepositoryClient gitClient = gitRepositoryClientFactory.getClient(configuration.getGitRepository());
         return gitClient.getRemoteBranches();
+    }
+
+    @Override
+    public String diff(GitChangeLog changeLog, List<String> patterns) {
+        // Gets the client client for this configuration`
+        GitRepositoryClient gitClient = getGitRepositoryClient(changeLog.getProject());
+        // Path predicate
+        Predicate<String> pathFilter = scmService.getPathFilter(patterns);
+        // Gets the build boundaries
+        Build buildFrom = changeLog.getFrom().getBuild();
+        Build buildTo = changeLog.getTo().getBuild();
+        // Commit boundaries
+        String commitFrom = getCommitFromBuild(buildFrom);
+        String commitTo = getCommitFromBuild(buildTo);
+        // Gets the diff
+        return gitClient.unifiedDiff(
+                commitFrom,
+                commitTo,
+                pathFilter
+        );
     }
 
     private OntrackGitCommitInfo getOntrackGitCommitInfo(String commit) {

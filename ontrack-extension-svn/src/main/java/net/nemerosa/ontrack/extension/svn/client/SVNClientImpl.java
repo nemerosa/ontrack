@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.svn.client;
 
+import net.nemerosa.ontrack.common.Time;
+import net.nemerosa.ontrack.common.Utils;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFileChangeType;
 import net.nemerosa.ontrack.extension.svn.db.SVNEventDao;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
@@ -9,7 +11,6 @@ import net.nemerosa.ontrack.extension.svn.model.SVNReference;
 import net.nemerosa.ontrack.extension.svn.model.SVNRevisionPath;
 import net.nemerosa.ontrack.extension.svn.support.SVNLogEntryCollector;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
-import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.tx.Transaction;
 import net.nemerosa.ontrack.tx.TransactionService;
 import org.apache.commons.lang3.StringUtils;
@@ -21,6 +22,7 @@ import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.wc.*;
 
+import java.io.ByteArrayOutputStream;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -224,6 +226,30 @@ public class SVNClientImpl implements SVNClient {
             throw translateSVNException(ex);
         }
         return results;
+    }
+
+    @Override
+    public String getDiff(SVNRepository repository, String path, List<Long> revisions) {
+        SVNRevision min = SVNRevision.create(revisions.stream().min(Long::compare).get() - 1);
+        SVNRevision max = SVNRevision.create(revisions.stream().max(Long::compare).get());
+
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+        try {
+            getDiffClient(repository).doDiff(
+                    SVNUtils.toURL(repository.getUrl(path)),
+                    max,
+                    min,
+                    max,
+                    SVNDepth.EMPTY,
+                    false,
+                    output
+            );
+        } catch (SVNException ex) {
+            throw translateSVNException(ex);
+        }
+
+        return Utils.toString(output.toByteArray());
     }
 
     private SCMChangeLogFileChangeType toFileChangeType(SVNStatusType modificationType) {
