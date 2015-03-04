@@ -1,5 +1,6 @@
 angular.module('ontrack.extension.scm', [
-    'ot.service.form'
+    'ot.service.form',
+    'ontrack.extension.scm.dialog.diff'
 ])
     .directive('otScmChangelogBuild', function () {
         return {
@@ -119,7 +120,8 @@ angular.module('ontrack.extension.scm', [
             }
         };
     })
-    .service('otScmChangelogFilechangefilterService', function ($q, $http, ot, otFormService) {
+    .service('otScmChangelogFilechangefilterService', function ($q, $http, $modal,
+                                                                ot, otFormService) {
         var self = {};
 
         function loadStore(project) {
@@ -212,8 +214,20 @@ angular.module('ontrack.extension.scm', [
                     to: changeLog.scmBuildTo.buildView.build.id,
                     patterns: patterns.join(',')
                 }
-            }));
-            // TODO Displays the diff result
+            })).then(function (diff) {
+                $modal.open({
+                    templateUrl: 'app/extension/scm/dialog.scmDiff.tpl.html',
+                    controller: 'otExtensionScmDialogDiff',
+                    resolve: {
+                        config: function () {
+                            return {
+                                diff: diff
+                                // TODO Link
+                            };
+                        }
+                    }
+                });
+            });
         };
 
         self.filterFunction = function (patterns) {
