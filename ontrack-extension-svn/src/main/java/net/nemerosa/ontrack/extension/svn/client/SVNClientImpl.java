@@ -230,7 +230,7 @@ public class SVNClientImpl implements SVNClient {
 
     @Override
     public String getDiff(SVNRepository repository, String path, List<Long> revisions) {
-        SVNRevision min = SVNRevision.create(revisions.stream().min(Long::compare).get());
+        SVNRevision min = SVNRevision.create(revisions.stream().min(Long::compare).get() - 1);
         SVNRevision max = SVNRevision.create(revisions.stream().max(Long::compare).get());
 
         ByteArrayOutputStream output = new ByteArrayOutputStream();
