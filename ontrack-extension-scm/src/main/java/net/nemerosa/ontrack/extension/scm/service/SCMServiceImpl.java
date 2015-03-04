@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.scm.service;
 
+import com.google.common.base.Predicates;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFile;
 import org.springframework.stereotype.Service;
 
@@ -29,20 +30,24 @@ public class SCMServiceImpl implements SCMService {
 
     @Override
     public Predicate<String> getPathFilter(List<String> patterns) {
-        return path -> patterns.stream()
-                .map(pattern ->
-                                Pattern.compile(
-                                        "^" +
-                                                pattern
-                                                        .replace("**", "$MULTI$")
-                                                        .replace("*", "$SINGLE$")
-                                                        .replace("$SINGLE$", "[^\\/]+")
-                                                        .replace("$MULTI$", ".*") +
-                                                "$"
-                                )
-                ).anyMatch(
-                        pattern -> pattern.matcher(path).matches()
-                );
+        if (patterns == null || patterns.isEmpty()) {
+            return path -> true;
+        } else {
+            return path -> patterns.stream()
+                    .map(pattern ->
+                                    Pattern.compile(
+                                            "^" +
+                                                    pattern
+                                                            .replace("**", "$MULTI$")
+                                                            .replace("*", "$SINGLE$")
+                                                            .replace("$SINGLE$", "[^\\/]+")
+                                                            .replace("$MULTI$", ".*") +
+                                                    "$"
+                                    )
+                    ).anyMatch(
+                            pattern -> pattern.matcher(path).matches()
+                    );
+        }
     }
 
 }
