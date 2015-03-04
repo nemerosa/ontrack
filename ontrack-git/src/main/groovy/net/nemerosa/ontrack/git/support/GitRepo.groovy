@@ -39,6 +39,16 @@ class GitRepo {
         return output
     }
 
+    /**
+     * Creates or updates a file with some content, and optionally adds it to the index
+     */
+    void file(String path, String content, boolean add = true) {
+        new File(dir, path).text = content
+        if (add) {
+            git 'add', path
+        }
+    }
+
     void commit(def no, def message = '') {
         String fileName = "file${no}"
         cmd 'touch', fileName
