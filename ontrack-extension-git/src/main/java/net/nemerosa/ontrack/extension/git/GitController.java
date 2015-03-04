@@ -16,7 +16,6 @@ import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogIssue;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogUUIDException;
-import net.nemerosa.ontrack.extension.scm.service.SCMService;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.buildfilter.BuildDiff;
@@ -53,7 +52,6 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
 
     private final StructureService structureService;
     private final GitService gitService;
-    private final SCMService scmService;
     private final GitConfigurationService configurationService;
     private final IssueServiceRegistry issueServiceRegistry;
     private final SecurityService securityService;
@@ -64,13 +62,12 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
     public GitController(GitExtensionFeature feature,
                          StructureService structureService,
                          GitService gitService,
-                         SCMService scmService, GitConfigurationService configurationService,
+                         GitConfigurationService configurationService,
                          IssueServiceRegistry issueServiceRegistry,
                          SecurityService securityService) {
         super(feature);
         this.structureService = structureService;
         this.gitService = gitService;
-        this.scmService = scmService;
         this.configurationService = configurationService;
         this.issueServiceRegistry = issueServiceRegistry;
         this.securityService = securityService;
@@ -269,15 +266,11 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
     public ResponseEntity<String> diff(FileDiffChangeLogRequest request) {
         // Gets the change log
         GitChangeLog changeLog = gitService.changeLog(request);
-        // Gets the files
-        GitChangeLogFiles changeLogFiles = changeLogFiles(changeLog.getUuid());
-        // FIXME Diff export
-        String diff = "";
-//        String diff = scmService.diff(
-//                changeLogFiles.getList(),
-//                request.getPatterns(),
-//                changeLogFile -> gitService.getDiff(changeLogFile)
-//        );
+        // Diff export
+        String diff = gitService.diff(
+                changeLog,
+                request.getPatterns()
+        );
         // Content type
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("Content-Type", "text/plain");

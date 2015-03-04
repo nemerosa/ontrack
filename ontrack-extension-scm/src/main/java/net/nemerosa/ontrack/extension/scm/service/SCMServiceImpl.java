@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -13,8 +14,22 @@ public class SCMServiceImpl implements SCMService {
 
     @Override
     public <T extends SCMChangeLogFile> String diff(List<T> changeLogFiles, List<String> patterns, Function<T, String> diffFn) {
-        // Filter
-        List<Pattern> regexList = patterns.stream()
+        // Predicate
+        Predicate<String> pathFilter = getPathFilter(patterns);
+        // Gets all changes
+        return changeLogFiles.stream()
+                // Filters on path
+                .filter(changeLogFile -> pathFilter.test(changeLogFile.getPath()))
+                        // Collects the diffs
+                .map(diffFn)
+                        // Group together
+                .collect(Collectors.joining("\n"))
+                ;
+    }
+
+    @Override
+    public Predicate<String> getPathFilter(List<String> patterns) {
+        return path -> patterns.stream()
                 .map(pattern ->
                                 Pattern.compile(
                                         "^" +
@@ -25,18 +40,9 @@ public class SCMServiceImpl implements SCMService {
                                                         .replace("$MULTI$", ".*") +
                                                 "$"
                                 )
-                )
-                .collect(Collectors.toList());
-
-        // Gets all changes
-        return changeLogFiles.stream()
-                // Filters on path
-                .filter(changeLogFile -> regexList.stream().anyMatch(pattern -> pattern.matcher(changeLogFile.getPath()).matches()))
-                        // Collects the diffs
-                .map(diffFn)
-                        // Group together
-                .collect(Collectors.joining("\n"))
-                ;
+                ).anyMatch(
+                        pattern -> pattern.matcher(path).matches()
+                );
     }
 
 }

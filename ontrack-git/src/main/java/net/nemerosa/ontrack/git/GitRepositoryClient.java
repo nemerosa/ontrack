@@ -118,4 +118,14 @@ public interface GitRepositoryClient {
      * @return <code>true</code> if this is a valid commit-like entry, <code>false</code> otherwise
      */
     boolean isCommit(String commitish);
+
+    /**
+     * Gets the unified diff between two boundaries, for a given list of paths
+     *
+     * @param from       Commitish from
+     * @param to         Commitish to
+     * @param pathFilter Filter on the path
+     * @return Unified diff
+     */
+    String unifiedDiff(String from, String to, Predicate<String> pathFilter);
 }

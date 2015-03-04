@@ -60,7 +60,7 @@ class GitBuildSyncIT {
                 mock(ApplicationLogService),
                 gitClientFactory,
                 mock(BuildGitCommitLinkService),
-                []
+                [], scmService
         )
     }
 
