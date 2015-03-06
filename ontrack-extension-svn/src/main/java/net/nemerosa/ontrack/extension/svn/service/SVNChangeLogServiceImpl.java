@@ -67,6 +67,12 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
             // Gets the two builds
             Build buildFrom = structureService.getBuild(request.getFrom());
             Build buildTo = structureService.getBuild(request.getTo());
+            // Ordering of builds
+            if (buildFrom.id() > buildTo.id()) {
+                Build t = buildFrom;
+                buildFrom = buildTo;
+                buildTo = t;
+            }
             // Gets the two branches, for each build
             Branch branchFrom = buildFrom.getBranch();
             Branch branchTo = buildTo.getBranch();
@@ -79,8 +85,8 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
                     UUID.randomUUID().toString(),
                     branchFrom.getProject(),
                     svnRepository,
-                    getSCMBuildView(svnRepository, request.getFrom()),
-                    getSCMBuildView(svnRepository, request.getTo())
+                    getSCMBuildView(svnRepository, buildFrom.getId()),
+                    getSCMBuildView(svnRepository, buildTo.getId())
             );
         }
     }
