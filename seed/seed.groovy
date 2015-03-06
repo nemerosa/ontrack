@@ -67,42 +67,11 @@ if (['master', 'feature', 'release', 'hotfix'].contains(branchType)) {
         name "${PROJECT}/${PROJECT}-${NAME}"
     }
 
-    // Quick check job
+    // Build job
     job {
-        name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-01-quick"
-        logRotator(numToKeep = 40)
-        deliveryPipelineConfiguration('Commit', 'Quick check')
-        jdk 'JDK8u25'
-        scm {
-            git {
-                remote {
-                    url "git@github.com:nemerosa/ontrack.git"
-                    branch "origin/${BRANCH}"
-                }
-                localBranch "${BRANCH}"
-            }
-        }
-        triggers {
-            scm 'H/5 * * * *'
-        }
-        steps {
-            gradle 'versionDisplay test --info'
-        }
-        publishers {
-            archiveJunit("**/build/test-results/*.xml")
-            downstreamParameterized {
-                trigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-02-package", 'SUCCESS', false) {
-                    gitRevision(true)
-                }
-            }
-        }
-    }
-
-    // Package job
-    job {
-        name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-02-package"
-        logRotator(numToKeep = 40)
-        deliveryPipelineConfiguration('Commit', 'Package')
+        name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-build"
+        logRotator(-1, 40)
+        deliveryPipelineConfiguration('Commit', 'Build')
         jdk 'JDK8u25'
         scm {
             git {
@@ -114,8 +83,11 @@ if (['master', 'feature', 'release', 'hotfix'].contains(branchType)) {
                 localBranch "${BRANCH}"
             }
         }
+        triggers {
+            scm 'H/5 * * * *'
+        }
         steps {
-            gradle 'clean versionDisplay versionFile test integrationTest release  --info --profile'
+            gradle 'clean versionDisplay versionFile test integrationTest release  --info --profile --parallel'
             conditionalSteps {
                 condition {
                     status('SUCCESS', 'SUCCESS')
@@ -155,9 +127,9 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
     // Local acceptance job
 
     job {
-        name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-11-acceptance-local"
+        name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-acceptance-local"
         logRotator(numToKeep = 40)
-        deliveryPipelineConfiguration('Acceptance', 'Local acceptance')
+        deliveryPipelineConfiguration('Commit', 'Local acceptance')
         jdk 'JDK8u25'
         parameters {
             stringParam('VERSION_FULL', '', '')
@@ -202,7 +174,7 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
     // Docker push
 
     job {
-        name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-12-docker-push"
+        name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-docker-push"
         logRotator(numToKeep = 40)
         deliveryPipelineConfiguration('Acceptance', 'Docker push')
         jdk 'JDK8u25'
@@ -243,7 +215,7 @@ docker logout
     // Digital Ocean acceptance job
 
     job {
-        name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-13-acceptance-do"
+        name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-acceptance-do"
         logRotator(numToKeep = 40)
         deliveryPipelineConfiguration('Acceptance', 'Digital Ocean')
         jdk 'JDK8u25'
@@ -289,7 +261,7 @@ docker logout
         // Publish job
 
         job {
-            name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-21-publish"
+            name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-publish"
             logRotator(numToKeep = 40)
             deliveryPipelineConfiguration('Release', 'Publish')
             jdk 'JDK8u25'
@@ -348,7 +320,7 @@ ontrack.build('ontrack', '${NAME}', VERSION_BUILD).config {
         // Production deployment
 
         job {
-            name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-22-production"
+            name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-production"
             logRotator(numToKeep = 40)
             deliveryPipelineConfiguration('Release', 'Production')
             jdk 'JDK8u25'
@@ -384,7 +356,7 @@ ontrack.build('ontrack', '${NAME}', VERSION_BUILD).config {
         // Production acceptance test
 
         job {
-            name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-23-acceptance-production"
+            name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-acceptance-production"
             logRotator(numToKeep = 40)
             deliveryPipelineConfiguration('Release', 'Production acceptance')
             jdk 'JDK8u25'
@@ -429,7 +401,7 @@ ontrack.build('ontrack', '${NAME}', VERSION_BUILD).config {
         showChangeLog()
         updateInterval(5)
         pipelines {
-            component("ontrack-${NAME}", "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-01-quick")
+            component("ontrack-${NAME}", "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-build")
         }
     }
 
