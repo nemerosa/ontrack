@@ -439,7 +439,7 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
         RevCommit commitFrom = walk.parseCommit(oFrom);
         RevCommit commitTo = walk.parseCommit(oTo);
 
-        if (commitFrom.getCommitTime() < commitTo.getCommitTime()) {
+        if (commitFrom.getCommitTime() > commitTo.getCommitTime()) {
             RevCommit t = commitFrom;
             commitFrom = commitTo;
             commitTo = t;
