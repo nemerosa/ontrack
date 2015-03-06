@@ -155,6 +155,12 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             // Gets the two builds
             Build buildFrom = structureService.getBuild(request.getFrom());
             Build buildTo = structureService.getBuild(request.getTo());
+            // Ordering of builds
+            if (buildFrom.id() > buildTo.id()) {
+                Build t = buildFrom;
+                buildFrom = buildTo;
+                buildTo = t;
+            }
             // Gets the two associated projects
             Project project = buildFrom.getBranch().getProject();
             Project otherProject = buildTo.getBranch().getProject();
@@ -192,8 +198,8 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             return new GitChangeLog(
                     UUID.randomUUID().toString(),
                     project,
-                    getSCMBuildView(request.getFrom()),
-                    getSCMBuildView(request.getTo()),
+                    getSCMBuildView(buildFrom.getId()),
+                    getSCMBuildView(buildTo.getId()),
                     syncError
             );
         }

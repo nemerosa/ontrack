@@ -49,6 +49,16 @@ class GitRepo {
         }
     }
 
+    /**
+     * Deletes a file
+     */
+    void delete(String path) {
+        def file = new File(dir, path)
+        if (file.exists()) {
+            git 'rm', path
+        }
+    }
+
     void commit(def no, def message = '') {
         String fileName = "file${no}"
         cmd 'touch', fileName

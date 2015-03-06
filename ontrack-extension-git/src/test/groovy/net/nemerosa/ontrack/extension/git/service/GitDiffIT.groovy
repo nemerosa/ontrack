@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationProper
 import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.support.CommitBuildNameGitCommitLink
 import net.nemerosa.ontrack.extension.git.support.CommitLinkConfig
+import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFileChangeType
 import net.nemerosa.ontrack.git.support.GitRepo
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.security.GlobalSettings
@@ -53,12 +54,15 @@ class GitDiffIT extends AbstractServiceTestSupport {
             git 'init'
             file 'file1', 'Line 1\n'
             file 'file2', 'Line 1\n'
+            file 'file4', 'Line 1\n'
             git 'commit', '-m', 'Commit 1'
             file 'file1', 'Line 1\nLine 2\n'
             file 'file2', 'Line 1\n'
             git 'commit', '-m', 'Commit 2'
             file 'file1', 'Line 1\nLine 2\nLine 3\n'
             file 'file2', 'Line 1\nLine 2\n'
+            file 'file3', 'Line 1\nLine 2\n'
+            delete 'file4'
             git 'commit', '-m', 'Commit 3'
             git 'log', '--oneline', '--decorate'
         }
@@ -124,8 +128,9 @@ class GitDiffIT extends AbstractServiceTestSupport {
         // Getting the change log between build 1 and 3
         changeLog = asUser().with(project, ProjectView).call {
             BuildDiffRequest buildDiffRequest = new BuildDiffRequest()
-            buildDiffRequest.from = structureService.findBuildByName(project.name, branch.name, commits['1'] as String).get().id
-            buildDiffRequest.to = structureService.findBuildByName(project.name, branch.name, commits['3'] as String).get().id
+            // Invert boundaries on purpose, to test the absolute ordering of builds
+            buildDiffRequest.to = structureService.findBuildByName(project.name, branch.name, commits['1'] as String).get().id
+            buildDiffRequest.from = structureService.findBuildByName(project.name, branch.name, commits['3'] as String).get().id
             return gitService.changeLog(buildDiffRequest)
         }
     }
@@ -134,6 +139,27 @@ class GitDiffIT extends AbstractServiceTestSupport {
     void after() {
         repo.close()
     }
+
+    @Test
+    void 'File change indicator'() {
+        def changeLogFiles = gitService.getChangeLogFiles(changeLog)
+
+        // Updated file
+        def changeLogFile = changeLogFiles.list.find { it.path == 'file1' }
+        assert changeLogFile
+        assert changeLogFile.changeType == SCMChangeLogFileChangeType.MODIFIED
+
+        // Added file
+        changeLogFile = changeLogFiles.list.find { it.path == 'file3' }
+        assert changeLogFile
+        assert changeLogFile.changeType == SCMChangeLogFileChangeType.ADDED
+
+        // Deleted file
+        changeLogFile = changeLogFiles.list.find { it.path == 'file4' }
+        assert changeLogFile
+        assert changeLogFile.changeType == SCMChangeLogFileChangeType.DELETED
+    }
+
 
     @Test
     void 'Full diff'() {
@@ -154,6 +180,21 @@ index 3be9c81..c82de6a 100644
 @@ -1 +1,2 @@
  Line 1
 +Line 2
+diff --git a/file3 b/file3
+new file mode 100644
+index 0000000..c82de6a
+--- /dev/null
++++ b/file3
+@@ -0,0 +1,2 @@
++Line 1
++Line 2
+diff --git a/file4 b/file4
+deleted file mode 100644
+index 3be9c81..0000000
+--- a/file4
++++ /dev/null
+@@ -1 +0,0 @@
+-Line 1
 ''', diff
     }
 
