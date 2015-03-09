@@ -4,5 +4,6 @@
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
 
     <logger name="net.nemerosa.ontrack" level="DEBUG"/>
+    <logger name="net.nemerosa.ontrack.boot.metrics" level="TRACE"/>
 
 </configuration>

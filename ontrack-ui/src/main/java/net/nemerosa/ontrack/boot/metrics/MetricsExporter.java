@@ -5,12 +5,14 @@ import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.metrics.Metric;
 import org.springframework.boot.actuate.metrics.export.MetricCopyExporter;
 import org.springframework.boot.actuate.metrics.reader.MetricReader;
 import org.springframework.boot.actuate.metrics.writer.MetricWriter;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.Collection;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -32,6 +34,8 @@ public class MetricsExporter extends MetricCopyExporter {
                         .setNameFormat("metrics-exporter-%d")
                         .build()
         );
+        logger.debug("Metrics reader: {}", reader);
+        logger.debug("Metrics writer: {}", writer);
     }
 
     @PostConstruct
@@ -46,4 +50,13 @@ public class MetricsExporter extends MetricCopyExporter {
         }, config.getMetricsPeriod(), config.getMetricsPeriod(), TimeUnit.SECONDS);
     }
 
+    @Override
+    protected void write(String group, Collection<Metric<?>> values) {
+        if (logger.isTraceEnabled()) {
+            for (Metric<?> metric : values) {
+                logger.trace("Metric: {}#{} = {}", group, metric.getName(), metric.getValue());
+            }
+        }
+        super.write(group, values);
+    }
 }
