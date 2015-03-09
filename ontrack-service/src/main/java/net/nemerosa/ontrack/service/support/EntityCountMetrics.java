@@ -25,7 +25,15 @@ public class EntityCountMetrics implements PublicMetrics {
     public Collection<Metric<?>> metrics() {
         return Arrays.asList(
                 new Metric<>("counter.entity.project", repository.getProjectCount()),
-                new Metric<>("counter.entity.branch", repository.getBranchCount())
+                new Metric<>("counter.entity.branch", repository.getBranchCount()),
+                new Metric<>("counter.entity.build", repository.getBuildCount()),
+                new Metric<>("counter.entity.promotionLevel", repository.getPromotionLevelCount()),
+                new Metric<>("counter.entity.promotionRun", repository.getPromotionRunCount()),
+                new Metric<>("counter.entity.validationStamp", repository.getValidationStampCount()),
+                new Metric<>("counter.entity.validationRun", repository.getValidationRunCount()),
+                new Metric<>("counter.entity.validationRunStatus", repository.getValidationRunStatusCount()),
+                new Metric<>("counter.entity.property", repository.getPropertyCount()),
+                new Metric<>("counter.entity.event", repository.getEventCount())
         );
     }
 

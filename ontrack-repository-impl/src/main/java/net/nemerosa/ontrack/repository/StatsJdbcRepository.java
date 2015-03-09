@@ -29,4 +29,68 @@ public class StatsJdbcRepository extends AbstractJdbcRepository implements Stats
                 Integer.class
         );
     }
+
+    @Override
+    public int getBuildCount() {
+        return getJdbcTemplate().queryForObject(
+                "SELECT COUNT(*) FROM BUILDS",
+                Integer.class
+        );
+    }
+
+    @Override
+    public int getPromotionLevelCount() {
+        return getJdbcTemplate().queryForObject(
+                "SELECT COUNT(*) FROM PROMOTION_LEVELS",
+                Integer.class
+        );
+    }
+
+    @Override
+    public int getPromotionRunCount() {
+        return getJdbcTemplate().queryForObject(
+                "SELECT COUNT(*) FROM PROMOTION_RUNS",
+                Integer.class
+        );
+    }
+
+    @Override
+    public int getValidationStampCount() {
+        return getJdbcTemplate().queryForObject(
+                "SELECT COUNT(*) FROM VALIDATION_STAMPS",
+                Integer.class
+        );
+    }
+
+    @Override
+    public int getValidationRunCount() {
+        return getJdbcTemplate().queryForObject(
+                "SELECT COUNT(*) FROM VALIDATION_RUNS",
+                Integer.class
+        );
+    }
+
+    @Override
+    public int getValidationRunStatusCount() {
+        return getJdbcTemplate().queryForObject(
+                "SELECT COUNT(*) FROM VALIDATION_RUN_STATUSES",
+                Integer.class
+        );
+    }
+
+    @Override
+    public int getPropertyCount() {
+        return getJdbcTemplate().queryForObject(
+                "SELECT COUNT(*) FROM PROPERTIES",
+                Integer.class
+        );
+    }
+
+    @Override
+    public int getEventCount() {
+        return getJdbcTemplate().queryForObject(
+                "SELECT COUNT(*) FROM EVENTS",
+                Integer.class
+        );
+    }
 }

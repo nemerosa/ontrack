@@ -5,5 +5,22 @@ package net.nemerosa.ontrack.repository;
  */
 public interface StatsRepository {
     int getProjectCount();
+
     int getBranchCount();
+
+    int getBuildCount();
+
+    int getPromotionLevelCount();
+
+    int getPromotionRunCount();
+
+    int getValidationStampCount();
+
+    int getValidationRunCount();
+
+    int getValidationRunStatusCount();
+
+    int getPropertyCount();
+
+    int getEventCount();
 }
