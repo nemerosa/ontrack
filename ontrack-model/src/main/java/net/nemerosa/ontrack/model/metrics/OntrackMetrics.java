@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.service.metrics;
+package net.nemerosa.ontrack.model.metrics;
 
 import org.springframework.boot.actuate.endpoint.PublicMetrics;
 

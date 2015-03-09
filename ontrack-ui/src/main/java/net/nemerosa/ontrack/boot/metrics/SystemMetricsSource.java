@@ -1,5 +1,6 @@
-package net.nemerosa.ontrack.service.metrics;
+package net.nemerosa.ontrack.boot.metrics;
 
+import net.nemerosa.ontrack.model.metrics.MetricsSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.endpoint.PublicMetrics;
 import org.springframework.boot.actuate.metrics.Metric;

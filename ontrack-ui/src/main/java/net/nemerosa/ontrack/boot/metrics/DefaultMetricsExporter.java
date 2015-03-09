@@ -1,6 +1,7 @@
-package net.nemerosa.ontrack.service.metrics;
+package net.nemerosa.ontrack.boot.metrics;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import net.nemerosa.ontrack.model.metrics.MetricsSource;
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,5 +1,6 @@
-package net.nemerosa.ontrack.service.metrics;
+package net.nemerosa.ontrack.boot.metrics;
 
+import net.nemerosa.ontrack.model.metrics.OntrackMetrics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.metrics.Metric;
 import org.springframework.boot.autoconfigure.jdbc.metadata.DataSourcePoolMetadata;
