@@ -57,7 +57,7 @@ public class DataSourceMetrics {
             } catch (RuntimeException ex) {
                 logger.error("RuntimeException thrown from {}#report. Exception was suppressed.", DataSourceMetrics.this.getClass().getSimpleName(), ex);
             }
-        }, config.getGraphitePeriod(), config.getGraphitePeriod(), TimeUnit.SECONDS);
+        }, config.getMetricsPeriod(), config.getMetricsPeriod(), TimeUnit.SECONDS);
     }
 
     protected void report() {
