@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.model.structure;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,7 @@ import net.nemerosa.ontrack.model.buildfilter.BuildDiff;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
+@JsonPropertyOrder(alphabetic = true)
 public class PromotionRun implements ProjectEntity {
 
     private final ID id;
