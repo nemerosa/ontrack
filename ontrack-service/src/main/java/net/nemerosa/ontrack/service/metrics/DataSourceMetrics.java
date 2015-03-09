@@ -1,7 +1,6 @@
-package net.nemerosa.ontrack.boot.metrics;
+package net.nemerosa.ontrack.service.metrics;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.endpoint.PublicMetrics;
 import org.springframework.boot.actuate.metrics.Metric;
 import org.springframework.boot.autoconfigure.jdbc.metadata.DataSourcePoolMetadata;
 import org.springframework.boot.autoconfigure.jdbc.metadata.DataSourcePoolMetadataProvider;
@@ -15,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class DataSourceMetrics implements PublicMetrics {
+public class DataSourceMetrics implements OntrackMetrics {
 
     private final Map<String, DataSource> dataSources;
     private final DataSourcePoolMetadataProviders provider;

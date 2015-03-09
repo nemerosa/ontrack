@@ -1,11 +1,10 @@
-package net.nemerosa.ontrack.boot.metrics;
+package net.nemerosa.ontrack.service.metrics;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.endpoint.PublicMetrics;
 import org.springframework.boot.actuate.metrics.Metric;
 import org.springframework.boot.actuate.metrics.export.AbstractMetricExporter;
 import org.springframework.boot.actuate.metrics.writer.DropwizardMetricWriter;
@@ -19,19 +18,20 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Component
-public class MetricsExporter extends AbstractMetricExporter {
+public class OntrackMetricsExporter extends AbstractMetricExporter {
 
-    private final Logger logger = LoggerFactory.getLogger(MetricsExporter.class);
+    private final Logger logger = LoggerFactory.getLogger(OntrackMetricsExporter.class);
+
     private final OntrackConfigProperties config;
-    private final ScheduledExecutorService executor;
-    private final Collection<PublicMetrics> publicMetricsList;
+    private final Collection<OntrackMetrics> ontrackMetrics;
     private final DropwizardMetricWriter metricWriter;
+    private final ScheduledExecutorService executor;
 
     @Autowired
-    public MetricsExporter(OntrackConfigProperties config, Collection<PublicMetrics> publicMetricsList, DropwizardMetricWriter metricWriter) {
+    public OntrackMetricsExporter(OntrackConfigProperties config, Collection<OntrackMetrics> ontrackMetrics, DropwizardMetricWriter metricWriter) {
         super("");
         this.config = config;
-        this.publicMetricsList = publicMetricsList;
+        this.ontrackMetrics = ontrackMetrics;
         this.metricWriter = metricWriter;
         this.executor = Executors.newSingleThreadScheduledExecutor(
                 new ThreadFactoryBuilder()
@@ -56,7 +56,7 @@ public class MetricsExporter extends AbstractMetricExporter {
 
     @Override
     protected Iterable<Metric<?>> next(String group) {
-        return publicMetricsList.stream().flatMap(p -> p.metrics().stream()).collect(Collectors.toList());
+        return ontrackMetrics.stream().flatMap(p -> p.metrics().stream()).collect(Collectors.toList());
     }
 
     @Override
@@ -68,4 +68,5 @@ public class MetricsExporter extends AbstractMetricExporter {
         logger.trace("{} -> {}", metric.getName(), metric.getValue());
         metricWriter.set(metric);
     }
+
 }
