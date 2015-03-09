@@ -18,21 +18,21 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Component
-public class OntrackMetricsExporter extends AbstractMetricExporter {
+public class DefaultMetricsExporter extends AbstractMetricExporter {
 
-    private final Logger logger = LoggerFactory.getLogger(OntrackMetricsExporter.class);
+    private final Logger logger = LoggerFactory.getLogger(DefaultMetricsExporter.class);
 
     private final OntrackConfigProperties config;
-    private final Collection<OntrackMetrics> ontrackMetrics;
     private final DropwizardMetricWriter metricWriter;
     private final ScheduledExecutorService executor;
+    private final Collection<MetricsSource> metricsSources;
 
     @Autowired
-    public OntrackMetricsExporter(OntrackConfigProperties config, Collection<OntrackMetrics> ontrackMetrics, DropwizardMetricWriter metricWriter) {
+    public DefaultMetricsExporter(OntrackConfigProperties config, DropwizardMetricWriter metricWriter, Collection<MetricsSource> metricsSources) {
         super("");
         this.config = config;
-        this.ontrackMetrics = ontrackMetrics;
         this.metricWriter = metricWriter;
+        this.metricsSources = metricsSources;
         this.executor = Executors.newSingleThreadScheduledExecutor(
                 new ThreadFactoryBuilder()
                         .setDaemon(true)
@@ -56,7 +56,7 @@ public class OntrackMetricsExporter extends AbstractMetricExporter {
 
     @Override
     protected Iterable<Metric<?>> next(String group) {
-        return ontrackMetrics.stream().flatMap(p -> p.metrics().stream()).collect(Collectors.toList());
+        return metricsSources.stream().flatMap(MetricsSource::getMetrics).collect(Collectors.toList());
     }
 
     @Override
