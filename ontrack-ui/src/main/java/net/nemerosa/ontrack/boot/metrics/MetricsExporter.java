@@ -5,10 +5,10 @@ import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.endpoint.PublicMetrics;
 import org.springframework.boot.actuate.metrics.Metric;
-import org.springframework.boot.actuate.metrics.export.MetricCopyExporter;
-import org.springframework.boot.actuate.metrics.reader.MetricReader;
-import org.springframework.boot.actuate.metrics.writer.MetricWriter;
+import org.springframework.boot.actuate.metrics.export.AbstractMetricExporter;
+import org.springframework.boot.actuate.metrics.writer.DropwizardMetricWriter;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -16,26 +16,29 @@ import java.util.Collection;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Component
-public class MetricsExporter extends MetricCopyExporter {
+public class MetricsExporter extends AbstractMetricExporter {
 
     private final Logger logger = LoggerFactory.getLogger(MetricsExporter.class);
     private final OntrackConfigProperties config;
     private final ScheduledExecutorService executor;
+    private final Collection<PublicMetrics> publicMetricsList;
+    private final DropwizardMetricWriter metricWriter;
 
     @Autowired
-    public MetricsExporter(MetricReader reader, MetricWriter writer, OntrackConfigProperties config) {
-        super(reader, writer);
+    public MetricsExporter(OntrackConfigProperties config, Collection<PublicMetrics> publicMetricsList, DropwizardMetricWriter metricWriter) {
+        super("");
         this.config = config;
+        this.publicMetricsList = publicMetricsList;
+        this.metricWriter = metricWriter;
         this.executor = Executors.newSingleThreadScheduledExecutor(
                 new ThreadFactoryBuilder()
                         .setDaemon(true)
                         .setNameFormat("metrics-exporter-%d")
                         .build()
         );
-        logger.debug("Metrics reader: {}", reader);
-        logger.debug("Metrics writer: {}", writer);
     }
 
     @PostConstruct
@@ -43,6 +46,7 @@ public class MetricsExporter extends MetricCopyExporter {
         logger.info("Scheduling export of metrics");
         executor.scheduleAtFixedRate(() -> {
             try {
+                logger.trace("Exporting...");
                 export();
             } catch (RuntimeException ex) {
                 logger.error("RuntimeException thrown from {}#export. Exception was suppressed.", getClass().getSimpleName(), ex);
@@ -51,12 +55,17 @@ public class MetricsExporter extends MetricCopyExporter {
     }
 
     @Override
+    protected Iterable<Metric<?>> next(String group) {
+        return publicMetricsList.stream().flatMap(p -> p.metrics().stream()).collect(Collectors.toList());
+    }
+
+    @Override
     protected void write(String group, Collection<Metric<?>> values) {
-        if (logger.isTraceEnabled()) {
-            for (Metric<?> metric : values) {
-                logger.trace("Metric: {}#{} = {}", group, metric.getName(), metric.getValue());
-            }
-        }
-        super.write(group, values);
+        values.forEach(this::write);
+    }
+
+    private void write(Metric<?> metric) {
+        logger.trace("{} -> {}", metric.getName(), metric.getValue());
+        metricWriter.set(metric);
     }
 }
