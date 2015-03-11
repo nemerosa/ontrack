@@ -12,6 +12,8 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 
+import java.time.ZoneId
+
 import static net.nemerosa.ontrack.test.TestUtils.uid
 
 /**
@@ -1070,6 +1072,25 @@ class ACCDSL extends AcceptanceTestClient {
             svn name, url: 'http://localhost'
         }
         assert ontrack.config.svn.findAll { it == name } == [name]
+    }
+
+    @Test
+    void 'Change build signature'() {
+        // Creates a build
+        def name = uid('P')
+        ontrack.project(name) {
+            branch('Test') {
+                build('1')
+            }
+        }
+        // Changes the signature
+        Date date = new Date()
+        ontrack.build(name, 'Test', '1').signature 'Other', date
+        // Checks the build
+        def signature = ontrack.build(name, 'Test', '1').node.signature
+        assert signature.user.name == 'Other'
+        // I want the JDK8 Date/time API in Groovy :'(
+        // assert signature.time == date
     }
 
     @Test

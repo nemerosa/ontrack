@@ -281,7 +281,7 @@ public class StructureServiceImpl implements StructureService {
         // Event
         eventPostService.post(eventFactory.updateBuild(savedBuild));
         // OK
-        return savedBuild;
+        return getBuild(build.getId());
     }
 
     private void validationSignatureChange(Build build) {

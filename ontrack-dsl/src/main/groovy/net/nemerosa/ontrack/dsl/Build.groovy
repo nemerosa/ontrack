@@ -68,4 +68,20 @@ class Build extends AbstractProjectResource {
     BuildProperties getConfig() {
         new BuildProperties(ontrack, this)
     }
+
+    /**
+     * Sets the signature of the build. This method is granted only for users having the
+     * <code>ProjectEdit</code> function: administrators, project owners, project managers.
+     *
+     * Date is expected to be UTC.
+     */
+    def signature(String user = null, Date date = null) {
+        ontrack.put(
+                link('signature'),
+                [
+                        user: user,
+                        time: date ? date.format("yyyy-MM-dd'T'HH:mm:ss") : null
+                ]
+        )
+    }
 }
