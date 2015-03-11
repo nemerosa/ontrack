@@ -1,16 +1,20 @@
 package net.nemerosa.ontrack.model.structure;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.experimental.Wither;
 import net.nemerosa.ontrack.model.buildfilter.BuildDiff;
 import net.nemerosa.ontrack.model.form.Form;
 
 @Data
+@AllArgsConstructor
 public class Build implements ProjectEntity {
 
     private final ID id;
     private final String name;
     private final String description;
+    @Wither
     private final Signature signature;
     @JsonView({Build.class, BuildView.class, PromotionRun.class, ValidationRun.class, BuildDiff.class})
     private final Branch branch;
