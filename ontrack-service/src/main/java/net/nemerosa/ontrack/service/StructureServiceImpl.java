@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -271,6 +272,8 @@ public class StructureServiceImpl implements StructureService {
         isEntityDefined(build.getBranch().getProject(), "Project must be defined");
         // Security
         securityService.checkProjectFunction(build.getBranch().getProject().id(), BuildEdit.class);
+        // Signature change check
+        validationSignatureChange(build);
         // Build validation
         validateBuild(build);
         // Repository
@@ -279,6 +282,16 @@ public class StructureServiceImpl implements StructureService {
         eventPostService.post(eventFactory.updateBuild(savedBuild));
         // OK
         return savedBuild;
+    }
+
+    private void validationSignatureChange(Build build) {
+        // Get the original build signature
+        Build orig = getBuild(build.getId());
+        // Compares the signatures
+        if (!Objects.equals(orig.getSignature(), build.getSignature())) {
+            // Checks the authorisation
+            securityService.checkProjectFunction(build, ProjectEdit.class);
+        }
     }
 
     @Override
