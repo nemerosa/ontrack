@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.boot.resources;
 
 import net.nemerosa.ontrack.boot.ui.*;
-import net.nemerosa.ontrack.model.security.BuildDelete;
-import net.nemerosa.ontrack.model.security.BuildEdit;
-import net.nemerosa.ontrack.model.security.PromotionRunCreate;
-import net.nemerosa.ontrack.model.security.ValidationRunCreate;
+import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
@@ -57,6 +54,12 @@ public class BuildResourceDecorator extends AbstractResourceDecorator<Build> {
                 .link("_decorations", on(DecorationsController.class).getDecorations(build.getProjectEntityType(), build.getId()))
                         // Events
                 .link("_events", on(EventController.class).getEvents(build.getProjectEntityType(), build.getId(), 0, 10))
+                        // Signature change
+                .link(
+                        "_signature",
+                        on(BuildController.class).updateBuildSignatureForm(build.getId()),
+                        ProjectEdit.class, build
+                )
                         // OK
                 .build();
     }
