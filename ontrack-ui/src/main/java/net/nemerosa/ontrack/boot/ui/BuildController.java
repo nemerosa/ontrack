@@ -165,7 +165,7 @@ public class BuildController extends AbstractResourceController {
     /**
      * Update the build signature
      */
-    @RequestMapping(value = "builds/{buildId}/update", method = RequestMethod.PUT)
+    @RequestMapping(value = "builds/{buildId}/signature", method = RequestMethod.PUT)
     public Build updateBuildSignature(@PathVariable ID buildId, @RequestBody SignatureRequest request) {
         // Gets from the repository
         Build build = structureService.getBuild(buildId);
