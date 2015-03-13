@@ -110,7 +110,7 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
                     'FIXME', 'TODO', '@Deprecated', true
             )
             downstreamParameterized {
-                trigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-11-acceptance-local", 'SUCCESS', false) {
+                trigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-acceptance-local", 'SUCCESS', false) {
                     propertiesFile('build/version.properties')
                 }
             }
@@ -144,12 +144,12 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
             archiveJunit('ontrack-acceptance.xml')
             if (branchType == 'release') {
                 downstreamParameterized {
-                    trigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-12-docker-push", 'SUCCESS', false) {
+                    trigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-docker-push", 'SUCCESS', false) {
                         currentBuild()
                     }
                 }
             } else {
-                buildPipelineTrigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-12-docker-push") {
+                buildPipelineTrigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-docker-push") {
                     parameters {
                         currentBuild()
                     }
@@ -197,7 +197,7 @@ docker logout
         }
         publishers {
             downstreamParameterized {
-                trigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-13-acceptance-do", 'SUCCESS', false) {
+                trigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-acceptance-do", 'SUCCESS', false) {
                     currentBuild()
                 }
             }
@@ -290,7 +290,7 @@ docker logout
 """
             }
             publishers {
-                buildPipelineTrigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-22-production") {
+                buildPipelineTrigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-production") {
                     parameters {
                         currentBuild()
                     }
@@ -338,7 +338,7 @@ ontrack.build('ontrack', '${NAME}', VERSION_BUILD).config {
             }
             publishers {
                 downstreamParameterized {
-                    trigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-23-acceptance-production", 'SUCCESS', false) {
+                    trigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-acceptance-production", 'SUCCESS', false) {
                         currentBuild()
                     }
                 }
