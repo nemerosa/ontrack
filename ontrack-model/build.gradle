@@ -9,6 +9,7 @@ dependencies {
     compile libraries.spring_boot
     compile libraries.validation_api
     compile libraries.slf4j_api
+    compile libraries.spring_boot_starter_actuator
 
     testCompile libraries.groovy
     testCompile project(':ontrack-test-utils')

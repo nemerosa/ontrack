@@ -46,7 +46,7 @@ public class MetricsConfig {
                 "[metrics] Starting Graphite reporting to {}:{}",
                 config.getGraphiteHost(),
                 config.getGraphitePort());
-        reporter.start(config.getGraphitePeriod(), TimeUnit.SECONDS);
+        reporter.start(config.getMetricsPeriod(), TimeUnit.SECONDS);
         return reporter;
     }
 

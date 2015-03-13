@@ -277,9 +277,11 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         // Update
         try {
             getNamedParameterJdbcTemplate().update(
-                    "UPDATE BUILDS SET NAME = :name, DESCRIPTION = :description WHERE ID = :id",
+                    "UPDATE BUILDS SET NAME = :name, DESCRIPTION = :description, CREATION = :creation, CREATOR = :creator WHERE ID = :id",
                     params("name", build.getName())
                             .addValue("description", build.getDescription())
+                            .addValue("creation", dateTimeForDB(build.getSignature().getTime()))
+                            .addValue("creator", build.getSignature().getUser().getName())
                             .addValue("id", build.id())
             );
             return build;

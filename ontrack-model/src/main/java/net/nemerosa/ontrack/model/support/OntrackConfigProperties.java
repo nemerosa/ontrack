@@ -33,8 +33,8 @@ public class OntrackConfigProperties {
     private int graphitePort = 2003;
 
     /**
-     * Graphite refresh period (in seconds)
+     * Metrics refresh period (in seconds)
      */
-    private int graphitePeriod = 60;
+    private int metricsPeriod = 60;
 
 }

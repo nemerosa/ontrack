@@ -152,6 +152,33 @@ public class BuildController extends AbstractResourceController {
         return build;
     }
 
+    /**
+     * Update form for the build signature.
+     */
+    @RequestMapping(value = "builds/{buildId}/signature", method = RequestMethod.GET)
+    public Form updateBuildSignatureForm(@PathVariable ID buildId) {
+        return SignatureRequest.of(
+                structureService.getBuild(buildId).getSignature()
+        ).asForm();
+    }
+
+    /**
+     * Update the build signature
+     */
+    @RequestMapping(value = "builds/{buildId}/signature", method = RequestMethod.PUT)
+    public Build updateBuildSignature(@PathVariable ID buildId, @RequestBody SignatureRequest request) {
+        // Gets from the repository
+        Build build = structureService.getBuild(buildId);
+        // Updates
+        build = build.withSignature(
+            request.getSignature(build.getSignature())
+        );
+        // Saves in repository
+        structureService.saveBuild(build);
+        // As resource
+        return build;
+    }
+
     @RequestMapping(value = "builds/{buildId}", method = RequestMethod.DELETE)
     public Ack deleteBuild(@PathVariable ID buildId) {
         return structureService.deleteBuild(buildId);

@@ -156,7 +156,7 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
     @Override
     public GitLog graph(String from, String to) {
         try {
-            GitRange range = range(from, to);
+            GitRange range = range(from, to, false);
             PlotWalk walk = new PlotWalk(git.getRepository());
 
             // Log
@@ -429,6 +429,10 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
     }
 
     protected GitRange range(String from, String to) throws IOException {
+        return range(from, to, true);
+    }
+
+    protected GitRange range(String from, String to, boolean reorder) throws IOException {
         Repository gitRepository = git.getRepository();
 
         ObjectId oFrom = gitRepository.resolve(from);
@@ -439,7 +443,7 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
         RevCommit commitFrom = walk.parseCommit(oFrom);
         RevCommit commitTo = walk.parseCommit(oTo);
 
-        if (commitFrom.getCommitTime() > commitTo.getCommitTime()) {
+        if (reorder && commitFrom.getCommitTime() > commitTo.getCommitTime()) {
             RevCommit t = commitFrom;
             commitFrom = commitTo;
             commitTo = t;
