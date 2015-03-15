@@ -33,7 +33,8 @@ angular.module('ot.view.branch', [
         var refreshTaskName = 'Branch build view refresh';
         $scope.$watch('autoRefresh', function () {
             if ($scope.autoRefresh) {
-                otTaskService.register(refreshTaskName, refreshBuildView, 30 * 1000);
+                // 1 minute interval
+                otTaskService.register(refreshTaskName, refreshBuildView, 60 * 1000);
             } else {
                 otTaskService.stop(refreshTaskName);
             }

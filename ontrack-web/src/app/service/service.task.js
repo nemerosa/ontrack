@@ -12,12 +12,20 @@ angular.module('ot.service.task', [
          * @param interval Interval (in milliseconds) between each run
          */
         self.register = function (name, taskFn, interval) {
+            $log.debug('[task] Registering "' + name + '" with interval ' + interval);
             // Task object
             var task = {
                 name: name,
                 run: function () {
-                    $log.debug('[task] Launching ' + name);
-                    taskFn();
+                    if (!task.running) {
+                        try {
+                            task.running = true;
+                            $log.debug('[task] Launching "' + name + "'");
+                            taskFn();
+                        } finally {
+                            task.running = false;
+                        }
+                    }
                 }
             };
             // Puts in the map
