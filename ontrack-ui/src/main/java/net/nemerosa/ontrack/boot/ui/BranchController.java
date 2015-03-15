@@ -358,6 +358,14 @@ public class BranchController extends AbstractResourceController {
     }
 
     /**
+     * Sync. this template instance against its template definition
+     */
+    @RequestMapping(value = "branches/{branchId}/sync", method = RequestMethod.POST)
+    public Ack syncTemplateInstance(@PathVariable ID branchId) {
+        return branchTemplateService.syncInstance(branchId);
+    }
+
+    /**
      * Gets the form to create a template instance using a name.
      */
     @RequestMapping(value = "branches/{branchId}/template", method = RequestMethod.GET)

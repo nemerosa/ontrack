@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service.support.template;
 
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.exceptions.*;
 import net.nemerosa.ontrack.model.job.*;
 import net.nemerosa.ontrack.model.security.BranchTemplateMgt;
@@ -277,6 +278,41 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
     @Override
     public BranchTemplateSyncResults sync(ID branchId) {
         return syncTemplateDefinition(branchId, logger::info);
+    }
+
+    @Override
+    public Ack syncInstance(ID branchId) {
+        // Loads the instance
+        Branch instance = structureService.getBranch(branchId);
+        if (securityService.isProjectFunctionGranted(instance, BranchTemplateMgt.class) ||
+                securityService.isProjectFunctionGranted(instance, BranchTemplateSync.class)) {
+            // Checks this is an instance
+            TemplateInstance templateInstance = getTemplateInstance(branchId).orElseThrow(() ->
+                            new BranchNotTemplateInstanceException(branchId)
+            );
+            // Gets the template definition
+            TemplateDefinition templateDefinition = getTemplateDefinition(templateInstance.getTemplateDefinitionId()).orElseThrow(() ->
+                            new BranchNotTemplateDefinitionException(templateInstance.getTemplateDefinitionId())
+            );
+            // Template branch
+            Branch template = structureService.getBranch(templateInstance.getTemplateDefinitionId());
+            // Now, we have to "run as" admin since the permission to sync was granted
+            // but might not be enough to create branches and such.
+            updateTemplateInstance(
+                    instance.getName(),
+                    instance,
+                    template,
+                    new BranchTemplateInstanceSingleRequest(
+                            instance.getName(),
+                            true,
+                            templateInstance.getParameterMap()
+                    ),
+                    templateDefinition);
+            // OK
+            return Ack.OK;
+        } else {
+            throw new AccessDeniedException("Cannot synchronise branches.");
+        }
     }
 
     @Override
