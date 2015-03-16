@@ -74,6 +74,20 @@ angular.module('ot.service.template', [
         };
 
         /**
+         * Connect a branch to a template
+         */
+        self.templateInstanceConnect = function (templateInstanceConnectUri) {
+            return otFormService.display({
+                uri: templateInstanceConnectUri,
+                title: "Connection to a template",
+                submit: function (data) {
+                    console.log('data=', data);
+                    return true;
+                }
+            });
+        };
+
+        /**
          * Syncs a branch against its template
          */
         self.templateInstanceSync = function (templateInstanceSyncUri) {
