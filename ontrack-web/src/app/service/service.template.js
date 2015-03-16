@@ -81,7 +81,7 @@ angular.module('ot.service.template', [
                 title: "Template synchronisation",
                 message: "Do you really want to synchronise this branch from its template?"
             }).then(function () {
-                return ot.pageCall($http.delete(templateInstanceSyncUri));
+                return ot.pageCall($http.post(templateInstanceSyncUri));
             });
         };
 
