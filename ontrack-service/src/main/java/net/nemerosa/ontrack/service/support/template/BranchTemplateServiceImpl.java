@@ -298,16 +298,18 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
             Branch template = structureService.getBranch(templateInstance.getTemplateDefinitionId());
             // Now, we have to "run as" admin since the permission to sync was granted
             // but might not be enough to create branches and such.
-            updateTemplateInstance(
-                    instance.getName(),
-                    instance,
-                    template,
-                    new BranchTemplateInstanceSingleRequest(
-                            instance.getName(),
-                            true,
-                            templateInstance.getParameterMap()
-                    ),
-                    templateDefinition);
+            securityService.asAdmin(() ->
+                            updateTemplateInstance(
+                                    instance.getName(),
+                                    instance,
+                                    template,
+                                    new BranchTemplateInstanceSingleRequest(
+                                            instance.getName(),
+                                            true,
+                                            templateInstance.getParameterMap()
+                                    ),
+                                    templateDefinition)
+            );
             // OK
             return Ack.OK;
         } else {

@@ -451,6 +451,60 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
     }
 
     @Test
+    void 'Instance sync - mgt granted'() {
+        doInstanceSync(BranchTemplateMgt)
+    }
+
+    @Test
+    void 'Instance sync - sync granted'() {
+        doInstanceSync(BranchTemplateSync)
+    }
+
+    @Test(expected = AccessDeniedException)
+    void 'Instance sync - not granted'() {
+        doInstanceSync(ProjectView)
+    }
+
+    protected void doInstanceSync(Class<? extends ProjectFunction> fn) {
+        // Creates a template definition
+        Branch template = createBranchTemplateDefinition()
+
+        // Creates a single template
+        Branch instance = asUser().with(template, BranchTemplateMgt).call {
+            templateService.createTemplateInstance(
+                    template.id,
+                    new BranchTemplateInstanceSingleRequest(
+                            'instance',
+                            false, // Auto
+                            [:]
+                    )
+            )
+        }
+
+        // Changes the template definition
+        asUser().with(template, ProjectEdit).call {
+            // Creates a few promotion levels
+            structureService.newPromotionLevel(
+                    PromotionLevel.of(
+                            template,
+                            nd('GOLD', 'Branch ${BRANCH} promoted to NFT.')
+                    )
+            )
+        }
+
+        // Re-sync the instance
+        asUser().with(template, fn).call {
+            assert templateService.syncInstance(instance.id).success
+        }
+
+        // Checks the new promotion level
+        asUser().with(template, ProjectView).call {
+            assert structureService.findPromotionLevelByName(instance.project.name, instance.name, 'GOLD').present
+        }
+    }
+
+    @Test
+
     void 'Sync - new branches'() {
         // Creating the template
         Branch template = createBranchTemplateDefinition()
