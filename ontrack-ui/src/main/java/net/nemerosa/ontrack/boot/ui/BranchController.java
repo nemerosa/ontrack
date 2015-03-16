@@ -455,7 +455,7 @@ public class BranchController extends AbstractResourceController {
      *
      * @param branchId Branch to connect
      */
-    @RequestMapping(value = "branches/{branchId}/template/connect", method = RequestMethod.GET)
+    @RequestMapping(value = "branches/{branchId}/template/connect", method = RequestMethod.POST)
     public Branch connectTemplateInstance(@PathVariable ID branchId, @RequestBody BranchTemplateInstanceConnectRequest request) {
         return branchTemplateService.connectTemplateInstance(branchId, request);
     }
