@@ -259,6 +259,18 @@ angular.module('ot.view.branch', [
                     },
                     {
                         condition: function () {
+                            return branchResource._templateInstanceConnect;
+                        },
+                        id: 'templateInstanceConnect',
+                        name: "Connect to template",
+                        cls: 'ot-command-branch-template-instance-connect',
+                        action: function () {
+                            otTemplateService.templateInstanceConnect(branchResource._templateInstanceConnect)
+                                .then(loadBranch);
+                        }
+                    },
+                    {
+                        condition: function () {
                             return branchResource._templateInstanceSync;
                         },
                         id: 'templateInstanceSync',
