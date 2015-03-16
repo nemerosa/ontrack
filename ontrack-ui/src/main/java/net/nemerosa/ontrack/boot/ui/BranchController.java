@@ -21,10 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
 import javax.validation.Valid;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static net.nemerosa.ontrack.boot.ui.UIUtils.requestParametersToJson;
@@ -450,11 +447,22 @@ public class BranchController extends AbstractResourceController {
      */
     @RequestMapping(value = "branches/{branchId}/template/connect", method = RequestMethod.GET)
     public Form connectTemplateInstance(@PathVariable ID branchId) {
-        // TODO List of templates
+        // List of templates
+        Collection<LoadedBranchTemplateDefinition> templateDefinitions = branchTemplateService.getTemplateDefinitions();
         // TODO List of sync form per template
         return Form.create()
                 ;
     }
+
+    /**
+     * Tries to connect an existing branch to a template
+     * @param branchId Branch to connect
+     */
+    @RequestMapping(value = "branches/{branchId}/template/connect", method = RequestMethod.GET)
+    public Branch connectTemplateInstance(@PathVariable ID branchId, @RequestBody BranchTemplateInstanceConnectRequest request) {
+        return branchTemplateService.connectTemplateInstance(branchId, request);
+    }
+
 
     private BranchBuildView buildViewWithFilter(ID branchId, BuildFilter buildFilter) {
         // Gets the branch

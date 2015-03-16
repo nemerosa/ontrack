@@ -335,6 +335,12 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
         return structureService.getBranch(branchId);
     }
 
+    @Override
+    public Branch connectTemplateInstance(ID branchId, BranchTemplateInstanceConnectRequest request) {
+        // FIXME Method net.nemerosa.ontrack.service.support.template.BranchTemplateServiceImpl.connectTemplateInstance
+        return structureService.getBranch(branchId);
+    }
+
     protected BranchTemplateSyncResults syncTemplateDefinition(ID branchId, JobInfoListener info) {
         // Gets the branch
         Branch branch = structureService.getBranch(branchId);

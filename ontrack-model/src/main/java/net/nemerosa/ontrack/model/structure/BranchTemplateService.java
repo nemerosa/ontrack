@@ -61,4 +61,13 @@ public interface BranchTemplateService {
      * Disconnects the branch from any template definition, if any.
      */
     Branch disconnectTemplateInstance(ID branchId);
+
+    /**
+     * Connects an existing branch to a template
+     *
+     * @param branchId Branch to connect
+     * @param request  Connection request
+     * @return Connected branch
+     */
+    Branch connectTemplateInstance(ID branchId, BranchTemplateInstanceConnectRequest request);
 }
