@@ -206,6 +206,7 @@ public class CoreResourceModuleTest {
                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:BRANCH,1,0,10")
                         .with("_templateInstance", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getTemplateInstance:1")
                         .with("_templateInstanceDisconnect", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#disconnectTemplateInstance:1")
+                        .with("_templateInstanceSync", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#syncTemplateInstance:1")
                         .end(),
                 b
         );
