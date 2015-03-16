@@ -178,6 +178,15 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                         branch.getType() == BranchType.TEMPLATE_INSTANCE
                                 && resourceContext.isProjectFunctionGranted(branch, BranchTemplateMgt.class)
                 )
+                        // Template instance synchronisation
+                .link(
+                        "_templateInstanceSync",
+                        on(BranchController.class).syncTemplateInstance(branch.getId()),
+                        branch.getType() == BranchType.TEMPLATE_INSTANCE
+                                && (resourceContext.isProjectFunctionGranted(branch, BranchTemplateMgt.class)
+                                || resourceContext.isProjectFunctionGranted(branch, BranchTemplateSync.class)
+                        )
+                )
                         // OK
                 .build();
     }
