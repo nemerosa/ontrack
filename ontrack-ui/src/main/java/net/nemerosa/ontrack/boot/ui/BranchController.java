@@ -445,6 +445,17 @@ public class BranchController extends AbstractResourceController {
         return branchTemplateService.disconnectTemplateInstance(branchId);
     }
 
+    /**
+     * Gets the form to connect a branch to a template.
+     */
+    @RequestMapping(value = "branches/{branchId}/template/connect", method = RequestMethod.GET)
+    public Form connectTemplateInstance(@PathVariable ID branchId) {
+        // TODO List of templates
+        // TODO List of sync form per template
+        return Form.create()
+                ;
+    }
+
     private BranchBuildView buildViewWithFilter(ID branchId, BuildFilter buildFilter) {
         // Gets the branch
         Branch branch = getBranch(branchId);

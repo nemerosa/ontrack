@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.model.structure;
 
 import net.nemerosa.ontrack.model.Ack;
 
+import java.util.Collection;
 import java.util.Optional;
 
 public interface BranchTemplateService {
@@ -10,6 +11,11 @@ public interface BranchTemplateService {
      * Gets the template definition for a branch
      */
     Optional<TemplateDefinition> getTemplateDefinition(ID branchId);
+
+    /**
+     * Gets all template definitions
+     */
+    Collection<LoadedBranchTemplateDefinition> getTemplateDefinitions();
 
     /**
      * Sets the branch as a template definition or updates the existing definition.
