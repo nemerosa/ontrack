@@ -47,6 +47,10 @@ class Branch extends AbstractProjectResource {
         ontrack.post(link('templateSync'), [:])
     }
 
+    def syncInstance() {
+        ontrack.post(link('templateInstanceSync'), [:])
+    }
+
     Branch instance(String sourceName, Map<String, String> params) {
         new Branch(
                 ontrack,
