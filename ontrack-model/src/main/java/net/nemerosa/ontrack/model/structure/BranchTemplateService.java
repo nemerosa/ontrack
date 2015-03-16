@@ -14,8 +14,9 @@ public interface BranchTemplateService {
 
     /**
      * Gets all template definitions
+     * @param project
      */
-    Collection<LoadedBranchTemplateDefinition> getTemplateDefinitions();
+    Collection<LoadedBranchTemplateDefinition> getTemplateDefinitions(Project project);
 
     /**
      * Sets the branch as a template definition or updates the existing definition.

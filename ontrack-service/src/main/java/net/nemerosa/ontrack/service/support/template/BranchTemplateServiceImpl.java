@@ -52,12 +52,13 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
     }
 
     @Override
-    public Collection<LoadedBranchTemplateDefinition> getTemplateDefinitions() {
+    public Collection<LoadedBranchTemplateDefinition> getTemplateDefinitions(Project project) {
         return branchTemplateRepository.getTemplateDefinitions().stream()
                 .map(btd -> new LoadedBranchTemplateDefinition(
                         structureService.getBranch(btd.getBranchId()),
                         btd.getTemplateDefinition()
                 ))
+                .filter(lbtd -> (lbtd.getBranch().projectId() == project.id()))
                 .collect(Collectors.toList());
     }
 

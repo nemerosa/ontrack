@@ -378,26 +378,7 @@ public class BranchController extends AbstractResourceController {
                         .label("Source name")
                         .help("Name used to create the branch from.")
         );
-        // Parameters only if at least one is available
-        List<TemplateParameter> parameters = templateDefinition.get().getParameters();
-        if (!parameters.isEmpty()) {
-            // Auto expression
-            form = form.with(
-                    YesNo.of("manual")
-                            .label("Manual")
-                            .help("Do not use automatic expansion of parameters using the branch name.")
-                            .value(false)
-            );
-            // Template parameters
-            for (TemplateParameter parameter : parameters) {
-                form = form.with(
-                        Text.of(parameter.getName())
-                                .label(parameter.getName())
-                                .visibleIf("manual")
-                                .help(parameter.getDescription())
-                );
-            }
-        }
+        form.append(templateDefinition.get().getForm());
         // OK
         return form;
     }
@@ -447,15 +428,31 @@ public class BranchController extends AbstractResourceController {
      */
     @RequestMapping(value = "branches/{branchId}/template/connect", method = RequestMethod.GET)
     public Form connectTemplateInstance(@PathVariable ID branchId) {
+        // Loads the branch
+        Branch branch = structureService.getBranch(branchId);
         // List of templates
-        Collection<LoadedBranchTemplateDefinition> templateDefinitions = branchTemplateService.getTemplateDefinitions();
-        // TODO List of sync form per template
+        Collection<LoadedBranchTemplateDefinition> templateDefinitions = branchTemplateService.getTemplateDefinitions(branch.getProject());
+        // List of sync form per template
         return Form.create()
-                ;
+                .with(
+                        ServiceConfigurator.of("connectionRequest")
+                                .label("Template")
+                                .help("Template to connect to")
+                                .sources(
+                                        templateDefinitions.stream()
+                                                .map(lbtd -> new ServiceConfigurationSource(
+                                                        lbtd.getBranch().getId().toString(),
+                                                        lbtd.getBranch().getName(),
+                                                        lbtd.getForm()
+                                                ))
+                                                .collect(Collectors.toList())
+                                )
+                );
     }
 
     /**
      * Tries to connect an existing branch to a template
+     *
      * @param branchId Branch to connect
      */
     @RequestMapping(value = "branches/{branchId}/template/connect", method = RequestMethod.GET)

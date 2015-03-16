@@ -1,7 +1,11 @@
 package net.nemerosa.ontrack.model.structure;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Maps;
 import lombok.Data;
+import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.form.Text;
+import net.nemerosa.ontrack.model.form.YesNo;
 
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
@@ -75,5 +79,31 @@ public class TemplateDefinition {
      */
     public void checkCompilation(ExpressionEngine expressionEngine) {
         templateInstanceExecution("x", expressionEngine);
+    }
+
+    @JsonIgnore
+    public Form getForm() {
+        Form form = Form.create();
+        // Parameters only if at least one is available
+        if (!parameters.isEmpty()) {
+            // Auto expression
+            form = form.with(
+                    YesNo.of("manual")
+                            .label("Manual")
+                            .help("Do not use automatic expansion of parameters using the branch name.")
+                            .value(false)
+            );
+            // Template parameters
+            for (TemplateParameter parameter : parameters) {
+                form = form.with(
+                        Text.of(parameter.getName())
+                                .label(parameter.getName())
+                                .visibleIf("manual")
+                                .help(parameter.getDescription())
+                );
+            }
+        }
+        // OK
+        return form;
     }
 }
