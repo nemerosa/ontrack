@@ -259,6 +259,18 @@ angular.module('ot.view.branch', [
                     },
                     {
                         condition: function () {
+                            return branchResource._templateInstanceSync;
+                        },
+                        id: 'templateInstanceSync',
+                        name: "Sync w/ template",
+                        cls: 'ot-command-branch-template-instance-sync',
+                        action: function () {
+                            otTemplateService.templateInstanceSync(branchResource._templateInstanceSync)
+                                .then(loadBranch);
+                        }
+                    },
+                    {
+                        condition: function () {
                             return branchResource._disable;
                         },
                         id: 'disableBranch',
