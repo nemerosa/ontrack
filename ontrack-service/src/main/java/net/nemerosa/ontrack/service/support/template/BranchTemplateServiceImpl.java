@@ -338,7 +338,29 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
 
     @Override
     public Branch connectTemplateInstance(ID branchId, BranchTemplateInstanceConnectRequest request) {
-        // FIXME Method net.nemerosa.ontrack.service.support.template.BranchTemplateServiceImpl.connectTemplateInstance
+        // Gets the branch
+        Branch branch = structureService.getBranch(branchId);
+        // Checks it is not connected yet
+        if (branch.getType() != BranchType.CLASSIC) {
+            throw new BranchCannotConnectToTemplateException(branch.getName());
+        }
+        // Checks the rights
+        securityService.checkProjectFunction(branch, BranchTemplateMgt.class);
+        // Gets the template definition
+        ID templateId = ID.of(request.getTemplateId());
+        TemplateDefinition templateDefinition = getTemplateDefinition(templateId)
+                .orElseThrow(() -> new BranchNotTemplateDefinitionException(templateId));
+        // Loads the branch template
+        Branch template = structureService.getBranch(templateId);
+        // Update request
+        BranchTemplateInstanceSingleRequest instanceSingleRequest = new BranchTemplateInstanceSingleRequest(
+                branch.getName(),
+                request.isManual(),
+                request.getParameters()
+        );
+        // Updates the instance
+        updateTemplateInstance(branch.getName(), branch, template, instanceSingleRequest, templateDefinition);
+        // OK
         return structureService.getBranch(branchId);
     }
 
