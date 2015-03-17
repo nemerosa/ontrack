@@ -66,6 +66,17 @@ class Branch extends AbstractProjectResource {
         ontrack.delete(link('templateInstanceDisconnect'))
     }
 
+    def link(String templateName, boolean manual = true, Map<String, String> parameters) {
+        // Gets the template id
+        def templateId = ontrack.branch(project, templateName).id
+        // Sends the request
+        ontrack.post(link('templateInstanceConnect'), [
+                templateId: templateId,
+                manual: manual,
+                parameters: parameters,
+        ])
+    }
+
     PromotionLevel promotionLevel(String name, String description = '', boolean updateIfExists = false) {
         def node = ontrack.get(link('promotionLevels')).resources.find { it.name == name }
         if (node) {
