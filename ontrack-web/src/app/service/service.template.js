@@ -82,7 +82,21 @@ angular.module('ot.service.template', [
                 title: "Connection to a template",
                 submit: function (data) {
                     console.log('data=', data);
-                    return true;
+                    // Creation of the request
+                    var request = {};
+                    // Selected template
+                    request.templateId = parseInt(data.connectionRequest.id, 10);
+                    // Manual mode?
+                    request.manual = data.connectionRequest.data.manual;
+                    // Collections of parameters
+                    request.parameters = {};
+                    angular.forEach(data.connectionRequest.data, function (value, key) {
+                        if (key != 'manual') {
+                            request.parameters[key] = value;
+                        }
+                    });
+                    // Call
+                    return ot.pageCall($http.post(templateInstanceConnectUri, request));
                 }
             });
         };
