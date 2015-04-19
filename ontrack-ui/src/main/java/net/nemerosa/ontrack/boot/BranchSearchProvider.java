@@ -16,6 +16,8 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
+
 @Component
 public class BranchSearchProvider extends AbstractSearchProvider {
 
@@ -45,10 +47,10 @@ public class BranchSearchProvider extends AbstractSearchProvider {
                 .filter(Optional::isPresent).map(Optional::get)
                         // Creates the search result
                 .map(branch -> new SearchResult(
-                                branch.getName(),
-                                String.format("%s branch on project %s", branch.getName(), branch.getProject().getName()),
+                                format("%s / %s", branch.getProject().getName(), branch.getName()),
+                                format("%s branch on project %s", branch.getName(), branch.getProject().getName()),
                                 uri(MvcUriComponentsBuilder.on(BranchController.class).getBranch(branch.getId())),
-                                String.format("/branch/%d", branch.id()),
+                                format("/branch/%d", branch.id()),
                                 100
                         )
                 )
