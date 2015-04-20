@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.repository;
 
+import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.model.structure.PredefinedValidationStamp;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
@@ -11,6 +12,7 @@ import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class PredefinedValidationStampJdbcRepository extends AbstractJdbcRepository implements PredefinedValidationStampRepository {
@@ -23,7 +25,36 @@ public class PredefinedValidationStampJdbcRepository extends AbstractJdbcReposit
     @Override
     public List<PredefinedValidationStamp> getPredefinedValidationStamps() {
         return getJdbcTemplate().query(
-                "SELECT * FROM PREDEFINED_VALIDATION_STAMPS ORDER BY ORDERNB",
+                "SELECT * FROM PREDEFINED_VALIDATION_STAMPS ORDER BY NAME",
+                (rs, rowNum) -> toPredefinedValidationStamp(rs)
+        );
+    }
+
+    @Override
+    public ID newPredefinedValidationStamp(PredefinedValidationStamp stamp) {
+        return ID.of(
+                dbCreate(
+                        "INSERT INTO PREDEFINED_VALIDATION_STAMPS(NAME, DESCRIPTION) VALUES (:name, :description)",
+                        params("name", stamp.getName())
+                                .addValue("description", stamp.getDescription())
+                )
+        );
+    }
+
+    @Override
+    public PredefinedValidationStamp getPredefinedValidationStamp(ID id) {
+        return getNamedParameterJdbcTemplate().queryForObject(
+                "SELECT * FROM PREDEFINED_VALIDATION_STAMPS WHERE ID = :id",
+                params("id", id),
+                (rs, rowNum) -> toPredefinedValidationStamp(rs)
+        );
+    }
+
+    @Override
+    public Optional<PredefinedValidationStamp> findPredefinedValidationStampByName(String name) {
+        return getOptional(
+                "SELECT * FROM PREDEFINED_VALIDATION_STAMPS WHERE NAME = :name",
+                params("name", name),
                 (rs, rowNum) -> toPredefinedValidationStamp(rs)
         );
     }
