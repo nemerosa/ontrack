@@ -14,10 +14,10 @@ class Project extends AbstractProjectResource {
         closure()
     }
 
-    Branch branch(String name, String description = '', boolean updateIfExists = false) {
+    Branch branch(String name, String description = '', boolean getIfExists = false) {
         def node = ontrack.get(link('branches')).resources.find { it.name == name }
         if (node) {
-            if (updateIfExists) {
+            if (getIfExists) {
                 new Branch(
                         ontrack,
                         ontrack.get(node._self)
@@ -36,8 +36,8 @@ class Project extends AbstractProjectResource {
         }
     }
 
-    Branch branch(String name, String description = '', boolean updateIfExists = false, Closure closure) {
-        Branch b = branch(name, description, updateIfExists)
+    Branch branch(String name, String description = '', boolean getIfExists = false, Closure closure) {
+        Branch b = branch(name, description, getIfExists)
         b(closure)
         b
     }
