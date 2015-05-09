@@ -133,18 +133,28 @@ class Branch extends AbstractProjectResource {
         vs
     }
 
-    Build build(String name, String description = '') {
-        new Build(
-                ontrack,
-                ontrack.post(link('createBuild'), [
-                        name       : name,
-                        description: description
-                ])
-        )
+    Build build(String name, String description = '', boolean updateIfExists = false) {
+        def builds = ontrack.project(this.project).search(branchName: this.name, buildName: name)
+        if (builds.empty) {
+            new Build(
+                    ontrack,
+                    ontrack.post(link('createBuild'), [
+                            name       : name,
+                            description: description
+                    ])
+            )
+        } else if (updateIfExists) {
+            new Build(
+                    ontrack,
+                    ontrack.get(builds[0].node._self)
+            )
+        } else {
+            throw new ObjectAlreadyExistsException("Build ${name} already exists.")
+        }
     }
 
-    Build build(String name, String description = '', Closure closure) {
-        def b = build(name, description)
+    Build build(String name, String description = '', boolean updateIfExists = false, Closure closure) {
+        def b = build(name, description, updateIfExists)
         b(closure)
         b
     }
