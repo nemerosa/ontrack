@@ -143,7 +143,7 @@ echo "[LOCAL] Ontrack container created: ${ONTRACK_CID} (${ONTRACK_NAME})"
 echo "[LOCAL] Preparation of nginx..."
 
 # Generation of the Nginx image
-NGINX_IMAGE="dockerfile/nginx"
+NGINX_IMAGE="nginx"
 
 # Mounting directories for Nginx
 NGINX_MOUNT=${MOUNT}/nginx
