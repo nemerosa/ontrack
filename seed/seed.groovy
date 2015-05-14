@@ -33,14 +33,6 @@
 def LOCAL_REPOSITORY = '/var/lib/jenkins/repository/ontrack/2.0'
 
 /**
- * Folder for the project (making sure)
- */
-
-folder {
-    name PROJECT
-}
-
-/**
  * Branch
  */
 
@@ -382,8 +374,7 @@ ontrack.build('ontrack', '${NAME}', VERSION_BUILD).config {
 
     // Pipeline view
 
-    view(type: DeliveryPipelineView) {
-        name "Pipeline"
+    deliveryPipelineView('Pipeline') {
         pipelineInstances(4)
         enableManualTriggers()
         showChangeLog()
