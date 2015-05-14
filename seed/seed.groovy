@@ -63,8 +63,7 @@ if (['master', 'feature', 'release', 'hotfix'].contains(branchType)) {
     println "\tGenerating ${NAME}..."
 
     // Build job
-    job {
-        name "${PROJECT}-${NAME}-build"
+    freeStyleJob("${PROJECT}-${NAME}-build") {
         logRotator(-1, 40)
         deliveryPipelineConfiguration('Commit', 'Build')
         jdk 'JDK8u25'
@@ -121,8 +120,7 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
 
     // Local acceptance job
 
-    job {
-        name "${PROJECT}-${NAME}-acceptance-local"
+    freeStyleJob("${PROJECT}-${NAME}-acceptance-local") {
         logRotator(numToKeep = 40)
         deliveryPipelineConfiguration('Commit', 'Local acceptance')
         jdk 'JDK8u25'
@@ -168,8 +166,7 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
 
     // Docker push
 
-    job {
-        name "${PROJECT}-${NAME}-docker-push"
+    freeStyleJob("${PROJECT}-${NAME}-docker-push") {
         logRotator(numToKeep = 40)
         deliveryPipelineConfiguration('Acceptance', 'Docker push')
         jdk 'JDK8u25'
@@ -209,8 +206,7 @@ docker logout
 
     // Digital Ocean acceptance job
 
-    job {
-        name "${PROJECT}-${NAME}-acceptance-do"
+    freeStyleJob("${PROJECT}-${NAME}-acceptance-do") {
         logRotator(numToKeep = 40)
         deliveryPipelineConfiguration('Acceptance', 'Digital Ocean')
         jdk 'JDK8u25'
@@ -255,8 +251,7 @@ docker logout
 
         // Publish job
 
-        job {
-            name "${PROJECT}-${NAME}-publish"
+        freeStyleJob("${PROJECT}-${NAME}-publish") {
             logRotator(numToKeep = 40)
             deliveryPipelineConfiguration('Release', 'Publish')
             jdk 'JDK8u25'
@@ -314,8 +309,7 @@ ontrack.build('ontrack', '${NAME}', VERSION_BUILD).config {
 
         // Production deployment
 
-        job {
-            name "${PROJECT}-${NAME}-production"
+        freeStyleJob("${PROJECT}-${NAME}-production") {
             logRotator(numToKeep = 40)
             deliveryPipelineConfiguration('Release', 'Production')
             jdk 'JDK8u25'
@@ -350,8 +344,7 @@ ontrack.build('ontrack', '${NAME}', VERSION_BUILD).config {
 
         // Production acceptance test
 
-        job {
-            name "${PROJECT}-${NAME}-acceptance-production"
+        freeStyleJob("${PROJECT}-${NAME}-acceptance-production") {
             logRotator(numToKeep = 40)
             deliveryPipelineConfiguration('Release', 'Production acceptance')
             jdk 'JDK8u25'
