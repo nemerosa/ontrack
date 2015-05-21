@@ -77,10 +77,10 @@ class Branch extends AbstractProjectResource {
         ])
     }
 
-    PromotionLevel promotionLevel(String name, String description = '', boolean updateIfExists = false) {
+    PromotionLevel promotionLevel(String name, String description = '', boolean getIfExists = false) {
         def node = ontrack.get(link('promotionLevels')).resources.find { it.name == name }
         if (node) {
-            if (updateIfExists) {
+            if (getIfExists) {
                 new PromotionLevel(
                         ontrack,
                         ontrack.get(node._self)
@@ -99,16 +99,16 @@ class Branch extends AbstractProjectResource {
         }
     }
 
-    PromotionLevel promotionLevel(String name, String description = '', boolean updateIfExists = false, Closure closure) {
-        def pl = promotionLevel(name, description, updateIfExists)
+    PromotionLevel promotionLevel(String name, String description = '', boolean getIfExists = false, Closure closure) {
+        def pl = promotionLevel(name, description, getIfExists)
         pl(closure)
         pl
     }
 
-    ValidationStamp validationStamp(String name, String description = '', boolean updateIfExists = false) {
+    ValidationStamp validationStamp(String name, String description = '', boolean getIfExists = false) {
         def node = ontrack.get(link('validationStamps')).resources.find { it.name == name }
         if (node) {
-            if (updateIfExists) {
+            if (getIfExists) {
                 new ValidationStamp(
                         ontrack,
                         ontrack.get(node._self)
@@ -127,24 +127,34 @@ class Branch extends AbstractProjectResource {
         }
     }
 
-    ValidationStamp validationStamp(String name, String description = '', boolean updateIfExists = false, Closure closure) {
-        def vs = validationStamp(name, description, updateIfExists)
+    ValidationStamp validationStamp(String name, String description = '', boolean getIfExists = false, Closure closure) {
+        def vs = validationStamp(name, description, getIfExists)
         vs(closure)
         vs
     }
 
-    Build build(String name, String description = '') {
-        new Build(
-                ontrack,
-                ontrack.post(link('createBuild'), [
-                        name       : name,
-                        description: description
-                ])
-        )
+    Build build(String name, String description = '', boolean getIfExists = false) {
+        def builds = ontrack.project(this.project).search(branchName: this.name, buildName: name)
+        if (builds.empty) {
+            new Build(
+                    ontrack,
+                    ontrack.post(link('createBuild'), [
+                            name       : name,
+                            description: description
+                    ])
+            )
+        } else if (getIfExists) {
+            new Build(
+                    ontrack,
+                    ontrack.get(builds[0].node._self)
+            )
+        } else {
+            throw new ObjectAlreadyExistsException("Build ${name} already exists.")
+        }
     }
 
-    Build build(String name, String description = '', Closure closure) {
-        def b = build(name, description)
+    Build build(String name, String description = '', boolean getIfExists = false, Closure closure) {
+        def b = build(name, description, getIfExists)
         b(closure)
         b
     }

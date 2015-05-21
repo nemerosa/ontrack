@@ -64,7 +64,7 @@ echo "[PRODUCTION] Startup delay   = ${ONTRACK_DELAY}"
 # Removes the Nginx container
 
 echo "[PRODUCTION] Stopping Nginx container..."
-NGINX_CID=`docker ps | grep "dockerfile/nginx" | awk '{print $1}'`
+NGINX_CID=`docker ps | grep "nginx" | awk '{print $1}'`
 if [ "${NGINX_CID}" != "" ]
 then
 	docker stop ${NGINX_CID}
@@ -98,8 +98,8 @@ docker run -d \
     --publish 443:443 \
     --link ontrack-${VERSION}:ontrack \
     --volume /root/nginx/certs:/etc/nginx/certs \
-    --volume /root/nginx/sites-enabled:/etc/nginx/sites-enabled \
-    dockerfile/nginx
+    --volume /root/nginx/sites-enabled:/etc/nginx/conf.d \
+    "nginx:1.9.0"
 
 # Waiting for the application to start
 

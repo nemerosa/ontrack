@@ -23,7 +23,7 @@
  *
  * - PROJECT
  * - BRANCH
- * - SCM_URL
+ * - PROJECT_SCM_URL
  */
 
 /**
@@ -31,14 +31,6 @@
  */
 
 def LOCAL_REPOSITORY = '/var/lib/jenkins/repository/ontrack/2.0'
-
-/**
- * Folder for the project (making sure)
- */
-
-folder {
-    name PROJECT
-}
 
 /**
  * Branch
@@ -62,14 +54,8 @@ if (['master', 'feature', 'release', 'hotfix'].contains(branchType)) {
     def NAME = BRANCH.replaceAll(/[^A-Za-z0-9\.\-_]/, '-')
     println "\tGenerating ${NAME}..."
 
-    // Folder for the branch
-    folder {
-        name "${PROJECT}/${PROJECT}-${NAME}"
-    }
-
     // Build job
-    job {
-        name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-build"
+    freeStyleJob("${PROJECT}-${NAME}-build") {
         logRotator(-1, 40)
         deliveryPipelineConfiguration('Commit', 'Build')
         jdk 'JDK8u25'
@@ -126,8 +112,7 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
 
     // Local acceptance job
 
-    job {
-        name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-acceptance-local"
+    freeStyleJob("${PROJECT}-${NAME}-acceptance-local") {
         logRotator(numToKeep = 40)
         deliveryPipelineConfiguration('Commit', 'Local acceptance')
         jdk 'JDK8u25'
@@ -144,12 +129,12 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
             archiveJunit('ontrack-acceptance.xml')
             if (branchType == 'release') {
                 downstreamParameterized {
-                    trigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-docker-push", 'SUCCESS', false) {
+                    trigger("${PROJECT}-${NAME}-docker-push", 'SUCCESS', false) {
                         currentBuild()
                     }
                 }
             } else {
-                buildPipelineTrigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-docker-push") {
+                buildPipelineTrigger("${PROJECT}-${NAME}-docker-push") {
                     parameters {
                         currentBuild()
                     }
@@ -173,8 +158,7 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
 
     // Docker push
 
-    job {
-        name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-docker-push"
+    freeStyleJob("${PROJECT}-${NAME}-docker-push") {
         logRotator(numToKeep = 40)
         deliveryPipelineConfiguration('Acceptance', 'Docker push')
         jdk 'JDK8u25'
@@ -197,7 +181,7 @@ docker logout
         }
         publishers {
             downstreamParameterized {
-                trigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-acceptance-do", 'SUCCESS', false) {
+                trigger("${PROJECT}-${NAME}-acceptance-do", 'SUCCESS', false) {
                     currentBuild()
                 }
             }
@@ -214,8 +198,7 @@ docker logout
 
     // Digital Ocean acceptance job
 
-    job {
-        name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-acceptance-do"
+    freeStyleJob("${PROJECT}-${NAME}-acceptance-do") {
         logRotator(numToKeep = 40)
         deliveryPipelineConfiguration('Acceptance', 'Digital Ocean')
         jdk 'JDK8u25'
@@ -234,7 +217,7 @@ docker logout
         publishers {
             archiveJunit('ontrack-acceptance.xml')
             if (branchType == 'release') {
-                buildPipelineTrigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-publish") {
+                buildPipelineTrigger("${PROJECT}-${NAME}-publish") {
                     parameters {
                         currentBuild()
                     }
@@ -260,8 +243,7 @@ docker logout
 
         // Publish job
 
-        job {
-            name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-publish"
+        freeStyleJob("${PROJECT}-${NAME}-publish") {
             logRotator(numToKeep = 40)
             deliveryPipelineConfiguration('Release', 'Publish')
             jdk 'JDK8u25'
@@ -290,7 +272,7 @@ docker logout
 """
             }
             publishers {
-                buildPipelineTrigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-production") {
+                buildPipelineTrigger("${PROJECT}-${NAME}-production") {
                     parameters {
                         currentBuild()
                     }
@@ -319,8 +301,7 @@ ontrack.build('ontrack', '${NAME}', VERSION_BUILD).config {
 
         // Production deployment
 
-        job {
-            name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-production"
+        freeStyleJob("${PROJECT}-${NAME}-production") {
             logRotator(numToKeep = 40)
             deliveryPipelineConfiguration('Release', 'Production')
             jdk 'JDK8u25'
@@ -338,7 +319,7 @@ ontrack.build('ontrack', '${NAME}', VERSION_BUILD).config {
             }
             publishers {
                 downstreamParameterized {
-                    trigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-acceptance-production", 'SUCCESS', false) {
+                    trigger("${PROJECT}-${NAME}-acceptance-production", 'SUCCESS', false) {
                         currentBuild()
                     }
                 }
@@ -355,8 +336,7 @@ ontrack.build('ontrack', '${NAME}', VERSION_BUILD).config {
 
         // Production acceptance test
 
-        job {
-            name "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-acceptance-production"
+        freeStyleJob("${PROJECT}-${NAME}-acceptance-production") {
             logRotator(numToKeep = 40)
             deliveryPipelineConfiguration('Release', 'Production acceptance')
             jdk 'JDK8u25'
@@ -394,14 +374,13 @@ ontrack.build('ontrack', '${NAME}', VERSION_BUILD).config {
 
     // Pipeline view
 
-    view(type: DeliveryPipelineView) {
-        name "${PROJECT}/${PROJECT}-${NAME}/Pipeline"
+    deliveryPipelineView('Pipeline') {
         pipelineInstances(4)
         enableManualTriggers()
         showChangeLog()
         updateInterval(5)
         pipelines {
-            component("ontrack-${NAME}", "${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-build")
+            component("ontrack-${NAME}", "${PROJECT}-${NAME}-build")
         }
     }
 

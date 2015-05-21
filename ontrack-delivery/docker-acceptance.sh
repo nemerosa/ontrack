@@ -143,7 +143,7 @@ echo "[LOCAL] Ontrack container created: ${ONTRACK_CID} (${ONTRACK_NAME})"
 echo "[LOCAL] Preparation of nginx..."
 
 # Generation of the Nginx image
-NGINX_IMAGE="dockerfile/nginx"
+NGINX_IMAGE="nginx:1.9.0"
 
 # Mounting directories for Nginx
 NGINX_MOUNT=${MOUNT}/nginx
@@ -159,7 +159,7 @@ docker run \
 	-P \
 	--link ${ONTRACK_NAME}:ontrack \
 	--volume ${NGINX_MOUNT}/certs:/etc/nginx/certs \
-	--volume ${NGINX_MOUNT}/sites-enabled:/etc/nginx/sites-enabled \
+	--volume ${NGINX_MOUNT}/sites-enabled:/etc/nginx/conf.d \
 	--volume ${NGINX_MOUNT}/logs:/var/log/nginx \
 	--cidfile nginx.cid \
 	${NGINX_IMAGE}

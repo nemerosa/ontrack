@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.acceptance
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTest
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import net.nemerosa.ontrack.dsl.Branch
+import net.nemerosa.ontrack.dsl.ObjectAlreadyExistsException
 import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.OntrackConnection
 import net.nemerosa.ontrack.dsl.Shell
@@ -88,6 +89,35 @@ class ACCDSL extends AcceptanceTestClient {
         Branch branch = createBuildsAndPromotions()
         def builds = ontrack.project(branch.project).search(promotionName: 'BRONZE')
         assert builds.collect { it.name } == ['2']
+    }
+
+    @Test
+    void 'Build update'() {
+        // Project and branch
+        def name = uid('P')
+        def project = ontrack.project(name)
+        def branch = project.branch('master', '')
+        // Creates a build
+        branch.build('1', 'Build 1')
+        // Updates the build
+        branch.build('1', 'Build 2', true)
+    }
+
+    @Test
+    void 'Build creation twice'() {
+        // Project and branch
+        def name = uid('P')
+        def project = ontrack.project(name)
+        def branch = project.branch('master', '')
+        // Creates a build
+        branch.build('1', 'Build 1')
+        // Creates the build a second time
+        try {
+            branch.build('1', 'Build 2')
+            assert false: 'The build creation should have failed'
+        } catch (ObjectAlreadyExistsException ex) {
+            assert ex.message == 'Build 1 already exists.'
+        }
     }
 
     @Test
