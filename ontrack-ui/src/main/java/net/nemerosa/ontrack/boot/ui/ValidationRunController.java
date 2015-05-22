@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Selection;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -9,6 +10,7 @@ import net.nemerosa.ontrack.ui.resource.Pagination;
 import net.nemerosa.ontrack.ui.resource.PaginationCountException;
 import net.nemerosa.ontrack.ui.resource.PaginationOffsetException;
 import net.nemerosa.ontrack.ui.resource.Resources;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -80,7 +82,7 @@ public class ValidationRunController extends AbstractResourceController {
         // Gets the build
         Build build = structureService.getBuild(buildId);
         // Gets the validation stamp
-        ValidationStamp validationStamp = structureService.getValidationStamp(ID.of(validationRunRequest.getValidationStamp()));
+        ValidationStamp validationStamp = getValidationStamp(build, validationRunRequest.getValidationStamp());
         // Gets the validation run status
         ValidationRunStatusID validationRunStatusID = validationRunStatusService.getValidationRunStatus(validationRunRequest.getValidationRunStatusId());
         // Validation run to create
@@ -104,6 +106,22 @@ public class ValidationRunController extends AbstractResourceController {
         }
         // OK
         return validationRun;
+    }
+
+    protected ValidationStamp getValidationStamp(Build build, String validationStamp) {
+        if (StringUtils.isNumeric(validationStamp)) {
+            return structureService.getValidationStamp(ID.of(Integer.parseInt(validationStamp, 10)));
+        } else {
+            return structureService.findValidationStampByName(
+                    build.getBranch().getProject().getName(),
+                    build.getBranch().getName(),
+                    validationStamp
+            ).orElseThrow(() -> new ValidationStampNotFoundException(
+                    build.getBranch().getProject().getName(),
+                    build.getBranch().getName(),
+                    validationStamp
+            ));
+        }
     }
 
     @RequestMapping(value = "validationRuns/{validationRunId}", method = RequestMethod.GET)
