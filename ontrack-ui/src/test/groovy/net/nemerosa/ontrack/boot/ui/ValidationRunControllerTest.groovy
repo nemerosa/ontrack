@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.boot.ui
 
 import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import net.nemerosa.ontrack.ui.controller.MockURIBuilder
@@ -35,11 +36,13 @@ class ValidationRunControllerTest {
         ValidationRunStatusService validationRunStatusService = mock(ValidationRunStatusService.class)
         PropertyService propertyService = mock(PropertyService.class)
         SecurityService securityService = mock(SecurityService.class)
+        PredefinedValidationStampService predefinedValidationStampService = mock(PredefinedValidationStampService)
         controller = new ValidationRunController(
                 structureService,
                 validationRunStatusService,
                 propertyService,
-                securityService, predefinedValidationStampService
+                securityService,
+                predefinedValidationStampService
         )
         // Mock URI builder for tests
         Field field = AbstractResourceController.class.getDeclaredField("uriBuilder")
