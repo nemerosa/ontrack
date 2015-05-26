@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.model.settings;
 
+import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.PredefinedValidationStamp;
 
@@ -25,6 +26,11 @@ public interface PredefinedValidationStampService {
      * Gets a predefined validation stamp using its ID
      */
     PredefinedValidationStamp getPredefinedValidationStamp(ID id);
+
+    /**
+     * Gets the image for a predefined validation stamp
+     */
+    Document getPredefinedValidationStampImage(ID id);
 
     /**
      * Gets a predefined validation stamp using its name

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.repository;
 
+import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.model.structure.PredefinedValidationStamp;
@@ -57,6 +58,15 @@ public class PredefinedValidationStampJdbcRepository extends AbstractJdbcReposit
                 params("name", name),
                 (rs, rowNum) -> toPredefinedValidationStamp(rs)
         );
+    }
+
+    @Override
+    public Document getPredefinedValidationStampImage(ID id) {
+        return getOptional(
+                "SELECT IMAGETYPE, IMAGEBYTES FROM PREDEFINED_VALIDATION_STAMPS WHERE ID = :id",
+                params("id", id.getValue()),
+                (rs, rowNum) -> toDocument(rs)
+        ).orElse(Document.EMPTY);
     }
 
     protected PredefinedValidationStamp toPredefinedValidationStamp(ResultSet rs) throws SQLException {

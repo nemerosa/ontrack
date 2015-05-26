@@ -871,14 +871,4 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 .withDisabled(rs.getBoolean("disabled"));
     }
 
-    protected Document toDocument(ResultSet rs) throws SQLException {
-        String type = rs.getString("imagetype");
-        byte[] bytes = rs.getBytes("imagebytes");
-        if (StringUtils.isNotBlank(type) && bytes != null && bytes.length > 0) {
-            return new Document(type, bytes);
-        } else {
-            return null;
-        }
-    }
-
 }

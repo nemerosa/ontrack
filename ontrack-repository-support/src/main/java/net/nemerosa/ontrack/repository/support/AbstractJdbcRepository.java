@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.repository.support;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.exceptions.JsonParsingException;
@@ -148,6 +149,16 @@ public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSuppor
             }
         } catch (IOException ex) {
             throw new JsonParsingException(ex);
+        }
+    }
+
+    protected Document toDocument(ResultSet rs) throws SQLException {
+        String type = rs.getString("imagetype");
+        byte[] bytes = rs.getBytes("imagebytes");
+        if (StringUtils.isNotBlank(type) && bytes != null && bytes.length > 0) {
+            return new Document(type, bytes);
+        } else {
+            return null;
         }
     }
 

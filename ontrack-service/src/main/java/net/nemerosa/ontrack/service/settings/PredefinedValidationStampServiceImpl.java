@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service.settings;
 
+import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService;
@@ -44,6 +45,14 @@ public class PredefinedValidationStampServiceImpl implements PredefinedValidatio
     @Override
     public PredefinedValidationStamp getPredefinedValidationStamp(ID id) {
         return predefinedValidationStampRepository.getPredefinedValidationStamp(id);
+    }
+
+    @Override
+    public Document getPredefinedValidationStampImage(ID id) {
+        // Checks access
+        getPredefinedValidationStamp(id);
+        // Repository access
+        return predefinedValidationStampRepository.getPredefinedValidationStampImage(id);
     }
 
     @Override
