@@ -430,7 +430,7 @@ angular.module('ot.view.branch', [
                 'Validation for the build',
                 {
                     postForm: function (form) {
-                        return otFormService.updateFieldValue(form, 'validationStamp', validationStampRunView.validationStamp.id);
+                        return otFormService.updateFieldValue(form, 'validationStampId', validationStampRunView.validationStamp.id);
                     }
                 }
             ).then(loadBuildView);
