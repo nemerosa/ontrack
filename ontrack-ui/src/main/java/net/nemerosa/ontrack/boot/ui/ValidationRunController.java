@@ -86,7 +86,7 @@ public class ValidationRunController extends AbstractResourceController {
         // Gets the build
         Build build = structureService.getBuild(buildId);
         // Gets the validation stamp
-        ValidationStamp validationStamp = getValidationStamp(build, validationRunRequest.getValidationStamp());
+        ValidationStamp validationStamp = getValidationStamp(build.getBranch(), validationRunRequest.getValidationStamp());
         // Gets the validation run status
         ValidationRunStatusID validationRunStatusID = validationRunStatusService.getValidationRunStatus(validationRunRequest.getValidationRunStatusId());
         // Validation run to create
@@ -112,13 +112,13 @@ public class ValidationRunController extends AbstractResourceController {
         return validationRun;
     }
 
-    protected ValidationStamp getValidationStamp(Build build, String validationStamp) {
+    protected ValidationStamp getValidationStamp(Branch branch, String validationStamp) {
         if (StringUtils.isNumeric(validationStamp)) {
             return structureService.getValidationStamp(ID.of(Integer.parseInt(validationStamp, 10)));
         } else {
             Optional<ValidationStamp> oValidationStamp = structureService.findValidationStampByName(
-                    build.getBranch().getProject().getName(),
-                    build.getBranch().getName(),
+                    branch.getProject().getName(),
+                    branch.getName(),
                     validationStamp
             );
             if (oValidationStamp.isPresent()) {
@@ -128,11 +128,11 @@ public class ValidationRunController extends AbstractResourceController {
                 Optional<PredefinedValidationStamp> oPredefinedValidationStamp = predefinedValidationStampService.findPredefinedValidationStampByName(validationStamp);
                 if (oPredefinedValidationStamp.isPresent()) {
                     // Creates the validation stamp
-                    return securityService.asAdmin(() -> createValidationStamp(build.getBranch(), oPredefinedValidationStamp.get()));
+                    return securityService.asAdmin(() -> createValidationStamp(branch, oPredefinedValidationStamp.get()));
                 } else {
                     throw new ValidationStampNotFoundException(
-                            build.getBranch().getProject().getName(),
-                            build.getBranch().getName(),
+                            branch.getProject().getName(),
+                            branch.getName(),
                             validationStamp
                     );
                 }

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui
 
+import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
 import net.nemerosa.ontrack.model.structure.*
@@ -10,10 +11,14 @@ import net.nemerosa.ontrack.ui.resource.PaginationOffsetException
 import net.nemerosa.ontrack.ui.resource.Resources
 import org.junit.Before
 import org.junit.Test
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.stubbing.Answer
 
 import java.lang.reflect.Field
+import java.util.function.Supplier
 
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd
+import static org.mockito.Matchers.any
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when
 
@@ -21,6 +26,8 @@ class ValidationRunControllerTest {
 
     private ValidationRunController controller
     private StructureService structureService
+    private PredefinedValidationStampService predefinedValidationStampService
+    private SecurityService securityService
     private final Branch branch = Branch.of(
             Project.of(nd("P", "Project")).withId(ID.of(1)),
             nd("B", "Branch")
@@ -35,8 +42,8 @@ class ValidationRunControllerTest {
         structureService = mock(StructureService.class)
         ValidationRunStatusService validationRunStatusService = mock(ValidationRunStatusService.class)
         PropertyService propertyService = mock(PropertyService.class)
-        SecurityService securityService = mock(SecurityService.class)
-        PredefinedValidationStampService predefinedValidationStampService = mock(PredefinedValidationStampService)
+        securityService = mock(SecurityService.class)
+        predefinedValidationStampService = mock(PredefinedValidationStampService)
         controller = new ValidationRunController(
                 structureService,
                 validationRunStatusService,
@@ -156,6 +163,66 @@ class ValidationRunControllerTest {
     void 'getValidationRunsForValidationStamp: negative count'() throws Exception {
         when(structureService.getValidationRunsForValidationStamp(ID.of(1), 0, Integer.MAX_VALUE)).thenReturn(generateRuns(10))
         controller.getValidationRunsForValidationStamp(ID.of(1), 0, -1)
+    }
+
+    @Test
+    void 'Get validation stamp by name - numeric'() {
+        when(structureService.getValidationStamp(ID.of(1))).thenReturn(validationStamp)
+        def vs = controller.getValidationStamp(branch, '1')
+        assert vs == validationStamp
+    }
+
+    @Test(expected = ValidationStampNotFoundException)
+    void 'Get validation stamp by name - numeric - not found'() {
+        when(structureService.getValidationStamp(ID.of(10))).thenThrow(ValidationStampNotFoundException)
+        controller.getValidationStamp(branch, '10')
+    }
+
+    @Test
+    void 'Get validation stamp by name - found'() {
+        when(structureService.findValidationStampByName('P', 'B', 'VS')).thenReturn(Optional.of(validationStamp))
+        def vs = controller.getValidationStamp(branch, 'VS')
+        assert vs == validationStamp
+    }
+
+    @Test
+    void 'Get validation stamp by name - not found - predefined'() {
+        when(structureService.findValidationStampByName('P', 'B', 'VS')).thenReturn(Optional.empty())
+        when(predefinedValidationStampService.findPredefinedValidationStampByName('VS')).thenReturn(
+                Optional.of(
+                        new PredefinedValidationStamp(
+                                ID.of(1),
+                                'VS',
+                                'Validation stamp',
+                                Boolean.TRUE
+                        )
+                )
+        )
+        when(structureService.newValidationStamp(
+                ValidationStamp.of(
+                        branch,
+                        NameDescription.nd('VS', 'Validation stamp')
+                )
+        )).thenReturn(validationStamp)
+
+        when(securityService.asAdmin(any(Supplier) as Supplier)).thenAnswer(new Answer<Object>() {
+            @Override
+            Object answer(InvocationOnMock invocation) throws Throwable {
+                def s = invocation.arguments[0] as Supplier
+                return s.get()
+            }
+        })
+
+        def vs = controller.getValidationStamp(branch, 'VS')
+
+        assert vs == validationStamp
+    }
+
+    @Test(expected = ValidationStampNotFoundException)
+    void 'Get validation stamp by name - not found - not predefined'() {
+        when(structureService.findValidationStampByName('P', 'B', 'VS')).thenReturn(Optional.empty())
+        when(predefinedValidationStampService.findPredefinedValidationStampByName('VS')).thenReturn(Optional.empty())
+        controller.getValidationStamp(branch, 'VS')
     }
 
     List<ValidationRun> generateRuns(int count) {
