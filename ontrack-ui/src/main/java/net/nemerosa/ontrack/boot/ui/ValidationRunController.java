@@ -67,7 +67,7 @@ public class ValidationRunController extends AbstractResourceController {
         Build build = structureService.getBuild(buildId);
         return Form.create()
                 .with(
-                        Selection.of("validationStamp")
+                        Selection.of("validationStampId")
                                 .label("Validation stamp")
                                 .items(structureService.getValidationStampListForBranch(build.getBranch().getId()))
                 )
