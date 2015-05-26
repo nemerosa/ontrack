@@ -41,7 +41,7 @@ class Build extends AbstractProjectResource {
         new ValidationRun(
                 ontrack,
                 ontrack.post(link('validate'), [
-                        validationStamp      : ontrack.validationStamp(project, branch, validationStamp).id,
+                        validationStamp      : validationStamp,
                         validationRunStatusId: validationStampStatus
                 ])
         )
