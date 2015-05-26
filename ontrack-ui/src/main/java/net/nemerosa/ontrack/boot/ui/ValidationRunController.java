@@ -11,7 +11,6 @@ import net.nemerosa.ontrack.ui.resource.Pagination;
 import net.nemerosa.ontrack.ui.resource.PaginationCountException;
 import net.nemerosa.ontrack.ui.resource.PaginationOffsetException;
 import net.nemerosa.ontrack.ui.resource.Resources;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -86,7 +85,7 @@ public class ValidationRunController extends AbstractResourceController {
         // Gets the build
         Build build = structureService.getBuild(buildId);
         // Gets the validation stamp
-        ValidationStamp validationStamp = getValidationStamp(build.getBranch(), validationRunRequest.getValidationStamp());
+        ValidationStamp validationStamp = getValidationStamp(build.getBranch(), validationRunRequest.getValidationStampId(), validationRunRequest.getValidationStampName());
         // Gets the validation run status
         ValidationRunStatusID validationRunStatusID = validationRunStatusService.getValidationRunStatus(validationRunRequest.getValidationRunStatusId());
         // Validation run to create
@@ -112,20 +111,20 @@ public class ValidationRunController extends AbstractResourceController {
         return validationRun;
     }
 
-    protected ValidationStamp getValidationStamp(Branch branch, String validationStamp) {
-        if (StringUtils.isNumeric(validationStamp)) {
-            return structureService.getValidationStamp(ID.of(Integer.parseInt(validationStamp, 10)));
+    protected ValidationStamp getValidationStamp(Branch branch, Integer validationStampId, String validationStampName) {
+        if (validationStampId != null) {
+            return structureService.getValidationStamp(ID.of(validationStampId));
         } else {
             Optional<ValidationStamp> oValidationStamp = structureService.findValidationStampByName(
                     branch.getProject().getName(),
                     branch.getName(),
-                    validationStamp
+                    validationStampName
             );
             if (oValidationStamp.isPresent()) {
                 return oValidationStamp.get();
             } else {
-                // FIXME Checks if the project allows for auto creation of validation stamps - assuming yes for now
-                Optional<PredefinedValidationStamp> oPredefinedValidationStamp = predefinedValidationStampService.findPredefinedValidationStampByName(validationStamp);
+                // TODO Checks if the project allows for auto creation of validation stamps - assuming yes for now
+                Optional<PredefinedValidationStamp> oPredefinedValidationStamp = predefinedValidationStampService.findPredefinedValidationStampByName(validationStampName);
                 if (oPredefinedValidationStamp.isPresent()) {
                     // Creates the validation stamp
                     return securityService.asAdmin(() -> createValidationStamp(branch, oPredefinedValidationStamp.get()));
@@ -133,7 +132,7 @@ public class ValidationRunController extends AbstractResourceController {
                     throw new ValidationStampNotFoundException(
                             branch.getProject().getName(),
                             branch.getName(),
-                            validationStamp
+                            validationStampName
                     );
                 }
             }

@@ -168,20 +168,20 @@ class ValidationRunControllerTest {
     @Test
     void 'Get validation stamp by name - numeric'() {
         when(structureService.getValidationStamp(ID.of(1))).thenReturn(validationStamp)
-        def vs = controller.getValidationStamp(branch, '1')
+        def vs = controller.getValidationStamp(branch, 1, null)
         assert vs == validationStamp
     }
 
     @Test(expected = ValidationStampNotFoundException)
     void 'Get validation stamp by name - numeric - not found'() {
         when(structureService.getValidationStamp(ID.of(10))).thenThrow(ValidationStampNotFoundException)
-        controller.getValidationStamp(branch, '10')
+        controller.getValidationStamp(branch, 10, null)
     }
 
     @Test
     void 'Get validation stamp by name - found'() {
         when(structureService.findValidationStampByName('P', 'B', 'VS')).thenReturn(Optional.of(validationStamp))
-        def vs = controller.getValidationStamp(branch, 'VS')
+        def vs = controller.getValidationStamp(branch, null, 'VS')
         assert vs == validationStamp
     }
 
@@ -213,7 +213,7 @@ class ValidationRunControllerTest {
             }
         })
 
-        def vs = controller.getValidationStamp(branch, 'VS')
+        def vs = controller.getValidationStamp(branch, null, 'VS')
 
         assert vs == validationStamp
     }
@@ -222,7 +222,7 @@ class ValidationRunControllerTest {
     void 'Get validation stamp by name - not found - not predefined'() {
         when(structureService.findValidationStampByName('P', 'B', 'VS')).thenReturn(Optional.empty())
         when(predefinedValidationStampService.findPredefinedValidationStampByName('VS')).thenReturn(Optional.empty())
-        controller.getValidationStamp(branch, 'VS')
+        controller.getValidationStamp(branch, null, 'VS')
     }
 
     List<ValidationRun> generateRuns(int count) {
