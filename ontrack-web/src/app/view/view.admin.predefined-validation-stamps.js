@@ -14,8 +14,23 @@ angular.module('ot.view.admin.predefined-validation-stamps', [
         var view = ot.view();
         view.title = "Predefined validation stamps";
         view.commands = [
+            {
+                id: 'admin-predefined-validation-stamps-new',
+                name: "New predefined validation stamp",
+                cls: 'ot-command-new',
+                action: newPredefinedValidationStamp
+            },
             ot.viewCloseCommand('/home')
         ];
+
+        function loadPredefinedValidationStamps() {
+
+        }
+        loadPredefinedValidationStamps();
+
+        function newPredefinedValidationStamp() {
+
+        }
     })
 
 ;
