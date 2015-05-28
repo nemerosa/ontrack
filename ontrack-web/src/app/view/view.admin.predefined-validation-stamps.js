@@ -24,12 +24,16 @@ angular.module('ot.view.admin.predefined-validation-stamps', [
         ];
 
         function loadPredefinedValidationStamps() {
-
+            ot.pageCall($http.get('admin/predefinedValidationStamps')).then(function (predefinedValidationStamps) {
+                $scope.predefinedValidationStamps = predefinedValidationStamps;
+            });
         }
+
         loadPredefinedValidationStamps();
 
         function newPredefinedValidationStamp() {
-
+            otFormService.create($scope.predefinedValidationStamps._create, "New predefined validation stamp")
+                .then(loadPredefinedValidationStamps);
         }
     })
 
