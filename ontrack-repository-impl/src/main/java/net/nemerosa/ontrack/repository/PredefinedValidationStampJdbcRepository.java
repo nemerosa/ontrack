@@ -46,7 +46,7 @@ public class PredefinedValidationStampJdbcRepository extends AbstractJdbcReposit
     public PredefinedValidationStamp getPredefinedValidationStamp(ID id) {
         return getNamedParameterJdbcTemplate().queryForObject(
                 "SELECT * FROM PREDEFINED_VALIDATION_STAMPS WHERE ID = :id",
-                params("id", id),
+                params("id", id.get()),
                 (rs, rowNum) -> toPredefinedValidationStamp(rs)
         );
     }
