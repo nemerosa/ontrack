@@ -1,12 +1,14 @@
 package net.nemerosa.ontrack.repository;
 
 import net.nemerosa.ontrack.common.Document;
+import net.nemerosa.ontrack.model.exceptions.PredefinedValidationStampNameAlreadyDefinedException;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.model.structure.PredefinedValidationStamp;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -33,13 +35,17 @@ public class PredefinedValidationStampJdbcRepository extends AbstractJdbcReposit
 
     @Override
     public ID newPredefinedValidationStamp(PredefinedValidationStamp stamp) {
-        return ID.of(
-                dbCreate(
-                        "INSERT INTO PREDEFINED_VALIDATION_STAMPS(NAME, DESCRIPTION) VALUES (:name, :description)",
-                        params("name", stamp.getName())
-                                .addValue("description", stamp.getDescription())
-                )
-        );
+        try {
+            return ID.of(
+                    dbCreate(
+                            "INSERT INTO PREDEFINED_VALIDATION_STAMPS(NAME, DESCRIPTION) VALUES (:name, :description)",
+                            params("name", stamp.getName())
+                                    .addValue("description", stamp.getDescription())
+                    )
+            );
+        } catch (DuplicateKeyException ex) {
+            throw new PredefinedValidationStampNameAlreadyDefinedException(stamp.getName());
+        }
     }
 
     @Override

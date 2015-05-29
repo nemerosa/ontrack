@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.settings
 
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.model.exceptions.PredefinedValidationStampNameAlreadyDefinedException
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
 import net.nemerosa.ontrack.model.structure.NameDescription
@@ -30,6 +31,33 @@ class PredefinedValidationStampServiceIT extends AbstractServiceTestSupport {
         }
         assert predefinedValidationStamp != null
         assert predefinedValidationStamp.id.set
+    }
+
+    @Test(expected = PredefinedValidationStampNameAlreadyDefinedException)
+    void 'Predefined validation stamp name already exists'() {
+        String name = uid('PVS')
+        // Once --> OK
+        asUser().with(GlobalSettings).call {
+            service.newPredefinedValidationStamp(
+                    PredefinedValidationStamp.of(
+                            NameDescription.nd(
+                                    name,
+                                    "Predefined $name"
+                            )
+                    )
+            )
+        }
+        // Twice --> NOK
+        asUser().with(GlobalSettings).call {
+            service.newPredefinedValidationStamp(
+                    PredefinedValidationStamp.of(
+                            NameDescription.nd(
+                                    name,
+                                    "Predefined other $name"
+                            )
+                    )
+            )
+        }
     }
 
 }
