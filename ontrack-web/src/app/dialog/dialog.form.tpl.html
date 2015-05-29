@@ -9,14 +9,14 @@
     </div>
     <div class="modal-footer">
 
-        <div class="ot-alert-{{message.type}} alert-dismissable" ng-show="message">
+        <div class="ot-alert-{{message.type}} alert-dismissable ot-dialog-alert" ng-show="message">
             <span>{{message.content}}</span>
         </div>
 
-        <button class="btn btn-primary" type="submit" ng-disabled="thisForm.$invalid || submitting">
+        <button class="btn btn-primary ot-dialog-ok" type="submit" ng-disabled="thisForm.$invalid || submitting">
             <span class="ot-loading-indicator" ng-show="submitting"></span>
             OK
         </button>
-        <button class="btn btn-link" type="button" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-link ot-dialog-cancel" type="button" ng-click="cancel()">Cancel</button>
     </div>
 </form>

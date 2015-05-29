@@ -15,7 +15,7 @@ public class HomePage extends AbstractHeaderPage {
         return "index.html";
     }
 
-    public void createProject(Closure closure) {
+    public ProjectDialog createProject(Closure closure) {
         def createProjectCommand = $('.ot-command-project-new')
         browser.waitUntil { createProjectCommand.displayed }
         createProjectCommand.click()
@@ -23,6 +23,8 @@ public class HomePage extends AbstractHeaderPage {
         closure.delegate = dialog
         closure(dialog)
         dialog.ok()
+        // Returns the dialog
+        return dialog
     }
 
     public boolean isProjectPresent(String name) {
