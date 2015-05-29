@@ -1,6 +1,7 @@
 angular.module('ot.view.admin.predefined-validation-stamps', [
     'ui.router',
-    'ot.service.core'
+    'ot.service.core',
+    'ot.service.structure'
 ])
     .config(function ($stateProvider) {
         $stateProvider.state('admin-predefined-validation-stamps', {
@@ -10,7 +11,7 @@ angular.module('ot.view.admin.predefined-validation-stamps', [
         });
     })
 
-    .controller('AdminPredefinedValidationStampsCtrl', function ($scope, $http, ot, otFormService, otAlertService) {
+    .controller('AdminPredefinedValidationStampsCtrl', function ($scope, $http, ot, otFormService, otAlertService, otStructureService) {
         var view = ot.view();
         view.title = "Predefined validation stamps";
         view.commands = [
@@ -50,7 +51,13 @@ angular.module('ot.view.admin.predefined-validation-stamps', [
             }).then(function () {
                 ot.pageCall($http.delete(predefinedValidationStamp._delete)).then(loadPredefinedValidationStamps);
             });
+        };
 
+        // Updating the image for a predefined validation stamp
+        $scope.editValidationStampImage = function (predefinedValidationStamp) {
+            otStructureService.changeImage(predefinedValidationStamp, {
+                title: 'Image for predefined validation stamp ' + predefinedValidationStamp.name
+            });
         };
 
     })
