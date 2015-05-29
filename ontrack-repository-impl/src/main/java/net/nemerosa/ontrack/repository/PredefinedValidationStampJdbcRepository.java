@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.repository;
 
 import net.nemerosa.ontrack.common.Document;
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.exceptions.PredefinedValidationStampNameAlreadyDefinedException;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.NameDescription;
@@ -88,6 +89,16 @@ public class PredefinedValidationStampJdbcRepository extends AbstractJdbcReposit
         } catch (DuplicateKeyException ex) {
             throw new PredefinedValidationStampNameAlreadyDefinedException(validationStamp.getName());
         }
+    }
+
+    @Override
+    public Ack deletePredefinedValidationStamp(ID predefinedValidationStampId) {
+        return Ack.one(
+                getNamedParameterJdbcTemplate().update(
+                        "DELETE FROM PREDEFINED_VALIDATION_STAMPS WHERE ID = :id",
+                        params("id", predefinedValidationStampId.get())
+                )
+        );
     }
 
     protected PredefinedValidationStamp toPredefinedValidationStamp(ResultSet rs) throws SQLException {

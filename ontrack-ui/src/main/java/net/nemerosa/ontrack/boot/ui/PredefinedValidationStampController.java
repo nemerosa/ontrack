@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService;
 import net.nemerosa.ontrack.model.structure.ID;
@@ -78,6 +79,11 @@ public class PredefinedValidationStampController extends AbstractResourceControl
         predefinedValidationStampService.savePredefinedValidationStamp(validationStamp);
         // OK
         return validationStamp;
+    }
+
+    @RequestMapping(value = "predefinedValidationStamps/{predefinedValidationStampId}", method = RequestMethod.DELETE)
+    public Ack deleteValidationStamp(@PathVariable ID predefinedValidationStampId) {
+        return predefinedValidationStampService.deletePredefinedValidationStamp(predefinedValidationStampId);
     }
 
 }

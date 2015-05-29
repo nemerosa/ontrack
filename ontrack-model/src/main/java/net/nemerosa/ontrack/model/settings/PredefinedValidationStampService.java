@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.model.settings;
 
 import net.nemerosa.ontrack.common.Document;
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.PredefinedValidationStamp;
 
@@ -41,4 +42,9 @@ public interface PredefinedValidationStampService {
      * Updates the predefined validation stamp
      */
     void savePredefinedValidationStamp(PredefinedValidationStamp stamp);
+
+    /**
+     * Deletes a predefined validation stamp
+     */
+    Ack deletePredefinedValidationStamp(ID predefinedValidationStampId);
 }

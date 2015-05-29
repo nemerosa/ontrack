@@ -1,12 +1,16 @@
 package net.nemerosa.ontrack.service.settings;
 
 import net.nemerosa.ontrack.common.Document;
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.security.ValidationStampDelete;
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.PredefinedValidationStamp;
+import net.nemerosa.ontrack.model.structure.ValidationStamp;
 import net.nemerosa.ontrack.repository.PredefinedValidationStampRepository;
+import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,6 +74,13 @@ public class PredefinedValidationStampServiceImpl implements PredefinedValidatio
         securityService.checkGlobalFunction(GlobalSettings.class);
         // Repository
         predefinedValidationStampRepository.savePredefinedValidationStamp(stamp);
+    }
+
+    @Override
+    public Ack deletePredefinedValidationStamp(ID predefinedValidationStampId) {
+        Validate.isTrue(predefinedValidationStampId.isSet(), "Predefined validation stamp ID must be set");
+        securityService.checkGlobalFunction(GlobalSettings.class);
+        return predefinedValidationStampRepository.deletePredefinedValidationStamp(predefinedValidationStampId);
     }
 
 }

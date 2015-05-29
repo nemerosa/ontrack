@@ -25,8 +25,8 @@ public class PredefinedValidationStampResourceDecorator extends AbstractResource
                         // .link(Link.IMAGE_LINK, on(PredefinedValidationStampController.class).getValidationStampImage_(validationStamp.getId()))
                         // Update link
                 .link(Link.UPDATE, on(PredefinedValidationStampController.class).updateValidationStampForm(validationStamp.getId()), GlobalSettings.class)
-                        // TODO Delete link
-                        // .delete(on(PredefinedValidationStampController.class).deleteValidationStamp(validationStamp.getId()), ValidationStampDelete.class, validationStamp.projectId())
+                        // Delete link
+                .link(Link.DELETE, on(PredefinedValidationStampController.class).deleteValidationStamp(validationStamp.getId()), GlobalSettings.class)
                         // OK
                 .build();
     }

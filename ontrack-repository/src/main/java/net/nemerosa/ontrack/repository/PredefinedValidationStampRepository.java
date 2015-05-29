@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.repository;
 
 import net.nemerosa.ontrack.common.Document;
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.PredefinedValidationStamp;
 
@@ -20,4 +21,6 @@ public interface PredefinedValidationStampRepository {
     Document getPredefinedValidationStampImage(ID id);
 
     void savePredefinedValidationStamp(PredefinedValidationStamp stamp);
+
+    Ack deletePredefinedValidationStamp(ID predefinedValidationStampId);
 }

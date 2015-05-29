@@ -10,7 +10,7 @@ angular.module('ot.view.admin.predefined-validation-stamps', [
         });
     })
 
-    .controller('AdminPredefinedValidationStampsCtrl', function ($scope, $http, ot, otFormService) {
+    .controller('AdminPredefinedValidationStampsCtrl', function ($scope, $http, ot, otFormService, otAlertService) {
         var view = ot.view();
         view.title = "Predefined validation stamps";
         view.commands = [
@@ -40,6 +40,17 @@ angular.module('ot.view.admin.predefined-validation-stamps', [
         $scope.editValidationStamp = function (predefinedValidationStamp) {
             otFormService.update(predefinedValidationStamp._update, "Edit predefined validation stamp")
                 .then(loadPredefinedValidationStamps);
+        };
+
+        // Deleting a predefined validation stamp
+        $scope.deleteValidationStamp = function (predefinedValidationStamp) {
+            otAlertService.confirm({
+                title: "Predefined validation stamp deletion",
+                message: "Do you really want to delete this validation stamp?"
+            }).then(function () {
+                ot.pageCall($http.delete(predefinedValidationStamp._delete)).then(loadPredefinedValidationStamps);
+            });
+
         };
 
     })
