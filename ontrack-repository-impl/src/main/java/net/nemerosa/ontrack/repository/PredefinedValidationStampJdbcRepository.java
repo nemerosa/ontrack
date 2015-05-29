@@ -75,6 +75,21 @@ public class PredefinedValidationStampJdbcRepository extends AbstractJdbcReposit
         ).orElse(Document.EMPTY);
     }
 
+    @Override
+    public void savePredefinedValidationStamp(PredefinedValidationStamp validationStamp) {
+        // Update
+        try {
+            getNamedParameterJdbcTemplate().update(
+                    "UPDATE PREDEFINED_VALIDATION_STAMPS SET NAME = :name, DESCRIPTION = :description WHERE ID = :id",
+                    params("name", validationStamp.getName())
+                            .addValue("description", validationStamp.getDescription())
+                            .addValue("id", validationStamp.id())
+            );
+        } catch (DuplicateKeyException ex) {
+            throw new PredefinedValidationStampNameAlreadyDefinedException(validationStamp.getName());
+        }
+    }
+
     protected PredefinedValidationStamp toPredefinedValidationStamp(ResultSet rs) throws SQLException {
         return PredefinedValidationStamp.of(
                 new NameDescription(

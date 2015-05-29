@@ -63,4 +63,21 @@ public class PredefinedValidationStampController extends AbstractResourceControl
         return predefinedValidationStampService.getPredefinedValidationStamp(predefinedValidationStampId);
     }
 
+    @RequestMapping(value = "predefinedValidationStamps/{predefinedValidationStampId}/update", method = RequestMethod.GET)
+    public Form updateValidationStampForm(@PathVariable ID predefinedValidationStampId) {
+        return predefinedValidationStampService.getPredefinedValidationStamp(predefinedValidationStampId).asForm();
+    }
+
+    @RequestMapping(value = "predefinedValidationStamps/{predefinedValidationStampId}/update", method = RequestMethod.PUT)
+    public PredefinedValidationStamp updateValidationStamp(@PathVariable ID predefinedValidationStampId, @RequestBody @Valid NameDescription nameDescription) {
+        // Gets from the repository
+        PredefinedValidationStamp validationStamp = predefinedValidationStampService.getPredefinedValidationStamp(predefinedValidationStampId);
+        // Updates
+        validationStamp = validationStamp.update(nameDescription);
+        // Saves in repository
+        predefinedValidationStampService.savePredefinedValidationStamp(validationStamp);
+        // OK
+        return validationStamp;
+    }
+
 }

@@ -36,4 +36,9 @@ public interface PredefinedValidationStampService {
      * Gets a predefined validation stamp using its name
      */
     Optional<PredefinedValidationStamp> findPredefinedValidationStampByName(String name);
+
+    /**
+     * Updates the predefined validation stamp
+     */
+    void savePredefinedValidationStamp(PredefinedValidationStamp stamp);
 }

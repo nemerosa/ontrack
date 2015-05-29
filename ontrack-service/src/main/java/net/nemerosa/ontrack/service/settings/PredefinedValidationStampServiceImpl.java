@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+import static net.nemerosa.ontrack.model.structure.Entity.isEntityDefined;
+
 @Service
 @Transactional
 public class PredefinedValidationStampServiceImpl implements PredefinedValidationStampService {
@@ -58,6 +60,16 @@ public class PredefinedValidationStampServiceImpl implements PredefinedValidatio
     @Override
     public Optional<PredefinedValidationStamp> findPredefinedValidationStampByName(String name) {
         return predefinedValidationStampRepository.findPredefinedValidationStampByName(name);
+    }
+
+    @Override
+    public void savePredefinedValidationStamp(PredefinedValidationStamp stamp) {
+        // Validation
+        isEntityDefined(stamp, "Predefined validation stamp must be defined");
+        // Security
+        securityService.checkGlobalFunction(GlobalSettings.class);
+        // Repository
+        predefinedValidationStampRepository.savePredefinedValidationStamp(stamp);
     }
 
 }

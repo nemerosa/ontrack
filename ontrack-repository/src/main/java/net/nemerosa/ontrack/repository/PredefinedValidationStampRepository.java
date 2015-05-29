@@ -18,4 +18,6 @@ public interface PredefinedValidationStampRepository {
     Optional<PredefinedValidationStamp> findPredefinedValidationStampByName(String name);
 
     Document getPredefinedValidationStampImage(ID id);
+
+    void savePredefinedValidationStamp(PredefinedValidationStamp stamp);
 }
