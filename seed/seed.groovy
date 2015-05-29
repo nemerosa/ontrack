@@ -144,7 +144,7 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
                     }
                 }
             } else {
-                buildPipelineTrigger("${SEED_PROJECT}/${SEED_BRANCH}/${PROJECT}-${NAME}-docker-push") {
+                buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${PROJECT}-${NAME}-docker-push") {
                     parameters {
                         currentBuild()
                     }
@@ -227,7 +227,7 @@ docker logout
         publishers {
             archiveJunit('ontrack-acceptance.xml')
             if (branchType == 'release') {
-                buildPipelineTrigger("${SEED_PROJECT}/${SEED_BRANCH}/${PROJECT}-${NAME}-publish") {
+                buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${PROJECT}-${NAME}-publish") {
                     parameters {
                         currentBuild()
                     }
@@ -282,7 +282,7 @@ docker logout
 """
             }
             publishers {
-                buildPipelineTrigger("${SEED_PROJECT}/${SEED_BRANCH}/${PROJECT}-${NAME}-production") {
+                buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${PROJECT}-${NAME}-production") {
                     parameters {
                         currentBuild()
                     }
