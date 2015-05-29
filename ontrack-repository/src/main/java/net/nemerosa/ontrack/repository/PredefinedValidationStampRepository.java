@@ -23,4 +23,6 @@ public interface PredefinedValidationStampRepository {
     void savePredefinedValidationStamp(PredefinedValidationStamp stamp);
 
     Ack deletePredefinedValidationStamp(ID predefinedValidationStampId);
+
+    void setPredefinedValidationStampImage(ID predefinedValidationStampId, Document document);
 }

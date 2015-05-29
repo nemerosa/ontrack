@@ -101,6 +101,16 @@ public class PredefinedValidationStampJdbcRepository extends AbstractJdbcReposit
         );
     }
 
+    @Override
+    public void setPredefinedValidationStampImage(ID predefinedValidationStampId, Document document) {
+        getNamedParameterJdbcTemplate().update(
+                "UPDATE PREDEFINED_VALIDATION_STAMPS SET IMAGETYPE = :type, IMAGEBYTES = :content WHERE ID = :id",
+                params("id", predefinedValidationStampId.getValue())
+                        .addValue("type", Document.isValid(document) ? document.getType() : null)
+                        .addValue("content", Document.isValid(document) ? document.getContent() : null)
+        );
+    }
+
     protected PredefinedValidationStamp toPredefinedValidationStamp(ResultSet rs) throws SQLException {
         return PredefinedValidationStamp.of(
                 new NameDescription(

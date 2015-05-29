@@ -11,9 +11,13 @@ import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+
+import java.io.IOException;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -90,6 +94,15 @@ public class PredefinedValidationStampController extends AbstractResourceControl
     @RequestMapping(value = "predefinedValidationStamps/{predefinedValidationStampId}/image", method = RequestMethod.GET)
     public Document getValidationStampImage(@PathVariable ID predefinedValidationStampId) {
         return predefinedValidationStampService.getPredefinedValidationStampImage(predefinedValidationStampId);
+    }
+
+    @RequestMapping(value = "predefinedValidationStamps/{predefinedValidationStampId}/image", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void setValidationStampImage(@PathVariable ID predefinedValidationStampId, @RequestParam MultipartFile file) throws IOException {
+        predefinedValidationStampService.setPredefinedValidationStampImage(predefinedValidationStampId, new Document(
+                file.getContentType(),
+                file.getBytes()
+        ));
     }
 
 }

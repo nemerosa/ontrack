@@ -47,4 +47,9 @@ public interface PredefinedValidationStampService {
      * Deletes a predefined validation stamp
      */
     Ack deletePredefinedValidationStamp(ID predefinedValidationStampId);
+
+    /**
+     * Sets the image for a predefined validation stamp
+     */
+    void setPredefinedValidationStampImage(ID predefinedValidationStampId, Document document);
 }

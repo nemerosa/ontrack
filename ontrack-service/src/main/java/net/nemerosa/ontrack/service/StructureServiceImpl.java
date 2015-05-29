@@ -37,18 +37,11 @@ import java.util.stream.Collectors;
 
 import static net.nemerosa.ontrack.model.structure.Entity.isEntityDefined;
 import static net.nemerosa.ontrack.model.structure.Entity.isEntityNew;
+import static net.nemerosa.ontrack.service.ImageHelper.checkImage;
 
 @Service
 @Transactional
 public class StructureServiceImpl implements StructureService {
-
-    private static final long ICON_IMAGE_SIZE_MAX = 16 * 1000L;
-
-    private static final String[] ACCEPTED_IMAGE_TYPES = {
-            "image/jpeg",
-            "image/png",
-            "image/gif"
-    };
 
     private final SecurityService securityService;
     private final EventPostService eventPostService;
@@ -773,15 +766,4 @@ public class StructureServiceImpl implements StructureService {
                 .filter(pl -> securityService.isProjectFunctionGranted(pl.projectId(), ProjectView.class));
     }
 
-    protected void checkImage(Document document) {
-        // Checks the image type
-        if (document != null && !ArrayUtils.contains(ACCEPTED_IMAGE_TYPES, document.getType())) {
-            throw new ImageTypeNotAcceptedException(document.getType(), ACCEPTED_IMAGE_TYPES);
-        }
-        // Checks the image length
-        int size = document != null ? document.getContent().length : 0;
-        if (size > ICON_IMAGE_SIZE_MAX) {
-            throw new ImageFileSizeException(size, ICON_IMAGE_SIZE_MAX);
-        }
-    }
 }
