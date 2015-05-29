@@ -35,6 +35,13 @@ angular.module('ot.view.admin.predefined-validation-stamps', [
             otFormService.create($scope.predefinedValidationStamps._create, "New predefined validation stamp")
                 .then(loadPredefinedValidationStamps);
         }
+
+        // Editing a predefined validation stamp
+        $scope.editValidationStamp = function (predefinedValidationStamp) {
+            otFormService.update(predefinedValidationStamp._update, "Edit predefined validation stamp")
+                .then(loadPredefinedValidationStamps);
+        };
+
     })
 
 ;

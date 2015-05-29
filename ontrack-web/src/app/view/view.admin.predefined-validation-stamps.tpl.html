@@ -17,7 +17,18 @@
                 {{predefinedValidationStamp.description}}
             </td>
             <td>
-
+                <span
+                        class="fa fa-image ot-command"
+                        ng-click="editValidationStampImage(predefinedValidationStamp)"
+                        title="Edits the image for the {{predefinedValidationStamp.name}} validation stamp"></span>
+                <span
+                        class="fa fa-pencil ot-command"
+                        ng-click="editValidationStamp(predefinedValidationStamp)"
+                        title="Edits the name or description for the {{predefinedValidationStamp.name}} validation stamp"></span>
+                <span
+                        class="fa fa-trash ot-command"
+                        ng-click="deleteValidationStamp(predefinedValidationStamp)"
+                        title="Deletes the {{predefinedValidationStamp.name}} validation stamp"></span>
             </td>
         </tr>
         </tbody>
