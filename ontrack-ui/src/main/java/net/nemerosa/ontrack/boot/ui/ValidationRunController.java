@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import net.nemerosa.ontrack.boot.properties.AutoValidationStampProperty;
+import net.nemerosa.ontrack.boot.properties.AutoValidationStampPropertyType;
 import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Selection;
@@ -123,11 +125,20 @@ public class ValidationRunController extends AbstractResourceController {
             if (oValidationStamp.isPresent()) {
                 return oValidationStamp.get();
             } else {
-                // TODO Checks if the project allows for auto creation of validation stamps - assuming yes for now
-                Optional<PredefinedValidationStamp> oPredefinedValidationStamp = predefinedValidationStampService.findPredefinedValidationStampByName(validationStampName);
-                if (oPredefinedValidationStamp.isPresent()) {
-                    // Creates the validation stamp
-                    return securityService.asAdmin(() -> createValidationStamp(branch, oPredefinedValidationStamp.get()));
+                Optional<AutoValidationStampProperty> oAutoValidationStampProperty = propertyService.getProperty(branch.getProject(), AutoValidationStampPropertyType.class).option();
+                // Checks if the project allows for auto creation of validation stamps
+                if (oAutoValidationStampProperty.isPresent() && oAutoValidationStampProperty.get().isAutoCreate()) {
+                    Optional<PredefinedValidationStamp> oPredefinedValidationStamp = predefinedValidationStampService.findPredefinedValidationStampByName(validationStampName);
+                    if (oPredefinedValidationStamp.isPresent()) {
+                        // Creates the validation stamp
+                        return securityService.asAdmin(() -> createValidationStamp(branch, oPredefinedValidationStamp.get()));
+                    } else {
+                        throw new ValidationStampNotFoundException(
+                                branch.getProject().getName(),
+                                branch.getName(),
+                                validationStampName
+                        );
+                    }
                 } else {
                     throw new ValidationStampNotFoundException(
                             branch.getProject().getName(),

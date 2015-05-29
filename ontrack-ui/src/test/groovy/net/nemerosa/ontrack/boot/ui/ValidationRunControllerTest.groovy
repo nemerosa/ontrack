@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.boot.ui
 
+import net.nemerosa.ontrack.boot.properties.AutoValidationStampProperty
+import net.nemerosa.ontrack.boot.properties.AutoValidationStampPropertyType
 import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
@@ -26,6 +28,7 @@ class ValidationRunControllerTest {
 
     private ValidationRunController controller
     private StructureService structureService
+    private PropertyService propertyService
     private PredefinedValidationStampService predefinedValidationStampService
     private SecurityService securityService
     private final Branch branch = Branch.of(
@@ -41,7 +44,7 @@ class ValidationRunControllerTest {
     void before() {
         structureService = mock(StructureService.class)
         ValidationRunStatusService validationRunStatusService = mock(ValidationRunStatusService.class)
-        PropertyService propertyService = mock(PropertyService.class)
+        propertyService = mock(PropertyService.class)
         securityService = mock(SecurityService.class)
         predefinedValidationStampService = mock(PredefinedValidationStampService)
         controller = new ValidationRunController(
@@ -187,6 +190,13 @@ class ValidationRunControllerTest {
 
     @Test
     void 'Get validation stamp by name - not found - predefined'() {
+        when(propertyService.getProperty(branch.getProject(), AutoValidationStampPropertyType.class)).thenReturn(
+                new Property<AutoValidationStampProperty>(
+                        new AutoValidationStampPropertyType(),
+                        new AutoValidationStampProperty(true),
+                        true
+                )
+        )
         when(structureService.findValidationStampByName('P', 'B', 'VS')).thenReturn(Optional.empty())
         when(predefinedValidationStampService.findPredefinedValidationStampByName('VS')).thenReturn(
                 Optional.of(
@@ -219,7 +229,40 @@ class ValidationRunControllerTest {
     }
 
     @Test(expected = ValidationStampNotFoundException)
+    void 'Get validation stamp by name - not found - predefined not allowed'() {
+        when(propertyService.getProperty(branch.getProject(), AutoValidationStampPropertyType.class)).thenReturn(
+                new Property<AutoValidationStampProperty>(
+                        new AutoValidationStampPropertyType(),
+                        new AutoValidationStampProperty(false),
+                        true
+                )
+        )
+        when(structureService.findValidationStampByName('P', 'B', 'VS')).thenReturn(Optional.empty())
+
+        controller.getValidationStamp(branch, null, 'VS')
+    }
+
+    @Test(expected = ValidationStampNotFoundException)
+    void 'Get validation stamp by name - not found - predefined not allowed by default'() {
+        when(propertyService.getProperty(branch.getProject(), AutoValidationStampPropertyType.class)).thenReturn(
+                Property.empty(
+                        new AutoValidationStampPropertyType()
+                )
+        )
+        when(structureService.findValidationStampByName('P', 'B', 'VS')).thenReturn(Optional.empty())
+
+        controller.getValidationStamp(branch, null, 'VS')
+    }
+
+    @Test(expected = ValidationStampNotFoundException)
     void 'Get validation stamp by name - not found - not predefined'() {
+        when(propertyService.getProperty(branch.getProject(), AutoValidationStampPropertyType.class)).thenReturn(
+                new Property<AutoValidationStampProperty>(
+                        new AutoValidationStampPropertyType(),
+                        new AutoValidationStampProperty(true),
+                        true
+                )
+        )
         when(structureService.findValidationStampByName('P', 'B', 'VS')).thenReturn(Optional.empty())
         when(predefinedValidationStampService.findPredefinedValidationStampByName('VS')).thenReturn(Optional.empty())
         controller.getValidationStamp(branch, null, 'VS')
