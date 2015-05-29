@@ -11,7 +11,9 @@
         <tbody>
         <tr ng-repeat="predefinedValidationStamp in predefinedValidationStamps.resources">
             <td>
-                {{predefinedValidationStamp.name}}
+                <ot-entity-image entity="predefinedValidationStamp">
+                    {{predefinedValidationStamp.name}}
+                </ot-entity-image>
             </td>
             <td>
                 {{predefinedValidationStamp.description}}
