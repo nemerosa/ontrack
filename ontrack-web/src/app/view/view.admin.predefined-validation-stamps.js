@@ -57,7 +57,7 @@ angular.module('ot.view.admin.predefined-validation-stamps', [
         $scope.editValidationStampImage = function (predefinedValidationStamp) {
             otStructureService.changeImage(predefinedValidationStamp, {
                 title: 'Image for predefined validation stamp ' + predefinedValidationStamp.name
-            });
+            }).then(loadPredefinedValidationStamps);
         };
 
     })
