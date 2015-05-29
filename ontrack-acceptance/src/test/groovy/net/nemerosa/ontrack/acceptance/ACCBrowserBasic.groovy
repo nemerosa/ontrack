@@ -49,6 +49,30 @@ class ACCBrowserBasic extends AcceptanceTestClient {
 
     @Test
     @AcceptanceTest(excludes = "production")
+    void 'Project creation - name already exists'() {
+        def projectName = doCreateProject().path('name').asText()
+        browser { browser ->
+            HomePage home = loginAsAdmin(browser)
+
+            // Checks the project is visible in the list
+            assert home.isProjectPresent(projectName)
+
+            // Tries to create a project with the same name
+            def dialog = home.createProject {
+                name = projectName
+                description = "Project ${projectName}"
+            }
+
+            // Checks that there is an error message
+            assert dialog.displayed && dialog.errorMessage == "Project name already exists: ${projectName}"
+
+            // Closes the dialog
+            dialog.cancel()
+        }
+    }
+
+    @Test
+    @AcceptanceTest(excludes = "production")
     void 'Branch creation'() {
         browser { browser ->
             withProject { id, name ->
