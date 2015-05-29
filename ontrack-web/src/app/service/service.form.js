@@ -242,10 +242,7 @@ angular.module('ot.service.form', [
                 modalInstance.close('ok');
             } else if (angular.isString(submit)) {
                 messageContainer.message = submit;
-            } else if (angular.isObject(submit) || angular.isArray(submit)) {
-                modalInstance.close(submit);
-                d.resolve(submit);
-            } else {
+            } else if (submit.then && angular.isFunction(submit.then)) {
                 submit.then(
                     function success(data) {
                         modalInstance.close(data);
@@ -255,6 +252,11 @@ angular.module('ot.service.form', [
                         messageContainer.message = message;
                         d.reject(message);
                     });
+            } else if (angular.isObject(submit) || angular.isArray(submit)) {
+                modalInstance.close(submit);
+                d.resolve(submit);
+            } else {
+                throw 'Cannot handle submit result type';
             }
             return d.promise;
         };
