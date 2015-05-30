@@ -5,15 +5,11 @@ import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import net.nemerosa.ontrack.dsl.Branch
 import net.nemerosa.ontrack.dsl.ObjectAlreadyExistsException
 import net.nemerosa.ontrack.dsl.Ontrack
-import net.nemerosa.ontrack.dsl.OntrackConnection
 import net.nemerosa.ontrack.dsl.Shell
 import net.nemerosa.ontrack.dsl.http.OTForbiddenClientException
 import net.nemerosa.ontrack.dsl.http.OTMessageClientException
 import org.junit.Assert
-import org.junit.Before
 import org.junit.Test
-
-import java.time.ZoneId
 
 import static net.nemerosa.ontrack.test.TestUtils.uid
 
@@ -22,28 +18,7 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
  */
 @AcceptanceTestSuite
 @AcceptanceTest(excludes = 'production')
-class ACCDSL extends AcceptanceTestClient {
-
-    private Ontrack ontrack
-
-    @Before
-    void init() {
-        ontrack = ontrackAsAdmin
-    }
-
-    protected Ontrack getOntrackAsAdmin() {
-        getOntrackAs('admin', adminPassword)
-    }
-
-    protected Ontrack getOntrackAs(String user, String password) {
-        ontrackBuilder
-                .authenticate(user, password)
-                .build()
-    }
-
-    protected OntrackConnection getOntrackBuilder() {
-        OntrackConnection.create(baseURL).disableSsl(sslDisabled)
-    }
+class ACCDSL extends AbstractACCDSL {
 
     @Test
     void 'Branch not found'() {
@@ -52,7 +27,7 @@ class ACCDSL extends AcceptanceTestClient {
         def projectName = testBranch.project.name.asText()
         def branchName = testBranch.name.asText()
         // Anonymous client
-        ontrack = ontrackBuilder.build()
+        Ontrack ontrack = ontrackBuilder.build()
         // Branch cannot be found
         try {
             ontrack.branch(projectName, branchName)
@@ -461,12 +436,6 @@ class ACCDSL extends AcceptanceTestClient {
         }
         // Gets its Label property
         assert build.config.label == 'RC'
-    }
-
-    protected static File getImageFile() {
-        def file = File.createTempFile('image', '.png')
-        file.bytes = ACCDSL.class.getResource('/gold.png').bytes
-        file
     }
 
     @Test

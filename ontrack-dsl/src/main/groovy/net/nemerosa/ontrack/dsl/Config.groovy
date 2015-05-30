@@ -109,4 +109,45 @@ class Config {
     List<String> getArtifactory() {
         ontrack.get('extension/artifactory/configurations/descriptors').resources.collect { it.id }
     }
+
+    /**
+     * Predefined validation stamps
+     */
+
+    List<PredefinedValidationStamp> getPredefinedValidationStamps() {
+        ontrack.get('admin/predefinedValidationStamps').resources.collect {
+            new PredefinedValidationStamp(
+                    ontrack,
+                    it
+            )
+        }
+    }
+
+    PredefinedValidationStamp predefinedValidationStamp(String name, String description = '', boolean getIfExists = false) {
+        def node = predefinedValidationStamps.find { it.name == name }
+        if (node) {
+            if (getIfExists) {
+                new PredefinedValidationStamp(
+                        ontrack,
+                        ontrack.get(node._self)
+                )
+            } else {
+                throw new ObjectAlreadyExistsException("Predefined validation stamp ${name} already exists.")
+            }
+        } else {
+            new PredefinedValidationStamp(
+                    ontrack,
+                    ontrack.post(ontrack.get('admin/predefinedValidationStamps')._create, [
+                            name       : name,
+                            description: description
+                    ])
+            )
+        }
+    }
+
+    PredefinedValidationStamp predefinedValidationStamp(String name, String description = '', boolean getIfExists = false, Closure closure) {
+        def vs = predefinedValidationStamp(name, description, getIfExists)
+        vs(closure)
+        vs
+    }
 }

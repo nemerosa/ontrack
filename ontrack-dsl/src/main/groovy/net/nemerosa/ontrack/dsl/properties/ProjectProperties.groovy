@@ -65,4 +65,18 @@ class ProjectProperties extends ProjectEntityProperties {
         property('net.nemerosa.ontrack.extension.jira.JIRAFollowLinksPropertyType').linkNames
     }
 
+    /**
+     * Auto validation stamp
+     */
+
+    def autoValidationStamp(boolean autoCreate = true) {
+        property('net.nemerosa.ontrack.boot.properties.AutoValidationStampPropertyType', [
+                autoCreate: autoCreate
+        ])
+    }
+
+    boolean getAutoValidationStamp() {
+        property('net.nemerosa.ontrack.boot.properties.AutoValidationStampPropertyType')?.autoCreate
+    }
+
 }
