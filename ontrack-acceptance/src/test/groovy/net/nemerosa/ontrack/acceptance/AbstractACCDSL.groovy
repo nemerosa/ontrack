@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.acceptance.support.AcceptanceTest
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.OntrackConnection
+import net.nemerosa.ontrack.dsl.http.OTMessageClientException
 import org.junit.Before
 
 /**
@@ -38,6 +39,15 @@ abstract class AbstractACCDSL extends AcceptanceTestClient {
         def file = File.createTempFile('image', '.png')
         file.bytes = AbstractACCDSL.class.getResource('/gold.png').bytes
         file
+    }
+
+    protected static def validationError(String expectedMessage, Closure code) {
+        try {
+            code()
+            assert false: "Should have failed with: ${expectedMessage}"
+        } catch (OTMessageClientException ex) {
+            assert ex.message == expectedMessage
+        }
     }
 
 }

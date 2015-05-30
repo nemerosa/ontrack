@@ -24,10 +24,10 @@ class ACCDSLPredefinedValidationStamps extends AbstractACCDSL {
             }
         }
         // Checks it has been created
-        def vs = ontrack.config.predefinedValidationStamps.find { it.name == vsName }
-        assert vs != null
+        def pvs = ontrack.config.predefinedValidationStamps.find { it.name == vsName }
+        assert pvs != null
         // Downloading the image
-        def image = vs.image
+        def image = pvs.image
         assert image.type == 'image/png;charset=UTF-8'
         assert image.content == imageFile.bytes
 
@@ -49,7 +49,81 @@ class ACCDSLPredefinedValidationStamps extends AbstractACCDSL {
         build.validate(vsName)
 
         // Checks the validation stamp has been created
-        assert ontrack.validationStamp(projectName, 'B', vsName).id > 0
+        def vs = ontrack.validationStamp(projectName, 'B', vsName)
+        assert vs.id > 0
+        image = pvs.image
+        assert image.type == 'image/png;charset=UTF-8'
+        assert image.content == imageFile.bytes
+    }
+
+    @Test
+    void 'Auto creation of validation stamps for an authorised project but with a non existing validation stamp'() {
+        // Name of the validation stamp
+        def vsName = uid('VS')
+
+        // Creating a branch
+        def projectName = uid('P')
+        ontrack.project(projectName) {
+            branch('B')
+        }
+
+        // Enabling the auto validation stamps on the project
+        ontrack.project(projectName).config {
+            autoValidationStamp()
+        }
+
+        // Creates a build
+        def build = ontrack.branch(projectName, 'B').build('1')
+
+        // Validates a build using a non existing validation stamp on the branch
+        validationError("Validation stamp not found: ${projectName}/B/${vsName}") {
+            build.validate(vsName)
+        }
+    }
+
+    @Test
+    void 'No creation of validation stamps for a non authorised project'() {
+        // Name of the validation stamp
+        def vsName = uid('VS')
+
+        // Creating a branch
+        def projectName = uid('P')
+        ontrack.project(projectName) {
+            branch('B')
+        }
+
+        // NOT enabling the auto validation stamps on the project
+        ontrack.project(projectName).config {
+            autoValidationStamp(false)
+        }
+
+        // Creates a build
+        def build = ontrack.branch(projectName, 'B').build('1')
+
+        // Validates a build using a non existing validation stamp on the branch
+        validationError("Validation stamp not found: ${projectName}/B/${vsName}") {
+            build.validate(vsName)
+        }
+    }
+
+    @Test
+    void 'No creation of validation stamps by default'() {
+        // Name of the validation stamp
+        def vsName = uid('VS')
+
+        // Creating a branch
+        def projectName = uid('P')
+        ontrack.project(projectName) {
+            branch('B')
+        }
+
+        // Creates a build
+        def build = ontrack.branch(projectName, 'B').build('1')
+
+        // Validates a build using a non existing validation stamp on the branch
+        validationError("Validation stamp not found: ${projectName}/B/${vsName}") {
+            build.validate(vsName)
+        }
     }
 
 }
