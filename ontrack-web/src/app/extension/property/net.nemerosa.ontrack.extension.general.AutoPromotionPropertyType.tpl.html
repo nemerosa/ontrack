@@ -1,3 +1,5 @@
-<span ng-repeat="validationStampName in property.value.validationStamps" class="ot-property-label">
-    {{validationStampName}}
+<span ng-repeat="validationStamp in property.value.validationStamps" class="ot-property-label">
+    <ot-entity-image entity="validationStamp">
+        {{validationStamp.name}}
+    </ot-entity-image>
 </span>&nbsp;

@@ -71,7 +71,10 @@ public class AutoPromotionPropertyType extends AbstractPropertyType<AutoPromotio
 
     @Override
     public AutoPromotionProperty fromClient(JsonNode node) {
-        JsonNode validationStamps = node.get("validationStamps");
+        return loadAutoPromotionProperty(node.get("validationStamps"));
+    }
+
+    private AutoPromotionProperty loadAutoPromotionProperty(JsonNode validationStamps) {
         if (validationStamps.isArray()) {
             List<Integer> ids = new ArrayList<>();
             validationStamps.forEach(id -> ids.add(id.asInt()));
@@ -79,7 +82,6 @@ public class AutoPromotionPropertyType extends AbstractPropertyType<AutoPromotio
             return new AutoPromotionProperty(
                     ids.stream()
                             .map(id -> structureService.getValidationStamp(ID.of(id)))
-                            .map(ValidationStamp::getName)
                             .collect(Collectors.toList())
             );
         } else {
@@ -87,9 +89,21 @@ public class AutoPromotionPropertyType extends AbstractPropertyType<AutoPromotio
         }
     }
 
+    /**
+     * As a list of validation stamp IDs
+     */
+    @Override
+    public JsonNode forStorage(AutoPromotionProperty value) {
+        return format(
+                value.getValidationStamps().stream()
+                        .map(Entity::id)
+                        .collect(Collectors.toList())
+        );
+    }
+
     @Override
     public AutoPromotionProperty fromStorage(JsonNode node) {
-        return parse(node, AutoPromotionProperty.class);
+        return loadAutoPromotionProperty(node);
     }
 
     @Override
