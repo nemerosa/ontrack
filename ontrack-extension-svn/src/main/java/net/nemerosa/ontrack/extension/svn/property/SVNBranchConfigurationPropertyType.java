@@ -57,7 +57,7 @@ public class SVNBranchConfigurationPropertyType extends AbstractPropertyType<SVN
     }
 
     @Override
-    public Form getEditionForm(SVNBranchConfigurationProperty value) {
+    public Form getEditionForm(ProjectEntity entity, SVNBranchConfigurationProperty value) {
         return Form.create()
                 .with(
                         Text.of("branchPath")

@@ -46,7 +46,7 @@ public class LinkPropertyType extends AbstractPropertyType<LinkProperty> {
     }
 
     @Override
-    public Form getEditionForm(LinkProperty value) {
+    public Form getEditionForm(ProjectEntity entity, LinkProperty value) {
         return Form.create()
                 .with(
                         NamedEntries.of("links")

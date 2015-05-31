@@ -44,7 +44,7 @@ public class JIRAFollowLinksPropertyType extends AbstractPropertyType<JIRAFollow
     }
 
     @Override
-    public Form getEditionForm(JIRAFollowLinksProperty value) {
+    public Form getEditionForm(ProjectEntity entity, JIRAFollowLinksProperty value) {
         return Form.create()
                 .with(
                         MultiStrings.of("linkNames")

@@ -53,7 +53,7 @@ public class ArtifactoryPromotionSyncPropertyType extends AbstractPropertyType<A
     }
 
     @Override
-    public Form getEditionForm(ArtifactoryPromotionSyncProperty value) {
+    public Form getEditionForm(ProjectEntity entity, ArtifactoryPromotionSyncProperty value) {
         return Form.create()
                 .with(
                         Selection.of("configuration")

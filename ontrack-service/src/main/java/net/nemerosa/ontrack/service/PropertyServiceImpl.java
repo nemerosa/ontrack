@@ -214,6 +214,6 @@ public class PropertyServiceImpl implements PropertyService {
         // Gets the value for this property
         T value = getPropertyValue(propertyType, entity);
         // Gets the form
-        return propertyType.getEditionForm(value);
+        return propertyType.getEditionForm(entity, value);
     }
 }

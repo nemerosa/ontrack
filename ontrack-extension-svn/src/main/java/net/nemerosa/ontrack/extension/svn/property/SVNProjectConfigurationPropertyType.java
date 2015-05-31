@@ -51,7 +51,7 @@ public class SVNProjectConfigurationPropertyType extends AbstractPropertyType<SV
     }
 
     @Override
-    public Form getEditionForm(SVNProjectConfigurationProperty value) {
+    public Form getEditionForm(ProjectEntity entity, SVNProjectConfigurationProperty value) {
         return Form.create()
                 .with(
                         Selection.of("configuration")

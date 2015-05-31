@@ -40,7 +40,7 @@ public class AutoPromotionPropertyType extends AbstractPropertyType<AutoPromotio
     }
 
     @Override
-    public Form getEditionForm(AutoPromotionProperty value) {
+    public Form getEditionForm(ProjectEntity entity, AutoPromotionProperty value) {
         // FIXME Method net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType.getEditionForm
         return null;
     }

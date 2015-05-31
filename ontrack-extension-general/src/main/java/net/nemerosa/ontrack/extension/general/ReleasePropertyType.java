@@ -44,7 +44,7 @@ public class ReleasePropertyType extends AbstractPropertyType<ReleaseProperty> {
     }
 
     @Override
-    public Form getEditionForm(ReleaseProperty value) {
+    public Form getEditionForm(ProjectEntity entity, ReleaseProperty value) {
         return Form.create()
                 .with(
                         Text.of("name")

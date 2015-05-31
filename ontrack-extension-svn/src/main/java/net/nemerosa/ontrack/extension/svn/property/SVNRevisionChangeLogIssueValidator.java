@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.extension.svn.model.SVNHistory;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.MultiStrings;
+import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.PropertyService;
 
 import java.util.Collections;
@@ -74,7 +75,7 @@ public class SVNRevisionChangeLogIssueValidator extends AbstractSVNChangeLogIssu
     }
 
     @Override
-    public Form getEditionForm(SVNRevisionChangeLogIssueValidatorConfig value) {
+    public Form getEditionForm(ProjectEntity entity, SVNRevisionChangeLogIssueValidatorConfig value) {
         return Form.create()
                 .with(
                         MultiStrings.of("closedStatuses")

@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.jenkins;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Selection;
+import net.nemerosa.ontrack.model.structure.ProjectEntity;
 
 import java.util.function.Function;
 
@@ -15,7 +16,7 @@ public abstract class AbstractJenkinsPropertyType<T extends AbstractJenkinsPrope
     }
 
     @Override
-    public Form getEditionForm(T value) {
+    public Form getEditionForm(ProjectEntity entity, T value) {
         return Form.create()
                 .with(
                         Selection.of("configuration")

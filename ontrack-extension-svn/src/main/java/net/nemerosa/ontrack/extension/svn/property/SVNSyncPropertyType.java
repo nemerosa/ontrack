@@ -63,7 +63,7 @@ public class SVNSyncPropertyType extends AbstractPropertyType<SVNSyncProperty> {
     }
 
     @Override
-    public Form getEditionForm(SVNSyncProperty value) {
+    public Form getEditionForm(ProjectEntity entity, SVNSyncProperty value) {
         return Form.create()
                 .with(
                         YesNo.of("override")

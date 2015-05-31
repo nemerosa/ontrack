@@ -11,14 +11,14 @@ public class ReleasePropertyTypeTest {
     @Test
     public void getEditionForm_empty() throws Exception {
         ReleasePropertyType type = new ReleasePropertyType();
-        Form form = type.getEditionForm(null);
+        Form form = type.getEditionForm(null, null);
         assertNull(form.getField("name").getValue());
     }
 
     @Test
     public void getEditionForm_not_empty() throws Exception {
         ReleasePropertyType type = new ReleasePropertyType();
-        Form form = type.getEditionForm(new ReleaseProperty("test"));
+        Form form = type.getEditionForm(null, new ReleaseProperty("test"));
         assertEquals("test", form.getField("name").getValue());
     }
 }

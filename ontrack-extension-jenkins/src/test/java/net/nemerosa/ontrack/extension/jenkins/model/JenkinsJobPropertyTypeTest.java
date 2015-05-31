@@ -117,7 +117,7 @@ public class JenkinsJobPropertyTypeTest {
 
     @Test
     public void editionForm_for_new() {
-        Form form = type.getEditionForm(null);
+        Form form = type.getEditionForm(null, null);
         assertEquals(2, form.getFields().size());
         {
             Field f = form.getField("configuration");
@@ -143,7 +143,7 @@ public class JenkinsJobPropertyTypeTest {
                 configuration,
                 "MyJob"
         );
-        Form form = type.getEditionForm(property);
+        Form form = type.getEditionForm(null, property);
         assertEquals(2, form.getFields().size());
         {
             Field f = form.getField("configuration");

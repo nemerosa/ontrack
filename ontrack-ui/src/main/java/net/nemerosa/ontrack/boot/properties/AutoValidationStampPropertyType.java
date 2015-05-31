@@ -40,7 +40,7 @@ public class AutoValidationStampPropertyType extends AbstractPropertyType<AutoVa
     }
 
     @Override
-    public Form getEditionForm(AutoValidationStampProperty value) {
+    public Form getEditionForm(ProjectEntity entity, AutoValidationStampProperty value) {
         return Form.create()
                 .with(
                         YesNo.of("autoCreate")

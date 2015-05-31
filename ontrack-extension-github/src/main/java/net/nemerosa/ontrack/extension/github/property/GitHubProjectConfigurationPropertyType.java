@@ -50,7 +50,7 @@ public class GitHubProjectConfigurationPropertyType extends AbstractPropertyType
     }
 
     @Override
-    public Form getEditionForm(GitHubProjectConfigurationProperty value) {
+    public Form getEditionForm(ProjectEntity entity, GitHubProjectConfigurationProperty value) {
         return Form.create()
                 .with(
                         Selection.of("configuration")

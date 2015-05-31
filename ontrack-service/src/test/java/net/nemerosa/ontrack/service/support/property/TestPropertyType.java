@@ -41,7 +41,7 @@ public class TestPropertyType extends AbstractPropertyType<TestProperty> {
     }
 
     @Override
-    public Form getEditionForm(TestProperty value) {
+    public Form getEditionForm(ProjectEntity entity, TestProperty value) {
         return Form.create()
                 .with(
                         Text.of("value")

@@ -56,8 +56,8 @@ public class JenkinsJobPropertyType extends AbstractJenkinsPropertyType<JenkinsJ
     }
 
     @Override
-    public Form getEditionForm(JenkinsJobProperty value) {
-        return super.getEditionForm(value)
+    public Form getEditionForm(ProjectEntity entity, JenkinsJobProperty value) {
+        return super.getEditionForm(entity, value)
                 .with(
                         Text.of("job")
                                 .label("Job name")

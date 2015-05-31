@@ -42,7 +42,7 @@ public class GitCommitPropertyType extends AbstractPropertyType<GitCommitPropert
     }
 
     @Override
-    public Form getEditionForm(GitCommitProperty value) {
+    public Form getEditionForm(ProjectEntity entity, GitCommitProperty value) {
         return Form.create()
                 .with(
                         Text.of("commit")

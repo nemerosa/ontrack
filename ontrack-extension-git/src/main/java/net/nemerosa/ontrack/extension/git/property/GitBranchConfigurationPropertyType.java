@@ -56,7 +56,7 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
     }
 
     @Override
-    public Form getEditionForm(GitBranchConfigurationProperty value) {
+    public Form getEditionForm(ProjectEntity entity, GitBranchConfigurationProperty value) {
         return Form.create()
                 .with(
                         Text.of("branch")

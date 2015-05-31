@@ -54,9 +54,10 @@ public interface PropertyType<T> {
     /**
      * Form to create/update this property.
      *
-     * @param value Value to update if set. If not set, this means the creation of a new property.
+     * @param entity Entity to edit the property for
+     * @param value  Value to update if set. If not set, this means the creation of a new property.
      */
-    Form getEditionForm(T value);
+    Form getEditionForm(ProjectEntity entity, T value);
 
     /**
      * Creation of a property value from a value. Should perform validation.
@@ -72,7 +73,7 @@ public interface PropertyType<T> {
      * Parses the client JSON representation for a property value. This method
      * <i>MUST</i> perform validation before accepting the value.
      *
-     * @see #getEditionForm(Object)
+     * @see #getEditionForm(ProjectEntity, Object)
      */
     T fromClient(JsonNode node);
 
