@@ -8,7 +8,9 @@ import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -63,12 +65,26 @@ public class AutoPromotionPropertyType extends AbstractPropertyType<AutoPromotio
                                                 )
                                                 .collect(Collectors.toList())
                                 )
+                                .help("When all the selected validation stamps have passed for a build, the promotion will automatically be granted.")
                 );
     }
 
     @Override
     public AutoPromotionProperty fromClient(JsonNode node) {
-        return fromStorage(node);
+        JsonNode validationStamps = node.get("validationStamps");
+        if (validationStamps.isArray()) {
+            List<Integer> ids = new ArrayList<>();
+            validationStamps.forEach(id -> ids.add(id.asInt()));
+            // Reading the validation stamps and then the names
+            return new AutoPromotionProperty(
+                    ids.stream()
+                            .map(id -> structureService.getValidationStamp(ID.of(id)))
+                            .map(ValidationStamp::getName)
+                            .collect(Collectors.toList())
+            );
+        } else {
+            throw new AutoPromotionPropertyCannotParseException("Cannot get the list of validation stamps");
+        }
     }
 
     @Override
