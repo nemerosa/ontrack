@@ -3,16 +3,23 @@ package net.nemerosa.ontrack.extension.general;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
 import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.form.MultiSelection;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.structure.ProjectEntity;
-import net.nemerosa.ontrack.model.structure.ProjectEntityType;
+import net.nemerosa.ontrack.model.structure.*;
 
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class AutoPromotionPropertyType extends AbstractPropertyType<AutoPromotionProperty> {
+
+    private final StructureService structureService;
+
+    public AutoPromotionPropertyType(StructureService structureService) {
+        this.structureService = structureService;
+    }
 
     @Override
     public String getName() {
@@ -41,8 +48,22 @@ public class AutoPromotionPropertyType extends AbstractPropertyType<AutoPromotio
 
     @Override
     public Form getEditionForm(ProjectEntity entity, AutoPromotionProperty value) {
-        // FIXME Method net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType.getEditionForm
-        return null;
+        PromotionLevel promotionLevel = (PromotionLevel) entity;
+        return Form.create()
+                .with(
+                        MultiSelection.of("validationStamps")
+                                .label("Validation stamps")
+                                .items(
+                                        structureService.getValidationStampListForBranch(promotionLevel.getBranch().getId())
+                                                .stream()
+                                                .map(vs -> new ValidationStampSelection(
+                                                                vs,
+                                                                value != null && value.getValidationStamps().contains(vs.getName())
+                                                        )
+                                                )
+                                                .collect(Collectors.toList())
+                                )
+                );
     }
 
     @Override
