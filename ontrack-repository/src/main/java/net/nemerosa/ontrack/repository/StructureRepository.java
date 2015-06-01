@@ -139,6 +139,8 @@ public interface StructureRepository {
 
     List<ValidationRun> getValidationRunsForBuild(Build build, Function<String,ValidationRunStatusID> validationRunStatusService);
 
+    List<ValidationRun> getValidationRunsForBuildAndValidationStamp(Build build, ValidationStamp validationStamp, Function<String,ValidationRunStatusID> validationRunStatusService);
+
     List<ValidationRun> getValidationRunsForValidationStamp(ValidationStamp validationStamp, int offset, int count, Function<String,ValidationRunStatusID> validationRunStatusService);
 
     ValidationRun newValidationRunStatus(ValidationRun validationRun, ValidationRunStatus runStatus);

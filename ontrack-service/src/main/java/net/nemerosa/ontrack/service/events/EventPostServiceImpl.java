@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.events;
 
 import net.nemerosa.ontrack.model.events.Event;
+import net.nemerosa.ontrack.model.events.EventListenerService;
 import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.repository.EventRepository;
@@ -14,11 +15,13 @@ public class EventPostServiceImpl implements EventPostService {
 
     private final SecurityService securityService;
     private final EventRepository eventRepository;
+    private final EventListenerService eventListenerService;
 
     @Autowired
-    public EventPostServiceImpl(SecurityService securityService, EventRepository eventRepository) {
+    public EventPostServiceImpl(SecurityService securityService, EventRepository eventRepository, EventListenerService eventListenerService) {
         this.securityService = securityService;
         this.eventRepository = eventRepository;
+        this.eventListenerService = eventListenerService;
     }
 
     @Override
@@ -28,6 +31,8 @@ public class EventPostServiceImpl implements EventPostService {
             e = e.withSignature(securityService.getCurrentSignature());
         }
         eventRepository.post(e);
+        // Notification to the listeners
+        eventListenerService.onEvent(event);
     }
 
 }
