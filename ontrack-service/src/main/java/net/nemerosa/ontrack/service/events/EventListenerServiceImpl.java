@@ -12,15 +12,16 @@ import java.util.Collection;
 @Service
 public class EventListenerServiceImpl implements EventListenerService {
 
-    private final Collection<EventListener> listeners;
+    private final ApplicationContext context;
 
     @Autowired
     public EventListenerServiceImpl(ApplicationContext context) {
-        this.listeners = context.getBeansOfType(EventListener.class).values();
+        this.context = context;
     }
 
     @Override
     public void onEvent(Event event) {
+        Collection<EventListener> listeners = context.getBeansOfType(EventListener.class).values();
         listeners.forEach(listener -> listener.onEvent(event));
     }
 
