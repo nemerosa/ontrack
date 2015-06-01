@@ -1003,14 +1003,14 @@ class ACCDSL extends AbstractACCDSL {
                 // Template definition
                 template {
                     parameter 'gitBranch', 'Name of the Git branch', 'release/${sourceName}'
-                    fixedSource '1.0', '1.1'
+                    fixedSource '1.0', '1.1', 'b' * 120
                 }
             }
         }
         // Sync. the template
         ontrack.branch(project, 'template').sync()
         // Checks the created instances
-        ['1.0', '1.1'].each {
+        ['1.0', '1.1', 'b' * 120].each {
             def instance = ontrack.branch(project, it)
             assert instance.id > 0
             assert instance.name == it
