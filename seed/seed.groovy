@@ -183,7 +183,7 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
         }
         steps {
             shell """\
-docker tag ontrack:\${VERSION_FULL} nemerosa/ontrack:\${VERSION_FULL}
+docker tag --force ontrack:\${VERSION_FULL} nemerosa/ontrack:\${VERSION_FULL}
 docker login --email="damien.coraboeuf+nemerosa@gmail.com" --username="nemerosa" --password="\${DOCKER_PASSWORD}"
 docker push nemerosa/ontrack:\${VERSION_FULL}
 docker logout
@@ -273,8 +273,8 @@ docker logout
                 }
                 shell readFileFromWorkspace('seed/publish.sh')
                 shell """\
-docker tag nemerosa/ontrack:\${VERSION_FULL} nemerosa/ontrack:latest
-docker tag nemerosa/ontrack:\${VERSION_FULL} nemerosa/ontrack:\${VERSION_DISPLAY}
+docker tag --force nemerosa/ontrack:\${VERSION_FULL} nemerosa/ontrack:latest
+docker tag --force nemerosa/ontrack:\${VERSION_FULL} nemerosa/ontrack:\${VERSION_DISPLAY}
 docker login --email="damien.coraboeuf+nemerosa@gmail.com" --username="nemerosa" --password="\${DOCKER_PASSWORD}"
 docker push nemerosa/ontrack:\${VERSION_DISPLAY}
 docker push nemerosa/ontrack:latest
