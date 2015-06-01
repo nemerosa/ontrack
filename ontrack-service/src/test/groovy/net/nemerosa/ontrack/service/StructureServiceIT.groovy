@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.security.access.AccessDeniedException
 
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd
@@ -70,6 +71,24 @@ class StructureServiceIT extends AbstractServiceTestSupport {
         }
         assert build.signature.user.name == 'Test2'
         assert build.signature.time == time
+    }
+
+    @Test
+    void '#269 Branch name of 120 characters is allowed'() {
+        def project = doCreateProject()
+        doCreateBranch(project, nd(
+                'b' * 120,
+                'Test with 120 characters'
+        ))
+    }
+
+    @Test(expected = DataIntegrityViolationException)
+    void '#269 Branch name of more than 120 characters is not allowed'() {
+        def project = doCreateProject()
+        doCreateBranch(project, nd(
+                'b' * 121,
+                'Test with 120 characters'
+        ))
     }
 
 }
