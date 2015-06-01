@@ -53,7 +53,11 @@ public class Branch implements ProjectEntity {
     }
 
     public static Form form() {
-        return Form.nameAndDescription()
+        return Form.create()
+                .with(
+                        Form.defaultNameField().length(120)
+                )
+                .description()
                 .with(
                         YesNo.of("disabled").label("Disabled").help("Check if the branch must be disabled.")
                 );
