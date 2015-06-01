@@ -94,6 +94,27 @@ class ACCBrowserBasic extends AcceptanceTestClient {
 
     @Test
     @AcceptanceTest(excludes = "production")
+    void 'Branch creation with a 120 characters long name'() {
+        browser { browser ->
+            withProject { id, name ->
+                // Goes to the home page and logs in browser ->
+                HomePage home = loginAsAdmin(browser)
+                // Goes to the project
+                ProjectPage projectPage = home.goToProject(name)
+                // Creates a branch
+                def branchName = 'b' * 120
+                projectPage.createBranch { dialog ->
+                    dialog.name = branchName
+                    dialog.description = "Branch $branchName"
+                }
+                // Checks the branch is created
+                assert projectPage.isBranchPresent(branchName)
+            }
+        }
+    }
+
+    @Test
+    @AcceptanceTest(excludes = "production")
     void 'Project API page must be accessible'() {
         browser { browser ->
             withProject { id, name ->
