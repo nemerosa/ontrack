@@ -92,6 +92,10 @@ public final class JsonUtils {
         return builder.end();
     }
 
+    public static JsonNode fromMap(Map<String, ?> map) {
+        return ObjectMapperFactory.create().valueToTree(map);
+    }
+
     public static String get(JsonNode data, String field) {
         return get(data, field, true, null);
     }

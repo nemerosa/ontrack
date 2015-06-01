@@ -5,6 +5,8 @@ import net.nemerosa.ontrack.model.structure.*
 import org.junit.Before
 import org.junit.Test
 
+import static net.nemerosa.ontrack.json.JsonUtils.fromMap
+import static net.nemerosa.ontrack.json.JsonUtils.mapToJson
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when
@@ -49,6 +51,23 @@ class AutoPromotionPropertyTypeTest {
         def field = form.getField('validationStamps') as MultiSelection
         assert field.items.collect { it.name } == ['VS1', 'VS2']
         assert field.items.collect { it.selected } == [true, false]
+    }
+
+    @Test(expected = AutoPromotionPropertyCannotParseException)
+    void 'From client - parsing error'() {
+        type.fromClient(mapToJson([
+                validationStamps: 'VS1'
+        ]))
+    }
+
+    @Test
+    void 'From client'() {
+        when(structureService.getValidationStamp(ID.of(1))).thenReturn(validationStamp1)
+        when(structureService.getValidationStamp(ID.of(2))).thenReturn(validationStamp2)
+        def autoPromotionProperty = type.fromClient(fromMap([
+                validationStamps: [1, 2]
+        ]))
+        assert autoPromotionProperty.validationStamps.collect { it.name } == ['VS1', 'VS2']
     }
 
 }
