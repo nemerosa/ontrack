@@ -45,7 +45,7 @@ public class AutoValidationStampPropertyType extends AbstractPropertyType<AutoVa
                 .with(
                         YesNo.of("autoCreate")
                                 .label("Auto creation")
-                                .help("If set, allows validation stamps to be creatdd automatically")
+                                .help("If set, allows validation stamps to be created automatically")
                                 .value(value != null && value.isAutoCreate())
                 )
                 ;
