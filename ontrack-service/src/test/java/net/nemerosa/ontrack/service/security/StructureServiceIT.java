@@ -187,17 +187,6 @@ public class StructureServiceIT extends AbstractServiceTestSupport {
         assertEquals("Validation run order must be 1", 1, run.getRunOrder());
     }
 
-    private ValidationStamp doCreateValidationStamp(Branch branch, NameDescription nameDescription) throws Exception {
-        return asUser().with(branch.getProject().id(), ValidationStampCreate.class).call(() ->
-                        structureService.newValidationStamp(
-                                ValidationStamp.of(
-                                        branch,
-                                        nameDescription
-                                )
-                        )
-        );
-    }
-
     private int[] doCreateProjects() throws Exception {
         return asUser().with(ProjectCreation.class).call(() -> {
             int[] ids = new int[3];

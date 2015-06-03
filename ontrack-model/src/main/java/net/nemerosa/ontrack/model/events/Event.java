@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,6 +26,42 @@ public final class Event {
     private final Map<ProjectEntityType, ProjectEntity> entities;
     private final ProjectEntityType ref;
     private final Map<String, NameValue> values;
+
+    public int getIntValue(String name) {
+        return Integer.parseInt(getValue(name), 10);
+    }
+
+    public String getValue(String name) {
+        return getOptionalValue(name).orElseThrow(
+                () -> new IllegalStateException(
+                        String.format(
+                                "Missing '%s' in the event",
+                                name
+                        )
+                )
+        );
+    }
+
+    public Optional<String> getOptionalValue(String name) {
+        return Optional.of(values.get(name)).map(NameValue::getValue);
+    }
+
+    public <T extends ProjectEntity> T getEntity(ProjectEntityType entityType) {
+        return this.<T>getOptionalEntity(entityType).orElseThrow(
+                () -> new IllegalStateException(
+                        String.format(
+                                "Missing entity %s in the event",
+                                entityType
+                        )
+                )
+        );
+    }
+
+    public <T extends ProjectEntity> Optional<T> getOptionalEntity(ProjectEntityType entityType) {
+        @SuppressWarnings("unchecked")
+        T entity = (T) entities.get(entityType);
+        return Optional.of(entity);
+    }
 
     public String renderText() {
         return render(INSTANCE);

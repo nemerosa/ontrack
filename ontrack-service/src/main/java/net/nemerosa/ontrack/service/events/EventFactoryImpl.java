@@ -82,7 +82,10 @@ public class EventFactoryImpl implements EventFactory {
 
     @Override
     public Event deleteProject(Project project) {
-        return Event.of(DELETE_PROJECT).with("project", project.getName()).get();
+        return Event.of(DELETE_PROJECT)
+                .with("project", project.getName())
+                .with("project_id", project.getId().toString())
+                .get();
     }
 
     @Override
@@ -100,6 +103,7 @@ public class EventFactoryImpl implements EventFactory {
         return Event.of(DELETE_BRANCH)
                 .withProject(branch.getProject())
                 .with("branch", branch.getName())
+                .with("branch_id", branch.getId().toString())
                 .get();
     }
 
@@ -123,6 +127,7 @@ public class EventFactoryImpl implements EventFactory {
         return Event.of(DELETE_BUILD)
                 .withBranch(build.getBranch())
                 .with("build", build.getName())
+                .with("build_id", build.getId().toString())
                 .get();
     }
 
@@ -152,6 +157,7 @@ public class EventFactoryImpl implements EventFactory {
         return Event.of(DELETE_PROMOTION_LEVEL)
                 .withBranch(promotionLevel.getBranch())
                 .with("promotion_level", promotionLevel.getName())
+                .with("promotion_level_id", promotionLevel.getId().toString())
                 .get();
     }
 
@@ -204,6 +210,7 @@ public class EventFactoryImpl implements EventFactory {
         return Event.of(DELETE_VALIDATION_STAMP)
                 .withBranch(validationStamp.getBranch())
                 .with("validation_stamp", validationStamp.getName())
+                .with("validation_stamp_id", validationStamp.getId().toString())
                 .get();
     }
 
