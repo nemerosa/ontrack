@@ -4,11 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.nemerosa.ontrack.extension.support.ConfigurationService;
 import net.nemerosa.ontrack.extension.support.UserPasswordConfiguration;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
-import net.nemerosa.ontrack.model.support.DBMigrationAction;
 import net.nemerosa.ontrack.model.security.EncryptionService;
+import net.nemerosa.ontrack.model.support.DBMigrationAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -16,7 +17,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
 
 /**
  * Migration for the configurations, so they can be encrypted
@@ -28,14 +28,14 @@ public class EncryptedConfigurationMigrationAction implements DBMigrationAction 
 
     private final ObjectMapper objectMapper = ObjectMapperFactory.create();
 
-    private final Collection<ConfigurationService<?>> configurationServices;
+    private final ApplicationContext applicationContext;
     private final EncryptionService encryptionService;
 
     @Autowired
     protected EncryptedConfigurationMigrationAction(
-            Collection<ConfigurationService<?>> configurationServices,
+            ApplicationContext applicationContext,
             EncryptionService encryptionService) {
-        this.configurationServices = configurationServices;
+        this.applicationContext = applicationContext;
         this.encryptionService = encryptionService;
     }
 
@@ -47,7 +47,7 @@ public class EncryptedConfigurationMigrationAction implements DBMigrationAction 
     @Override
     public void migrate(Connection connection) throws SQLException, IOException {
         // For all configuration services
-        for (ConfigurationService<?> configurationService : configurationServices) {
+        for (ConfigurationService<?> configurationService : applicationContext.getBeansOfType(ConfigurationService.class).values()) {
             migrate(configurationService, connection);
         }
     }
