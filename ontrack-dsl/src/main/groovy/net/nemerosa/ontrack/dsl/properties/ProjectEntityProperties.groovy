@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.dsl.ProjectEntity
 
 class ProjectEntityProperties {
 
-    private final Ontrack ontrack
+    protected final Ontrack ontrack
     private final ProjectEntity entity
 
     ProjectEntityProperties(Ontrack ontrack, ProjectEntity entity) {
