@@ -92,7 +92,6 @@ public class CombinedIssueServiceExtension extends AbstractExtension implements 
 
     @Override
     public String getLinkForAllIssues(IssueServiceConfiguration issueServiceConfiguration, List<Issue> issues) {
-        // FIXME Method net.nemerosa.ontrack.extension.issues.combined.CombinedIssueServiceExtension.getLinkForAllIssues
         return null;
     }
 
