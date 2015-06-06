@@ -1,7 +1,8 @@
 package net.nemerosa.ontrack.extension.issues.combined;
 
-import net.nemerosa.ontrack.extension.api.ExtensionFeature;
+import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory;
+import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtension;
@@ -9,18 +10,38 @@ import net.nemerosa.ontrack.model.support.MessageAnnotator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class CombinedIssueServiceExtension extends AbstractIssueServiceExtension {
 
     public static final String SERVICE = "combined";
+    private final IssueServiceRegistry issueServiceRegistry;
 
     @Autowired
-    public CombinedIssueServiceExtension(CombinedIssueServiceExtensionFeature extensionFeature, String id, String name, IssueExportServiceFactory issueExportServiceFactory) {
+    public CombinedIssueServiceExtension(
+            CombinedIssueServiceExtensionFeature extensionFeature,
+            IssueServiceRegistry issueServiceRegistry,
+            IssueExportServiceFactory issueExportServiceFactory) {
         super(extensionFeature, SERVICE, "Combined issue service", issueExportServiceFactory);
+        this.issueServiceRegistry = issueServiceRegistry;
+    }
+
+    /**
+     * Gets the list of attached configured issue services.
+     *
+     * @param issueServiceConfiguration Configuration of the combined issue service
+     * @return List of associated configured issue services
+     */
+    protected Collection<ConfiguredIssueService> getConfiguredIssueServices(IssueServiceConfiguration issueServiceConfiguration) {
+        CombinedIssueServiceConfiguration combinedIssueServiceConfiguration = (CombinedIssueServiceConfiguration) issueServiceConfiguration;
+        return combinedIssueServiceConfiguration.getIssueServiceConfigurationIdentifiers().stream()
+                .map(issueServiceRegistry::getConfiguredIssueService)
+                .collect(Collectors.toList());
     }
 
     @Override
