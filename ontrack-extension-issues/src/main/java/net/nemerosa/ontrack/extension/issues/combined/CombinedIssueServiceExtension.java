@@ -11,11 +11,13 @@ import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
+import net.nemerosa.ontrack.model.support.MessageAnnotation;
 import net.nemerosa.ontrack.model.support.MessageAnnotator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
@@ -96,8 +98,34 @@ public class CombinedIssueServiceExtension extends AbstractExtension implements 
 
     @Override
     public Optional<MessageAnnotator> getMessageAnnotator(IssueServiceConfiguration issueServiceConfiguration) {
-        // FIXME Method net.nemerosa.ontrack.extension.issues.combined.CombinedIssueServiceExtension.getMessageAnnotator
-        return null;
+        // Gets all the defined message annotators
+        Collection<MessageAnnotator> messageAnnotators = getConfiguredIssueServices(issueServiceConfiguration).stream()
+                .map(
+                        configuredIssueService ->
+                                configuredIssueService.getIssueServiceExtension().getMessageAnnotator(
+                                        configuredIssueService.getIssueServiceConfiguration()
+                                )
+                )
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+        if (messageAnnotators.isEmpty()) {
+            return Optional.empty();
+        } else {
+            // For each message annotator, gets the list of annotation
+            return Optional.of(
+                    text -> messageAnnotators.stream()
+                            .map(messageAnnotator -> messageAnnotator.annotate(text))
+                            .map((Function<Collection<MessageAnnotation>, HashSet<MessageAnnotation>>) HashSet::new)
+                            .collect(
+                                    // ... and gets them all together
+                                    Collectors.reducing(
+                                            Collections.<MessageAnnotation>emptySet(),
+                                            Sets::union
+                                    )
+                            )
+            );
+        }
     }
 
     @Override

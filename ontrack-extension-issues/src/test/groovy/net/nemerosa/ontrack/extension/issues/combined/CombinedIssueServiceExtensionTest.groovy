@@ -6,6 +6,8 @@ import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
+import net.nemerosa.ontrack.model.support.MessageAnnotation
+import net.nemerosa.ontrack.model.support.MessageAnnotator
 import org.junit.Before
 import org.junit.Test
 
@@ -122,6 +124,70 @@ class CombinedIssueServiceExtensionTest {
         when(type1IssueService.getIssueId(testConfiguration, '#1')).thenReturn(Optional.of('11'))
         when(type2IssueService.getIssueId(testConfiguration, '#1')).thenReturn(Optional.of('12'))
         assert service.getIssueId(configuration, '#1').get() == '11'
+    }
+
+    @Test
+    void 'Message annotator - none returned'() {
+        when(type1IssueService.getMessageAnnotator(testConfiguration)).thenReturn(Optional.empty())
+        when(type2IssueService.getMessageAnnotator(testConfiguration)).thenReturn(Optional.empty())
+        assert !service.getMessageAnnotator(configuration).present
+    }
+
+    @Test
+    void 'Message annotator - first returned'() {
+        def text = '#1 Issue'
+
+        MessageAnnotator messageAnnotator1 = mock(MessageAnnotator)
+        MessageAnnotation annotation1 = new MessageAnnotation('type1', 'text1', [:])
+        when(messageAnnotator1.annotate(text)).thenReturn([annotation1])
+
+        when(type1IssueService.getMessageAnnotator(testConfiguration)).thenReturn(Optional.of(messageAnnotator1))
+        when(type2IssueService.getMessageAnnotator(testConfiguration)).thenReturn(Optional.empty())
+
+        def messageAnnotator = service.getMessageAnnotator(configuration)
+        assert messageAnnotator.present
+
+        assert messageAnnotator.get().annotate(text) == [annotation1] as Set
+    }
+
+    @Test
+    void 'Message annotator - second returned'() {
+        def text = '#1 Issue'
+
+        MessageAnnotator messageAnnotator2 = mock(MessageAnnotator)
+        MessageAnnotation annotation21 = new MessageAnnotation('type2', 'text21', [:])
+        MessageAnnotation annotation22 = new MessageAnnotation('type2', 'text22', [:])
+        when(messageAnnotator2.annotate(text)).thenReturn([annotation21, annotation22])
+
+        when(type1IssueService.getMessageAnnotator(testConfiguration)).thenReturn(Optional.empty())
+        when(type2IssueService.getMessageAnnotator(testConfiguration)).thenReturn(Optional.of(messageAnnotator2))
+
+        def messageAnnotator = service.getMessageAnnotator(configuration)
+        assert messageAnnotator.present
+
+        assert messageAnnotator.get().annotate(text) == [annotation21, annotation22] as Set
+    }
+
+    @Test
+    void 'Message annotator - all returned'() {
+        def text = '#1 Issue'
+
+        MessageAnnotator messageAnnotator1 = mock(MessageAnnotator)
+        MessageAnnotation annotation1 = new MessageAnnotation('type1', 'text1', [:])
+        when(messageAnnotator1.annotate(text)).thenReturn([annotation1])
+
+        MessageAnnotator messageAnnotator2 = mock(MessageAnnotator)
+        MessageAnnotation annotation21 = new MessageAnnotation('type2', 'text21', [:])
+        MessageAnnotation annotation22 = new MessageAnnotation('type2', 'text22', [:])
+        when(messageAnnotator2.annotate(text)).thenReturn([annotation21, annotation22])
+
+        when(type1IssueService.getMessageAnnotator(testConfiguration)).thenReturn(Optional.of(messageAnnotator1))
+        when(type2IssueService.getMessageAnnotator(testConfiguration)).thenReturn(Optional.of(messageAnnotator2))
+
+        def messageAnnotator = service.getMessageAnnotator(configuration)
+        assert messageAnnotator.present
+
+        assert messageAnnotator.get().annotate(text) == [annotation1, annotation21, annotation22] as Set
     }
 
 }
