@@ -70,10 +70,12 @@ public class CombinedIssueServiceExtension extends AbstractExtension implements 
         return null;
     }
 
+    /**
+     * Without any specific configuration, we have to assume the token is valid.
+     */
     @Override
     public boolean validIssueToken(String token) {
-        // FIXME Method net.nemerosa.ontrack.extension.issues.combined.CombinedIssueServiceExtension.validIssueToken
-        return false;
+        return true;
     }
 
     @Override
