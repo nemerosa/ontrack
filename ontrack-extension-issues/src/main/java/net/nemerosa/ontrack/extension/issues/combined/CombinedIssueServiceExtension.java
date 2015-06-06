@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.issues.combined;
 
+import com.google.common.collect.Sets;
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest;
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtension;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
@@ -14,10 +15,7 @@ import net.nemerosa.ontrack.model.support.MessageAnnotator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -80,8 +78,20 @@ public class CombinedIssueServiceExtension extends AbstractExtension implements 
 
     @Override
     public Set<String> extractIssueKeysFromMessage(IssueServiceConfiguration issueServiceConfiguration, String message) {
-        // FIXME Method net.nemerosa.ontrack.extension.issues.combined.CombinedIssueServiceExtension.extractIssueKeysFromMessage
-        return null;
+        return getConfiguredIssueServices(issueServiceConfiguration).stream()
+                .map(
+                        configuredIssueService ->
+                                configuredIssueService.getIssueServiceExtension().extractIssueKeysFromMessage(
+                                        configuredIssueService.getIssueServiceConfiguration(),
+                                        message
+                                )
+                )
+                .collect(
+                        Collectors.reducing(
+                                Collections.emptySet(),
+                                Sets::union
+                        )
+                );
     }
 
     @Override
