@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.issues.IssueServiceExtension
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
 import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
+import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
 import org.junit.Before
 import org.junit.Test
@@ -65,6 +66,34 @@ class CombinedIssueServiceExtensionTest {
 
         def keys = service.extractIssueKeysFromMessage(configuration, message)
         assert keys == ['ONTRACK-1', '1'] as Set
+    }
+
+    @Test
+    void 'No issue found'() {
+        assert service.getIssue(configuration, '1') == null
+    }
+
+    @Test
+    void 'One issue found - 1'() {
+        Issue issue1 = mock(Issue)
+        when(type1IssueService.getIssue(testConfiguration, '1')).thenReturn(issue1)
+        assert service.getIssue(configuration, '1') == issue1
+    }
+
+    @Test
+    void 'One issue found - 2'() {
+        Issue issue2 = mock(Issue)
+        when(type2IssueService.getIssue(testConfiguration, '1')).thenReturn(issue2)
+        assert service.getIssue(configuration, '1') == issue2
+    }
+
+    @Test
+    void 'Two issues found - takes the first one'() {
+        Issue issue1 = mock(Issue)
+        Issue issue2 = mock(Issue)
+        when(type1IssueService.getIssue(testConfiguration, '1')).thenReturn(issue1)
+        when(type2IssueService.getIssue(testConfiguration, '1')).thenReturn(issue2)
+        assert service.getIssue(configuration, '1') == issue1
     }
 
 }
