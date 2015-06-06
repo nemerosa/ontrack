@@ -137,7 +137,16 @@ public class CombinedIssueServiceExtension extends AbstractExtension implements 
 
     @Override
     public Optional<String> getIssueId(IssueServiceConfiguration issueServiceConfiguration, String token) {
-        // FIXME Method net.nemerosa.ontrack.extension.issues.combined.CombinedIssueServiceExtension.getIssueId
-        return null;
+        return getConfiguredIssueServices(issueServiceConfiguration).stream()
+                .map(
+                        configuredIssueService ->
+                                configuredIssueService.getIssueServiceExtension().getIssueId(
+                                        configuredIssueService.getIssueServiceConfiguration(),
+                                        token
+                                )
+                )
+                .filter(Optional::isPresent)
+                .findFirst()
+                .orElse(Optional.<String>empty());
     }
 }
