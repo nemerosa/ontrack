@@ -1,11 +1,15 @@
 package net.nemerosa.ontrack.extension.issues.combined;
 
+import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest;
+import net.nemerosa.ontrack.extension.issues.IssueServiceExtension;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
+import net.nemerosa.ontrack.extension.issues.export.ExportFormat;
+import net.nemerosa.ontrack.extension.issues.export.ExportedIssues;
 import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
-import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtension;
+import net.nemerosa.ontrack.extension.support.AbstractExtension;
 import net.nemerosa.ontrack.model.support.MessageAnnotator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,7 +21,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
-public class CombinedIssueServiceExtension extends AbstractIssueServiceExtension {
+public class CombinedIssueServiceExtension extends AbstractExtension implements IssueServiceExtension {
 
     public static final String SERVICE = "combined";
     private final IssueServiceRegistry issueServiceRegistry;
@@ -27,7 +31,7 @@ public class CombinedIssueServiceExtension extends AbstractIssueServiceExtension
             CombinedIssueServiceExtensionFeature extensionFeature,
             IssueServiceRegistry issueServiceRegistry,
             IssueExportServiceFactory issueExportServiceFactory) {
-        super(extensionFeature, SERVICE, "Combined issue service", issueExportServiceFactory);
+        super(extensionFeature);
         this.issueServiceRegistry = issueServiceRegistry;
     }
 
@@ -45,9 +49,13 @@ public class CombinedIssueServiceExtension extends AbstractIssueServiceExtension
     }
 
     @Override
-    protected Set<String> getIssueTypes(IssueServiceConfiguration issueServiceConfiguration, Issue issue) {
-        // FIXME Method net.nemerosa.ontrack.extension.issues.combined.CombinedIssueServiceExtension.getIssueTypes
-        return null;
+    public String getId() {
+        return SERVICE;
+    }
+
+    @Override
+    public String getName() {
+        return "Combined issue service";
     }
 
     @Override
@@ -89,6 +97,24 @@ public class CombinedIssueServiceExtension extends AbstractIssueServiceExtension
     @Override
     public Issue getIssue(IssueServiceConfiguration issueServiceConfiguration, String issueKey) {
         // FIXME Method net.nemerosa.ontrack.extension.issues.combined.CombinedIssueServiceExtension.getIssue
+        return null;
+    }
+
+    @Override
+    public boolean containsIssueKey(IssueServiceConfiguration issueServiceConfiguration, String key, Set<String> keys) {
+        // FIXME Method net.nemerosa.ontrack.extension.issues.combined.CombinedIssueServiceExtension.containsIssueKey
+        return false;
+    }
+
+    @Override
+    public List<ExportFormat> exportFormats() {
+        // FIXME Method net.nemerosa.ontrack.extension.issues.combined.CombinedIssueServiceExtension.exportFormats
+        return null;
+    }
+
+    @Override
+    public ExportedIssues exportIssues(IssueServiceConfiguration issueServiceConfiguration, List<? extends Issue> issues, IssueChangeLogExportRequest request) {
+        // FIXME Method net.nemerosa.ontrack.extension.issues.combined.CombinedIssueServiceExtension.exportIssues
         return null;
     }
 
