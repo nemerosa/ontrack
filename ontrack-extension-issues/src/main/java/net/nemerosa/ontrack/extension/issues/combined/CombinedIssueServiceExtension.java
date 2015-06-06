@@ -88,7 +88,7 @@ public class CombinedIssueServiceExtension extends AbstractExtension implements 
                 )
                 .collect(
                         Collectors.reducing(
-                                Collections.emptySet(),
+                                Collections.<String>emptySet(),
                                 Sets::union
                         )
                 );
