@@ -96,4 +96,32 @@ class CombinedIssueServiceExtensionTest {
         assert service.getIssue(configuration, '1') == issue1
     }
 
+    @Test
+    void 'Getting the issue ID - not valid for both'() {
+        when(type1IssueService.getIssueId(testConfiguration, 'X')).thenReturn(Optional.empty())
+        when(type2IssueService.getIssueId(testConfiguration, 'X')).thenReturn(Optional.empty())
+        assert !service.getIssueId(configuration, 'X').present
+    }
+
+    @Test
+    void 'Getting the issue ID - valid for first'() {
+        when(type1IssueService.getIssueId(testConfiguration, '#1')).thenReturn(Optional.of('1'))
+        when(type2IssueService.getIssueId(testConfiguration, '#1')).thenReturn(Optional.empty())
+        assert service.getIssueId(configuration, '#1').get() == '1'
+    }
+
+    @Test
+    void 'Getting the issue ID - valid for second'() {
+        when(type1IssueService.getIssueId(testConfiguration, '#1')).thenReturn(Optional.empty())
+        when(type2IssueService.getIssueId(testConfiguration, '#1')).thenReturn(Optional.of('1'))
+        assert service.getIssueId(configuration, '#1').get() == '1'
+    }
+
+    @Test
+    void 'Getting the issue ID - valid for both - takes the first'() {
+        when(type1IssueService.getIssueId(testConfiguration, '#1')).thenReturn(Optional.of('11'))
+        when(type2IssueService.getIssueId(testConfiguration, '#1')).thenReturn(Optional.of('12'))
+        assert service.getIssueId(configuration, '#1').get() == '11'
+    }
+
 }
