@@ -96,14 +96,31 @@ public class CombinedIssueServiceExtension extends AbstractExtension implements 
 
     @Override
     public Issue getIssue(IssueServiceConfiguration issueServiceConfiguration, String issueKey) {
-        // FIXME Method net.nemerosa.ontrack.extension.issues.combined.CombinedIssueServiceExtension.getIssue
-        return null;
+        return getConfiguredIssueServices(issueServiceConfiguration).stream()
+                .map(
+                        configuredIssueService ->
+                                configuredIssueService.getIssueServiceExtension().getIssue(
+                                        configuredIssueService.getIssueServiceConfiguration(),
+                                        issueKey
+                                )
+                )
+                .filter(issue -> issue != null)
+                .findFirst()
+                .orElse(null)
+                ;
     }
 
     @Override
     public boolean containsIssueKey(IssueServiceConfiguration issueServiceConfiguration, String key, Set<String> keys) {
-        // FIXME Method net.nemerosa.ontrack.extension.issues.combined.CombinedIssueServiceExtension.containsIssueKey
-        return false;
+        return getConfiguredIssueServices(issueServiceConfiguration).stream()
+                .anyMatch(
+                        configuredIssueService ->
+                                configuredIssueService.getIssueServiceExtension().containsIssueKey(
+                                        configuredIssueService.getIssueServiceConfiguration(),
+                                        key,
+                                        keys
+                                )
+                );
     }
 
     @Override
