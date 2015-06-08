@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.issues.combined;
 
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
+import net.nemerosa.ontrack.model.security.GlobalSettings;
+import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +18,13 @@ public class CombinedIssueServiceConfigurationServiceImpl implements CombinedIss
 
     private final ConfigurationRepository configurationRepository;
     private final IssueServiceRegistry issueServiceRegistry;
+    private final SecurityService securityService;
 
     @Autowired
-    public CombinedIssueServiceConfigurationServiceImpl(ConfigurationRepository configurationRepository, IssueServiceRegistry issueServiceRegistry) {
+    public CombinedIssueServiceConfigurationServiceImpl(ConfigurationRepository configurationRepository, IssueServiceRegistry issueServiceRegistry, SecurityService securityService) {
         this.configurationRepository = configurationRepository;
         this.issueServiceRegistry = issueServiceRegistry;
+        this.securityService = securityService;
     }
 
     @Override
@@ -45,5 +49,12 @@ public class CombinedIssueServiceConfigurationServiceImpl implements CombinedIss
                                 )
                 )
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public CombinedIssueServiceConfiguration newConfiguration(CombinedIssueServiceConfiguration configuration) {
+        securityService.checkGlobalFunction(GlobalSettings.class);
+        configurationRepository.save(configuration);
+        return configuration;
     }
 }

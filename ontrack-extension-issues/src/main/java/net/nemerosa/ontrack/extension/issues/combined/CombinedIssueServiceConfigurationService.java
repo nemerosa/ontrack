@@ -12,4 +12,6 @@ public interface CombinedIssueServiceConfigurationService {
     Optional<CombinedIssueServiceConfiguration> getConfigurationByName(String name);
 
     List<IssueServiceConfigurationRepresentation> getAvailableIssueServiceConfigurations();
+
+    CombinedIssueServiceConfiguration newConfiguration(CombinedIssueServiceConfiguration configuration);
 }
