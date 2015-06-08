@@ -26,10 +26,12 @@ class CombinedIssueServiceExtensionTest {
     void 'Setup'() {
         IssueServiceRegistry issueServiceRegistry = mock(IssueServiceRegistry)
         IssueExportServiceFactory issueExportServiceFactory = mock(IssueExportServiceFactory)
+        CombinedIssueServiceConfigurationService configurationService = mock(CombinedIssueServiceConfigurationService)
         service = new CombinedIssueServiceExtension(
                 new CombinedIssueServiceExtensionFeature(),
                 issueServiceRegistry,
-                issueExportServiceFactory
+                issueExportServiceFactory,
+                configurationService
         )
 
         configuration = new CombinedIssueServiceConfiguration(

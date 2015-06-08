@@ -24,15 +24,18 @@ import java.util.stream.Collectors;
 public class CombinedIssueServiceExtension extends AbstractExtension implements IssueServiceExtension {
 
     public static final String SERVICE = "combined";
+    private final CombinedIssueServiceConfigurationService configurationService;
     private final IssueServiceRegistry issueServiceRegistry;
 
     @Autowired
     public CombinedIssueServiceExtension(
             CombinedIssueServiceExtensionFeature extensionFeature,
             IssueServiceRegistry issueServiceRegistry,
-            IssueExportServiceFactory issueExportServiceFactory) {
+            IssueExportServiceFactory issueExportServiceFactory,
+            CombinedIssueServiceConfigurationService configurationService) {
         super(extensionFeature);
         this.issueServiceRegistry = issueServiceRegistry;
+        this.configurationService = configurationService;
     }
 
     /**
@@ -60,14 +63,12 @@ public class CombinedIssueServiceExtension extends AbstractExtension implements 
 
     @Override
     public List<? extends IssueServiceConfiguration> getConfigurationList() {
-        // FIXME Method net.nemerosa.ontrack.extension.issues.combined.CombinedIssueServiceExtension.getConfigurationList
-        return null;
+        return configurationService.getConfigurationList();
     }
 
     @Override
     public IssueServiceConfiguration getConfigurationByName(String name) {
-        // FIXME Method net.nemerosa.ontrack.extension.issues.combined.CombinedIssueServiceExtension.getConfigurationByName
-        return null;
+        return configurationService.getConfigurationByName(name).orElse(null);
     }
 
     /**
