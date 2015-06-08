@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.issues.combined;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
@@ -22,11 +23,13 @@ public class CombinedIssueServiceConfiguration implements Configuration, IssueSe
     private final List<String> issueServiceConfigurationIdentifiers;
 
     @Override
+    @JsonIgnore
     public String getServiceId() {
         return CombinedIssueServiceExtension.SERVICE;
     }
 
     @Override
+    @JsonIgnore
     public ConfigurationDescriptor getDescriptor() {
         return new ConfigurationDescriptor(name, name);
     }
