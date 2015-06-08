@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.issues.combined;
 
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -8,4 +10,6 @@ public interface CombinedIssueServiceConfigurationService {
     List<CombinedIssueServiceConfiguration> getConfigurationList();
 
     Optional<CombinedIssueServiceConfiguration> getConfigurationByName(String name);
+
+    List<IssueServiceConfigurationRepresentation> getAvailableIssueServiceConfigurations();
 }
