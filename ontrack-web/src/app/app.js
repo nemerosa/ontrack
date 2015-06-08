@@ -42,6 +42,7 @@ var ontrack = angular.module('ontrack', [
         'ontrack.extension.jenkins',
         'ontrack.extension.svn',
         'ontrack.extension.jira',
+        'ontrack.extension.combined',
         'ontrack.extension.artifactory',
         'ontrack.extension.git',
         'ontrack.extension.github'

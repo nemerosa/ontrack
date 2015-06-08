@@ -13,6 +13,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static net.nemerosa.ontrack.model.form.Form.defaultNameField;
+
 @Data
 public class CombinedIssueServiceConfiguration implements Configuration, IssueServiceConfiguration {
 
@@ -43,6 +45,7 @@ public class CombinedIssueServiceConfiguration implements Configuration, IssueSe
 
     public Form asForm(List<IssueServiceConfigurationRepresentation> availableIssueServiceConfigurations) {
         return Form.create()
+                .with(defaultNameField())
                 .with(
                         MultiSelection.of("issueServiceConfigurationIdentifiers")
                                 .label("Issue services")
