@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -63,5 +64,18 @@ public class CombinedIssueServiceConfigurationServiceImpl implements CombinedIss
     public CombinedIssueServiceConfiguration getConfiguration(String name) {
         return getConfigurationByName(name)
                 .orElseThrow(() -> new ConfigurationNotFoundException(name));
+    }
+
+    @Override
+    public void deleteConfiguration(String name) {
+        securityService.checkGlobalFunction(GlobalSettings.class);
+        configurationRepository.delete(CombinedIssueServiceConfiguration.class, name);
+    }
+
+    @Override
+    public void updateConfiguration(String name, CombinedIssueServiceConfiguration configuration) {
+        securityService.checkGlobalFunction(GlobalSettings.class);
+        Validate.isTrue(StringUtils.equals(name, configuration.getName()), "Configuration name must match");
+        configurationRepository.save(configuration);
     }
 }

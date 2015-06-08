@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.issues.combined;
 
 import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -9,6 +10,7 @@ import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
@@ -76,5 +78,34 @@ public class CombinedIssueServiceController extends AbstractExtensionController<
     @RequestMapping(value = "configurations/{name}", method = RequestMethod.GET)
     public CombinedIssueServiceConfiguration getConfiguration(@PathVariable String name) {
         return configurationService.getConfiguration(name);
+    }
+
+    /**
+     * Update form
+     */
+    @RequestMapping(value = "configurations/{name}/update", method = RequestMethod.GET)
+    public Form updateConfigurationForm(@PathVariable String name) {
+        return configurationService.getConfiguration(name).asForm(
+                configurationService.getAvailableIssueServiceConfigurations()
+        );
+    }
+
+    /**
+     * Updating one configuration
+     */
+    @RequestMapping(value = "configurations/{name}/update", method = RequestMethod.PUT)
+    public CombinedIssueServiceConfiguration updateConfiguration(@PathVariable String name, @RequestBody CombinedIssueServiceConfiguration configuration) {
+        configurationService.updateConfiguration(name, configuration);
+        return getConfiguration(name);
+    }
+
+    /**
+     * Deleting one configuration
+     */
+    @RequestMapping(value = "configurations/{name}", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public Ack deleteConfiguration(@PathVariable String name) {
+        configurationService.deleteConfiguration(name);
+        return Ack.OK;
     }
 }

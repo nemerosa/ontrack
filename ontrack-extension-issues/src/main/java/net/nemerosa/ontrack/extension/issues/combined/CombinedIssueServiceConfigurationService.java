@@ -16,4 +16,8 @@ public interface CombinedIssueServiceConfigurationService {
     CombinedIssueServiceConfiguration newConfiguration(CombinedIssueServiceConfiguration configuration);
 
     CombinedIssueServiceConfiguration getConfiguration(String name);
+
+    void deleteConfiguration(String name);
+
+    void updateConfiguration(String name, CombinedIssueServiceConfiguration configuration);
 }
