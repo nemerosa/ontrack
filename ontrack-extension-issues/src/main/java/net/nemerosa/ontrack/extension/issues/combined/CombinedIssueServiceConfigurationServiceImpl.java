@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.issues.combined;
 
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
+import net.nemerosa.ontrack.extension.support.ConfigurationNotFoundException;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
@@ -56,5 +57,11 @@ public class CombinedIssueServiceConfigurationServiceImpl implements CombinedIss
         securityService.checkGlobalFunction(GlobalSettings.class);
         configurationRepository.save(configuration);
         return configuration;
+    }
+
+    @Override
+    public CombinedIssueServiceConfiguration getConfiguration(String name) {
+        return getConfigurationByName(name)
+                .orElseThrow(() -> new ConfigurationNotFoundException(name));
     }
 }

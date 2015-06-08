@@ -9,10 +9,7 @@ import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -71,5 +68,13 @@ public class CombinedIssueServiceController extends AbstractExtensionController<
     @RequestMapping(value = "configurations/create", method = RequestMethod.POST)
     public CombinedIssueServiceConfiguration newConfiguration(@RequestBody CombinedIssueServiceConfiguration configuration) {
         return configurationService.newConfiguration(configuration);
+    }
+
+    /**
+     * Gets one configuration
+     */
+    @RequestMapping(value = "configurations/{name}", method = RequestMethod.GET)
+    public CombinedIssueServiceConfiguration getConfiguration(@PathVariable String name) {
+        return configurationService.getConfiguration(name);
     }
 }
