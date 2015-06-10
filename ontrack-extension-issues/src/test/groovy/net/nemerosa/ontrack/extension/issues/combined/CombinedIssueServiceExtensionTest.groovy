@@ -1,8 +1,10 @@
 package net.nemerosa.ontrack.extension.issues.combined
 
+import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtension
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
 import net.nemerosa.ontrack.extension.issues.export.ExportFormat
+import net.nemerosa.ontrack.extension.issues.export.ExportedIssues
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
@@ -199,6 +201,63 @@ class CombinedIssueServiceExtensionTest {
         def formats = service.exportFormats(configuration)
 
         assert formats as Set == [ExportFormat.HTML, ExportFormat.MARKDOWN, ExportFormat.TEXT] as Set
+    }
+
+    @Test
+    void 'Export issues with no issue'() {
+
+        def issues = []
+
+        def exportRequest = new IssueChangeLogExportRequest()
+        exportRequest.format = 'text'
+
+        when(type1IssueService.exportIssues(testConfiguration, issues, exportRequest)).thenReturn(
+                new ExportedIssues('text', '')
+        )
+        when(type2IssueService.exportIssues(testConfiguration, issues, exportRequest)).thenReturn(
+                new ExportedIssues('text', '')
+        )
+
+        def export = service.exportIssues(configuration, issues, exportRequest)
+
+        assert export.format == 'text'
+        assert export.content == ''
+
+    }
+
+    @Test
+    void 'Export issues'() {
+
+        def issue1 = mock(Issue)
+        def issue2 = mock(Issue)
+
+        def issues = [
+                issue1,
+                issue2
+        ]
+
+        def exportRequest = new IssueChangeLogExportRequest()
+        exportRequest.format = 'text'
+
+        when(type1IssueService.exportIssues(testConfiguration, issues, exportRequest)).thenReturn(
+                new ExportedIssues('text', '''\
+#1 Issue 1
+''')
+        )
+        when(type2IssueService.exportIssues(testConfiguration, issues, exportRequest)).thenReturn(
+                new ExportedIssues('text', '''\
+PRJ-2 Issue 2
+''')
+        )
+
+        def export = service.exportIssues(configuration, issues, exportRequest)
+
+        assert export.format == 'text'
+        assert export.content == '''\
+#1 Issue 1
+PRJ-2 Issue 2
+'''
+
     }
 
 }

@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
 import net.nemerosa.ontrack.model.support.MessageAnnotation;
 import net.nemerosa.ontrack.model.support.MessageAnnotator;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -183,8 +184,25 @@ public class CombinedIssueServiceExtension extends AbstractExtension implements 
 
     @Override
     public ExportedIssues exportIssues(IssueServiceConfiguration issueServiceConfiguration, List<? extends Issue> issues, IssueChangeLogExportRequest request) {
-        // FIXME Method net.nemerosa.ontrack.extension.issues.combined.CombinedIssueServiceExtension.exportIssues
-        return null;
+        List<ExportedIssues> exportedIssues = getConfiguredIssueServices(issueServiceConfiguration).stream()
+                .map(
+                        configuredIssueService ->
+                                configuredIssueService.getIssueServiceExtension().exportIssues(
+                                        configuredIssueService.getIssueServiceConfiguration(),
+                                        issues,
+                                        request
+                                )
+                )
+                .collect(Collectors.toList());
+        // Checks the format is the same for all exports (it must)
+        if (!exportedIssues.stream().allMatch(it -> StringUtils.equals(it.getFormat(), request.getFormat()))) {
+            throw new IllegalStateException("All exported issues must have the same export format");
+        }
+        // Concatenates the content
+        return new ExportedIssues(
+                request.getFormat(),
+                exportedIssues.stream().map(ExportedIssues::getContent).collect(Collectors.joining(""))
+        );
     }
 
     @Override
