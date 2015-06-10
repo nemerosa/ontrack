@@ -48,7 +48,7 @@ public class CombinedIssueServiceConfiguration implements Configuration, IssueSe
 
     public Form asForm(List<IssueServiceConfigurationRepresentation> availableIssueServiceConfigurations) {
         return Form.create()
-                .with(defaultNameField())
+                .with(defaultNameField().value(name))
                 .with(
                         MultiSelection.of("issueServiceConfigurationIdentifiers")
                                 .label("Issue services")

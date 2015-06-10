@@ -43,7 +43,7 @@ angular.module('ontrack.extension.combined', [
                 submit: function (data) {
                     return ot.call($http.post($scope.configurations._create, data));
                 }
-            }).then(loadJiraConfigurations);
+            }).then(loadConfigurations);
         };
 
         // Deleting a configuration
@@ -53,7 +53,7 @@ angular.module('ontrack.extension.combined', [
                 message: "Do you really want to delete this JIRA configuration? Some projects may still refer to it."
             }).then(
                 function success() {
-                    ot.call($http.delete(configuration._delete)).then(loadJiraConfigurations);
+                    ot.call($http.delete(configuration._delete)).then(loadConfigurations);
                 }
             );
         };
@@ -66,7 +66,7 @@ angular.module('ontrack.extension.combined', [
                 submit: function (data) {
                     return ot.call($http.put(configuration._update, data));
                 }
-            }).then(loadJiraConfigurations);
+            }).then(loadConfigurations);
         };
     })
     .directive('otExtensionJiraIssueLink', function () {
