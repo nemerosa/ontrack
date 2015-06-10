@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.issues.combined
 
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtension
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
-import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
+import net.nemerosa.ontrack.extension.issues.export.ExportFormat
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
@@ -25,12 +25,10 @@ class CombinedIssueServiceExtensionTest {
     @Before
     void 'Setup'() {
         IssueServiceRegistry issueServiceRegistry = mock(IssueServiceRegistry)
-        IssueExportServiceFactory issueExportServiceFactory = mock(IssueExportServiceFactory)
         CombinedIssueServiceConfigurationService configurationService = mock(CombinedIssueServiceConfigurationService)
         service = new CombinedIssueServiceExtension(
                 new CombinedIssueServiceExtensionFeature(),
                 issueServiceRegistry,
-                issueExportServiceFactory,
                 configurationService
         )
 
@@ -190,6 +188,17 @@ class CombinedIssueServiceExtensionTest {
         assert messageAnnotator.present
 
         assert messageAnnotator.get().annotate(text) == [annotation1, annotation21, annotation22] as Set
+    }
+
+    @Test
+    void 'Export formats'() {
+
+        when(type1IssueService.exportFormats(testConfiguration)).thenReturn([ExportFormat.HTML, ExportFormat.TEXT])
+        when(type2IssueService.exportFormats(testConfiguration)).thenReturn([ExportFormat.MARKDOWN, ExportFormat.TEXT])
+
+        def formats = service.exportFormats(configuration)
+
+        assert formats as Set == [ExportFormat.HTML, ExportFormat.MARKDOWN, ExportFormat.TEXT] as Set
     }
 
 }

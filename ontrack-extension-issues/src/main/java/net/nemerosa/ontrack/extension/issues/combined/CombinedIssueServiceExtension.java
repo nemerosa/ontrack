@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.extension.issues.IssueServiceExtension;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.export.ExportFormat;
 import net.nemerosa.ontrack.extension.issues.export.ExportedIssues;
-import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
@@ -31,7 +30,6 @@ public class CombinedIssueServiceExtension extends AbstractExtension implements 
     public CombinedIssueServiceExtension(
             CombinedIssueServiceExtensionFeature extensionFeature,
             IssueServiceRegistry issueServiceRegistry,
-            IssueExportServiceFactory issueExportServiceFactory,
             CombinedIssueServiceConfigurationService configurationService) {
         super(extensionFeature);
         this.issueServiceRegistry = issueServiceRegistry;
@@ -165,8 +163,22 @@ public class CombinedIssueServiceExtension extends AbstractExtension implements 
 
     @Override
     public List<ExportFormat> exportFormats(IssueServiceConfiguration issueServiceConfiguration) {
-        // FIXME Method net.nemerosa.ontrack.extension.issues.combined.CombinedIssueServiceExtension.exportFormats
-        return null;
+        Set<ExportFormat> lists = getConfiguredIssueServices(issueServiceConfiguration).stream()
+                .map(
+                        configuredIssueService ->
+                                configuredIssueService.getIssueServiceExtension().exportFormats(
+                                        configuredIssueService.getIssueServiceConfiguration()
+                                )
+                )
+                .map((Function<List<ExportFormat>, HashSet<ExportFormat>>) HashSet::new)
+                .collect(
+                        // ... and gets them all together
+                        Collectors.reducing(
+                                Collections.<ExportFormat>emptySet(),
+                                Sets::union
+                        )
+                );
+        return new ArrayList<>(lists);
     }
 
     @Override
