@@ -1,0 +1,36 @@
+<table>
+    <tbody>
+    <tr>
+        <td>
+            Key:
+        </td>
+        <td>
+            {{value.displayKey}}
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Status:
+        </td>
+        <td>
+            {{value.status.name}}
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Summary:
+        </td>
+        <td>
+            {{value.summary}}
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Update time
+        </td>
+        <td>
+            {{value.updateTime | date: 'mediumDate'}}
+        </td>
+    </tr>
+    </tbody>
+</table>
