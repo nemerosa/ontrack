@@ -353,7 +353,9 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
         SVNRepository svnRepository = getSVNRepository(branch);
         ConfiguredIssueService configuredIssueService = svnRepository.getConfiguredIssueService();
         if (configuredIssueService != null) {
-            return configuredIssueService.getIssueServiceExtension().exportFormats();
+            return configuredIssueService.getIssueServiceExtension().exportFormats(
+                    configuredIssueService.getIssueServiceConfiguration()
+            );
         } else {
             return Collections.emptyList();
         }

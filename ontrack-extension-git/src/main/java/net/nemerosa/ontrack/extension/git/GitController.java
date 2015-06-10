@@ -197,7 +197,9 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
             ConfiguredIssueService configuredIssueService = issueServiceRegistry.getConfiguredIssueService(configuration.get().getIssueServiceConfigurationIdentifier());
             if (configuredIssueService != null) {
                 return Resources.of(
-                        configuredIssueService.getIssueServiceExtension().exportFormats(),
+                        configuredIssueService.getIssueServiceExtension().exportFormats(
+                                configuredIssueService.getIssueServiceConfiguration()
+                        ),
                         uri(on(GitController.class).changeLogExportFormats(projectId))
                 );
             }

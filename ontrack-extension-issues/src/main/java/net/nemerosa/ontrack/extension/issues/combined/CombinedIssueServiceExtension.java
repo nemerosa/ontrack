@@ -164,7 +164,7 @@ public class CombinedIssueServiceExtension extends AbstractExtension implements 
     }
 
     @Override
-    public List<ExportFormat> exportFormats() {
+    public List<ExportFormat> exportFormats(IssueServiceConfiguration issueServiceConfiguration) {
         // FIXME Method net.nemerosa.ontrack.extension.issues.combined.CombinedIssueServiceExtension.exportFormats
         return null;
     }
