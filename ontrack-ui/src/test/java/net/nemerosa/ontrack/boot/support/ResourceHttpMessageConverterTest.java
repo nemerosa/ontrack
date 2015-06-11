@@ -7,13 +7,14 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.test.TestUtils;
 import net.nemerosa.ontrack.ui.controller.MockURIBuilder;
+import net.nemerosa.ontrack.ui.resource.ResourceDecorationContributorService;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpOutputMessage;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.Collections;
 
 import static net.nemerosa.ontrack.json.JsonUtils.object;
 import static org.mockito.Mockito.mock;
@@ -27,9 +28,10 @@ public class ResourceHttpMessageConverterTest {
     public void before() {
         SecurityService securityService = mock(SecurityService.class);
         StructureService structureService = mock(StructureService.class);
+        ResourceDecorationContributorService resourceDecorationContributorService = mock(ResourceDecorationContributorService.class);
         converter = new ResourceHttpMessageConverter(
                 new MockURIBuilder(), securityService,
-                Arrays.asList(new CoreResourceModule(structureService))
+                Collections.singletonList(new CoreResourceModule(structureService, resourceDecorationContributorService))
         );
     }
 
@@ -68,7 +70,7 @@ public class ResourceHttpMessageConverterTest {
                                         .with("_branches", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranchListForProject:1")
                                         .with("_branchStatusViews", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getBranchStatusViews:1")
                                         .with("_buildSearch", "urn:test:net.nemerosa.ontrack.boot.ui.BuildController#buildSearchForm:1")
-                                        .with("_buildDiffActions","urn:test:net.nemerosa.ontrack.boot.ui.BuildController#buildDiffActions:1")
+                                        .with("_buildDiffActions", "urn:test:net.nemerosa.ontrack.boot.ui.BuildController#buildDiffActions:1")
                                         .with("_properties", "urn:test:net.nemerosa.ontrack.boot.ui.PropertyController#getProperties:PROJECT,1")
                                         .with("_actions", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getActions:PROJECT,1")
                                         .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:PROJECT,1")

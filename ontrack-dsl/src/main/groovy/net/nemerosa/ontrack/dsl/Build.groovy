@@ -84,4 +84,30 @@ class Build extends AbstractProjectResource {
                 ]
         )
     }
+
+    /**
+     * Gets the change log between this build and another one.
+     *
+     * If no change log is available, because the associated branch is not configured for example,
+     * null is returned.
+     */
+    ChangeLog getChangeLog(Build otherBuild) {
+        try {
+            return new ChangeLog(
+                    ontrack,
+                    ontrack.get(
+                            query(
+                                    link('changeLog'),
+                                    [
+                                            from: otherBuild.id,
+                                            to  : this.id,
+                                    ]
+                            )
+                    )
+            )
+        } catch (ResourceMissingLinkException ignored) {
+            return null
+        }
+    }
+
 }

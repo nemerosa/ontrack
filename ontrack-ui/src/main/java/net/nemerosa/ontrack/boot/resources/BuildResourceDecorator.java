@@ -4,9 +4,7 @@ import net.nemerosa.ontrack.boot.ui.*;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
-import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
-import net.nemerosa.ontrack.ui.resource.Link;
-import net.nemerosa.ontrack.ui.resource.ResourceContext;
+import net.nemerosa.ontrack.ui.resource.*;
 
 import java.util.List;
 
@@ -14,13 +12,16 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 public class BuildResourceDecorator extends AbstractResourceDecorator<Build> {
 
-    protected BuildResourceDecorator() {
+    private final ResourceDecorationContributorService resourceDecorationContributorService;
+
+    public BuildResourceDecorator(ResourceDecorationContributorService resourceDecorationContributorService) {
         super(Build.class);
+        this.resourceDecorationContributorService = resourceDecorationContributorService;
     }
 
     @Override
     public List<Link> links(Build build, ResourceContext resourceContext) {
-        return resourceContext.links()
+        LinksBuilder linksBuilder = resourceContext.links()
                 .self(on(BuildController.class).getBuild(build.getId()))
                         // Other linked resources
                 .link("_lastPromotionRuns", on(PromotionRunController.class).getLastPromotionRuns(build.getId()))
@@ -59,9 +60,11 @@ public class BuildResourceDecorator extends AbstractResourceDecorator<Build> {
                         "_signature",
                         on(BuildController.class).updateBuildSignatureForm(build.getId()),
                         ProjectEdit.class, build
-                )
-                        // OK
-                .build();
+                );
+        // Contributions
+        resourceDecorationContributorService.contribute(linksBuilder, build);
+        // OK
+        return linksBuilder.build();
     }
 
 }
