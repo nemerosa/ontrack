@@ -57,19 +57,21 @@ def maven_publish(options):
 
 def publish(options):
     # Creation of the release
-    print "[publish] Creation of GitHub release %s" % options.version_release
-    release_id = github.create_release(options, options.version_commit, options.version_release)
-    print "[publish] Release ID is %d" % release_id
-    # Attach artifacts to the release
-    ui_jar = "%s/ontrack-ui-%s.jar" % (options.repository, options.version_full)
-    print "[publish] Uploading ontrack-ui.jar at %s..." % ui_jar
-    github.upload_github_artifact(options, release_id, 'ontrack-ui.jar', 'application/zip', ui_jar)
-    # Gets the change log since last release
-    print "[publish] Getting the change log from Ontrack..."
-    change_log = ontrack.get_change_log(options.ontrack_url, options.ontrack_branch, 'RELEASE')
-    # Attach change log to the release
-    print "[publish] Setting the change log as description in the release..."
-    github.set_release_description(options, release_id, change_log)
+    if (options.release == 'true'):
+        print "[publish] Creation of GitHub release %s" % options.version_release
+        release_id = github.create_release(options, options.version_commit, options.version_release)
+        print "[publish] Release ID is %d" % release_id
+        # Attach artifacts to the release
+        ui_jar = "%s/ontrack-ui-%s.jar" % (options.repository, options.version_full)
+        print "[publish] Uploading ontrack-ui.jar at %s..." % ui_jar
+        github.upload_github_artifact(options, release_id, 'ontrack-ui.jar', 'application/zip', ui_jar)
+        # Gets the change log since last release
+        print "[publish] Getting the change log from Ontrack..."
+        change_log = ontrack.get_change_log(options.ontrack_url, options.ontrack_branch, 'RELEASE')
+        # Attach change log to the release
+        print "[publish] Setting the change log as description in the release..."
+        github.set_release_description(options, release_id, change_log)
+
     # Publication in the Maven Central repository
     print "[publish] Publishing DSL libraries in OSSRH..."
     maven_publish(options)
@@ -80,6 +82,7 @@ def publish(options):
 if __name__ == '__main__':
     # Argument definitions
     parser = argparse.ArgumentParser(description='Ontrack publication')
+    parser.add_argument('--release', required=True, help='Commit to release')
     parser.add_argument('--version-commit', required=True, help='Commit to release')
     parser.add_argument('--version-full', required=True, help='Version to release')
     parser.add_argument('--version-release', required=True, help='Release to create')

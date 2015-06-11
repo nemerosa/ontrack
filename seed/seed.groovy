@@ -249,29 +249,30 @@ docker logout
         }
     }
 
-    if (branchType == 'release') {
+    // Publish job
+    // Available for all branches, with some restrictions (no tagging) for non release branches
+    boolean release = branchType == 'release'
 
-        // Publish job
-
-        freeStyleJob("${PROJECT}-${NAME}-publish") {
-            logRotator(numToKeep = 40)
-            deliveryPipelineConfiguration('Release', 'Publish')
-            jdk 'JDK8u25'
-            parameters {
-                stringParam('VERSION_FULL', '', '')
-                stringParam('VERSION_COMMIT', '', '')
-                stringParam('VERSION_BUILD', '', '')
-                stringParam('VERSION_DISPLAY', '', '')
+    freeStyleJob("${PROJECT}-${NAME}-publish") {
+        logRotator(numToKeep = 40)
+        deliveryPipelineConfiguration('Release', 'Publish')
+        jdk 'JDK8u25'
+        parameters {
+            stringParam('VERSION_FULL', '', '')
+            stringParam('VERSION_COMMIT', '', '')
+            stringParam('VERSION_BUILD', '', '')
+            stringParam('VERSION_DISPLAY', '', '')
+        }
+        wrappers {
+            injectPasswords()
+            toolenv('Maven-3.2.x')
+        }
+        steps {
+            environmentVariables {
+                env 'VERSION_BRANCHID', NAME
             }
-            wrappers {
-                injectPasswords()
-                toolenv('Maven-3.2.x')
-            }
-            steps {
-                environmentVariables {
-                    env 'VERSION_BRANCHID', NAME
-                }
-                shell readFileFromWorkspace('seed/publish.sh')
+            if (release) {
+                shell readFileFromWorkspace('seed/publish-release.sh')
                 shell """\
 docker tag --force nemerosa/ontrack:\${VERSION_FULL} nemerosa/ontrack:latest
 docker tag --force nemerosa/ontrack:\${VERSION_FULL} nemerosa/ontrack:\${VERSION_DISPLAY}
@@ -280,34 +281,39 @@ docker push nemerosa/ontrack:\${VERSION_DISPLAY}
 docker push nemerosa/ontrack:latest
 docker logout
 """
-            }
-            publishers {
-                buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${PROJECT}-${NAME}-production") {
-                    parameters {
-                        currentBuild()
+                publishers {
+                    buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${PROJECT}-${NAME}-production") {
+                        parameters {
+                            currentBuild()
+                        }
                     }
                 }
-            }
-            configure { node ->
-                node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackPromotedRunNotifier' {
-                    'project'('ontrack')
-                    'branch'(NAME)
-                    'build'('${VERSION_BUILD}')
-                    'promotionLevel'('RELEASE')
-                }
-                node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackDSLNotifier' {
-                    'usingText' true
-                    'scriptText' """\
-ontrack.build('ontrack', '${NAME}', VERSION_BUILD).config {
-   label VERSION_DISPLAY
-}
-"""
-                    injectEnvironment 'VERSION_BUILD,VERSION_DISPLAY'
-                    injectProperties ''
-                    ontrackLog false
-                }
+            } else {
+                shell readFileFromWorkspace('seed/publish.sh')
             }
         }
+        configure { node ->
+            node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackPromotedRunNotifier' {
+                'project'('ontrack')
+                'branch'(NAME)
+                'build'('${VERSION_BUILD}')
+                'promotionLevel'('RELEASE')
+            }
+            node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackDSLNotifier' {
+                'usingText' true
+                'scriptText' """\
+ontrack.build('ontrack', '${NAME}', VERSION_BUILD).config {
+label VERSION_DISPLAY
+}
+"""
+                injectEnvironment 'VERSION_BUILD,VERSION_DISPLAY'
+                injectProperties ''
+                ontrackLog false
+            }
+        }
+    }
+
+    if (release) {
 
         // Production deployment
 
