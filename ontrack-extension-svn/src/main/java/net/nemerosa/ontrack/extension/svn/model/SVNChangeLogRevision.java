@@ -26,4 +26,9 @@ public class SVNChangeLogRevision implements SCMChangeLogCommit {
     public String getId() {
         return String.valueOf(revision);
     }
+
+    @Override
+    public LocalDateTime getTimestamp() {
+        return revisionDate;
+    }
 }

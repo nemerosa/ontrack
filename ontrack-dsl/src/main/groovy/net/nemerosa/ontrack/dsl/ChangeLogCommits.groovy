@@ -6,4 +6,10 @@ class ChangeLogCommits extends AbstractResource {
         super(ontrack, node)
     }
 
+    List<ChangeLogCommit> getCommits() {
+        return node['commits'].collect {
+            new ChangeLogCommit(ontrack, it)
+        }
+    }
+
 }

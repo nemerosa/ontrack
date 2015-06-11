@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.scm.model;
 
+import java.time.LocalDateTime;
+
 /**
  * Common attributes for a commit (or revision) in a change log.
  */
@@ -21,6 +23,11 @@ public interface SCMChangeLogCommit {
      * Author of the commit
      */
     String getAuthor();
+
+    /**
+     * Timestamp of the commit
+     */
+    LocalDateTime getTimestamp();
 
     /**
      * Message associated with the commit

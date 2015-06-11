@@ -4,6 +4,8 @@ import lombok.Data;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogCommit;
 import net.nemerosa.ontrack.git.model.GitCommit;
 
+import java.time.LocalDateTime;
+
 @Data
 public class GitUICommit implements SCMChangeLogCommit {
 
@@ -25,6 +27,11 @@ public class GitUICommit implements SCMChangeLogCommit {
     @Override
     public String getAuthor() {
         return commit.getCommitter().getName();
+    }
+
+    @Override
+    public LocalDateTime getTimestamp() {
+        return commit.getCommitTime();
     }
 
     @Override
