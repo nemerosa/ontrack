@@ -7,6 +7,9 @@ import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFile;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFileChangeType;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Collections;
+import java.util.List;
+
 @Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class GitChangeLogFile implements SCMChangeLogFile {
@@ -31,5 +34,10 @@ public class GitChangeLogFile implements SCMChangeLogFile {
     @Override
     public String getPath() {
         return StringUtils.isNotBlank(oldPath) ? oldPath : newPath;
+    }
+
+    @Override
+    public List<SCMChangeLogFileChangeType> getChangeTypes() {
+        return Collections.singletonList(changeType);
     }
 }

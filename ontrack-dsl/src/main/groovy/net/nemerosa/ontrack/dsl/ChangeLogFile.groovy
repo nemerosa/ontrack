@@ -10,4 +10,12 @@ class ChangeLogFile extends AbstractResource {
         node['path']
     }
 
+    List<String> getChangeTypes() {
+        node['changeTypes'] as List
+    }
+
+    String getChangeType() {
+        changeTypes.last()
+    }
+
 }
