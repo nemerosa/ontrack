@@ -10,6 +10,20 @@ class ChangeLog extends AbstractResource {
         node['uuid']
     }
 
+    Build getFrom() {
+        new Build(
+                ontrack,
+                node.scmBuildFrom.buildView.build
+        )
+    }
+
+    Build getTo() {
+        new Build(
+                ontrack,
+                node.scmBuildTo.buildView.build
+        )
+    }
+
     List<ChangeLogCommit> getCommits() {
         // The commit link is available as _commits or as _revisions
         String url = optionalLink('commits')
