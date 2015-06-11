@@ -40,9 +40,8 @@ public class GitHubIssue implements Issue {
     }
 
     @Override
-    @JsonIgnore
     public IssueStatus getStatus() {
-        return state;
+        return new GitHubIssueStatus(state.name());
     }
 
     @Override

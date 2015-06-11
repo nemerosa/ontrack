@@ -23,7 +23,7 @@ class ChangeLogIssue extends AbstractResource {
     }
 
     String getStatus() {
-        node['status']['name']
+        node['status']?.name
     }
 
     String getUpdateTime() {
