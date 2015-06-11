@@ -5,15 +5,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.MockURIBuilder;
-import net.nemerosa.ontrack.ui.resource.DefaultResourceContext;
-import net.nemerosa.ontrack.ui.resource.ResourceObjectMapper;
-import net.nemerosa.ontrack.ui.resource.ResourceObjectMapperFactory;
-import net.nemerosa.ontrack.ui.resource.Resources;
+import net.nemerosa.ontrack.ui.resource.*;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static net.nemerosa.ontrack.json.JsonUtils.array;
@@ -32,9 +30,10 @@ public class CoreResourceModuleTest {
     public void before() {
         securityService = mock(SecurityService.class);
         structureService = mock(StructureService.class);
+        ResourceDecorationContributorService resourceDecorationContributorService = mock(ResourceDecorationContributorService.class);
         mapper = new ResourceObjectMapperFactory().resourceObjectMapper(
-                Arrays.asList(
-                        new CoreResourceModule(structureService)
+                Collections.singletonList(
+                        new CoreResourceModule(structureService, resourceDecorationContributorService)
                 ),
                 new DefaultResourceContext(new MockURIBuilder(), securityService)
         );
