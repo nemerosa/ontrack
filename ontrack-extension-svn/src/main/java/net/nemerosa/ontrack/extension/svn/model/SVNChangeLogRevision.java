@@ -1,11 +1,12 @@
 package net.nemerosa.ontrack.extension.svn.model;
 
 import lombok.Data;
+import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogCommit;
 
 import java.time.LocalDateTime;
 
 @Data
-public class SVNChangeLogRevision {
+public class SVNChangeLogRevision implements SCMChangeLogCommit {
 
     private final String path;
     private final int level;
