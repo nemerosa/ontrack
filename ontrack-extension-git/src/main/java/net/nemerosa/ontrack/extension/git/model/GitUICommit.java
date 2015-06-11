@@ -12,4 +12,28 @@ public class GitUICommit implements SCMChangeLogCommit {
     private final String fullAnnotatedMessage;
     private final String link;
 
+    @Override
+    public String getMessage() {
+        return commit.getFullMessage();
+    }
+
+    @Override
+    public String getFormattedMessage() {
+        return fullAnnotatedMessage;
+    }
+
+    @Override
+    public String getAuthor() {
+        return commit.getCommitter().getName();
+    }
+
+    @Override
+    public String getId() {
+        return commit.getId();
+    }
+
+    @Override
+    public String getShortId() {
+        return commit.getShortId();
+    }
 }

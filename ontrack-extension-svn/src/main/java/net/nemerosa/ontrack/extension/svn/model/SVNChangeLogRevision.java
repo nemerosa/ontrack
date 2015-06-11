@@ -17,4 +17,13 @@ public class SVNChangeLogRevision implements SCMChangeLogCommit {
     private final String revisionUrl;
     private final String formattedMessage;
 
+    @Override
+    public String getLink() {
+        return revisionUrl;
+    }
+
+    @Override
+    public String getId() {
+        return String.valueOf(revision);
+    }
 }
