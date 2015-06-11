@@ -6,4 +6,50 @@ class ChangeLogCommit extends AbstractResource {
         super(ontrack, node)
     }
 
+    String getId() {
+        node['id']
+    }
+
+    /**
+     * Short identifier for the commit
+     */
+    String getShortId() {
+        node['shortId']
+    }
+
+    /**
+     * Author of the commit
+     */
+    String getAuthor() {
+        node['author']
+    }
+
+    /**
+     * Timestamp of the commit
+     */
+    String getTimestamp() {
+        node['timestamp']
+    }
+
+    /**
+     * Message associated with the commit
+     */
+    String getMessage() {
+        node['message']
+    }
+
+    /**
+     * Annotated message
+     */
+    String getFormattedMessage() {
+        node['formattedMessage']
+    }
+
+    /**
+     * Link to the revision
+     */
+    String getLink() {
+        node['link']
+    }
+
 }
