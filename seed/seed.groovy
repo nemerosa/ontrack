@@ -226,11 +226,9 @@ docker logout
         }
         publishers {
             archiveJunit('ontrack-acceptance.xml')
-            if (branchType == 'release') {
-                buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${PROJECT}-${NAME}-publish") {
-                    parameters {
-                        currentBuild()
-                    }
+            buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${PROJECT}-${NAME}-publish") {
+                parameters {
+                    currentBuild()
                 }
             }
         }
