@@ -35,14 +35,14 @@ class ChangeLogCommit extends AbstractResource {
      * Message associated with the commit
      */
     String getMessage() {
-        node['message']
+        node['message']?.trim()
     }
 
     /**
      * Annotated message
      */
     String getFormattedMessage() {
-        node['formattedMessage']
+        node['formattedMessage']?.trim()
     }
 
     /**
