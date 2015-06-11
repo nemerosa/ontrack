@@ -32,4 +32,15 @@ class ChangeLog extends AbstractResource {
         }
     }
 
+    List<ChangeLogFile> getFiles() {
+        String url = optionalLink('files')
+        if (url) {
+            return ontrack.get(url).list.collect {
+                new ChangeLogFile(ontrack, it)
+            }
+        } else {
+            return []
+        }
+    }
+
 }
