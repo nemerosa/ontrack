@@ -15,11 +15,20 @@ class AbstractResource {
     }
 
     protected String link(String name) {
+        String link = optionalLink(name)
+        if (link) {
+            link
+        } else {
+            throw new ResourceMissingLinkException(name)
+        }
+    }
+
+    protected String optionalLink(String name) {
         String linkName = name.startsWith('_') ? name : '_' + name
         if (node[linkName]) {
             node[linkName]
         } else {
-            throw new ResourceMissingLinkException(name);
+            null
         }
     }
 
