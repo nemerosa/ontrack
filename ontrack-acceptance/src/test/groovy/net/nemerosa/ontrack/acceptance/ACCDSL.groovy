@@ -140,6 +140,42 @@ class ACCDSL extends AbstractACCDSL {
     }
 
     @Test
+    void 'Filtering build - with validation (any)'() {
+        Branch branch = createBuildsAndPromotions()
+        ontrack.build(branch.project, branch.name, '2').validate('SMOKE', 'FAILED')
+        ontrack.build(branch.project, branch.name, '3').validate('SMOKE', 'PASSED')
+        def results = branch.standardFilter withValidationStamp: 'SMOKE'
+        assert results.collect { it.name } == ['3', '2']
+    }
+
+    @Test
+    void 'Filtering build - with validation (passed)'() {
+        Branch branch = createBuildsAndPromotions()
+        ontrack.build(branch.project, branch.name, '2').validate('SMOKE', 'FAILED')
+        ontrack.build(branch.project, branch.name, '3').validate('SMOKE', 'PASSED')
+        def results = branch.standardFilter withValidationStamp: 'SMOKE', withValidationStampStatus: 'PASSED'
+        assert results.collect { it.name } == ['3']
+    }
+
+    @Test
+    void 'Filtering build - since validation (any)'() {
+        Branch branch = createBuildsAndPromotions()
+        ontrack.build(branch.project, branch.name, '1').validate('SMOKE', 'PASSED')
+        ontrack.build(branch.project, branch.name, '2').validate('SMOKE', 'FAILED')
+        def results = branch.standardFilter sinceValidationStamp: 'SMOKE'
+        assert results.collect { it.name } == ['3', '2']
+    }
+
+    @Test
+    void 'Filtering build - since validation (passed)'() {
+        Branch branch = createBuildsAndPromotions()
+        ontrack.build(branch.project, branch.name, '1').validate('SMOKE', 'PASSED')
+        ontrack.build(branch.project, branch.name, '2').validate('SMOKE', 'FAILED')
+        def results = branch.standardFilter sinceValidationStamp: 'SMOKE', sinceValidationStampStatus: 'PASSED'
+        assert results.collect { it.name } == ['3', '2', '1']
+    }
+
+    @Test
     void 'Promotion runs'() {
         def branch = createBuildsAndPromotions()
         // Creates a run
