@@ -14,7 +14,7 @@ class AbstractResource {
         node
     }
 
-    protected String link(String name) {
+    public String link(String name) {
         String link = optionalLink(name)
         if (link) {
             link
@@ -23,7 +23,7 @@ class AbstractResource {
         }
     }
 
-    protected String optionalLink(String name) {
+    public String optionalLink(String name) {
         String linkName = name.startsWith('_') ? name : '_' + name
         if (node[linkName]) {
             node[linkName]
