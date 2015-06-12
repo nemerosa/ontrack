@@ -25,8 +25,8 @@ public class BuildIntervalFilterProvider extends AbstractBuildFilterProvider<Bui
     @Override
     protected Form fill(Form form, BuildIntervalFilterData data) {
         return form
-                .fill("fromBuild", data.getFromBuild())
-                .fill("toBuild", data.getToBuild())
+                .fill("from", data.getFrom())
+                .fill("to", data.getTo())
                 ;
     }
 
@@ -34,12 +34,12 @@ public class BuildIntervalFilterProvider extends AbstractBuildFilterProvider<Bui
     protected Form blankForm(ID branchId) {
         return Form.create()
                 .with(
-                        Text.of("fromBuild")
+                        Text.of("from")
                                 .label("From build")
                                 .help("First build")
                 )
                 .with(
-                        Text.of("toBuild")
+                        Text.of("to")
                                 .label("To build")
                                 .optional()
                                 .help("Last build")
@@ -65,8 +65,8 @@ public class BuildIntervalFilterProvider extends AbstractBuildFilterProvider<Bui
     public Optional<BuildIntervalFilterData> parse(JsonNode data) {
         return Optional.of(
                 BuildIntervalFilterData.of(
-                        JsonUtils.get(data, "fromBuild", true, null),
-                        JsonUtils.get(data, "toBuild", true, null)
+                        JsonUtils.get(data, "from", true, null),
+                        JsonUtils.get(data, "to", true, null)
                 )
         );
     }

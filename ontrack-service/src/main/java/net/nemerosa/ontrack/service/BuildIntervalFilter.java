@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.BuildView;
 import net.nemerosa.ontrack.model.structure.StructureService;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -25,11 +24,11 @@ public class BuildIntervalFilter implements BuildFilter {
     @Override
     public void init(Branch branch) {
         // Loads the two build boundaries
-        mostRecentId = structureService.findBuildByName(branch.getProject().getName(), branch.getName(), data.getFromBuild())
-                .orElseThrow(() -> new BuildNotFoundException(branch.getProject().getName(), branch.getName(), data.getFromBuild()))
+        mostRecentId = structureService.findBuildByName(branch.getProject().getName(), branch.getName(), data.getFrom())
+                .orElseThrow(() -> new BuildNotFoundException(branch.getProject().getName(), branch.getName(), data.getFrom()))
                 .id();
-        leastRecentId = structureService.findBuildByName(branch.getProject().getName(), branch.getName(), data.getToBuild())
-                .orElseThrow(() -> new BuildNotFoundException(branch.getProject().getName(), branch.getName(), data.getToBuild()))
+        leastRecentId = structureService.findBuildByName(branch.getProject().getName(), branch.getName(), data.getTo())
+                .orElseThrow(() -> new BuildNotFoundException(branch.getProject().getName(), branch.getName(), data.getTo()))
                 .id();
         // Reordering of the builds
         // mostRecentId > leastRecentId
@@ -55,14 +54,6 @@ public class BuildIntervalFilter implements BuildFilter {
         else {
             return BuildFilterResult.stopNow();
         }
-    }
-
-    private boolean isToBuild(Build build) {
-        return StringUtils.equals(data.getToBuild(), build.getName());
-    }
-
-    private boolean isFromBuild(Build build) {
-        return StringUtils.equals(data.getFromBuild(), build.getName());
     }
 
 }

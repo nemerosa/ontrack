@@ -30,6 +30,13 @@ class Branch extends AbstractProjectResource {
         filter('net.nemerosa.ontrack.service.StandardBuildFilterProvider', filterConfig)
     }
 
+    List<Build> intervalFilter(Map<String, ?> filterConfig) {
+        filter('net.nemerosa.ontrack.service.BuildIntervalFilterProvider', [
+                from: filterConfig.from,
+                to  : filterConfig.to,
+        ])
+    }
+
     List<Build> getLastPromotedBuilds() {
         filter('net.nemerosa.ontrack.service.PromotionLevelBuildFilterProvider', [:])
     }
@@ -72,7 +79,7 @@ class Branch extends AbstractProjectResource {
         // Sends the request
         ontrack.post(link('templateInstanceConnect'), [
                 templateId: templateId,
-                manual: manual,
+                manual    : manual,
                 parameters: parameters,
         ])
     }

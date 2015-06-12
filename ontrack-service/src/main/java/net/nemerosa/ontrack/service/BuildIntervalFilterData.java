@@ -8,11 +8,11 @@ import lombok.Data;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class BuildIntervalFilterData {
 
-    private final String fromBuild;
-    private final String toBuild;
+    private final String from;
+    private final String to;
 
-    public static BuildIntervalFilterData of(String fromBuild, String toBuild) {
-        return new BuildIntervalFilterData(fromBuild, toBuild);
+    public static BuildIntervalFilterData of(String from, String to) {
+        return new BuildIntervalFilterData(from, to);
     }
 
 }
