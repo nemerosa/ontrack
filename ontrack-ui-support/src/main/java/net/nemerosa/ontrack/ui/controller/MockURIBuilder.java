@@ -33,6 +33,16 @@ public class MockURIBuilder implements URIBuilder {
         );
     }
 
+    @Override
+    public URI page(String path, Object... arguments) {
+        return URI.create(
+                format(
+                        "urn:test:#:%s",
+                        format(path, arguments)
+                )
+        );
+    }
+
     private String encode(String s) {
         try {
             return URLEncoder.encode(s, "UTF-8");

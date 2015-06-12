@@ -49,6 +49,12 @@ public class GitChangeLogResourceDecorator extends AbstractResourceDecorator<Git
                         on(GitController.class).changeLogExportFormats(changeLog.getProject().getId())
                 )
                 .link("_exportIssues", on(GitController.class).changeLog(new IssueChangeLogExportRequest()))
+                .page(
+                        "_page",
+                        "extension/git/changelog?from=%d&to=%d",
+                        changeLog.getFrom().getBuild().id(),
+                        changeLog.getTo().getBuild().id()
+                )
                 .build();
     }
 

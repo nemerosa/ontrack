@@ -35,6 +35,12 @@ public class GitBuildResourceDecorationContributor implements ResourceDecoration
                         ProjectView.class,
                         build
                 );
+                linksBuilder.page(
+                        "_changeLogPage",
+                        "extension/git/changelog",
+                        ProjectView.class,
+                        build
+                );
             }
         }
     }

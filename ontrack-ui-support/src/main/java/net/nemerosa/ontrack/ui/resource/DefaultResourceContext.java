@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.ui.resource;
 import net.nemerosa.ontrack.model.security.GlobalFunction;
 import net.nemerosa.ontrack.model.security.ProjectFunction;
 import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
 
 import java.net.URI;
@@ -93,6 +94,30 @@ public class DefaultResourceContext implements ResourceContext {
         @Override
         public LinksBuilder delete(Object methodInvocation, Class<? extends ProjectFunction> fn, int projectId) {
             return link(Link.DELETE, methodInvocation, fn, projectId);
+        }
+
+        @Override
+        public LinksBuilder page(String name, String path, Object... arguments) {
+            return link(name, uriBuilder.page(path, arguments));
+        }
+
+        @Override
+        public LinksBuilder page(String name, boolean allowed, String path, Object... arguments) {
+            if (allowed) {
+                return page(name, path, arguments);
+            } else {
+                return this;
+            }
+        }
+
+        @Override
+        public LinksBuilder page(String name, Class<? extends GlobalFunction> fn, String path, Object... arguments) {
+            return page(name, securityService.isGlobalFunctionGranted(fn), path, arguments);
+        }
+
+        @Override
+        public LinksBuilder page(String name, Class<? extends ProjectFunction> fn, ProjectEntity projectEntity, String path, Object... arguments) {
+            return page(name, securityService.isProjectFunctionGranted(projectEntity, fn), path, arguments);
         }
 
         @Override

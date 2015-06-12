@@ -10,11 +10,14 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
+
+import static java.lang.String.format;
 
 @Component
 @Profile({RunProfile.DEV, RunProfile.ACC, RunProfile.PROD})
@@ -44,5 +47,17 @@ public class DefaultURIBuilder implements URIBuilder {
 
         // OK
         return builder.build().toUri();
+    }
+
+    @Override
+    public URI page(String path, Object... arguments) {
+        String pagePath = format(
+                "/#/%s",
+                format(path, arguments)
+        );
+        return URI.create(
+                ServletUriComponentsBuilder.fromCurrentServletMapping().build().toUriString() +
+                        pagePath
+        );
     }
 }

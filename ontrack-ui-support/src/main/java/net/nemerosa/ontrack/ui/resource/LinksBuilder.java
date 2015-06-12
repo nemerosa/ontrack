@@ -30,6 +30,14 @@ public interface LinksBuilder {
         return link(name, methodInvocation, fn, projectEntity.projectId());
     }
 
+    LinksBuilder page(String name, String path, Object... arguments);
+
+    LinksBuilder page(String name, boolean allowed, String path, Object... arguments);
+
+    LinksBuilder page(String name, Class<? extends GlobalFunction> fn, String path, Object... arguments);
+
+    LinksBuilder page(String name, Class<? extends ProjectFunction> fn, ProjectEntity projectEntity, String path, Object... arguments);
+
     LinksBuilder update(Object methodInvocation, Class<? extends ProjectFunction> fn, int projectId);
 
     LinksBuilder delete(Object methodInvocation, Class<? extends ProjectFunction> fn, int projectId);
