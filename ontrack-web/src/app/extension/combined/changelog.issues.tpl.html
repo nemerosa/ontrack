@@ -10,7 +10,8 @@
     <tbody>
     <tr ng-repeat="changeLogIssue in value.list">
         <td>
-            {{changeLogIssue.issue.displayKey}}
+            <span ng-if="changeLogIssue.issue.url"><a href="{{changeLogIssue.issue.url}}">{{changeLogIssue.issue.displayKey}}</a></span>
+            <span ng-if="!changeLogIssue.issue.url">{{changeLogIssue.issue.displayKey}}</span>
         </td>
         <td>
             {{changeLogIssue.issue.status.name}}

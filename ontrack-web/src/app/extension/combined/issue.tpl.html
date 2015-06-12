@@ -5,7 +5,8 @@
             Key:
         </td>
         <td>
-            {{value.displayKey}}
+            <span ng-if="value.url"><a href="{{value.url}}">{{value.displayKey}}</a></span>
+            <span ng-if="!value.url">{{value.displayKey}}</span>
         </td>
     </tr>
     <tr>
