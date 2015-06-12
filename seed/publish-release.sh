@@ -25,7 +25,7 @@ unzip ${REPOSITORY}/ontrack-delivery-docker-${VERSION_FULL}.jar -d ${WORKSPACE}
 # Publication of the release
 
 ./publish.py \
-    --release=false \
+    --release=true \
     --repository=${REPOSITORY} \
     --version-commit=${VERSION_COMMIT} \
     --version-full=${VERSION_FULL} \
