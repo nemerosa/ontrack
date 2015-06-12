@@ -32,4 +32,12 @@ public interface BuildFilter {
      * the list and return <code>false</code> instead)
      */
     BuildFilterResult filter(List<Build> builds, Branch branch, Build build, Supplier<BuildView> buildViewSupplier);
+
+    /**
+     * Initialises this filter so it can be used. By default, this does nothing.
+     *
+     * @param branch Branch to use for the filter
+     */
+    default void init(Branch branch) {
+    }
 }

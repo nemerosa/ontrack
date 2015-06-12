@@ -16,21 +16,40 @@ public class BuildFilterResult {
     }
 
     public static BuildFilterResult stopNow() {
-        return stopNowIf(true);
+        return new BuildFilterResult(false, false);
     }
 
     public static BuildFilterResult ok() {
         return new BuildFilterResult(true, true);
     }
 
+    public static BuildFilterResult notAccept() {
+        return new BuildFilterResult(false, true);
+    }
+
+    public static BuildFilterResult accept() {
+        return new BuildFilterResult(true, true);
+    }
+
+    public BuildFilterResult goingOn() {
+        return new BuildFilterResult(accept, true);
+    }
+
+    public BuildFilterResult stop() {
+        return new BuildFilterResult(accept, false);
+    }
+
+    @Deprecated
     public BuildFilterResult acceptIf(boolean condition) {
         return new BuildFilterResult(accept && condition, goingOn);
     }
 
+    @Deprecated
     public BuildFilterResult goOnIf(boolean condition) {
         return new BuildFilterResult(accept, goingOn && condition);
     }
 
+    @Deprecated
     public BuildFilterResult forceAccept() {
         return new BuildFilterResult(true, goingOn);
     }
