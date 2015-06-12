@@ -39,18 +39,15 @@ public class BuildFilterResult {
         return new BuildFilterResult(accept, false);
     }
 
-    @Deprecated
     public BuildFilterResult acceptIf(boolean condition) {
         return new BuildFilterResult(accept && condition, goingOn);
     }
 
-    @Deprecated
     public BuildFilterResult goOnIf(boolean condition) {
         return new BuildFilterResult(accept, goingOn && condition);
     }
 
-    @Deprecated
-    public BuildFilterResult forceAccept() {
+    public BuildFilterResult doAccept() {
         return new BuildFilterResult(true, goingOn);
     }
 }
