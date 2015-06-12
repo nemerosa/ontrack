@@ -35,6 +35,12 @@ public class SVNBuildResourceDecorationContributor implements ResourceDecoration
                         ProjectView.class,
                         build
                 );
+                linksBuilder.page(
+                        "_changeLogPage",
+                        "extension/svn/changelog",
+                        ProjectView.class,
+                        build
+                );
             }
         }
     }

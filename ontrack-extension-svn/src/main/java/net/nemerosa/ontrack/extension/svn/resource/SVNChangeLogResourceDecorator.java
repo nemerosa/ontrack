@@ -28,6 +28,12 @@ public class SVNChangeLogResourceDecorator extends AbstractResourceDecorator<SVN
                 .link("_diff", on(SVNController.class).diff(null))
                 .link("_exportFormats", on(SVNController.class).changeLogExportFormats(changeLog.getBranch().getId()))
                 .link("_exportIssues", on(SVNController.class).changeLog(new IssueChangeLogExportRequest()))
+                .page(
+                        "_page",
+                        "extension/svn/changelog?from=%d&to=%d",
+                        changeLog.getFrom().getBuild().id(),
+                        changeLog.getTo().getBuild().id()
+                )
                 .build();
     }
 
