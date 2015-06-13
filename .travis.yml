@@ -12,4 +12,4 @@ before_install:
   - git config --global user.name "Travis CI"
 
 script:
-  - ./gradlew test integrationTest --info --stacktrace
+  - ./gradlew test integrationTest --stacktrace
