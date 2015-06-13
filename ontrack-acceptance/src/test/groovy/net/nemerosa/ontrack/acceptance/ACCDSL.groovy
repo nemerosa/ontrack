@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.Shell
 import net.nemerosa.ontrack.dsl.http.OTForbiddenClientException
 import net.nemerosa.ontrack.dsl.http.OTMessageClientException
+import net.nemerosa.ontrack.dsl.http.OTNotFoundException
 import org.junit.Assert
 import org.junit.Test
 
@@ -21,7 +22,7 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
 class ACCDSL extends AbstractACCDSL {
 
     @Test
-    void 'Branch not found'() {
+    void 'Branch not found before not authorised'() {
         // Creating a branch
         def testBranch = doCreateBranch()
         def projectName = testBranch.project.name.asText()
@@ -32,7 +33,7 @@ class ACCDSL extends AbstractACCDSL {
         try {
             ontrack.branch(projectName, branchName)
             Assert.fail "Branch access should have been forbidden"
-        } catch (OTMessageClientException ex) {
+        } catch (OTNotFoundException ex) {
             assert ex.message == "Branch not found: ${projectName}/${branchName}"
         }
     }
