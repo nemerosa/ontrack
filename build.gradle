@@ -65,7 +65,6 @@ configure(javaProjects) {
     // Integration tests
     task integrationTest(type: Test, dependsOn: 'test') {
         include '**/*IT.class'
-        ignoreFailures true
         reports {
             html.enabled = false
         }
