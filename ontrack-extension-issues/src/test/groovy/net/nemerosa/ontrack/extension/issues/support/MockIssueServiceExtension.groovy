@@ -12,12 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 import java.util.regex.Matcher
-import java.util.regex.Pattern
 
 @Component
 class MockIssueServiceExtension extends AbstractIssueServiceExtension {
-
-    public static final String ISSUE_PATTERN = "#(\\d+)";
 
     /**
      * Issues registered for testing
@@ -64,14 +61,14 @@ class MockIssueServiceExtension extends AbstractIssueServiceExtension {
 
     @Override
     boolean validIssueToken(String token) {
-        return Pattern.matches(ISSUE_PATTERN, token);
+        return token ==~ /#(\d+)/
     }
 
     @Override
     Set<String> extractIssueKeysFromMessage(IssueServiceConfiguration issueServiceConfiguration, String message) {
         Set<String> result = new HashSet<>()
         if (StringUtils.isNotBlank(message)) {
-            Matcher matcher = Pattern.compile(ISSUE_PATTERN).matcher(message)
+            Matcher matcher = (message =~ /#(\d+)/)
             while (matcher.find()) {
                 // Gets the issue
                 String issueKey = matcher.group(1);

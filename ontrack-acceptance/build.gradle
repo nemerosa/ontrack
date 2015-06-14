@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.1.8.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.2.2.RELEASE")
     }
 }
 
@@ -35,7 +35,7 @@ artifacts {
 }
 
 bootRepackage {
-    mainClass = 'net.nemerosa.ontrack.acceptance.boot.Start'
+    mainClassName = 'net.nemerosa.ontrack.acceptance.boot.Start'
     withJarTask = 'testJar'
     customConfiguration = 'testRuntime'
 }
