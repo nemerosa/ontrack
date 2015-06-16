@@ -55,7 +55,7 @@ public class StandardBuildFilter implements BuildFilter {
                     .isPresent();
             // The last build is accepted
             if (promoted) {
-                result = result.forceAccept();
+                result = result.doAccept();
             }
             // Going on if not promoted
             result = result.goOnIf(!promoted);
@@ -77,7 +77,7 @@ public class StandardBuildFilter implements BuildFilter {
                     .isPresent();
             // The last build is accepted
             if (validated) {
-                result = result.forceAccept();
+                result = result.doAccept();
             }
             // Going on if not validated
             result = result.goOnIf(!validated);

@@ -38,12 +38,12 @@ public class NamedBuildFilter implements BuildFilter {
         if (from != null && to == null && isToBuild(build, buildViewSupplier, fromPattern, toPattern)) {
             // Keeps this build and stops
             to = build;
-            return BuildFilterResult.ok().goOnIf(false);
+            return BuildFilterResult.accept().stop();
         }
 
         // Neither a from or to?
         // Just goes on without accepting the build
-        return BuildFilterResult.ok().acceptIf(false);
+        return BuildFilterResult.notAccept().goingOn();
 
     }
 

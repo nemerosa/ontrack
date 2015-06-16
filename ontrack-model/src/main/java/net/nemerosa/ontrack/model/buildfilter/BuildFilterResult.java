@@ -16,11 +16,27 @@ public class BuildFilterResult {
     }
 
     public static BuildFilterResult stopNow() {
-        return stopNowIf(true);
+        return new BuildFilterResult(false, false);
     }
 
     public static BuildFilterResult ok() {
         return new BuildFilterResult(true, true);
+    }
+
+    public static BuildFilterResult notAccept() {
+        return new BuildFilterResult(false, true);
+    }
+
+    public static BuildFilterResult accept() {
+        return new BuildFilterResult(true, true);
+    }
+
+    public BuildFilterResult goingOn() {
+        return new BuildFilterResult(accept, true);
+    }
+
+    public BuildFilterResult stop() {
+        return new BuildFilterResult(accept, false);
     }
 
     public BuildFilterResult acceptIf(boolean condition) {
@@ -31,7 +47,7 @@ public class BuildFilterResult {
         return new BuildFilterResult(accept, goingOn && condition);
     }
 
-    public BuildFilterResult forceAccept() {
+    public BuildFilterResult doAccept() {
         return new BuildFilterResult(true, goingOn);
     }
 }

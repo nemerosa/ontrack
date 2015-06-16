@@ -298,6 +298,8 @@ public class StructureServiceImpl implements StructureService {
     public List<Build> getFilteredBuilds(ID branchId, BuildFilter buildFilter) {
         // Gets the branch
         Branch branch = getBranch(branchId);
+        // Initialises the build filter with the branch
+        buildFilter.init(branch);
         // Collects the builds associated with this predicate
         List<Build> builds = new ArrayList<>();
         structureRepository.builds(branch, build -> filterBuild(builds, branch, build, buildFilter));

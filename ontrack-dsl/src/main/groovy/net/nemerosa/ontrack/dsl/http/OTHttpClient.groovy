@@ -123,11 +123,11 @@ class OTHttpClient {
         } else if (statusCode == HttpStatus.SC_BAD_REQUEST) {
             throw new OTMessageClientException(getMessage(response))
         } else if (statusCode == HttpStatus.SC_UNAUTHORIZED) {
-            throw new OTMessageClientException("Not authorised")
+            throw new OTNotAuthorizedException()
         } else if (statusCode == HttpStatus.SC_FORBIDDEN) {
             throw new OTForbiddenClientException()
         } else if (statusCode == HttpStatus.SC_NOT_FOUND) {
-            throw new OTMessageClientException(getMessage(response))
+            throw new OTNotFoundException(getMessage(response))
         } else if (statusCode == HttpStatus.SC_NO_CONTENT) {
             return null
         } else if (statusCode == HttpStatus.SC_INTERNAL_SERVER_ERROR) {

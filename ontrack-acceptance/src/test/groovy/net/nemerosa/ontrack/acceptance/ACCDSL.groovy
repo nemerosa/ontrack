@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.Shell
 import net.nemerosa.ontrack.dsl.http.OTForbiddenClientException
 import net.nemerosa.ontrack.dsl.http.OTMessageClientException
+import net.nemerosa.ontrack.dsl.http.OTNotFoundException
 import org.junit.Assert
 import org.junit.Test
 
@@ -21,7 +22,7 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
 class ACCDSL extends AbstractACCDSL {
 
     @Test
-    void 'Branch not found'() {
+    void 'Branch not found before not authorised'() {
         // Creating a branch
         def testBranch = doCreateBranch()
         def projectName = testBranch.project.name.asText()
@@ -32,7 +33,7 @@ class ACCDSL extends AbstractACCDSL {
         try {
             ontrack.branch(projectName, branchName)
             Assert.fail "Branch access should have been forbidden"
-        } catch (OTMessageClientException ex) {
+        } catch (OTNotFoundException ex) {
             assert ex.message == "Branch not found: ${projectName}/${branchName}"
         }
     }
@@ -96,11 +97,83 @@ class ACCDSL extends AbstractACCDSL {
     }
 
     @Test
+    void 'Filter interval'() {
+        Branch branch = createBuildsAndPromotions()
+        def results = branch.intervalFilter from: '3', to: '1'
+        assert results.collect { it.name } == ['3', '2', '1']
+    }
+
+    @Test
+    void 'Filter interval in reverse order'() {
+        Branch branch = createBuildsAndPromotions()
+        def results = branch.intervalFilter from: '1', to: '3'
+        assert results.collect { it.name } == ['3', '2', '1']
+    }
+
+    @Test
+    void 'Filter interval - only two'() {
+        Branch branch = createBuildsAndPromotions()
+        def results = branch.intervalFilter from: '2', to: '3'
+        assert results.collect { it.name } == ['3', '2']
+    }
+
+    @Test
+    void 'Filter interval - only one'() {
+        Branch branch = createBuildsAndPromotions()
+        def results = branch.intervalFilter from: '2', to: '2'
+        assert results.collect { it.name } == ['2']
+    }
+
+    @Test
+    void 'Filter interval - not existing'() {
+        Branch branch = createBuildsAndPromotions()
+        validationError("Build not found: ${branch.project}/${branch.name}/4") {
+            branch.intervalFilter from: '2', to: '4'
+        }
+    }
+
+    @Test
     void 'Filtering build on promotion'() {
         Branch branch = createBuildsAndPromotions()
         // Filtering builds on promotion
         def results = branch.standardFilter withPromotionLevel: 'BRONZE'
         assert results.collect { it.name } == ['2']
+    }
+
+    @Test
+    void 'Filtering build - with validation (any)'() {
+        Branch branch = createBuildsAndPromotions()
+        ontrack.build(branch.project, branch.name, '2').validate('SMOKE', 'FAILED')
+        ontrack.build(branch.project, branch.name, '3').validate('SMOKE', 'PASSED')
+        def results = branch.standardFilter withValidationStamp: 'SMOKE'
+        assert results.collect { it.name } == ['3', '2']
+    }
+
+    @Test
+    void 'Filtering build - with validation (passed)'() {
+        Branch branch = createBuildsAndPromotions()
+        ontrack.build(branch.project, branch.name, '2').validate('SMOKE', 'FAILED')
+        ontrack.build(branch.project, branch.name, '3').validate('SMOKE', 'PASSED')
+        def results = branch.standardFilter withValidationStamp: 'SMOKE', withValidationStampStatus: 'PASSED'
+        assert results.collect { it.name } == ['3']
+    }
+
+    @Test
+    void 'Filtering build - since validation (any)'() {
+        Branch branch = createBuildsAndPromotions()
+        ontrack.build(branch.project, branch.name, '1').validate('SMOKE', 'PASSED')
+        ontrack.build(branch.project, branch.name, '2').validate('SMOKE', 'FAILED')
+        def results = branch.standardFilter sinceValidationStamp: 'SMOKE'
+        assert results.collect { it.name } == ['3', '2']
+    }
+
+    @Test
+    void 'Filtering build - since validation (passed)'() {
+        Branch branch = createBuildsAndPromotions()
+        ontrack.build(branch.project, branch.name, '1').validate('SMOKE', 'PASSED')
+        ontrack.build(branch.project, branch.name, '2').validate('SMOKE', 'FAILED')
+        def results = branch.standardFilter sinceValidationStamp: 'SMOKE', sinceValidationStampStatus: 'PASSED'
+        assert results.collect { it.name } == ['3', '2', '1']
     }
 
     @Test
