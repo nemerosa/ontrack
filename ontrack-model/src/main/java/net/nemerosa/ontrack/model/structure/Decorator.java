@@ -1,13 +1,15 @@
 package net.nemerosa.ontrack.model.structure;
 
+import java.util.List;
+
 public interface Decorator {
 
     /**
-     * Gets a decoration for this entity.
+     * Gets a list of decorations for this entity.
      *
      * @param entity Entity
-     * @return A decoration to apply or <code>null</code> if none.
+     * @return A list of decorations to apply or empty if none.
      */
-    Decoration getDecoration(ProjectEntity entity);
+    List<Decoration> getDecorations(ProjectEntity entity);
 
 }

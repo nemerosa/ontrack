@@ -9,7 +9,9 @@ import net.nemerosa.ontrack.model.structure.PropertyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.EnumSet;
+import java.util.List;
 
 @Component
 public class MessageDecorationExtension extends AbstractExtension implements DecorationExtension {
@@ -28,19 +30,21 @@ public class MessageDecorationExtension extends AbstractExtension implements Dec
     }
 
     @Override
-    public Decoration getDecoration(ProjectEntity entity) {
+    public List<Decoration> getDecorations(ProjectEntity entity) {
         // Gets the `message` property
         return propertyService.getProperty(entity, MessagePropertyType.class)
                 .option()
                 .map(
                         messageProperty ->
-                                Decoration.of(
-                                        this,
-                                        messageProperty.getType().getId(),
-                                        messageProperty.getText()
+                                Collections.singletonList(
+                                        Decoration.of(
+                                                this,
+                                                messageProperty.getType().getId(),
+                                                messageProperty.getText()
+                                        )
                                 )
                 )
-                .orElse(null);
+                .orElse(Collections.<Decoration>emptyList());
     }
 
 }
