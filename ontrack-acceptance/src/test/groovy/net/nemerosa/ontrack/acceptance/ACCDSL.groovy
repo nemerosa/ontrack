@@ -808,6 +808,29 @@ class ACCDSL extends AbstractACCDSL {
     }
 
     @Test
+    void 'Message property'() {
+        def project = uid('P')
+        ontrack.project(project) {
+            config {
+                message 'Information'
+            }
+            branch('test') {
+                config {
+                    message 'Warning', 'WARNING'
+                }
+                build('1') {
+                    config {
+                        message 'Error', 'ERROR'
+                    }
+                }
+            }
+        }
+        assert ontrack.project(project).config.message == [type: 'INFO', text: 'Information']
+        assert ontrack.branch(project, 'test').config.message == [type: 'WARNING', text: 'Warning']
+        assert ontrack.build(project, 'test', '1').config.message == [type: 'ERROR', text: 'Error']
+    }
+
+    @Test
     void 'Build Git commit property'() {
         def name = uid('P')
         ontrack.project(name) {

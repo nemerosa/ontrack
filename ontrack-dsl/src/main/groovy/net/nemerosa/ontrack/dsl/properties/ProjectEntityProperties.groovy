@@ -42,6 +42,21 @@ class ProjectEntityProperties {
     }
 
     /**
+     * Message
+     */
+
+    def message(String text, String type = 'INFO') {
+        property('net.nemerosa.ontrack.extension.general.MessagePropertyType', [
+                type: type,
+                text: text,
+        ])
+    }
+
+    def getMessage() {
+        property('net.nemerosa.ontrack.extension.general.MessagePropertyType')
+    }
+
+    /**
      * Jenkins job
      */
 
