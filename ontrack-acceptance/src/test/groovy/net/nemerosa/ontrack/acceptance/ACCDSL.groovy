@@ -831,6 +831,46 @@ class ACCDSL extends AbstractACCDSL {
     }
 
     @Test
+    void 'Meta info property'() {
+        def project = uid('P')
+        ontrack.project(project) {
+            config {
+                metaInfo A: '1', B: '2'
+            }
+            branch('test') {
+                config {
+                    metaInfo 'A', '1', 'linkA'
+                    metaInfo 'B', '2', 'linkB'
+                }
+            }
+        }
+        assert ontrack.project(project).config.metaInfo == [
+                [
+                        name: 'A',
+                        value: '1',
+                        link: null,
+                ],
+                [
+                        name: 'B',
+                        value: '2',
+                        link: null,
+                ],
+        ]
+        assert ontrack.branch(project, 'test').config.metaInfo == [
+                [
+                        name: 'A',
+                        value: '1',
+                        link: 'linkA',
+                ],
+                [
+                        name: 'B',
+                        value: '2',
+                        link: 'linkB',
+                ],
+        ]
+    }
+
+    @Test
     void 'Build Git commit property'() {
         def name = uid('P')
         ontrack.project(name) {
