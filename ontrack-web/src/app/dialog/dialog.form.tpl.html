@@ -14,7 +14,7 @@
         </div>
 
         <!-- Additional buttons -->
-        <button class="btn btn-default" type="button" ng-repeat="button in config.formConfig.buttons" ng-click="button.action()">
+        <button class="btn btn-default" type="button" ng-repeat="button in config.formConfig.buttons" ng-click="buttonAction(button)">
             {{button.title}}
         </button>
 

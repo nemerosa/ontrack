@@ -1,6 +1,7 @@
 angular.module('ontrack.extension.jira', [
     'ui.router',
     'ot.service.core',
+    'ot.service.configuration',
     'ot.service.form'
 ])
     .config(function ($stateProvider) {
@@ -11,7 +12,7 @@ angular.module('ontrack.extension.jira', [
             controller: 'JiraConfigurationsCtrl'
         });
     })
-    .controller('JiraConfigurationsCtrl', function ($scope, $http, ot, otFormService, otAlertService) {
+    .controller('JiraConfigurationsCtrl', function ($scope, $http, ot, otFormService, otAlertService, otConfigurationService) {
         var view = ot.view();
         view.title = 'JIRA configurations';
         view.description = 'Management of the JIRA configurations.';
@@ -43,8 +44,8 @@ angular.module('ontrack.extension.jira', [
                 buttons: [
                     {
                         title: "Test",
-                        action: function() {
-                            alert("Test");
+                        action: function () {
+                            return "";
                         }
                     }
                 ],

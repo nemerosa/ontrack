@@ -7,6 +7,16 @@ angular.module('ot.dialog.form', [
         $scope.config = config;
         // Form data
         $scope.data = otFormService.prepareForDisplay(config.form);
+        // Custom button
+        $scope.buttonAction = function (button) {
+            var message = button.action();
+            if (message) {
+                $scope.message = {
+                    type: 'error',
+                    content: message
+                };
+            }
+        };
         // Cancelling the dialog
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
