@@ -1,6 +1,7 @@
 angular.module('ontrack.extension.jenkins', [
     'ui.router',
     'ot.service.core',
+    'ot.service.configuration',
     'ot.service.form'
 ])
     .config(function ($stateProvider) {
@@ -11,7 +12,7 @@ angular.module('ontrack.extension.jenkins', [
             controller: 'JenkinsConfigurationsCtrl'
         });
     })
-    .controller('JenkinsConfigurationsCtrl', function ($scope, $http, ot, otFormService, otAlertService) {
+    .controller('JenkinsConfigurationsCtrl', function ($scope, $http, ot, otFormService, otAlertService, otConfigurationService) {
         var view = ot.view();
         view.title = 'Jenkins configurations';
         view.description = 'Management of the Jenkins configurations.';
@@ -40,6 +41,14 @@ angular.module('ontrack.extension.jenkins', [
             otFormService.display({
                 uri: $scope.configurations._create,
                 title: "Jenkins configuration",
+                buttons: [
+                    {
+                        title: "Test",
+                        action: function (data) {
+                            return otConfigurationService.test($scope.configurations._test, data);
+                        }
+                    }
+                ],
                 submit: function (data) {
                     return ot.call($http.post($scope.configurations._create, data));
                 }
@@ -63,6 +72,14 @@ angular.module('ontrack.extension.jenkins', [
             otFormService.display({
                 uri: configuration._update,
                 title: "Jenkins configuration",
+                buttons: [
+                    {
+                        title: "Test",
+                        action: function (data) {
+                            return otConfigurationService.test($scope.configurations._test, data);
+                        }
+                    }
+                ],
                 submit: function (data) {
                     return ot.call($http.put(configuration._update, data));
                 }

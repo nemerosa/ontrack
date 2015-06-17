@@ -72,6 +72,14 @@ angular.module('ontrack.extension.jira', [
             otFormService.display({
                 uri: configuration._update,
                 title: "JIRA configuration",
+                buttons: [
+                    {
+                        title: "Test",
+                        action: function (data) {
+                            return otConfigurationService.test($scope.configurations._test, data);
+                        }
+                    }
+                ],
                 submit: function (data) {
                     return ot.call($http.put(configuration._update, data));
                 }
