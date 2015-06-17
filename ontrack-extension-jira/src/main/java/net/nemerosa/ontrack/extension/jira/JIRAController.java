@@ -39,13 +39,11 @@ public class JIRAController extends AbstractExtensionController<JIRAExtensionFea
     @Override
     @RequestMapping(value = "", method = RequestMethod.GET)
     public Resource<ExtensionFeatureDescription> getDescription() {
-        boolean globalFunctionGranted = securityService.isGlobalFunctionGranted(GlobalSettings.class);
         return Resource.of(
                 feature.getFeatureDescription(),
                 uri(MvcUriComponentsBuilder.on(getClass()).getDescription())
         )
-                .with("configurations", uri(on(getClass()).getConfigurations()), globalFunctionGranted)
-                .with("test", uri(on(getClass()).testConfiguration(null)), globalFunctionGranted)
+                .with("configurations", uri(on(getClass()).getConfigurations()), securityService.isGlobalFunctionGranted(GlobalSettings.class))
                 ;
     }
 
@@ -59,6 +57,7 @@ public class JIRAController extends AbstractExtensionController<JIRAExtensionFea
                 uri(on(getClass()).getConfigurations())
         )
                 .with(Link.CREATE, uri(on(getClass()).getConfigurationForm()))
+                .with("_test", uri(on(getClass()).testConfiguration(null)), securityService.isGlobalFunctionGranted(GlobalSettings.class))
                 ;
     }
 

@@ -9,13 +9,12 @@ angular.module('ot.dialog.form', [
         $scope.data = otFormService.prepareForDisplay(config.form);
         // Custom button
         $scope.buttonAction = function (button) {
-            var message = button.action();
-            if (message) {
-                $scope.message = {
-                    type: 'error',
-                    content: message
-                };
-            }
+            var data = otFormService.prepareForSubmit(config.form, $scope.data);
+            button.action(data).then(function (message) {
+                if (message) {
+                    $scope.message = message;
+                }
+            });
         };
         // Cancelling the dialog
         $scope.cancel = function () {

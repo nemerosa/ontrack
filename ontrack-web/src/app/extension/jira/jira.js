@@ -44,8 +44,8 @@ angular.module('ontrack.extension.jira', [
                 buttons: [
                     {
                         title: "Test",
-                        action: function () {
-                            return "";
+                        action: function (data) {
+                            return otConfigurationService.test($scope.configurations._test, data);
                         }
                     }
                 ],
