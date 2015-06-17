@@ -14,7 +14,11 @@
         </div>
 
         <!-- Additional buttons -->
-        <button class="btn btn-default" type="button" ng-repeat="button in config.formConfig.buttons" ng-click="buttonAction(button)">
+        <button class="btn btn-default" type="button"
+                ng-repeat="button in config.formConfig.buttons"
+                ng-disabled="button.actionRunning"
+                ng-click="buttonAction(button)">
+            <span class="ot-loading-indicator" ng-show="button.actionRunning"></span>
             {{button.title}}
         </button>
 
