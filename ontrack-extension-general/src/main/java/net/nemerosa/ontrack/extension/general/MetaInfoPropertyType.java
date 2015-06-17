@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
 import java.util.EnumSet;
@@ -81,6 +82,22 @@ public class MetaInfoPropertyType extends AbstractPropertyType<MetaInfoProperty>
                         item -> String.format("%s->%s", item.getName(), item.getValue())
                 )
                 .collect(Collectors.joining(";"));
+    }
+
+    @Override
+    public boolean containsValue(MetaInfoProperty property, String propertyValue) {
+        String value = StringUtils.substringAfter(propertyValue, ":");
+        if (StringUtils.isNotBlank(value)) {
+            String name = StringUtils.substringBefore(propertyValue, ":");
+            return property.getItems().stream()
+                    .anyMatch(
+                            item ->
+                                    StringUtils.equals(name, item.getName()) &&
+                                            StringUtils.equals(value, item.getValue())
+                    );
+        } else {
+            return false;
+        }
     }
 
     @Override

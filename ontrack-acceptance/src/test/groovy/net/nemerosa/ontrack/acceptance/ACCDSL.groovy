@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.dsl.ObjectAlreadyExistsException
 import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.Shell
 import net.nemerosa.ontrack.dsl.http.OTForbiddenClientException
-import net.nemerosa.ontrack.dsl.http.OTMessageClientException
 import net.nemerosa.ontrack.dsl.http.OTNotFoundException
 import org.junit.Assert
 import org.junit.Test
@@ -846,28 +845,53 @@ class ACCDSL extends AbstractACCDSL {
         }
         assert ontrack.project(project).config.metaInfo == [
                 [
-                        name: 'A',
+                        name : 'A',
                         value: '1',
-                        link: null,
+                        link : null,
                 ],
                 [
-                        name: 'B',
+                        name : 'B',
                         value: '2',
-                        link: null,
+                        link : null,
                 ],
         ]
         assert ontrack.branch(project, 'test').config.metaInfo == [
                 [
-                        name: 'A',
+                        name : 'A',
                         value: '1',
-                        link: 'linkA',
+                        link : 'linkA',
                 ],
                 [
-                        name: 'B',
+                        name : 'B',
                         value: '2',
-                        link: 'linkB',
+                        link : 'linkB',
                 ],
         ]
+    }
+
+    @Test
+    void 'Search on meta info property'() {
+        def project = uid('P')
+        ontrack.project(project) {
+            branch('test') {
+                build('1', 'Build 1') {
+                    config {
+                        metaInfo 'A', '1', 'link/1'
+                    }
+                }
+                build('2', 'Build 2') {
+                    config {
+                        metaInfo 'A', '2', 'link/2'
+                    }
+                }
+            }
+        }
+
+        def results = ontrack.branch(project, 'test').standardFilter([
+                withProperty     : 'net.nemerosa.ontrack.extension.general.MetaInfoPropertyType',
+                withPropertyValue: 'A:2'
+        ])
+        assert results.collect { it.name } == ['2']
     }
 
     @Test
