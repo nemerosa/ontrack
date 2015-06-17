@@ -41,14 +41,7 @@ angular.module('ontrack.extension.jenkins', [
             otFormService.display({
                 uri: $scope.configurations._create,
                 title: "Jenkins configuration",
-                buttons: [
-                    {
-                        title: "Test",
-                        action: function (data) {
-                            return otConfigurationService.test($scope.configurations._test, data);
-                        }
-                    }
-                ],
+                buttons: [ otConfigurationService.testButton($scope.configurations._test) ],
                 submit: function (data) {
                     return ot.call($http.post($scope.configurations._create, data));
                 }
@@ -72,14 +65,7 @@ angular.module('ontrack.extension.jenkins', [
             otFormService.display({
                 uri: configuration._update,
                 title: "Jenkins configuration",
-                buttons: [
-                    {
-                        title: "Test",
-                        action: function (data) {
-                            return otConfigurationService.test($scope.configurations._test, data);
-                        }
-                    }
-                ],
+                buttons: [ otConfigurationService.testButton($scope.configurations._test) ],
                 submit: function (data) {
                     return ot.call($http.put(configuration._update, data));
                 }

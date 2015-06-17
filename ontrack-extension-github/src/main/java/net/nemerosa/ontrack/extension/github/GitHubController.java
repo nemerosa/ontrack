@@ -4,11 +4,13 @@ import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.github.model.GitHubConfiguration;
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
+import net.nemerosa.ontrack.git.GitRepositoryClientFactory;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
+import net.nemerosa.ontrack.model.support.ConnectionResult;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
@@ -25,14 +27,16 @@ public class GitHubController extends AbstractExtensionController<GitHubExtensio
 
     private final GitHubConfigurationService configurationService;
     private final SecurityService securityService;
+    private final GitRepositoryClientFactory repositoryClientFactory;
 
     @Autowired
     public GitHubController(GitHubExtensionFeature feature,
                             GitHubConfigurationService configurationService,
-                            SecurityService securityService) {
+                            SecurityService securityService, GitRepositoryClientFactory repositoryClientFactory) {
         super(feature);
         this.configurationService = configurationService;
         this.securityService = securityService;
+        this.repositoryClientFactory = repositoryClientFactory;
     }
 
     @Override
@@ -56,7 +60,23 @@ public class GitHubController extends AbstractExtensionController<GitHubExtensio
                 uri(on(getClass()).getConfigurations())
         )
                 .with(Link.CREATE, uri(on(getClass()).getConfigurationForm()))
+                .with("_test", uri(on(getClass()).testConfiguration(null)), securityService.isGlobalFunctionGranted(GlobalSettings.class))
                 ;
+    }
+
+    /**
+     * Test for a configuration
+     */
+    @RequestMapping(value = "configurations/test", method = RequestMethod.POST)
+    public ConnectionResult testConfiguration(@RequestBody GitHubConfiguration configuration) {
+        try {
+            // TODO Not sure it's enough without testing an actual sync or connection
+            repositoryClientFactory.getClient(configuration.getGitRepository());
+            // OK
+            return ConnectionResult.ok();
+        } catch (Exception ex) {
+            return ConnectionResult.error(ex.getMessage());
+        }
     }
 
     /**

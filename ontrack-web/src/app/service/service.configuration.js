@@ -5,6 +5,18 @@ angular.module('ot.service.configuration', [
         var self = {};
 
         /**
+         * Creates a test button
+         */
+        self.testButton = function (url) {
+            return {
+                title: "Test",
+                action: function (data) {
+                    return self.test(url, data);
+                }
+            };
+        };
+
+        /**
          * Testing a configuration
          */
         self.test = function (url, data) {
