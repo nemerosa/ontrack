@@ -31,6 +31,7 @@ angular.module('ot.service.form', [
          * @param formConfig.title Title for the dialog
          * @param formConfig.submit Function to call with the raw form data. See {@link #submitDialog}
          * @param formConfig.size 'sm' (default) or 'lg'
+         * @param formConfig.buttons Additional buttons. List of {"title", action}.
          */
         self.display = function (formConfig) {
             var d = $q.defer();

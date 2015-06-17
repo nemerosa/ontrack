@@ -13,6 +13,11 @@
             <span>{{message.content}}</span>
         </div>
 
+        <!-- Additional buttons -->
+        <button class="btn btn-default" type="button" ng-repeat="button in config.formConfig.buttons" ng-click="button.action()">
+            {{button.title}}
+        </button>
+
         <button class="btn btn-primary ot-dialog-ok" type="submit" ng-disabled="thisForm.$invalid || submitting">
             <span class="ot-loading-indicator" ng-show="submitting"></span>
             OK

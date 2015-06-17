@@ -40,6 +40,14 @@ angular.module('ontrack.extension.jira', [
             otFormService.display({
                 uri: $scope.configurations._create,
                 title: "JIRA configuration",
+                buttons: [
+                    {
+                        title: "Test",
+                        action: function() {
+                            alert("Test");
+                        }
+                    }
+                ],
                 submit: function (data) {
                     return ot.call($http.post($scope.configurations._create, data));
                 }
