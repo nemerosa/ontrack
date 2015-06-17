@@ -2,6 +2,16 @@
 @import '../../vendor/bootstrap/less/mixins';
 @import 'variables.less';
 
-.net-nemerosa-ontrack-extension-general-ReleaseDecorationExtension-release {
+.ot-decoration-label.net-nemerosa-ontrack-extension-general-ReleaseDecorationExtension-release {
   .label-success !important;
+}
+
+.ot-decoration-label.net-nemerosa-ontrack-extension-general-MetaInfoDecorationExtension-any {
+  border: solid gray 1px !important;
+  color: @text-color !important;
+  background-color: white !important;
+  // No image
+  .ot-decoration-label-image {
+    display: none;
+  }
 }
