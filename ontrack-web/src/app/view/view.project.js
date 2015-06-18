@@ -81,7 +81,7 @@ angular.module('ot.view.project', [
                         }
                     }, {
                         id: 'showDisabled',
-                        name: "Show disabled items",
+                        name: "Show all branches",
                         cls: 'ot-command-show-disabled',
                         condition: function () {
                             return !$scope.showDisabled;
@@ -91,7 +91,7 @@ angular.module('ot.view.project', [
                         }
                     }, {
                         id: 'hideDisabled',
-                        name: "Hide disabled items",
+                        name: "Hide disabled branches",
                         cls: 'ot-command-hide-disabled',
                         condition: function () {
                             return $scope.showDisabled;
@@ -168,5 +168,24 @@ angular.module('ot.view.project', [
 
         // Reload callback available in the scope
         $scope.reloadProject = loadProject;
+
+        // Enabling a branch
+        $scope.enableBranch = function (branch) {
+            if (branch._enable) {
+                ot.pageCall($http.put(branch._enable)).then(loadProject);
+            }
+        };
+
+        // Disabling a branch
+        $scope.disableBranch = function (branch) {
+            if (branch._disable) {
+                ot.pageCall($http.put(branch._disable)).then(loadProject);
+            }
+        };
+
+        // Deleting a branch
+        $scope.deleteBranch = function (branch) {
+            otStructureService.deleteBranch(branch).then(loadProject);
+        };
     })
 ;

@@ -29,6 +29,21 @@
                                     {{branch.name}}
                                 </a>
                                 <ot-entity-decorations entity="branch"></ot-entity-decorations>
+                                <span
+                                        ng-show="showDisabled && branch._enable"
+                                        title="Enable the {{branch.name}} branch"
+                                        ng-click="enableBranch(branch)"
+                                        class="ot-command ot-command-enable"></span>
+                                <span
+                                        ng-show="showDisabled && branch._disable"
+                                        title="Disable the {{branch.name}} branch"
+                                        ng-click="disableBranch(branch)"
+                                        class="ot-command ot-command-disable"></span>
+                                <span
+                                        ng-show="showDisabled && branch._delete"
+                                        title="Delete the {{branch.name}} branch"
+                                        ng-click="deleteBranch(branch)"
+                                        class="ot-command ot-command-delete"></span>
                             </td>
                             <td>
                                 <div class="ot-project-branch-promotion"

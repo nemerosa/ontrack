@@ -3,7 +3,7 @@ angular.module('ot.service.structure', [
     'ot.service.form',
     'ot.dialog.image'
 ])
-    .service('otStructureService', function (ot, $q, $interpolate, $http, $modal, otFormService) {
+    .service('otStructureService', function (ot, $q, $interpolate, $http, $modal, otFormService, otAlertService) {
         var self = {};
 
         /**
@@ -36,6 +36,19 @@ angular.module('ot.service.structure', [
          */
         self.getProject = function (id) {
             return ot.call($http.get('structure/projects/' + id));
+        };
+
+        /**
+         * Deleting a branch
+         */
+        self.deleteBranch = function (branch) {
+            return otAlertService.confirm({
+                title: "Deleting a branch",
+                message: "Do you really want to delete the branch " + branch.name +
+                " and all its associated data?"
+            }).then(function () {
+                return ot.call($http.delete(branch._delete));
+            });
         };
 
         /**

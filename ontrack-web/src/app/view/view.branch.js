@@ -325,6 +325,9 @@ angular.module('ot.view.branch', [
                         name: "Delete branch",
                         cls: 'ot-command-branch-delete',
                         action: function () {
+                            otStructureService.deleteBranch($scope.branch).then(function () {
+                                $state.go('project', {projectId: $scope.branch.project.id});
+                            });
                             otAlertService.confirm({
                                 title: "Deleting a branch",
                                 message: "Do you really want to delete the branch " + $scope.branch.name +
