@@ -70,9 +70,7 @@ public class GitHubController extends AbstractExtensionController<GitHubExtensio
     @RequestMapping(value = "configurations/test", method = RequestMethod.POST)
     public ConnectionResult testConfiguration(@RequestBody GitHubConfiguration configuration) {
         try {
-            // TODO Not sure it's enough without testing an actual sync or connection
-            repositoryClientFactory.getClient(configuration.getGitRepository());
-            // OK
+            repositoryClientFactory.getClient(configuration.getGitRepository()).test();
             return ConnectionResult.ok();
         } catch (Exception ex) {
             return ConnectionResult.error(ex.getMessage());
