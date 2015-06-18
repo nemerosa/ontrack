@@ -25,8 +25,14 @@ angular.module('ot.view.search', [
             $scope.results = results;
             // If only one result, switches directly to the correct page
             if (results.length == 1) {
-                $log.info('[search] Autoredirect for 1 result: ', results[0]);
-                $location.path(results[0].hint);
+                var result = results[0];
+                $log.info('[search] Autoredirect for 1 result: ', result);
+                if (result.page) {
+                    window.location = result.page;
+                } else {
+                    // TODO Deprecated
+                    $location.path(result.hint);
+                }
             }
         });
 
