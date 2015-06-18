@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.ui.controller;
 
 import net.nemerosa.ontrack.common.RunProfile;
+import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
@@ -41,6 +42,22 @@ public class MockURIBuilder implements URIBuilder {
                         format(path, arguments)
                 )
         );
+    }
+
+    @Override
+    public URI getEntityURI(ProjectEntity entity) {
+        return URI.create(
+                format(
+                        "urn:test:entity:%s:%d",
+                        entity.getProjectEntityType().name(),
+                        entity.id()
+                )
+        );
+    }
+
+    @Override
+    public URI getEntityPage(ProjectEntity entity) {
+        return page("entity:%s:%d", entity.getProjectEntityType().name(), entity.id());
     }
 
     private String encode(String s) {

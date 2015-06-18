@@ -41,4 +41,10 @@ public interface ProjectEntity extends Entity {
     @JsonIgnore
     ProjectEntityType getProjectEntityType();
 
+    /**
+     * Representation, like "Branch P/X"
+     */
+    @JsonIgnore
+    String getEntityDisplayName();
+
 }

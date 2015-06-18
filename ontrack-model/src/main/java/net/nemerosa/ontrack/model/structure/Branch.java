@@ -48,6 +48,11 @@ public class Branch implements ProjectEntity {
         return ProjectEntityType.BRANCH;
     }
 
+    @Override
+    public String getEntityDisplayName() {
+        return String.format("Branch %s/%s", project.getName(), name);
+    }
+
     public Branch withId(ID id) {
         return new Branch(id, name, description, disabled, type, project);
     }

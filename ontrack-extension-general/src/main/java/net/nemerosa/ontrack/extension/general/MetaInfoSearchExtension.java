@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.stream.Collectors;
 
 @Component
 public class MetaInfoSearchExtension extends AbstractExtension implements SearchExtension {
@@ -56,10 +57,26 @@ public class MetaInfoSearchExtension extends AbstractExtension implements Search
                     (entityType, id) -> entityType.getEntityFn(structureService).apply(id),
                     metaInfoProperty -> metaInfoProperty.matchNameValue(name, value)
             );
-            // FIXME Returns entities
-            return Collections.emptyList();
+            // Returns search results
+            return entities.stream()
+                    .map(entity -> toSearchResult(entity, name))
+                    .collect(Collectors.toList());
         } else {
             return Collections.emptyList();
         }
+    }
+
+    protected SearchResult toSearchResult(ProjectEntity entity, String name) {
+        // Gets the property value for the meta info name (required)
+        String value = propertyService.getProperty(entity, MetaInfoPropertyType.class).getValue().getValue(name)
+                .orElseThrow(() -> new IllegalStateException("Expecting to have a meta info property"));
+        // OK
+        return new SearchResult(
+                entity.getEntityDisplayName(),
+                String.format("%s -> %s", name, value),
+                uriBuilder.getEntityURI(entity),
+                uriBuilder.getEntityPage(entity),
+                100
+        );
     }
 }
