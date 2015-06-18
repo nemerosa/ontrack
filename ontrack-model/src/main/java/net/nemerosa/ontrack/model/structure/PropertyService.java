@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Management of properties.
@@ -83,6 +85,14 @@ public interface PropertyService {
      * @param propertyTypeName Fully qualified name of the property to delete
      */
     Ack deleteProperty(ProjectEntity entity, String propertyTypeName);
+
+    /**
+     * Searches for all entities with the corresponding property value.
+     */
+    <T> Collection<ProjectEntity> searchWithPropertyValue(
+            Class<? extends PropertyType<T>> propertyTypeClass,
+            Predicate<T> predicate
+    );
 
     /**
      * Tests if a property is defined.

@@ -86,15 +86,11 @@ public class MetaInfoPropertyType extends AbstractPropertyType<MetaInfoProperty>
 
     @Override
     public boolean containsValue(MetaInfoProperty property, String propertyValue) {
-        String value = StringUtils.substringAfter(propertyValue, ":");
-        if (StringUtils.isNotBlank(value)) {
+        int pos = StringUtils.indexOf(propertyValue, ":");
+        if (pos > 0) {
+            String value = StringUtils.substringAfter(propertyValue, ":");
             String name = StringUtils.substringBefore(propertyValue, ":");
-            return property.getItems().stream()
-                    .anyMatch(
-                            item ->
-                                    StringUtils.equals(name, item.getName()) &&
-                                            StringUtils.equals(value, item.getValue())
-                    );
+            return property.matchNameValue(name, value);
         } else {
             return false;
         }

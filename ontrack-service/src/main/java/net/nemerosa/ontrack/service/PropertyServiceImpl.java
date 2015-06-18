@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
@@ -204,6 +205,12 @@ public class PropertyServiceImpl implements PropertyService {
         PropertyType<?> propertyType = getPropertyTypeByName(propertyTypeName);
         // Gets the edition form for this type
         return getPropertyEditionForm(entity, propertyType);
+    }
+
+    @Override
+    public <T> Collection<ProjectEntity> searchWithPropertyValue(Class<? extends PropertyType<T>> propertyTypeClass, Predicate<T> predicate) {
+        // FIXME Method net.nemerosa.ontrack.service.PropertyServiceImpl.searchWithPropertyValue
+        return null;
     }
 
     protected <T> Form getPropertyEditionForm(ProjectEntity entity, PropertyType<T> propertyType) {
