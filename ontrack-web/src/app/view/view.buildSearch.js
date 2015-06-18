@@ -1,6 +1,7 @@
 angular.module('ot.view.buildSearch', [
     'ui.router',
     'ot.service.core',
+    'ot.service.form',
     'ot.service.structure'
 ])
     .config(function ($stateProvider) {
@@ -10,7 +11,7 @@ angular.module('ot.view.buildSearch', [
             controller: 'BuildSearchCtrl'
         });
     })
-    .controller('BuildSearchCtrl', function ($location, $scope, $stateParams, $state, $http, ot, otStructureService, otNotificationService) {
+    .controller('BuildSearchCtrl', function ($location, $scope, $stateParams, $state, $http, ot, otStructureService, otFormService, otNotificationService) {
         var view = ot.view();
         // Project's id
         var projectId = $stateParams.projectId;
@@ -33,6 +34,10 @@ angular.module('ot.view.buildSearch', [
                 return ot.pageCall($http.get($scope.project._buildSearch));
             }).then(function (searchForm) {
                 $scope.searchForm = searchForm;
+
+                // Extracts the list of properties
+                $scope.propertyField = otFormService.getField(searchForm, "property");
+
                 $scope.data = {
                     maximumCount: 10
                 };
