@@ -39,6 +39,11 @@ public class Project implements ProjectEntity {
         return ProjectEntityType.PROJECT;
     }
 
+    @Override
+    public String getEntityDisplayName() {
+        return String.format("Project %s", name);
+    }
+
     public static Form form() {
         return Form.nameAndDescription()
                 .with(

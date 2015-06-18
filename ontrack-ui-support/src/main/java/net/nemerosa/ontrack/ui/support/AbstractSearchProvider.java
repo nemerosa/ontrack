@@ -7,7 +7,7 @@ import java.net.URI;
 
 public abstract class AbstractSearchProvider implements SearchProvider {
 
-    private final URIBuilder uriBuilder;
+    protected final URIBuilder uriBuilder;
 
     protected AbstractSearchProvider(URIBuilder uriBuilder) {
         this.uriBuilder = uriBuilder;

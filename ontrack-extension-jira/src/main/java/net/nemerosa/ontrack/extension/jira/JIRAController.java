@@ -1,12 +1,15 @@
 package net.nemerosa.ontrack.extension.jira;
 
 import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
+import net.nemerosa.ontrack.extension.jira.tx.JIRASession;
+import net.nemerosa.ontrack.extension.jira.tx.JIRASessionFactory;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
+import net.nemerosa.ontrack.model.support.ConnectionResult;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
@@ -22,12 +25,14 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 public class JIRAController extends AbstractExtensionController<JIRAExtensionFeature> {
 
     private final JIRAConfigurationService jiraConfigurationService;
+    private final JIRASessionFactory jiraSessionFactory;
     private final SecurityService securityService;
 
     @Autowired
-    public JIRAController(JIRAExtensionFeature feature, JIRAConfigurationService jiraConfigurationService, SecurityService securityService) {
+    public JIRAController(JIRAExtensionFeature feature, JIRAConfigurationService jiraConfigurationService, JIRASessionFactory jiraSessionFactory, SecurityService securityService) {
         super(feature);
         this.jiraConfigurationService = jiraConfigurationService;
+        this.jiraSessionFactory = jiraSessionFactory;
         this.securityService = securityService;
     }
 
@@ -52,6 +57,7 @@ public class JIRAController extends AbstractExtensionController<JIRAExtensionFea
                 uri(on(getClass()).getConfigurations())
         )
                 .with(Link.CREATE, uri(on(getClass()).getConfigurationForm()))
+                .with("_test", uri(on(getClass()).testConfiguration(null)), securityService.isGlobalFunctionGranted(GlobalSettings.class))
                 ;
     }
 
@@ -64,6 +70,21 @@ public class JIRAController extends AbstractExtensionController<JIRAExtensionFea
                 jiraConfigurationService.getConfigurationDescriptors(),
                 uri(on(getClass()).getConfigurationsDescriptors())
         );
+    }
+
+    /**
+     * Test for a configuration
+     */
+    @RequestMapping(value = "configurations/test", method = RequestMethod.POST)
+    public ConnectionResult testConfiguration(@RequestBody JIRAConfiguration configuration) {
+        try (JIRASession jiraSession = jiraSessionFactory.create(configuration)) {
+            // Gets the list of projects
+            jiraSession.getClient().getProjects();
+            // OK
+            return ConnectionResult.ok();
+        } catch (Exception ex) {
+            return ConnectionResult.error(ex.getMessage());
+        }
     }
 
     /**

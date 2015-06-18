@@ -36,6 +36,11 @@ public class ValidationStamp implements ProjectEntity {
         return ProjectEntityType.VALIDATION_STAMP;
     }
 
+    @Override
+    public String getEntityDisplayName() {
+        return String.format("Validation stamp %s/%s/%s", branch.getProject().getName(), branch.getName(), name);
+    }
+
     public ValidationStamp withId(ID id) {
         return new ValidationStamp(id, name, description, branch, owner, image);
     }

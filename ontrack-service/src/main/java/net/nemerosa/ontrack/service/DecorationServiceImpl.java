@@ -13,9 +13,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Transactional
@@ -38,17 +40,15 @@ public class DecorationServiceImpl implements DecorationService {
     @Override
     public List<Decoration> getDecorations(ProjectEntity entity) {
         // Downloading a decoration with the current security context
-        Function<Decorator, Decoration> securedDecoratorFunction = securityService.runner(
-                decorator -> getDecoration(entity, decorator)
+        Function<Decorator, Stream<Decoration>> securedDecoratorFunction = securityService.runner(
+                decorator -> getDecorations(entity, decorator).stream()
         );
         List<Decoration> decorations = new ArrayList<>();
         // Built-in decorations
         decorations.addAll(
                 builtinDecorators.parallelStream()
-                        // ... and gets the decoration
-                        .map(securedDecoratorFunction)
-                                // ... and excludes the null ones
-                        .filter(decoration -> decoration != null)
+                        // ... and gets the decorations
+                        .flatMap(securedDecoratorFunction)
                                 // OK
                         .collect(Collectors.toList())
         );
@@ -59,9 +59,7 @@ public class DecorationServiceImpl implements DecorationService {
                                 // ... and filters per entity
                         .filter(decorator -> decorator.getScope().contains(entity.getProjectEntityType()))
                                 // ... and gets the decoration
-                        .map(securedDecoratorFunction)
-                                // ... and excludes the null ones
-                        .filter(decoration -> decoration != null)
+                        .flatMap(securedDecoratorFunction)
                                 // OK
                         .collect(Collectors.toList())
         );
@@ -72,11 +70,11 @@ public class DecorationServiceImpl implements DecorationService {
     /**
      * Gets the decoration for an entity, and returns an "error" decoration in case of problem.
      */
-    protected Decoration getDecoration(ProjectEntity entity, Decorator decorator) {
+    protected List<Decoration> getDecorations(ProjectEntity entity, Decorator decorator) {
         try {
-            return decorator.getDecoration(entity);
+            return decorator.getDecorations(entity);
         } catch (Exception ex) {
-            return errorDecorator.getDecoration(ex);
+            return Collections.singletonList(errorDecorator.getDecoration(ex));
         }
     }
 }

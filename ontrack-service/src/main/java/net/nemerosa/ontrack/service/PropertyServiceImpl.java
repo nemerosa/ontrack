@@ -10,10 +10,7 @@ import net.nemerosa.ontrack.model.exceptions.PropertyTypeNotFoundException;
 import net.nemerosa.ontrack.model.exceptions.PropertyUnsupportedEntityTypeException;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.structure.ProjectEntity;
-import net.nemerosa.ontrack.model.structure.Property;
-import net.nemerosa.ontrack.model.structure.PropertyService;
-import net.nemerosa.ontrack.model.structure.PropertyType;
+import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.repository.PropertyRepository;
 import net.nemerosa.ontrack.repository.TProperty;
 import org.apache.commons.lang3.StringUtils;
@@ -25,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
@@ -204,6 +203,22 @@ public class PropertyServiceImpl implements PropertyService {
         PropertyType<?> propertyType = getPropertyTypeByName(propertyTypeName);
         // Gets the edition form for this type
         return getPropertyEditionForm(entity, propertyType);
+    }
+
+    @Override
+    public <T> Collection<ProjectEntity> searchWithPropertyValue(
+            Class<? extends PropertyType<T>> propertyTypeClass,
+            BiFunction<ProjectEntityType, ID, ProjectEntity> entityLoader,
+            Predicate<T> predicate) {
+        // Gets the property type
+        String propertyTypeName = propertyTypeClass.getName();
+        PropertyType<T> propertyType = getPropertyTypeByName(propertyTypeName);
+        // Search
+        return propertyRepository.searchByProperty(
+                propertyTypeName,
+                entityLoader,
+                t -> predicate.test(propertyType.fromStorage(t.getJson()))
+        );
     }
 
     protected <T> Form getPropertyEditionForm(ProjectEntity entity, PropertyType<T> propertyType) {

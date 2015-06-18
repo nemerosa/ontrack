@@ -5,10 +5,7 @@ import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.common.Utils;
 import net.nemerosa.ontrack.git.GitRepository;
 import net.nemerosa.ontrack.git.GitRepositoryClient;
-import net.nemerosa.ontrack.git.exceptions.GitRepositoryAPIException;
-import net.nemerosa.ontrack.git.exceptions.GitRepositoryCannotCloneException;
-import net.nemerosa.ontrack.git.exceptions.GitRepositoryIOException;
-import net.nemerosa.ontrack.git.exceptions.GitRepositoryInitException;
+import net.nemerosa.ontrack.git.exceptions.*;
 import net.nemerosa.ontrack.git.model.*;
 import net.nemerosa.ontrack.git.model.plot.GPlot;
 import net.nemerosa.ontrack.git.model.plot.GitPlotRenderer;
@@ -29,6 +26,8 @@ import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.eclipse.jgit.treewalk.AbstractTreeIterator;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -44,6 +43,8 @@ import java.util.stream.Stream;
 import static java.lang.String.format;
 
 public class GitRepositoryClientImpl implements GitRepositoryClient {
+
+    private final Logger logger = LoggerFactory.getLogger(GitRepositoryClient.class);
 
     private final File repositoryDir;
     private final GitRepository repository;
@@ -71,6 +72,23 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
             credentialsProvider = new UsernamePasswordCredentialsProvider(repository.getUser(), repository.getPassword());
         } else {
             credentialsProvider = null;
+        }
+    }
+
+    /**
+     * Tries to ls-remote the heads
+     */
+    @Override
+    public void test() {
+        logger.debug(format("[git] Listing the remote heads in %s", repository.getRemote()));
+        try {
+            git.lsRemote()
+                    .setRemote(repository.getRemote())
+                    .setHeads(true)
+                    .setCredentialsProvider(credentialsProvider)
+                    .call();
+        } catch (GitAPIException e) {
+            throw new GitTestException(e.getMessage());
         }
     }
 

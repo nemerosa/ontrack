@@ -39,6 +39,11 @@ public class Build implements ProjectEntity {
         return ProjectEntityType.BUILD;
     }
 
+    @Override
+    public String getEntityDisplayName() {
+        return String.format("Build %s/%s/%s", branch.getProject().getName(), branch.getName(), name);
+    }
+
     public Build withId(ID id) {
         return new Build(id, name, description, signature, branch);
     }

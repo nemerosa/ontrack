@@ -1,12 +1,15 @@
 package net.nemerosa.ontrack.extension.jenkins;
 
 import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
+import net.nemerosa.ontrack.extension.jenkins.client.JenkinsClient;
+import net.nemerosa.ontrack.extension.jenkins.client.JenkinsClientFactory;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
+import net.nemerosa.ontrack.model.support.ConnectionResult;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
@@ -22,12 +25,14 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 public class JenkinsController extends AbstractExtensionController<JenkinsExtensionFeature> {
 
     private final JenkinsConfigurationService jenkinsService;
+    private final JenkinsClientFactory jenkinsClientFactory;
     private final SecurityService securityService;
 
     @Autowired
-    public JenkinsController(JenkinsExtensionFeature feature, JenkinsConfigurationService jenkinsService, SecurityService securityService) {
+    public JenkinsController(JenkinsExtensionFeature feature, JenkinsConfigurationService jenkinsService, JenkinsClientFactory jenkinsClientFactory, SecurityService securityService) {
         super(feature);
         this.jenkinsService = jenkinsService;
+        this.jenkinsClientFactory = jenkinsClientFactory;
         this.securityService = securityService;
     }
 
@@ -52,6 +57,7 @@ public class JenkinsController extends AbstractExtensionController<JenkinsExtens
                 uri(on(getClass()).getConfigurations())
         )
                 .with(Link.CREATE, uri(on(getClass()).getConfigurationForm()))
+                .with("_test", uri(on(getClass()).testConfiguration(null)), securityService.isGlobalFunctionGranted(GlobalSettings.class))
                 ;
     }
 
@@ -64,6 +70,22 @@ public class JenkinsController extends AbstractExtensionController<JenkinsExtens
                 jenkinsService.getConfigurationDescriptors(),
                 uri(on(getClass()).getConfigurationsDescriptors())
         );
+    }
+
+    /**
+     * Test for a configuration
+     */
+    @RequestMapping(value = "configurations/test", method = RequestMethod.POST)
+    public ConnectionResult testConfiguration(@RequestBody JenkinsConfiguration configuration) {
+        JenkinsClient client = jenkinsClientFactory.getClient(configuration);
+        try {
+            // Gets the basic info
+            client.getInfo();
+            // OK
+            return ConnectionResult.ok();
+        } catch (Exception ex) {
+            return ConnectionResult.error(ex.getMessage());
+        }
     }
 
     /**

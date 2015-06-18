@@ -1,0 +1,8 @@
+<ul>
+    <li ng-repeat="item in property.value.items">
+        {{item.name}}
+        <span class="fa fa-arrow-right"></span>
+        <a ng-if="item.link" href="{{item.link}}">{{item.value}}</a>
+        <span ng-if="!item.link">{{item.value}}</span>
+    </li>
+</ul>

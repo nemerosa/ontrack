@@ -25,15 +25,17 @@ public class DecorationServiceImplTest {
         ProjectEntity projectEntity = mock(ProjectEntity.class);
 
         Decorator decorator = mock(Decorator.class);
-        when(decorator.getDecoration(any(ProjectEntity.class))).thenThrow(new RuntimeException("Error while generating the decoration"));
+        when(decorator.getDecorations(any(ProjectEntity.class))).thenThrow(new RuntimeException("Error while generating the decoration"));
 
         SecurityService securityService = mock(SecurityService.class);
 
         List<Decorator> builtinDecorators = Collections.emptyList();
         DecorationServiceImpl service = new DecorationServiceImpl(extensionManager, builtinDecorators, securityService);
 
-        Decoration decoration = service.getDecoration(projectEntity, decorator);
-        assertNotNull(decoration);
+        List<Decoration> decorations = service.getDecorations(projectEntity, decorator);
+        assertNotNull(decorations);
+        assertEquals(1, decorations.size());
+        Decoration decoration = decorations.get(0);
         assertEquals("error", decoration.getId());
         assertEquals("Problem while getting decoration", decoration.getTitle());
     }
@@ -44,15 +46,17 @@ public class DecorationServiceImplTest {
         ProjectEntity projectEntity = mock(ProjectEntity.class);
 
         Decorator decorator = mock(Decorator.class);
-        when(decorator.getDecoration(any(ProjectEntity.class))).thenThrow(new TestBaseException());
+        when(decorator.getDecorations(any(ProjectEntity.class))).thenThrow(new TestBaseException());
 
         SecurityService securityService = mock(SecurityService.class);
 
         List<Decorator> builtinDecorators = Collections.emptyList();
         DecorationServiceImpl service = new DecorationServiceImpl(extensionManager, builtinDecorators, securityService);
 
-        Decoration decoration = service.getDecoration(projectEntity, decorator);
-        assertNotNull(decoration);
+        List<Decoration> decorations = service.getDecorations(projectEntity, decorator);
+        assertNotNull(decorations);
+        assertEquals(1, decorations.size());
+        Decoration decoration = decorations.get(0);
         assertEquals("error", decoration.getId());
         assertEquals("Known exception", decoration.getTitle());
     }

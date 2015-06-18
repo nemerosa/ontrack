@@ -2,6 +2,7 @@ angular.module('ontrack.extension.svn', [
     'ui.router',
     'ontrack.extension.scm',
     'ot.service.core',
+    'ot.service.configuration',
     'ot.service.form',
     'ot.extension.svn.changelog',
     'ot.extension.svn.revision',
@@ -18,7 +19,7 @@ angular.module('ontrack.extension.svn', [
         });
 
     })
-    .controller('SVNConfigurationsCtrl', function ($scope, $http, $modal, ot, otFormService, otAlertService) {
+    .controller('SVNConfigurationsCtrl', function ($scope, $http, $modal, ot, otFormService, otAlertService, otConfigurationService) {
         var view = ot.view();
         view.title = 'SVN configurations';
         view.description = 'Management of the SVN configurations.';
@@ -47,6 +48,7 @@ angular.module('ontrack.extension.svn', [
             otFormService.display({
                 uri: $scope.configurations._create,
                 title: "SVN configuration",
+                buttons: [ otConfigurationService.testButton($scope.configurations._test) ],
                 submit: function (data) {
                     return ot.call($http.post($scope.configurations._create, data));
                 }
@@ -70,6 +72,7 @@ angular.module('ontrack.extension.svn', [
             otFormService.display({
                 uri: configuration._update,
                 title: "SVN configuration",
+                buttons: [ otConfigurationService.testButton($scope.configurations._test) ],
                 submit: function (data) {
                     return ot.call($http.put(configuration._update, data));
                 }

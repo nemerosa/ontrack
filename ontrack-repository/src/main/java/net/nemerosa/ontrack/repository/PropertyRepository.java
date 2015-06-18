@@ -3,7 +3,12 @@ package net.nemerosa.ontrack.repository;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.structure.ID;
+import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
+
+import java.util.Collection;
+import java.util.function.BiFunction;
+import java.util.function.Predicate;
 
 /**
  * Repository to access the properties.
@@ -15,4 +20,8 @@ public interface PropertyRepository {
     void saveProperty(String typeName, ProjectEntityType entityType, ID entityId, JsonNode data, String searchKey);
 
     Ack deleteProperty(String typeName, ProjectEntityType entityType, ID entityId);
+
+    Collection<ProjectEntity> searchByProperty(String typeName,
+                                               BiFunction<ProjectEntityType, ID, ProjectEntity> entityLoader,
+                                               Predicate<TProperty> predicate);
 }

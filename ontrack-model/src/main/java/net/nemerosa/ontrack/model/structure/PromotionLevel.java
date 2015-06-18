@@ -37,6 +37,11 @@ public class PromotionLevel implements ProjectEntity {
         return ProjectEntityType.PROMOTION_LEVEL;
     }
 
+    @Override
+    public String getEntityDisplayName() {
+        return String.format("Promotion level %s/%s/%s", branch.getProject().getName(), branch.getName(), name);
+    }
+
     public PromotionLevel withId(ID id) {
         return new PromotionLevel(id, name, description, branch, image);
     }

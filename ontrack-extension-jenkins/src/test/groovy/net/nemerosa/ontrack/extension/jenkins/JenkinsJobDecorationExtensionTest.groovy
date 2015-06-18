@@ -62,8 +62,10 @@ class JenkinsJobDecorationExtensionTest {
         when(propertyService.getProperty(branch, JenkinsJobPropertyType.class.getName())).thenReturn(
                 jenkinsJobProperty
         )
-        def decoration = extension.getDecoration(branch)
-        assert decoration != null
+        def decorations = extension.getDecorations(branch)
+        assert decorations != null
+        assert decorations.size() == 1
+        def decoration = decorations[0]
         assert decoration.decorationType == 'net.nemerosa.ontrack.extension.jenkins.JenkinsJobDecorationExtension'
         assert decoration.id == 'idle'
         assert decoration.name == null
@@ -76,8 +78,8 @@ class JenkinsJobDecorationExtensionTest {
         when(propertyService.getProperty(branch, JenkinsJobPropertyType.class.getName())).thenReturn(
                 jenkinsJobProperty
         )
-        def decoration = extension.getDecoration(branch)
-        assert decoration == null
+        def decorations = extension.getDecorations(branch)
+        assert decorations == []
     }
 
 }

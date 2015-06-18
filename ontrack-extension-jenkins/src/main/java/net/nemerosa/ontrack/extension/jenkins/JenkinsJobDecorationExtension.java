@@ -10,7 +10,9 @@ import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.EnumSet;
+import java.util.List;
 
 /**
  * Provides a decoration that displays the state of a running job.
@@ -39,22 +41,24 @@ public class JenkinsJobDecorationExtension extends AbstractExtension implements 
     }
 
     @Override
-    public Decoration getDecoration(ProjectEntity entity) {
+    public List<Decoration> getDecorations(ProjectEntity entity) {
         // Gets the Jenkins Job property for this entity, if any
         Property<JenkinsJobProperty> property = propertyService.getProperty(entity, JenkinsJobPropertyType.class.getName());
         if (property.isEmpty()) {
-            return null;
+            return Collections.emptyList();
         } else {
             // Template branch? Decoration cannot be computed
             if (entity instanceof Branch && ((Branch) entity).getType() == BranchType.TEMPLATE_DEFINITION) {
-                return null;
+                return Collections.emptyList();
             }
             // Gets a client
             JenkinsClient jenkinsClient = jenkinsClientFactory.getClient(property.getValue().getConfiguration());
             // Gets the Jenkins job
             JenkinsJob job = jenkinsClient.getJob(property.getValue().getJob(), false);
             // Gets the decoration for the job
-            return getDecoration(job);
+            return Collections.singletonList(
+                    getDecoration(job)
+            );
         }
     }
 

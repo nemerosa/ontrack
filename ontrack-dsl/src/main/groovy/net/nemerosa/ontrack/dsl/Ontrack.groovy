@@ -85,6 +85,12 @@ class Ontrack {
         )
     }
 
+    List<SearchResult> search(String token) {
+        post('search', [token: token]).collect {
+            new SearchResult(this, it)
+        }
+    }
+
     def configure(Closure closure) {
         Config configResource = new Config(this)
         closure.delegate = configResource

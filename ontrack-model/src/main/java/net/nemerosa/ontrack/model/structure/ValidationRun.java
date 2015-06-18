@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -52,6 +51,17 @@ public class ValidationRun implements ProjectEntity {
         return ProjectEntityType.VALIDATION_RUN;
     }
 
+    @Override
+    public String getEntityDisplayName() {
+        return String.format("Validation run %s#%d for %s/%s/%s",
+                validationStamp.getName(),
+                runOrder,
+                build.getBranch().getProject().getName(),
+                build.getBranch().getName(),
+                build.getName()
+        );
+    }
+
     public static ValidationRun of(
             Build build,
             ValidationStamp validationStamp,
@@ -59,7 +69,7 @@ public class ValidationRun implements ProjectEntity {
             Signature signature,
             ValidationRunStatusID validationRunStatusID,
             String description) {
-        List<ValidationRunStatus> statuses = Arrays.asList(
+        List<ValidationRunStatus> statuses = Collections.singletonList(
                 ValidationRunStatus.of(
                         signature,
                         validationRunStatusID,

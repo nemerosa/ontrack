@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.artifactory;
 
 import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
+import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClient;
+import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClientFactory;
 import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfiguration;
 import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfigurationService;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
@@ -9,6 +11,7 @@ import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
+import net.nemerosa.ontrack.model.support.ConnectionResult;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
@@ -25,12 +28,14 @@ public class ArtifactoryController extends AbstractExtensionController<Artifacto
 
     private final ArtifactoryConfigurationService configurationService;
     private final SecurityService securityService;
+    private final ArtifactoryClientFactory artifactoryClientFactory;
 
     @Autowired
-    public ArtifactoryController(ArtifactoryExtensionFeature feature, ArtifactoryConfigurationService configurationService, SecurityService securityService) {
+    public ArtifactoryController(ArtifactoryExtensionFeature feature, ArtifactoryConfigurationService configurationService, SecurityService securityService, ArtifactoryClientFactory artifactoryClientFactory) {
         super(feature);
         this.configurationService = configurationService;
         this.securityService = securityService;
+        this.artifactoryClientFactory = artifactoryClientFactory;
     }
 
     @Override
@@ -54,6 +59,7 @@ public class ArtifactoryController extends AbstractExtensionController<Artifacto
                 uri(on(getClass()).getConfigurations())
         )
                 .with(Link.CREATE, uri(on(getClass()).getConfigurationForm()))
+                .with("_test", uri(on(getClass()).testConfiguration(null)), securityService.isGlobalFunctionGranted(GlobalSettings.class))
                 ;
     }
 
@@ -66,6 +72,22 @@ public class ArtifactoryController extends AbstractExtensionController<Artifacto
                 configurationService.getConfigurationDescriptors(),
                 uri(on(getClass()).getConfigurationsDescriptors())
         );
+    }
+
+    /**
+     * Test for a configuration
+     */
+    @RequestMapping(value = "configurations/test", method = RequestMethod.POST)
+    public ConnectionResult testConfiguration(@RequestBody ArtifactoryConfiguration configuration) {
+        try {
+            ArtifactoryClient client = artifactoryClientFactory.getClient(configuration);
+            // Gets the basic info
+            client.getBuildNames();
+            // OK
+            return ConnectionResult.ok();
+        } catch (Exception ex) {
+            return ConnectionResult.error(ex.getMessage());
+        }
     }
 
     /**

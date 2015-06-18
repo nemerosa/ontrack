@@ -40,6 +40,16 @@ public class PromotionRun implements ProjectEntity {
         return ProjectEntityType.PROMOTION_RUN;
     }
 
+    @Override
+    public String getEntityDisplayName() {
+        return String.format("Promotion run %s/%s/%s/%s",
+                build.getBranch().getProject().getName(),
+                build.getBranch().getName(),
+                build.getName(),
+                promotionLevel.getName()
+        );
+    }
+
     public PromotionRun withId(ID id) {
         return new PromotionRun(
                 id,

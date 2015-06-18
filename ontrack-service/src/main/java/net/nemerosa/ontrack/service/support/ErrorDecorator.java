@@ -5,13 +5,15 @@ import net.nemerosa.ontrack.model.structure.Decoration;
 import net.nemerosa.ontrack.model.structure.Decorator;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 
+import java.util.List;
+
 /**
  * Fake decorator used for the generation of decorations in error.
  */
 public class ErrorDecorator implements Decorator {
 
     @Override
-    public Decoration getDecoration(ProjectEntity entity) {
+    public List<Decoration> getDecorations(ProjectEntity entity) {
         throw new UnsupportedOperationException("Not a real decorator");
     }
 

@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.dsl.ObjectAlreadyExistsException
 import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.Shell
 import net.nemerosa.ontrack.dsl.http.OTForbiddenClientException
-import net.nemerosa.ontrack.dsl.http.OTMessageClientException
 import net.nemerosa.ontrack.dsl.http.OTNotFoundException
 import org.junit.Assert
 import org.junit.Test
@@ -805,6 +804,128 @@ class ACCDSL extends AbstractACCDSL {
         assert ontrack.project(project).config.links.project == 'http://project'
         assert ontrack.branch(project, 'test').config.links.branch == 'http://branch'
         assert ontrack.build(project, 'test', '1').config.links.build == 'http://build'
+    }
+
+    @Test
+    void 'Message property'() {
+        def project = uid('P')
+        ontrack.project(project) {
+            config {
+                message 'Information'
+            }
+            branch('test') {
+                config {
+                    message 'Warning', 'WARNING'
+                }
+                build('1') {
+                    config {
+                        message 'Error', 'ERROR'
+                    }
+                }
+            }
+        }
+        assert ontrack.project(project).config.message == [type: 'INFO', text: 'Information']
+        assert ontrack.branch(project, 'test').config.message == [type: 'WARNING', text: 'Warning']
+        assert ontrack.build(project, 'test', '1').config.message == [type: 'ERROR', text: 'Error']
+    }
+
+    @Test
+    void 'Meta info property'() {
+        def project = uid('P')
+        ontrack.project(project) {
+            config {
+                metaInfo A: '1', B: '2'
+            }
+            branch('test') {
+                config {
+                    metaInfo 'A', '1', 'linkA'
+                    metaInfo 'B', '2', 'linkB'
+                }
+            }
+        }
+        assert ontrack.project(project).config.metaInfo == [
+                [
+                        name : 'A',
+                        value: '1',
+                        link : null,
+                ],
+                [
+                        name : 'B',
+                        value: '2',
+                        link : null,
+                ],
+        ]
+        assert ontrack.branch(project, 'test').config.metaInfo == [
+                [
+                        name : 'A',
+                        value: '1',
+                        link : 'linkA',
+                ],
+                [
+                        name : 'B',
+                        value: '2',
+                        link : 'linkB',
+                ],
+        ]
+    }
+
+    @Test
+    void 'Search on meta info property'() {
+        def project = uid('P')
+        ontrack.project(project) {
+            branch('test') {
+                build('1', 'Build 1') {
+                    config {
+                        metaInfo 'A', '1', 'link/1'
+                    }
+                }
+                build('2', 'Build 2') {
+                    config {
+                        metaInfo 'A', '2', 'link/2'
+                    }
+                }
+            }
+        }
+
+        def results = ontrack.branch(project, 'test').standardFilter([
+                withProperty     : 'net.nemerosa.ontrack.extension.general.MetaInfoPropertyType',
+                withPropertyValue: 'A:2'
+        ])
+        assert results.collect { it.name } == ['2']
+    }
+
+    @Test
+    void 'Global search on meta info property'() {
+        def project = uid('P')
+        def value = uid('V')
+        ontrack.project(project) {
+            branch('test') {
+                build('1', 'Build 1') {
+                    config {
+                        metaInfo 'name', "${value}1", 'link/1'
+                    }
+                }
+                build('2', 'Build 2') {
+                    config {
+                        metaInfo 'name', "${value}2", 'link/2'
+                    }
+                }
+            }
+        }
+
+        def build1 = ontrack.build(project, 'test', '1')
+        def build2 = ontrack.build(project, 'test', '2')
+
+        def result1 = ["Build ${project}/test/1" as String, "name -> ${value}1" as String, "${baseURL}/#/build/${build1.id}" as String]
+        def result2 = ["Build ${project}/test/2" as String, "name -> ${value}2" as String, "${baseURL}/#/build/${build2.id}" as String]
+
+        assert ontrack.search("name:${value}1").collect { [it.title, it.description, it.page] } == [
+                result1
+        ]
+
+        assert ontrack.search("name:${value}*").collect { [it.title, it.description, it.page] } == [
+                result2, result1
+        ]
     }
 
     @Test

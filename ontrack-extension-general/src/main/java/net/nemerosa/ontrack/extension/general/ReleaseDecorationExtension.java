@@ -7,7 +7,9 @@ import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.EnumSet;
+import java.util.List;
 
 @Component
 public class ReleaseDecorationExtension extends AbstractExtension implements DecorationExtension {
@@ -26,19 +28,21 @@ public class ReleaseDecorationExtension extends AbstractExtension implements Dec
     }
 
     @Override
-    public Decoration getDecoration(ProjectEntity entity) {
+    public List<Decoration> getDecorations(ProjectEntity entity) {
         // Argument check
         Validate.isTrue(entity instanceof Build, "Expecting build");
         // Gets the `release` property
         Property<ReleaseProperty> property = propertyService.getProperty(entity, ReleasePropertyType.class);
         if (property.isEmpty()) {
-            return null;
+            return Collections.emptyList();
         } else {
-            return Decoration.of(
-                    this,
-                    "release",
-                    property.getValue().getName()
-            ).withName(property.getValue().getName());
+            return Collections.singletonList(
+                    Decoration.of(
+                            this,
+                            "release",
+                            property.getValue().getName()
+                    ).withName(property.getValue().getName())
+            );
         }
     }
 

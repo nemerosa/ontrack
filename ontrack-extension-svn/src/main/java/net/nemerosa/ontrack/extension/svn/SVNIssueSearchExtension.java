@@ -67,7 +67,7 @@ public class SVNIssueSearchExtension extends AbstractExtension implements Search
                                         repositoryIssue.getRepository().getConfiguration().getName(),
                                         repositoryIssue.getIssue().getKey()
                                 )),
-                                String.format("extension/svn/issue/%s/%s",
+                                uriBuilder.page("extension/svn/issue/%s/%s",
                                         repositoryIssue.getRepository().getConfiguration().getName(),
                                         repositoryIssue.getIssue().getKey()),
                                 100

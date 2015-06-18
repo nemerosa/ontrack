@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ID;
+import net.nemerosa.ontrack.model.support.ConnectionResult;
 
 import java.util.List;
 import java.util.Optional;
@@ -84,4 +85,12 @@ public interface SVNService {
      * Gets the list of branches
      */
     List<String> getBranches(Branch branch);
+
+    /**
+     * Tests a connection
+     *
+     * @param configuration Configuration to test
+     * @return Result of the test
+     */
+    ConnectionResult test(SVNConfiguration configuration);
 }

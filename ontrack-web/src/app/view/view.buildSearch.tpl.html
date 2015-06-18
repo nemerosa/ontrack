@@ -72,7 +72,20 @@
                            type="number" min="1"
                            placeholder="Maximum count"/>
                 </td>
-                <td colspan="4">
+                <td>
+                    Property
+                    <select ng-model="data.property"
+                            ng-options="item.typeName as item.name for item in propertyField.items"
+                            class="form-control input-sm">
+                        <option value="">&nbsp;</option>
+                    </select>
+                </td>
+                <td>
+                    Property value
+                    <input name="propertyValue" ng-model="data.propertyValue"
+                           class="form-control input-sm"/>
+                </td>
+                <td colspan="2">
                     &nbsp;
                 </td>
             </tr>

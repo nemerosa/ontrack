@@ -31,6 +31,7 @@ angular.module('ot.service.form', [
          * @param formConfig.title Title for the dialog
          * @param formConfig.submit Function to call with the raw form data. See {@link #submitDialog}
          * @param formConfig.size 'sm' (default) or 'lg'
+         * @param formConfig.buttons Additional buttons. List of {"title", action}.
          */
         self.display = function (formConfig) {
             var d = $q.defer();
@@ -209,16 +210,23 @@ angular.module('ot.service.form', [
         };
 
         /**
-         * Gets the value for a field in a form
+         * Gets a field in a form
          */
-        self.getFieldValue = function (form, fieldName) {
+        self.getField = function (form, fieldName) {
             for (var i = 0; i < form.fields.length; i++) {
                 var field = form.fields[i];
                 if (field.name == fieldName) {
-                    return field.value;
+                    return field;
                 }
             }
             throw "Could not find any field with name " + fieldName;
+        };
+
+        /**
+         * Gets the value for a field in a form
+         */
+        self.getFieldValue = function (form, fieldName) {
+            return self.getField(form, fieldName).value;
         };
 
         /**

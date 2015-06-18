@@ -7,6 +7,7 @@ import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class ValidationStampWeatherDecorationExtension extends AbstractExtension
     }
 
     @Override
-    public Decoration getDecoration(ProjectEntity entity) {
+    public List<Decoration> getDecorations(ProjectEntity entity) {
         // Argument check
         Validate.isTrue(entity instanceof ValidationStamp, "Expecting validation stamp");
         // List of last five runs for this validation stamp
@@ -35,17 +36,20 @@ public class ValidationStampWeatherDecorationExtension extends AbstractExtension
         // Keeps only the ones which are not passed
         long notPassed = runs.stream().filter(run -> !run.isPassed()).count();
         // Result
+        Decoration decoration;
         if (notPassed == 0) {
-            return sunny();
+            decoration = sunny();
         } else if (notPassed == 1) {
-            return sunAndClouds();
+            decoration = sunAndClouds();
         } else if (notPassed == 2) {
-            return clouds();
+            decoration = clouds();
         } else if (notPassed == 3) {
-            return rain();
+            decoration = rain();
         } else {
-            return storm();
+            decoration = storm();
         }
+        // OK
+        return Collections.singletonList(decoration);
     }
 
     private Decoration sunny() {

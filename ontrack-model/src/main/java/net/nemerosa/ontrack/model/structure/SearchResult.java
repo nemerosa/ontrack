@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.model.structure;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.net.URI;
@@ -9,11 +11,15 @@ public class SearchResult {
 
     private final String title;
     private final String description;
+    /**
+     * API access point
+     */
     private final URI uri;
     /**
-     * String used as a hint to redirect the user to a page.
+     * Web access point
      */
-    private final String hint;
+    private final URI page;
+
     private final int accuracy;
 
 }

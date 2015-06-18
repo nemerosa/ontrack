@@ -42,12 +42,12 @@ public class GitCommitSearchExtension extends AbstractExtension implements Searc
 
     @Override
     public SearchProvider getSearchProvider() {
-        return new GitCommitSearchProvider();
+        return new GitCommitSearchProvider(uriBuilder);
     }
 
     protected class GitCommitSearchProvider extends AbstractSearchProvider {
 
-        public GitCommitSearchProvider() {
+        public GitCommitSearchProvider(URIBuilder uriBuilder) {
             super(uriBuilder);
         }
 
@@ -84,7 +84,7 @@ public class GitCommitSearchExtension extends AbstractExtension implements Searc
                                                 commit.get().getFullAnnotatedMessage()),
                                         uri(on(GitController.class)
                                                 .commitInfo(branch.getId(), theCommit.getId())),
-                                        String.format("extension/git/%d/commit/%s",
+                                        uriBuilder.page("extension/git/%d/commit/%s",
                                                 branch.id(),
                                                 theCommit.getId()),
                                         100

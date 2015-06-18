@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.dsl.properties
 
 import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.ProjectEntity
+import net.nemerosa.ontrack.dsl.PropertyNotFoundException
 
 class ProjectEntityProperties {
 
@@ -38,6 +39,61 @@ class ProjectEntityProperties {
     Map<String, String> getLinks() {
         property('net.nemerosa.ontrack.extension.general.LinkPropertyType').links.collectEntries {
             [it.name, it.value]
+        }
+    }
+
+    /**
+     * Message
+     */
+
+    def message(String text, String type = 'INFO') {
+        property('net.nemerosa.ontrack.extension.general.MessagePropertyType', [
+                type: type,
+                text: text,
+        ])
+    }
+
+    def getMessage() {
+        property('net.nemerosa.ontrack.extension.general.MessagePropertyType')
+    }
+
+    /**
+     * Meta info properties
+     */
+
+    def metaInfo(Map<String, String> map) {
+        property('net.nemerosa.ontrack.extension.general.MetaInfoPropertyType', [
+                items: map.collect { name, value ->
+                    [
+                            name : name,
+                            value: value,
+                    ]
+                }
+        ])
+    }
+
+    def metaInfo(String name, String value, String link = '') {
+        // Gets the list of meta info properties
+        def items = metaInfo
+        // Index by name
+        def map = items.collectEntries { item -> [item.name, item] }
+        // Updates or sets the entry
+        map[name] = [
+                name : name,
+                value: value,
+                link : link,
+        ]
+        // Edits the property
+        property('net.nemerosa.ontrack.extension.general.MetaInfoPropertyType', [
+                items: map.collect { itemName, item -> item }
+        ])
+    }
+
+    def getMetaInfo() {
+        try {
+            return property('net.nemerosa.ontrack.extension.general.MetaInfoPropertyType').items
+        } catch (PropertyNotFoundException ignored) {
+            return []
         }
     }
 

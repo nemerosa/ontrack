@@ -60,6 +60,11 @@ public class BuildResourceDecorator extends AbstractResourceDecorator<Build> {
                         "_signature",
                         on(BuildController.class).updateBuildSignatureForm(build.getId()),
                         ProjectEdit.class, build
+                )
+                .page(
+                        "_page",
+                        "build/%d",
+                        build.id()
                 );
         // Contributions
         resourceDecorationContributorService.contribute(linksBuilder, build);
