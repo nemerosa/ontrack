@@ -12,13 +12,11 @@ import net.nemerosa.ontrack.model.buildfilter.DefaultBuildFilter;
 import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.exceptions.BranchTemplateCannotHaveBuildException;
-import net.nemerosa.ontrack.model.exceptions.ImageFileSizeException;
-import net.nemerosa.ontrack.model.exceptions.ImageTypeNotAcceptedException;
 import net.nemerosa.ontrack.model.exceptions.ReorderingSizeException;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.model.support.PropertyServiceHelper;
 import net.nemerosa.ontrack.repository.StructureRepository;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,15 +47,17 @@ public class StructureServiceImpl implements StructureService {
     private final ValidationRunStatusService validationRunStatusService;
     private final StructureRepository structureRepository;
     private final ExtensionManager extensionManager;
+    private final PropertyService propertyService;
 
     @Autowired
-    public StructureServiceImpl(SecurityService securityService, EventPostService eventPostService, EventFactory eventFactory, ValidationRunStatusService validationRunStatusService, StructureRepository structureRepository, ExtensionManager extensionManager) {
+    public StructureServiceImpl(SecurityService securityService, EventPostService eventPostService, EventFactory eventFactory, ValidationRunStatusService validationRunStatusService, StructureRepository structureRepository, ExtensionManager extensionManager, PropertyService propertyService) {
         this.securityService = securityService;
         this.eventPostService = eventPostService;
         this.eventFactory = eventFactory;
         this.validationRunStatusService = validationRunStatusService;
         this.structureRepository = structureRepository;
         this.extensionManager = extensionManager;
+        this.propertyService = propertyService;
     }
 
     @Override
@@ -339,6 +339,14 @@ public class StructureServiceImpl implements StructureService {
                         .filter(validationStampRunView -> validationStampRunView.hasValidationStamp(form.getValidationStampName(), ValidationRunStatusID.PASSED))
                         .findAny()
                         .isPresent();
+            }
+            // Property & property value
+            if (accept && StringUtils.isNotBlank(form.getProperty())) {
+                accept = PropertyServiceHelper.hasProperty(
+                        propertyService,
+                        build,
+                        form.getProperty(),
+                        form.getPropertyValue());
             }
             // Accepting the build into the list?
             if (accept) {

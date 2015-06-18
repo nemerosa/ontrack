@@ -31,13 +31,15 @@ public class StructureServiceImplTest {
         EventPostService eventService = mock(EventPostService.class);
         EventFactory eventFactory = mock(EventFactory.class);
         ExtensionManager extensionManager = mock(ExtensionManager.class);
+        PropertyService propertyService = mock(PropertyService.class);
         service = new StructureServiceImpl(
                 securityService,
                 eventService,
                 eventFactory,
                 validationRunStatusService,
                 structureRepository,
-                extensionManager);
+                extensionManager,
+                propertyService);
         // Model
         Project project = Project.of(nd("P", "Project")).withId(ID.of(1));
         Branch branch = Branch.of(project, nd("B", "Branch")).withId(ID.of(1));

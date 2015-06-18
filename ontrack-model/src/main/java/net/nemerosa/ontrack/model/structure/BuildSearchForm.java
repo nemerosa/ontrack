@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.model.structure;
 
 import lombok.Data;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
 @Data
@@ -13,5 +14,8 @@ public class BuildSearchForm {
     private String buildName;
     private String promotionName;
     private String validationStampName;
+    private String property;
+    @Max(40)
+    private String propertyValue;
 
 }

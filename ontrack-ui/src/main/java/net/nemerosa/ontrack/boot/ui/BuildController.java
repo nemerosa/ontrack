@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Int;
+import net.nemerosa.ontrack.model.form.Selection;
 import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -40,40 +42,67 @@ public class BuildController extends AbstractResourceController {
     @RequestMapping(value = "project/{projectId}/builds", method = RequestMethod.GET)
     public Resource<Form> buildSearchForm(@PathVariable ID projectId) {
         return Resource.of(
-                Form.create()
-                        .with(
-                                Int.of("maximumCount")
-                                        .label("Maximum number")
-                                        .help("Maximum number of builds to return.")
-                                        .min(1)
-                                        .value(10)
-                        )
-                        .with(
-                                Text.of("branchName")
-                                        .label("Branch name")
-                                        .help("Regular expression for the branch name")
-                                        .optional()
-                        )
-                        .with(
-                                Text.of("buildName")
-                                        .label("Build name")
-                                        .help("Regular expression for the build name")
-                                        .optional()
-                        )
-                        .with(
-                                Text.of("promotionName")
-                                        .label("Promotion name")
-                                        .help("Collects only builds which are promoted to this promotion level.")
-                                        .optional()
-                        )
-                        .with(
-                                Text.of("validationStampName")
-                                        .label("Validation stamp name")
-                                        .help("Collects only builds which have `passed` this validation stamp.")
-                                        .optional()
-                        ),
+                createBuildSearchForm(),
                 uri(on(getClass()).buildSearchForm(projectId))
         ).with("_search", uri(on(getClass()).buildSearch(projectId, null)));
+    }
+
+    private Form createBuildSearchForm() {
+        // List of properties for a build
+        List<PropertyTypeDescriptor> properties = propertyService.getPropertyTypes().stream()
+                .filter(
+                        type -> type.getSupportedEntityTypes().contains(ProjectEntityType.BUILD)
+                )
+                .map(PropertyTypeDescriptor::of)
+                .collect(Collectors.toList());
+        // Form
+        return Form.create()
+                .with(
+                        Int.of("maximumCount")
+                                .label("Maximum number")
+                                .help("Maximum number of builds to return.")
+                                .min(1)
+                                .value(10)
+                )
+                .with(
+                        Text.of("branchName")
+                                .label("Branch name")
+                                .help("Regular expression for the branch name")
+                                .optional()
+                )
+                .with(
+                        Text.of("buildName")
+                                .label("Build name")
+                                .help("Regular expression for the build name")
+                                .optional()
+                )
+                .with(
+                        Text.of("promotionName")
+                                .label("Promotion name")
+                                .help("Collects only builds which are promoted to this promotion level.")
+                                .optional()
+                )
+                .with(
+                        Text.of("validationStampName")
+                                .label("Validation stamp name")
+                                .help("Collects only builds which have `passed` this validation stamp.")
+                                .optional()
+                )
+
+                .with(
+                        Selection.of("property")
+                                .label("With property")
+                                .items(properties)
+                                .itemId("typeName")
+                                .optional()
+                )
+                .with(
+                        Text.of("propertyValue")
+                                .label("... with value")
+                                .length(40)
+                                .optional()
+                )
+                ;
     }
 
     /**
@@ -171,7 +200,7 @@ public class BuildController extends AbstractResourceController {
         Build build = structureService.getBuild(buildId);
         // Updates
         build = build.withSignature(
-            request.getSignature(build.getSignature())
+                request.getSignature(build.getSignature())
         );
         // Saves in repository
         structureService.saveBuild(build);

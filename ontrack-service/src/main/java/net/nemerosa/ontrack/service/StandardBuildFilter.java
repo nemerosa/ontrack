@@ -3,9 +3,8 @@ package net.nemerosa.ontrack.service;
 import lombok.Data;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterResult;
-import net.nemerosa.ontrack.model.exceptions.PropertyTypeNotFoundException;
 import net.nemerosa.ontrack.model.structure.*;
-import org.apache.commons.lang3.StringUtils;
+import net.nemerosa.ontrack.model.support.PropertyServiceHelper;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -99,15 +98,7 @@ public class StandardBuildFilter implements BuildFilter {
     }
 
     private boolean hasProperty(Build build, String propertyTypeName, String propertyValue) {
-        try {
-            Property<?> property = propertyService.getProperty(build, propertyTypeName);
-            return !property.isEmpty()
-                    && (
-                    StringUtils.isBlank(propertyValue)
-                            || property.containsValue(propertyValue));
-        } catch (PropertyTypeNotFoundException ex) {
-            return false;
-        }
+        return PropertyServiceHelper.hasProperty(propertyService, build, propertyTypeName, propertyValue);
     }
 
     private boolean hasValidationStamp(ValidationStampRunView validationStampRunView, String name, String status) {
