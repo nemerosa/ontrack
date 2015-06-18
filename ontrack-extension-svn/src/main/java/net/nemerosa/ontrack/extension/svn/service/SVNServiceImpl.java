@@ -10,9 +10,13 @@ import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.extension.svn.property.*;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.model.support.ConnectionResult;
+import net.nemerosa.ontrack.tx.Transaction;
+import net.nemerosa.ontrack.tx.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.tmatesoft.svn.core.wc.SVNRevision;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -33,6 +37,7 @@ public class SVNServiceImpl implements SVNService {
     private final SVNEventDao eventDao;
     private final SVNRepositoryDao repositoryDao;
     private final SVNClient svnClient;
+    private final TransactionService transactionService;
 
     @Autowired
     public SVNServiceImpl(
@@ -44,7 +49,7 @@ public class SVNServiceImpl implements SVNService {
             SVNIssueRevisionDao issueRevisionDao,
             SVNEventDao eventDao,
             SVNRepositoryDao repositoryDao,
-            SVNClient svnClient) {
+            SVNClient svnClient, TransactionService transactionService) {
         this.structureService = structureService;
         this.propertyService = propertyService;
         this.issueServiceRegistry = issueServiceRegistry;
@@ -54,6 +59,7 @@ public class SVNServiceImpl implements SVNService {
         this.eventDao = eventDao;
         this.repositoryDao = repositoryDao;
         this.svnClient = svnClient;
+        this.transactionService = transactionService;
     }
 
     @Override
@@ -362,6 +368,29 @@ public class SVNServiceImpl implements SVNService {
                     repository,
                     SVNUtils.toURL(repository.getUrl(branchesDir))
             );
+        }
+    }
+
+    @Override
+    public ConnectionResult test(SVNConfiguration configuration) {
+        //noinspection unused
+        try(Transaction tx = transactionService.start()) {
+            // Creates a repository
+            SVNRepository repository = SVNRepository.of(
+                    0,
+                    configuration,
+                    null
+            );
+            // Connection to the root
+            boolean ok = svnClient.exists(
+                    repository,
+                    SVNUtils.toURL(configuration.getUrl()),
+                    SVNRevision.HEAD
+            );
+            // OK
+            return ok ? ConnectionResult.ok() : ConnectionResult.error(configuration.getUrl() + " does not exist.");
+        } catch (Exception ex) {
+            return ConnectionResult.error(ex.getMessage());
         }
     }
 
