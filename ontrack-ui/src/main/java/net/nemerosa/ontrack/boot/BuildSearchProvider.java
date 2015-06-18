@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.boot;
 
-import net.nemerosa.ontrack.boot.ui.BuildController;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.model.structure.SearchResult;
 import net.nemerosa.ontrack.model.structure.StructureService;
@@ -8,7 +7,6 @@ import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import net.nemerosa.ontrack.ui.support.AbstractSearchProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -44,14 +42,10 @@ public class BuildSearchProvider extends AbstractSearchProvider {
                 .filter(Optional::isPresent).map(Optional::get)
                         // Creates the search result
                 .map(build -> new SearchResult(
-                                build.getName(),
-                                String.format("Build %s on branch %s project %s",
-                                        build.getName(),
-                                        build.getBranch().getName(),
-                                        build.getBranch().getProject().getName()
-                                ),
-                                uri(MvcUriComponentsBuilder.on(BuildController.class).getBuild(build.getId())),
-                                String.format("/build/%d", build.id()),
+                                build.getEntityDisplayName(),
+                                "",
+                                uriBuilder.getEntityURI(build),
+                                uriBuilder.getEntityPage(build),
                                 100
                         )
                 )

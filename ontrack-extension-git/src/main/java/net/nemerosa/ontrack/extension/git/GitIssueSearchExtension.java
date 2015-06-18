@@ -46,7 +46,7 @@ public class GitIssueSearchExtension extends AbstractExtension implements Search
 
     @Override
     public SearchProvider getSearchProvider() {
-        return new GitIssueSearchProvider();
+        return new GitIssueSearchProvider(uriBuilder);
     }
 
     @Data
@@ -62,7 +62,7 @@ public class GitIssueSearchExtension extends AbstractExtension implements Search
 
         private final Collection<BranchSearchConfiguration> branchSearchConfigurations;
 
-        public GitIssueSearchProvider() {
+        public GitIssueSearchProvider(URIBuilder uriBuilder) {
             super(uriBuilder);
             branchSearchConfigurations = new ArrayList<>();
             gitService.forEachConfiguredBranch((branch, branchConfiguration) -> {
@@ -123,7 +123,7 @@ public class GitIssueSearchExtension extends AbstractExtension implements Search
                                                 c.getBranch().getId(),
                                                 issue.getKey()
                                         )),
-                                        String.format("extension/git/%d/issue/%s",
+                                        uriBuilder.page("extension/git/%d/issue/%s",
                                                 c.getBranch().id(),
                                                 issue.getKey()),
                                         100

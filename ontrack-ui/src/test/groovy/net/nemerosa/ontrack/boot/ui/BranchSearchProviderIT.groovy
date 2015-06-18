@@ -29,7 +29,7 @@ class BranchSearchProviderIT extends AbstractWebTestSupport {
         def results = asUser().with(branch1, ProjectView).with(branch2, ProjectView).call { provider.search(branchName) }
         // Checks the results
         assert results.size() == 2
-        assert results[0].title == "${branch1.project.name} / ${branch1.name}"
-        assert results[1].title == "${branch2.project.name} / ${branch2.name}"
+        assert results[0].title == branch1.entityDisplayName
+        assert results[1].title == branch2.entityDisplayName
     }
 }

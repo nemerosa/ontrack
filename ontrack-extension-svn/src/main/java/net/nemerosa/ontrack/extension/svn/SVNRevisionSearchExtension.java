@@ -75,7 +75,7 @@ public class SVNRevisionSearchExtension extends AbstractExtension implements Sea
                                         repositoryRevision.getRepository().getConfiguration().getName(),
                                         repositoryRevision.getRevisionInfo().getRevision()
                                 )),
-                                String.format("extension/svn/revision/%s/%d",
+                                uriBuilder.page("extension/svn/revision/%s/%d",
                                         repositoryRevision.getRepository().getConfiguration().getName(),
                                         repositoryRevision.getRevisionInfo().getRevision()),
                                 100

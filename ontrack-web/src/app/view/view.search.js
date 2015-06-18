@@ -17,7 +17,7 @@ angular.module('ot.view.search', [
         // View definition
         var view = ot.view();
         view.title = "Search results for \"" + $scope.token + "\"";
-        view.commands = [ ot.viewCloseCommand('/home') ];
+        view.commands = [ot.viewCloseCommand('/home')];
 
         // Launching the search
         ot.pageCall($http.post('search', {token: $scope.token})).then(function (results) {
@@ -30,8 +30,7 @@ angular.module('ot.view.search', [
                 if (result.page) {
                     window.location = result.page;
                 } else {
-                    // TODO Deprecated
-                    $location.path(result.hint);
+                    $log.error('[search] Could not find any page in the result:', result);
                 }
             }
         });

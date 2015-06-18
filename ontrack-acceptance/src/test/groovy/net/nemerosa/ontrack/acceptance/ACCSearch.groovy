@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.acceptance
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTest
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
+import org.junit.Assert
 import org.junit.Test
 
 import static net.nemerosa.ontrack.json.JsonUtils.array
@@ -34,6 +35,11 @@ class ACCSearch extends AcceptanceTestClient {
     void 'Looking for a build after its creation'() {
         // Prerequisites
         JsonNode build = doCreateBuild()
+        // Data
+        String project = build.path('branch').path('project').path('name').asText()
+        String branch = build.path('branch').path('name').asText()
+        String name = build.path('name').asText()
+        String id = build.path('id').asText()
         // Looking for this build as admin
         def results = admin().post(
                 object()
@@ -43,8 +49,8 @@ class ACCSearch extends AcceptanceTestClient {
         ).get()
         // Check
         def result = results.get(0)
-        assert result.path('title').asText() == build.path('name').asText()
-        assert result.path('hint').asText() == "/build/${build.path('id').asText()}"
+        assert result.path('title').asText() == "Build ${project}/${branch}/${name}" as String
+        assert result.path('page').asText() == "${baseURL}/#/build/${id}" as String
     }
 
 }
