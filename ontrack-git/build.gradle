@@ -9,4 +9,5 @@ dependencies {
     compile libraries.guava
     compile project(':ontrack-common')
     compile libraries.groovy
+    compile libraries.slf4j_api
 }

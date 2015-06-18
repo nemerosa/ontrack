@@ -19,6 +19,13 @@ import java.util.stream.Stream;
 public interface GitRepositoryClient {
 
     /**
+     * Tests the connection
+     *
+     * @throws net.nemerosa.ontrack.common.BaseException When the remote Git repository is not reachable
+     */
+    void test();
+
+    /**
      * Makes sure the repository is synchronised with its remote location.
      *
      * @param logger Used to log messages during the synchronisation

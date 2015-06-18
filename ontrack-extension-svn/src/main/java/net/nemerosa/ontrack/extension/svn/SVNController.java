@@ -25,6 +25,7 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
+import net.nemerosa.ontrack.model.support.ConnectionResult;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
@@ -95,6 +96,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
                 uri(on(getClass()).getConfigurations())
         )
                 .with(Link.CREATE, uri(on(getClass()).getConfigurationForm()))
+                .with("_test", uri(on(getClass()).testConfiguration(null)), securityService.isGlobalFunctionGranted(GlobalSettings.class))
                 ;
     }
 
@@ -107,6 +109,17 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
                 svnConfigurationService.getConfigurationDescriptors(),
                 uri(on(getClass()).getConfigurationsDescriptors())
         );
+    }
+
+    /**
+     * Test for a configuration
+     *
+     * @see SVNService#test(SVNConfiguration)
+     */
+    @RequestMapping(value = "configurations/test", method = RequestMethod.POST)
+    public ConnectionResult testConfiguration(@RequestBody SVNConfiguration configuration) {
+        // Delegates to the SVNService
+        return svnService.test(configuration);
     }
 
     /**
