@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.form.Form;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 /**
@@ -91,6 +92,7 @@ public interface PropertyService {
      */
     <T> Collection<ProjectEntity> searchWithPropertyValue(
             Class<? extends PropertyType<T>> propertyTypeClass,
+            BiFunction<ProjectEntityType, ID, ProjectEntity> entityLoader,
             Predicate<T> predicate
     );
 

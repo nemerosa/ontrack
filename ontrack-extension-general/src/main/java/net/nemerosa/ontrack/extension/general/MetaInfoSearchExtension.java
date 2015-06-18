@@ -2,10 +2,7 @@ package net.nemerosa.ontrack.extension.general;
 
 import net.nemerosa.ontrack.extension.api.SearchExtension;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
-import net.nemerosa.ontrack.model.structure.ProjectEntity;
-import net.nemerosa.ontrack.model.structure.PropertyService;
-import net.nemerosa.ontrack.model.structure.SearchProvider;
-import net.nemerosa.ontrack.model.structure.SearchResult;
+import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import net.nemerosa.ontrack.ui.support.AbstractSearchProvider;
 import org.apache.commons.lang3.StringUtils;
@@ -20,12 +17,14 @@ public class MetaInfoSearchExtension extends AbstractExtension implements Search
 
     private final URIBuilder uriBuilder;
     private final PropertyService propertyService;
+    private final StructureService structureService;
 
     @Autowired
-    public MetaInfoSearchExtension(GeneralExtensionFeature extensionFeature, URIBuilder uriBuilder, PropertyService propertyService) {
+    public MetaInfoSearchExtension(GeneralExtensionFeature extensionFeature, URIBuilder uriBuilder, PropertyService propertyService, StructureService structureService) {
         super(extensionFeature);
         this.uriBuilder = uriBuilder;
         this.propertyService = propertyService;
+        this.structureService = structureService;
     }
 
     @Override
@@ -54,6 +53,7 @@ public class MetaInfoSearchExtension extends AbstractExtension implements Search
             // Searchs for all entities with the value
             Collection<ProjectEntity> entities = propertyService.searchWithPropertyValue(
                     MetaInfoPropertyType.class,
+                    (entityType, id) -> entityType.getEntityFn(structureService).apply(id),
                     metaInfoProperty -> metaInfoProperty.matchNameValue(name, value)
             );
             // FIXME Returns entities
