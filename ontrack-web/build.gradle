@@ -52,9 +52,10 @@ task bowerInstall(type: NodeTask, dependsOn: npmPackages) {
 
 task setup(dependsOn: ['bowerInstall'])
 
-//task gruntClean(type: Exec, dependsOn: ['setup']) {
-//    commandLine 'grunt', 'clean'
-//}
+task gruntClean(type: NodeTask, dependsOn: npmPackages) {
+    script = file('node_modules/grunt-cli/bin/grunt')
+    args = ['clean']
+}
 
 task versionClean(type: Exec) {
     commandLine 'git', 'checkout', '--', 'package.json'
@@ -63,7 +64,7 @@ task versionClean(type: Exec) {
 clean.delete << file('node_modules')
 clean.delete << file('vendor')
 clean.dependsOn 'versionClean'
-// TODO clean.dependsOn gruntClean
+clean.dependsOn 'gruntClean'
 
 /**
  * Adds the version information into the `package.json` file.
