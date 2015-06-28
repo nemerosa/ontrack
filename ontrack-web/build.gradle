@@ -62,7 +62,7 @@ task versionClean(type: Exec) {
 
 clean.delete << file('node_modules')
 clean.delete << file('vendor')
-clean.dependsOn versionClean
+clean.dependsOn 'versionClean'
 // TODO clean.dependsOn gruntClean
 
 /**
