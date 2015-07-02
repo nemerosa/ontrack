@@ -58,6 +58,9 @@ public class MetaInfoPropertyType extends AbstractPropertyType<MetaInfoProperty>
                                         .with(
                                                 Text.of("link").label("Link").optional()
                                         )
+                                        .with(
+                                                Text.of("category").label("Category").optional()
+                                        )
                         )
                                 .label("Items")
                                 .value(value != null ? value.getItems() : Collections.emptyList())
@@ -104,7 +107,8 @@ public class MetaInfoPropertyType extends AbstractPropertyType<MetaInfoProperty>
                                 item -> new MetaInfoPropertyItem(
                                         item.getName(),
                                         replacementFunction.apply(item.getValue()),
-                                        replacementFunction.apply(item.getLink())
+                                        replacementFunction.apply(item.getLink()),
+                                        replacementFunction.apply(item.getCategory())
                                 )
                         )
                         .collect(Collectors.toList())

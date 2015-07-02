@@ -73,13 +73,15 @@ class ProjectEntityProperties {
         ])
     }
 
-    def metaInfo(String name, String value, String link = '') {
+
+
+    def metaInfo(String name, String value, String link = null, String category = null) {
         // Gets the list of meta info properties
         def items = metaInfo
         // Index by name
         Map<String, MetaInfo> map = items.collectEntries { item -> [item.name, item] }
         // Updates or sets the entry
-        map[name] = new MetaInfo(name, value, link)
+        map[name] = new MetaInfo(name, value, link, category)
         // Edits the property
         property('net.nemerosa.ontrack.extension.general.MetaInfoPropertyType', [
                 items: map.collect { itemName, item -> item.map }

@@ -841,17 +841,20 @@ class ACCDSL extends AbstractACCDSL {
                 config {
                     metaInfo 'A', '1', 'linkA'
                     metaInfo 'B', '2', 'linkB'
+                    metaInfo 'C', '3', 'linkC', 'CatC'
                 }
             }
         }
         assert ontrack.project(project).config.metaInfo == [
-                new MetaInfo('A', '1', null),
-                new MetaInfo('B', '2', null),
+                new MetaInfo('A', '1', null, null),
+                new MetaInfo('B', '2', null, null),
         ]
-        assert ontrack.branch(project, 'test').config.metaInfo == [
-                new MetaInfo('A', '1', 'linkA'),
-                new MetaInfo('B', '2', 'linkB'),
-        ]
+
+        def metaInfos = ontrack.branch(project, 'test').config.metaInfo
+        assert metaInfos.size() == 3
+        assert metaInfos[0] ==  new MetaInfo('A', '1', 'linkA', null)
+        assert metaInfos[1] ==  new MetaInfo('B', '2', 'linkB', null)
+        assert metaInfos[2] ==  new MetaInfo('C', '3', 'linkC', 'CatC')
     }
 
     @Test

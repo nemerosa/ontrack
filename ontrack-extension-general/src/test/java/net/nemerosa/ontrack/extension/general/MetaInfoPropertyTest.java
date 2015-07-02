@@ -23,7 +23,7 @@ public class MetaInfoPropertyTest {
         assertFalse(
                 new MetaInfoProperty(
                         Collections.singletonList(
-                                new MetaInfoPropertyItem("name", "value", "")
+                                MetaInfoPropertyItem.of("name", "value")
                         )
                 ).matchNameValue("nam", "value")
         );
@@ -34,7 +34,7 @@ public class MetaInfoPropertyTest {
         assertFalse(
                 new MetaInfoProperty(
                         Collections.singletonList(
-                                new MetaInfoPropertyItem("name", "value", "")
+                                MetaInfoPropertyItem.of("name", "value")
                         )
                 ).matchNameValue("name", "val")
         );
@@ -45,7 +45,7 @@ public class MetaInfoPropertyTest {
         assertTrue(
                 new MetaInfoProperty(
                         Collections.singletonList(
-                                new MetaInfoPropertyItem("name", "value", "")
+                                MetaInfoPropertyItem.of("name", "value")
                         )
                 ).matchNameValue("name", "value")
         );
@@ -56,7 +56,7 @@ public class MetaInfoPropertyTest {
         assertTrue(
                 new MetaInfoProperty(
                         Collections.singletonList(
-                                new MetaInfoPropertyItem("name", "value", "")
+                                MetaInfoPropertyItem.of("name", "value")
                         )
                 ).matchNameValue("name", "val*")
         );
@@ -67,7 +67,7 @@ public class MetaInfoPropertyTest {
         assertTrue(
                 new MetaInfoProperty(
                         Collections.singletonList(
-                                new MetaInfoPropertyItem("name", "value", "")
+                                MetaInfoPropertyItem.of("name", "value")
                         )
                 ).matchNameValue("name", "*")
         );
@@ -78,7 +78,7 @@ public class MetaInfoPropertyTest {
         assertTrue(
                 new MetaInfoProperty(
                         Collections.singletonList(
-                                new MetaInfoPropertyItem("name", "value", "")
+                                MetaInfoPropertyItem.of("name", "value")
                         )
                 ).matchNameValue("name", "")
         );
@@ -89,7 +89,7 @@ public class MetaInfoPropertyTest {
         assertTrue(
                 new MetaInfoProperty(
                         Collections.singletonList(
-                                new MetaInfoPropertyItem("name", "value", "")
+                                MetaInfoPropertyItem.of("name", "value")
                         )
                 ).matchNameValue("name", null)
         );
