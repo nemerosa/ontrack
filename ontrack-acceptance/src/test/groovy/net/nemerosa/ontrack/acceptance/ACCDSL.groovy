@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.acceptance
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTest
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import net.nemerosa.ontrack.dsl.Branch
+import net.nemerosa.ontrack.dsl.MetaInfo
 import net.nemerosa.ontrack.dsl.ObjectAlreadyExistsException
 import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.Shell
@@ -844,28 +845,12 @@ class ACCDSL extends AbstractACCDSL {
             }
         }
         assert ontrack.project(project).config.metaInfo == [
-                [
-                        name : 'A',
-                        value: '1',
-                        link : null,
-                ],
-                [
-                        name : 'B',
-                        value: '2',
-                        link : null,
-                ],
+                new MetaInfo('A', '1', null),
+                new MetaInfo('B', '2', null),
         ]
         assert ontrack.branch(project, 'test').config.metaInfo == [
-                [
-                        name : 'A',
-                        value: '1',
-                        link : 'linkA',
-                ],
-                [
-                        name : 'B',
-                        value: '2',
-                        link : 'linkB',
-                ],
+                new MetaInfo('A', '1', 'linkA'),
+                new MetaInfo('B', '2', 'linkB'),
         ]
     }
 

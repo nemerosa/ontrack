@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.dsl.properties
 
+import net.nemerosa.ontrack.dsl.MetaInfo
 import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.ProjectEntity
 import net.nemerosa.ontrack.dsl.PropertyNotFoundException
@@ -76,22 +77,20 @@ class ProjectEntityProperties {
         // Gets the list of meta info properties
         def items = metaInfo
         // Index by name
-        def map = items.collectEntries { item -> [item.name, item] }
+        Map<String, MetaInfo> map = items.collectEntries { item -> [item.name, item] }
         // Updates or sets the entry
-        map[name] = [
-                name : name,
-                value: value,
-                link : link,
-        ]
+        map[name] = new MetaInfo(name, value, link)
         // Edits the property
         property('net.nemerosa.ontrack.extension.general.MetaInfoPropertyType', [
-                items: map.collect { itemName, item -> item }
+                items: map.collect { itemName, item -> item.map }
         ])
     }
 
-    def getMetaInfo() {
+    List<MetaInfo> getMetaInfo() {
         try {
-            return property('net.nemerosa.ontrack.extension.general.MetaInfoPropertyType').items
+            return property('net.nemerosa.ontrack.extension.general.MetaInfoPropertyType').items.collect {
+                new MetaInfo(it)
+            }
         } catch (PropertyNotFoundException ignored) {
             return []
         }
