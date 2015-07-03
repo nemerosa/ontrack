@@ -112,6 +112,10 @@ mkdir -p ${MOUNT}/nginx
 echo "[LOCAL] Ontrack data at:        ${MOUNT}"
 echo "[LOCAL] Nginx data at:          ${MOUNT}/nginx"
 
+# Acceptance configuration
+
+cp -r docker-acceptance/* ${MOUNT}
+
 # Docker Options
 
 ONTRACK_DOCKER_OPTIONS=
