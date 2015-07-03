@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.svn.service
 
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository
 import net.nemerosa.ontrack.extension.svn.db.SVNRepositoryDao
+import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration
+import net.nemerosa.ontrack.extension.svn.model.SVNURLFormatException
 import net.nemerosa.ontrack.extension.svn.support.SVNProfileValueSource
 import net.nemerosa.ontrack.extension.svn.support.SVNTestRepo
 import net.nemerosa.ontrack.extension.svn.support.SVNTestUtils
@@ -41,6 +43,14 @@ class SVNConfigurationServiceIT extends AbstractServiceTestSupport {
 
     @Autowired
     private SVNRepositoryDao repositoryDao
+
+    @Autowired
+    private SVNService svnService
+
+    @Test(expected = SVNURLFormatException)
+    void 'No trailing slash on the URL'() {
+        svnService.test(SVNConfiguration.of("test", "svn://localhost/"))
+    }
 
     @Test
     @IfProfileValue(name = "svn", value = "true")
