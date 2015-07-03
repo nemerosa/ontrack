@@ -1,3 +1,5 @@
+import java.util.regex.Pattern
+
 /**
  * Docker tasks
  */
@@ -19,8 +21,18 @@ task dockerBuild(type: Exec, dependsOn: dockerPrepareEnv) {
     ]
 }
 
+task dockerLatest(type: Exec, dependsOn: dockerBuild) {
+    executable 'docker'
+    args = [
+            'tag',
+            '--force',
+            "nemerosa/ontrack:${versioning.info.full}",
+            "nemerosa/ontrack:latest",
+    ]
+}
+
 // Link with the build
-build.dependsOn dockerBuild
+build.dependsOn dockerLatest
 
 /**
  * Docker start class
@@ -35,7 +47,31 @@ class DockerStart extends DefaultTask {
 
     boolean clean = false
 
+    String publish = ''
+
     private String cid
+
+    private int port
+
+    /**
+     * Utility method to get a published port
+     */
+    int getPublishedPort (String cid, int port = 8080) {
+        new ByteArrayOutputStream().withStream { os ->
+            project.exec {
+                executable = 'docker'
+                args = ['port', cid, port]
+                standardOutput = os
+            }
+            def output = os.toString().trim()
+            def m = Pattern.compile(/^.*:(\d+)$/).matcher(output)
+            if (m.matches()) {
+                m.group(1) as int
+            } else {
+                throw new GradleException("Cannot parse port from ${output}")
+            }
+        }
+    }
 
     @TaskAction
     def start() {
@@ -46,12 +82,22 @@ class DockerStart extends DefaultTask {
             project.delete mount
             project.mkdir mount
         }
+        // Port publication
+        String portPublication
+        if (publish) {
+            println "[${name}] Publishing ${publish}..."
+            portPublication = "--publish=${publish}"
+        } else {
+            println "[${name}] Publishing on random ports..."
+            portPublication = '--publish-all'
+        }
         // Starting the container
         def output = new ByteArrayOutputStream()
         project.exec {
             executable 'docker'
             args 'run', '--detach',
                     "--env=PROFILE=${profile}",
+                    portPublication,
                     "--volume=${mount}:/var/ontrack",
                     image
             standardOutput = output
@@ -59,6 +105,9 @@ class DockerStart extends DefaultTask {
         // Getting the container ID
         this.cid = output.toString().trim()
         println "[${name}] Container ${cid} started"
+        // Getting the published port
+        this.port = getPublishedPort(this.cid)
+        println "[${name}] Application running on port ${port}"
     }
 
     String getCid() {
@@ -92,7 +141,7 @@ class DockerStop extends DefaultTask {
  */
 
 task ciDockerStart(type: DockerStart) {
-    image = "nemerosa/ontrack:${versioning.info.full}"
+    image = "nemerosa/ontrack:latest"
     mount = file('gradle/env/ci')
     profile = 'acceptance'
     clean = true

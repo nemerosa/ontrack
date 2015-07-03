@@ -31,7 +31,7 @@ Acceptance:
 
 task ciAcceptanceTest {
     dependsOn ciDockerStart
-    // TODO dependsOn ciDockerWait
+    // dependsOn ciDockerWait
     // TODO dependsOn remoteAcceptanceTest
     finalizedBy ciDockerStop
 }
