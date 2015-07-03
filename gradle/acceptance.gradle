@@ -123,6 +123,10 @@ class DockerStop extends DefaultTask {
  */
 class RemoteAcceptanceTest extends DefaultTask {
 
+    boolean disableSsl = false
+
+    String acceptanceContext = 'default'
+
     @TaskAction
     def launch() {
         // Collecting the data
@@ -152,8 +156,8 @@ class RemoteAcceptanceTest extends DefaultTask {
 //            executable 'java'
 //            args '-jar', "${acceptanceJar}",
 //                    '--ontrack.url', "${applicationUrl}",
-//                    '--ontrack.admin', "${acceptanceOntrackPassword}",
-//                    '--ontrack.disableSSL', "${acceptanceDisableSsl}",
+//                    '--ontrack.admin', "${project.properties.acceptanceOntrackPassword}",
+//                    '--ontrack.disableSSL', "${disableSsl}",
 //                    '--ontrack.context', "${acceptanceContext}"
 //        }
     }
@@ -175,6 +179,8 @@ task ciDockerStop(type: DockerStop) {
 }
 
 task ciAcceptanceTest(type: RemoteAcceptanceTest) {
+    // TODO Self signed certificates can be stored locally and mounted
+    disableSsl = true
     dependsOn ciDockerStart
     // TODO Wait to be done at acceptance test level
     // TODO dependsOn remoteAcceptanceTest
