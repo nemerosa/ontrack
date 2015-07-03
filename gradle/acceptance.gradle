@@ -8,7 +8,7 @@
  * ./gradlew build localAcceptanceTest
  */
 
-task remoteAcceptanceSetup {
+task remoteAcceptanceTest(type: Exec) {
     doFirst {
         println """\
 Acceptance:
@@ -20,9 +20,6 @@ Acceptance:
 * SSL disabled        = ${acceptanceDisableSsl}
 """
     }
-}
-
-task remoteAcceptanceTest(type: Exec, dependsOn: remoteAcceptanceSetup) {
     workingDir projectDir
     executable 'java'
     args '-jar', "${acceptanceJar}",
@@ -30,4 +27,11 @@ task remoteAcceptanceTest(type: Exec, dependsOn: remoteAcceptanceSetup) {
             '--ontrack.admin', "${acceptanceOntrackPassword}",
             '--ontrack.disableSSL', "${acceptanceDisableSsl}",
             '--ontrack.context', "${acceptanceContext}"
+}
+
+task ciAcceptanceTest {
+    dependsOn ciDockerStart
+    // TODO dependsOn ciDockerWait
+    // TODO dependsOn remoteAcceptanceTest
+    // TODO finalizedBy ciDockerStop
 }

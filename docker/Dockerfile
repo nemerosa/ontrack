@@ -16,9 +16,12 @@ VOLUME /var/ontrack
 # Exposing the port
 EXPOSE 8080
 
+# Profile
+ENV PROFILE prod
+
 # Copies the Ontrack JAR
 COPY ontrack.jar /opt/ontrack/
 
 # Running the application
 WORKDIR /var/ontrack
-CMD ["java", "-jar", "/opt/ontrack/ontrack.jar", "--spring.profiles.active=prod", "--logging.path=log/"]
+CMD ["java", "-jar", "/opt/ontrack/ontrack.jar", "--spring.profiles.active=${PROFILE}", "--logging.path=log/"]

@@ -21,3 +21,55 @@ task dockerBuild(type: Exec, dependsOn: dockerPrepareEnv) {
 
 // Link with the build
 build.dependsOn dockerBuild
+
+/**
+ * Docker start class
+ */
+
+class DockerStart extends DefaultTask {
+
+    String image = 'nemerosa/ontrack:latest'
+
+    File mount = project.projectDir.absoluteFile
+
+    String profile = 'prod'
+
+    boolean clean = false
+
+    private String cid
+
+    @TaskAction
+    def start() {
+        println "[${name}] Starting ${image} with mount at ${mount} for profile ${profile}..."
+        // Cleaning any previus data
+        if (clean) {
+            println "[${name}] Cleaning data in ${mount}..."
+            project.delete mount
+            project.mkdir mount
+        }
+        // Starting the container
+        def output = new ByteArrayOutputStream()
+        project.exec {
+            executable 'docker'
+            args 'run', '--detach',
+                    "--env=PROFILE=${profile}",
+                    "--volume=${mount}:/var/ontrack",
+                    image
+            standardOutput = output
+        }
+        // Getting the container ID
+        this.cid = output.toString().trim()
+        println "[${name}] Container ${cid} started"
+    }
+
+    String getCid() {
+        cid
+    }
+}
+
+task ciDockerStart(type: DockerStart) {
+    image = "nemerosa/ontrack:${versioning.info.full}"
+    mount = file('gradle/env/ci')
+    profile = 'acceptance'
+    clean = true
+}
