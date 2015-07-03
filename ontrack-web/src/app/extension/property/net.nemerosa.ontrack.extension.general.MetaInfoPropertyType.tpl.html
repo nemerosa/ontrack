@@ -1,5 +1,6 @@
 <ul>
     <li ng-repeat="item in property.value.items">
+        <span ng-if="item.category" class="label label-info">{{item.category}}</span>
         {{item.name}}
         <span class="fa fa-arrow-right"></span>
         <a ng-if="item.link" href="{{item.link}}">{{item.value}}</a>
