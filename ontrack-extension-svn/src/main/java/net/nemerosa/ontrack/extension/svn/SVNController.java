@@ -135,7 +135,15 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
      */
     @RequestMapping(value = "configurations/create", method = RequestMethod.POST)
     public SVNConfiguration newConfiguration(@RequestBody SVNConfiguration configuration) {
+        validateConfiguration(configuration);
         return svnConfigurationService.newConfiguration(configuration);
+    }
+
+    /**
+     * Validating the configuration
+     */
+    protected void validateConfiguration(SVNConfiguration configuration) {
+        svnService.test(configuration).onErrorThrow(message -> new SVNConfigurationValidationException(message));
     }
 
     /**
@@ -230,6 +238,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
      */
     @RequestMapping(value = "configurations/{name}/update", method = RequestMethod.PUT)
     public SVNConfiguration updateConfiguration(@PathVariable String name, @RequestBody SVNConfiguration configuration) {
+        validateConfiguration(configuration);
         svnConfigurationService.updateConfiguration(name, configuration);
         return getConfiguration(name);
     }

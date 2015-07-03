@@ -34,7 +34,6 @@ public class SVNConfigurationServiceImpl extends AbstractConfigurationService<SV
                     url
             );
         }
-        // TODO Checks the SVN info
     }
 
     @Override
