@@ -1,0 +1,33 @@
+/**
+ * Acceptance tasks
+ *
+ * Only used to run from a packaged Ontrack application against a running server.
+ *
+ * For local development testing, running the following tasks is enough:
+ *
+ * ./gradlew build localAcceptanceTest
+ */
+
+task remoteAcceptanceSetup {
+    doFirst {
+        println """\
+Acceptance:
+* Ontrack URL         = ${acceptanceOntrackUrl}
+* Ontrack password    = ***
+* Ontrack delay       = ${acceptanceOntrackDelay} s
+* JAR                 = ${acceptanceJar}
+* Context             = ${acceptanceContext}
+* SSL disabled        = ${acceptanceDisableSsl}
+"""
+    }
+}
+
+task remoteAcceptanceTest(type: Exec, dependsOn: remoteAcceptanceSetup) {
+    workingDir projectDir
+    executable 'java'
+    args '-jar', "${acceptanceJar}",
+            '--ontrack.url', "${acceptanceOntrackUrl}",
+            '--ontrack.admin', "${acceptanceOntrackPassword}",
+            '--ontrack.disableSSL', "${acceptanceDisableSsl}",
+            '--ontrack.context', "${acceptanceContext}"
+}

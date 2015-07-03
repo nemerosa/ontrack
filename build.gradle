@@ -97,10 +97,16 @@ apply from: 'gradle/maven.gradle'
 apply from: 'gradle/packaging.gradle'
 
 /**
- * Docker build
+ * Docker tasks
  */
 
 apply from: 'gradle/docker.gradle'
+
+/**
+ * Acceptance tasks
+ */
+
+apply from: 'gradle/acceptance.gradle'
 
 /**
  * General test report
