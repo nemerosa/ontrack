@@ -25,7 +25,6 @@ build.dependsOn dockerBuild
 /**
  * Docker start class
  */
-
 class DockerStart extends DefaultTask {
 
     String image = 'nemerosa/ontrack:latest'
@@ -67,9 +66,38 @@ class DockerStart extends DefaultTask {
     }
 }
 
+/**
+ * Docker stop task
+ */
+class DockerStop extends DefaultTask {
+
+    String startTask
+
+    @TaskAction
+    def stop() {
+        // Gets the start task
+        def task = project.tasks.getByName(startTask) as DockerStart
+        // Stopping the container
+        println "[${name}] Stopping container at ${task.cid} created by ${startTask}"
+        project.exec {
+            executable 'docker'
+            args 'rm', '--force', '--volumes', task.cid
+        }
+    }
+
+}
+
+/**
+ * CI environment
+ */
+
 task ciDockerStart(type: DockerStart) {
     image = "nemerosa/ontrack:${versioning.info.full}"
     mount = file('gradle/env/ci')
     profile = 'acceptance'
     clean = true
+}
+
+task ciDockerStop(type: DockerStop) {
+    startTask = 'ciDockerStart'
 }
