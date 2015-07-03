@@ -17,6 +17,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.tmatesoft.svn.core.SVNURL;
+import org.tmatesoft.svn.core.wc.SVNInfo;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
 import java.util.*;
@@ -383,21 +385,34 @@ public class SVNServiceImpl implements SVNService {
             );
         }
         //noinspection unused
-        try(Transaction tx = transactionService.start()) {
+        try (Transaction tx = transactionService.start()) {
             // Creates a repository
             SVNRepository repository = SVNRepository.of(
                     0,
                     configuration,
                     null
             );
+            // Configuration URL
+            SVNURL svnurl = SVNUtils.toURL(configuration.getUrl());
             // Connection to the root
-            boolean ok = svnClient.exists(
+            if (!svnClient.exists(
                     repository,
-                    SVNUtils.toURL(configuration.getUrl()),
+                    svnurl,
                     SVNRevision.HEAD
-            );
+            )) {
+                return ConnectionResult.error(configuration.getUrl() + " does not exist.");
+            }
+            // Gets base info
+            SVNInfo info = svnClient.getInfo(repository, svnurl, SVNRevision.HEAD);
+            // Checks the repository root
+            if (!Objects.equals(
+                    info.getRepositoryRootURL(),
+                    svnurl
+            )) {
+                return ConnectionResult.error(configuration.getUrl() + " must be the root of the repository.");
+            }
             // OK
-            return ok ? ConnectionResult.ok() : ConnectionResult.error(configuration.getUrl() + " does not exist.");
+            return ConnectionResult.ok();
         } catch (Exception ex) {
             return ConnectionResult.error(ex.getMessage());
         }

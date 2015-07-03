@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.svn.model.SVNReference;
 import net.nemerosa.ontrack.extension.svn.model.SVNRevisionPath;
 import org.tmatesoft.svn.core.ISVNLogEntryHandler;
 import org.tmatesoft.svn.core.SVNURL;
+import org.tmatesoft.svn.core.wc.SVNInfo;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
 import java.util.List;
@@ -19,6 +20,16 @@ public interface SVNClient {
     void log(SVNRepository repository, SVNURL url, SVNRevision pegRevision, SVNRevision startRevision, SVNRevision stopRevision,
              boolean stopOnCopy, boolean discoverChangedPaths, long limit, boolean includeMergedRevisions,
              ISVNLogEntryHandler isvnLogEntryHandler);
+
+    /**
+     * Gets the Subversion information about a URL in a repository
+     *
+     * @param repository Repository configuration
+     * @param url        URL to get the info about
+     * @param revision   Revision
+     * @return Subversion information
+     */
+    SVNInfo getInfo(SVNRepository repository, SVNURL url, SVNRevision revision);
 
     boolean isTrunkOrBranch(SVNRepository repository, String path);
 
