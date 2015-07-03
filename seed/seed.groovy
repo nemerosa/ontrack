@@ -37,12 +37,6 @@
  */
 
 /**
- * Variables
- */
-
-def LOCAL_REPOSITORY = '/var/lib/jenkins/repository/ontrack/2.0'
-
-/**
  * Branch
  */
 
@@ -84,32 +78,28 @@ if (['master', 'feature', 'release', 'hotfix'].contains(branchType)) {
         }
         steps {
             gradle 'clean versionDisplay versionFile test integrationTest release  --info --profile --parallel'
-            conditionalSteps {
-                condition {
-                    status('SUCCESS', 'SUCCESS')
-                }
-                runner('Fail')
-                shell """\
-# Copies the JAR to a local directory
-ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSITORY}
-"""
-            }
             environmentVariables {
                 propertiesFile 'build/version.properties'
             }
         }
         publishers {
             archiveJunit("**/build/test-results/*.xml")
+            archiveArtifacts {
+                pattern 'ontrack-ui/build/libs/ontrack-ui-*.jar'
+                pattern 'ontrack-acceptance/build/libs/ontrack-acceptance-*.jar'
+                pattern 'ontrack-dsl/build/libs/ontrack-dsl-*.jar'
+                pattern 'ontrack-dsl/build/libs/ontrack-dsl-*.pom'
+            }
             tasks(
                     '**/*.java,**/*.groovy,**/*.xml,**/*.html,**/*.js',
                     '**/target/**,**/node_modules/**,**/vendor/**',
                     'FIXME', 'TODO', '@Deprecated', true
             )
-            downstreamParameterized {
-                trigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-acceptance-local", 'SUCCESS', false) {
-                    propertiesFile('build/version.properties')
-                }
-            }
+//            downstreamParameterized {
+//                FIXME trigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-acceptance-local", 'SUCCESS', false) {
+//                    propertiesFile('build/version.properties')
+//                }
+//            }
         }
         configure { node ->
             node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackBuildNotifier' {
