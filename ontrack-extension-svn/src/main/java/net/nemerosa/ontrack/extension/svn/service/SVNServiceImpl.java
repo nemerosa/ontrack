@@ -8,12 +8,15 @@ import net.nemerosa.ontrack.extension.svn.client.SVNClient;
 import net.nemerosa.ontrack.extension.svn.db.*;
 import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.extension.svn.property.*;
+import net.nemerosa.ontrack.extension.svn.support.SVNConfigProperties;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.ConnectionResult;
 import net.nemerosa.ontrack.tx.Transaction;
 import net.nemerosa.ontrack.tx.TransactionService;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +34,8 @@ import java.util.stream.Collectors;
 @Transactional
 public class SVNServiceImpl implements SVNService {
 
+    private final Logger logger = LoggerFactory.getLogger(SVNService.class);
+
     private final StructureService structureService;
     private final PropertyService propertyService;
     private final IssueServiceRegistry issueServiceRegistry;
@@ -41,6 +46,7 @@ public class SVNServiceImpl implements SVNService {
     private final SVNRepositoryDao repositoryDao;
     private final SVNClient svnClient;
     private final TransactionService transactionService;
+    private final SVNConfigProperties svnConfigProperties;
 
     @Autowired
     public SVNServiceImpl(
@@ -52,7 +58,9 @@ public class SVNServiceImpl implements SVNService {
             SVNIssueRevisionDao issueRevisionDao,
             SVNEventDao eventDao,
             SVNRepositoryDao repositoryDao,
-            SVNClient svnClient, TransactionService transactionService) {
+            SVNClient svnClient,
+            TransactionService transactionService,
+            SVNConfigProperties svnConfigProperties) {
         this.structureService = structureService;
         this.propertyService = propertyService;
         this.issueServiceRegistry = issueServiceRegistry;
@@ -63,6 +71,7 @@ public class SVNServiceImpl implements SVNService {
         this.repositoryDao = repositoryDao;
         this.svnClient = svnClient;
         this.transactionService = transactionService;
+        this.svnConfigProperties = svnConfigProperties;
     }
 
     @Override
@@ -384,37 +393,42 @@ public class SVNServiceImpl implements SVNService {
                     url
             );
         }
-        //noinspection unused
-        try (Transaction tx = transactionService.start()) {
-            // Creates a repository
-            SVNRepository repository = SVNRepository.of(
-                    0,
-                    configuration,
-                    null
-            );
-            // Configuration URL
-            SVNURL svnurl = SVNUtils.toURL(configuration.getUrl());
-            // Connection to the root
-            if (!svnClient.exists(
-                    repository,
-                    svnurl,
-                    SVNRevision.HEAD
-            )) {
-                return ConnectionResult.error(configuration.getUrl() + " does not exist.");
+        if (svnConfigProperties.isTest()) {
+            //noinspection unused
+            try (Transaction tx = transactionService.start()) {
+                // Creates a repository
+                SVNRepository repository = SVNRepository.of(
+                        0,
+                        configuration,
+                        null
+                );
+                // Configuration URL
+                SVNURL svnurl = SVNUtils.toURL(configuration.getUrl());
+                // Connection to the root
+                if (!svnClient.exists(
+                        repository,
+                        svnurl,
+                        SVNRevision.HEAD
+                )) {
+                    return ConnectionResult.error(configuration.getUrl() + " does not exist.");
+                }
+                // Gets base info
+                SVNInfo info = svnClient.getInfo(repository, svnurl, SVNRevision.HEAD);
+                // Checks the repository root
+                if (!Objects.equals(
+                        info.getRepositoryRootURL(),
+                        svnurl
+                )) {
+                    return ConnectionResult.error(configuration.getUrl() + " must be the root of the repository.");
+                }
+                // OK
+                return ConnectionResult.ok();
+            } catch (Exception ex) {
+                return ConnectionResult.error(ex.getMessage());
             }
-            // Gets base info
-            SVNInfo info = svnClient.getInfo(repository, svnurl, SVNRevision.HEAD);
-            // Checks the repository root
-            if (!Objects.equals(
-                    info.getRepositoryRootURL(),
-                    svnurl
-            )) {
-                return ConnectionResult.error(configuration.getUrl() + " must be the root of the repository.");
-            }
-            // OK
+        } else {
+            logger.warn("[svn] SVN configuration URL checks have been disabled.");
             return ConnectionResult.ok();
-        } catch (Exception ex) {
-            return ConnectionResult.error(ex.getMessage());
         }
     }
 
