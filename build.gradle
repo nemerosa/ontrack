@@ -97,6 +97,12 @@ apply from: 'gradle/maven.gradle'
 apply from: 'gradle/packaging.gradle'
 
 /**
+ * Docker build
+ */
+
+apply from: 'gradle/docker.gradle'
+
+/**
  * General test report
  */
 

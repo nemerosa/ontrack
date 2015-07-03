@@ -1,0 +1,23 @@
+/**
+ * Docker tasks
+ */
+
+task dockerPrepareEnv(type: Copy, dependsOn: ':ontrack-ui:bootRepackage') {
+    from 'ontrack-ui/build/libs'
+    include '*.jar'
+    into project.file('docker')
+    rename '.*', 'ontrack.jar'
+}
+
+task dockerBuild(type: Exec, dependsOn: dockerPrepareEnv) {
+    executable 'docker'
+    args = [
+            'build',
+            '--tag',
+            "nemerosa/ontrack:${versioning.info.full}",
+            project.file('docker')
+    ]
+}
+
+// Link with the build
+build.dependsOn dockerBuild
