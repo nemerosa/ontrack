@@ -40,6 +40,15 @@ bootRepackage {
     customConfiguration = 'testRuntime'
 }
 
+task normaliseJar {
+    doFirst {
+        // Used for local testing only
+        ant.copy file: testJar.outputs.files.singleFile, tofile: "${buildDir}/libs/ontrack-acceptance.jar"
+    }
+}
+normaliseJar.dependsOn bootRepackage
+assemble.dependsOn normaliseJar
+
 /**
  * Local test definitions
  */
