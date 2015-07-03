@@ -1,14 +1,11 @@
 package net.nemerosa.ontrack.extension.support;
 
-import net.nemerosa.ontrack.extension.support.ConfigurationNotFoundException;
-import net.nemerosa.ontrack.extension.support.ConfigurationService;
-import net.nemerosa.ontrack.extension.support.UserPasswordConfiguration;
+import net.nemerosa.ontrack.model.security.EncryptionService;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.Configuration;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
-import net.nemerosa.ontrack.model.security.EncryptionService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
@@ -57,7 +54,6 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
     @Override
     public T newConfiguration(T configuration) {
         checkAccess();
-        validateConfiguration(configuration);
         configurationRepository.save(encrypt(configuration));
         return configuration;
     }
@@ -84,7 +80,6 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
     @Override
     public void updateConfiguration(String name, T configuration) {
         checkAccess();
-        validateConfiguration(configuration);
         Validate.isTrue(StringUtils.equals(name, configuration.getName()), "Configuration name must match");
         T configToSave;
         if (StringUtils.isBlank(configuration.getPassword())) {
@@ -98,12 +93,6 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
             configToSave = configuration;
         }
         configurationRepository.save(encrypt(configToSave));
-    }
-
-    /**
-     * Extra validation
-     */
-    protected void validateConfiguration(T configuration) {
     }
 
     @Override

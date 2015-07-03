@@ -13,6 +13,7 @@ import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.ConnectionResult;
 import net.nemerosa.ontrack.tx.Transaction;
 import net.nemerosa.ontrack.tx.TransactionService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -373,6 +374,14 @@ public class SVNServiceImpl implements SVNService {
 
     @Override
     public ConnectionResult test(SVNConfiguration configuration) {
+        // No trailing slash
+        String url = configuration.getUrl();
+        if (StringUtils.endsWith(url, "/")) {
+            throw new SVNURLFormatException(
+                    "The Subversion URL must not end with a slash: %s",
+                    url
+            );
+        }
         //noinspection unused
         try(Transaction tx = transactionService.start()) {
             // Creates a repository
