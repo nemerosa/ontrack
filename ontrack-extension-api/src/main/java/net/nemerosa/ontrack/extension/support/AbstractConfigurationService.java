@@ -57,6 +57,7 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
     @Override
     public T newConfiguration(T configuration) {
         checkAccess();
+        validateConfiguration(configuration);
         configurationRepository.save(encrypt(configuration));
         return configuration;
     }
@@ -83,6 +84,7 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
     @Override
     public void updateConfiguration(String name, T configuration) {
         checkAccess();
+        validateConfiguration(configuration);
         Validate.isTrue(StringUtils.equals(name, configuration.getName()), "Configuration name must match");
         T configToSave;
         if (StringUtils.isBlank(configuration.getPassword())) {
@@ -96,6 +98,12 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
             configToSave = configuration;
         }
         configurationRepository.save(encrypt(configToSave));
+    }
+
+    /**
+     * Extra validation
+     */
+    protected void validateConfiguration(T configuration) {
     }
 
     @Override
