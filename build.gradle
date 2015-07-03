@@ -91,6 +91,12 @@ configure(javaProjects) {
 apply from: 'gradle/maven.gradle'
 
 /**
+ * Packaging for delivery
+ */
+
+apply from: 'gradle/packaging.gradle'
+
+/**
  * General test report
  */
 

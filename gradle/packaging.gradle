@@ -1,0 +1,15 @@
+/**
+ * Packaging of Gradle related files
+ */
+
+task deliveryPackage(type: Zip) {
+    from projectDir
+    include '*.gradle'
+    include 'gradlew*'
+    include 'gradle/**'
+    classifier = 'delivery'
+}
+
+// Link with the build
+
+assemble.dependsOn deliveryPackage
