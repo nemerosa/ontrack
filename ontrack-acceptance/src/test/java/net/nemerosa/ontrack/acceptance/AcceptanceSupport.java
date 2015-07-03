@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.nemerosa.ontrack.client.*;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Before;
 
 import java.io.IOException;
 import java.util.function.Consumer;
@@ -22,6 +23,14 @@ import static org.junit.Assert.fail;
 public abstract class AcceptanceSupport {
 
     private static final ObjectMapper mapper = ObjectMapperFactory.create();
+
+    /**
+     * Waits for the application to be ready by performing a call
+     */
+    @Before
+    public void waitForApplication() {
+        System.out.format("Check for application readiness at %s%n", getBaseURL());
+    }
 
     public JsonNode nameDescription() {
         return object()
@@ -119,7 +128,7 @@ public abstract class AcceptanceSupport {
         }
     }
 
-    protected static interface Client {
+    protected interface Client {
 
         JsonResult get(String path, Object... parameters);
 
@@ -131,7 +140,7 @@ public abstract class AcceptanceSupport {
 
     }
 
-    protected static interface JsonResult {
+    protected interface JsonResult {
 
         JsonNode get();
 
