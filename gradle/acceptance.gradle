@@ -151,15 +151,15 @@ class RemoteAcceptanceTest extends DefaultTask {
         println "[${name}] Acceptance library at ${acceptanceJar}"
         println "[${name}] Application at ${applicationUrl}"
         // Running the tests
-//        project.exec {
-//            workingDir project.projectDir
-//            executable 'java'
-//            args '-jar', "${acceptanceJar}",
-//                    '--ontrack.url', "${applicationUrl}",
-//                    '--ontrack.admin', "${project.properties.acceptanceOntrackPassword}",
-//                    '--ontrack.disableSSL', "${disableSsl}",
-//                    '--ontrack.context', "${acceptanceContext}"
-//        }
+        project.exec {
+            workingDir project.projectDir
+            executable 'java'
+            args '-jar', "${acceptanceJar}",
+                    '--ontrack.url', "${applicationUrl}",
+                    '--ontrack.admin', "${project.properties.acceptanceOntrackPassword}",
+                    '--ontrack.disableSSL', "${disableSsl}",
+                    '--ontrack.context', "${acceptanceContext}"
+        }
     }
 }
 
