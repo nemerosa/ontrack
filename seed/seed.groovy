@@ -86,7 +86,7 @@ if (['master', 'feature', 'release', 'hotfix'].contains(branchType)) {
             archiveJunit("**/build/test-results/*.xml")
             archiveArtifacts {
                 pattern 'ontrack-ui/build/libs/ontrack-ui-*.jar'
-                pattern 'ontrack-acceptance/build/libs/ontrack-acceptance-*.jar'
+                pattern 'ontrack-acceptance/build/libs/ontrack-acceptance.jar' // No version needed here
                 pattern 'ontrack-dsl/build/libs/ontrack-dsl-*.jar'
                 pattern 'ontrack-dsl/build/libs/ontrack-dsl-*.pom'
                 pattern 'build/distributions/ontrack-*-delivery.zip'
@@ -138,6 +138,10 @@ if (['master', 'feature', 'release', 'hotfix'].contains(branchType)) {
             }
             // Expanding the delivery ZIP
             shell 'unzip ontrack-*-delivery.zip'
+            // Runs the CI acceptance tests
+            gradle """\
+ciAcceptanceTest -PacceptanceJar=ontrack-acceptance.jar
+"""
         }
         publishers {
             archiveJunit('ontrack-acceptance.xml')

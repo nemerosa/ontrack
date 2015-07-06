@@ -182,10 +182,7 @@ task ciDockerStop(type: DockerStop) {
 }
 
 task ciAcceptanceTest(type: RemoteAcceptanceTest) {
-    // TODO Self signed certificates can be stored locally and mounted
     disableSsl = true
     dependsOn ciDockerStart
-    // TODO Wait to be done at acceptance test level
-    // TODO dependsOn remoteAcceptanceTest
     finalizedBy ciDockerStop
 }
