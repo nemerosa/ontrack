@@ -95,11 +95,11 @@ if (['master', 'feature', 'release', 'hotfix'].contains(branchType)) {
                     '**/target/**,**/node_modules/**,**/vendor/**',
                     'FIXME', 'TODO', '@Deprecated', true
             )
-//            downstreamParameterized {
-//                FIXME trigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-acceptance-local", 'SUCCESS', false) {
-//                    propertiesFile('build/version.properties')
-//                }
-//            }
+            downstreamParameterized {
+                trigger("${PROJECT}-${NAME}-acceptance-local", 'SUCCESS', false) {
+                    propertiesFile('build/version.properties')
+                }
+            }
         }
         configure { node ->
             node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackBuildNotifier' {
@@ -112,7 +112,7 @@ if (['master', 'feature', 'release', 'hotfix'].contains(branchType)) {
 
     // Local acceptance job
 
-    freeStyleJob("${PROJECT}-${NAME}-acceptance-local") {
+    freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
         logRotator(numToKeep = 40)
         deliveryPipelineConfiguration('Commit', 'Local acceptance')
         jdk 'JDK8u25'
@@ -122,14 +122,22 @@ if (['master', 'feature', 'release', 'hotfix'].contains(branchType)) {
             stringParam('VERSION_BUILD', '', '')
             stringParam('VERSION_DISPLAY', '', '')
         }
+        wrappers {
+            xvfb('default')
+        }
         steps {
-            shell readFileFromWorkspace('seed/local-acceptance.sh')
+            copyArtifacts("${SEED_PROJECT}-${SEED_BRANCH}-build") {
+                flatten()
+                buildSelector {
+                    upstreamBuild()
+                }
+            }
         }
         publishers {
             archiveJunit('ontrack-acceptance.xml')
             if (branchType == 'release') {
                 downstreamParameterized {
-                    trigger("${PROJECT}-${NAME}-docker-push", 'SUCCESS', false) {
+                    trigger("${SEED_PROJECT}-${SEED_BRANCH}-docker-push", 'SUCCESS', false) {
                         currentBuild()
                     }
                 }
@@ -142,11 +150,6 @@ if (['master', 'feature', 'release', 'hotfix'].contains(branchType)) {
             }
         }
         configure { node ->
-            node / 'buildWrappers' / 'org.jenkinsci.plugins.xvfb.XvfbBuildWrapper' {
-                'installationName'('default')
-                'screen'('1024x768x24')
-                'displayNameOffset'('1')
-            }
             node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
                 'project'('ontrack')
                 'branch'(NAME)
