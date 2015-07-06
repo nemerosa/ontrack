@@ -127,12 +127,15 @@ if (['master', 'feature', 'release', 'hotfix'].contains(branchType)) {
             xvfb('default')
         }
         steps {
+            // Copy of artifacts
             copyArtifacts("${SEED_PROJECT}-${SEED_BRANCH}-build") {
                 flatten()
                 buildSelector {
                     upstreamBuild()
                 }
             }
+            // Expanding the delivery ZIP
+            shell 'unzip ontrack-*-delivery.zip'
         }
         publishers {
             archiveJunit('ontrack-acceptance.xml')
