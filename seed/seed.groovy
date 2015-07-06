@@ -89,6 +89,7 @@ if (['master', 'feature', 'release', 'hotfix'].contains(branchType)) {
                 pattern 'ontrack-acceptance/build/libs/ontrack-acceptance-*.jar'
                 pattern 'ontrack-dsl/build/libs/ontrack-dsl-*.jar'
                 pattern 'ontrack-dsl/build/libs/ontrack-dsl-*.pom'
+                pattern 'build/distributions/ontrack-*-delivery.zip'
             }
             tasks(
                     '**/*.java,**/*.groovy,**/*.xml,**/*.html,**/*.js',

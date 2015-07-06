@@ -12,4 +12,4 @@ task deliveryPackage(type: Zip) {
 
 // Link with the build
 
-assemble.dependsOn deliveryPackage
+build.dependsOn deliveryPackage
