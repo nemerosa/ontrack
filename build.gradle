@@ -85,6 +85,12 @@ configure(javaProjects) {
 }
 
 /**
+ * Release task.
+ */
+task release(dependsOn: ['versionDisplay']) {
+}
+
+/**
  * Publication in Maven repository
  */
 
@@ -116,12 +122,6 @@ task testReport(type: TestReport) {
     destinationDir = file("$buildDir/reports/allTests")
     // Include the results from the `test` tasks in all Java subprojects
     reportOn javaProjects*.test, javaProjects*.integrationTest, javaProjects*.acceptanceTest
-}
-
-/**
- * Release task.
- */
-task release(dependsOn: ['versionDisplay']) {
 }
 
 /**
