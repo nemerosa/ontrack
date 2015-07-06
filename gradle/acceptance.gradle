@@ -56,8 +56,10 @@ class DockerStart extends DefaultTask {
         // Cleaning any previus data
         if (clean) {
             println "[${name}] Cleaning data in ${mount}..."
-            project.delete mount
-            project.mkdir mount
+            project.delete "${mount}/log"
+            project.delete "${mount}/database"
+            project.delete "${mount}/work"
+            project.delete "${mount}/ontrack.pid"
         }
         // Port publication
         String portPublication

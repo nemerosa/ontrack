@@ -24,4 +24,4 @@ COPY ontrack.jar /opt/ontrack/
 
 # Running the application
 WORKDIR /var/ontrack
-CMD ["java", "-jar", "/opt/ontrack/ontrack.jar", "--spring.profiles.active=${PROFILE}", "--logging.path=log/"]
+CMD ["java", "-jar", "/opt/ontrack/ontrack.jar", "--spring.profiles.active=${PROFILE}"]
