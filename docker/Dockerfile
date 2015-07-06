@@ -14,7 +14,7 @@ RUN mkdir -p /opt/ontrack
 VOLUME /var/ontrack
 
 # Exposing the port
-EXPOSE 8080
+EXPOSE 443
 
 # Profile
 ENV PROFILE prod

@@ -33,7 +33,7 @@ class DockerStart extends DefaultTask {
     /**
      * Utility method to get a published port
      */
-    int getPublishedPort (String cid, int port = 8080) {
+    int getPublishedPort (String cid, int port = 443) {
         new ByteArrayOutputStream().withStream { os ->
             project.exec {
                 executable = 'docker'
