@@ -127,6 +127,8 @@ if (['master', 'feature', 'release', 'hotfix'].contains(branchType)) {
             xvfb('default')
         }
         steps {
+            // Cleaning the workspace
+            shell 'rm -rf *'
             // Copy of artifacts
             copyArtifacts("${SEED_PROJECT}-${SEED_BRANCH}-build") {
                 flatten()
