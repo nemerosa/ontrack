@@ -80,7 +80,8 @@ class AcceptanceConfig {
                     JsonNode info = jsonClient.get("info");
                     // Gets the version
                     return info.path("version").path("display").asText();
-                } catch (ClientException ignored) {
+                } catch (ClientException ex) {
+                    logger.debug(ex.getMessage());
                 }
                 // Waits
                 Thread.sleep(1_000);
