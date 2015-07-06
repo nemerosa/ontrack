@@ -158,7 +158,8 @@ class RemoteAcceptanceTest extends DefaultTask {
                     '--ontrack.url', "${applicationUrl}",
                     '--ontrack.admin', "${project.properties.acceptanceOntrackPassword}",
                     '--ontrack.disableSSL', "${disableSsl}",
-                    '--ontrack.context', "${acceptanceContext}"
+                    '--ontrack.context', "${acceptanceContext}",
+                    '--ontrack.timeout', "${project.properties.acceptanceTimeout}"
         }
     }
 }
