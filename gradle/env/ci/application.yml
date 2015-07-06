@@ -10,7 +10,9 @@ server:
   port: 443
   ssl:
     enabled: true
-    key-store: "acceptance.jks"
+    key-alias: ontrack
+    key-store: "keystore.p12"
+    key-store-type: PKCS12
     key-store-password: ontrack
     key-password: ontrack
 
