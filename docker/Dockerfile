@@ -10,8 +10,11 @@ RUN apt-get install -y git
 # Directory set-up
 RUN mkdir -p /opt/ontrack
 
-# External volume set-up and links
-VOLUME /var/ontrack
+# Data volume
+VOLUME /var/ontrack/data
+
+# Configuration volume
+VOLUME /var/ontrack/conf
 
 # Exposing the port
 EXPOSE 443
@@ -22,6 +25,9 @@ ENV PROFILE prod
 # Copies the Ontrack JAR
 COPY ontrack.jar /opt/ontrack/
 
+# Starting script
+ADD start.sh /opt/ontrack/start.sh
+
 # Running the application
-WORKDIR /var/ontrack
-CMD ["java", "-jar", "/opt/ontrack/ontrack.jar", "--spring.profiles.active=${PROFILE}"]
+WORKDIR /opt/ontrack
+CMD ["sh", "/opt/ontrack/start.sh"]
