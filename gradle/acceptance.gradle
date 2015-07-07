@@ -190,3 +190,62 @@ task ciAcceptanceTest(type: RemoteAcceptanceTest) {
     dependsOn ciDockerStart
     finalizedBy ciDockerStop
 }
+
+/**
+ * DO environment
+ */
+
+class DOSetup extends DefaultTask {
+
+    String apiToken
+    String dropletName
+    String region = 'ams2'
+    String size = '512mb'
+
+    private String ip
+
+    @TaskAction
+    def setup() {
+        // Creates the machine
+        project.exec {
+            executable 'docker-machine'
+            args 'create',
+                    '--driver', 'digitalocean',
+                    '--digitalocean-access-token', apiToken,
+                    '--digitalocean-image', 'docker',
+                    '--digitalocean-region', region,
+                    '--digitalocean-size', size,
+                    dropletName
+        }
+        // Gets its IP
+        ip = new ByteArrayOutputStream().withStream { os ->
+            project.exec {
+                executable = 'docker-machine'
+                args = ['ip', dropletName]
+                standardOutput = os
+            }
+            os.toString().trim()
+        }
+        // Displays the IP
+        println "[${name}] Droplet ${dropletName} available at ${ip}"
+    }
+
+    String getIp() {
+        return ip
+    }
+}
+
+task doSetup(type: DOSetup) {
+    doFirst {
+        // Checks the token
+        if (!digitalOceanAccessToken) {
+            throw new GradleException("Missing digitalOceanAccessToken parameter")
+        }
+        // Checks the version
+        if (!ontrackVersion) {
+            throw new GradleException("Missing ontrackVersion parameter")
+        }
+    }
+    apiToken = digitalOceanAccessToken
+    dropletName = "ontrack-acceptance-${ontrackVersion}"
+}
