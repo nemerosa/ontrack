@@ -11,7 +11,7 @@ server:
   ssl:
     enabled: true
     key-alias: ontrack
-    key-store: "keystore.p12"
+    key-store: "config/keystore.p12"
     key-store-type: PKCS12
     key-store-password: ontrack
     key-password: ontrack

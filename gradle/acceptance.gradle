@@ -18,11 +18,11 @@ class DockerStart extends DefaultTask {
 
     String image = 'nemerosa/ontrack:latest'
 
-    File mount = project.projectDir.absoluteFile
+    File data
+
+    File conf
 
     String profile = 'prod'
-
-    boolean clean = false
 
     String publish = ''
 
@@ -52,33 +52,38 @@ class DockerStart extends DefaultTask {
 
     @TaskAction
     def start() {
-        println "[${name}] Starting ${image} with mount at ${mount} for profile ${profile}..."
-        // Cleaning any previus data
-        if (clean) {
-            println "[${name}] Cleaning data in ${mount}..."
-            project.delete "${mount}/log"
-            project.delete "${mount}/database"
-            project.delete "${mount}/work"
-            project.delete "${mount}/ontrack.pid"
-        }
+        println "[${name}] Starting ${image} for profile ${profile}..."
+        // All arguments
+        List<String> arguments = ['run', '--detach', "--env=PROFILE=${profile}"]
         // Port publication
         String portPublication
         if (publish) {
             println "[${name}] Publishing ${publish}..."
-            portPublication = "--publish=${publish}"
+            arguments << "--publish=${publish}"
         } else {
             println "[${name}] Publishing on random ports..."
-            portPublication = '--publish-all'
+            arguments << '--publish-all'
         }
+        // Volumes
+        if (data) {
+            println "[${name}] Data mount: ${data}"
+            arguments << "--volume=${data}:/var/ontrack/data"
+        } else {
+            println "[${name}] No data mount"
+        }
+        if (conf) {
+            println "[${name}] Conf mount: ${conf}"
+            arguments << "--volume=${conf}:/var/ontrack/conf"
+        } else {
+            println "[${name}] No conf mount"
+        }
+        // Image to start
+        arguments << image
         // Starting the container
         def output = new ByteArrayOutputStream()
         project.exec {
             executable 'docker'
-            args 'run', '--detach',
-                    "--env=PROFILE=${profile}",
-                    portPublication,
-                    "--volume=${mount}:/var/ontrack",
-                    image
+            args = arguments
             standardOutput = output
         }
         // Getting the container ID
@@ -172,9 +177,8 @@ class RemoteAcceptanceTest extends DefaultTask {
 
 task ciDockerStart(type: DockerStart) {
     image = "nemerosa/ontrack:latest"
-    mount = file('gradle/env/ci')
+    conf = file('gradle/env/ci')
     profile = 'acceptance'
-    clean = true
 }
 
 task ciDockerStop(type: DockerStop) {
