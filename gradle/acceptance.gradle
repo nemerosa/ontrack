@@ -254,3 +254,17 @@ task doTeardown(type: Exec) {
     executable 'docker-machine'
     args = ['rm', '--force', "ontrack-acceptance-${ontrackVersion}"]
 }
+
+task doEnv {
+    mustRunAfter doSetup
+    doFirst {
+        project.exec {
+            executable 'docker-machine'
+            args = ['ssh', "ontrack-acceptance-${ontrackVersion}", 'mkdir -p /var/ontrack']
+        }
+        project.exec {
+            executable 'docker-machine'
+            args = ['scp', '-r', 'gradle/env/ci', "ontrack-acceptance-${ontrackVersion}:/var/ontrack/conf"]
+        }
+    }
+}
