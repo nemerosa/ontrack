@@ -171,7 +171,7 @@ ciAcceptanceTest -PacceptanceJar=ontrack-acceptance.jar
 
     // Docker push
 
-    freeStyleJob("${PROJECT}-${NAME}-docker-push") {
+    freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-docker-push") {
         logRotator(numToKeep = 40)
         deliveryPipelineConfiguration('Acceptance', 'Docker push')
         jdk 'JDK8u25'
@@ -193,16 +193,16 @@ docker logout
 """
         }
         publishers {
-            downstreamParameterized {
-                trigger("${PROJECT}-${NAME}-acceptance-do", 'SUCCESS', false) {
-                    currentBuild()
-                }
-            }
+//            downstreamParameterized {
+//                TODO trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do", 'SUCCESS', false) {
+//                    currentBuild()
+//                }
+//            }
         }
         configure { node ->
             node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
                 'project'('ontrack')
-                'branch'(NAME)
+                'branch'(SEED_BRANCH)
                 'build'('${VERSION_BUILD}')
                 'validationStamp'('DOCKER')
             }
