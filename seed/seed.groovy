@@ -186,7 +186,6 @@ ciAcceptanceTest -PacceptanceJar=ontrack-acceptance.jar
         }
         steps {
             shell """\
-docker tag --force ontrack:\${VERSION_FULL} nemerosa/ontrack:\${VERSION_FULL}
 docker login --email="damien.coraboeuf+nemerosa@gmail.com" --username="nemerosa" --password="\${DOCKER_PASSWORD}"
 docker push nemerosa/ontrack:\${VERSION_FULL}
 docker logout
