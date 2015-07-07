@@ -45,7 +45,7 @@ task versionUnset {
     doLast {
         ant.replaceregexp(
                 match: '"version": "(.*)"',
-                replace: "\"version\": \"2\"",
+                replace: "\"version\": \"2.0.0\"",
                 byline: true,
                 encoding: 'UTF-8'
         ) {
@@ -55,6 +55,7 @@ task versionUnset {
 }
 
 task buildProd(dependsOn: ['setup', 'versionSet', 'gruntProd']) {
+    finalizedBy versionUnset
 }
 
 task buildDev(dependsOn: ['setup', 'gruntDev']) {
