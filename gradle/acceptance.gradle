@@ -249,3 +249,8 @@ task doSetup(type: DOSetup) {
     apiToken = digitalOceanAccessToken
     dropletName = "ontrack-acceptance-${ontrackVersion}"
 }
+
+task doTeardown(type: Exec) {
+    executable 'docker-machine'
+    args = ['rm', '--force', "ontrack-acceptance-${ontrackVersion}"]
+}
