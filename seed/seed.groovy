@@ -77,7 +77,7 @@ if (['master', 'feature', 'release', 'hotfix'].contains(branchType)) {
             scm 'H/5 * * * *'
         }
         steps {
-            gradle 'clean versionDisplay versionFile test integrationTest release  --info --profile --parallel'
+            gradle 'clean versionDisplay versionFile test integrationTest build  --info --profile --parallel'
             environmentVariables {
                 propertiesFile 'build/version.properties'
             }
