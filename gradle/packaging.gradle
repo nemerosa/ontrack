@@ -14,4 +14,3 @@ task deliveryPackage(type: Zip) {
 // Link with the build
 
 build.dependsOn deliveryPackage
-release.dependsOn deliveryPackage

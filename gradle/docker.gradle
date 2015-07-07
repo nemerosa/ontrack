@@ -31,4 +31,3 @@ task dockerLatest(type: Exec, dependsOn: dockerBuild) {
 
 // Link with the build
 build.dependsOn dockerLatest
-release.dependsOn dockerLatest

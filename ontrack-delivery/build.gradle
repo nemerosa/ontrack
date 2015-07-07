@@ -23,5 +23,3 @@ task docker(type: Zip) {
 }
 
 task build(dependsOn: ['docker'])
-
-task release(dependsOn: ['build'])

@@ -79,15 +79,6 @@ configure(javaProjects) {
         }
     }
 
-    // Release task
-    task release(dependsOn: 'build') {}
-
-}
-
-/**
- * Release task.
- */
-task release(dependsOn: ['versionDisplay']) {
 }
 
 /**
