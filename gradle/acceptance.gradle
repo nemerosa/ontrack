@@ -58,6 +58,19 @@ abstract class AbstractDocker extends AbstractCDTask {
         }
     }
 
+    /**
+     * Gets the initial arguments for a Docker command
+     */
+    List<String> getDockerConfig() {
+        if (machine) {
+            println "[${name}] Using Docker Machine ${machine}"
+            def config = execute('docker-machine', 'config', machine)
+            return config.split(' ') as List
+        } else {
+            return []
+        }
+    }
+
 }
 
 /**
@@ -82,13 +95,7 @@ class DockerStart extends AbstractDocker {
     @TaskAction
     def start() {
         // Arguments
-        List<String> arguments = []
-        // Machine setup
-        if (machine) {
-            println "[${name}] Using Docker Machine ${machine}"
-            def config = execute('docker-machine', 'config', machine)
-            arguments.addAll(config.split(' ') as List)
-        }
+        List<String> arguments = getDockerConfig()
         // Logging
         println "[${name}] Starting ${image} for profile ${profile}..."
         // All arguments
@@ -148,9 +155,13 @@ class DockerStop extends AbstractDocker {
         def task = project.tasks.getByName(startTask) as DockerStart
         // Stopping the container
         println "[${name}] Stopping container at ${task.cid} created by ${startTask}"
+        // Arguments
+        List<String> arguments = getDockerConfig()
+        // Stopping
+        arguments.addAll(['rm', '--force', '--volumes', task.cid])
         project.exec {
             executable 'docker'
-            args 'rm', '--force', '--volumes', task.cid
+            args = arguments
         }
     }
 
