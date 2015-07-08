@@ -95,7 +95,7 @@ class DockerStart extends AbstractDocker {
 
     String profile = 'prod'
 
-    String publish = ''
+    boolean exposePort = false
 
     private String cid
 
@@ -111,9 +111,9 @@ class DockerStart extends AbstractDocker {
         arguments.addAll(['run', '--detach', "--env=PROFILE=${profile}"])
         // Port publication
         String portPublication
-        if (publish) {
-            println "[${name}] Publishing ${publish}..."
-            arguments << "--publish=${publish}"
+        if (exposePort) {
+            println "[${name}] Publishing port 443..."
+            arguments << "--publish=443:443"
         } else {
             println "[${name}] Publishing on random ports..."
             arguments << '--publish-all'
@@ -315,6 +315,7 @@ task doEnv {
 
 task doDockerStart(type: DockerStart) {
     machine = "ontrack-acceptance-${ontrackVersion}"
+    exposePort = true
     image = "nemerosa/ontrack:${ontrackVersion}"
     conf = file('/var/ontrack/conf')
     profile = 'acceptance'
@@ -327,7 +328,7 @@ task doDockerStop(type: DockerStop) {
 }
 
 task doAcceptanceTest(type: RemoteAcceptanceTest) {
-    acceptanceUrl = { "https://${doSetup.ip}:${doDockerStart.port}" }
+    acceptanceUrl = { "https://${doSetup.ip}" }
     disableSsl = true
     dependsOn doSetup
     dependsOn doEnv
