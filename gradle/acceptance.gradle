@@ -185,39 +185,37 @@ class RemoteAcceptanceTest extends DefaultTask {
 
     String acceptanceContext = 'default'
 
+    String acceptanceJar = project.properties.acceptanceJar
+
+    def acceptanceUrl
+
+    String acceptancePassword = 'admin'
+
+    int acceptanceTimeout = 120
+
     @TaskAction
     def launch() {
-        // Collecting the data
-        String acceptanceJar = project.properties.acceptanceJar
-        // Fixed URL?
-        String applicationUrl
-        if (project.hasProperty('acceptanceOntrackUrl')) {
-            applicationUrl = project.properties.acceptanceOntrackUrl
+        // URL
+        String url
+        if (!acceptanceUrl) throw new GradleException("acceptanceUrl property is not defined for ${name}")
+        else if (acceptanceUrl instanceof Closure) {
+            url = acceptanceUrl()
         } else {
-            // Gets the port
-            int applicationPort
-            def dockerStart = taskDependencies.getDependencies(this).find { it instanceof DockerStart } as DockerStart
-            if (dockerStart) {
-                applicationPort = dockerStart.port
-            } else {
-                applicationPort = project.properties.acceptanceOntrackPort as int
-            }
-            // Computes the URL
-            applicationUrl = "${project.properties.acceptanceOntrackScheme}://${project.properties.acceptanceOntrackHost}:${applicationPort}"
+            url = acceptanceUrl as String
         }
         // Logging
         println "[${name}] Acceptance library at ${acceptanceJar}"
-        println "[${name}] Application at ${applicationUrl}"
+        println "[${name}] Application at ${url}"
         // Running the tests
         project.exec {
             workingDir project.projectDir
             executable 'java'
             args '-jar', "${acceptanceJar}",
-                    "--ontrack.url=${applicationUrl}",
-                    "--ontrack.admin=${project.properties.acceptanceOntrackPassword}",
+                    "--ontrack.url=${url}",
+                    "--ontrack.admin=${acceptancePassword}",
                     "--ontrack.disableSsl=${disableSsl}",
                     "--ontrack.context=${acceptanceContext}",
-                    "--ontrack.timeout=${project.properties.acceptanceTimeout}"
+                    "--ontrack.timeout=${acceptanceTimeout}"
         }
     }
 }
@@ -237,6 +235,7 @@ task ciDockerStop(type: DockerStop) {
 }
 
 task ciAcceptanceTest(type: RemoteAcceptanceTest) {
+    acceptanceUrl = { "https://${project.properties.acceptanceHost}:${ciDockerStart.port}" }
     disableSsl = true
     dependsOn ciDockerStart
     finalizedBy ciDockerStop
