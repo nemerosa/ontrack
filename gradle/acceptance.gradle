@@ -241,7 +241,7 @@ class DOSetup extends AbstractCDTask {
 
     String apiToken
     String dropletName
-    String region = 'ams2'
+    String region = 'ams1'
     String size = '512mb'
 
     private String ip
