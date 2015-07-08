@@ -10,11 +10,60 @@ import java.util.regex.Pattern
  * ./gradlew build localAcceptanceTest
  */
 
+/**
+ * Base class
+ */
+abstract class AbstractCDTask extends DefaultTask {
+
+    /**
+     * Utility method to get a string from running a process
+     */
+    String execute(String program, List arguments) {
+        return new ByteArrayOutputStream().withStream { os ->
+            project.exec {
+                executable = program
+                args = arguments
+                standardOutput = os
+            }
+            return os.toString().trim()
+        }
+    }
+
+    /**
+     * Utility method to get a string from running a process
+     */
+    String execute(String program, Object... arguments) {
+        return execute(program, arguments as List)
+    }
+
+}
+
+/**
+ * Docker base class
+ */
+abstract class AbstractDocker extends AbstractCDTask {
+
+    String machine
+
+    /**
+     * Utility method to get a published port
+     */
+    int getPublishedPort (String cid, int port = 443) {
+        def output = execute('docker', 'port', cid, port)
+        def m = Pattern.compile(/^.*:(\d+)$/).matcher(output)
+        if (m.matches()) {
+            m.group(1) as int
+        } else {
+            throw new GradleException("Cannot parse port from ${output}")
+        }
+    }
+
+}
 
 /**
  * Docker start class
  */
-class DockerStart extends DefaultTask {
+class DockerStart extends AbstractDocker {
 
     String image = 'nemerosa/ontrack:latest'
 
@@ -30,31 +79,20 @@ class DockerStart extends DefaultTask {
 
     private int port
 
-    /**
-     * Utility method to get a published port
-     */
-    int getPublishedPort (String cid, int port = 443) {
-        new ByteArrayOutputStream().withStream { os ->
-            project.exec {
-                executable = 'docker'
-                args = ['port', cid, port]
-                standardOutput = os
-            }
-            def output = os.toString().trim()
-            def m = Pattern.compile(/^.*:(\d+)$/).matcher(output)
-            if (m.matches()) {
-                m.group(1) as int
-            } else {
-                throw new GradleException("Cannot parse port from ${output}")
-            }
-        }
-    }
-
     @TaskAction
     def start() {
+        // Arguments
+        List<String> arguments = []
+        // Machine setup
+        if (machine) {
+            println "[${name}] Using Docker Machine ${machine}"
+            def config = execute('docker-machine', 'config', machine)
+            arguments.addAll(config.split(' ') as List)
+        }
+        // Logging
         println "[${name}] Starting ${image} for profile ${profile}..."
         // All arguments
-        List<String> arguments = ['run', '--detach', "--env=PROFILE=${profile}"]
+        arguments.addAll(['run', '--detach', "--env=PROFILE=${profile}"])
         // Port publication
         String portPublication
         if (publish) {
@@ -80,14 +118,7 @@ class DockerStart extends DefaultTask {
         // Image to start
         arguments << image
         // Starting the container
-        def output = new ByteArrayOutputStream()
-        project.exec {
-            executable 'docker'
-            args = arguments
-            standardOutput = output
-        }
-        // Getting the container ID
-        this.cid = output.toString().trim()
+        cid = execute('docker', arguments)
         println "[${name}] Container ${cid} started"
         // Getting the published port
         this.port = getPublishedPort(this.cid)
@@ -107,7 +138,7 @@ class DockerStart extends DefaultTask {
 /**
  * Docker stop task
  */
-class DockerStop extends DefaultTask {
+class DockerStop extends AbstractDocker {
 
     String startTask
 
@@ -195,7 +226,7 @@ task ciAcceptanceTest(type: RemoteAcceptanceTest) {
  * DO environment
  */
 
-class DOSetup extends DefaultTask {
+class DOSetup extends AbstractCDTask {
 
     String apiToken
     String dropletName
@@ -218,14 +249,7 @@ class DOSetup extends DefaultTask {
                     dropletName
         }
         // Gets its IP
-        ip = new ByteArrayOutputStream().withStream { os ->
-            project.exec {
-                executable = 'docker-machine'
-                args = ['ip', dropletName]
-                standardOutput = os
-            }
-            os.toString().trim()
-        }
+        ip = execute('docker-machine', 'ip', dropletName)
         // Displays the IP
         println "[${name}] Droplet ${dropletName} available at ${ip}"
     }
@@ -270,11 +294,13 @@ task doEnv {
 }
 
 task doDockerStart(type: DockerStart) {
+    machine = "ontrack-acceptance-${ontrackVersion}:/var/ontrack/conf"
     image = "nemerosa/ontrack:${ontrackVersion}"
     conf = file('/var/ontrack/conf')
     profile = 'acceptance'
 }
 
 task doDockerStop(type: DockerStop) {
+    machine = "ontrack-acceptance-${ontrackVersion}:/var/ontrack/conf"
     startTask = 'doDockerStart'
 }
