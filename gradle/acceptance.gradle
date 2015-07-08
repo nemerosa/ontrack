@@ -288,6 +288,7 @@ task doSetup(type: DOSetup) {
 task doTeardown(type: Exec) {
     executable 'docker-machine'
     args = ['rm', '--force', "ontrack-acceptance-${ontrackVersion}"]
+    mustRunAfter 'doDockerStop'
 }
 
 task doEnv {
@@ -309,9 +310,22 @@ task doDockerStart(type: DockerStart) {
     image = "nemerosa/ontrack:${ontrackVersion}"
     conf = file('/var/ontrack/conf')
     profile = 'acceptance'
+    mustRunAfter doEnv
 }
 
 task doDockerStop(type: DockerStop) {
     machine = "ontrack-acceptance-${ontrackVersion}:/var/ontrack/conf"
     startTask = 'doDockerStart'
+}
+
+task doAcceptanceTest(type: RemoteAcceptanceTest) {
+    doFirst {
+        project.properties.acceptanceOntrackHost = doSetup.ip
+    }
+    disableSsl = true
+    dependsOn doSetup
+    dependsOn doEnv
+    dependsOn doDockerStart
+    finalizedBy doDockerStop
+    finalizedBy doTeardown
 }
