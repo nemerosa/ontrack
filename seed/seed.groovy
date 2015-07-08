@@ -73,9 +73,6 @@ if (['master', 'feature', 'release', 'hotfix'].contains(branchType)) {
                 localBranch "${BRANCH}"
             }
         }
-        triggers {
-            scm 'H/5 * * * *'
-        }
         steps {
             gradle 'clean versionDisplay versionFile test integrationTest build  --info --profile --parallel'
             environmentVariables {
