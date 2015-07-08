@@ -14,3 +14,4 @@ ontrack-acceptance.xml
 /version.properties
 /release.sh
 /release
+/ontrack-dsl-*
