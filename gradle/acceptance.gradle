@@ -268,3 +268,13 @@ task doEnv {
         }
     }
 }
+
+task doDockerStart(type: DockerStart) {
+    image = "nemerosa/ontrack:${ontrackVersion}"
+    conf = file('/var/ontrack/conf')
+    profile = 'acceptance'
+}
+
+task doDockerStop(type: DockerStop) {
+    startTask = 'doDockerStart'
+}
