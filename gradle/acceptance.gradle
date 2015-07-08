@@ -327,9 +327,7 @@ task doDockerStop(type: DockerStop) {
 }
 
 task doAcceptanceTest(type: RemoteAcceptanceTest) {
-    doFirst {
-        project.properties.acceptanceOntrackHost = doSetup.ip
-    }
+    acceptanceUrl = { "https://${doSetup.ip}:${doDockerStart.port}" }
     disableSsl = true
     dependsOn doSetup
     dependsOn doEnv
