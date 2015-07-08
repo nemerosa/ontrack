@@ -265,31 +265,45 @@ docker logout
         }
         wrappers {
             injectPasswords()
-            toolenv('Maven-3.2.x')
+            // toolenv('Maven-3.2.x')
         }
         steps {
-            environmentVariables {
-                env 'VERSION_BRANCHID', NAME
+            // Cleaning the workspace
+            shell 'rm -rf *'
+            // Copy of artifacts
+            copyArtifacts("${SEED_PROJECT}-${SEED_BRANCH}-build") {
+                flatten()
+                buildSelector {
+                    upstreamBuild()
+                }
             }
+            // Publication
             if (release) {
-                shell readFileFromWorkspace('seed/publish-release.sh')
-                shell """\
-docker tag --force nemerosa/ontrack:\${VERSION_FULL} nemerosa/ontrack:latest
-docker tag --force nemerosa/ontrack:\${VERSION_FULL} nemerosa/ontrack:\${VERSION_DISPLAY}
-docker login --email="damien.coraboeuf+nemerosa@gmail.com" --username="nemerosa" --password="\${DOCKER_PASSWORD}"
-docker push nemerosa/ontrack:\${VERSION_DISPLAY}
-docker push nemerosa/ontrack:latest
-docker logout
-"""
-                publishers {
-                    buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${PROJECT}-${NAME}-production") {
-                        parameters {
-                            currentBuild()
-                        }
+                gradle "-Ppublication publicationRelease"
+            } else {
+                gradle "-Ppublication publicationMaven"
+            }
+//            if (release) {
+//                shell readFileFromWorkspace('seed/publish-release.sh')
+//                shell """\
+//docker tag --force nemerosa/ontrack:\${VERSION_FULL} nemerosa/ontrack:latest
+//docker tag --force nemerosa/ontrack:\${VERSION_FULL} nemerosa/ontrack:\${VERSION_DISPLAY}
+//docker login --email="damien.coraboeuf+nemerosa@gmail.com" --username="nemerosa" --password="\${DOCKER_PASSWORD}"
+//docker push nemerosa/ontrack:\${VERSION_DISPLAY}
+//docker push nemerosa/ontrack:latest
+//docker logout
+//"""
+//            } else {
+//                shell readFileFromWorkspace('seed/publish.sh')
+//            }
+        }
+        if (release) {
+            publishers {
+                buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${SEED_PROJECT}-${SEED_BRANCH}-production") {
+                    parameters {
+                        currentBuild()
                     }
                 }
-            } else {
-                shell readFileFromWorkspace('seed/publish.sh')
             }
         }
         configure { node ->

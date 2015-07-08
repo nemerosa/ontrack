@@ -1,7 +1,6 @@
 description = "DSL for Ontrack."
 
 apply plugin: 'groovy'
-apply plugin:'application'
 
 tasks.withType(AbstractCompile) {
     sourceCompatibility = 1.7
@@ -16,10 +15,55 @@ dependencies {
     compile libraries.http_mime
 }
 
-javadocJar {
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
     from groovydoc
 }
 
-mainClassName = 'net.nemerosa.ontrack.dsl.Shell'
+task sourceJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
 
-build.dependsOn distZip
+
+// Maven POM
+task writePomFiles << {
+    pom {
+        project {
+            name = project.name
+            description project.description
+            url 'http://nemerosa.github.io/ontrack'
+            licenses {
+                license {
+                    name 'The MIT License (MIT)'
+                    url 'http://opensource.org/licenses/MIT'
+                    distribution 'repo'
+                }
+            }
+            scm {
+                url = 'https://github.com/nemerosa/ontrack'
+                connection = 'scm:git:git://github.com/nemerosa/ontrack'
+                developerConnection = 'scm:git:git://github.com/nemerosa/ontrack'
+            }
+            developers {
+                developer {
+                    id = 'dcoraboeuf'
+                    name = 'Damien Coraboeuf'
+                    email = 'damien.coraboeuf@gmail.com'
+                }
+            }
+        }
+    }.writeTo("${buildDir}/poms/${project.name}-${version}.pom")
+}
+
+// Archives for Javadoc and Sources
+artifacts {
+    archives javadocJar
+    archives sourceJar
+    archives file: file("${buildDir}/poms/${project.name}-${version}.pom"), type: 'pom'
+}
+
+// Links with assembly
+assemble.dependsOn writePomFiles
+
