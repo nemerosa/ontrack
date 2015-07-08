@@ -2,8 +2,6 @@ plugins {
     id 'net.nemerosa.versioning' version '1.2.0'
 }
 
-apply plugin: 'maven'
-
 /**
  * Meta information
  */

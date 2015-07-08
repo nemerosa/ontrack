@@ -1,6 +1,7 @@
 description = "DSL for Ontrack."
 
 apply plugin: 'groovy'
+apply plugin: 'maven-publish'
 
 tasks.withType(AbstractCompile) {
     sourceCompatibility = 1.7
@@ -26,35 +27,39 @@ task sourceJar(type: Jar) {
     from sourceSets.main.allSource
 }
 
-
-// Maven POM
-task writePomFiles << {
-    pom {
-        project {
-            name = project.name
-            description project.description
-            url 'http://nemerosa.github.io/ontrack'
-            licenses {
-                license {
-                    name 'The MIT License (MIT)'
-                    url 'http://opensource.org/licenses/MIT'
-                    distribution 'repo'
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            pom.withXml {
+                def pom = asNode()
+                pom.appendNode 'name', project.name
+                pom.appendNode 'description', project.description
+                pom.appendNode 'url', 'http://nemerosa.github.io/ontrack'
+                pom.appendNode('licenses').appendNode('license').with {
+                    appendNode 'name', 'The MIT License (MIT)'
+                    appendNode 'url', 'http://opensource.org/licenses/MIT'
+                    appendNode 'distribution', 'repo'
                 }
-            }
-            scm {
-                url = 'https://github.com/nemerosa/ontrack'
-                connection = 'scm:git:git://github.com/nemerosa/ontrack'
-                developerConnection = 'scm:git:git://github.com/nemerosa/ontrack'
-            }
-            developers {
-                developer {
-                    id = 'dcoraboeuf'
-                    name = 'Damien Coraboeuf'
-                    email = 'damien.coraboeuf@gmail.com'
+                pom.appendNode('scm').with {
+                    appendNode 'url', 'https://github.com/nemerosa/ontrack'
+                    appendNode 'connection', 'scm:git://github.com/nemerosa/ontrack'
+                    appendNode 'developerConnection', 'scm:git:git://github.com/nemerosa/ontrack'
+                }
+                pom.appendNode('developers').appendNode('developer').with {
+                    appendNode 'id', 'dcoraboeuf'
+                    appendNode 'name', 'Damien Coraboeuf'
+                    appendNode 'email', 'damien.coraboeuf@gmail.com'
                 }
             }
         }
-    }.writeTo("${buildDir}/poms/${project.name}-${version}.pom")
+    }
+}
+
+model {
+    tasks.generatePomFileForMavenJavaPublication {
+        destination = file("${buildDir}/poms/${project.name}-${version}.pom")
+    }
 }
 
 // Archives for Javadoc and Sources
@@ -65,5 +70,4 @@ artifacts {
 }
 
 // Links with assembly
-assemble.dependsOn writePomFiles
-
+assemble.dependsOn 'generatePomFileForMavenJavaPublication'
