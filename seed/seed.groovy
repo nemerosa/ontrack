@@ -51,6 +51,23 @@ if (pos > 0) {
 println "BRANCH = ${BRANCH}"
 println "\tBranchType = ${branchType}"
 
+// Extracting the delivery
+def extractDeliveryArtifacts(Object dsl) {
+    dsl.steps {
+        // Cleaning the workspace
+        shell 'rm -rf *'
+        // Copy of artifacts
+        copyArtifacts("${SEED_PROJECT}-${SEED_BRANCH}-build") {
+            flatten()
+            buildSelector {
+                upstreamBuild()
+            }
+        }
+        // Expanding the delivery ZIP
+        shell 'unzip ontrack-*-delivery.zip'
+    }
+}
+
 // Keeps only some version types
 if (['master', 'feature', 'release', 'hotfix'].contains(branchType)) {
 
@@ -123,18 +140,8 @@ if (['master', 'feature', 'release', 'hotfix'].contains(branchType)) {
         wrappers {
             xvfb('default')
         }
+        extractDeliveryArtifacts delegate
         steps {
-            // Cleaning the workspace
-            shell 'rm -rf *'
-            // Copy of artifacts
-            copyArtifacts("${SEED_PROJECT}-${SEED_BRANCH}-build") {
-                flatten()
-                buildSelector {
-                    upstreamBuild()
-                }
-            }
-            // Expanding the delivery ZIP
-            shell 'unzip ontrack-*-delivery.zip'
             // Runs the CI acceptance tests
             gradle """\
 ciAcceptanceTest -PacceptanceJar=ontrack-acceptance.jar
@@ -189,11 +196,11 @@ docker logout
 """
         }
         publishers {
-//            downstreamParameterized {
-//                TODO trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do", 'SUCCESS', false) {
-//                    currentBuild()
-//                }
-//            }
+            downstreamParameterized {
+                trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do", 'SUCCESS', false) {
+                    currentBuild()
+                }
+            }
         }
         configure { node ->
             node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
@@ -219,9 +226,17 @@ docker logout
         }
         wrappers {
             injectPasswords()
+            xvfb('default')
         }
+        extractDeliveryArtifacts delegate
         steps {
-            shell readFileFromWorkspace('seed/do-acceptance.sh')
+            // Runs the CI acceptance tests
+            gradle '''\
+doAcceptanceTest
+-PacceptanceJar=ontrack-acceptance.jar
+-PdigitalOceanAccessToken=${DO_TOKEN}
+-PontrackVersion=${VERSION_FULL}
+'''
         }
         publishers {
             archiveJunit('ontrack-acceptance.xml')
@@ -232,11 +247,6 @@ docker logout
             }
         }
         configure { node ->
-            node / 'buildWrappers' / 'org.jenkinsci.plugins.xvfb.XvfbBuildWrapper' {
-                'installationName'('default')
-                'screen'('1024x768x24')
-                'displayNameOffset'('1')
-            }
             node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
                 'project'('ontrack')
                 'branch'(NAME)
