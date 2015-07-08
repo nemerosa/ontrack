@@ -306,7 +306,7 @@ task doEnv {
 }
 
 task doDockerStart(type: DockerStart) {
-    machine = "ontrack-acceptance-${ontrackVersion}:/var/ontrack/conf"
+    machine = "ontrack-acceptance-${ontrackVersion}"
     image = "nemerosa/ontrack:${ontrackVersion}"
     conf = file('/var/ontrack/conf')
     profile = 'acceptance'
@@ -314,7 +314,7 @@ task doDockerStart(type: DockerStart) {
 }
 
 task doDockerStop(type: DockerStop) {
-    machine = "ontrack-acceptance-${ontrackVersion}:/var/ontrack/conf"
+    machine = "ontrack-acceptance-${ontrackVersion}"
     startTask = 'doDockerStart'
 }
 
