@@ -46,7 +46,7 @@ public class DecorationServiceImpl implements DecorationService {
         List<Decoration> decorations = new ArrayList<>();
         // Built-in decorations
         decorations.addAll(
-                builtinDecorators.parallelStream()
+                builtinDecorators.stream()
                         // ... and gets the decorations
                         .flatMap(securedDecoratorFunction)
                                 // OK
@@ -55,7 +55,7 @@ public class DecorationServiceImpl implements DecorationService {
         // Extended decorations
         decorations.addAll(
                 extensionManager.getExtensions(DecorationExtension.class)
-                        .parallelStream()
+                        .stream()
                                 // ... and filters per entity
                         .filter(decorator -> decorator.getScope().contains(entity.getProjectEntityType()))
                                 // ... and gets the decoration
