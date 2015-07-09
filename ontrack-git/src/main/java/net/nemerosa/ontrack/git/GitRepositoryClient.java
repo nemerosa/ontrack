@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.git;
 
+import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.git.model.GitCommit;
 import net.nemerosa.ontrack.git.model.GitDiff;
 import net.nemerosa.ontrack.git.model.GitLog;
@@ -135,4 +136,9 @@ public interface GitRepositoryClient {
      * @return Unified diff
      */
     String unifiedDiff(String from, String to, Predicate<String> pathFilter);
+
+    /**
+     * Downloads a document
+     */
+    Optional<Document> download(String path);
 }

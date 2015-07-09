@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.git.support;
 
 import com.google.common.collect.Lists;
+import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.common.Utils;
 import net.nemerosa.ontrack.git.GitRepository;
@@ -9,6 +10,7 @@ import net.nemerosa.ontrack.git.exceptions.*;
 import net.nemerosa.ontrack.git.model.*;
 import net.nemerosa.ontrack.git.model.plot.GPlot;
 import net.nemerosa.ontrack.git.model.plot.GitPlotRenderer;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
@@ -284,6 +286,28 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
             throw new GitRepositoryAPIException(repository.getRemote(), e);
         } catch (IOException e) {
             throw new GitRepositoryIOException(repository.getRemote(), e);
+        }
+    }
+
+    @Override
+    public Optional<Document> download(String path) {
+        // Sync first
+        sync(logger::debug);
+        // Access to the file
+        File file = new File(repositoryDir, path);
+        if (file.exists()) {
+            try {
+                return Optional.of(
+                        new Document(
+                                "text/plain",
+                                FileUtils.readFileToByteArray(file)
+                        )
+                );
+            } catch (IOException e) {
+                return Optional.empty();
+            }
+        } else {
+            return Optional.empty();
         }
     }
 

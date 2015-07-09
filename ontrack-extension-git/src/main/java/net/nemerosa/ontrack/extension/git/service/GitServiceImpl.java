@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.git.service;
 
 import com.google.common.collect.Lists;
+import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequestDifferenceProjectException;
 import net.nemerosa.ontrack.extension.git.model.*;
@@ -215,6 +216,12 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                 .map(GitConfiguration::getGitRepository)
                 .map(gitRepositoryClientFactory::getClient)
                 .orElseThrow(() -> new GitProjectNotConfiguredException(project.getId()));
+    }
+
+    protected GitRepositoryClient getGitRepositoryClient(Branch branch) {
+        return gitRepositoryClientFactory.getClient(
+                getRequiredBranchConfiguration(branch).getConfiguration().getGitRepository()
+        );
     }
 
     @Override
@@ -484,6 +491,17 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                 commitTo,
                 pathFilter
         );
+    }
+
+    @Override
+    public Optional<Document> download(Branch branch, String path) {
+        Transaction tx = transactionService.start();
+        try {
+            GitRepositoryClient client = getGitRepositoryClient(branch);
+            return client.download(path);
+        } finally {
+            tx.close();
+        }
     }
 
     private OntrackGitCommitInfo getOntrackGitCommitInfo(String commit) {

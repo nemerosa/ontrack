@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.git.service;
 
+import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.git.model.*;
 import net.nemerosa.ontrack.model.Ack;
@@ -105,4 +106,9 @@ public interface GitService {
      * Gets a diff on a list of file changes, filtering the changes using ANT-like patterns
      */
     String diff(GitChangeLog changeLog, List<String> patterns);
+
+    /**
+     * Downloads the file at the given path for a branch
+     */
+    Optional<Document> download(Branch branch, String path);
 }
