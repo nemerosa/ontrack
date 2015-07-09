@@ -82,7 +82,8 @@ angular.module('ot.directive.entity', [
                     return 'assets/extension/decoration/' + decoration.decorationType + '/' + decoration.id + '.png';
                 };
                 scope.decorationClassName = function (decoration) {
-                    return (decoration.decorationType + '.' + decoration.id).replace(/\./g, '-');
+                    return (decoration.decorationType).replace(/\./g, '-') +
+                        (decoration.decorationType + '.' + decoration.id).replace(/\./g, '-');
                 };
             });
         }
