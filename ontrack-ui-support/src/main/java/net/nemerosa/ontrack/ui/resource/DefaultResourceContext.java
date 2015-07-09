@@ -121,6 +121,24 @@ public class DefaultResourceContext implements ResourceContext {
         }
 
         @Override
+        public LinksBuilder link(String name, ProjectEntity projectEntity, boolean allowed) {
+            if (allowed) {
+                return link(name, uriBuilder.getEntityURI(projectEntity));
+            } else {
+                return this;
+            }
+        }
+
+        @Override
+        public LinksBuilder page(String name, boolean allowed, ProjectEntity projectEntity) {
+            if (allowed) {
+                return link(name, uriBuilder.getEntityPage(projectEntity));
+            } else {
+                return this;
+            }
+        }
+
+        @Override
         public List<Link> build() {
             return new ArrayList<>(links.values());
         }
