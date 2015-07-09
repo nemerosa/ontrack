@@ -6,9 +6,7 @@ import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.BranchType;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.structure.StructureService;
-import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
-import net.nemerosa.ontrack.ui.resource.Link;
-import net.nemerosa.ontrack.ui.resource.ResourceContext;
+import net.nemerosa.ontrack.ui.resource.*;
 
 import java.util.List;
 
@@ -16,16 +14,18 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
 
+    private final ResourceDecorationContributorService resourceDecorationContributorService;
     private final StructureService structureService;
 
-    protected BranchResourceDecorator(StructureService structureService) {
+    protected BranchResourceDecorator(ResourceDecorationContributorService resourceDecorationContributorService, StructureService structureService) {
         super(Branch.class);
+        this.resourceDecorationContributorService = resourceDecorationContributorService;
         this.structureService = structureService;
     }
 
     @Override
     public List<Link> links(Branch branch, ResourceContext resourceContext) {
-        return resourceContext.links()
+        LinksBuilder linksBuilder = resourceContext.links()
                 .self(on(BranchController.class).getBranch(branch.getId()))
                 .link(
                         "_project",
@@ -193,9 +193,11 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                                 && (resourceContext.isProjectFunctionGranted(branch, BranchTemplateMgt.class)
                                 || resourceContext.isProjectFunctionGranted(branch, BranchTemplateSync.class)
                         )
-                )
-                        // OK
-                .build();
+                );
+        // Contributions
+        resourceDecorationContributorService.contribute(linksBuilder, branch);
+        // OK
+        return linksBuilder.build();
     }
 
 }
