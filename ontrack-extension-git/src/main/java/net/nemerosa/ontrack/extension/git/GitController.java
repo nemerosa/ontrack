@@ -384,8 +384,8 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
      *
      * @param branchId ID to download a document from
      */
-    @RequestMapping(value = "download/{branchId}/{path:.*}")
-    public String download(@PathVariable ID branchId, @PathVariable String path) {
+    @RequestMapping(value = "download/{branchId}")
+    public String download(@PathVariable ID branchId, String path) {
         return gitService.download(structureService.getBranch(branchId), path).orElseThrow(
                 () -> new SCMDocumentNotFoundException(path)
         );
