@@ -45,6 +45,23 @@ public final class Utils {
      * @return Output of the command
      */
     public static String run(File wd, String cmd, String... args) {
+        try {
+            return IOUtils.toString(runAsBytes(wd, cmd, args), "UTF-8");
+        } catch (IOException ex) {
+            throw new ProcessRunException("Error while executing " + cmd + " command: " + ex.getMessage());
+        }
+    }
+
+    /**
+     * Runs a command in the <code>wd</code> directory and returns its output. In case of error (exit
+     * code different than 0), an exception is thrown.
+     *
+     * @param wd   Directory where to execute the command
+     * @param cmd  Command to execute
+     * @param args Command parameters
+     * @return Output of the command
+     */
+    public static byte[] runAsBytes(File wd, String cmd, String... args) {
         // Complete list of arguments
         List<String> list = new ArrayList<>();
         list.add(cmd);
@@ -59,7 +76,7 @@ public final class Utils {
                 String error = IOUtils.toString(process.getErrorStream());
                 throw new ProcessExitException(exit, error);
             } else {
-                return IOUtils.toString(process.getInputStream());
+                return IOUtils.toByteArray(process.getInputStream());
             }
         } catch (IOException | InterruptedException ex) {
             throw new ProcessRunException("Error while executing " + cmd + " command: " + ex.getMessage());

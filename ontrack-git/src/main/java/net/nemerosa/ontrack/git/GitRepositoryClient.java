@@ -140,5 +140,5 @@ public interface GitRepositoryClient {
     /**
      * Downloads a document
      */
-    Optional<Document> download(String path);
+    Optional<Document> download(String branch, String path);
 }

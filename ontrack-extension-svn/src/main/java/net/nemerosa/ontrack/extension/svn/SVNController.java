@@ -423,7 +423,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
      *
      * @param branchId ID to download a document from
      */
-    @RequestMapping(value = "download/{branchId}/{path}")
+    @RequestMapping(value = "download/{branchId}/{path:.*}")
     public Document download(@PathVariable ID branchId, @PathVariable String path) {
         return svnService.download(branchId, path).orElseThrow(
                 () -> new SCMDocumentNotFoundException(path)

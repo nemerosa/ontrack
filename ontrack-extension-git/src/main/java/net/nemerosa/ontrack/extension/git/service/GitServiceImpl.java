@@ -218,12 +218,6 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                 .orElseThrow(() -> new GitProjectNotConfiguredException(project.getId()));
     }
 
-    protected GitRepositoryClient getGitRepositoryClient(Branch branch) {
-        return gitRepositoryClientFactory.getClient(
-                getRequiredBranchConfiguration(branch).getConfiguration().getGitRepository()
-        );
-    }
-
     @Override
     public GitChangeLogCommits getChangeLogCommits(GitChangeLog changeLog) {
         // Gets the client
@@ -497,8 +491,11 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     public Optional<Document> download(Branch branch, String path) {
         Transaction tx = transactionService.start();
         try {
-            GitRepositoryClient client = getGitRepositoryClient(branch);
-            return client.download(path);
+            GitBranchConfiguration branchConfiguration = getRequiredBranchConfiguration(branch);
+            GitRepositoryClient client = gitRepositoryClientFactory.getClient(
+                    branchConfiguration.getConfiguration().getGitRepository()
+            );
+            return client.download(branchConfiguration.getBranch(), path);
         } finally {
             tx.close();
         }
