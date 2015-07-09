@@ -83,6 +83,7 @@ angular.module('ot.directive.entity', [
                 };
                 scope.decorationClassName = function (decoration) {
                     return (decoration.decorationType).replace(/\./g, '-') +
+                        ' ' +
                         (decoration.decorationType + '.' + decoration.id).replace(/\./g, '-');
                 };
             });
