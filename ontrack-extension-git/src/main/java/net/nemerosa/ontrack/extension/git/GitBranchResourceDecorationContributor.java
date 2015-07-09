@@ -28,7 +28,7 @@ public class GitBranchResourceDecorationContributor implements ResourceDecoratio
                 linksBuilder.link(
                         "_download",
                         MvcUriComponentsBuilder.on(GitController.class).download(
-                                branch.getId(), ""
+                                branch.getId(), null
                         )
                 );
             }
