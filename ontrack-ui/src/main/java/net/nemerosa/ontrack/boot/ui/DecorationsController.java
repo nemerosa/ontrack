@@ -8,8 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.concurrent.Callable;
-
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
@@ -28,8 +26,8 @@ public class DecorationsController extends AbstractProjectEntityController {
      * Decorations for an entity.
      */
     @RequestMapping(value = "{entityType}/{id}", method = RequestMethod.GET)
-    public Callable<Resources<Decoration>> getDecorations(@PathVariable ProjectEntityType entityType, @PathVariable ID id) {
-        return () -> Resources.of(
+    public Resources<Decoration> getDecorations(@PathVariable ProjectEntityType entityType, @PathVariable ID id) {
+        return Resources.of(
                 decorationService.getDecorations(getEntity(entityType, id)),
                 uri(on(getClass()).getDecorations(entityType, id))
         );
