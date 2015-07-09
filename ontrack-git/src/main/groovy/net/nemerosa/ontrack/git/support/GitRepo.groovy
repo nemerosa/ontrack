@@ -43,7 +43,9 @@ class GitRepo {
      * Creates or updates a file with some content, and optionally adds it to the index
      */
     void file(String path, String content, boolean add = true) {
-        new File(dir, path).text = content
+        def file = new File(dir, path)
+        file.parentFile.mkdirs()
+        file.text = content
         if (add) {
             git 'add', path
         }
