@@ -121,7 +121,7 @@ public class DefaultResourceContext implements ResourceContext {
         }
 
         @Override
-        public LinksBuilder link(String name, ProjectEntity projectEntity, boolean allowed) {
+        public LinksBuilder entityURI(String name, ProjectEntity projectEntity, boolean allowed) {
             if (allowed) {
                 return link(name, uriBuilder.getEntityURI(projectEntity));
             } else {
@@ -130,7 +130,7 @@ public class DefaultResourceContext implements ResourceContext {
         }
 
         @Override
-        public LinksBuilder page(String name, boolean allowed, ProjectEntity projectEntity) {
+        public LinksBuilder entityPage(String name, boolean allowed, ProjectEntity projectEntity) {
             if (allowed) {
                 return link(name, uriBuilder.getEntityPage(projectEntity));
             } else {

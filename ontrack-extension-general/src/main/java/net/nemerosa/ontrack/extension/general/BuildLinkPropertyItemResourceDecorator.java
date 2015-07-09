@@ -39,8 +39,8 @@ public class BuildLinkPropertyItemResourceDecorator extends AbstractResourceDeco
             } else {
                 Build build = builds.get(0);
                 return resourceContext.links()
-                        .link("_build", build, true)
-                        .page("_buildPage", true, build)
+                        .entityURI("_build", build, true)
+                        .entityPage("_buildPage", true, build)
                         .build();
             }
         } else {

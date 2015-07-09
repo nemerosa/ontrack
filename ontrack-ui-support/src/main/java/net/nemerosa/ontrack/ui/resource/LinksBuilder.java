@@ -22,7 +22,7 @@ public interface LinksBuilder {
 
     LinksBuilder link(String name, Object methodInvocation, boolean test);
 
-    LinksBuilder link(String name, ProjectEntity projectEntity, boolean allowed);
+    LinksBuilder entityURI(String name, ProjectEntity projectEntity, boolean allowed);
 
     LinksBuilder link(String name, Object methodInvocation, Class<? extends GlobalFunction> fn);
 
@@ -36,7 +36,7 @@ public interface LinksBuilder {
 
     LinksBuilder page(String name, boolean allowed, String path, Object... arguments);
 
-    LinksBuilder page(String name, boolean allowed, ProjectEntity projectEntity);
+    LinksBuilder entityPage(String name, boolean allowed, ProjectEntity projectEntity);
 
     LinksBuilder page(String name, Class<? extends GlobalFunction> fn, String path, Object... arguments);
 
