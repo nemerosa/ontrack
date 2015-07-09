@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.svn.client;
 
-import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.model.SVNHistory;
 import net.nemerosa.ontrack.extension.svn.model.SVNReference;
@@ -40,5 +39,5 @@ public interface SVNClient {
 
     String getDiff(SVNRepository repository, String path, List<Long> revisions);
 
-    Optional<Document> download(SVNRepository repository, String path);
+    Optional<String> download(SVNRepository repository, String path);
 }

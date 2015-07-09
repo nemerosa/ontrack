@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.svn.client;
 
-import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.common.Utils;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFileChangeType;
@@ -14,6 +13,7 @@ import net.nemerosa.ontrack.extension.svn.support.SVNLogEntryCollector;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
 import net.nemerosa.ontrack.tx.Transaction;
 import net.nemerosa.ontrack.tx.TransactionService;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,6 +24,7 @@ import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.wc.*;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -254,7 +255,7 @@ public class SVNClientImpl implements SVNClient {
     }
 
     @Override
-    public Optional<Document> download(SVNRepository repository, String path) {
+    public Optional<String> download(SVNRepository repository, String path) {
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             getWCClient(repository).doGetFileContents(
@@ -265,12 +266,9 @@ public class SVNClientImpl implements SVNClient {
                     out
             );
             return Optional.of(
-                    new Document(
-                            "text/plain",
-                            out.toByteArray()
-                    )
+                    IOUtils.toString(out.toByteArray(), "UTF-8")
             );
-        } catch (SVNException ex) {
+        } catch (SVNException | IOException ex) {
             return Optional.empty();
         }
     }

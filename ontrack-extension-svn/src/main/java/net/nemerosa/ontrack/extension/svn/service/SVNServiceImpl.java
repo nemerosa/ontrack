@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.svn.service;
 
-import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
@@ -396,12 +395,12 @@ public class SVNServiceImpl implements SVNService {
     }
 
     @Override
-    public Optional<Document> download(ID branchId, String path) {
+    public Optional<String> download(ID branchId, String path) {
         return getSVNRepository(structureService.getBranch(branchId))
                 .flatMap(repository -> download(repository, path));
     }
 
-    protected Optional<Document> download(SVNRepository repository, String path) {
+    protected Optional<String> download(SVNRepository repository, String path) {
         try (Transaction ignored = transactionService.start()) {
             return svnClient.download(repository, path);
         }
