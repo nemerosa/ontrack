@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.git;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.api.model.FileDiffChangeLogRequest;
@@ -386,7 +385,7 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
      * @param branchId ID to download a document from
      */
     @RequestMapping(value = "download/{branchId}/{path:.*}")
-    public Document download(@PathVariable ID branchId, @PathVariable String path) {
+    public String download(@PathVariable ID branchId, @PathVariable String path) {
         return gitService.download(structureService.getBranch(branchId), path).orElseThrow(
                 () -> new SCMDocumentNotFoundException(path)
         );

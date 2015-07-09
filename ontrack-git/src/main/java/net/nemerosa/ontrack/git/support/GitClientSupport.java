@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.git.support;
 
-import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.common.ProcessExitException;
 import net.nemerosa.ontrack.common.Utils;
 
@@ -47,14 +46,11 @@ public class GitClientSupport {
      * @param path     Path to download
      * @return Content of the file as text
      */
-    public static Optional<Document> showPath(File wd, String commitId, String path) {
+    public static Optional<String> showPath(File wd, String commitId, String path) {
         try {
             // Reads the file as bytes
             return Optional.of(
-                    new Document(
-                            "text/plain",
-                            Utils.runAsBytes(wd, "git", "show", String.format("%s:%s", commitId, path))
-                    )
+                    Utils.run(wd, "git", "show", String.format("%s:%s", commitId, path))
             );
         } catch (ProcessExitException ex) {
             if (ex.getExit() == 128) {

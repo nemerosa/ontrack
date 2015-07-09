@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.git.service;
 
 import com.google.common.collect.Lists;
-import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequestDifferenceProjectException;
 import net.nemerosa.ontrack.extension.git.model.*;
@@ -488,7 +487,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     @Override
-    public Optional<Document> download(Branch branch, String path) {
+    public Optional<String> download(Branch branch, String path) {
         Transaction tx = transactionService.start();
         try {
             GitBranchConfiguration branchConfiguration = getRequiredBranchConfiguration(branch);

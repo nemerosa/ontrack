@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.git.support;
 
 import com.google.common.collect.Lists;
-import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.common.Utils;
 import net.nemerosa.ontrack.git.GitRepository;
@@ -289,9 +288,9 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
     }
 
     @Override
-    public Optional<Document> download(String branch, String path) {
+    public Optional<String> download(String branch, String path) {
         // Sync first
-        sync(logger::debug);
+        // sync(logger::debug);
         // Git show
         return GitClientSupport.showPath(repositoryDir, branch, path);
     }
