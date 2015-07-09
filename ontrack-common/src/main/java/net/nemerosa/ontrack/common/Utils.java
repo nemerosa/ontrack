@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.common;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +15,8 @@ import java.util.Collections;
 import java.util.List;
 
 public final class Utils {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
 
     private Utils() {
     }
@@ -45,38 +49,26 @@ public final class Utils {
      * @return Output of the command
      */
     public static String run(File wd, String cmd, String... args) {
-        try {
-            return IOUtils.toString(runAsBytes(wd, cmd, args), "UTF-8");
-        } catch (IOException ex) {
-            throw new ProcessRunException("Error while executing " + cmd + " command: " + ex.getMessage());
-        }
-    }
-
-    /**
-     * Runs a command in the <code>wd</code> directory and returns its output. In case of error (exit
-     * code different than 0), an exception is thrown.
-     *
-     * @param wd   Directory where to execute the command
-     * @param cmd  Command to execute
-     * @param args Command parameters
-     * @return Output of the command
-     */
-    public static byte[] runAsBytes(File wd, String cmd, String... args) {
         // Complete list of arguments
         List<String> list = new ArrayList<>();
         list.add(cmd);
         list.addAll(Arrays.asList(args));
         try {
+            LOGGER.trace("RUN WITH {}", list);
             // Builds a process
             Process process = new ProcessBuilder(list).directory(wd).start();
             // Running the process and waiting for its completion
             int exit = process.waitFor();
+            LOGGER.trace("RUN EXIT {}", exit);
             // In case of error
             if (exit != 0) {
                 String error = IOUtils.toString(process.getErrorStream());
+                LOGGER.trace("RUN ERROR {}", error);
                 throw new ProcessExitException(exit, error);
             } else {
-                return IOUtils.toByteArray(process.getInputStream());
+                String output = IOUtils.toString(process.getInputStream());
+                LOGGER.trace("RUN OUT   {}", output);
+                return output;
             }
         } catch (IOException | InterruptedException ex) {
             throw new ProcessRunException("Error while executing " + cmd + " command: " + ex.getMessage());
