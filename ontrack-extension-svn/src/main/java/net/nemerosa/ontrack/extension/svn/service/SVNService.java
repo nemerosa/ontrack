@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.svn.service;
 
+import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.model.structure.Branch;
@@ -93,4 +94,9 @@ public interface SVNService {
      * @return Result of the test
      */
     ConnectionResult test(SVNConfiguration configuration);
+
+    /**
+     * Downloads the file at the given path for a branch
+     */
+    Optional<Document> download(ID branchId, String path);
 }

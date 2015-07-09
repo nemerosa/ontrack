@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.svn.client;
 
+import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.common.Utils;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFileChangeType;
@@ -250,6 +251,28 @@ public class SVNClientImpl implements SVNClient {
         }
 
         return Utils.toString(output.toByteArray());
+    }
+
+    @Override
+    public Optional<Document> download(SVNRepository repository, String path) {
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            getWCClient(repository).doGetFileContents(
+                    SVNUtils.toURL(repository.getUrl(path)),
+                    SVNRevision.HEAD,
+                    SVNRevision.HEAD,
+                    false,
+                    out
+            );
+            return Optional.of(
+                    new Document(
+                            "text/plain",
+                            out.toByteArray()
+                    )
+            );
+        } catch (SVNException ex) {
+            return Optional.empty();
+        }
     }
 
     private SCMChangeLogFileChangeType toFileChangeType(SVNStatusType modificationType) {

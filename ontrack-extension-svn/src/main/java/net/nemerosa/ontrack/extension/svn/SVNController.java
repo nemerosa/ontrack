@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.svn;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.api.model.FileDiffChangeLogRequest;
@@ -13,6 +14,7 @@ import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogIssue;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogUUIDException;
+import net.nemerosa.ontrack.extension.scm.model.SCMDocumentNotFoundException;
 import net.nemerosa.ontrack.extension.scm.service.SCMService;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.extension.svn.model.*;
@@ -414,6 +416,18 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     @RequestMapping(value = "sync/{branchId}", method = RequestMethod.POST)
     public SVNSyncInfoStatus launchSync(@PathVariable ID branchId) {
         return svnSyncService.launchSync(branchId);
+    }
+
+    /**
+     * Download a path for a branch
+     *
+     * @param branchId ID to download a document from
+     */
+    @RequestMapping(value = "download/{branchId}/{path}")
+    public Document download(@PathVariable ID branchId, @PathVariable String path) {
+        return svnService.download(branchId, path).orElseThrow(
+                () -> new SCMDocumentNotFoundException(path)
+        );
     }
 
 }

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.svn.client;
 
+import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.model.SVNHistory;
 import net.nemerosa.ontrack.extension.svn.model.SVNReference;
@@ -9,6 +10,7 @@ import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface SVNClient {
 
@@ -37,4 +39,6 @@ public interface SVNClient {
     List<String> getBranches(SVNRepository repository, SVNURL url);
 
     String getDiff(SVNRepository repository, String path, List<Long> revisions);
+
+    Optional<Document> download(SVNRepository repository, String path);
 }
