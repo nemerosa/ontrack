@@ -86,6 +86,11 @@ angular.module('ot.directive.entity', [
                         ' ' +
                         (decoration.decorationType + '.' + decoration.id).replace(/\./g, '-');
                 };
+                scope.decorationAction = function (decoration) {
+                    if (decoration.uri) {
+                        window.location = decoration.uri;
+                    }
+                };
             });
         }
 
