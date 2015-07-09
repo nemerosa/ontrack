@@ -12,7 +12,7 @@ import java.util.Collections;
 /**
  * Collection of {@link net.nemerosa.ontrack.ui.resource.ResourceDecorator} for the <code>general</code> extension.
  */
-// FIXME @Component
+@Component
 public class GeneralExtensionResourceModule extends AbstractResourceModule {
 
     private final StructureService structureService;

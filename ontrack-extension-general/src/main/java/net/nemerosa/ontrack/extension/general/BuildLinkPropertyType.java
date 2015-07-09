@@ -20,12 +20,12 @@ public class BuildLinkPropertyType extends AbstractPropertyType<BuildLinkPropert
 
     @Override
     public String getName() {
-        return "Build link";
+        return "Build links";
     }
 
     @Override
     public String getDescription() {
-        return "Build link.";
+        return "Build links.";
     }
 
     @Override
