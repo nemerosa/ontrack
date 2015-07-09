@@ -57,7 +57,7 @@ class GitDownloadIT extends AbstractServiceTestSupport {
             git 'init'
             file 'folder/file1', 'Content1'
             git 'commit', '-m', 'Commit 1'
-            git 'checkout', '-b', 'Branch1'
+            git 'checkout', '-b', 'branch1'
             git 'checkout', 'master'
             file 'folder/file1', 'Content2'
             git 'commit', '-m', 'Commit 2'
@@ -82,8 +82,8 @@ class GitDownloadIT extends AbstractServiceTestSupport {
 
         // Creates a project and branches
         Project project = doCreateProject()
-        Branch branch1 = doCreateBranch(project, nd("Branch1", ""))
-        Branch master = doCreateBranch(project, nd("Master", ""))
+        Branch branch1 = doCreateBranch(project, nd("branch1", ""))
+        Branch master = doCreateBranch(project, nd("master", ""))
 
         // Configures the project
         asUser().with(project, ProjectEdit).call {
