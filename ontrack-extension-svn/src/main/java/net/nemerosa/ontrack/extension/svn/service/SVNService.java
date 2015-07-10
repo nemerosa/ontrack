@@ -93,4 +93,9 @@ public interface SVNService {
      * @return Result of the test
      */
     ConnectionResult test(SVNConfiguration configuration);
+
+    /**
+     * Downloads the file at the given path for a branch
+     */
+    Optional<String> download(ID branchId, String path);
 }

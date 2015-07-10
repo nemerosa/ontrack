@@ -374,7 +374,7 @@ public class SVNServiceImpl implements SVNService {
     @Override
     public ConnectionResult test(SVNConfiguration configuration) {
         //noinspection unused
-        try(Transaction tx = transactionService.start()) {
+        try (Transaction tx = transactionService.start()) {
             // Creates a repository
             SVNRepository repository = SVNRepository.of(
                     0,
@@ -391,6 +391,18 @@ public class SVNServiceImpl implements SVNService {
             return ok ? ConnectionResult.ok() : ConnectionResult.error(configuration.getUrl() + " does not exist.");
         } catch (Exception ex) {
             return ConnectionResult.error(ex.getMessage());
+        }
+    }
+
+    @Override
+    public Optional<String> download(ID branchId, String path) {
+        return getSVNRepository(structureService.getBranch(branchId))
+                .flatMap(repository -> download(repository, path));
+    }
+
+    protected Optional<String> download(SVNRepository repository, String path) {
+        try (Transaction ignored = transactionService.start()) {
+            return svnClient.download(repository, path);
         }
     }
 

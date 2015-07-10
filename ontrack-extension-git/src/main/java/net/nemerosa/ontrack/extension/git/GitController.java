@@ -16,6 +16,7 @@ import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogIssue;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogUUIDException;
+import net.nemerosa.ontrack.extension.scm.model.SCMDocumentNotFoundException;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory;
 import net.nemerosa.ontrack.model.Ack;
@@ -376,5 +377,19 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
                 gitService.getCommitInfo(branchId, commit),
                 uri(on(getClass()).commitInfo(branchId, commit))
         ).withView(Build.class);
+    }
+
+    /**
+     * Download a path for a branch
+     *
+     * @param branchId ID to download a document from
+     */
+    @RequestMapping(value = "download/{branchId}")
+    public ResponseEntity<String> download(@PathVariable ID branchId, String path) {
+        return gitService.download(structureService.getBranch(branchId), path)
+                .map(ResponseEntity::ok)
+                .orElseThrow(
+                        () -> new SCMDocumentNotFoundException(path)
+                );
     }
 }

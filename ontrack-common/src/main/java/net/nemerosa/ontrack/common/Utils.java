@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.common;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +15,8 @@ import java.util.Collections;
 import java.util.List;
 
 public final class Utils {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
 
     private Utils() {
     }
@@ -50,16 +54,21 @@ public final class Utils {
         list.add(cmd);
         list.addAll(Arrays.asList(args));
         try {
+            LOGGER.trace("RUN WITH {}", list);
             // Builds a process
             Process process = new ProcessBuilder(list).directory(wd).start();
             // Running the process and waiting for its completion
             int exit = process.waitFor();
+            LOGGER.trace("RUN EXIT {}", exit);
             // In case of error
             if (exit != 0) {
                 String error = IOUtils.toString(process.getErrorStream());
+                LOGGER.trace("RUN ERROR {}", error);
                 throw new ProcessExitException(exit, error);
             } else {
-                return IOUtils.toString(process.getInputStream());
+                String output = IOUtils.toString(process.getInputStream());
+                LOGGER.trace("RUN OUT   {}", output);
+                return output;
             }
         } catch (IOException | InterruptedException ex) {
             throw new ProcessRunException("Error while executing " + cmd + " command: " + ex.getMessage());

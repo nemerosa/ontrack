@@ -166,6 +166,13 @@ class Branch extends AbstractProjectResource {
         b
     }
 
+    /**
+     * Download file from the branch SCM
+     */
+    String download(String path) {
+        ontrack.text(query(link('download'), [path: path]))
+    }
+
     BranchProperties getConfig() {
         new BranchProperties(ontrack, this)
     }
