@@ -60,7 +60,7 @@ public abstract class AbstractIssueServiceExtension extends AbstractExtension im
      * Export of both text and HTML by default.
      */
     @Override
-    public List<ExportFormat> exportFormats() {
+    public List<ExportFormat> exportFormats(IssueServiceConfiguration issueServiceConfiguration) {
         return issueExportServiceFactory.getIssueExportServices().stream()
                 .map(IssueExportService::getExportFormat)
                 .collect(Collectors.toList());
