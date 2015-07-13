@@ -65,6 +65,25 @@ class SVNTestRepo {
         run repo, 'svn', 'mkdir', '--message', message, '--parents', '--username', 'user', '--password', 'test', '--no-auth-cache', "svn://localhost/${path}"
     }
 
+    def file(String path, String content, String message) {
+        File wc = File.createTempFile("wc-${repoName}", '.d')
+        FileUtils.deleteQuietly(wc)
+        wc.mkdirs()
+        try {
+            // Download
+            run wc, 'svn', 'checkout', "svn://localhost", wc.absolutePath
+            // Edition
+            File file = new File(wc, path)
+            file.parentFile.mkdirs()
+            file.text = content
+            // Addition and commit
+            run wc, 'svn', 'add', '--force', '--parents', path
+            run wc, 'svn', 'commit', '.', '--message', message, '--username', 'user', '--password', 'test', '--no-auth-cache'
+        } finally {
+            FileUtils.deleteQuietly(wc)
+        }
+    }
+
     /**
      * Merges {@code from} into {@code to} using the {@code wd} working directory.
      */
