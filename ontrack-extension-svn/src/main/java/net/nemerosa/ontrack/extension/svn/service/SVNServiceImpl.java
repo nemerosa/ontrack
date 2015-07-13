@@ -13,6 +13,7 @@ import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.ConnectionResult;
 import net.nemerosa.ontrack.tx.Transaction;
 import net.nemerosa.ontrack.tx.TransactionService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -396,13 +397,27 @@ public class SVNServiceImpl implements SVNService {
 
     @Override
     public Optional<String> download(ID branchId, String path) {
-        return getSVNRepository(structureService.getBranch(branchId))
-                .flatMap(repository -> download(repository, path));
-    }
-
-    protected Optional<String> download(SVNRepository repository, String path) {
-        try (Transaction ignored = transactionService.start()) {
-            return svnClient.download(repository, path);
+        Branch branch = structureService.getBranch(branchId);
+        // If project configured...
+        Optional<SVNRepository> oSvnRepository = getSVNRepository(branch);
+        if (oSvnRepository.isPresent()) {
+            // SVN Branch configuration
+            Optional<SVNBranchConfigurationProperty> oSvnBranchConfigurationProperty = propertyService.getProperty(
+                    branch,
+                    SVNBranchConfigurationPropertyType.class
+            ).option();
+            if (oSvnBranchConfigurationProperty.isPresent()) {
+                String pathInBranch = StringUtils.stripEnd(oSvnBranchConfigurationProperty.get().getBranchPath(), "/")
+                        + "/"
+                        + StringUtils.stripStart(path, "/");
+                try (Transaction ignored = transactionService.start()) {
+                    return svnClient.download(oSvnRepository.get(), pathInBranch);
+                }
+            } else {
+                return Optional.empty();
+            }
+        } else {
+            return Optional.empty();
         }
     }
 

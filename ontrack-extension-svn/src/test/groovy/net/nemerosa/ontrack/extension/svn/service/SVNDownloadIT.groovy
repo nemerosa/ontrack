@@ -69,7 +69,7 @@ class SVNDownloadIT extends AbstractServiceTestSupport {
         repo.mkdir 'SVNDownload/trunk', 'Trunk'
         repo.file 'SVNDownload/trunk/folder/file1', 'Content 1', 'Commit file'
         repo.copy 'SVNDownload/trunk', 'SVNDownload/branches/v1', 'Branch 1'
-        repo.file 'SVNDownload/trunk/folder/file1', 'Content 1', 'Commit file'
+        repo.file 'SVNDownload/trunk/folder/file1', 'Content 2', 'Commit file'
 
         /**
          * Definition of the repository
@@ -135,8 +135,8 @@ class SVNDownloadIT extends AbstractServiceTestSupport {
          */
 
         asUser().with(project, ProjectConfig).call {
-            assert svnService.download(branch1.id, 'folder/file1').get() == 'Content1'
-            assert svnService.download(trunk.id, 'folder/file1').get() == 'Content2'
+            assert svnService.download(branch1.id, 'folder/file1').get() == 'Content 1'
+            assert svnService.download(trunk.id, 'folder/file1').get() == 'Content 2'
         }
 
     }
