@@ -260,11 +260,11 @@ class DOSetup extends AbstractCDTask {
         project.exec {
             executable 'docker-machine'
             args 'create',
-                    '--driver', 'digitalocean',
-                    '--digitalocean-access-token', apiToken,
-                    '--digitalocean-image', 'docker',
-                    '--digitalocean-region', region,
-                    '--digitalocean-size', size,
+                    '--driver=digitalocean',
+                    "--digitalocean-access-token=${apiToken}",
+                    "--digitalocean-image=docker",
+                    "--digitalocean-region=${region}",
+                    "--digitalocean-size=${size}",
                     dropletName
         }
         // Gets its IP
