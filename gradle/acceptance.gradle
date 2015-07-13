@@ -256,8 +256,6 @@ class DOSetup extends AbstractCDTask {
 
     @TaskAction
     def setup() {
-        // FIXME Debug
-        println "DO Token - ${apiToken.toUpperCase()}"
         // Creates the machine
         project.exec {
             executable 'docker-machine'
