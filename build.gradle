@@ -1,8 +1,15 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3"
+    }
+}
+
 plugins {
     id 'net.nemerosa.versioning' version '1.2.0'
 }
-
-apply plugin: 'maven'
 
 /**
  * Meta information
@@ -82,12 +89,6 @@ configure(javaProjects) {
 }
 
 /**
- * Publication in Maven repository
- */
-
-apply from: 'gradle/maven.gradle'
-
-/**
  * Packaging for delivery
  */
 
@@ -104,6 +105,14 @@ apply from: 'gradle/docker.gradle'
  */
 
 apply from: 'gradle/acceptance.gradle'
+
+/**
+ * Publication tasks
+ */
+
+if (project.hasProperty('publication')) {
+    apply from: 'gradle/publication.gradle'
+}
 
 /**
  * General test report

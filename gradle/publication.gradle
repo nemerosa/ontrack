@@ -1,0 +1,78 @@
+/**
+ * Release and publication tasks
+ */
+
+/**
+ * Maven publication
+ */
+
+apply plugin: 'signing'
+apply plugin: 'maven'
+apply plugin: 'io.codearte.nexus-staging'
+
+if (!project.properties.ontrackVersion) throw new GradleException("Missing ontrackVersion property")
+if (!project.properties.ossrhUser) throw new GradleException("Missing ossrhUser property")
+if (!project.properties.ossrhPassword) throw new GradleException("Missing ossrhPassword property")
+
+artifacts {
+    archives file: file("ontrack-dsl-${ontrackVersion}.pom"), extension: 'pom'
+    archives file: file("ontrack-dsl-${ontrackVersion}.jar")
+    archives file: file("ontrack-dsl-${ontrackVersion}-sources.jar"), classifier: 'sources'
+    archives file: file("ontrack-dsl-${ontrackVersion}-javadoc.jar"), classifier: 'javadoc'
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUser, password: ossrhPassword)
+            }
+        }
+    }
+}
+
+nexusStaging {
+    username = ossrhUser
+    password = ossrhPassword
+    numberOfRetries = 30
+}
+
+task publicationCollectArtifacts(type: Copy) {
+    description = "Test task to collect built artifacts for testing the publication"
+    dependsOn ':ontrack-dsl:assemble'
+    from(project(':ontrack-dsl').file('build/libs')) {
+        include '*.jar'
+    }
+    from(project(':ontrack-dsl').file('build/poms')) {
+        include '*.pom'
+    }
+    into projectDir
+
+}
+
+task publicationMaven {
+    description = "Publication of the DSL library to the Maven Central"
+    dependsOn 'uploadArchives'
+    // TODO finalizedBy 'closeAndPromoteRepository'
+}
+
+// TODO GitHub release
+// TODO Upload of artifacts in GitHub
+// TODO Getting the change log from Ontrack
+// TODO Setting the change log as description in the GitHub release
+
+task publicationGitHubRelease {
+//    dependsOn publicationGitHubReleaseCreate
+//    dependsOn publicationGitHubReleaseUpload
+//    dependsOn publicationGitHubReleaseUpload
+}
+
+task publicationRelease {
+    dependsOn publicationMaven
+    dependsOn publicationGitHubRelease
+    // TODO finalizedBy 'closeAndPromoteRepository'
+}

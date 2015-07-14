@@ -2,6 +2,8 @@
  * Packaging of Gradle related files
  */
 
+apply plugin: 'base'
+
 task deliveryPackage(type: Zip) {
     from projectDir
     include '*.gradle'
