@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.svn;
 
 import net.nemerosa.ontrack.extension.svn.service.SVNService;
+import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
@@ -29,7 +30,8 @@ public class SVNBranchResourceDecorationContributor implements ResourceDecoratio
                         "_download",
                         MvcUriComponentsBuilder.on(SVNController.class).download(
                                 branch.getId(), ""
-                        )
+                        ),
+                        ProjectConfig.class, projectEntity
                 );
             }
         }

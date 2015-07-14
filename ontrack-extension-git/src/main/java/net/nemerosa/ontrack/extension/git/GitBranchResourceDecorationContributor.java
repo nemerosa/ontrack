@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.git;
 
 import net.nemerosa.ontrack.extension.git.service.GitService;
+import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
@@ -29,7 +30,8 @@ public class GitBranchResourceDecorationContributor implements ResourceDecoratio
                         "_download",
                         MvcUriComponentsBuilder.on(GitController.class).download(
                                 branch.getId(), null
-                        )
+                        ),
+                        ProjectConfig.class, projectEntity
                 );
             }
         }

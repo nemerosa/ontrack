@@ -9,6 +9,8 @@ import net.nemerosa.ontrack.extension.svn.db.*;
 import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.extension.svn.property.*;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
+import net.nemerosa.ontrack.model.security.ProjectConfig;
+import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.ConnectionResult;
 import net.nemerosa.ontrack.tx.Transaction;
@@ -39,6 +41,7 @@ public class SVNServiceImpl implements SVNService {
     private final SVNRepositoryDao repositoryDao;
     private final SVNClient svnClient;
     private final TransactionService transactionService;
+    private final SecurityService securityService;
 
     @Autowired
     public SVNServiceImpl(
@@ -50,7 +53,9 @@ public class SVNServiceImpl implements SVNService {
             SVNIssueRevisionDao issueRevisionDao,
             SVNEventDao eventDao,
             SVNRepositoryDao repositoryDao,
-            SVNClient svnClient, TransactionService transactionService) {
+            SVNClient svnClient,
+            TransactionService transactionService,
+            SecurityService securityService) {
         this.structureService = structureService;
         this.propertyService = propertyService;
         this.issueServiceRegistry = issueServiceRegistry;
@@ -61,6 +66,7 @@ public class SVNServiceImpl implements SVNService {
         this.repositoryDao = repositoryDao;
         this.svnClient = svnClient;
         this.transactionService = transactionService;
+        this.securityService = securityService;
     }
 
     @Override
@@ -398,6 +404,8 @@ public class SVNServiceImpl implements SVNService {
     @Override
     public Optional<String> download(ID branchId, String path) {
         Branch branch = structureService.getBranch(branchId);
+        // Security check
+        securityService.checkProjectFunction(branch, ProjectConfig.class);
         // If project configured...
         Optional<SVNRepository> oSvnRepository = getSVNRepository(branch);
         if (oSvnRepository.isPresent()) {
