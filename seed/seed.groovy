@@ -231,11 +231,12 @@ docker logout
         extractDeliveryArtifacts delegate
         steps {
             // Runs the CI acceptance tests
-            gradle '''\
-doAcceptanceTest
--PacceptanceJar=ontrack-acceptance.jar
--PdigitalOceanAccessToken=${DO_TOKEN}
--PontrackVersion=${VERSION_FULL}
+            shell '''\
+./gradlew \\
+    doAcceptanceTest \\
+    -PacceptanceJar=ontrack-acceptance.jar \\
+    -PdigitalOceanAccessToken=${DO_TOKEN} \\
+    -PontrackVersion=${VERSION_FULL}
 '''
         }
         publishers {
