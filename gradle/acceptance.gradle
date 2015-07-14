@@ -193,6 +193,8 @@ class RemoteAcceptanceTest extends DefaultTask {
 
     int acceptanceTimeout = 120
 
+    int acceptanceImplicitWait = 5
+
     @TaskAction
     def launch() {
         // URL
@@ -215,7 +217,8 @@ class RemoteAcceptanceTest extends DefaultTask {
                     "--ontrack.admin=${acceptancePassword}",
                     "--ontrack.disableSsl=${disableSsl}",
                     "--ontrack.context=${acceptanceContext}",
-                    "--ontrack.timeout=${acceptanceTimeout}"
+                    "--ontrack.timeout=${acceptanceTimeout}",
+                    "--ontrack.implicitWait=${acceptanceImplicitWait}"
         }
     }
 }
@@ -329,6 +332,7 @@ task doDockerStop(type: DockerStop) {
 
 task doAcceptanceTest(type: RemoteAcceptanceTest) {
     acceptanceUrl = { "https://${doSetup.ip}" }
+    acceptanceImplicitWait = 20
     disableSsl = true
     dependsOn doSetup
     dependsOn doEnv

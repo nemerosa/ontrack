@@ -31,6 +31,7 @@ class AcceptanceConfig {
     private String admin = "admin";
     private Set<String> context = Collections.emptySet();
     private int timeout = 120;
+    private int implicitWait = 5; // GUI implicit wait, in seconds
 
     @PostConstruct
     void check() throws InterruptedException, ExecutionException, TimeoutException {
@@ -64,6 +65,7 @@ class AcceptanceConfig {
         System.setProperty("ontrack.url", url);
         System.setProperty("ontrack.admin", admin);
         System.setProperty("ontrack.disableSSL", String.valueOf(disableSsl));
+        System.setProperty("ontrack.implicitWait", String.valueOf(implicitWait));
     }
 
     private class AcceptanceTargetCheck implements Callable<String> {
