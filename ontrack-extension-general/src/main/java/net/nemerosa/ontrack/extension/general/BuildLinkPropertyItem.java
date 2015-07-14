@@ -5,15 +5,25 @@ import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.BuildSearchForm;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.StructureService;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Data
 public class BuildLinkPropertyItem {
 
     private final String project;
     private final String build;
+
+    public static BuildLinkPropertyItem of(String project, String build) {
+        return new BuildLinkPropertyItem(project, build);
+    }
+
+    public static BuildLinkPropertyItem of(Build build) {
+        return of(build.getBranch().getProject().getName(), build.getName());
+    }
 
     public Optional<Build> findBuild(StructureService structureService) {
         // Gets the project
@@ -32,6 +42,19 @@ public class BuildLinkPropertyItem {
         } else {
             return Optional.empty();
         }
+    }
+
+    /**
+     * Does one of the items match the project->build? The value can be blank (meaning all values)
+     * or contains wildcards (*).
+     */
+    public boolean match(String projectPattern, String buildPattern) {
+        return StringUtils.equals(this.project, projectPattern) &&
+                (
+                        StringUtils.isBlank(buildPattern) ||
+                                StringUtils.equals("*", buildPattern) ||
+                                Pattern.matches(StringUtils.replace(buildPattern, "*", ".*"), this.build)
+                );
     }
 
 }
