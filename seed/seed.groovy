@@ -275,16 +275,8 @@ docker logout
             injectPasswords()
             // toolenv('Maven-3.2.x')
         }
+        extractDeliveryArtifacts delegate
         steps {
-            // Cleaning the workspace
-            shell 'rm -rf *'
-            // Copy of artifacts
-            copyArtifacts("${SEED_PROJECT}-${SEED_BRANCH}-build") {
-                flatten()
-                buildSelector {
-                    upstreamBuild()
-                }
-            }
             // Publication
             if (release) {
                 gradle "-Ppublication publicationRelease"
