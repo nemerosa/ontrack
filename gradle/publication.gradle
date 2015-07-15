@@ -2,6 +2,15 @@
  * Release and publication tasks
  */
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'net.nemerosa:http-client-json:1.0.0'
+    }
+}
+
 /**
  * Maven publication
  */
@@ -58,15 +67,15 @@ task publicationCollectArtifacts(type: Copy) {
 
 }
 
-// TODO GitHub release
-// TODO Upload of artifacts in GitHub
-// TODO Getting the change log from Ontrack
-// TODO Setting the change log as description in the GitHub release
+task publicationGitHubReleaseCreate {
+
+}
 
 task publicationGitHubRelease {
-//    dependsOn publicationGitHubReleaseCreate
-//    dependsOn publicationGitHubReleaseUpload
-//    dependsOn publicationGitHubReleaseUpload
+    dependsOn publicationGitHubReleaseCreate
+// TODO dependsOn publicationGitHubReleaseUpload
+// TODO Getting the change log from Ontrack
+// TODO Setting the change log as description in the GitHub release
 }
 
 /**
