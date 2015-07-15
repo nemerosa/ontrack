@@ -87,8 +87,19 @@ class AutoPromotionPropertyIT extends AbstractServiceTestSupport {
         }
         assert clonedBranch.name == clonedBranchName
 
+        // Gets the cloned promotion level
+        def clonedPromotionLevel = asUser().with(clonedBranch, ProjectView).call {
+            structureService.findPromotionLevelByName(
+                    clonedBranch.project.name,
+                    clonedBranch.name,
+                    promotionLevel.name
+            ).get()
+        }
+
         // Gets the auto validation property for the cloned branch
-        def property = propertyService.getProperty(clonedBranch, AutoPromotionPropertyType)
+        def property = asUser().with(clonedPromotionLevel, ProjectView).call {
+            propertyService.getProperty(clonedPromotionLevel, AutoPromotionPropertyType)
+        }
         assert property != null
         assert !property.empty
         assert property.value != null

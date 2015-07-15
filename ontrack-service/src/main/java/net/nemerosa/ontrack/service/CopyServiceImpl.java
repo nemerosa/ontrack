@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.security.BranchEdit;
@@ -134,10 +133,10 @@ public class CopyServiceImpl implements CopyService {
     protected void doCopy(Branch sourceBranch, Branch targetBranch, Function<String, String> replacementFn, SyncPolicy syncPolicy) {
         // Branch properties
         doCopyProperties(sourceBranch, targetBranch, replacementFn, syncPolicy);
-        // Promotion level and properties
-        doCopyPromotionLevels(sourceBranch, targetBranch, replacementFn, syncPolicy);
         // Validation stamps and properties
         doCopyValidationStamps(sourceBranch, targetBranch, replacementFn, syncPolicy);
+        // Promotion level and properties
+        doCopyPromotionLevels(sourceBranch, targetBranch, replacementFn, syncPolicy);
         // User filters
         doCopyUserBuildFilters(sourceBranch, targetBranch);
     }
@@ -237,12 +236,12 @@ public class CopyServiceImpl implements CopyService {
 
                     @Override
                     public void createTargetItem(Property<?> sourceProperty) {
-                        doCopyProperty(sourceProperty, target, replacementFn);
+                        doCopyProperty(source, sourceProperty, target, replacementFn);
                     }
 
                     @Override
                     public void replaceTargetItem(Property<?> sourceProperty, Property<?> targetProperty) {
-                        doCopyProperty(sourceProperty, target, replacementFn);
+                        doCopyProperty(source, sourceProperty, target, replacementFn);
                     }
 
                     @Override
@@ -324,17 +323,14 @@ public class CopyServiceImpl implements CopyService {
         );
     }
 
-    protected <T> void doCopyProperty(Property<T> property, ProjectEntity targetEntity, Function<String, String> replacementFn) {
+    protected <T> void doCopyProperty(ProjectEntity sourceEntity, Property<T> property, ProjectEntity targetEntity, Function<String, String> replacementFn) {
         if (!property.isEmpty() && property.getType().canEdit(targetEntity, securityService)) {
-            // Property value replacement
-            T data = property.getType().replaceValue(property.getValue(), replacementFn);
-            // Property data
-            JsonNode jsonData = property.getType().forStorage(data);
-            // Creates the property
-            propertyService.editProperty(
+            // Copy of the property
+            propertyService.copyProperty(
+                    sourceEntity,
+                    property,
                     targetEntity,
-                    property.getType().getTypeName(),
-                    jsonData
+                    replacementFn
             );
         }
     }

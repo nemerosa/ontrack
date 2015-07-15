@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.form.Form;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -102,4 +103,15 @@ public interface PropertyService {
     default <T> boolean hasProperty(ProjectEntity entity, Class<? extends PropertyType<T>> propertyTypeClass) {
         return !getProperty(entity, propertyTypeClass).isEmpty();
     }
+
+    /**
+     * Copy/clones the {@code property} into the {@code targetEntity} after applying the replacement function.
+     *
+     * @param sourceEntity  Owner of the property to copy
+     * @param property      Property to copy
+     * @param targetEntity  Entity to associate the new property with
+     * @param replacementFn Replacement function for textual values
+     * @param <T>           Type of the property
+     */
+    <T> void copyProperty(ProjectEntity sourceEntity, Property<T> property, ProjectEntity targetEntity, Function<String, String> replacementFn);
 }
