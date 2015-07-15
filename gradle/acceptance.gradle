@@ -259,6 +259,14 @@ class DOSetup extends AbstractCDTask {
 
     @TaskAction
     def setup() {
+        // Makes sure any previous machine is discarded
+        project.exec {
+            ignoreExitValue = true
+            executable 'docker-machine'
+            args 'rm',
+                    '--force',
+                    dropletName
+        }
         // Creates the machine
         project.exec {
             executable 'docker-machine'
