@@ -41,6 +41,10 @@ nexusStaging {
     numberOfRetries = 30
 }
 
+/**
+ * Test task
+ */
+
 task publicationCollectArtifacts(type: Copy) {
     description = "Test task to collect built artifacts for testing the publication"
     dependsOn ':ontrack-dsl:assemble'
@@ -54,12 +58,6 @@ task publicationCollectArtifacts(type: Copy) {
 
 }
 
-task publicationMaven {
-    description = "Publication of the DSL library to the Maven Central"
-    dependsOn 'uploadArchives'
-    // TODO finalizedBy 'closeAndPromoteRepository'
-}
-
 // TODO GitHub release
 // TODO Upload of artifacts in GitHub
 // TODO Getting the change log from Ontrack
@@ -69,6 +67,16 @@ task publicationGitHubRelease {
 //    dependsOn publicationGitHubReleaseCreate
 //    dependsOn publicationGitHubReleaseUpload
 //    dependsOn publicationGitHubReleaseUpload
+}
+
+/**
+ * Root tasks
+ */
+
+task publicationMaven {
+    description = "Publication of the DSL library to the Maven Central"
+    dependsOn 'uploadArchives'
+    // TODO finalizedBy 'closeAndPromoteRepository'
 }
 
 task publicationRelease {

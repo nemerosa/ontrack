@@ -279,9 +279,17 @@ docker logout
         steps {
             // Publication
             if (release) {
-                gradle "-Ppublication publicationRelease"
+                gradle '''\
+-Ppublication
+-PontrackVersion=${VERSION_DISPLAY}
+publicationRelease
+'''
             } else {
-                gradle "-Ppublication publicationMaven"
+                gradle '''\
+-Ppublication
+-PontrackVersion=${VERSION_DISPLAY}
+publicationMaven
+'''
             }
 //            if (release) {
 //                shell readFileFromWorkspace('seed/publish-release.sh')
