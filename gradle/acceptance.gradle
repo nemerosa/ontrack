@@ -340,7 +340,7 @@ task doDockerStop(type: DockerStop) {
 task doAcceptanceTest(type: RemoteAcceptanceTest) {
     acceptanceUrl = { "https://${doSetup.ip}" }
     acceptanceTimeout = 300
-    acceptanceImplicitWait = 20
+    acceptanceImplicitWait = 30
     disableSsl = true
     dependsOn doSetup
     dependsOn doEnv
