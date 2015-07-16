@@ -118,13 +118,18 @@ class GitHubReleaseCreate extends GitHubTask {
  */
 
 task publicationGitHubReleaseCreate(type: GitHubReleaseCreate) {
-    commit ontrackVersionCommit
-    tag ontrackVersion
+    commit = ontrackVersionCommit // VERSION_COMMIT
+    tag = ontrackVersion          // VERSION_DISPLAY
+}
+
+task publicationGitHubReleaseUpload(type: GitHubReleaseUpload) {
+    mustRunAfter publicationGitHubReleaseCreate
+    releaseId = { t }
 }
 
 task publicationGitHubRelease {
     dependsOn publicationGitHubReleaseCreate
-// TODO dependsOn publicationGitHubReleaseUpload
+    dependsOn publicationGitHubReleaseUpload
 // TODO Getting the change log from Ontrack
 // TODO Setting the change log as description in the GitHub release
 }
