@@ -20,7 +20,7 @@ public class AcceptanceTestRunner extends BlockJUnit4ClassRunner {
 
     @Override
     public void run(RunNotifier notifier) {
-        logger.info("*** [TESTSUITE] " + getDescription());
+        logger.info("\n\n[TESTSUITE] " + getDescription() + "\n");
         super.run(notifier);
     }
 
@@ -32,7 +32,7 @@ public class AcceptanceTestRunner extends BlockJUnit4ClassRunner {
             return;
         }
         // Default
-        logger.info("[TEST] " + describeChild(method));
+        logger.info("\n\n[TEST] " + describeChild(method) + "\n");
         super.runChild(method, notifier);
     }
 
