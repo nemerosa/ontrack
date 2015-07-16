@@ -67,8 +67,59 @@ task publicationCollectArtifacts(type: Copy) {
 
 }
 
-task publicationGitHubReleaseCreate {
+/**
+ * GitHub publication task tasks
+ */
 
+abstract class GitHubTask extends DefaultTask {
+
+    String repository = 'nemerosa/ontrack'
+
+    protected def gitHubPost(String url, Map data) {
+        Client client = ClientBuilder
+                .create(url, false)
+                .withLogger({ println "[${name}][HTTP] ${it}" })
+                .withCredentials(gitHubUser, gitHubPassword)
+                .build()
+        JsonClient jsonClient = new JsonClientImpl(client)
+        return jsonClient.post(data, '')
+    }
+
+}
+
+class GitHubReleaseCreate extends GitHubTask {
+
+    String commit = 'HEAD'
+    String tag
+
+    private String releaseId
+
+    @TaskAction
+    void run() {
+        println "[${name}] Createing release ${tag} from commit ${commit}..."
+        releaseId = gitHubPost(
+                "https://api.github.com/repos/${repository}/releases",
+                [
+                        target_commitish: commit,
+                        tag_name: tag,
+                        name: tag,
+                ]
+        ).id
+        println "[${name}] Release ID = ${releaseId}"
+    }
+
+    String getReleaseId() {
+        releaseId
+    }
+}
+
+/**
+ * GitHub publication tasks
+ */
+
+task publicationGitHubReleaseCreate(type: GitHubReleaseCreate) {
+    commit ontrackVersionCommit
+    tag ontrackVersion
 }
 
 task publicationGitHubRelease {
