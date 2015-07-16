@@ -157,6 +157,7 @@ class DockerStart extends AbstractDocker {
 class DockerStop extends AbstractDocker {
 
     String startTask
+    String logFile = 'build/docker.log'
 
     @TaskAction
     def stop() {
@@ -166,6 +167,12 @@ class DockerStop extends AbstractDocker {
         println "[${name}] Stopping container at ${task.cid} created by ${startTask}"
         // Arguments
         List<String> arguments = getDockerConfig()
+        // Getting all the logs
+        println "[${name}] Writing log files of ${task.cid} at ${logFile}..."
+        String logs = docker('logs', task.cid)
+        def targetFile = project.file(logFile)
+        targetFile.parentFile.mkdirs()
+        targetFile.text = logs
         // Stopping
         arguments.addAll(['rm', '--force', '--volumes', task.cid])
         project.exec {
