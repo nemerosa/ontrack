@@ -1,3 +1,6 @@
+import net.nemerosa.httpclient.*
+import net.nemerosa.httpclient.json.*
+
 /**
  * Release and publication tasks
  */
@@ -74,15 +77,20 @@ task publicationCollectArtifacts(type: Copy) {
 abstract class GitHubTask extends DefaultTask {
 
     String repository = 'nemerosa/ontrack'
+    String gitHubUser = project.properties.gitHubUser
+    String gitHubPassword = project.properties.gitHubPassword
 
-    protected def gitHubPost(String url, Map data) {
+    protected def createJsonClient(String url) {
         Client client = ClientBuilder
                 .create(url, false)
                 .withLogger({ println "[${name}][HTTP] ${it}" })
                 .withCredentials(gitHubUser, gitHubPassword)
                 .build()
-        JsonClient jsonClient = new JsonClientImpl(client)
-        return jsonClient.post(data, '')
+        return new JsonClientImpl(client)
+    }
+
+    protected def gitHubPost(String url, Map data) {
+        return createJsonClient(url).post(data, '')
     }
 
 }
@@ -96,7 +104,7 @@ class GitHubReleaseCreate extends GitHubTask {
 
     @TaskAction
     void run() {
-        println "[${name}] Createing release ${tag} from commit ${commit}..."
+        println "[${name}] Creating release ${tag} from commit ${commit}..."
         releaseId = gitHubPost(
                 "https://api.github.com/repos/${repository}/releases",
                 [
@@ -113,6 +121,36 @@ class GitHubReleaseCreate extends GitHubTask {
     }
 }
 
+class GitHubReleaseUpload extends GitHubTask {
+
+    Closure<String> releaseId
+    String fileName
+    String fileType
+    File file
+
+    @TaskAction
+    void run() {
+        // Release ID
+        String id = releaseId()
+        println "[${name}] Uploading to release ${id}..."
+        // Upload URL
+        String url = "https://uploads.github.com/repos/${repository}/releases/${id}/assets?name=${fileName}"
+        // Client
+        def client = createJsonClient(url)
+        // Upload
+        client.upload(
+                fileName,
+                new Document(
+                        fileType,
+                        file.bytes
+                ),
+                file.name,
+                ''
+        )
+    }
+
+}
+
 /**
  * GitHub publication tasks
  */
@@ -124,7 +162,10 @@ task publicationGitHubReleaseCreate(type: GitHubReleaseCreate) {
 
 task publicationGitHubReleaseUpload(type: GitHubReleaseUpload) {
     mustRunAfter publicationGitHubReleaseCreate
-    releaseId = { t }
+    releaseId = { tasks.findByType(GitHubReleaseCreate).releaseId }
+    fileName = 'ontrack.jar'
+    fileType = 'application/zip'
+    file = project.file("ontrack-ui-${ontrackVersion}.jar")
 }
 
 task publicationGitHubRelease {
