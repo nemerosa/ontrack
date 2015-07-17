@@ -32,6 +32,7 @@ class AbstractResource {
         }
     }
 
+    // TODO Make this method public and static
     protected static String query(String url, Map<String, ?> parameters) {
         if (parameters == null || parameters.empty) {
             url

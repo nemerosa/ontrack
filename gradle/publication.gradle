@@ -1,5 +1,6 @@
 import net.nemerosa.httpclient.*
 import net.nemerosa.httpclient.json.*
+import net.nemerosa.ontrack.dsl.*
 
 /**
  * Release and publication tasks
@@ -11,6 +12,7 @@ buildscript {
     }
     dependencies {
         classpath 'net.nemerosa:http-client-json:1.0.0'
+        classpath 'net.nemerosa.ontrack:ontrack-dsl:2.12.3'
     }
 }
 
@@ -151,7 +153,58 @@ class GitHubReleaseUpload extends GitHubTask {
 }
 
 /**
- * GitHub publication tasks
+ * Ontrack task definitions
+ */
+
+class OntrackChangeLog extends DefaultTask {
+
+    String ontrackProject = 'ontrack'
+    String ontrackUrl = project.properties.ontrackUrl
+    String ontrackUser = project.properties.ontrackUser
+    String ontrackPassword = project.properties.ontrackPassword
+
+    String ontrackReleasePromotionLevel = 'RELEASE'
+    String ontrackReleaseBranch
+
+    private String changeLog
+
+    protected Ontrack getOntrackClient() {
+        return OntrackConnection.create(ontrackUrl)
+                .logger({ println "[${name}][Ontrack] ${it}" })
+                .authenticate(ontrackUser, ontrackPassword)
+                .build()
+    }
+
+    @TaskAction
+    void run() {
+        // Gets the Ontrack client
+        def ontrack = ontrackClient
+        // Gest the Ontrack project
+        def project = ontrack.project(ontrackProject)
+        // Gets the last build on the branch to release
+        def lastBuild = project.search(branchName: ontrackReleaseBranch)[0]
+        // Gets the last release
+        def lastRelease = project.search(promotionName: ontrackReleasePromotionLevel)[0]
+        // Gets the change log
+        def changeLogResource = lastBuild.getChangeLog(lastRelease)
+        // Exports the issues
+        // TODO Include the export of issues in the DSL
+        def changeLogExportLink = changeLogResource.link('exportIssues')
+        changeLog = ontrack.get(
+                "${changeLogExportLink}?from=${lastBuild.id}&to=${lastRelease.id}" +
+                        "&format=text" +
+                        "&grouping=Features%%3Dfeature%%7CEnhancements%%3Denhancement%%7CBugs%%3Dbug" +
+                        "&exclude=delivery,design",
+        )
+    }
+
+    String getChangeLog() {
+        return changeLog
+    }
+}
+
+/**
+ * Publication tasks
  */
 
 task publicationGitHubReleaseCreate(type: GitHubReleaseCreate) {
@@ -167,10 +220,14 @@ task publicationGitHubReleaseUpload(type: GitHubReleaseUpload) {
     file = project.file("ontrack-ui-${ontrackVersion}.jar")
 }
 
+task publicationOntrackChangeLog(type: OntrackChangeLog) {
+    mustRunAfter publicationGitHubReleaseUpload
+}
+
 task publicationGitHubRelease {
     dependsOn publicationGitHubReleaseCreate
     dependsOn publicationGitHubReleaseUpload
-// TODO Getting the change log from Ontrack
+    dependsOn publicationOntrackChangeLog
 // TODO Setting the change log as description in the GitHub release
 }
 
