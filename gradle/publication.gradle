@@ -224,11 +224,15 @@ task publicationOntrackChangeLog(type: OntrackChangeLog) {
     mustRunAfter publicationGitHubReleaseUpload
 }
 
+//task publicationGitHubReleaseDescription(type: GitHubReleaseDescription) {
+//    mustRunAfter publicationGitHubReleaseCreate
+//}
+
 task publicationGitHubRelease {
     dependsOn publicationGitHubReleaseCreate
     dependsOn publicationGitHubReleaseUpload
     dependsOn publicationOntrackChangeLog
-// TODO Setting the change log as description in the GitHub release
+    // TODO dependsOn publicationGitHubReleaseDescription
 }
 
 /**
