@@ -23,8 +23,7 @@ apply plugin: 'maven'
 apply plugin: 'io.codearte.nexus-staging'
 
 if (!project.properties.ontrackVersion) throw new GradleException("Missing ontrackVersion property")
-if (!project.properties.ossrhUser) throw new GradleException("Missing ossrhUser property")
-if (!project.properties.ossrhPassword) throw new GradleException("Missing ossrhPassword property")
+if (!project.properties.ontrackVersionCommit) throw new GradleException("Missing ontrackVersionCommit property")
 
 artifacts {
     archives file: file("ontrack-dsl-${ontrackVersion}.pom"), extension: 'pom'
