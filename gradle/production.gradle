@@ -6,5 +6,19 @@ import net.nemerosa.ontrack.gradle.*
 
 task productionSetup(type: DOSetup) {
     apiToken = project.properties.digitalOceanAccessToken
-    dropletName = 'ontrack'
+    dropletName = project.properties.productionMachine
+}
+
+task productionEnv {
+    mustRunAfter productionSetup
+    doFirst {
+        project.exec {
+            executable 'docker-machine'
+            args = ['ssh', project.properties.productionMachine, 'mkdir -p /var/ontrack']
+        }
+        project.exec {
+            executable 'docker-machine'
+            args = ['scp', '-r', project.properties.productionEnv, "${project.properties.productionMachine}:/var/ontrack/conf"]
+        }
+    }
 }

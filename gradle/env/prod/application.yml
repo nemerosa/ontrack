@@ -1,0 +1,23 @@
+# Production environment
+
+spring:
+  # Cache configuration
+  resources:
+    cache-period: 3600
+  # Local database
+  datasource:
+    url: "jdbc:h2:./database/data;MODE=MYSQL;DB_CLOSE_ON_EXIT=FALSE;DEFRAG_ALWAYS=TRUE"
+    # Tomcat specific pool configuration
+    # #234 Make sure the connections are renewed in the pool
+    maxAge: 600000
+
+# SSL configuration
+server:
+  port: 443
+  ssl:
+    enabled: true
+    key-alias: ontrack
+    key-store: "config/keystore.p12"
+    key-store-type: PKCS12
+    key-store-password: ontrack
+    key-password: ontrack
