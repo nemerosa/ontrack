@@ -6,6 +6,7 @@ apply plugin: 'base'
 
 task deliveryPackage(type: Zip) {
     from projectDir
+    include 'buildSrc/**'
     include '*.gradle'
     include 'gradlew*'
     include 'gradle/**'
