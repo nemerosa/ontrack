@@ -276,11 +276,11 @@ task publicationGitHubRelease {
 task publicationMaven {
     description = "Publication of the DSL library to the Maven Central"
     dependsOn 'uploadArchives'
-    // TODO finalizedBy 'closeAndPromoteRepository'
+    finalizedBy 'closeAndPromoteRepository'
 }
 
 task publicationRelease {
     dependsOn publicationMaven
     dependsOn publicationGitHubRelease
-    // TODO finalizedBy 'closeAndPromoteRepository'
+    finalizedBy 'closeAndPromoteRepository'
 }
