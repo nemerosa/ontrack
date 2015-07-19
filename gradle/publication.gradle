@@ -11,7 +11,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'net.nemerosa:http-client-json:1.0.0'
+        classpath 'net.nemerosa:http-client-json:1.1.0'
         classpath 'net.nemerosa.ontrack:ontrack-dsl:2.12.3'
     }
 }
@@ -87,11 +87,12 @@ abstract class GitHubTask extends DefaultTask {
                 .withLogger({ println "[${name}][HTTP] ${it}" })
                 .withCredentials(gitHubUser, gitHubPassword)
                 .build()
-        return new JsonClientImpl(client)
+                .withHeader('Accept', 'application/vnd.github+json')
+        return new JsonClientImpl(client, true)
     }
 
-    protected def gitHubPost(String url, Map data) {
-        return createJsonClient(url).post(data, '')
+    protected def gitHubPost(String url, String path, Map data) {
+        return createJsonClient(url).post(data, path)
     }
 
 }
@@ -107,7 +108,8 @@ class GitHubReleaseCreate extends GitHubTask {
     void run() {
         println "[${name}] Creating release ${tag} from commit ${commit}..."
         releaseId = gitHubPost(
-                "https://api.github.com/repos/${repository}/releases",
+                "https://api.github.com",
+                "/repos/${repository}/releases",
                 [
                         target_commitish: commit,
                         tag_name: tag,
