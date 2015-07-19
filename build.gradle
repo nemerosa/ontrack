@@ -72,7 +72,7 @@ configure(javaProjects) {
     // Integration tests
     task integrationTest(type: Test, dependsOn: 'test') {
         include '**/*IT.class'
-        jvmArgs '-Xmx=512m'
+        jvmArgs '-Xmx512m'
         reports {
             html.enabled = false
         }
