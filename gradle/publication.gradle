@@ -12,7 +12,7 @@ buildscript {
     }
     dependencies {
         classpath 'net.nemerosa:http-client-json:1.1.0'
-        classpath 'net.nemerosa.ontrack:ontrack-dsl:2.12.3'
+        classpath 'net.nemerosa.ontrack:ontrack-dsl:2.12.4'
     }
 }
 
@@ -26,6 +26,7 @@ apply plugin: 'io.codearte.nexus-staging'
 
 if (!project.properties.ontrackVersion) throw new GradleException("Missing ontrackVersion property")
 if (!project.properties.ontrackVersionCommit) throw new GradleException("Missing ontrackVersionCommit property")
+if (!project.properties.ontrackReleaseBranch) throw new GradleException("Missing ontrackReleaseBranch property")
 
 artifacts {
     archives file: file("ontrack-dsl-${ontrackVersion}.pom"), extension: 'pom'
@@ -112,8 +113,8 @@ class GitHubReleaseCreate extends GitHubTask {
                 "/repos/${repository}/releases",
                 [
                         target_commitish: commit,
-                        tag_name: tag,
-                        name: tag,
+                        tag_name        : tag,
+                        name            : tag,
                 ]
         ).id
         println "[${name}] Release ID = ${releaseId}"
@@ -191,15 +192,17 @@ class OntrackChangeLog extends DefaultTask {
         // Gets the last release
         def lastRelease = project.search(promotionName: ontrackReleasePromotionLevel)[0]
         // Gets the change log
-        def changeLogResource = lastBuild.getChangeLog(lastRelease)
+        def changeLog = lastBuild.getChangeLog(lastRelease)
         // Exports the issues
-        // TODO Include the export of issues in the DSL
-        def changeLogExportLink = changeLogResource.link('exportIssues')
-        changeLog = ontrack.get(
-                "${changeLogExportLink}?from=${lastBuild.id}&to=${lastRelease.id}" +
-                        "&format=text" +
-                        "&grouping=Features%%3Dfeature%%7CEnhancements%%3Denhancement%%7CBugs%%3Dbug" +
-                        "&exclude=delivery,design",
+        this.changeLog = changeLog.exportIssues(
+                format: 'text',
+                groups: [
+                        'Features'    : ['feature'],
+                        'Enhancements': ['enhancement'],
+                        'Bugs'        : ['bug'],
+                ],
+                exclude: ['design', 'delivery']
+
         )
     }
 
@@ -233,8 +236,8 @@ task publicationOntrackChangeLog(type: OntrackChangeLog) {
 //}
 
 task publicationGitHubRelease {
-    dependsOn publicationGitHubReleaseCreate
-    dependsOn publicationGitHubReleaseUpload
+    // FIXME dependsOn publicationGitHubReleaseCreate
+    // FIXME dependsOn publicationGitHubReleaseUpload
     dependsOn publicationOntrackChangeLog
     // TODO dependsOn publicationGitHubReleaseDescription
 }
