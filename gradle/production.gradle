@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.gradle.*
 task productionSetup(type: DOSetup) {
     apiToken = project.properties.digitalOceanAccessToken
     dropletName = project.properties.productionMachine
+    size = '1gb'
 }
 
 task productionEnv {
@@ -18,7 +19,18 @@ task productionEnv {
         }
         project.exec {
             executable 'docker-machine'
-            args = ['scp', '-r', project.properties.productionEnv, "${project.properties.productionMachine}:/var/ontrack/conf"]
+            args = ['scp', '-r', project.properties.productionConf, "${project.properties.productionMachine}:/var/ontrack/conf"]
         }
     }
+}
+
+task productionStart(type: DockerStart) {
+    // TODO dependsOn productionStop
+    machine = project.properties.productionMachine
+    exposePort = false // Exposes 443
+    // TODO Container name based on version
+    image = "nemerosa/ontrack:${project.properties.ontrackVersion}"
+    conf = file('/var/ontrack/conf')
+    profile = 'prod'
+    mustRunAfter productionEnv
 }
