@@ -183,11 +183,14 @@ class OntrackChangeLog extends DefaultTask {
 
     @TaskAction
     void run() {
+        println "[${name}] Getting the Ontrack log for ${ontrackProject} since " +
+                "last ${ontrackReleasePromotionLevel} on branch ${ontrackReleaseBranch}"
         // Gets the Ontrack client
         def ontrack = ontrackClient
         // Gest the Ontrack project
         def project = ontrack.project(ontrackProject)
         // Gets the last build on the branch to release
+        println "ontrackReleaseBranch = ${ontrackReleaseBranch}"
         def lastBuild = project.search(branchName: ontrackReleaseBranch)[0]
         // Gets the last release
         def lastRelease = project.search(promotionName: ontrackReleasePromotionLevel)[0]
@@ -228,6 +231,7 @@ task publicationGitHubReleaseUpload(type: GitHubReleaseUpload) {
 }
 
 task publicationOntrackChangeLog(type: OntrackChangeLog) {
+    ontrackReleaseBranch = project.properties.ontrackReleaseBranch
     mustRunAfter publicationGitHubReleaseUpload
 }
 
