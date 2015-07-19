@@ -73,6 +73,62 @@ task publicationCollectArtifacts(type: Copy) {
 }
 
 /**
+ * Ontrack task definitions
+ */
+
+class OntrackChangeLog extends DefaultTask {
+
+    String ontrackProject = 'ontrack'
+    String ontrackUrl = project.properties.ontrackUrl
+    String ontrackUser = project.properties.ontrackUser
+    String ontrackPassword = project.properties.ontrackPassword
+
+    String ontrackReleasePromotionLevel = 'RELEASE'
+    String ontrackReleaseBranch
+
+    private String changeLog
+
+    protected Ontrack getOntrackClient() {
+        return OntrackConnection.create(ontrackUrl)
+                .logger({ println "[${name}][Ontrack] ${it}" })
+                .authenticate(ontrackUser, ontrackPassword)
+                .build()
+    }
+
+    @TaskAction
+    void run() {
+        println "[${name}] Getting the Ontrack log for ${ontrackProject} since " +
+                "last ${ontrackReleasePromotionLevel} on branch ${ontrackReleaseBranch}"
+        // Gets the Ontrack client
+        def ontrack = ontrackClient
+        // Gest the Ontrack project
+        def project = ontrack.project(ontrackProject)
+        // Gets the last build on the branch to release
+        println "ontrackReleaseBranch = ${ontrackReleaseBranch}"
+        def lastBuild = project.search(branchName: ontrackReleaseBranch)[0]
+        // Gets the last release
+        def lastRelease = project.search(promotionName: ontrackReleasePromotionLevel)[0]
+        // Gets the change log
+        def changeLog = lastBuild.getChangeLog(lastRelease)
+        // Exports the issues
+        this.changeLog = changeLog.exportIssues(
+                format: 'text',
+                groups: [
+                        'Features'    : ['feature'],
+                        'Enhancements': ['enhancement'],
+                        'Bugs'        : ['bug'],
+                ],
+                exclude: ['design', 'delivery']
+
+        )
+    }
+
+    String getChangeLog() {
+        return changeLog
+    }
+}
+
+/**
  * GitHub publication task tasks
  */
 
@@ -158,60 +214,26 @@ class GitHubReleaseUpload extends GitHubTask {
 
 }
 
-/**
- * Ontrack task definitions
- */
-
-class OntrackChangeLog extends DefaultTask {
-
-    String ontrackProject = 'ontrack'
-    String ontrackUrl = project.properties.ontrackUrl
-    String ontrackUser = project.properties.ontrackUser
-    String ontrackPassword = project.properties.ontrackPassword
-
-    String ontrackReleasePromotionLevel = 'RELEASE'
-    String ontrackReleaseBranch
-
-    private String changeLog
-
-    protected Ontrack getOntrackClient() {
-        return OntrackConnection.create(ontrackUrl)
-                .logger({ println "[${name}][Ontrack] ${it}" })
-                .authenticate(ontrackUser, ontrackPassword)
-                .build()
-    }
+class GitHubReleaseDescription extends GitHubTask {
 
     @TaskAction
     void run() {
-        println "[${name}] Getting the Ontrack log for ${ontrackProject} since " +
-                "last ${ontrackReleasePromotionLevel} on branch ${ontrackReleaseBranch}"
-        // Gets the Ontrack client
-        def ontrack = ontrackClient
-        // Gest the Ontrack project
-        def project = ontrack.project(ontrackProject)
-        // Gets the last build on the branch to release
-        println "ontrackReleaseBranch = ${ontrackReleaseBranch}"
-        def lastBuild = project.search(branchName: ontrackReleaseBranch)[0]
-        // Gets the last release
-        def lastRelease = project.search(promotionName: ontrackReleasePromotionLevel)[0]
-        // Gets the change log
-        def changeLog = lastBuild.getChangeLog(lastRelease)
-        // Exports the issues
-        this.changeLog = changeLog.exportIssues(
-                format: 'text',
-                groups: [
-                        'Features'    : ['feature'],
-                        'Enhancements': ['enhancement'],
-                        'Bugs'        : ['bug'],
-                ],
-                exclude: ['design', 'delivery']
-
+        // Release ID
+        def releaseId = taskDependencies.getDependencies(this).find { it instanceof GitHubReleaseCreate }.releaseId
+        // Ontrack change log
+        def changeLog = taskDependencies.getDependencies(this).find { it instanceof OntrackChangeLog }.changeLog
+        // Logging
+        println "[${name}] Setting change log of release ${releaseId}\n${changeLog}"
+        // Call
+        gitHubPost(
+                "https://api.github.com",
+                "/repos/${repository}/releases/${releaseId}",
+                [
+                        body: changeLog,
+                ]
         )
     }
 
-    String getChangeLog() {
-        return changeLog
-    }
 }
 
 /**
@@ -235,15 +257,16 @@ task publicationOntrackChangeLog(type: OntrackChangeLog) {
     mustRunAfter publicationGitHubReleaseUpload
 }
 
-//task publicationGitHubReleaseDescription(type: GitHubReleaseDescription) {
-//    mustRunAfter publicationGitHubReleaseCreate
-//}
+task publicationGitHubReleaseDescription(type: GitHubReleaseDescription) {
+    dependsOn publicationGitHubReleaseCreate
+    dependsOn publicationOntrackChangeLog
+}
 
 task publicationGitHubRelease {
-    // FIXME dependsOn publicationGitHubReleaseCreate
-    // FIXME dependsOn publicationGitHubReleaseUpload
+    dependsOn publicationGitHubReleaseCreate
+    dependsOn publicationGitHubReleaseUpload
     dependsOn publicationOntrackChangeLog
-    // TODO dependsOn publicationGitHubReleaseDescription
+    dependsOn publicationGitHubReleaseDescription
 }
 
 /**
