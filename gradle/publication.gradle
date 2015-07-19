@@ -24,10 +24,6 @@ apply plugin: 'signing'
 apply plugin: 'maven'
 apply plugin: 'io.codearte.nexus-staging'
 
-if (!project.properties.ontrackVersion) throw new GradleException("Missing ontrackVersion property")
-if (!project.properties.ontrackVersionCommit) throw new GradleException("Missing ontrackVersionCommit property")
-if (!project.properties.ontrackReleaseBranch) throw new GradleException("Missing ontrackReleaseBranch property")
-
 artifacts {
     archives file: file("ontrack-dsl-${ontrackVersion}.pom"), extension: 'pom'
     archives file: file("ontrack-dsl-${ontrackVersion}.jar")
@@ -84,7 +80,7 @@ class OntrackChangeLog extends DefaultTask {
     String ontrackPassword = project.properties.ontrackPassword
 
     String ontrackReleasePromotionLevel = 'RELEASE'
-    String ontrackReleaseBranch
+    String ontrackReleaseBranch = project.properties.ontrackReleaseBranch
 
     private String changeLog
 
@@ -97,6 +93,7 @@ class OntrackChangeLog extends DefaultTask {
 
     @TaskAction
     void run() {
+        if (!ontrackReleaseBranch) throw new GradleException("Missing ontrackReleaseBranch property")
         println "[${name}] Getting the Ontrack log for ${ontrackProject} since " +
                 "last ${ontrackReleasePromotionLevel} on branch ${ontrackReleaseBranch}"
         // Gets the Ontrack client
@@ -156,13 +153,15 @@ abstract class GitHubTask extends DefaultTask {
 
 class GitHubReleaseCreate extends GitHubTask {
 
-    String commit = 'HEAD'
-    String tag
+    String commit = project.properties.ontrackVersionCommit
+    String tag = project.properties.ontrackVersion
 
     private String releaseId
 
     @TaskAction
     void run() {
+        if (!tag) throw new GradleException("Missing ontrackVersion property")
+        if (!commit) throw new GradleException("Missing ontrackVersionCommit property")
         println "[${name}] Creating release ${tag} from commit ${commit}..."
         releaseId = gitHubPost(
                 "https://api.github.com",

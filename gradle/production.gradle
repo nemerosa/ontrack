@@ -1,0 +1,10 @@
+/**
+ * Production tasks
+ */
+
+import net.nemerosa.ontrack.gradle.*
+
+task productionSetup(type: DOSetup) {
+    apiToken = project.properties.digitalOceanAccessToken
+    dropletName = 'ontrack'
+}
