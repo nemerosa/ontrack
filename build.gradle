@@ -42,7 +42,7 @@ ext {
 }
 
 def javaProjects = subprojects.findAll {
-    it.path != ':ontrack-web' && it.path != ':ontrack-delivery'
+    it.path != ':ontrack-web'
 }
 
 configure(javaProjects) {

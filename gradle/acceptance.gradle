@@ -8,7 +8,9 @@
  * ./gradlew build localAcceptanceTest
  */
 
-import net.nemerosa.ontrack.gradle.*
+import net.nemerosa.ontrack.gradle.DockerStart
+import net.nemerosa.ontrack.gradle.DockerStop
+import net.nemerosa.ontrack.gradle.DOSetup
 
 /**
  * Launching acceptance tests
