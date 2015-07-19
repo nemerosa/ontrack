@@ -11,6 +11,8 @@ task deliveryPackage(type: Zip) {
     include 'gradlew*'
     include 'gradle/**'
     include 'gradle.properties'
+    exclude '**/.gradle/**'
+    exclude '**/build/**'
     classifier = 'delivery'
 }
 
