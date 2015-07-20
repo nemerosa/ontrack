@@ -103,3 +103,8 @@ task productionInstall {
     dependsOn productionStart
     dependsOn productionTest
 }
+
+task productionUpgrade {
+    dependsOn productionStart
+    dependsOn productionTest
+}
