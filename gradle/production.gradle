@@ -96,3 +96,10 @@ task productionTest(type: RemoteAcceptanceTest) {
     acceptanceTimeout = 300
     acceptanceImplicitWait = 30
 }
+
+task productionInstall {
+    dependsOn productionSetup
+    dependsOn productionEnv
+    dependsOn productionStart
+    dependsOn productionTest
+}
