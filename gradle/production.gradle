@@ -72,9 +72,8 @@ task productionStop(type: DockerStop) {
     containerName = 'ontrack'
     remove = false
     removeVolumes = false
-    doLast {
-        docker 'rename', 'ontrack', "ontrack-${new Date()}"
-    }
+    ignoreError = true
+    logFile = null
 }
 
 task productionStart(type: DockerStart) {

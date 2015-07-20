@@ -13,6 +13,7 @@ class DockerStop extends AbstractDocker {
     String logFile = 'build/docker.log'
     boolean remove = true
     boolean removeVolumes = true
+    boolean ignoreError = false
 
     protected String getContainer() {
         if (startTask) {
@@ -34,14 +35,16 @@ class DockerStop extends AbstractDocker {
     def stop() {
         // Gets the container id or name
         String container = getContainer()
+        // Getting all the logs
+        if (logFile) {
+            println "[${name}] Writing log files of ${container} at ${logFile}..."
+            String logs = docker('logs', container)
+            def targetFile = project.file(logFile)
+            targetFile.parentFile.mkdirs()
+            targetFile.text = logs
+        }
         // Arguments
         List<String> arguments = getDockerConfig()
-        // Getting all the logs
-        println "[${name}] Writing log files of ${container} at ${logFile}..."
-        String logs = docker('logs', container)
-        def targetFile = project.file(logFile)
-        targetFile.parentFile.mkdirs()
-        targetFile.text = logs
         // Stopping
         if (remove) {
             arguments << 'rm'
@@ -58,6 +61,7 @@ class DockerStop extends AbstractDocker {
         project.exec {
             executable 'docker'
             args = arguments
+            ignoreExitValue = ignoreError
         }
     }
 
