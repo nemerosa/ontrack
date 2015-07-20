@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.gradle
 
+import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 
 /**
