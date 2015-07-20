@@ -45,6 +45,7 @@ task doSetup(type: DOSetup) {
             throw new GradleException("Missing ontrackVersion parameter")
         }
     }
+    removeFirst = true
     apiToken = digitalOceanAccessToken
     dropletName = "ontrack-acceptance-${ontrackVersion}"
 }

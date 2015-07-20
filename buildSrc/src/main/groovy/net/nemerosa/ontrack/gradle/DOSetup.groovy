@@ -11,11 +11,22 @@ class DOSetup extends AbstractCDTask {
     String dropletName
     String region = 'ams2'
     String size = '512mb'
+    boolean removeFirst = false
 
     private String ip
 
     @TaskAction
     def setup() {
+        // Removing any previous machine
+        if (removeFirst) {
+            project.exec {
+                executable 'docker-machine'
+                ignoreExitValue true
+                args 'rm',
+                        '--force',
+                        dropletName
+            }
+        }
         // Creates the machine
         project.exec {
             executable 'docker-machine'
