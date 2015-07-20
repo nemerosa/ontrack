@@ -61,6 +61,10 @@ task productionEnv {
         }
         project.exec {
             executable 'docker-machine'
+            args = ['ssh', project.properties.productionMachine, 'mkdir -p /var/ontrack/data']
+        }
+        project.exec {
+            executable 'docker-machine'
             args = ['scp', '-r', project.properties.productionConf, "${project.properties.productionMachine}:/var/ontrack/conf"]
         }
     }
@@ -69,7 +73,7 @@ task productionEnv {
 task productionVersion(type: ProductionVersion)
 
 task productionStop(type: DockerStop) {
-    // TODO Backup
+    // FIXME Backup according to version number
     machine = project.properties.productionMachine
     containerName = 'ontrack'
     remove = true
@@ -85,13 +89,15 @@ task productionStart(type: DockerStart) {
     containerName = 'ontrack'
     image = "nemerosa/ontrack:${project.properties.ontrackVersion}"
     conf = file('/var/ontrack/conf') // Dir on the host, provisioned initially by productionEnv
+    // FIXME Data is cleared on startup...
     data = file('/var/ontrack/data') // Dir on the host, filled in by the application itself
     profile = 'prod'
     mustRunAfter productionEnv
 }
 
 task productionTest(type: RemoteAcceptanceTest) {
-    disableSsl = false
+    // FIXME Production test must use a valid SSL certificate
+    disableSsl = true
     acceptanceContext = 'production'
     acceptanceUrl = project.properties.productionUrl
     acceptanceTimeout = 300
