@@ -2,10 +2,49 @@
  * Production tasks
  */
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'net.nemerosa:http-client-json:1.1.0'
+        classpath 'net.nemerosa.ontrack:ontrack-dsl:2.12.4'
+    }
+}
+
+import net.nemerosa.httpclient.*
+import net.nemerosa.httpclient.json.*
+import net.nemerosa.ontrack.gradle.DOSetup
 import net.nemerosa.ontrack.gradle.DockerStart
 import net.nemerosa.ontrack.gradle.DockerStop
-import net.nemerosa.ontrack.gradle.DOSetup
 import net.nemerosa.ontrack.gradle.RemoteAcceptanceTest
+
+class ProductionVersion extends DefaultTask {
+
+    private String version
+
+    @TaskAction
+    void run() {
+        def client = new JsonClientImpl(
+                ClientBuilder
+                        .create(project.properties.productionUrl, false)
+                        .withLogger({ println "[${name}][HTTP] ${it}" })
+                        .build(),
+                true
+        )
+        try {
+            version = client.get('info').version.full.asText()
+        } catch (ClientGeneralException ignored) {
+            println "[${name}] Cannot connect to the production URL at ${project.properties.productionUrl}"
+            version = null
+        }
+        println "[${name}] Version = ${version}"
+    }
+
+    String getVersion() {
+        return version
+    }
+}
 
 task productionSetup(type: DOSetup) {
     apiToken = project.properties.digitalOceanAccessToken
@@ -26,6 +65,8 @@ task productionEnv {
         }
     }
 }
+
+task productionVersion(type: ProductionVersion)
 
 task productionStop(type: DockerStop) {
     containerName = 'ontrack'
