@@ -70,6 +70,7 @@ task productionVersion(type: ProductionVersion)
 
 task productionStop(type: DockerStop) {
     // TODO Backup
+    machine = project.properties.productionMachine
     containerName = 'ontrack'
     remove = true
     removeVolumes = false
