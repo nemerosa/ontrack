@@ -83,7 +83,8 @@ task productionStart(type: DockerStart) {
     exposePort = true
     containerName = 'ontrack'
     image = "nemerosa/ontrack:${project.properties.ontrackVersion}"
-    conf = file('/var/ontrack/conf')
+    conf = file('/var/ontrack/conf') // Dir on the host, provisioned initially by productionEnv
+    data = file('/var/ontrack/data') // Dir on the host, filled in by the application itself
     profile = 'prod'
     mustRunAfter productionEnv
 }
