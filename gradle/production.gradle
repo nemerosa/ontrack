@@ -3,6 +3,7 @@
  */
 
 import net.nemerosa.ontrack.gradle.DockerStart
+import net.nemerosa.ontrack.gradle.DockerStop
 import net.nemerosa.ontrack.gradle.DOSetup
 
 task productionSetup(type: DOSetup) {
@@ -25,11 +26,20 @@ task productionEnv {
     }
 }
 
+task productionStop(type: DockerStop) {
+    containerName = 'ontrack'
+    remove = false
+    removeVolumes = false
+    doLast {
+        docker 'rename', 'ontrack', "ontrack-${new Date()}"
+    }
+}
+
 task productionStart(type: DockerStart) {
-    // TODO dependsOn productionStop
+    dependsOn 'productionStop'
     machine = project.properties.productionMachine
     exposePort = true
-    // TODO Container name based on version
+    containerName = 'ontrack'
     image = "nemerosa/ontrack:${project.properties.ontrackVersion}"
     conf = file('/var/ontrack/conf')
     profile = 'prod'

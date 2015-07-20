@@ -17,6 +17,8 @@ class DockerStart extends AbstractDocker {
 
     boolean exposePort = false
 
+    String containerName
+
     private String cid
 
     private int port
@@ -50,6 +52,10 @@ class DockerStart extends AbstractDocker {
             arguments << "--volume=${conf}:/var/ontrack/conf"
         } else {
             println "[${name}] No conf mount"
+        }
+        // Container name
+        if (containerName) {
+            arguments << "--name=${containerName}"
         }
         // Image to start
         arguments << image
