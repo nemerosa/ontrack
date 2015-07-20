@@ -5,6 +5,7 @@
 import net.nemerosa.ontrack.gradle.DockerStart
 import net.nemerosa.ontrack.gradle.DockerStop
 import net.nemerosa.ontrack.gradle.DOSetup
+import net.nemerosa.ontrack.gradle.RemoteAcceptanceTest
 
 task productionSetup(type: DOSetup) {
     apiToken = project.properties.digitalOceanAccessToken
@@ -44,4 +45,12 @@ task productionStart(type: DockerStart) {
     conf = file('/var/ontrack/conf')
     profile = 'prod'
     mustRunAfter productionEnv
+}
+
+task productionTest(type: RemoteAcceptanceTest) {
+    disableSsl = false
+    acceptanceContext = 'production'
+    acceptanceUrl = project.properties.productionUrl
+    acceptanceTimeout = 300
+    acceptanceImplicitWait = 30
 }
