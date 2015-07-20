@@ -69,8 +69,9 @@ task productionEnv {
 task productionVersion(type: ProductionVersion)
 
 task productionStop(type: DockerStop) {
+    // TODO Backup
     containerName = 'ontrack'
-    remove = false
+    remove = true
     removeVolumes = false
     ignoreError = true
     logFile = null
