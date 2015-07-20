@@ -28,7 +28,7 @@ task productionEnv {
 task productionStart(type: DockerStart) {
     // TODO dependsOn productionStop
     machine = project.properties.productionMachine
-    exposePort = false // Exposes 443
+    exposePort = true
     // TODO Container name based on version
     image = "nemerosa/ontrack:${project.properties.ontrackVersion}"
     conf = file('/var/ontrack/conf')
