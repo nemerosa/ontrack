@@ -1,10 +1,5 @@
 # CI environment
 
-# Local database
-spring:
-  datasource:
-    url: "jdbc:h2:./database/data;MODE=MYSQL;DB_CLOSE_ON_EXIT=FALSE;DEFRAG_ALWAYS=TRUE"
-
 # SSL with self signed certificate
 server:
   port: 443

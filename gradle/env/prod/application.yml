@@ -6,7 +6,6 @@ spring:
     cache-period: 3600
   # Local database
   datasource:
-    url: "jdbc:h2:./database/data;MODE=MYSQL;DB_CLOSE_ON_EXIT=FALSE;DEFRAG_ALWAYS=TRUE"
     # Tomcat specific pool configuration
     # #234 Make sure the connections are renewed in the pool
     maxAge: 600000
