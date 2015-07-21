@@ -91,7 +91,18 @@ if (['master', 'feature', 'release', 'hotfix'].contains(branchType)) {
             }
         }
         steps {
-            gradle 'clean versionDisplay versionFile test integrationTest build  --info --profile --parallel'
+            gradle '''\
+clean
+versionDisplay
+versionFile
+test
+integrationTest
+dockerLatest
+build
+--info
+--profile
+--parallel
+'''
             environmentVariables {
                 propertiesFile 'build/version.properties'
             }

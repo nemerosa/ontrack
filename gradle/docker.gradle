@@ -28,6 +28,3 @@ task dockerLatest(type: Exec, dependsOn: dockerBuild) {
             "nemerosa/ontrack:latest",
     ]
 }
-
-// Link with the build
-build.dependsOn dockerLatest
