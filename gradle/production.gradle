@@ -94,7 +94,6 @@ task productionStart(type: DockerStart) {
     containerName = 'ontrack'
     image = "nemerosa/ontrack:${project.properties.ontrackVersion}"
     conf = file('/var/ontrack/conf') // Dir on the host, provisioned initially by productionEnv
-    // FIXME Data is cleared on startup...
     data = file('/var/ontrack/data') // Dir on the host, filled in by the application itself
     profile = 'prod'
     mustRunAfter productionEnv
