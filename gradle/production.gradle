@@ -135,7 +135,7 @@ task productionTest(type: RemoteAcceptanceTest) {
     disableSsl = true
     acceptanceContext = 'production'
     acceptanceUrl = project.properties.productionUrl
-    acceptanceTimeout = 300
+    acceptanceTimeout = 600 // 10 minutes for the startup...
     acceptanceImplicitWait = 30
 }
 
