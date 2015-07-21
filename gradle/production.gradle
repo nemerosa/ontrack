@@ -49,6 +49,7 @@ class ProductionVersion extends DefaultTask {
 task productionSetup(type: DOSetup) {
     apiToken = project.properties.digitalOceanAccessToken
     dropletName = project.properties.productionMachine
+    region = 'fra1'
     size = '1gb'
 }
 
