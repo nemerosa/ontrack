@@ -66,6 +66,10 @@ task productionEnv {
         }
         project.exec {
             executable 'docker-machine'
+            args = ['ssh', project.properties.productionMachine, 'rm -rf /var/ontrack/conf']
+        }
+        project.exec {
+            executable 'docker-machine'
             args = ['scp', '-r', project.properties.productionConf, "${project.properties.productionMachine}:/var/ontrack/conf"]
         }
     }
