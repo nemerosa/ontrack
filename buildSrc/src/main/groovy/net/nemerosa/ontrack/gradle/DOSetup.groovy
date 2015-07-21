@@ -31,6 +31,7 @@ class DOSetup extends AbstractCDTask {
         project.exec {
             executable 'docker-machine'
             args 'create',
+                    '--debug',
                     '--driver=digitalocean',
                     "--digitalocean-access-token=${apiToken}",
                     "--digitalocean-image=docker",
