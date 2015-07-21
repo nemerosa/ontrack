@@ -302,19 +302,16 @@ publicationRelease
 publicationMaven
 '''
             }
-//            if (release) {
-//                shell readFileFromWorkspace('seed/publish-release.sh')
-//                shell """\
-//docker tag --force nemerosa/ontrack:\${VERSION_FULL} nemerosa/ontrack:latest
-//docker tag --force nemerosa/ontrack:\${VERSION_FULL} nemerosa/ontrack:\${VERSION_DISPLAY}
-//docker login --email="damien.coraboeuf+nemerosa@gmail.com" --username="nemerosa" --password="\${DOCKER_PASSWORD}"
-//docker push nemerosa/ontrack:\${VERSION_DISPLAY}
-//docker push nemerosa/ontrack:latest
-//docker logout
-//"""
-//            } else {
-//                shell readFileFromWorkspace('seed/publish.sh')
-//            }
+            if (release) {
+                shell """\
+docker tag --force nemerosa/ontrack:\${VERSION_FULL} nemerosa/ontrack:latest
+docker tag --force nemerosa/ontrack:\${VERSION_FULL} nemerosa/ontrack:\${VERSION_DISPLAY}
+docker login --email="damien.coraboeuf+nemerosa@gmail.com" --username="nemerosa" --password="\${DOCKER_PASSWORD}"
+docker push nemerosa/ontrack:\${VERSION_DISPLAY}
+docker push nemerosa/ontrack:latest
+docker logout
+"""
+            }
         }
         if (release) {
             publishers {
