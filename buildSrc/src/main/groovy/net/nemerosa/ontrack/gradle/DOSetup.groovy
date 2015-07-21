@@ -32,9 +32,7 @@ class DOSetup extends AbstractCDTask {
         println "[${name}] Creating ${size} machine ${dropletName} in ${region}..."
         project.exec {
             executable 'docker-machine'
-            args '--debug',
-                    '--native-ssh',
-                    'create',
+            args 'create',
                     '--driver=digitalocean',
                     "--digitalocean-access-token=${apiToken}",
                     "--digitalocean-image=docker",
