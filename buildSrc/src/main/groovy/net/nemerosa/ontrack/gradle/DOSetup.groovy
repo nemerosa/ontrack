@@ -19,6 +19,7 @@ class DOSetup extends AbstractCDTask {
     def setup() {
         // Removing any previous machine
         if (removeFirst) {
+            println "[${name}] Removing machine ${dropletName}..."
             project.exec {
                 executable 'docker-machine'
                 ignoreExitValue true
@@ -28,10 +29,11 @@ class DOSetup extends AbstractCDTask {
             }
         }
         // Creates the machine
+        println "[${name}] Creating ${size} machine ${dropletName} in ${region}..."
         project.exec {
             executable 'docker-machine'
-            args 'create',
-                    '--debug',
+            args '--debug',
+                    'create',
                     '--driver=digitalocean',
                     "--digitalocean-access-token=${apiToken}",
                     "--digitalocean-image=docker",
