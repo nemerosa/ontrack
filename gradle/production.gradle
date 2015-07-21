@@ -77,8 +77,29 @@ task productionEnv {
 
 task productionVersion(type: ProductionVersion)
 
+task productionBackup {
+    dependsOn productionVersion
+    doFirst {
+        // Classifier
+        def version = productionVersion.version
+        def classifier = version ?: new Date().format('yyyMMddHHmmss')
+        // Creates a TAR
+        project.exec {
+            executable 'docker-machine'
+            args = [
+                    'ssh', project.properties.productionMachine,
+                    'tar', 'czvf', "/var/ontrack/backup-${classifier}.tgz",
+                    "--exclude=git",
+                    "--exclude=log",
+                    '-C', '/var/ontrack/data',
+                    '.'
+            ]
+        }
+    }
+}
+
 task productionStop(type: DockerStop) {
-    // FIXME Backup according to version number
+    dependsOn productionBackup
     machine = project.properties.productionMachine
     containerName = 'ontrack'
     remove = true
