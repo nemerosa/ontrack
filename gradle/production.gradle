@@ -142,10 +142,8 @@ task productionInstall {
     dependsOn productionSetup
     dependsOn productionEnv
     dependsOn productionStart
-    dependsOn productionTest
 }
 
 task productionUpgrade {
     dependsOn productionStart
-    dependsOn productionTest
 }

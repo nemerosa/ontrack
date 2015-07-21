@@ -284,7 +284,6 @@ docker logout
         }
         wrappers {
             injectPasswords()
-            // toolenv('Maven-3.2.x')
         }
         extractDeliveryArtifacts delegate
         steps {
@@ -293,12 +292,14 @@ docker logout
                 gradle '''\
 -Ppublication
 -PontrackVersion=${VERSION_DISPLAY}
+-PontrackVersionCommit=${VERSION_COMMIT}
 publicationRelease
 '''
             } else {
                 gradle '''\
 -Ppublication
 -PontrackVersion=${VERSION_DISPLAY}
+-PontrackVersionCommit=${VERSION_COMMIT}
 publicationMaven
 '''
             }
@@ -359,9 +360,15 @@ label VERSION_DISPLAY
             }
             wrappers {
                 injectPasswords()
+                xvfb('default')
             }
+            extractDeliveryArtifacts delegate
             steps {
-                shell readFileFromWorkspace('seed/production.sh')
+                gradle '''\
+-Ppublication
+productionUpgrade
+-PontrackVersion=${VERSION_DISPLAY}
+'''
             }
             publishers {
                 downstreamParameterized {
@@ -395,18 +402,17 @@ label VERSION_DISPLAY
             wrappers {
                 injectPasswords()
             }
+            extractDeliveryArtifacts delegate
             steps {
-                shell readFileFromWorkspace('seed/production-acceptance.sh')
+                gradle '''\
+-Ppublication
+productionTest
+'''
             }
             publishers {
                 archiveJunit('ontrack-acceptance.xml')
             }
             configure { node ->
-                node / 'buildWrappers' / 'org.jenkinsci.plugins.xvfb.XvfbBuildWrapper' {
-                    'installationName'('default')
-                    'screen'('1024x768x24')
-                    'displayNameOffset'('1')
-                }
                 node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
                     'project'('ontrack')
                     'branch'(NAME)
