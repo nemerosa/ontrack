@@ -27,7 +27,7 @@ public class CoreResourceModule extends AbstractResourceModule {
         return Arrays.asList(
                 new ConnectedAccountResourceDecorator(),
                 new ProjectResourceDecorator(),
-                new BranchResourceDecorator(structureService),
+                new BranchResourceDecorator(resourceDecorationContributorService, structureService),
                 new PromotionLevelResourceDecorator(),
                 new ValidationStampResourceDecorator(),
                 new BuildResourceDecorator(resourceDecorationContributorService),

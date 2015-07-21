@@ -9,6 +9,7 @@ import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface SVNClient {
 
@@ -37,4 +38,6 @@ public interface SVNClient {
     List<String> getBranches(SVNRepository repository, SVNURL url);
 
     String getDiff(SVNRepository repository, String path, List<Long> revisions);
+
+    Optional<String> download(SVNRepository repository, String path);
 }

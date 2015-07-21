@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -219,6 +220,14 @@ public class PropertyServiceImpl implements PropertyService {
                 entityLoader,
                 t -> predicate.test(propertyType.fromStorage(t.getJson()))
         );
+    }
+
+    @Override
+    public <T> void copyProperty(ProjectEntity sourceEntity, Property<T> property, ProjectEntity targetEntity, Function<String, String> replacementFn) {
+        // Property copy
+        T data = property.getType().copy(sourceEntity, property.getValue(), targetEntity, replacementFn);
+        // Direct edition
+        editProperty(targetEntity, property.getType(), data);
     }
 
     protected <T> Form getPropertyEditionForm(ProjectEntity entity, PropertyType<T> propertyType) {

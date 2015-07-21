@@ -9,10 +9,13 @@ import net.nemerosa.ontrack.extension.svn.db.*;
 import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.extension.svn.property.*;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
+import net.nemerosa.ontrack.model.security.ProjectConfig;
+import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.ConnectionResult;
 import net.nemerosa.ontrack.tx.Transaction;
 import net.nemerosa.ontrack.tx.TransactionService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +41,7 @@ public class SVNServiceImpl implements SVNService {
     private final SVNRepositoryDao repositoryDao;
     private final SVNClient svnClient;
     private final TransactionService transactionService;
+    private final SecurityService securityService;
 
     @Autowired
     public SVNServiceImpl(
@@ -49,7 +53,9 @@ public class SVNServiceImpl implements SVNService {
             SVNIssueRevisionDao issueRevisionDao,
             SVNEventDao eventDao,
             SVNRepositoryDao repositoryDao,
-            SVNClient svnClient, TransactionService transactionService) {
+            SVNClient svnClient,
+            TransactionService transactionService,
+            SecurityService securityService) {
         this.structureService = structureService;
         this.propertyService = propertyService;
         this.issueServiceRegistry = issueServiceRegistry;
@@ -60,6 +66,7 @@ public class SVNServiceImpl implements SVNService {
         this.repositoryDao = repositoryDao;
         this.svnClient = svnClient;
         this.transactionService = transactionService;
+        this.securityService = securityService;
     }
 
     @Override
@@ -374,7 +381,7 @@ public class SVNServiceImpl implements SVNService {
     @Override
     public ConnectionResult test(SVNConfiguration configuration) {
         //noinspection unused
-        try(Transaction tx = transactionService.start()) {
+        try (Transaction tx = transactionService.start()) {
             // Creates a repository
             SVNRepository repository = SVNRepository.of(
                     0,
@@ -391,6 +398,34 @@ public class SVNServiceImpl implements SVNService {
             return ok ? ConnectionResult.ok() : ConnectionResult.error(configuration.getUrl() + " does not exist.");
         } catch (Exception ex) {
             return ConnectionResult.error(ex.getMessage());
+        }
+    }
+
+    @Override
+    public Optional<String> download(ID branchId, String path) {
+        Branch branch = structureService.getBranch(branchId);
+        // Security check
+        securityService.checkProjectFunction(branch, ProjectConfig.class);
+        // If project configured...
+        Optional<SVNRepository> oSvnRepository = getSVNRepository(branch);
+        if (oSvnRepository.isPresent()) {
+            // SVN Branch configuration
+            Optional<SVNBranchConfigurationProperty> oSvnBranchConfigurationProperty = propertyService.getProperty(
+                    branch,
+                    SVNBranchConfigurationPropertyType.class
+            ).option();
+            if (oSvnBranchConfigurationProperty.isPresent()) {
+                String pathInBranch = StringUtils.stripEnd(oSvnBranchConfigurationProperty.get().getBranchPath(), "/")
+                        + "/"
+                        + StringUtils.stripStart(path, "/");
+                try (Transaction ignored = transactionService.start()) {
+                    return svnClient.download(oSvnRepository.get(), pathInBranch);
+                }
+            } else {
+                return Optional.empty();
+            }
+        } else {
+            return Optional.empty();
         }
     }
 

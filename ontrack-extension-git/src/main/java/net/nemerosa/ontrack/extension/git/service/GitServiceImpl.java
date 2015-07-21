@@ -22,6 +22,7 @@ import net.nemerosa.ontrack.git.exceptions.GitRepositorySyncException;
 import net.nemerosa.ontrack.git.model.*;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.job.*;
+import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.ApplicationLogService;
@@ -484,6 +485,21 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                 commitTo,
                 pathFilter
         );
+    }
+
+    @Override
+    public Optional<String> download(Branch branch, String path) {
+        securityService.checkProjectFunction(branch, ProjectConfig.class);
+        Transaction tx = transactionService.start();
+        try {
+            GitBranchConfiguration branchConfiguration = getRequiredBranchConfiguration(branch);
+            GitRepositoryClient client = gitRepositoryClientFactory.getClient(
+                    branchConfiguration.getConfiguration().getGitRepository()
+            );
+            return client.download(branchConfiguration.getBranch(), path);
+        } finally {
+            tx.close();
+        }
     }
 
     private OntrackGitCommitInfo getOntrackGitCommitInfo(String commit) {

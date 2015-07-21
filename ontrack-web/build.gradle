@@ -1,36 +1,70 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.moowork.gradle:gradle-node-plugin:0.10'
+    }
+}
+
+// Plug-ins
+
 apply plugin: 'base'
+apply plugin: 'com.moowork.node'
 
-task npmInstall(type: Exec) {
-    commandLine 'npm', 'install'
+// Node environment
+
+node {
+    version = '0.12.2'
+    npmVersion = '2.7.5'
+    download = true
 }
 
-task bowerInstall(type: Exec) {
-    inputs.file "${projectDir}/bower.json"
-    outputs.dir "${projectDir}/vendor"
-    commandLine 'bower', 'install', '--force-latest'
+// Environment
+
+ext {
+    cacheDir = gradle.getGradleUserHomeDir() as String ?: "${System.getProperty("user.home")}/.cache/gradle"
 }
 
-task setup(dependsOn: ['npmInstall', 'bowerInstall'])
-
-task gruntClean(type: Exec, dependsOn: ['setup']) {
-    commandLine 'grunt', 'clean'
+task npmCacheConfig(type: NpmTask) {
+    description = "Configure the NPM cache"
+    def npmCacheDir = "${cacheDir}/caches/npm"
+    outputs.files file(npmCacheDir)
+    args = [ 'config', 'set', 'cache', npmCacheDir ]
 }
+
+task npmPackages(type: NpmTask, dependsOn: npmCacheConfig) {
+    description = "Install Node.js packages"
+    args = [ 'install' ]
+    inputs.files file('package.json')
+    outputs.files file('node_modules')
+}
+
+task bowerInstall(type: NodeTask, dependsOn: npmPackages) {
+    script = file('node_modules/bower/bin/bower')
+    args = ["--config.storage.cache=${cacheDir}/caches/bower/cache",
+            "--config.storage.packages=${cacheDir}/caches/bower/packages",
+            "--config.storage.registry=${cacheDir}/caches/bower/registry",
+            'install']
+    inputs.files file('bower.json')
+    outputs.files file('vendor')
+}
+
+task setup(dependsOn: ['bowerInstall'])
 
 task versionClean(type: Exec) {
     commandLine 'git', 'checkout', '--', 'package.json'
 }
 
-task clean(dependsOn: ['gruntClean', 'versionClean']) {
-    doLast {
-        project.delete project.buildDir
-    }
-}
+clean.delete << file('node_modules')
+clean.delete << file('vendor')
+clean.dependsOn 'versionClean'
 
 /**
  * Adds the version information into the `package.json` file.
  */
 task versionSet {
-    doLast {
+    doFirst {
         ant.replaceregexp(
                 match: '"version": "(.*)"',
                 replace: "\"version\": \"${version}\"",
@@ -69,23 +103,24 @@ if (project.hasProperty('dev')) {
     build.ext.output = "${project.buildDir}/grunt/prod"
 }
 
-task gruntProd(type: Exec) {
+task gruntProd(type: NodeTask, dependsOn: npmPackages) {
+    script = file('node_modules/grunt-cli/bin/grunt')
+    args = ['prod']
     inputs.dir "${projectDir}/src"
     inputs.dir "${projectDir}/vendor"
     inputs.file "${projectDir}/bower.json"
     outputs.dir "${project.buildDir}/grunt/prod"
-    commandLine 'grunt', 'prod'
 }
 
-task gruntDev(type: Exec) {
+task gruntDev(type: NodeTask, dependsOn: npmPackages) {
+    script = file('node_modules/grunt-cli/bin/grunt')
+    args = ['dev']
     inputs.dir "${projectDir}/src"
     inputs.dir "${projectDir}/vendor"
     inputs.file "${projectDir}/bower.json"
     outputs.dir "${project.buildDir}/grunt/dev"
-    commandLine 'grunt', 'dev'
 }
 
-clean.mustRunAfter setup
 gruntDev.mustRunAfter setup
 gruntProd.mustRunAfter setup
 gruntProd.mustRunAfter versionSet

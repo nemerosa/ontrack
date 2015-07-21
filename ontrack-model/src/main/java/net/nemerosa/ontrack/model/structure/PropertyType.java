@@ -130,4 +130,20 @@ public interface PropertyType<T> {
     default String getTypeName() {
         return getClass().getName();
     }
+
+    /**
+     * Copy/clones the {@code value} defined for the {@code sourceEntity} for being suitable
+     * in the {@code targetEntity} after applying the replacement function.
+     * <p>
+     * By default, just applies the textual replacements.
+     *
+     * @param sourceEntity  Owner of the property to copy
+     * @param value         Property value to copy
+     * @param targetEntity  Entity to associate the new property with
+     * @param replacementFn Replacement function for textual values
+     * @see #replaceValue(Object, Function)
+     */
+    default T copy(ProjectEntity sourceEntity, T value, ProjectEntity targetEntity, Function<String, String> replacementFn) {
+        return replaceValue(value, replacementFn);
+    }
 }
