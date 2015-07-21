@@ -83,16 +83,26 @@ task productionBackup {
         // Classifier
         def version = productionVersion.version
         def classifier = version ?: new Date().format('yyyMMddHHmmss')
+        // Paths
+        def remotePath = "/var/ontrack/backup-${classifier}.tgz"
+        def localPath = new File(buildDir, "backup-${classifier}.tgz").absolutePath
         // Creates a TAR
+        println "[${name}] Creating backup on ${project.properties.productionMachine} at ${remotePath}"
         project.exec {
             executable 'docker-machine'
             args = [
                     'ssh', project.properties.productionMachine,
-                    'tar', 'czvf', "/var/ontrack/backup-${classifier}.tgz",
-                    "--exclude=git",
-                    "--exclude=log",
-                    '-C', '/var/ontrack/data',
-                    '.'
+                    "tar czvf ${remotePath} --exclude=git --exclude=log -C /var/ontrack/data ."
+            ]
+        }
+        // Gets the TAR locally
+        println "[${name}] Getting local backup at ${localPath}"
+        project.exec {
+            executable 'docker-machine'
+            args = [
+                    'scp',
+                    "${project.properties.productionMachine}:${remotePath}",
+                    localPath
             ]
         }
     }
