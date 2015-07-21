@@ -131,8 +131,7 @@ task productionStart(type: DockerStart) {
 }
 
 task productionTest(type: RemoteAcceptanceTest) {
-    // FIXME Production test must use a valid SSL certificate
-    disableSsl = true
+    disableSsl = false // Production test must use a valid SSL certificate
     acceptanceContext = 'production'
     acceptanceUrl = project.properties.productionUrl
     acceptanceTimeout = 600 // 10 minutes for the startup...
