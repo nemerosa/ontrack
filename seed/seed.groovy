@@ -289,21 +289,23 @@ docker logout
         steps {
             // Publication
             if (release) {
-                gradle '''\
+                gradle """\
 -Ppublication
--PontrackVersion=${VERSION_DISPLAY}
--PontrackVersionCommit=${VERSION_COMMIT}
--PontrackVersionFull=${VERSION_FULL}
+-PontrackVersion=\${VERSION_DISPLAY}
+-PontrackVersionCommit=\${VERSION_COMMIT}
+-PontrackVersionFull=\${VERSION_FULL}
+-PontrackReleaseBranch=${SEED_BRANCH}
 publicationRelease
-'''
+"""
             } else {
-                gradle '''\
+                gradle """\
 -Ppublication
--PontrackVersion=${VERSION_DISPLAY}
--PontrackVersionCommit=${VERSION_COMMIT}
--PontrackVersionFull=${VERSION_FULL}
+-PontrackVersion=\${VERSION_DISPLAY}
+-PontrackVersionCommit=\${VERSION_COMMIT}
+-PontrackVersionFull=\${VERSION_FULL}
+-PontrackReleaseBranch=${SEED_BRANCH}
 publicationMaven
-'''
+"""
             }
             if (release) {
                 shell """\
