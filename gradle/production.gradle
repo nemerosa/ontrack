@@ -95,6 +95,8 @@ task productionBackup {
                     "tar czvf ${remotePath} --exclude=git --exclude=log -C /var/ontrack/data ."
             ]
         }
+        // Creates the local directory
+        buildDir.mkdirs()
         // Gets the TAR locally
         println "[${name}] Getting local backup at ${localPath}"
         project.exec {

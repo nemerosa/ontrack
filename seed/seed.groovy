@@ -375,6 +375,9 @@ productionUpgrade
 '''
             }
             publishers {
+                archiveArtifacts {
+                    pattern 'build/*.tgz'
+                }
                 downstreamParameterized {
                     trigger("${PROJECT}-${NAME}-acceptance-production", 'SUCCESS', false) {
                         currentBuild()
