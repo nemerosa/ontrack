@@ -3,6 +3,8 @@ package net.nemerosa.ontrack.model.structure;
 import lombok.Data;
 import net.nemerosa.ontrack.model.support.Selectable;
 
+import java.util.Objects;
+
 @Data
 public class ValidationStampSelection implements Selectable {
 
@@ -10,8 +12,8 @@ public class ValidationStampSelection implements Selectable {
     private final boolean selected;
 
     @Override
-    public int getId() {
-        return validationStamp.id();
+    public String getId() {
+        return Objects.toString(validationStamp.id());
     }
 
     @Override

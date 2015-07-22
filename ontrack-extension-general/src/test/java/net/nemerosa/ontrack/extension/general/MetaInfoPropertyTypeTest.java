@@ -15,29 +15,29 @@ public class MetaInfoPropertyTypeTest {
     @Test
     public void containsValueNOKIfWrongFormat() {
         assertFalse(type.containsValue(new MetaInfoProperty(Collections.singletonList(
-                new MetaInfoPropertyItem("name", "value", "")
+                MetaInfoPropertyItem.of("name", "value")
         )), "value"));
     }
 
     @Test
     public void containsValueNOKIfNotFound() {
         assertFalse(type.containsValue(new MetaInfoProperty(Collections.singletonList(
-                new MetaInfoPropertyItem("name", "value1", "")
+                MetaInfoPropertyItem.of("name", "value1")
         )), "name:value"));
     }
 
     @Test
     public void containsValueOKIfFound() {
         assertTrue(type.containsValue(new MetaInfoProperty(Collections.singletonList(
-                new MetaInfoPropertyItem("name", "value1", "")
+                MetaInfoPropertyItem.of("name", "value1")
         )), "name:value1"));
     }
 
     @Test
     public void containsValueOKIfFoundAmongOthers() {
         assertTrue(type.containsValue(new MetaInfoProperty(Arrays.asList(
-                new MetaInfoPropertyItem("name1", "value1", ""),
-                new MetaInfoPropertyItem("name2", "value2", "")
+                MetaInfoPropertyItem.of("name1", "value1"),
+                MetaInfoPropertyItem.of("name2", "value2")
         )), "name2:value2"));
     }
 

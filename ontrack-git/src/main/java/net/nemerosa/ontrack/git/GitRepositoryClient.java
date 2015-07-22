@@ -135,4 +135,9 @@ public interface GitRepositoryClient {
      * @return Unified diff
      */
     String unifiedDiff(String from, String to, Predicate<String> pathFilter);
+
+    /**
+     * Downloads a document
+     */
+    Optional<String> download(String branch, String path);
 }

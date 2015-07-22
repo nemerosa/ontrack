@@ -1,0 +1,7 @@
+log/
+work/
+database/
+ontrack.pid
+*.p12
+*.jks
+application-prod.yml

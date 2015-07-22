@@ -7,7 +7,7 @@ public interface Selectable {
 
     boolean isSelected();
 
-    int getId();
+    String getId();
 
     String getName();
 

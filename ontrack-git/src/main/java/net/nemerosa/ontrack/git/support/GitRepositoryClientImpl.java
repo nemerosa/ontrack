@@ -287,6 +287,14 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
         }
     }
 
+    @Override
+    public Optional<String> download(String branch, String path) {
+        // Sync first
+        sync(logger::debug);
+        // Git show
+        return GitClientSupport.showPath(repositoryDir, getBranchRef(branch), path);
+    }
+
     private void formatDiffEntry(DiffFormatter formatter, DiffEntry entry) {
         try {
             formatter.format(entry);

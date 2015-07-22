@@ -1,0 +1,21 @@
+# Production environment
+
+spring:
+  # Cache configuration
+  resources:
+    cache-period: 3600
+  # Local database
+  datasource:
+    # Tomcat specific pool configuration
+    # #234 Make sure the connections are renewed in the pool
+    maxAge: 600000
+
+# SSL configuration
+server:
+  port: 443
+  ssl:
+    enabled: true
+    # Fill the keystore information in a secret `application-prod.yml` file
+    # key-alias: server
+    # key-store: "config/ontrack_nemerosa_net.jks"
+    # key-store-password: ***

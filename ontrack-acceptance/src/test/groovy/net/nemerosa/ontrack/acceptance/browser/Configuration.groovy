@@ -34,7 +34,7 @@ public class Configuration {
     protected Configuration() {
         try {
             // Configuration
-            baseUrl = env("ontrack.url", false, "http://localhost:8080", "Base URL");
+            baseUrl = env("ontrack.url", true, "http://localhost:8080", "Base URL");
             implicitWait = Integer.parseInt(
                     env("ontrack.implicitWait", false, "5", "Implicit wait time for GUI components (in seconds)"),
                     10);

@@ -1,0 +1,98 @@
+/**
+ * Acceptance tasks
+ *
+ * Only used to run from a packaged Ontrack application against a running server.
+ *
+ * For local development testing, running the following tasks is enough:
+ *
+ * ./gradlew build localAcceptanceTest
+ */
+
+import net.nemerosa.ontrack.gradle.DockerStart
+import net.nemerosa.ontrack.gradle.DockerStop
+import net.nemerosa.ontrack.gradle.DOSetup
+import net.nemerosa.ontrack.gradle.RemoteAcceptanceTest
+
+/**
+ * CI environment
+ */
+
+task ciDockerStart(type: DockerStart) {
+    image = "nemerosa/ontrack:latest"
+    conf = file('gradle/env/ci')
+    profile = 'acceptance'
+}
+
+task ciDockerStop(type: DockerStop) {
+    startTask = 'ciDockerStart'
+}
+
+task ciAcceptanceTest(type: RemoteAcceptanceTest) {
+    acceptanceUrl = { "https://${project.properties.acceptanceHost}:${ciDockerStart.port}" }
+    disableSsl = true
+    dependsOn ciDockerStart
+    finalizedBy ciDockerStop
+}
+
+task doSetup(type: DOSetup) {
+    doFirst {
+        // Checks the token
+        if (!digitalOceanAccessToken) {
+            throw new GradleException("Missing digitalOceanAccessToken parameter")
+        }
+        // Checks the version
+        if (!ontrackVersion) {
+            throw new GradleException("Missing ontrackVersion parameter")
+        }
+    }
+    removeFirst = true
+    apiToken = digitalOceanAccessToken
+    dropletName = "ontrack-acceptance-${ontrackVersion}"
+    region = 'fra1'
+}
+
+task doTeardown(type: Exec) {
+    executable 'docker-machine'
+    args = ['rm', '--force', "ontrack-acceptance-${ontrackVersion}"]
+    mustRunAfter 'doDockerStop'
+}
+
+task doEnv {
+    mustRunAfter doSetup
+    doFirst {
+        project.exec {
+            executable 'docker-machine'
+            args = ['ssh', "ontrack-acceptance-${ontrackVersion}", 'mkdir -p /var/ontrack']
+        }
+        project.exec {
+            executable 'docker-machine'
+            args = ['scp', '-r', 'gradle/env/ci', "ontrack-acceptance-${ontrackVersion}:/var/ontrack/conf"]
+        }
+    }
+}
+
+task doDockerStart(type: DockerStart) {
+    machine = "ontrack-acceptance-${ontrackVersion}"
+    exposePort = true
+    image = "nemerosa/ontrack:${ontrackVersion}"
+    conf = file('/var/ontrack/conf')
+    profile = 'acceptance'
+    mustRunAfter doEnv
+}
+
+task doDockerStop(type: DockerStop) {
+    machine = "ontrack-acceptance-${ontrackVersion}"
+    startTask = 'doDockerStart'
+}
+
+task doAcceptanceTest(type: RemoteAcceptanceTest) {
+    acceptanceUrl = { "https://${doSetup.ip}" }
+    acceptanceTimeout = 300
+    acceptanceImplicitWait = 30
+    disableSsl = true
+    dependsOn doSetup
+    dependsOn doEnv
+    dependsOn doDockerStart
+    finalizedBy doDockerStop
+    finalizedBy doTeardown
+}

@@ -32,11 +32,21 @@ class AbstractResource {
         }
     }
 
+    // TODO Make this method public and static
     protected static String query(String url, Map<String, ?> parameters) {
-        if (parameters == null || parameters.empty) {
-            url
+        // Cleanup
+        String base
+        int pos = url.indexOf('?')
+        if (pos < 0) {
+            base = url
         } else {
-            "${url}?${parameters.collect { k, v -> "$k=${URLEncoder.encode(v as String, 'UTF-8')}" }.join('&')}"
+            base = url.substring(0, pos)
+        }
+        // Parameters
+        if (parameters == null || parameters.empty) {
+            return base
+        } else {
+            return "${base}?${parameters.collect { k, v -> "$k=${URLEncoder.encode(v as String, 'UTF-8')}" }.join('&')}"
         }
     }
 

@@ -37,12 +37,6 @@
  */
 
 /**
- * Variables
- */
-
-def LOCAL_REPOSITORY = '/var/lib/jenkins/repository/ontrack/2.0'
-
-/**
  * Branch
  */
 
@@ -56,6 +50,23 @@ if (pos > 0) {
 }
 println "BRANCH = ${BRANCH}"
 println "\tBranchType = ${branchType}"
+
+// Extracting the delivery
+def extractDeliveryArtifacts(Object dsl) {
+    dsl.steps {
+        // Cleaning the workspace
+        shell 'rm -rf *'
+        // Copy of artifacts
+        copyArtifacts("${SEED_PROJECT}-${SEED_BRANCH}-build") {
+            flatten()
+            buildSelector {
+                upstreamBuild()
+            }
+        }
+        // Expanding the delivery ZIP
+        shell 'unzip ontrack-*-delivery.zip'
+    }
+}
 
 // Keeps only some version types
 if (['master', 'feature', 'release', 'hotfix'].contains(branchType)) {
@@ -79,34 +90,39 @@ if (['master', 'feature', 'release', 'hotfix'].contains(branchType)) {
                 localBranch "${BRANCH}"
             }
         }
-        triggers {
-            scm 'H/5 * * * *'
-        }
         steps {
-            gradle 'clean versionDisplay versionFile test integrationTest release  --info --profile --parallel'
-            conditionalSteps {
-                condition {
-                    status('SUCCESS', 'SUCCESS')
-                }
-                runner('Fail')
-                shell """\
-# Copies the JAR to a local directory
-ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSITORY}
-"""
-            }
+            gradle '''\
+clean
+versionDisplay
+versionFile
+test
+integrationTest
+dockerLatest
+build
+--info
+--profile
+--parallel
+'''
             environmentVariables {
                 propertiesFile 'build/version.properties'
             }
         }
         publishers {
             archiveJunit("**/build/test-results/*.xml")
+            archiveArtifacts {
+                pattern 'ontrack-ui/build/libs/ontrack-ui-*.jar'
+                pattern 'ontrack-acceptance/build/libs/ontrack-acceptance.jar' // No version needed here
+                pattern 'ontrack-dsl/build/libs/ontrack-dsl-*.jar'
+                pattern 'ontrack-dsl/build/libs/ontrack-dsl-*.pom'
+                pattern 'build/distributions/ontrack-*-delivery.zip'
+            }
             tasks(
                     '**/*.java,**/*.groovy,**/*.xml,**/*.html,**/*.js',
                     '**/target/**,**/node_modules/**,**/vendor/**',
                     'FIXME', 'TODO', '@Deprecated', true
             )
             downstreamParameterized {
-                trigger("${PROJECT}/${PROJECT}-${NAME}/${PROJECT}-${NAME}-acceptance-local", 'SUCCESS', false) {
+                trigger("${PROJECT}-${NAME}-acceptance-local", 'SUCCESS', false) {
                     propertiesFile('build/version.properties')
                 }
             }
@@ -122,7 +138,7 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
 
     // Local acceptance job
 
-    freeStyleJob("${PROJECT}-${NAME}-acceptance-local") {
+    freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
         logRotator(numToKeep = 40)
         deliveryPipelineConfiguration('Commit', 'Local acceptance')
         jdk 'JDK8u25'
@@ -132,14 +148,21 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
             stringParam('VERSION_BUILD', '', '')
             stringParam('VERSION_DISPLAY', '', '')
         }
+        wrappers {
+            xvfb('default')
+        }
+        extractDeliveryArtifacts delegate
         steps {
-            shell readFileFromWorkspace('seed/local-acceptance.sh')
+            // Runs the CI acceptance tests
+            gradle """\
+ciAcceptanceTest -PacceptanceJar=ontrack-acceptance.jar
+"""
         }
         publishers {
             archiveJunit('ontrack-acceptance.xml')
             if (branchType == 'release') {
                 downstreamParameterized {
-                    trigger("${PROJECT}-${NAME}-docker-push", 'SUCCESS', false) {
+                    trigger("${SEED_PROJECT}-${SEED_BRANCH}-docker-push", 'SUCCESS', false) {
                         currentBuild()
                     }
                 }
@@ -152,11 +175,6 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
             }
         }
         configure { node ->
-            node / 'buildWrappers' / 'org.jenkinsci.plugins.xvfb.XvfbBuildWrapper' {
-                'installationName'('default')
-                'screen'('1024x768x24')
-                'displayNameOffset'('1')
-            }
             node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
                 'project'('ontrack')
                 'branch'(NAME)
@@ -168,7 +186,7 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
 
     // Docker push
 
-    freeStyleJob("${PROJECT}-${NAME}-docker-push") {
+    freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-docker-push") {
         logRotator(numToKeep = 40)
         deliveryPipelineConfiguration('Acceptance', 'Docker push')
         jdk 'JDK8u25'
@@ -183,7 +201,6 @@ ontrack-delivery/archive.sh --source=\${WORKSPACE} --destination=${LOCAL_REPOSIT
         }
         steps {
             shell """\
-docker tag --force ontrack:\${VERSION_FULL} nemerosa/ontrack:\${VERSION_FULL}
 docker login --email="damien.coraboeuf+nemerosa@gmail.com" --username="nemerosa" --password="\${DOCKER_PASSWORD}"
 docker push nemerosa/ontrack:\${VERSION_FULL}
 docker logout
@@ -191,7 +208,7 @@ docker logout
         }
         publishers {
             downstreamParameterized {
-                trigger("${PROJECT}-${NAME}-acceptance-do", 'SUCCESS', false) {
+                trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do", 'SUCCESS', false) {
                     currentBuild()
                 }
             }
@@ -199,7 +216,7 @@ docker logout
         configure { node ->
             node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
                 'project'('ontrack')
-                'branch'(NAME)
+                'branch'(SEED_BRANCH)
                 'build'('${VERSION_BUILD}')
                 'validationStamp'('DOCKER')
             }
@@ -220,9 +237,18 @@ docker logout
         }
         wrappers {
             injectPasswords()
+            xvfb('default')
         }
+        extractDeliveryArtifacts delegate
         steps {
-            shell readFileFromWorkspace('seed/do-acceptance.sh')
+            // Runs the CI acceptance tests
+            shell '''\
+./gradlew \\
+    doAcceptanceTest \\
+    -PacceptanceJar=ontrack-acceptance.jar \\
+    -PdigitalOceanAccessToken=${DO_TOKEN} \\
+    -PontrackVersion=${VERSION_FULL}
+'''
         }
         publishers {
             archiveJunit('ontrack-acceptance.xml')
@@ -233,11 +259,6 @@ docker logout
             }
         }
         configure { node ->
-            node / 'buildWrappers' / 'org.jenkinsci.plugins.xvfb.XvfbBuildWrapper' {
-                'installationName'('default')
-                'screen'('1024x768x24')
-                'displayNameOffset'('1')
-            }
             node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
                 'project'('ontrack')
                 'branch'(NAME)
@@ -263,14 +284,28 @@ docker logout
         }
         wrappers {
             injectPasswords()
-            toolenv('Maven-3.2.x')
         }
+        extractDeliveryArtifacts delegate
         steps {
-            environmentVariables {
-                env 'VERSION_BRANCHID', NAME
+            // Publication
+            if (release) {
+                gradle '''\
+-Ppublication
+-PontrackVersion=${VERSION_DISPLAY}
+-PontrackVersionCommit=${VERSION_COMMIT}
+-PontrackVersionFull=${VERSION_FULL}
+publicationRelease
+'''
+            } else {
+                gradle '''\
+-Ppublication
+-PontrackVersion=${VERSION_DISPLAY}
+-PontrackVersionCommit=${VERSION_COMMIT}
+-PontrackVersionFull=${VERSION_FULL}
+publicationMaven
+'''
             }
             if (release) {
-                shell readFileFromWorkspace('seed/publish-release.sh')
                 shell """\
 docker tag --force nemerosa/ontrack:\${VERSION_FULL} nemerosa/ontrack:latest
 docker tag --force nemerosa/ontrack:\${VERSION_FULL} nemerosa/ontrack:\${VERSION_DISPLAY}
@@ -279,15 +314,15 @@ docker push nemerosa/ontrack:\${VERSION_DISPLAY}
 docker push nemerosa/ontrack:latest
 docker logout
 """
-                publishers {
-                    buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${PROJECT}-${NAME}-production") {
-                        parameters {
-                            currentBuild()
-                        }
+            }
+        }
+        if (release) {
+            publishers {
+                buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${SEED_PROJECT}-${SEED_BRANCH}-production") {
+                    parameters {
+                        currentBuild()
                     }
                 }
-            } else {
-                shell readFileFromWorkspace('seed/publish.sh')
             }
         }
         configure { node ->
@@ -327,9 +362,15 @@ label VERSION_DISPLAY
             }
             wrappers {
                 injectPasswords()
+                xvfb('default')
             }
+            extractDeliveryArtifacts delegate
             steps {
-                shell readFileFromWorkspace('seed/production.sh')
+                gradle '''\
+-Ppublication
+productionUpgrade
+-PontrackVersion=${VERSION_DISPLAY}
+'''
             }
             publishers {
                 downstreamParameterized {
@@ -363,18 +404,17 @@ label VERSION_DISPLAY
             wrappers {
                 injectPasswords()
             }
+            extractDeliveryArtifacts delegate
             steps {
-                shell readFileFromWorkspace('seed/production-acceptance.sh')
+                gradle '''\
+-Ppublication
+productionTest
+'''
             }
             publishers {
                 archiveJunit('ontrack-acceptance.xml')
             }
             configure { node ->
-                node / 'buildWrappers' / 'org.jenkinsci.plugins.xvfb.XvfbBuildWrapper' {
-                    'installationName'('default')
-                    'screen'('1024x768x24')
-                    'displayNameOffset'('1')
-                }
                 node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
                     'project'('ontrack')
                     'branch'(NAME)

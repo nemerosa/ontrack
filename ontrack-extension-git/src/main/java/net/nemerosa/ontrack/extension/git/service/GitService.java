@@ -105,4 +105,9 @@ public interface GitService {
      * Gets a diff on a list of file changes, filtering the changes using ANT-like patterns
      */
     String diff(GitChangeLog changeLog, List<String> patterns);
+
+    /**
+     * Downloads the file at the given path for a branch
+     */
+    Optional<String> download(Branch branch, String path);
 }

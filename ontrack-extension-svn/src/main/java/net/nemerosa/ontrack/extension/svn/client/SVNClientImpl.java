@@ -13,6 +13,7 @@ import net.nemerosa.ontrack.extension.svn.support.SVNLogEntryCollector;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
 import net.nemerosa.ontrack.tx.Transaction;
 import net.nemerosa.ontrack.tx.TransactionService;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,7 @@ import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.wc.*;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -250,6 +252,25 @@ public class SVNClientImpl implements SVNClient {
         }
 
         return Utils.toString(output.toByteArray());
+    }
+
+    @Override
+    public Optional<String> download(SVNRepository repository, String path) {
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            getWCClient(repository).doGetFileContents(
+                    SVNUtils.toURL(repository.getUrl(path)),
+                    SVNRevision.HEAD,
+                    SVNRevision.HEAD,
+                    false,
+                    out
+            );
+            return Optional.of(
+                    IOUtils.toString(out.toByteArray(), "UTF-8")
+            );
+        } catch (SVNException | IOException ex) {
+            return Optional.empty();
+        }
     }
 
     private SCMChangeLogFileChangeType toFileChangeType(SVNStatusType modificationType) {

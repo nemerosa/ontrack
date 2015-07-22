@@ -10,6 +10,8 @@ import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.extension.svn.property.*;
 import net.nemerosa.ontrack.extension.svn.support.SVNConfigProperties;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
+import net.nemerosa.ontrack.model.security.ProjectConfig;
+import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.ConnectionResult;
 import net.nemerosa.ontrack.tx.Transaction;
@@ -46,6 +48,7 @@ public class SVNServiceImpl implements SVNService {
     private final SVNRepositoryDao repositoryDao;
     private final SVNClient svnClient;
     private final TransactionService transactionService;
+    private final SecurityService securityService;
     private final SVNConfigProperties svnConfigProperties;
 
     @Autowired
@@ -60,7 +63,8 @@ public class SVNServiceImpl implements SVNService {
             SVNRepositoryDao repositoryDao,
             SVNClient svnClient,
             TransactionService transactionService,
-            SVNConfigProperties svnConfigProperties) {
+            SVNConfigProperties svnConfigProperties,
+            SecurityService securityService) {
         this.structureService = structureService;
         this.propertyService = propertyService;
         this.issueServiceRegistry = issueServiceRegistry;
@@ -71,6 +75,7 @@ public class SVNServiceImpl implements SVNService {
         this.repositoryDao = repositoryDao;
         this.svnClient = svnClient;
         this.transactionService = transactionService;
+        this.securityService = securityService;
         this.svnConfigProperties = svnConfigProperties;
     }
 
@@ -429,6 +434,34 @@ public class SVNServiceImpl implements SVNService {
         } else {
             logger.warn("[svn] SVN configuration URL checks have been disabled.");
             return ConnectionResult.ok();
+        }
+    }
+
+    @Override
+    public Optional<String> download(ID branchId, String path) {
+        Branch branch = structureService.getBranch(branchId);
+        // Security check
+        securityService.checkProjectFunction(branch, ProjectConfig.class);
+        // If project configured...
+        Optional<SVNRepository> oSvnRepository = getSVNRepository(branch);
+        if (oSvnRepository.isPresent()) {
+            // SVN Branch configuration
+            Optional<SVNBranchConfigurationProperty> oSvnBranchConfigurationProperty = propertyService.getProperty(
+                    branch,
+                    SVNBranchConfigurationPropertyType.class
+            ).option();
+            if (oSvnBranchConfigurationProperty.isPresent()) {
+                String pathInBranch = StringUtils.stripEnd(oSvnBranchConfigurationProperty.get().getBranchPath(), "/")
+                        + "/"
+                        + StringUtils.stripStart(path, "/");
+                try (Transaction ignored = transactionService.start()) {
+                    return svnClient.download(oSvnRepository.get(), pathInBranch);
+                }
+            } else {
+                return Optional.empty();
+            }
+        } else {
+            return Optional.empty();
         }
     }
 

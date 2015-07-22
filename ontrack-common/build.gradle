@@ -3,4 +3,5 @@ description = "Common types for Ontrack."
 dependencies {
     compile libraries.commons_lang3
     compile libraries.commons_io
+    compile libraries.slf4j_api
 }

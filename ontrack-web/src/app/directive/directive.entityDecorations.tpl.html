@@ -1,4 +1,8 @@
-<span class="ot-decoration {{decorationClassName(decoration)}}" title="{{decoration.title}}" ng-repeat="decoration in decorations.resources">
+<span class="ot-decoration {{decorationClassName(decoration)}}"
+      title="{{decoration.title}}"
+      ng-class="{'ot-action': decoration.uri}"
+      ng-click="decorationAction(decoration)"
+      ng-repeat="decoration in decorations.resources">
     <!-- Image if no name provided -->
     <img
             ng-if="!decoration.name"

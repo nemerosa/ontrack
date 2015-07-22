@@ -8,10 +8,7 @@ import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -87,6 +84,22 @@ public class AutoPromotionPropertyType extends AbstractPropertyType<AutoPromotio
         } else {
             throw new AutoPromotionPropertyCannotParseException("Cannot get the list of validation stamps");
         }
+    }
+
+    @Override
+    public AutoPromotionProperty copy(ProjectEntity sourceEntity, AutoPromotionProperty value, ProjectEntity targetEntity, Function<String, String> replacementFn) {
+        PromotionLevel targetPromotionLevel = (PromotionLevel) targetEntity;
+        return new AutoPromotionProperty(
+                value.getValidationStamps().stream()
+                        .map(vs -> structureService.findValidationStampByName(
+                                targetPromotionLevel.getBranch().getProject().getName(),
+                                targetPromotionLevel.getBranch().getName(),
+                                vs.getName()
+                        ))
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .collect(Collectors.toList())
+        );
     }
 
     /**

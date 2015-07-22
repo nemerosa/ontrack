@@ -29,7 +29,7 @@ class MetaInfoSearchExtensionIT extends AbstractServiceTestSupport {
                     build,
                     MetaInfoPropertyType,
                     new MetaInfoProperty([
-                            new MetaInfoPropertyItem("name", "value", "")
+                            MetaInfoPropertyItem.of("name", "value")
                     ])
             )
         }
@@ -61,7 +61,7 @@ class MetaInfoSearchExtensionIT extends AbstractServiceTestSupport {
                         build,
                         MetaInfoPropertyType,
                         new MetaInfoProperty([
-                                new MetaInfoPropertyItem("name", "value${index + 1}", "")
+                                MetaInfoPropertyItem.of("name", "value${index + 1}")
                         ])
                 )
             }
@@ -101,7 +101,7 @@ class MetaInfoSearchExtensionIT extends AbstractServiceTestSupport {
                         build,
                         MetaInfoPropertyType,
                         new MetaInfoProperty([
-                                new MetaInfoPropertyItem("name", "value${index + 1}", "")
+                                MetaInfoPropertyItem.of("name", "value${index + 1}")
                         ])
                 )
             }

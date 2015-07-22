@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static net.nemerosa.ontrack.json.JsonUtils.object;
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd;
 import static net.nemerosa.ontrack.model.structure.Replacement.replacementFn;
 import static org.mockito.Matchers.eq;
@@ -51,10 +50,11 @@ public class CopyServiceImplTest {
         );
 
         // Branch properties
+        TestPropertyType testPropertyType = new TestPropertyType();
         when(propertyService.getProperties(sourceBranch)).thenReturn(
                 Arrays.asList(
                         Property.of(
-                                new TestPropertyType(),
+                                testPropertyType,
                                 TestProperty.of("http://wiki/B1")
                         )
                 )
@@ -64,7 +64,7 @@ public class CopyServiceImplTest {
         when(propertyService.getProperties(sourceProject)).thenReturn(
                 Arrays.asList(
                         Property.of(
-                                new TestPropertyType(),
+                                testPropertyType,
                                 TestProperty.of("http://wiki/P1")
                         )
                 )
@@ -95,21 +95,19 @@ public class CopyServiceImplTest {
         verify(structureService, times(1)).newBranch(branchToCreate);
 
         // Checks the copy of properties for the project
-        verify(propertyService, times(1)).editProperty(
+        verify(propertyService, times(1)).copyProperty(
+                eq(sourceProject),
+                eq(Property.of(testPropertyType, new TestProperty("http://wiki/P1"))),
                 eq(createdProject),
-                eq(TestPropertyType.class.getName()),
-                eq(object()
-                        .with("value", "http://wiki/P2")
-                        .end())
+                any()
         );
 
         // Checks the copy of properties for the branch
-        verify(propertyService, times(1)).editProperty(
+        verify(propertyService, times(1)).copyProperty(
+                eq(sourceBranch),
+                eq(Property.of(testPropertyType, new TestProperty("http://wiki/B1"))),
                 eq(createdBranch),
-                eq(TestPropertyType.class.getName()),
-                eq(object()
-                        .with("value", "http://wiki/B2")
-                        .end())
+                any()
         );
     }
 
@@ -126,10 +124,11 @@ public class CopyServiceImplTest {
         );
 
         // Branch properties
+        TestPropertyType testPropertyType = new TestPropertyType();
         when(propertyService.getProperties(sourceBranch)).thenReturn(
                 Arrays.asList(
                         Property.of(
-                                new TestPropertyType(),
+                                testPropertyType,
                                 TestProperty.of("http://wiki/B1")
                         )
                 )
@@ -151,12 +150,11 @@ public class CopyServiceImplTest {
         verify(structureService, times(1)).newBranch(targetBranch);
 
         // Checks the copy of properties for the branch
-        verify(propertyService, times(1)).editProperty(
+        verify(propertyService, times(1)).copyProperty(
+                eq(sourceBranch),
+                eq(Property.of(testPropertyType, new TestProperty("http://wiki/B1"))),
                 eq(targetBranch.withId(ID.of(2))),
-                eq(TestPropertyType.class.getName()),
-                eq(object()
-                        .with("value", "http://wiki/B2")
-                        .end())
+                any()
         );
     }
 
@@ -172,10 +170,11 @@ public class CopyServiceImplTest {
         );
 
         // Branch properties
+        TestPropertyType testPropertyType = new TestPropertyType();
         when(propertyService.getProperties(branch)).thenReturn(
                 Arrays.asList(
                         Property.of(
-                                new TestPropertyType(),
+                                testPropertyType,
                                 TestProperty.of("http://wiki/B1")
                         )
                 )
@@ -194,12 +193,11 @@ public class CopyServiceImplTest {
         verify(structureService, times(1)).saveBranch(updatedBranch);
 
         // Checks the copy of properties for the branch
-        verify(propertyService, times(1)).editProperty(
+        verify(propertyService, times(1)).copyProperty(
+                eq(branch),
+                eq(Property.of(testPropertyType, TestProperty.of("http://wiki/B1"))),
                 eq(updatedBranch),
-                eq(TestPropertyType.class.getName()),
-                eq(object()
-                        .with("value", "http://wiki/B2")
-                        .end())
+                any()
         );
     }
 
@@ -215,10 +213,11 @@ public class CopyServiceImplTest {
         );
 
         // Properties for the branch
+        TestPropertyType testPropertyType = new TestPropertyType();
         when(propertyService.getProperties(sourceBranch)).thenReturn(
                 Arrays.asList(
                         Property.of(
-                                new TestPropertyType(),
+                                testPropertyType,
                                 TestProperty.of("http://wiki/P1")
                         )
                 )
@@ -231,12 +230,11 @@ public class CopyServiceImplTest {
         service.doCopy(sourceBranch, targetBranch, replacementFn, SyncPolicy.COPY);
 
         // Checks the copy of properties for the branch
-        verify(propertyService, times(1)).editProperty(
+        verify(propertyService, times(1)).copyProperty(
+                eq(sourceBranch),
+                eq(Property.of(testPropertyType, new TestProperty("http://wiki/P1"))),
                 eq(targetBranch),
-                eq(TestPropertyType.class.getName()),
-                eq(object()
-                        .with("value", "http://wiki/P2")
-                        .end())
+                any()
         );
     }
 
@@ -268,10 +266,11 @@ public class CopyServiceImplTest {
         when(structureService.newPromotionLevel(targetPromotionLevel)).thenReturn(targetPromotionLevel);
 
         // Properties for the promotion level
+        TestPropertyType testPropertyType = new TestPropertyType();
         when(propertyService.getProperties(sourcePromotionLevel)).thenReturn(
                 Arrays.asList(
                         Property.of(
-                                new TestPropertyType(),
+                                testPropertyType,
                                 TestProperty.of("http://wiki/P1")
                         )
                 )
@@ -286,12 +285,11 @@ public class CopyServiceImplTest {
         // Checks the promotion level was created
         verify(structureService, times(1)).newPromotionLevel(targetPromotionLevel);
         // Checks the copy of properties for the promotion levels
-        verify(propertyService, times(1)).editProperty(
+        verify(propertyService, times(1)).copyProperty(
+                eq(sourcePromotionLevel),
+                eq(Property.of(testPropertyType, new TestProperty("http://wiki/P1"))),
                 eq(targetPromotionLevel),
-                eq(TestPropertyType.class.getName()),
-                eq(object()
-                        .with("value", "http://wiki/P2")
-                        .end())
+                any()
         );
     }
 
@@ -323,10 +321,11 @@ public class CopyServiceImplTest {
         when(structureService.newValidationStamp(targetValidationStamp)).thenReturn(targetValidationStamp);
 
         // Properties for the validation stamp
+        TestPropertyType testPropertyType = new TestPropertyType();
         when(propertyService.getProperties(sourceValidationStamp)).thenReturn(
                 Arrays.asList(
                         Property.of(
-                                new TestPropertyType(),
+                                testPropertyType,
                                 TestProperty.of("http://wiki/P1")
                         )
                 )
@@ -341,12 +340,11 @@ public class CopyServiceImplTest {
         // Checks the validation stamp was created
         verify(structureService, times(1)).newValidationStamp(targetValidationStamp);
         // Checks the copy of properties for the validation stamps
-        verify(propertyService, times(1)).editProperty(
+        verify(propertyService, times(1)).copyProperty(
+                eq(sourceValidationStamp),
+                eq(Property.of(testPropertyType, TestProperty.of("http://wiki/P1"))),
                 eq(targetValidationStamp),
-                eq(TestPropertyType.class.getName()),
-                eq(object()
-                        .with("value", "http://wiki/P2")
-                        .end())
+                any()
         );
     }
 }
