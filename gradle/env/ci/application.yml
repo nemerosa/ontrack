@@ -15,3 +15,9 @@ server:
 endpoints:
   shutdown:
     enabled: true
+
+# Disabling the test of the SVN configurations
+ontrack:
+  extension:
+    svn:
+      test: false
