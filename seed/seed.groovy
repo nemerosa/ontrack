@@ -113,7 +113,7 @@ build
                 pattern 'ontrack-ui/build/libs/ontrack-ui-*.jar'
                 pattern 'ontrack-acceptance/build/libs/ontrack-acceptance.jar' // No version needed here
                 pattern 'ontrack-dsl/build/libs/ontrack-dsl-*.jar'
-                pattern 'ontrack-dsl/build/libs/ontrack-dsl-*.pom'
+                pattern 'ontrack-dsl/build/poms/ontrack-dsl-*.pom'
                 pattern 'build/distributions/ontrack-*-delivery.zip'
             }
             tasks(
