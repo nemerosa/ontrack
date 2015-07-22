@@ -293,6 +293,7 @@ docker logout
 -Ppublication
 -PontrackVersion=${VERSION_DISPLAY}
 -PontrackVersionCommit=${VERSION_COMMIT}
+-PontrackVersionFull=${VERSION_FULL}
 publicationRelease
 '''
             } else {
@@ -300,6 +301,7 @@ publicationRelease
 -Ppublication
 -PontrackVersion=${VERSION_DISPLAY}
 -PontrackVersionCommit=${VERSION_COMMIT}
+-PontrackVersionFull=${VERSION_FULL}
 publicationMaven
 '''
             }

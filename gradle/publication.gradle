@@ -248,7 +248,7 @@ task publicationGitHubReleaseUpload(type: GitHubReleaseUpload) {
     dependsOn publicationGitHubReleaseCreate
     fileName = 'ontrack.jar'
     fileType = 'application/zip'
-    file = project.file("ontrack-ui-${ontrackVersion}.jar")
+    file = project.file("ontrack-ui-${ontrackVersionFull}.jar")
 }
 
 task publicationOntrackChangeLog(type: OntrackChangeLog) {
@@ -275,11 +275,10 @@ task publicationGitHubRelease {
 task publicationMaven {
     description = "Publication of the DSL library to the Maven Central"
     dependsOn 'uploadArchives'
-    finalizedBy 'closeAndPromoteRepository'
+    dependsOn 'closeAndPromoteRepository'
 }
 
 task publicationRelease {
     dependsOn publicationMaven
     dependsOn publicationGitHubRelease
-    finalizedBy 'closeAndPromoteRepository'
 }
