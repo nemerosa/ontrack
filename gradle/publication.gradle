@@ -278,6 +278,7 @@ task publicationMaven {
     dependsOn 'uploadArchives'
     dependsOn 'closeAndPromoteRepository'
 }
+closeAndPromoteRepository.mustRunAfter uploadArchives
 
 task publicationRelease {
     dependsOn publicationMaven
