@@ -129,11 +129,6 @@ task productionBackup {
     }
 }
 
-task productionRestore(type: ProductionRestore) {
-    backup = project.properties.backup
-    dependsOn productionStop
-}
-
 task productionStop(type: DockerStop) {
     dependsOn productionBackup
     machine = project.properties.productionMachine
@@ -142,6 +137,11 @@ task productionStop(type: DockerStop) {
     removeVolumes = false
     ignoreError = true
     logFile = null
+}
+
+task productionRestore(type: ProductionRestore) {
+    backup = project.properties.backup
+    dependsOn productionStop
 }
 
 task productionStart(type: DockerStart) {
