@@ -51,6 +51,7 @@ task productionSetup(type: DOSetup) {
     dropletName = project.properties.productionMachine
     region = 'fra1'
     size = '1gb'
+    backups = true
 }
 
 task productionEnv {

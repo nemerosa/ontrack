@@ -12,6 +12,7 @@ class DOSetup extends AbstractCDTask {
     String region = 'ams2'
     String size = '512mb'
     boolean removeFirst = false
+    boolean backups = false
 
     private String ip
 
@@ -38,6 +39,7 @@ class DOSetup extends AbstractCDTask {
                     "--digitalocean-image=docker",
                     "--digitalocean-region=${region}",
                     "--digitalocean-size=${size}",
+                    "--digitalocean-backups=${backups}",
                     dropletName
         }
         // Gets its IP
