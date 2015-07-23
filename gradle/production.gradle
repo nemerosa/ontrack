@@ -14,10 +14,28 @@ buildscript {
 
 import net.nemerosa.httpclient.*
 import net.nemerosa.httpclient.json.*
+import net.nemerosa.ontrack.gradle.AbstractCDTask
 import net.nemerosa.ontrack.gradle.DOSetup
 import net.nemerosa.ontrack.gradle.DockerStart
 import net.nemerosa.ontrack.gradle.DockerStop
 import net.nemerosa.ontrack.gradle.RemoteAcceptanceTest
+
+class ProductionRestore extends AbstractCDTask {
+
+    /**
+     * Location of the TGZ backup file
+     */
+    File backup
+
+    @TaskAction
+    void run() {
+        // Copies the TGZ on the remote machine
+        execute 'docker-machine', 'scp', backup.absolutePath, "${project.properties.productionMachine}:/var/ontrack/${backup.name}"
+        // Extracts the TGZ
+        execute 'docker-machine', 'ssh', "tar xzvf /var/ontrack/${backup.name} -C /var/ontrack/data"
+    }
+
+}
 
 class ProductionVersion extends DefaultTask {
 
@@ -109,6 +127,11 @@ task productionBackup {
             ]
         }
     }
+}
+
+task productionRestore {
+    backup = new File(project.properties.backup as String)
+    dependsOn productionStop
 }
 
 task productionStop(type: DockerStop) {
