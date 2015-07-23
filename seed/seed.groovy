@@ -406,6 +406,7 @@ productionUpgrade
                 gradle '''\
 -Ppublication
 productionTest
+-PacceptanceJar=ontrack-acceptance.jar
 '''
             }
             publishers {
