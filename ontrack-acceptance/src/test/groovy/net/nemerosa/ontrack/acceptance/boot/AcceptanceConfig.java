@@ -73,7 +73,7 @@ class AcceptanceConfig {
         @Override
         public String call() throws Exception {
             // Client
-            OTHttpClient client = OTHttpClientBuilder.create(url, disableSsl).withCredentials("admin", admin).build();
+            OTHttpClient client = OTHttpClientBuilder.create(url, disableSsl).build();
             JsonClient jsonClient = new JsonClientImpl(client);
             // Gets the info every second
             while (true) {
