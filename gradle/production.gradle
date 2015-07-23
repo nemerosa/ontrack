@@ -25,12 +25,12 @@ class ProductionRestore extends AbstractCDTask {
     /**
      * Location of the TGZ backup file
      */
-    File backup
+    String backup
 
     @TaskAction
     void run() {
         // Copies the TGZ on the remote machine
-        execute 'docker-machine', 'scp', backup.absolutePath, "${project.properties.productionMachine}:/var/ontrack/${backup.name}"
+        execute 'docker-machine', 'scp', backup, "${project.properties.productionMachine}:/var/ontrack/${backup.name}"
         // Extracts the TGZ
         execute 'docker-machine', 'ssh', "tar xzvf /var/ontrack/${backup.name} -C /var/ontrack/data"
     }
@@ -130,7 +130,7 @@ task productionBackup {
 }
 
 task productionRestore(type: ProductionRestore) {
-    backup = new File(project.properties.backup as String)
+    backup = project.properties.backup
     dependsOn productionStop
 }
 
