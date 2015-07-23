@@ -60,7 +60,7 @@ def extractDeliveryArtifacts(Object dsl) {
         copyArtifacts("${SEED_PROJECT}-${SEED_BRANCH}-build") {
             flatten()
             buildSelector {
-                upstreamBuild()
+                upstreamBuild(true)
             }
         }
         // Expanding the delivery ZIP
