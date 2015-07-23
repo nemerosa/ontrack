@@ -97,7 +97,7 @@ task productionEnv {
 task productionVersion(type: ProductionVersion)
 
 task productionBackup {
-    dependsOn productionVersion
+    dependsOn 'productionVersion'
     doFirst {
         // Classifier
         def version = productionVersion.version
@@ -130,7 +130,7 @@ task productionBackup {
 }
 
 task productionStop(type: DockerStop) {
-    dependsOn productionBackup
+    dependsOn 'productionBackup'
     machine = project.properties.productionMachine
     containerName = 'ontrack'
     remove = true
@@ -139,9 +139,11 @@ task productionStop(type: DockerStop) {
     logFile = null
 }
 
-task productionRestore(type: ProductionRestore) {
-    // dependsOn productionStop
-    backup = new File(project.properties.backup as String)
+if (hasProperty('backup')) {
+    task productionRestore(type: ProductionRestore) {
+        // dependsOn productionStop
+        backup = new File(project.properties.backup as String)
+    }
 }
 
 task productionStart(type: DockerStart) {
