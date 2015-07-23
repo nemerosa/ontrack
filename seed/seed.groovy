@@ -384,14 +384,6 @@ productionUpgrade
                     }
                 }
             }
-            configure { node ->
-                node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackPromotedRunNotifier' {
-                    'project'('ontrack')
-                    'branch'(NAME)
-                    'build'('${VERSION_BUILD}')
-                    'promotionLevel'('ONTRACK')
-                }
-            }
         }
 
         // Production acceptance test
@@ -425,6 +417,14 @@ productionTest
                     'branch'(NAME)
                     'build'('${VERSION_BUILD}')
                     'validationStamp'('ONTRACK.SMOKE')
+                }
+            }
+            configure { node ->
+                node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackPromotedRunNotifier' {
+                    'project'('ontrack')
+                    'branch'(NAME)
+                    'build'('${VERSION_BUILD}')
+                    'promotionLevel'('ONTRACK')
                 }
             }
         }
