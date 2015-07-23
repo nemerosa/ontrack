@@ -129,7 +129,7 @@ task productionBackup {
     }
 }
 
-task productionRestore {
+task productionRestore(type: ProductionRestore) {
     backup = new File(project.properties.backup as String)
     dependsOn productionStop
 }
