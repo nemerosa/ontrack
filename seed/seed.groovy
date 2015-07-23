@@ -400,6 +400,7 @@ productionUpgrade
             }
             wrappers {
                 injectPasswords()
+                xvfb('default')
             }
             extractDeliveryArtifacts delegate
             steps {
