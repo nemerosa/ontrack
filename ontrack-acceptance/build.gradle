@@ -40,6 +40,15 @@ bootRepackage {
     customConfiguration = 'testRuntime'
 }
 
+task normaliseJar {
+    doFirst {
+        // Used for local testing only
+        ant.copy file: testJar.outputs.files.singleFile, tofile: "${buildDir}/libs/ontrack-acceptance.jar"
+    }
+}
+normaliseJar.dependsOn bootRepackage
+assemble.dependsOn normaliseJar
+
 /**
  * Local test definitions
  */
@@ -64,81 +73,3 @@ test {
 jar {
     enabled = false
 }
-
-// Local acceptance tests
-task localAcceptanceTest << {
-    // Running the acceptance tests
-    project.tasks.acceptanceTest.execute()
-}
-
-task localAcceptanceTestStart << {
-
-    // Properties
-    project.ext.ontrackPort = project.hasProperty('ontrackPort') ? ontrackPort : 9999
-    def ontrackWait = 120
-
-    // Ontrack URL
-    project.ext.ontrackUrl = "http://localhost:${ontrackPort}"
-
-    // Configuring the acceptance tests
-    project.tasks.acceptanceTest.configure {
-        systemProperty 'ontrack.url', project.ext.ontrackUrl
-    }
-
-    // Getting the version on the UI to get
-    def ontrackVersion = project.hasProperty('ontrackVersion') ? ontrackVersion : project.version
-    println "Using Ontrack version ${ontrackVersion}"
-
-    // Copying the UI JAR locally
-    println "Copying the UI JAR to ${project.buildDir}/local-acceptance"
-    copy {
-        from project(':ontrack-ui').tasks.jar
-        into "${project.buildDir}/local-acceptance"
-    }
-
-    ant.echo 'Starting the UI for the acceptance tests...'
-    ant.property(name: 'app.file', value: "${project.buildDir}/local-acceptance/${project(':ontrack-ui').tasks.jar.archiveName}")
-    ant.property(name: 'app.dir', value: "${project.buildDir}/local-acceptance/run")
-    ant.property(name: 'app.log', value: "${project.buildDir}/local-acceptance/run/log/")
-    ant.mkdir(dir: '${app.dir}')
-    ant.echo 'Starting application in ${app.dir}'
-    ant.echo 'Starting application defined by ${app.file}'
-    ant.echo "Starting application on port ${ontrackPort}"
-    ant.echo 'Log files available at ${app.log}'
-    ant.echo "JVM options: ${ontrackJvmOptions}"
-
-    ant.java(
-            jar: '${app.file}',
-            fork: true,
-            spawn: true,
-            dir: '${app.dir}'
-    ) {
-        jvmarg(value: "${ontrackJvmOptions}")
-        arg(value: "--server.port=${ontrackPort}")
-        arg(value: '--logging.path=${app.log}')
-        arg(value: '--spring.profiles.active=acceptance')
-    }
-
-    ant.echo "Waiting ${ontrackWait} seconds (max) for the JVM to start"
-    ant.waitfor(maxwait: ontrackWait, maxwaitunit: 'second', checkevery: 500) {
-        http(url: "${ontrackUrl}/info")
-    }
-    ant.echo 'JVM is started'
-
-}
-
-task localAcceptanceTestEnd << {
-    ant.echo "Stopping the JVM at ${ontrackUrl}"
-    ant.exec(executable: 'curl', failOnError: true) {
-        arg(value: '-v')
-        arg(value: '--fail')
-        arg(value: "${ontrackUrl}/manage/shutdown")
-        arg(value: '-X')
-        arg(value: 'POST')
-    }
-}
-
-// Ordering
-project.tasks.localAcceptanceTestStart.dependsOn ':ontrack-ui:assemble'
-project.tasks.localAcceptanceTest.dependsOn 'localAcceptanceTestStart'
-project.tasks.localAcceptanceTest.finalizedBy 'localAcceptanceTestEnd'

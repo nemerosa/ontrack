@@ -56,17 +56,10 @@ clean << {
 }
 
 /**
- * Copy of Web resources before release
+ * Copy of Web resources before packaging
  */
 
-task copyWebResourcesRelease(dependsOn: ':ontrack-web:release') << {
-    project.copy {
-        from project(':ontrack-web').tasks.release.output
-        into project.file('src/main/resources/static')
-    }
-}
-
-task copyWebResourcesBuild(dependsOn: ':ontrack-web:build') << {
+task copyWebResources(dependsOn: ':ontrack-web:build') << {
     project.copy {
         from project(':ontrack-web').tasks.build.output
         into project.file('src/main/resources/static')
@@ -90,14 +83,8 @@ ontrack.version.sourceType = ${rootProject.versioning.info.branchType}
 """
 }
 
-release.dependsOn copyWebResourcesRelease
-release.dependsOn generateVersionInfo
+build.dependsOn copyWebResources
+build.dependsOn generateVersionInfo
 
-if (!('release' in gradle.startParameter.taskNames)) {
-    build.dependsOn copyWebResourcesBuild
-    build.dependsOn generateVersionInfo
-}
-
-processResources.mustRunAfter copyWebResourcesRelease
-processResources.mustRunAfter copyWebResourcesBuild
+processResources.mustRunAfter copyWebResources
 processResources.mustRunAfter generateVersionInfo

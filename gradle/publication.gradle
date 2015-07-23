@@ -1,0 +1,285 @@
+import net.nemerosa.httpclient.*
+import net.nemerosa.httpclient.json.*
+import net.nemerosa.ontrack.dsl.*
+
+/**
+ * Release and publication tasks
+ */
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'net.nemerosa:http-client-json:1.1.0'
+        classpath 'net.nemerosa.ontrack:ontrack-dsl:2.12.4'
+    }
+}
+
+/**
+ * Maven publication
+ */
+
+apply plugin: 'signing'
+apply plugin: 'maven'
+apply plugin: 'io.codearte.nexus-staging'
+
+artifacts {
+    archives file: file("ontrack-dsl-${ontrackVersion}.pom"), extension: 'pom'
+    archives file: file("ontrack-dsl-${ontrackVersion}.jar")
+    archives file: file("ontrack-dsl-${ontrackVersion}-sources.jar"), classifier: 'sources'
+    archives file: file("ontrack-dsl-${ontrackVersion}-javadoc.jar"), classifier: 'javadoc'
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUser, password: ossrhPassword)
+            }
+        }
+    }
+}
+
+nexusStaging {
+    username = ossrhUser
+    password = ossrhPassword
+    numberOfRetries = 30
+}
+
+/**
+ * Test task
+ */
+
+task publicationCollectArtifacts(type: Copy) {
+    description = "Test task to collect built artifacts for testing the publication"
+    dependsOn ':ontrack-dsl:assemble'
+    from(project(':ontrack-dsl').file('build/libs')) {
+        include '*.jar'
+    }
+    from(project(':ontrack-dsl').file('build/poms')) {
+        include '*.pom'
+    }
+    into projectDir
+
+}
+
+/**
+ * Ontrack task definitions
+ */
+
+class OntrackChangeLog extends DefaultTask {
+
+    String ontrackProject = 'ontrack'
+    String ontrackUrl = project.properties.ontrackUrl
+    String ontrackUser = project.properties.ontrackUser
+    String ontrackPassword = project.properties.ontrackPassword
+
+    String ontrackReleasePromotionLevel = 'RELEASE'
+    String ontrackReleaseBranch = project.properties.ontrackReleaseBranch
+
+    private String changeLog
+
+    protected Ontrack getOntrackClient() {
+        return OntrackConnection.create(ontrackUrl)
+                .logger({ println "[${name}][Ontrack] ${it}" })
+                .authenticate(ontrackUser, ontrackPassword)
+                .build()
+    }
+
+    @TaskAction
+    void run() {
+        if (!ontrackReleaseBranch) throw new GradleException("Missing ontrackReleaseBranch property")
+        println "[${name}] Getting the Ontrack log for ${ontrackProject} since " +
+                "last ${ontrackReleasePromotionLevel} on branch ${ontrackReleaseBranch}"
+        // Gets the Ontrack client
+        def ontrack = ontrackClient
+        // Gest the Ontrack project
+        def project = ontrack.project(ontrackProject)
+        // Gets the last build on the branch to release
+        println "ontrackReleaseBranch = ${ontrackReleaseBranch}"
+        def lastBuild = project.search(branchName: ontrackReleaseBranch)[0]
+        // Gets the last release
+        def lastRelease = project.search(promotionName: ontrackReleasePromotionLevel)[0]
+        // Gets the change log
+        def changeLog = lastBuild.getChangeLog(lastRelease)
+        // Exports the issues
+        this.changeLog = changeLog.exportIssues(
+                format: 'text',
+                groups: [
+                        'Features'    : ['feature'],
+                        'Enhancements': ['enhancement'],
+                        'Bugs'        : ['bug'],
+                ],
+                exclude: ['design', 'delivery']
+
+        )
+    }
+
+    String getChangeLog() {
+        return changeLog
+    }
+}
+
+/**
+ * GitHub publication task tasks
+ */
+
+abstract class GitHubTask extends DefaultTask {
+
+    String repository = 'nemerosa/ontrack'
+    String gitHubUser = project.properties.gitHubUser
+    String gitHubPassword = project.properties.gitHubPassword
+
+    protected def createJsonClient(String url) {
+        Client client = ClientBuilder
+                .create(url, false)
+                .withLogger({ println "[${name}][HTTP] ${it}" })
+                .withCredentials(gitHubUser, gitHubPassword)
+                .build()
+                .withHeader('Accept', 'application/vnd.github+json')
+        return new JsonClientImpl(client, true)
+    }
+
+    protected def gitHubPost(String url, String path, Map data) {
+        return createJsonClient(url).post(data, path)
+    }
+
+}
+
+class GitHubReleaseCreate extends GitHubTask {
+
+    String commit = project.properties.ontrackVersionCommit
+    String tag = project.properties.ontrackVersion
+
+    private String releaseId
+
+    @TaskAction
+    void run() {
+        if (!tag) throw new GradleException("Missing ontrackVersion property")
+        if (!commit) throw new GradleException("Missing ontrackVersionCommit property")
+        println "[${name}] Creating release ${tag} from commit ${commit}..."
+        releaseId = gitHubPost(
+                "https://api.github.com",
+                "/repos/${repository}/releases",
+                [
+                        target_commitish: commit,
+                        tag_name        : tag,
+                        name            : tag,
+                ]
+        ).id
+        println "[${name}] Release ID = ${releaseId}"
+    }
+
+    String getReleaseId() {
+        releaseId
+    }
+}
+
+class GitHubReleaseUpload extends GitHubTask {
+
+    String releaseId
+    String fileName
+    String fileType
+    File file
+
+    @TaskAction
+    void run() {
+        // Release ID
+        if (!releaseId) {
+            releaseId = taskDependencies.getDependencies(this).find { it instanceof GitHubReleaseCreate }.releaseId
+        }
+        println "[${name}] Uploading ${file} as ${fileName} to release ${releaseId}..."
+        // Upload URL
+        String url = "https://uploads.github.com"
+        String path = "/repos/${repository}/releases/${releaseId}/assets?name=${fileName}"
+        // Client
+        def client = createJsonClient(url)
+        // Upload
+        client.upload(
+                fileName,
+                new Document(
+                        fileType,
+                        file.bytes
+                ),
+                file.name,
+                path
+        )
+    }
+
+}
+
+class GitHubReleaseDescription extends GitHubTask {
+
+    @TaskAction
+    void run() {
+        // Release ID
+        def releaseId = taskDependencies.getDependencies(this).find { it instanceof GitHubReleaseCreate }.releaseId
+        // Ontrack change log
+        def changeLog = taskDependencies.getDependencies(this).find { it instanceof OntrackChangeLog }.changeLog
+        // Logging
+        println "[${name}] Setting change log of release ${releaseId}\n${changeLog}"
+        // Call
+        gitHubPost(
+                "https://api.github.com",
+                "/repos/${repository}/releases/${releaseId}",
+                [
+                        body: changeLog,
+                ]
+        )
+    }
+
+}
+
+/**
+ * Publication tasks
+ */
+
+task publicationGitHubReleaseCreate(type: GitHubReleaseCreate) {
+    commit = ontrackVersionCommit // VERSION_COMMIT
+    tag = ontrackVersion          // VERSION_DISPLAY
+}
+
+task publicationGitHubReleaseUpload(type: GitHubReleaseUpload) {
+    dependsOn publicationGitHubReleaseCreate
+    fileName = 'ontrack.jar'
+    fileType = 'application/zip'
+    file = project.file("ontrack-ui-${ontrackVersion}.jar")
+}
+
+task publicationOntrackChangeLog(type: OntrackChangeLog) {
+    ontrackReleaseBranch = project.properties.ontrackReleaseBranch
+    mustRunAfter publicationGitHubReleaseUpload
+}
+
+task publicationGitHubReleaseDescription(type: GitHubReleaseDescription) {
+    dependsOn publicationGitHubReleaseCreate
+    dependsOn publicationOntrackChangeLog
+}
+
+task publicationGitHubRelease {
+    dependsOn publicationGitHubReleaseCreate
+    dependsOn publicationGitHubReleaseUpload
+    dependsOn publicationOntrackChangeLog
+    dependsOn publicationGitHubReleaseDescription
+}
+
+/**
+ * Root tasks
+ */
+
+task publicationMaven {
+    description = "Publication of the DSL library to the Maven Central"
+    dependsOn 'uploadArchives'
+    finalizedBy 'closeAndPromoteRepository'
+}
+
+task publicationRelease {
+    dependsOn publicationMaven
+    dependsOn publicationGitHubRelease
+    finalizedBy 'closeAndPromoteRepository'
+}

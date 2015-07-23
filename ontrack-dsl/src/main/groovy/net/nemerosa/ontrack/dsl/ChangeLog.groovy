@@ -46,6 +46,19 @@ class ChangeLog extends AbstractResource {
         }
     }
 
+    String exportIssues(IssueChangeLogExportRequest request = new IssueChangeLogExportRequest()) {
+        return ontrack.text(
+                query(
+                        link('exportIssues'),
+                        request.toQuery(from.id, to.id)
+                )
+        )
+    }
+
+    String exportIssues(Map map) {
+        return exportIssues(new IssueChangeLogExportRequest(map))
+    }
+
     List<ChangeLogFile> getFiles() {
         String url = optionalLink('files')
         if (url) {

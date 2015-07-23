@@ -1,7 +1,7 @@
 description = "DSL for Ontrack."
 
 apply plugin: 'groovy'
-apply plugin:'application'
+apply plugin: 'maven-publish'
 
 tasks.withType(AbstractCompile) {
     sourceCompatibility = 1.7
@@ -16,10 +16,58 @@ dependencies {
     compile libraries.http_mime
 }
 
-javadocJar {
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
     from groovydoc
 }
 
-mainClassName = 'net.nemerosa.ontrack.dsl.Shell'
+task sourceJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
 
-build.dependsOn distZip
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            pom.withXml {
+                def pom = asNode()
+                pom.appendNode 'name', project.name
+                pom.appendNode 'description', project.description
+                pom.appendNode 'url', 'http://nemerosa.github.io/ontrack'
+                pom.appendNode('licenses').appendNode('license').with {
+                    appendNode 'name', 'The MIT License (MIT)'
+                    appendNode 'url', 'http://opensource.org/licenses/MIT'
+                    appendNode 'distribution', 'repo'
+                }
+                pom.appendNode('scm').with {
+                    appendNode 'url', 'https://github.com/nemerosa/ontrack'
+                    appendNode 'connection', 'scm:git://github.com/nemerosa/ontrack'
+                    appendNode 'developerConnection', 'scm:git:git://github.com/nemerosa/ontrack'
+                }
+                pom.appendNode('developers').appendNode('developer').with {
+                    appendNode 'id', 'dcoraboeuf'
+                    appendNode 'name', 'Damien Coraboeuf'
+                    appendNode 'email', 'damien.coraboeuf@gmail.com'
+                }
+            }
+        }
+    }
+}
+
+model {
+    tasks.generatePomFileForMavenJavaPublication {
+        destination = file("${buildDir}/poms/${project.name}-${version}.pom")
+    }
+}
+
+// Archives for Javadoc and Sources
+artifacts {
+    archives javadocJar
+    archives sourceJar
+    archives file: file("${buildDir}/poms/${project.name}-${version}.pom"), type: 'pom'
+}
+
+// Links with assembly
+assemble.dependsOn 'generatePomFileForMavenJavaPublication'

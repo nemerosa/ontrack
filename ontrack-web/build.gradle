@@ -75,17 +75,32 @@ task versionSet {
         }
     }
 }
-
-task release(dependsOn: ['setup', 'versionSet', 'gruntProd']) {
-    ext {
-        output = "${project.buildDir}/grunt/prod"
+task versionUnset {
+    doLast {
+        ant.replaceregexp(
+                match: '"version": "(.*)"',
+                replace: "\"version\": \"2.0.0\"",
+                byline: true,
+                encoding: 'UTF-8'
+        ) {
+            fileset(dir: project.projectDir, includes: 'package.json')
+        }
     }
 }
 
-task build(dependsOn: ['setup', 'gruntDev']) {
-    ext {
-        output = "${project.buildDir}/grunt/dev"
-    }
+task buildProd(dependsOn: ['setup', 'versionSet', 'gruntProd']) {
+    finalizedBy versionUnset
+}
+
+task buildDev(dependsOn: ['setup', 'gruntDev']) {
+}
+
+if (project.hasProperty('dev')) {
+    build.dependsOn buildDev
+    build.ext.output = "${project.buildDir}/grunt/dev"
+} else {
+    build.dependsOn buildProd
+    build.ext.output = "${project.buildDir}/grunt/prod"
 }
 
 task gruntProd(type: NodeTask, dependsOn: npmPackages) {
