@@ -60,7 +60,7 @@ def extractDeliveryArtifacts(Object dsl) {
         copyArtifacts("${SEED_PROJECT}-${SEED_BRANCH}-build") {
             flatten()
             buildSelector {
-                upstreamBuild()
+                upstreamBuild(true)
             }
         }
         // Expanding the delivery ZIP
@@ -113,7 +113,7 @@ build
                 pattern 'ontrack-ui/build/libs/ontrack-ui-*.jar'
                 pattern 'ontrack-acceptance/build/libs/ontrack-acceptance.jar' // No version needed here
                 pattern 'ontrack-dsl/build/libs/ontrack-dsl-*.jar'
-                pattern 'ontrack-dsl/build/libs/ontrack-dsl-*.pom'
+                pattern 'ontrack-dsl/build/poms/ontrack-dsl-*.pom'
                 pattern 'build/distributions/ontrack-*-delivery.zip'
             }
             tasks(
@@ -289,21 +289,23 @@ docker logout
         steps {
             // Publication
             if (release) {
-                gradle '''\
+                gradle """\
 -Ppublication
--PontrackVersion=${VERSION_DISPLAY}
--PontrackVersionCommit=${VERSION_COMMIT}
--PontrackVersionFull=${VERSION_FULL}
+-PontrackVersion=\${VERSION_DISPLAY}
+-PontrackVersionCommit=\${VERSION_COMMIT}
+-PontrackVersionFull=\${VERSION_FULL}
+-PontrackReleaseBranch=${SEED_BRANCH}
 publicationRelease
-'''
+"""
             } else {
-                gradle '''\
+                gradle """\
 -Ppublication
--PontrackVersion=${VERSION_DISPLAY}
--PontrackVersionCommit=${VERSION_COMMIT}
--PontrackVersionFull=${VERSION_FULL}
+-PontrackVersion=\${VERSION_DISPLAY}
+-PontrackVersionCommit=\${VERSION_COMMIT}
+-PontrackVersionFull=\${VERSION_FULL}
+-PontrackReleaseBranch=${SEED_BRANCH}
 publicationMaven
-'''
+"""
             }
             if (release) {
                 shell """\
@@ -373,18 +375,13 @@ productionUpgrade
 '''
             }
             publishers {
+                archiveArtifacts {
+                    pattern 'build/*.tgz'
+                }
                 downstreamParameterized {
                     trigger("${PROJECT}-${NAME}-acceptance-production", 'SUCCESS', false) {
                         currentBuild()
                     }
-                }
-            }
-            configure { node ->
-                node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackPromotedRunNotifier' {
-                    'project'('ontrack')
-                    'branch'(NAME)
-                    'build'('${VERSION_BUILD}')
-                    'promotionLevel'('ONTRACK')
                 }
             }
         }
@@ -403,12 +400,14 @@ productionUpgrade
             }
             wrappers {
                 injectPasswords()
+                xvfb('default')
             }
             extractDeliveryArtifacts delegate
             steps {
                 gradle '''\
 -Ppublication
 productionTest
+-PacceptanceJar=ontrack-acceptance.jar
 '''
             }
             publishers {
@@ -420,6 +419,14 @@ productionTest
                     'branch'(NAME)
                     'build'('${VERSION_BUILD}')
                     'validationStamp'('ONTRACK.SMOKE')
+                }
+            }
+            configure { node ->
+                node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackPromotedRunNotifier' {
+                    'project'('ontrack')
+                    'branch'(NAME)
+                    'build'('${VERSION_BUILD}')
+                    'promotionLevel'('ONTRACK')
                 }
             }
         }
