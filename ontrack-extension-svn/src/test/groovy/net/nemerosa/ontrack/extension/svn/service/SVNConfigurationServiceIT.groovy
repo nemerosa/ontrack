@@ -2,11 +2,14 @@ package net.nemerosa.ontrack.extension.svn.service
 
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository
 import net.nemerosa.ontrack.extension.svn.db.SVNRepositoryDao
+import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration
+import net.nemerosa.ontrack.extension.svn.model.SVNURLFormatException
 import net.nemerosa.ontrack.extension.svn.support.SVNProfileValueSource
 import net.nemerosa.ontrack.extension.svn.support.SVNTestRepo
 import net.nemerosa.ontrack.extension.svn.support.SVNTestUtils
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.security.GlobalSettings
+import net.nemerosa.ontrack.model.support.ConnectionResult
 import org.apache.commons.io.FileUtils
 import org.junit.AfterClass
 import org.junit.BeforeClass
@@ -25,7 +28,7 @@ class SVNConfigurationServiceIT extends AbstractServiceTestSupport {
 
     @BeforeClass
     static void 'SVN repository: start'() {
-        repo = SVNTestRepo.get('IndexationServiceIT')
+        repo = SVNTestRepo.get('SVNConfigurationServiceIT')
     }
 
     @AfterClass
@@ -41,6 +44,36 @@ class SVNConfigurationServiceIT extends AbstractServiceTestSupport {
 
     @Autowired
     private SVNRepositoryDao repositoryDao
+
+    @Autowired
+    private SVNService svnService
+
+    @Test(expected = SVNURLFormatException)
+    void 'No trailing slash on the URL'() {
+        svnService.test(SVNConfiguration.of("test", "svn://localhost/"))
+    }
+
+    @Test
+    @IfProfileValue(name = "svn", value = "true")
+    void 'SVN configuration must point to the repository root - nok'() {
+        repo.mkdir "SVNConfigurationSubFolder", "Sub folder"
+        def result = svnService.test(
+                SVNConfiguration.of("test", "svn://localhost/SVNConfigurationSubFolder")
+                        .withUser("test").withPassword("test")
+        )
+        assert result.type == ConnectionResult.ConnectionResultType.ERROR
+        assert result.message == "svn://localhost/SVNConfigurationSubFolder must be the root of the repository."
+    }
+
+    @Test
+    @IfProfileValue(name = "svn", value = "true")
+    void 'SVN configuration must point to the repository root'() {
+        def result = svnService.test(
+                SVNConfiguration.of("test", "svn://localhost")
+                        .withUser("test").withPassword("test")
+        )
+        assert result.type == ConnectionResult.ConnectionResultType.OK
+    }
 
     @Test
     @IfProfileValue(name = "svn", value = "true")

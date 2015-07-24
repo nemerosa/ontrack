@@ -309,7 +309,8 @@ public class SVNClientImpl implements SVNClient {
         );
     }
 
-    private SVNInfo getInfo(SVNRepository repository, SVNURL url, SVNRevision revision) {
+    @Override
+    public SVNInfo getInfo(SVNRepository repository, SVNURL url, SVNRevision revision) {
         try {
             return getWCClient(repository).doInfo(url, revision, revision);
         } catch (SVNException e) {
