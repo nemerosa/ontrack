@@ -154,8 +154,12 @@ public class JIRAServiceExtension extends AbstractIssueServiceExtension {
 
     @Override
     protected Set<String> getIssueTypes(IssueServiceConfiguration issueServiceConfiguration, Issue issue) {
-        JIRAIssue jiraIssue = (JIRAIssue) issue;
-        return Collections.singleton(jiraIssue.getIssueType());
+        if (issue != null) {
+            JIRAIssue jiraIssue = (JIRAIssue) issue;
+            return Collections.singleton(jiraIssue.getIssueType());
+        } else {
+            return Collections.emptySet();
+        }
     }
 
     /**
