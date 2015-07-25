@@ -11,7 +11,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'net.nemerosa:http-client-json:1.1.0'
+        classpath 'net.nemerosa:http-client-json:1.2.0'
         classpath 'net.nemerosa.ontrack:ontrack-dsl:2.12.4'
     }
 }
@@ -202,12 +202,10 @@ class GitHubReleaseUpload extends GitHubTask {
         def client = createJsonClient(url)
         // Upload
         client.upload(
-                fileName,
                 new Document(
                         fileType,
                         file.bytes
                 ),
-                file.name,
                 path
         )
     }
