@@ -20,20 +20,40 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
 
     private final String name;
     private final String url;
+    @Wither
     private final String user;
     @SuppressWarnings("UnusedDeclaration")
     private final String password;
+    @Wither
     private final String branchPattern;
     @Wither
     private final String tagPattern;
+    @Wither
     private final String tagFilterPattern;
+    @Wither
     private final String browserForPath;
+    @Wither
     private final String browserForRevision;
+    @Wither
     private final String browserForChange;
+    @Wither
     private final int indexationInterval;
+    @Wither
     private final long indexationStart;
     @Wither
     private final String issueServiceConfigurationIdentifier;
+
+    public static SVNConfiguration of(String name, String url) {
+        return new SVNConfiguration(
+                name,
+                url,
+                null, null, // user, password
+                "", "", "", // patterns
+                "", "", "", // browser URL
+                0, 1L,      // indexation
+                null        // issue service
+        );
+    }
 
     public static Form form(List<IssueServiceConfigurationRepresentation> availableIssueServiceConfigurations) {
         return Form.create()

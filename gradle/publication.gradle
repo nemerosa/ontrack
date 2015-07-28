@@ -11,7 +11,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'net.nemerosa:http-client-json:1.1.0'
+        classpath 'net.nemerosa:http-client-json:1.2.0'
         classpath 'net.nemerosa.ontrack:ontrack-dsl:2.12.4'
     }
 }
@@ -25,10 +25,10 @@ apply plugin: 'maven'
 apply plugin: 'io.codearte.nexus-staging'
 
 artifacts {
-    archives file: file("ontrack-dsl-${ontrackVersion}.pom"), extension: 'pom'
-    archives file: file("ontrack-dsl-${ontrackVersion}.jar")
-    archives file: file("ontrack-dsl-${ontrackVersion}-sources.jar"), classifier: 'sources'
-    archives file: file("ontrack-dsl-${ontrackVersion}-javadoc.jar"), classifier: 'javadoc'
+    archives file: file("ontrack-dsl-${ontrackVersionFull}.pom"), extension: 'pom'
+    archives file: file("ontrack-dsl-${ontrackVersionFull}.jar")
+    archives file: file("ontrack-dsl-${ontrackVersionFull}-sources.jar"), classifier: 'sources'
+    archives file: file("ontrack-dsl-${ontrackVersionFull}-javadoc.jar"), classifier: 'javadoc'
 }
 
 signing {
@@ -46,6 +46,7 @@ uploadArchives {
 }
 
 nexusStaging {
+    packageGroup = 'net.nemerosa'
     username = ossrhUser
     password = ossrhPassword
     numberOfRetries = 30
@@ -201,12 +202,10 @@ class GitHubReleaseUpload extends GitHubTask {
         def client = createJsonClient(url)
         // Upload
         client.upload(
-                fileName,
                 new Document(
                         fileType,
                         file.bytes
                 ),
-                file.name,
                 path
         )
     }
@@ -248,7 +247,7 @@ task publicationGitHubReleaseUpload(type: GitHubReleaseUpload) {
     dependsOn publicationGitHubReleaseCreate
     fileName = 'ontrack.jar'
     fileType = 'application/zip'
-    file = project.file("ontrack-ui-${ontrackVersion}.jar")
+    file = project.file("ontrack-ui-${ontrackVersionFull}.jar")
 }
 
 task publicationOntrackChangeLog(type: OntrackChangeLog) {
@@ -275,11 +274,11 @@ task publicationGitHubRelease {
 task publicationMaven {
     description = "Publication of the DSL library to the Maven Central"
     dependsOn 'uploadArchives'
-    finalizedBy 'closeAndPromoteRepository'
+    dependsOn 'closeAndPromoteRepository'
 }
+closeAndPromoteRepository.mustRunAfter uploadArchives
 
 task publicationRelease {
     dependsOn publicationMaven
     dependsOn publicationGitHubRelease
-    finalizedBy 'closeAndPromoteRepository'
 }

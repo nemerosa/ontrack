@@ -60,7 +60,7 @@ def extractDeliveryArtifacts(Object dsl) {
         copyArtifacts("${SEED_PROJECT}-${SEED_BRANCH}-build") {
             flatten()
             buildSelector {
-                upstreamBuild()
+                upstreamBuild(true)
             }
         }
         // Expanding the delivery ZIP
@@ -113,7 +113,7 @@ build
                 pattern 'ontrack-ui/build/libs/ontrack-ui-*.jar'
                 pattern 'ontrack-acceptance/build/libs/ontrack-acceptance.jar' // No version needed here
                 pattern 'ontrack-dsl/build/libs/ontrack-dsl-*.jar'
-                pattern 'ontrack-dsl/build/libs/ontrack-dsl-*.pom'
+                pattern 'ontrack-dsl/build/poms/ontrack-dsl-*.pom'
                 pattern 'build/distributions/ontrack-*-delivery.zip'
             }
             tasks(
@@ -284,37 +284,39 @@ docker logout
         }
         wrappers {
             injectPasswords()
-            // toolenv('Maven-3.2.x')
         }
         extractDeliveryArtifacts delegate
         steps {
             // Publication
             if (release) {
-                gradle '''\
+                gradle """\
 -Ppublication
--PontrackVersion=${VERSION_DISPLAY}
+-PontrackVersion=\${VERSION_DISPLAY}
+-PontrackVersionCommit=\${VERSION_COMMIT}
+-PontrackVersionFull=\${VERSION_FULL}
+-PontrackReleaseBranch=${SEED_BRANCH}
 publicationRelease
-'''
+"""
             } else {
-                gradle '''\
+                gradle """\
 -Ppublication
--PontrackVersion=${VERSION_DISPLAY}
+-PontrackVersion=\${VERSION_DISPLAY}
+-PontrackVersionCommit=\${VERSION_COMMIT}
+-PontrackVersionFull=\${VERSION_FULL}
+-PontrackReleaseBranch=${SEED_BRANCH}
 publicationMaven
-'''
+"""
             }
-//            if (release) {
-//                shell readFileFromWorkspace('seed/publish-release.sh')
-//                shell """\
-//docker tag --force nemerosa/ontrack:\${VERSION_FULL} nemerosa/ontrack:latest
-//docker tag --force nemerosa/ontrack:\${VERSION_FULL} nemerosa/ontrack:\${VERSION_DISPLAY}
-//docker login --email="damien.coraboeuf+nemerosa@gmail.com" --username="nemerosa" --password="\${DOCKER_PASSWORD}"
-//docker push nemerosa/ontrack:\${VERSION_DISPLAY}
-//docker push nemerosa/ontrack:latest
-//docker logout
-//"""
-//            } else {
-//                shell readFileFromWorkspace('seed/publish.sh')
-//            }
+            if (release) {
+                shell """\
+docker tag --force nemerosa/ontrack:\${VERSION_FULL} nemerosa/ontrack:latest
+docker tag --force nemerosa/ontrack:\${VERSION_FULL} nemerosa/ontrack:\${VERSION_DISPLAY}
+docker login --email="damien.coraboeuf+nemerosa@gmail.com" --username="nemerosa" --password="\${DOCKER_PASSWORD}"
+docker push nemerosa/ontrack:\${VERSION_DISPLAY}
+docker push nemerosa/ontrack:latest
+docker logout
+"""
+            }
         }
         if (release) {
             publishers {
@@ -362,23 +364,24 @@ label VERSION_DISPLAY
             }
             wrappers {
                 injectPasswords()
+                xvfb('default')
             }
+            extractDeliveryArtifacts delegate
             steps {
-                shell readFileFromWorkspace('seed/production.sh')
+                gradle '''\
+-Ppublication
+productionUpgrade
+-PontrackVersion=${VERSION_DISPLAY}
+'''
             }
             publishers {
+                archiveArtifacts {
+                    pattern 'build/*.tgz'
+                }
                 downstreamParameterized {
                     trigger("${PROJECT}-${NAME}-acceptance-production", 'SUCCESS', false) {
                         currentBuild()
                     }
-                }
-            }
-            configure { node ->
-                node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackPromotedRunNotifier' {
-                    'project'('ontrack')
-                    'branch'(NAME)
-                    'build'('${VERSION_BUILD}')
-                    'promotionLevel'('ONTRACK')
                 }
             }
         }
@@ -397,24 +400,33 @@ label VERSION_DISPLAY
             }
             wrappers {
                 injectPasswords()
+                xvfb('default')
             }
+            extractDeliveryArtifacts delegate
             steps {
-                shell readFileFromWorkspace('seed/production-acceptance.sh')
+                gradle '''\
+-Ppublication
+productionTest
+-PacceptanceJar=ontrack-acceptance.jar
+'''
             }
             publishers {
                 archiveJunit('ontrack-acceptance.xml')
             }
             configure { node ->
-                node / 'buildWrappers' / 'org.jenkinsci.plugins.xvfb.XvfbBuildWrapper' {
-                    'installationName'('default')
-                    'screen'('1024x768x24')
-                    'displayNameOffset'('1')
-                }
                 node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
                     'project'('ontrack')
                     'branch'(NAME)
                     'build'('${VERSION_BUILD}')
                     'validationStamp'('ONTRACK.SMOKE')
+                }
+            }
+            configure { node ->
+                node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackPromotedRunNotifier' {
+                    'project'('ontrack')
+                    'branch'(NAME)
+                    'build'('${VERSION_BUILD}')
+                    'promotionLevel'('ONTRACK')
                 }
             }
         }

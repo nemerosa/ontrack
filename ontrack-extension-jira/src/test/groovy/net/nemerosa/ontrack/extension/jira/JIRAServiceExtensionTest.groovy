@@ -72,6 +72,19 @@ public class JIRAServiceExtensionTest {
     }
 
     @Test
+    public void getIssueTypes() {
+        JIRAIssue issue = createIssue(1)
+        def types = service.getIssueTypes(null, issue)
+        assert types as List == ['Defect']
+    }
+
+    @Test
+    public void getIssueTypes_for_null() {
+        def types = service.getIssueTypes(null, null)
+        assert types as List == []
+    }
+
+    @Test
     public void getMessageAnnotator() {
         JIRAConfiguration config = jiraConfiguration();
         Optional<MessageAnnotator> annotator = service.getMessageAnnotator(config);
@@ -200,7 +213,7 @@ public class JIRAServiceExtensionTest {
                 new JIRAStatus("Open", "..."),
                 "",
                 Time.now(),
-                [], [], [], '', []
+                [], [], [], 'Defect', []
         )
     }
 

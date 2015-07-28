@@ -16,8 +16,9 @@ VOLUME /var/ontrack/data
 # Configuration volume
 VOLUME /var/ontrack/conf
 
-# Exposing the port
+# Exposing the ports
 EXPOSE 443
+EXPOSE 8080
 
 # Profile
 ENV PROFILE prod

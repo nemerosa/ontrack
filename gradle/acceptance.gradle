@@ -48,6 +48,7 @@ task doSetup(type: DOSetup) {
     removeFirst = true
     apiToken = digitalOceanAccessToken
     dropletName = "ontrack-acceptance-${ontrackVersion}"
+    region = project.properties.acceptanceRegion
 }
 
 task doTeardown(type: Exec) {

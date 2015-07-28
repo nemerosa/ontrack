@@ -14,10 +14,28 @@ buildscript {
 
 import net.nemerosa.httpclient.*
 import net.nemerosa.httpclient.json.*
+import net.nemerosa.ontrack.gradle.AbstractCDTask
 import net.nemerosa.ontrack.gradle.DOSetup
 import net.nemerosa.ontrack.gradle.DockerStart
 import net.nemerosa.ontrack.gradle.DockerStop
 import net.nemerosa.ontrack.gradle.RemoteAcceptanceTest
+
+class ProductionRestore extends AbstractCDTask {
+
+    /**
+     * Location of the TGZ backup file
+     */
+    File backup
+
+    @TaskAction
+    void run() {
+        // Copies the TGZ on the remote machine
+        execute 'docker-machine', 'scp', backup.absolutePath, "${project.properties.productionMachine}:/var/ontrack/${backup.name}"
+        // Extracts the TGZ
+        execute 'docker-machine', 'ssh', project.properties.productionMachine, "tar xzvf /var/ontrack/${backup.name} -C /var/ontrack/data"
+    }
+
+}
 
 class ProductionVersion extends DefaultTask {
 
@@ -49,8 +67,9 @@ class ProductionVersion extends DefaultTask {
 task productionSetup(type: DOSetup) {
     apiToken = project.properties.digitalOceanAccessToken
     dropletName = project.properties.productionMachine
-    region = 'fra1'
+    region = project.properties.productionRegion
     size = '1gb'
+    backups = true
 }
 
 task productionEnv {
@@ -78,7 +97,7 @@ task productionEnv {
 task productionVersion(type: ProductionVersion)
 
 task productionBackup {
-    dependsOn productionVersion
+    dependsOn 'productionVersion'
     doFirst {
         // Classifier
         def version = productionVersion.version
@@ -95,6 +114,8 @@ task productionBackup {
                     "tar czvf ${remotePath} --exclude=git --exclude=log -C /var/ontrack/data ."
             ]
         }
+        // Creates the local directory
+        buildDir.mkdirs()
         // Gets the TAR locally
         println "[${name}] Getting local backup at ${localPath}"
         project.exec {
@@ -109,13 +130,20 @@ task productionBackup {
 }
 
 task productionStop(type: DockerStop) {
-    dependsOn productionBackup
+    dependsOn 'productionBackup'
     machine = project.properties.productionMachine
     containerName = 'ontrack'
     remove = true
     removeVolumes = false
     ignoreError = true
     logFile = null
+}
+
+if (hasProperty('backup')) {
+    task productionRestore(type: ProductionRestore) {
+        // dependsOn productionStop
+        backup = new File(project.properties.backup as String)
+    }
 }
 
 task productionStart(type: DockerStart) {
@@ -131,8 +159,7 @@ task productionStart(type: DockerStart) {
 }
 
 task productionTest(type: RemoteAcceptanceTest) {
-    // FIXME Production test must use a valid SSL certificate
-    disableSsl = true
+    disableSsl = false // Production test must use a valid SSL certificate
     acceptanceContext = 'production'
     acceptanceUrl = project.properties.productionUrl
     acceptanceTimeout = 600 // 10 minutes for the startup...
@@ -143,10 +170,8 @@ task productionInstall {
     dependsOn productionSetup
     dependsOn productionEnv
     dependsOn productionStart
-    dependsOn productionTest
 }
 
 task productionUpgrade {
     dependsOn productionStart
-    dependsOn productionTest
 }
