@@ -1203,6 +1203,15 @@ class ACCDSL extends AbstractACCDSL {
     }
 
     @Test
+    void 'Configuration - Stash'() {
+        def name = uid('S')
+        ontrack.configure {
+            stash name, url: 'http://localhost:443/stash', indexationInterval: 0
+        }
+        assert ontrack.config.stash.find { it == name } != null
+    }
+
+    @Test
     void 'Configuration - GitHub'() {
         def name = uid('GH')
         ontrack.configure {
