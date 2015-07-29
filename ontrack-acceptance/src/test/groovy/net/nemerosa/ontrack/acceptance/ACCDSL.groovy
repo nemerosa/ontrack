@@ -1212,6 +1212,27 @@ class ACCDSL extends AbstractACCDSL {
     }
 
     @Test
+    void 'Project configuration - Stash'() {
+        def name = uid('S')
+        ontrack.configure {
+            stash name, url: 'http://localhost:443/stash', indexationInterval: 0
+        }
+        def projectName = uid('P')
+        // Sets the configuration
+        ontrack.project(projectName) {
+            config {
+                stash(name, 'PROJECT', 'my-repository')
+            }
+        }
+        // Gets the configuration
+        def stash = ontrack.project(projectName).config.stash
+        assert stash.configuration.name == name
+        assert stash.project == 'PROJECT'
+        assert stash.repository == 'my-repository'
+        assert stash.repositoryUrl == 'http://localhost:443/stash/projects/PROJECT/repos/my-repository'
+    }
+
+    @Test
     void 'Configuration - GitHub'() {
         def name = uid('GH')
         ontrack.configure {
