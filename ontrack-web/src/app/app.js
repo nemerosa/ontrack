@@ -46,7 +46,8 @@ var ontrack = angular.module('ontrack', [
         'ontrack.extension.combined',
         'ontrack.extension.artifactory',
         'ontrack.extension.git',
-        'ontrack.extension.github'
+        'ontrack.extension.github',
+        'ontrack.extension.stash'
     ])
         // HTTP configuration
         .config(function ($httpProvider) {
