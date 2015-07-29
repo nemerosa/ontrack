@@ -2,13 +2,9 @@ package net.nemerosa.ontrack.extension.stash.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import lombok.experimental.Wither;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
 import net.nemerosa.ontrack.extension.support.UserPasswordConfiguration;
-import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.form.Password;
-import net.nemerosa.ontrack.model.form.Selection;
-import net.nemerosa.ontrack.model.form.Text;
+import net.nemerosa.ontrack.model.form.*;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import net.nemerosa.ontrack.model.support.UserPassword;
 import org.apache.commons.lang3.StringUtils;
@@ -44,10 +40,14 @@ public class StashConfiguration implements UserPasswordConfiguration<StashConfig
     private final String password;
 
     /**
+     * Indexation interval
+     */
+    private final int indexationInterval;
+
+    /**
      * ID to the {@link net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration} associated
      * with this repository.
      */
-    @Wither
     private final String issueServiceConfigurationIdentifier;
 
     @Override
@@ -71,6 +71,7 @@ public class StashConfiguration implements UserPasswordConfiguration<StashConfig
                 url,
                 user,
                 password,
+                indexationInterval,
                 issueServiceConfigurationIdentifier
         );
     }
@@ -95,6 +96,14 @@ public class StashConfiguration implements UserPasswordConfiguration<StashConfig
                                 .optional()
                 )
                 .with(
+                        Int.of("indexationInterval")
+                                .label("Indexation interval")
+                                .min(0)
+                                .max(60 * 24)
+                                .value(0)
+                                .help("@file:extension/git/help.net.nemerosa.ontrack.extension.git.model.GitConfiguration.indexationInterval.tpl.html")
+                )
+                .with(
                         Selection.of("issueServiceConfigurationIdentifier")
                                 .label("Issue configuration")
                                 .help("Select an issue service that is sued to associate tickets and issues to the source.")
@@ -109,6 +118,7 @@ public class StashConfiguration implements UserPasswordConfiguration<StashConfig
                 .fill("url", url)
                 .fill("user", user)
                 .fill("password", "")
+                .fill("indexationInterval", indexationInterval)
                 .fill("issueServiceConfigurationIdentifier", issueServiceConfigurationIdentifier)
                 ;
     }
@@ -120,6 +130,7 @@ public class StashConfiguration implements UserPasswordConfiguration<StashConfig
                 replacementFunction.apply(url),
                 replacementFunction.apply(user),
                 password,
+                indexationInterval,
                 issueServiceConfigurationIdentifier
         );
     }

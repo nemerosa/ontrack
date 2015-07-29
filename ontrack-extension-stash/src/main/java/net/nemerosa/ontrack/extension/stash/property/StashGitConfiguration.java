@@ -62,8 +62,7 @@ public class StashGitConfiguration implements GitConfiguration {
 
     @Override
     public int getIndexationInterval() {
-        // FIXME Method net.nemerosa.ontrack.extension.stash.property.StashGitConfiguration.getIndexationInterval
-        return 30;
+        return property.getConfiguration().getIndexationInterval();
     }
 
     @Override
