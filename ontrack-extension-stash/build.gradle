@@ -1,0 +1,5 @@
+dependencies {
+    compile project(':ontrack-extension-git')
+
+    testCompile project(':ontrack-test-utils')
+}
