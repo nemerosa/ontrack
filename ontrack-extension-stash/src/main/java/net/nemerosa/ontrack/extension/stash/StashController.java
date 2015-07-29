@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.stash;
 
 import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
+import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.stash.model.StashConfiguration;
 import net.nemerosa.ontrack.extension.stash.service.StashConfigurationService;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
@@ -25,14 +26,16 @@ public class StashController extends AbstractExtensionController<StashExtensionF
 
     private final StashConfigurationService configurationService;
     private final SecurityService securityService;
+    private final IssueServiceRegistry issueServiceRegistry;
 
     @Autowired
     public StashController(StashExtensionFeature feature,
                            StashConfigurationService configurationService,
-                           SecurityService securityService) {
+                           SecurityService securityService, IssueServiceRegistry issueServiceRegistry) {
         super(feature);
         this.configurationService = configurationService;
         this.securityService = securityService;
+        this.issueServiceRegistry = issueServiceRegistry;
     }
 
     @Override
@@ -85,7 +88,7 @@ public class StashController extends AbstractExtensionController<StashExtensionF
      */
     @RequestMapping(value = "configurations/create", method = RequestMethod.GET)
     public Form getConfigurationForm() {
-        return StashConfiguration.form();
+        return StashConfiguration.form(issueServiceRegistry.getAvailableIssueServiceConfigurations());
     }
 
     /**
@@ -119,7 +122,7 @@ public class StashController extends AbstractExtensionController<StashExtensionF
      */
     @RequestMapping(value = "configurations/{name}/update", method = RequestMethod.GET)
     public Form updateConfigurationForm(@PathVariable String name) {
-        return configurationService.getConfiguration(name).asForm();
+        return configurationService.getConfiguration(name).asForm(issueServiceRegistry.getAvailableIssueServiceConfigurations());
     }
 
     /**

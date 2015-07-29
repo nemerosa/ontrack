@@ -68,7 +68,6 @@ public class StashGitConfiguration implements GitConfiguration {
 
     @Override
     public String getIssueServiceConfigurationIdentifier() {
-        // FIXME Method net.nemerosa.ontrack.extension.stash.property.StashGitConfiguration.getIssueServiceConfigurationIdentifier
-        return null;
+        return property.getConfiguration().getIssueServiceConfigurationIdentifier();
     }
 }
