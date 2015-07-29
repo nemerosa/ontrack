@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.stash.property;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.stash.model.StashConfiguration;
 
 @Data
@@ -33,4 +35,11 @@ public class StashProjectConfigurationProperty {
         );
     }
 
+    /**
+     * Creates a Git configuration from the project's configuration.
+     */
+    @JsonIgnore
+    public GitConfiguration getGitConfiguration() {
+        return new StashGitConfiguration(this);
+    }
 }
