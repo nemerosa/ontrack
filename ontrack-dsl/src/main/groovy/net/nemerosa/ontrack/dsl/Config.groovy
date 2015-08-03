@@ -27,6 +27,22 @@ class Config {
     }
 
     /**
+     * Stash configurations.
+     */
+
+    def stash(Map<String, ?> parameters, String name) {
+        def params = parameters + [name: name]
+        ontrack.post(
+                'extension/stash/configurations/create',
+                params
+        )
+    }
+
+    List<String> getStash() {
+        ontrack.get('extension/stash/configurations/descriptors').resources.collect { it.id }
+    }
+
+    /**
      * Creates or update a Git configuration
      */
     def git(Map<String, ?> parameters, String name) {

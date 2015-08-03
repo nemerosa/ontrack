@@ -49,6 +49,22 @@ class ProjectProperties extends ProjectEntityProperties {
     }
 
     /**
+     * Stash configuration
+     */
+
+    def stash(String name, String project, String repository) {
+        property('net.nemerosa.ontrack.extension.stash.property.StashProjectConfigurationPropertyType', [
+                configuration: name,
+                project      : project,
+                repository   : repository,
+        ])
+    }
+
+    def getStash() {
+        property('net.nemerosa.ontrack.extension.stash.property.StashProjectConfigurationPropertyType')
+    }
+
+    /**
      * JIRA Follow links
      */
     def jiraFollowLinks(String... linkNames) {
