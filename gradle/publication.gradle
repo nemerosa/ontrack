@@ -25,10 +25,10 @@ apply plugin: 'maven'
 apply plugin: 'io.codearte.nexus-staging'
 
 artifacts {
-    archives file: file("ontrack-dsl-${ontrackVersionFull}.pom"), name: 'ontrack-dsl', version: ontrackVersion, extension: 'pom'
-    archives file: file("ontrack-dsl-${ontrackVersionFull}.jar"), name: 'ontrack-dsl', version: ontrackVersion
-    archives file: file("ontrack-dsl-${ontrackVersionFull}-sources.jar"), name: 'ontrack-dsl', version: ontrackVersion, classifier: 'sources'
-    archives file: file("ontrack-dsl-${ontrackVersionFull}-javadoc.jar"), name: 'ontrack-dsl', version: ontrackVersion, classifier: 'javadoc'
+    archives file: file("ontrack-dsl-${ontrackVersionFull}.pom"), name: 'ontrack-dsl', extension: 'pom'
+    archives file: file("ontrack-dsl-${ontrackVersionFull}.jar"), name: 'ontrack-dsl'
+    archives file: file("ontrack-dsl-${ontrackVersionFull}-sources.jar"), name: 'ontrack-dsl', classifier: 'sources'
+    archives file: file("ontrack-dsl-${ontrackVersionFull}-javadoc.jar"), name: 'ontrack-dsl', classifier: 'javadoc'
 }
 
 signing {
