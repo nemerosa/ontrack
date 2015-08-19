@@ -3,7 +3,9 @@ import net.nemerosa.httpclient.json.*
 import net.nemerosa.ontrack.dsl.*
 
 /**
- * Release and publication tasks
+ * Release and publication tasks.
+ *
+ * Standalone tasks.
  */
 
 buildscript {
@@ -13,12 +15,16 @@ buildscript {
     dependencies {
         classpath 'net.nemerosa:http-client-json:1.2.0'
         classpath 'net.nemerosa.ontrack:ontrack-dsl:2.12.4'
+        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3"
     }
 }
 
 /**
  * Maven publication
  */
+
+group = 'net.nemerosa.ontrack'
+version = ontrackVersion
 
 apply plugin: 'signing'
 apply plugin: 'maven'
@@ -50,23 +56,6 @@ nexusStaging {
     username = ossrhUser
     password = ossrhPassword
     numberOfRetries = 30
-}
-
-/**
- * Test task
- */
-
-task publicationCollectArtifacts(type: Copy) {
-    description = "Test task to collect built artifacts for testing the publication"
-    dependsOn ':ontrack-dsl:assemble'
-    from(project(':ontrack-dsl').file('build/libs')) {
-        include '*.jar'
-    }
-    from(project(':ontrack-dsl').file('build/poms')) {
-        include '*.pom'
-    }
-    into projectDir
-
 }
 
 /**

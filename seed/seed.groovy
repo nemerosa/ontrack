@@ -290,6 +290,7 @@ docker logout
             // Publication
             if (release) {
                 gradle """\
+--build-file publication.gradle
 --info
 --profile
 -Ppublication
@@ -301,6 +302,7 @@ publicationRelease
 """
             } else {
                 gradle """\
+--build-file publication.gradle
 --info
 --profile
 -Ppublication
@@ -373,6 +375,9 @@ label VERSION_DISPLAY
             extractDeliveryArtifacts delegate
             steps {
                 gradle '''\
+--build-file production.gradle
+--info
+--profile
 -Ppublication
 productionUpgrade
 -PontrackVersion=${VERSION_DISPLAY}
@@ -409,6 +414,9 @@ productionUpgrade
             extractDeliveryArtifacts delegate
             steps {
                 gradle '''\
+--build-file production.gradle
+--info
+--profile
 -Ppublication
 productionTest
 -PacceptanceJar=ontrack-acceptance.jar
