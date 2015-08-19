@@ -1,5 +1,7 @@
 /**
  * Production tasks
+ *
+ * Standalone tasks.
  */
 
 buildscript {

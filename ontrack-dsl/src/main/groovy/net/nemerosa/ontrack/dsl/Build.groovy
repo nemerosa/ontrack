@@ -27,6 +27,7 @@ class Build extends AbstractProjectResource {
                 ontrack,
                 ontrack.post(link('promote'), [
                         promotionLevel: ontrack.promotionLevel(project, branch, promotion).id,
+			description : ''
                 ])
         )
     }
@@ -42,7 +43,8 @@ class Build extends AbstractProjectResource {
                 ontrack,
                 ontrack.post(link('validate'), [
                         validationStampName  : validationStamp,
-                        validationRunStatusId: validationStampStatus
+                        validationRunStatusId: validationStampStatus,
+			description : ''
                 ])
         )
     }
