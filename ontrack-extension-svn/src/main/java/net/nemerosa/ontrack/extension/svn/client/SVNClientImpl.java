@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 import org.tmatesoft.svn.core.*;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
 import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
+import org.tmatesoft.svn.core.internal.io.dav.http.DefaultHTTPConnectionFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.wc.*;
 
@@ -45,7 +46,10 @@ public class SVNClientImpl implements SVNClient {
         this.transactionService = transactionService;
         // Repository factories
         SVNRepositoryFactoryImpl.setup();
-        DAVRepositoryFactory.setup();
+        DAVRepositoryFactory.setup(
+                // Using spooling
+                new DefaultHTTPConnectionFactory(null, true, null)
+        );
     }
 
     @Override
