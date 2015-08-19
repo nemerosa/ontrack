@@ -290,6 +290,8 @@ docker logout
             // Publication
             if (release) {
                 gradle """\
+--info
+--profile
 -Ppublication
 -PontrackVersion=\${VERSION_DISPLAY}
 -PontrackVersionCommit=\${VERSION_COMMIT}
@@ -299,6 +301,8 @@ publicationRelease
 """
             } else {
                 gradle """\
+--info
+--profile
 -Ppublication
 -PontrackVersion=\${VERSION_DISPLAY}
 -PontrackVersionCommit=\${VERSION_COMMIT}
