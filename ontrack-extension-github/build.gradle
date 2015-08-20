@@ -3,4 +3,5 @@ dependencies {
     compile 'org.eclipse.mylyn.github:org.eclipse.egit.github.core:2.1.5'
 
     testCompile project(':ontrack-test-utils')
+    testCompile project(':ontrack-it-utils')
 }

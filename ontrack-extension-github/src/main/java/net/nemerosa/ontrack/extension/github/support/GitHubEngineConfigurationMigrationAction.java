@@ -26,13 +26,19 @@ import java.util.Map;
 @Component
 public class GitHubEngineConfigurationMigrationAction implements DBMigrationAction {
 
+    /**
+     * Version of the database to migrate.
+     * <p>
+     * TODO Update MainDBInitConfig version to 18
+     */
+    public static final int GITHUB_ENGINE_PATCH = 18;
+
     private final Logger logger = LoggerFactory.getLogger(GitHubEngineConfigurationMigrationAction.class);
     private final ObjectMapper objectMapper = ObjectMapperFactory.create();
 
     @Override
     public int getPatch() {
-        // TODO Update MainDBInitConfig version to 18
-        return 18;
+        return GITHUB_ENGINE_PATCH;
     }
 
     @Override
