@@ -1,9 +1,21 @@
 package net.nemerosa.ontrack.extension.github.support;
 
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport;
+import net.nemerosa.ontrack.model.exceptions.ProjectNotFoundException;
+import net.nemerosa.ontrack.model.security.ProjectList;
+import net.nemerosa.ontrack.model.structure.Project;
+import net.nemerosa.ontrack.model.structure.PropertyService;
+import net.nemerosa.ontrack.model.structure.StructureService;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class GitHubEngineConfigurationMigrationActionIT extends AbstractServiceTestSupport {
+
+    @Autowired
+    private StructureService structureService;
+
+    @Autowired
+    private PropertyService propertyService;
 
     /**
      * Test of the migration.
@@ -18,6 +30,10 @@ public class GitHubEngineConfigurationMigrationActionIT extends AbstractServiceT
      */
     @Test
     public void migration() throws Exception {
+        // Gets the project
+        Project project = asUser().with(ProjectList.class).call(() ->
+                        structureService.findProjectByName("GitHubEngineConfigurationMigrationAction")
+        ).orElseThrow(() -> new ProjectNotFoundException("GitHubEngineConfigurationMigrationAction"));
     }
 
 }
