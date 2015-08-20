@@ -2,9 +2,6 @@ package net.nemerosa.ontrack.extension.github.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
-import net.nemerosa.ontrack.extension.github.GitHubIssueServiceExtension;
-import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.support.UserPasswordConfiguration;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Int;
@@ -20,9 +17,16 @@ import java.util.function.Function;
 import static java.lang.String.format;
 import static net.nemerosa.ontrack.model.form.Form.defaultNameField;
 
+/**
+ * Configuration for accessing a GitHub engine, github.com or GitHub enterprise.
+ */
 @Data
-@Deprecated
-public class GitHubConfiguration implements GitConfiguration, UserPasswordConfiguration<GitHubConfiguration>, IssueServiceConfiguration {
+public class GitHubEngineConfiguration implements UserPasswordConfiguration<GitHubEngineConfiguration> {
+
+    /**
+     * github.com end point.
+     */
+    public static final String GITHUB_COM = "https://github.com";
 
     /**
      * Name of this configuration
@@ -30,9 +34,9 @@ public class GitHubConfiguration implements GitConfiguration, UserPasswordConfig
     private final String name;
 
     /**
-     * Repository name
+     * End point
      */
-    private final String repository;
+    private final String url;
 
     /**
      * User name
@@ -49,34 +53,28 @@ public class GitHubConfiguration implements GitConfiguration, UserPasswordConfig
      */
     private final String oauth2Token;
 
-    /**
-     * Indexation interval
-     */
-    private final int indexationInterval;
-
     @Override
     @JsonIgnore
     public ConfigurationDescriptor getDescriptor() {
         return new ConfigurationDescriptor(
                 name,
-                format("%s (%s)", name, repository)
+                format("%s (%s)", name, url)
         );
     }
 
     @Override
-    public GitHubConfiguration obfuscate() {
+    public GitHubEngineConfiguration obfuscate() {
         return this;
     }
 
     @Override
-    public GitHubConfiguration withPassword(String password) {
-        return new GitHubConfiguration(
+    public GitHubEngineConfiguration withPassword(String password) {
+        return new GitHubEngineConfiguration(
                 name,
-                repository,
+                url,
                 user,
                 password,
-                oauth2Token,
-                indexationInterval
+                oauth2Token
         );
     }
 
@@ -84,11 +82,12 @@ public class GitHubConfiguration implements GitConfiguration, UserPasswordConfig
         return Form.create()
                 .with(defaultNameField())
                 .with(
-                        Text.of("repository")
-                                .label("Repository")
-                                .length(100)
-                                .regex("[A-Za-z0-9_\\.\\-]+")
-                                .validation("Repository is required and must be a GitHub repository (account/repository)."))
+                        Text.of("url")
+                                .label("URL")
+                                .length(250)
+                                .optional()
+                                .help(format("URL of the GitHub engine. Defaults to %s if not defined.", GITHUB_COM))
+                )
                 .with(
                         Text.of("user")
                                 .label("User")
@@ -120,51 +119,22 @@ public class GitHubConfiguration implements GitConfiguration, UserPasswordConfig
     public Form asForm() {
         return form()
                 .with(defaultNameField().readOnly().value(name))
-                .fill("repository", repository)
+                .fill("url", url)
                 .fill("user", user)
                 .fill("password", "")
                 .fill("oauth2Token", oauth2Token)
-                .fill("indexationInterval", indexationInterval)
                 ;
     }
 
-    @JsonIgnore
-    public String getRemote() {
-        return format("https://github.com/%s.git", repository);
-    }
-
-    @JsonIgnore
-    public String getCommitLink() {
-        return format("https://github.com/%s/commit/{commit}", repository);
-    }
-
-    @JsonIgnore
-    public String getFileAtCommitLink() {
-        return format("https://github.com/%s/blob/{commit}/{path}", repository);
-    }
-
     @Override
-    @JsonIgnore
-    public String getServiceId() {
-        return GitHubIssueServiceExtension.GITHUB_SERVICE_ID;
-    }
-
-    @Override
-    public GitHubConfiguration clone(String targetConfigurationName, Function<String, String> replacementFunction) {
-        return new GitHubConfiguration(
+    public GitHubEngineConfiguration clone(String targetConfigurationName, Function<String, String> replacementFunction) {
+        return new GitHubEngineConfiguration(
                 targetConfigurationName,
-                replacementFunction.apply(repository),
+                replacementFunction.apply(url),
                 replacementFunction.apply(user),
                 password,
-                oauth2Token,
-                indexationInterval
+                oauth2Token
         );
-    }
-
-    @Override
-    @JsonIgnore
-    public String getType() {
-        return "github";
     }
 
     @Override
@@ -189,9 +159,4 @@ public class GitHubConfiguration implements GitConfiguration, UserPasswordConfig
         }
     }
 
-    @Override
-    @JsonIgnore
-    public String getIssueServiceConfigurationIdentifier() {
-        return toIdentifier().format();
-    }
 }
