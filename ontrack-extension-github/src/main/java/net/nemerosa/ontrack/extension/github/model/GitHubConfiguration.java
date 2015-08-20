@@ -20,6 +20,12 @@ import java.util.function.Function;
 import static java.lang.String.format;
 import static net.nemerosa.ontrack.model.form.Form.defaultNameField;
 
+/**
+ * Old GitHub configurations.
+ *
+ * @see net.nemerosa.ontrack.extension.github.support.GitHubEngineConfigurationMigrationAction
+ * @deprecated See {@link GitHubEngineConfiguration}
+ */
 @Data
 @Deprecated
 public class GitHubConfiguration implements GitConfiguration, UserPasswordConfiguration<GitHubConfiguration>, IssueServiceConfiguration {
