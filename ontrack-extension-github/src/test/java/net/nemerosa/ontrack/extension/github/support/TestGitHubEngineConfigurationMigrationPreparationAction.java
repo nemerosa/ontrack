@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
+import net.nemerosa.ontrack.model.security.EncryptionService;
 import net.nemerosa.ontrack.model.support.DBMigrationAction;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
@@ -21,6 +23,13 @@ import java.sql.ResultSet;
 public class TestGitHubEngineConfigurationMigrationPreparationAction implements DBMigrationAction {
 
     private final ObjectMapper objectMapper = ObjectMapperFactory.create();
+
+    private final EncryptionService encryptionService;
+
+    @Autowired
+    public TestGitHubEngineConfigurationMigrationPreparationAction(EncryptionService encryptionService) {
+        this.encryptionService = encryptionService;
+    }
 
     @Override
     public int getPatch() {
@@ -39,7 +48,7 @@ public class TestGitHubEngineConfigurationMigrationPreparationAction implements 
                                     "OntrackTest",
                                     "nemerosa/ontrack",
                                     "user",
-                                    "password",
+                                    encryptionService.encrypt("password"),
                                     "token",
                                     30
                             )
@@ -71,6 +80,7 @@ public class TestGitHubEngineConfigurationMigrationPreparationAction implements 
                             .with("configuration", "OntrackTest")
                             .end()
             ));
+            ps.executeUpdate();
         }
     }
 

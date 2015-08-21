@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.github.support;
 
+import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationProperty;
+import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType;
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport;
 import net.nemerosa.ontrack.model.exceptions.ProjectNotFoundException;
 import net.nemerosa.ontrack.model.security.ProjectList;
@@ -34,6 +36,10 @@ public class GitHubEngineConfigurationMigrationActionIT extends AbstractServiceT
         Project project = asUser().with(ProjectList.class).call(() ->
                         structureService.findProjectByName("GitHubEngineConfigurationMigrationAction")
         ).orElseThrow(() -> new ProjectNotFoundException("GitHubEngineConfigurationMigrationAction"));
+        // Gets the GitHub project property
+        GitHubProjectConfigurationProperty configurationProperty = asUser().withView(project).call(() ->
+                        propertyService.getProperty(project, GitHubProjectConfigurationPropertyType.class).option()
+        ).orElseThrow(() -> new RuntimeException("Missing GitHub property on project"));
     }
 
 }
