@@ -61,7 +61,7 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
     @Override
     public IssueServiceConfiguration getConfigurationByName(String name) {
         // Parsing of the name
-        String[] tokens = StringUtils.split(name, "/");
+        String[] tokens = StringUtils.split(name, ":");
         if (tokens == null || tokens.length != 2) {
             throw new IllegalStateException("The GitHub issue configuration identifier name is expected using configuration:repository as a format");
         }

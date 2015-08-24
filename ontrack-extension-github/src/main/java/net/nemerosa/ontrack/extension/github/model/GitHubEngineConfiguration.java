@@ -4,13 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import net.nemerosa.ontrack.extension.support.UserPasswordConfiguration;
 import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.form.Int;
 import net.nemerosa.ontrack.model.form.Password;
 import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import net.nemerosa.ontrack.model.support.UserPassword;
 import org.apache.commons.lang3.StringUtils;
 
+import java.beans.ConstructorProperties;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -52,6 +52,15 @@ public class GitHubEngineConfiguration implements UserPasswordConfiguration<GitH
      * OAuth2 token
      */
     private final String oauth2Token;
+
+    @ConstructorProperties({"name", "url", "user", "password", "oauth2Token"})
+    public GitHubEngineConfiguration(String name, String url, String user, String password, String oauth2Token) {
+        this.name = name;
+        this.url = StringUtils.isBlank(url) ? GITHUB_COM : url;
+        this.user = user;
+        this.password = password;
+        this.oauth2Token = oauth2Token;
+    }
 
     @Override
     @JsonIgnore
