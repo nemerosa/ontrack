@@ -1,22 +1,27 @@
 package net.nemerosa.ontrack.extension.github.support;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Data;
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration;
+import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType;
+import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.support.DBMigrationAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * FIXME Migration of the GitHub configurations.
+ * Migration of the GitHub configurations.
  * <p>
  * <ul>
  * <li>The configurations do not hold the repositories any longer.</li>
@@ -28,8 +33,6 @@ public class GitHubEngineConfigurationMigrationAction implements DBMigrationActi
 
     /**
      * Version of the database to migrate.
-     * <p>
-     * TODO Update MainDBInitConfig version to 18
      */
     public static final int GITHUB_ENGINE_PATCH = 18;
 
@@ -45,8 +48,35 @@ public class GitHubEngineConfigurationMigrationAction implements DBMigrationActi
     public void migrate(Connection connection) throws Exception {
         // Migrates the configurations
         Map<String, OldConfiguration> oldConfigurations = migrateConfigurations(connection);
-        // FIXME Migrates the projects
-        // migrateProjects(connection, oldConfigurations);
+        // Migrates the projects
+        migrateProjects(connection, oldConfigurations);
+    }
+
+    private void migrateProjects(Connection connection, Map<String, OldConfiguration> oldConfigurations) throws SQLException, IOException {
+        try (PreparedStatement ps = connection.prepareStatement("SELECT * FROM PROPERTIES WHERE TYPE = ?", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE)) {
+            ps.setString(1, GitHubProjectConfigurationPropertyType.class.getName());
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    // Raw property
+                    String json = rs.getString("JSON");
+                    // Parsing
+                    ObjectNode node = (ObjectNode) objectMapper.readTree(json);
+                    // Gets the configuration name
+                    String configurationName = JsonUtils.get(node, "configuration");
+                    // Gets the configuration from the map
+                    OldConfiguration oldConfiguration = oldConfigurations.get(configurationName);
+                    if (oldConfiguration == null) {
+                        throw new IllegalStateException("Could not find GitHub configuration with name " + configurationName);
+                    }
+                    // Completes the project configuration with the old one
+                    node.put("repository", oldConfiguration.getRepository());
+                    node.put("indexationInterval", oldConfiguration.getIndexationInterval());
+                    // Saves the configuration back
+                    rs.updateString("JSON", objectMapper.writeValueAsString(node));
+                    rs.updateRow();
+                }
+            }
+        }
     }
 
     private Map<String, OldConfiguration> migrateConfigurations(Connection connection) throws Exception {

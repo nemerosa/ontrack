@@ -61,6 +61,9 @@ public class GitHubEngineConfigurationMigrationActionIT extends AbstractServiceT
         GitHubProjectConfigurationProperty configurationProperty = asUser().withView(project).call(() ->
                         propertyService.getProperty(project, GitHubProjectConfigurationPropertyType.class).option()
         ).orElseThrow(() -> new RuntimeException("Missing GitHub property on project"));
+        assertEquals("OntrackTest", configurationProperty.getConfiguration().getName());
+        assertEquals("nemerosa/ontrack", configurationProperty.getRepository());
+        assertEquals(30, configurationProperty.getIndexationInterval());
     }
 
 }
