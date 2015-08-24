@@ -58,13 +58,22 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
     /**
      * A GitHub configuration name
      *
-     * @param name Name of the configuration
+     * @param name Name of the configuration and repository.
      * @return Wrapper for the GitHub issue service.
+     * @see net.nemerosa.ontrack.extension.github.property.GitHubGitConfiguration
      */
     @Override
     public IssueServiceConfiguration getConfigurationByName(String name) {
+        // Parsing of the name
+        String[] tokens = StringUtils.split(name, "/");
+        if (tokens == null || tokens.length != 2) {
+            throw new IllegalStateException("The GitHub issue configuration identifier name is expected using configuration:repository as a format");
+        }
+        String configuration = tokens[0];
+        String repository = tokens[1];
         return new GitHubIssueServiceConfiguration(
-                configurationService.getConfiguration(name)
+                configurationService.getConfiguration(configuration),
+                repository
         );
     }
 

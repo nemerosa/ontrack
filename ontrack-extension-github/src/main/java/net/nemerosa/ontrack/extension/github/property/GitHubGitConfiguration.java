@@ -64,11 +64,25 @@ public class GitHubGitConfiguration implements GitConfiguration {
         return property.getIndexationInterval();
     }
 
+    /**
+     * The returned identifier combines the service id (GitHub) with the configuration name
+     * and the repository name.
+     * <p>
+     * The syntax is:
+     * <p>
+     * <code>github//configuration:repository</code>
+     *
+     * @see IssueServiceConfigurationIdentifier
+     */
     @Override
     public String getIssueServiceConfigurationIdentifier() {
         return new IssueServiceConfigurationIdentifier(
                 GitHubIssueServiceExtension.GITHUB_SERVICE_ID,
-                property.getRepository()
+                format(
+                        "%s:%s",
+                        property.getConfiguration().getName(),
+                        property.getRepository()
+                )
         ).format();
     }
 }
