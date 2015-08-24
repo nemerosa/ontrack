@@ -105,14 +105,6 @@ public class GitHubEngineConfiguration implements UserPasswordConfiguration<GitH
                                 .label("OAuth2 token")
                                 .length(50)
                                 .optional()
-                )
-                .with(
-                        Int.of("indexationInterval")
-                                .label("Indexation interval")
-                                .min(0)
-                                .max(60 * 24)
-                                .value(0)
-                                .help("@file:extension/github/help.net.nemerosa.ontrack.extension.github.model.GitHubConfiguration.indexationInterval.tpl.html")
                 );
     }
 
