@@ -6,5 +6,5 @@ dependencies {
     testCompile project(':ontrack-it-utils')
     testRuntime project(':ontrack-service')
     testRuntime project(':ontrack-repository-impl')
-    testRuntime libraries.spring_boot_starter_web
+    testRuntime libraries.spring_boot_starter_actuator
 }
