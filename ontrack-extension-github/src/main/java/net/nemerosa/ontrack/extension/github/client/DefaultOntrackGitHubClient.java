@@ -3,13 +3,11 @@ package net.nemerosa.ontrack.extension.github.client;
 import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.extension.github.model.*;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.Milestone;
-import org.eclipse.egit.github.core.User;
+import org.eclipse.egit.github.core.*;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.RequestException;
 import org.eclipse.egit.github.core.service.IssueService;
+import org.eclipse.egit.github.core.service.RepositoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,37 +23,35 @@ public class DefaultOntrackGitHubClient implements OntrackGitHubClient {
     private final Logger logger = LoggerFactory.getLogger(OntrackGitHubClient.class);
 
     private final GitHubEngineConfiguration configuration;
-    private final String repository;
 
-    public DefaultOntrackGitHubClient(GitHubEngineConfiguration configuration, String repository) {
+    public DefaultOntrackGitHubClient(GitHubEngineConfiguration configuration) {
         this.configuration = configuration;
-        this.repository = repository;
     }
 
     @Override
-    public GitHubIssue getIssue(int id) {
+    public List<String> getRepositories() {
+        // Logging
+        logger.debug("[github] Getting repository list");
+        // Getting a client
+        GitHubClient client = createGitHubClient();
+        // Service
+        RepositoryService repositoryService = new RepositoryService(client);
+        // Gets the repository names
+        try {
+            return repositoryService.getRepositories().stream()
+                    .map(Repository::getName)
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new OntrackGitHubClientException(e);
+        }
+    }
+
+    @Override
+    public GitHubIssue getIssue(String repository, int id) {
         // Logging
         logger.debug("[github] Getting issue {}/{}", repository, id);
-        // GitHub client (non authentified)
-        GitHubClient client = new GitHubClient() {
-            @Override
-            protected HttpURLConnection configureRequest(HttpURLConnection request) {
-                HttpURLConnection connection = super.configureRequest(request);
-                connection.setRequestProperty(HEADER_ACCEPT, "application/vnd.github.v3.full+json");
-                return connection;
-            }
-        };
-        // Authentication
-        String oAuth2Token = configuration.getOauth2Token();
-        if (StringUtils.isNotBlank(oAuth2Token)) {
-            client.setOAuth2Token(oAuth2Token);
-        } else {
-            String user = configuration.getUser();
-            String password = configuration.getPassword();
-            if (StringUtils.isNotBlank(user)) {
-                client.setCredentials(user, password);
-            }
-        }
+        // Getting a client
+        GitHubClient client = createGitHubClient();
         // Issue service using this client
         IssueService service = new IssueService(client);
         // Gets the repository for this project
@@ -83,11 +79,35 @@ public class DefaultOntrackGitHubClient implements OntrackGitHubClient {
                 toUser(issue.getAssignee()),
                 toLabels(issue.getLabels()),
                 toState(issue.getState()),
-                toMilestone(issue.getMilestone()),
+                toMilestone(repository, issue.getMilestone()),
                 toDateTime(issue.getCreatedAt()),
                 toDateTime(issue.getUpdatedAt()),
                 toDateTime(issue.getClosedAt())
         );
+    }
+
+    protected GitHubClient createGitHubClient() {
+        // GitHub client (non authentified)
+        GitHubClient client = new GitHubClient() {
+            @Override
+            protected HttpURLConnection configureRequest(HttpURLConnection request) {
+                HttpURLConnection connection = super.configureRequest(request);
+                connection.setRequestProperty(HEADER_ACCEPT, "application/vnd.github.v3.full+json");
+                return connection;
+            }
+        };
+        // Authentication
+        String oAuth2Token = configuration.getOauth2Token();
+        if (StringUtils.isNotBlank(oAuth2Token)) {
+            client.setOAuth2Token(oAuth2Token);
+        } else {
+            String user = configuration.getUser();
+            String password = configuration.getPassword();
+            if (StringUtils.isNotBlank(user)) {
+                client.setCredentials(user, password);
+            }
+        }
+        return client;
     }
 
     private LocalDateTime toDateTime(Date date) {
@@ -98,7 +118,7 @@ public class DefaultOntrackGitHubClient implements OntrackGitHubClient {
         }
     }
 
-    private GitHubMilestone toMilestone(Milestone milestone) {
+    private GitHubMilestone toMilestone(String repository, Milestone milestone) {
         if (milestone != null) {
             return new GitHubMilestone(
                     milestone.getTitle(),

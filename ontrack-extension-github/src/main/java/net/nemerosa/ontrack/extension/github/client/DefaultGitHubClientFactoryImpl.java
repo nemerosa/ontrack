@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DefaultGitHubClientFactoryImpl implements OntrackGitHubClientFactory {
     @Override
-    public OntrackGitHubClient create(GitHubEngineConfiguration configuration, String repository) {
-        return new DefaultOntrackGitHubClient(configuration, repository);
+    public OntrackGitHubClient create(GitHubEngineConfiguration configuration) {
+        return new DefaultOntrackGitHubClient(configuration);
     }
 }

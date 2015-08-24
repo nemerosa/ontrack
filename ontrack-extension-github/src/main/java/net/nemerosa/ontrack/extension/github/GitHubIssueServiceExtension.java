@@ -124,10 +124,10 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
     public Issue getIssue(IssueServiceConfiguration issueServiceConfiguration, String issueKey) {
         GitHubIssueServiceConfiguration configuration = (GitHubIssueServiceConfiguration) issueServiceConfiguration;
         OntrackGitHubClient client = gitHubClientFactory.create(
-                configuration.getConfiguration(),
-                configuration.getRepository()
+                configuration.getConfiguration()
         );
         return client.getIssue(
+                configuration.getRepository(),
                 getIssueId(issueKey)
         );
     }

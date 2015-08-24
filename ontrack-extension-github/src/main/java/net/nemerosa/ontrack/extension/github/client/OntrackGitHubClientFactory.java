@@ -8,8 +8,8 @@ import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration;
 public interface OntrackGitHubClientFactory {
 
     /**
-     * Given a GitHub engine configuration and a repository, creates a GitHub client.
+     * Given a GitHub engine configuration, creates a GitHub client.
      */
-    OntrackGitHubClient create(GitHubEngineConfiguration configuration, String repository);
+    OntrackGitHubClient create(GitHubEngineConfiguration configuration);
 
 }
