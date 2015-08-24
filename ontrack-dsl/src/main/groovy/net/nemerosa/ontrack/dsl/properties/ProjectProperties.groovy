@@ -12,11 +12,14 @@ class ProjectProperties extends ProjectEntityProperties {
     /**
      * GitHub property
      * @param name Configuration name
+     * @param parameters Map of GitHub parameters, like 'repository' and 'indexationInterval'
      */
-    def gitHub(String name) {
-        property('net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType', [
-                configuration: name
-        ])
+    def gitHub(Map<String, ?> parameters, String name) {
+        assert parameters.containsKey('repository') : "The 'repository' parameter is required"
+        property('net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType',
+                parameters + [
+                        configuration: name
+                ])
     }
 
     /**

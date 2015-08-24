@@ -309,7 +309,7 @@ class ACCDSL extends AbstractACCDSL {
         // GitHub configuration
         def configName = uid('GH')
         ontrack.configure {
-            gitHub configName, repository: 'nemerosa/ontrack', indexationInterval: 0
+            gitHub configName
         }
         // Creation of a controller
         def userName = uid('A')
@@ -320,7 +320,7 @@ class ACCDSL extends AbstractACCDSL {
         def project = uid('P')
         ontrack.project(project) {
             config {
-                gitHub configName
+                gitHub configName, repository: 'nemerosa/ontrack'
             }
             branch('template') {
                 promotionLevel 'COPPER', 'Copper promotion'
@@ -354,7 +354,7 @@ class ACCDSL extends AbstractACCDSL {
         // GitHub configuration
         def configName = uid('GH')
         ontrack.configure {
-            gitHub configName, repository: 'nemerosa/ontrack', indexationInterval: 0
+            gitHub configName
         }
         // Creation of a controller
         def userName = uid('A')
@@ -365,7 +365,7 @@ class ACCDSL extends AbstractACCDSL {
         def project = uid('P')
         ontrack.project(project) {
             config {
-                gitHub configName
+                gitHub configName, repository: 'nemerosa/ontrack'
             }
             branch('template') {
                 promotionLevel 'COPPER', 'Copper promotion'
@@ -404,7 +404,7 @@ class ACCDSL extends AbstractACCDSL {
         // GitHub configuration
         def configName = uid('GH')
         ontrack.configure {
-            gitHub configName, repository: 'nemerosa/ontrack', indexationInterval: 0
+            gitHub configName
         }
         // Creation of a controller
         def userName = uid('A')
@@ -415,7 +415,7 @@ class ACCDSL extends AbstractACCDSL {
         def project = uid('P')
         ontrack.project(project) {
             config {
-                gitHub configName
+                gitHub configName, repository: 'nemerosa/ontrack'
             }
             branch('template', '', true) {
                 promotionLevel 'COPPER', 'Copper promotion', true
@@ -643,13 +643,13 @@ class ACCDSL extends AbstractACCDSL {
     void 'Definition of a template with parameters'() {
         // GitHub configuration
         ontrack.configure {
-            gitHub 'ontrack', repository: 'nemerosa/ontrack', indexationInterval: 0
+            gitHub 'ontrack'
         }
         // Project and branch template
         def project = uid('P')
         ontrack.project(project) {
             config {
-                gitHub 'ontrack'
+                gitHub 'ontrack', repository: 'nemerosa/ontrack', indexationInterval: 0
             }
             branch('template') {
                 promotionLevel 'COPPER', 'Copper promotion'
@@ -1166,13 +1166,13 @@ class ACCDSL extends AbstractACCDSL {
     void 'Launching branch template synchronisation'() {
         // GitHub configuration
         ontrack.configure {
-            gitHub 'ontrack', repository: 'nemerosa/ontrack', indexationInterval: 0
+            gitHub 'ontrack'
         }
         // Project and branch template
         def project = uid('P')
         ontrack.project(project) {
             config {
-                gitHub 'ontrack'
+                gitHub 'ontrack', repository: 'nemerosa/ontrack', indexationInterval: 0
             }
             branch('template') {
                 promotionLevel 'COPPER', 'Copper promotion'
@@ -1236,7 +1236,7 @@ class ACCDSL extends AbstractACCDSL {
     void 'Configuration - GitHub'() {
         def name = uid('GH')
         ontrack.configure {
-            gitHub name, repository: 'nemerosa/ontrack', indexationInterval: 0, oauth2Token: 'ABCDEF'
+            gitHub name, oauth2Token: 'ABCDEF'
         }
         assert ontrack.config.gitHub.find { it == name } != null
     }
