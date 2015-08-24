@@ -1,8 +1,7 @@
 package net.nemerosa.ontrack.extension.github;
 
 import com.google.common.collect.Sets;
-import net.nemerosa.ontrack.extension.github.client.GitHubClientConfiguratorFactory;
-import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClient;
+import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory;
 import net.nemerosa.ontrack.extension.github.model.GitHubConfiguration;
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService;
 import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory;
@@ -24,14 +23,12 @@ public class GitHubIssueServiceExtensionTest {
     @Before
     public void init() {
         GitHubConfigurationService configurationService = mock(GitHubConfigurationService.class);
-        GitHubClientConfiguratorFactory gitHubClientConfiguratorFactory = mock(GitHubClientConfiguratorFactory.class);
-        OntrackGitHubClient gitHubClient = mock(OntrackGitHubClient.class);
+        OntrackGitHubClientFactory gitHubClientFactory = mock(OntrackGitHubClientFactory.class);
         IssueExportServiceFactory issueExportServiceFactory = mock(IssueExportServiceFactory.class);
         extension = new GitHubIssueServiceExtension(
                 new GitHubExtensionFeature(),
                 configurationService,
-                gitHubClientConfiguratorFactory,
-                gitHubClient,
+                gitHubClientFactory,
                 issueExportServiceFactory
         );
 

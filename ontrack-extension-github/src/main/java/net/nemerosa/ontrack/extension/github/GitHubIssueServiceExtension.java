@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.github;
 
 import com.google.common.collect.Sets;
-import net.nemerosa.ontrack.extension.github.client.GitHubClientConfiguratorFactory;
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClient;
+import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory;
 import net.nemerosa.ontrack.extension.github.model.GitHubIssue;
 import net.nemerosa.ontrack.extension.github.model.GitHubLabel;
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService;
@@ -29,21 +29,18 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
     public static final String GITHUB_SERVICE_ID = "github";
     public static final String GITHUB_ISSUE_PATTERN = "#(\\d+)";
     private final GitHubConfigurationService configurationService;
-    private final GitHubClientConfiguratorFactory gitHubClientConfiguratorFactory;
-    private final OntrackGitHubClient gitHubClient;
+    private final OntrackGitHubClientFactory gitHubClientFactory;
 
     @Autowired
     public GitHubIssueServiceExtension(
             GitHubExtensionFeature extensionFeature,
             GitHubConfigurationService configurationService,
-            GitHubClientConfiguratorFactory gitHubClientConfiguratorFactory,
-            OntrackGitHubClient gitHubClient,
+            OntrackGitHubClientFactory gitHubClientFactory,
             IssueExportServiceFactory issueExportServiceFactory
     ) {
         super(extensionFeature, GITHUB_SERVICE_ID, "GitHub", issueExportServiceFactory);
         this.configurationService = configurationService;
-        this.gitHubClientConfiguratorFactory = gitHubClientConfiguratorFactory;
-        this.gitHubClient = gitHubClient;
+        this.gitHubClientFactory = gitHubClientFactory;
     }
 
     /**
@@ -126,10 +123,11 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
     @Override
     public Issue getIssue(IssueServiceConfiguration issueServiceConfiguration, String issueKey) {
         GitHubIssueServiceConfiguration configuration = (GitHubIssueServiceConfiguration) issueServiceConfiguration;
-        return gitHubClient.getIssue(
-                configuration.getRepository(),
-                null,
-                // FIXME gitHubClientConfiguratorFactory.getGitHubConfigurator(configuration),
+        OntrackGitHubClient client = gitHubClientFactory.create(
+                configuration.getConfiguration(),
+                configuration.getRepository()
+        );
+        return client.getIssue(
                 getIssueId(issueKey)
         );
     }

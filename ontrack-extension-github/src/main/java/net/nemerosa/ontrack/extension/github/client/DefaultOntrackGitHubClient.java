@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.github.client;
 
-import net.nemerosa.ontrack.extension.github.model.*;
 import net.nemerosa.ontrack.common.Time;
+import net.nemerosa.ontrack.extension.github.model.*;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
@@ -12,7 +12,6 @@ import org.eclipse.egit.github.core.client.RequestException;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -21,15 +20,22 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
 public class DefaultOntrackGitHubClient implements OntrackGitHubClient {
 
     private final Logger logger = LoggerFactory.getLogger(OntrackGitHubClient.class);
 
+    private final GitHubEngineConfiguration configuration;
+    private final String repository;
+
+    public DefaultOntrackGitHubClient(GitHubEngineConfiguration configuration, String repository) {
+        this.configuration = configuration;
+        this.repository = repository;
+    }
+
     @Override
-    public GitHubIssue getIssue(String project, GitHubClientConfigurator configurator, int id) {
+    public GitHubIssue getIssue(int id) {
         // Logging
-        logger.debug("[github] Getting issue {}/{}", project, id);
+        logger.debug("[github] Getting issue {}/{}", repository, id);
         // GitHub client (non authentified)
         GitHubClient client = new GitHubClient() {
             @Override
@@ -39,12 +45,22 @@ public class DefaultOntrackGitHubClient implements OntrackGitHubClient {
                 return connection;
             }
         };
-        configurator.configure(client);
+        // Authentication
+        String oAuth2Token = configuration.getOauth2Token();
+        if (StringUtils.isNotBlank(oAuth2Token)) {
+            client.setOAuth2Token(oAuth2Token);
+        } else {
+            String user = configuration.getUser();
+            String password = configuration.getPassword();
+            if (StringUtils.isNotBlank(user)) {
+                client.setCredentials(user, password);
+            }
+        }
         // Issue service using this client
         IssueService service = new IssueService(client);
         // Gets the repository for this project
-        String owner = StringUtils.substringBefore(project, "/");
-        String name = StringUtils.substringAfter(project, "/");
+        String owner = StringUtils.substringBefore(repository, "/");
+        String name = StringUtils.substringAfter(repository, "/");
         Issue issue;
         try {
             issue = service.getIssue(owner, name, id);
@@ -67,7 +83,7 @@ public class DefaultOntrackGitHubClient implements OntrackGitHubClient {
                 toUser(issue.getAssignee()),
                 toLabels(issue.getLabels()),
                 toState(issue.getState()),
-                toMilestone(project, issue.getMilestone()),
+                toMilestone(issue.getMilestone()),
                 toDateTime(issue.getCreatedAt()),
                 toDateTime(issue.getUpdatedAt()),
                 toDateTime(issue.getClosedAt())
@@ -82,13 +98,18 @@ public class DefaultOntrackGitHubClient implements OntrackGitHubClient {
         }
     }
 
-    private GitHubMilestone toMilestone(String project, Milestone milestone) {
+    private GitHubMilestone toMilestone(Milestone milestone) {
         if (milestone != null) {
             return new GitHubMilestone(
                     milestone.getTitle(),
                     toState(milestone.getState()),
                     milestone.getNumber(),
-                    String.format("https://github.com/%s/issues?milestone=%d&state=open", project, milestone.getNumber())
+                    String.format(
+                            "%s/%s/issues?milestone=%d&state=open",
+                            configuration.getUrl(),
+                            repository,
+                            milestone.getNumber()
+                    )
             );
         } else {
             return null;
