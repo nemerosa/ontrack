@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.github.model.GitHubConfiguration;
 import net.nemerosa.ontrack.extension.github.model.GitHubIssue;
 import net.nemerosa.ontrack.extension.github.model.GitHubLabel;
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService;
+import net.nemerosa.ontrack.extension.github.service.GitHubIssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
@@ -18,10 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -49,14 +47,25 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
         this.gitHubClient = gitHubClient;
     }
 
+    /**
+     * The GitHub configurations are not selectable and this method returns an empty list.
+     */
     @Override
     public List<? extends IssueServiceConfiguration> getConfigurationList() {
-        return configurationService.getConfigurations();
+        return Collections.emptyList();
     }
 
+    /**
+     * A GitHub configuration name
+     *
+     * @param name Name of the configuration
+     * @return Wrapper for the GitHub issue service.
+     */
     @Override
     public IssueServiceConfiguration getConfigurationByName(String name) {
-        return configurationService.getConfiguration(name);
+        return new GitHubIssueServiceConfiguration(
+                configurationService.getConfiguration(name)
+        );
     }
 
     @Override
