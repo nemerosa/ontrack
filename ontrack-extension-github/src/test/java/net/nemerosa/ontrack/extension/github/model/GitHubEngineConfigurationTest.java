@@ -6,6 +6,7 @@ import org.junit.Test;
 import static net.nemerosa.ontrack.json.JsonUtils.object;
 import static net.nemerosa.ontrack.test.TestUtils.assertJsonRead;
 import static net.nemerosa.ontrack.test.TestUtils.assertJsonWrite;
+import static org.junit.Assert.assertEquals;
 
 public class GitHubEngineConfigurationTest {
 
@@ -48,6 +49,30 @@ public class GitHubEngineConfigurationTest {
                         .end(),
                 GitHubEngineConfiguration.class
         );
+    }
+
+    @Test
+    public void null_url_for_github_com() {
+        GitHubEngineConfiguration configuration = new GitHubEngineConfiguration(
+                "Test",
+                null,
+                "",
+                "",
+                ""
+        );
+        assertEquals("https://github.com", configuration.getUrl());
+    }
+
+    @Test
+    public void empty_url_for_github_com() {
+        GitHubEngineConfiguration configuration = new GitHubEngineConfiguration(
+                "Test",
+                "",
+                "",
+                "",
+                ""
+        );
+        assertEquals("https://github.com", configuration.getUrl());
     }
 
 }

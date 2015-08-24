@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.github.model;
 
+import net.nemerosa.ontrack.extension.github.property.GitHubGitConfiguration;
+import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationProperty;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -7,27 +9,21 @@ import static org.junit.Assert.assertEquals;
 public class GitHubGitConfigurationTest {
 
     @Test
-    public void null_url_for_github_com() {
-        GitHubEngineConfiguration configuration = new GitHubEngineConfiguration(
-                "Test",
-                null,
-                "",
-                "",
-                ""
+    public void issueServiceIdentifierContainsBothConfigurationAndRepository() {
+        GitHubGitConfiguration configuration = new GitHubGitConfiguration(
+                new GitHubProjectConfigurationProperty(
+                        new GitHubEngineConfiguration(
+                                "Test",
+                                null,
+                                null,
+                                null,
+                                null
+                        ),
+                        "nemerosa/ontrack",
+                        30
+                )
         );
-        assertEquals("https://github.com", configuration.getUrl());
-    }
-
-    @Test
-    public void empty_url_for_github_com() {
-        GitHubEngineConfiguration configuration = new GitHubEngineConfiguration(
-                "Test",
-                "",
-                "",
-                "",
-                ""
-        );
-        assertEquals("https://github.com", configuration.getUrl());
+        assertEquals("github//Test:nemerosa/ontrack", configuration.getIssueServiceConfigurationIdentifier());
     }
 
 }

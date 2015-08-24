@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClient;
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory;
 import net.nemerosa.ontrack.extension.github.model.GitHubIssue;
 import net.nemerosa.ontrack.extension.github.model.GitHubLabel;
+import net.nemerosa.ontrack.extension.github.property.GitHubGitConfiguration;
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService;
 import net.nemerosa.ontrack.extension.github.service.GitHubIssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory;
@@ -61,7 +62,7 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
     @Override
     public IssueServiceConfiguration getConfigurationByName(String name) {
         // Parsing of the name
-        String[] tokens = StringUtils.split(name, ":");
+        String[] tokens = StringUtils.split(name, GitHubGitConfiguration.CONFIGURATION_REPOSITORY_SEPARATOR);
         if (tokens == null || tokens.length != 2) {
             throw new IllegalStateException("The GitHub issue configuration identifier name is expected using configuration:repository as a format");
         }

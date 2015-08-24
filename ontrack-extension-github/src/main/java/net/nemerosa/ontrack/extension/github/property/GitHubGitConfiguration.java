@@ -11,6 +11,7 @@ import static java.lang.String.format;
 
 public class GitHubGitConfiguration implements GitConfiguration {
 
+    public static final String CONFIGURATION_REPOSITORY_SEPARATOR = ":";
     private final GitHubProjectConfigurationProperty property;
 
     public GitHubGitConfiguration(GitHubProjectConfigurationProperty property) {
@@ -78,11 +79,9 @@ public class GitHubGitConfiguration implements GitConfiguration {
     public String getIssueServiceConfigurationIdentifier() {
         return new IssueServiceConfigurationIdentifier(
                 GitHubIssueServiceExtension.GITHUB_SERVICE_ID,
-                format(
-                        "%s:%s",
-                        property.getConfiguration().getName(),
-                        property.getRepository()
-                )
+                property.getConfiguration().getName()
+                        + CONFIGURATION_REPOSITORY_SEPARATOR
+                        + property.getRepository()
         ).format();
     }
 }

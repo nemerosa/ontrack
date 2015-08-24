@@ -16,15 +16,17 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class GitHubIssueServiceExtensionTest {
 
     private GitHubIssueServiceExtension extension;
     private IssueServiceConfiguration configuration;
+    private GitHubConfigurationService configurationService;
 
     @Before
     public void init() {
-        GitHubConfigurationService configurationService = mock(GitHubConfigurationService.class);
+        configurationService = mock(GitHubConfigurationService.class);
         OntrackGitHubClientFactory gitHubClientFactory = mock(OntrackGitHubClientFactory.class);
         IssueExportServiceFactory issueExportServiceFactory = mock(IssueExportServiceFactory.class);
         extension = new GitHubIssueServiceExtension(
@@ -44,6 +46,25 @@ public class GitHubIssueServiceExtensionTest {
                 engineConfiguration,
                 "nemerosa/ontrack"
         );
+    }
+
+    @Test
+    public void issueServiceIdentifierContainsBothConfigurationAndRepository() {
+        when(configurationService.getConfiguration("Test")).thenReturn(
+                new GitHubEngineConfiguration(
+                        "Test",
+                        null,
+                        null, null, null
+                )
+        );
+        IssueServiceConfiguration configuration = extension.getConfigurationByName("Test:nemerosa/ontrack");
+        assertEquals("github", configuration.getServiceId());
+        assertEquals("Test:nemerosa/ontrack", configuration.getName());
+        assertTrue(configuration instanceof GitHubIssueServiceConfiguration);
+        GitHubIssueServiceConfiguration issueServiceConfiguration = (GitHubIssueServiceConfiguration) configuration;
+        assertEquals("Test", issueServiceConfiguration.getConfiguration().getName());
+        assertEquals("https://github.com", issueServiceConfiguration.getConfiguration().getUrl());
+        assertEquals("nemerosa/ontrack", issueServiceConfiguration.getRepository());
     }
 
     @Test
