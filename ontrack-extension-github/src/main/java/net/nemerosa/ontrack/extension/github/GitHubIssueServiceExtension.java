@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.github;
 import com.google.common.collect.Sets;
 import net.nemerosa.ontrack.extension.github.client.GitHubClientConfiguratorFactory;
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClient;
-import net.nemerosa.ontrack.extension.github.model.GitHubConfiguration;
 import net.nemerosa.ontrack.extension.github.model.GitHubIssue;
 import net.nemerosa.ontrack.extension.github.model.GitHubLabel;
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService;
@@ -100,7 +99,7 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
 
     @Override
     public Optional<MessageAnnotator> getMessageAnnotator(IssueServiceConfiguration issueServiceConfiguration) {
-        GitHubConfiguration configuration = (GitHubConfiguration) issueServiceConfiguration;
+        GitHubIssueServiceConfiguration configuration = (GitHubIssueServiceConfiguration) issueServiceConfiguration;
         return Optional.of(
                 new RegexMessageAnnotator(
                         GITHUB_ISSUE_PATTERN,
@@ -108,7 +107,8 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
                                 .attr(
                                         "href",
                                         String.format(
-                                                "https://github.com/%s/issues/%s",
+                                                "%s/%s/issues/%s",
+                                                configuration.getConfiguration().getUrl(),
                                                 configuration.getRepository(),
                                                 key.substring(1)
                                         )
@@ -125,10 +125,11 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
 
     @Override
     public Issue getIssue(IssueServiceConfiguration issueServiceConfiguration, String issueKey) {
-        GitHubConfiguration configuration = (GitHubConfiguration) issueServiceConfiguration;
+        GitHubIssueServiceConfiguration configuration = (GitHubIssueServiceConfiguration) issueServiceConfiguration;
         return gitHubClient.getIssue(
                 configuration.getRepository(),
-                gitHubClientConfiguratorFactory.getGitHubConfigurator(configuration),
+                null,
+                // FIXME gitHubClientConfiguratorFactory.getGitHubConfigurator(configuration),
                 getIssueId(issueKey)
         );
     }
