@@ -2,9 +2,11 @@ package net.nemerosa.ontrack.extension.github;
 
 import com.google.common.collect.Sets;
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory;
-import net.nemerosa.ontrack.extension.github.model.GitHubConfiguration;
+import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration;
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService;
+import net.nemerosa.ontrack.extension.github.service.GitHubIssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory;
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,7 +20,7 @@ import static org.mockito.Mockito.mock;
 public class GitHubIssueServiceExtensionTest {
 
     private GitHubIssueServiceExtension extension;
-    private GitHubConfiguration configuration;
+    private IssueServiceConfiguration configuration;
 
     @Before
     public void init() {
@@ -31,14 +33,16 @@ public class GitHubIssueServiceExtensionTest {
                 gitHubClientFactory,
                 issueExportServiceFactory
         );
-
-        configuration = new GitHubConfiguration(
+        GitHubEngineConfiguration engineConfiguration = new GitHubEngineConfiguration(
                 "test",
-                "repo/test",
+                "url",
                 "",
                 "",
-                "",
-                0
+                ""
+        );
+        configuration = new GitHubIssueServiceConfiguration(
+                engineConfiguration,
+                "nemerosa/ontrack"
         );
     }
 

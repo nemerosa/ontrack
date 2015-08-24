@@ -25,7 +25,7 @@ public class GitHubResourceModule extends AbstractResourceModule {
     @Override
     public Collection<ResourceDecorator<?>> decorators() {
         return Arrays.asList(
-                new GitHubConfigurationResourceDecorator(securityService)
+                new GitHubEngineConfigurationResourceDecorator(securityService)
         );
     }
 
