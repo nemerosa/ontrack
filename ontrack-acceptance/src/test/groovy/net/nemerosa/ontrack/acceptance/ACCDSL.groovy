@@ -445,7 +445,7 @@ class ACCDSL extends AbstractACCDSL {
         // Updates the template
         ontrack.project(project) {
             config {
-                gitHub configName
+                gitHub configName, repository: 'nemerosa/ontrack'
             }
             branch('template', '', true) {
                 promotionLevel 'COPPER', 'Copper promotion', true
