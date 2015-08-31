@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.git.model.IndexableBuildGitCommitLink;
 import net.nemerosa.ontrack.git.GitRepositoryClient;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Build;
 import org.springframework.stereotype.Component;
 
@@ -64,7 +65,7 @@ public class TagBuildNameGitCommitLink implements IndexableBuildGitCommitLink<No
      * Returns all tags starting from the {@code commit}.
      */
     @Override
-    public Stream<String> getBuildCandidateReferences(String commit, GitRepositoryClient gitClient, GitBranchConfiguration branchConfiguration, NoConfig data) {
+    public Stream<String> getBuildCandidateReferences(String commit, Branch branch, GitRepositoryClient gitClient, GitBranchConfiguration branchConfiguration, NoConfig data) {
         return gitClient.getTagsWhichContainCommit(commit).stream();
     }
 
