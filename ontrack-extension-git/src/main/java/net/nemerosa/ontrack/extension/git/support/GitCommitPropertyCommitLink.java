@@ -93,7 +93,9 @@ public class GitCommitPropertyCommitLink implements BuildGitCommitLink<NoConfig>
                             // Filters on the branch
                     .filter(projectEntity -> ((Build) projectEntity).getBranch().getId().equals(branch.getId()))
                             // Gets the build names
-                    .map(projectEntity -> ((Build) projectEntity).getName());
+                    .map(projectEntity -> ((Build) projectEntity).getName())
+                            // Unique build names
+                    .distinct();
         } else {
             return Collections.<String>emptyList().stream();
         }
