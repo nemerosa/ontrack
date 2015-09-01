@@ -4,10 +4,12 @@ import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Selection;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
+import net.nemerosa.ontrack.model.support.ConfigurationPropertyType;
 
 import java.util.function.Function;
 
-public abstract class AbstractJenkinsPropertyType<T extends AbstractJenkinsProperty> extends AbstractPropertyType<T> {
+public abstract class AbstractJenkinsPropertyType<T extends AbstractJenkinsProperty> extends AbstractPropertyType<T>
+        implements ConfigurationPropertyType<JenkinsConfiguration, T> {
 
     protected final JenkinsConfigurationService configurationService;
 

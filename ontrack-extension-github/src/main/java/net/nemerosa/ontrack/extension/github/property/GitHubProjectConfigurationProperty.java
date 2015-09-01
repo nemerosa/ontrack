@@ -4,9 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration;
+import net.nemerosa.ontrack.model.support.ConfigurationProperty;
 
 @Data
-public class GitHubProjectConfigurationProperty {
+public class GitHubProjectConfigurationProperty implements ConfigurationProperty<GitHubEngineConfiguration> {
 
     /**
      * Link to the GitHub configuration

@@ -2,9 +2,10 @@ package net.nemerosa.ontrack.extension.artifactory.property;
 
 import lombok.Data;
 import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfiguration;
+import net.nemerosa.ontrack.model.support.ConfigurationProperty;
 
 @Data
-public class ArtifactoryPromotionSyncProperty {
+public class ArtifactoryPromotionSyncProperty implements ConfigurationProperty<ArtifactoryConfiguration> {
 
     /**
      * Reference to the Artifactory configuration.

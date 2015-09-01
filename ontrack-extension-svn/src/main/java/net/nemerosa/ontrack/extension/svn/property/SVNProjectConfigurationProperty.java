@@ -2,13 +2,14 @@ package net.nemerosa.ontrack.extension.svn.property;
 
 import lombok.Data;
 import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration;
+import net.nemerosa.ontrack.model.support.ConfigurationProperty;
 
 /**
  * Associates a {@link net.nemerosa.ontrack.model.structure.Project} with a
  * {@link net.nemerosa.ontrack.extension.svn.model.SVNConfiguration}.
  */
 @Data
-public class SVNProjectConfigurationProperty {
+public class SVNProjectConfigurationProperty implements ConfigurationProperty<SVNConfiguration> {
 
     /**
      * Link to the SVN configuration

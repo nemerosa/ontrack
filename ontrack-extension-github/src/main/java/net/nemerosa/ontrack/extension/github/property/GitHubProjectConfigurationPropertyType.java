@@ -13,12 +13,14 @@ import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
+import net.nemerosa.ontrack.model.support.ConfigurationPropertyType;
 
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.Function;
 
-public class GitHubProjectConfigurationPropertyType extends AbstractPropertyType<GitHubProjectConfigurationProperty> {
+public class GitHubProjectConfigurationPropertyType extends AbstractPropertyType<GitHubProjectConfigurationProperty>
+        implements ConfigurationPropertyType<GitHubEngineConfiguration, GitHubProjectConfigurationProperty> {
 
     private final GitHubConfigurationService configurationService;
 
