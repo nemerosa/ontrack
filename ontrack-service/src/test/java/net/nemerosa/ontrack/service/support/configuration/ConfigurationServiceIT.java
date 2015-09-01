@@ -196,22 +196,22 @@ public class ConfigurationServiceIT extends AbstractServiceTestSupport {
                         )
         );
         // Assert the properties are there
-        asUser().with(p1, ProjectView.class).call(() ->
+        asUser().with(p1, ProjectView.class).execute(() ->
                         assertTrue(propertyService.hasProperty(p1, TestPropertyType.class))
         );
-        asUser().with(p2, ProjectView.class).call(() ->
+        asUser().with(p2, ProjectView.class).execute(() ->
                         assertTrue(propertyService.hasProperty(p2, TestPropertyType.class))
         );
         // Deletes the first configuration
-        asUser().with(GlobalSettings.class).call(() ->
+        asUser().with(GlobalSettings.class).execute(() ->
                         configurationService.deleteConfiguration(conf1Name)
         );
         // Checks the property 1 is gone
-        asUser().with(p1, ProjectView.class).call(() ->
+        asUser().with(p1, ProjectView.class).execute(() ->
                         assertFalse("Project configuration should be gone", propertyService.hasProperty(p1, TestPropertyType.class))
         );
         // ... but not the second one
-        asUser().with(p2, ProjectView.class).call(() ->
+        asUser().with(p2, ProjectView.class).execute(() ->
                         assertTrue(propertyService.hasProperty(p2, TestPropertyType.class))
         );
     }
