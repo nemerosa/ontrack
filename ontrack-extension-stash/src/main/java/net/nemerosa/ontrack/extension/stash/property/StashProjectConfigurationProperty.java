@@ -4,9 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.stash.model.StashConfiguration;
+import net.nemerosa.ontrack.model.support.ConfigurationProperty;
 
 @Data
-public class StashProjectConfigurationProperty {
+public class StashProjectConfigurationProperty implements ConfigurationProperty<StashConfiguration> {
 
     /**
      * Link to the Stash configuration

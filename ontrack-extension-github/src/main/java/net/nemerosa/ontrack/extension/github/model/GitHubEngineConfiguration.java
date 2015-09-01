@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.github.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import net.nemerosa.ontrack.extension.support.UserPasswordConfiguration;
+import net.nemerosa.ontrack.model.support.UserPasswordConfiguration;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Password;
 import net.nemerosa.ontrack.model.form.Text;

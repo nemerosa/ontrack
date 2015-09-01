@@ -1,8 +1,6 @@
-package net.nemerosa.ontrack.extension.support;
+package net.nemerosa.ontrack.model.support;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.nemerosa.ontrack.model.support.Configuration;
-import net.nemerosa.ontrack.model.support.UserPassword;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Optional;

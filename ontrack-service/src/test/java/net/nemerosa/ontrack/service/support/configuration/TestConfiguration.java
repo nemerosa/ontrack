@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.service.support.configuration;
 
 import lombok.Data;
-import net.nemerosa.ontrack.extension.support.UserPasswordConfiguration;
+import net.nemerosa.ontrack.model.support.UserPasswordConfiguration;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 
 import java.util.function.Function;

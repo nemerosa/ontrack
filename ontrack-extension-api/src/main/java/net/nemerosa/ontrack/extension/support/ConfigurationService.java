@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.support;
 
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
+import net.nemerosa.ontrack.model.support.UserPasswordConfiguration;
 
 import java.util.List;
 import java.util.Optional;
