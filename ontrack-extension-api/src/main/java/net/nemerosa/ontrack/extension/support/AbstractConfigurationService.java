@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.support;
 
+import net.nemerosa.ontrack.model.events.EventFactory;
+import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.security.EncryptionService;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -20,12 +22,16 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
     private final ConfigurationRepository configurationRepository;
     private final SecurityService securityService;
     private final EncryptionService encryptionService;
+    private final EventPostService eventPostService;
+    private final EventFactory eventFactory;
 
-    public AbstractConfigurationService(Class<T> configurationClass, ConfigurationRepository configurationRepository, SecurityService securityService, EncryptionService encryptionService) {
+    public AbstractConfigurationService(Class<T> configurationClass, ConfigurationRepository configurationRepository, SecurityService securityService, EncryptionService encryptionService, EventPostService eventPostService, EventFactory eventFactory) {
         this.configurationClass = configurationClass;
         this.configurationRepository = configurationRepository;
         this.securityService = securityService;
         this.encryptionService = encryptionService;
+        this.eventPostService = eventPostService;
+        this.eventFactory = eventFactory;
     }
 
     /**
@@ -55,6 +61,7 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
     public T newConfiguration(T configuration) {
         checkAccess();
         configurationRepository.save(encrypt(configuration));
+        eventPostService.post(eventFactory.newConfiguration(configuration));
         return configuration;
     }
 
@@ -74,7 +81,9 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
     @Override
     public void deleteConfiguration(String name) {
         checkAccess();
+        T configuration = getConfiguration(name);
         configurationRepository.delete(configurationClass, name);
+        eventPostService.post(eventFactory.deleteConfiguration(configuration));
     }
 
     @Override
@@ -93,6 +102,7 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
             configToSave = configuration;
         }
         configurationRepository.save(encrypt(configToSave));
+        eventPostService.post(eventFactory.updateConfiguration(configuration));
     }
 
     @Override

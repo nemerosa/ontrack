@@ -3,6 +3,8 @@ package net.nemerosa.ontrack.extension.svn.service;
 import net.nemerosa.ontrack.extension.support.AbstractConfigurationService;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepositoryDao;
 import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration;
+import net.nemerosa.ontrack.model.events.EventFactory;
+import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.security.EncryptionService;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
@@ -17,8 +19,8 @@ public class SVNConfigurationServiceImpl extends AbstractConfigurationService<SV
     private final SVNRepositoryDao repositoryDao;
 
     @Autowired
-    public SVNConfigurationServiceImpl(ConfigurationRepository configurationRepository, SecurityService securityService, EncryptionService encryptionService, SVNRepositoryDao repositoryDao) {
-        super(SVNConfiguration.class, configurationRepository, securityService, encryptionService);
+    public SVNConfigurationServiceImpl(ConfigurationRepository configurationRepository, SecurityService securityService, EncryptionService encryptionService, SVNRepositoryDao repositoryDao, EventPostService eventPostService, EventFactory eventFactory) {
+        super(SVNConfiguration.class, configurationRepository, securityService, encryptionService, eventPostService, eventFactory);
         this.repositoryDao = repositoryDao;
     }
 

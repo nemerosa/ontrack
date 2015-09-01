@@ -3,6 +3,8 @@ package net.nemerosa.ontrack.extension.jenkins.model;
 import net.nemerosa.ontrack.extension.jenkins.JenkinsConfiguration;
 import net.nemerosa.ontrack.extension.jenkins.JenkinsConfigurationService;
 import net.nemerosa.ontrack.extension.jenkins.JenkinsConfigurationServiceImpl;
+import net.nemerosa.ontrack.model.events.EventFactory;
+import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.security.EncryptionService;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
@@ -24,7 +26,8 @@ public class JenkinsServiceTest {
         SecurityService securityService = mock(SecurityService.class);
         configurationRepository = mock(ConfigurationRepository.class);
         encryptionService = mock(EncryptionService.class);
-        jenkinsService = new JenkinsConfigurationServiceImpl(configurationRepository, securityService, encryptionService);
+        jenkinsService = new JenkinsConfigurationServiceImpl(configurationRepository, securityService, encryptionService,
+                mock(EventPostService.class), mock(EventFactory.class));
     }
 
     @Test(expected = IllegalArgumentException.class)

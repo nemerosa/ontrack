@@ -1,7 +1,11 @@
 package net.nemerosa.ontrack.service.events;
 
-import net.nemerosa.ontrack.model.events.*;
+import net.nemerosa.ontrack.model.events.Event;
+import net.nemerosa.ontrack.model.events.EventFactory;
+import net.nemerosa.ontrack.model.events.EventType;
+import net.nemerosa.ontrack.model.events.EventTypeNotFoundException;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.model.support.Configuration;
 import net.nemerosa.ontrack.model.support.NameValue;
 import org.springframework.stereotype.Service;
 
@@ -258,6 +262,27 @@ public class EventFactoryImpl implements EventFactory {
                         propertyType.getTypeName(),
                         propertyType.getName()
                 ))
+                .get();
+    }
+
+    @Override
+    public <T extends Configuration<T>> Event newConfiguration(T configuration) {
+        return Event.of(NEW_CONFIGURATION)
+                .with("configuration", configuration.getName())
+                .get();
+    }
+
+    @Override
+    public <T extends Configuration<T>> Event updateConfiguration(T configuration) {
+        return Event.of(UPDATE_CONFIGURATION)
+                .with("configuration", configuration.getName())
+                .get();
+    }
+
+    @Override
+    public <T extends Configuration<T>> Event deleteConfiguration(T configuration) {
+        return Event.of(DELETE_CONFIGURATION)
+                .with("configuration", configuration.getName())
                 .get();
     }
 }
