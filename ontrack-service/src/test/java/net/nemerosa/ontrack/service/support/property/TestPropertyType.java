@@ -8,12 +8,14 @@ import net.nemerosa.ontrack.model.security.ProjectEdit;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
+import net.nemerosa.ontrack.model.support.ConfigurationPropertyType;
+import net.nemerosa.ontrack.service.support.configuration.TestConfiguration;
 
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.Function;
 
-public class TestPropertyType extends AbstractPropertyType<TestProperty> {
+public class TestPropertyType extends AbstractPropertyType<TestProperty> implements ConfigurationPropertyType<TestConfiguration, TestProperty> {
 
     @Override
     public String getName() {
