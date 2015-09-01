@@ -4,9 +4,12 @@ import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
+import net.nemerosa.ontrack.extension.git.property.GitCommitProperty
+import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.service.GitConfigurationService
+import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory
 import net.nemerosa.ontrack.git.support.GitRepo
@@ -15,8 +18,11 @@ import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.PropertyService
+import net.nemerosa.ontrack.model.structure.Signature
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 
@@ -33,18 +39,31 @@ class GitCommitPropertyCommitLinkIT extends AbstractServiceTestSupport {
     @Autowired
     private GitRepositoryClientFactory gitRepositoryClientFactory
 
+    @Autowired
+    private GitService gitService
+
+    @Autowired
+    private GitCommitPropertyCommitLink gitCommitPropertyCommitLink
+
     @Test
     void 'Issue search on one branch'() {
         // Git repository
         def repo = new GitRepo()
         try {
+
+            // Some commits
             repo.with {
                 git 'init'
-                commit 1, '#1'
-                commit 2, '#2'
-                commit 3, '#2'
-                commit 4, '#1'
+                (1..10).each {
+                    commit it, "Commit $it"
+                }
                 git 'log', '--oneline', '--decorate'
+            }
+
+            // Identifies the commits
+            def commits = [:]
+            (1..10).each {
+                commits[it] = repo.commitLookup("Commit $it", false)
             }
 
             // Create a Git configuration
@@ -58,6 +77,9 @@ class GitCommitPropertyCommitLinkIT extends AbstractServiceTestSupport {
                 )
             }
 
+            // Need to force the Git sync first
+            gitRepositoryClientFactory.getClient(gitConfiguration.gitRepository).sync { println it }
+
             // Creates a project and branch
             Branch branch = doCreateBranch()
             Project project = branch.project
@@ -69,34 +91,45 @@ class GitCommitPropertyCommitLinkIT extends AbstractServiceTestSupport {
                         GitProjectConfigurationPropertyType,
                         new GitProjectConfigurationProperty(gitConfiguration)
                 )
-                // ...  & the branch with a link based on commits
+                // ...  & the branch with a link based on property
                 propertyService.editProperty(
                         branch,
                         GitBranchConfigurationPropertyType,
                         new GitBranchConfigurationProperty(
                                 'master',
                                 new ConfiguredBuildGitCommitLink<>(
-                                        new CommitBuildNameGitCommitLink(),
-                                        new CommitLinkConfig(true)
+                                        gitCommitPropertyCommitLink,
+                                        NoConfig.INSTANCE
                                 ).toServiceConfiguration(),
                                 false, 0
                         )
                 )
+                // ... & creates some builds associated with some commits
+                ['1.0': 3, '1.1': 6].each { name, int commitIndex ->
+                    def build = structureService.newBuild(
+                            Build.of(
+                                    branch,
+                                    NameDescription.nd(name, "Build commit number $commitIndex"),
+                                    Signature.of('test')
+                            )
+                    )
+                    propertyService.editProperty(
+                            build,
+                            GitCommitPropertyType,
+                            new GitCommitProperty(commits[commitIndex] as String)
+                    )
+                }
             }
 
-            // Need to force the Git sync first
-            gitRepositoryClientFactory.getClient(gitConfiguration.gitRepository).sync { println it }
+            // Commit info
 
-            // Looks for an issue
-            def info = asUser().with(project, ProjectView).call { gitService.getIssueInfo(branch.id, '2') }
-            assert info != null
-            assert info.issue.key == '2'
-            assert info.issue.displayKey == '#2'
-            assert info.commitInfos.size() == 1
-            def ci = info.commitInfos.first()
-            assert ci.branchInfos.size() == 1
-            assert ci.branchInfos.first().branch.id == branch.id
-
+            def commitInfo = asUser().with(project, ProjectView).call {
+                gitService.getCommitInfo(branch.id, commits[4] as String)
+            }
+            assert commitInfo != null
+            assert commitInfo.uiCommit.commit.id == commits[4] as String
+            assert commitInfo.uiCommit.annotatedMessage == "Commit 4"
+            assert commitInfo.buildViews[0].build.description == "Build commit number 6"
         } finally {
             repo.close()
         }
