@@ -81,7 +81,7 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
     @Override
     public void deleteConfiguration(String name) {
         checkAccess();
-        T configuration = getConfiguration(name);
+        T configuration = configurationRepository.find(configurationClass, name).get();
         configurationRepository.delete(configurationClass, name);
         eventPostService.post(eventFactory.deleteConfiguration(configuration));
     }
