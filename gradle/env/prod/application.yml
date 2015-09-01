@@ -8,7 +8,7 @@ spring:
   datasource:
     # Tomcat specific pool configuration
     # #234 Make sure the connections are renewed in the pool
-    maxAge: 600000
+    max-age: 600000
 
 # SSL configuration
 server:
