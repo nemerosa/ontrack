@@ -145,6 +145,13 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
             }
         }
 
+        public void call(Runnable task) throws Exception {
+            call(() -> {
+                task.run();
+                return null;
+            });
+        }
+
         protected abstract void contextSetup();
     }
 

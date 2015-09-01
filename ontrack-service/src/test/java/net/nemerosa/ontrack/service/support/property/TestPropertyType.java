@@ -68,6 +68,12 @@ public class TestPropertyType extends AbstractPropertyType<TestProperty> {
 
     @Override
     public TestProperty replaceValue(TestProperty value, Function<String, String> replacementFunction) {
-        return new TestProperty(replacementFunction.apply(value.getValue()));
+        return new TestProperty(
+                value.getConfiguration().clone(
+                        replacementFunction.apply(value.getConfiguration().getName()),
+                        replacementFunction
+                ),
+                replacementFunction.apply(value.getValue())
+        );
     }
 }
