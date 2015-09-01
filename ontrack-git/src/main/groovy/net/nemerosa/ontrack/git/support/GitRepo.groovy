@@ -69,8 +69,9 @@ class GitRepo {
         git 'commit', '-m', commitMessage
     }
 
-    String commitLookup(String message) {
-        def info = git 'log', '--all', '--grep', message, '--pretty=format:%h'
+    String commitLookup(String message, boolean shortId = true) {
+        def commitFormat = shortId ? '%h' : '%H'
+        def info = git 'log', '--all', '--grep', message, "--pretty=format:${commitFormat}"
         if (info) {
             info.trim()
         } else {

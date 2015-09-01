@@ -574,7 +574,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         // Delegates to the build commit link...
         return configuredBuildGitCommitLink.getLink()
                 // ... by getting candidate references
-                .getBuildCandidateReferences(commit, client, branchConfiguration, configuredBuildGitCommitLink.getData())
+                .getBuildCandidateReferences(commit, branch, client, branchConfiguration, configuredBuildGitCommitLink.getData())
                         // ... gets the builds
                 .map(buildName -> structureService.findBuildByName(branch.getProject().getName(), branch.getName(), buildName))
                         // ... filter on existing builds

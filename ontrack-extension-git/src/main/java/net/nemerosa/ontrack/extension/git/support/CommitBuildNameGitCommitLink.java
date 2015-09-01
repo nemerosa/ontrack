@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.exceptions.JsonParsingException;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.YesNo;
+import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Build;
 import org.springframework.stereotype.Component;
 
@@ -69,7 +70,7 @@ public class CommitBuildNameGitCommitLink implements BuildGitCommitLink<CommitLi
     }
 
     @Override
-    public Stream<String> getBuildCandidateReferences(String commit, GitRepositoryClient gitClient, GitBranchConfiguration branchConfiguration, CommitLinkConfig data) {
+    public Stream<String> getBuildCandidateReferences(String commit, Branch branch, GitRepositoryClient gitClient, GitBranchConfiguration branchConfiguration, CommitLinkConfig data) {
         if (gitClient.isCommit(commit)) {
             return gitClient.log(
                     String.format("%s~1", commit),
