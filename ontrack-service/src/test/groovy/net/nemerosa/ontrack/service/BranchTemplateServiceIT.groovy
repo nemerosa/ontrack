@@ -1101,7 +1101,7 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
             propertyService.editProperty(
                     templateBranch,
                     TestPropertyType,
-                    new TestProperty('Value for ${sourceName}')
+                    TestProperty.of('Value for ${sourceName}')
             )
         }
 
