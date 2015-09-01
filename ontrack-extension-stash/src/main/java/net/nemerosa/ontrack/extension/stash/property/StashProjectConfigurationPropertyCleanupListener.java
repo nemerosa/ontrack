@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.stash.property;
 
 import net.nemerosa.ontrack.extension.stash.model.StashConfiguration;
+import net.nemerosa.ontrack.extension.support.AbstractConfigurationPropertyCleanupListener;
 import net.nemerosa.ontrack.model.structure.PropertyService;
 import net.nemerosa.ontrack.model.structure.StructureService;
 import org.springframework.beans.factory.annotation.Autowired;

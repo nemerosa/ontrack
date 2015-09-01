@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.stash.property;
+package net.nemerosa.ontrack.extension.support;
 
 import net.nemerosa.ontrack.model.events.Event;
 import net.nemerosa.ontrack.model.events.EventFactory;
