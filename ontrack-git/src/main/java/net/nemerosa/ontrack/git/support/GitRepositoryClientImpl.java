@@ -361,12 +361,24 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
                                 ref.getName(),
                                 Constants.R_TAGS
                         );
-                        RevCommit revCommit = revWalk.lookupCommit(ref.getObjectId());
-                        LocalDateTime tagTime = Time.from(revCommit.getCommitTime() * 1000L);
-                        return new GitTag(
-                                tagName,
-                                tagTime
-                        );
+                        RevCommit revCommit = null;
+                        try {
+                            revCommit = revWalk.parseCommit(ref.getObjectId());
+                            int commitTime = revCommit.getCommitTime();
+                            LocalDateTime tagTime = Time.from(commitTime * 1000L);
+                            return new GitTag(
+                                    tagName,
+                                    tagTime
+                            );
+                        } catch (IOException e) {
+                            //TODO log warning in case of exception ?
+                            return new GitTag(
+                                    tagName,
+                                    Time.from(0L)
+                            );
+                        }
+
+
                     })
                     .collect(Collectors.toList())
                     ;
