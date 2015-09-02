@@ -7,17 +7,21 @@ import net.nemerosa.ontrack.model.structure.BranchType;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.structure.StructureService;
 import net.nemerosa.ontrack.ui.resource.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+@Component
 public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
 
     private final ResourceDecorationContributorService resourceDecorationContributorService;
     private final StructureService structureService;
 
-    protected BranchResourceDecorator(ResourceDecorationContributorService resourceDecorationContributorService, StructureService structureService) {
+    @Autowired
+    public BranchResourceDecorator(ResourceDecorationContributorService resourceDecorationContributorService, StructureService structureService) {
         super(Branch.class);
         this.resourceDecorationContributorService = resourceDecorationContributorService;
         this.structureService = structureService;

@@ -9,6 +9,8 @@ import net.nemerosa.ontrack.model.support.JsonViewClass;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class ResourceObjectMapperFactory {
@@ -21,6 +23,17 @@ public class ResourceObjectMapperFactory {
 
     public ResourceObjectMapperFactory(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
+    }
+
+    public ResourceObjectMapper resourceObjectMapper(ResourceContext resourceContext, ResourceDecorator<?>... decorators) {
+        return resourceObjectMapper(
+                Collections.singletonList(
+                        new DefaultResourceModule(
+                                Arrays.asList(decorators)
+                        )
+                ),
+                resourceContext
+        );
     }
 
     public ResourceObjectMapper resourceObjectMapper(List<ResourceModule> resourceModules, ResourceContext resourceContext) {

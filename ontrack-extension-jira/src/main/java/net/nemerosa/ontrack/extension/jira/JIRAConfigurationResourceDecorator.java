@@ -3,11 +3,13 @@ package net.nemerosa.ontrack.extension.jira;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.ResourceContext;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+@Component
 public class JIRAConfigurationResourceDecorator extends AbstractResourceDecorator<JIRAConfiguration> {
 
     public JIRAConfigurationResourceDecorator() {

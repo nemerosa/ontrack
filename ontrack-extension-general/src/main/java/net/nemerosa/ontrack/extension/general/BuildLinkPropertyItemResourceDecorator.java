@@ -5,6 +5,8 @@ import net.nemerosa.ontrack.model.structure.StructureService;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.ResourceContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
@@ -13,11 +15,13 @@ import java.util.Optional;
 /**
  * Decorator for {@link BuildLinkPropertyItem}.
  */
+@Component
 public class BuildLinkPropertyItemResourceDecorator extends AbstractResourceDecorator<BuildLinkPropertyItem> {
 
     private final StructureService structureService;
 
-    protected BuildLinkPropertyItemResourceDecorator(StructureService structureService) {
+    @Autowired
+    public BuildLinkPropertyItemResourceDecorator(StructureService structureService) {
         super(BuildLinkPropertyItem.class);
         this.structureService = structureService;
     }
