@@ -40,10 +40,8 @@ public class GitChangeLogResourceDecoratorTest {
         SecurityService securityService = mock(SecurityService.class);
         gitService = mock(GitService.class);
         mapper = new ResourceObjectMapperFactory().resourceObjectMapper(
-                Arrays.asList(
-                        new GitResourceModule(gitService, securityService)
-                ),
-                new DefaultResourceContext(new MockURIBuilder(), securityService)
+                new DefaultResourceContext(new MockURIBuilder(), securityService),
+                new GitChangeLogResourceDecorator(gitService)
         );
     }
 

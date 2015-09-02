@@ -89,6 +89,16 @@ public interface PropertyService {
     Ack deleteProperty(ProjectEntity entity, String propertyTypeName);
 
     /**
+     * Deletes the value of a property.
+     *
+     * @param entity Type  of the entity to edit
+     * @param propertyType Class of the property to delete
+     */
+    default <T> Ack deleteProperty(ProjectEntity entity, Class<? extends PropertyType<T>> propertyType) {
+        return deleteProperty(entity, propertyType.getName());
+    }
+
+    /**
      * Searches for all entities with the corresponding property value.
      */
     <T> Collection<ProjectEntity> searchWithPropertyValue(

@@ -1,11 +1,12 @@
 package net.nemerosa.ontrack.extension.github;
 
 import com.google.common.collect.Sets;
-import net.nemerosa.ontrack.extension.github.client.GitHubClientConfiguratorFactory;
-import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClient;
-import net.nemerosa.ontrack.extension.github.model.GitHubConfiguration;
+import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory;
+import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration;
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService;
+import net.nemerosa.ontrack.extension.github.service.GitHubIssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory;
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,34 +16,55 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class GitHubIssueServiceExtensionTest {
 
     private GitHubIssueServiceExtension extension;
-    private GitHubConfiguration configuration;
+    private IssueServiceConfiguration configuration;
+    private GitHubConfigurationService configurationService;
 
     @Before
     public void init() {
-        GitHubConfigurationService configurationService = mock(GitHubConfigurationService.class);
-        GitHubClientConfiguratorFactory gitHubClientConfiguratorFactory = mock(GitHubClientConfiguratorFactory.class);
-        OntrackGitHubClient gitHubClient = mock(OntrackGitHubClient.class);
+        configurationService = mock(GitHubConfigurationService.class);
+        OntrackGitHubClientFactory gitHubClientFactory = mock(OntrackGitHubClientFactory.class);
         IssueExportServiceFactory issueExportServiceFactory = mock(IssueExportServiceFactory.class);
         extension = new GitHubIssueServiceExtension(
                 new GitHubExtensionFeature(),
                 configurationService,
-                gitHubClientConfiguratorFactory,
-                gitHubClient,
+                gitHubClientFactory,
                 issueExportServiceFactory
         );
-
-        configuration = new GitHubConfiguration(
+        GitHubEngineConfiguration engineConfiguration = new GitHubEngineConfiguration(
                 "test",
-                "repo/test",
+                "url",
                 "",
                 "",
-                "",
-                0
+                ""
         );
+        configuration = new GitHubIssueServiceConfiguration(
+                engineConfiguration,
+                "nemerosa/ontrack"
+        );
+    }
+
+    @Test
+    public void issueServiceIdentifierContainsBothConfigurationAndRepository() {
+        when(configurationService.getConfiguration("Test")).thenReturn(
+                new GitHubEngineConfiguration(
+                        "Test",
+                        null,
+                        null, null, null
+                )
+        );
+        IssueServiceConfiguration configuration = extension.getConfigurationByName("Test:nemerosa/ontrack");
+        assertEquals("github", configuration.getServiceId());
+        assertEquals("Test:nemerosa/ontrack", configuration.getName());
+        assertTrue(configuration instanceof GitHubIssueServiceConfiguration);
+        GitHubIssueServiceConfiguration issueServiceConfiguration = (GitHubIssueServiceConfiguration) configuration;
+        assertEquals("Test", issueServiceConfiguration.getConfiguration().getName());
+        assertEquals("https://github.com", issueServiceConfiguration.getConfiguration().getUrl());
+        assertEquals("nemerosa/ontrack", issueServiceConfiguration.getRepository());
     }
 
     @Test

@@ -1,37 +1,46 @@
 package net.nemerosa.ontrack.boot.support;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import net.nemerosa.ontrack.boot.resources.CoreResourceModule;
+import net.nemerosa.ontrack.it.AbstractServiceTestSupport;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.model.structure.Branch;
+import net.nemerosa.ontrack.model.structure.ID;
+import net.nemerosa.ontrack.model.structure.NameDescription;
+import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.test.TestUtils;
 import net.nemerosa.ontrack.ui.controller.MockURIBuilder;
-import net.nemerosa.ontrack.ui.resource.ResourceDecorationContributorService;
+import net.nemerosa.ontrack.ui.resource.DefaultResourceModule;
+import net.nemerosa.ontrack.ui.resource.ResourceDecorator;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpOutputMessage;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 
 import static net.nemerosa.ontrack.json.JsonUtils.object;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class ResourceHttpMessageConverterTest {
+public class ResourceHttpMessageConverterIT extends AbstractServiceTestSupport {
+
+    @Autowired
+    private SecurityService securityService;
+
+    @Autowired
+    private Collection<ResourceDecorator<?>> decorators;
 
     private ResourceHttpMessageConverter converter;
 
     @Before
     public void before() {
-        SecurityService securityService = mock(SecurityService.class);
-        StructureService structureService = mock(StructureService.class);
-        ResourceDecorationContributorService resourceDecorationContributorService = mock(ResourceDecorationContributorService.class);
         converter = new ResourceHttpMessageConverter(
                 new MockURIBuilder(), securityService,
-                Collections.singletonList(new CoreResourceModule(structureService, resourceDecorationContributorService))
+                Collections.singletonList(new DefaultResourceModule(decorators))
         );
     }
 

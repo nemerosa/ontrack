@@ -7,15 +7,19 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.ResourceContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+@Component
 public class StashConfigurationResourceDecorator extends AbstractResourceDecorator<StashConfiguration> {
 
     private final SecurityService securityService;
 
+    @Autowired
     public StashConfigurationResourceDecorator(SecurityService securityService) {
         super(StashConfiguration.class);
         this.securityService = securityService;

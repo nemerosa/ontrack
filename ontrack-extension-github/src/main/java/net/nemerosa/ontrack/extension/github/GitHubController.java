@@ -1,10 +1,11 @@
 package net.nemerosa.ontrack.extension.github;
 
 import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
-import net.nemerosa.ontrack.extension.github.model.GitHubConfiguration;
+import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClient;
+import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory;
+import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration;
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
-import net.nemerosa.ontrack.git.GitRepositoryClientFactory;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
@@ -26,17 +27,18 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 public class GitHubController extends AbstractExtensionController<GitHubExtensionFeature> {
 
     private final GitHubConfigurationService configurationService;
+    private final OntrackGitHubClientFactory gitHubClientFactory;
     private final SecurityService securityService;
-    private final GitRepositoryClientFactory repositoryClientFactory;
 
     @Autowired
     public GitHubController(GitHubExtensionFeature feature,
                             GitHubConfigurationService configurationService,
-                            SecurityService securityService, GitRepositoryClientFactory repositoryClientFactory) {
+                            OntrackGitHubClientFactory gitHubClientFactory,
+                            SecurityService securityService) {
         super(feature);
         this.configurationService = configurationService;
+        this.gitHubClientFactory = gitHubClientFactory;
         this.securityService = securityService;
-        this.repositoryClientFactory = repositoryClientFactory;
     }
 
     @Override
@@ -54,7 +56,7 @@ public class GitHubController extends AbstractExtensionController<GitHubExtensio
      * Gets the configurations
      */
     @RequestMapping(value = "configurations", method = RequestMethod.GET)
-    public Resources<GitHubConfiguration> getConfigurations() {
+    public Resources<GitHubEngineConfiguration> getConfigurations() {
         return Resources.of(
                 configurationService.getConfigurations(),
                 uri(on(getClass()).getConfigurations())
@@ -68,9 +70,13 @@ public class GitHubController extends AbstractExtensionController<GitHubExtensio
      * Test for a configuration
      */
     @RequestMapping(value = "configurations/test", method = RequestMethod.POST)
-    public ConnectionResult testConfiguration(@RequestBody GitHubConfiguration configuration) {
+    public ConnectionResult testConfiguration(@RequestBody GitHubEngineConfiguration configuration) {
         try {
-            repositoryClientFactory.getClient(configuration.getGitRepository()).test();
+            // Gets the client
+            OntrackGitHubClient client = gitHubClientFactory.create(configuration);
+            // Gets the list of repositories
+            client.getRepositories();
+            // OK
             return ConnectionResult.ok();
         } catch (Exception ex) {
             return ConnectionResult.error(ex.getMessage());
@@ -93,14 +99,14 @@ public class GitHubController extends AbstractExtensionController<GitHubExtensio
      */
     @RequestMapping(value = "configurations/create", method = RequestMethod.GET)
     public Form getConfigurationForm() {
-        return GitHubConfiguration.form();
+        return GitHubEngineConfiguration.form();
     }
 
     /**
      * Creating a configuration
      */
     @RequestMapping(value = "configurations/create", method = RequestMethod.POST)
-    public GitHubConfiguration newConfiguration(@RequestBody GitHubConfiguration configuration) {
+    public GitHubEngineConfiguration newConfiguration(@RequestBody GitHubEngineConfiguration configuration) {
         return configurationService.newConfiguration(configuration);
     }
 
@@ -108,7 +114,7 @@ public class GitHubController extends AbstractExtensionController<GitHubExtensio
      * Gets one configuration
      */
     @RequestMapping(value = "configurations/{name}", method = RequestMethod.GET)
-    public GitHubConfiguration getConfiguration(@PathVariable String name) {
+    public GitHubEngineConfiguration getConfiguration(@PathVariable String name) {
         return configurationService.getConfiguration(name);
     }
 
@@ -134,7 +140,7 @@ public class GitHubController extends AbstractExtensionController<GitHubExtensio
      * Updating one configuration
      */
     @RequestMapping(value = "configurations/{name}/update", method = RequestMethod.PUT)
-    public GitHubConfiguration updateConfiguration(@PathVariable String name, @RequestBody GitHubConfiguration configuration) {
+    public GitHubEngineConfiguration updateConfiguration(@PathVariable String name, @RequestBody GitHubEngineConfiguration configuration) {
         configurationService.updateConfiguration(name, configuration);
         return getConfiguration(name);
     }

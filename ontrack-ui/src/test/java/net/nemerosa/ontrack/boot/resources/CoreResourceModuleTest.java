@@ -34,7 +34,25 @@ public class CoreResourceModuleTest {
         ResourceDecorationContributorService resourceDecorationContributorService = mock(ResourceDecorationContributorService.class);
         mapper = new ResourceObjectMapperFactory().resourceObjectMapper(
                 Collections.singletonList(
-                        new CoreResourceModule(structureService, resourceDecorationContributorService)
+                        new DefaultResourceModule(
+                                Arrays.asList(
+                                        new ConnectedAccountResourceDecorator(),
+                                        new ProjectResourceDecorator(),
+                                        new BranchResourceDecorator(resourceDecorationContributorService, structureService),
+                                        new PromotionLevelResourceDecorator(),
+                                        new ValidationStampResourceDecorator(),
+                                        new BuildResourceDecorator(resourceDecorationContributorService),
+                                        new PromotionRunResourceDecorator(),
+                                        new ValidationRunResourceDecorator(),
+                                        new BuildFilterResourceDecorator(),
+                                        new AccountResourceDecorator(),
+                                        new AccountGroupResourceDecorator(),
+                                        new GlobalPermissionResourceDecorator(),
+                                        new ProjectPermissionResourceDecorator(),
+                                        new JobStatusResourceDecorator(),
+                                        new PredefinedValidationStampResourceDecorator()
+                                )
+                        )
                 ),
                 new DefaultResourceContext(new MockURIBuilder(), securityService)
         );

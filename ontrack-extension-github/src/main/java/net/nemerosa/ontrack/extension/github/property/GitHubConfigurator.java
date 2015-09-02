@@ -23,6 +23,6 @@ public class GitHubConfigurator implements GitConfigurator {
     public Optional<GitConfiguration> getConfiguration(Project project) {
         return propertyService.getProperty(project, GitHubProjectConfigurationPropertyType.class)
                 .option()
-                .map(GitHubProjectConfigurationProperty::getConfiguration);
+                .map(GitHubProjectConfigurationProperty::getGitConfiguration);
     }
 }

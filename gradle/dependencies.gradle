@@ -31,7 +31,7 @@ ext {
             jackson_databind            : 'com.fasterxml.jackson.core:jackson-databind:2.3.3',
             guava                       : 'com.google.guava:guava:17.0',
             dbinit                      : 'net.sf.dbinit:dbinit:1.4.0',
-            h2                          : 'com.h2database:h2:1.4.185',
+            h2                          : 'com.h2database:h2:1.4.188',
             args4j                      : 'args4j:args4j:2.0.29',
 
             // Spring

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.model.events;
 
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.model.support.Configuration;
 
 /**
  * Factory for events.
@@ -40,6 +41,9 @@ public interface EventFactory {
     EventType PROPERTY_CHANGE = SimpleEventType.of("property_change", "${:property} property has changed for ${:entity} ${REF}.");
     EventType PROPERTY_DELETE = SimpleEventType.of("property_delete", "${:property} property has been removed from ${:entity} ${REF}.");
 
+    EventType NEW_CONFIGURATION = SimpleEventType.of("new_configuration", "${:configuration} configuration has been created.");
+    EventType UPDATE_CONFIGURATION = SimpleEventType.of("update_configuration", "${:configuration} configuration has been updated.");
+    EventType DELETE_CONFIGURATION = SimpleEventType.of("delete_configuration", "${:configuration} configuration has been deleted.");
 
     /**
      * Gets an event type using its {@linkplain EventType#getId()}  id}.
@@ -97,4 +101,12 @@ public interface EventFactory {
     <T> Event propertyChange(ProjectEntity entity, PropertyType<T> propertyType);
 
     <T> Event propertyDelete(ProjectEntity entity, PropertyType<T> propertyType);
+
+    // Configurations
+
+    <T extends Configuration<T>> Event newConfiguration(T configuration);
+
+    <T extends Configuration<T>> Event updateConfiguration(T configuration);
+
+    <T extends Configuration<T>> Event deleteConfiguration(T configuration);
 }

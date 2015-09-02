@@ -769,7 +769,9 @@ public class StructureServiceImpl implements StructureService {
     @Override
     public Optional<Project> findProjectByName(String project) {
         return structureRepository.getProjectByName(project)
-                .filter(p -> securityService.isProjectFunctionGranted(p.id(), ProjectView.class));
+                .filter(p ->
+                        securityService.isGlobalFunctionGranted(ProjectList.class) ||
+                                securityService.isProjectFunctionGranted(p.id(), ProjectView.class));
     }
 
     @Override

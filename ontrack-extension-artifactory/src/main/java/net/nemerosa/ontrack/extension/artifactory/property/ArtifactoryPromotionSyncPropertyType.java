@@ -13,13 +13,14 @@ import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
-import org.apache.commons.lang3.StringUtils;
+import net.nemerosa.ontrack.model.support.ConfigurationPropertyType;
 
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.Function;
 
-public class ArtifactoryPromotionSyncPropertyType extends AbstractPropertyType<ArtifactoryPromotionSyncProperty> {
+public class ArtifactoryPromotionSyncPropertyType extends AbstractPropertyType<ArtifactoryPromotionSyncProperty>
+        implements ConfigurationPropertyType<ArtifactoryConfiguration, ArtifactoryPromotionSyncProperty> {
 
     private final ArtifactoryConfigurationService configurationService;
 

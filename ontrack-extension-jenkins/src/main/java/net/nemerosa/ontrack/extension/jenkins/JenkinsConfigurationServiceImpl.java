@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.jenkins;
 
 import net.nemerosa.ontrack.extension.support.AbstractConfigurationService;
+import net.nemerosa.ontrack.model.events.EventFactory;
+import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.security.EncryptionService;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
@@ -13,8 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class JenkinsConfigurationServiceImpl extends AbstractConfigurationService<JenkinsConfiguration> implements JenkinsConfigurationService {
 
     @Autowired
-    public JenkinsConfigurationServiceImpl(ConfigurationRepository configurationRepository, SecurityService securityService, EncryptionService encryptionService) {
-        super(JenkinsConfiguration.class, configurationRepository, securityService, encryptionService);
+    public JenkinsConfigurationServiceImpl(ConfigurationRepository configurationRepository, SecurityService securityService, EncryptionService encryptionService, EventPostService eventPostService, EventFactory eventFactory) {
+        super(JenkinsConfiguration.class, configurationRepository, securityService, encryptionService, eventPostService, eventFactory);
     }
 
 }

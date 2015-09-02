@@ -5,15 +5,19 @@ import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.ui.resource.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+@Component
 public class BuildResourceDecorator extends AbstractResourceDecorator<Build> {
 
     private final ResourceDecorationContributorService resourceDecorationContributorService;
 
+    @Autowired
     public BuildResourceDecorator(ResourceDecorationContributorService resourceDecorationContributorService) {
         super(Build.class);
         this.resourceDecorationContributorService = resourceDecorationContributorService;

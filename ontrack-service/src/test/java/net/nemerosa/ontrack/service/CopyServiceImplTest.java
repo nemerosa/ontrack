@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -52,7 +53,7 @@ public class CopyServiceImplTest {
         // Branch properties
         TestPropertyType testPropertyType = new TestPropertyType();
         when(propertyService.getProperties(sourceBranch)).thenReturn(
-                Arrays.asList(
+                Collections.singletonList(
                         Property.of(
                                 testPropertyType,
                                 TestProperty.of("http://wiki/B1")
@@ -62,7 +63,7 @@ public class CopyServiceImplTest {
 
         // Project properties
         when(propertyService.getProperties(sourceProject)).thenReturn(
-                Arrays.asList(
+                Collections.singletonList(
                         Property.of(
                                 testPropertyType,
                                 TestProperty.of("http://wiki/P1")
@@ -97,7 +98,7 @@ public class CopyServiceImplTest {
         // Checks the copy of properties for the project
         verify(propertyService, times(1)).copyProperty(
                 eq(sourceProject),
-                eq(Property.of(testPropertyType, new TestProperty("http://wiki/P1"))),
+                eq(Property.of(testPropertyType, TestProperty.of("http://wiki/P1"))),
                 eq(createdProject),
                 any()
         );
@@ -105,7 +106,7 @@ public class CopyServiceImplTest {
         // Checks the copy of properties for the branch
         verify(propertyService, times(1)).copyProperty(
                 eq(sourceBranch),
-                eq(Property.of(testPropertyType, new TestProperty("http://wiki/B1"))),
+                eq(Property.of(testPropertyType, TestProperty.of("http://wiki/B1"))),
                 eq(createdBranch),
                 any()
         );
@@ -118,7 +119,7 @@ public class CopyServiceImplTest {
         // Request
         BranchCloneRequest request = new BranchCloneRequest(
                 "B2",
-                Arrays.asList(
+                Collections.singletonList(
                         new Replacement("B1", "B2")
                 )
         );
@@ -126,7 +127,7 @@ public class CopyServiceImplTest {
         // Branch properties
         TestPropertyType testPropertyType = new TestPropertyType();
         when(propertyService.getProperties(sourceBranch)).thenReturn(
-                Arrays.asList(
+                Collections.singletonList(
                         Property.of(
                                 testPropertyType,
                                 TestProperty.of("http://wiki/B1")
@@ -152,7 +153,7 @@ public class CopyServiceImplTest {
         // Checks the copy of properties for the branch
         verify(propertyService, times(1)).copyProperty(
                 eq(sourceBranch),
-                eq(Property.of(testPropertyType, new TestProperty("http://wiki/B1"))),
+                eq(Property.of(testPropertyType, TestProperty.of("http://wiki/B1"))),
                 eq(targetBranch.withId(ID.of(2))),
                 any()
         );
@@ -164,7 +165,7 @@ public class CopyServiceImplTest {
         Branch branch = Branch.of(project, nd("B1", "Branch B1")).withId(ID.of(1));
         // Request
         BranchBulkUpdateRequest request = new BranchBulkUpdateRequest(
-                Arrays.asList(
+                Collections.singletonList(
                         new Replacement("B1", "B2")
                 )
         );
@@ -172,7 +173,7 @@ public class CopyServiceImplTest {
         // Branch properties
         TestPropertyType testPropertyType = new TestPropertyType();
         when(propertyService.getProperties(branch)).thenReturn(
-                Arrays.asList(
+                Collections.singletonList(
                         Property.of(
                                 testPropertyType,
                                 TestProperty.of("http://wiki/B1")
@@ -207,7 +208,7 @@ public class CopyServiceImplTest {
         Branch targetBranch = Branch.of(Project.of(nd("P2", "")).withId(ID.of(2)), nd("B2", "")).withId(ID.of(2));
         // Request
         Function<String, String> replacementFn = replacementFn(
-                Arrays.asList(
+                Collections.singletonList(
                         new Replacement("P1", "P2")
                 )
         );
@@ -215,7 +216,7 @@ public class CopyServiceImplTest {
         // Properties for the branch
         TestPropertyType testPropertyType = new TestPropertyType();
         when(propertyService.getProperties(sourceBranch)).thenReturn(
-                Arrays.asList(
+                Collections.singletonList(
                         Property.of(
                                 testPropertyType,
                                 TestProperty.of("http://wiki/P1")
@@ -232,7 +233,7 @@ public class CopyServiceImplTest {
         // Checks the copy of properties for the branch
         verify(propertyService, times(1)).copyProperty(
                 eq(sourceBranch),
-                eq(Property.of(testPropertyType, new TestProperty("http://wiki/P1"))),
+                eq(Property.of(testPropertyType, TestProperty.of("http://wiki/P1"))),
                 eq(targetBranch),
                 any()
         );
@@ -244,14 +245,14 @@ public class CopyServiceImplTest {
         Branch targetBranch = Branch.of(Project.of(nd("P2", "")).withId(ID.of(2)), nd("B2", "")).withId(ID.of(2));
         // Request
         Function<String, String> replacementFn = replacementFn(
-                Arrays.asList(
+                Collections.singletonList(
                         new Replacement("P1", "P2")
                 )
         );
         // Promotion levels for source
         PromotionLevel sourcePromotionLevel = PromotionLevel.of(sourceBranch, nd("copper", "Copper level for P1"));
         when(structureService.getPromotionLevelListForBranch(ID.of(1))).thenReturn(
-                Arrays.asList(
+                Collections.singletonList(
                         sourcePromotionLevel
                 )
         );
@@ -268,7 +269,7 @@ public class CopyServiceImplTest {
         // Properties for the promotion level
         TestPropertyType testPropertyType = new TestPropertyType();
         when(propertyService.getProperties(sourcePromotionLevel)).thenReturn(
-                Arrays.asList(
+                Collections.singletonList(
                         Property.of(
                                 testPropertyType,
                                 TestProperty.of("http://wiki/P1")
@@ -287,7 +288,7 @@ public class CopyServiceImplTest {
         // Checks the copy of properties for the promotion levels
         verify(propertyService, times(1)).copyProperty(
                 eq(sourcePromotionLevel),
-                eq(Property.of(testPropertyType, new TestProperty("http://wiki/P1"))),
+                eq(Property.of(testPropertyType, TestProperty.of("http://wiki/P1"))),
                 eq(targetPromotionLevel),
                 any()
         );
@@ -299,14 +300,14 @@ public class CopyServiceImplTest {
         Branch targetBranch = Branch.of(Project.of(nd("P2", "")).withId(ID.of(2)), nd("B2", "")).withId(ID.of(2));
         // Request
         Function<String, String> replacementFn = replacementFn(
-                Arrays.asList(
+                Collections.singletonList(
                         new Replacement("P1", "P2")
                 )
         );
         // Validation stamps for source
         ValidationStamp sourceValidationStamp = ValidationStamp.of(sourceBranch, nd("smoke", "Smoke test for P1"));
         when(structureService.getValidationStampListForBranch(ID.of(1))).thenReturn(
-                Arrays.asList(
+                Collections.singletonList(
                         sourceValidationStamp
                 )
         );
@@ -323,7 +324,7 @@ public class CopyServiceImplTest {
         // Properties for the validation stamp
         TestPropertyType testPropertyType = new TestPropertyType();
         when(propertyService.getProperties(sourceValidationStamp)).thenReturn(
-                Arrays.asList(
+                Collections.singletonList(
                         Property.of(
                                 testPropertyType,
                                 TestProperty.of("http://wiki/P1")

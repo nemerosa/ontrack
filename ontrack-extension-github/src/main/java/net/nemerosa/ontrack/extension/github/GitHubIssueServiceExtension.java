@@ -1,12 +1,13 @@
 package net.nemerosa.ontrack.extension.github;
 
 import com.google.common.collect.Sets;
-import net.nemerosa.ontrack.extension.github.client.GitHubClientConfiguratorFactory;
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClient;
-import net.nemerosa.ontrack.extension.github.model.GitHubConfiguration;
+import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory;
 import net.nemerosa.ontrack.extension.github.model.GitHubIssue;
 import net.nemerosa.ontrack.extension.github.model.GitHubLabel;
+import net.nemerosa.ontrack.extension.github.property.GitHubGitConfiguration;
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService;
+import net.nemerosa.ontrack.extension.github.service.GitHubIssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
@@ -18,10 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -32,31 +30,48 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
     public static final String GITHUB_SERVICE_ID = "github";
     public static final String GITHUB_ISSUE_PATTERN = "#(\\d+)";
     private final GitHubConfigurationService configurationService;
-    private final GitHubClientConfiguratorFactory gitHubClientConfiguratorFactory;
-    private final OntrackGitHubClient gitHubClient;
+    private final OntrackGitHubClientFactory gitHubClientFactory;
 
     @Autowired
     public GitHubIssueServiceExtension(
             GitHubExtensionFeature extensionFeature,
             GitHubConfigurationService configurationService,
-            GitHubClientConfiguratorFactory gitHubClientConfiguratorFactory,
-            OntrackGitHubClient gitHubClient,
+            OntrackGitHubClientFactory gitHubClientFactory,
             IssueExportServiceFactory issueExportServiceFactory
     ) {
         super(extensionFeature, GITHUB_SERVICE_ID, "GitHub", issueExportServiceFactory);
         this.configurationService = configurationService;
-        this.gitHubClientConfiguratorFactory = gitHubClientConfiguratorFactory;
-        this.gitHubClient = gitHubClient;
+        this.gitHubClientFactory = gitHubClientFactory;
     }
 
+    /**
+     * The GitHub configurations are not selectable and this method returns an empty list.
+     */
     @Override
     public List<? extends IssueServiceConfiguration> getConfigurationList() {
-        return configurationService.getConfigurations();
+        return Collections.emptyList();
     }
 
+    /**
+     * A GitHub configuration name
+     *
+     * @param name Name of the configuration and repository.
+     * @return Wrapper for the GitHub issue service.
+     * @see net.nemerosa.ontrack.extension.github.property.GitHubGitConfiguration
+     */
     @Override
     public IssueServiceConfiguration getConfigurationByName(String name) {
-        return configurationService.getConfiguration(name);
+        // Parsing of the name
+        String[] tokens = StringUtils.split(name, GitHubGitConfiguration.CONFIGURATION_REPOSITORY_SEPARATOR);
+        if (tokens == null || tokens.length != 2) {
+            throw new IllegalStateException("The GitHub issue configuration identifier name is expected using configuration:repository as a format");
+        }
+        String configuration = tokens[0];
+        String repository = tokens[1];
+        return new GitHubIssueServiceConfiguration(
+                configurationService.getConfiguration(configuration),
+                repository
+        );
     }
 
     @Override
@@ -82,7 +97,7 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
 
     @Override
     public Optional<MessageAnnotator> getMessageAnnotator(IssueServiceConfiguration issueServiceConfiguration) {
-        GitHubConfiguration configuration = (GitHubConfiguration) issueServiceConfiguration;
+        GitHubIssueServiceConfiguration configuration = (GitHubIssueServiceConfiguration) issueServiceConfiguration;
         return Optional.of(
                 new RegexMessageAnnotator(
                         GITHUB_ISSUE_PATTERN,
@@ -90,7 +105,8 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
                                 .attr(
                                         "href",
                                         String.format(
-                                                "https://github.com/%s/issues/%s",
+                                                "%s/%s/issues/%s",
+                                                configuration.getConfiguration().getUrl(),
                                                 configuration.getRepository(),
                                                 key.substring(1)
                                         )
@@ -107,10 +123,12 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
 
     @Override
     public Issue getIssue(IssueServiceConfiguration issueServiceConfiguration, String issueKey) {
-        GitHubConfiguration configuration = (GitHubConfiguration) issueServiceConfiguration;
-        return gitHubClient.getIssue(
+        GitHubIssueServiceConfiguration configuration = (GitHubIssueServiceConfiguration) issueServiceConfiguration;
+        OntrackGitHubClient client = gitHubClientFactory.create(
+                configuration.getConfiguration()
+        );
+        return client.getIssue(
                 configuration.getRepository(),
-                gitHubClientConfiguratorFactory.getGitHubConfigurator(configuration),
                 getIssueId(issueKey)
         );
     }

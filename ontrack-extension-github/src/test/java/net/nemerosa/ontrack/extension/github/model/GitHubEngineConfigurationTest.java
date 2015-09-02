@@ -6,27 +6,26 @@ import org.junit.Test;
 import static net.nemerosa.ontrack.json.JsonUtils.object;
 import static net.nemerosa.ontrack.test.TestUtils.assertJsonRead;
 import static net.nemerosa.ontrack.test.TestUtils.assertJsonWrite;
+import static org.junit.Assert.assertEquals;
 
-public class GitHubConfigurationTest {
+public class GitHubEngineConfigurationTest {
 
     @Test
     public void toJson() throws JsonProcessingException {
         assertJsonWrite(
                 object()
                         .with("name", "ontrack")
-                        .with("repository", "nemerosa/ontrack")
+                        .with("url", "https://github.com")
                         .withNull("user")
                         .withNull("password")
                         .with("oauth2Token", "1234567890abcdef")
-                        .with("indexationInterval", 60)
                         .end(),
-                new GitHubConfiguration(
+                new GitHubEngineConfiguration(
                         "ontrack",
-                        "nemerosa/ontrack",
+                        GitHubEngineConfiguration.GITHUB_COM,
                         null,
                         null,
-                        "1234567890abcdef",
-                        60
+                        "1234567890abcdef"
                 )
         );
     }
@@ -34,25 +33,46 @@ public class GitHubConfigurationTest {
     @Test
     public void fromJson() throws JsonProcessingException {
         assertJsonRead(
-                new GitHubConfiguration(
+                new GitHubEngineConfiguration(
                         "ontrack",
-                        "nemerosa/ontrack",
+                        GitHubEngineConfiguration.GITHUB_COM,
                         null,
                         null,
-                        "1234567890abcdef",
-                        60
+                        "1234567890abcdef"
                 ),
                 object()
                         .with("name", "ontrack")
-                        .with("repository", "nemerosa/ontrack")
+                        .with("url", "https://github.com")
                         .withNull("user")
                         .withNull("password")
-                        .with("indexationInterval", 60)
                         .with("oauth2Token", "1234567890abcdef")
-                        .with("serviceId", "ontrack") // This field is ignored
                         .end(),
-                GitHubConfiguration.class
+                GitHubEngineConfiguration.class
         );
+    }
+
+    @Test
+    public void null_url_for_github_com() {
+        GitHubEngineConfiguration configuration = new GitHubEngineConfiguration(
+                "Test",
+                null,
+                "",
+                "",
+                ""
+        );
+        assertEquals("https://github.com", configuration.getUrl());
+    }
+
+    @Test
+    public void empty_url_for_github_com() {
+        GitHubEngineConfiguration configuration = new GitHubEngineConfiguration(
+                "Test",
+                "",
+                "",
+                "",
+                ""
+        );
+        assertEquals("https://github.com", configuration.getUrl());
     }
 
 }

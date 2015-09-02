@@ -1,9 +1,15 @@
 package net.nemerosa.ontrack.service.support.configuration;
 
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport;
-import net.nemerosa.ontrack.model.security.GlobalSettings;
-import net.nemerosa.ontrack.model.support.ConfigurationRepository;
 import net.nemerosa.ontrack.model.security.EncryptionService;
+import net.nemerosa.ontrack.model.security.GlobalSettings;
+import net.nemerosa.ontrack.model.security.ProjectEdit;
+import net.nemerosa.ontrack.model.security.ProjectView;
+import net.nemerosa.ontrack.model.structure.Project;
+import net.nemerosa.ontrack.model.structure.PropertyService;
+import net.nemerosa.ontrack.model.support.ConfigurationRepository;
+import net.nemerosa.ontrack.service.support.property.TestProperty;
+import net.nemerosa.ontrack.service.support.property.TestPropertyType;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -11,6 +17,7 @@ import java.util.Optional;
 
 import static net.nemerosa.ontrack.service.support.configuration.TestConfiguration.PLAIN_PASSWORD;
 import static net.nemerosa.ontrack.service.support.configuration.TestConfiguration.config;
+import static net.nemerosa.ontrack.test.TestUtils.uid;
 import static org.junit.Assert.*;
 
 public class ConfigurationServiceIT extends AbstractServiceTestSupport {
@@ -23,6 +30,9 @@ public class ConfigurationServiceIT extends AbstractServiceTestSupport {
 
     @Autowired
     private EncryptionService encryptionService;
+
+    @Autowired
+    private PropertyService propertyService;
 
     @Test
     public void encryption() {
@@ -155,6 +165,55 @@ public class ConfigurationServiceIT extends AbstractServiceTestSupport {
             // End of test
             return true;
         });
+    }
+
+    /**
+     * Checks that configuration properties are removed when an associated configuration is deleted.
+     */
+    @Test
+    public void configuration_property_removed_on_configuration_deleted() throws Exception {
+        // Creates two configurations
+        String conf1Name = uid("C");
+        String conf2Name = uid("C");
+        TestConfiguration conf1 = asUser().with(GlobalSettings.class).call(() -> configurationService.newConfiguration(config(conf1Name)));
+        TestConfiguration conf2 = asUser().with(GlobalSettings.class).call(() -> configurationService.newConfiguration(config(conf2Name)));
+        // Creates two projects
+        Project p1 = doCreateProject();
+        Project p2 = doCreateProject();
+        // Sets the properties
+        asUser().with(p1, ProjectEdit.class).call(() ->
+                        propertyService.editProperty(
+                                p1,
+                                TestPropertyType.class,
+                                TestProperty.of(conf1, "1")
+                        )
+        );
+        asUser().with(p2, ProjectEdit.class).call(() ->
+                        propertyService.editProperty(
+                                p2,
+                                TestPropertyType.class,
+                                TestProperty.of(conf2, "2")
+                        )
+        );
+        // Assert the properties are there
+        asUser().with(p1, ProjectView.class).execute(() ->
+                        assertTrue(propertyService.hasProperty(p1, TestPropertyType.class))
+        );
+        asUser().with(p2, ProjectView.class).execute(() ->
+                        assertTrue(propertyService.hasProperty(p2, TestPropertyType.class))
+        );
+        // Deletes the first configuration
+        asUser().with(GlobalSettings.class).execute(() ->
+                        configurationService.deleteConfiguration(conf1Name)
+        );
+        // Checks the property 1 is gone
+        asUser().with(p1, ProjectView.class).execute(() ->
+                        assertFalse("Project configuration should be gone", propertyService.hasProperty(p1, TestPropertyType.class))
+        );
+        // ... but not the second one
+        asUser().with(p2, ProjectView.class).execute(() ->
+                        assertTrue(propertyService.hasProperty(p2, TestPropertyType.class))
+        );
     }
 
 }

@@ -11,6 +11,11 @@ class Config {
     /**
      * Creates or update a GitHub configuration.
      */
+
+    def gitHub(String name) {
+        gitHub([:], name)
+    }
+
     def gitHub(Map<String, ?> parameters, String name) {
         def params = parameters + [name: name]
         ontrack.post(

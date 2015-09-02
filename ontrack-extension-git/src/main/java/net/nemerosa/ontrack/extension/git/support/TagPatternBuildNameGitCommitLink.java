@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.exceptions.JsonParsingException;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Text;
+import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Build;
 import org.springframework.stereotype.Component;
 
@@ -66,7 +67,7 @@ public class TagPatternBuildNameGitCommitLink implements IndexableBuildGitCommit
     }
 
     @Override
-    public Stream<String> getBuildCandidateReferences(String commit, GitRepositoryClient gitClient, GitBranchConfiguration branchConfiguration, TagPattern data) {
+    public Stream<String> getBuildCandidateReferences(String commit, Branch branch, GitRepositoryClient gitClient, GitBranchConfiguration branchConfiguration, TagPattern data) {
         return gitClient.getTagsWhichContainCommit(commit).stream()
                 // ... filter on valid tags only
                 .filter(data::isValidTagName)

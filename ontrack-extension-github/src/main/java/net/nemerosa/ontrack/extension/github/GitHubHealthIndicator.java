@@ -1,13 +1,11 @@
 package net.nemerosa.ontrack.extension.github;
 
-import net.nemerosa.ontrack.extension.github.model.GitHubConfiguration;
+import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClient;
+import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory;
+import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration;
 import net.nemerosa.ontrack.extension.support.ConfigurationHealthIndicator;
 import net.nemerosa.ontrack.extension.support.ConfigurationService;
-import net.nemerosa.ontrack.git.GitRepositoryClient;
-import net.nemerosa.ontrack.git.GitRepositoryClientFactory;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthAggregator;
@@ -18,23 +16,28 @@ import org.springframework.stereotype.Component;
  * to it...
  */
 @Component
-public class GitHubHealthIndicator extends ConfigurationHealthIndicator<GitHubConfiguration> {
+public class GitHubHealthIndicator extends ConfigurationHealthIndicator<GitHubEngineConfiguration> {
 
-    private static final Logger logger = LoggerFactory.getLogger(GitHubHealthIndicator.class);
-
-    private final GitRepositoryClientFactory repositoryClientFactory;
+    private final OntrackGitHubClientFactory gitHubClientFactory;
 
     @Autowired
-    public GitHubHealthIndicator(ConfigurationService<GitHubConfiguration> configurationService, SecurityService securityService, HealthAggregator healthAggregator, GitRepositoryClientFactory repositoryClientFactory) {
+    public GitHubHealthIndicator(
+            ConfigurationService<GitHubEngineConfiguration> configurationService,
+            SecurityService securityService,
+            HealthAggregator healthAggregator,
+            OntrackGitHubClientFactory gitHubClientFactory) {
         super(configurationService, securityService, healthAggregator);
-        this.repositoryClientFactory = repositoryClientFactory;
+        this.gitHubClientFactory = gitHubClientFactory;
     }
 
     @Override
-    protected Health getHealth(GitHubConfiguration config) {
+    protected Health getHealth(GitHubEngineConfiguration config) {
         try {
-            GitRepositoryClient client = repositoryClientFactory.getClient(config.getGitRepository());
-            client.sync(logger::debug);
+            // Gets the client
+            OntrackGitHubClient client = gitHubClientFactory.create(config);
+            // Gets the list of repositories
+            client.getRepositories();
+            // OK
             return Health.up().build();
         } catch (Exception ex) {
             return Health.down(ex).build();

@@ -10,16 +10,20 @@ import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.ResourceContext;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+@Component
 public class GitChangeLogResourceDecorator extends AbstractResourceDecorator<GitChangeLog> {
 
     private final GitService gitService;
 
+    @Autowired
     public GitChangeLogResourceDecorator(GitService gitService) {
         super(GitChangeLog.class);
         this.gitService = gitService;
