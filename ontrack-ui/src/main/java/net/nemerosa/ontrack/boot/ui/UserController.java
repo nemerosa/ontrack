@@ -125,9 +125,10 @@ public class UserController extends AbstractResourceController {
         if (securityService.isGlobalFunctionGranted(AccountManagement.class)) {
             user.add(Action.of("admin-accounts", "Account management", "admin-accounts"));
         }
-        // Management of predefined validation stamps
+        // Management of predefined validation stamps and promotion levels
         if (securityService.isGlobalFunctionGranted(GlobalSettings.class)) {
             user.add(Action.of("admin-predefined-validation-stamps", "Predefined validation stamps", "admin-predefined-validation-stamps"));
+            user.add(Action.of("admin-predefined-promotion-levels", "Predefined promotion levels", "admin-predefined-promotion-levels"));
         }
         // Contributions from extensions
         user = userMenuExtensions(user);
