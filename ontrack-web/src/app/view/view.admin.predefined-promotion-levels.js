@@ -27,6 +27,18 @@ angular.module('ot.view.admin.predefined-promotion-levels', [
         function loadPredefinedPromotionLevels() {
             ot.pageCall($http.get('admin/predefinedPromotionLevels')).then(function (predefinedPromotionLevels) {
                 $scope.predefinedPromotionLevels = predefinedPromotionLevels;
+                $scope.predefinedPromotionLevelSortOptions = {
+                    disabled: !$scope.predefinedPromotionLevels._reorderPromotionLevels,
+                    stop: function (event, ui) {
+                        var ids = $scope.predefinedPromotionLevels.resources.map(function (pl) {
+                            return pl.id;
+                        });
+                        ot.call($http.put(
+                            $scope.predefinedPromotionLevels._reorderPromotionLevels,
+                            { ids: ids}
+                        ));
+                    }
+                };
             });
         }
 
