@@ -1,0 +1,45 @@
+<ot-view>
+
+    <table class="table table-hover" ng-if="predefinedPromotionLevels.resources">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="predefinedPromotionLevel in predefinedPromotionLevels.resources">
+            <td>
+                <ot-entity-image entity="predefinedPromotionLevel">
+                    {{predefinedPromotionLevel.name}}
+                </ot-entity-image>
+            </td>
+            <td>
+                {{predefinedPromotionLevel.description}}
+            </td>
+            <td>
+                <span
+                        class="fa fa-image ot-command"
+                        ng-click="editPromotionLevelImage(predefinedPromotionLevel)"
+                        title="Edits the image for the {{predefinedPromotionLevel.name}} promotion level"></span>
+                <span
+                        class="fa fa-pencil ot-command"
+                        ng-click="editPromotionLevel(predefinedPromotionLevel)"
+                        title="Edits the name or description for the {{predefinedPromotionLevel.name}} promotion level"></span>
+                <span
+                        class="fa fa-trash ot-command"
+                        ng-click="deletePromotionLevel(predefinedPromotionLevel)"
+                        title="Deletes the {{predefinedPromotionLevel.name}} promotion level"></span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="row" ng-hide="predefinedPromotionLevels.resources">
+        <div class="col-md-12 alert alert-warning">
+            No predefined promotion level has been created yet.
+        </div>
+    </div>
+
+</ot-view>
