@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.exceptions.PredefinedPromotionLevelNameAlready
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.model.structure.PredefinedPromotionLevel;
+import net.nemerosa.ontrack.model.structure.Reordering;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ public class PredefinedPromotionLevelJdbcRepository extends AbstractJdbcReposito
     @Override
     public List<PredefinedPromotionLevel> getPredefinedPromotionLevels() {
         return getJdbcTemplate().query(
-                "SELECT * FROM PREDEFINED_PROMOTION_LEVELS ORDER BY NAME",
+                "SELECT * FROM PREDEFINED_PROMOTION_LEVELS ORDER BY ORDERNB",
                 (rs, rowNum) -> toPredefinedPromotionLevel(rs)
         );
     }
@@ -37,11 +38,19 @@ public class PredefinedPromotionLevelJdbcRepository extends AbstractJdbcReposito
     @Override
     public ID newPredefinedPromotionLevel(PredefinedPromotionLevel stamp) {
         try {
+            // Order nb = max + 1
+            Integer orderNbValue = getFirstItem(
+                    "SELECT MAX(ORDERNB) FROM PREDEFINED_PROMOTION_LEVELS",
+                    noParams(),
+                    Integer.class
+            );
+            int orderNb = orderNbValue != null ? orderNbValue + 1 : 0;
             return ID.of(
                     dbCreate(
-                            "INSERT INTO PREDEFINED_PROMOTION_LEVELS(NAME, DESCRIPTION) VALUES (:name, :description)",
+                            "INSERT INTO PREDEFINED_PROMOTION_LEVELS(NAME, ORDERNB, DESCRIPTION) VALUES (:name, :orderNb, :description)",
                             params("name", stamp.getName())
                                     .addValue("description", stamp.getDescription())
+                                    .addValue("orderNb", orderNb)
                     )
             );
         } catch (DuplicateKeyException ex) {
@@ -109,6 +118,17 @@ public class PredefinedPromotionLevelJdbcRepository extends AbstractJdbcReposito
                         .addValue("type", Document.isValid(document) ? document.getType() : null)
                         .addValue("content", Document.isValid(document) ? document.getContent() : null)
         );
+    }
+
+    @Override
+    public void reorderPredefinedPromotionLevels(Reordering reordering) {
+        int order = 1;
+        for (int id : reordering.getIds()) {
+            getNamedParameterJdbcTemplate().update(
+                    "UPDATE PREDEFINED_PROMOTION_LEVELS SET ORDERNB = :order WHERE ID = :id",
+                    params("id", id).addValue("order", order++)
+            );
+        }
     }
 
     protected PredefinedPromotionLevel toPredefinedPromotionLevel(ResultSet rs) throws SQLException {

@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.PredefinedPromotionLevel;
+import net.nemerosa.ontrack.model.structure.Reordering;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,4 +26,6 @@ public interface PredefinedPromotionLevelRepository {
     Ack deletePredefinedPromotionLevel(ID predefinedPromotionLevelId);
 
     void setPredefinedPromotionLevelImage(ID predefinedPromotionLevelId, Document document);
+
+    void reorderPredefinedPromotionLevels(Reordering reordering);
 }
