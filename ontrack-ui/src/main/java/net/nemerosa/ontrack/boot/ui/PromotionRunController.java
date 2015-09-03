@@ -76,11 +76,6 @@ public class PromotionRunController extends AbstractResourceController {
                                 .items(structureService.getPromotionLevelListForBranch(build.getBranch().getId()))
                 )
                 .with(
-                        Selection.of("promotionLevel")
-                                .label("Promotion level")
-                                .items(structureService.getPromotionLevelListForBranch(build.getBranch().getId()))
-                )
-                .with(
                         DateTime.of("dateTime")
                                 .label("Date/time")
                                 .value(Time.now())
