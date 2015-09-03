@@ -46,7 +46,11 @@ public class PredefinedPromotionLevelController extends AbstractResourceControll
                 predefinedPromotionLevelService.getPredefinedPromotionLevels(),
                 uri(on(getClass()).getPredefinedPromotionLevelList())
         ).with(
-                Link.CREATE, uri(on(getClass()).getPredefinedPromotionLevelCreationForm())
+                Link.CREATE,
+                uri(on(getClass()).getPredefinedPromotionLevelCreationForm())
+        ).with(
+                "_reorderPromotionLevels",
+                uri(on(getClass()).reorderPromotionLevelListForBranch(null))
         );
     }
 
