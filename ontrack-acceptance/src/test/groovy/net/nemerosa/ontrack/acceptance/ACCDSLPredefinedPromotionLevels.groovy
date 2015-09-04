@@ -14,6 +14,47 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
 class ACCDSLPredefinedPromotionLevels extends AbstractACCDSL {
 
     @Test
+    void 'Auto creation of promotion levels must preserve the order'() {
+        // Names of the promotion level
+        def plNames = (1..4).collect { uid("PL${it}") }
+        // Creation of predefined promotion levels
+        ontrack.configure {
+            plNames.each { plName ->
+                predefinedPromotionLevel(plName, "Promotion level ${plName}")
+            }
+        }
+
+        // Checks the order
+        assert ontrack.config.predefinedPromotionLevels
+                .collect { it.name }
+                .findAll { it in plNames } == plNames
+
+        // Creating a build
+        def projectName = uid('P')
+        ontrack.project(projectName) {
+            branch('B') {
+                build('1')
+            }
+        }
+        def branch = ontrack.branch(projectName, 'B')
+        def build = ontrack.build(projectName, 'B', '1')
+
+        // Enabling the auto promotion levels on the project
+        ontrack.project(projectName).config {
+            autoPromotionLevel()
+        }
+
+        // Promoting the builds in a different order
+        [2, 4, 3, 1].each {
+            String plName = plNames[it - 1]
+            build.promote(plName)
+        }
+
+        // Gets the list of promotions for the branch and check this is the same order than for the predefined ones
+        assert branch.promotionLevels.collect { it.name } == plNames
+    }
+
+    @Test
     void 'Auto creation of promotion levels for an authorised project'() {
         // Name of the promotion level
         def plName = uid('PL')
