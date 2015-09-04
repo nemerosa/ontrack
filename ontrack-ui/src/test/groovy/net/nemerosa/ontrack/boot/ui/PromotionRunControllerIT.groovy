@@ -1,15 +1,16 @@
 package net.nemerosa.ontrack.boot.ui
 
+import net.nemerosa.ontrack.boot.properties.AutoPromotionLevelProperty
+import net.nemerosa.ontrack.boot.properties.AutoPromotionLevelPropertyType
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.jenkins.JenkinsBuildPropertyType
 import net.nemerosa.ontrack.extension.jenkins.JenkinsConfiguration
 import net.nemerosa.ontrack.extension.jenkins.JenkinsConfigurationService
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectEdit
-import net.nemerosa.ontrack.model.structure.PromotionRunRequest
-import net.nemerosa.ontrack.model.structure.PropertyCreationRequest
-import net.nemerosa.ontrack.model.structure.PropertyService
-import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService
+import net.nemerosa.ontrack.model.structure.*
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 
@@ -25,6 +26,72 @@ class PromotionRunControllerIT extends AbstractWebTestSupport {
 
     @Autowired
     private JenkinsConfigurationService jenkinsConfigurationService
+
+    @Autowired
+    private PredefinedPromotionLevelService predefinedPromotionLevelService
+
+    @Test
+    void 'Auto creation of promotion levels must preserve the order'() {
+        asUser().with(GlobalSettings).call {
+            // Creating three predefined promotion levels
+            def copper = predefinedPromotionLevelService.newPredefinedPromotionLevel(
+                    PredefinedPromotionLevel.of(nd('COPPER', ''))
+            )
+            def bronze = predefinedPromotionLevelService.newPredefinedPromotionLevel(
+                    PredefinedPromotionLevel.of(nd('BRONZE', ''))
+            )
+            def silver = predefinedPromotionLevelService.newPredefinedPromotionLevel(
+                    PredefinedPromotionLevel.of(nd('SILVER', ''))
+            )
+            def gold = predefinedPromotionLevelService.newPredefinedPromotionLevel(
+                    PredefinedPromotionLevel.of(nd('GOLD', ''))
+            )
+            // Reordering
+            predefinedPromotionLevelService.reorderPromotionLevels(
+                    new Reordering([
+                            gold.id.get(),
+                            silver.id.get(),
+                            bronze.id.get(),
+                            copper.id.get(),
+                    ])
+            )
+            // Checking their order
+            assert predefinedPromotionLevelService.getPredefinedPromotionLevels().collect { it.name } ==
+                    ['GOLD', 'SILVER', 'BRONZE', 'COPPER']
+        }
+        // Creating a build
+        Build build = doCreateBuild()
+        Branch branch = build.branch
+        Project project = build.project
+        // Configuring the project for auto creation of promotion levels
+        asUser().with(project, ProjectEdit).call {
+            propertyService.editProperty(
+                    project,
+                    AutoPromotionLevelPropertyType,
+                    new AutoPromotionLevelProperty(true)
+            )
+        }
+        // Promoting the build
+        asUser().with(project, ProjectEdit).call {
+            controller.newPromotionRun(build.id, new PromotionRunRequest(
+                    null, 'BRONZE', Time.now(), '', []
+            ))
+            controller.newPromotionRun(build.id, new PromotionRunRequest(
+                    null, 'GOLD', Time.now(), '', []
+            ))
+            controller.newPromotionRun(build.id, new PromotionRunRequest(
+                    null, 'COPPER', Time.now(), '', []
+            ))
+            controller.newPromotionRun(build.id, new PromotionRunRequest(
+                    null, 'SILVER', Time.now(), '', []
+            ))
+        }
+        // Controlling the promotion levels which have been created for the branch
+        asUser().withView(project).call {
+            structureService.getPromotionLevelListForBranch(branch.id).collect { it.name } ==
+                    ['GOLD', 'SILVER', 'BRONZE', 'COPPER']
+        }
+    }
 
     @Test
     void 'New promotion run'() {
@@ -70,10 +137,10 @@ class PromotionRunControllerIT extends AbstractWebTestSupport {
                         new PropertyCreationRequest(
                                 JenkinsBuildPropertyType.class.name,
                                 JsonUtils.object()
-                                    .with('configuration', 'MyConfig')
-                                    .with('job', 'MyJob')
-                                    .with('build', 1)
-                                    .end()
+                                        .with('configuration', 'MyConfig')
+                                        .with('job', 'MyJob')
+                                        .with('build', 1)
+                                        .end()
                         )
                 ]
         )
