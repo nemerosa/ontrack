@@ -14,6 +14,7 @@ import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.exceptions.BranchTemplateCannotHaveBuildException;
 import net.nemerosa.ontrack.model.exceptions.ReorderingSizeException;
 import net.nemerosa.ontrack.model.security.*;
+import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.PropertyServiceHelper;
 import net.nemerosa.ontrack.repository.StructureRepository;
@@ -48,9 +49,10 @@ public class StructureServiceImpl implements StructureService {
     private final StructureRepository structureRepository;
     private final ExtensionManager extensionManager;
     private final PropertyService propertyService;
+    private final PredefinedPromotionLevelService predefinedPromotionLevelService;
 
     @Autowired
-    public StructureServiceImpl(SecurityService securityService, EventPostService eventPostService, EventFactory eventFactory, ValidationRunStatusService validationRunStatusService, StructureRepository structureRepository, ExtensionManager extensionManager, PropertyService propertyService) {
+    public StructureServiceImpl(SecurityService securityService, EventPostService eventPostService, EventFactory eventFactory, ValidationRunStatusService validationRunStatusService, StructureRepository structureRepository, ExtensionManager extensionManager, PropertyService propertyService, PredefinedPromotionLevelService predefinedPromotionLevelService) {
         this.securityService = securityService;
         this.eventPostService = eventPostService;
         this.eventFactory = eventFactory;
@@ -58,6 +60,7 @@ public class StructureServiceImpl implements StructureService {
         this.structureRepository = structureRepository;
         this.extensionManager = extensionManager;
         this.propertyService = propertyService;
+        this.predefinedPromotionLevelService = predefinedPromotionLevelService;
     }
 
     @Override
@@ -495,6 +498,26 @@ public class StructureServiceImpl implements StructureService {
         structureRepository.reorderPromotionLevels(branchId, reordering);
         // Event
         eventPostService.post(eventFactory.reorderPromotionLevels(branch));
+    }
+
+    @Override
+    public PromotionLevel newPromotionLevelFromPredefined(Branch branch, PredefinedPromotionLevel predefinedPromotionLevel) {
+        PromotionLevel promotionLevel = newPromotionLevel(
+                PromotionLevel.of(
+                        branch,
+                        NameDescription.nd(predefinedPromotionLevel.getName(), predefinedPromotionLevel.getDescription())
+                )
+        );
+        // FIXME Makes sure the order is the same than for the predefined promotion levels
+        // Image?
+        if (predefinedPromotionLevel.getImage() != null && predefinedPromotionLevel.getImage()) {
+            setPromotionLevelImage(
+                    promotionLevel.getId(),
+                    predefinedPromotionLevelService.getPredefinedPromotionLevelImage(predefinedPromotionLevel.getId())
+            );
+        }
+        // OK
+        return promotionLevel;
     }
 
     @Override

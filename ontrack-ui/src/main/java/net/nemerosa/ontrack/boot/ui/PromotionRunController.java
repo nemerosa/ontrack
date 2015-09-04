@@ -143,7 +143,7 @@ public class PromotionRunController extends AbstractResourceController {
                     Optional<PredefinedPromotionLevel> oPredefinedPromotionLevel = predefinedPromotionLevelService.findPredefinedPromotionLevelByName(promotionLevelName);
                     if (oPredefinedPromotionLevel.isPresent()) {
                         // Creates the promotion level
-                        return securityService.asAdmin(() -> createPromotionLevel(branch, oPredefinedPromotionLevel.get()));
+                        return securityService.asAdmin(() -> structureService.newPromotionLevelFromPredefined(branch, oPredefinedPromotionLevel.get()));
                     } else {
                         throw new PromotionLevelNotFoundException(
                                 branch.getProject().getName(),
@@ -162,21 +162,4 @@ public class PromotionRunController extends AbstractResourceController {
         }
     }
 
-    private PromotionLevel createPromotionLevel(Branch branch, PredefinedPromotionLevel predefinedPromotionLevel) {
-        PromotionLevel promotionLevel = structureService.newPromotionLevel(
-                PromotionLevel.of(
-                        branch,
-                        NameDescription.nd(predefinedPromotionLevel.getName(), predefinedPromotionLevel.getDescription())
-                )
-        );
-        // Image?
-        if (predefinedPromotionLevel.getImage() != null && predefinedPromotionLevel.getImage()) {
-            structureService.setPromotionLevelImage(
-                    promotionLevel.getId(),
-                    predefinedPromotionLevelService.getPredefinedPromotionLevelImage(predefinedPromotionLevel.getId())
-            );
-        }
-        // OK
-        return promotionLevel;
-    }
 }
