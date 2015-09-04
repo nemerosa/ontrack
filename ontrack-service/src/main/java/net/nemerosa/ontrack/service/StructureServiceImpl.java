@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service;
 
+import com.google.common.collect.Iterables;
 import net.nemerosa.ontrack.common.CachedSupplier;
 import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.common.Time;
@@ -25,10 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -508,7 +506,25 @@ public class StructureServiceImpl implements StructureService {
                         NameDescription.nd(predefinedPromotionLevel.getName(), predefinedPromotionLevel.getDescription())
                 )
         );
-        // FIXME Makes sure the order is the same than for the predefined promotion levels
+
+        // Makes sure the order is the same than for the predefined promotion levels
+        List<PredefinedPromotionLevel> predefinedPromotionLevels = securityService.asAdmin(
+                predefinedPromotionLevelService::getPredefinedPromotionLevels
+        );
+        List<Integer> sortedIds = getPromotionLevelListForBranch(branch.getId()).stream()
+                .sorted((o1, o2) -> {
+                    String name1 = o1.getName();
+                    String name2 = o2.getName();
+                    // Looking for the order in the predefined list
+                    int order1 = Iterables.indexOf(predefinedPromotionLevels, pred -> StringUtils.equals(pred.getName(), name1));
+                    int order2 = Iterables.indexOf(predefinedPromotionLevels, pred -> StringUtils.equals(pred.getName(), name2));
+                    // Comparing the orders
+                    return (order1 - order2);
+                })
+                .map(Entity::id)
+                .collect(Collectors.toList());
+        reorderPromotionLevels(branch.getId(), new Reordering(sortedIds));
+
         // Image?
         if (predefinedPromotionLevel.getImage() != null && predefinedPromotionLevel.getImage()) {
             setPromotionLevelImage(
