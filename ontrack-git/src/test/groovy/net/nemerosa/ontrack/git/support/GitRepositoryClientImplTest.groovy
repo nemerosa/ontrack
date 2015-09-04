@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.git.support
 
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.git.GitRepository
 import net.nemerosa.ontrack.git.GitRepositoryClient
 import org.junit.Test
@@ -213,7 +214,9 @@ class GitRepositoryClientImplTest {
     void 'Get tags'() {
         prepare { prepareBranches it } withClone { GitRepositoryClient client, clientRepo, origin ->
             client.sync({println it})
+            def expectedDate = Time.now().toLocalDate();
             assert client.tags.collect { it.name } == ['v2.1', 'v2.2']
+            assert client.tags.collect { it.time.toLocalDate() } == [expectedDate, expectedDate]
         }
     }
 
