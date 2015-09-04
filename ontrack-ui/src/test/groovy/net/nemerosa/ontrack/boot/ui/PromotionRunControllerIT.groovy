@@ -38,6 +38,7 @@ class PromotionRunControllerIT extends AbstractWebTestSupport {
         // Promotion run request
         PromotionRunRequest request = new PromotionRunRequest(
                 promotionLevel.id(),
+                '',
                 Time.now(),
                 "Run",
                 []
@@ -62,6 +63,7 @@ class PromotionRunControllerIT extends AbstractWebTestSupport {
         // Promotion run request
         PromotionRunRequest request = new PromotionRunRequest(
                 promotionLevel.id(),
+                '',
                 Time.now(),
                 "Run",
                 [
