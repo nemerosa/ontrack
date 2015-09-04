@@ -46,6 +46,9 @@ class PromotionRunControllerIT extends AbstractWebTestSupport {
             def gold = predefinedPromotionLevelService.newPredefinedPromotionLevel(
                     PredefinedPromotionLevel.of(nd('GOLD', ''))
             )
+            // Checking their order
+            assert predefinedPromotionLevelService.getPredefinedPromotionLevels().collect { it.name } ==
+                    ['COPPER', 'BRONZE', 'SILVER', 'GOLD']
             // Reordering
             predefinedPromotionLevelService.reorderPromotionLevels(
                     new Reordering([
@@ -88,7 +91,7 @@ class PromotionRunControllerIT extends AbstractWebTestSupport {
         }
         // Controlling the promotion levels which have been created for the branch
         asUser().withView(project).call {
-            structureService.getPromotionLevelListForBranch(branch.id).collect { it.name } ==
+            assert structureService.getPromotionLevelListForBranch(branch.id).collect { it.name } ==
                     ['GOLD', 'SILVER', 'BRONZE', 'COPPER']
         }
     }
