@@ -67,9 +67,7 @@ class JenkinsJobDecorationExtensionTest {
         assert decorations.size() == 1
         def decoration = decorations[0]
         assert decoration.decorationType == 'net.nemerosa.ontrack.extension.jenkins.JenkinsJobDecorationExtension'
-        assert decoration.id == 'idle'
-        assert decoration.name == null
-        assert decoration.title == 'The Jenkins Job is not running.'
+        assert decoration.data == JenkinsJobState.IDLE
     }
 
     @Test
