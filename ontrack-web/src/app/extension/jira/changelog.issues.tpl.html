@@ -51,7 +51,10 @@
         <td>
             <span ng-repeat="link in changeLogIssue.issue.links">
                 {{link.link}}
-                <ot-extension-jira-issue-link issue="link"></ot-extension-jira-issue-link><span ng-if="!$last">, </span>
+                <span class="ot-extension-jira-issue-link">
+                    <img ng-src="{{link.status.iconUrl}}" title="{{link.status.name}}" />
+                    <a href="{{link.url}}" target="_blank">{{link.key}}</a>
+                </span>
             </span>
         </td>
     </tr>
