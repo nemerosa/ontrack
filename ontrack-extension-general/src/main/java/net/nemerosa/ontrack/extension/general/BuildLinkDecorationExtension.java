@@ -51,6 +51,11 @@ public class BuildLinkDecorationExtension extends AbstractExtension implements D
     protected Decoration getDecoration(BuildLinkPropertyItem item) {
         Optional<Build> oBuild = item.findBuild(structureService);
         if (oBuild.isPresent()) {
+            Build build = oBuild.get();
+            // Gets the list of promotion runs for this build
+            // List<PromotionRun> promotionRuns = structureService.getLastPromotionRunsForBuild(build.getId());
+            // TODO Adds the list of promotion runs to the decoration
+            // Decoration
             return Decoration.of(
                     this,
                     "found",
@@ -62,7 +67,7 @@ public class BuildLinkDecorationExtension extends AbstractExtension implements D
                             item.getProject()
                     )
             ).withUri(
-                    uriBuilder.getEntityPage(oBuild.get())
+                    uriBuilder.getEntityPage(build)
             );
         } else {
             return Decoration.of(
