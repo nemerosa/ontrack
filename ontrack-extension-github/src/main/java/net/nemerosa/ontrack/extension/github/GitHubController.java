@@ -113,7 +113,7 @@ public class GitHubController extends AbstractExtensionController<GitHubExtensio
     /**
      * Gets one configuration
      */
-    @RequestMapping(value = "configurations/{name}", method = RequestMethod.GET)
+    @RequestMapping(value = "configurations/{name:.*}", method = RequestMethod.GET)
     public GitHubEngineConfiguration getConfiguration(@PathVariable String name) {
         return configurationService.getConfiguration(name);
     }
@@ -121,7 +121,7 @@ public class GitHubController extends AbstractExtensionController<GitHubExtensio
     /**
      * Deleting one configuration
      */
-    @RequestMapping(value = "configurations/{name}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "configurations/{name:.*}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Ack deleteConfiguration(@PathVariable String name) {
         configurationService.deleteConfiguration(name);
