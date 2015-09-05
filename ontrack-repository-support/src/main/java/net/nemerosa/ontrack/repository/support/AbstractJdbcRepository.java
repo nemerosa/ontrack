@@ -37,6 +37,10 @@ public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSuppor
         return new MapSqlParameterSource(name, value);
     }
 
+    protected MapSqlParameterSource noParams() {
+        return new MapSqlParameterSource();
+    }
+
     protected int dbCreate(String sql, MapSqlParameterSource params) {
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         getNamedParameterJdbcTemplate().update(sql, params, keyHolder);

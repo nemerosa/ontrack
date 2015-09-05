@@ -171,4 +171,45 @@ class Config {
         vs(closure)
         vs
     }
+
+    /**
+     * Predefined promotion levels
+     */
+
+    List<PredefinedPromotionLevel> getPredefinedPromotionLevels() {
+        ontrack.get('admin/predefinedPromotionLevels').resources.collect {
+            new PredefinedPromotionLevel(
+                    ontrack,
+                    it
+            )
+        }
+    }
+
+    PredefinedPromotionLevel predefinedPromotionLevel(String name, String description = '', boolean getIfExists = false) {
+        def node = predefinedPromotionLevels.find { it.name == name }
+        if (node) {
+            if (getIfExists) {
+                new PredefinedPromotionLevel(
+                        ontrack,
+                        ontrack.get(node._self)
+                )
+            } else {
+                throw new ObjectAlreadyExistsException("Predefined promotion level ${name} already exists.")
+            }
+        } else {
+            new PredefinedPromotionLevel(
+                    ontrack,
+                    ontrack.post(ontrack.get('admin/predefinedPromotionLevels')._create, [
+                            name       : name,
+                            description: description
+                    ])
+            )
+        }
+    }
+
+    PredefinedPromotionLevel predefinedPromotionLevel(String name, String description = '', boolean getIfExists = false, Closure closure) {
+        def vs = predefinedPromotionLevel(name, description, getIfExists)
+        vs(closure)
+        vs
+    }
 }

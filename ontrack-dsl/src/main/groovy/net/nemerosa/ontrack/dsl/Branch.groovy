@@ -84,6 +84,15 @@ class Branch extends AbstractProjectResource {
         ])
     }
 
+    /**
+     * Gets the list of promotion levels for this branch
+     */
+    List<PromotionLevel> getPromotionLevels() {
+        return ontrack.get(link('promotionLevels')).resources.collect { node ->
+            new PromotionLevel(ontrack, node)
+        }
+    }
+
     PromotionLevel promotionLevel(String name, String description = '', boolean getIfExists = false) {
         def node = ontrack.get(link('promotionLevels')).resources.find { it.name == name }
         if (node) {

@@ -26,8 +26,8 @@ class Build extends AbstractProjectResource {
         new PromotionRun(
                 ontrack,
                 ontrack.post(link('promote'), [
-                        promotionLevel: ontrack.promotionLevel(project, branch, promotion).id,
-			description : ''
+                        promotionLevelName: promotion,
+			            description : '',
                 ])
         )
     }

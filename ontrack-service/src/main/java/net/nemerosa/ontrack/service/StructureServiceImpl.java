@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service;
 
+import com.google.common.collect.Iterables;
 import net.nemerosa.ontrack.common.CachedSupplier;
 import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.common.Time;
@@ -14,6 +15,7 @@ import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.exceptions.BranchTemplateCannotHaveBuildException;
 import net.nemerosa.ontrack.model.exceptions.ReorderingSizeException;
 import net.nemerosa.ontrack.model.security.*;
+import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.PropertyServiceHelper;
 import net.nemerosa.ontrack.repository.StructureRepository;
@@ -24,10 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -48,9 +47,10 @@ public class StructureServiceImpl implements StructureService {
     private final StructureRepository structureRepository;
     private final ExtensionManager extensionManager;
     private final PropertyService propertyService;
+    private final PredefinedPromotionLevelService predefinedPromotionLevelService;
 
     @Autowired
-    public StructureServiceImpl(SecurityService securityService, EventPostService eventPostService, EventFactory eventFactory, ValidationRunStatusService validationRunStatusService, StructureRepository structureRepository, ExtensionManager extensionManager, PropertyService propertyService) {
+    public StructureServiceImpl(SecurityService securityService, EventPostService eventPostService, EventFactory eventFactory, ValidationRunStatusService validationRunStatusService, StructureRepository structureRepository, ExtensionManager extensionManager, PropertyService propertyService, PredefinedPromotionLevelService predefinedPromotionLevelService) {
         this.securityService = securityService;
         this.eventPostService = eventPostService;
         this.eventFactory = eventFactory;
@@ -58,6 +58,7 @@ public class StructureServiceImpl implements StructureService {
         this.structureRepository = structureRepository;
         this.extensionManager = extensionManager;
         this.propertyService = propertyService;
+        this.predefinedPromotionLevelService = predefinedPromotionLevelService;
     }
 
     @Override
@@ -495,6 +496,44 @@ public class StructureServiceImpl implements StructureService {
         structureRepository.reorderPromotionLevels(branchId, reordering);
         // Event
         eventPostService.post(eventFactory.reorderPromotionLevels(branch));
+    }
+
+    @Override
+    public PromotionLevel newPromotionLevelFromPredefined(Branch branch, PredefinedPromotionLevel predefinedPromotionLevel) {
+        PromotionLevel promotionLevel = newPromotionLevel(
+                PromotionLevel.of(
+                        branch,
+                        NameDescription.nd(predefinedPromotionLevel.getName(), predefinedPromotionLevel.getDescription())
+                )
+        );
+
+        // Makes sure the order is the same than for the predefined promotion levels
+        List<PredefinedPromotionLevel> predefinedPromotionLevels = securityService.asAdmin(
+                predefinedPromotionLevelService::getPredefinedPromotionLevels
+        );
+        List<Integer> sortedIds = getPromotionLevelListForBranch(branch.getId()).stream()
+                .sorted((o1, o2) -> {
+                    String name1 = o1.getName();
+                    String name2 = o2.getName();
+                    // Looking for the order in the predefined list
+                    int order1 = Iterables.indexOf(predefinedPromotionLevels, pred -> StringUtils.equals(pred.getName(), name1));
+                    int order2 = Iterables.indexOf(predefinedPromotionLevels, pred -> StringUtils.equals(pred.getName(), name2));
+                    // Comparing the orders
+                    return (order1 - order2);
+                })
+                .map(Entity::id)
+                .collect(Collectors.toList());
+        reorderPromotionLevels(branch.getId(), new Reordering(sortedIds));
+
+        // Image?
+        if (predefinedPromotionLevel.getImage() != null && predefinedPromotionLevel.getImage()) {
+            setPromotionLevelImage(
+                    promotionLevel.getId(),
+                    predefinedPromotionLevelService.getPredefinedPromotionLevelImage(predefinedPromotionLevel.getId())
+            );
+        }
+        // OK
+        return promotionLevel;
     }
 
     @Override

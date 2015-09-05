@@ -39,6 +39,7 @@ var ontrack = angular.module('ontrack', [
         'ot.view.admin.project-acl',
         'ot.view.admin.console',
         'ot.view.admin.predefined-validation-stamps',
+        'ot.view.admin.predefined-promotion-levels',
         // Extensions
         'ontrack.extension.jenkins',
         'ontrack.extension.svn',

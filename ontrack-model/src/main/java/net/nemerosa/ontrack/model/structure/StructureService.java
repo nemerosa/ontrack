@@ -93,6 +93,8 @@ public interface StructureService {
 
     void reorderPromotionLevels(ID branchId, Reordering reordering);
 
+    PromotionLevel newPromotionLevelFromPredefined(Branch branch, PredefinedPromotionLevel predefinedPromotionLevel);
+
     // Promotion runs
 
     PromotionRun newPromotionRun(PromotionRun promotionRun);

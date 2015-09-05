@@ -98,4 +98,18 @@ class ProjectProperties extends ProjectEntityProperties {
         property('net.nemerosa.ontrack.boot.properties.AutoValidationStampPropertyType')?.autoCreate
     }
 
+    /**
+     * Auto promotion level
+     */
+
+    def autoPromotionLevel(boolean autoCreate = true) {
+        property('net.nemerosa.ontrack.boot.properties.AutoPromotionLevelPropertyType', [
+                autoCreate: autoCreate
+        ])
+    }
+
+    boolean getAutoPromotionLevel() {
+        property('net.nemerosa.ontrack.boot.properties.AutoPromotionLevelPropertyType')?.autoCreate
+    }
+
 }
