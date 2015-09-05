@@ -32,12 +32,12 @@ public class DecorationServiceImplTest {
         List<Decorator> builtinDecorators = Collections.emptyList();
         DecorationServiceImpl service = new DecorationServiceImpl(extensionManager, builtinDecorators, securityService);
 
-        List<Decoration> decorations = service.getDecorations(projectEntity, decorator);
+        @SuppressWarnings("unchecked")
+        List<? extends Decoration> decorations = service.getDecorations(projectEntity, decorator);
         assertNotNull(decorations);
         assertEquals(1, decorations.size());
         Decoration decoration = decorations.get(0);
-        assertEquals("error", decoration.getId());
-        assertEquals("Problem while getting decoration", decoration.getTitle());
+        assertEquals("Problem while getting decoration", decoration.getData());
     }
 
     @Test
@@ -53,12 +53,12 @@ public class DecorationServiceImplTest {
         List<Decorator> builtinDecorators = Collections.emptyList();
         DecorationServiceImpl service = new DecorationServiceImpl(extensionManager, builtinDecorators, securityService);
 
-        List<Decoration> decorations = service.getDecorations(projectEntity, decorator);
+        @SuppressWarnings("unchecked")
+        List<? extends Decoration> decorations = service.getDecorations(projectEntity, decorator);
         assertNotNull(decorations);
         assertEquals(1, decorations.size());
         Decoration decoration = decorations.get(0);
-        assertEquals("error", decoration.getId());
-        assertEquals("Known exception", decoration.getTitle());
+        assertEquals("Known exception", decoration.getData());
     }
 
     public static class TestBaseException extends BaseException {

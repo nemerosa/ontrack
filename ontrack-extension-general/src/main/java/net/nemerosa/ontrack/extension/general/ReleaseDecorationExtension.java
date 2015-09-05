@@ -12,7 +12,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 @Component
-public class ReleaseDecorationExtension extends AbstractExtension implements DecorationExtension {
+public class ReleaseDecorationExtension extends AbstractExtension implements DecorationExtension<String> {
 
     private final PropertyService propertyService;
 
@@ -28,7 +28,7 @@ public class ReleaseDecorationExtension extends AbstractExtension implements Dec
     }
 
     @Override
-    public List<Decoration> getDecorations(ProjectEntity entity) {
+    public List<Decoration<String>> getDecorations(ProjectEntity entity) {
         // Argument check
         Validate.isTrue(entity instanceof Build, "Expecting build");
         // Gets the `release` property
@@ -39,9 +39,8 @@ public class ReleaseDecorationExtension extends AbstractExtension implements Dec
             return Collections.singletonList(
                     Decoration.of(
                             this,
-                            "release",
                             property.getValue().getName()
-                    ).withName(property.getValue().getName())
+                    )
             );
         }
     }

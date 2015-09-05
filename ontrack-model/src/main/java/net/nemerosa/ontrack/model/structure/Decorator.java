@@ -2,7 +2,12 @@ package net.nemerosa.ontrack.model.structure;
 
 import java.util.List;
 
-public interface Decorator {
+/**
+ * Produces decorations
+ *
+ * @param <T> Type of data associated with the decorations.
+ */
+public interface Decorator<T> {
 
     /**
      * Gets a list of decorations for this entity.
@@ -10,6 +15,6 @@ public interface Decorator {
      * @param entity Entity
      * @return A list of decorations to apply or empty if none.
      */
-    List<Decoration> getDecorations(ProjectEntity entity);
+    List<Decoration<T>> getDecorations(ProjectEntity entity);
 
 }

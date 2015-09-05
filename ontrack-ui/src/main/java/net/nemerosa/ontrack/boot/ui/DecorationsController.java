@@ -30,7 +30,7 @@ public class DecorationsController extends AbstractProjectEntityController {
      * Decorations for an entity.
      */
     @RequestMapping(value = "{entityType}/{id}", method = RequestMethod.GET)
-    public Callable<Resources<Decoration>> getDecorations(@PathVariable ProjectEntityType entityType, @PathVariable ID id) {
+    public Callable<Resources<Decoration<?>>> getDecorations(@PathVariable ProjectEntityType entityType, @PathVariable ID id) {
         // Gets the current request attributes
         RequestAttributes attributes = RequestContextHolder.currentRequestAttributes();
         return () -> {

@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
-public class BuildLinkDecorationExtension extends AbstractExtension implements DecorationExtension {
+public class BuildLinkDecorationExtension extends AbstractExtension implements DecorationExtension<BuildLinkDecoration> {
 
     private final StructureService structureService;
     private final URIBuilder uriBuilder;
@@ -34,53 +34,37 @@ public class BuildLinkDecorationExtension extends AbstractExtension implements D
     }
 
     @Override
-    public List<Decoration> getDecorations(ProjectEntity entity) {
+    public List<Decoration<BuildLinkDecoration>> getDecorations(ProjectEntity entity) {
         // Gets the `buildLink` property
         return propertyService.getProperty(entity, BuildLinkPropertyType.class)
                 .option()
                 .map(this::getDecorations)
-                .orElse(Collections.<Decoration>emptyList());
+                .orElse(Collections.<Decoration<BuildLinkDecoration>>emptyList());
     }
 
-    protected List<Decoration> getDecorations(BuildLinkProperty buildLinkProperty) {
+    protected List<Decoration<BuildLinkDecoration>> getDecorations(BuildLinkProperty buildLinkProperty) {
         return buildLinkProperty.getLinks().stream()
                 .map(this::getDecoration)
                 .collect(Collectors.toList());
     }
 
-    protected Decoration getDecoration(BuildLinkPropertyItem item) {
+    protected Decoration<BuildLinkDecoration> getDecoration(BuildLinkPropertyItem item) {
         Optional<Build> oBuild = item.findBuild(structureService);
         if (oBuild.isPresent()) {
             Build build = oBuild.get();
             // Gets the list of promotion runs for this build
-            // List<PromotionRun> promotionRuns = structureService.getLastPromotionRunsForBuild(build.getId());
-            // TODO Adds the list of promotion runs to the decoration
+            List<PromotionRun> promotionRuns = structureService.getLastPromotionRunsForBuild(build.getId());
             // Decoration
-            return Decoration.of(
-                    this,
-                    "found",
-                    ""
-            ).withName(
-                    String.format(
-                            "%s @ %s",
-                            item.getBuild(),
-                            item.getProject()
-                    )
-            ).withUri(
-                    uriBuilder.getEntityPage(build)
-            );
+            return Decoration.of(this, new BuildLinkDecoration(
+                    item.getProject(),
+                    item.getBuild(),
+                    uriBuilder.getEntityPage(build),
+                    promotionRuns
+            ));
         } else {
-            return Decoration.of(
-                    this,
-                    "not-found",
-                    ""
-            ).withName(
-                    String.format(
-                            "%s @ %s",
-                            item.getBuild(),
-                            item.getProject()
-                    )
-            );
+            return Decoration.of(this, BuildLinkDecoration.found(
+                    item.getProject(),
+                    item.getBuild()));
         }
     }
 

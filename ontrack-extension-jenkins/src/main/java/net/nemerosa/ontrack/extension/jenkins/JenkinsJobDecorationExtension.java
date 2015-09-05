@@ -18,7 +18,7 @@ import java.util.List;
  * Provides a decoration that displays the state of a running job.
  */
 @Component
-public class JenkinsJobDecorationExtension extends AbstractExtension implements DecorationExtension {
+public class JenkinsJobDecorationExtension extends AbstractExtension implements DecorationExtension<JenkinsJobState> {
 
     private final PropertyService propertyService;
     private final JenkinsClientFactory jenkinsClientFactory;
@@ -41,7 +41,7 @@ public class JenkinsJobDecorationExtension extends AbstractExtension implements 
     }
 
     @Override
-    public List<Decoration> getDecorations(ProjectEntity entity) {
+    public List<Decoration<JenkinsJobState>> getDecorations(ProjectEntity entity) {
         // Gets the Jenkins Job property for this entity, if any
         Property<JenkinsJobProperty> property = propertyService.getProperty(entity, JenkinsJobPropertyType.class.getName());
         if (property.isEmpty()) {
@@ -62,18 +62,8 @@ public class JenkinsJobDecorationExtension extends AbstractExtension implements 
         }
     }
 
-    private Decoration getDecoration(JenkinsJob job) {
-        JenkinsJobState jenkinsJobState = job.getState();
-        switch (jenkinsJobState) {
-            case DISABLED:
-                return Decoration.of(this, "disabled", "The Jenkins Job is disabled.");
-            case RUNNING:
-                // TODO Link to the running build
-                return Decoration.of(this, "running", "The Jenkins Job is running.");
-            case IDLE:
-                return Decoration.of(this, "idle", "The Jenkins Job is not running.");
-            default:
-                return null;
-        }
+    private Decoration<JenkinsJobState> getDecoration(JenkinsJob job) {
+        return Decoration.of(this, job.getState());
     }
+
 }

@@ -38,12 +38,12 @@ public class DecorationServiceImpl implements DecorationService {
     }
 
     @Override
-    public List<Decoration> getDecorations(ProjectEntity entity) {
+    public List<Decoration<?>> getDecorations(ProjectEntity entity) {
         // Downloading a decoration with the current security context
-        Function<Decorator, Stream<Decoration>> securedDecoratorFunction = securityService.runner(
+        Function<Decorator, Stream<Decoration<?>>> securedDecoratorFunction = securityService.runner(
                 decorator -> getDecorations(entity, decorator).stream()
         );
-        List<Decoration> decorations = new ArrayList<>();
+        List<Decoration<?>> decorations = new ArrayList<>();
         // Built-in decorations
         decorations.addAll(
                 builtinDecorators.stream()
@@ -70,7 +70,7 @@ public class DecorationServiceImpl implements DecorationService {
     /**
      * Gets the decoration for an entity, and returns an "error" decoration in case of problem.
      */
-    protected List<Decoration> getDecorations(ProjectEntity entity, Decorator decorator) {
+    protected <T> List<? extends Decoration> getDecorations(ProjectEntity entity, Decorator<T> decorator) {
         try {
             return decorator.getDecorations(entity);
         } catch (Exception ex) {

@@ -4,43 +4,46 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.net.URI;
+import org.apache.commons.lang3.Validate;
 
 /**
  * Decoration for an entity.
- * <p>
- * Only the {@link #id id} and the {@link #title} are required. They will be used to access an icon
- * and to display a tooltip. If a {@link #name name} is specified, the representation of the decoration
- * will also include this name directly.
+ *
+ * @param <T> Type of data contained by the entity
  */
 @Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class Decoration {
+public class Decoration<T> {
 
+    /**
+     * Which {@link Decorator} has created this decoration
+     */
     @JsonIgnore
     private final Class<? extends Decorator> decorator;
-    private final String id;
-    private final String title;
-    private final URI uri;
-    private final String name;
 
-    public static Decoration of(Decorator decorator, String id, String title) {
-        return new Decoration(decorator.getClass(), id, title, null, null);
+    /**
+     * Data associated with the decoration
+     */
+    private final T data;
+
+    /**
+     * Basic construction. Only the data is required
+     */
+    public static <T> Decoration<T> of(Decorator decorator, T data) {
+        return of(decorator.getClass(), data);
     }
 
-    public static Decoration of(Class<? extends Decorator> decorator, String id, String title) {
-        return new Decoration(decorator, id, title, null, null);
+    /**
+     * Basic construction. Only the data is required
+     */
+    public static <T> Decoration<T> of(Class<? extends Decorator> decorator, T data) {
+        Validate.notNull(data, "The decoration data is required");
+        return new Decoration<>(decorator, data);
     }
 
-    public Decoration withUri(URI value) {
-        return new Decoration(decorator, id, title, value, name);
-    }
-
-    public Decoration withName(String value) {
-        return new Decoration(decorator, id, title, uri, value);
-    }
-
+    /**
+     * Gets the decoration type for the decorator name.
+     */
     public String getDecorationType() {
         return decorator.getName();
     }

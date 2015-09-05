@@ -10,17 +10,16 @@ import java.util.List;
 /**
  * Fake decorator used for the generation of decorations in error.
  */
-public class ErrorDecorator implements Decorator {
+public class ErrorDecorator implements Decorator<String> {
 
     @Override
-    public List<Decoration> getDecorations(ProjectEntity entity) {
+    public List<Decoration<String>> getDecorations(ProjectEntity entity) {
         throw new UnsupportedOperationException("Not a real decorator");
     }
 
-    public Decoration getDecoration(Exception ex) {
+    public Decoration<String> getDecoration(Exception ex) {
         return Decoration.of(
                 ErrorDecorator.class,
-                "error",
                 getErrorMessage(ex)
         );
     }
