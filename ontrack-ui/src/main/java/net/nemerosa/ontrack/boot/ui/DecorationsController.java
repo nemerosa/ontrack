@@ -39,7 +39,7 @@ public class DecorationsController extends AbstractProjectEntityController {
                 return Resources.of(
                         decorationService.getDecorations(getEntity(entityType, id)),
                         uri(on(getClass()).getDecorations(entityType, id))
-                );
+                ).forView(Decoration.class);
             } finally {
                 RequestContextHolder.resetRequestAttributes();
             }
