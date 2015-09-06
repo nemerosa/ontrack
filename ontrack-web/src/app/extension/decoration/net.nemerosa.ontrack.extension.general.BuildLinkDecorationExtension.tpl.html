@@ -4,6 +4,6 @@
     <span ng-if="decoration.data.uri"><a href="{{decoration.data.uri}}">{{decoration.data.build}} @ {{decoration.data.project}}</a></span>
     <!-- Promotions -->
     <span ng-repeat="promotionRun in decoration.data.promotionRuns">
-        {{promotionRun.promotionLevel}}
+        <ot-entity-image entity="promotionRun.promotionLevel"></ot-entity-image>
     </span>
 </span>
