@@ -1,22 +1,3 @@
-<span class="ot-decoration {{decorationClassName(decoration)}}"
-      title="{{decoration.title}}"
-      ng-class="{'ot-action': decoration.uri}"
-      ng-click="decorationAction(decoration)"
-      ng-repeat="decoration in decorations.resources">
-    <!-- Image if no name provided -->
-    <img
-            ng-if="!decoration.name"
-            ng-src="{{decorationImagePath(decoration)}}"
-            class="ot-icon ot-decoration-image-only {{decorationClassName(decoration)}}"
-            alt="{{decoration.id}}"/>
-    <!-- Image and label if a name is provided -->
-    <span
-        ng-if="decoration.name"
-        class="ot-decoration-label {{decorationClassName(decoration)}}">
-        <img
-                class="ot-icon ot-decoration-label-image"
-                ng-src="{{decorationImagePath(decoration)}}"
-                alt="{{decoration.id}}"/>
-        {{decoration.name}}
-    </span>
+<span class="ot-decoration" ng-repeat="decoration in decorations.resources">
+    <ng-include src="'app/extension/decoration/' + decoration.decorationType + '.tpl.html'"></ng-include>
 </span>

@@ -1,0 +1,9 @@
+<span class="ot-decoration-border net-nemerosa-ontrack-extension-general-BuildLinkDecorationExtension">
+    <!-- Build @ Project -->
+    <span ng-if="!decoration.data.uri">{{decoration.data.build}} @ {{decoration.data.project}}</span>
+    <span ng-if="decoration.data.uri"><a href="{{decoration.data.uri}}">{{decoration.data.build}} @ {{decoration.data.project}}</a></span>
+    <!-- Promotions -->
+    <span ng-repeat="promotionRun in decoration.data.promotionRuns">
+        {{promotionRun.promotionLevel}}
+    </span>
+</span>

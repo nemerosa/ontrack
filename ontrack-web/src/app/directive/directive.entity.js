@@ -78,26 +78,12 @@ angular.module('ot.directive.entity', [
         function updateEntityDecorations(scope, entity) {
             ot.call($http.get(entity._decorations)).then(function (decorations) {
                 scope.decorations = decorations;
-                scope.decorationImagePath = function (decoration) {
-                    return 'assets/extension/decoration/' + decoration.decorationType + '/' + decoration.id + '.png';
-                };
-                scope.decorationClassName = function (decoration) {
-                    return (decoration.decorationType).replace(/\./g, '-') +
-                        ' ' +
-                        (decoration.decorationType + '.' + decoration.id).replace(/\./g, '-');
-                };
-                scope.decorationAction = function (decoration) {
-                    if (decoration.uri) {
-                        window.location = decoration.uri;
-                    }
-                };
             });
         }
 
         return {
             restrict: 'E',
             templateUrl: 'app/directive/directive.entityDecorations.tpl.html',
-            transclude: true,
             scope: {
                 entity: '='
             },
