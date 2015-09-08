@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.acceptance.browser
 import com.google.common.base.Function
 import com.google.common.base.Predicate
 import org.apache.commons.io.FileUtils
-import org.apache.commons.lang3.StringUtils
 import org.openqa.selenium.*
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.firefox.FirefoxProfile
@@ -81,6 +80,21 @@ public class Configuration {
                 new Function<WebDriver, WebElement>() {
                     public WebElement apply(WebDriver driver) {
                         return driver.findElement(by);
+                    }
+                }
+        )
+    }
+
+    public Collection<WebElement> findElements(By by) {
+        new FluentWait<WebDriver>(driver)
+                .withTimeout(implicitWait, TimeUnit.SECONDS)
+                .pollingEvery(1, TimeUnit.SECONDS)
+                .ignoring(NoSuchElementException.class)
+                .ignoring(StaleElementReferenceException.class)
+                .until(
+                new Function<WebDriver, Collection<WebElement>>() {
+                    public Collection<WebElement> apply(WebDriver driver) {
+                        return driver.findElements(by);
                     }
                 }
         )

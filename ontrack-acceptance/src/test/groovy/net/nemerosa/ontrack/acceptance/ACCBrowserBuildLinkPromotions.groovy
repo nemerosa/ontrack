@@ -1,15 +1,15 @@
 package net.nemerosa.ontrack.acceptance
 
-import net.nemerosa.ontrack.acceptance.browser.pages.APIPage
 import net.nemerosa.ontrack.acceptance.browser.pages.BuildPage
-import net.nemerosa.ontrack.acceptance.browser.pages.HomePage
-import net.nemerosa.ontrack.acceptance.browser.pages.ProjectPage
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTest
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import org.junit.Test
+import org.openqa.selenium.By
+import org.openqa.selenium.WebElement
 
 import static net.nemerosa.ontrack.acceptance.browser.Browser.browser
 import static net.nemerosa.ontrack.acceptance.steps.BasicSteps.loginAsAdmin
+import static net.nemerosa.ontrack.test.TestUtils.assertJsonEquals
 import static net.nemerosa.ontrack.test.TestUtils.uid
 
 /**
@@ -47,7 +47,16 @@ class ACCBrowserBuildLinkPromotions extends AcceptanceTestClient {
             // Logs in
             loginAsAdmin(browser)
             // Goes to the build page which must contains the link
-            goTo BuildPage, [id: build2.id]
+            BuildPage buildPage = goTo(BuildPage, [id: build2.id])
+            // Get the decoration
+            Collection<WebElement> decorations = buildPage.findDecorations('net.nemerosa.ontrack.extension.general.BuildLinkDecorationExtension')
+            assert decorations.size() == 1
+            WebElement decoration = decorations[0]
+            // Gets the link to the build
+            assert decoration.findElement(By.linkText("1 @ ${projectName}")) != null
+            // Gets the images for the two promotions
+            assert decoration.findElement(By.cssSelector("img.ot-icon[title='COPPER']")) != null
+            assert decoration.findElement(By.cssSelector("img.ot-icon[title='BRONZE']")) != null
         }
     }
 
