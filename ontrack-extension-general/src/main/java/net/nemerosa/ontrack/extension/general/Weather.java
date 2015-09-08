@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.general;
 
-public enum ValidationStampWeather {
+public enum Weather {
 
     sunny,
     sunAndClouds,
