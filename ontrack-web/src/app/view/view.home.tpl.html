@@ -36,7 +36,7 @@
                         <div class="ot-home-branch"
                              ng-repeat="branchStatusView in project.branchStatusViews.resources"
                              ng-show="showDisabled || !(branchStatusView.branch.disabled || branchStatusView.branch.type == 'TEMPLATE_DEFINITION')">
-                            <span class="ot-home-branch-name"
+                            <span class="ot-home-branch-name ot-decoration-list"
                                   ng-class="{'ot-entity-disabled': branchStatusView.branch.disabled}">
                                 <a href="#/branch/{{branchStatusView.branch.id}}">{{branchStatusView.branch.name}}</a>
                                 <ot-entity-decorations entity="branchStatusView.branch"></ot-entity-decorations>
