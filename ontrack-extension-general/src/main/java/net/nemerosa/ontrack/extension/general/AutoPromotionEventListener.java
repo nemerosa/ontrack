@@ -60,7 +60,9 @@ public class AutoPromotionEventListener implements EventListener {
             ).collect(Collectors.toList());
             if (keptValidationStamps.size() < property.getValidationStamps().size()) {
                 property = new AutoPromotionProperty(
-                        keptValidationStamps
+                        keptValidationStamps,
+                        property.getInclude(),
+                        property.getExclude()
                 );
                 propertyService.editProperty(
                         promotionLevel,

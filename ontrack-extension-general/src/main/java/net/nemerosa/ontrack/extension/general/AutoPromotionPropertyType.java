@@ -1,9 +1,12 @@
 package net.nemerosa.ontrack.extension.general;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.common.MapBuilder;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
+import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.MultiSelection;
+import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
@@ -63,27 +66,61 @@ public class AutoPromotionPropertyType extends AbstractPropertyType<AutoPromotio
                                                 .collect(Collectors.toList())
                                 )
                                 .help("When all the selected validation stamps have passed for a build, the promotion will automatically be granted.")
-                );
+                )
+                .with(
+                        Text.of("include")
+                                .label("Include")
+                                .optional()
+                                .value(value != null ? value.getInclude() : "")
+                                .help("Regular expression to select validation stamps by name")
+                )
+                .with(
+                        Text.of("exclude")
+                                .label("Exclude")
+                                .optional()
+                                .value(value != null ? value.getExclude() : "")
+                                .help("Regular expression to exclude validation stamps by name")
+                )
+                ;
     }
 
     @Override
     public AutoPromotionProperty fromClient(JsonNode node) {
-        return loadAutoPromotionProperty(node.get("validationStamps"));
+        return loadAutoPromotionProperty(node);
     }
 
-    private AutoPromotionProperty loadAutoPromotionProperty(JsonNode validationStamps) {
-        if (validationStamps.isArray()) {
-            List<Integer> ids = new ArrayList<>();
-            validationStamps.forEach(id -> ids.add(id.asInt()));
-            // Reading the validation stamps and then the names
+    private AutoPromotionProperty loadAutoPromotionProperty(JsonNode node) {
+        // Backward compatibility (before 2.14)
+        if (node.isArray()) {
             return new AutoPromotionProperty(
-                    ids.stream()
-                            .map(id -> structureService.getValidationStamp(ID.of(id)))
-                            .collect(Collectors.toList())
+                    readValidationStamps(node),
+                    "",
+                    ""
             );
+        } else {
+            JsonNode validationStamps = node.get("validationStamps");
+            List<ValidationStamp> validationStampList = readValidationStamps(validationStamps);
+            return new AutoPromotionProperty(
+                    validationStampList,
+                    JsonUtils.get(node, "include", false, ""),
+                    JsonUtils.get(node, "exclude", false, "")
+            );
+        }
+    }
+
+    private List<ValidationStamp> readValidationStamps(JsonNode validationStampIds) {
+        List<ValidationStamp> validationStampList;
+        if (validationStampIds.isArray()) {
+            List<Integer> ids = new ArrayList<>();
+            validationStampIds.forEach(id -> ids.add(id.asInt()));
+            // Reading the validation stamps and then the names
+            validationStampList = ids.stream()
+                    .map(id -> structureService.getValidationStamp(ID.of(id)))
+                    .collect(Collectors.toList());
         } else {
             throw new AutoPromotionPropertyCannotParseException("Cannot get the list of validation stamps");
         }
+        return validationStampList;
     }
 
     @Override
@@ -98,7 +135,9 @@ public class AutoPromotionPropertyType extends AbstractPropertyType<AutoPromotio
                         ))
                         .filter(Optional::isPresent)
                         .map(Optional::get)
-                        .collect(Collectors.toList())
+                        .collect(Collectors.toList()),
+                value.getInclude(),
+                value.getExclude()
         );
     }
 
@@ -108,9 +147,13 @@ public class AutoPromotionPropertyType extends AbstractPropertyType<AutoPromotio
     @Override
     public JsonNode forStorage(AutoPromotionProperty value) {
         return format(
-                value.getValidationStamps().stream()
-                        .map(Entity::id)
-                        .collect(Collectors.toList())
+                MapBuilder.create()
+                        .with("validationStamps", value.getValidationStamps().stream()
+                                .map(Entity::id)
+                                .collect(Collectors.toList()))
+                        .with("include", value.getInclude())
+                        .with("exclude", value.getExclude())
+                        .get()
         );
     }
 

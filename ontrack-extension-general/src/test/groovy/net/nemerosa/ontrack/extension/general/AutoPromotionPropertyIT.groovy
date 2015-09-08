@@ -40,7 +40,7 @@ class AutoPromotionPropertyIT extends AbstractServiceTestSupport {
             propertyService.editProperty(
                     promotionLevel,
                     AutoPromotionPropertyType,
-                    new AutoPromotionProperty([vs1, vs2])
+                    new AutoPromotionProperty([vs1, vs2], '', '')
             )
         }
         // Deletes a validation stamp
@@ -71,7 +71,7 @@ class AutoPromotionPropertyIT extends AbstractServiceTestSupport {
             propertyService.editProperty(
                     promotionLevel,
                     AutoPromotionPropertyType,
-                    new AutoPromotionProperty([vs1])
+                    new AutoPromotionProperty([vs1], '', '')
             )
         }
         // Cloning the branch

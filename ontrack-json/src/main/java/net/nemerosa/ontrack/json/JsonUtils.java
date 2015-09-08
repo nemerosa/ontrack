@@ -32,6 +32,14 @@ public final class JsonUtils {
         return builder.end();
     }
 
+    public static JsonNode intArray(int... values) {
+        ArrayBuilder builder = array();
+        for (int value : values) {
+            builder.with(number(value));
+        }
+        return builder.end();
+    }
+
     public static JsonNode stringArray(String... values) {
         return stringArray(Arrays.asList(values));
     }

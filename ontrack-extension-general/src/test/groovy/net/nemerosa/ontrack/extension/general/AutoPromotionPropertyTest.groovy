@@ -37,7 +37,7 @@ class AutoPromotionPropertyTest {
                 [
                         vs1,
                         vs2,
-                ]
+                ], "", ""
         )
 
         assert property.contains(vs1)
@@ -58,7 +58,7 @@ class AutoPromotionPropertyTest {
         AutoPromotionProperty property = new AutoPromotionProperty(
                 [
                         vs2,
-                ]
+                ], "", ""
         )
 
         assert !property.contains(vs1)
