@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.service.settings;
 
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.settings.LDAPSettings;
 import net.nemerosa.ontrack.model.settings.SecuritySettings;
 import net.nemerosa.ontrack.model.settings.SettingsService;
 import net.nemerosa.ontrack.service.Caches;
@@ -42,18 +41,5 @@ public class SettingsServiceImpl implements SettingsService {
     public void saveSecuritySettings(SecuritySettings securitySettings) {
         securityService.checkGlobalFunction(GlobalSettings.class);
         settingsInternalService.saveSecuritySettings(securitySettings);
-    }
-
-    @Override
-    public LDAPSettings getLDAPSettings() {
-        securityService.checkGlobalFunction(GlobalSettings.class);
-        return settingsInternalService.getLDAPSettings();
-    }
-
-    @Override
-    @CacheEvict(value = Caches.LDAP_SETTINGS, allEntries = true)
-    public void saveLDAPSettings(LDAPSettings ldapSettings) {
-        securityService.checkGlobalFunction(GlobalSettings.class);
-        settingsInternalService.saveLDAPSettings(ldapSettings);
     }
 }

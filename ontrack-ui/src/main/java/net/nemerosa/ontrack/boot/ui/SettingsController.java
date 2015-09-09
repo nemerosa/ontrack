@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.api.GlobalSettingsExtension;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.DescribedForm;
 import net.nemerosa.ontrack.model.settings.LDAPSettings;
+import net.nemerosa.ontrack.model.settings.LDAPSettingsService;
 import net.nemerosa.ontrack.model.settings.SecuritySettings;
 import net.nemerosa.ontrack.model.settings.SettingsService;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
@@ -27,11 +28,13 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 public class SettingsController extends AbstractResourceController {
 
     private final SettingsService settingsService;
+    private final LDAPSettingsService ldapSettingsService;
     private final ExtensionManager extensionManager;
 
     @Autowired
-    public SettingsController(SettingsService settingsService, ExtensionManager extensionManager) {
+    public SettingsController(SettingsService settingsService, LDAPSettingsService ldapSettingsService, ExtensionManager extensionManager) {
         this.settingsService = settingsService;
+        this.ldapSettingsService = ldapSettingsService;
         this.extensionManager = extensionManager;
     }
 
@@ -74,7 +77,7 @@ public class SettingsController extends AbstractResourceController {
     @RequestMapping(value = "ldap", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Ack updateLDAP(@RequestBody LDAPSettings ldapSettings) {
-        settingsService.saveLDAPSettings(ldapSettings);
+        ldapSettingsService.saveSettings(ldapSettings);
         return Ack.OK;
     }
 
@@ -92,10 +95,9 @@ public class SettingsController extends AbstractResourceController {
 
 
     private DescribedForm getLDAPSettingsForm() {
-        LDAPSettings ldapSettings = settingsService.getLDAPSettings();
         return DescribedForm.create(
                 "ldap",
-                ldapSettings.form()
+                ldapSettingsService.getSettingsForm()
         )
                 .title("LDAP")
                 .description("LDAP configuration.")
