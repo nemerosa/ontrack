@@ -30,6 +30,7 @@ public class AccountServiceImpl implements AccountService {
     private final SecurityService securityService;
     private final AuthenticationSourceService authenticationSourceService;
     private final PasswordEncoder passwordEncoder;
+    private final Collection<AccountGroupContributor> accountGroupContributors;
 
     @Autowired
     public AccountServiceImpl(
@@ -39,7 +40,8 @@ public class AccountServiceImpl implements AccountService {
             AccountGroupRepository accountGroupRepository,
             SecurityService securityService,
             AuthenticationSourceService authenticationSourceService,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            Collection<AccountGroupContributor> accountGroupContributors) {
         this.roleRepository = roleRepository;
         this.rolesService = rolesService;
         this.accountRepository = accountRepository;
@@ -47,6 +49,7 @@ public class AccountServiceImpl implements AccountService {
         this.securityService = securityService;
         this.authenticationSourceService = authenticationSourceService;
         this.passwordEncoder = passwordEncoder;
+        this.accountGroupContributors = accountGroupContributors;
     }
 
     @Override
@@ -60,10 +63,16 @@ public class AccountServiceImpl implements AccountService {
                 .withProjectRoles(
                         roleRepository.findProjectRoleAssociationsByAccount(raw.id(), rolesService::getProjectRoleAssociation)
                 )
-                        // Groups
+                        // Groups from the repository
                 .withGroups(
                         accountGroupRepository.findByAccount(raw.id()).stream()
                                 .map(this::groupWithACL)
+                                .collect(Collectors.toList())
+                )
+                        // Group contributions
+                .withGroups(
+                        accountGroupContributors.stream()
+                                .flatMap(accountGroupContributor -> accountGroupContributor.collectGroups(raw).stream())
                                 .collect(Collectors.toList())
                 )
                         // OK
