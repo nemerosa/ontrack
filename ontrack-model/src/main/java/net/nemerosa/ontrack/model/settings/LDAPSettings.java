@@ -23,7 +23,10 @@ public class LDAPSettings {
     private final String fullNameAttribute;
     @Wither
     private final String emailAttribute;
-    // TODO Group configuration
+    @Wither
+    private final String groupAttribute;
+    @Wither
+    private final String groupFilter;
 
     public Form form() {
         return Form.create()
@@ -87,11 +90,29 @@ public class LDAPSettings {
                                 .optional()
                                 .value(emailAttribute)
                 )
+                .with(
+                        Text.of("groupAttribute")
+                                .visibleIf("enabled")
+                                .label("Group attribute")
+                                .help("Name of the attribute that contains the groups the user belongs to (defaults to memberOf)")
+                                .optional()
+                                .value(groupAttribute)
+                )
+                .with(
+                        Text.of("groupFilter")
+                                .visibleIf("enabled")
+                                .label("Group filter")
+                                .help("Name of the OU field used to filter groups a user belongs to (optional)")
+                                .optional()
+                                .value(groupFilter)
+                )
                 ;
     }
 
     public static final LDAPSettings NONE = new LDAPSettings(
             false,
+            "",
+            "",
             "",
             "",
             "",

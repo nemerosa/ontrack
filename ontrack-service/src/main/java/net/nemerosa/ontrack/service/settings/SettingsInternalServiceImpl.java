@@ -49,7 +49,9 @@ public class SettingsInternalServiceImpl implements SettingsInternalService {
                 settingsRepository.getString(LDAPSettings.class, "user", ""),
                 settingsRepository.getPassword(LDAPSettings.class, "password", "", encryptionService::decrypt),
                 settingsRepository.getString(LDAPSettings.class, "fullNameAttribute", ""),
-                settingsRepository.getString(LDAPSettings.class, "emailAttribute", "")
+                settingsRepository.getString(LDAPSettings.class, "emailAttribute", ""),
+                settingsRepository.getString(LDAPSettings.class, "groupAttribute", ""),
+                settingsRepository.getString(LDAPSettings.class, "groupFilter", "")
         );
     }
 
@@ -64,5 +66,7 @@ public class SettingsInternalServiceImpl implements SettingsInternalService {
         settingsRepository.setPassword(LDAPSettings.class, "password", ldapSettings.getPassword(), true, encryptionService::encrypt);
         settingsRepository.setString(LDAPSettings.class, "fullNameAttribute", ldapSettings.getFullNameAttribute());
         settingsRepository.setString(LDAPSettings.class, "emailAttribute", ldapSettings.getEmailAttribute());
+        settingsRepository.setString(LDAPSettings.class, "groupAttribute", ldapSettings.getGroupAttribute());
+        settingsRepository.setString(LDAPSettings.class, "groupFilter", ldapSettings.getGroupFilter());
     }
 }
