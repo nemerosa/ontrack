@@ -93,7 +93,7 @@ class LDAPAuthenticationProviderTest {
 
         def authAccount = provider.findUser("test", authentication)
         assert authAccount.present
-        assert authAccount.get() == account
+        assert authAccount.get().account == account
     }
 
     @Test
@@ -120,7 +120,7 @@ class LDAPAuthenticationProviderTest {
 
         def authAccount = provider.findUser("test", authentication)
         assert authAccount.present
-        assert authAccount.get() == tempAccount
+        assert authAccount.get().account == tempAccount
     }
 
     @Test
@@ -151,7 +151,7 @@ class LDAPAuthenticationProviderTest {
 
         def authAccount = provider.findUser("test", authentication)
         assert authAccount.present
-        assert authAccount.get() == tempAccount
+        assert authAccount.get().account == tempAccount
     }
 
     @Test
@@ -198,7 +198,7 @@ class LDAPAuthenticationProviderTest {
 
         def authAccount = provider.findUser("test", authentication)
         assert authAccount.present
-        assert authAccount.get() == account
+        assert authAccount.get().account == account
     }
 
 }

@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.service.security.ldap;
 
-import net.nemerosa.ontrack.model.security.Account;
-import net.nemerosa.ontrack.model.security.AccountService;
-import net.nemerosa.ontrack.model.security.SecurityRole;
-import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.support.ApplicationLogService;
 import net.nemerosa.ontrack.repository.AccountRepository;
 import net.nemerosa.ontrack.service.security.AbstractOntrackAuthenticationProvider;
@@ -46,7 +43,7 @@ public class LDAPAuthenticationProvider extends AbstractOntrackAuthenticationPro
     }
 
     @Override
-    protected Optional<Account> findUser(String username, UsernamePasswordAuthenticationToken authentication) {
+    protected Optional<AuthenticatedAccount> findUser(String username, UsernamePasswordAuthenticationToken authentication) {
         // Gets the (cached) provider
         LdapAuthenticationProvider ldapAuthenticationProvider = ldapProviderFactory.getProvider();
         // If not enabled, cannot authenticate!
@@ -73,54 +70,69 @@ public class LDAPAuthenticationProvider extends AbstractOntrackAuthenticationPro
             if (ldapAuthentication != null && ldapAuthentication.isAuthenticated()) {
                 // Gets the account name
                 final String name = ldapAuthentication.getName();
+                // If not found, auto-registers the account using the LDAP details
+                ExtendedLDAPUserDetails userDetails;
+                Object principal = ldapAuthentication.getPrincipal();
+                if (principal instanceof ExtendedLDAPUserDetails) {
+                    userDetails = (ExtendedLDAPUserDetails) principal;
+                } else {
+                    userDetails = null;
+                }
                 // Gets any existing account
                 Optional<Account> existingAccount = accountRepository.findUserByNameAndSource(username, ldapAuthenticationSourceProvider);
                 if (!existingAccount.isPresent()) {
                     // If not found, auto-registers the account using the LDAP details
-                    Object principal = ldapAuthentication.getPrincipal();
-                    if (principal instanceof ExtendedLDAPUserDetails) {
-                        ExtendedLDAPUserDetails details = (ExtendedLDAPUserDetails) principal;
+                    if (userDetails != null) {
                         // Auto-registration if email is OK
-                        if (StringUtils.isNotBlank(details.getEmail())) {
+                        if (StringUtils.isNotBlank(userDetails.getEmail())) {
                             // Registration
                             return securityService.asAdmin(() -> Optional.of(
-                                            accountRepository.newAccount(
-                                                    Account.of(
-                                                            name,
-                                                            details.getFullName(),
-                                                            details.getEmail(),
-                                                            SecurityRole.USER,
-                                                            ldapAuthenticationSourceProvider.getSource()
-                                                    )
+                                            new AuthenticatedAccount(
+                                                    accountRepository.newAccount(
+                                                            Account.of(
+                                                                    name,
+                                                                    userDetails.getFullName(),
+                                                                    userDetails.getEmail(),
+                                                                    SecurityRole.USER,
+                                                                    ldapAuthenticationSourceProvider.getSource()
+                                                            )
+                                                    ),
+                                                    userDetails
                                             )
                                     )
                             );
                         } else {
                             // Temporary account
                             return Optional.of(
-                                    Account.of(
-                                            name,
-                                            details.getFullName(),
-                                            "",
-                                            SecurityRole.USER,
-                                            ldapAuthenticationSourceProvider.getSource()
+                                    AuthenticatedAccount.of(
+                                            Account.of(
+                                                    name,
+                                                    userDetails.getFullName(),
+                                                    "",
+                                                    SecurityRole.USER,
+                                                    ldapAuthenticationSourceProvider.getSource()
+                                            )
                                     )
                             );
                         }
                     } else {
                         // Temporary account
                         return Optional.of(
-                                Account.of(
-                                        name,
-                                        name,
-                                        "",
-                                        SecurityRole.USER,
-                                        ldapAuthenticationSourceProvider.getSource()
+                                AuthenticatedAccount.of(
+                                        Account.of(
+                                                name,
+                                                name,
+                                                "",
+                                                SecurityRole.USER,
+                                                ldapAuthenticationSourceProvider.getSource()
+                                        )
                                 )
                         );
                     }
                 } else {
-                    return existingAccount;
+                    return existingAccount.map(
+                            account -> new AuthenticatedAccount(account, userDetails)
+                    );
                 }
             } else {
                 return Optional.empty();

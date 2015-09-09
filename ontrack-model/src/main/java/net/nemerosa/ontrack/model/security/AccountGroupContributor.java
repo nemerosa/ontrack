@@ -11,9 +11,9 @@ public interface AccountGroupContributor {
     /**
      * Collects the list of groups for this account
      *
-     * @param account Account to collect groups for
+     * @param authenticatedAccount Account with authentication information to collect groups for
      * @return List of groups (can be empty but not null)
      */
-    Collection<AccountGroup> collectGroups(@NotNull Account account);
+    Collection<AccountGroup> collectGroups(@NotNull AuthenticatedAccount authenticatedAccount);
 
 }

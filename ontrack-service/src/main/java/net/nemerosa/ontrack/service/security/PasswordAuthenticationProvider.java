@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.service.security;
 
-import net.nemerosa.ontrack.model.security.Account;
 import net.nemerosa.ontrack.model.security.AccountService;
-import net.nemerosa.ontrack.model.security.AuthenticationSourceService;
+import net.nemerosa.ontrack.model.security.AccountUserDetails;
+import net.nemerosa.ontrack.model.security.AuthenticatedAccount;
 import net.nemerosa.ontrack.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -44,7 +44,8 @@ public class PasswordAuthenticationProvider extends AbstractOntrackAuthenticatio
     }
 
     @Override
-    protected Optional<Account> findUser(String username, UsernamePasswordAuthenticationToken authentication) {
-        return accountRepository.findUserByNameAndSource(username, passwordAuthenticationSourceProvider);
+    protected Optional<AuthenticatedAccount> findUser(String username, UsernamePasswordAuthenticationToken authentication) {
+        return accountRepository.findUserByNameAndSource(username, passwordAuthenticationSourceProvider)
+                .map(AuthenticatedAccount::of);
     }
 }

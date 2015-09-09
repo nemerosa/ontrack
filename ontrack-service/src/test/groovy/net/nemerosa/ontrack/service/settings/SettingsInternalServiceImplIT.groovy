@@ -50,7 +50,9 @@ class SettingsInternalServiceImplIT extends AbstractServiceTestSupport {
                 "user",
                 password,
                 "fullName",
-                "email"
+                "email",
+                "",
+                ""
         )
         settings
     }

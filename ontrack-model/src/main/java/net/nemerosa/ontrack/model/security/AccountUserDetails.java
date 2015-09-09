@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.service.security;
+package net.nemerosa.ontrack.model.security;
 
 import lombok.Data;
 import net.nemerosa.ontrack.model.security.Account;

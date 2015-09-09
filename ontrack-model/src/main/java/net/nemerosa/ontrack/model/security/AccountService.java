@@ -18,7 +18,7 @@ public interface AccountService {
      * @param raw Account without authorisations
      * @return Account with authorisations
      */
-    Account withACL(Account raw);
+    Account withACL(AuthenticatedAccount raw);
 
     /**
      * List of accounts

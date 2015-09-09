@@ -53,19 +53,19 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account withACL(Account raw) {
-        return raw
+    public Account withACL(AuthenticatedAccount raw) {
+        return raw.getAccount()
                 // Global role
                 .withGlobalRole(
-                        roleRepository.findGlobalRoleByAccount(raw.id()).flatMap(rolesService::getGlobalRole)
+                        roleRepository.findGlobalRoleByAccount(raw.getAccount().id()).flatMap(rolesService::getGlobalRole)
                 )
                         // Project roles
                 .withProjectRoles(
-                        roleRepository.findProjectRoleAssociationsByAccount(raw.id(), rolesService::getProjectRoleAssociation)
+                        roleRepository.findProjectRoleAssociationsByAccount(raw.getAccount().id(), rolesService::getProjectRoleAssociation)
                 )
                         // Groups from the repository
                 .withGroups(
-                        accountGroupRepository.findByAccount(raw.id()).stream()
+                        accountGroupRepository.findByAccount(raw.getAccount().id()).stream()
                                 .map(this::groupWithACL)
                                 .collect(Collectors.toList())
                 )

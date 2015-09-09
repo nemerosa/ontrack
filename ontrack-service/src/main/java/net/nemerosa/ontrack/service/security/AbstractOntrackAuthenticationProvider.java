@@ -1,7 +1,8 @@
 package net.nemerosa.ontrack.service.security;
 
-import net.nemerosa.ontrack.model.security.Account;
 import net.nemerosa.ontrack.model.security.AccountService;
+import net.nemerosa.ontrack.model.security.AccountUserDetails;
+import net.nemerosa.ontrack.model.security.AuthenticatedAccount;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
 import org.springframework.security.core.AuthenticationException;
@@ -20,12 +21,12 @@ public abstract class AbstractOntrackAuthenticationProvider extends AbstractUser
 
     @Override
     protected UserDetails retrieveUser(String username, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
-        Optional<Account> t = findUser(username, authentication);
+        Optional<AuthenticatedAccount> t = findUser(username, authentication);
         return t
                 .map(accountService::withACL)
                 .map(AccountUserDetails::new)
                 .orElseThrow(() -> new UsernameNotFoundException(String.format("User %s cannot be found", username)));
     }
 
-    protected abstract Optional<Account> findUser(String username, UsernamePasswordAuthenticationToken authentication);
+    protected abstract Optional<AuthenticatedAccount> findUser(String username, UsernamePasswordAuthenticationToken authentication);
 }
