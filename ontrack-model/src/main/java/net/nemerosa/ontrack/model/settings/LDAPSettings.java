@@ -7,6 +7,7 @@ import lombok.experimental.Wither;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
+@Deprecated
 public class LDAPSettings {
 
     private final boolean enabled;
