@@ -1,20 +1,21 @@
 package net.nemerosa.ontrack.boot.ui;
 
-import net.nemerosa.ontrack.extension.api.ExtensionManager;
-import net.nemerosa.ontrack.extension.api.GlobalSettingsExtension;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.DescribedForm;
-import net.nemerosa.ontrack.model.settings.LDAPSettings;
-import net.nemerosa.ontrack.model.settings.LDAPSettingsService;
-import net.nemerosa.ontrack.model.settings.SecuritySettings;
-import net.nemerosa.ontrack.model.settings.SettingsService;
+import net.nemerosa.ontrack.model.settings.SettingsManager;
+import net.nemerosa.ontrack.model.settings.SettingsManagerNotFoundException;
+import net.nemerosa.ontrack.model.settings.SettingsValidationException;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Resources;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,15 +28,13 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 @RequestMapping("/settings")
 public class SettingsController extends AbstractResourceController {
 
-    private final SettingsService settingsService;
-    private final LDAPSettingsService ldapSettingsService;
-    private final ExtensionManager extensionManager;
+    private final Collection<SettingsManager<?>> settingsManagers;
+    private final ObjectMapper objectMapper;
 
     @Autowired
-    public SettingsController(SettingsService settingsService, LDAPSettingsService ldapSettingsService, ExtensionManager extensionManager) {
-        this.settingsService = settingsService;
-        this.ldapSettingsService = ldapSettingsService;
-        this.extensionManager = extensionManager;
+    public SettingsController(Collection<SettingsManager<?>> settingsManagers, ObjectMapper objectMapper) {
+        this.settingsManagers = settingsManagers;
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -43,17 +42,10 @@ public class SettingsController extends AbstractResourceController {
      */
     @RequestMapping(value = "", method = RequestMethod.GET)
     public Resources<DescribedForm> configuration() {
-        List<DescribedForm> forms = new ArrayList<>();
-        // Security settings
-        forms.add(getSecuritySettingsForm());
-        // LDAP settings
-        forms.add(getLDAPSettingsForm());
-        // Extensions settings
-        forms.addAll(
-                extensionManager.getExtensions(GlobalSettingsExtension.class).stream()
-                        .map(GlobalSettingsExtension::getConfigurationForm)
-                        .collect(Collectors.toList())
-        );
+        List<DescribedForm> forms = settingsManagers.stream()
+                .sorted((o1, o2) -> o1.getTitle().compareTo(o2.getTitle()))
+                .map(this::getSettingsForm)
+                .collect(Collectors.toList());
         // OK
         return Resources.of(
                 forms,
@@ -64,44 +56,43 @@ public class SettingsController extends AbstractResourceController {
     /**
      * Security
      */
-    @RequestMapping(value = "security", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{type:.*}", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public Ack updateSecurity(@RequestBody SecuritySettings securitySettings) {
-        settingsService.saveSecuritySettings(securitySettings);
+    public <T> Ack updateSettings(@PathVariable String type, @RequestBody JsonNode settingsNode) {
+        // Gets the settings manager by type
+        @SuppressWarnings("unchecked")
+        SettingsManager<T> settingsManager = (SettingsManager<T>) settingsManagers.stream()
+                .filter(candidate -> StringUtils.equals(
+                        type,
+                        getSettingsManagerName(candidate)
+                ))
+                .findFirst()
+                .orElseThrow(() -> new SettingsManagerNotFoundException(type));
+        // Parsing
+        T settings;
+        try {
+            settings = objectMapper.treeToValue(settingsNode, settingsManager.getSettingsClass());
+        } catch (JsonProcessingException e) {
+            throw new SettingsValidationException(e);
+        }
+        // Saves the settings
+        settingsManager.saveSettings(settings);
+        // OK
         return Ack.OK;
     }
 
-    /**
-     * LDAP
-     */
-    @RequestMapping(value = "ldap", method = RequestMethod.PUT)
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public Ack updateLDAP(@RequestBody LDAPSettings ldapSettings) {
-        ldapSettingsService.saveSettings(ldapSettings);
-        return Ack.OK;
+    private String getSettingsManagerName(SettingsManager<?> settingsManager) {
+        return settingsManager.getClass().getName();
     }
 
-
-    private DescribedForm getSecuritySettingsForm() {
-        SecuritySettings securitySettings = settingsService.getSecuritySettings();
+    private <T> DescribedForm getSettingsForm(SettingsManager<T> settingsManager) {
         return DescribedForm.create(
-                "security",
-                securitySettings.form()
+                getSettingsManagerName(settingsManager),
+                settingsManager.getSettingsForm()
         )
-                .title("Security")
-                .description("Global settings for the security.")
-                .uri(uri(on(getClass()).updateSecurity(null)));
-    }
-
-
-    private DescribedForm getLDAPSettingsForm() {
-        return DescribedForm.create(
-                "ldap",
-                ldapSettingsService.getSettingsForm()
-        )
-                .title("LDAP")
-                .description("LDAP configuration.")
-                .uri(uri(on(getClass()).updateLDAP(null)));
+                .title(settingsManager.getTitle())
+                .uri(uri(on(getClass()).updateSettings(getSettingsManagerName(settingsManager), null)))
+                ;
     }
 
 }

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.settings;
 
 import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.settings.AbstractSettingsManager;
 import net.nemerosa.ontrack.model.settings.CachedSettingsService;
 import net.nemerosa.ontrack.model.settings.SecuritySettings;
@@ -14,8 +15,8 @@ public class SecuritySettingsManager extends AbstractSettingsManager<SecuritySet
     private final SettingsRepository settingsRepository;
 
     @Autowired
-    public SecuritySettingsManager(CachedSettingsService cachedSettingsService, SettingsRepository settingsRepository) {
-        super(SecuritySettings.class, cachedSettingsService);
+    public SecuritySettingsManager(CachedSettingsService cachedSettingsService, SettingsRepository settingsRepository, SecurityService securityService) {
+        super(SecuritySettings.class, cachedSettingsService, securityService);
         this.settingsRepository = settingsRepository;
     }
 
@@ -29,4 +30,8 @@ public class SecuritySettingsManager extends AbstractSettingsManager<SecuritySet
         settingsRepository.setBoolean(SecuritySettings.class, "grantProjectViewToAll", settings.isGrantProjectViewToAll());
     }
 
+    @Override
+    public String getTitle() {
+        return "General security settings";
+    }
 }
