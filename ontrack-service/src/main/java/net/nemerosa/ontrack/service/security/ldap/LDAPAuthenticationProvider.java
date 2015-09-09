@@ -3,14 +3,15 @@ package net.nemerosa.ontrack.service.security.ldap;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.support.ApplicationLogService;
 import net.nemerosa.ontrack.repository.AccountRepository;
-import net.nemerosa.ontrack.service.security.AbstractOntrackAuthenticationProvider;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
 import org.springframework.stereotype.Component;
 
@@ -18,8 +19,9 @@ import java.util.Optional;
 
 @Component
 @Qualifier("ldap")
-public class LDAPAuthenticationProvider extends AbstractOntrackAuthenticationProvider {
+public class LDAPAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
 
+    private final AccountService accountService;
     private final LDAPProviderFactory ldapProviderFactory;
     private final LDAPAuthenticationSourceProvider ldapAuthenticationSourceProvider;
     private final AccountRepository accountRepository;
@@ -34,7 +36,7 @@ public class LDAPAuthenticationProvider extends AbstractOntrackAuthenticationPro
             AccountRepository accountRepository,
             SecurityService securityService,
             ApplicationLogService applicationLogService) {
-        super(accountService);
+        this.accountService = accountService;
         this.ldapProviderFactory = ldapProviderFactory;
         this.ldapAuthenticationSourceProvider = ldapAuthenticationSourceProvider;
         this.accountRepository = accountRepository;
@@ -42,7 +44,6 @@ public class LDAPAuthenticationProvider extends AbstractOntrackAuthenticationPro
         this.applicationLogService = applicationLogService;
     }
 
-    @Override
     protected Optional<AuthenticatedAccount> findUser(String username, UsernamePasswordAuthenticationToken authentication) {
         // Gets the (cached) provider
         LdapAuthenticationProvider ldapAuthenticationProvider = ldapProviderFactory.getProvider();
@@ -142,5 +143,13 @@ public class LDAPAuthenticationProvider extends AbstractOntrackAuthenticationPro
 
     @Override
     protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
+    }
+
+    @Override
+    protected UserDetails retrieveUser(String username, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
+        return findUser(username, authentication)
+                .map(accountService::withACL)
+                .map(AccountUserDetails::new)
+                .orElseThrow(() -> new UsernameNotFoundException(String.format("User %s cannot be found", username)));
     }
 }

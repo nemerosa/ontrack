@@ -8,24 +8,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-
 @Component
 @Qualifier("password")
-public class PasswordAuthenticationProvider extends AbstractOntrackAuthenticationProvider {
+public class PasswordAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
 
+    private final AccountService accountService;
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
     private final PasswordAuthenticationSourceProvider passwordAuthenticationSourceProvider;
 
     @Autowired
     public PasswordAuthenticationProvider(AccountService accountService, AccountRepository accountRepository, PasswordEncoder passwordEncoder, PasswordAuthenticationSourceProvider passwordAuthenticationSourceProvider) {
-        super(accountService);
+        this.accountService = accountService;
         this.accountRepository = accountRepository;
         this.passwordEncoder = passwordEncoder;
         this.passwordAuthenticationSourceProvider = passwordAuthenticationSourceProvider;
@@ -44,8 +45,12 @@ public class PasswordAuthenticationProvider extends AbstractOntrackAuthenticatio
     }
 
     @Override
-    protected Optional<AuthenticatedAccount> findUser(String username, UsernamePasswordAuthenticationToken authentication) {
+    protected UserDetails retrieveUser(String username, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
         return accountRepository.findUserByNameAndSource(username, passwordAuthenticationSourceProvider)
-                .map(AuthenticatedAccount::of);
+                .map(AuthenticatedAccount::of)
+                .map(accountService::withACL)
+                .map(AccountUserDetails::new)
+                .orElseThrow(() -> new UsernameNotFoundException(String.format("User %s cannot be found", username)));
     }
+
 }
