@@ -31,6 +31,11 @@ public class SecuritySettingsManager extends AbstractSettingsManager<SecuritySet
     }
 
     @Override
+    public String getId() {
+        return "general-security";
+    }
+
+    @Override
     public String getTitle() {
         return "General security settings";
     }

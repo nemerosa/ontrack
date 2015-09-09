@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.boot.ui;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.DescribedForm;
 import net.nemerosa.ontrack.model.settings.SettingsManager;
@@ -29,12 +30,11 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 public class SettingsController extends AbstractResourceController {
 
     private final Collection<SettingsManager<?>> settingsManagers;
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = ObjectMapperFactory.create();
 
     @Autowired
-    public SettingsController(Collection<SettingsManager<?>> settingsManagers, ObjectMapper objectMapper) {
+    public SettingsController(Collection<SettingsManager<?>> settingsManagers) {
         this.settingsManagers = settingsManagers;
-        this.objectMapper = objectMapper;
     }
 
     /**
@@ -82,7 +82,7 @@ public class SettingsController extends AbstractResourceController {
     }
 
     private String getSettingsManagerName(SettingsManager<?> settingsManager) {
-        return settingsManager.getClass().getName();
+        return settingsManager.getId();
     }
 
     private <T> DescribedForm getSettingsForm(SettingsManager<T> settingsManager) {

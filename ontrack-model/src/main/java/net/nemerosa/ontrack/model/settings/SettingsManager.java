@@ -4,6 +4,8 @@ import net.nemerosa.ontrack.model.form.Form;
 
 public interface SettingsManager<T> {
 
+    String getId();
+
     String getTitle();
 
     Form getSettingsForm();
