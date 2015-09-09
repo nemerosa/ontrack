@@ -3,8 +3,8 @@ package net.nemerosa.ontrack.service.settings;
 import net.nemerosa.ontrack.model.security.EncryptionService;
 import net.nemerosa.ontrack.model.settings.LDAPSettings;
 import net.nemerosa.ontrack.model.settings.SecuritySettings;
-import net.nemerosa.ontrack.repository.SettingsRepository;
-import net.nemerosa.ontrack.service.Caches;
+import net.nemerosa.ontrack.model.support.SettingsRepository;
+import net.nemerosa.ontrack.common.Caches;
 import net.nemerosa.ontrack.service.support.SettingsInternalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
+@Deprecated
 public class SettingsInternalServiceImpl implements SettingsInternalService {
 
     private final SettingsRepository settingsRepository;

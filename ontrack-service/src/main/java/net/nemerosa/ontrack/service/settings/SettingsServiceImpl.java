@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.settings.SecuritySettings;
 import net.nemerosa.ontrack.model.settings.SettingsService;
-import net.nemerosa.ontrack.service.Caches;
+import net.nemerosa.ontrack.common.Caches;
 import net.nemerosa.ontrack.service.support.SettingsInternalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
+@Deprecated
 public class SettingsServiceImpl implements SettingsService {
 
     private final SecurityService securityService;

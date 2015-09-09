@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.service.security;
 
 import net.nemerosa.ontrack.model.security.*;
+import net.nemerosa.ontrack.model.settings.CachedSettingsService;
 import net.nemerosa.ontrack.model.settings.SecuritySettings;
 import net.nemerosa.ontrack.model.structure.Signature;
-import net.nemerosa.ontrack.service.support.SettingsInternalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
@@ -20,11 +20,11 @@ import static java.lang.String.format;
 @Component
 public class SecurityServiceImpl implements SecurityService {
 
-    private final SettingsInternalService settingsInternalService;
+    private final CachedSettingsService cachedSettingsService;
 
     @Autowired
-    public SecurityServiceImpl(SettingsInternalService settingsInternalService) {
-        this.settingsInternalService = settingsInternalService;
+    public SecurityServiceImpl(CachedSettingsService cachedSettingsService) {
+        this.cachedSettingsService = cachedSettingsService;
     }
 
     @Override
@@ -58,7 +58,7 @@ public class SecurityServiceImpl implements SecurityService {
     }
 
     protected boolean isGlobalGrant(Class<? extends ProjectFunction> fn) {
-        SecuritySettings settings = settingsInternalService.getSecuritySettings();
+        SecuritySettings settings = cachedSettingsService.getCachedSettings(SecuritySettings.class);
         return settings.isGrantProjectViewToAll() && fn.isAssignableFrom(ProjectView.class);
     }
 

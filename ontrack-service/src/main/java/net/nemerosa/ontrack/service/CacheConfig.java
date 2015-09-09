@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service;
 
+import net.nemerosa.ontrack.common.Caches;
 import net.nemerosa.ontrack.service.support.GuavaCacheFactoryBean;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -19,7 +20,8 @@ public class CacheConfig {
         o.setCaches(
                 Arrays.asList(
                         new GuavaCacheFactoryBean(Caches.SECURITY_SETTINGS, 1, 600).getObject(),
-                        new GuavaCacheFactoryBean(Caches.LDAP_SETTINGS, 1, 600).getObject()
+                        new GuavaCacheFactoryBean(Caches.LDAP_SETTINGS, 1, 600).getObject(),
+                        new GuavaCacheFactoryBean(Caches.SETTINGS, 1, 600).getObject()
                 )
         );
         return o;

@@ -8,7 +8,7 @@ import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.settings.LDAPSettings;
 import net.nemerosa.ontrack.model.settings.LDAPSettingsService;
-import net.nemerosa.ontrack.service.Caches;
+import net.nemerosa.ontrack.common.Caches;
 import net.nemerosa.ontrack.service.support.SettingsInternalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
+@Deprecated
 public class LDAPSettingsServiceImpl implements LDAPSettingsService {
 
     private final SecurityService securityService;

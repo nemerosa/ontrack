@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.repository;
+package net.nemerosa.ontrack.model.support;
 
 import java.util.function.Function;
 
