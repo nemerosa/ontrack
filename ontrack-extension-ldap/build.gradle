@@ -1,0 +1,8 @@
+apply plugin: 'groovy'
+
+dependencies {
+    compile project(':ontrack-extension-support')
+    compile libraries.spring_security_ldap
+
+    testCompile libraries.groovy
+}
