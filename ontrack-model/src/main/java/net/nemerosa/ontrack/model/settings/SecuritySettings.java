@@ -9,7 +9,6 @@ import net.nemerosa.ontrack.model.form.YesNo;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-@Deprecated
 public class SecuritySettings {
 
     @Wither
