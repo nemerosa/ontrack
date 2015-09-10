@@ -17,16 +17,19 @@ public class LDAPSettingsManager extends AbstractSettingsManager<LDAPSettings> {
 
     private final SettingsRepository settingsRepository;
     private final EncryptionService encryptionService;
+    private final LDAPProviderFactory ldapProviderFactory;
 
     @Autowired
-    public LDAPSettingsManager(CachedSettingsService cachedSettingsService, SecurityService securityService, SettingsRepository settingsRepository, EncryptionService encryptionService) {
+    public LDAPSettingsManager(CachedSettingsService cachedSettingsService, SecurityService securityService, SettingsRepository settingsRepository, EncryptionService encryptionService, LDAPProviderFactory ldapProviderFactory) {
         super(LDAPSettings.class, cachedSettingsService, securityService);
         this.settingsRepository = settingsRepository;
         this.encryptionService = encryptionService;
+        this.ldapProviderFactory = ldapProviderFactory;
     }
 
     @Override
     protected void doSaveSettings(LDAPSettings settings) {
+        ldapProviderFactory.invalidate();
         settingsRepository.setBoolean(LDAPSettings.class, "enabled", settings.isEnabled());
         settingsRepository.setString(LDAPSettings.class, "url", settings.getUrl());
         settingsRepository.setString(LDAPSettings.class, "searchBase", settings.getSearchBase());

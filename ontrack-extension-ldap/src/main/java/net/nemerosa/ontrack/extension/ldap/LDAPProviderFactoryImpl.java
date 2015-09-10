@@ -1,11 +1,8 @@
-package net.nemerosa.ontrack.service.security.ldap;
+package net.nemerosa.ontrack.extension.ldap;
 
 import net.nemerosa.ontrack.model.security.SecurityRole;
-import net.nemerosa.ontrack.model.settings.LDAPSettings;
-import net.nemerosa.ontrack.common.Caches;
-import net.nemerosa.ontrack.service.support.SettingsInternalService;
+import net.nemerosa.ontrack.model.settings.CachedSettingsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
 import org.springframework.security.ldap.authentication.BindAuthenticator;
@@ -14,21 +11,34 @@ import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 @Service
-@Deprecated
 public class LDAPProviderFactoryImpl implements LDAPProviderFactory {
 
-    private final SettingsInternalService settingsService;
+    private final CachedSettingsService cachedSettingsService;
     private final LdapAuthoritiesPopulator authoritiesPopulator = (userData, username) -> AuthorityUtils.createAuthorityList(SecurityRole.USER.name());
 
+    private static final String CACHE_KEY = "0";
+    private final Map<String, LdapAuthenticationProvider> cache = new ConcurrentHashMap<>();
+
     @Autowired
-    public LDAPProviderFactoryImpl(SettingsInternalService settingsService) {
-        this.settingsService = settingsService;
+    public LDAPProviderFactoryImpl(CachedSettingsService cachedSettingsService) {
+        this.cachedSettingsService = cachedSettingsService;
     }
 
-    @Cacheable(value = Caches.LDAP_SETTINGS, key = "'0'")
+    @Override
+    public void invalidate() {
+        cache.clear();
+    }
+
     public LdapAuthenticationProvider getProvider() {
-        LDAPSettings settings = settingsService.getLDAPSettings();
+        return cache.computeIfAbsent(CACHE_KEY, x -> loadProvider());
+    }
+
+    private LdapAuthenticationProvider loadProvider() {
+        LDAPSettings settings = cachedSettingsService.getCachedSettings(LDAPSettings.class);
         if (settings.isEnabled()) {
             // LDAP context
             DefaultSpringSecurityContextSource ldapContextSource = new DefaultSpringSecurityContextSource(settings.getUrl());

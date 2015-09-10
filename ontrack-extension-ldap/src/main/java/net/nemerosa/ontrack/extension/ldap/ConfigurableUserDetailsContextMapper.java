@@ -1,6 +1,5 @@
-package net.nemerosa.ontrack.service.security.ldap;
+package net.nemerosa.ontrack.extension.ldap;
 
-import net.nemerosa.ontrack.model.settings.LDAPSettings;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.DistinguishedName;
@@ -15,7 +14,6 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Deprecated
 public class ConfigurableUserDetailsContextMapper extends LdapUserDetailsMapper {
 
     private final LDAPSettings settings;
