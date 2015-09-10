@@ -58,7 +58,8 @@ public class AccountController extends AbstractResourceController {
     public Resources<Action> getAccountMgtActions() {
         return Resources.of(
                 extensionManager.getExtensions(AccountMgtActionExtension.class).stream()
-                        .map(this::resolveExtensionAction),
+                        .map(this::resolveExtensionAction)
+                        .filter(action -> action != null),
                 uri(on(AccountController.class).getAccountMgtActions())
         );
     }
