@@ -57,7 +57,7 @@
             </ot-noentry>
             <div ng-if="promotionLevelCollection.resources" class="ot-entity-sortable-list"
                     ui-sortable="promotionLevelSortOptions" ng-model="promotionLevelCollection.resources">
-                <div ng-repeat="promotionLevel in promotionLevelCollection.resources" class="ot-entity-sortable-list-item">
+                <div ng-repeat="promotionLevel in promotionLevelCollection.resources" class="ot-entity-sortable-list-item ot-decoration-list">
                     <span class="ot-entity-sortable-list-handle"
                           ng-if="branch._reorderPromotionLevels"
                           title="Move this to reorder the promotion levels">&nbsp;</span>
@@ -67,6 +67,7 @@
                     <a href="#/promotionLevel/{{promotionLevel.id}}" class="ot-entity-sortable-list-link">
                         {{promotionLevel.name}}
                     </a>
+                    <ot-entity-decorations entity="promotionLevel"></ot-entity-decorations>
                 </div>
             </div>
             <button ng-if="branch._createPromotionLevel" type="button" class="btn btn-default"

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.acceptance.browser.pages
 
 import net.nemerosa.ontrack.acceptance.browser.Browser
 import net.nemerosa.ontrack.acceptance.browser.modules.HeaderModule
+import org.openqa.selenium.By
 import org.openqa.selenium.WebElement
 import org.openqa.selenium.support.FindBy
 
@@ -33,5 +34,11 @@ public abstract class AbstractHeaderPage extends AbstractPage {
     APIPage goToAPI() {
         $('.ot-command-api').click()
         browser.at(APIPage)
+    }
+
+    Collection<WebElement> findDecorations(String decorationType) {
+        return browser.findElements(By.className(
+                "ot-decoration-${decorationType}"
+        ))
     }
 }

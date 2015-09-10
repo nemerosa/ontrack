@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.OptionalLong;
 
 @Component
-public class SVNRevisionDecorationExtension extends AbstractExtension implements DecorationExtension {
+public class SVNRevisionDecorationExtension extends AbstractExtension implements DecorationExtension<Long> {
 
     private final SVNChangeLogService svnChangeLogService;
 
@@ -32,21 +32,17 @@ public class SVNRevisionDecorationExtension extends AbstractExtension implements
     }
 
     @Override
-    public List<Decoration> getDecorations(ProjectEntity entity) {
+    public List<Decoration<Long>> getDecorations(ProjectEntity entity) {
         if (entity instanceof Build) {
             // Gets the revision for this build
             OptionalLong revision = svnChangeLogService.getBuildRevision((Build) entity);
             if (revision.isPresent()) {
-                String name = String.valueOf(revision.getAsLong());
+                long lRevision = revision.getAsLong();
                 return Collections.singletonList(
                         Decoration.of(
                                 this,
-                                "revision",
-                                String.format(
-                                        "Revision %s",
-                                        name
-                                )
-                        ).withName(name)
+                                lRevision
+                        )
                 );
             } else {
                 return Collections.emptyList();

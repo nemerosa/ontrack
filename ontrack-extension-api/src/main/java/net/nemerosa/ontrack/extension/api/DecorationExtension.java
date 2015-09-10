@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 
 import java.util.EnumSet;
 
-public interface DecorationExtension extends Extension, Decorator {
+public interface DecorationExtension<T> extends Extension, Decorator<T> {
 
     /**
      * Scope of the decorator

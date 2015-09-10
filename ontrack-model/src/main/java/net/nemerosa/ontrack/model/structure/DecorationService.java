@@ -10,6 +10,6 @@ public interface DecorationService {
      * @param entity Entity to decorate
      * @return List of its decorations
      */
-    List<Decoration> getDecorations(ProjectEntity entity);
+    List<Decoration<?>> getDecorations(ProjectEntity entity);
 
 }

@@ -14,7 +14,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 @Component
-public class MessageDecorationExtension extends AbstractExtension implements DecorationExtension {
+public class MessageDecorationExtension extends AbstractExtension implements DecorationExtension<MessageProperty> {
 
     private final PropertyService propertyService;
 
@@ -30,7 +30,7 @@ public class MessageDecorationExtension extends AbstractExtension implements Dec
     }
 
     @Override
-    public List<Decoration> getDecorations(ProjectEntity entity) {
+    public List<Decoration<MessageProperty>> getDecorations(ProjectEntity entity) {
         // Gets the `message` property
         return propertyService.getProperty(entity, MessagePropertyType.class)
                 .option()
@@ -39,12 +39,11 @@ public class MessageDecorationExtension extends AbstractExtension implements Dec
                                 Collections.singletonList(
                                         Decoration.of(
                                                 this,
-                                                messageProperty.getType().getId(),
-                                                messageProperty.getText()
+                                                messageProperty
                                         )
                                 )
                 )
-                .orElse(Collections.<Decoration>emptyList());
+                .orElse(Collections.<Decoration<MessageProperty>>emptyList());
     }
 
 }

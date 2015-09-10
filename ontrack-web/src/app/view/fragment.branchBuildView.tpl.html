@@ -68,7 +68,9 @@
                 {{buildView.build.name}}
             </a>
             <!-- Build decorations -->
-            <ot-entity-decorations entity="buildView.build"></ot-entity-decorations>
+            <span class="ot-decoration-list">
+                <ot-entity-decorations entity="buildView.build"></ot-entity-decorations>
+            </span>
             <!-- Signature, without the creator in the overview -->
             <div class="ot-branch-build-view-build-signature">
                 {{buildView.build.signature.time | date:'mediumDate'}}

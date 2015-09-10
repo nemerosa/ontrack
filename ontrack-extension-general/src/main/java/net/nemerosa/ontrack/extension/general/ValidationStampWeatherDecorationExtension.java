@@ -12,7 +12,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 @Component
-public class ValidationStampWeatherDecorationExtension extends AbstractExtension implements DecorationExtension {
+public class ValidationStampWeatherDecorationExtension extends AbstractExtension implements DecorationExtension<ValidationStampWeatherDecoration> {
 
     private final StructureService structureService;
 
@@ -28,7 +28,7 @@ public class ValidationStampWeatherDecorationExtension extends AbstractExtension
     }
 
     @Override
-    public List<Decoration> getDecorations(ProjectEntity entity) {
+    public List<Decoration<ValidationStampWeatherDecoration>> getDecorations(ProjectEntity entity) {
         // Argument check
         Validate.isTrue(entity instanceof ValidationStamp, "Expecting validation stamp");
         // List of last five runs for this validation stamp
@@ -36,40 +36,35 @@ public class ValidationStampWeatherDecorationExtension extends AbstractExtension
         // Keeps only the ones which are not passed
         long notPassed = runs.stream().filter(run -> !run.isPassed()).count();
         // Result
-        Decoration decoration;
+        ValidationStampWeatherDecoration decoration;
         if (notPassed == 0) {
-            decoration = sunny();
+            decoration = new ValidationStampWeatherDecoration(
+                    Weather.sunny,
+                    "Sunny (0 failure in the last 5 builds)"
+            );
         } else if (notPassed == 1) {
-            decoration = sunAndClouds();
+            decoration = new ValidationStampWeatherDecoration(
+                    Weather.sunAndClouds,
+                    "Sun and clouds (1 failure in the last 5 builds)"
+            );
         } else if (notPassed == 2) {
-            decoration = clouds();
+            decoration = new ValidationStampWeatherDecoration(
+                    Weather.clouds,
+                    "Clouds (2 failures in the last 5 builds)"
+            );
         } else if (notPassed == 3) {
-            decoration = rain();
+            decoration = new ValidationStampWeatherDecoration(
+                    Weather.rain,
+                    "Rain (3 failures in the last 5 builds)"
+            );
         } else {
-            decoration = storm();
+            decoration = new ValidationStampWeatherDecoration(
+                    Weather.storm,
+                    "Storm (4 failures or more in the last 5 builds)"
+            );
         }
         // OK
-        return Collections.singletonList(decoration);
-    }
-
-    private Decoration sunny() {
-        return Decoration.of(this, "sunny", "Sunny (0 failure in the last 5 builds)");
-    }
-
-    private Decoration sunAndClouds() {
-        return Decoration.of(this, "sunAndClouds", "Sun and clouds (1 failure in the last 5 builds)");
-    }
-
-    private Decoration clouds() {
-        return Decoration.of(this, "clouds", "Clouds (2 failures in the last 5 builds)");
-    }
-
-    private Decoration rain() {
-        return Decoration.of(this, "rain", "Rain (3 failures in the last 5 builds)");
-    }
-
-    private Decoration storm() {
-        return Decoration.of(this, "storm", "Storm (4 failures or more in the last 5 builds)");
+        return Collections.singletonList(Decoration.of(this, decoration));
     }
 
 }

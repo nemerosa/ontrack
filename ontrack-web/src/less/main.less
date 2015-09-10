@@ -728,19 +728,31 @@ a.ot-application-info-error {
  */
 
 .ot-decoration {
-  img.ot-decoration-image-only {
-    .ot-icon;
-    margin-right: 2px;
+  white-space: nowrap;
+  font-weight: normal;
+  font-size: 75%;
+  margin-right: 0.5em;
+  a {
+    text-decoration: none;
+    color: black;
   }
-  span.ot-decoration-label {
-    .label;
-    .label-default;
-    margin-right: 2px;
-    font-weight: normal;
+}
+
+.ot-decoration-list {
+  .ot-decoration {
     img {
       .ot-icon-mini;
     }
   }
+}
+
+.ot-decoration-border {
+  border: solid gray 1px !important;
+  border-radius: 0.5em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  padding-bottom: 0.25em;
+  padding-top: 0.25em;
 }
 
 /**
