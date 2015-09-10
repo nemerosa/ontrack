@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.service.security.ldap
+package net.nemerosa.ontrack.extension.ldap
 
 import net.nemerosa.ontrack.model.security.Account
 import net.nemerosa.ontrack.model.security.AccountService
@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.model.security.SecurityRole
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.support.ApplicationLogService
-import net.nemerosa.ontrack.repository.AccountRepository
 import org.junit.Before
 import org.junit.Test
 import org.mockito.invocation.InvocationOnMock
@@ -22,19 +21,18 @@ import static org.mockito.Mockito.when
 
 class LDAPAuthenticationProviderTest {
 
-    LDAPAuthenticationProvider provider
-    LDAPProviderFactory ldapProviderFactory
-    LdapAuthenticationProvider ldapAuthenticationProvider
-    LDAPAuthenticationSourceProvider ldapAuthenticationSourceProvider
-    AccountRepository accountRepository
-    SecurityService securityService
+    private LDAPAuthenticationProvider provider
+    private LDAPProviderFactory ldapProviderFactory
+    private LdapAuthenticationProvider ldapAuthenticationProvider
+    private LDAPAuthenticationSourceProvider ldapAuthenticationSourceProvider
+    private SecurityService securityService
+    private AccountService accountService
 
     @Before
     void before() {
-        AccountService accountService = mock(AccountService)
+        accountService = mock(AccountService)
         ldapProviderFactory = mock(LDAPProviderFactory)
         ldapAuthenticationSourceProvider = new LDAPAuthenticationSourceProvider()
-        accountRepository = mock(AccountRepository)
         securityService = mock(SecurityService)
         ldapAuthenticationProvider = mock(LdapAuthenticationProvider)
         ApplicationLogService applicationLogService = mock(ApplicationLogService)
@@ -42,7 +40,6 @@ class LDAPAuthenticationProviderTest {
                 accountService,
                 ldapProviderFactory,
                 ldapAuthenticationSourceProvider,
-                accountRepository,
                 securityService,
                 applicationLogService
         )
@@ -85,7 +82,7 @@ class LDAPAuthenticationProviderTest {
                 SecurityRole.USER,
                 ldapAuthenticationSourceProvider.source
         )
-        when(accountRepository.findUserByNameAndSource("test", ldapAuthenticationSourceProvider)).thenReturn(
+        when(accountService.findUserByNameAndSource("test", ldapAuthenticationSourceProvider)).thenReturn(
                 Optional.of(
                         account
                 )
@@ -114,7 +111,7 @@ class LDAPAuthenticationProviderTest {
                 SecurityRole.USER,
                 ldapAuthenticationSourceProvider.source
         )
-        when(accountRepository.findUserByNameAndSource("test", ldapAuthenticationSourceProvider)).thenReturn(
+        when(accountService.findUserByNameAndSource("test", ldapAuthenticationSourceProvider)).thenReturn(
                 Optional.empty()
         )
 
@@ -145,7 +142,7 @@ class LDAPAuthenticationProviderTest {
                 SecurityRole.USER,
                 ldapAuthenticationSourceProvider.source
         )
-        when(accountRepository.findUserByNameAndSource("test", ldapAuthenticationSourceProvider)).thenReturn(
+        when(accountService.findUserByNameAndSource("test", ldapAuthenticationSourceProvider)).thenReturn(
                 Optional.empty()
         )
 
@@ -182,7 +179,7 @@ class LDAPAuthenticationProviderTest {
                 SecurityRole.USER,
                 ldapAuthenticationSourceProvider.source
         ).withId(ID.of(10))
-        when(accountRepository.newAccount(
+        when(accountService.newAccount(
                 Account.of(
                         "test",
                         "Test user",
@@ -192,7 +189,7 @@ class LDAPAuthenticationProviderTest {
                 )
         )).thenReturn(account)
 
-        when(accountRepository.findUserByNameAndSource("test", ldapAuthenticationSourceProvider)).thenReturn(
+        when(accountService.findUserByNameAndSource("test", ldapAuthenticationSourceProvider)).thenReturn(
                 Optional.empty()
         )
 

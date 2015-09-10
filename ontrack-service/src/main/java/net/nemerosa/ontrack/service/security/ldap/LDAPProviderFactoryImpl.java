@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.service.security.ldap;
 
+import net.nemerosa.ontrack.common.Caches;
 import net.nemerosa.ontrack.model.security.SecurityRole;
 import net.nemerosa.ontrack.model.settings.LDAPSettings;
-import net.nemerosa.ontrack.common.Caches;
 import net.nemerosa.ontrack.service.support.SettingsInternalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -12,9 +12,7 @@ import org.springframework.security.ldap.authentication.BindAuthenticator;
 import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
 import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
-import org.springframework.stereotype.Service;
 
-@Service
 @Deprecated
 public class LDAPProviderFactoryImpl implements LDAPProviderFactory {
 

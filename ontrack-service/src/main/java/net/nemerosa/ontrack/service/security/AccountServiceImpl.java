@@ -30,7 +30,7 @@ public class AccountServiceImpl implements AccountService {
     private final SecurityService securityService;
     private final AuthenticationSourceService authenticationSourceService;
     private final PasswordEncoder passwordEncoder;
-    private final Collection<AccountGroupContributor> accountGroupContributors;
+    private Collection<AccountGroupContributor> accountGroupContributors = Collections.emptyList();
 
     @Autowired
     public AccountServiceImpl(
@@ -40,8 +40,7 @@ public class AccountServiceImpl implements AccountService {
             AccountGroupRepository accountGroupRepository,
             SecurityService securityService,
             AuthenticationSourceService authenticationSourceService,
-            PasswordEncoder passwordEncoder,
-            Collection<AccountGroupContributor> accountGroupContributors) {
+            PasswordEncoder passwordEncoder) {
         this.roleRepository = roleRepository;
         this.rolesService = rolesService;
         this.accountRepository = accountRepository;
@@ -49,6 +48,10 @@ public class AccountServiceImpl implements AccountService {
         this.securityService = securityService;
         this.authenticationSourceService = authenticationSourceService;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    @Autowired(required = false)
+    public void setAccountGroupContributors(Collection<AccountGroupContributor> accountGroupContributors) {
         this.accountGroupContributors = accountGroupContributors;
     }
 
