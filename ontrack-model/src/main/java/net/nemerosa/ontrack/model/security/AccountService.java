@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.structure.NameDescription;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Management of accounts.
@@ -29,6 +30,24 @@ public interface AccountService {
      * Creates a built-in account
      */
     Account create(AccountInput input);
+
+    /**
+     * Creates an account and allows for further customisation
+     *
+     * @param input                    Account data
+     * @param authenticationSourceMode Authentication mode
+     * @see AuthenticationSourceService#getAuthenticationSource(String)
+     */
+    Account create(AccountInput input, String authenticationSourceMode);
+
+    /**
+     * Looks for an account using its user name and his authentication source.
+     *
+     * @param username       User name
+     * @param sourceProvider Provider of the source
+     * @return Account
+     */
+    Optional<Account> findUserByNameAndSource(String username, AuthenticationSourceProvider sourceProvider);
 
     /**
      * Gets an account using its ID

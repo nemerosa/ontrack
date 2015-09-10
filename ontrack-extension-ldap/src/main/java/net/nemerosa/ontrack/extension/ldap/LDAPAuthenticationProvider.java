@@ -1,8 +1,7 @@
-package net.nemerosa.ontrack.service.security.ldap;
+package net.nemerosa.ontrack.extension.ldap;
 
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.support.ApplicationLogService;
-import net.nemerosa.ontrack.repository.AccountRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,16 +14,16 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.Optional;
 
 @Component
-@Deprecated
+@Qualifier("ldap")
 public class LDAPAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
 
     private final AccountService accountService;
     private final LDAPProviderFactory ldapProviderFactory;
     private final LDAPAuthenticationSourceProvider ldapAuthenticationSourceProvider;
-    private final AccountRepository accountRepository;
     private final SecurityService securityService;
     private final ApplicationLogService applicationLogService;
 
@@ -33,13 +32,11 @@ public class LDAPAuthenticationProvider extends AbstractUserDetailsAuthenticatio
             AccountService accountService,
             LDAPProviderFactory ldapProviderFactory,
             LDAPAuthenticationSourceProvider ldapAuthenticationSourceProvider,
-            AccountRepository accountRepository,
             SecurityService securityService,
             ApplicationLogService applicationLogService) {
         this.accountService = accountService;
         this.ldapProviderFactory = ldapProviderFactory;
         this.ldapAuthenticationSourceProvider = ldapAuthenticationSourceProvider;
-        this.accountRepository = accountRepository;
         this.securityService = securityService;
         this.applicationLogService = applicationLogService;
     }
@@ -80,7 +77,9 @@ public class LDAPAuthenticationProvider extends AbstractUserDetailsAuthenticatio
                     userDetails = null;
                 }
                 // Gets any existing account
-                Optional<Account> existingAccount = accountRepository.findUserByNameAndSource(username, ldapAuthenticationSourceProvider);
+                Optional<Account> existingAccount = securityService.asAdmin(() ->
+                                accountService.findUserByNameAndSource(username, ldapAuthenticationSourceProvider)
+                );
                 if (!existingAccount.isPresent()) {
                     // If not found, auto-registers the account using the LDAP details
                     if (userDetails != null) {
@@ -89,14 +88,15 @@ public class LDAPAuthenticationProvider extends AbstractUserDetailsAuthenticatio
                             // Registration
                             return securityService.asAdmin(() -> Optional.of(
                                             new AuthenticatedAccount(
-                                                    accountRepository.newAccount(
-                                                            Account.of(
+                                                    accountService.create(
+                                                            new AccountInput(
                                                                     name,
                                                                     userDetails.getFullName(),
                                                                     userDetails.getEmail(),
-                                                                    SecurityRole.USER,
-                                                                    ldapAuthenticationSourceProvider.getSource()
-                                                            )
+                                                                    "",
+                                                                    Collections.emptyList()
+                                                            ),
+                                                            LDAPAuthenticationSourceProvider.LDAP_AUTHENTICATION_SOURCE
                                                     ),
                                                     userDetails
                                             )

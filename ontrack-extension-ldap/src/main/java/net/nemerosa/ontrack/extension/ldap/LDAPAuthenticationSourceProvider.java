@@ -7,8 +7,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class LDAPAuthenticationSourceProvider implements AuthenticationSourceProvider {
 
+    public static final String LDAP_AUTHENTICATION_SOURCE = "ldap";
+
     private final AuthenticationSource source = AuthenticationSource.of(
-            "ldap",
+            LDAP_AUTHENTICATION_SOURCE,
             "LDAP authentication"
     );
 

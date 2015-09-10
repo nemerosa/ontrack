@@ -90,6 +90,16 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account create(AccountInput input) {
+        Account account = create(
+                input,
+                "password"
+        );
+        accountRepository.setPassword(account.id(), passwordEncoder.encode(input.getPassword()));
+        return account;
+    }
+
+    @Override
+    public Account create(AccountInput input, String authenticationSourceMode) {
         securityService.checkGlobalFunction(AccountManagement.class);
         // Creates the account
         Account account = Account.of(
@@ -97,14 +107,18 @@ public class AccountServiceImpl implements AccountService {
                 input.getFullName(),
                 input.getEmail(),
                 SecurityRole.USER,
-                authenticationSourceService.getAuthenticationSource("password")
+                authenticationSourceService.getAuthenticationSource(authenticationSourceMode)
         );
         // Saves it
         account = accountRepository.newAccount(account);
-        // Sets the its password
-        accountRepository.setPassword(account.id(), passwordEncoder.encode(input.getPassword()));
         // OK
         return account;
+    }
+
+    @Override
+    public Optional<Account> findUserByNameAndSource(String username, AuthenticationSourceProvider sourceProvider) {
+        securityService.checkGlobalFunction(AccountManagement.class);
+        return accountRepository.findUserByNameAndSource(username, sourceProvider);
     }
 
     @Override
