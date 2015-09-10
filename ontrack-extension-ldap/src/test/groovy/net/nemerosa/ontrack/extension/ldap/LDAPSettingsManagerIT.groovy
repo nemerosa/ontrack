@@ -1,24 +1,25 @@
-package net.nemerosa.ontrack.service.settings
+package net.nemerosa.ontrack.extension.ldap
 
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
-import net.nemerosa.ontrack.model.settings.LDAPSettings
-import net.nemerosa.ontrack.service.support.SettingsInternalService
+import net.nemerosa.ontrack.model.security.GlobalSettings
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 
-class SettingsInternalServiceImplIT extends AbstractServiceTestSupport {
+class LDAPSettingsManagerIT extends AbstractServiceTestSupport {
 
     @Autowired
-    private SettingsInternalService service
+    private LDAPSettingsManager service
 
     @Test
     void 'LDAP settings: save and restore'() {
         // Settings to save
         LDAPSettings settings = createSettings()
-        // Saves the settings
-        service.saveLDAPSettings(settings)
-        // Gets them back
-        LDAPSettings restoredSettings = service.getLDAPSettings()
+        LDAPSettings restoredSettings = asUser().with(GlobalSettings).call {
+            // Saves the settings
+            service.saveSettings(settings)
+            // Gets them back
+            service.settings
+        }
         // Checks they are the same
         assert settings == restoredSettings
     }
@@ -27,12 +28,14 @@ class SettingsInternalServiceImplIT extends AbstractServiceTestSupport {
     void 'LDAP settings: password not saved when blank'() {
         // Settings to save
         LDAPSettings settings = createSettings()
-        // Saves the settings once
-        service.saveLDAPSettings(settings)
-        // Saves them again, without the password
-        service.saveLDAPSettings(createSettings(""))
-        // Gets the settings back...
-        LDAPSettings restoredSettings = service.getLDAPSettings()
+        LDAPSettings restoredSettings = asUser().with(GlobalSettings).call {
+            // Saves the settings once
+            service.saveSettings(settings)
+            // Saves them again, without the password
+            service.saveSettings(createSettings(""))
+            // Gets the settings back...
+            service.settings
+        }
         // Checks they are the same
         assert settings == restoredSettings
     }

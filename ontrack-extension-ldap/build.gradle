@@ -4,5 +4,8 @@ dependencies {
     compile project(':ontrack-extension-support')
     compile libraries.spring_security_ldap
 
+    testCompile project(':ontrack-it-utils')
     testCompile libraries.groovy
+    testRuntime project(':ontrack-service')
+    testRuntime project(':ontrack-repository-impl')
 }
