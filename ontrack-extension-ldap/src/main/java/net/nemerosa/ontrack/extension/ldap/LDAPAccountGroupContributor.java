@@ -1,9 +1,9 @@
-package net.nemerosa.ontrack.service.security.ldap;
+package net.nemerosa.ontrack.extension.ldap;
 
 import net.nemerosa.ontrack.model.security.AccountGroup;
 import net.nemerosa.ontrack.model.security.AccountGroupContributor;
+import net.nemerosa.ontrack.model.security.AccountGroupMappingService;
 import net.nemerosa.ontrack.model.security.AuthenticatedAccount;
-import net.nemerosa.ontrack.repository.AccountGroupMappingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -16,11 +16,11 @@ import java.util.stream.Collectors;
 @Component
 public class LDAPAccountGroupContributor implements AccountGroupContributor {
 
-    private final AccountGroupMappingRepository accountGroupMappingRepository;
+    private final AccountGroupMappingService accountGroupMappingService;
 
     @Autowired
-    public LDAPAccountGroupContributor(AccountGroupMappingRepository accountGroupMappingRepository) {
-        this.accountGroupMappingRepository = accountGroupMappingRepository;
+    public LDAPAccountGroupContributor(AccountGroupMappingService accountGroupMappingService) {
+        this.accountGroupMappingService = accountGroupMappingService;
     }
 
     @Override
@@ -29,7 +29,7 @@ public class LDAPAccountGroupContributor implements AccountGroupContributor {
         Collection<String> ldapGroups = getLdapGroups(authenticatedAccount);
         // Maps them to the account groups
         return ldapGroups.stream()
-                .flatMap(ldapGroup -> accountGroupMappingRepository.getGroups("ldap", ldapGroup).stream())
+                .flatMap(ldapGroup -> accountGroupMappingService.getGroups("ldap", ldapGroup).stream())
                 .collect(Collectors.toList());
     }
 
