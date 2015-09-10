@@ -1,7 +1,6 @@
-package net.nemerosa.ontrack.service.security.ldap
+package net.nemerosa.ontrack.extension.ldap
 
-import net.nemerosa.ontrack.model.settings.LDAPSettings
-import net.nemerosa.ontrack.service.support.SettingsInternalService
+import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import org.junit.Test
 
 import static org.mockito.Mockito.mock
@@ -11,8 +10,8 @@ class LDAPProviderFactoryImplTest {
 
     @Test
     void 'No provider when LDAP is disabled'() {
-        SettingsInternalService settingsService = mock(SettingsInternalService)
-        when(settingsService.getLDAPSettings()).thenReturn(LDAPSettings.NONE)
+        CachedSettingsService settingsService = mock(CachedSettingsService)
+        when(settingsService.getCachedSettings(LDAPSettings)).thenReturn(LDAPSettings.NONE)
         LDAPProviderFactoryImpl factory = new LDAPProviderFactoryImpl(settingsService)
         assert factory.provider == null
     }

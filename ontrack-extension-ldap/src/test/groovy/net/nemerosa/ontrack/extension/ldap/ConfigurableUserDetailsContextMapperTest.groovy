@@ -1,6 +1,5 @@
-package net.nemerosa.ontrack.service.security.ldap
+package net.nemerosa.ontrack.extension.ldap
 
-import net.nemerosa.ontrack.model.settings.LDAPSettings
 import org.junit.Test
 import org.springframework.ldap.core.DirContextOperations
 import org.springframework.ldap.core.DistinguishedName
