@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.service.security.ldap;
+package net.nemerosa.ontrack.extension.ldap;
 
 import lombok.Data;
 import lombok.experimental.Delegate;
@@ -7,7 +7,6 @@ import org.springframework.security.ldap.userdetails.LdapUserDetails;
 import java.util.Collection;
 
 @Data
-@Deprecated
 public class ExtendedLDAPUserDetails implements LdapUserDetails {
 
     @Delegate
