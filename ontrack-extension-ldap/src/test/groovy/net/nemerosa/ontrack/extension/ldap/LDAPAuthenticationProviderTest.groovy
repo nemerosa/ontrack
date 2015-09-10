@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.extension.ldap
 
-import net.nemerosa.ontrack.model.security.Account
-import net.nemerosa.ontrack.model.security.AccountService
-import net.nemerosa.ontrack.model.security.SecurityRole
-import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.support.ApplicationLogService
 import org.junit.Before
@@ -43,6 +40,14 @@ class LDAPAuthenticationProviderTest {
                 securityService,
                 applicationLogService
         )
+
+        when(securityService.asAdmin(any(Supplier) as Supplier)).then(new Answer<Object>() {
+            @Override
+            Object answer(InvocationOnMock invocation) throws Throwable {
+                Supplier<?> supplier = invocation.arguments[0] as Supplier<?>
+                return supplier.get()
+            }
+        })
     }
 
     @Test
@@ -165,13 +170,6 @@ class LDAPAuthenticationProviderTest {
         when(authentication.principal).thenReturn(ldapUserDetails)
         when(ldapAuthenticationProvider.authenticate(authentication)).thenReturn(authentication)
 
-        when(securityService.asAdmin(any(Supplier) as Supplier)).then(new Answer<Object>() {
-            @Override
-            Object answer(InvocationOnMock invocation) throws Throwable {
-                Supplier<?> supplier = invocation.arguments[0] as Supplier<?>
-                return supplier.get()
-            }
-        })
         def account = Account.of(
                 "test",
                 "Test user",
@@ -179,14 +177,16 @@ class LDAPAuthenticationProviderTest {
                 SecurityRole.USER,
                 ldapAuthenticationSourceProvider.source
         ).withId(ID.of(10))
-        when(accountService.newAccount(
-                Account.of(
+
+        when(accountService.create(
+                new AccountInput(
                         "test",
                         "Test user",
                         "test@test.com",
-                        SecurityRole.USER,
-                        ldapAuthenticationSourceProvider.getSource()
-                )
+                        "",
+                        []
+                ),
+                "ldap"
         )).thenReturn(account)
 
         when(accountService.findUserByNameAndSource("test", ldapAuthenticationSourceProvider)).thenReturn(
