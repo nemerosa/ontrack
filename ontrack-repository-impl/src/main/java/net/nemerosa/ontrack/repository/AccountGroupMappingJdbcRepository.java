@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.repository;
 
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.exceptions.AccountGroupMappingNameAlreadyDefinedException;
 import net.nemerosa.ontrack.model.exceptions.AccountGroupMappingNotFoundException;
 import net.nemerosa.ontrack.model.security.AccountGroup;
@@ -97,6 +98,16 @@ public class AccountGroupMappingJdbcRepository extends AbstractJdbcRepository im
         } catch (DuplicateKeyException ex) {
             throw new AccountGroupMappingNameAlreadyDefinedException(input.getName());
         }
+    }
+
+    @Override
+    public Ack deleteMapping(ID id) {
+        return Ack.one(
+                getNamedParameterJdbcTemplate().update(
+                        "DELETE FROM ACCOUNT_GROUP_MAPPING WHERE ID = :id",
+                        params("id", id.get())
+                )
+        );
     }
 
     protected AccountGroupMapping toAccountGroupMapping(ResultSet rs, int rowNum) throws SQLException {

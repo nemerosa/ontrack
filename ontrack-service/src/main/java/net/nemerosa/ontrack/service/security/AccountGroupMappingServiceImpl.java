@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service.security;
 
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.exceptions.AccountGroupMappingWrongTypeException;
 import net.nemerosa.ontrack.model.security.AccountGroup;
 import net.nemerosa.ontrack.model.security.AccountGroupMapping;
@@ -55,5 +56,11 @@ public class AccountGroupMappingServiceImpl implements AccountGroupMappingServic
     public AccountGroupMapping updateMapping(String mapping, ID id, AccountGroupMappingInput input) {
         getMapping(mapping, id);
         return accountGroupMappingRepository.updateMapping(id, input);
+    }
+
+    @Override
+    public Ack deleteMapping(String mapping, ID id) {
+        getMapping(mapping, id);
+        return accountGroupMappingRepository.deleteMapping(id);
     }
 }

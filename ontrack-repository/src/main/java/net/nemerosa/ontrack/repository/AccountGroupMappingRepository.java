@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.repository;
 
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.security.AccountGroup;
 import net.nemerosa.ontrack.model.security.AccountGroupMapping;
 import net.nemerosa.ontrack.model.security.AccountGroupMappingInput;
@@ -57,4 +58,11 @@ public interface AccountGroupMappingRepository {
      */
     AccountGroupMapping updateMapping(ID id, AccountGroupMappingInput input);
 
+    /**
+     * Deletes a mapping
+     *
+     * @param id ID of the mapping
+     * @return Acknowledgment
+     */
+    Ack deleteMapping(ID id);
 }

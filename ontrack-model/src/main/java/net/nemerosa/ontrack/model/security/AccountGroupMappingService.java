@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.model.security;
 
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.structure.ID;
 
 import java.util.Collection;
@@ -55,4 +56,13 @@ public interface AccountGroupMappingService {
      * @return Created mapping
      */
     AccountGroupMapping updateMapping(String mapping, ID id, AccountGroupMappingInput input);
+
+    /**
+     * Deletes a mapping
+     *
+     * @param mapping Mapping type, for example: "ldap"
+     * @param id      ID of the mapping
+     * @return Acknowledgment
+     */
+    Ack deleteMapping(String mapping, ID id);
 }

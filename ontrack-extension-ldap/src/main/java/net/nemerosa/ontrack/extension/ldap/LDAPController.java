@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.ldap;
 
 import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
+import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.ID;
@@ -121,6 +122,18 @@ public class LDAPController extends AbstractExtensionController<LDAPExtensionFea
                 LDAPExtensionFeature.LDAP_GROUP_MAPPING,
                 id,
                 input
+        );
+    }
+
+    /**
+     * Deleting a mapping
+     */
+    @RequestMapping(value = "ldap-mapping/{id}/delete", method = RequestMethod.DELETE)
+    public Ack deleteMapping(@PathVariable ID id) {
+        securityService.checkGlobalFunction(AccountManagement.class);
+        return accountGroupMappingService.deleteMapping(
+                LDAPExtensionFeature.LDAP_GROUP_MAPPING,
+                id
         );
     }
 }
