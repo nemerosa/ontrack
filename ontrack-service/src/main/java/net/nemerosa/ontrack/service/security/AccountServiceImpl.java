@@ -115,6 +115,8 @@ public class AccountServiceImpl implements AccountService {
         );
         // Saves it
         account = accountRepository.newAccount(account);
+        // Account groups
+        accountGroupRepository.linkAccountToGroups(account.id(), input.getGroups());
         // OK
         return account;
     }

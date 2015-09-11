@@ -24,9 +24,11 @@ class Admin {
     /**
      * Creating or updating an account
      */
-    Account account(String name, String fullName, String email, String password = '') {
-        // Gets the groups
+    Account account(String name, String fullName, String email, String password = '', List<String> groupNames = []) {
+        // Gets the accounts
         def accounts = ontrack.get('accounts')
+        // Gets the groups by name
+        def groups = groupNames.collect { findGroupByName(it) }
         // Looks for an existing account
         def account = accounts.resources.find { it.name == name }
         if (account != null) {
@@ -39,7 +41,8 @@ class Admin {
                                     name    : name,
                                     fullName: fullName,
                                     email   : email,
-                                    password: password
+                                    password: password,
+                                    groups  : groups.collect { it.id },
                             ]
                     )
             )
@@ -53,7 +56,8 @@ class Admin {
                                     name    : name,
                                     fullName: fullName,
                                     email   : email,
-                                    password: password
+                                    password: password,
+                                    groups  : groups.collect { it.id },
                             ]
                     )
             )
@@ -123,10 +127,7 @@ class Admin {
     GroupMapping ldapMapping(String name, String groupName) {
         def mappings = ontrack.get('extension/ldap/ldap-mapping')
         // Group ID from the name
-        def group = getGroups().find { it.name == groupName }
-        if (group == null) {
-            throw new AccountGroupNameNotFoundException(groupName)
-        }
+        AccountGroup group = findGroupByName(groupName)
         // Looks for an existing mapping
         def mapping = mappings.resources.find { it.name == name }
         if (mapping != null) {
@@ -154,6 +155,14 @@ class Admin {
                     )
             )
         }
+    }
+
+    protected AccountGroup findGroupByName(String groupName) {
+        def group = getGroups().find { it.name == groupName }
+        if (group == null) {
+            throw new AccountGroupNameNotFoundException(groupName)
+        }
+        group
     }
 
 }
