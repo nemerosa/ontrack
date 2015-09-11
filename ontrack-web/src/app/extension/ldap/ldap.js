@@ -38,5 +38,15 @@ angular.module('ontrack.extension.ldap', [])
         $scope.updateMapping = function (mapping) {
             otFormService.update(mapping._update, "Updating mapping").then(loadMappings);
         };
+
+        // Deleting a mapping
+        $scope.deleteMapping = function (mapping) {
+            otAlertService.confirm({
+                title: "Mapping deletion",
+                message: "Do you really want to delete this mapping?"
+            }).then(function () {
+                ot.pageCall($http.delete(mapping._delete)).then(loadMappings);
+            });
+        };
     })
 ;
