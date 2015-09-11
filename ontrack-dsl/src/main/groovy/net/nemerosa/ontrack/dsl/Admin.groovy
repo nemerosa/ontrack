@@ -22,6 +22,41 @@ class Admin {
     }
 
     /**
+     * Creating or updating a group
+     */
+    AccountGroup accountGroup(String name, String description) {
+        // Gets the groups
+        def groups = ontrack.get('accounts/groups')
+        // Looks for an existing group
+        def group = groups.resources.find { it.name == name }
+        if (group != null) {
+            // Update
+            new AccountGroup(
+                    ontrack,
+                    ontrack.put(
+                            group._update,
+                            [
+                                    name       : name,
+                                    description: description
+                            ]
+                    )
+            )
+        } else {
+            // Creation
+            new AccountGroup(
+                    ontrack,
+                    ontrack.post(
+                            groups._create,
+                            [
+                                    name       : name,
+                                    description: description
+                            ]
+                    )
+            )
+        }
+    }
+
+    /**
      * Gets the list of LDAP mappings
      */
     List<GroupMapping> getLdapMappings() {
@@ -45,7 +80,7 @@ class Admin {
         }
         // Looks for an existing mapping
         def mapping = mappings.resources.find { it.name == name }
-        if (mapping) {
+        if (mapping != null) {
             // Update
             new GroupMapping(
                     ontrack,
