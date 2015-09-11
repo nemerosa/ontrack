@@ -2,16 +2,13 @@ package net.nemerosa.ontrack.extension.ldap;
 
 import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
-import net.nemerosa.ontrack.model.security.AccountGroupMapping;
-import net.nemerosa.ontrack.model.security.AccountGroupMappingService;
-import net.nemerosa.ontrack.model.security.GlobalSettings;
-import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.security.*;
+import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -23,16 +20,19 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 public class LDAPController extends AbstractExtensionController<LDAPExtensionFeature> {
 
     private final SecurityService securityService;
+    private final AccountService accountService;
     private final AccountGroupMappingService accountGroupMappingService;
 
     @Autowired
     public LDAPController(
             LDAPExtensionFeature feature,
             SecurityService securityService,
+            AccountService accountService,
             AccountGroupMappingService accountGroupMappingService
     ) {
         super(feature);
         this.securityService = securityService;
+        this.accountService = accountService;
         this.accountGroupMappingService = accountGroupMappingService;
     }
 
@@ -47,7 +47,7 @@ public class LDAPController extends AbstractExtensionController<LDAPExtensionFea
                 .with(
                         "_mappings",
                         uri(on(getClass()).getMappings()),
-                        securityService.isGlobalFunctionGranted(GlobalSettings.class)
+                        securityService.isGlobalFunctionGranted(AccountManagement.class)
                 )
                 ;
     }
@@ -57,10 +57,39 @@ public class LDAPController extends AbstractExtensionController<LDAPExtensionFea
      */
     @RequestMapping(value = "ldap-mapping", method = RequestMethod.GET)
     public Resources<AccountGroupMapping> getMappings() {
-        securityService.checkGlobalFunction(GlobalSettings.class);
+        securityService.checkGlobalFunction(AccountManagement.class);
         return Resources.of(
                 accountGroupMappingService.getMappings(LDAPExtensionFeature.LDAP_GROUP_MAPPING),
                 uri(on(getClass()).getMappings())
         );
+    }
+
+    /**
+     * Gets the form for the creation of a mapping
+     */
+    @RequestMapping(value = "ldap-mapping/create", method = RequestMethod.GET)
+    public Form getMappingCreationForm() {
+        securityService.checkGlobalFunction(AccountManagement.class);
+        return AccountGroupMapping.form(
+                accountService.getAccountGroups()
+        );
+    }
+
+    /**
+     * Creates a mapping
+     */
+    @RequestMapping(value = "ldap-mapping/create", method = RequestMethod.POST)
+    public AccountGroupMapping newMapping(@RequestBody AccountGroupMappingInput input) {
+        securityService.checkGlobalFunction(AccountManagement.class);
+        return accountGroupMappingService.newMapping(LDAPExtensionFeature.LDAP_GROUP_MAPPING, input);
+    }
+
+    /**
+     * Gets a mapping
+     */
+    @RequestMapping(value = "ldap-mapping/{id}", method = RequestMethod.GET)
+    public AccountGroupMapping getMapping(@PathVariable ID id) {
+        securityService.checkGlobalFunction(AccountManagement.class);
+        return accountGroupMappingService.getMapping(LDAPExtensionFeature.LDAP_GROUP_MAPPING, id);
     }
 }

@@ -1,13 +1,18 @@
 package net.nemerosa.ontrack.repository;
 
+import net.nemerosa.ontrack.model.exceptions.AccountGroupMappingNotFoundException;
 import net.nemerosa.ontrack.model.security.AccountGroup;
 import net.nemerosa.ontrack.model.security.AccountGroupMapping;
+import net.nemerosa.ontrack.model.security.AccountGroupMappingInput;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,13 +47,43 @@ public class AccountGroupMappingJdbcRepository extends AbstractJdbcRepository im
                 .query(
                         "SELECT * FROM ACCOUNT_GROUP_MAPPING WHERE MAPPING = :mapping ORDER BY SOURCE",
                         params("mapping", mapping),
-                        (rs, rowNum) -> {
-                            return new AccountGroupMapping(
-                                    id(rs),
-                                    rs.getString("SOURCE"),
-                                    accountGroupRepository.getById(id(rs, "GROUPID"))
-                            );
-                        }
+                        this::toAccountGroupMapping
                 );
+    }
+
+    @Override
+    public AccountGroupMapping newMapping(String mapping, AccountGroupMappingInput input) {
+        return getMapping(
+                ID.of(dbCreate(
+                                "INSERT INTO ACCOUNT_GROUP_MAPPING(MAPPING, SOURCE, GROUPID) " +
+                                        "VALUES(:mapping, :source, :groupId)",
+                                params("mapping", mapping)
+                                        .addValue("source", input.getName())
+                                        .addValue("groupId", input.getGroup().get())
+                        )
+                )
+        );
+    }
+
+    @Override
+    public AccountGroupMapping getMapping(ID id) {
+        try {
+            return getNamedParameterJdbcTemplate().queryForObject(
+                    "SELECT * FROM ACCOUNT_GROUP_MAPPING WHERE ID = :id",
+                    params("id", id.get()),
+                    this::toAccountGroupMapping
+            );
+        } catch (EmptyResultDataAccessException ex) {
+            throw new AccountGroupMappingNotFoundException(id);
+        }
+    }
+
+    protected AccountGroupMapping toAccountGroupMapping(ResultSet rs, int rowNum) throws SQLException {
+        return new AccountGroupMapping(
+                id(rs),
+                rs.getString("MAPPING"),
+                rs.getString("SOURCE"),
+                accountGroupRepository.getById(id(rs, "GROUPID"))
+        );
     }
 }

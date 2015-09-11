@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.model.security;
 
+import net.nemerosa.ontrack.model.structure.ID;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -25,4 +27,22 @@ public interface AccountGroupMappingService {
      * @return List of mappings, can be empty, but not null
      */
     List<AccountGroupMapping> getMappings(String mapping);
+
+    /**
+     * Creates a new mapping
+     *
+     * @param mapping Mapping type, for example: "ldap"
+     * @param input   Input data for the mapping
+     * @return Created mapping
+     */
+    AccountGroupMapping newMapping(String mapping, AccountGroupMappingInput input);
+
+    /**
+     * Gets a mapping by its ID
+     *
+     * @param mapping Mapping type, for example: "ldap"
+     * @param id      ID of the mapping
+     * @return Mapping
+     */
+    AccountGroupMapping getMapping(String mapping, ID id);
 }
