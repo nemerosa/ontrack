@@ -50,4 +50,10 @@ public class AccountGroupMappingServiceImpl implements AccountGroupMappingServic
             throw new AccountGroupMappingWrongTypeException(mapping, o.getType());
         }
     }
+
+    @Override
+    public AccountGroupMapping updateMapping(String mapping, ID id, AccountGroupMappingInput input) {
+        getMapping(mapping, id);
+        return accountGroupMappingRepository.updateMapping(id, input);
+    }
 }

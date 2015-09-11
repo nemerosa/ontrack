@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.repository;
 
+import net.nemerosa.ontrack.model.exceptions.AccountGroupMappingNameAlreadyDefinedException;
 import net.nemerosa.ontrack.model.exceptions.AccountGroupMappingNotFoundException;
 import net.nemerosa.ontrack.model.security.AccountGroup;
 import net.nemerosa.ontrack.model.security.AccountGroupMapping;
@@ -7,6 +8,7 @@ import net.nemerosa.ontrack.model.security.AccountGroupMappingInput;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Repository;
 
@@ -53,16 +55,20 @@ public class AccountGroupMappingJdbcRepository extends AbstractJdbcRepository im
 
     @Override
     public AccountGroupMapping newMapping(String mapping, AccountGroupMappingInput input) {
-        return getMapping(
-                ID.of(dbCreate(
-                                "INSERT INTO ACCOUNT_GROUP_MAPPING(MAPPING, SOURCE, GROUPID) " +
-                                        "VALUES(:mapping, :source, :groupId)",
-                                params("mapping", mapping)
-                                        .addValue("source", input.getName())
-                                        .addValue("groupId", input.getGroup().get())
-                        )
-                )
-        );
+        try {
+            return getMapping(
+                    ID.of(dbCreate(
+                                    "INSERT INTO ACCOUNT_GROUP_MAPPING(MAPPING, SOURCE, GROUPID) " +
+                                            "VALUES(:mapping, :source, :groupId)",
+                                    params("mapping", mapping)
+                                            .addValue("source", input.getName())
+                                            .addValue("groupId", input.getGroup().get())
+                            )
+                    )
+            );
+        } catch (DuplicateKeyException ex) {
+            throw new AccountGroupMappingNameAlreadyDefinedException(input.getName());
+        }
     }
 
     @Override
@@ -75,6 +81,21 @@ public class AccountGroupMappingJdbcRepository extends AbstractJdbcRepository im
             );
         } catch (EmptyResultDataAccessException ex) {
             throw new AccountGroupMappingNotFoundException(id);
+        }
+    }
+
+    @Override
+    public AccountGroupMapping updateMapping(ID id, AccountGroupMappingInput input) {
+        try {
+            getNamedParameterJdbcTemplate().update(
+                    "UPDATE ACCOUNT_GROUP_MAPPING SET SOURCE = :source, GROUPID = :groupId WHERE ID = :id",
+                    params("id", id.get())
+                            .addValue("source", input.getName())
+                            .addValue("groupId", input.getGroup().get())
+            );
+            return getMapping(id);
+        } catch (DuplicateKeyException ex) {
+            throw new AccountGroupMappingNameAlreadyDefinedException(input.getName());
         }
     }
 

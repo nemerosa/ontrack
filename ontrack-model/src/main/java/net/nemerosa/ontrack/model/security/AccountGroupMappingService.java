@@ -45,4 +45,14 @@ public interface AccountGroupMappingService {
      * @return Mapping
      */
     AccountGroupMapping getMapping(String mapping, ID id);
+
+    /**
+     * Updates a mapping
+     *
+     * @param mapping Mapping type, for example: "ldap"
+     * @param id      ID of the mapping
+     * @param input   Input data for the mapping
+     * @return Created mapping
+     */
+    AccountGroupMapping updateMapping(String mapping, ID id, AccountGroupMappingInput input);
 }

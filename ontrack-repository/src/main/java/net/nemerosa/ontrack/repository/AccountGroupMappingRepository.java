@@ -47,4 +47,14 @@ public interface AccountGroupMappingRepository {
      * @return Mapping
      */
     AccountGroupMapping getMapping(ID id);
+
+    /**
+     * Updates a mapping
+     *
+     * @param id    ID of the mapping
+     * @param input Input data for the mapping
+     * @return Updated mapping
+     */
+    AccountGroupMapping updateMapping(ID id, AccountGroupMappingInput input);
+
 }

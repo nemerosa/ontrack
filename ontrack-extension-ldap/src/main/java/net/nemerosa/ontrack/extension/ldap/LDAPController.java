@@ -99,4 +99,28 @@ public class LDAPController extends AbstractExtensionController<LDAPExtensionFea
         securityService.checkGlobalFunction(AccountManagement.class);
         return accountGroupMappingService.getMapping(LDAPExtensionFeature.LDAP_GROUP_MAPPING, id);
     }
+
+    /**
+     * Gets the form to update a mapping
+     */
+    @RequestMapping(value = "ldap-mapping/{id}/update", method = RequestMethod.GET)
+    public Form getMappingUpdateForm(@PathVariable ID id) {
+        securityService.checkGlobalFunction(AccountManagement.class);
+        return accountGroupMappingService.getMapping(LDAPExtensionFeature.LDAP_GROUP_MAPPING, id).asForm(
+                accountService.getAccountGroups()
+        );
+    }
+
+    /**
+     * Updating a mapping
+     */
+    @RequestMapping(value = "ldap-mapping/{id}/update", method = RequestMethod.PUT)
+    public AccountGroupMapping updateMapping(@PathVariable ID id, @RequestBody AccountGroupMappingInput input) {
+        securityService.checkGlobalFunction(AccountManagement.class);
+        return accountGroupMappingService.updateMapping(
+                LDAPExtensionFeature.LDAP_GROUP_MAPPING,
+                id,
+                input
+        );
+    }
 }

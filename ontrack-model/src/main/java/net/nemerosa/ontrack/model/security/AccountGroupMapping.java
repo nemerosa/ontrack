@@ -26,4 +26,10 @@ public class AccountGroupMapping implements Entity {
                 )
                 ;
     }
+
+    public Form asForm(List<AccountGroup> groups) {
+        return form(groups)
+                .fill("name", name)
+                .fill("group", group.getId());
+    }
 }
