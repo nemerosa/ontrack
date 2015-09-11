@@ -76,6 +76,7 @@ public class AccountServiceImpl implements AccountService {
                 .withGroups(
                         accountGroupContributors.stream()
                                 .flatMap(accountGroupContributor -> accountGroupContributor.collectGroups(raw).stream())
+                                .map(this::groupWithACL)
                                 .collect(Collectors.toList())
                 )
                         // OK
