@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.ID;
+import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +62,13 @@ public class LDAPController extends AbstractExtensionController<LDAPExtensionFea
         return Resources.of(
                 accountGroupMappingService.getMappings(LDAPExtensionFeature.LDAP_GROUP_MAPPING),
                 uri(on(getClass()).getMappings())
-        );
+        )
+                .with(
+                        Link.CREATE,
+                        uri(on(getClass()).getMappingCreationForm()),
+                        securityService.isGlobalFunctionGranted(AccountManagement.class)
+                )
+                ;
     }
 
     /**
