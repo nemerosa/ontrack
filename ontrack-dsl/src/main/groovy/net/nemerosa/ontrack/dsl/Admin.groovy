@@ -12,6 +12,55 @@ class Admin {
     }
 
     /**
+     * Gets the list of accounts
+     */
+
+    List<Account> getAccounts() {
+        ontrack.get('accounts').resources.collect {
+            new Account(ontrack, it)
+        }
+    }
+
+    /**
+     * Creating or updating an account
+     */
+    Account account(String name, String fullName, String email, String password = '') {
+        // Gets the groups
+        def accounts = ontrack.get('accounts')
+        // Looks for an existing account
+        def account = accounts.resources.find { it.name == name }
+        if (account != null) {
+            // Update
+            new Account(
+                    ontrack,
+                    ontrack.put(
+                            account._update as String,
+                            [
+                                    name    : name,
+                                    fullName: fullName,
+                                    email   : email,
+                                    password: password
+                            ]
+                    )
+            )
+        } else {
+            // Creation
+            new Account(
+                    ontrack,
+                    ontrack.post(
+                            accounts._create as String,
+                            [
+                                    name    : name,
+                                    fullName: fullName,
+                                    email   : email,
+                                    password: password
+                            ]
+                    )
+            )
+        }
+    }
+
+    /**
      * Gets the list of groups
      */
 
@@ -34,7 +83,7 @@ class Admin {
             new AccountGroup(
                     ontrack,
                     ontrack.put(
-                            group._update,
+                            group._update as String,
                             [
                                     name       : name,
                                     description: description
@@ -46,7 +95,7 @@ class Admin {
             new AccountGroup(
                     ontrack,
                     ontrack.post(
-                            groups._create,
+                            groups._create as String,
                             [
                                     name       : name,
                                     description: description
@@ -85,7 +134,7 @@ class Admin {
             new GroupMapping(
                     ontrack,
                     ontrack.put(
-                            mapping._update,
+                            mapping._update as String,
                             [
                                     name : name,
                                     group: group.id
@@ -97,7 +146,7 @@ class Admin {
             new GroupMapping(
                     ontrack,
                     ontrack.post(
-                            mappings._create,
+                            mappings._create as String,
                             [
                                     name : name,
                                     group: group.id
