@@ -33,5 +33,10 @@ angular.module('ontrack.extension.ldap', [])
         }
 
         loadMappings();
+
+        // Updating a mapping
+        $scope.updateMapping = function (mapping) {
+            otFormService.update(mapping._update, "Updating mapping").then(loadMappings);
+        };
     })
 ;

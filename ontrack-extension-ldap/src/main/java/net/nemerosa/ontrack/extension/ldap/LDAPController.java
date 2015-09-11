@@ -58,10 +58,11 @@ public class LDAPController extends AbstractExtensionController<LDAPExtensionFea
      * Gets the list of mappings
      */
     @RequestMapping(value = "ldap-mapping", method = RequestMethod.GET)
-    public Resources<AccountGroupMapping> getMappings() {
+    public Resources<LDAPMapping> getMappings() {
         securityService.checkGlobalFunction(AccountManagement.class);
         return Resources.of(
-                accountGroupMappingService.getMappings(LDAPExtensionFeature.LDAP_GROUP_MAPPING),
+                accountGroupMappingService.getMappings(LDAPExtensionFeature.LDAP_GROUP_MAPPING)
+                        .stream().map(LDAPMapping::of),
                 uri(on(getClass()).getMappings())
         )
                 .with(
@@ -87,18 +88,18 @@ public class LDAPController extends AbstractExtensionController<LDAPExtensionFea
      * Creates a mapping
      */
     @RequestMapping(value = "ldap-mapping/create", method = RequestMethod.POST)
-    public AccountGroupMapping newMapping(@RequestBody AccountGroupMappingInput input) {
+    public LDAPMapping newMapping(@RequestBody AccountGroupMappingInput input) {
         securityService.checkGlobalFunction(AccountManagement.class);
-        return accountGroupMappingService.newMapping(LDAPExtensionFeature.LDAP_GROUP_MAPPING, input);
+        return LDAPMapping.of(accountGroupMappingService.newMapping(LDAPExtensionFeature.LDAP_GROUP_MAPPING, input));
     }
 
     /**
      * Gets a mapping
      */
     @RequestMapping(value = "ldap-mapping/{id}", method = RequestMethod.GET)
-    public AccountGroupMapping getMapping(@PathVariable ID id) {
+    public LDAPMapping getMapping(@PathVariable ID id) {
         securityService.checkGlobalFunction(AccountManagement.class);
-        return accountGroupMappingService.getMapping(LDAPExtensionFeature.LDAP_GROUP_MAPPING, id);
+        return LDAPMapping.of(accountGroupMappingService.getMapping(LDAPExtensionFeature.LDAP_GROUP_MAPPING, id));
     }
 
     /**
@@ -116,13 +117,13 @@ public class LDAPController extends AbstractExtensionController<LDAPExtensionFea
      * Updating a mapping
      */
     @RequestMapping(value = "ldap-mapping/{id}/update", method = RequestMethod.PUT)
-    public AccountGroupMapping updateMapping(@PathVariable ID id, @RequestBody AccountGroupMappingInput input) {
+    public LDAPMapping updateMapping(@PathVariable ID id, @RequestBody AccountGroupMappingInput input) {
         securityService.checkGlobalFunction(AccountManagement.class);
-        return accountGroupMappingService.updateMapping(
+        return LDAPMapping.of(accountGroupMappingService.updateMapping(
                 LDAPExtensionFeature.LDAP_GROUP_MAPPING,
                 id,
                 input
-        );
+        ));
     }
 
     /**
