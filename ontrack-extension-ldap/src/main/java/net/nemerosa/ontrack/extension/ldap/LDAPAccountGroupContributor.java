@@ -29,7 +29,7 @@ public class LDAPAccountGroupContributor implements AccountGroupContributor {
         Collection<String> ldapGroups = getLdapGroups(authenticatedAccount);
         // Maps them to the account groups
         return ldapGroups.stream()
-                .flatMap(ldapGroup -> accountGroupMappingService.getGroups("ldap", ldapGroup).stream())
+                .flatMap(ldapGroup -> accountGroupMappingService.getGroups(LDAPExtensionFeature.LDAP_GROUP_MAPPING, ldapGroup).stream())
                 .collect(Collectors.toList());
     }
 

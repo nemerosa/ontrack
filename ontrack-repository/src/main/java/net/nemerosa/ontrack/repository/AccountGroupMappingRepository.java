@@ -1,8 +1,10 @@
 package net.nemerosa.ontrack.repository;
 
 import net.nemerosa.ontrack.model.security.AccountGroup;
+import net.nemerosa.ontrack.model.security.AccountGroupMapping;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Generic mapping for the account groups.
@@ -19,4 +21,11 @@ public interface AccountGroupMappingRepository {
      */
     Collection<AccountGroup> getGroups(String mapping, String mappedName);
 
+    /**
+     * For the given {@code mapping} type, collects the {@linkplain AccountGroupMapping mappings}.
+     *
+     * @param mapping Mapping type, for example: "ldap"
+     * @return List of mappings, can be empty, but not null
+     */
+    List<AccountGroupMapping> getMappings(String mapping);
 }
