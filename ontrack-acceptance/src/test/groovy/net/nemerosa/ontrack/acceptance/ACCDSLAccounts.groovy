@@ -52,4 +52,20 @@ class ACCDSLAccounts extends AbstractACCDSL {
         assert account.accountGroups.collect { it.name } == [g1Name, g2Name]
     }
 
+    @Test
+    void 'Account global permissions'() {
+        // Account
+        def name = uid('A')
+        ontrack.admin.account(name, "Damien Coraboeuf", "dcoraboeuf@nemerosa.net")
+        // Sets permissions
+        ontrack.admin.setAccountGlobalPermission(name, "ADMINISTRATOR")
+        // Checks its global permissions
+        def permissions = ontrack.admin.getAccountGlobalPermissions(name)
+        assert permissions != null
+        assert permissions.size() == 1
+        assert permissions[0].id == 'ADMINISTRATOR'
+        assert permissions[0].name == 'Administrator'
+        assert permissions[0].description == "An administrator is allowed to do everything in the application."
+    }
+
 }

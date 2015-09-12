@@ -165,4 +165,41 @@ class Admin {
         group
     }
 
+    protected Account findAccountByName(String name) {
+        def account = getAccounts().find { it.name == name }
+        if (account == null) {
+            throw new AccountGroupNameNotFoundException(name)
+        }
+        account
+    }
+
+    /**
+     * Sets a global role on an account
+     */
+    public void setAccountGlobalPermission(String accountName, String globalRole) {
+        def account = findAccountByName(accountName)
+        ontrack.put(
+                "/accounts/permissions/globals/ACCOUNT/${account.id}",
+                [
+                        role: globalRole
+                ]
+        )
+    }
+
+    /**
+     * Gets the list of global roles an account has
+     * @param accountName Name of the account to get the permissions for
+     * @return List of roles
+     */
+    List<Role> getAccountGlobalPermissions(String accountName) {
+        def account = findAccountByName(accountName)
+        ontrack.get("/accounts/permissions/globals").resources
+                .findAll { it.target.type == 'ACCOUNT' && it.target.id == account.id }
+                .collect {
+            new Role(
+                    ontrack,
+                    it.role
+            )
+        }
+    }
 }
