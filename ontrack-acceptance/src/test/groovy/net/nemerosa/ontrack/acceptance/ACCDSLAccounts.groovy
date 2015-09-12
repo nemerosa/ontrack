@@ -87,4 +87,20 @@ class ACCDSLAccounts extends AbstractACCDSL {
         assert permissions[0].description == "The project owner is allowed to all functions in a project, but for its deletion."
     }
 
+    @Test
+    void 'Account group global permissions'() {
+        // Group
+        def name = uid('G')
+        ontrack.admin.accountGroup(name, "Test group")
+        // Sets permissions
+        ontrack.admin.setAccountGroupGlobalPermission(name, "ADMINISTRATOR")
+        // Checks its global permissions
+        def permissions = ontrack.admin.getAccountGroupGlobalPermissions(name)
+        assert permissions != null
+        assert permissions.size() == 1
+        assert permissions[0].id == 'ADMINISTRATOR'
+        assert permissions[0].name == 'Administrator'
+        assert permissions[0].description == "An administrator is allowed to do everything in the application."
+    }
+
 }

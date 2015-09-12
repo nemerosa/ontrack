@@ -234,4 +234,34 @@ class Admin {
             )
         }
     }
+
+    /**
+     * Sets a global role on an account group
+     */
+    public void setAccountGroupGlobalPermission(String groupName, String globalRole) {
+        def group = findGroupByName(groupName)
+        ontrack.put(
+                "/accounts/permissions/globals/GROUP/${group.id}",
+                [
+                        role: globalRole
+                ]
+        )
+    }
+
+    /**
+     * Gets the list of global roles an account group has
+     * @param groupName Name of the account group to get the permissions for
+     * @return List of roles
+     */
+    List<Role> getAccountGroupGlobalPermissions(String groupName) {
+        def group = findGroupByName(groupName)
+        ontrack.get("/accounts/permissions/globals").resources
+                .findAll { it.target.type == 'GROUP' && it.target.id == group.id }
+                .collect {
+            new Role(
+                    ontrack,
+                    it.role
+            )
+        }
+    }
 }
