@@ -202,4 +202,36 @@ class Admin {
             )
         }
     }
+
+    /**
+     * Sets a project role on an account
+     */
+    public void setAccountProjectPermission(String projectName, String accountName, String projectRole) {
+        def project = ontrack.project(projectName)
+        def account = findAccountByName(accountName)
+        ontrack.put(
+                "/accounts/permissions/projects/${project.id}/ACCOUNT/${account.id}",
+                [
+                        role: projectRole
+                ]
+        )
+    }
+
+    /**
+     * Gets the list of roles an account has on a project
+     * @param accountName Name of the account to get the permissions for
+     * @return List of roles
+     */
+    List<Role> getAccountProjectPermissions(String projectName, String accountName) {
+        def project = ontrack.project(projectName)
+        def account = findAccountByName(accountName)
+        ontrack.get("/accounts/permissions/projects/${project.id}").resources
+                .findAll { it.target.type == 'ACCOUNT' && it.target.id == account.id }
+                .collect {
+            new Role(
+                    ontrack,
+                    it.role
+            )
+        }
+    }
 }
