@@ -103,4 +103,23 @@ class ACCDSLAccounts extends AbstractACCDSL {
         assert permissions[0].description == "An administrator is allowed to do everything in the application."
     }
 
+    @Test
+    void 'Account group project permissions'() {
+        // Project
+        def project = uid('P')
+        ontrack.project(project)
+        // Group
+        def name = uid('G')
+        ontrack.admin.accountGroup(name, "Test")
+        // Sets permissions
+        ontrack.admin.setAccountGroupProjectPermission(project, name, "PARTICIPANT")
+        // Checks the project permissions
+        def permissions = ontrack.admin.getAccountGroupProjectPermissions(project, name)
+        assert permissions != null
+        assert permissions.size() == 1
+        assert permissions[0].id == 'PARTICIPANT'
+        assert permissions[0].name == 'Participant'
+        assert permissions[0].description == "A participant in a project is allowed to change statuses in validation runs."
+    }
+
 }

@@ -264,4 +264,36 @@ class Admin {
             )
         }
     }
+
+    /**
+     * Sets a project role on an account group
+     */
+    public void setAccountGroupProjectPermission(String projectName, String groupName, String projectRole) {
+        def project = ontrack.project(projectName)
+        def group = findGroupByName(groupName)
+        ontrack.put(
+                "/accounts/permissions/projects/${project.id}/GROUP/${group.id}",
+                [
+                        role: projectRole
+                ]
+        )
+    }
+
+    /**
+     * Gets the list of roles an account group has on a project
+     * @param groupName Name of the account group to get the permissions for
+     * @return List of roles
+     */
+    List<Role> getAccountGroupProjectPermissions(String projectName, String groupName) {
+        def project = ontrack.project(projectName)
+        def group = findGroupByName(groupName)
+        ontrack.get("/accounts/permissions/projects/${project.id}").resources
+                .findAll { it.target.type == 'GROUP' && it.target.id == group.id }
+                .collect {
+            new Role(
+                    ontrack,
+                    it.role
+            )
+        }
+    }
 }
