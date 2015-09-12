@@ -53,11 +53,13 @@ public class AccountGroupJdbcRepository extends AbstractJdbcRepository implement
                 params("accountId", accountId)
         );
         // Adding the links
-        for (int groupId : groupIds) {
-            getNamedParameterJdbcTemplate().update(
-                    "INSERT INTO ACCOUNT_GROUP_LINK (ACCOUNT, ACCOUNTGROUP) VALUES (:accountId, :groupId)",
-                    params("accountId", accountId).addValue("groupId", groupId)
-            );
+        if (groupIds != null) {
+            for (int groupId : groupIds) {
+                getNamedParameterJdbcTemplate().update(
+                        "INSERT INTO ACCOUNT_GROUP_LINK (ACCOUNT, ACCOUNTGROUP) VALUES (:accountId, :groupId)",
+                        params("accountId", accountId).addValue("groupId", groupId)
+                );
+            }
         }
     }
 
