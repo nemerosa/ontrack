@@ -30,6 +30,7 @@ public class AccountServiceImpl implements AccountService {
     private final SecurityService securityService;
     private final AuthenticationSourceService authenticationSourceService;
     private final PasswordEncoder passwordEncoder;
+    private Collection<AccountGroupContributor> accountGroupContributors = Collections.emptyList();
 
     @Autowired
     public AccountServiceImpl(
@@ -49,20 +50,32 @@ public class AccountServiceImpl implements AccountService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Autowired(required = false)
+    public void setAccountGroupContributors(Collection<AccountGroupContributor> accountGroupContributors) {
+        this.accountGroupContributors = accountGroupContributors;
+    }
+
     @Override
-    public Account withACL(Account raw) {
-        return raw
+    public Account withACL(AuthenticatedAccount raw) {
+        return raw.getAccount()
                 // Global role
                 .withGlobalRole(
-                        roleRepository.findGlobalRoleByAccount(raw.id()).flatMap(rolesService::getGlobalRole)
+                        roleRepository.findGlobalRoleByAccount(raw.getAccount().id()).flatMap(rolesService::getGlobalRole)
                 )
                         // Project roles
                 .withProjectRoles(
-                        roleRepository.findProjectRoleAssociationsByAccount(raw.id(), rolesService::getProjectRoleAssociation)
+                        roleRepository.findProjectRoleAssociationsByAccount(raw.getAccount().id(), rolesService::getProjectRoleAssociation)
                 )
-                        // Groups
+                        // Groups from the repository
                 .withGroups(
-                        accountGroupRepository.findByAccount(raw.id()).stream()
+                        accountGroupRepository.findByAccount(raw.getAccount().id()).stream()
+                                .map(this::groupWithACL)
+                                .collect(Collectors.toList())
+                )
+                        // Group contributions
+                .withGroups(
+                        accountGroupContributors.stream()
+                                .flatMap(accountGroupContributor -> accountGroupContributor.collectGroups(raw).stream())
                                 .map(this::groupWithACL)
                                 .collect(Collectors.toList())
                 )
@@ -81,6 +94,16 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account create(AccountInput input) {
+        Account account = create(
+                input,
+                "password"
+        );
+        accountRepository.setPassword(account.id(), passwordEncoder.encode(input.getPassword()));
+        return account;
+    }
+
+    @Override
+    public Account create(AccountInput input, String authenticationSourceMode) {
         securityService.checkGlobalFunction(AccountManagement.class);
         // Creates the account
         Account account = Account.of(
@@ -88,14 +111,20 @@ public class AccountServiceImpl implements AccountService {
                 input.getFullName(),
                 input.getEmail(),
                 SecurityRole.USER,
-                authenticationSourceService.getAuthenticationSource("password")
+                authenticationSourceService.getAuthenticationSource(authenticationSourceMode)
         );
         // Saves it
         account = accountRepository.newAccount(account);
-        // Sets the its password
-        accountRepository.setPassword(account.id(), passwordEncoder.encode(input.getPassword()));
+        // Account groups
+        accountGroupRepository.linkAccountToGroups(account.id(), input.getGroups());
         // OK
         return account;
+    }
+
+    @Override
+    public Optional<Account> findUserByNameAndSource(String username, AuthenticationSourceProvider sourceProvider) {
+        securityService.checkGlobalFunction(AccountManagement.class);
+        return accountRepository.findUserByNameAndSource(username, sourceProvider);
     }
 
     @Override

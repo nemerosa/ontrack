@@ -2,12 +2,14 @@ package net.nemerosa.ontrack.repository;
 
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.exceptions.AccountGroupNameAlreadyDefinedException;
+import net.nemerosa.ontrack.model.exceptions.AccountGroupNotFoundException;
 import net.nemerosa.ontrack.model.security.AccountGroup;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -51,11 +53,13 @@ public class AccountGroupJdbcRepository extends AbstractJdbcRepository implement
                 params("accountId", accountId)
         );
         // Adding the links
-        for (int groupId : groupIds) {
-            getNamedParameterJdbcTemplate().update(
-                    "INSERT INTO ACCOUNT_GROUP_LINK (ACCOUNT, ACCOUNTGROUP) VALUES (:accountId, :groupId)",
-                    params("accountId", accountId).addValue("groupId", groupId)
-            );
+        if (groupIds != null) {
+            for (int groupId : groupIds) {
+                getNamedParameterJdbcTemplate().update(
+                        "INSERT INTO ACCOUNT_GROUP_LINK (ACCOUNT, ACCOUNTGROUP) VALUES (:accountId, :groupId)",
+                        params("accountId", accountId).addValue("groupId", groupId)
+                );
+            }
         }
     }
 
@@ -103,11 +107,15 @@ public class AccountGroupJdbcRepository extends AbstractJdbcRepository implement
 
     @Override
     public AccountGroup getById(ID groupId) {
-        return getNamedParameterJdbcTemplate().queryForObject(
-                "SELECT * FROM ACCOUNT_GROUPS WHERE ID = :id",
-                params("id", groupId.getValue()),
-                (rs, num) -> toAccountGroup(rs)
-        );
+        try {
+            return getNamedParameterJdbcTemplate().queryForObject(
+                    "SELECT * FROM ACCOUNT_GROUPS WHERE ID = :id",
+                    params("id", groupId.getValue()),
+                    (rs, num) -> toAccountGroup(rs)
+            );
+        } catch (EmptyResultDataAccessException ex) {
+            throw new AccountGroupNotFoundException(groupId);
+        }
     }
 
     @Override

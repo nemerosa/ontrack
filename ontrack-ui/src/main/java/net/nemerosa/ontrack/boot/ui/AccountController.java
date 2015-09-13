@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import net.nemerosa.ontrack.extension.api.AccountMgtActionExtension;
+import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.*;
 import net.nemerosa.ontrack.model.security.Account;
@@ -8,6 +10,7 @@ import net.nemerosa.ontrack.model.security.AccountInput;
 import net.nemerosa.ontrack.model.security.AccountService;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.NameDescription;
+import net.nemerosa.ontrack.model.support.Action;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resources;
@@ -26,10 +29,12 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 public class AccountController extends AbstractResourceController {
 
     private final AccountService accountService;
+    private final ExtensionManager extensionManager;
 
     @Autowired
-    public AccountController(AccountService accountService) {
+    public AccountController(AccountService accountService, ExtensionManager extensionManager) {
         this.accountService = accountService;
+        this.extensionManager = extensionManager;
     }
 
     /**
@@ -41,7 +46,22 @@ public class AccountController extends AbstractResourceController {
                 accountService.getAccounts(),
                 uri(on(getClass()).getAccounts())
         )
-                .with(Link.CREATE, uri(on(AccountController.class).getCreationForm()));
+                .with(Link.CREATE, uri(on(AccountController.class).getCreationForm()))
+                .with("_actions", uri(on(AccountController.class).getAccountMgtActions()))
+                ;
+    }
+
+    /**
+     * Action management contributions
+     */
+    @RequestMapping(value = "actions", method = RequestMethod.GET)
+    public Resources<Action> getAccountMgtActions() {
+        return Resources.of(
+                extensionManager.getExtensions(AccountMgtActionExtension.class).stream()
+                        .map(this::resolveExtensionAction)
+                        .filter(action -> action != null),
+                uri(on(AccountController.class).getAccountMgtActions())
+        );
     }
 
     /**

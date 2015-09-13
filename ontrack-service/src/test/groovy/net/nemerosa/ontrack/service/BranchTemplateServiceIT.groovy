@@ -602,7 +602,7 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
                     new PermissionInput('CONTROLLER')
             )
             // Loads the ACL
-            account = accountService.withACL(account)
+            account = accountService.withACL(AuthenticatedAccount.of(account))
             // OK
             account
         }

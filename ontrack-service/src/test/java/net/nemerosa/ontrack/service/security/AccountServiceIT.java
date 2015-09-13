@@ -35,7 +35,7 @@ public class AccountServiceIT extends AbstractServiceTestSupport {
     @Test
     public void account_with_no_role() throws Exception {
         Account account = account();
-        account = accountService.withACL(account);
+        account = accountService.withACL(AuthenticatedAccount.of(account));
         assertNotNull(account);
         assertFalse("As a normal user, must not have any global grant", account.isGranted(AccountManagement.class));
         assertFalse("As a normal user, must not have any project grant", account.isGranted(project, BranchCreate.class));
@@ -52,7 +52,7 @@ public class AccountServiceIT extends AbstractServiceTestSupport {
                 id,
                 new PermissionInput("CONTROLLER")
         ));
-        account = accountService.withACL(account);
+        account = accountService.withACL(AuthenticatedAccount.of(account));
         assertNotNull(account);
         assertFalse("As a normal user, must not have any global grant", account.isGranted(AccountManagement.class));
         assertFalse("As a normal user, must not have any project grant", account.isGranted(project, BranchCreate.class));
@@ -93,7 +93,9 @@ public class AccountServiceIT extends AbstractServiceTestSupport {
         ));
 
         // Gets the ACL of the account
-        Account account = asUser().with(AccountManagement.class).call(() -> accountService.withACL(accountService.getAccount(accountWithGroup.getId())));
+        Account account = asUser().with(AccountManagement.class).call(() -> accountService.withACL(
+                AuthenticatedAccount.of(accountService.getAccount(accountWithGroup.getId()))
+        ));
 
         // Checks
         assertNotNull(account);

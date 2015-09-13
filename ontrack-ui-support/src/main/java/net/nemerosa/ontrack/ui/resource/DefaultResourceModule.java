@@ -8,10 +8,18 @@ import java.util.Collection;
 @Component
 public class DefaultResourceModule implements ResourceModule {
 
-    private final Collection<ResourceDecorator<?>> decorators;
+    private Collection<ResourceDecorator<?>> decorators;
 
-    @Autowired
+    @SuppressWarnings("unused")
+    public DefaultResourceModule() {
+    }
+
     public DefaultResourceModule(Collection<ResourceDecorator<?>> decorators) {
+        this.decorators = decorators;
+    }
+
+    @Autowired(required = false)
+    public void setDecorators(Collection<ResourceDecorator<?>> decorators) {
         this.decorators = decorators;
     }
 

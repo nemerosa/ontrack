@@ -24,11 +24,15 @@ public abstract class AbstractResourceController {
     }
 
     protected Action resolveExtensionAction(Extension extension, Action action) {
-        return action.withUri(
-                String.format("extension/%s/%s",
-                        extension.getFeature().getId(),
-                        action.getUri())
-        );
+        if (action != null) {
+            return action.withUri(
+                    String.format("extension/%s/%s",
+                            extension.getFeature().getId(),
+                            action.getUri())
+            );
+        } else {
+            return null;
+        }
     }
 
 }
