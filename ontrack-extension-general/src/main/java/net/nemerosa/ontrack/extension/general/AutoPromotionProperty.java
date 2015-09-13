@@ -26,8 +26,12 @@ public class AutoPromotionProperty {
     private final String exclude;
 
     public boolean contains(ValidationStamp vs) {
-        return validationStamps.stream().anyMatch(v -> (v.id() == vs.id()))
+        return containsDirectValidationStamp(vs)
                 || containsByPattern(vs);
+    }
+
+    public boolean containsDirectValidationStamp(ValidationStamp vs) {
+        return validationStamps.stream().anyMatch(v -> (v.id() == vs.id()));
     }
 
     private boolean containsByPattern(ValidationStamp vs) {

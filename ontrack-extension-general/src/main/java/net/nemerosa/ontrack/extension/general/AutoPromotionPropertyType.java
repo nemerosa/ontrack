@@ -60,7 +60,7 @@ public class AutoPromotionPropertyType extends AbstractPropertyType<AutoPromotio
                                                 .stream()
                                                 .map(vs -> new ValidationStampSelection(
                                                                 vs,
-                                                                value != null && value.contains(vs)
+                                                                value != null && value.containsDirectValidationStamp(vs)
                                                         )
                                                 )
                                                 .collect(Collectors.toList())
