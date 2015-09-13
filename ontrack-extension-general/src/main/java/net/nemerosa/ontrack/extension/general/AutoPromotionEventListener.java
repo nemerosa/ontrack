@@ -85,17 +85,23 @@ public class AutoPromotionEventListener implements EventListener {
             Build build = event.getEntity(ProjectEntityType.BUILD);
             // Gets all promotion levels for this branch
             List<PromotionLevel> promotionLevels = structureService.getPromotionLevelListForBranch(branch.getId());
+            // Gets all validation stamps for this branch
+            List<ValidationStamp> validationStamps = structureService.getValidationStampListForBranch(branch.getId());
             // Gets the promotion levels which have an auto promotion property
-            promotionLevels.forEach(promotionLevel -> checkPromotionLevel(build, promotionLevel));
+            promotionLevels.forEach(promotionLevel -> checkPromotionLevel(build, promotionLevel, validationStamps));
         }
     }
 
-    protected void checkPromotionLevel(Build build, PromotionLevel promotionLevel) {
+    protected void checkPromotionLevel(Build build, PromotionLevel promotionLevel, List<ValidationStamp> validationStamps) {
         Optional<AutoPromotionProperty> oProperty = propertyService.getProperty(promotionLevel, AutoPromotionPropertyType.class).option();
         if (oProperty.isPresent()) {
             AutoPromotionProperty property = oProperty.get();
             // Checks the status of each validation stamp
-            boolean allPassed = property.getValidationStamps().stream().allMatch(validationStamp -> isPassed(build, validationStamp));
+            boolean allPassed = validationStamps.stream()
+                    // Keeps only the ones selectable for the autopromotion property
+                    .filter(property::contains)
+                            // They must all pass
+                    .allMatch(validationStamp -> isPassed(build, validationStamp));
             if (allPassed) {
                 // Promotes
                 structureService.newPromotionRun(
