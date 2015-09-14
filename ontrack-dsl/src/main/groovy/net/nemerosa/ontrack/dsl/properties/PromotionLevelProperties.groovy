@@ -20,13 +20,15 @@ class PromotionLevelProperties extends ProjectEntityProperties {
         autoPromotion(validationStamps as List)
     }
 
-    def autoPromotion(Collection<String> validationStamps) {
+    def autoPromotion(Collection<String> validationStamps, String include = '', String exclude = '') {
         property(
                 'net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType',
                 [
                         validationStamps: validationStamps.collect {
                             String vsName -> ontrack.validationStamp(promotionLevel.project, promotionLevel.branch, vsName).id
-                        }
+                        },
+                        include         : include,
+                        exclude         : exclude,
                 ]
         )
     }

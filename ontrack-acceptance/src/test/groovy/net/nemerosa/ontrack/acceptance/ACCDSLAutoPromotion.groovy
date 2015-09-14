@@ -97,4 +97,59 @@ class ACCDSLAutoPromotion extends AbstractACCDSL {
 
     }
 
+    @Test
+    void 'Auto promotion based on list, include and exclude patterns'() {
+
+        // Creating a project and a branch
+        def projectName = uid('P')
+        ontrack.project(projectName) {
+            branch('B', '')
+        }
+        def branch = ontrack.branch(projectName, 'B')
+
+        // Creating validation stamps
+        branch {
+            validationStamp 'CI.1'
+            validationStamp 'CI.2'
+            validationStamp 'CI.NIGHTLY'
+            validationStamp 'QA'
+        }
+
+        // Creation of auto promoted promotion levels
+        branch {
+            promotionLevel('COPPER') {
+                config {
+                    autoPromotion([], 'CI.*', '.*NIGHTLY.*')
+                }
+            }
+            promotionLevel('BRONZE') {
+                config {
+                    autoPromotion(['QA'], 'CI.*', '.*NIGHTLY.*')
+                }
+            }
+        }
+
+        // Creating a build
+        def build = branch.build('1')
+
+        // CI validations first
+        build.validate 'CI.1'
+        build.validate 'CI.2'
+
+        // Checks COPPER is OK
+        // Checks BRONZE is NOK
+        def promotionRuns = build.promotionRuns
+        assert promotionRuns.collect { it.promotionLevel.name } == ['COPPER']
+
+        // QA validation
+        build.validate 'QA'
+
+        // Checks COPPER is OK
+        // Checks BRONZE is OK
+        promotionRuns = build.promotionRuns
+        assert promotionRuns.size() == 2
+        assert promotionRuns.collect { it.promotionLevel.name } == ['BRONZE', 'COPPER']
+
+    }
+
 }

@@ -23,6 +23,70 @@ class AutoPromotionPropertyIT extends AbstractServiceTestSupport {
     private CopyService copyService
 
     /**
+     * This test checks that a promotion level is not attributed twice on validation upon auto promotion.
+     */
+    @Test
+    void 'Auto promotion - only once'() {
+        // Creation of a branch
+        def branch = doCreateBranch()
+        // Creation of validation stamps
+        def vs1 = doCreateValidationStamp(branch, nd('CI.1', ''))
+        def vs2 = doCreateValidationStamp(branch, nd('CI.2', ''))
+        // Creation of one promotion level
+        def promotionLevel = doCreatePromotionLevel(branch, nd('PL', ''))
+        // Sets the auto promotion
+        asUser().with(branch, ProjectConfig).call {
+            propertyService.editProperty(
+                    promotionLevel,
+                    AutoPromotionPropertyType,
+                    new AutoPromotionProperty([], 'CI.*', '')
+            )
+        }
+        // Creates a build
+        def build = doCreateBuild(branch, nd('1', ''))
+        // Validates the build once
+        asUser().with(branch, ProjectEdit).call {
+            structureService.newValidationRun(ValidationRun.of(
+                    build,
+                    vs1,
+                    1,
+                    Signature.of('test'),
+                    ValidationRunStatusID.STATUS_PASSED,
+                    ''
+            ))
+            structureService.newValidationRun(ValidationRun.of(
+                    build,
+                    vs2,
+                    1,
+                    Signature.of('test'),
+                    ValidationRunStatusID.STATUS_PASSED,
+                    ''
+            ))
+        }
+        // Checks the promotion of the build
+        asUser().withView(branch).call {
+            def runs = structureService.getPromotionRunsForBuild(build.id)
+            assert runs*.promotionLevel.name == ['PL']
+        }
+        // Validates the build a second time
+        asUser().with(branch, ProjectEdit).call {
+            structureService.newValidationRun(ValidationRun.of(
+                    build,
+                    vs1,
+                    1,
+                    Signature.of('test'),
+                    ValidationRunStatusID.STATUS_PASSED,
+                    ''
+            ))
+        }
+        // Checks the promotion of the build (only one)
+        asUser().withView(branch).call {
+            def runs = structureService.getPromotionRunsForBuild(build.id)
+            assert runs*.promotionLevel.name == ['PL']
+        }
+    }
+
+    /**
      * This test checks that whenever a validation stamp, which was part of an auto promotion configuration,
      * is deleted, it is automatically removed from the auto promotion configuration.
      */
