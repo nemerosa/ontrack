@@ -160,4 +160,23 @@ class AutoPromotionPropertyTest {
         assert property.contains(qa)
     }
 
+    @Test
+    void 'List has priority on inclusion and exclusion patterns'() {
+        def vs1 = ValidationStamp.of(
+                branch,
+                nd('CI.1', '')
+        ).withId(ID.of(1))
+        def vs2 = ValidationStamp.of(
+                branch,
+                nd('CI.NIGHT', '')
+        ).withId(ID.of(2))
+
+        AutoPromotionProperty property = new AutoPromotionProperty(
+                [vs2], 'CI.*', '.*NIGHT.*'
+        )
+
+        assert property.contains(vs1)
+        assert property.contains(vs2)
+    }
+
 }
