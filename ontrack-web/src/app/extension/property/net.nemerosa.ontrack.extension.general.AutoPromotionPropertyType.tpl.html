@@ -3,3 +3,9 @@
         {{validationStamp.name}}
     </ot-entity-image>
 </span>&nbsp;
+<p ng-if="property.value.include">
+    Includes: <b>{{property.value.include}}</b>
+</p>
+<p ng-if="property.value.exclude">
+    Excludes: <b>{{property.value.exclude}}</b>
+</p>

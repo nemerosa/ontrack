@@ -2,12 +2,28 @@
 
     <div class="row">
         <div class="col-md-12">
-            <h3>
-                Status
-            </h3>
-            <p>
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" ng-class="{'active':(!tab || tab == 'status')}"><a role="tab"
+                                                                                           ng-click="tab = 'status'">Status</a>
+                </li>
+                <li role="presentation" ng-class="{'active': tab == 'jobs'}"><a role="tab"
+                                                                                ng-click="tab = 'jobs'">Jobs</a></li>
+                <li role="presentation" ng-class="{'active': tab == 'log'}"><a role="tab" ng-click="tab = 'log'">Log</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+
+    <div class="row" ng-show="!tab || tab == 'status'">
+        <div class="col-md-12">
+
+            <br/>
+
+            <p class="ot-description">
                 Status of the applications Ontrack connects to.
             </p>
+
             <div class="alert alert-info" ng-hide="health">
                 Loading health indicators...
             </div>
@@ -66,10 +82,14 @@
         </div>
     </div>
 
-    <div class="row">
+
+    <div class="row" ng-show="tab == 'jobs'">
         <div class="col-md-12">
-            <h3>
-                Jobs
+
+            <br/>
+
+            <p class="ot-description">
+                List of registered jobs and their status.
                 <button class="btn btn-link pull-right" ng-show="!showDisabled" ng-click="showDisabled = true;">
                     <span class="ot-command-show-disabled"></span>
                     Show disabled jobs
@@ -78,12 +98,10 @@
                     <span class="ot-command-hide-disabled"></span>
                     Hide disabled jobs
                 </button>
-                <input class="form-control col-md-3 pull-right" type="text" ng-model="jobFilter" placeholder="Filter the jobs"/>
-            </h3>
-
-            <p class="ot-description">
-                List of registered jobs and their status.
+                <input class="form-control col-md-3 pull-right" type="text" ng-model="jobFilter"
+                       placeholder="Filter the jobs"/>
             </p>
+
             <table class="ot-admin-console-jobs" ng-if="jobs">
                 <thead>
                 <tr>
@@ -166,13 +184,15 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row" ng-show="tab == 'log'">
         <div class="col-md-12">
-            <h3>Log entries</h3>
+
+            <br/>
 
             <p class="ot-description">
                 List of application log messages.
             </p>
+
             <p ng-if="logs.resources.length == 0" class="ot-admin-console-log-ok">
                 No log entry - everything is OK!
             </p>

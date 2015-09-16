@@ -18,6 +18,7 @@ angular.module('ot.view.admin.accounts', [
         function load() {
             ot.call($http.get('accounts')).then(function (accounts) {
                 $scope.accounts = accounts;
+                // Initial commands
                 view.commands = [
                     {
                         id: 'admin-global-acl',
@@ -29,6 +30,18 @@ angular.module('ot.view.admin.accounts', [
                     ot.viewApiCommand(accounts._self),
                     ot.viewCloseCommand('/home')
                 ];
+                // Loads the actions
+                ot.call($http.get(accounts._actions)).then(function (actionResources) {
+                    actionResources.resources.forEach(function (action) {
+                        view.commands.unshift({
+                            id: action.id,
+                            name: action.name,
+                            cls: 'ot-command-admin-' + action.id,
+                            link: action.uri
+                        });
+                    });
+                });
+                // Loads the groups
                 return ot.call($http.get('accounts/groups'));
             }).then(function (groups) {
                 $scope.groups = groups;

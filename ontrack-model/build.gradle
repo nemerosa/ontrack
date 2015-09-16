@@ -7,6 +7,7 @@ dependencies {
     compile libraries.guava
     compile libraries.spring_context
     compile libraries.spring_boot
+    compile libraries.spring_security_core
     compile libraries.validation_api
     compile libraries.slf4j_api
     compile libraries.spring_boot_starter_actuator

@@ -90,6 +90,7 @@ public class RolesServiceImpl implements RolesService, StartupService {
         register("PARTICIPANT", "Participant",
                 "A participant in a project is allowed to change statuses in validation runs.",
                 Arrays.asList(
+                        ProjectView.class,
                         ValidationRunStatusChange.class
                 )
         );
@@ -157,7 +158,7 @@ public class RolesServiceImpl implements RolesService, StartupService {
         register("CREATOR", "Creator",
                 "A creator is allowed to create new projects and to configure it. Once done, its rights on the " +
                         "project are revoked immediately.",
-                Arrays.asList(
+                Collections.singletonList(
                         ProjectCreation.class
                 ),
                 Arrays.asList(
@@ -174,7 +175,7 @@ public class RolesServiceImpl implements RolesService, StartupService {
         register("AUTOMATION", "Automation",
                 "This role can be assigned to users or groups which must automate Ontrack. It aggregates both the " +
                         "Creator and the Controller roles into one.",
-                Arrays.asList(
+                Collections.singletonList(
                         ProjectCreation.class
                 ),
                 Arrays.asList(
@@ -198,9 +199,7 @@ public class RolesServiceImpl implements RolesService, StartupService {
         register("CONTROLLER", "Controller",
                 "A controller, is allowed to create builds, promotion runs and validation runs. He can also " +
                         "synchronise templates. This role is typically granted to continuous integration tools.",
-                Arrays.asList(
-                        // No global function
-                ),
+                Collections.emptyList(),
                 Arrays.asList(
                         ProjectView.class,
                         BuildCreate.class,

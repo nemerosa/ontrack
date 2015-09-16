@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.general
 
+import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.form.MultiSelection
 import net.nemerosa.ontrack.model.structure.*
 import org.junit.Before
@@ -47,7 +48,7 @@ class AutoPromotionPropertyTypeTest {
         when(structureService.getValidationStampListForBranch(branch.getId())).thenReturn([validationStamp1, validationStamp2])
         def form = type.getEditionForm(
                 promotionLevel,
-                new AutoPromotionProperty([validationStamp1]))
+                new AutoPromotionProperty([validationStamp1], '', ''))
         def field = form.getField('validationStamps') as MultiSelection
         assert field.items.collect { it.name } == ['VS1', 'VS2']
         assert field.items.collect { it.selected } == [true, false]
@@ -58,6 +59,60 @@ class AutoPromotionPropertyTypeTest {
         type.fromClient(mapToJson([
                 validationStamps: 'VS1'
         ]))
+    }
+
+    @Test
+    void 'From storage'() {
+        when(structureService.getValidationStamp(ID.of(1))).thenReturn(validationStamp1)
+        when(structureService.getValidationStamp(ID.of(2))).thenReturn(validationStamp2)
+        def autoPromotionProperty = type.fromStorage(fromMap([
+                validationStamps: [1, 2],
+                include: 'include',
+                exclude: 'exclude',
+        ]))
+        assert autoPromotionProperty.validationStamps.collect { it.name } == ['VS1', 'VS2']
+        assert autoPromotionProperty.include == 'include'
+        assert autoPromotionProperty.exclude == 'exclude'
+    }
+
+    @Test
+    void 'From storage - backward compatibility'() {
+        when(structureService.getValidationStamp(ID.of(1))).thenReturn(validationStamp1)
+        when(structureService.getValidationStamp(ID.of(2))).thenReturn(validationStamp2)
+        def autoPromotionProperty = type.fromStorage(
+                JsonUtils.intArray(1, 2)
+        )
+        assert autoPromotionProperty.validationStamps.collect { it.name } == ['VS1', 'VS2']
+        assert autoPromotionProperty.include == ''
+        assert autoPromotionProperty.exclude == ''
+    }
+
+    @Test
+    void 'For storage'() {
+        def autoPromotionProperty = new AutoPromotionProperty(
+                [validationStamp1, validationStamp2],
+                'include',
+                'exclude'
+        )
+        def node = type.forStorage(autoPromotionProperty)
+        assert node.path('validationStamps')[0].asInt() == 1
+        assert node.path('validationStamps')[1].asInt() == 2
+        assert node.path('include').asText() == 'include'
+        assert node.path('exclude').asText() == 'exclude'
+    }
+
+    @Test
+    void 'For/from storage'() {
+        when(structureService.getValidationStamp(ID.of(1))).thenReturn(validationStamp1)
+        when(structureService.getValidationStamp(ID.of(2))).thenReturn(validationStamp2)
+        def autoPromotionProperty = new AutoPromotionProperty(
+                [validationStamp1, validationStamp2],
+                'include',
+                'exclude'
+        )
+        def node = type.forStorage(autoPromotionProperty)
+        def restored = type.fromStorage(node)
+        assert restored == autoPromotionProperty
     }
 
     @Test

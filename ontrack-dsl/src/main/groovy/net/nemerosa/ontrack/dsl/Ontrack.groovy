@@ -101,6 +101,10 @@ class Ontrack {
         new Config(this)
     }
 
+    def getAdmin() {
+        new Admin(this)
+    }
+
     def get(String url) {
         httpClient.get(url) { jsonSlurper.parseText(it) }
     }

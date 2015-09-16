@@ -32,8 +32,7 @@ class AbstractResource {
         }
     }
 
-    // TODO Make this method public and static
-    protected static String query(String url, Map<String, ?> parameters) {
+    public static String query(String url, Map<String, ?> parameters) {
         // Cleanup
         String base
         int pos = url.indexOf('?')
