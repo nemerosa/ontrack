@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.service.settings;
 
 import net.nemerosa.ontrack.model.settings.GeneralSettings;
-import net.nemerosa.ontrack.model.settings.SecuritySettings;
 import net.nemerosa.ontrack.model.settings.SettingsProvider;
 import net.nemerosa.ontrack.model.support.SettingsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +19,8 @@ public class GeneralSettingsProvider implements SettingsProvider<GeneralSettings
     @Override
     public GeneralSettings getSettings() {
         return GeneralSettings.of()
-                .withDisablingDuration(settingsRepository.getInt(SecuritySettings.class, "disablingDuration", 0))
-                .withDeletingDuration(settingsRepository.getInt(SecuritySettings.class, "deletingDuration", 0))
+                .withDisablingDuration(settingsRepository.getInt(GeneralSettings.class, "disablingDuration", 0))
+                .withDeletingDuration(settingsRepository.getInt(GeneralSettings.class, "deletingDuration", 0))
                 ;
     }
 
