@@ -101,27 +101,28 @@ public class StaleBranchesJob implements JobProvider {
             // Logging
             infoListener.post(format("Disabling time: %s", disablingTime));
             infoListener.post(format("Deletion time: %s", deletionTime));
-            // Build filter to get the last build
-            StandardBuildFilter filter = new StandardBuildFilter(
-                    StandardBuildFilterData.of(1),
-                    propertyService
-            );
             // For all projects
             structureService.getProjectList().forEach(
-                    project -> detectAndManageStaleBranches(infoListener, project, filter, disablingTime, deletionTime)
+                    project -> detectAndManageStaleBranches(infoListener, project, disablingTime, deletionTime)
             );
         }
     }
 
-    protected void detectAndManageStaleBranches(JobInfoListener infoListener, Project project, StandardBuildFilter filter, LocalDateTime disablingTime, Optional<LocalDateTime> deletionTime) {
+    protected void detectAndManageStaleBranches(JobInfoListener infoListener, Project project, LocalDateTime disablingTime, Optional<LocalDateTime> deletionTime) {
+        // FIXME Deletion/desactivation is activated at project?
         infoListener.post(format("[%s] Scanning project for stale branches", project.getName()));
         structureService.getBranchesForProject(project.getId()).forEach(
-                branch -> detectAndManageStaleBranch(infoListener, branch, filter, disablingTime, deletionTime)
+                branch -> detectAndManageStaleBranch(infoListener, branch, disablingTime, deletionTime)
         );
     }
 
-    protected void detectAndManageStaleBranch(JobInfoListener infoListener, Branch branch, StandardBuildFilter filter, LocalDateTime disablingTime, Optional<LocalDateTime> deletionTime) {
+    protected void detectAndManageStaleBranch(JobInfoListener infoListener, Branch branch, LocalDateTime disablingTime, Optional<LocalDateTime> deletionTime) {
         infoListener.post(format("[%s][%s] Scanning branch for staleness", branch.getProject().getName(), branch.getName()));
+        // Build filter to get the last build
+        StandardBuildFilter filter = new StandardBuildFilter(
+                StandardBuildFilterData.of(1),
+                propertyService
+        );
         // Templates are excluded
         if (branch.getType() == BranchType.TEMPLATE_DEFINITION) {
             infoListener.post(format("[%s][%s] Branch templates are not eligible for staleness", branch.getProject().getName(), branch.getName()));
