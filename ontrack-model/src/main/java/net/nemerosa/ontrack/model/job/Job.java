@@ -6,6 +6,16 @@ package net.nemerosa.ontrack.model.job;
 public interface Job {
 
     /**
+     * Hour interval
+     */
+    int HOUR = 60;
+
+    /**
+     * Day interval
+     */
+    int DAY = HOUR * 24;
+
+    /**
      * Job group, defaults to the category
      */
     default String getGroup() {
