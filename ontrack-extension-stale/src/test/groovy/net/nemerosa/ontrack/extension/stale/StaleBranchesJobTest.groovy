@@ -149,6 +149,45 @@ class StaleBranchesJobTest {
         verify(structureService, never()).saveBranch(any(Branch))
     }
 
+    @Test
+    void 'No scan for project without stale property'() {
+        // No configuration
+        configureProject(null)
+        // Call
+        job.detectAndManageStaleBranches({ println it }, project)
+        // Check
+        verify(structureService, never()).getBranchesForProject(any(ID))
+    }
+
+    @Test
+    void 'No scan for project with no disabling duration'() {
+        // No configuration
+        configureProject(StaleProperty.create())
+        // Call
+        job.detectAndManageStaleBranches({ println it }, project)
+        // Check
+        verify(structureService, never()).getBranchesForProject(any(ID))
+    }
+
+    @Test
+    void 'Scan for project with disabling duration'() {
+        // No configuration
+        configureProject(StaleProperty.create().withDisablingDuration(1))
+        // Call
+        job.detectAndManageStaleBranches({ println it }, project)
+        // Check
+        verify(structureService).getBranchesForProject(project.id)
+    }
+
+    protected def configureProject(StaleProperty property) {
+        when(propertyService.getProperty(project, StalePropertyType)).thenReturn(
+                Property.of(
+                        new StalePropertyType(),
+                        property
+                )
+        )
+    }
+
     protected def configureBranchCreationEvent(int branchAge) {
         when(eventQueryService.getEvents(ProjectEntityType.BRANCH, branch.id, EventFactory.NEW_BRANCH, 0, 1)).thenReturn([
                 new Event(
