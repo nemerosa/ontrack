@@ -37,7 +37,7 @@ public class GeneralSettings {
                                 .help("Number of days of inactivity after a branch is deleted, after it has been" +
                                         "disabled automatically. 0 means that " +
                                         "the branch won't ever be deleted automatically.")
-                                .value(getDisablingDuration())
+                                .value(getDeletingDuration())
                 )
                 ;
     }
