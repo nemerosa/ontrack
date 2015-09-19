@@ -34,6 +34,21 @@ public class SettingsJdbcRepository extends AbstractJdbcRepository implements Se
     }
 
     @Override
+    public int getInt(Class<?> category, String name, int defaultValue) {
+        return getValue(
+                category,
+                name,
+                s -> Integer.parseInt(s, 10),
+                defaultValue
+        );
+    }
+
+    @Override
+    public void setInt(Class<?> category, String name, int value) {
+        setValue(category, name, String.valueOf(value));
+    }
+
+    @Override
     public String getString(Class<?> category, String name, String defaultValue) {
         return getValue(category, name, Function.identity(), defaultValue);
     }
