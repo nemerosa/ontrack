@@ -1,0 +1,13 @@
+<p ng-if="property.value.disablingDuration == 0">
+    Branches are not disabled or deleted automatically.
+</p>
+<p ng-if="property.value.disablingDuration">
+    Inactive branches are disabled after
+    <b>{{property.value.disablingDuration}}</b>
+    day(s).
+</p>
+<p ng-if="property.value.disablingDuration && property.value.deletingDuration">
+    Inactive branches are deleted after
+    <b>{{property.value.disablingDuration + property.value.deletingDuration}}</b>
+    day(s).
+</p>
