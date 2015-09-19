@@ -94,6 +94,9 @@ public class StaleBranchesJob implements JobProvider {
                                     disablingTime.minusDays(deletionDuration) :
                                     null
                     );
+            // Logging
+            infoListener.post(format("Disabling time: %s", disablingTime));
+            infoListener.post(format("Deletion time: %s", deletionTime));
             // Build filter to get the last build
             StandardBuildFilter filter = new StandardBuildFilter(
                     StandardBuildFilterData.of(1),
@@ -115,6 +118,11 @@ public class StaleBranchesJob implements JobProvider {
 
     protected void detectAndManageStaleBranch(JobInfoListener infoListener, Branch branch, StandardBuildFilter filter, LocalDateTime disablingTime, Optional<LocalDateTime> deletionTime) {
         infoListener.post(format("[%s][%s] Scanning branch for staleness", branch.getProject().getName(), branch.getName()));
+        // Templates are excluded
+        if (branch.getType() == BranchType.TEMPLATE_DEFINITION) {
+            infoListener.post(format("[%s][%s] Branch templates are not eligible for staleness", branch.getProject().getName(), branch.getName()));
+            return;
+        }
         // Last date
         LocalDateTime lastTime;
         // Last build on this branch
@@ -139,6 +147,19 @@ public class StaleBranchesJob implements JobProvider {
             Build build = builds.get(0);
             lastTime = build.getSignature().getTime();
         }
-        // FIXME Compares with the stale and retention times
+        // Logging
+        infoListener.post(format("[%s][%s] Branch last build activity: %s", branch.getProject().getName(), branch.getName(), lastTime));
+        // Deletion?
+        if (deletionTime.isPresent() && deletionTime.get().compareTo(lastTime) > 0) {
+            infoListener.post(format("[%s][%s] Branch due for deletion", branch.getProject().getName(), branch.getName()));
+            structureService.deleteBranch(branch.getId());
+        } else if (disablingTime.compareTo(lastTime) > 0 && !branch.isDisabled()) {
+            infoListener.post(format("[%s][%s] Branch due for staleness - disabling", branch.getProject().getName(), branch.getName()));
+            structureService.saveBranch(
+                    branch.withDisabled(true)
+            );
+        } else {
+            infoListener.post(format("[%s][%s] Not touching the branch", branch.getProject().getName(), branch.getName()));
+        }
     }
 }
