@@ -24,7 +24,7 @@ public class GeneralSettings {
         return Form.create()
                 .with(
                         Int.of("disablingDuration")
-                                .label("Disabling after")
+                                .label("Disabling branches after N (days)")
                                 .min(0)
                                 .help("Number of days of inactivity after a branch is disabled. 0 means that " +
                                         "the branch won't ever be disabled automatically.")
@@ -32,7 +32,7 @@ public class GeneralSettings {
                 )
                 .with(
                         Int.of("deletionDuration")
-                                .label("Deleting after")
+                                .label("Deleting branches after N (days) more")
                                 .min(0)
                                 .help("Number of days of inactivity after a branch is deleted, after it has been" +
                                         "disabled automatically. 0 means that " +
