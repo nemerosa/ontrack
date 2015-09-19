@@ -5,6 +5,8 @@ import net.nemerosa.ontrack.model.events.Event;
 import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventQueryService;
 import net.nemerosa.ontrack.model.job.*;
+import net.nemerosa.ontrack.model.settings.CachedSettingsService;
+import net.nemerosa.ontrack.model.settings.GeneralSettings;
 import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,12 +28,14 @@ public class StaleBranchesJob implements JobProvider {
     private final StructureService structureService;
     private final PropertyService propertyService;
     private final EventQueryService eventQueryService;
+    private final CachedSettingsService cachedSettingsService;
 
     @Autowired
-    public StaleBranchesJob(StructureService structureService, PropertyService propertyService, EventQueryService eventQueryService) {
+    public StaleBranchesJob(StructureService structureService, PropertyService propertyService, EventQueryService eventQueryService, CachedSettingsService cachedSettingsService) {
         this.structureService = structureService;
         this.propertyService = propertyService;
         this.eventQueryService = eventQueryService;
+        this.cachedSettingsService = cachedSettingsService;
     }
 
     @Override
@@ -76,9 +80,9 @@ public class StaleBranchesJob implements JobProvider {
 
     protected void detectAndManageStaleBranches(JobInfoListener infoListener) {
         // Disabling and deletion times
-        // FIXME Gets the duration from the global settings
-        int disablingDuration = 30;
-        int deletionDuration = 0;
+        GeneralSettings settings = cachedSettingsService.getCachedSettings(GeneralSettings.class);
+        int disablingDuration = settings.getDisablingDuration();
+        int deletionDuration = settings.getDeletingDuration();
         // Nothing to do if no disabling time
         if (disablingDuration <= 0) {
             infoListener.post("No disabling time being set - exiting.");
