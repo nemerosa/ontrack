@@ -31,7 +31,7 @@ public class GeneralSettings {
                                 .value(getDisablingDuration())
                 )
                 .with(
-                        Int.of("deletionDuration")
+                        Int.of("deletingDuration")
                                 .label("Deleting branches after N (days) more")
                                 .min(0)
                                 .help("Number of days of inactivity after a branch is deleted, after it has been" +
