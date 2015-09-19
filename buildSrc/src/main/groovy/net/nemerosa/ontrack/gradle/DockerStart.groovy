@@ -23,6 +23,8 @@ class DockerStart extends AbstractDocker {
 
     private int port
 
+    private boolean restart = false
+
     @TaskAction
     def start() {
         // Arguments
@@ -39,6 +41,11 @@ class DockerStart extends AbstractDocker {
         } else {
             println "[${name}] Publishing on random ports..."
             arguments << '--publish-all'
+        }
+        // Restart policy
+        if (restart) {
+            println "[${name}] Restarting on host restart"
+            arguments << '--restart=always'
         }
         // Volumes
         if (data) {
