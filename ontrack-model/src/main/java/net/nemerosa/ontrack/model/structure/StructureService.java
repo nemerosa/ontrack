@@ -71,6 +71,8 @@ public interface StructureService {
      */
     List<Build> getFilteredBuilds(ID branchId, BuildFilter buildFilter);
 
+    Optional<Build> getLastBuild(ID branchId);
+
     List<Build> buildSearch(ID projectId, BuildSearchForm form);
 
     List<ValidationStampRunView> getValidationStampRunViewsForBuild(Build build);

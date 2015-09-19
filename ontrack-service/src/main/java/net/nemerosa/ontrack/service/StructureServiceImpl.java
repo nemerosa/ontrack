@@ -308,6 +308,17 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public Optional<Build> getLastBuild(ID branchId) {
+        return getFilteredBuilds(
+                branchId,
+                new StandardBuildFilter(
+                        StandardBuildFilterData.of(1),
+                        propertyService
+                )
+        ).stream().findFirst();
+    }
+
+    @Override
     public List<Build> buildSearch(ID projectId, BuildSearchForm form) {
         // Gets the project
         Project project = getProject(projectId);

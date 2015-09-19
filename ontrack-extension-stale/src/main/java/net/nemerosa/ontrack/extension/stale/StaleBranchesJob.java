@@ -1,12 +1,10 @@
-package net.nemerosa.ontrack.service;
+package net.nemerosa.ontrack.extension.stale;
 
 import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.model.events.Event;
 import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventQueryService;
 import net.nemerosa.ontrack.model.job.*;
-import net.nemerosa.ontrack.model.settings.CachedSettingsService;
-import net.nemerosa.ontrack.model.settings.GeneralSettings;
 import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,20 +21,17 @@ import static java.lang.String.format;
  * Detection and management of stale branches.
  */
 @Component
-@Deprecated
 public class StaleBranchesJob implements JobProvider {
 
     private final StructureService structureService;
     private final PropertyService propertyService;
     private final EventQueryService eventQueryService;
-    private final CachedSettingsService cachedSettingsService;
 
     @Autowired
-    public StaleBranchesJob(StructureService structureService, PropertyService propertyService, EventQueryService eventQueryService, CachedSettingsService cachedSettingsService) {
+    public StaleBranchesJob(StructureService structureService, PropertyService propertyService, EventQueryService eventQueryService) {
         this.structureService = structureService;
         this.propertyService = propertyService;
         this.eventQueryService = eventQueryService;
-        this.cachedSettingsService = cachedSettingsService;
     }
 
     @Override
@@ -80,50 +75,46 @@ public class StaleBranchesJob implements JobProvider {
     }
 
     protected void detectAndManageStaleBranches(JobInfoListener infoListener) {
-        // Disabling and deletion times
-        GeneralSettings settings = cachedSettingsService.getCachedSettings(GeneralSettings.class);
-        int disablingDuration = settings.getDisablingDuration();
-        int deletionDuration = settings.getDeletingDuration();
-        // Nothing to do if no disabling time
-        if (disablingDuration <= 0) {
-            infoListener.post("No disabling time being set - exiting.");
-        } else {
-            // Current time
-            LocalDateTime now = Time.now();
-            // Disabling time
-            LocalDateTime disablingTime = now.minusDays(disablingDuration);
-            // Deletion time
-            Optional<LocalDateTime> deletionTime =
-                    Optional.ofNullable(
-                            deletionDuration > 0 ?
-                                    disablingTime.minusDays(deletionDuration) :
-                                    null
-                    );
-            // Logging
-            infoListener.post(format("Disabling time: %s", disablingTime));
-            infoListener.post(format("Deletion time: %s", deletionTime));
-            // For all projects
-            structureService.getProjectList().forEach(
-                    project -> detectAndManageStaleBranches(infoListener, project, disablingTime, deletionTime)
-            );
-        }
+        // For all projects
+        structureService.getProjectList().forEach(
+                project -> detectAndManageStaleBranches(infoListener, project)
+        );
     }
 
-    protected void detectAndManageStaleBranches(JobInfoListener infoListener, Project project, LocalDateTime disablingTime, Optional<LocalDateTime> deletionTime) {
-        // FIXME Deletion/desactivation is activated at project?
-        infoListener.post(format("[%s] Scanning project for stale branches", project.getName()));
-        structureService.getBranchesForProject(project.getId()).forEach(
-                branch -> detectAndManageStaleBranch(infoListener, branch, disablingTime, deletionTime)
-        );
+    protected void detectAndManageStaleBranches(JobInfoListener infoListener, Project project) {
+        // Gets the stale property for the project
+        propertyService.getProperty(project, StalePropertyType.class).option().ifPresent(property -> {
+            // Disabling and deletion times
+            int disablingDuration = property.getDisablingDuration();
+            int deletionDuration = property.getDeletingDuration();
+            if (disablingDuration <= 0) {
+                infoListener.post(format("[%s] No disabling time being set - exiting.", project.getName()));
+            } else {
+                // Current time
+                LocalDateTime now = Time.now();
+                // Disabling time
+                LocalDateTime disablingTime = now.minusDays(disablingDuration);
+                // Deletion time
+                Optional<LocalDateTime> deletionTime =
+                        Optional.ofNullable(
+                                deletionDuration > 0 ?
+                                        disablingTime.minusDays(deletionDuration) :
+                                        null
+                        );
+                // Logging
+                infoListener.post(format("[%s] Disabling time: %s", project.getName(), disablingTime));
+                infoListener.post(format("[%s] Deletion time: %s", project.getName(), deletionTime));
+                // Going on with the scan of the project
+                infoListener.post(format("[%s] Scanning project for stale branches", project.getName()));
+                structureService.getBranchesForProject(project.getId()).forEach(
+                        branch -> detectAndManageStaleBranch(infoListener, branch, disablingTime, deletionTime)
+                );
+            }
+        });
     }
 
     protected void detectAndManageStaleBranch(JobInfoListener infoListener, Branch branch, LocalDateTime disablingTime, Optional<LocalDateTime> deletionTime) {
         infoListener.post(format("[%s][%s] Scanning branch for staleness", branch.getProject().getName(), branch.getName()));
-        // Build filter to get the last build
-        StandardBuildFilter filter = new StandardBuildFilter(
-                StandardBuildFilterData.of(1),
-                propertyService
-        );
         // Templates are excluded
         if (branch.getType() == BranchType.TEMPLATE_DEFINITION) {
             infoListener.post(format("[%s][%s] Branch templates are not eligible for staleness", branch.getProject().getName(), branch.getName()));
@@ -132,8 +123,8 @@ public class StaleBranchesJob implements JobProvider {
         // Last date
         LocalDateTime lastTime;
         // Last build on this branch
-        List<Build> builds = structureService.getFilteredBuilds(branch.getId(), filter);
-        if (builds.isEmpty()) {
+        Optional<Build> oBuild = structureService.getLastBuild(branch.getId());
+        if (!oBuild.isPresent()) {
             infoListener.post(format("[%s][%s] No available build - taking branch's creation time", branch.getProject().getName(), branch.getName()));
             // Takes the branch creation time
             List<Event> events = eventQueryService.getEvents(
@@ -150,7 +141,7 @@ public class StaleBranchesJob implements JobProvider {
                 lastTime = events.get(0).getSignature().getTime();
             }
         } else {
-            Build build = builds.get(0);
+            Build build = oBuild.get();
             lastTime = build.getSignature().getTime();
         }
         // Logging

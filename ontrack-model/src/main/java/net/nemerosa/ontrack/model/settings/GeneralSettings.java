@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.model.form.Int;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
+@Deprecated
 public class GeneralSettings {
 
     @Wither
