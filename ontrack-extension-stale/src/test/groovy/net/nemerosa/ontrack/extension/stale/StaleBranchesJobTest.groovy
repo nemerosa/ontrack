@@ -1,11 +1,8 @@
-package net.nemerosa.ontrack.service
+package net.nemerosa.ontrack.extension.stale
 
-import net.nemerosa.ontrack.model.buildfilter.BuildFilter
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventQueryService
-import net.nemerosa.ontrack.model.settings.CachedSettingsService
-import net.nemerosa.ontrack.model.settings.GeneralSettings
 import net.nemerosa.ontrack.model.structure.*
 import org.junit.Before
 import org.junit.Test
@@ -14,15 +11,14 @@ import java.time.LocalDateTime
 
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd
 import static org.mockito.Matchers.any
-import static org.mockito.Matchers.eq
 import static org.mockito.Mockito.*
 
 class StaleBranchesJobTest {
 
     private StaleBranchesJob job
     private StructureService structureService
+    private PropertyService propertyService
     private EventQueryService eventQueryService
-    private CachedSettingsService cachedSettingsService
     private Project project
     private Branch branch
     private LocalDateTime now
@@ -32,14 +28,12 @@ class StaleBranchesJobTest {
     @Before
     void before() {
         structureService = mock(StructureService)
-        def propertyService = mock(PropertyService)
+        propertyService = mock(PropertyService)
         eventQueryService = mock(EventQueryService)
-        cachedSettingsService = mock(CachedSettingsService)
         job = new StaleBranchesJob(
                 structureService,
                 propertyService,
                 eventQueryService,
-                cachedSettingsService
         )
 
 
@@ -47,7 +41,7 @@ class StaleBranchesJobTest {
         branch = Branch.of(project, nd('B', '')).withId(ID.of(1))
 
         // By default, no build
-        when(structureService.getFilteredBuilds(any(ID), any(BuildFilter))).thenReturn([])
+        when(structureService.getLastBuild(any(ID))).thenReturn(Optional.empty())
 
         // Times
         now = LocalDateTime.now()
@@ -155,18 +149,6 @@ class StaleBranchesJobTest {
         verify(structureService, never()).saveBranch(any(Branch))
     }
 
-    @Test
-    void 'No scan when disabling is set to 0'() {
-        // Settings
-        when(cachedSettingsService.getCachedSettings(GeneralSettings)).thenReturn(
-                GeneralSettings.of() // Defaults
-        )
-        // Scan
-        job.detectAndManageStaleBranches({println it})
-        // No scan
-        verify(structureService, never()).getProjectList()
-    }
-
     protected def configureBranchCreationEvent(int branchAge) {
         when(eventQueryService.getEvents(ProjectEntityType.BRANCH, branch.id, EventFactory.NEW_BRANCH, 0, 1)).thenReturn([
                 new Event(
@@ -183,7 +165,7 @@ class StaleBranchesJobTest {
     }
 
     protected def configureBuild(int buildAge) {
-        when(structureService.getFilteredBuilds(eq(branch.id), any(BuildFilter))).thenReturn([
+        when(structureService.getLastBuild(branch.id)).thenReturn(Optional.of(
                 Build.of(
                         branch,
                         nd('1', ''),
@@ -192,7 +174,7 @@ class StaleBranchesJobTest {
                                 'test'
                         )
                 )
-        ])
+        ))
     }
 
 }
