@@ -15,7 +15,7 @@ import static org.mockito.Mockito.*
 
 class StaleBranchesJobTest {
 
-    private StaleBranchesJob job
+    private StaleBranchesJobProvider job
     private StructureService structureService
     private PropertyService propertyService
     private EventQueryService eventQueryService
@@ -30,7 +30,7 @@ class StaleBranchesJobTest {
         structureService = mock(StructureService)
         propertyService = mock(PropertyService)
         eventQueryService = mock(EventQueryService)
-        job = new StaleBranchesJob(
+        job = new StaleBranchesJobProvider(
                 structureService,
                 propertyService,
                 eventQueryService,

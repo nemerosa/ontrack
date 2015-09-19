@@ -11,9 +11,9 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -21,14 +21,14 @@ import static java.lang.String.format;
  * Detection and management of stale branches.
  */
 @Component
-public class StaleBranchesJob implements JobProvider {
+public class StaleBranchesJobProvider implements JobProvider {
 
     private final StructureService structureService;
     private final PropertyService propertyService;
     private final EventQueryService eventQueryService;
 
     @Autowired
-    public StaleBranchesJob(StructureService structureService, PropertyService propertyService, EventQueryService eventQueryService) {
+    public StaleBranchesJobProvider(StructureService structureService, PropertyService propertyService, EventQueryService eventQueryService) {
         this.structureService = structureService;
         this.propertyService = propertyService;
         this.eventQueryService = eventQueryService;
@@ -36,49 +36,51 @@ public class StaleBranchesJob implements JobProvider {
 
     @Override
     public Collection<Job> getJobs() {
-        return Collections.singletonList(
-                new Job() {
-                    @Override
-                    public String getCategory() {
-                        return "System";
-                    }
-
-                    @Override
-                    public String getId() {
-                        return "StaleBranches";
-                    }
-
-                    @Override
-                    public String getDescription() {
-                        return "Detection and management of stale branches";
-                    }
-
-                    @Override
-                    public boolean isDisabled() {
-                        return false;
-                    }
-
-                    /**
-                     * Once a day
-                     */
-                    @Override
-                    public int getInterval() {
-                        return Job.DAY;
-                    }
-
-                    @Override
-                    public JobTask createTask() {
-                        return new RunnableJobTask(StaleBranchesJob.this::detectAndManageStaleBranches);
-                    }
-                }
-        );
+        // Gets all projects...
+        return structureService.getProjectList().stream()
+                // ... which have a StaleProperty
+                .filter(project -> propertyService.hasProperty(project, StalePropertyType.class))
+                        // ... and associates a job with them
+                .map(this::createStaleJob)
+                        // OK
+                .collect(Collectors.toList());
     }
 
-    protected void detectAndManageStaleBranches(JobInfoListener infoListener) {
-        // For all projects
-        structureService.getProjectList().forEach(
-                project -> detectAndManageStaleBranches(infoListener, project)
-        );
+    protected Job createStaleJob(Project project) {
+        return new Job() {
+            @Override
+            public String getCategory() {
+                return "StaleBranches";
+            }
+
+            @Override
+            public String getId() {
+                return project.getId().toString();
+            }
+
+            @Override
+            public String getDescription() {
+                return "Detection and management of stale branches for " + project.getName();
+            }
+
+            @Override
+            public boolean isDisabled() {
+                return project.isDisabled();
+            }
+
+            /**
+             * Once a day
+             */
+            @Override
+            public int getInterval() {
+                return Job.DAY;
+            }
+
+            @Override
+            public JobTask createTask() {
+                return new RunnableJobTask(jobInfoListener -> detectAndManageStaleBranches(jobInfoListener, project));
+            }
+        };
     }
 
     protected void detectAndManageStaleBranches(JobInfoListener infoListener, Project project) {
