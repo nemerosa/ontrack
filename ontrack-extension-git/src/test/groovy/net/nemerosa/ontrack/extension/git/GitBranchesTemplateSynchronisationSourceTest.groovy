@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.git
 
-import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration
 import net.nemerosa.ontrack.extension.git.service.GitService
@@ -15,8 +14,6 @@ import static org.mockito.Mockito.when
 
 class GitBranchesTemplateSynchronisationSourceTest {
 
-    final GitExtensionFeature extensionFeature = new GitExtensionFeature()
-    ExtensionManager extensionManager
     GitService gitService
     GitBranchesTemplateSynchronisationSource source
     GitConfiguration gitConfiguration
@@ -28,36 +25,24 @@ class GitBranchesTemplateSynchronisationSourceTest {
         project = Project.of(nd('P', "Project"))
         branch = Branch.of(project, nd('B', "Branch"))
         gitConfiguration = BasicGitConfiguration.empty()
-        extensionManager = mock(ExtensionManager)
         gitService = mock(GitService)
         when(gitService.getProjectConfiguration(project)).thenReturn(Optional.of(gitConfiguration))
         when(gitService.getRemoteBranches(gitConfiguration)).thenReturn(
                 ['master', 'feature/ontrack-40-templating', 'feature/ontrack-111-project-manager', 'fix/ontrack-110']
         )
         source = new GitBranchesTemplateSynchronisationSource(
-                extensionFeature,
-                extensionManager,
                 gitService
         )
     }
 
     @Test
-    void 'Not applicable if feature not enabled'() {
-        when(extensionManager.isExtensionFeatureEnabled(extensionFeature)).thenReturn(false)
-        when(gitService.isBranchConfiguredForGit(branch)).thenReturn(true)
-        assert !source.isApplicable(branch)
-    }
-
-    @Test
     void 'Not applicable if branch not configured for Git'() {
-        when(extensionManager.isExtensionFeatureEnabled(extensionFeature)).thenReturn(true)
         when(gitService.isBranchConfiguredForGit(branch)).thenReturn(false)
         assert !source.isApplicable(branch)
     }
 
     @Test
-    void 'Applicable if feature enabled and branch configured for Git'() {
-        when(extensionManager.isExtensionFeatureEnabled(extensionFeature)).thenReturn(true)
+    void 'Applicable if branch configured for Git'() {
         when(gitService.isBranchConfiguredForGit(branch)).thenReturn(true)
         assert source.isApplicable(branch)
     }

@@ -1,7 +1,5 @@
 package net.nemerosa.ontrack.extension.svn.template;
 
-import net.nemerosa.ontrack.extension.api.ExtensionManager;
-import net.nemerosa.ontrack.extension.svn.SVNExtensionFeature;
 import net.nemerosa.ontrack.extension.svn.service.SVNService;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.structure.Branch;
@@ -17,16 +15,12 @@ import java.util.stream.Collectors;
 @Component
 public class SVNBranchesTemplateSynchronisationSource extends AbstractTemplateSynchronisationSource<SVNBranchesTemplateSynchronisationSourceConfig> {
 
-    private final SVNExtensionFeature svnExtensionFeature;
-    private final ExtensionManager extensionManager;
     private final SVNService svnService;
     private final TransactionService transactionService;
 
     @Autowired
-    public SVNBranchesTemplateSynchronisationSource(SVNExtensionFeature svnExtensionFeature, ExtensionManager extensionManager, SVNService svnService, TransactionService transactionService) {
+    public SVNBranchesTemplateSynchronisationSource(SVNService svnService, TransactionService transactionService) {
         super(SVNBranchesTemplateSynchronisationSourceConfig.class);
-        this.svnExtensionFeature = svnExtensionFeature;
-        this.extensionManager = extensionManager;
         this.svnService = svnService;
         this.transactionService = transactionService;
     }
@@ -43,8 +37,7 @@ public class SVNBranchesTemplateSynchronisationSource extends AbstractTemplateSy
 
     @Override
     public boolean isApplicable(Branch branch) {
-        return extensionManager.isExtensionFeatureEnabled(svnExtensionFeature)
-                && svnService.getSVNRepository(branch).isPresent();
+        return svnService.getSVNRepository(branch).isPresent();
     }
 
     @Override

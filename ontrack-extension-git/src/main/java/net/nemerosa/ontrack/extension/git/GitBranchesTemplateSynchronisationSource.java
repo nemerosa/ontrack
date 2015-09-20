@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.git;
 
-import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.model.form.Form;
@@ -18,15 +17,11 @@ import java.util.stream.Collectors;
 @Component
 public class GitBranchesTemplateSynchronisationSource extends AbstractTemplateSynchronisationSource<GitBranchesTemplateSynchronisationSourceConfig> {
 
-    private final GitExtensionFeature gitExtensionFeature;
-    private final ExtensionManager extensionManager;
     private final GitService gitService;
 
     @Autowired
-    public GitBranchesTemplateSynchronisationSource(GitExtensionFeature gitExtensionFeature, ExtensionManager extensionManager, GitService gitService) {
+    public GitBranchesTemplateSynchronisationSource(GitService gitService) {
         super(GitBranchesTemplateSynchronisationSourceConfig.class);
-        this.gitExtensionFeature = gitExtensionFeature;
-        this.extensionManager = extensionManager;
         this.gitService = gitService;
     }
 
@@ -42,8 +37,7 @@ public class GitBranchesTemplateSynchronisationSource extends AbstractTemplateSy
 
     @Override
     public boolean isApplicable(Branch branch) {
-        return extensionManager.isExtensionFeatureEnabled(gitExtensionFeature)
-                && gitService.isBranchConfiguredForGit(branch);
+        return gitService.isBranchConfiguredForGit(branch);
     }
 
     @Override

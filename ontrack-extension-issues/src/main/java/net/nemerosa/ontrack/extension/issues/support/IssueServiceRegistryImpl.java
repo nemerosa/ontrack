@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.issues.support;
 
-import net.nemerosa.ontrack.extension.api.AvailableExtension;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtension;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
@@ -26,8 +25,7 @@ public class IssueServiceRegistryImpl implements IssueServiceRegistry {
     }
 
     protected Map<String, IssueServiceExtension> getIssueServiceExtensionMap() {
-        return extensionManager.getAllExtensions(IssueServiceExtension.class).stream()
-                .map(AvailableExtension::getExtension)
+        return extensionManager.getExtensions(IssueServiceExtension.class).stream()
                 .collect(Collectors.toMap(
                                 IssueServiceExtension::getId,
                                 x -> x
@@ -43,7 +41,6 @@ public class IssueServiceRegistryImpl implements IssueServiceRegistry {
     @Override
     public IssueServiceExtension getIssueService(String id) {
         return getOptionalIssueService(id)
-                .filter(extensionManager::isExtensionEnabled)
                 .orElseThrow(() -> new IssueServiceNotAvailableException(id));
     }
 
