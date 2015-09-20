@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.jenkins;
 
-import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
+import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.jenkins.client.JenkinsClient;
 import net.nemerosa.ontrack.extension.jenkins.client.JenkinsClientFactory;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;

@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.api;
+package net.nemerosa.ontrack.model.extension;
 
 import lombok.Data;
 

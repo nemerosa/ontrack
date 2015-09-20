@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.service.security;
 
-import net.nemerosa.ontrack.extension.api.Extension;
-import net.nemerosa.ontrack.extension.api.ExtensionFeature;
+import net.nemerosa.ontrack.model.extension.Extension;
+import net.nemerosa.ontrack.model.extension.ExtensionFeature;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.support.StartupService;
 import org.slf4j.Logger;

@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.svn;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
+import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.api.model.FileDiffChangeLogRequest;
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest;

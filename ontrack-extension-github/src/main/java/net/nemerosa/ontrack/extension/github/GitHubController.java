@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.github;
 
-import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
+import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClient;
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory;
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration;

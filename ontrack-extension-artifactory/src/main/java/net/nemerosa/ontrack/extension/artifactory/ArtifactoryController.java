@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.artifactory;
 
-import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
+import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClient;
 import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClientFactory;
 import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfiguration;

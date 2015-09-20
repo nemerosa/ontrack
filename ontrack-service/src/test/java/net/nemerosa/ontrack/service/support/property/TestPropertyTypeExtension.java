@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service.support.property;
 
-import net.nemerosa.ontrack.extension.api.ExtensionFeature;
+import net.nemerosa.ontrack.model.extension.ExtensionFeature;
 import net.nemerosa.ontrack.extension.api.PropertyTypeExtension;
 import net.nemerosa.ontrack.model.structure.PropertyType;
 import org.springframework.beans.factory.annotation.Autowired;

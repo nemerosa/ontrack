@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.support;
 
-import net.nemerosa.ontrack.extension.api.ExtensionFeature;
-import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
+import net.nemerosa.ontrack.model.extension.ExtensionFeature;
+import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Resource;
 

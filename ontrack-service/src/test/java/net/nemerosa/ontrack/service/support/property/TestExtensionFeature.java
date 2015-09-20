@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service.support.property;
 
-import net.nemerosa.ontrack.extension.api.ExtensionFeature;
+import net.nemerosa.ontrack.model.extension.ExtensionFeature;
 import org.springframework.stereotype.Component;
 
 @Component

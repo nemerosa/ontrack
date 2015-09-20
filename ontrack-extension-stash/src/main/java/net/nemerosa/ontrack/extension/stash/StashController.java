@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.stash;
 
 import net.nemerosa.ontrack.client.OTHttpClient;
-import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
+import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.stash.model.StashConfiguration;
 import net.nemerosa.ontrack.extension.stash.service.StashConfigurationService;
