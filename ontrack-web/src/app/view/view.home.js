@@ -27,9 +27,10 @@ angular.module('ot.view.home', [
                     ot.call($http.get(project._branchStatusViews)).then(function (branchStatusViews) {
                         project.branchStatusViews = branchStatusViews;
                         // All branches disabled?
-                        project.allBranchesDisabled = branchStatusViews.resources.every(function (branchStatusView) {
-                            return branchStatusView.branch.disabled || branchStatusView.branch.type == 'TEMPLATE_DEFINITION';
-                        });
+                        project.allBranchesDisabled = branchStatusViews.resources.length > 0 &&
+                            branchStatusViews.resources.every(function (branchStatusView) {
+                                return branchStatusView.branch.disabled || branchStatusView.branch.type == 'TEMPLATE_DEFINITION';
+                            });
                     });
                 });
                 // Commands
