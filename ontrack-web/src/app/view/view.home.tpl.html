@@ -20,7 +20,7 @@
             <table class="ot-home-projects">
                 <tbody>
                 <tr ng-repeat="project in projectCollection.resources | filter:{name:projectNameFilter}"
-                    ng-show="showDisabled || !project.disabled">
+                    ng-show="showDisabled || (!project.disabled && !project.allBranchesDisabled)">
                     <td ng-class="{'ot-entity-disabled': project.disabled}">
                         <a href="#/project/{{project.id}}">
                             {{project.name}}
