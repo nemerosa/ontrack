@@ -6,6 +6,8 @@ import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventQueryService;
 import net.nemerosa.ontrack.model.job.*;
 import net.nemerosa.ontrack.model.structure.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +24,8 @@ import static java.lang.String.format;
  */
 @Component
 public class StaleBranchesJobProvider implements JobProvider {
+
+    private final Logger logger = LoggerFactory.getLogger(StaleBranchesJobProvider.class);
 
     private final StructureService structureService;
     private final PropertyService propertyService;
@@ -83,6 +87,14 @@ public class StaleBranchesJobProvider implements JobProvider {
         };
     }
 
+    protected void trace(Project project, String pattern, Object... arguments) {
+        logger.debug(format(
+                "[%s] %s",
+                project.getName(),
+                format(pattern, arguments)
+        ));
+    }
+
     protected void detectAndManageStaleBranches(JobInfoListener infoListener, Project project) {
         // Gets the stale property for the project
         propertyService.getProperty(project, StalePropertyType.class).option().ifPresent(property -> {
@@ -90,7 +102,7 @@ public class StaleBranchesJobProvider implements JobProvider {
             int disablingDuration = property.getDisablingDuration();
             int deletionDuration = property.getDeletingDuration();
             if (disablingDuration <= 0) {
-                infoListener.post(format("[%s] No disabling time being set - exiting.", project.getName()));
+                trace(project, "No disabling time being set - exiting.");
             } else {
                 // Current time
                 LocalDateTime now = Time.now();
@@ -104,22 +116,23 @@ public class StaleBranchesJobProvider implements JobProvider {
                                         null
                         );
                 // Logging
-                infoListener.post(format("[%s] Disabling time: %s", project.getName(), disablingTime));
-                infoListener.post(format("[%s] Deletion time: %s", project.getName(), deletionTime));
+                trace(project, "Disabling time: %s", disablingTime);
+                trace(project, "Deletion time: %s", deletionTime);
                 // Going on with the scan of the project
-                infoListener.post(format("[%s] Scanning project for stale branches", project.getName()));
+                infoListener.post(format("Scanning %s project for stale branches", project.getName()));
+                trace(project, "Scanning project for stale branches");
                 structureService.getBranchesForProject(project.getId()).forEach(
-                        branch -> detectAndManageStaleBranch(infoListener, branch, disablingTime, deletionTime)
+                        branch -> detectAndManageStaleBranch(branch, disablingTime, deletionTime)
                 );
             }
         });
     }
 
-    protected void detectAndManageStaleBranch(JobInfoListener infoListener, Branch branch, LocalDateTime disablingTime, Optional<LocalDateTime> deletionTime) {
-        infoListener.post(format("[%s][%s] Scanning branch for staleness", branch.getProject().getName(), branch.getName()));
+    protected void detectAndManageStaleBranch(Branch branch, LocalDateTime disablingTime, Optional<LocalDateTime> deletionTime) {
+        trace(branch.getProject(), "[%s] Scanning branch for staleness", branch.getName());
         // Templates are excluded
         if (branch.getType() == BranchType.TEMPLATE_DEFINITION) {
-            infoListener.post(format("[%s][%s] Branch templates are not eligible for staleness", branch.getProject().getName(), branch.getName()));
+            trace(branch.getProject(), "[%s] Branch templates are not eligible for staleness", branch.getName());
             return;
         }
         // Last date
@@ -127,7 +140,7 @@ public class StaleBranchesJobProvider implements JobProvider {
         // Last build on this branch
         Optional<Build> oBuild = structureService.getLastBuild(branch.getId());
         if (!oBuild.isPresent()) {
-            infoListener.post(format("[%s][%s] No available build - taking branch's creation time", branch.getProject().getName(), branch.getName()));
+            trace(branch.getProject(), "[%s] No available build - taking branch's creation time", branch.getName());
             // Takes the branch creation time
             List<Event> events = eventQueryService.getEvents(
                     ProjectEntityType.BRANCH,
@@ -137,7 +150,7 @@ public class StaleBranchesJobProvider implements JobProvider {
                     1
             );
             if (events.isEmpty()) {
-                infoListener.post(format("[%s][%s] No available branch creation date - keeping the branch", branch.getProject().getName(), branch.getName()));
+                trace(branch.getProject(), "[%s] No available branch creation date - keeping the branch", branch.getName());
                 lastTime = Time.now();
             } else {
                 lastTime = events.get(0).getSignature().getTime();
@@ -147,18 +160,18 @@ public class StaleBranchesJobProvider implements JobProvider {
             lastTime = build.getSignature().getTime();
         }
         // Logging
-        infoListener.post(format("[%s][%s] Branch last build activity: %s", branch.getProject().getName(), branch.getName(), lastTime));
+        trace(branch.getProject(), "[%s] Branch last build activity: %s", branch.getName(), lastTime);
         // Deletion?
         if (deletionTime.isPresent() && deletionTime.get().compareTo(lastTime) > 0) {
-            infoListener.post(format("[%s][%s] Branch due for deletion", branch.getProject().getName(), branch.getName()));
+            trace(branch.getProject(), "[%s] Branch due for deletion", branch.getName());
             structureService.deleteBranch(branch.getId());
         } else if (disablingTime.compareTo(lastTime) > 0 && !branch.isDisabled()) {
-            infoListener.post(format("[%s][%s] Branch due for staleness - disabling", branch.getProject().getName(), branch.getName()));
+            trace(branch.getProject(), "[%s] Branch due for staleness - disabling", branch.getName());
             structureService.saveBranch(
                     branch.withDisabled(true)
             );
         } else {
-            infoListener.post(format("[%s][%s] Not touching the branch", branch.getProject().getName(), branch.getName()));
+            trace(branch.getProject(), "[%s] Not touching the branch", branch.getName());
         }
     }
 }
