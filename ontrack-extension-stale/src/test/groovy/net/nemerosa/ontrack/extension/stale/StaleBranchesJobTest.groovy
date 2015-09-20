@@ -56,7 +56,7 @@ class StaleBranchesJobTest {
         // Branch creation for deletion (normally)
         configureBranchCreationEvent(11)
 
-        job.detectAndManageStaleBranch({ println it }, branch, disablingTime, deletingTime)
+        job.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
 
         verify(structureService, never()).deleteBranch(any(ID))
         verify(structureService, never()).saveBranch(any(Branch))
@@ -67,7 +67,7 @@ class StaleBranchesJobTest {
         // Last build for deletion
         configureBuild(11)
 
-        job.detectAndManageStaleBranch({ println it }, branch, disablingTime, deletingTime)
+        job.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
 
         verify(structureService).deleteBranch(branch.id)
         verify(structureService, never()).saveBranch(any(Branch))
@@ -80,7 +80,7 @@ class StaleBranchesJobTest {
         // Last build for deletion
         configureBuild(11)
 
-        job.detectAndManageStaleBranch({ println it }, branch, disablingTime, deletingTime)
+        job.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
 
         verify(structureService, never()).deleteBranch(any(ID))
         verify(structureService).saveBranch(branch.withDisabled(true))
@@ -91,7 +91,7 @@ class StaleBranchesJobTest {
         // Last build for disabling
         configureBuild(6)
 
-        job.detectAndManageStaleBranch({ println it }, branch, disablingTime, deletingTime)
+        job.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
 
         verify(structureService, never()).deleteBranch(any(ID))
         verify(structureService).saveBranch(branch.withDisabled(true))
@@ -102,7 +102,7 @@ class StaleBranchesJobTest {
         // Last build still OK
         configureBuild(4)
 
-        job.detectAndManageStaleBranch({ println it }, branch, disablingTime, deletingTime)
+        job.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
 
         verify(structureService, never()).deleteBranch(any(ID))
         verify(structureService, never()).saveBranch(any(Branch))
@@ -113,7 +113,7 @@ class StaleBranchesJobTest {
         // Configure branch for deletion
         configureBranchCreationEvent(11)
 
-        job.detectAndManageStaleBranch({ println it }, branch, disablingTime, deletingTime)
+        job.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
 
         verify(structureService).deleteBranch(branch.id)
         verify(structureService, never()).saveBranch(any(Branch))
@@ -124,7 +124,7 @@ class StaleBranchesJobTest {
         // Configure branch for disabling
         configureBranchCreationEvent(6)
 
-        job.detectAndManageStaleBranch({ println it }, branch, disablingTime, deletingTime)
+        job.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
 
         verify(structureService, never()).deleteBranch(any(ID))
         verify(structureService).saveBranch(branch.withDisabled(true))
@@ -135,7 +135,7 @@ class StaleBranchesJobTest {
         // Configure branch for OK
         configureBranchCreationEvent(4)
 
-        job.detectAndManageStaleBranch({ println it }, branch, disablingTime, deletingTime)
+        job.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
 
         verify(structureService, never()).deleteBranch(any(ID))
         verify(structureService, never()).saveBranch(any(Branch))
@@ -143,7 +143,7 @@ class StaleBranchesJobTest {
 
     @Test
     void 'Not touching a branch when no branch creation time'() {
-        job.detectAndManageStaleBranch({ println it }, branch, disablingTime, deletingTime)
+        job.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
 
         verify(structureService, never()).deleteBranch(any(ID))
         verify(structureService, never()).saveBranch(any(Branch))
