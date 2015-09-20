@@ -15,7 +15,9 @@ public class LinkPropertyTypeTest {
 
     @Before
     public void before() {
-        type = new LinkPropertyType();
+        type = new LinkPropertyType(
+                new GeneralExtensionFeature()
+        );
     }
 
     @Test

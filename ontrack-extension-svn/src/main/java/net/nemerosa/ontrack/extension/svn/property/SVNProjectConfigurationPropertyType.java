@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.svn.property;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.common.MapBuilder;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
+import net.nemerosa.ontrack.extension.svn.SVNExtensionFeature;
 import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration;
 import net.nemerosa.ontrack.extension.svn.service.SVNConfigurationService;
 import net.nemerosa.ontrack.model.form.Form;
@@ -27,7 +28,8 @@ public class SVNProjectConfigurationPropertyType extends AbstractPropertyType<SV
     private final SVNConfigurationService configurationService;
 
     @Autowired
-    public SVNProjectConfigurationPropertyType(SVNConfigurationService configurationService) {
+    public SVNProjectConfigurationPropertyType(SVNExtensionFeature extensionFeature, SVNConfigurationService configurationService) {
+        super(extensionFeature);
         this.configurationService = configurationService;
     }
 

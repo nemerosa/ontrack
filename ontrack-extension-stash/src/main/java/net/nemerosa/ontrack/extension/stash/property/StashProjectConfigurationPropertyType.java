@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.stash.property;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.common.MapBuilder;
+import net.nemerosa.ontrack.extension.stash.StashExtensionFeature;
 import net.nemerosa.ontrack.extension.stash.model.StashConfiguration;
 import net.nemerosa.ontrack.extension.stash.service.StashConfigurationService;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
@@ -27,7 +28,8 @@ public class StashProjectConfigurationPropertyType extends AbstractPropertyType<
     private final StashConfigurationService configurationService;
 
     @Autowired
-    public StashProjectConfigurationPropertyType(StashConfigurationService configurationService) {
+    public StashProjectConfigurationPropertyType(StashExtensionFeature extensionFeature, StashConfigurationService configurationService) {
+        super(extensionFeature);
         this.configurationService = configurationService;
     }
 

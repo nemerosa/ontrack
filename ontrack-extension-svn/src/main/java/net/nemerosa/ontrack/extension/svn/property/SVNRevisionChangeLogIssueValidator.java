@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.svn.property;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLog;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogIssueValidation;
+import net.nemerosa.ontrack.extension.svn.SVNExtensionFeature;
 import net.nemerosa.ontrack.extension.svn.db.SVNIssueRevisionDao;
 import net.nemerosa.ontrack.extension.svn.model.SVNChangeLog;
 import net.nemerosa.ontrack.extension.svn.model.SVNChangeLogIssue;
@@ -26,8 +27,8 @@ public class SVNRevisionChangeLogIssueValidator extends AbstractSVNChangeLogIssu
     private final SVNIssueRevisionDao issueRevisionDao;
 
     @Autowired
-    public SVNRevisionChangeLogIssueValidator(PropertyService propertyService, SVNIssueRevisionDao issueRevisionDao) {
-        super(propertyService);
+    public SVNRevisionChangeLogIssueValidator(SVNExtensionFeature extensionFeature, PropertyService propertyService, SVNIssueRevisionDao issueRevisionDao) {
+        super(extensionFeature, propertyService);
         this.issueRevisionDao = issueRevisionDao;
     }
 

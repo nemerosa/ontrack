@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.scm.property.AbstractSCMChangeLogIssueVali
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.model.SVNChangeLogIssue;
 import net.nemerosa.ontrack.extension.svn.model.SVNHistory;
+import net.nemerosa.ontrack.model.extension.ExtensionFeature;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.Branch;
@@ -17,7 +18,8 @@ public abstract class AbstractSVNChangeLogIssueValidator<T> extends AbstractSCMC
 
     private final PropertyService propertyService;
 
-    public AbstractSVNChangeLogIssueValidator(PropertyService propertyService) {
+    public AbstractSVNChangeLogIssueValidator(ExtensionFeature extensionFeature, PropertyService propertyService) {
+        super(extensionFeature);
         this.propertyService = propertyService;
     }
 

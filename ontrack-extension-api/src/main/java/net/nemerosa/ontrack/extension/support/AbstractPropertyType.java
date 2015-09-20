@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.exceptions.PropertyTypeStorageReadException;
 import net.nemerosa.ontrack.model.exceptions.PropertyValidationException;
+import net.nemerosa.ontrack.model.extension.ExtensionFeature;
 import net.nemerosa.ontrack.model.structure.Property;
 import net.nemerosa.ontrack.model.structure.PropertyType;
 import org.apache.commons.lang3.StringUtils;
@@ -13,6 +14,17 @@ import org.apache.commons.lang3.StringUtils;
 public abstract class AbstractPropertyType<T> implements PropertyType<T> {
 
     private static final ObjectMapper mapper = ObjectMapperFactory.create();
+
+    private final ExtensionFeature extensionFeature;
+
+    protected AbstractPropertyType(ExtensionFeature extensionFeature) {
+        this.extensionFeature = extensionFeature;
+    }
+
+    @Override
+    public ExtensionFeature getFeature() {
+        return extensionFeature;
+    }
 
     @Override
     public Property<T> of(T value) {

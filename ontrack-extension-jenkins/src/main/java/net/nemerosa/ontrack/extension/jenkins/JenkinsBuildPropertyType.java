@@ -23,8 +23,8 @@ import java.util.function.Function;
 public class JenkinsBuildPropertyType extends AbstractJenkinsPropertyType<JenkinsBuildProperty> {
 
     @Autowired
-    public JenkinsBuildPropertyType(JenkinsConfigurationService configurationService) {
-        super(configurationService);
+    public JenkinsBuildPropertyType(JenkinsExtensionFeature extensionFeature, JenkinsConfigurationService configurationService) {
+        super(extensionFeature, configurationService);
     }
 
     @Override

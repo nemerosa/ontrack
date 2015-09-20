@@ -19,8 +19,8 @@ import java.util.function.Function;
 public class JenkinsJobPropertyType extends AbstractJenkinsPropertyType<JenkinsJobProperty> {
 
     @Autowired
-    public JenkinsJobPropertyType(JenkinsConfigurationService configurationService) {
-        super(configurationService);
+    public JenkinsJobPropertyType(JenkinsExtensionFeature extensionFeature, JenkinsConfigurationService configurationService) {
+        super(extensionFeature, configurationService);
     }
 
     @Override

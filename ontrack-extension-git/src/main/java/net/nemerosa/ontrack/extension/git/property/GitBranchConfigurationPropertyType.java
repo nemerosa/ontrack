@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.git.property;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.extension.git.GitExtensionFeature;
 import net.nemerosa.ontrack.extension.git.model.BuildGitCommitLink;
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink;
 import net.nemerosa.ontrack.extension.git.model.IndexableBuildGitCommitLink;
@@ -30,7 +31,8 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
     private final BuildGitCommitLinkService buildGitCommitLinkService;
 
     @Autowired
-    public GitBranchConfigurationPropertyType(BuildGitCommitLinkService buildGitCommitLinkService) {
+    public GitBranchConfigurationPropertyType(GitExtensionFeature extensionFeature, BuildGitCommitLinkService buildGitCommitLinkService) {
+        super(extensionFeature);
         this.buildGitCommitLinkService = buildGitCommitLinkService;
     }
 

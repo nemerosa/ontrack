@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.support.ConfigurationPropertyType;
 import net.nemerosa.ontrack.service.support.configuration.TestConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.EnumSet;
@@ -18,6 +19,11 @@ import java.util.function.Function;
 
 @Component
 public class TestPropertyType extends AbstractPropertyType<TestProperty> implements ConfigurationPropertyType<TestConfiguration, TestProperty> {
+
+    @Autowired
+    public TestPropertyType(TestExtensionFeature extensionFeature) {
+        super(extensionFeature);
+    }
 
     @Override
     public String getName() {

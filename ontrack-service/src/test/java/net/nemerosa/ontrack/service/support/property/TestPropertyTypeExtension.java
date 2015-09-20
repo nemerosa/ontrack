@@ -15,7 +15,9 @@ public class TestPropertyTypeExtension implements PropertyTypeExtension<TestProp
     @Autowired
     public TestPropertyTypeExtension(TestExtensionFeature extensionFeature) {
         this.extensionFeature = extensionFeature;
-        this.propertyType = new TestPropertyType();
+        this.propertyType = new TestPropertyType(
+                new TestExtensionFeature()
+        );
     }
 
 

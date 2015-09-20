@@ -13,7 +13,8 @@ public abstract class AbstractJenkinsPropertyType<T extends AbstractJenkinsPrope
 
     protected final JenkinsConfigurationService configurationService;
 
-    protected AbstractJenkinsPropertyType(JenkinsConfigurationService configurationService) {
+    protected AbstractJenkinsPropertyType(JenkinsExtensionFeature extensionFeature, JenkinsConfigurationService configurationService) {
+        super(extensionFeature);
         this.configurationService = configurationService;
     }
 

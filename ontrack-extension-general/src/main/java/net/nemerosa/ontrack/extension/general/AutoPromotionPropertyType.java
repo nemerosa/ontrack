@@ -23,7 +23,8 @@ public class AutoPromotionPropertyType extends AbstractPropertyType<AutoPromotio
     private final StructureService structureService;
 
     @Autowired
-    public AutoPromotionPropertyType(StructureService structureService) {
+    public AutoPromotionPropertyType(GeneralExtensionFeature extensionFeature, StructureService structureService) {
+        super(extensionFeature);
         this.structureService = structureService;
     }
 

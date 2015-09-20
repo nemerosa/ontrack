@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.artifactory.property;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.common.MapBuilder;
+import net.nemerosa.ontrack.extension.artifactory.ArtifactoryExtensionFeature;
 import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfiguration;
 import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfigurationService;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
@@ -28,7 +29,8 @@ public class ArtifactoryPromotionSyncPropertyType extends AbstractPropertyType<A
     private final ArtifactoryConfigurationService configurationService;
 
     @Autowired
-    public ArtifactoryPromotionSyncPropertyType(ArtifactoryConfigurationService configurationService) {
+    public ArtifactoryPromotionSyncPropertyType(ArtifactoryExtensionFeature extensionFeature, ArtifactoryConfigurationService configurationService) {
+        super(extensionFeature);
         this.configurationService = configurationService;
     }
 

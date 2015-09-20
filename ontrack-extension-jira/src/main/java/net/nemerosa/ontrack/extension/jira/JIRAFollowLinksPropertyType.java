@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -19,6 +20,11 @@ import java.util.stream.Collectors;
 
 @Component
 public class JIRAFollowLinksPropertyType extends AbstractPropertyType<JIRAFollowLinksProperty> {
+
+    @Autowired
+    public JIRAFollowLinksPropertyType(JIRAExtensionFeature extensionFeature) {
+        super(extensionFeature);
+    }
 
     @Override
     public String getName() {
