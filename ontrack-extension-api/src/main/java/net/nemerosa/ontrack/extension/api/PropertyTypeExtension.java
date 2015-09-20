@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.structure.PropertyType;
 /**
  * This extension allows the definition of a property.
  */
+@Deprecated
 public interface PropertyTypeExtension<T> extends Extension {
 
     /**
