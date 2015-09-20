@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.api.ExtensionFeature;
 import net.nemerosa.ontrack.extension.api.PropertyTypeExtension;
 import net.nemerosa.ontrack.model.structure.PropertyType;
 
+@Deprecated
 public abstract class AbstractPropertyTypeExtension<T> extends AbstractExtension implements PropertyTypeExtension {
 
     private final PropertyType<T> propertyType;

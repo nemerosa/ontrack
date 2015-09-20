@@ -14,16 +14,20 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.support.ConfigurationPropertyType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.Function;
 
+@Component
 public class ArtifactoryPromotionSyncPropertyType extends AbstractPropertyType<ArtifactoryPromotionSyncProperty>
         implements ConfigurationPropertyType<ArtifactoryConfiguration, ArtifactoryPromotionSyncProperty> {
 
     private final ArtifactoryConfigurationService configurationService;
 
+    @Autowired
     public ArtifactoryPromotionSyncPropertyType(ArtifactoryConfigurationService configurationService) {
         this.configurationService = configurationService;
     }

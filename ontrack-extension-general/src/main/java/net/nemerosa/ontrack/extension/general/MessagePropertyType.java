@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.Describable;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
+import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -17,6 +18,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Component
 public class MessagePropertyType extends AbstractPropertyType<MessageProperty> {
 
     @Override

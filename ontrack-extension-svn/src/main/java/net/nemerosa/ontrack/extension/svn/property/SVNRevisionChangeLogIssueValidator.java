@@ -12,16 +12,20 @@ import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.MultiStrings;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.PropertyService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.OptionalLong;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Component
 public class SVNRevisionChangeLogIssueValidator extends AbstractSVNChangeLogIssueValidator<SVNRevisionChangeLogIssueValidatorConfig> {
 
     private final SVNIssueRevisionDao issueRevisionDao;
 
+    @Autowired
     public SVNRevisionChangeLogIssueValidator(PropertyService propertyService, SVNIssueRevisionDao issueRevisionDao) {
         super(propertyService);
         this.issueRevisionDao = issueRevisionDao;

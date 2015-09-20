@@ -8,12 +8,15 @@ import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
+import org.springframework.stereotype.Component;
 
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.Function;
 
+@Component
 public class AutoPromotionLevelPropertyType extends AbstractPropertyType<AutoPromotionLevelProperty> {
+
     @Override
     public String getName() {
         return "Auto promotion levels";
