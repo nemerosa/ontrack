@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.boot.ui
 
 import net.nemerosa.ontrack.boot.properties.AutoValidationStampProperty
 import net.nemerosa.ontrack.boot.properties.AutoValidationStampPropertyType
+import net.nemerosa.ontrack.boot.properties.CoreExtensionFeature
 import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
@@ -191,7 +192,12 @@ class ValidationRunControllerTest {
     void 'Get validation stamp by name - not found - predefined'() {
         when(propertyService.getProperty(branch.getProject(), AutoValidationStampPropertyType.class)).thenReturn(
                 new Property<AutoValidationStampProperty>(
-                        new AutoValidationStampPropertyType(),
+                        new AutoValidationStampPropertyType(
+                                new CoreExtensionFeature(),
+                                predefinedValidationStampService,
+                                securityService,
+                                structureService
+                        ),
                         new AutoValidationStampProperty(true),
                         true
                 )

@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.boot.properties;
+package net.nemerosa.ontrack.extension.general;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
@@ -27,7 +27,7 @@ public class AutoPromotionLevelPropertyType extends AbstractPropertyType<AutoPro
 
     @Autowired
     public AutoPromotionLevelPropertyType(
-            CoreExtensionFeature extensionFeature,
+            GeneralExtensionFeature extensionFeature,
             PredefinedPromotionLevelService predefinedPromotionLevelService,
             StructureService structureService,
             SecurityService securityService
