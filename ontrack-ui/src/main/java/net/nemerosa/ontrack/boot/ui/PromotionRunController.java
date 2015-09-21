@@ -1,15 +1,13 @@
 package net.nemerosa.ontrack.boot.ui;
 
-import net.nemerosa.ontrack.boot.properties.AutoPromotionLevelProperty;
-import net.nemerosa.ontrack.boot.properties.AutoPromotionLevelPropertyType;
 import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.exceptions.PromotionLevelNotFoundException;
+import net.nemerosa.ontrack.model.extension.PromotionLevelPropertyType;
 import net.nemerosa.ontrack.model.form.DateTime;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Selection;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Resources;
@@ -18,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -29,14 +28,12 @@ public class PromotionRunController extends AbstractResourceController {
     private final StructureService structureService;
     private final PropertyService propertyService;
     private final SecurityService securityService;
-    private final PredefinedPromotionLevelService predefinedPromotionLevelService;
 
     @Autowired
-    public PromotionRunController(StructureService structureService, PropertyService propertyService, SecurityService securityService, PredefinedPromotionLevelService predefinedPromotionLevelService) {
+    public PromotionRunController(StructureService structureService, PropertyService propertyService, SecurityService securityService) {
         this.structureService = structureService;
         this.propertyService = propertyService;
         this.securityService = securityService;
-        this.predefinedPromotionLevelService = predefinedPromotionLevelService;
     }
 
     @RequestMapping(value = "builds/{buildId}/promotionRun", method = RequestMethod.GET)
@@ -137,29 +134,39 @@ public class PromotionRunController extends AbstractResourceController {
             if (oPromotionLevel.isPresent()) {
                 return oPromotionLevel.get();
             } else {
-                Optional<AutoPromotionLevelProperty> oAutoPromotionLevelProperty = propertyService.getProperty(branch.getProject(), AutoPromotionLevelPropertyType.class).option();
-                // Checks if the project allows for auto creation of promotion levels
-                if (oAutoPromotionLevelProperty.isPresent() && oAutoPromotionLevelProperty.get().isAutoCreate()) {
-                    Optional<PredefinedPromotionLevel> oPredefinedPromotionLevel = predefinedPromotionLevelService.findPredefinedPromotionLevelByName(promotionLevelName);
-                    if (oPredefinedPromotionLevel.isPresent()) {
-                        // Creates the promotion level
-                        return securityService.asAdmin(() -> structureService.newPromotionLevelFromPredefined(branch, oPredefinedPromotionLevel.get()));
-                    } else {
-                        throw new PromotionLevelNotFoundException(
-                                branch.getProject().getName(),
-                                branch.getName(),
+                List<Property<?>> properties = propertyService.getProperties(branch.getProject());
+                for (Property<?> property : properties) {
+                    PropertyType<?> type = property.getType();
+                    if (type instanceof PromotionLevelPropertyType && !property.isEmpty()) {
+                        oPromotionLevel = getPromotionLevelFromProperty(
+                                property,
+                                branch,
                                 promotionLevelName
                         );
+                        if (oPromotionLevel.isPresent()) {
+                            return oPromotionLevel.get();
+                        }
                     }
-                } else {
-                    throw new PromotionLevelNotFoundException(
-                            branch.getProject().getName(),
-                            branch.getName(),
-                            promotionLevelName
-                    );
                 }
+                throw new PromotionLevelNotFoundException(
+                        branch.getProject().getName(),
+                        branch.getName(),
+                        promotionLevelName
+                );
             }
         }
+    }
+
+    protected <T> Optional<PromotionLevel> getPromotionLevelFromProperty(
+            Property<T> property,
+            Branch branch,
+            String promotionLevelName) {
+        PromotionLevelPropertyType<T> promotionLevelPropertyType = (PromotionLevelPropertyType<T>) property.getType();
+        return promotionLevelPropertyType.getOrCreatePromotionLevel(
+                property.getValue(),
+                branch,
+                promotionLevelName
+        );
     }
 
 }
