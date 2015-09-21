@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.boot.properties;
+package net.nemerosa.ontrack.extension.general;
 
 import lombok.Data;
 

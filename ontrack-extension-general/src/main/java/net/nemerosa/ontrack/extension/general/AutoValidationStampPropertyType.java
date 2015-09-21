@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.boot.properties;
+package net.nemerosa.ontrack.extension.general;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
@@ -26,7 +26,7 @@ public class AutoValidationStampPropertyType extends AbstractPropertyType<AutoVa
     private final StructureService structureService;
 
     @Autowired
-    public AutoValidationStampPropertyType(CoreExtensionFeature extensionFeature, PredefinedValidationStampService predefinedValidationStampService, SecurityService securityService, StructureService structureService) {
+    public AutoValidationStampPropertyType(GeneralExtensionFeature extensionFeature, PredefinedValidationStampService predefinedValidationStampService, SecurityService securityService, StructureService structureService) {
         super(extensionFeature);
         this.predefinedValidationStampService = predefinedValidationStampService;
         this.securityService = securityService;
