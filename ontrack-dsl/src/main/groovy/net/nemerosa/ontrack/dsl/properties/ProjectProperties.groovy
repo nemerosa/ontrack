@@ -118,13 +118,13 @@ class ProjectProperties extends ProjectEntityProperties {
      */
 
     def autoValidationStamp(boolean autoCreate = true) {
-        property('net.nemerosa.ontrack.boot.properties.AutoValidationStampPropertyType', [
+        property('net.nemerosa.ontrack.extension.general.AutoValidationStampPropertyType', [
                 autoCreate: autoCreate
         ])
     }
 
     boolean getAutoValidationStamp() {
-        property('net.nemerosa.ontrack.boot.properties.AutoValidationStampPropertyType')?.autoCreate
+        property('net.nemerosa.ontrack.extension.general.AutoValidationStampPropertyType')?.autoCreate
     }
 
     /**
@@ -132,13 +132,13 @@ class ProjectProperties extends ProjectEntityProperties {
      */
 
     def autoPromotionLevel(boolean autoCreate = true) {
-        property('net.nemerosa.ontrack.boot.properties.AutoPromotionLevelPropertyType', [
+        property('net.nemerosa.ontrack.extension.general.AutoPromotionLevelPropertyType', [
                 autoCreate: autoCreate
         ])
     }
 
     boolean getAutoPromotionLevel() {
-        property('net.nemerosa.ontrack.boot.properties.AutoPromotionLevelPropertyType')?.autoCreate
+        property('net.nemerosa.ontrack.extension.general.AutoPromotionLevelPropertyType')?.autoCreate
     }
 
 }
