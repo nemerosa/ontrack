@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.git.service
 
+import net.nemerosa.ontrack.extension.git.GitExtensionFeature
 import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
 import net.nemerosa.ontrack.extension.git.model.GitBranchConfiguration
-import net.nemerosa.ontrack.extension.git.model.GitConfiguration
 import net.nemerosa.ontrack.extension.git.model.GitConfigurator
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
@@ -18,8 +18,6 @@ import net.nemerosa.ontrack.tx.TransactionService
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
-import org.mockito.invocation.InvocationOnMock
-import org.mockito.stubbing.Answer
 
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd
 import static org.mockito.Mockito.mock
@@ -38,13 +36,12 @@ class GitServiceImplTest {
         propertyService = mock(PropertyService)
 
         def gitConfigurator = mock(GitConfigurator)
-        when(gitConfigurator.getConfiguration(Mockito.any(Project))).thenAnswer(
-                new Answer<Optional<GitConfiguration>>() {
-                    @Override
-                    Optional<GitConfiguration> answer(InvocationOnMock invocation) throws Throwable {
-                        return Optional.of(BasicGitConfiguration.empty().withRemote("remote").withName('MyGitConfig'))
-                    }
-                }
+        when(gitConfigurator.getConfiguration(Mockito.any(Project.class))).thenReturn(
+                Optional.of(
+                        BasicGitConfiguration.empty()
+                                .withRemote("remote")
+                                .withName("MyGitConfig")
+                )
         )
 
         gitService = new GitServiceImpl(
@@ -82,7 +79,10 @@ class GitServiceImplTest {
         [b11, b12, b20].each { branch ->
             when(propertyService.getProperty(branch, GitBranchConfigurationPropertyType)).thenReturn(
                     new Property<GitBranchConfigurationProperty>(
-                            new GitBranchConfigurationPropertyType(buildGitCommitLinkService),
+                            new GitBranchConfigurationPropertyType(
+                                    new GitExtensionFeature(),
+                                    buildGitCommitLinkService
+                            ),
                             null,
                             false
                     )

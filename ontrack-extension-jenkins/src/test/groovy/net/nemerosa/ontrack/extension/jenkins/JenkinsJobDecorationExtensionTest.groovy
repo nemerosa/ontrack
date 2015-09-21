@@ -49,7 +49,10 @@ class JenkinsJobDecorationExtensionTest {
 
 
         jenkinsJobProperty = Property.of(
-                new JenkinsJobPropertyType(null),
+                new JenkinsJobPropertyType(
+                        new JenkinsExtensionFeature(),
+                        null
+                ),
                 new JenkinsJobProperty(
                         jenkinsConfiguration,
                         'MyBuild'

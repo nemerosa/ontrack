@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.git.service
 
 import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.extension.git.GitExtensionFeature
 import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
 import net.nemerosa.ontrack.extension.git.model.GitBranchConfiguration
@@ -80,7 +81,10 @@ class GitBuildSyncIT {
                 new TagPattern("1.2.*"))
         when(propertyService.getProperty(branch, GitBranchConfigurationPropertyType)).thenReturn(
                 Property.of(
-                        new GitBranchConfigurationPropertyType(buildGitCommitLinkService),
+                        new GitBranchConfigurationPropertyType(
+                                new GitExtensionFeature(),
+                                buildGitCommitLinkService
+                        ),
                         new GitBranchConfigurationProperty(
                                 'master',
                                 configuredBuildGitCommitLink.toServiceConfiguration(),
