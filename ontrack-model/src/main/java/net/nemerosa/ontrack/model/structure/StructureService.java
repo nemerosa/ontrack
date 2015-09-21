@@ -97,6 +97,8 @@ public interface StructureService {
 
     PromotionLevel newPromotionLevelFromPredefined(Branch branch, PredefinedPromotionLevel predefinedPromotionLevel);
 
+    PromotionLevel getOrCreatePromotionLevel(Branch branch, Integer promotionLevelId, String promotionLevelName);
+
     // Promotion runs
 
     PromotionRun newPromotionRun(PromotionRun promotionRun);

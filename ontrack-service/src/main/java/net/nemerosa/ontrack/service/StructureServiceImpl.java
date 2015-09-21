@@ -13,7 +13,9 @@ import net.nemerosa.ontrack.model.buildfilter.DefaultBuildFilter;
 import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.exceptions.BranchTemplateCannotHaveBuildException;
+import net.nemerosa.ontrack.model.exceptions.PromotionLevelNotFoundException;
 import net.nemerosa.ontrack.model.exceptions.ReorderingSizeException;
+import net.nemerosa.ontrack.model.extension.PromotionLevelPropertyType;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService;
 import net.nemerosa.ontrack.model.structure.*;
@@ -545,6 +547,54 @@ public class StructureServiceImpl implements StructureService {
         }
         // OK
         return promotionLevel;
+    }
+
+    @Override
+    public PromotionLevel getOrCreatePromotionLevel(Branch branch, Integer promotionLevelId, String promotionLevelName) {
+        if (promotionLevelId != null) {
+            return getPromotionLevel(ID.of(promotionLevelId));
+        } else {
+            Optional<PromotionLevel> oPromotionLevel = findPromotionLevelByName(
+                    branch.getProject().getName(),
+                    branch.getName(),
+                    promotionLevelName
+            );
+            if (oPromotionLevel.isPresent()) {
+                return oPromotionLevel.get();
+            } else {
+                List<Property<?>> properties = propertyService.getProperties(branch.getProject());
+                for (Property<?> property : properties) {
+                    PropertyType<?> type = property.getType();
+                    if (type instanceof PromotionLevelPropertyType && !property.isEmpty()) {
+                        oPromotionLevel = getPromotionLevelFromProperty(
+                                property,
+                                branch,
+                                promotionLevelName
+                        );
+                        if (oPromotionLevel.isPresent()) {
+                            return oPromotionLevel.get();
+                        }
+                    }
+                }
+                throw new PromotionLevelNotFoundException(
+                        branch.getProject().getName(),
+                        branch.getName(),
+                        promotionLevelName
+                );
+            }
+        }
+    }
+
+    protected <T> Optional<PromotionLevel> getPromotionLevelFromProperty(
+            Property<T> property,
+            Branch branch,
+            String promotionLevelName) {
+        PromotionLevelPropertyType<T> promotionLevelPropertyType = (PromotionLevelPropertyType<T>) property.getType();
+        return promotionLevelPropertyType.getOrCreatePromotionLevel(
+                property.getValue(),
+                branch,
+                promotionLevelName
+        );
     }
 
     @Override
