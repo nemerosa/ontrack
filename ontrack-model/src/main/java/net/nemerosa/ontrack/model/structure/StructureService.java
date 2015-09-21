@@ -143,6 +143,10 @@ public interface StructureService {
 
     void reorderValidationStamps(ID branchId, Reordering reordering);
 
+    ValidationStamp newValidationStampFromPredefined(Branch branch, PredefinedValidationStamp stamp);
+
+    ValidationStamp getOrCreateValidationStamp(Branch branch, Integer validationStampId, String validationStampName);
+
     // Validation runs
 
     ValidationRun newValidationRun(ValidationRun validationRun);

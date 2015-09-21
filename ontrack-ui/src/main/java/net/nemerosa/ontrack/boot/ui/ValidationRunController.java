@@ -1,8 +1,5 @@
 package net.nemerosa.ontrack.boot.ui;
 
-import net.nemerosa.ontrack.boot.properties.AutoValidationStampProperty;
-import net.nemerosa.ontrack.boot.properties.AutoValidationStampPropertyType;
-import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Selection;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -19,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -31,15 +27,13 @@ public class ValidationRunController extends AbstractResourceController {
     private final ValidationRunStatusService validationRunStatusService;
     private final PropertyService propertyService;
     private final SecurityService securityService;
-    private final PredefinedValidationStampService predefinedValidationStampService;
 
     @Autowired
-    public ValidationRunController(StructureService structureService, ValidationRunStatusService validationRunStatusService, PropertyService propertyService, SecurityService securityService, PredefinedValidationStampService predefinedValidationStampService) {
+    public ValidationRunController(StructureService structureService, ValidationRunStatusService validationRunStatusService, PropertyService propertyService, SecurityService securityService) {
         this.structureService = structureService;
         this.validationRunStatusService = validationRunStatusService;
         this.propertyService = propertyService;
         this.securityService = securityService;
-        this.predefinedValidationStampService = predefinedValidationStampService;
     }
 
     @RequestMapping(value = "builds/{buildId}/validationRuns/view", method = RequestMethod.GET)
@@ -114,58 +108,7 @@ public class ValidationRunController extends AbstractResourceController {
     }
 
     protected ValidationStamp getValidationStamp(Branch branch, Integer validationStampId, String validationStampName) {
-        if (validationStampId != null) {
-            return structureService.getValidationStamp(ID.of(validationStampId));
-        } else {
-            Optional<ValidationStamp> oValidationStamp = structureService.findValidationStampByName(
-                    branch.getProject().getName(),
-                    branch.getName(),
-                    validationStampName
-            );
-            if (oValidationStamp.isPresent()) {
-                return oValidationStamp.get();
-            } else {
-                Optional<AutoValidationStampProperty> oAutoValidationStampProperty = propertyService.getProperty(branch.getProject(), AutoValidationStampPropertyType.class).option();
-                // Checks if the project allows for auto creation of validation stamps
-                if (oAutoValidationStampProperty.isPresent() && oAutoValidationStampProperty.get().isAutoCreate()) {
-                    Optional<PredefinedValidationStamp> oPredefinedValidationStamp = predefinedValidationStampService.findPredefinedValidationStampByName(validationStampName);
-                    if (oPredefinedValidationStamp.isPresent()) {
-                        // Creates the validation stamp
-                        return securityService.asAdmin(() -> createValidationStamp(branch, oPredefinedValidationStamp.get()));
-                    } else {
-                        throw new ValidationStampNotFoundException(
-                                branch.getProject().getName(),
-                                branch.getName(),
-                                validationStampName
-                        );
-                    }
-                } else {
-                    throw new ValidationStampNotFoundException(
-                            branch.getProject().getName(),
-                            branch.getName(),
-                            validationStampName
-                    );
-                }
-            }
-        }
-    }
-
-    private ValidationStamp createValidationStamp(Branch branch, PredefinedValidationStamp predefinedValidationStamp) {
-        ValidationStamp validationStamp = structureService.newValidationStamp(
-                ValidationStamp.of(
-                        branch,
-                        NameDescription.nd(predefinedValidationStamp.getName(), predefinedValidationStamp.getDescription())
-                )
-        );
-        // Image?
-        if (predefinedValidationStamp.getImage() != null && predefinedValidationStamp.getImage()) {
-            structureService.setValidationStampImage(
-                    validationStamp.getId(),
-                    predefinedValidationStampService.getPredefinedValidationStampImage(predefinedValidationStamp.getId())
-            );
-        }
-        // OK
-        return validationStamp;
+        return structureService.getOrCreateValidationStamp(branch, validationStampId, validationStampName);
     }
 
     @RequestMapping(value = "validationRuns/{validationRunId}", method = RequestMethod.GET)

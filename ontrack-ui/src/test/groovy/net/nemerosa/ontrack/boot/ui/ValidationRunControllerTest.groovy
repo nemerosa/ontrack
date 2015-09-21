@@ -51,8 +51,7 @@ class ValidationRunControllerTest {
                 structureService,
                 validationRunStatusService,
                 propertyService,
-                securityService,
-                predefinedValidationStampService
+                securityService
         )
         // Mock URI builder for tests
         Field field = AbstractResourceController.class.getDeclaredField("uriBuilder")

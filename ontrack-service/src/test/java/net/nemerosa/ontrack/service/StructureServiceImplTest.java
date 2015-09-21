@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService;
+import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.repository.StructureRepository;
 import org.junit.Before;
@@ -34,6 +35,7 @@ public class StructureServiceImplTest {
         ExtensionManager extensionManager = mock(ExtensionManager.class);
         PropertyService propertyService = mock(PropertyService.class);
         PredefinedPromotionLevelService predefinedPromotionLevelService = mock(PredefinedPromotionLevelService.class);
+        PredefinedValidationStampService predefinedValidationStampService = mock(PredefinedValidationStampService.class);
         service = new StructureServiceImpl(
                 securityService,
                 eventService,
@@ -42,7 +44,8 @@ public class StructureServiceImplTest {
                 structureRepository,
                 extensionManager,
                 propertyService,
-                predefinedPromotionLevelService);
+                predefinedPromotionLevelService,
+                predefinedValidationStampService);
         // Model
         Project project = Project.of(nd("P", "Project")).withId(ID.of(1));
         Branch branch = Branch.of(project, nd("B", "Branch")).withId(ID.of(1));

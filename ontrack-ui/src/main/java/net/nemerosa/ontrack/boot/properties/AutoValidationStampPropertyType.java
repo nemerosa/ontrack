@@ -2,25 +2,54 @@ package net.nemerosa.ontrack.boot.properties;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
+import net.nemerosa.ontrack.model.extension.ValidationStampPropertyType;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.YesNo;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.structure.ProjectEntity;
-import net.nemerosa.ontrack.model.structure.ProjectEntityType;
+import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService;
+import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.EnumSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
 @Component
-public class AutoValidationStampPropertyType extends AbstractPropertyType<AutoValidationStampProperty> {
+public class AutoValidationStampPropertyType extends AbstractPropertyType<AutoValidationStampProperty>
+        implements ValidationStampPropertyType<AutoValidationStampProperty> {
+
+    private final PredefinedValidationStampService predefinedValidationStampService;
+    private final SecurityService securityService;
+    private final StructureService structureService;
 
     @Autowired
-    public AutoValidationStampPropertyType(CoreExtensionFeature extensionFeature) {
+    public AutoValidationStampPropertyType(CoreExtensionFeature extensionFeature, PredefinedValidationStampService predefinedValidationStampService, SecurityService securityService, StructureService structureService) {
         super(extensionFeature);
+        this.predefinedValidationStampService = predefinedValidationStampService;
+        this.securityService = securityService;
+        this.structureService = structureService;
+    }
+
+    @Override
+    public Optional<ValidationStamp> getOrCreateValidationStamp(AutoValidationStampProperty value, Branch branch, String validationStampName) {
+        if (value.isAutoCreate()) {
+            Optional<PredefinedValidationStamp> oPredefinedValidationStamp = predefinedValidationStampService.findPredefinedValidationStampByName(validationStampName);
+            if (oPredefinedValidationStamp.isPresent()) {
+                // Creates the validation stamp
+                return Optional.of(
+                        securityService.asAdmin(() ->
+                                        structureService.newValidationStampFromPredefined(
+                                                branch,
+                                                oPredefinedValidationStamp.get()
+                                        )
+                        )
+                );
+            }
+        }
+        return Optional.empty();
     }
 
     @Override
