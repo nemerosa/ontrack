@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
-import net.nemerosa.ontrack.extension.api.PropertyTypeExtension;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventPostService;
@@ -48,14 +47,10 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     public List<PropertyType<?>> getPropertyTypes() {
-        Collection<PropertyTypeExtension> extensions = extensionManager.getExtensions(PropertyTypeExtension.class);
-        List<PropertyType<?>> propertyTypes = new ArrayList<>();
-        for (PropertyTypeExtension extension : extensions) {
-            propertyTypes.add(
-                    extension.getPropertyType()
-            );
-        }
-        return propertyTypes;
+        Collection<PropertyType> types = extensionManager.getExtensions(PropertyType.class);
+        List<PropertyType<?>> result = new ArrayList<>();
+        types.forEach(result::add);
+        return result;
     }
 
     protected <T> PropertyType<T> getPropertyTypeByName(String propertyTypeName) {
