@@ -40,7 +40,10 @@ class AutoPromotionPropertyTypeTest {
     @Before
     void 'Setup'() {
         structureService = mock(StructureService)
-        type = new AutoPromotionPropertyType(structureService)
+        type = new AutoPromotionPropertyType(
+                new GeneralExtensionFeature(),
+                structureService
+        )
     }
 
     @Test

@@ -71,6 +71,8 @@ public interface StructureService {
      */
     List<Build> getFilteredBuilds(ID branchId, BuildFilter buildFilter);
 
+    Optional<Build> getLastBuild(ID branchId);
+
     List<Build> buildSearch(ID projectId, BuildSearchForm form);
 
     List<ValidationStampRunView> getValidationStampRunViewsForBuild(Build build);
@@ -94,6 +96,8 @@ public interface StructureService {
     void reorderPromotionLevels(ID branchId, Reordering reordering);
 
     PromotionLevel newPromotionLevelFromPredefined(Branch branch, PredefinedPromotionLevel predefinedPromotionLevel);
+
+    PromotionLevel getOrCreatePromotionLevel(Branch branch, Integer promotionLevelId, String promotionLevelName);
 
     // Promotion runs
 
@@ -138,6 +142,10 @@ public interface StructureService {
     Ack deleteValidationStamp(ID validationStampId);
 
     void reorderValidationStamps(ID branchId, Reordering reordering);
+
+    ValidationStamp newValidationStampFromPredefined(Branch branch, PredefinedValidationStamp stamp);
+
+    ValidationStamp getOrCreateValidationStamp(Branch branch, Integer validationStampId, String validationStampName);
 
     // Validation runs
 

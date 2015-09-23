@@ -8,6 +8,10 @@ public interface SettingsRepository {
 
     void setBoolean(Class<?> category, String name, boolean value);
 
+    int getInt(Class<?> category, String name, int defaultValue);
+
+    void setInt(Class<?> category, String name, int value);
+
     String getString(Class<?> category, String name, String defaultValue);
 
     void setString(Class<?> category, String name, String value);

@@ -13,9 +13,14 @@ import net.nemerosa.ontrack.model.buildfilter.DefaultBuildFilter;
 import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.exceptions.BranchTemplateCannotHaveBuildException;
+import net.nemerosa.ontrack.model.exceptions.PromotionLevelNotFoundException;
 import net.nemerosa.ontrack.model.exceptions.ReorderingSizeException;
+import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException;
+import net.nemerosa.ontrack.model.extension.PromotionLevelPropertyType;
+import net.nemerosa.ontrack.model.extension.ValidationStampPropertyType;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService;
+import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.PropertyServiceHelper;
 import net.nemerosa.ontrack.repository.StructureRepository;
@@ -26,7 +31,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -48,9 +56,10 @@ public class StructureServiceImpl implements StructureService {
     private final ExtensionManager extensionManager;
     private final PropertyService propertyService;
     private final PredefinedPromotionLevelService predefinedPromotionLevelService;
+    private final PredefinedValidationStampService predefinedValidationStampService;
 
     @Autowired
-    public StructureServiceImpl(SecurityService securityService, EventPostService eventPostService, EventFactory eventFactory, ValidationRunStatusService validationRunStatusService, StructureRepository structureRepository, ExtensionManager extensionManager, PropertyService propertyService, PredefinedPromotionLevelService predefinedPromotionLevelService) {
+    public StructureServiceImpl(SecurityService securityService, EventPostService eventPostService, EventFactory eventFactory, ValidationRunStatusService validationRunStatusService, StructureRepository structureRepository, ExtensionManager extensionManager, PropertyService propertyService, PredefinedPromotionLevelService predefinedPromotionLevelService, PredefinedValidationStampService predefinedValidationStampService) {
         this.securityService = securityService;
         this.eventPostService = eventPostService;
         this.eventFactory = eventFactory;
@@ -59,6 +68,7 @@ public class StructureServiceImpl implements StructureService {
         this.extensionManager = extensionManager;
         this.propertyService = propertyService;
         this.predefinedPromotionLevelService = predefinedPromotionLevelService;
+        this.predefinedValidationStampService = predefinedValidationStampService;
     }
 
     @Override
@@ -308,6 +318,17 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public Optional<Build> getLastBuild(ID branchId) {
+        return getFilteredBuilds(
+                branchId,
+                new StandardBuildFilter(
+                        StandardBuildFilterData.of(1),
+                        propertyService
+                )
+        ).stream().findFirst();
+    }
+
+    @Override
     public List<Build> buildSearch(ID projectId, BuildSearchForm form) {
         // Gets the project
         Project project = getProject(projectId);
@@ -537,6 +558,54 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public PromotionLevel getOrCreatePromotionLevel(Branch branch, Integer promotionLevelId, String promotionLevelName) {
+        if (promotionLevelId != null) {
+            return getPromotionLevel(ID.of(promotionLevelId));
+        } else {
+            Optional<PromotionLevel> oPromotionLevel = findPromotionLevelByName(
+                    branch.getProject().getName(),
+                    branch.getName(),
+                    promotionLevelName
+            );
+            if (oPromotionLevel.isPresent()) {
+                return oPromotionLevel.get();
+            } else {
+                List<Property<?>> properties = propertyService.getProperties(branch.getProject());
+                for (Property<?> property : properties) {
+                    PropertyType<?> type = property.getType();
+                    if (type instanceof PromotionLevelPropertyType && !property.isEmpty()) {
+                        oPromotionLevel = getPromotionLevelFromProperty(
+                                property,
+                                branch,
+                                promotionLevelName
+                        );
+                        if (oPromotionLevel.isPresent()) {
+                            return oPromotionLevel.get();
+                        }
+                    }
+                }
+                throw new PromotionLevelNotFoundException(
+                        branch.getProject().getName(),
+                        branch.getName(),
+                        promotionLevelName
+                );
+            }
+        }
+    }
+
+    protected <T> Optional<PromotionLevel> getPromotionLevelFromProperty(
+            Property<T> property,
+            Branch branch,
+            String promotionLevelName) {
+        PromotionLevelPropertyType<T> promotionLevelPropertyType = (PromotionLevelPropertyType<T>) property.getType();
+        return promotionLevelPropertyType.getOrCreatePromotionLevel(
+                property.getValue(),
+                branch,
+                promotionLevelName
+        );
+    }
+
+    @Override
     public PromotionRun newPromotionRun(PromotionRun promotionRun) {
         // Validation
         isEntityNew(promotionRun, "Promotion run must be new");
@@ -740,6 +809,73 @@ public class StructureServiceImpl implements StructureService {
         structureRepository.reorderValidationStamps(branchId, reordering);
         // Event
         eventPostService.post(eventFactory.reorderValidationStamps(branch));
+    }
+
+    @Override
+    public ValidationStamp getOrCreateValidationStamp(Branch branch, Integer validationStampId, String validationStampName) {
+        if (validationStampId != null) {
+            return getValidationStamp(ID.of(validationStampId));
+        } else {
+            Optional<ValidationStamp> oValidationStamp = findValidationStampByName(
+                    branch.getProject().getName(),
+                    branch.getName(),
+                    validationStampName
+            );
+            if (oValidationStamp.isPresent()) {
+                return oValidationStamp.get();
+            } else {
+                List<Property<?>> properties = propertyService.getProperties(branch.getProject());
+                for (Property<?> property : properties) {
+                    PropertyType<?> type = property.getType();
+                    if (type instanceof ValidationStampPropertyType && !property.isEmpty()) {
+                        oValidationStamp = getValidationStampFromProperty(
+                                property,
+                                branch,
+                                validationStampName
+                        );
+                        if (oValidationStamp.isPresent()) {
+                            return oValidationStamp.get();
+                        }
+                    }
+                }
+                throw new ValidationStampNotFoundException(
+                        branch.getProject().getName(),
+                        branch.getName(),
+                        validationStampName
+                );
+            }
+        }
+    }
+
+    protected <T> Optional<ValidationStamp> getValidationStampFromProperty(
+            Property<T> property,
+            Branch branch,
+            String validationStampName) {
+        ValidationStampPropertyType<T> validationStampPropertyType = (ValidationStampPropertyType<T>) property.getType();
+        return validationStampPropertyType.getOrCreateValidationStamp(
+                property.getValue(),
+                branch,
+                validationStampName
+        );
+    }
+
+    @Override
+    public ValidationStamp newValidationStampFromPredefined(Branch branch, PredefinedValidationStamp predefinedValidationStamp) {
+        ValidationStamp validationStamp = newValidationStamp(
+                ValidationStamp.of(
+                        branch,
+                        NameDescription.nd(predefinedValidationStamp.getName(), predefinedValidationStamp.getDescription())
+                )
+        );
+        // Image?
+        if (predefinedValidationStamp.getImage() != null && predefinedValidationStamp.getImage()) {
+            setValidationStampImage(
+                    validationStamp.getId(),
+                    predefinedValidationStampService.getPredefinedValidationStampImage(predefinedValidationStamp.getId())
+            );
+        }
+        // OK
+        return validationStamp;
     }
 
     @Override

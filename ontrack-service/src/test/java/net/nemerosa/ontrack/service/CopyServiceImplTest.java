@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.security.ProjectEdit;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.service.support.property.TestExtensionFeature;
 import net.nemerosa.ontrack.service.support.property.TestProperty;
 import net.nemerosa.ontrack.service.support.property.TestPropertyType;
 import org.junit.Before;
@@ -51,7 +52,9 @@ public class CopyServiceImplTest {
         );
 
         // Branch properties
-        TestPropertyType testPropertyType = new TestPropertyType();
+        TestPropertyType testPropertyType = new TestPropertyType(
+                new TestExtensionFeature()
+        );
         when(propertyService.getProperties(sourceBranch)).thenReturn(
                 Collections.singletonList(
                         Property.of(
@@ -125,7 +128,9 @@ public class CopyServiceImplTest {
         );
 
         // Branch properties
-        TestPropertyType testPropertyType = new TestPropertyType();
+        TestPropertyType testPropertyType = new TestPropertyType(
+                new TestExtensionFeature()
+        );
         when(propertyService.getProperties(sourceBranch)).thenReturn(
                 Collections.singletonList(
                         Property.of(
@@ -171,7 +176,9 @@ public class CopyServiceImplTest {
         );
 
         // Branch properties
-        TestPropertyType testPropertyType = new TestPropertyType();
+        TestPropertyType testPropertyType = new TestPropertyType(
+                new TestExtensionFeature()
+        );
         when(propertyService.getProperties(branch)).thenReturn(
                 Collections.singletonList(
                         Property.of(
@@ -214,7 +221,9 @@ public class CopyServiceImplTest {
         );
 
         // Properties for the branch
-        TestPropertyType testPropertyType = new TestPropertyType();
+        TestPropertyType testPropertyType = new TestPropertyType(
+                new TestExtensionFeature()
+        );
         when(propertyService.getProperties(sourceBranch)).thenReturn(
                 Collections.singletonList(
                         Property.of(
@@ -267,7 +276,9 @@ public class CopyServiceImplTest {
         when(structureService.newPromotionLevel(targetPromotionLevel)).thenReturn(targetPromotionLevel);
 
         // Properties for the promotion level
-        TestPropertyType testPropertyType = new TestPropertyType();
+        TestPropertyType testPropertyType = new TestPropertyType(
+                new TestExtensionFeature()
+        );
         when(propertyService.getProperties(sourcePromotionLevel)).thenReturn(
                 Collections.singletonList(
                         Property.of(
@@ -322,7 +333,9 @@ public class CopyServiceImplTest {
         when(structureService.newValidationStamp(targetValidationStamp)).thenReturn(targetValidationStamp);
 
         // Properties for the validation stamp
-        TestPropertyType testPropertyType = new TestPropertyType();
+        TestPropertyType testPropertyType = new TestPropertyType(
+                new TestExtensionFeature()
+        );
         when(propertyService.getProperties(sourceValidationStamp)).thenReturn(
                 Collections.singletonList(
                         Property.of(

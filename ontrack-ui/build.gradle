@@ -42,6 +42,7 @@ dependencies {
     runtime project(':ontrack-extension-stash')
     runtime project(':ontrack-extension-combined')
     runtime project(':ontrack-extension-ldap')
+    runtime project(':ontrack-extension-stale')
 }
 
 /**

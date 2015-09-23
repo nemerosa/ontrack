@@ -26,6 +26,11 @@ angular.module('ot.view.home', [
                 angular.forEach($scope.projectCollection.resources, function (project) {
                     ot.call($http.get(project._branchStatusViews)).then(function (branchStatusViews) {
                         project.branchStatusViews = branchStatusViews;
+                        // All branches disabled?
+                        project.allBranchesDisabled = branchStatusViews.resources.length > 0 &&
+                            branchStatusViews.resources.every(function (branchStatusView) {
+                                return branchStatusView.branch.disabled || branchStatusView.branch.type == 'TEMPLATE_DEFINITION';
+                            });
                     });
                 });
                 // Commands
@@ -42,7 +47,7 @@ angular.module('ot.view.home', [
                         }
                     }, {
                         id: 'showDisabled',
-                        name: "Show disabled items",
+                        name: "Show all hidden items",
                         cls: 'ot-command-show-disabled',
                         condition: function () {
                             return !$scope.showDisabled;

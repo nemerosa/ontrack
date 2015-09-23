@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.github.property;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.common.MapBuilder;
+import net.nemerosa.ontrack.extension.github.GitHubExtensionFeature;
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration;
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
@@ -14,17 +15,22 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.support.ConfigurationPropertyType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.Function;
 
+@Component
 public class GitHubProjectConfigurationPropertyType extends AbstractPropertyType<GitHubProjectConfigurationProperty>
         implements ConfigurationPropertyType<GitHubEngineConfiguration, GitHubProjectConfigurationProperty> {
 
     private final GitHubConfigurationService configurationService;
 
-    public GitHubProjectConfigurationPropertyType(GitHubConfigurationService configurationService) {
+    @Autowired
+    public GitHubProjectConfigurationPropertyType(GitHubExtensionFeature extensionFeature, GitHubConfigurationService configurationService) {
+        super(extensionFeature);
         this.configurationService = configurationService;
     }
 

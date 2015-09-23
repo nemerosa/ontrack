@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.git.property;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.extension.git.GitExtensionFeature;
 import net.nemerosa.ontrack.extension.git.model.BuildGitCommitLink;
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink;
 import net.nemerosa.ontrack.extension.git.model.IndexableBuildGitCommitLink;
@@ -15,6 +16,8 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.structure.ServiceConfiguration;
 import net.nemerosa.ontrack.model.structure.ServiceConfigurationSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.EnumSet;
@@ -22,11 +25,14 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Component
 public class GitBranchConfigurationPropertyType extends AbstractPropertyType<GitBranchConfigurationProperty> {
 
     private final BuildGitCommitLinkService buildGitCommitLinkService;
 
-    public GitBranchConfigurationPropertyType(BuildGitCommitLinkService buildGitCommitLinkService) {
+    @Autowired
+    public GitBranchConfigurationPropertyType(GitExtensionFeature extensionFeature, BuildGitCommitLinkService buildGitCommitLinkService) {
+        super(extensionFeature);
         this.buildGitCommitLinkService = buildGitCommitLinkService;
     }
 

@@ -14,4 +14,6 @@ public interface EventQueryService {
 
     List<Event> getEvents(ProjectEntityType entityType, ID entityId, int offset, int count);
 
+    List<Event> getEvents(ProjectEntityType entityType, ID entityId, EventType eventType, int offset, int count);
+
 }

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.git.property;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.extension.git.GitExtensionFeature;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.form.Form;
@@ -9,12 +10,20 @@ import net.nemerosa.ontrack.model.security.BuildCreate;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.Function;
 
+@Component
 public class GitCommitPropertyType extends AbstractPropertyType<GitCommitProperty> {
+
+    @Autowired
+    public GitCommitPropertyType(GitExtensionFeature extensionFeature) {
+        super(extensionFeature);
+    }
 
     @Override
     public String getName() {

@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.support;
 
-import net.nemerosa.ontrack.extension.api.Extension;
-import net.nemerosa.ontrack.extension.api.ExtensionFeature;
+import net.nemerosa.ontrack.model.extension.Extension;
+import net.nemerosa.ontrack.model.extension.ExtensionFeature;
 
 public abstract class AbstractExtension implements Extension {
 

@@ -2,10 +2,7 @@ package net.nemerosa.ontrack.extension.jenkins.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import net.nemerosa.ontrack.extension.jenkins.JenkinsConfiguration;
-import net.nemerosa.ontrack.extension.jenkins.JenkinsConfigurationService;
-import net.nemerosa.ontrack.extension.jenkins.JenkinsJobProperty;
-import net.nemerosa.ontrack.extension.jenkins.JenkinsJobPropertyType;
+import net.nemerosa.ontrack.extension.jenkins.*;
 import net.nemerosa.ontrack.model.form.Field;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
@@ -32,7 +29,10 @@ public class JenkinsJobPropertyTypeTest {
     public void before() {
         securityService = mock(SecurityService.class);
         configurationService = mock(JenkinsConfigurationService.class);
-        type = new JenkinsJobPropertyType(configurationService);
+        type = new JenkinsJobPropertyType(
+                new JenkinsExtensionFeature(),
+                configurationService
+        );
     }
 
     @Test

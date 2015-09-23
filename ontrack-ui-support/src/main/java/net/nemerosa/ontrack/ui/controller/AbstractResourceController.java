@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.ui.controller;
 
 import net.nemerosa.ontrack.extension.api.ActionExtension;
-import net.nemerosa.ontrack.extension.api.Extension;
+import net.nemerosa.ontrack.model.extension.Extension;
 import net.nemerosa.ontrack.model.support.Action;
 import org.springframework.beans.factory.annotation.Autowired;
 

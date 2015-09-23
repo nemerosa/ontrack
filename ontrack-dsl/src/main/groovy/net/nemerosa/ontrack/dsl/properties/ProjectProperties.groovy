@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.dsl.properties
 
 import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.Project
+import net.nemerosa.ontrack.dsl.PropertyNotFoundException
 
 class ProjectProperties extends ProjectEntityProperties {
 
@@ -10,12 +11,40 @@ class ProjectProperties extends ProjectEntityProperties {
     }
 
     /**
+     * Stale property.
+     *
+     * Sets the disabling and deleting durations (in days) on the project.
+     */
+    def stale(int disablingDuration = 0, int deletingDuration = 0) {
+        assert disablingDuration >= 0: "The disabling duration must be >= 0"
+        assert deletingDuration >= 0: "The deleting duration must be >= 0"
+        property('net.nemerosa.ontrack.extension.stale.StalePropertyType', [
+                disablingDuration: disablingDuration,
+                deletingDuration : deletingDuration,
+        ])
+    }
+
+    /**
+     * Gets the stale property
+     */
+    def getStale() {
+        try {
+            return property('net.nemerosa.ontrack.extension.stale.StalePropertyType')
+        } catch (PropertyNotFoundException ignored) {
+            return [
+                    disablingDuration: 0,
+                    deletingDuration : 0,
+            ]
+        }
+    }
+
+    /**
      * GitHub property
      * @param name Configuration name
      * @param parameters Map of GitHub parameters, like 'repository' and 'indexationInterval'
      */
     def gitHub(Map<String, ?> parameters, String name) {
-        assert parameters.containsKey('repository') : "The 'repository' parameter is required"
+        assert parameters.containsKey('repository'): "The 'repository' parameter is required"
         property('net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType',
                 parameters + [
                         configuration: name
@@ -89,13 +118,13 @@ class ProjectProperties extends ProjectEntityProperties {
      */
 
     def autoValidationStamp(boolean autoCreate = true) {
-        property('net.nemerosa.ontrack.boot.properties.AutoValidationStampPropertyType', [
+        property('net.nemerosa.ontrack.extension.general.AutoValidationStampPropertyType', [
                 autoCreate: autoCreate
         ])
     }
 
     boolean getAutoValidationStamp() {
-        property('net.nemerosa.ontrack.boot.properties.AutoValidationStampPropertyType')?.autoCreate
+        property('net.nemerosa.ontrack.extension.general.AutoValidationStampPropertyType')?.autoCreate
     }
 
     /**
@@ -103,13 +132,13 @@ class ProjectProperties extends ProjectEntityProperties {
      */
 
     def autoPromotionLevel(boolean autoCreate = true) {
-        property('net.nemerosa.ontrack.boot.properties.AutoPromotionLevelPropertyType', [
+        property('net.nemerosa.ontrack.extension.general.AutoPromotionLevelPropertyType', [
                 autoCreate: autoCreate
         ])
     }
 
     boolean getAutoPromotionLevel() {
-        property('net.nemerosa.ontrack.boot.properties.AutoPromotionLevelPropertyType')?.autoCreate
+        property('net.nemerosa.ontrack.extension.general.AutoPromotionLevelPropertyType')?.autoCreate
     }
 
 }

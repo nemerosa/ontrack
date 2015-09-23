@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.svn.property;
 
+import net.nemerosa.ontrack.extension.svn.SVNExtensionFeature;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
@@ -23,7 +24,10 @@ public class SVNBranchConfigurationPropertyTypeTest {
         SecurityService securityService = mock(SecurityService.class);
         when(securityService.isProjectFunctionGranted(1, ProjectConfig.class)).thenReturn(true);
 
-        SVNBranchConfigurationPropertyType propertyType = new SVNBranchConfigurationPropertyType(propertiesService);
+        SVNBranchConfigurationPropertyType propertyType = new SVNBranchConfigurationPropertyType(
+                new SVNExtensionFeature(),
+                propertiesService
+        );
 
         assertFalse(propertyType.canEdit(branch, securityService));
     }
@@ -39,7 +43,10 @@ public class SVNBranchConfigurationPropertyTypeTest {
         SecurityService securityService = mock(SecurityService.class);
         when(securityService.isProjectFunctionGranted(1, ProjectConfig.class)).thenReturn(true);
 
-        SVNBranchConfigurationPropertyType propertyType = new SVNBranchConfigurationPropertyType(propertiesService);
+        SVNBranchConfigurationPropertyType propertyType = new SVNBranchConfigurationPropertyType(
+                new SVNExtensionFeature(),
+                propertiesService
+        );
 
         assertTrue(propertyType.canEdit(branch, securityService));
     }

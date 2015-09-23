@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.svn.property;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.common.MapBuilder;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
+import net.nemerosa.ontrack.extension.svn.SVNExtensionFeature;
 import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration;
 import net.nemerosa.ontrack.extension.svn.service.SVNConfigurationService;
 import net.nemerosa.ontrack.model.form.Form;
@@ -13,17 +14,22 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.support.ConfigurationPropertyType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.Function;
 
+@Component
 public class SVNProjectConfigurationPropertyType extends AbstractPropertyType<SVNProjectConfigurationProperty>
         implements ConfigurationPropertyType<SVNConfiguration, SVNProjectConfigurationProperty> {
 
     private final SVNConfigurationService configurationService;
 
-    public SVNProjectConfigurationPropertyType(SVNConfigurationService configurationService) {
+    @Autowired
+    public SVNProjectConfigurationPropertyType(SVNExtensionFeature extensionFeature, SVNConfigurationService configurationService) {
+        super(extensionFeature);
         this.configurationService = configurationService;
     }
 

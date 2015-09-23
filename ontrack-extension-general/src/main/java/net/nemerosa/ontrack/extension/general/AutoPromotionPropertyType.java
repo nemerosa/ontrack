@@ -10,16 +10,21 @@ import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Component
 public class AutoPromotionPropertyType extends AbstractPropertyType<AutoPromotionProperty> {
 
     private final StructureService structureService;
 
-    public AutoPromotionPropertyType(StructureService structureService) {
+    @Autowired
+    public AutoPromotionPropertyType(GeneralExtensionFeature extensionFeature, StructureService structureService) {
+        super(extensionFeature);
         this.structureService = structureService;
     }
 

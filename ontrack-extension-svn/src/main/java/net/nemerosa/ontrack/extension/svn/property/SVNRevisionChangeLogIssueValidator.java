@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.svn.property;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLog;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogIssueValidation;
+import net.nemerosa.ontrack.extension.svn.SVNExtensionFeature;
 import net.nemerosa.ontrack.extension.svn.db.SVNIssueRevisionDao;
 import net.nemerosa.ontrack.extension.svn.model.SVNChangeLog;
 import net.nemerosa.ontrack.extension.svn.model.SVNChangeLogIssue;
@@ -12,18 +13,22 @@ import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.MultiStrings;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.PropertyService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.OptionalLong;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Component
 public class SVNRevisionChangeLogIssueValidator extends AbstractSVNChangeLogIssueValidator<SVNRevisionChangeLogIssueValidatorConfig> {
 
     private final SVNIssueRevisionDao issueRevisionDao;
 
-    public SVNRevisionChangeLogIssueValidator(PropertyService propertyService, SVNIssueRevisionDao issueRevisionDao) {
-        super(propertyService);
+    @Autowired
+    public SVNRevisionChangeLogIssueValidator(SVNExtensionFeature extensionFeature, PropertyService propertyService, SVNIssueRevisionDao issueRevisionDao) {
+        super(extensionFeature, propertyService);
         this.issueRevisionDao = issueRevisionDao;
     }
 

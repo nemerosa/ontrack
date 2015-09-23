@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.artifactory.service;
 
 import net.nemerosa.ontrack.common.Time;
+import net.nemerosa.ontrack.extension.artifactory.ArtifactoryExtensionFeature;
 import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClient;
 import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClientFactory;
 import net.nemerosa.ontrack.extension.artifactory.model.ArtifactoryStatus;
@@ -11,7 +12,6 @@ import net.nemerosa.ontrack.model.structure.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
@@ -64,7 +64,7 @@ public class ArtifactoryPromotionSyncServiceImplTest {
         );
 
         // Existing promotions
-        when(artifactoryClient.getStatuses(any())).thenReturn(Arrays.asList(
+        when(artifactoryClient.getStatuses(any())).thenReturn(Collections.singletonList(
                 new ArtifactoryStatus(
                         "COPPER",
                         "x",
@@ -126,7 +126,10 @@ public class ArtifactoryPromotionSyncServiceImplTest {
     public void syncBuildJobs_one_per_configured_branch() {
         when(propertyService.hasProperty(branch, ArtifactoryPromotionSyncPropertyType.class)).thenReturn(true);
         Property<ArtifactoryPromotionSyncProperty> property = Property.of(
-                new ArtifactoryPromotionSyncPropertyType(null),
+                new ArtifactoryPromotionSyncPropertyType(
+                        new ArtifactoryExtensionFeature(),
+                        null
+                ),
                 new ArtifactoryPromotionSyncProperty(
                         null,
                         "",

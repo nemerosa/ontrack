@@ -32,4 +32,15 @@ public interface EventRepository {
             Function<String, EventType> eventTypeLoader
     );
 
+    List<Event> query(
+            List<Integer> allowedProjects,
+            EventType eventType,
+            ProjectEntityType entityType,
+            ID entityId,
+            int offset,
+            int count,
+            BiFunction<ProjectEntityType, ID, ProjectEntity> entityLoader,
+            Function<String, EventType> eventTypeLoader
+    );
+
 }

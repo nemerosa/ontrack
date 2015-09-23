@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.jira;
 
-import net.nemerosa.ontrack.extension.api.ExtensionFeatureDescription;
+import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.jira.tx.JIRASession;
 import net.nemerosa.ontrack.extension.jira.tx.JIRASessionFactory;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;

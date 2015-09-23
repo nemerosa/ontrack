@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.issues;
 
-import net.nemerosa.ontrack.extension.api.Extension;
+import net.nemerosa.ontrack.model.extension.Extension;
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest;
 import net.nemerosa.ontrack.extension.issues.export.ExportFormat;
 import net.nemerosa.ontrack.extension.issues.export.ExportedIssues;

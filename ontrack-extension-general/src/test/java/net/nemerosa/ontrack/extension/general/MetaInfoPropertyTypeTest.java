@@ -10,7 +10,9 @@ import static org.junit.Assert.assertTrue;
 
 public class MetaInfoPropertyTypeTest {
 
-    private MetaInfoPropertyType type = new MetaInfoPropertyType();
+    private MetaInfoPropertyType type = new MetaInfoPropertyType(
+            new GeneralExtensionFeature()
+    );
 
     @Test
     public void containsValueNOKIfWrongFormat() {

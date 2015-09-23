@@ -1,8 +1,7 @@
 package net.nemerosa.ontrack.service.security;
 
-import net.nemerosa.ontrack.extension.api.AvailableExtension;
-import net.nemerosa.ontrack.extension.api.Extension;
-import net.nemerosa.ontrack.extension.api.ExtensionFeature;
+import net.nemerosa.ontrack.model.extension.Extension;
+import net.nemerosa.ontrack.model.extension.ExtensionFeature;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.support.StartupService;
 import org.slf4j.Logger;
@@ -22,7 +21,6 @@ public class ExtensionManagerImpl implements ExtensionManager, StartupService {
 
     private final ApplicationContext applicationContext;
     private Collection<? extends Extension> extensions;
-    private Collection<? extends ExtensionFeature> extensionFeatures;
 
     @Autowired
     public ExtensionManagerImpl(ApplicationContext applicationContext) {
@@ -41,7 +39,7 @@ public class ExtensionManagerImpl implements ExtensionManager, StartupService {
 
     /**
      * Startup: loads the extensions & features from the application context.
-     * <p/>
+     * <p>
      * This cannot be done at construction time because of dependency cycle between
      * some extensions that need access to the extension manager.
      */
@@ -50,7 +48,7 @@ public class ExtensionManagerImpl implements ExtensionManager, StartupService {
         logger.info("[extensions] Loading the extensions");
         extensions = applicationContext.getBeansOfType(Extension.class).values();
         logger.info("[extensions] Number of loaded extensions: {}", extensions.size());
-        extensionFeatures = applicationContext.getBeansOfType(ExtensionFeature.class).values();
+        Collection<? extends ExtensionFeature> extensionFeatures = applicationContext.getBeansOfType(ExtensionFeature.class).values();
         logger.info("[extensions] Extension features:");
         for (ExtensionFeature feature : extensionFeatures) {
             logger.info("[extensions] * {} [{}]", feature.getName(), feature.getId());
@@ -63,39 +61,9 @@ public class ExtensionManagerImpl implements ExtensionManager, StartupService {
         // Filters the extensions
         List<Extension> collection = extensions.stream()
                 .filter(extensionType::isInstance)
-                .filter(this::isExtensionEnabled)
                 .collect(Collectors.<Extension>toList());
         //noinspection unchecked
         return (Collection<T>) collection;
-    }
-
-    @Override
-    public <T extends Extension> Collection<AvailableExtension<T>> getAllExtensions(Class<T> extensionType) {
-        // Filters the extensions
-        @SuppressWarnings("unchecked")
-        List<AvailableExtension<T>> collection = extensions.stream()
-                .filter(extensionType::isInstance)
-                .map(x -> new AvailableExtension<T>(
-                        (T) x,
-                        isExtensionEnabled(x)
-                ))
-                .collect(Collectors.toList());
-        return collection;
-    }
-
-    @Override
-    public boolean isExtensionEnabled(Extension x) {
-        return isExtensionFeatureEnabled(x.getFeature());
-    }
-
-    @Override
-    public boolean isExtensionFeatureEnabled(ExtensionFeature feature) {
-        return isExtensionFeatureEnabled(feature.getId());
-    }
-
-    // TODO Disabling features
-    private boolean isExtensionFeatureEnabled(String id) {
-        return true;
     }
 
 }
