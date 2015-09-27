@@ -19,11 +19,11 @@ class DockerStart extends AbstractDocker {
 
     String containerName
 
+    boolean restart = false
+
     private String cid
 
     private int port
-
-    private boolean restart = false
 
     @TaskAction
     def start() {
