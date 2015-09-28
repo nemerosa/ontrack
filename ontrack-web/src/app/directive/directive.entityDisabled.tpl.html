@@ -1,8 +1,10 @@
 <div class="row" ng-if="entity.disabled">
-    <div class="col-md-12 ot-entity-disabled-alert">
-        <span ng-transclude></span>
-        <button class="btn btn-default btn-xs pull-right" ng-if="entity._enable" ng-click="enableEntity(entity)">
-            Enable
-        </button>
+    <div class="col-md-12">
+        <div class="ot-entity-disabled-alert">
+            <span ng-transclude></span>
+            <button class="btn btn-default btn-xs pull-right" ng-if="entity._enable" ng-click="enableEntity(entity)">
+                Enable
+            </button>
+        </div>
     </div>
 </div>

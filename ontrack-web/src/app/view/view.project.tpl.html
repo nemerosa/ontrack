@@ -7,11 +7,11 @@
     <div class="row">
         <div class="col-md-12">
             <ot-section-title>Branches</ot-section-title>
-            <div class="row">
-                <ot-noentry list="branchCollection.resources">
-                    No branch has been created yet.
-                </ot-noentry>
-                <div class="col-md-12" ng-if="branchCollection.resources">
+            <ot-noentry list="branchCollection.resources">
+                No branch has been created yet.
+            </ot-noentry>
+            <div class="row" ng-if="branchCollection.resources">
+                <div class="col-md-12">
                     <div class="ot-project-branch-filter input-group col-md-4"
                             ng-show="branchCollection.resources.length > 5">
                         <input class="form-control"
