@@ -39,6 +39,17 @@ class ACCDSL extends AbstractACCDSL {
     }
 
     @Test
+    void 'Project branches'() {
+        // Project and two branches
+        def name = uid('P')
+        ontrack.project(name) {
+            (1..5).each { branch("B${it}") }
+        }
+        // Checks the branches
+        assert ontrack.project(name).branches*.name == (1..5).collect { "B${it}" }
+    }
+
+    @Test
     void 'Getting last promoted build'() {
         def branch = createBuildsAndPromotions()
         // Getting the last promoted builds

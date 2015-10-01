@@ -14,6 +14,15 @@ class Project extends AbstractProjectResource {
         closure()
     }
 
+    /**
+     * Gets the list of branches for the project.
+     */
+    List<Branch> getBranches() {
+        ontrack.get(link('branches')).resources.collect {
+            new Branch(ontrack, it)
+        }
+    }
+
     Branch branch(String name, String description = '', boolean getIfExists = false) {
         def node = ontrack.get(link('branches')).resources.find { it.name == name }
         if (node) {
