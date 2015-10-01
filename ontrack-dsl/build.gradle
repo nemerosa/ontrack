@@ -31,6 +31,7 @@ task sourceJar(type: Jar) {
 task writeNewPom << {
     pom {
         project {
+            version versioning.info.display
             name project.name
             description project.description
             url 'http://nemerosa.github.io/ontrack'
