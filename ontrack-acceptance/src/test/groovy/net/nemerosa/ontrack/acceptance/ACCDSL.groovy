@@ -200,6 +200,18 @@ class ACCDSL extends AbstractACCDSL {
     }
 
     @Test
+    void 'Branch validation stamps'() {
+        def name = uid('P')
+        ontrack.project(name) {
+            branch('1.0') {
+                validationStamp 'CI'
+                validationStamp 'QA'
+            }
+        }
+        assert ontrack.branch(name, '1.0').validationStamps*.name == ['CI', 'QA']
+    }
+
+    @Test
     void 'Validation runs'() {
         def branch = createBuildsAndPromotions()
         // Creates one run

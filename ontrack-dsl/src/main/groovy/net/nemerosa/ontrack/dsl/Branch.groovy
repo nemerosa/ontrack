@@ -121,6 +121,15 @@ class Branch extends AbstractProjectResource {
         pl
     }
 
+    /**
+     * Gets the list of validation stamps for this branch
+     */
+    List<ValidationStamp> getValidationStamps() {
+        ontrack.get(link('validationStamps')).resources.collect { node ->
+            new ValidationStamp(ontrack, node)
+        }
+    }
+
     ValidationStamp validationStamp(String name, String description = '', boolean getIfExists = false) {
         def node = ontrack.get(link('validationStamps')).resources.find { it.name == name }
         if (node) {
