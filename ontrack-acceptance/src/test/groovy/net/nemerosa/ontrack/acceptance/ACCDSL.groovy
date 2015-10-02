@@ -2,11 +2,7 @@ package net.nemerosa.ontrack.acceptance
 
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTest
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
-import net.nemerosa.ontrack.dsl.Branch
-import net.nemerosa.ontrack.dsl.MetaInfo
-import net.nemerosa.ontrack.dsl.ObjectAlreadyExistsException
-import net.nemerosa.ontrack.dsl.Ontrack
-import net.nemerosa.ontrack.dsl.Shell
+import net.nemerosa.ontrack.dsl.*
 import net.nemerosa.ontrack.dsl.http.OTForbiddenClientException
 import net.nemerosa.ontrack.dsl.http.OTNotFoundException
 import org.junit.Assert
@@ -702,6 +698,38 @@ class ACCDSL extends AbstractACCDSL {
     }
 
     @Test
+    void 'Access to template instance parameters'() {
+        // Project and branch template
+        def project = uid('P')
+        ontrack.project(project) {
+            branch('template') {
+                template {
+                    parameter 'paramName', 'A parameter'
+                }
+            }
+        }
+        // Creates an instance
+        ontrack.branch(project, 'template').instance 'TEST', [
+                paramName: 'paramValue'
+        ]
+        // Gets the instance parameters
+        def instance = ontrack.branch(project, 'TEST').instance
+        assert instance.parameters == [paramName: 'paramValue']
+    }
+
+    @Test
+    void 'Access to template instance when not an instance'() {
+        // Project and branch
+        def project = uid('P')
+        ontrack.project(project) {
+            branch('TEST')
+        }
+        // Gets the instance parameters
+        def instance = ontrack.branch(project, 'TEST').instance
+        assert instance == null
+    }
+
+    @Test
     void 'Unlinking a template instance'() {
         // Project and branch template
         def project = uid('P')
@@ -875,9 +903,9 @@ class ACCDSL extends AbstractACCDSL {
 
         def metaInfos = ontrack.branch(project, 'test').config.metaInfo
         assert metaInfos.size() == 3
-        assert metaInfos[0] ==  new MetaInfo('A', '1', 'linkA', null)
-        assert metaInfos[1] ==  new MetaInfo('B', '2', 'linkB', null)
-        assert metaInfos[2] ==  new MetaInfo('C', '3', 'linkC', 'CatC')
+        assert metaInfos[0] == new MetaInfo('A', '1', 'linkA', null)
+        assert metaInfos[1] == new MetaInfo('B', '2', 'linkB', null)
+        assert metaInfos[2] == new MetaInfo('C', '3', 'linkC', 'CatC')
     }
 
     @Test

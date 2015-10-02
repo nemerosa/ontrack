@@ -54,6 +54,21 @@ class Branch extends AbstractProjectResource {
         ontrack.post(link('templateSync'), [:])
     }
 
+    /**
+     * Gets the template instance parameters
+     */
+    TemplateInstance getInstance() {
+        def instanceLink = optionalLink('templateInstance')
+        if (instanceLink) {
+            return new TemplateInstance(
+                    ontrack,
+                    ontrack.get(instanceLink)
+            )
+        } else {
+            return null
+        }
+    }
+
     def syncInstance() {
         ontrack.post(link('templateInstanceSync'), [:])
     }
