@@ -356,32 +356,27 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
             Repository repo = git.getRepository();
             RevWalk revWalk = new RevWalk(repo);
             return repo.getRefDatabase().getRefs(Constants.R_TAGS).values().stream()
-                    .map(ref -> {
-                        String tagName = StringUtils.substringAfter(
-                                ref.getName(),
-                                Constants.R_TAGS
-                        );
-                        RevCommit revCommit = null;
-                        try {
-                            revCommit = revWalk.parseCommit(ref.getObjectId());
-                            int commitTime = revCommit.getCommitTime();
-                            LocalDateTime tagTime = Time.from(commitTime * 1000L);
-                            return new GitTag(
-                                    tagName,
-                                    tagTime
-                            );
-                        } catch (IOException e) {
-                            //TODO log warning in case of exception ?
-                            return new GitTag(
-                                    tagName,
-                                    Time.from(0L)
-                            );
-                        }
-
-
-                    })
+                    .map(ref -> getGitTagFromRef(revWalk, ref))
                     .collect(Collectors.toList())
                     ;
+        } catch (IOException e) {
+            throw new GitRepositoryIOException(repository.getRemote(), e);
+        }
+    }
+
+    protected GitTag getGitTagFromRef(RevWalk revWalk, Ref ref) {
+        String tagName = StringUtils.substringAfter(
+                ref.getName(),
+                Constants.R_TAGS
+        );
+        try {
+            RevCommit revCommit = revWalk.parseCommit(ref.getObjectId());
+            int commitTime = revCommit.getCommitTime();
+            LocalDateTime tagTime = Time.from(commitTime * 1000L);
+            return new GitTag(
+                    tagName,
+                    tagTime
+            );
         } catch (IOException e) {
             throw new GitRepositoryIOException(repository.getRemote(), e);
         }
