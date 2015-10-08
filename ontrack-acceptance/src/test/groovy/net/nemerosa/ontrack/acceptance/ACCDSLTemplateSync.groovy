@@ -52,4 +52,38 @@ class ACCDSLTemplateSync extends AbstractACCDSL {
         assert ontrack.branch(project, 'TEST').validationStamps*.name == ['VS1', 'VS2']
     }
 
+    @Test
+    void 'Template connection must preserve the validation stamps'() {
+        // Project and branch template
+        def project = uid('P')
+        ontrack.project(project) {
+            config {
+                autoValidationStamp()
+            }
+            branch('template') {
+                template {
+                    parameter 'paramName', 'A parameter'
+                }
+            }
+        }
+
+        // Creates a standalone branch
+        ontrack.project(project).branch('TEST')
+        // Creates validation stamps
+        ontrack.branch(project, 'TEST').with {
+            validationStamp 'VS1'
+            validationStamp 'VS2'
+        }
+        // ... and checks it has its validation stamps
+        assert ontrack.branch(project, 'TEST').type == 'CLASSIC'
+        assert ontrack.branch(project, 'TEST').validationStamps*.name == ['VS1', 'VS2']
+
+        // Links to the template
+        ontrack.branch(project, 'TEST').link('template', true, [paramName: 'paramValue'])
+
+        // Cheks the existing validation stamps are still there
+        assert ontrack.branch(project, 'TEST').type == 'TEMPLATE_INSTANCE'
+        assert ontrack.branch(project, 'TEST').validationStamps*.name == ['VS1', 'VS2']
+    }
+
 }
