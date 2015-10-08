@@ -69,6 +69,9 @@ class Branch extends AbstractProjectResource {
         }
     }
 
+    /**
+     * Sync this branch template instance with its template.
+     */
     def syncInstance() {
         ontrack.post(link('templateInstanceSync'), [:])
     }

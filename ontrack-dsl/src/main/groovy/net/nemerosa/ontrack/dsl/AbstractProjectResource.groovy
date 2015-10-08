@@ -61,4 +61,11 @@ abstract class AbstractProjectResource extends AbstractResource implements Proje
             throw new PropertyNotFoundException(type)
         }
     }
+
+    /**
+     * Deletes this entity
+     */
+    def delete() {
+        ontrack.delete(link('delete'))
+    }
 }
