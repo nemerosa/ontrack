@@ -223,7 +223,7 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
                 instance, // Target
                 template, // Source
                 templateInstanceExecution.getReplacementFn(),
-                SyncPolicy.SYNC
+                SyncPolicy.SYNC_KEEP // Conservative approach
         );
         // Template instance
         TemplateInstance templateInstance = new TemplateInstance(

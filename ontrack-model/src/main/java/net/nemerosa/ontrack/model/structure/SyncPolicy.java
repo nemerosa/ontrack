@@ -38,8 +38,22 @@ public class SyncPolicy {
      */
     private final UnknownTargetPolicy unknownTargetPolicy;
 
+    /**
+     * This Sync policy is conservative, making sure existing items in the target are kept as they were.
+     */
     public static final SyncPolicy COPY = new SyncPolicy(TargetPresentPolicy.IGNORE, UnknownTargetPolicy.IGNORE);
+
+    /**
+     * This Sync policy makes sure the source and the target are exactly aligned. Any existing item in the target
+     * which is not in the source will be deleted.
+     */
     public static final SyncPolicy SYNC = new SyncPolicy(TargetPresentPolicy.REPLACE, UnknownTargetPolicy.DELETE);
+
+    /**
+     * This Sync policy makes sure the source and the target common elements are synchronised. Any existing item in the
+     * target is kept if not existing in the source.
+     */
+    public static final SyncPolicy SYNC_KEEP = new SyncPolicy(TargetPresentPolicy.REPLACE, UnknownTargetPolicy.IGNORE);
 
     public static enum TargetPresentPolicy {
         IGNORE,
@@ -47,7 +61,7 @@ public class SyncPolicy {
         ERROR
     }
 
-    public static enum UnknownTargetPolicy {
+    public enum UnknownTargetPolicy {
         IGNORE,
         DELETE,
         ERROR

@@ -972,6 +972,85 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
         }
     }
 
+    @Test
+    void 'Connecting a branch to a template must keep existing items if not present in template'() {
+        // Creating a template
+        Branch template = createBranchTemplateDefinition([])
+        // Creates a normal branch
+        Branch branch = doCreateBranch(template.project, nd('mybranch', ''))
+        assert branch.type == BranchType.CLASSIC
+        // Populates the branch
+        asUser().with(branch, ProjectEdit).call {
+            // Creates a few promotion levels
+            structureService.newPromotionLevel(
+                    PromotionLevel.of(
+                            branch,
+                            nd('COPPER', 'Branch promoted to QA.')
+                    )
+            )
+            // ... included one not in the template
+            structureService.newPromotionLevel(
+                    PromotionLevel.of(
+                            branch,
+                            nd('GOLD', 'Branch validated by NFT.')
+                    )
+            )
+            // Creates a few validation stamps
+            structureService.newValidationStamp(
+                    ValidationStamp.of(
+                            branch,
+                            nd('QA.TEST.1', 'Branch has passed the test #1')
+                    )
+            )
+            // ... include one not in the template
+            structureService.newValidationStamp(
+                    ValidationStamp.of(
+                            branch,
+                            nd('QA.TEST.3', 'Branch has passed the test #3')
+                    )
+            )
+            // Creates some builds
+            (1..4).each { n ->
+                structureService.newBuild(
+                        Build.of(
+                                branch,
+                                nd(n as String, "Build $n"),
+                                Signature.of(Time.now(), 'user')
+                        )
+                )
+            }
+        }
+        asUser().with(branch, BranchTemplateMgt).call {
+            // Connects the branch to the template
+            templateService.connectTemplateInstance(
+                    branch.id,
+                    new BranchTemplateInstanceConnectRequest(
+                            template.id.value,
+                            true,
+                            [
+                                    BRANCH: 'My branch',
+                                    SCM   : 'feature/mybranch'
+                            ]
+                    )
+            )
+            // Checks the resulting branch
+            branch = structureService.getBranch(branch.id)
+            assert branch.name == 'mybranch'
+            assert branch.description == 'Branch mybranch'
+            assert branch.type == BranchType.TEMPLATE_INSTANCE
+            // Checks the promotion levels
+            assert structureService.findPromotionLevelByName(branch.project.name, branch.name, 'COPPER').get().description == 'Branch My branch promoted to QA.'
+            assert structureService.findPromotionLevelByName(branch.project.name, branch.name, 'BRONZE').get().description == 'Branch My branch validated by QA.'
+            assert structureService.findPromotionLevelByName(branch.project.name, branch.name, 'GOLD').get().description == 'Branch validated by NFT.'
+            // Checks the validation stamps
+            assert structureService.findValidationStampByName(branch.project.name, branch.name, 'QA.TEST.1').get().description == 'Branch My branch has passed the test #1'
+            assert structureService.findValidationStampByName(branch.project.name, branch.name, 'QA.TEST.2').get().description == 'Branch My branch has passed the test #2'
+            assert structureService.findValidationStampByName(branch.project.name, branch.name, 'QA.TEST.3').get().description == 'Branch has passed the test #3'
+            // Checks the property
+            assert propertyService.getProperty(branch, TestPropertyType).value.value == 'Value for mybranch'
+        }
+    }
+
     @Test(expected = AccessDeniedException)
     void 'Connecting a branch to a template not granted for sync only'() {
         // Creating a template
