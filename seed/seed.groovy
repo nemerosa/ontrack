@@ -55,7 +55,7 @@ println "\tBranchType = ${branchType}"
 def extractDeliveryArtifacts(Object dsl) {
     dsl.steps {
         // Cleaning the workspace
-        shell 'rm -rf *'
+        shell 'rm -rf ${WORKSPACE}'
         // Copy of artifacts
         copyArtifacts("${SEED_PROJECT}-${SEED_BRANCH}-build") {
             flatten()
