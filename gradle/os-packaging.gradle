@@ -22,7 +22,7 @@ ospackage {
     }
 
     from(files("gradle/os-package")) {
-        include '/opt/ontrack/ontrack'
+        include 'ontrack'
         into 'bin'
         fileMode = 0550
     }
