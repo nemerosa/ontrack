@@ -18,7 +18,7 @@ class DockerStop extends AbstractDocker {
     protected String getContainer() {
         if (startTask) {
             // Gets the start task
-            def task = project.tasks.getByName(startTask) as DockerStart
+            def task = project.tasks.getByName(startTask) as DockerOntrackStart
             // Stopping the container
             println "[${name}] Stopping container at ${task.cid} created by ${startTask}"
             // OK

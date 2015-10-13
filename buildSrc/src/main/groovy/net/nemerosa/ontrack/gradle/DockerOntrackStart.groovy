@@ -5,7 +5,7 @@ import org.gradle.api.tasks.TaskAction
 /**
  * Docker start class
  */
-class DockerStart extends AbstractDocker {
+class DockerOntrackStart extends AbstractDocker {
 
     String image = 'nemerosa/ontrack:latest'
 
