@@ -12,7 +12,7 @@
 dir="/opt/ontrack"
 user="ontrack"
 log_dir="log"
-cmd="java -jar ontrack.jar --spring.profiles.active=prod --logging.file=$log_dir/ontrack.log > /dev/null &"
+cmd="java -jar lib/ontrack.jar --spring.profiles.active=prod --logging.file=$log_dir/ontrack.log > /dev/null &"
 
 name='ontrack'
 pid_file="$dir/$name.pid"
@@ -34,10 +34,10 @@ case "$1" in
     else
         echo "Starting $name"
         cd "$dir"
-        sudo -u "$user" $cmd > /dev/null &
+        su --login "$user" --command "$cmd" > /dev/null &
         echo $! > "$pid_file"
         if ! is_running; then
-            echo "Unable to start, see $stdout_log and $stderr_log"
+            echo "Unable to start"
             exit 1
         fi
     fi
