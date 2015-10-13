@@ -14,17 +14,18 @@ ospackage {
     release = '1'
     os = LINUX // only applied to RPM
 
-    into '/opt/ontrack'
+    postInstall file('gradle/os-package/postInstall.sh')
 
     from(project(':ontrack-ui').files("build/libs/ontrack-ui-${versioning.info.full}.jar")) {
-        into 'lib'
+        into '/opt/ontrack/lib'
     }
 
     from(files("gradle/os-package")) {
-        include 'ontrack'
+        include '/opt/ontrack/ontrack'
         into 'bin'
         fileMode = 0550
     }
+
 }
 
 task debPackage(type: Deb, dependsOn: ':ontrack-ui:bootRepackage') {
