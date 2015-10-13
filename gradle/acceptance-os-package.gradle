@@ -1,0 +1,33 @@
+/**
+ * Acceptance tests for the OS packages
+ */
+
+/**
+ * Debian tests
+ */
+
+task debDockerStart
+
+task debDockerStop
+
+task debAcceptanceTest(/*type: RemoteAcceptanceTest*/) {
+//    acceptanceUrl = { "https://${project.properties.acceptanceHost}:${debDockerStart.port}" }
+//    disableSsl = true
+//    dependsOn debDockerStart
+//    finalizedBy debDockerStop
+}
+
+/**
+ * TODO RPM tests
+ */
+
+task rpmAcceptanceTest
+
+/**
+ * OS packages tests
+ */
+
+task osPackageAcceptanceTest {
+    dependsOn debAcceptanceTest
+    dependsOn rpmAcceptanceTest
+}
