@@ -19,9 +19,16 @@ ospackage {
     from(project(':ontrack-ui').files("build/libs/ontrack-ui-${versioning.info.full}.jar")) {
         into 'lib'
     }
+
+    from(files("gradle/os-package")) {
+        include 'ontrack'
+        into 'bin'
+        fileMode = 0550
+    }
 }
 
 task debPackage(type: Deb, dependsOn: ':ontrack-ui:bootRepackage') {
+    link '/etc/init.d/ontrack', '/opt/ontrack/bin/ontrack'
 }
 
 task osPackages {
