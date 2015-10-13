@@ -2,8 +2,26 @@
  * Packaging of Ontrack for Linux OS (RPM + Debian)
  */
 
-task debPackage(dependsOn: ':ontrack-ui:bootRepackage') {
+/**
+ * The package version does not accept versions like the ones generated
+ * from the Versioning plugin for the feature branches for example.
+ */
+def packageVersion = versioning.info.branchType != 'release' ? "0." + versioning.info.display : versioning.info.display
 
+ospackage {
+    packageName = 'ontrack'
+    version = packageVersion
+    release = '1'
+    os = LINUX // only applied to RPM
+
+    into '/opt/ontrack'
+
+    from(project(':ontrack-ui').files("build/libs/ontrack-ui-${versioning.info.full}.jar")) {
+        into 'lib'
+    }
+}
+
+task debPackage(type: Deb, dependsOn: ':ontrack-ui:bootRepackage') {
 }
 
 task osPackages {
