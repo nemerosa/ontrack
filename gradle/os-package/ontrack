@@ -11,13 +11,12 @@
 
 dir="/opt/ontrack"
 user="ontrack"
-log_dir="log"
-cmd="java -jar lib/ontrack.jar --spring.profiles.active=prod --logging.file=$log_dir/ontrack.log > /dev/null &"
+data_dir="/usr/lib/ontrack"
+log_dir="/var/log/ontrack"
+cmd="java -jar $dir/lib/ontrack.jar --spring.profiles.active=prod --logging.file=$log_dir/ontrack.log --ontrack.config.applicationWorkingDir=$data_dir/files \"--spring.datasource.url=jdbc:h2:$data_dir/database/data;MODE=MYSQL;DB_CLOSE_ON_EXIT=FALSE;DEFRAG_ALWAYS=TRUE\" > /dev/null &"
 
 name='ontrack'
 pid_file="$dir/$name.pid"
-# stdout_log="/var/log/$name.log"
-# stderr_log="/var/log/$name.err"
 
 get_pid() {
     cat "$pid_file"
