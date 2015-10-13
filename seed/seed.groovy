@@ -98,6 +98,7 @@ versionFile
 test
 integrationTest
 dockerLatest
+osPackages
 build
 --info
 --profile

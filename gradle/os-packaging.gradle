@@ -1,0 +1,12 @@
+/**
+ * Packaging of Ontrack for Linux OS (RPM + Debian)
+ */
+
+task debPackage(dependsOn: ':ontrack-ui:bootRepackage') {
+
+}
+
+task osPackages {
+    // dependsOn rpmPackage
+    dependsOn debPackage
+}

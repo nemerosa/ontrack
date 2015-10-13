@@ -87,6 +87,12 @@ configure(javaProjects) {
 apply from: 'gradle/packaging.gradle'
 
 /**
+ * Packaging for OS
+ */
+
+apply from: 'gradle/os-packaging.gradle'
+
+/**
  * Docker tasks
  */
 
