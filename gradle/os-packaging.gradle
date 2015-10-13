@@ -18,6 +18,7 @@ ospackage {
 
     from(project(':ontrack-ui').files("build/libs/ontrack-ui-${versioning.info.full}.jar")) {
         into '/opt/ontrack/lib'
+        rename '.*', 'ontrack.jar'
     }
 
     from(files("gradle/os-package")) {
