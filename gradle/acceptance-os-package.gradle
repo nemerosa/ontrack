@@ -2,6 +2,7 @@
  * Acceptance tests for the OS packages
  */
 
+import net.nemerosa.ontrack.gradle.DockerBuild
 import net.nemerosa.ontrack.gradle.DockerCopy
 import net.nemerosa.ontrack.gradle.DockerExec
 import net.nemerosa.ontrack.gradle.DockerStart
@@ -11,8 +12,13 @@ import net.nemerosa.ontrack.gradle.DockerStop
  * Debian tests
  */
 
-task debDockerStart(type: DockerStart) {
-    image = 'ubuntu:vivid'
+task debDockerBuild(type: DockerBuild) {
+    dir = file('gradle/os-package/docker/debian')
+    tag = 'nemerosa/ontrack-debian'
+}
+
+task debDockerStart(type: DockerStart, dependsOn: debDockerBuild) {
+    image = 'nemerosa/ontrack-debian'
     tty = true
     command = '/bin/cat'
 }
@@ -44,12 +50,10 @@ task debDockerCopy(type: DockerCopy, dependsOn: debDockerStart) {
 
 task debDockerInstall(type: DockerExec, dependsOn: debDockerCopy) {
     startTask = 'debDockerStart'
-    commands = ['dpkg', '-i', '/root/ontrack.deb']
-}
-
-task debDockerServiceStart(type: DockerExec, dependsOn: debDockerInstall) {
-    startTask = 'debDockerStart'
-    commands = ['service', 'ontrack', 'start']
+    commands = [
+            dpkg: ['dpkg', '-i', '/root/ontrack.deb'],
+            start: ['service', 'ontrack', 'start'],
+    ]
 }
 
 task debDockerStop(type: DockerStop) {
@@ -59,7 +63,7 @@ task debDockerStop(type: DockerStop) {
 task debAcceptanceTest(/*type: RemoteAcceptanceTest*/) {
 //    acceptanceUrl = { "https://${project.properties.acceptanceHost}:${debDockerStart.port}" }
 //    disableSsl = true
-    dependsOn debDockerServiceStart
+    dependsOn debDockerInstall
     finalizedBy debDockerStop
 }
 
