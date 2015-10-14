@@ -15,11 +15,11 @@ abstract class AbstractContainerDocker extends AbstractDocker {
             // Gets the start task
             def task = project.tasks.getByName(startTask) as DockerStart
             // Stopping the container
-            println "[${name}] Stopping container at ${task.cid} created by ${startTask}"
+            println "[${name}] Container ${task.cid} created by ${startTask}"
             // OK
             return task.cid
         } else if (containerName) {
-            println "[${name}] Stopping container ${containerName}"
+            println "[${name}] Container ${containerName}"
             return containerName
         } else {
             throw new GradleException("Either `startTask` or `containerName` must be specified.")

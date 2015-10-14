@@ -2,6 +2,7 @@
  * Acceptance tests for the OS packages
  */
 
+import net.nemerosa.ontrack.gradle.DockerCopy
 import net.nemerosa.ontrack.gradle.DockerExec
 import net.nemerosa.ontrack.gradle.DockerStart
 import net.nemerosa.ontrack.gradle.DockerStop
@@ -16,7 +17,32 @@ task debDockerStart(type: DockerStart) {
     command = '/bin/cat'
 }
 
-task debDockerInstall(type: DockerExec, dependsOn: debDockerStart) {
+String getDebianSourcePath() {
+    if (project.hasProperty('ontrack.debian')) {
+        return project.properties['ontrack.debian']
+    } else {
+        return 'build/distributions'
+    }
+}
+
+task debDockerCopy(type: DockerCopy, dependsOn: debDockerStart) {
+    doFirst {
+        def src = getDebianSourcePath()
+        println "[${name}] Copying Debian package from ${src}"
+        project.mkdir 'build/os-package/debian/'
+        project.copy {
+            from src
+            include '*.deb'
+            into 'build/os-package/debian/'
+            rename '.*', 'ontrack.deb'
+        }
+    }
+    startTask = 'debDockerStart'
+    sourcePath = 'build/os-package/debian/ontrack.deb'
+    containerPath = '/root/ontrack.deb'
+}
+
+task debDockerInstall(type: DockerExec, dependsOn: debDockerCopy) {
     startTask = 'debDockerStart'
     commands = ['echo', 'Test']
 }
