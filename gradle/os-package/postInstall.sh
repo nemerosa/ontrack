@@ -8,4 +8,4 @@ chown ontrack:ontrack /usr/lib/ontrack
 mkdir -p /var/log/ontrack
 chown ontrack:ontrack /var/log/ontrack
 
-service ontrack restart
+# service ontrack restart

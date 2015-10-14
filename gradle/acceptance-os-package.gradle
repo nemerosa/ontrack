@@ -21,6 +21,7 @@ task debDockerStart(type: DockerStart, dependsOn: debDockerBuild) {
     image = 'nemerosa/ontrack-debian'
     tty = true
     command = '/bin/cat'
+    ports = [ 443 : 0 ]
 }
 
 String getDebianSourcePath() {

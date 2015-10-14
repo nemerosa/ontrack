@@ -13,7 +13,7 @@ class DockerStart extends AbstractDocker {
 
     Map<String, String> volumes = [:]
 
-    Map<Integer, Integer> ports = [:]
+    Map<Object, Integer> ports = [:]
 
     String containerName
 
@@ -86,10 +86,10 @@ class DockerStart extends AbstractDocker {
         cid = docker(arguments as String[])
         println "[${name}] Container ${cid} started"
         // Getting the published ports
-        this.actualPorts = ports.collectEntries { int container, host ->
-            int actualPort = getPublishedPort(this.cid, container)
+        this.actualPorts = ports.collectEntries { Object container, host ->
+            int actualPort = getPublishedPort(this.cid, container as int)
             println "[${name}] Port ${container} mapped on actual ${actualPort} host port"
-            return [container, actualPort]
+            return [container as int, actualPort]
         }
     }
 
