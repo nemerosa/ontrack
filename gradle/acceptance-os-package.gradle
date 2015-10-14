@@ -2,11 +2,8 @@
  * Acceptance tests for the OS packages
  */
 
-import net.nemerosa.ontrack.gradle.DockerBuild
-import net.nemerosa.ontrack.gradle.DockerCopy
-import net.nemerosa.ontrack.gradle.DockerExec
-import net.nemerosa.ontrack.gradle.DockerStart
-import net.nemerosa.ontrack.gradle.DockerStop
+
+import net.nemerosa.ontrack.gradle.*
 
 /**
  * Debian tests
@@ -21,7 +18,7 @@ task debDockerStart(type: DockerStart, dependsOn: debDockerBuild) {
     image = 'nemerosa/ontrack-debian'
     tty = true
     command = '/bin/cat'
-    ports = [ 443 : 0 ]
+    ports = [443: 0]
 }
 
 String getDebianSourcePath() {
@@ -52,7 +49,9 @@ task debDockerCopy(type: DockerCopy, dependsOn: debDockerStart) {
 task debDockerInstall(type: DockerExec, dependsOn: debDockerCopy) {
     startTask = 'debDockerStart'
     commands = [
-            dpkg: ['dpkg', '-i', '/root/ontrack.deb'],
+            dpkg   : ['dpkg', '-i', '/root/ontrack.deb'],
+            install: ['update-rc.d', 'ontrack', 'defaults'],
+            start  : ['/etc/init.d/ontrack', 'start']
     ]
 }
 
