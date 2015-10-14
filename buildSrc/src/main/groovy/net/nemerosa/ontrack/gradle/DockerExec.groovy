@@ -9,6 +9,8 @@ class DockerExec extends AbstractContainerDocker {
 
     def commands
 
+    private Map<String, String> logs = [:]
+
     @TaskAction
     def run() {
         // Gets the container id or name
@@ -34,13 +36,14 @@ class DockerExec extends AbstractContainerDocker {
             throw new IllegalArgumentException("The `commands` must be a list of commands or a map of command lists")
         }
         // For each command set
+        println "[${name}] Executing commands..."
         commandSet.each { name, arguments ->
-            runInContainer(container, name, arguments as String[])
+            logs.put name, runInContainer(container, name, arguments as String[])
         }
     }
 
-    protected def runInContainer(String container, String name, String[] arguments) {
-        println "[${name}] Running ${name} commands"
+    protected String runInContainer(String container, String commandName, String[] arguments) {
+        println "[${name}] Running ${commandName} commands"
         // Arguments
         List<String> dockerArguments = [
                 'exec', '--tty', container
@@ -48,7 +51,10 @@ class DockerExec extends AbstractContainerDocker {
         // Commands
         dockerArguments.addAll arguments
         // Running
-        docker(dockerArguments as String[])
+        return docker(dockerArguments as String[])
     }
 
+    Map<String, String> getLogs() {
+        return logs
+    }
 }
