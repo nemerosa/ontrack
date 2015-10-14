@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 ### BEGIN INIT INFO
 # Provides:          ontrack
 # Required-Start:    $remote_fs $syslog
@@ -9,87 +9,111 @@
 # Description:       Enable service provided by daemon.
 ### END INIT INFO
 
-dir="/opt/ontrack"
-user="ontrack"
-data_dir="/usr/lib/ontrack"
-log_dir="/var/log/ontrack"
-cmd="java -jar $dir/lib/ontrack.jar --spring.profiles.active=prod --logging.file=$log_dir/ontrack.log --ontrack.config.applicationWorkingDir=$data_dir/files \"--spring.datasource.url=jdbc:h2:$data_dir/database/data;MODE=MYSQL;DB_CLOSE_ON_EXIT=FALSE;DEFRAG_ALWAYS=TRUE\" > /dev/null &"
+# Source function library.
+[ -f "/lib/lsb/init-functions" ] && . /lib/lsb/init-functions
 
-name='ontrack'
-pid_file="$dir/$name.pid"
+# the name of the project, will also be used for the war file, log file, ...
+PROJECT_NAME=ontrack
+# the user which should run the service
+SERVICE_USER=ontrack
+# base directory for the spring boot jar
+# TODO change to /usr/local
+SPRINGBOOTAPP_HOME=/opt/$PROJECT_NAME
 
-get_pid() {
-    cat "$pid_file"
+# the spring boot jar-file
+SPRINGBOOTAPP_JAR="$SPRINGBOOTAPP_HOME/lib/$PROJECT_NAME.jar"
+
+# java executable for spring boot app, change if you have multiple jdks installed
+SPRINGBOOTAPP_JAVA=java
+
+# log directory
+LOG_DIR="/var/log/$PROJECT_NAME"
+
+# data directory
+DATA_DIR="/usr/lib/$PROJECT_NAME"
+
+# spring boot log-file
+BOOT_LOG="$LOG_DIR/$PROJECT_NAME-boot.log"
+
+# spring boot options
+SPRINGBOOTAPP_OPTIONS="--spring.profiles.active=prod --logging.file=$LOG_DIR/$PROJECT_NAME.log --ontrack.config.applicationWorkingDir=$DATA_DIR/files \"--spring.datasource.url=jdbc:h2:$DATA_DIR/database/data;MODE=MYSQL;DB_CLOSE_ON_EXIT=FALSE;DEFRAG_ALWAYS=TRUE\""
+
+LOCK="/var/lock/subsys/$PROJECT_NAME"
+
+RETVAL=0
+
+pid_of_spring_boot() {
+    pgrep -f "java.*/opt/ontrack/lib/ontrack\.jar.*"
 }
 
-is_running() {
-    [ -f "$pid_file" ] && ps `get_pid` > /dev/null 2>&1
+start() {
+    echo -n $"Starting $PROJECT_NAME: "
+
+    cd "$SPRINGBOOTAPP_HOME"
+    su $SERVICE_USER -c "nohup $SPRINGBOOTAPP_JAVA -jar \"$SPRINGBOOTAPP_JAR\" $SPRINGBOOTAPP_OPTIONS  >> \"$BOOT_LOG\" 2>&1 &"
+
+    while { pid_of_spring_boot > /dev/null ; } ; do
+        sleep 1
+    done
+
+    pid_of_spring_boot > /dev/null
+    RETVAL=$?
+    [ $RETVAL = 0 ] && echo "[OK]" || echo "[NOK]"
+    echo
+
+    [ $RETVAL = 0 ] && touch "$LOCK"
 }
 
+stop() {
+    echo -n "Stopping $PROJECT_NAME: "
+
+    pid=`pid_of_spring_boot`
+    [ -n "$pid" ] && kill -TERM $pid
+    RETVAL=$?
+    cnt=10
+    while [ $RETVAL = 0 -a $cnt -gt 0 ] &&
+        { pid_of_spring_boot > /dev/null ; } ; do
+            sleep 1
+            ((cnt--))
+    done
+
+    [ $RETVAL = 0 ] && rm -f "$LOCK"
+    [ $RETVAL = 0 ] && echo "OK" || echo "NOK"
+    echo
+}
+
+status() {
+    pid=`pid_of_spring_boot`
+    if [ -n "$pid" ]; then
+        echo "$PROJECT_NAME (pid $pid) is running..."
+        return 0
+    fi
+    if [ -f "$LOCK" ]; then
+        echo $"${base} dead but subsys locked"
+        return 2
+    fi
+    echo "$PROJECT_NAME is stopped"
+    return 3
+}
+
+# See how we were called.
 case "$1" in
     start)
-    if is_running; then
-        echo "Already started"
-    else
-        echo "Starting $name"
-        cd "$dir"
-        su --login "$user" --command "$cmd" > /dev/null &
-        echo $! > "$pid_file"
-        if ! is_running; then
-            echo "Unable to start"
-            exit 1
-        fi
-    fi
-    ;;
+        start
+        ;;
     stop)
-    if is_running; then
-        echo -n "Stopping $name.."
-        kill -s TERM `cat $pid_file`
-        for i in {1..10}
-        do
-            if ! is_running; then
-                break
-            fi
-
-            echo -n "."
-            sleep 1
-        done
-        echo
-
-        if is_running; then
-            echo "Not stopped; may still be shutting down or shutdown may have failed"
-            exit 1
-        else
-            echo "Stopped"
-            if [ -f "$pid_file" ]; then
-                rm "$pid_file"
-            fi
-        fi
-    else
-        echo "Not running"
-    fi
-    rm -f "$pid_file"
-    ;;
-    restart)
-    $0 stop
-    if is_running; then
-        echo "Unable to stop, will not attempt to start"
-        exit 1
-    fi
-    $0 start
-    ;;
+        stop
+        ;;
     status)
-    if is_running; then
-        echo "Running"
-    else
-        echo "Stopped"
-        exit 1
-    fi
-    ;;
+        status
+        ;;
+    restart)
+        stop
+        start
+        ;;
     *)
-    echo "Usage: $0 {start|stop|restart|status}"
-    exit 1
-    ;;
+        echo $"Usage: $0 {start|stop|restart|status}"
+        exit 1
 esac
 
-exit 0
+exit $RETVAL
