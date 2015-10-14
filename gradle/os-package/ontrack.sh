@@ -32,9 +32,6 @@ LOG_DIR="/var/log/$PROJECT_NAME"
 # data directory
 DATA_DIR="/usr/lib/$PROJECT_NAME"
 
-# spring boot log-file
-BOOT_LOG="$LOG_DIR/$PROJECT_NAME-boot.log"
-
 # spring boot options
 SPRINGBOOTAPP_OPTIONS="--spring.profiles.active=prod --logging.file=$LOG_DIR/$PROJECT_NAME.log --ontrack.config.applicationWorkingDir=$DATA_DIR/files \"--spring.datasource.url=jdbc:h2:$DATA_DIR/database/data;MODE=MYSQL;DB_CLOSE_ON_EXIT=FALSE;DEFRAG_ALWAYS=TRUE\""
 
@@ -50,10 +47,12 @@ start() {
     echo -n $"Starting $PROJECT_NAME: "
 
     cd "$SPRINGBOOTAPP_HOME"
-    su $SERVICE_USER -c "nohup $SPRINGBOOTAPP_JAVA -jar \"$SPRINGBOOTAPP_JAR\" $SPRINGBOOTAPP_OPTIONS  >> \"$BOOT_LOG\" 2>&1 &"
+    su $SERVICE_USER -c "nohup $SPRINGBOOTAPP_JAVA -jar \"$SPRINGBOOTAPP_JAR\" $SPRINGBOOTAPP_OPTIONS  >> /dev/null 2>&1 &"
 
-    while { pid_of_spring_boot > /dev/null ; } ; do
+    cnt=10
+    while ! { pid_of_spring_boot > /dev/null ; } && [ $cnt -gt 0 ] ; do
         sleep 1
+        ((cnt--))
     done
 
     pid_of_spring_boot > /dev/null
