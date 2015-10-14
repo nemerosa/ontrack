@@ -52,7 +52,6 @@ task debDockerInstall(type: DockerExec, dependsOn: debDockerCopy) {
     startTask = 'debDockerStart'
     commands = [
             dpkg: ['dpkg', '-i', '/root/ontrack.deb'],
-            start: ['service', 'ontrack', 'start'],
     ]
 }
 
