@@ -35,8 +35,6 @@ DATA_DIR="/usr/lib/$PROJECT_NAME"
 # spring boot options
 SPRINGBOOTAPP_OPTIONS="--spring.profiles.active=prod --logging.file=$LOG_DIR/$PROJECT_NAME.log --ontrack.config.applicationWorkingDir=$DATA_DIR/files \"--spring.datasource.url=jdbc:h2:$DATA_DIR/database/data;MODE=MYSQL;DB_CLOSE_ON_EXIT=FALSE;DEFRAG_ALWAYS=TRUE\""
 
-LOCK="/var/lock/subsys/$PROJECT_NAME"
-
 RETVAL=0
 
 pid_of_spring_boot() {
@@ -60,7 +58,6 @@ start() {
     [ $RETVAL = 0 ] && echo "[OK]" || echo "[NOK]"
     echo
 
-    [ $RETVAL = 0 ] && touch "$LOCK"
 }
 
 stop() {
@@ -76,7 +73,6 @@ stop() {
             ((cnt--))
     done
 
-    [ $RETVAL = 0 ] && rm -f "$LOCK"
     [ $RETVAL = 0 ] && echo "OK" || echo "NOK"
     echo
 }
@@ -86,10 +82,6 @@ status() {
     if [ -n "$pid" ]; then
         echo "$PROJECT_NAME (pid $pid) is running..."
         return 0
-    fi
-    if [ -f "$LOCK" ]; then
-        echo $"${base} dead but subsys locked"
-        return 2
     fi
     echo "$PROJECT_NAME is stopped"
     return 3
