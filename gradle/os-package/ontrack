@@ -68,6 +68,7 @@ case "$1" in
     else
         echo "Not running"
     fi
+    rm -f "$pid_file"
     ;;
     restart)
     $0 stop
