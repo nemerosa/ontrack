@@ -44,7 +44,7 @@ pid_of_spring_boot() {
 start() {
     echo -n $"Starting $PROJECT_NAME: "
 
-    cd "$SPRINGBOOTAPP_HOME"
+    cd "$DATA_DIR"
     su $SERVICE_USER -c "nohup $SPRINGBOOTAPP_JAVA -jar \"$SPRINGBOOTAPP_JAR\" $SPRINGBOOTAPP_OPTIONS  >> /dev/null 2>&1 &"
 
     cnt=10

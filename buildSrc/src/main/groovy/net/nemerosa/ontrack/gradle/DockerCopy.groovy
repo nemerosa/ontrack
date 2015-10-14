@@ -7,15 +7,16 @@ import org.gradle.api.tasks.TaskAction
  */
 class DockerCopy extends AbstractContainerDocker {
 
-    String sourcePath
-    String containerPath
+    Map<String, String> copies = [:]
 
     @TaskAction
     def run() {
         // Gets the container id or name
         String container = getContainer()
-        // Runs the command
-        docker 'cp', sourcePath, "${container}:${containerPath}"
+        // Runs the copies
+        copies.each { sourcePath, containerPath ->
+            docker 'cp', sourcePath, "${container}:${containerPath}"
+        }
     }
 
 }

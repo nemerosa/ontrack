@@ -14,7 +14,7 @@ task debDockerBuild(type: DockerBuild) {
     tag = 'nemerosa/ontrack-debian'
 }
 
-task debDockerStart(type: DockerStart, dependsOn: debDockerBuild) {
+task debDockerRun(type: DockerStart, dependsOn: debDockerBuild) {
     image = 'nemerosa/ontrack-debian'
     tty = true
     command = '/bin/cat'
@@ -29,7 +29,7 @@ String getDebianSourcePath() {
     }
 }
 
-task debDockerCopy(type: DockerCopy, dependsOn: debDockerStart) {
+task debDockerUpload(type: DockerCopy, dependsOn: debDockerRun) {
     doFirst {
         def src = getDebianSourcePath()
         println "[${name}] Copying Debian package from ${src}"
@@ -41,28 +41,55 @@ task debDockerCopy(type: DockerCopy, dependsOn: debDockerStart) {
             rename '.*', 'ontrack.deb'
         }
     }
-    startTask = 'debDockerStart'
-    sourcePath = 'build/os-package/debian/ontrack.deb'
-    containerPath = '/root/ontrack.deb'
+    startTask = 'debDockerRun'
+    copies = [
+            'build/os-package/debian/ontrack.deb': '/root/ontrack.deb',
+    ]
 }
 
-task debDockerInstall(type: DockerExec, dependsOn: debDockerCopy) {
-    startTask = 'debDockerStart'
+task debDockerInstall(type: DockerExec, dependsOn: debDockerUpload) {
+    startTask = 'debDockerRun'
     commands = [
+            setup  : ['mkdir', '-p', '/usr/lib/ontrack/config'],
             dpkg   : ['dpkg', '-i', '/root/ontrack.deb'],
             install: ['update-rc.d', 'ontrack', 'defaults'],
-            start  : ['/etc/init.d/ontrack', 'start']
+    ]
+}
+
+task debDockerConfig(type: DockerCopy, dependsOn: debDockerInstall) {
+    doFirst {
+        def src = getDebianSourcePath()
+        println "[${name}] Copying Debian package from ${src}"
+        project.mkdir 'build/os-package/debian/'
+        project.copy {
+            from src
+            include '*.deb'
+            into 'build/os-package/debian/'
+            rename '.*', 'ontrack.deb'
+        }
+    }
+    startTask = 'debDockerRun'
+    copies = [
+            'gradle/env/ci/application.yml': '/usr/lib/ontrack/config/application.yml',
+            'gradle/env/ci/keystore.p12'   : '/usr/lib/ontrack/config/keystore.p12',
+    ]
+}
+
+task debDockerStart(type: DockerExec, dependsOn: debDockerConfig) {
+    startTask = 'debDockerRun'
+    commands = [
+            start: ['/etc/init.d/ontrack', 'start']
     ]
 }
 
 task debDockerStop(type: DockerStop) {
-    startTask = 'debDockerStart'
+    startTask = 'debDockerRun'
 }
 
 task debAcceptanceTest(/*type: RemoteAcceptanceTest*/) {
 //    acceptanceUrl = { "https://${project.properties.acceptanceHost}:${debDockerStart.port}" }
 //    disableSsl = true
-    dependsOn debDockerInstall
+    dependsOn debDockerStart
     finalizedBy debDockerStop
 }
 
