@@ -1,35 +1,16 @@
 package net.nemerosa.ontrack.gradle
 
-import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 
 /**
  * Docker stop task
  */
-class DockerStop extends AbstractDocker {
+class DockerStop extends AbstractContainerDocker {
 
-    String startTask
-    String containerName
     String logFile = 'build/docker.log'
     boolean remove = true
     boolean removeVolumes = true
     boolean ignoreError = false
-
-    protected String getContainer() {
-        if (startTask) {
-            // Gets the start task
-            def task = project.tasks.getByName(startTask) as DockerStart
-            // Stopping the container
-            println "[${name}] Stopping container at ${task.cid} created by ${startTask}"
-            // OK
-            return task.cid
-        } else if (containerName) {
-            println "[${name}] Stopping container ${containerName}"
-            return containerName
-        } else {
-            throw new GradleException("Either `startTask` or `containerName` must be specified.")
-        }
-    }
 
     @TaskAction
     def stop() {

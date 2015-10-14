@@ -2,6 +2,7 @@
  * Acceptance tests for the OS packages
  */
 
+import net.nemerosa.ontrack.gradle.DockerExec
 import net.nemerosa.ontrack.gradle.DockerStart
 import net.nemerosa.ontrack.gradle.DockerStop
 
@@ -15,6 +16,11 @@ task debDockerStart(type: DockerStart) {
     command = '/bin/cat'
 }
 
+task debDockerInstall(type: DockerExec, dependsOn: debDockerStart) {
+    startTask = 'debDockerStart'
+    commands = ['echo', 'Test']
+}
+
 task debDockerStop(type: DockerStop) {
     startTask = 'debDockerStart'
 }
@@ -22,7 +28,7 @@ task debDockerStop(type: DockerStop) {
 task debAcceptanceTest(/*type: RemoteAcceptanceTest*/) {
 //    acceptanceUrl = { "https://${project.properties.acceptanceHost}:${debDockerStart.port}" }
 //    disableSsl = true
-    dependsOn debDockerStart
+    dependsOn debDockerInstall
     finalizedBy debDockerStop
 }
 
