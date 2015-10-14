@@ -22,7 +22,7 @@ ospackage {
     }
 
     from('gradle/os-package') {
-        include 'ontrack'
+        include 'ontrack.sh'
         into '/opt/ontrack/bin'
         fileMode = 0550
     }
@@ -30,7 +30,7 @@ ospackage {
 }
 
 task debPackage(type: Deb, dependsOn: ':ontrack-ui:bootRepackage') {
-    link '/etc/init.d/ontrack', '/opt/ontrack/bin/ontrack'
+    link '/etc/init.d/ontrack', '/opt/ontrack/bin/ontrack.sh'
 }
 
 task osPackages {
