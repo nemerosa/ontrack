@@ -21,9 +21,9 @@ ospackage {
         rename '.*', 'ontrack.jar'
     }
 
-    from(files("gradle/os-package")) {
+    from('gradle/os-package') {
         include 'ontrack'
-        into 'bin'
+        into '/opt/ontrack/bin'
         fileMode = 0550
     }
 
