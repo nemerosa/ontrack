@@ -2,11 +2,17 @@
  * Acceptance tests for the OS packages
  */
 
+import net.nemerosa.ontrack.gradle.DockerStart
+
 /**
  * Debian tests
  */
 
-task debDockerStart
+task debDockerStart(type: DockerStart) {
+    image = 'ubuntu:vivid'
+    tty = true
+    command = '/bin/cat'
+}
 
 task debDockerStop
 

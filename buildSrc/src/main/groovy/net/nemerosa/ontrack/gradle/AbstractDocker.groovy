@@ -23,7 +23,7 @@ abstract class AbstractDocker extends AbstractCDTask {
     /**
      * Utility method to get a published port
      */
-    int getPublishedPort (String cid, int port = 443) {
+    int getPublishedPort (String cid, int port) {
         def output = docker('port', cid, port)
         def m = Pattern.compile(/^.*:(\d+)$/).matcher(output)
         if (m.matches()) {

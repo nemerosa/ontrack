@@ -10,6 +10,7 @@ abstract class AbstractCDTask extends DefaultTask {
      * Utility method to get a string from running a process
      */
     String execute(String program, List arguments) {
+        println "[${name}] ${program} ${arguments}"
         return new ByteArrayOutputStream().withStream { os ->
             project.exec {
                 executable = program

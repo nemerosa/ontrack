@@ -106,6 +106,12 @@ apply from: 'gradle/docker.gradle'
 apply from: 'gradle/acceptance.gradle'
 
 /**
+ * Acceptance tasks for OS packaging
+ */
+
+apply from: 'gradle/acceptance-os-package.gradle'
+
+/**
  * Publication tasks
  *
  * Standalone Gradle tasks in `gradle/publication.gradle` and in

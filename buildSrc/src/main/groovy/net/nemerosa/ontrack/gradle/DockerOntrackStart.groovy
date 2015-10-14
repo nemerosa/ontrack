@@ -5,9 +5,7 @@ import org.gradle.api.tasks.TaskAction
 /**
  * Docker start class
  */
-class DockerOntrackStart extends AbstractDocker {
-
-    String image = 'nemerosa/ontrack:latest'
+class DockerOntrackStart extends DockerStart {
 
     File data
 
@@ -17,69 +15,43 @@ class DockerOntrackStart extends AbstractDocker {
 
     boolean exposePort = false
 
-    String containerName
+    DockerOntrackStart() {
+        this.image = 'nemerosa/ontrack:latest'
+    }
 
-    boolean restart = false
+    @Override
+    Map<String, String> getEnvironment() {
+        return super.getEnvironment() + [
+                PROFILE: profile
+        ]
+    }
 
-    private String cid
+    @Override
+    Map<String, String> getVolumes() {
+        def map = super.getVolumes()
+        if (data) {
+            map.put(data.absolutePath, '/var/ontrack/data')
+        }
+        if (data) {
+            map.put(conf.absolutePath, '/var/ontrack/conf')
+        }
+        return map
+    }
 
-    private int port
+    @Override
+    Map<Integer, Integer> getPorts() {
+        def map = super.getPorts()
+        if (exposePort) {
+            map.put(443, 443)
+        } else {
+            map.put(443, 0)
+        }
+        return map
+    }
 
     @TaskAction
     def start() {
-        // Arguments
-        List<String> arguments = getDockerConfig()
-        // Logging
-        println "[${name}] Starting ${image} for profile ${profile}..."
-        // All arguments
-        arguments.addAll(['run', '--detach', "--env=PROFILE=${profile}"])
-        // Port publication
-        String portPublication
-        if (exposePort) {
-            println "[${name}] Publishing port 443..."
-            arguments << "--publish=443:443"
-        } else {
-            println "[${name}] Publishing on random ports..."
-            arguments << '--publish-all'
-        }
-        // Restart policy
-        if (restart) {
-            println "[${name}] Restarting on host restart"
-            arguments << '--restart=always'
-        }
-        // Volumes
-        if (data) {
-            println "[${name}] Data mount: ${data}"
-            arguments << "--volume=${data}:/var/ontrack/data"
-        } else {
-            println "[${name}] No data mount"
-        }
-        if (conf) {
-            println "[${name}] Conf mount: ${conf}"
-            arguments << "--volume=${conf}:/var/ontrack/conf"
-        } else {
-            println "[${name}] No conf mount"
-        }
-        // Container name
-        if (containerName) {
-            arguments << "--name=${containerName}"
-        }
-        // Image to start
-        arguments << image
-        // Starting the container
-        cid = execute('docker', arguments)
-        println "[${name}] Container ${cid} started"
-        // Getting the published port
-        this.port = getPublishedPort(this.cid)
-        println "[${name}] Application running on port ${port}"
-        project.ext.acceptanceOntrackPort = this.port
-    }
-
-    String getCid() {
-        cid
-    }
-
-    int getPort() {
-        port
+        super.start()
+        project.ext.acceptanceOntrackPort = getActualPort(443)
     }
 }
