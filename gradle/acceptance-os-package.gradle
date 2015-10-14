@@ -44,7 +44,12 @@ task debDockerCopy(type: DockerCopy, dependsOn: debDockerStart) {
 
 task debDockerInstall(type: DockerExec, dependsOn: debDockerCopy) {
     startTask = 'debDockerStart'
-    commands = ['echo', 'Test']
+    commands = ['dpkg', '-i', '/root/ontrack.deb']
+}
+
+task debDockerServiceStart(type: DockerExec, dependsOn: debDockerInstall) {
+    startTask = 'debDockerStart'
+    commands = ['service', 'ontrack', 'start']
 }
 
 task debDockerStop(type: DockerStop) {
@@ -54,7 +59,7 @@ task debDockerStop(type: DockerStop) {
 task debAcceptanceTest(/*type: RemoteAcceptanceTest*/) {
 //    acceptanceUrl = { "https://${project.properties.acceptanceHost}:${debDockerStart.port}" }
 //    disableSsl = true
-    dependsOn debDockerInstall
+    dependsOn debDockerServiceStart
     finalizedBy debDockerStop
 }
 
