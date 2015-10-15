@@ -28,7 +28,7 @@ task ciDockerStop(type: DockerStop) {
 }
 
 task ciAcceptanceTest(type: RemoteAcceptanceTest) {
-    acceptanceUrl = { "https://${project.properties.acceptanceHost}:${ciDockerStart.port}" }
+    acceptanceUrl = { "https://${project.properties.acceptanceHost}:${ciDockerStart.getActualPort(443)}" }
     disableSsl = true
     dependsOn ciDockerStart
     finalizedBy ciDockerStop
