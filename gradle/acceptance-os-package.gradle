@@ -2,6 +2,7 @@
  * Acceptance tests for the OS packages
  */
 import net.nemerosa.ontrack.gradle.DockerBuild
+import net.nemerosa.ontrack.gradle.DockerExec
 import net.nemerosa.ontrack.gradle.DockerStart
 import net.nemerosa.ontrack.gradle.DockerStop
 
@@ -23,15 +24,22 @@ task debDockerBuild(type: DockerBuild, dependsOn: debDockerPrepare) {
     tag = 'nemerosa/ontrack-debian'
 }
 
-task debDockerStart(type: DockerStart, dependsOn: debDockerBuild) {
+task debDockerRun(type: DockerStart, dependsOn: debDockerBuild) {
     image = 'nemerosa/ontrack-debian'
     tty = true
     command = '/bin/cat'
     ports = [8080: 0]
 }
 
+task debDockerStart(type: DockerExec, dependsOn: debDockerRun) {
+    startTask = 'debDockerRun'
+    commands = [
+            start: ['service', 'ontrack', 'start'],
+    ]
+}
+
 task debDockerStop(type: DockerStop) {
-    startTask = 'debDockerStart'
+    startTask = 'debDockerRun'
 }
 
 task debAcceptanceTest(/*type: RemoteAcceptanceTest*/) {

@@ -19,7 +19,4 @@ RUN dpkg -i /opt/ontrack/ontrack.deb
 # Gets the application.yml for local configuration
 COPY application.yml /usr/lib/ontrack/
 
-# Starts the Ontrack package
-RUN service ontrack start
-
 # This image must be run with --tty and /bin/cat
