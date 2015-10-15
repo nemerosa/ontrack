@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.gradle.DockerBuild
 import net.nemerosa.ontrack.gradle.DockerExec
 import net.nemerosa.ontrack.gradle.DockerStart
 import net.nemerosa.ontrack.gradle.DockerStop
+import net.nemerosa.ontrack.gradle.RemoteAcceptanceTest
 
 /**
  * Debian tests
@@ -42,9 +43,10 @@ task debDockerStop(type: DockerStop) {
     startTask = 'debDockerRun'
 }
 
-task debAcceptanceTest(/*type: RemoteAcceptanceTest*/) {
-//    acceptanceUrl = { "https://${project.properties.acceptanceHost}:${debDockerStart.port}" }
-//    disableSsl = true
+task debAcceptanceTest(type: RemoteAcceptanceTest) {
+    acceptanceUrl = { "http://${project.properties.acceptanceHost}:${debDockerRun.getActualPort(8080)}" }
+    acceptanceContext = 'production' // Only basic test
+    disableSsl = true
     dependsOn debDockerStart
     finalizedBy debDockerStop
 }
