@@ -13,7 +13,7 @@ import net.nemerosa.ontrack.gradle.RemoteAcceptanceTest
 
 task debDockerPrepare(type: Copy) {
     copy {
-        from project.hasProperty('ontrack.debian') ? project.properties['ontrack.debian'] : 'build/distributions'
+        from project.properties.acceptanceDebianDistributionDir
         include '*.deb'
         into 'gradle/os-package/docker/debian/'
         rename '.*', 'ontrack.deb'
