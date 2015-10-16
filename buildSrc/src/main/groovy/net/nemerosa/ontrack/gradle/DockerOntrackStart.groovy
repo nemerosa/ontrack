@@ -32,7 +32,7 @@ class DockerOntrackStart extends DockerStart {
         if (data) {
             map.put(data.absolutePath, '/var/ontrack/data')
         }
-        if (data) {
+        if (conf) {
             map.put(conf.absolutePath, '/var/ontrack/conf')
         }
         return map
