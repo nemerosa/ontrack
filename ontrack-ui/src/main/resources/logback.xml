@@ -32,6 +32,7 @@
     <!-- Custom loggers -->
 
     <logger name="net.nemerosa.ontrack" level="DEBUG"/>
+    <logger name="org.apache.catalina.util.SessionIdGeneratorBase" level="DEBUG"/>
     <!--<logger name="net.nemerosa.ontrack.boot.metrics" level="TRACE"/>-->
 
 </configuration>
