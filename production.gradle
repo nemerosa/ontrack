@@ -157,6 +157,10 @@ task productionStart(type: DockerOntrackStart) {
     image = "nemerosa/ontrack:${project.properties.ontrackVersion}"
     conf = file('/var/ontrack/conf') // Dir on the host, provisioned initially by productionEnv
     data = file('/var/ontrack/data') // Dir on the host, filled in by the application itself
+    urandom = false // Not using the urandom source for production
+    volumes = [
+            '/dev/random': '/dev/random', // Using the random source from the host
+    ]
     profile = 'prod'
     mustRunAfter productionEnv
 }
