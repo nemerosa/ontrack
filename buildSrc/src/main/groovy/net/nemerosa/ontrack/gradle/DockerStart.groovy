@@ -13,6 +13,8 @@ class DockerStart extends AbstractDocker {
 
     Map<String, String> volumes = [:]
 
+    boolean urandom = true
+
     Map<Object, Integer> ports = [:]
 
     String containerName
@@ -52,6 +54,11 @@ class DockerStart extends AbstractDocker {
         getVolumes().each { host, container ->
             println "[${name}] Volume ${host} mapped on ${container}"
             arguments.add "--volume=${host}:${container}"
+        }
+        // Urandom mapping?
+        if (urandom) {
+            println "[${name}] Mapping /dev/urandom host source to /dev/random"
+            arguments.add "--volume=/dev/urandom:/dev/random"
         }
         // Port publication
         getPorts().each { container, host ->
