@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.acceptance
 
+import net.nemerosa.ontrack.acceptance.support.AcceptanceTest
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import net.nemerosa.ontrack.dsl.*
 import net.nemerosa.ontrack.dsl.http.OTForbiddenClientException
@@ -13,6 +14,7 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
  * Ontrack DSL tests.
  */
 @AcceptanceTestSuite
+@AcceptanceTest(AcceptanceTestContext.SMOKE)
 class ACCDSL extends AbstractACCDSL {
 
     @Test
@@ -33,6 +35,7 @@ class ACCDSL extends AbstractACCDSL {
     }
 
     @Test
+    @AcceptanceTest(AcceptanceTestContext.SMOKE)
     void 'Project branches'() {
         // Project and two branches
         def name = uid('P')

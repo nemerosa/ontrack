@@ -15,11 +15,11 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
  * Basic GUI tests
  */
 @AcceptanceTestSuite
-@AcceptanceTest(AcceptanceTestContext.PRODUCTION)
+@AcceptanceTest([AcceptanceTestContext.PRODUCTION, AcceptanceTestContext.SMOKE])
 class ACCBrowserBasic extends AcceptanceTestClient {
 
     @Test
-    @AcceptanceTest(AcceptanceTestContext.PRODUCTION)
+    @AcceptanceTest([AcceptanceTestContext.PRODUCTION, AcceptanceTestContext.SMOKE])
     void 'Home page is accessible'() {
         browser {
             goTo HomePage, [:]
@@ -27,11 +27,13 @@ class ACCBrowserBasic extends AcceptanceTestClient {
     }
 
     @Test
+    @AcceptanceTest(AcceptanceTestContext.SMOKE)
     void 'Admin login'() {
         browser { browser -> loginAsAdmin(browser) }
     }
 
     @Test
+    @AcceptanceTest(AcceptanceTestContext.SMOKE)
     void 'Project creation'() {
         browser { browser ->
             HomePage home = loginAsAdmin(browser)
