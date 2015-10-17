@@ -51,7 +51,15 @@ class AcceptanceConfig {
     }
 
     public boolean acceptTest(AcceptanceTest acceptanceTest) {
-        return StringUtils.isBlank(context) || Arrays.asList(acceptanceTest.value()).contains(context);
+        // No context, all tests are eligible
+        // If there is a context, but no annotation, the test cannot be accepted
+        // There is a context *and* an annotation, checks the context is part of the
+        // accepted values in the annotation
+        return StringUtils.isBlank(context) ||
+                (
+                        acceptanceTest != null &&
+                                Arrays.asList(acceptanceTest.value()).contains(context)
+                );
     }
 
     public void setSystemProperties() {

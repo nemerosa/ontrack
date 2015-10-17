@@ -45,7 +45,7 @@ class JUnitAcceptanceRunner implements AcceptanceRunner {
         // Filters on classes
         suites = suites.findAll { name, bean ->
             def acceptanceTest = applicationContext.findAnnotationOnBean(name, AcceptanceTest)
-            return acceptanceTest == null || config.acceptTest(acceptanceTest)
+            return config.acceptTest(acceptanceTest)
         }
 
         // Class names

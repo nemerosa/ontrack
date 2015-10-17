@@ -15,6 +15,7 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
  * Basic GUI tests
  */
 @AcceptanceTestSuite
+@AcceptanceTest(AcceptanceTestContext.PRODUCTION)
 class ACCBrowserBasic extends AcceptanceTestClient {
 
     @Test
