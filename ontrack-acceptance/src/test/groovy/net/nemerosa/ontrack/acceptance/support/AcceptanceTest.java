@@ -10,8 +10,8 @@ import java.lang.annotation.Target;
 public @interface AcceptanceTest {
 
     /**
-     * Labels to exclude
+     * Execution context
      */
-    String[] excludes() default {};
+    String[] value();
 
 }

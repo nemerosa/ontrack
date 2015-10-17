@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTest;
 import net.nemerosa.ontrack.client.*;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +12,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Set;
 import java.util.concurrent.*;
 
 import static java.lang.String.format;
@@ -29,7 +26,7 @@ class AcceptanceConfig {
     private String url; // Required
     private boolean disableSsl = false;
     private String admin = "admin";
-    private Set<String> context = Collections.emptySet();
+    private String context = null;
     private int timeout = 120;
     private int implicitWait = 5; // GUI implicit wait, in seconds
     private String resultFile = "ontrack-acceptance.xml"; // Output for the test results
@@ -54,12 +51,7 @@ class AcceptanceConfig {
     }
 
     public boolean acceptTest(AcceptanceTest acceptanceTest) {
-        String[] excludes = acceptanceTest.excludes();
-        // No exclusion must be contained in the context
-        return CollectionUtils.intersection(
-                Arrays.asList(excludes),
-                context
-        ).isEmpty();
+        return StringUtils.isBlank(context) || Arrays.asList(acceptanceTest.value()).contains(context);
     }
 
     public void setSystemProperties() {

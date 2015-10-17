@@ -1,9 +1,7 @@
 package net.nemerosa.ontrack.acceptance
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.acceptance.support.AcceptanceTest
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
-import org.junit.Assert
 import org.junit.Test
 
 import static net.nemerosa.ontrack.json.JsonUtils.array
@@ -13,7 +11,6 @@ import static net.nemerosa.ontrack.json.JsonUtils.object
  * Search acceptance tests.
  */
 @AcceptanceTestSuite
-@AcceptanceTest(excludes = 'production')
 class ACCSearch extends AcceptanceTestClient {
 
     @Test

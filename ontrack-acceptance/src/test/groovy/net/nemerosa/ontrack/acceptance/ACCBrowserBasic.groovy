@@ -18,6 +18,7 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
 class ACCBrowserBasic extends AcceptanceTestClient {
 
     @Test
+    @AcceptanceTest(AcceptanceTestContext.PRODUCTION)
     void 'Home page is accessible'() {
         browser {
             goTo HomePage, [:]
@@ -25,13 +26,11 @@ class ACCBrowserBasic extends AcceptanceTestClient {
     }
 
     @Test
-    @AcceptanceTest(excludes = "production")
     void 'Admin login'() {
         browser { browser -> loginAsAdmin(browser) }
     }
 
     @Test
-    @AcceptanceTest(excludes = "production")
     void 'Project creation'() {
         browser { browser ->
             HomePage home = loginAsAdmin(browser)
@@ -48,7 +47,6 @@ class ACCBrowserBasic extends AcceptanceTestClient {
     }
 
     @Test
-    @AcceptanceTest(excludes = "production")
     void 'Project creation - name already exists'() {
         def projectName = doCreateProject().path('name').asText()
         browser { browser ->
@@ -72,7 +70,6 @@ class ACCBrowserBasic extends AcceptanceTestClient {
     }
 
     @Test
-    @AcceptanceTest(excludes = "production")
     void 'Branch creation'() {
         browser { browser ->
             withProject { id, name ->
@@ -93,7 +90,6 @@ class ACCBrowserBasic extends AcceptanceTestClient {
     }
 
     @Test
-    @AcceptanceTest(excludes = "production")
     void 'Branch creation with a 120 characters long name'() {
         browser { browser ->
             withProject { id, name ->
@@ -114,7 +110,6 @@ class ACCBrowserBasic extends AcceptanceTestClient {
     }
 
     @Test
-    @AcceptanceTest(excludes = "production")
     void 'Project API page must be accessible'() {
         browser { browser ->
             withProject { id, name ->

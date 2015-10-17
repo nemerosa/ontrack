@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.acceptance
 
-import net.nemerosa.ontrack.acceptance.support.AcceptanceTest
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import org.junit.Test
 
@@ -10,7 +9,6 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
  * Acceptance tests for some template synchronisation use cases
  */
 @AcceptanceTestSuite
-@AcceptanceTest(excludes = 'production')
 class ACCDSLTemplateSync extends AbstractACCDSL {
 
     @Test

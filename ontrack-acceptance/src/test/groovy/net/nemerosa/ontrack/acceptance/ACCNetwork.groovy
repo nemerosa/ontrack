@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.acceptance
 
-import net.nemerosa.ontrack.acceptance.support.AcceptanceTest
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import net.nemerosa.ontrack.client.OTHttpClientBuilder
 import net.nemerosa.ontrack.dsl.Ontrack
@@ -15,7 +14,6 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
  * Network oriented tests.
  */
 @AcceptanceTestSuite
-@AcceptanceTest(excludes = 'production')
 class ACCNetwork extends AcceptanceTestClient {
 
     private Ontrack ontrack

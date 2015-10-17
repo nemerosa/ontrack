@@ -1,13 +1,11 @@
 package net.nemerosa.ontrack.acceptance
 
-import net.nemerosa.ontrack.acceptance.support.AcceptanceTest
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import org.junit.Test
 
 import static net.nemerosa.ontrack.json.JsonUtils.object
 
 @AcceptanceTestSuite
-@AcceptanceTest(excludes = 'production')
 class ACCStructure extends AcceptanceTestClient {
 
     @Test

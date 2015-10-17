@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.acceptance
 
 import net.nemerosa.ontrack.acceptance.browser.pages.BuildPage
-import net.nemerosa.ontrack.acceptance.support.AcceptanceTest
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import org.junit.Test
 import org.openqa.selenium.By
@@ -9,7 +8,6 @@ import org.openqa.selenium.WebElement
 
 import static net.nemerosa.ontrack.acceptance.browser.Browser.browser
 import static net.nemerosa.ontrack.acceptance.steps.BasicSteps.loginAsAdmin
-import static net.nemerosa.ontrack.test.TestUtils.assertJsonEquals
 import static net.nemerosa.ontrack.test.TestUtils.uid
 
 /**
@@ -19,7 +17,6 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
 class ACCBrowserBuildLinkPromotions extends AcceptanceTestClient {
 
     @Test
-    @AcceptanceTest(excludes = "production")
     void 'Promotions are displayed in the build link decorations'() {
 
         // Preparation
