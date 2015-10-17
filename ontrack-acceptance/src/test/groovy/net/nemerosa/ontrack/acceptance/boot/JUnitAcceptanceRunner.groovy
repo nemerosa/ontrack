@@ -60,7 +60,7 @@ class JUnitAcceptanceRunner implements AcceptanceRunner {
                 .every { it.wasSuccessful() }
 
         // XML output
-        xmlRunListener.render(new File('ontrack-acceptance.xml'))
+        xmlRunListener.render(new File(config.resultFile))
 
         // Result
         ok

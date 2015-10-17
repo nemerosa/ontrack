@@ -162,7 +162,7 @@ debAcceptanceTest -PacceptanceDebianDistributionDir=.
 """
         }
         publishers {
-            archiveJunit('ontrack-acceptance.xml')
+            archiveJunit('*-tests.xml')
             if (branchType == 'release') {
                 downstreamParameterized {
                     trigger("${SEED_PROJECT}-${SEED_BRANCH}-docker-push", 'SUCCESS', false) {
@@ -254,7 +254,7 @@ docker logout
 '''
         }
         publishers {
-            archiveJunit('ontrack-acceptance.xml')
+            archiveJunit('*-tests.xml')
             buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${PROJECT}-${NAME}-publish") {
                 parameters {
                     currentBuild()
@@ -426,7 +426,7 @@ productionTest
 '''
             }
             publishers {
-                archiveJunit('ontrack-acceptance.xml')
+                archiveJunit('*-tests.xml')
             }
             configure { node ->
                 node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {

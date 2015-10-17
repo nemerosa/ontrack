@@ -46,7 +46,8 @@ class RemoteAcceptanceTest extends DefaultTask {
                     "--ontrack.disableSsl=${disableSsl}",
                     "--ontrack.context=${acceptanceContext}",
                     "--ontrack.timeout=${acceptanceTimeout}",
-                    "--ontrack.implicitWait=${acceptanceImplicitWait}"
+                    "--ontrack.implicitWait=${acceptanceImplicitWait}",
+                    "--ontrack.resultFile=${name}-tests.xml"
         }
     }
 }

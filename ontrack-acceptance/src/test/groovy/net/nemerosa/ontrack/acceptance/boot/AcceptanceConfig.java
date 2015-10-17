@@ -32,6 +32,7 @@ class AcceptanceConfig {
     private Set<String> context = Collections.emptySet();
     private int timeout = 120;
     private int implicitWait = 5; // GUI implicit wait, in seconds
+    private String resultFile = "ontrack-acceptance.xml"; // Output for the test results
 
     @PostConstruct
     void check() throws InterruptedException, ExecutionException, TimeoutException {
