@@ -11,7 +11,7 @@ class RemoteAcceptanceTest extends DefaultTask {
 
     boolean disableSsl = false
 
-    String acceptanceContext = 'default'
+    String acceptanceContext = null
 
     String acceptanceJar = project.properties.acceptanceJar
 

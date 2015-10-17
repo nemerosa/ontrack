@@ -158,7 +158,6 @@ build
             // Runs the CI acceptance tests
             gradle """\
 ciAcceptanceTest -PacceptanceJar=ontrack-acceptance.jar
-debAcceptanceTest -PacceptanceDebianDistributionDir=.
 """
         }
         publishers {
