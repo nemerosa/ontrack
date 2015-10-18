@@ -68,6 +68,11 @@ def extractDeliveryArtifacts(Object dsl) {
     }
 }
 
+// CentOS versions to tests
+def centOsVersions = [
+        '7'
+]
+
 // Keeps only some version types
 if (['master', 'feature', 'release', 'hotfix'].contains(branchType)) {
 
@@ -166,6 +171,11 @@ ciAcceptanceTest -PacceptanceJar=ontrack-acceptance.jar
                 trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-debian", 'SUCCESS', false) {
                     currentBuild()
                 }
+                centOsVersions.each { centOsVersion ->
+                    trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-centos-${centOsVersion}", 'SUCCESS', false) {
+                        currentBuild()
+                    }
+                }
             }
             if (branchType == 'release') {
                 downstreamParameterized {
@@ -224,6 +234,45 @@ debAcceptanceTest
                 'branch'(NAME)
                 'build'('${VERSION_BUILD}')
                 'validationStamp'('ACCEPTANCE.DEBIAN')
+            }
+        }
+    }
+
+    // CentOS package acceptance job
+
+    centOsVersions.each { centOsVersion ->
+        freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-centos-${centOsVersion}") {
+            logRotator(numToKeep = 40)
+            deliveryPipelineConfiguration('Commit', "CentOS ${centOsVersion} package acceptance")
+            jdk 'JDK8u25'
+            parameters {
+                stringParam('VERSION_FULL', '', '')
+                stringParam('VERSION_COMMIT', '', '')
+                stringParam('VERSION_BUILD', '', '')
+                stringParam('VERSION_DISPLAY', '', '')
+            }
+            wrappers {
+                xvfb('default')
+            }
+            extractDeliveryArtifacts delegate
+            steps {
+                // Runs the CI acceptance tests
+                gradle """\
+rpmAcceptanceTest${centOsVersion}
+-PacceptanceJar=ontrack-acceptance.jar
+-PacceptanceDebianDistributionDir=.
+"""
+            }
+            publishers {
+                archiveJunit('*-tests.xml')
+            }
+            configure { node ->
+                node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
+                    'project'('ontrack')
+                    'branch'(NAME)
+                    'build'('${VERSION_BUILD}')
+                    'validationStamp'("ACCEPTANCE.CENTOS.${centOsVersion}")
+                }
             }
         }
     }
