@@ -122,7 +122,8 @@ build
                 pattern 'ontrack-dsl/build/libs/ontrack-dsl-*.jar'
                 pattern 'ontrack-dsl/build/poms/ontrack-dsl-*.pom'
                 pattern 'build/distributions/ontrack-*-delivery.zip'
-                pattern 'build/distributions/ontrack_*.deb'
+                pattern 'build/distributions/ontrack*.deb'
+                pattern 'build/distributions/ontrack*.rpm'
             }
             tasks(
                     '**/*.java,**/*.groovy,**/*.xml,**/*.html,**/*.js',
