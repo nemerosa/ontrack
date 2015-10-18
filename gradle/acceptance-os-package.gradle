@@ -52,16 +52,55 @@ task debAcceptanceTest(type: RemoteAcceptanceTest) {
 }
 
 /**
- * TODO RPM tests
+ * RPM tests
  */
 
-task rpmAcceptanceTest
+['7'].each { centOsVersion ->
 
-/**
- * OS packages tests
- */
+    tasks.create("rpmDockerPrepare${centOsVersion}", Copy) {
+        copy {
+            from project.properties.acceptanceRpmDistributionDir
+            include '*.rpm'
+            into "gradle/os-package/docker/centos/${centOsVersion}"
+            rename '.*', 'ontrack.rpm'
+        }
+    }
 
-task osPackageAcceptanceTest {
-    dependsOn debAcceptanceTest
-    dependsOn rpmAcceptanceTest
+    tasks.create("rpmDockerBuild${centOsVersion}", DockerBuild) {
+        dependsOn "rpmDockerPrepare${centOsVersion}"
+        dir = file("gradle/os-package/docker/centos/${centOsVersion}")
+        tag = "nemerosa/ontrack-centos:${centOsVersion}"
+    }
+
+    tasks.create("rpmDockerRun${centOsVersion}", DockerStart) {
+        dependsOn "rpmDockerBuild${centOsVersion}"
+        image = "nemerosa/ontrack-centos:${centOsVersion}"
+        tty = true
+        command = '/bin/cat'
+        ports = [8080: 0]
+    }
+
+    tasks.create("rpmDockerStart${centOsVersion}", DockerExec) {
+        dependsOn "rpmDockerRun${centOsVersion}"
+        startTask = "rpmDockerRun${centOsVersion}"
+        commands = [
+                start: ['/etc/init.d/ontrack', 'start'],
+        ]
+    }
+
+    tasks.create("rpmDockerStop${centOsVersion}", DockerStop) {
+        startTask = "rpmDockerRun${centOsVersion}"
+    }
+
+    tasks.create("rpmAcceptanceTest${centOsVersion}", RemoteAcceptanceTest) {
+        acceptanceUrl = {
+            DockerStart run = project.tasks.getByName("rpmDockerRun${centOsVersion}") as DockerStart
+            return "http://${project.properties.acceptanceHost}:${run.getActualPort(8080)}"
+        }
+        acceptanceContext = 'smoke' // Only basic test
+        disableSsl = true
+        dependsOn "rpmDockerStart${centOsVersion}"
+        finalizedBy "rpmDockerStop${centOsVersion}"
+    }
+
 }

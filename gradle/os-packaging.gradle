@@ -6,7 +6,7 @@
  * The package version does not accept versions like the ones generated
  * from the Versioning plugin for the feature branches for example.
  */
-def packageVersion = versioning.info.branchType != 'release' ? "0." + versioning.info.display : versioning.info.display
+def packageVersion = versioning.info.branchType != 'release' ? '0.0.0' : versioning.info.display
 
 ospackage {
     packageName = 'ontrack'
@@ -33,7 +33,11 @@ task debPackage(type: Deb, dependsOn: ':ontrack-ui:bootRepackage') {
     link '/etc/init.d/ontrack', '/opt/ontrack/bin/ontrack.sh'
 }
 
+task rpmPackage(type: Rpm, dependsOn: ':ontrack-ui:bootRepackage') {
+    link '/etc/init.d/ontrack', '/opt/ontrack/bin/ontrack.sh'
+}
+
 task osPackages {
-    // dependsOn rpmPackage
+    dependsOn rpmPackage
     dependsOn debPackage
 }
