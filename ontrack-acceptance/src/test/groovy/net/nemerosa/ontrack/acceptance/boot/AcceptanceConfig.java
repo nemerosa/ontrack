@@ -23,6 +23,8 @@ class AcceptanceConfig {
 
     private final Logger logger = LoggerFactory.getLogger(AcceptanceConfig.class);
 
+    public static final String CONTEXT_ALL = "all";
+
     private String url; // Required
     private boolean disableSsl = false;
     private String admin = "admin";
@@ -55,7 +57,7 @@ class AcceptanceConfig {
         // If there is a context, but no annotation, the test cannot be accepted
         // There is a context *and* an annotation, checks the context is part of the
         // accepted values in the annotation
-        return StringUtils.isBlank(context) ||
+        return StringUtils.isBlank(context) || StringUtils.equals(CONTEXT_ALL, context) ||
                 (
                         acceptanceTest != null &&
                                 Arrays.asList(acceptanceTest.value()).contains(context)
