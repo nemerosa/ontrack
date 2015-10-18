@@ -262,7 +262,7 @@ debAcceptanceTest
                 gradle """\
 rpmAcceptanceTest${centOsVersion}
 -PacceptanceJar=ontrack-acceptance.jar
--PacceptanceDebianDistributionDir=.
+-PacceptanceRpmDistributionDir=.
 """
             }
             publishers {
