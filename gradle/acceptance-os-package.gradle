@@ -45,7 +45,7 @@ task debDockerStop(type: DockerStop) {
 
 task debAcceptanceTest(type: RemoteAcceptanceTest) {
     acceptanceUrl = { "http://${project.properties.acceptanceHost}:${debDockerRun.getActualPort(8080)}" }
-    acceptanceContext = 'production' // Only basic test
+    acceptanceContext = 'smoke' // Only basic test
     disableSsl = true
     dependsOn debDockerStart
     finalizedBy debDockerStop
