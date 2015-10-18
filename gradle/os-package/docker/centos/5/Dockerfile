@@ -1,5 +1,5 @@
 # Base
-FROM centos:5
+FROM centos:5.11
 
 # Meta-information
 MAINTAINER Damien Coraboeuf <damien.coraboeuf@gmail.com>
