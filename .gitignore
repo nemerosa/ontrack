@@ -10,7 +10,7 @@ build
 /.gradle
 *.txt
 *.pid
-ontrack-acceptance.xml
+/*-tests.xml
 /version.properties
 /release.sh
 /release
