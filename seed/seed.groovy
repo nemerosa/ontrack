@@ -162,6 +162,11 @@ ciAcceptanceTest -PacceptanceJar=ontrack-acceptance.jar
         }
         publishers {
             archiveJunit('*-tests.xml')
+            downstreamParameterized {
+                trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-debian", 'SUCCESS', false) {
+                    currentBuild()
+                }
+            }
             if (branchType == 'release') {
                 downstreamParameterized {
                     trigger("${SEED_PROJECT}-${SEED_BRANCH}-docker-push", 'SUCCESS', false) {
@@ -182,6 +187,43 @@ ciAcceptanceTest -PacceptanceJar=ontrack-acceptance.jar
                 'branch'(NAME)
                 'build'('${VERSION_BUILD}')
                 'validationStamp'('ACCEPTANCE')
+            }
+        }
+    }
+
+    // Debian package acceptance job
+
+    freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-debian") {
+        logRotator(numToKeep = 40)
+        deliveryPipelineConfiguration('Commit', 'Debian package acceptance')
+        jdk 'JDK8u25'
+        parameters {
+            stringParam('VERSION_FULL', '', '')
+            stringParam('VERSION_COMMIT', '', '')
+            stringParam('VERSION_BUILD', '', '')
+            stringParam('VERSION_DISPLAY', '', '')
+        }
+        wrappers {
+            xvfb('default')
+        }
+        extractDeliveryArtifacts delegate
+        steps {
+            // Runs the CI acceptance tests
+            gradle """\
+debAcceptanceTest
+-PacceptanceJar=ontrack-acceptance.jar
+-PacceptanceDebianDistributionDir=.
+"""
+        }
+        publishers {
+            archiveJunit('*-tests.xml')
+        }
+        configure { node ->
+            node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
+                'project'('ontrack')
+                'branch'(NAME)
+                'build'('${VERSION_BUILD}')
+                'validationStamp'('ACCEPTANCE.DEBIAN')
             }
         }
     }
