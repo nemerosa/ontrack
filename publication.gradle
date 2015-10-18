@@ -232,11 +232,23 @@ task publicationGitHubReleaseCreate(type: GitHubReleaseCreate) {
     tag = ontrackVersion          // VERSION_DISPLAY
 }
 
-task publicationGitHubReleaseUpload(type: GitHubReleaseUpload) {
+task publicationGitHubReleaseJarUpload(type: GitHubReleaseUpload) {
     dependsOn publicationGitHubReleaseCreate
     fileName = 'ontrack.jar'
     fileType = 'application/zip'
     file = project.file("ontrack-ui-${ontrackVersionFull}.jar")
+}
+
+task publicationGitHubReleaseDebianUpload(type: GitHubReleaseUpload) {
+    dependsOn publicationGitHubReleaseCreate
+    fileName = 'ontrack.deb'
+    fileType = 'application/x-debian-package'
+    file = project.file("ontrack-${ontrackVersion}-1_all.deb")
+}
+
+task publicationGitHubReleaseUpload {
+    dependsOn publicationGitHubReleaseJarUpload
+    dependsOn publicationGitHubReleaseDebianUpload
 }
 
 task publicationOntrackChangeLog(type: OntrackChangeLog) {
