@@ -55,7 +55,7 @@ task debAcceptanceTest(type: RemoteAcceptanceTest) {
  * RPM tests
  */
 
-['7'].each { centOsVersion ->
+['7', '6'].each { centOsVersion ->
 
     tasks.create("rpmDockerPrepare${centOsVersion}", Copy) {
         copy {

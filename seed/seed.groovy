@@ -70,7 +70,8 @@ def extractDeliveryArtifacts(Object dsl) {
 
 // CentOS versions to tests
 def centOsVersions = [
-        '7'
+        '7',
+        '6',
 ]
 
 // Keeps only some version types
