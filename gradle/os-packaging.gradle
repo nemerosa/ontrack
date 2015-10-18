@@ -14,6 +14,7 @@ ospackage {
     release = '1'
     os = LINUX // only applied to RPM
 
+    preInstall file('gradle/os-package/preInstall.sh')
     postInstall file('gradle/os-package/postInstall.sh')
 
     from(project(':ontrack-ui').files("build/libs/ontrack-ui-${versioning.info.full}.jar")) {
@@ -34,6 +35,7 @@ task debPackage(type: Deb, dependsOn: ':ontrack-ui:bootRepackage') {
 }
 
 task rpmPackage(type: Rpm, dependsOn: ':ontrack-ui:bootRepackage') {
+    user = 'ontrack'
     link '/etc/init.d/ontrack', '/opt/ontrack/bin/ontrack.sh'
 }
 
