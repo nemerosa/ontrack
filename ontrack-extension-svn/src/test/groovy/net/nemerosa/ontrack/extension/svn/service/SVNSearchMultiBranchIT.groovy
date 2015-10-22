@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfigurati
 import net.nemerosa.ontrack.extension.svn.support.SVNProfileValueSource
 import net.nemerosa.ontrack.extension.svn.support.SVNTestRepo
 import net.nemerosa.ontrack.extension.svn.support.SVNTestUtils
+import net.nemerosa.ontrack.extension.svn.support.TagNameSvnRevisionLink
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectEdit
@@ -192,6 +193,7 @@ class SVNSearchMultiBranchIT extends AbstractServiceTestSupport {
             // Branch's configuration
             propertyService.editProperty(branch, SVNBranchConfigurationPropertyType, new SVNBranchConfigurationProperty(
                     "/${testName}/${path}",
+                    TagNameSvnRevisionLink.DEFAULT.toServiceConfiguration(),
                     "/${testName}/tags/{build}"
             ))
             // Two promotion levels

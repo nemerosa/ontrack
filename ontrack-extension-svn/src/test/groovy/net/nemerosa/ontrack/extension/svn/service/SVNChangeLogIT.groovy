@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfigurati
 import net.nemerosa.ontrack.extension.svn.support.SVNProfileValueSource
 import net.nemerosa.ontrack.extension.svn.support.SVNTestRepo
 import net.nemerosa.ontrack.extension.svn.support.SVNTestUtils
+import net.nemerosa.ontrack.extension.svn.support.TagNameSvnRevisionLink
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectEdit
@@ -111,6 +112,7 @@ class SVNChangeLogIT extends AbstractServiceTestSupport {
             ))
             propertyService.editProperty(branch, SVNBranchConfigurationPropertyType, new SVNBranchConfigurationProperty(
                     '/SVNChangeLogWithoutIssues/trunk',
+                    TagNameSvnRevisionLink.DEFAULT.toServiceConfiguration(),
                     '/SVNChangeLogWithoutIssues/tags/{build}'
             ))
         }
@@ -208,6 +210,7 @@ class SVNChangeLogIT extends AbstractServiceTestSupport {
             ))
             propertyService.editProperty(branch, SVNBranchConfigurationPropertyType, new SVNBranchConfigurationProperty(
                     '/SVNChangeLogWithIssues/trunk',
+                    TagNameSvnRevisionLink.DEFAULT.toServiceConfiguration(),
                     '/SVNChangeLogWithIssues/tags/{build}'
             ))
         }

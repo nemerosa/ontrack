@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationProper
 import net.nemerosa.ontrack.extension.svn.support.SVNProfileValueSource
 import net.nemerosa.ontrack.extension.svn.support.SVNTestRepo
 import net.nemerosa.ontrack.extension.svn.support.SVNTestUtils
+import net.nemerosa.ontrack.extension.svn.support.TagNameSvnRevisionLink
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectConfig
@@ -117,6 +118,7 @@ class SVNDownloadIT extends AbstractServiceTestSupport {
                     SVNBranchConfigurationPropertyType,
                     new SVNBranchConfigurationProperty(
                             '/SVNDownload/branches/v1',
+                            TagNameSvnRevisionLink.DEFAULT.toServiceConfiguration(),
                             '/SVNDownload/tags/{build}',
                     )
             )
@@ -125,6 +127,7 @@ class SVNDownloadIT extends AbstractServiceTestSupport {
                     SVNBranchConfigurationPropertyType,
                     new SVNBranchConfigurationProperty(
                             '/SVNDownload/trunk',
+                            TagNameSvnRevisionLink.DEFAULT.toServiceConfiguration(),
                             '/SVNDownload/tags/{build}',
                     )
             )

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.svn.property;
 
 import lombok.Data;
+import net.nemerosa.ontrack.model.structure.ServiceConfiguration;
 
 /**
  * Associates a {@link net.nemerosa.ontrack.model.structure.Branch branch} with a path in a Subversion repository
@@ -16,8 +17,11 @@ public class SVNBranchConfigurationProperty {
     private final String branchPath;
 
     /**
-     * TODO Revision / build link
+     * Revision / build link
+     *
+     * @see {@link net.nemerosa.ontrack.extension.svn.model.BuildSvnRevisionLink}
      */
+    private final ServiceConfiguration buildRevisionLink;
 
     /**
      * Path of a tag in the Subversion repository using a build name. The path is computed relative to the root
@@ -30,8 +34,8 @@ public class SVNBranchConfigurationProperty {
      * is a simplified regex where * stands for any character.</li>
      * </ul>
      *
+     * @see #buildRevisionLink
      * @deprecated Use {@link net.nemerosa.ontrack.extension.svn.model.BuildSvnRevisionLink} instead
-     * @see
      */
     @Deprecated
     private final String buildPath;

@@ -1,13 +1,12 @@
 package net.nemerosa.ontrack.extension.svn.service
 
 import net.nemerosa.ontrack.extension.api.model.BuildValidationException
+import net.nemerosa.ontrack.extension.scm.support.TagPattern
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationPropertyType
-import net.nemerosa.ontrack.extension.svn.support.SVNProfileValueSource
-import net.nemerosa.ontrack.extension.svn.support.SVNTestRepo
-import net.nemerosa.ontrack.extension.svn.support.SVNTestUtils
+import net.nemerosa.ontrack.extension.svn.support.*
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectEdit
@@ -81,6 +80,7 @@ class SVNBuildValidationIT extends AbstractServiceTestSupport {
             // Branch's configuration
             propertyService.editProperty(branch, SVNBranchConfigurationPropertyType, new SVNBranchConfigurationProperty(
                     "/project/trunk",
+                    TagNameSvnRevisionLink.DEFAULT.toServiceConfiguration(),
                     "/project/tags/{build}"
             ))
         }
@@ -116,6 +116,10 @@ class SVNBuildValidationIT extends AbstractServiceTestSupport {
             // Branch's configuration
             propertyService.editProperty(branch, SVNBranchConfigurationPropertyType, new SVNBranchConfigurationProperty(
                     "/project/trunk",
+                    new ConfiguredBuildSvnRevisionLink<>(
+                            new TagNamePatternSvnRevisionLink(),
+                            new TagPattern("1.1.*")
+                    ).toServiceConfiguration(),
                     "/project/tags/{build:1.1.*}"
             ))
         }

@@ -49,5 +49,6 @@ public interface BuildSvnRevisionLink<T> {
     Form getForm();
 
     // TODO SVN integration
+    // TODO The tag path has to be computed from the branch path
 
 }

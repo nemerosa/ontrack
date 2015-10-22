@@ -15,6 +15,12 @@ import java.util.function.Function;
 @Component
 public class TagNameSvnRevisionLink implements BuildSvnRevisionLink<NoConfig> {
 
+    public static final ConfiguredBuildSvnRevisionLink<NoConfig> DEFAULT =
+            new ConfiguredBuildSvnRevisionLink<>(
+                    new TagNameSvnRevisionLink(),
+                    NoConfig.INSTANCE
+            );
+
     @Override
     public String getId() {
         return "tag";
