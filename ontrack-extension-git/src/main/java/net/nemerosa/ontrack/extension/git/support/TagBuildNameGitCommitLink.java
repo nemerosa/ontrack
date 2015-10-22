@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Build;
+import net.nemerosa.ontrack.model.support.NoConfig;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;

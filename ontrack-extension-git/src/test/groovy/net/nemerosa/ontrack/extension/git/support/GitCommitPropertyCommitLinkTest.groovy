@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.git.support
 import net.nemerosa.ontrack.extension.git.property.GitCommitProperty
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.support.NoConfig
 import org.junit.Before
 import org.junit.Test
 

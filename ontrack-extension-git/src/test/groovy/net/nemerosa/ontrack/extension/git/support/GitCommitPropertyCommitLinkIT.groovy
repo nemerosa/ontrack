@@ -23,6 +23,7 @@ import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.PropertyService
 import net.nemerosa.ontrack.model.structure.Signature
+import net.nemerosa.ontrack.model.support.NoConfig
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 

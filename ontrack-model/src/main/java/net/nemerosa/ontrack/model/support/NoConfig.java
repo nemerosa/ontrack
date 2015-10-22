@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.git.support;
+package net.nemerosa.ontrack.model.support;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
