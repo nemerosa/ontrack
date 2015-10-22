@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.git.support
 
+import net.nemerosa.ontrack.extension.scm.support.TagPattern
 import org.junit.Test
 
 class TagPatternTest {

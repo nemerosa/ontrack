@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.git.support;
+package net.nemerosa.ontrack.extension.scm.support;
 
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;

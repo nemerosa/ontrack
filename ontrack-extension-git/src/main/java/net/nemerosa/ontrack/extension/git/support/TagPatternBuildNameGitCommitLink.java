@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.git.model.GitBranchConfiguration;
 import net.nemerosa.ontrack.extension.git.model.IndexableBuildGitCommitLink;
+import net.nemerosa.ontrack.extension.scm.support.TagPattern;
 import net.nemerosa.ontrack.git.GitRepositoryClient;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.exceptions.JsonParsingException;
