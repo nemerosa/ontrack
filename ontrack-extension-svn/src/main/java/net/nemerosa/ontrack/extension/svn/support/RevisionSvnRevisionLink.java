@@ -10,19 +10,19 @@ import org.springframework.stereotype.Component;
 import java.util.function.Function;
 
 /**
- * Build / revision relationship based on the build name being a subversion tag name.
+ * Build / revision relationship based on the build name being a subversion revision.
  */
 @Component
 public class RevisionSvnRevisionLink implements BuildSvnRevisionLink<NoConfig> {
 
     @Override
     public String getId() {
-        return "tag";
+        return "revision";
     }
 
     @Override
     public String getName() {
-        return "Tag as name";
+        return "Revision as name";
     }
 
     @Override
