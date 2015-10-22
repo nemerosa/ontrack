@@ -16,6 +16,10 @@ public class SVNBranchConfigurationProperty {
     private final String branchPath;
 
     /**
+     * TODO Revision / build link
+     */
+
+    /**
      * Path of a tag in the Subversion repository using a build name. The path is computed relative to the root
      * of the repository. Several placeholders can be defined in the path definition, that will be replaced
      * at runtime:
@@ -25,7 +29,11 @@ public class SVNBranchConfigurationProperty {
      * <li><code>{build:expression}</code> - the build name, which must complies to the expression. This expression
      * is a simplified regex where * stands for any character.</li>
      * </ul>
+     *
+     * @deprecated Use {@link net.nemerosa.ontrack.extension.svn.model.BuildSvnRevisionLink} instead
+     * @see
      */
+    @Deprecated
     private final String buildPath;
 
 }
