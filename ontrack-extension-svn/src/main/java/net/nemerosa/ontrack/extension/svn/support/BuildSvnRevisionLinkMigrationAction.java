@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropert
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.structure.ServiceConfiguration;
 import net.nemerosa.ontrack.model.support.DBMigrationAction;
+import net.nemerosa.ontrack.model.support.NoConfig;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
@@ -20,6 +21,16 @@ import java.sql.ResultSet;
 public class BuildSvnRevisionLinkMigrationAction implements DBMigrationAction {
 
     private final ObjectMapper objectMapper = ObjectMapperFactory.create();
+
+    private final RevisionSvnRevisionLink revisionLink;
+    private final TagNamePatternSvnRevisionLink tagPatternLink;
+    private final TagNameSvnRevisionLink tagLink;
+
+    public BuildSvnRevisionLinkMigrationAction(RevisionSvnRevisionLink revisionLink, TagNamePatternSvnRevisionLink tagPatternLink, TagNameSvnRevisionLink tagLink) {
+        this.revisionLink = revisionLink;
+        this.tagPatternLink = tagPatternLink;
+        this.tagLink = tagLink;
+    }
 
     @Override
     public int getPatch() {
@@ -65,6 +76,14 @@ public class BuildSvnRevisionLinkMigrationAction implements DBMigrationAction {
     }
 
     protected ConfiguredBuildSvnRevisionLink<?> toBuildSvnRevisionLinkConfiguration(String branchPath, String buildPath) {
+        // Revision based
+        if (SVNUtils.isPathRevision(buildPath)) {
+            return new ConfiguredBuildSvnRevisionLink<>(
+                    revisionLink,
+                    NoConfig.INSTANCE
+            );
+        }
+        // Default
         // FIXME Method net.nemerosa.ontrack.extension.svn.support.BuildSvnRevisionLinkMigrationAction.toBuildSvnRevisionLinkConfiguration
         return TagNameSvnRevisionLink.DEFAULT;
     }
