@@ -15,12 +15,11 @@ public class BuildSvnRevisionLinkMigrationActionTest {
 
     private RevisionSvnRevisionLink revisionLink = mock(RevisionSvnRevisionLink.class);
     private TagNamePatternSvnRevisionLink tagPatternLink = mock(TagNamePatternSvnRevisionLink.class);
-    private TagNameSvnRevisionLink tagLink = mock(TagNameSvnRevisionLink.class);
     private BuildSvnRevisionLinkMigrationAction action;
 
     @Before
     public void before() {
-        action = new BuildSvnRevisionLinkMigrationAction(revisionLink, tagPatternLink, tagLink);
+        action = new BuildSvnRevisionLinkMigrationAction(revisionLink, tagPatternLink);
     }
 
     @Test
@@ -49,7 +48,6 @@ public class BuildSvnRevisionLinkMigrationActionTest {
     @Test
     public void tagName() {
         ConfiguredBuildSvnRevisionLink<?> c = action.toBuildSvnRevisionLinkConfiguration(
-                "/project/branches/1.1",
                 "/project/tags/{build}"
         );
         assertTrue(c.getLink() instanceof TagNameSvnRevisionLink);
@@ -59,7 +57,6 @@ public class BuildSvnRevisionLinkMigrationActionTest {
     @Test
     public void tagPatternName() {
         ConfiguredBuildSvnRevisionLink<?> c = action.toBuildSvnRevisionLinkConfiguration(
-                "/project/branches/1.1",
                 "/project/tags/{build:1.1.*}"
         );
         assertTrue(c.getLink() instanceof TagNamePatternSvnRevisionLink);
@@ -71,7 +68,6 @@ public class BuildSvnRevisionLinkMigrationActionTest {
     @Test
     public void revision() {
         ConfiguredBuildSvnRevisionLink<?> c = action.toBuildSvnRevisionLinkConfiguration(
-                "/project/branches/1.1",
                 "/project/branches/1.1@{build}"
         );
         assertTrue(c.getLink() instanceof RevisionSvnRevisionLink);
