@@ -66,6 +66,17 @@ public class BuildSvnRevisionLinkMigrationActionTest {
     }
 
     @Test
+    public void tagPatternNameForTemplate() {
+        ConfiguredBuildSvnRevisionLink<?> c = action.toBuildSvnRevisionLinkConfiguration(
+                "/project/tags/{build:${sourceName}*}"
+        );
+        assertTrue(c.getLink() instanceof TagNamePatternSvnRevisionLink);
+        assertTrue(c.getData() instanceof TagPattern);
+        TagPattern tagPattern = (TagPattern) c.getData();
+        assertEquals("${sourceName}*", tagPattern.getPattern());
+    }
+
+    @Test
     public void revision() {
         ConfiguredBuildSvnRevisionLink<?> c = action.toBuildSvnRevisionLinkConfiguration(
                 "/project/branches/1.1@{build}"

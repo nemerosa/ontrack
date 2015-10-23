@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 public class SVNUtils {
 
-    public static final String BUILD_PLACEHOLDER_PATTERN = "\\{([^}]+)\\}";
+    public static final String BUILD_PLACEHOLDER_PATTERN = "\\{(.+)\\}";
 
     public static SVNURL toURL(String path) {
         try {
