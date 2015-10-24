@@ -1,4 +1,10 @@
 <ul class="fa-ul">
-    <li><i class="fa-li fa fa-database"></i>{{property.value.branchPath}}</li>
-    <li><i class="fa-li fa fa-tags"></i>{{property.value.buildPath}}</li>
+    <li>
+        <span class="fa-li fa fa-code-fork"></span>
+        {{property.value.branchPath}}
+    </li>
+    <li>
+        <span class="fa fa-li fa-gear"></span>
+        <span ng-include="'app/extension/svn/buildRevisionLink/' + property.value.buildRevisionLink.id + '.tpl.html'"></span>
+    </li>
 </ul>
