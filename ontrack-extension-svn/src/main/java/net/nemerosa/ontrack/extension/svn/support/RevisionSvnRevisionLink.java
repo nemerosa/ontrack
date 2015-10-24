@@ -62,4 +62,9 @@ public class RevisionSvnRevisionLink implements BuildSvnRevisionLink<NoConfig> {
             return OptionalLong.empty();
         }
     }
+
+    @Override
+    public String getBuildPath(NoConfig data, Build build, SVNBranchConfigurationProperty branchConfigurationProperty) {
+        return branchConfigurationProperty.getBranchPath() + "@" + build.getName();
+    }
 }

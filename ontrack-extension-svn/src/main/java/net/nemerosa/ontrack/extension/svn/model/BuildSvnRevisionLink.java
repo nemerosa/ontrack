@@ -72,4 +72,15 @@ public interface BuildSvnRevisionLink<T> {
      * @return Revision if found
      */
     OptionalLong getRevision(T data, Build build, SVNBranchConfigurationProperty branchConfigurationProperty);
+
+    /**
+     * Gets the path attached to a build. This is a relative path, can a branch or tag path, can be suffixed
+     * with a revision (@1345).
+     *
+     * @param data                        Link configuration
+     * @param build                       Build
+     * @param branchConfigurationProperty SVN branch configuration
+     * @return Revision if found
+     */
+    String getBuildPath(T data, Build build, SVNBranchConfigurationProperty branchConfigurationProperty);
 }

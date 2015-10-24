@@ -32,8 +32,6 @@ import org.tmatesoft.svn.core.wc.SVNRevision;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static net.nemerosa.ontrack.extension.svn.support.SVNUtils.expandBuildPath;
-
 @Service
 public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService implements SVNChangeLogService {
 
@@ -355,10 +353,12 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
         if (branchConfiguration.isEmpty()) {
             throw new MissingSVNBranchConfigurationException(build.getBranch().getName());
         } else {
-            // Gets the build path definition
-            String buildPathDefinition = branchConfiguration.getValue().getBuildPath();
-            // Expands the build path
-            return expandBuildPath(buildPathDefinition, build);
+            // Gets the build revision link
+            ConfiguredBuildSvnRevisionLink<Object> revisionLink = buildSvnRevisionLinkService.getConfiguredBuildSvnRevisionLink(
+                    branchConfiguration.getValue().getBuildRevisionLink()
+            );
+            // Gets the path to the build
+            return revisionLink.getBuildPath(build, branchConfiguration.getValue());
         }
     }
 

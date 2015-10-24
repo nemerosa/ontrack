@@ -39,4 +39,8 @@ public class ConfiguredBuildSvnRevisionLink<T> {
     public OptionalLong getRevision(Build build, SVNBranchConfigurationProperty branchConfigurationProperty) {
         return link.getRevision(data, build, branchConfigurationProperty);
     }
+
+    public String getBuildPath(Build build, SVNBranchConfigurationProperty branchConfigurationProperty) {
+        return link.getBuildPath(data, build, branchConfigurationProperty);
+    }
 }

@@ -23,19 +23,12 @@ public abstract class AbstractTagBasedSvnRevisionLink<T> implements BuildSvnRevi
 
     @Override
     public OptionalLong getRevision(T data, Build build, SVNBranchConfigurationProperty branchConfigurationProperty) {
-        // Gets the tag name
-        Optional<String> oTagName = getTagName(data, build.getName());
-        if (!oTagName.isPresent()) {
-            return OptionalLong.empty();
-        }
-        String tagName = oTagName.get();
-        // Repository for the branch
-        SVNRepository svnRepository = svnService.getRequiredSVNRepository(build.getBranch());
         // Gets the tag path
-        Optional<String> oTagPath = svnService.getTagPathForTagName(svnRepository, branchConfigurationProperty.getBranchPath(), tagName);
+        Optional<String> oTagPath = getTagPath(data, build, branchConfigurationProperty);
         // If present
         if (oTagPath.isPresent()) {
             String tagPath = oTagPath.get();
+            SVNRepository svnRepository = svnService.getRequiredSVNRepository(build.getBranch());
             // Gets the copy event for this build
             TCopyEvent lastCopyEvent = svnService.getLastCopyEvent(
                     svnRepository.getId(),
@@ -49,6 +42,22 @@ public abstract class AbstractTagBasedSvnRevisionLink<T> implements BuildSvnRevi
         } else {
             return OptionalLong.empty();
         }
+    }
+
+    @Override
+    public String getBuildPath(T data, Build build, SVNBranchConfigurationProperty branchConfigurationProperty) {
+        return getTagPath(data, build, branchConfigurationProperty).get();
+    }
+
+    protected Optional<String> getTagPath(T data, Build build, SVNBranchConfigurationProperty branchConfigurationProperty) {
+        // Gets the tag name
+        return getTagName(data, build.getName())
+                .flatMap(tagName -> {
+                    // Repository for the branch
+                    SVNRepository svnRepository = svnService.getRequiredSVNRepository(build.getBranch());
+                    // Gets the tag path
+                    return svnService.getTagPathForTagName(svnRepository, branchConfigurationProperty.getBranchPath(), tagName);
+                });
     }
 
     protected abstract Optional<String> getTagName(T data, String buildName);
