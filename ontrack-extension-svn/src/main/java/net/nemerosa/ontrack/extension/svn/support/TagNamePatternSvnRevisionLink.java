@@ -57,4 +57,9 @@ public class TagNamePatternSvnRevisionLink implements BuildSvnRevisionLink<TagPa
                 )
                 ;
     }
+
+    @Override
+    public boolean isValidBuildName(TagPattern data, String name) {
+        return data.isValidTagName(name);
+    }
 }

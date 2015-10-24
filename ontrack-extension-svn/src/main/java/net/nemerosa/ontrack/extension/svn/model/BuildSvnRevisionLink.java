@@ -51,4 +51,13 @@ public interface BuildSvnRevisionLink<T> {
     // TODO SVN integration
     // TODO The tag path has to be computed from the branch path
 
+    /**
+     * Tests if the name of a build for a branch does comply with the build link.
+     *
+     * @param data Link configuration
+     * @param name Name of the build to test
+     * @return <code>true</code> if the build name is OK
+     */
+    boolean isValidBuildName(T data, String name);
+
 }

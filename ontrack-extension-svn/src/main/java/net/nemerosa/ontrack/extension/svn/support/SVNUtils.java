@@ -41,6 +41,7 @@ public class SVNUtils {
     /**
      * See the definition of the build path at {@link net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty#buildPath}.
      */
+    @Deprecated
     public static String expandBuildPath(String buildPathDefinition, Build build) {
         return expandBuildPath(buildPathDefinition, build.getName());
     }
@@ -48,6 +49,7 @@ public class SVNUtils {
     /**
      * See the definition of the build path at {@link net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty#buildPath}.
      */
+    @Deprecated
     public static String expandBuildPath(String buildPathDefinition, String name) {
         // Pattern
         Pattern pattern = Pattern.compile(BUILD_PLACEHOLDER_PATTERN);

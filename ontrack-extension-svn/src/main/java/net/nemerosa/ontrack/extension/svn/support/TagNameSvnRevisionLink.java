@@ -50,4 +50,9 @@ public class TagNameSvnRevisionLink implements BuildSvnRevisionLink<NoConfig> {
     public Form getForm() {
         return Form.create();
     }
+
+    @Override
+    public boolean isValidBuildName(NoConfig data, String name) {
+        return true;
+    }
 }

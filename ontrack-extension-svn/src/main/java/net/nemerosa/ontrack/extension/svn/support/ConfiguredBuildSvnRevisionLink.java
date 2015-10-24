@@ -28,4 +28,8 @@ public class ConfiguredBuildSvnRevisionLink<T> {
                 link.toJson(data)
         );
     }
+
+    public boolean isValidBuildName(String name) {
+        return link.isValidBuildName(data, name);
+    }
 }

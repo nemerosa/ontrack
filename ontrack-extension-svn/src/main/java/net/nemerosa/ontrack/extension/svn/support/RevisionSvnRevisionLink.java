@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.svn.model.BuildSvnRevisionLink;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.support.NoConfig;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Function;
@@ -43,5 +44,10 @@ public class RevisionSvnRevisionLink implements BuildSvnRevisionLink<NoConfig> {
     @Override
     public Form getForm() {
         return Form.create();
+    }
+
+    @Override
+    public boolean isValidBuildName(NoConfig data, String name) {
+        return StringUtils.isNumeric(name);
     }
 }
