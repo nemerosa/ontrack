@@ -41,6 +41,9 @@ class SVNBuildValidationIT extends AbstractServiceTestSupport {
     @Autowired
     private SVNConfigurationService svnConfigurationService
 
+    @Autowired
+    private TagNamePatternSvnRevisionLink tagNamePatternSvnRevisionLink;
+
     /**
      * Validates a build according to the branch SCM policy.
      */
@@ -80,7 +83,7 @@ class SVNBuildValidationIT extends AbstractServiceTestSupport {
             // Branch's configuration
             propertyService.editProperty(branch, SVNBranchConfigurationPropertyType, new SVNBranchConfigurationProperty(
                     "/project/trunk",
-                    TagNameSvnRevisionLink.DEFAULT.toServiceConfiguration(),
+                    TagNameSvnRevisionLink.DEFAULT,
                     "/project/tags/{build}"
             ))
         }
@@ -117,7 +120,7 @@ class SVNBuildValidationIT extends AbstractServiceTestSupport {
             propertyService.editProperty(branch, SVNBranchConfigurationPropertyType, new SVNBranchConfigurationProperty(
                     "/project/trunk",
                     new ConfiguredBuildSvnRevisionLink<>(
-                            new TagNamePatternSvnRevisionLink(),
+                            tagNamePatternSvnRevisionLink,
                             new TagPattern("1.1.*")
                     ).toServiceConfiguration(),
                     "/project/tags/{build:1.1.*}"
@@ -151,6 +154,10 @@ class SVNBuildValidationIT extends AbstractServiceTestSupport {
             // Branch's configuration
             propertyService.editProperty(branch, SVNBranchConfigurationPropertyType, new SVNBranchConfigurationProperty(
                     "/project/trunk",
+                    new ConfiguredBuildSvnRevisionLink<>(
+                            tagNamePatternSvnRevisionLink,
+                            new TagPattern("1.1.*")
+                    ).toServiceConfiguration(),
                     "/project/tags/{build:1.1.*}"
             ))
         }

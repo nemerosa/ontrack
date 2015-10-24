@@ -51,7 +51,7 @@ public class RevisionSvnRevisionLink implements BuildSvnRevisionLink<NoConfig> {
 
     @Override
     public boolean isValidBuildName(NoConfig data, String name) {
-        return StringUtils.isNumeric(name);
+        return StringUtils.isNumeric(name) && Long.parseLong(name, 10) > 0;
     }
 
     @Override

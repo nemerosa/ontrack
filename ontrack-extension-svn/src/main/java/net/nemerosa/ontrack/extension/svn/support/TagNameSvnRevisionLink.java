@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.svn.service.SVNService;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.structure.ServiceConfiguration;
 import net.nemerosa.ontrack.model.support.NoConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,13 @@ import java.util.function.Function;
 @Component
 public class TagNameSvnRevisionLink extends AbstractTagBasedSvnRevisionLink<NoConfig> {
 
+    public static final String ID = "tag";
+
+    public static ServiceConfiguration DEFAULT = new ServiceConfiguration(
+            ID,
+            JsonUtils.object().end()
+    );
+
     @Autowired
     public TagNameSvnRevisionLink(SVNService svnService) {
         super(svnService);
@@ -24,7 +32,7 @@ public class TagNameSvnRevisionLink extends AbstractTagBasedSvnRevisionLink<NoCo
 
     @Override
     public String getId() {
-        return "tag";
+        return ID;
     }
 
     @Override

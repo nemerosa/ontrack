@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.svn.support;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import net.nemerosa.ontrack.extension.scm.support.TagPattern;
+import net.nemerosa.ontrack.extension.svn.service.SVNService;
 import net.nemerosa.ontrack.model.support.NoConfig;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,9 +14,10 @@ import static org.mockito.Mockito.mock;
 
 public class BuildSvnRevisionLinkMigrationActionTest {
 
-    private RevisionSvnRevisionLink revisionLink = mock(RevisionSvnRevisionLink.class);
-    private TagNamePatternSvnRevisionLink tagPatternLink = mock(TagNamePatternSvnRevisionLink.class);
-    private TagNameSvnRevisionLink tagLink = mock(TagNameSvnRevisionLink.class);
+    private SVNService svnService = mock(SVNService.class);
+    private RevisionSvnRevisionLink revisionLink = new RevisionSvnRevisionLink();
+    private TagNamePatternSvnRevisionLink tagPatternLink = new TagNamePatternSvnRevisionLink(svnService);
+    private TagNameSvnRevisionLink tagLink = new TagNameSvnRevisionLink(svnService);
     private BuildSvnRevisionLinkMigrationAction action;
 
     @Before
