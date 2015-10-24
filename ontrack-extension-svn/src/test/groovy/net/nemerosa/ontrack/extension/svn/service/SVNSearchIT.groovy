@@ -258,7 +258,7 @@ class SVNSearchIT extends AbstractServiceTestSupport {
             def trunk = doCreateBranch(project, nd('trunk', ''))
             propertyService.editProperty(trunk, SVNBranchConfigurationPropertyType, new SVNBranchConfigurationProperty(
                     "/${testName}/trunk",
-                    TagNameSvnRevisionLink.DEFAULT.toServiceConfiguration(),
+                    TagNameSvnRevisionLink.DEFAULT,
                     "/${testName}/tags/{build}"
             ))
 
@@ -266,7 +266,7 @@ class SVNSearchIT extends AbstractServiceTestSupport {
             def branch10 = doCreateBranch(project, nd('1.0', ''))
             propertyService.editProperty(branch10, SVNBranchConfigurationPropertyType, new SVNBranchConfigurationProperty(
                     "/${testName}/branches/1.0",
-                    TagNameSvnRevisionLink.DEFAULT.toServiceConfiguration(),
+                    TagNameSvnRevisionLink.DEFAULT,
                     "/${testName}/tags/{build}"
             ))
 
@@ -318,7 +318,7 @@ class SVNSearchIT extends AbstractServiceTestSupport {
             // Branch's configuration
             propertyService.editProperty(branch, SVNBranchConfigurationPropertyType, new SVNBranchConfigurationProperty(
                     "/${testName}/trunk",
-                    TagNameSvnRevisionLink.DEFAULT.toServiceConfiguration(),
+                    TagNameSvnRevisionLink.DEFAULT,
                     "/${testName}/tags/{build}"
             ))
             // Two promotion levels

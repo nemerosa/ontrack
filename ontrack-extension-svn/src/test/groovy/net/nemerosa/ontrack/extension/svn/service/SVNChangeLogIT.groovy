@@ -112,7 +112,7 @@ class SVNChangeLogIT extends AbstractServiceTestSupport {
             ))
             propertyService.editProperty(branch, SVNBranchConfigurationPropertyType, new SVNBranchConfigurationProperty(
                     '/SVNChangeLogWithoutIssues/trunk',
-                    TagNameSvnRevisionLink.DEFAULT.toServiceConfiguration(),
+                    TagNameSvnRevisionLink.DEFAULT,
                     '/SVNChangeLogWithoutIssues/tags/{build}'
             ))
         }
@@ -210,7 +210,7 @@ class SVNChangeLogIT extends AbstractServiceTestSupport {
             ))
             propertyService.editProperty(branch, SVNBranchConfigurationPropertyType, new SVNBranchConfigurationProperty(
                     '/SVNChangeLogWithIssues/trunk',
-                    TagNameSvnRevisionLink.DEFAULT.toServiceConfiguration(),
+                    TagNameSvnRevisionLink.DEFAULT,
                     '/SVNChangeLogWithIssues/tags/{build}'
             ))
         }

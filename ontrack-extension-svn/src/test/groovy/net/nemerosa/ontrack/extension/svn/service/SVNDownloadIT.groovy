@@ -118,7 +118,7 @@ class SVNDownloadIT extends AbstractServiceTestSupport {
                     SVNBranchConfigurationPropertyType,
                     new SVNBranchConfigurationProperty(
                             '/SVNDownload/branches/v1',
-                            TagNameSvnRevisionLink.DEFAULT.toServiceConfiguration(),
+                            TagNameSvnRevisionLink.DEFAULT,
                             '/SVNDownload/tags/{build}',
                     )
             )
@@ -127,7 +127,7 @@ class SVNDownloadIT extends AbstractServiceTestSupport {
                     SVNBranchConfigurationPropertyType,
                     new SVNBranchConfigurationProperty(
                             '/SVNDownload/trunk',
-                            TagNameSvnRevisionLink.DEFAULT.toServiceConfiguration(),
+                            TagNameSvnRevisionLink.DEFAULT,
                             '/SVNDownload/tags/{build}',
                     )
             )
