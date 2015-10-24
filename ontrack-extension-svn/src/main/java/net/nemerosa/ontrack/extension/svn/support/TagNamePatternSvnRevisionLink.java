@@ -3,20 +3,27 @@ package net.nemerosa.ontrack.extension.svn.support;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.scm.support.TagPattern;
-import net.nemerosa.ontrack.extension.svn.model.BuildSvnRevisionLink;
+import net.nemerosa.ontrack.extension.svn.service.SVNService;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.exceptions.JsonParsingException;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Text;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
  * Build / revision relationship based on the build name being a subversion tag name which must follow a given pattern.
  */
 @Component
-public class TagNamePatternSvnRevisionLink implements BuildSvnRevisionLink<TagPattern> {
+public class TagNamePatternSvnRevisionLink extends AbstractTagBasedSvnRevisionLink<TagPattern> {
+
+    @Autowired
+    public TagNamePatternSvnRevisionLink(SVNService svnService) {
+        super(svnService);
+    }
 
     @Override
     public String getId() {
@@ -61,5 +68,10 @@ public class TagNamePatternSvnRevisionLink implements BuildSvnRevisionLink<TagPa
     @Override
     public boolean isValidBuildName(TagPattern data, String name) {
         return data.isValidTagName(name);
+    }
+
+    @Override
+    protected Optional<String> getTagName(TagPattern data, String buildName) {
+        return data.getTagNameFromBuildName(buildName);
     }
 }

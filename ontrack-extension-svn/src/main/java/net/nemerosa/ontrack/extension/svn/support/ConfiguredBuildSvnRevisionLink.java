@@ -2,8 +2,11 @@ package net.nemerosa.ontrack.extension.svn.support;
 
 import lombok.Data;
 import net.nemerosa.ontrack.extension.svn.model.BuildSvnRevisionLink;
+import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty;
+import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.ServiceConfiguration;
 
+import java.util.OptionalLong;
 import java.util.function.Function;
 
 /**
@@ -31,5 +34,9 @@ public class ConfiguredBuildSvnRevisionLink<T> {
 
     public boolean isValidBuildName(String name) {
         return link.isValidBuildName(data, name);
+    }
+
+    public OptionalLong getRevision(Build build, SVNBranchConfigurationProperty branchConfigurationProperty) {
+        return link.getRevision(data, build, branchConfigurationProperty);
     }
 }

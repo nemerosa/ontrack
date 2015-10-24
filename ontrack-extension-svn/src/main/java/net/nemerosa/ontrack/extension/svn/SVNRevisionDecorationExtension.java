@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.Decoration;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -37,13 +38,21 @@ public class SVNRevisionDecorationExtension extends AbstractExtension implements
             // Gets the revision for this build
             OptionalLong revision = svnChangeLogService.getBuildRevision((Build) entity);
             if (revision.isPresent()) {
-                long lRevision = revision.getAsLong();
-                return Collections.singletonList(
-                        Decoration.of(
-                                this,
-                                lRevision
-                        )
-                );
+                // If the revision == build name, no need for decoration
+                if (StringUtils.equals(
+                        String.valueOf(revision.getAsLong()),
+                        ((Build) entity).getName()
+                )) {
+                    return Collections.emptyList();
+                } else {
+                    long lRevision = revision.getAsLong();
+                    return Collections.singletonList(
+                            Decoration.of(
+                                    this,
+                                    lRevision
+                            )
+                    );
+                }
             } else {
                 return Collections.emptyList();
             }

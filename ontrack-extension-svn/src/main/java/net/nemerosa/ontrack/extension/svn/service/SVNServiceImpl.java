@@ -365,6 +365,14 @@ public class SVNServiceImpl implements SVNService {
     }
 
     @Override
+    public SVNRepository getRequiredSVNRepository(Branch branch) {
+        return getSVNRepository(branch)
+                .orElseThrow(() ->
+                                new MissingSVNProjectConfigurationException(branch.getProject().getName())
+                );
+    }
+
+    @Override
     public List<String> getBranches(Branch branch) {
         Property<SVNProjectConfigurationProperty> svnProperty = propertyService.getProperty(
                 branch.getProject(),
@@ -463,6 +471,21 @@ public class SVNServiceImpl implements SVNService {
         } else {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public TCopyEvent getLastCopyEvent(int id, String tagPath, long maxValue) {
+        return eventDao.getLastCopyEvent(id, tagPath, maxValue);
+    }
+
+    @Override
+    public Optional<String> getTagPathForTagName(SVNRepository svnRepository, String branchPath, String tagName) {
+        return getBasePath(svnRepository, branchPath)
+                .map(basePath -> basePath + "/tags/" + tagName);
+    }
+
+    private Optional<String> getBasePath(SVNRepository svnRepository, String branchPath) {
+        return svnClient.getBasePath(svnRepository, branchPath);
     }
 
     private Optional<Build> lookupBuild(SVNLocation location, SVNLocation firstCopy, Branch branch) {

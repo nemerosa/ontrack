@@ -34,11 +34,13 @@ public class BuildSvnRevisionLinkMigrationAction implements DBMigrationAction {
 
     private final RevisionSvnRevisionLink revisionLink;
     private final TagNamePatternSvnRevisionLink tagPatternLink;
+    private final TagNameSvnRevisionLink tagLink;
 
     @Autowired
-    public BuildSvnRevisionLinkMigrationAction(RevisionSvnRevisionLink revisionLink, TagNamePatternSvnRevisionLink tagPatternLink) {
+    public BuildSvnRevisionLinkMigrationAction(RevisionSvnRevisionLink revisionLink, TagNamePatternSvnRevisionLink tagPatternLink, TagNameSvnRevisionLink tagLink) {
         this.revisionLink = revisionLink;
         this.tagPatternLink = tagPatternLink;
+        this.tagLink = tagLink;
     }
 
     @Override
@@ -96,7 +98,7 @@ public class BuildSvnRevisionLinkMigrationAction implements DBMigrationAction {
 
     protected ConfiguredBuildSvnRevisionLink<?> toBuildSvnRevisionLinkConfiguration(String buildPath) {
         // Revision based
-        if (SVNUtils.isPathRevision(buildPath)) {
+        if (buildPath.endsWith("@{build}")) {
             return new ConfiguredBuildSvnRevisionLink<>(
                     revisionLink,
                     NoConfig.INSTANCE
@@ -108,7 +110,10 @@ public class BuildSvnRevisionLinkMigrationAction implements DBMigrationAction {
         if (matcher.find()) {
             String expression = matcher.group(1);
             if ("build".equals(expression)) {
-                return TagNameSvnRevisionLink.DEFAULT;
+                return new ConfiguredBuildSvnRevisionLink<>(
+                        tagLink,
+                        NoConfig.INSTANCE
+                );
             } else if (StringUtils.startsWith(expression, "build:")) {
                 String buildExpression = StringUtils.substringAfter(expression, "build:");
                 return new ConfiguredBuildSvnRevisionLink<>(
@@ -118,7 +123,10 @@ public class BuildSvnRevisionLinkMigrationAction implements DBMigrationAction {
             }
         }
         // Default
-        return TagNameSvnRevisionLink.DEFAULT;
+        return new ConfiguredBuildSvnRevisionLink<>(
+                tagLink,
+                NoConfig.INSTANCE
+        );
     }
 
     @Override

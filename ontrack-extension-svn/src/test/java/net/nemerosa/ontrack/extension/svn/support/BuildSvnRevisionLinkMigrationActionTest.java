@@ -15,11 +15,12 @@ public class BuildSvnRevisionLinkMigrationActionTest {
 
     private RevisionSvnRevisionLink revisionLink = mock(RevisionSvnRevisionLink.class);
     private TagNamePatternSvnRevisionLink tagPatternLink = mock(TagNamePatternSvnRevisionLink.class);
+    private TagNameSvnRevisionLink tagLink = mock(TagNameSvnRevisionLink.class);
     private BuildSvnRevisionLinkMigrationAction action;
 
     @Before
     public void before() {
-        action = new BuildSvnRevisionLinkMigrationAction(revisionLink, tagPatternLink);
+        action = new BuildSvnRevisionLinkMigrationAction(revisionLink, tagPatternLink, tagLink);
     }
 
     @Test

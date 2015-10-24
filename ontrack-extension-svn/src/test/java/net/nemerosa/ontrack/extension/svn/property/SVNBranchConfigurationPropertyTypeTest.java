@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.svn.property;
 
 import net.nemerosa.ontrack.extension.svn.SVNExtensionFeature;
 import net.nemerosa.ontrack.extension.svn.model.BuildSvnRevisionLinkService;
+import net.nemerosa.ontrack.extension.svn.service.SVNService;
+import net.nemerosa.ontrack.extension.svn.support.TagNameSvnRevisionLink;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
@@ -27,10 +29,13 @@ public class SVNBranchConfigurationPropertyTypeTest {
 
         BuildSvnRevisionLinkService buildSvnRevisionLinkService = mock(BuildSvnRevisionLinkService.class);
 
+        TagNameSvnRevisionLink tagNameSvnRevisionLink = new TagNameSvnRevisionLink(mock(SVNService.class));
+
         SVNBranchConfigurationPropertyType propertyType = new SVNBranchConfigurationPropertyType(
                 new SVNExtensionFeature(),
                 propertiesService,
-                buildSvnRevisionLinkService
+                buildSvnRevisionLinkService,
+                tagNameSvnRevisionLink
         );
 
         assertFalse(propertyType.canEdit(branch, securityService));
@@ -49,11 +54,13 @@ public class SVNBranchConfigurationPropertyTypeTest {
 
         BuildSvnRevisionLinkService buildSvnRevisionLinkService = mock(BuildSvnRevisionLinkService.class);
 
+        TagNameSvnRevisionLink tagNameSvnRevisionLink = new TagNameSvnRevisionLink(mock(SVNService.class));
+
         SVNBranchConfigurationPropertyType propertyType = new SVNBranchConfigurationPropertyType(
                 new SVNExtensionFeature(),
                 propertiesService,
-                buildSvnRevisionLinkService
-        );
+                buildSvnRevisionLinkService,
+                tagNameSvnRevisionLink);
 
         assertTrue(propertyType.canEdit(branch, securityService));
     }

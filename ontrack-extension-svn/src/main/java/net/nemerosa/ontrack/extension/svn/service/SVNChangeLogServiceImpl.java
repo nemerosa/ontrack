@@ -9,15 +9,14 @@ import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepr
 import net.nemerosa.ontrack.extension.scm.model.SCMBuildView;
 import net.nemerosa.ontrack.extension.scm.service.AbstractSCMChangeLogService;
 import net.nemerosa.ontrack.extension.svn.client.SVNClient;
-import net.nemerosa.ontrack.extension.svn.db.SVNEventDao;
 import net.nemerosa.ontrack.extension.svn.db.SVNIssueRevisionDao;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
-import net.nemerosa.ontrack.extension.svn.db.TCopyEvent;
 import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty;
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType;
 import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationProperty;
 import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationPropertyType;
+import net.nemerosa.ontrack.extension.svn.support.ConfiguredBuildSvnRevisionLink;
 import net.nemerosa.ontrack.extension.svn.support.SVNLogEntryCollector;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
 import net.nemerosa.ontrack.model.structure.*;
@@ -38,26 +37,27 @@ import static net.nemerosa.ontrack.extension.svn.support.SVNUtils.expandBuildPat
 @Service
 public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService implements SVNChangeLogService {
 
+    private final BuildSvnRevisionLinkService buildSvnRevisionLinkService;
     private final SVNIssueRevisionDao issueRevisionDao;
     private final SVNService svnService;
     private final SVNClient svnClient;
     private final TransactionService transactionService;
-    private final SVNEventDao eventDao;
 
     @Autowired
     public SVNChangeLogServiceImpl(
             StructureService structureService,
             PropertyService propertyService,
+            BuildSvnRevisionLinkService buildSvnRevisionLinkService,
             SVNIssueRevisionDao issueRevisionDao,
             SVNService svnService,
             SVNClient svnClient,
-            TransactionService transactionService, SVNEventDao eventDao) {
+            TransactionService transactionService) {
         super(structureService, propertyService);
+        this.buildSvnRevisionLinkService = buildSvnRevisionLinkService;
         this.issueRevisionDao = issueRevisionDao;
         this.svnService = svnService;
         this.svnClient = svnClient;
         this.transactionService = transactionService;
-        this.eventDao = eventDao;
     }
 
     @Override
@@ -302,27 +302,12 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
         if (branchConfigurationProperty.isEmpty() || projectConfigurationProperty.isEmpty()) {
             return OptionalLong.empty();
         } else {
-            // Gets the build path definition
-            String buildPathDefinition = branchConfigurationProperty.getValue().getBuildPath();
-            // Revision path
-            if (SVNUtils.isPathRevision(buildPathDefinition)) {
-                return OptionalLong.empty();
-            } else {
-                // Expands the build path
-                String buildPath = expandBuildPath(buildPathDefinition, build);
-                // Repository
-                SVNRepository svnRepository = getSVNRepository(build.getBranch());
-                // Gets the copy event for this build
-                TCopyEvent lastCopyEvent = eventDao.getLastCopyEvent(
-                        svnRepository.getId(),
-                        buildPath,
-                        Long.MAX_VALUE
-                );
-                // Gets the revision
-                return lastCopyEvent != null ?
-                        OptionalLong.of(lastCopyEvent.getCopyFromRevision()) :
-                        OptionalLong.empty();
-            }
+            // Gets the branch revision link
+            ConfiguredBuildSvnRevisionLink<Object> revisionLink = buildSvnRevisionLinkService.getConfiguredBuildSvnRevisionLink(
+                    branchConfigurationProperty.getValue().getBuildRevisionLink()
+            );
+            // Returns revision information
+            return revisionLink.getRevision(build, branchConfigurationProperty.getValue());
         }
     }
 
@@ -378,10 +363,7 @@ public class SVNChangeLogServiceImpl extends AbstractSCMChangeLogService impleme
     }
 
     public SVNRepository getSVNRepository(Branch branch) {
-        return svnService.getSVNRepository(branch)
-                .orElseThrow(() ->
-                                new MissingSVNProjectConfigurationException(branch.getProject().getName())
-                );
+        return svnService.getRequiredSVNRepository(branch);
     }
 
 }

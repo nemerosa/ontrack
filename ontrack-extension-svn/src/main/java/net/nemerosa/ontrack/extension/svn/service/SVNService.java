@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.svn.service;
 
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
+import net.nemerosa.ontrack.extension.svn.db.TCopyEvent;
 import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ID;
@@ -82,6 +83,11 @@ public interface SVNService {
     Optional<SVNRepository> getSVNRepository(Branch branch);
 
     /**
+     * Gets the required configuration for a branch
+     */
+    SVNRepository getRequiredSVNRepository(Branch branch);
+
+    /**
      * Gets the list of branches
      */
     List<String> getBranches(Branch branch);
@@ -98,4 +104,25 @@ public interface SVNService {
      * Downloads the file at the given path for a branch
      */
     Optional<String> download(ID branchId, String path);
+
+    /**
+     * Gets the last copy event to this tag.
+     *
+     * @param id       Repository ID
+     * @param tagPath  Target of the copy
+     * @param maxValue Maximum revision
+     * @return Copy event
+     */
+    TCopyEvent getLastCopyEvent(int id, String tagPath, long maxValue);
+
+
+    /**
+     * Given a tag name and a base branch, returns the corresponding tag path.
+     *
+     * @param svnRepository Repository access
+     * @param branchPath    Branch or trunk path
+     * @param tagName       Tag name
+     * @return Path to the tag
+     */
+    Optional<String> getTagPathForTagName(SVNRepository svnRepository, String branchPath, String tagName);
 }

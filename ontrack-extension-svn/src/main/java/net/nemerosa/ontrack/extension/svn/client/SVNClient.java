@@ -32,6 +32,10 @@ public interface SVNClient {
      */
     SVNInfo getInfo(SVNRepository repository, SVNURL url, SVNRevision revision);
 
+    boolean isBranch(SVNRepository repository, String path);
+
+    boolean isTrunk(String path);
+
     boolean isTrunkOrBranch(SVNRepository repository, String path);
 
     boolean isTagOrBranch(SVNRepository repository, String path);
@@ -51,4 +55,6 @@ public interface SVNClient {
     String getDiff(SVNRepository repository, String path, List<Long> revisions);
 
     Optional<String> download(SVNRepository repository, String path);
+
+    Optional<String> getBasePath(SVNRepository svnRepository, String branchPath);
 }

@@ -277,6 +277,27 @@ public class SVNClientImpl implements SVNClient {
         }
     }
 
+    @Override
+    public Optional<String> getBasePath(SVNRepository svnRepository, String branchPath) {
+        if (isTrunk(branchPath)) {
+            return Optional.of(
+                    StringUtils.stripEnd(
+                            StringUtils.substringBefore(branchPath, "trunk"),
+                            "/"
+                    )
+            );
+        } else if (isBranch(svnRepository, branchPath)) {
+            return Optional.of(
+                    StringUtils.stripEnd(
+                            StringUtils.substringBefore(branchPath, "branches"),
+                            "/"
+                    )
+            );
+        } else {
+            return Optional.empty();
+        }
+    }
+
     private SCMChangeLogFileChangeType toFileChangeType(SVNStatusType modificationType) {
         if (modificationType.equals(SVNStatusType.STATUS_MODIFIED)) {
             return SCMChangeLogFileChangeType.MODIFIED;
@@ -347,7 +368,8 @@ public class SVNClientImpl implements SVNClient {
         return isPathOK(repository.getTagPattern(), path);
     }
 
-    private boolean isBranch(SVNRepository repository, String path) {
+    @Override
+    public boolean isBranch(SVNRepository repository, String path) {
         return isPathOK(repository.getBranchPattern(), path);
     }
 
@@ -355,7 +377,8 @@ public class SVNClientImpl implements SVNClient {
         return StringUtils.isNotBlank(pattern) && Pattern.matches(pattern, path);
     }
 
-    private boolean isTrunk(String path) {
+    @Override
+    public boolean isTrunk(String path) {
         return isPathOK(".*/trunk", path);
     }
 

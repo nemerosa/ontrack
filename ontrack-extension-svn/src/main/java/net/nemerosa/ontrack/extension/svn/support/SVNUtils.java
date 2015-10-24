@@ -30,6 +30,7 @@ public class SVNUtils {
         }
     }
 
+    @Deprecated
     public static boolean isPathRevision(String pathPattern) {
         if (StringUtils.isNotBlank(pathPattern)) {
             return pathPattern.endsWith("@{build}");

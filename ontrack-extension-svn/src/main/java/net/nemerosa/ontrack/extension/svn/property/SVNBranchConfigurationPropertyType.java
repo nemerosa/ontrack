@@ -14,6 +14,7 @@ import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.model.support.NoConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,12 +28,14 @@ public class SVNBranchConfigurationPropertyType extends AbstractPropertyType<SVN
 
     private final PropertyService propertyService;
     private final BuildSvnRevisionLinkService buildSvnRevisionLinkService;
+    private final TagNameSvnRevisionLink tagNameSvnRevisionLink;
 
     @Autowired
-    public SVNBranchConfigurationPropertyType(SVNExtensionFeature extensionFeature, PropertyService propertyService, BuildSvnRevisionLinkService buildSvnRevisionLinkService) {
+    public SVNBranchConfigurationPropertyType(SVNExtensionFeature extensionFeature, PropertyService propertyService, BuildSvnRevisionLinkService buildSvnRevisionLinkService, TagNameSvnRevisionLink tagNameSvnRevisionLink) {
         super(extensionFeature);
         this.propertyService = propertyService;
         this.buildSvnRevisionLinkService = buildSvnRevisionLinkService;
+        this.tagNameSvnRevisionLink = tagNameSvnRevisionLink;
     }
 
     @Override
@@ -116,7 +119,10 @@ public class SVNBranchConfigurationPropertyType extends AbstractPropertyType<SVN
             JsonNode linkNode = node.get("buildRevisionLink");
             configuredBuildSvnRevisionLink = parseBuildRevisionLink(linkNode);
         } else {
-            configuredBuildSvnRevisionLink = TagNameSvnRevisionLink.DEFAULT;
+            configuredBuildSvnRevisionLink = new ConfiguredBuildSvnRevisionLink<>(
+                    tagNameSvnRevisionLink,
+                    NoConfig.INSTANCE
+            );
         }
         // OK
         return new SVNBranchConfigurationProperty(

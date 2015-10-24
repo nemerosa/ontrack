@@ -2,8 +2,11 @@ package net.nemerosa.ontrack.extension.svn.model;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty;
 import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.structure.Build;
 
+import java.util.OptionalLong;
 import java.util.function.Function;
 
 /**
@@ -60,4 +63,13 @@ public interface BuildSvnRevisionLink<T> {
      */
     boolean isValidBuildName(T data, String name);
 
+    /**
+     * Gets the revision attached to a build. The revision is one the SVN URL defined for the build's branch.
+     *
+     * @param data                        Link configuration
+     * @param build                       Build to get the revision for
+     * @param branchConfigurationProperty SVN branch configuration
+     * @return Revision if found
+     */
+    OptionalLong getRevision(T data, Build build, SVNBranchConfigurationProperty branchConfigurationProperty);
 }

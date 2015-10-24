@@ -25,7 +25,7 @@ public interface SVNChangeLogService {
     Collection<ExportFormat> changeLogExportFormats(ID branchId);
 
     /**
-     * Gets the optional revision for a build
+     * Gets the optional revision for a build.
      */
     OptionalLong getBuildRevision(Build build);
 
