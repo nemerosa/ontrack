@@ -130,15 +130,10 @@ public class SVNBranchConfigurationPropertyType extends AbstractPropertyType<SVN
         String linkId = JsonUtils.get(linkNode, "id");
         // Gets the link data
         JsonNode linkDataNode = linkNode.get("data");
-        // Gets the link
-        @SuppressWarnings("unchecked")
-        BuildSvnRevisionLink<T> link = (BuildSvnRevisionLink<T>) buildSvnRevisionLinkService.getLink(linkId);
-        // Parses the data (for validation)
-        T linkData = link.parseData(linkDataNode);
-        // OK
-        return new ConfiguredBuildSvnRevisionLink<>(
-                link,
-                linkData
+        // Gets the configured link
+        return buildSvnRevisionLinkService.getConfiguredBuildSvnRevisionLink(
+                linkId,
+                linkDataNode
         );
     }
 
