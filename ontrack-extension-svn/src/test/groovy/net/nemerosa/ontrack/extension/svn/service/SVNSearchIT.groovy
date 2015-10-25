@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.issues.support.MockIssueStatus
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository
 import net.nemerosa.ontrack.extension.svn.db.SVNRepositoryDao
 import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration
+import net.nemerosa.ontrack.extension.svn.model.SVNInfoService
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationProperty
@@ -48,6 +49,9 @@ class SVNSearchIT extends AbstractServiceTestSupport {
 
     @Autowired
     private SVNService svnService
+
+    @Autowired
+    private SVNInfoService svnInfoService
 
     @Autowired
     private IndexationService indexationService
@@ -105,7 +109,7 @@ class SVNSearchIT extends AbstractServiceTestSupport {
          */
 
         asUser().with(branch, ProjectEdit).call {
-            def info = svnService.getOntrackRevisionInfo(svnService.getRepository(configuration.name), 4)
+            def info = svnInfoService.getOntrackRevisionInfo(svnService.getRepository(configuration.name), 4)
             assert info.revisionInfo.message == "Commit 3 for #2"
             assert info.buildViews.collect { it.build.name } == ['1.0.1']
             assert info.branchStatusViews.size() == 1
@@ -116,7 +120,7 @@ class SVNSearchIT extends AbstractServiceTestSupport {
         }
 
         asUser().with(branch, ProjectEdit).call {
-            def info = svnService.getOntrackRevisionInfo(svnService.getRepository(configuration.name), 8)
+            def info = svnInfoService.getOntrackRevisionInfo(svnService.getRepository(configuration.name), 8)
             assert info.revisionInfo.message == "Commit 7 for #3"
             assert info.buildViews.collect { it.build.name } == ['1.0.2']
             assert info.branchStatusViews.size() == 1
@@ -127,7 +131,7 @@ class SVNSearchIT extends AbstractServiceTestSupport {
         }
 
         asUser().with(branch, ProjectEdit).call {
-            def info = svnService.getOntrackRevisionInfo(svnService.getRepository(configuration.name), 10)
+            def info = svnInfoService.getOntrackRevisionInfo(svnService.getRepository(configuration.name), 10)
             assert info.revisionInfo.message == "Commit 9 for #4"
             assert info.buildViews.collect { it.build.name } == ['1.0.3']
             assert info.branchStatusViews.size() == 1
@@ -197,7 +201,7 @@ class SVNSearchIT extends AbstractServiceTestSupport {
          * Looking for issue #1 must bring the last revision (for issue #4)
          */
 
-        def info = asUser().with(branch, ProjectView).call { svnService.getIssueInfo(configuration.name, '1') }
+        def info = asUser().with(branch, ProjectView).call { svnInfoService.getIssueInfo(configuration.name, '1') }
         assert info.issue.key == '1'
         assert info.issue.displayKey == '#1'
 
@@ -288,7 +292,7 @@ class SVNSearchIT extends AbstractServiceTestSupport {
          * Search
          */
 
-        def info = asUser().with(project, ProjectView).call { svnService.getIssueInfo(configuration.name, '3') }
+        def info = asUser().with(project, ProjectView).call { svnInfoService.getIssueInfo(configuration.name, '3') }
         assert info.issue.key == '3'
         assert info.issue.displayKey == '#3'
 
