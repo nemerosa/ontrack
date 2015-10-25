@@ -3,12 +3,16 @@ package net.nemerosa.ontrack.extension.svn.service;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.db.TCopyEvent;
 import net.nemerosa.ontrack.extension.svn.model.*;
+import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty;
+import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationProperty;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.support.ConnectionResult;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.Predicate;
 
 /**
  * Layer on top of the basic Subversion client and of the repositories.
@@ -51,23 +55,11 @@ public interface SVNService {
      */
     Optional<SVNRepositoryIssue> searchIssues(SVNRepository repository, String token);
 
-    /**
-     * Gets information about an issue in a repository.
-     *
-     * @param configurationName Name of the repository configuration.
-     * @param issueKey          Key of the issue
-     * @return Information (never null, but can be empty)
-     */
-    OntrackSVNIssueInfo getIssueInfo(String configurationName, String issueKey);
+    SVNChangeLogRevision createChangeLogRevision(SVNRepository repository, SVNRevisionInfo basicInfo);
 
-    /**
-     * Gets information about a revision in a repository
-     *
-     * @param repository Repository to get the info from
-     * @param revision   Revision to get information about
-     * @return Information (never null, but can be empty)
-     */
-    OntrackSVNRevisionInfo getOntrackRevisionInfo(SVNRepository repository, long revision);
+    void forEachConfiguredBranch(
+            Predicate<SVNProjectConfigurationProperty> projectConfigurationPredicate,
+            BiConsumer<Branch, SVNBranchConfigurationProperty> branchConsumer);
 
     /**
      * Gets the synchronisation information for a branch.
@@ -125,4 +117,6 @@ public interface SVNService {
      * @return Path to the tag
      */
     Optional<String> getTagPathForTagName(SVNRepository svnRepository, String branchPath, String tagName);
+
+    SVNLocation getFirstCopyAfter(SVNRepository repository, SVNLocation location);
 }

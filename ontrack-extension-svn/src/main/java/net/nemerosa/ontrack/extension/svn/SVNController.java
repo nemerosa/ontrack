@@ -52,6 +52,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     private final SVNChangeLogService changeLogService;
     private final IssueServiceRegistry issueServiceRegistry;
     private final SVNService svnService;
+    private final SVNInfoService svnInfoService;
     private final SCMService scmService;
     private final SVNSyncService svnSyncService;
     private final SecurityService securityService;
@@ -59,13 +60,14 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     private final Cache<String, SVNChangeLog> logCache;
 
     @Autowired
-    public SVNController(SVNExtensionFeature feature, SVNConfigurationService svnConfigurationService, IndexationService indexationService, SVNChangeLogService changeLogService, IssueServiceRegistry issueServiceRegistry, SVNService svnService, SCMService scmService, SVNSyncService svnSyncService, SecurityService securityService) {
+    public SVNController(SVNExtensionFeature feature, SVNConfigurationService svnConfigurationService, IndexationService indexationService, SVNChangeLogService changeLogService, IssueServiceRegistry issueServiceRegistry, SVNService svnService, SVNInfoService svnInfoService, SCMService scmService, SVNSyncService svnSyncService, SecurityService securityService) {
         super(feature);
         this.svnConfigurationService = svnConfigurationService;
         this.indexationService = indexationService;
         this.changeLogService = changeLogService;
         this.issueServiceRegistry = issueServiceRegistry;
         this.svnService = svnService;
+        this.svnInfoService = svnInfoService;
         this.scmService = scmService;
         this.svnSyncService = svnSyncService;
         this.securityService = securityService;
@@ -399,7 +401,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     @RequestMapping(value = "configuration/{configuration}/issue/{key}", method = RequestMethod.GET)
     public Resource<OntrackSVNIssueInfo> issueInfo(@PathVariable String configuration, @PathVariable String key) {
         return Resource.of(
-                svnService.getIssueInfo(configuration, key),
+                svnInfoService.getIssueInfo(configuration, key),
                 uri(on(getClass()).issueInfo(configuration, key))
         ).withView(Build.class);
     }
@@ -410,7 +412,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     @RequestMapping(value = "configuration/{configuration}/revision/{revision}", method = RequestMethod.GET)
     public Resource<OntrackSVNRevisionInfo> revisionInfo(@PathVariable String configuration, @PathVariable long revision) {
         return Resource.of(
-                svnService.getOntrackRevisionInfo(
+                svnInfoService.getOntrackRevisionInfo(
                         svnService.getRepository(configuration),
                         revision
                 ),
