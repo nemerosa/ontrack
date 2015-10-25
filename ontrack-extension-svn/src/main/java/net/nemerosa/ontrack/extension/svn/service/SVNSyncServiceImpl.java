@@ -3,9 +3,12 @@ package net.nemerosa.ontrack.extension.svn.service;
 import net.nemerosa.ontrack.extension.svn.db.SVNEventDao;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.db.TCopyEvent;
+import net.nemerosa.ontrack.extension.svn.model.BuildSvnRevisionLinkService;
+import net.nemerosa.ontrack.extension.svn.model.IndexableBuildSvnRevisionLink;
 import net.nemerosa.ontrack.extension.svn.model.SVNRevisionInfo;
 import net.nemerosa.ontrack.extension.svn.model.SVNSyncInfoStatus;
 import net.nemerosa.ontrack.extension.svn.property.*;
+import net.nemerosa.ontrack.extension.svn.support.ConfiguredBuildSvnRevisionLink;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
 import net.nemerosa.ontrack.model.job.*;
 import net.nemerosa.ontrack.model.security.BuildCreate;
@@ -38,6 +41,7 @@ public class SVNSyncServiceImpl implements SVNSyncService, JobProvider {
     private final SVNEventDao eventDao;
     private final TransactionTemplate transactionTemplate;
     private final JobQueueService jobQueueService;
+    private final BuildSvnRevisionLinkService buildSvnRevisionLinkService;
 
     @Autowired
     public SVNSyncServiceImpl(
@@ -47,13 +51,15 @@ public class SVNSyncServiceImpl implements SVNSyncService, JobProvider {
             SVNService svnService,
             SVNEventDao eventDao,
             PlatformTransactionManager transactionManager,
-            JobQueueService jobQueueService) {
+            JobQueueService jobQueueService,
+            BuildSvnRevisionLinkService buildSvnRevisionLinkService) {
         this.structureService = structureService;
         this.propertyService = propertyService;
         this.securityService = securityService;
         this.svnService = svnService;
         this.eventDao = eventDao;
         this.jobQueueService = jobQueueService;
+        this.buildSvnRevisionLinkService = buildSvnRevisionLinkService;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
     }
 
@@ -79,8 +85,10 @@ public class SVNSyncServiceImpl implements SVNSyncService, JobProvider {
         if (branchConfigurationProperty.isEmpty()) {
             return SVNSyncInfoStatus.of(branchId).withMessage("SVN has not been configured for this branch.");
         }
+        // Gets the build link
+        ConfiguredBuildSvnRevisionLink<Object> revisionLink = buildSvnRevisionLinkService.getConfiguredBuildSvnRevisionLink(branchConfigurationProperty.getValue().getBuildRevisionLink());
         // Cannot work with revisions only
-        if (SVNUtils.isPathRevision(branchConfigurationProperty.getValue().getBuildPath())) {
+        if (!(revisionLink instanceof IndexableBuildSvnRevisionLink)) {
             return SVNSyncInfoStatus.of(branchId).withMessage("The build path for the branch is not correctly configured.");
         }
         // Queue a new job

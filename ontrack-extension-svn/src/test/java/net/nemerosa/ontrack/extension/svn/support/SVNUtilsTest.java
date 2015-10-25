@@ -65,21 +65,6 @@ public class SVNUtilsTest {
     }
 
     @Test
-    public void isPathRevision_ok() {
-        assertTrue(isPathRevision("/project/trunk@{build}"));
-    }
-
-    @Test
-    public void isPathRevision_nok_for_star() {
-        assertFalse(isPathRevision("/project/trunk@*"));
-    }
-
-    @Test
-    public void isPathRevision_nok_for_tag() {
-        assertFalse(isPathRevision("/project/tags/{build}"));
-    }
-
-    @Test
     public void expandBuildPath_build() {
         assertEquals("/project/tags/v1", expandBuildPath("/project/tags/v{build}", build()));
     }
