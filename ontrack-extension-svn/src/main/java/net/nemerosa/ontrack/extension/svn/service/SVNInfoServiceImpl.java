@@ -10,6 +10,8 @@ import net.nemerosa.ontrack.extension.svn.db.TRevision;
 import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty;
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType;
+import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationProperty;
+import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationPropertyType;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
 import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -163,8 +165,54 @@ public class SVNInfoServiceImpl implements SVNInfoService {
 
     @Override
     public OntrackSVNRevisionInfo getOntrackRevisionInfo(SVNRepository repository, long revision) {
-        // FIXME OntrackSVNRevisionInfo getOntrackRevisionInfo(SVNRepository repository, long revision)
-        return null;
+
+        // Gets information about the revision
+        SVNRevisionInfo basicInfo = svnService.getRevisionInfo(repository, revision);
+        SVNChangeLogRevision changeLogRevision = svnService.createChangeLogRevision(
+                repository,
+                basicInfo);
+
+        // Gets the first copy event on this path after this revision
+        SVNLocation firstCopy = svnService.getFirstCopyAfter(repository, basicInfo.toLocation());
+
+        // Data to collect
+        Collection<BuildView> buildViews = new ArrayList<>();
+        Collection<BranchStatusView> branchStatusViews = new ArrayList<>();
+        // Loops over all authorised branches
+        for (Project project : structureService.getProjectList()) {
+            // Filter on SVN configuration: must be present and equal to the one the revision info is looked into
+            Property<SVNProjectConfigurationProperty> projectSvnConfig = propertyService.getProperty(project, SVNProjectConfigurationPropertyType.class);
+            if (!projectSvnConfig.isEmpty()
+                    && repository.getConfiguration().getName().equals(projectSvnConfig.getValue().getConfiguration().getName())) {
+                for (Branch branch : structureService.getBranchesForProject(project.getId())) {
+                    // Filter on SVN configuration: must be present
+                    if (propertyService.hasProperty(branch, SVNBranchConfigurationPropertyType.class)) {
+                        // Identifies a possible build given the path/revision and the first copy
+                        Optional<Build> build = lookupBuild(basicInfo.toLocation(), firstCopy, branch);
+                        // Build found
+                        if (build.isPresent()) {
+                            // Gets the build view
+                            BuildView buildView = structureService.getBuildView(build.get());
+                            // Adds it to the list
+                            buildViews.add(buildView);
+                            // Collects the promotions for the branch
+                            branchStatusViews.add(
+                                    structureService.getEarliestPromotionsAfterBuild(build.get())
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
+        // OK
+        return new OntrackSVNRevisionInfo(
+                repository.getConfiguration(),
+                changeLogRevision,
+                buildViews,
+                branchStatusViews
+        );
+
     }
 
     protected Optional<Build> lookupBuild(SVNLocation location, SVNLocation firstCopy, Branch branch) {
