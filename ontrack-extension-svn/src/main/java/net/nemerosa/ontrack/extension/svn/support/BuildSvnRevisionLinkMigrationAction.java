@@ -104,6 +104,7 @@ public class BuildSvnRevisionLinkMigrationAction implements DBMigrationAction {
                     NoConfig.INSTANCE
             );
         }
+        // FIXME The tag name can look like 11.7-${build:*}
         // Looking for the {build} expression
         Pattern pattern = Pattern.compile(SVNUtils.BUILD_PLACEHOLDER_PATTERN);
         Matcher matcher = pattern.matcher(buildPath);

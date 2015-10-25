@@ -118,5 +118,7 @@ public interface SVNService {
      */
     Optional<String> getTagPathForTagName(SVNRepository svnRepository, String branchPath, String tagName);
 
+    Optional<String> getBasePath(SVNRepository svnRepository, String branchPath);
+
     SVNLocation getFirstCopyAfter(SVNRepository repository, SVNLocation location);
 }

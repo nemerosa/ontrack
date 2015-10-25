@@ -315,7 +315,8 @@ public class SVNServiceImpl implements SVNService {
                 .map(basePath -> basePath + "/tags/" + tagName);
     }
 
-    private Optional<String> getBasePath(SVNRepository svnRepository, String branchPath) {
+    @Override
+    public Optional<String> getBasePath(SVNRepository svnRepository, String branchPath) {
         return svnClient.getBasePath(svnRepository, branchPath);
     }
 

@@ -4,8 +4,10 @@ package net.nemerosa.ontrack.extension.svn.model;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty;
 import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Build;
 
+import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.function.Function;
 
@@ -83,4 +85,9 @@ public interface BuildSvnRevisionLink<T> {
      * @return Revision if found
      */
     String getBuildPath(T data, Build build, SVNBranchConfigurationProperty branchConfigurationProperty);
+
+    /**
+     * Gets the earliest build after a given SVN location.
+     */
+    Optional<Build> getEarliestBuild(T data, Branch branch, SVNLocation location, SVNLocation firstCopy, SVNBranchConfigurationProperty branchConfigurationProperty);
 }

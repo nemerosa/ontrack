@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.extension.svn.support;
 
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty;
-import net.nemerosa.ontrack.model.structure.Branch;
-import net.nemerosa.ontrack.model.structure.Build;
-import net.nemerosa.ontrack.model.structure.Project;
-import net.nemerosa.ontrack.model.structure.Signature;
+import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.NoConfig;
 import org.junit.Test;
 
@@ -12,14 +9,16 @@ import java.util.OptionalLong;
 
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 
 public class RevisionSvnRevisionLinkTest {
 
-    private final RevisionSvnRevisionLink link = new RevisionSvnRevisionLink();
+    private final StructureService structureService = mock(StructureService.class);
+    private final RevisionSvnRevisionLink link = new RevisionSvnRevisionLink(structureService);
     private SVNBranchConfigurationProperty branchConfigurationProperty = new SVNBranchConfigurationProperty(
             "/trunk",
             new ConfiguredBuildSvnRevisionLink<>(
-                    new RevisionSvnRevisionLink(),
+                    new RevisionSvnRevisionLink(structureService),
                     NoConfig.INSTANCE
             ).toServiceConfiguration(),
             ""

@@ -12,7 +12,7 @@ import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropert
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType;
 import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationProperty;
 import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationPropertyType;
-import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
+import net.nemerosa.ontrack.extension.svn.support.ConfiguredBuildSvnRevisionLink;
 import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -221,42 +221,12 @@ public class SVNInfoServiceImpl implements SVNInfoService {
         if (configurationProperty.isEmpty()) {
             return Optional.empty();
         }
-        // Information
-        String buildPathPattern = configurationProperty.getValue().getBuildPath();
-        // Revision path
-        if (SVNUtils.isPathRevision(buildPathPattern)) {
-            return getEarliestBuild(branch, location, buildPathPattern);
-        }
-        // Tag pattern
-        else {
-            // Uses the copy (if available)
-            if (firstCopy != null) {
-                return getEarliestBuild(branch, firstCopy, buildPathPattern);
-            } else {
-                return Optional.empty();
-            }
-        }
+        // Gets the build link
+        ConfiguredBuildSvnRevisionLink<Object> revisionLink = buildSvnRevisionLinkService.getConfiguredBuildSvnRevisionLink(
+                configurationProperty.getValue().getBuildRevisionLink()
+        );
+        // Gets the earliest build
+        return revisionLink.getEarliestBuild(branch, location, firstCopy, configurationProperty.getValue());
     }
 
-    protected Optional<Build> getEarliestBuild(Branch branch, SVNLocation location, String buildPathPattern) {
-        if (SVNUtils.followsBuildPattern(location, buildPathPattern)) {
-            // Gets the build name
-            String buildName = SVNUtils.getBuildName(location, buildPathPattern);
-            /**
-             * If the build is defined by path@revision, the earliest build is the one
-             * that follows this revision.
-             */
-            if (SVNUtils.isPathRevision(buildPathPattern)) {
-                return structureService.findBuildAfterUsingNumericForm(branch.getId(), buildName);
-            }
-            /**
-             * In any other case (tag or tag prefix), the build must be looked exactly
-             */
-            else {
-                return structureService.findBuildByName(branch.getProject().getName(), branch.getName(), buildName);
-            }
-        } else {
-            return Optional.empty();
-        }
-    }
 }

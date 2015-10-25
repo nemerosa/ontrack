@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.svn.service.SVNService;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.structure.ServiceConfiguration;
+import net.nemerosa.ontrack.model.structure.StructureService;
 import net.nemerosa.ontrack.model.support.NoConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,8 +27,13 @@ public class TagNameSvnRevisionLink extends AbstractTagBasedSvnRevisionLink<NoCo
     );
 
     @Autowired
-    public TagNameSvnRevisionLink(SVNService svnService) {
-        super(svnService);
+    public TagNameSvnRevisionLink(SVNService svnService, StructureService structureService) {
+        super(svnService, structureService);
+    }
+
+    @Override
+    protected Optional<String> getBuildName(NoConfig data, String tagName) {
+        return Optional.of(tagName);
     }
 
     @Override

@@ -65,6 +65,7 @@ public class SVNUtils {
         return path.toString();
     }
 
+    @Deprecated
     public static String expandBuildPathExpression(String expression, String name) {
         if ("build".equals(expression)) {
             return name;
@@ -87,6 +88,7 @@ public class SVNUtils {
         );
     }
 
+    @Deprecated
     public static String getBuildName(SVNLocation location, String pathPattern) {
         if (isPathRevision(pathPattern)) {
             // Removes the last part of the pattern
@@ -116,6 +118,7 @@ public class SVNUtils {
         }
     }
 
+    @Deprecated
     public static boolean followsBuildPattern(SVNLocation location, String pathPattern) {
         try {
             return StringUtils.isNotBlank(getBuildName(location, pathPattern));
@@ -124,6 +127,7 @@ public class SVNUtils {
         }
     }
 
+    @Deprecated
     public static String getBasePath(String pathPattern) {
         if (isPathRevision(pathPattern)) {
             throw new NoBasePathForRevisionPatternException(pathPattern);

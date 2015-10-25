@@ -29,7 +29,9 @@ public class SVNBranchConfigurationPropertyTypeTest {
 
         BuildSvnRevisionLinkService buildSvnRevisionLinkService = mock(BuildSvnRevisionLinkService.class);
 
-        TagNameSvnRevisionLink tagNameSvnRevisionLink = new TagNameSvnRevisionLink(mock(SVNService.class));
+        TagNameSvnRevisionLink tagNameSvnRevisionLink = new TagNameSvnRevisionLink(
+                mock(SVNService.class),
+                mock(StructureService.class));
 
         SVNBranchConfigurationPropertyType propertyType = new SVNBranchConfigurationPropertyType(
                 new SVNExtensionFeature(),
@@ -54,7 +56,9 @@ public class SVNBranchConfigurationPropertyTypeTest {
 
         BuildSvnRevisionLinkService buildSvnRevisionLinkService = mock(BuildSvnRevisionLinkService.class);
 
-        TagNameSvnRevisionLink tagNameSvnRevisionLink = new TagNameSvnRevisionLink(mock(SVNService.class));
+        TagNameSvnRevisionLink tagNameSvnRevisionLink = new TagNameSvnRevisionLink(
+                mock(SVNService.class),
+                mock(StructureService.class));
 
         SVNBranchConfigurationPropertyType propertyType = new SVNBranchConfigurationPropertyType(
                 new SVNExtensionFeature(),

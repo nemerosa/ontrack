@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.exceptions.JsonParsingException;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Text;
+import net.nemerosa.ontrack.model.structure.StructureService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,8 +22,17 @@ import java.util.function.Function;
 public class TagNamePatternSvnRevisionLink extends AbstractTagBasedSvnRevisionLink<TagPattern> {
 
     @Autowired
-    public TagNamePatternSvnRevisionLink(SVNService svnService) {
-        super(svnService);
+    public TagNamePatternSvnRevisionLink(SVNService svnService, StructureService structureService) {
+        super(svnService, structureService);
+    }
+
+    @Override
+    protected Optional<String> getBuildName(TagPattern data, String tagName) {
+        if (data.isValidTagName(tagName)) {
+            return Optional.empty();
+        } else {
+            return data.getBuildNameFromTagName(tagName);
+        }
     }
 
     @Override
