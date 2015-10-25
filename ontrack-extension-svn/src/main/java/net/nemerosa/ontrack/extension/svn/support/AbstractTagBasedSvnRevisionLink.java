@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.svn.support;
 
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.db.TCopyEvent;
-import net.nemerosa.ontrack.extension.svn.model.BuildSvnRevisionLink;
+import net.nemerosa.ontrack.extension.svn.model.IndexableBuildSvnRevisionLink;
 import net.nemerosa.ontrack.extension.svn.model.SVNLocation;
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty;
 import net.nemerosa.ontrack.extension.svn.service.SVNService;
@@ -17,7 +17,7 @@ import java.util.OptionalLong;
 /**
  * Build / revision relationship based on the build name indicating a subversion tag.
  */
-public abstract class AbstractTagBasedSvnRevisionLink<T> implements BuildSvnRevisionLink<T> {
+public abstract class AbstractTagBasedSvnRevisionLink<T> implements IndexableBuildSvnRevisionLink<T> {
 
     private final SVNService svnService;
     private final StructureService structureService;
@@ -113,6 +113,11 @@ public abstract class AbstractTagBasedSvnRevisionLink<T> implements BuildSvnRevi
         else {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Optional<String> getBuildNameFromTagName(T data, String tagName) {
+        return getBuildName(data, tagName);
     }
 
     protected abstract Optional<String> getBuildName(T data, String tagName);

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.svn.support;
 
-import net.nemerosa.ontrack.extension.svn.model.*;
+import net.nemerosa.ontrack.extension.svn.model.BuildPathMatchingException;
+import net.nemerosa.ontrack.extension.svn.model.UnknownBuildPathExpression;
 import net.nemerosa.ontrack.model.structure.Build;
 import org.apache.commons.lang3.StringUtils;
 import org.tmatesoft.svn.core.SVNException;
@@ -27,15 +28,6 @@ public class SVNUtils {
             return repoURL.setPath(path, false);
         } catch (SVNException e) {
             throw new IllegalArgumentException("Cannot get SVN URL for " + path, e);
-        }
-    }
-
-    @Deprecated
-    public static boolean isPathRevision(String pathPattern) {
-        if (StringUtils.isNotBlank(pathPattern)) {
-            return pathPattern.endsWith("@{build}");
-        } else {
-            throw new BuildPathNotDefinedException();
         }
     }
 
@@ -88,54 +80,4 @@ public class SVNUtils {
         );
     }
 
-    @Deprecated
-    public static String getBuildName(SVNLocation location, String pathPattern) {
-        if (isPathRevision(pathPattern)) {
-            // Removes the last part of the pattern
-            String pathOnly = StringUtils.substringBeforeLast(pathPattern, "@");
-            // Equality of paths is required
-            if (StringUtils.equals(location.getPath(), pathOnly)) {
-                return String.valueOf(location.getRevision());
-            } else {
-                throw new BuildPathMatchingException(location.getPath(), pathPattern);
-            }
-        } else {
-            // Replaces the whole build expression by a generic regex
-            String regex = pathPattern.replaceAll(BUILD_PLACEHOLDER_PATTERN, "(.*)");
-            // Identifies the variable part in this regex
-            Matcher matcher = Pattern.compile(regex).matcher(location.getPath());
-            if (matcher.matches()) {
-                String name = matcher.group(1);
-                if (!StringUtils.isBlank(name)
-                        && StringUtils.equals(location.getPath(), expandBuildPath(pathPattern, name))) {
-                    return name;
-                } else {
-                    throw new BuildPathMatchingException(location.getPath(), pathPattern);
-                }
-            } else {
-                throw new BuildPathMatchingException(location.getPath(), pathPattern);
-            }
-        }
-    }
-
-    @Deprecated
-    public static boolean followsBuildPattern(SVNLocation location, String pathPattern) {
-        try {
-            return StringUtils.isNotBlank(getBuildName(location, pathPattern));
-        } catch (BuildPathMatchingException ex) {
-            return false;
-        }
-    }
-
-    @Deprecated
-    public static String getBasePath(String pathPattern) {
-        if (isPathRevision(pathPattern)) {
-            throw new NoBasePathForRevisionPatternException(pathPattern);
-        } else {
-            // Removes any expression
-            String rawPath = pathPattern.replaceAll(BUILD_PLACEHOLDER_PATTERN, "");
-            // Gets the path BEFORE the last slash
-            return StringUtils.substringBeforeLast(rawPath, "/");
-        }
-    }
 }

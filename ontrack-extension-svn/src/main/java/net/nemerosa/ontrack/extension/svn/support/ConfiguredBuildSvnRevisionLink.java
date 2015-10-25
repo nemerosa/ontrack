@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.svn.support;
 
 import lombok.Data;
 import net.nemerosa.ontrack.extension.svn.model.BuildSvnRevisionLink;
+import net.nemerosa.ontrack.extension.svn.model.IndexableBuildSvnRevisionLink;
 import net.nemerosa.ontrack.extension.svn.model.SVNLocation;
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty;
 import net.nemerosa.ontrack.model.structure.Branch;
@@ -49,5 +50,13 @@ public class ConfiguredBuildSvnRevisionLink<T> {
 
     public Optional<Build> getEarliestBuild(Branch branch, SVNLocation location, SVNLocation firstCopy, SVNBranchConfigurationProperty branchConfigurationProperty) {
         return link.getEarliestBuild(data, branch, location, firstCopy, branchConfigurationProperty);
+    }
+
+    public Optional<String> getBuildNameFromTagName(String tagName) {
+        if (link instanceof IndexableBuildSvnRevisionLink) {
+            return ((IndexableBuildSvnRevisionLink<T>) link).getBuildNameFromTagName(data, tagName);
+        } else {
+            throw new UnsupportedOperationException("getBuildNameFromPath is not supported for non indexable links");
+        }
     }
 }

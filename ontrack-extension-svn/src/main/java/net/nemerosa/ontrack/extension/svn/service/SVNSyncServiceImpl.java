@@ -3,17 +3,14 @@ package net.nemerosa.ontrack.extension.svn.service;
 import net.nemerosa.ontrack.extension.svn.db.SVNEventDao;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.db.TCopyEvent;
-import net.nemerosa.ontrack.extension.svn.model.BuildSvnRevisionLinkService;
-import net.nemerosa.ontrack.extension.svn.model.IndexableBuildSvnRevisionLink;
-import net.nemerosa.ontrack.extension.svn.model.SVNRevisionInfo;
-import net.nemerosa.ontrack.extension.svn.model.SVNSyncInfoStatus;
+import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.extension.svn.property.*;
 import net.nemerosa.ontrack.extension.svn.support.ConfiguredBuildSvnRevisionLink;
-import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
 import net.nemerosa.ontrack.model.job.*;
 import net.nemerosa.ontrack.model.security.BuildCreate;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,62 +103,80 @@ public class SVNSyncServiceImpl implements SVNSyncService, JobProvider {
         SVNProjectConfigurationProperty projectConfigurationProperty = propertyService.getProperty(branch.getProject(), SVNProjectConfigurationPropertyType.class).getValue();
         // Gets the branch configurations for SVN
         SVNBranchConfigurationProperty branchConfigurationProperty = propertyService.getProperty(branch, SVNBranchConfigurationPropertyType.class).getValue();
-        // Gets the build path
-        String buildPathPattern = branchConfigurationProperty.getBuildPath();
-        // Gets the directory to look the tags from
-        String basePath = SVNUtils.getBasePath(buildPathPattern);
         // SVN repository configuration
         SVNRepository repository = svnService.getRepository(projectConfigurationProperty.getConfiguration().getName());
-        // Gets the list of tags from the copy events, filtering them
-        List<TCopyEvent> copies = eventDao.findCopies(
-                // In this repository
-                repository.getId(),
-                // from path...
-                branchConfigurationProperty.getBranchPath(),
-                // to path with prefix...
-                basePath,
-                // filter the target path with...
-                (copyEvent) -> SVNUtils.followsBuildPattern(copyEvent.copyToLocation(), buildPathPattern)
-        );
-        // Creates the builds (in a transaction)
-        for (TCopyEvent copy : copies) {
-            Optional<Build> build = transactionTemplate.execute(status -> createBuild(syncProperty, branch, copy, buildPathPattern, repository));
-            // Completes the information collection (build created)
-            if (build.isPresent()) {
-                int count = createdBuilds.incrementAndGet();
-                info.post(String.format(
-                        "Running build synchronisation from SVN for branch %s/%s: %d build(s) created",
-                        branch.getProject().getName(),
-                        branch.getName(),
-                        count
-                ));
+        // Link
+        ConfiguredBuildSvnRevisionLink<?> revisionLink = buildSvnRevisionLinkService.getConfiguredBuildSvnRevisionLink(branchConfigurationProperty.getBuildRevisionLink());
+        // Gets the base path
+        svnService.getBasePath(repository, branchConfigurationProperty.getBranchPath()).ifPresent(basePath -> {
+            // Tags path
+            String tagsPath = basePath + "/tags";
+            // Gets the list of tags from the copy events, filtering them
+            List<TCopyEvent> copies = eventDao.findCopies(
+                    // In this repository
+                    repository.getId(),
+                    // from path...
+                    branchConfigurationProperty.getBranchPath(),
+                    // to path with prefix...
+                    tagsPath,
+                    // filter the target path with...
+                    (copyEvent) -> getBuildNameFromPath(tagsPath, revisionLink, copyEvent.copyToLocation()).isPresent()
+            );
+            // Creates the builds (in a transaction)
+            for (TCopyEvent copy : copies) {
+                Optional<Build> build = transactionTemplate.execute(status -> createBuild(tagsPath, syncProperty, branch, copy, revisionLink, repository));
+                // Completes the information collection (build created)
+                if (build.isPresent()) {
+                    int count = createdBuilds.incrementAndGet();
+                    info.post(String.format(
+                            "Running build synchronisation from SVN for branch %s/%s: %d build(s) created",
+                            branch.getProject().getName(),
+                            branch.getName(),
+                            count
+                    ));
+                }
             }
+        });
+    }
+
+    private Optional<String> getBuildNameFromPath(String tagsPath, ConfiguredBuildSvnRevisionLink<?> revisionLink, SVNLocation location) {
+        String path = location.getPath();
+        if (StringUtils.startsWith(path, tagsPath)) {
+            String tagName = StringUtils.strip(
+                    StringUtils.substringAfter(path, tagsPath),
+                    "/"
+            );
+            return revisionLink.getBuildNameFromTagName(tagName);
+        } else {
+            return Optional.empty();
         }
     }
 
-    private Optional<Build> createBuild(SVNSyncProperty syncProperty, Branch branch, TCopyEvent copy, String buildPathPattern, SVNRepository repository) {
+    private Optional<Build> createBuild(String tagsPath, SVNSyncProperty syncProperty, Branch branch, TCopyEvent copy, ConfiguredBuildSvnRevisionLink<?> revisionLink, SVNRepository repository) {
         // Extracts the build name from the copyTo path
-        String buildName = SVNUtils.getBuildName(copy.copyToLocation(), buildPathPattern);
-        // Gets an existing build if any
-        Optional<Build> build = structureService.findBuildByName(branch.getProject().getName(), branch.getName(), buildName);
-        // If none exists, just creates it
-        if (!build.isPresent()) {
-            logger.debug("[svn-sync] Build {} does not exist - creating.", buildName);
-            return Optional.of(doCreateBuild(branch, copy, buildName, repository));
-        }
-        // If Ok to override, deletes it and creates it
-        else if (syncProperty.isOverride()) {
-            logger.debug("[svn-sync] Build {} already exists - overriding.", buildName);
-            // Deletes the build
-            structureService.deleteBuild(build.get().getId());
-            // Creates the build
-            return Optional.of(doCreateBuild(branch, copy, buildName, repository));
-        }
-        // Else, just puts some log entry
-        else {
-            logger.debug("[svn-sync] Build {} already exists - not overriding.", buildName);
-            return Optional.empty();
-        }
+        return getBuildNameFromPath(tagsPath, revisionLink, copy.copyToLocation())
+                .flatMap(buildName -> {
+                    // Gets an existing build if any
+                    Optional<Build> build = structureService.findBuildByName(branch.getProject().getName(), branch.getName(), buildName);
+                    // If none exists, just creates it
+                    if (!build.isPresent()) {
+                        logger.debug("[svn-sync] Build {} does not exist - creating.", buildName);
+                        return Optional.of(doCreateBuild(branch, copy, buildName, repository));
+                    }
+                    // If Ok to override, deletes it and creates it
+                    else if (syncProperty.isOverride()) {
+                        logger.debug("[svn-sync] Build {} already exists - overriding.", buildName);
+                        // Deletes the build
+                        structureService.deleteBuild(build.get().getId());
+                        // Creates the build
+                        return Optional.of(doCreateBuild(branch, copy, buildName, repository));
+                    }
+                    // Else, just puts some log entry
+                    else {
+                        logger.debug("[svn-sync] Build {} already exists - not overriding.", buildName);
+                        return Optional.empty();
+                    }
+                });
     }
 
     private Build doCreateBuild(Branch branch, TCopyEvent copy, String buildName, SVNRepository repository) {
