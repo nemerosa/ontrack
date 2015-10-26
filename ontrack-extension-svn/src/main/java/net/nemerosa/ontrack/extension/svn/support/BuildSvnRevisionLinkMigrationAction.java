@@ -29,6 +29,8 @@ import java.util.regex.Pattern;
 @Component
 public class BuildSvnRevisionLinkMigrationAction implements DBMigrationAction {
 
+    public static final String BUILD_PLACEHOLDER_PATTERN = "\\{(.+)\\}";
+
     private final Logger logger = LoggerFactory.getLogger(BuildSvnRevisionLinkMigrationAction.class);
     private final ObjectMapper objectMapper = ObjectMapperFactory.create();
 
@@ -104,9 +106,8 @@ public class BuildSvnRevisionLinkMigrationAction implements DBMigrationAction {
                     NoConfig.INSTANCE
             );
         }
-        // FIXME The tag name can look like 11.7-${build:*}
         // Looking for the {build} expression
-        Pattern pattern = Pattern.compile(SVNUtils.BUILD_PLACEHOLDER_PATTERN);
+        Pattern pattern = Pattern.compile(BUILD_PLACEHOLDER_PATTERN);
         Matcher matcher = pattern.matcher(buildPath);
         if (matcher.find()) {
             String expression = matcher.group(1);
