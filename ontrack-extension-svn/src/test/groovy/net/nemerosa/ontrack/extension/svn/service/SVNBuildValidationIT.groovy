@@ -27,8 +27,6 @@ import static net.nemerosa.ontrack.model.structure.NameDescription.nd
 @ProfileValueSourceConfiguration(SVNProfileValueSource)
 class SVNBuildValidationIT extends AbstractServiceTestSupport {
 
-    private static SVNTestRepo repo
-
     @Autowired
     private PropertyService propertyService
 
