@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository
 import net.nemerosa.ontrack.extension.svn.db.SVNRepositoryDao
 import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration
+import net.nemerosa.ontrack.extension.svn.model.SVNInfoService
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationProperty
@@ -48,6 +49,9 @@ class SVNSearchMultiBranchIT extends AbstractServiceTestSupport {
 
     @Autowired
     private SVNService svnService
+
+    @Autowired
+    private SVNInfoService svnInfoService
 
     @Autowired
     private IndexationService indexationService
@@ -144,7 +148,7 @@ class SVNSearchMultiBranchIT extends AbstractServiceTestSupport {
          * Search for issue #1
          */
 
-        def info = asUser().with(project, ProjectEdit).call { svnService.getIssueInfo(configuration.name, '1') }
+        def info = asUser().with(project, ProjectEdit).call { svnInfoService.getIssueInfo(configuration.name, '1') }
         assert info.issue.displayKey == '#1'
 
         // Last revisions on the branches
