@@ -83,8 +83,7 @@ class SVNBuildValidationIT extends AbstractServiceTestSupport {
             // Branch's configuration
             propertyService.editProperty(branch, SVNBranchConfigurationPropertyType, new SVNBranchConfigurationProperty(
                     "/project/trunk",
-                    TagNameSvnRevisionLink.DEFAULT,
-                    "/project/tags/{build}"
+                    TagNameSvnRevisionLink.DEFAULT
             ))
         }
         // Creates a build
@@ -122,8 +121,7 @@ class SVNBuildValidationIT extends AbstractServiceTestSupport {
                     new ConfiguredBuildSvnRevisionLink<>(
                             tagNamePatternSvnRevisionLink,
                             new TagPattern("1.1.*")
-                    ).toServiceConfiguration(),
-                    "/project/tags/{build:1.1.*}"
+                    ).toServiceConfiguration()
             ))
         }
         // Creates a build
@@ -157,8 +155,7 @@ class SVNBuildValidationIT extends AbstractServiceTestSupport {
                     new ConfiguredBuildSvnRevisionLink<>(
                             tagNamePatternSvnRevisionLink,
                             new TagPattern("1.1.*")
-                    ).toServiceConfiguration(),
-                    "/project/tags/{build:1.1.*}"
+                    ).toServiceConfiguration()
             ))
         }
         // Renames the build

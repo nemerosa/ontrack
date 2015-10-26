@@ -127,8 +127,7 @@ public class SVNBranchConfigurationPropertyType extends AbstractPropertyType<SVN
         // OK
         return new SVNBranchConfigurationProperty(
                 branchPath,
-                configuredBuildSvnRevisionLink.toServiceConfiguration(),
-                ""
+                configuredBuildSvnRevisionLink.toServiceConfiguration()
         );
     }
 
@@ -152,8 +151,7 @@ public class SVNBranchConfigurationPropertyType extends AbstractPropertyType<SVN
     public SVNBranchConfigurationProperty replaceValue(SVNBranchConfigurationProperty value, Function<String, String> replacementFunction) {
         return new SVNBranchConfigurationProperty(
                 replacementFunction.apply(value.getBranchPath()),
-                replaceBuildRevisionLink(value.getBuildRevisionLink(), replacementFunction),
-                ""
+                replaceBuildRevisionLink(value.getBuildRevisionLink(), replacementFunction)
         );
     }
 

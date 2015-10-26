@@ -197,8 +197,7 @@ class SVNSearchMultiBranchIT extends AbstractServiceTestSupport {
             // Branch's configuration
             propertyService.editProperty(branch, SVNBranchConfigurationPropertyType, new SVNBranchConfigurationProperty(
                     "/${testName}/${path}",
-                    TagNameSvnRevisionLink.DEFAULT,
-                    "/${testName}/tags/{build}"
+                    TagNameSvnRevisionLink.DEFAULT
             ))
             // Two promotion levels
             structureService.newPromotionLevel(PromotionLevel.of(branch, nd('COPPER', 'Copper promotion')))

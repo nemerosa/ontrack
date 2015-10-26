@@ -23,21 +23,4 @@ public class SVNBranchConfigurationProperty {
      */
     private final ServiceConfiguration buildRevisionLink;
 
-    /**
-     * Path of a tag in the Subversion repository using a build name. The path is computed relative to the root
-     * of the repository. Several placeholders can be defined in the path definition, that will be replaced
-     * at runtime:
-     * <p>
-     * <ul>
-     * <li><code>{build}</code> - the build name</li>
-     * <li><code>{build:expression}</code> - the build name, which must complies to the expression. This expression
-     * is a simplified regex where * stands for any character.</li>
-     * </ul>
-     *
-     * @see #buildRevisionLink
-     * @deprecated Use {@link net.nemerosa.ontrack.extension.svn.model.BuildSvnRevisionLink} instead
-     */
-    @Deprecated
-    private final String buildPath;
-
 }

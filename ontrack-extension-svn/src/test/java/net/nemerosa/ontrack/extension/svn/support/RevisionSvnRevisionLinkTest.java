@@ -20,8 +20,7 @@ public class RevisionSvnRevisionLinkTest {
             new ConfiguredBuildSvnRevisionLink<>(
                     new RevisionSvnRevisionLink(structureService),
                     NoConfig.INSTANCE
-            ).toServiceConfiguration(),
-            ""
+            ).toServiceConfiguration()
     );
 
     @Test
