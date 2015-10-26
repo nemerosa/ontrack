@@ -2,8 +2,15 @@ package net.nemerosa.ontrack.dsl.properties
 
 import net.nemerosa.ontrack.dsl.Branch
 import net.nemerosa.ontrack.dsl.Ontrack
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 class BranchProperties extends ProjectEntityProperties {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BranchProperties)
 
     BranchProperties(Ontrack ontrack, Branch branch) {
         super(ontrack, branch)
@@ -27,9 +34,50 @@ class BranchProperties extends ProjectEntityProperties {
      * SVN branch property
      */
 
+    /**
+     * Compatibility with version 2.15 and older
+     */
     @Deprecated
     def svn(String branchPath, String buildPath) {
-
+        // Build path expression
+        String buildPlaceholderPattern = "\\{(.+)\\}"
+        // Link data
+        String linkId
+        Map linkData = [:]
+        // Detecting the link type
+        // Revision
+        if (buildPath.endsWith('@{build}')) {
+            linkId = 'revision'
+        }
+        // Tag or pattern
+        else {
+            Pattern pattern = Pattern.compile(buildPlaceholderPattern)
+            Matcher matcher = pattern.matcher(buildPath)
+            if (matcher.find()) {
+                String expression = matcher.group(1);
+                if ("build".equals(expression)) {
+                    linkId = 'tag'
+                } else if (expression.startsWith("build:")) {
+                    String buildExpression = expression - "build:";
+                    linkId = 'tagPattern'
+                    linkData = [
+                            pattern: buildExpression,
+                    ]
+                } else {
+                    throw new IllegalStateException("buildPath = ${buildPath} is not supported.")
+                }
+            } else {
+                throw new IllegalStateException("buildPath = ${buildPath} is not supported.")
+            }
+        }
+        // Logging
+        LOGGER.warn("[svn] The svn(branchPath=${branchPath}, buildPath=${buildPath}) call is deprecated and will be deleted in future versions")
+        // New call
+        svn([
+                branchPath: branchPath,
+                link      : linkId,
+                data      : linkData,
+        ])
     }
 
     def svn(Map<String, ?> params = [:]) {
@@ -42,14 +90,14 @@ class BranchProperties extends ProjectEntityProperties {
             def linkId = params['link']
             def linkData = params['data']
             buildRevisionLink = [
-                    id: linkId,
+                    id  : linkId,
                     data: linkData,
             ]
         }
         // Setting the property
         property('net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType', [
-                branchPath: branchPath,
-                buildRevisionLink : buildRevisionLink,
+                branchPath       : branchPath,
+                buildRevisionLink: buildRevisionLink,
         ])
     }
 
@@ -91,10 +139,10 @@ class BranchProperties extends ProjectEntityProperties {
 
     def artifactorySync(String configuration, String buildName, String buildNameFilter = '*', int interval = 0) {
         property('net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncPropertyType', [
-                configuration: configuration,
-                buildName: buildName,
+                configuration  : configuration,
+                buildName      : buildName,
                 buildNameFilter: buildNameFilter,
-                interval: interval
+                interval       : interval
         ])
     }
 

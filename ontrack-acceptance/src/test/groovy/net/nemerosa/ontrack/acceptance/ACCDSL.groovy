@@ -1128,7 +1128,7 @@ class ACCDSL extends AbstractACCDSL {
     }
 
     @Test
-    void 'Branch property - SVN configuration - backward compatibility'() {
+    void 'Branch property - SVN configuration - backward compatibility with tag pattern'() {
         def name = uid('S')
         ontrack.configure {
             svn name, url: 'svn://localhost'
@@ -1148,6 +1148,50 @@ class ACCDSL extends AbstractACCDSL {
         assert cfg.branchPath == '/project/branches/mybranch'
         assert cfg.buildRevisionLink.id == 'tagPattern'
         assert cfg.buildRevisionLink.data.pattern == 'mybranch-*'
+    }
+
+    @Test
+    void 'Branch property - SVN configuration - backward compatibility with tag name'() {
+        def name = uid('S')
+        ontrack.configure {
+            svn name, url: 'svn://localhost'
+        }
+        def project = uid('P')
+        ontrack.project(project) {
+            config {
+                svn name, '/project/trunk'
+            }
+            branch('mybranch') {
+                config {
+                    svn '/project/branches/mybranch', '/project/tags/{build}'
+                }
+            }
+        }
+        def cfg = ontrack.branch(project, 'mybranch').config.svn
+        assert cfg.branchPath == '/project/branches/mybranch'
+        assert cfg.buildRevisionLink.id == 'tag'
+    }
+
+    @Test
+    void 'Branch property - SVN configuration - backward compatibility with revision'() {
+        def name = uid('S')
+        ontrack.configure {
+            svn name, url: 'svn://localhost'
+        }
+        def project = uid('P')
+        ontrack.project(project) {
+            config {
+                svn name, '/project/trunk'
+            }
+            branch('mybranch') {
+                config {
+                    svn '/project/branches/mybranch', '/project/branches/mybranch@{build}'
+                }
+            }
+        }
+        def cfg = ontrack.branch(project, 'mybranch').config.svn
+        assert cfg.branchPath == '/project/branches/mybranch'
+        assert cfg.buildRevisionLink.id == 'revision'
     }
 
     @Test
