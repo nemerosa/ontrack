@@ -70,7 +70,7 @@ public class TagNamePatternSvnRevisionLink extends AbstractTagBasedSvnRevisionLi
                 .with(
                         Text.of("pattern")
                                 .label("Tag pattern")
-                                .help("@file:extension/scm/help.net.nemerosa.ontrack.extension.svn.support.TagNamePatternSvnRevisionLink.tagPattern.tpl.html")
+                                .help("@file:extension/svn/buildRevisionLink/tagPattern.help.tpl.html")
                 )
                 ;
     }
