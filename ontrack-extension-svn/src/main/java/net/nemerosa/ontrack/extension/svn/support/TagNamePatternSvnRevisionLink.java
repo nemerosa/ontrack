@@ -29,9 +29,9 @@ public class TagNamePatternSvnRevisionLink extends AbstractTagBasedSvnRevisionLi
     @Override
     protected Optional<String> getBuildName(TagPattern data, String tagName) {
         if (data.isValidTagName(tagName)) {
-            return Optional.empty();
-        } else {
             return data.getBuildNameFromTagName(tagName);
+        } else {
+            return Optional.empty();
         }
     }
 
