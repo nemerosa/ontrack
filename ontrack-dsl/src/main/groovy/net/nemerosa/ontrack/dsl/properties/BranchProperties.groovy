@@ -27,10 +27,29 @@ class BranchProperties extends ProjectEntityProperties {
      * SVN branch property
      */
 
+    @Deprecated
     def svn(String branchPath, String buildPath) {
+
+    }
+
+    def svn(Map<String, ?> params = [:]) {
+        // Gets the branch path
+        String branchPath = params['branchPath'] as String
+        if (!branchPath) throw new IllegalStateException("Missing `branchPath` parameter.")
+        // Gets the build link
+        def buildRevisionLink = [:]
+        if (params.containsKey('link')) {
+            def linkId = params['link']
+            def linkData = params['data']
+            buildRevisionLink = [
+                    id: linkId,
+                    data: linkData,
+            ]
+        }
+        // Setting the property
         property('net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType', [
                 branchPath: branchPath,
-                buildPath : buildPath
+                buildRevisionLink : buildRevisionLink,
         ])
     }
 

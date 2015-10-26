@@ -1128,7 +1128,7 @@ class ACCDSL extends AbstractACCDSL {
     }
 
     @Test
-    void 'Branch property - SVN configuration'() {
+    void 'Branch property - SVN configuration - backward compatibility'() {
         def name = uid('S')
         ontrack.configure {
             svn name, url: 'svn://localhost'
@@ -1146,7 +1146,75 @@ class ACCDSL extends AbstractACCDSL {
         }
         def cfg = ontrack.branch(project, 'mybranch').config.svn
         assert cfg.branchPath == '/project/branches/mybranch'
-        assert cfg.buildPath == '/project/tags/{build:mybranch-*}'
+        assert cfg.buildRevisionLink.id == 'tagPattern'
+        assert cfg.buildRevisionLink.data.pattern == 'mybranch-*'
+    }
+
+    @Test
+    void 'Branch property - SVN configuration with tag pattern'() {
+        def name = uid('S')
+        ontrack.configure {
+            svn name, url: 'svn://localhost'
+        }
+        def project = uid('P')
+        ontrack.project(project) {
+            config {
+                svn name, '/project/trunk'
+            }
+            branch('mybranch') {
+                config {
+                    svn branchPath: '/project/branches/mybranch', link: 'tagPattern', data: [pattern: 'mybranch-*']
+                }
+            }
+        }
+        def cfg = ontrack.branch(project, 'mybranch').config.svn
+        assert cfg.branchPath == '/project/branches/mybranch'
+        assert cfg.buildRevisionLink.id == 'tagPattern'
+        assert cfg.buildRevisionLink.data.pattern == 'mybranch-*'
+    }
+
+    @Test
+    void 'Branch property - SVN configuration with tag name'() {
+        def name = uid('S')
+        ontrack.configure {
+            svn name, url: 'svn://localhost'
+        }
+        def project = uid('P')
+        ontrack.project(project) {
+            config {
+                svn name, '/project/trunk'
+            }
+            branch('mybranch') {
+                config {
+                    svn branchPath: '/project/branches/mybranch', link: 'tag'
+                }
+            }
+        }
+        def cfg = ontrack.branch(project, 'mybranch').config.svn
+        assert cfg.branchPath == '/project/branches/mybranch'
+        assert cfg.buildRevisionLink.id == 'tag'
+    }
+
+    @Test
+    void 'Branch property - SVN configuration with revision'() {
+        def name = uid('S')
+        ontrack.configure {
+            svn name, url: 'svn://localhost'
+        }
+        def project = uid('P')
+        ontrack.project(project) {
+            config {
+                svn name, '/project/trunk'
+            }
+            branch('mybranch') {
+                config {
+                    svn branchPath: '/project/branches/mybranch', link: 'revision'
+                }
+            }
+        }
+        def cfg = ontrack.branch(project, 'mybranch').config.svn
+        assert cfg.branchPath == '/project/branches/mybranch'
+        assert cfg.buildRevisionLink.id == 'revision'
     }
 
     @Test
@@ -1162,7 +1230,7 @@ class ACCDSL extends AbstractACCDSL {
             }
             branch('test') {
                 config {
-                    svn '/project/branches/mybranch', '/project/tags/{build:mybranch-*}'
+                    svn branchPath: '/project/branches/mybranch', link: 'tagPattern', data: [pattern: 'mybranch-*']
                     svnValidatorClosedIssues(['Closed'])
                 }
             }
@@ -1183,7 +1251,7 @@ class ACCDSL extends AbstractACCDSL {
             }
             branch('test') {
                 config {
-                    svn '/project/branches/mybranch', '/project/tags/{build:mybranch-*}'
+                    svn branchPath: '/project/branches/mybranch', link: 'tagPattern', data: [pattern: 'mybranch-*']
                     svnSync 30
                 }
             }
