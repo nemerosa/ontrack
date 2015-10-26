@@ -185,8 +185,10 @@ public class SVNInfoServiceImpl implements SVNInfoService {
             if (!projectSvnConfig.isEmpty()
                     && repository.getConfiguration().getName().equals(projectSvnConfig.getValue().getConfiguration().getName())) {
                 for (Branch branch : structureService.getBranchesForProject(project.getId())) {
+                    // Filter on branch type
                     // Filter on SVN configuration: must be present
-                    if (propertyService.hasProperty(branch, SVNBranchConfigurationPropertyType.class)) {
+                    if (branch.getType() != BranchType.TEMPLATE_DEFINITION &&
+                            propertyService.hasProperty(branch, SVNBranchConfigurationPropertyType.class)) {
                         // Identifies a possible build given the path/revision and the first copy
                         Optional<Build> build = lookupBuild(basicInfo.toLocation(), firstCopy, branch);
                         // Build found
