@@ -70,6 +70,7 @@ public class RevisionPatternSvnRevisionLink implements BuildSvnRevisionLink<Revi
                 .with(
                         Text.of("pattern")
                                 .label("Revision pattern")
+                                .regex(".*\\{revision\\}.*")
                                 .help("@file:extension/svn/buildRevisionLink/revisionPattern.help.tpl.html")
                 )
                 ;
