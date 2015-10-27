@@ -59,8 +59,6 @@ public abstract class AbstractTagBasedSvnRevisionLink<T> implements IndexableBui
     public Optional<Build> getEarliestBuild(T data, Branch branch, SVNLocation location, SVNLocation firstCopy, SVNBranchConfigurationProperty branchConfigurationProperty) {
         // Uses the copy (if available)
         if (firstCopy != null) {
-            // TODO Gets the build name from the copy path
-            // TODO The copy target path must comply with the tag path
             return getEarliestBuild(data, branch, firstCopy, branchConfigurationProperty);
         } else {
             return Optional.empty();
