@@ -50,6 +50,7 @@ if (pos > 0) {
 }
 println "BRANCH = ${BRANCH}"
 println "\tBranchType = ${branchType}"
+boolean release = branchType == 'release'
 
 // Extracting the delivery
 def extractDeliveryArtifacts(Object dsl) {
@@ -169,17 +170,19 @@ ciAcceptanceTest -PacceptanceJar=ontrack-acceptance.jar
         }
         publishers {
             archiveJunit('*-tests.xml')
-            downstreamParameterized {
-                trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-debian", 'SUCCESS', false) {
-                    currentBuild()
-                }
-                centOsVersions.each { centOsVersion ->
-                    trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-centos-${centOsVersion}", 'SUCCESS', false) {
+            if (release) {
+                downstreamParameterized {
+                    trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-debian", 'SUCCESS', false) {
                         currentBuild()
+                    }
+                    centOsVersions.each { centOsVersion ->
+                        trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-centos-${centOsVersion}", 'SUCCESS', false) {
+                            currentBuild()
+                        }
                     }
                 }
             }
-            if (branchType == 'release') {
+            if (release) {
                 downstreamParameterized {
                     trigger("${SEED_PROJECT}-${SEED_BRANCH}-docker-push", 'SUCCESS', false) {
                         currentBuild()
@@ -203,49 +206,16 @@ ciAcceptanceTest -PacceptanceJar=ontrack-acceptance.jar
         }
     }
 
-    // Debian package acceptance job
+    // OS packages jobs
+    // Only for releases
 
-    freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-debian") {
-        logRotator(numToKeep = 40)
-        deliveryPipelineConfiguration('Commit', 'Debian package acceptance')
-        jdk 'JDK8u25'
-        parameters {
-            stringParam('VERSION_FULL', '', '')
-            stringParam('VERSION_COMMIT', '', '')
-            stringParam('VERSION_BUILD', '', '')
-            stringParam('VERSION_DISPLAY', '', '')
-        }
-        wrappers {
-            xvfb('default')
-        }
-        extractDeliveryArtifacts delegate
-        steps {
-            // Runs the CI acceptance tests
-            gradle """\
-debAcceptanceTest
--PacceptanceJar=ontrack-acceptance.jar
--PacceptanceDebianDistributionDir=.
-"""
-        }
-        publishers {
-            archiveJunit('*-tests.xml')
-        }
-        configure { node ->
-            node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
-                'project'('ontrack')
-                'branch'(NAME)
-                'build'('${VERSION_BUILD}')
-                'validationStamp'('ACCEPTANCE.DEBIAN')
-            }
-        }
-    }
+    if (release) {
 
-    // CentOS package acceptance job
+        // Debian package acceptance job
 
-    centOsVersions.each { centOsVersion ->
-        freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-centos-${centOsVersion}") {
+        freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-debian") {
             logRotator(numToKeep = 40)
-            deliveryPipelineConfiguration('Commit', "CentOS ${centOsVersion} package acceptance")
+            deliveryPipelineConfiguration('Commit', 'Debian package acceptance')
             jdk 'JDK8u25'
             parameters {
                 stringParam('VERSION_FULL', '', '')
@@ -260,9 +230,9 @@ debAcceptanceTest
             steps {
                 // Runs the CI acceptance tests
                 gradle """\
-rpmAcceptanceTest${centOsVersion}
+debAcceptanceTest
 -PacceptanceJar=ontrack-acceptance.jar
--PacceptanceRpmDistributionDir=.
+-PacceptanceDebianDistributionDir=.
 """
             }
             publishers {
@@ -273,10 +243,50 @@ rpmAcceptanceTest${centOsVersion}
                     'project'('ontrack')
                     'branch'(NAME)
                     'build'('${VERSION_BUILD}')
-                    'validationStamp'("ACCEPTANCE.CENTOS.${centOsVersion}")
+                    'validationStamp'('ACCEPTANCE.DEBIAN')
                 }
             }
         }
+
+        // CentOS package acceptance job
+
+        centOsVersions.each { centOsVersion ->
+            freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-centos-${centOsVersion}") {
+                logRotator(numToKeep = 40)
+                deliveryPipelineConfiguration('Commit', "CentOS ${centOsVersion} package acceptance")
+                jdk 'JDK8u25'
+                parameters {
+                    stringParam('VERSION_FULL', '', '')
+                    stringParam('VERSION_COMMIT', '', '')
+                    stringParam('VERSION_BUILD', '', '')
+                    stringParam('VERSION_DISPLAY', '', '')
+                }
+                wrappers {
+                    xvfb('default')
+                }
+                extractDeliveryArtifacts delegate
+                steps {
+                    // Runs the CI acceptance tests
+                    gradle """\
+rpmAcceptanceTest${centOsVersion}
+-PacceptanceJar=ontrack-acceptance.jar
+-PacceptanceRpmDistributionDir=.
+"""
+                }
+                publishers {
+                    archiveJunit('*-tests.xml')
+                }
+                configure { node ->
+                    node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
+                        'project'('ontrack')
+                        'branch'(NAME)
+                        'build'('${VERSION_BUILD}')
+                        'validationStamp'("ACCEPTANCE.CENTOS.${centOsVersion}")
+                    }
+                }
+            }
+        }
+
     }
 
     // Docker push
@@ -365,7 +375,6 @@ docker logout
 
     // Publish job
     // Available for all branches, with some restrictions (no tagging) for non release branches
-    boolean release = branchType == 'release'
 
     freeStyleJob("${PROJECT}-${NAME}-publish") {
         logRotator(numToKeep = 40)
