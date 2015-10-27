@@ -48,10 +48,10 @@ public class RevisionPattern {
     }
 
     private String getRegex() {
-        return replace(
+        return "^" + replace(
                 replace(pattern, "{revision}", "(\\d+)"),
                 "*",
                 ".*"
-        );
+        ) + "$";
     }
 }
