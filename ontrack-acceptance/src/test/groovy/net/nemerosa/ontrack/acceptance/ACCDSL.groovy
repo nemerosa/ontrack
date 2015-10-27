@@ -1218,6 +1218,29 @@ class ACCDSL extends AbstractACCDSL {
     }
 
     @Test
+    void 'Branch property - SVN configuration with revision pattern'() {
+        def name = uid('S')
+        ontrack.configure {
+            svn name, url: 'svn://localhost'
+        }
+        def project = uid('P')
+        ontrack.project(project) {
+            config {
+                svn name, '/project/trunk'
+            }
+            branch('mybranch') {
+                config {
+                    svn branchPath: '/project/branches/mybranch', link: 'revisionPattern', data: [pattern: '11.8.4.*-{revision}']
+                }
+            }
+        }
+        def cfg = ontrack.branch(project, 'mybranch').config.svn
+        assert cfg.branchPath == '/project/branches/mybranch'
+        assert cfg.buildRevisionLink.id == 'revisionPattern'
+        assert cfg.buildRevisionLink.data.pattern == '11.8.4.*-{revision}'
+    }
+
+    @Test
     void 'Branch property - SVN configuration with tag name'() {
         def name = uid('S')
         ontrack.configure {
