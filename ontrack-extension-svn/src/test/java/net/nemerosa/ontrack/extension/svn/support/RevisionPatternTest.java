@@ -6,7 +6,15 @@ import static org.junit.Assert.*;
 
 public class RevisionPatternTest {
 
-    // TODO Checks constructor
+    @Test
+    public void constructor_ok() {
+        assertEquals("11.8.4.*-{revision}", new RevisionPattern("11.8.4.*-{revision}").getPattern());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void constructor_nok() {
+        new RevisionPattern("11.8.4.*-{revision }");
+    }
 
     @Test
     public void validity() {

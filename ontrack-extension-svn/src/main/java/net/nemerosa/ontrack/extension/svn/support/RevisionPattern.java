@@ -1,7 +1,9 @@
 package net.nemerosa.ontrack.extension.svn.support;
 
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
+import java.beans.ConstructorProperties;
 import java.util.OptionalLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,6 +23,14 @@ public class RevisionPattern {
      * Pattern definition.
      */
     private final String pattern;
+
+    @ConstructorProperties({"pattern"})
+    public RevisionPattern(String pattern) {
+        if (!StringUtils.contains(pattern, "{revision}")) {
+            throw new IllegalArgumentException("Revision pattern must contain the {revision} token: " + pattern);
+        }
+        this.pattern = pattern;
+    }
 
     /**
      * Checks if the {@code buildName} complies with this pattern.
