@@ -159,8 +159,6 @@ public class SVNClientImplTest {
                         "",
                         "",
                         "",
-                        "",
-                        "",
                         0,
                         1,
                         ""

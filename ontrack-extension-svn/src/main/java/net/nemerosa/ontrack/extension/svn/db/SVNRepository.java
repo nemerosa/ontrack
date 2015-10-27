@@ -6,7 +6,6 @@ import lombok.Data;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.tmatesoft.svn.core.SVNURL;
 
 @Data
@@ -22,21 +21,11 @@ public class SVNRepository {
     }
 
     public String getBranchPattern() {
-        String branchPattern = configuration.getBranchPattern();
-        if (StringUtils.isNotBlank(branchPattern)) {
-            return branchPattern;
-        } else {
-            return ".*/branches/[^/]+";
-        }
+        return ".*/branches/[^/]+";
     }
 
     public String getTagPattern() {
-        String tagPattern = configuration.getTagPattern();
-        if (StringUtils.isNotBlank(tagPattern)) {
-            return tagPattern;
-        } else {
-            return ".*/tags/[^/]+";
-        }
+        return ".*/tags/[^/]+";
     }
 
     public String getUrl(String path) {

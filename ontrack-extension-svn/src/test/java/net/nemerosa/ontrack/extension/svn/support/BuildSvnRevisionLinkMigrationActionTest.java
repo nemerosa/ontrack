@@ -35,7 +35,7 @@ public class BuildSvnRevisionLinkMigrationActionTest {
                 .with("buildPath", "/project/tags/{build}")
                 .end();
         // Migration
-        action.migrate(node);
+        action.migrateSvnBranchConfiguration(node);
         // Checks the node
         assertEquals(
                 object()

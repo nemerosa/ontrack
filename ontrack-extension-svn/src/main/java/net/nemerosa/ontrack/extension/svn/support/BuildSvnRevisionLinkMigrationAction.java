@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import net.nemerosa.ontrack.client.JsonClientMappingException;
 import net.nemerosa.ontrack.extension.scm.support.TagPattern;
+import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration;
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.structure.ServiceConfiguration;
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,7 +54,32 @@ public class BuildSvnRevisionLinkMigrationAction implements DBMigrationAction {
 
     @Override
     public void migrate(Connection connection) throws Exception {
+        // For all SVN configurations
+        migrateSvnConfigurations(connection);
         // For all Svn branch configurations
+        migrateSvnBranchConfigurations(connection);
+    }
+
+    private void migrateSvnConfigurations(Connection connection) throws SQLException, IOException {
+        try (PreparedStatement ps = connection.prepareStatement("SELECT * FROM CONFIGURATIONS WHERE TYPE = ?", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE)) {
+            ps.setString(1, SVNConfiguration.class.getName());
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    // Configuration as JSON
+                    String json = rs.getString("CONTENT");
+                    // Parses the configuration as JSON
+                    ObjectNode node = (ObjectNode) objectMapper.readTree(json);
+                    // Migrates the node
+                    migrateSvnConfiguration(node);
+                    // Updating
+                    rs.updateString("CONTENT", objectMapper.writeValueAsString(node));
+                    rs.updateRow();
+                }
+            }
+        }
+    }
+
+    private void migrateSvnBranchConfigurations(Connection connection) throws SQLException, IOException {
         try (PreparedStatement ps = connection.prepareStatement("SELECT * FROM PROPERTIES WHERE TYPE = ?", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE)) {
             ps.setString(1, SVNBranchConfigurationPropertyType.class.getName());
             try (ResultSet rs = ps.executeQuery()) {
@@ -62,7 +89,7 @@ public class BuildSvnRevisionLinkMigrationAction implements DBMigrationAction {
                     // Parses the configuration as JSON
                     ObjectNode node = (ObjectNode) objectMapper.readTree(json);
                     // Migrates the node
-                    migrate(node);
+                    migrateSvnBranchConfiguration(node);
                     // Updating
                     rs.updateString("JSON", objectMapper.writeValueAsString(node));
                     rs.updateRow();
@@ -71,7 +98,13 @@ public class BuildSvnRevisionLinkMigrationAction implements DBMigrationAction {
         }
     }
 
-    protected void migrate(ObjectNode node) {
+    protected void migrateSvnConfiguration(ObjectNode node) {
+        // Removes branch & tag patterns
+        node.remove("branchPattern");
+        node.remove("tagPattern");
+    }
+
+    protected void migrateSvnBranchConfiguration(ObjectNode node) {
         // Gets the build path & branch path
         String branchPath = node.get("branchPath").asText();
         String buildPath = node.get("buildPath").asText();

@@ -67,7 +67,7 @@ class SVNBuildValidationIT extends AbstractServiceTestSupport {
         // Creates a branch
         def branch = doCreateBranch()
         // SVN configuration
-        def configuration = SVNTestUtils.repository().configuration.withTagPattern("1.1.*")
+        def configuration = SVNTestUtils.repository().configuration
         asUser().with(GlobalSettings).call {
             configuration = svnConfigurationService.newConfiguration(configuration)
         }
@@ -81,7 +81,10 @@ class SVNBuildValidationIT extends AbstractServiceTestSupport {
             // Branch's configuration
             propertyService.editProperty(branch, SVNBranchConfigurationPropertyType, new SVNBranchConfigurationProperty(
                     "/project/trunk",
-                    TagNameSvnRevisionLink.DEFAULT
+                    new ConfiguredBuildSvnRevisionLink<>(
+                            tagNamePatternSvnRevisionLink,
+                            new TagPattern("1.1.*")
+                    ).toServiceConfiguration()
             ))
         }
         // Creates a build

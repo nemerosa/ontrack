@@ -25,12 +25,6 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
     @SuppressWarnings("UnusedDeclaration")
     private final String password;
     @Wither
-    @Deprecated
-    private final String branchPattern;
-    @Wither
-    @Deprecated
-    private final String tagPattern;
-    @Wither
     private final String tagFilterPattern;
     @Wither
     private final String browserForPath;
@@ -50,7 +44,7 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
                 name,
                 url,
                 null, null, // user, password
-                "", "", "", // patterns
+                "",         // tag filter pattern
                 "", "", "", // browser URL
                 0, 1L,      // indexation
                 null        // issue service
@@ -145,8 +139,6 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
                 url,
                 user,
                 "",
-                branchPattern,
-                tagPattern,
                 tagFilterPattern,
                 browserForPath,
                 browserForRevision,
@@ -163,7 +155,7 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
                 .fill("url", url)
                 .fill("user", user)
                 .fill("password", "")
-                .fill("branchPattern", branchPattern)
+                .fill("tagFilterPattern", tagFilterPattern)
                 .fill("browserForPath", browserForPath)
                 .fill("browserForRevision", browserForRevision)
                 .fill("browserForChange", browserForChange)
@@ -180,8 +172,6 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
                 url,
                 user,
                 password,
-                branchPattern,
-                tagPattern,
                 tagFilterPattern,
                 browserForPath,
                 browserForRevision,
@@ -237,8 +227,6 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
                 replacementFunction.apply(url),
                 replacementFunction.apply(user),
                 password,
-                replacementFunction.apply(branchPattern),
-                replacementFunction.apply(tagPattern),
                 replacementFunction.apply(tagFilterPattern),
                 replacementFunction.apply(browserForPath),
                 replacementFunction.apply(browserForRevision),

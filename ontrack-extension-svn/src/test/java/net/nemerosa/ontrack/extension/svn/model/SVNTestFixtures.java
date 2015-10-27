@@ -12,8 +12,6 @@ public final class SVNTestFixtures {
                 "user",
                 "secret",
                 "",
-                "",
-                "",
                 "http://browser/file/{path}",
                 "http://browser/revision/{revision}",
                 "http://browser/file/{path}/{revision}",
