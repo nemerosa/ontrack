@@ -80,22 +80,6 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
                                 .optional()
                 )
                 .with(
-                        Text.of("branchPattern")
-                                .label("Branch pattern")
-                                .length(250)
-                                .optional()
-                                .help("Regular expression applied to SVN paths in order to detect the branches. " +
-                                        "It defaults to .*/branches/.*")
-                )
-                .with(
-                        Text.of("tagPattern")
-                                .label("Tag pattern")
-                                .length(250)
-                                .optional()
-                                .help("Regular expression applied to SVN paths in order to detect the tags. " +
-                                        "It defaults to .*/tags/.*")
-                )
-                .with(
                         Text.of("tagFilterPattern")
                                 .label("Tag filter pattern")
                                 .length(100)
@@ -180,8 +164,6 @@ public class SVNConfiguration implements UserPasswordConfiguration<SVNConfigurat
                 .fill("user", user)
                 .fill("password", "")
                 .fill("branchPattern", branchPattern)
-                .fill("tagPattern", tagPattern)
-                .fill("tagFilterPattern", tagFilterPattern)
                 .fill("browserForPath", browserForPath)
                 .fill("browserForRevision", browserForRevision)
                 .fill("browserForChange", browserForChange)
