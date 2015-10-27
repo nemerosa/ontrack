@@ -179,9 +179,10 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
-    public void builds(Branch branch, Predicate<Build> buildPredicate) {
+    public void builds(Branch branch, Predicate<Build> buildPredicate, BuildSortDirection sortDirection) {
+        String order = sortDirection == BuildSortDirection.FROM_NEWEST ? "DESC" : "ASC";
         getNamedParameterJdbcTemplate().execute(
-                "SELECT * FROM BUILDS WHERE BRANCHID = :branchId ORDER BY ID DESC",
+                "SELECT * FROM BUILDS WHERE BRANCHID = :branchId ORDER BY ID " + order,
                 params("branchId", branch.id()),
                 ps -> {
                     ResultSet rs = ps.executeQuery();

@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -315,6 +316,28 @@ public class StructureServiceImpl implements StructureService {
         List<Build> builds = new ArrayList<>();
         structureRepository.builds(branch, build -> filterBuild(builds, branch, build, buildFilter));
         return builds;
+    }
+
+    @Override
+    public Optional<Build> findBuild(ID branchId, Predicate<Build> buildPredicate, BuildSortDirection sortDirection) {
+        // Gets the branch
+        Branch branch = getBranch(branchId);
+        // Build being found
+        AtomicReference<Build> ref = new AtomicReference<>();
+        // Loops over the builds
+        structureRepository.builds(
+                branch,
+                build -> {
+                    boolean ok = buildPredicate.test(build);
+                    if (ok) {
+                        ref.set(build);
+                    }
+                    return !ok; // Going on if no match
+                },
+                sortDirection
+        );
+        // Result
+        return Optional.ofNullable(ref.get());
     }
 
     @Override

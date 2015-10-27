@@ -57,7 +57,14 @@ public interface StructureRepository {
      * Iterates over the builds of the branch, from the newest to the oldest, until
      * the <code>buildPredicate</code> returns <code>false</code>.
      */
-    void builds(Branch branch, Predicate<Build> buildPredicate);
+    default void builds(Branch branch, Predicate<Build> buildPredicate) {
+        builds(branch, buildPredicate, BuildSortDirection.FROM_NEWEST);
+    }
+
+    /**
+     * Iterates over the builds of the branch.
+     */
+    void builds(Branch branch, Predicate<Build> buildPredicate, BuildSortDirection sortDirection);
 
     /**
      * Iterates over the builds of the project, from the newest to the oldest, until
@@ -133,15 +140,15 @@ public interface StructureRepository {
 
     // Validation runs
 
-    ValidationRun newValidationRun(ValidationRun validationRun, Function<String,ValidationRunStatusID> validationRunStatusService);
+    ValidationRun newValidationRun(ValidationRun validationRun, Function<String, ValidationRunStatusID> validationRunStatusService);
 
-    ValidationRun getValidationRun(ID validationRunId, Function<String,ValidationRunStatusID> validationRunStatusService);
+    ValidationRun getValidationRun(ID validationRunId, Function<String, ValidationRunStatusID> validationRunStatusService);
 
-    List<ValidationRun> getValidationRunsForBuild(Build build, Function<String,ValidationRunStatusID> validationRunStatusService);
+    List<ValidationRun> getValidationRunsForBuild(Build build, Function<String, ValidationRunStatusID> validationRunStatusService);
 
-    List<ValidationRun> getValidationRunsForBuildAndValidationStamp(Build build, ValidationStamp validationStamp, Function<String,ValidationRunStatusID> validationRunStatusService);
+    List<ValidationRun> getValidationRunsForBuildAndValidationStamp(Build build, ValidationStamp validationStamp, Function<String, ValidationRunStatusID> validationRunStatusService);
 
-    List<ValidationRun> getValidationRunsForValidationStamp(ValidationStamp validationStamp, int offset, int count, Function<String,ValidationRunStatusID> validationRunStatusService);
+    List<ValidationRun> getValidationRunsForValidationStamp(ValidationStamp validationStamp, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService);
 
     ValidationRun newValidationRunStatus(ValidationRun validationRun, ValidationRunStatus runStatus);
 }

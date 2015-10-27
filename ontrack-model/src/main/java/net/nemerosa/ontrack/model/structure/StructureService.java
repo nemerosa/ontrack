@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 public interface StructureService {
 
@@ -69,6 +70,17 @@ public interface StructureService {
     /**
      * Branch builds
      */
+
+    /**
+     * Looks for the first build which matches a given predicate.
+     *
+     * @param branchId       Branch to look builds into
+     * @param buildPredicate Predicate for a match
+     * @param sortDirection  Build search direction
+     * @return Build if found, empty otherwise
+     */
+    Optional<Build> findBuild(ID branchId, Predicate<Build> buildPredicate, BuildSortDirection sortDirection);
+
     List<Build> getFilteredBuilds(ID branchId, BuildFilter buildFilter);
 
     Optional<Build> getLastBuild(ID branchId);

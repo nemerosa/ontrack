@@ -5,15 +5,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.svn.model.BuildSvnRevisionLink;
 import net.nemerosa.ontrack.extension.svn.model.SVNLocation;
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty;
-import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.exceptions.JsonParsingException;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Build;
+import net.nemerosa.ontrack.model.structure.BuildSortDirection;
 import net.nemerosa.ontrack.model.structure.StructureService;
-import net.nemerosa.ontrack.model.support.NoConfig;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -93,11 +92,16 @@ public class RevisionPatternSvnRevisionLink implements BuildSvnRevisionLink<Revi
 
     @Override
     public Optional<Build> getEarliestBuild(RevisionPattern data, Branch branch, SVNLocation location, SVNLocation firstCopy, SVNBranchConfigurationProperty branchConfigurationProperty) {
-        // FIXME Earliest build using revision pattern
         // Checks the path
         if (StringUtils.equals(branchConfigurationProperty.getBranchPath(), location.getPath())) {
-            String buildName = String.valueOf(location.getRevision());
-            return structureService.findBuildAfterUsingNumericForm(branch.getId(), buildName);
+            return structureService.findBuild(
+                    branch.getId(),
+                    build -> {
+                        OptionalLong oRevision = getRevision(data, build, branchConfigurationProperty);
+                        return oRevision.isPresent() && oRevision.getAsLong() >= location.getRevision();
+                    },
+                    BuildSortDirection.FROM_OLDEST
+            );
         } else {
             return Optional.empty();
         }
