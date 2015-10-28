@@ -7,8 +7,7 @@ import net.nemerosa.ontrack.tx.TransactionService;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 public class SVNClientImplTest {
@@ -20,6 +19,41 @@ public class SVNClientImplTest {
         SVNEventDao svnEventDao = mock(SVNEventDao.class);
         TransactionService transactionService = mock(TransactionService.class);
         client = new SVNClientImpl(svnEventDao, transactionService);
+    }
+
+    @Test
+    public void getBasePath_project_trunk_path() {
+        assertFalse(client.getBasePath(repository(), "/project/trunk/path").isPresent());
+    }
+
+    @Test
+    public void getBasePath_project_trunk() {
+        assertEquals("/project", client.getBasePath(repository(), "/project/trunk").get());
+    }
+
+    @Test
+    public void getBasePath_trunk() {
+        assertEquals("", client.getBasePath(repository(), "/trunk").get());
+    }
+
+    @Test
+    public void getBasePath_project_branch_path() {
+        assertFalse(client.getBasePath(repository(), "/project/branches/1.1/path").isPresent());
+    }
+
+    @Test
+    public void getBasePath_project_branch() {
+        assertEquals("/project", client.getBasePath(repository(), "/project/branches/1.1").get());
+    }
+
+    @Test
+    public void getBasePath_branch() {
+        assertEquals("", client.getBasePath(repository(), "/branches/1.1").get());
+    }
+
+    @Test
+    public void getBasePath_path() {
+        assertFalse(client.getBasePath(repository(), "/project/any/path").isPresent());
     }
 
     @Test
