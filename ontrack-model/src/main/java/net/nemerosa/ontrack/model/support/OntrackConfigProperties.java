@@ -23,16 +23,6 @@ public class OntrackConfigProperties {
     private String applicationWorkingDir = "work/files";
 
     /**
-     * Graphite host for metrics, disabled by default
-     */
-    private String graphiteHost = null;
-
-    /**
-     * Graphite port for metrics
-     */
-    private int graphitePort = 2003;
-
-    /**
      * Metrics refresh period (in seconds)
      */
     private int metricsPeriod = 60;
