@@ -18,6 +18,11 @@ public class GraphiteMetricsConfigProperties {
     public static final String PREFIX = "ontrack.metrics.graphite";
 
     /**
+     * Criteria (host) prefix
+     */
+    public static final String HOST_PROPERTY = "ontrack.metrics.graphite.host";
+
+    /**
      * Host
      */
     private String host;

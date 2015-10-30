@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  * Enabling the metrics in Graphite.
  */
 @Configuration
-@ConditionalOnProperty(name = GraphiteMetricsConfigProperties.PREFIX, havingValue = "")
+@ConditionalOnProperty(name = GraphiteMetricsConfigProperties.HOST_PROPERTY, havingValue = "")
 public class GraphiteMetricsConfig {
 
     private final Logger logger = LoggerFactory.getLogger(GraphiteMetricsConfig.class);
