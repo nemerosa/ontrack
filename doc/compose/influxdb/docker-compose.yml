@@ -1,0 +1,17 @@
+# InfluxDB container
+influxdb:
+  image: tutum/influxdb:0.9
+  ports:
+    - "8083"
+    - "8086"
+# Grafana container
+grafana:
+  image: tutum/grafana:latest
+  ports:
+    - "80"
+  links:
+    - "influxdb:influxdb"
+  environment:
+    INFLUXDB_HOST: influxdb
+    INFLUXDB_NAME: ontrack
+    HTTP_PASS: admin
