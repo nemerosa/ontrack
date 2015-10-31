@@ -2,8 +2,9 @@ package net.nemerosa.ontrack.extension.metrics.influxdb;
 
 import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
-import metrics_influxdb.InfluxdbHttp;
-import metrics_influxdb.InfluxdbReporter;
+import io.dropwizard.metrics.influxdb.InfluxDbHttpSender;
+import io.dropwizard.metrics.influxdb.InfluxDbReporter;
+import io.dropwizard.metrics.influxdb.InfluxDbSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +12,15 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Enabling the metrics in Graphite.
+ * <p>
+ * The InfluxdbReporter from net.alchim31 is not compatible with InfluxDB 0.9, the official InfluxDBReporter
+ * from DropWizards is not released yet
+ * TODO Use DroWizard InfluxDB 4.x as soon as out
  */
 @Configuration
 @ConditionalOnProperty(name = InfluxdbMetricsConfigProperties.HOST_PROPERTY, havingValue = "")
@@ -29,8 +35,8 @@ public class InfluxdbMetricsConfig {
     private MetricRegistry registry;
 
     @Bean
-    public InfluxdbHttp influxdb() throws Exception {
-        return new InfluxdbHttp(
+    public InfluxDbSender influxdb() throws Exception {
+        return new InfluxDbHttpSender(
                 config.getHost(),
                 config.getPort(),
                 config.getDatabase(),
@@ -40,10 +46,10 @@ public class InfluxdbMetricsConfig {
     }
 
     @Bean
-    public InfluxdbReporter influxdbReporter() throws Exception {
-        InfluxdbReporter reporter = InfluxdbReporter
+    public InfluxDbReporter influxdbReporter() throws Exception {
+        InfluxDbReporter reporter = InfluxDbReporter
                 .forRegistry(registry)
-                .prefixedWith("ontrack")
+                .withTags(Collections.singletonMap("src", "ontrack"))
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
                 .filter(MetricFilter.ALL)

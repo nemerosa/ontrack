@@ -71,7 +71,6 @@ ext {
             // Metrics
             metrics_core                : "io.dropwizard.metrics:metrics-graphite:${metricsVersion}",
             metrics_graphite            : "io.dropwizard.metrics:metrics-graphite:${metricsVersion}",
-            metrics_influxdb            : 'net.alchim31:metrics-influxdb:0.7.0',
 
             // Test
             junit                       : 'junit:junit:4.11',

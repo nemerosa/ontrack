@@ -1,5 +1,4 @@
 dependencies {
     compile libraries.metrics_core
-    compile libraries.metrics_influxdb
     compile project(':ontrack-extension-metrics-support')
 }
