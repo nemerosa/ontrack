@@ -2,25 +2,22 @@ package net.nemerosa.ontrack.extension.svn.service
 
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
+import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository
 import net.nemerosa.ontrack.extension.svn.db.SVNRepositoryDao
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationPropertyType
-import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
-import net.nemerosa.ontrack.extension.svn.support.SVNProfileValueSource
-import net.nemerosa.ontrack.extension.svn.support.SVNTestRepo
-import net.nemerosa.ontrack.extension.svn.support.SVNTestUtils
-import net.nemerosa.ontrack.extension.svn.support.TagNameSvnRevisionLink
+import net.nemerosa.ontrack.extension.svn.support.*
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.PropertyService
-import org.junit.AfterClass
-import org.junit.BeforeClass
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.annotation.ProfileValueSourceConfiguration
@@ -30,15 +27,15 @@ import static net.nemerosa.ontrack.model.structure.NameDescription.nd
 @ProfileValueSourceConfiguration(SVNProfileValueSource)
 class SVNChangeLogIT extends AbstractServiceTestSupport {
 
-    private static SVNTestRepo repo
+    private SVNTestRepo repo
 
-    @BeforeClass
-    static void 'SVN repository: start'() {
+    @Before
+    void 'SVN repository: start'() {
         repo = SVNTestRepo.get('SVNChangeLogIT')
     }
 
-    @AfterClass
-    static void 'SVN repository: stop'() {
+    @After
+    void 'SVN repository: stop'() {
         repo.stop()
     }
 
@@ -59,6 +56,9 @@ class SVNChangeLogIT extends AbstractServiceTestSupport {
 
     @Autowired
     private SVNRepositoryDao repositoryDao
+
+    @Autowired
+    private RevisionPatternSvnRevisionLink revisionPatternSvnRevisionLink
 
 
     @Test
@@ -149,6 +149,94 @@ class SVNChangeLogIT extends AbstractServiceTestSupport {
 
         def changeLogRevisions = svnChangeLogService.getChangeLogRevisions(changeLog)
         assert changeLogRevisions.list.collect { it.message } == ['6', '5', '4']
+
+    }
+
+    @Test
+    void 'SVN Change log with revision pattern'() {
+
+        /**
+         * Preparation of a repository with a few commits on the trunk
+         */
+
+        repo.mkdir 'SVNChangeLogWithRevisionPattern/trunk', 'Trunk'
+        (1..10).each { repo.mkdir "SVNChangeLogWithRevisionPattern/trunk/$it", "$it" }
+
+        /**
+         * Definition of the repository
+         */
+
+        def configuration = SVNTestUtils.repository().configuration
+        def repositoryId = repositoryDao.getOrCreateByName(configuration.name)
+        def repository = SVNRepository.of(repositoryId, configuration, null)
+
+        /**
+         * Saves the configuration
+         */
+
+        asUser().with(GlobalSettings).call {
+            configuration = svnConfigurationService.newConfiguration(configuration)
+        }
+
+        /**
+         * Indexation of this repository
+         */
+
+        asUser().with(GlobalSettings).call {
+            ((IndexationServiceImpl) indexationService).indexFromLatest(repository, { println it })
+        }
+
+        /**
+         * Branch with this configuration
+         */
+
+        Branch branch = doCreateBranch()
+        asUser().with(branch, ProjectEdit).call {
+            propertyService.editProperty(branch.project, SVNProjectConfigurationPropertyType, new SVNProjectConfigurationProperty(
+                    configuration,
+                    '/SVNChangeLogWithRevisionPattern/trunk'
+            ))
+            propertyService.editProperty(branch, SVNBranchConfigurationPropertyType, new SVNBranchConfigurationProperty(
+                    '/SVNChangeLogWithRevisionPattern/trunk',
+                    new ConfiguredBuildSvnRevisionLink<>(
+                            revisionPatternSvnRevisionLink,
+                            new RevisionPattern("1.0.*-{revision}")
+                    ).toServiceConfiguration()
+            ))
+        }
+
+        /**
+         * Builds for some revisions
+         */
+
+        def build1 = doCreateBuild(branch, nd("1.0.0-5", "Build 5"))
+        def build2 = doCreateBuild(branch, nd("1.0.1-9", "Build 9"))
+
+        /**
+         * Change log
+         */
+
+        def diff = new BuildDiffRequest()
+        diff.from = build1.id
+        diff.to = build2.id
+        def changeLog = asUser().with(branch, ProjectView).call {
+            svnChangeLogService.changeLog(diff)
+        }
+
+        /**
+         * Checks the change log
+         */
+
+        assert changeLog.branch == branch
+        assert changeLog.from.build == build1
+        assert changeLog.to.build == build2
+
+        /**
+         * Gets the revisions
+         */
+
+        def changeLogRevisions = svnChangeLogService.getChangeLogRevisions(changeLog)
+        assert changeLogRevisions.list.collect { it.revision } as long[] == [9, 8, 7, 6] as long[]
 
     }
 
