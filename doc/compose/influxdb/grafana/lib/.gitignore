@@ -1,1 +1,2 @@
-grafana.db
+/grafana.db
+/sessions
