@@ -4,6 +4,8 @@ influxdb:
   ports:
     - "8083"
     - "8086"
+  environment:
+    PRE_CREATE_DB: "ontrack"
 # Grafana container
 grafana:
   image: grafana/grafana:latest
