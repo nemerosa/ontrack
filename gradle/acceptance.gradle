@@ -8,6 +8,7 @@
  * ./gradlew build localAcceptanceTest
  */
 
+import net.nemerosa.ontrack.gradle.ComposeUp
 import net.nemerosa.ontrack.gradle.DockerOntrackStart
 import net.nemerosa.ontrack.gradle.DockerStop
 import net.nemerosa.ontrack.gradle.DOSetup
@@ -16,6 +17,12 @@ import net.nemerosa.ontrack.gradle.RemoteAcceptanceTest
 /**
  * CI environment
  */
+
+task ciStart(type: ComposeUp) {
+    machine = project.properties.ciMachine
+    dir = file("${rootDir}/gradle/compose/ci")
+    forceRecreate = true
+}
 
 task ciDockerStart(type: DockerOntrackStart) {
     image = "nemerosa/ontrack:latest"
