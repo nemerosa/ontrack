@@ -6,6 +6,7 @@ influxdb:
     - "8086"
   environment:
     PRE_CREATE_DB: "ontrack"
+
 # Grafana container
 grafana:
   image: grafana/grafana:latest
@@ -16,3 +17,15 @@ grafana:
 #  volumes:
 #    - "./grafana/etc:/etc/grafana"
 #    - "./grafana/lib:/var/lib/grafana"
+
+# Ontrack container
+ontrack:
+  image: nemerosa/ontrack:latest
+  environment:
+      PROFILE: acceptance
+  volumes:
+    - "./ontrack:/var/ontrack/conf"
+  ports:
+    - "443"
+  links:
+    - "influxdb:influxdb"
