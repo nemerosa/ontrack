@@ -30,7 +30,7 @@ public class InfluxdbMetricsConfigProperties {
     /**
      * Port
      */
-    private int port = 8083;
+    private int port = 8086;
 
     /**
      * User
