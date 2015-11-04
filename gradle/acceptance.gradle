@@ -31,22 +31,16 @@ task ciStop(type: ComposeStop) {
     remove = true
 }
 
-task ciDockerStart(type: DockerOntrackStart) {
-    image = "nemerosa/ontrack:latest"
-    conf = file('gradle/env/ci')
-    profile = 'acceptance'
-}
-
-task ciDockerStop(type: DockerStop) {
-    startTask = 'ciDockerStart'
-}
-
 task ciAcceptanceTest(type: RemoteAcceptanceTest) {
-    acceptanceUrl = { "https://${project.properties.acceptanceHost}:${ciDockerStart.getActualPort(443)}" }
+    acceptanceUrl = { "https://${ciStart.host}:${ciStart.getPublishedPort('ontrack', 443)}" }
     disableSsl = true
-    dependsOn ciDockerStart
-    finalizedBy ciDockerStop
+    dependsOn ciStart
+    finalizedBy ciStop
 }
+
+/**
+ * Digital Ocean environment
+ */
 
 task doSetup(type: DOSetup) {
     doFirst {

@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.gradle
 
+import org.gradle.api.GradleException
+
 import java.util.regex.Pattern
 
 /**
@@ -16,6 +18,11 @@ abstract class AbstractCompose extends AbstractCDTask {
     String machine
 
     /**
+     * Host reference when not using the machine's IP
+     */
+    String host
+
+    /**
      * Alternative project compose file
      */
     String projectFile
@@ -29,6 +36,32 @@ abstract class AbstractCompose extends AbstractCDTask {
      * Verbose flag
      */
     boolean verbose
+
+    /**
+     * Gets the machine host
+     */
+    String getHost() {
+        if (host) {
+            return host
+        } else if (machine) {
+            return execute('docker-machine', 'ip', machine)
+        } else {
+            return 'localhost'
+        }
+    }
+
+    /**
+     * Gets the published port for a service
+     */
+    int getPublishedPort(String service, int containerPort) {
+        def output = compose('port', service, containerPort)
+        def m = Pattern.compile(/^.*:(\d+)$/).matcher(output)
+        if (m.matches()) {
+            m.group(1) as int
+        } else {
+            throw new GradleException("Cannot parse port from ${output}")
+        }
+    }
 
     /**
      * Compose command
