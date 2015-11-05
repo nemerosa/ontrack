@@ -28,3 +28,5 @@ ontrack:
       # The host is defined by the Docker link ontrack -> influxdb
       # Using the default internal port because of the link
       host: influxdb
+      # Increases the refresh period for test
+      period: 5
