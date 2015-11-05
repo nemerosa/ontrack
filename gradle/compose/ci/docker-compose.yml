@@ -1,6 +1,7 @@
 # InfluxDB container
 influxdb:
   image: tutum/influxdb:0.9
+  # Makes all ports accessible on the host for testing
   ports:
     - "8083"
     - "8086"
@@ -9,14 +10,11 @@ influxdb:
 
 # Grafana container
 grafana:
-  image: grafana/grafana:latest
+  build: ./grafana
   ports:
     - "3000"
   links:
     - "influxdb:influxdb"
-#  volumes:
-#    - "./grafana/etc:/etc/grafana"
-#    - "./grafana/lib:/var/lib/grafana"
 
 # Ontrack container
 ontrack:
