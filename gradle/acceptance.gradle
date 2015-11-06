@@ -74,7 +74,7 @@ task doEnv {
         }
         project.exec {
             executable 'docker-machine'
-            args = ['scp', '-r', 'gradle/env/ci', "ontrack-acceptance-${ontrackVersion}:/var/ontrack/conf"]
+            args = ['scp', '-r', 'gradle/compose/ci/ontrack', "ontrack-acceptance-${ontrackVersion}:/var/ontrack/conf"]
         }
     }
 }
@@ -85,6 +85,16 @@ task doDockerStart(type: DockerOntrackStart) {
     image = "nemerosa/ontrack:${ontrackVersion}"
     conf = file('/var/ontrack/conf')
     profile = 'acceptance'
+    mustRunAfter doEnv
+}
+
+task doStart(type: ComposeUp) {
+    machine = "ontrack-acceptance-${ontrackVersion}"
+    dir = file("${rootDir}/gradle/compose")
+    projectFiles = ['docker-compose.yml', 'docker-compose-do.yml']
+    projectName = 'do'
+    forceRecreate = true
+    environment = [ONTRACK_VERSION: ontrackVersion]
     mustRunAfter doEnv
 }
 

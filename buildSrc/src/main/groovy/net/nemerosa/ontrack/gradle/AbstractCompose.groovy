@@ -38,6 +38,11 @@ abstract class AbstractCompose extends AbstractCDTask {
     boolean verbose
 
     /**
+     * Environment variables
+     */
+    Map<String, ?> environment = [:]
+
+    /**
      * Gets the machine host
      */
     String getHost() {
@@ -84,8 +89,12 @@ abstract class AbstractCompose extends AbstractCDTask {
         }
         // Adds all arguments
         list.addAll(arguments.collect { it as String } as List)
+        // Environment variables
+        Map<String, ?> env = [:]
+        env.putAll dockerEnvironment
+        env.putAll environment
         // Running
-        execute(dockerEnvironment, 'docker-compose', list)
+        execute(env, 'docker-compose', list)
     }
 
     /**

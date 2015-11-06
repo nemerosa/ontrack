@@ -1,0 +1,18 @@
+# InfluxDB container
+influxdb:
+  # Makes all ports accessible on the host for testing
+  ports:
+    - "8083"
+    - "8086"
+
+# Ontrack container
+ontrack:
+  image: nemerosa/ontrack:${ONTRACK_VERSION}
+  environment:
+      PROFILE: acceptance
+  volumes:
+    - "./ci/ontrack:/var/ontrack/conf"
+    # Better startup performances in CI and DO, do not use in Prod
+    - "/dev/urandom:/dev/random"
+  ports:
+    - "443"
