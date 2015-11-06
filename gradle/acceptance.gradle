@@ -8,12 +8,8 @@
  * ./gradlew build localAcceptanceTest
  */
 
-import net.nemerosa.ontrack.gradle.ComposeStop
-import net.nemerosa.ontrack.gradle.ComposeUp
-import net.nemerosa.ontrack.gradle.DockerOntrackStart
-import net.nemerosa.ontrack.gradle.DockerStop
-import net.nemerosa.ontrack.gradle.DOSetup
-import net.nemerosa.ontrack.gradle.RemoteAcceptanceTest
+
+import net.nemerosa.ontrack.gradle.*
 
 /**
  * CI environment
@@ -21,13 +17,17 @@ import net.nemerosa.ontrack.gradle.RemoteAcceptanceTest
 
 task ciStart(type: ComposeUp) {
     machine = project.properties.ciMachine
-    dir = file("${rootDir}/gradle/compose/ci")
+    dir = file("${rootDir}/gradle/compose")
+    projectFiles = ['docker-compose.yml', 'docker-compose-ci.yml']
+    projectName = 'ci'
     forceRecreate = true
 }
 
 task ciStop(type: ComposeStop) {
     machine = project.properties.ciMachine
-    dir = file("${rootDir}/gradle/compose/ci")
+    dir = file("${rootDir}/gradle/compose")
+    projectFiles = ['docker-compose.yml', 'docker-compose-ci.yml']
+    projectName = 'ci'
     remove = true
 }
 

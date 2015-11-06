@@ -1,0 +1,19 @@
+# InfluxDB container
+influxdb:
+  image: tutum/influxdb:0.9
+  environment:
+    PRE_CREATE_DB: "ontrack"
+
+# Grafana container
+grafana:
+  build: ./common/grafana
+  ports:
+    - "3000"
+  links:
+    - "influxdb:influxdb"
+
+# Ontrack container
+ontrack:
+  image: nemerosa/ontrack:latest
+  links:
+    - "influxdb:influxdb"

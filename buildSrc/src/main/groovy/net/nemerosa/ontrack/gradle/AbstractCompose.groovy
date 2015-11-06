@@ -23,9 +23,9 @@ abstract class AbstractCompose extends AbstractCDTask {
     String host
 
     /**
-     * Alternative project compose file
+     * Alternative project compose file(s)
      */
-    String projectFile
+    List<String> projectFiles
 
     /**
      * Project name
@@ -69,9 +69,11 @@ abstract class AbstractCompose extends AbstractCDTask {
     String compose(Object... arguments) {
         List<String> list = []
         // General options
-        if (projectFile) {
-            list.add("--file")
-            list.add(projectFile)
+        if (projectFiles) {
+            projectFiles.each { projectFile ->
+                list.add("--file")
+                list.add(projectFile)
+            }
         }
         if (projectName) {
             list.add("--project-name")
