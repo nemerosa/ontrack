@@ -62,7 +62,7 @@ task doSetup(type: DOSetup) {
 task doTeardown(type: Exec) {
     executable 'docker-machine'
     args = ['rm', '--force', "ontrack-acceptance-${ontrackVersion}"]
-    mustRunAfter 'doDockerStop'
+    mustRunAfter 'doStop'
 }
 
 task doEnv {
