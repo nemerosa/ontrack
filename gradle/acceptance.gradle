@@ -79,6 +79,7 @@ task doEnv {
     }
 }
 
+// TODO Remove doDockerStart
 task doDockerStart(type: DockerOntrackStart) {
     machine = "ontrack-acceptance-${ontrackVersion}"
     exposePort = true
@@ -98,9 +99,19 @@ task doStart(type: ComposeUp) {
     mustRunAfter doEnv
 }
 
+// TODO Remove doDockerStop
 task doDockerStop(type: DockerStop) {
     machine = "ontrack-acceptance-${ontrackVersion}"
     startTask = 'doDockerStart'
+}
+
+task doStop(type: ComposeStop) {
+    machine = "ontrack-acceptance-${ontrackVersion}"
+    dir = file("${rootDir}/gradle/compose")
+    projectFiles = ['docker-compose.yml', 'docker-compose-ci.yml']
+    projectName = 'do'
+    remove = true
+    environment = [ONTRACK_VERSION: ontrackVersion]
 }
 
 task doAcceptanceTest(type: RemoteAcceptanceTest) {
@@ -110,6 +121,8 @@ task doAcceptanceTest(type: RemoteAcceptanceTest) {
     disableSsl = true
     dependsOn doSetup
     dependsOn doEnv
+    // TODO dependsOn doStart
+    // TODO finalizedBy doStop
     dependsOn doDockerStart
     finalizedBy doDockerStop
     finalizedBy doTeardown
