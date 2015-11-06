@@ -79,16 +79,6 @@ task doEnv {
     }
 }
 
-// TODO Remove doDockerStart
-task doDockerStart(type: DockerOntrackStart) {
-    machine = "ontrack-acceptance-${ontrackVersion}"
-    exposePort = true
-    image = "nemerosa/ontrack:${ontrackVersion}"
-    conf = file('/var/ontrack/conf')
-    profile = 'acceptance'
-    mustRunAfter doEnv
-}
-
 task doStart(type: ComposeUp) {
     machine = "ontrack-acceptance-${ontrackVersion}"
     dir = file("${rootDir}/gradle/compose")
@@ -97,12 +87,6 @@ task doStart(type: ComposeUp) {
     forceRecreate = true
     environment = [ONTRACK_VERSION: ontrackVersion]
     mustRunAfter doEnv
-}
-
-// TODO Remove doDockerStop
-task doDockerStop(type: DockerStop) {
-    machine = "ontrack-acceptance-${ontrackVersion}"
-    startTask = 'doDockerStart'
 }
 
 task doStop(type: ComposeStop) {
@@ -121,9 +105,7 @@ task doAcceptanceTest(type: RemoteAcceptanceTest) {
     disableSsl = true
     dependsOn doSetup
     dependsOn doEnv
-    // TODO dependsOn doStart
-    // TODO finalizedBy doStop
-    dependsOn doDockerStart
-    finalizedBy doDockerStop
+    dependsOn doStart
+    finalizedBy doStop
     finalizedBy doTeardown
 }
