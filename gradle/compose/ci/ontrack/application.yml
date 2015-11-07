@@ -23,6 +23,8 @@ ontrack:
     svn:
       test: false
   # Integration with InfluxDB for the metrics
+  config:
+    metrics-period: 5
   metrics:
     influxdb:
       # The host is defined by the Docker link ontrack -> influxdb
