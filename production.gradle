@@ -137,7 +137,7 @@ task productionStop(type: ComposeStop) {
     dir = file("${rootDir}/gradle/compose")
     projectFiles = ['docker-compose.yml', 'docker-compose-prod.yml']
     projectName = 'prod'
-    remove = true
+    remove = false
     environment = [ONTRACK_VERSION: ontrackVersion]
 }
 
