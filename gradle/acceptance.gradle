@@ -8,31 +8,39 @@
  * ./gradlew build localAcceptanceTest
  */
 
-import net.nemerosa.ontrack.gradle.DockerOntrackStart
-import net.nemerosa.ontrack.gradle.DockerStop
-import net.nemerosa.ontrack.gradle.DOSetup
-import net.nemerosa.ontrack.gradle.RemoteAcceptanceTest
+
+import net.nemerosa.ontrack.gradle.*
 
 /**
  * CI environment
  */
 
-task ciDockerStart(type: DockerOntrackStart) {
-    image = "nemerosa/ontrack:latest"
-    conf = file('gradle/env/ci')
-    profile = 'acceptance'
+task ciStart(type: ComposeUp) {
+    machine = project.properties.ciMachine
+    dir = file("${rootDir}/gradle/compose")
+    projectFiles = ['docker-compose.yml', 'docker-compose-ci.yml']
+    projectName = 'ci'
+    forceRecreate = true
 }
 
-task ciDockerStop(type: DockerStop) {
-    startTask = 'ciDockerStart'
+task ciStop(type: ComposeStop) {
+    machine = project.properties.ciMachine
+    dir = file("${rootDir}/gradle/compose")
+    projectFiles = ['docker-compose.yml', 'docker-compose-ci.yml']
+    projectName = 'ci'
+    remove = true
 }
 
 task ciAcceptanceTest(type: RemoteAcceptanceTest) {
-    acceptanceUrl = { "https://${project.properties.acceptanceHost}:${ciDockerStart.getActualPort(443)}" }
+    acceptanceUrl = { "https://${ciStart.host}:${ciStart.getPublishedPort('ontrack', 443)}" }
     disableSsl = true
-    dependsOn ciDockerStart
-    finalizedBy ciDockerStop
+    dependsOn ciStart
+    finalizedBy ciStop
 }
+
+/**
+ * Digital Ocean environment
+ */
 
 task doSetup(type: DOSetup) {
     doFirst {
@@ -54,7 +62,7 @@ task doSetup(type: DOSetup) {
 task doTeardown(type: Exec) {
     executable 'docker-machine'
     args = ['rm', '--force', "ontrack-acceptance-${ontrackVersion}"]
-    mustRunAfter 'doDockerStop'
+    mustRunAfter 'doStop'
 }
 
 task doEnv {
@@ -66,23 +74,28 @@ task doEnv {
         }
         project.exec {
             executable 'docker-machine'
-            args = ['scp', '-r', 'gradle/env/ci', "ontrack-acceptance-${ontrackVersion}:/var/ontrack/conf"]
+            args = ['scp', '-r', 'gradle/compose/ci/ontrack', "ontrack-acceptance-${ontrackVersion}:/var/ontrack/conf"]
         }
     }
 }
 
-task doDockerStart(type: DockerOntrackStart) {
+task doStart(type: ComposeUp) {
     machine = "ontrack-acceptance-${ontrackVersion}"
-    exposePort = true
-    image = "nemerosa/ontrack:${ontrackVersion}"
-    conf = file('/var/ontrack/conf')
-    profile = 'acceptance'
+    dir = file("${rootDir}/gradle/compose")
+    projectFiles = ['docker-compose.yml', 'docker-compose-do.yml']
+    projectName = 'do'
+    forceRecreate = true
+    environment = [ONTRACK_VERSION: ontrackVersion]
     mustRunAfter doEnv
 }
 
-task doDockerStop(type: DockerStop) {
+task doStop(type: ComposeStop) {
     machine = "ontrack-acceptance-${ontrackVersion}"
-    startTask = 'doDockerStart'
+    dir = file("${rootDir}/gradle/compose")
+    projectFiles = ['docker-compose.yml', 'docker-compose-ci.yml']
+    projectName = 'do'
+    remove = true
+    environment = [ONTRACK_VERSION: ontrackVersion]
 }
 
 task doAcceptanceTest(type: RemoteAcceptanceTest) {
@@ -92,7 +105,7 @@ task doAcceptanceTest(type: RemoteAcceptanceTest) {
     disableSsl = true
     dependsOn doSetup
     dependsOn doEnv
-    dependsOn doDockerStart
-    finalizedBy doDockerStop
+    dependsOn doStart
+    finalizedBy doStop
     finalizedBy doTeardown
 }

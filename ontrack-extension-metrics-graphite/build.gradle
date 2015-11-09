@@ -1,0 +1,4 @@
+dependencies {
+    compile libraries.metrics_graphite
+    compile project(':ontrack-extension-metrics-support')
+}

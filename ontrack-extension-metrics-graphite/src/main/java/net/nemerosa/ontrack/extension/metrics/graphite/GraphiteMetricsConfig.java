@@ -1,10 +1,9 @@
-package net.nemerosa.ontrack.boot.metrics;
+package net.nemerosa.ontrack.extension.metrics.graphite;
 
 import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.graphite.Graphite;
 import com.codahale.metrics.graphite.GraphiteReporter;
-import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,14 +13,17 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Enabling the metrics in Graphite.
+ */
 @Configuration
-@ConditionalOnProperty(name = "ontrack.config.graphite-host", havingValue = "")
-public class MetricsConfig {
+@ConditionalOnProperty(name = GraphiteMetricsConfigProperties.HOST_PROPERTY, havingValue = "")
+public class GraphiteMetricsConfig {
 
-    private final Logger logger = LoggerFactory.getLogger(MetricsConfig.class);
+    private final Logger logger = LoggerFactory.getLogger(GraphiteMetricsConfig.class);
 
     @Autowired
-    private OntrackConfigProperties config;
+    private GraphiteMetricsConfigProperties config;
 
     @Autowired
     private MetricRegistry registry;
@@ -29,8 +31,8 @@ public class MetricsConfig {
     @Bean
     public Graphite graphite() {
         return new Graphite(
-                config.getGraphiteHost(),
-                config.getGraphitePort()
+                config.getHost(),
+                config.getPort()
         );
     }
 
@@ -44,10 +46,9 @@ public class MetricsConfig {
                 .build(graphite());
         logger.info(
                 "[metrics] Starting Graphite reporting to {}:{}",
-                config.getGraphiteHost(),
-                config.getGraphitePort());
-        reporter.start(config.getMetricsPeriod(), TimeUnit.SECONDS);
+                config.getHost(),
+                config.getPort());
+        reporter.start(config.getPeriod(), TimeUnit.SECONDS);
         return reporter;
     }
-
 }

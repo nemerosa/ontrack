@@ -17,9 +17,9 @@ buildscript {
 import net.nemerosa.httpclient.*
 import net.nemerosa.httpclient.json.*
 import net.nemerosa.ontrack.gradle.AbstractCDTask
+import net.nemerosa.ontrack.gradle.ComposeStop
+import net.nemerosa.ontrack.gradle.ComposeUp
 import net.nemerosa.ontrack.gradle.DOSetup
-import net.nemerosa.ontrack.gradle.DockerOntrackStart
-import net.nemerosa.ontrack.gradle.DockerStop
 import net.nemerosa.ontrack.gradle.RemoteAcceptanceTest
 
 class ProductionRestore extends AbstractCDTask {
@@ -131,14 +131,14 @@ task productionBackup {
     }
 }
 
-task productionStop(type: DockerStop) {
+task productionStop(type: ComposeStop) {
     dependsOn 'productionBackup'
     machine = project.properties.productionMachine
-    containerName = 'ontrack'
+    dir = file("${rootDir}/gradle/compose")
+    projectFiles = ['docker-compose.yml', 'docker-compose-prod.yml']
+    projectName = 'prod'
     remove = true
-    removeVolumes = false
-    ignoreError = true
-    logFile = null
+    environment = [ONTRACK_VERSION: ontrackVersion]
 }
 
 if (hasProperty('backup')) {
@@ -148,20 +148,13 @@ if (hasProperty('backup')) {
     }
 }
 
-task productionStart(type: DockerOntrackStart) {
-    dependsOn 'productionStop'
+task productionStart(type: ComposeUp) {
     machine = project.properties.productionMachine
-    exposePort = true
-    restart = true
-    containerName = 'ontrack'
-    image = "nemerosa/ontrack:${project.properties.ontrackVersion}"
-    conf = file('/var/ontrack/conf') // Dir on the host, provisioned initially by productionEnv
-    data = file('/var/ontrack/data') // Dir on the host, filled in by the application itself
-    urandom = false // Not using the urandom source for production
-    volumes = [
-            '/dev/random': '/dev/random', // Using the random source from the host
-    ]
-    profile = 'prod'
+    dir = file("${rootDir}/gradle/compose")
+    projectFiles = ['docker-compose.yml', 'docker-compose-prod.yml']
+    projectName = 'prod'
+    forceRecreate = true
+    environment = [ONTRACK_VERSION: ontrackVersion]
     mustRunAfter productionEnv
 }
 

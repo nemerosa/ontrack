@@ -1,2 +1,3 @@
 *.json
-application.properties
+/application.properties
+/application.yml
