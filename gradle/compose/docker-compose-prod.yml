@@ -1,0 +1,20 @@
+# InfluxDB container
+# Defaults are OK
+
+# Grafana container
+grafana:
+  ports:
+    - "3000:3000"
+
+# Ontrack container
+ontrack:
+  image: nemerosa/ontrack:${ONTRACK_VERSION}
+  environment:
+      PROFILE: prod
+  volumes:
+    - "/var/ontrack/conf:/var/ontrack/conf"
+    - "/var/ontrack/data:/var/ontrack/data"
+      # Using the random source from the host
+    - "/dev/random:/dev/random"
+  ports:
+    - "443:443"
