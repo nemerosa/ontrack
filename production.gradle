@@ -149,6 +149,7 @@ if (hasProperty('backup')) {
 }
 
 task productionStart(type: ComposeUp) {
+    dependsOn 'productionStop'
     machine = project.properties.productionMachine
     dir = file("${rootDir}/gradle/compose")
     projectFiles = ['docker-compose.yml', 'docker-compose-prod.yml']
