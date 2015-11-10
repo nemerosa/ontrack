@@ -55,7 +55,7 @@ class ComposeUp extends AbstractCompose {
 
     protected def rebuildImages() {
         // Arguments
-        List<?> args = ['build']
+        List<?> args = ['build', '--no-cache']
         // Service?
         if (service) {
             args << service
