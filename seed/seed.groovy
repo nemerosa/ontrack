@@ -397,6 +397,7 @@ docker logout
 --build-file publication.gradle
 --info
 --profile
+--stacktrace
 -Ppublication
 -PontrackVersion=\${VERSION_DISPLAY}
 -PontrackVersionCommit=\${VERSION_COMMIT}
@@ -409,6 +410,7 @@ publicationRelease
 --build-file publication.gradle
 --info
 --profile
+--stacktrace
 -Ppublication
 -PontrackVersion=\${VERSION_DISPLAY}
 -PontrackVersionCommit=\${VERSION_COMMIT}
