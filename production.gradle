@@ -155,7 +155,10 @@ task productionStart(type: ComposeUp) {
     projectFiles = ['docker-compose.yml', 'docker-compose-prod.yml']
     projectName = 'prod'
     forceRecreate = true
-    environment = [ONTRACK_VERSION: ontrackVersion]
+    environment = [
+            ONTRACK_VERSION: ontrackVersion,
+            GF_SECURITY_ADMIN_PASSWORD: productionGrafanaPassword,
+    ]
     mustRunAfter productionEnv
 }
 
