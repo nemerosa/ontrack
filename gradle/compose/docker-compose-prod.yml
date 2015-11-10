@@ -1,13 +1,16 @@
 # InfluxDB container
-# Defaults are OK
+influxdb:
+  restart: always
 
 # Grafana container
 grafana:
+  restart: always
   ports:
     - "3000:3000"
 
 # Ontrack container
 ontrack:
+  restart: always
   image: nemerosa/ontrack:${ONTRACK_VERSION}
   environment:
       PROFILE: prod
