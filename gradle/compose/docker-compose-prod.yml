@@ -1,6 +1,9 @@
 # InfluxDB container
 influxdb:
   restart: always
+  volumes:
+    # Keeping data on the host
+    - "/var/influxdb/data:/data"
 
 # Grafana container
 grafana:
@@ -8,10 +11,10 @@ grafana:
   ports:
     - "3000:3000"
   volumes:
-    - "/etc/grafana:/etc/grafana"
-    - "/var/lib/grafana:/var/lib/grafana"
+    # Editable dashboards
+    - "/usr/lib/grafana/dashboards:/usr/lib/grafana/dashboards"
   environment:
-    GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD}
+    - GF_SECURITY_ADMIN_PASSWORD
 
 # Ontrack container
 ontrack:
