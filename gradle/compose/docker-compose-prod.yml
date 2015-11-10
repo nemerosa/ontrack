@@ -7,6 +7,9 @@ grafana:
   restart: always
   ports:
     - "3000:3000"
+  volumes:
+    - "/etc/grafana:/etc/grafana"
+    - "/var/lib/grafana:/var/lib/grafana"
   environment:
     GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD}
 
