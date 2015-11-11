@@ -157,7 +157,6 @@ task productionStart(type: ComposeUp) {
     forceRecreate = true
     environment = [
             ONTRACK_VERSION: ontrackVersion,
-            GF_SECURITY_ADMIN_PASSWORD: productionGrafanaPassword,
     ]
     mustRunAfter productionEnv
 }

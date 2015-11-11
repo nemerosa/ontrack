@@ -487,7 +487,6 @@ label VERSION_DISPLAY
 -Ppublication
 productionUpgrade
 -PontrackVersion=${VERSION_DISPLAY}
--PproductionGrafanaPassword=${ONTRACK_PRODUCTION_GRAFANA_PASSWORD}
 '''
             }
             publishers {

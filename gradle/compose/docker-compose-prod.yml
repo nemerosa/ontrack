@@ -13,8 +13,6 @@ grafana:
   volumes:
     # Editable dashboards
     - "/usr/lib/grafana/dashboards:/usr/lib/grafana/dashboards"
-  environment:
-    GF_SECURITY_ADMIN_PASSWORD:
 
 # Ontrack container
 ontrack:
