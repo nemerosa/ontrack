@@ -16,7 +16,7 @@ class ApplicationLogServiceImplTest {
         SecurityService securityService = mock(SecurityService)
         ApplicationLogServiceImpl service = new ApplicationLogServiceImpl(
                 ontrackConfigProperties,
-                securityService
+                securityService, counterService
         )
         // Creates two entries
         service.error(new RuntimeException("Test 1"), ApplicationLogServiceImplTest, "test1", "test1", "test1")

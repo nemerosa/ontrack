@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -25,10 +26,12 @@ public class ApplicationLogServiceImpl implements ApplicationLogService {
     private final SecurityService securityService;
     private final int maxEntries;
     private final LinkedList<ApplicationLogEntry> entries;
+    private final CounterService counterService;
 
     @Autowired
-    public ApplicationLogServiceImpl(OntrackConfigProperties ontrackConfigProperties, SecurityService securityService) {
+    public ApplicationLogServiceImpl(OntrackConfigProperties ontrackConfigProperties, SecurityService securityService, CounterService counterService) {
         this.securityService = securityService;
+        this.counterService = counterService;
         this.maxEntries = ontrackConfigProperties.getApplicationLogMaxEntries();
         this.entries = new LinkedList<>();
     }
@@ -54,6 +57,7 @@ public class ApplicationLogServiceImpl implements ApplicationLogService {
                         info
                 ).withException(exception)
         );
+        counterService.increment("error");
     }
 
     private synchronized void log(ApplicationLogEntry entry) {
