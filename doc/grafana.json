@@ -1,569 +1,743 @@
 {
-  "id": null,
+  "id": 1,
   "title": "Ontrack",
   "originalTitle": "Ontrack",
   "tags": [],
-  "style": "light",
+  "style": "dark",
   "timezone": "browser",
   "editable": true,
-  "hideControls": false,
-  "sharedCrosshair": false,
+  "hideControls": true,
+  "sharedCrosshair": true,
   "rows": [
     {
-      "title": "test",
-      "height": "250px",
-      "editable": true,
       "collapse": false,
+      "editable": true,
+      "height": "200px",
       "panels": [
         {
-          "id": 4,
+          "aliasColors": {},
+          "bars": false,
+          "datasource": "ontrack",
+          "editable": true,
+          "error": false,
+          "fill": 1,
+          "grid": {
+            "leftLogBase": 1,
+            "leftMax": null,
+            "leftMin": null,
+            "rightLogBase": 1,
+            "rightMax": null,
+            "rightMin": null,
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "id": 1,
+          "leftYAxisLabel": "Count",
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "nullPointMode": "connected",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
           "span": 6,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "fields": [
+                {
+                  "func": "mean",
+                  "name": "value"
+                }
+              ],
+              "groupBy": [
+                {
+                  "interval": "auto",
+                  "type": "time"
+                }
+              ],
+              "measurement": "counter.entity.build",
+              "query": "SELECT \"value\" FROM \"counter.entity.build\"",
+              "rawQuery": true,
+              "refId": "A",
+              "tags": []
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Builds",
+          "tooltip": {
+            "shared": true,
+            "value_type": "cumulative"
+          },
           "type": "graph",
           "x-axis": true,
           "y-axis": true,
-          "scale": 1,
           "y_formats": [
             "none",
             "short"
-          ],
+          ]
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "datasource": "ontrack",
+          "editable": true,
+          "error": false,
+          "fill": 1,
           "grid": {
-            "max": null,
-            "min": null,
+            "leftLogBase": 1,
             "leftMax": null,
-            "rightMax": null,
             "leftMin": null,
+            "rightLogBase": 1,
+            "rightMax": null,
             "rightMin": null,
             "threshold1": null,
-            "threshold2": null,
             "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
             "threshold2Color": "rgba(234, 112, 112, 0.22)"
           },
-          "resolution": 100,
-          "lines": true,
-          "fill": 1,
-          "linewidth": 2,
-          "points": false,
-          "pointradius": 5,
-          "bars": false,
-          "stack": true,
-          "spyable": true,
-          "options": false,
+          "id": 2,
+          "leftYAxisLabel": "Count/Min",
           "legend": {
-            "show": true,
-            "values": false,
-            "min": false,
-            "max": false,
+            "avg": false,
             "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
             "total": false,
-            "avg": false
+            "values": false
           },
-          "interactive": true,
-          "legend_counts": true,
-          "timezone": "browser",
-          "percentage": false,
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
           "nullPointMode": "connected",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "span": 6,
+          "stack": false,
           "steppedLine": false,
-          "tooltip": {
-            "value_type": "cumulative",
-            "query_as_alias": true,
-            "shared": false
-          },
           "targets": [
             {
-              "target": "ontrack.gauge.datasource.dataSource.active"
+              "fields": [
+                {
+                  "func": "mean",
+                  "name": "value"
+                }
+              ],
+              "groupBy": [
+                {
+                  "interval": "auto",
+                  "type": "time"
+                }
+              ],
+              "measurement": "counter.entity.event",
+              "query": "SELECT derivative(\"value\", 1m) as \"1m\" FROM \"counter.entity.event\"",
+              "rawQuery": true,
+              "refId": "A",
+              "tags": []
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Events",
+          "tooltip": {
+            "shared": true,
+            "value_type": "cumulative"
+          },
+          "type": "graph",
+          "x-axis": true,
+          "y-axis": true,
+          "y_formats": [
+            "none",
+            "short"
+          ]
+        }
+      ],
+      "title": "New row"
+    },
+    {
+      "collapse": false,
+      "editable": true,
+      "height": "250px",
+      "panels": [
+        {
+          "aliasColors": {},
+          "bars": false,
+          "datasource": "ontrack",
+          "editable": true,
+          "error": false,
+          "fill": 2,
+          "grid": {
+            "leftLogBase": 1,
+            "leftMax": null,
+            "leftMin": null,
+            "rightLogBase": 1,
+            "rightMax": null,
+            "rightMin": null,
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)",
+            "thresholdLine": false
+          },
+          "id": 3,
+          "leftYAxisLabel": "Memory",
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "nullPointMode": "connected",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "rightYAxisLabel": "",
+          "seriesOverrides": [],
+          "span": 3,
+          "stack": false,
+          "steppedLine": true,
+          "targets": [
+            {
+              "fields": [
+                {
+                  "func": "mean",
+                  "name": "value"
+                }
+              ],
+              "groupBy": [
+                {
+                  "interval": "2m",
+                  "type": "time"
+                }
+              ],
+              "hide": false,
+              "measurement": "heap.used",
+              "query": "SELECT mean(\"value\") AS \"value\" FROM \"heap.used\" WHERE $timeFilter GROUP BY time(2m)",
+              "refId": "A",
+              "tags": []
             },
             {
-              "target": "ontrack.httpsessions.active"
+              "fields": [
+                {
+                  "func": "mean",
+                  "name": "value"
+                }
+              ],
+              "groupBy": [
+                {
+                  "interval": "auto",
+                  "type": "time"
+                }
+              ],
+              "measurement": "heap.committed",
+              "query": "SELECT mean(\"value\") AS \"value\" FROM \"heap.committed\" WHERE $timeFilter GROUP BY time($interval)",
+              "refId": "B",
+              "tags": []
             }
           ],
-          "aliasColors": {},
-          "aliasYAxis": {},
-          "title": "Active connections",
-          "datasource": "graphite",
-          "renderer": "flot",
-          "annotate": {
-            "enable": false
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Memory",
+          "tooltip": {
+            "shared": true,
+            "value_type": "cumulative"
           },
-          "seriesOverrides": [],
+          "type": "graph",
+          "x-axis": true,
+          "y-axis": true,
+          "y_formats": [
+            "kbytes",
+            "short"
+          ]
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "datasource": "ontrack",
+          "editable": true,
+          "error": false,
+          "fill": 1,
+          "grid": {
+            "leftLogBase": 1,
+            "leftMax": null,
+            "leftMin": null,
+            "rightLogBase": 1,
+            "rightMax": null,
+            "rightMin": null,
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "id": 4,
+          "leftYAxisLabel": "Count",
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
           "links": [],
-          "leftYAxisLabel": ""
-        },
-        {
-          "title": "Jobs",
-          "error": false,
-          "span": 6,
-          "editable": true,
-          "type": "graph",
-          "id": 5,
-          "datasource": null,
-          "renderer": "flot",
-          "x-axis": true,
-          "y-axis": true,
-          "y_formats": [
-            "ms",
-            "short"
-          ],
-          "grid": {
-            "leftMax": null,
-            "rightMax": null,
-            "leftMin": null,
-            "rightMin": null,
-            "threshold1": null,
-            "threshold2": null,
-            "threshold1Color": "rgba(216, 200, 27, 0.27)",
-            "threshold2Color": "rgba(234, 112, 112, 0.22)"
-          },
-          "lines": true,
-          "fill": 0,
-          "linewidth": 1,
-          "points": false,
-          "pointradius": 5,
-          "bars": false,
-          "stack": false,
-          "percentage": false,
-          "legend": {
-            "show": true,
-            "values": false,
-            "min": false,
-            "max": false,
-            "current": false,
-            "total": false,
-            "avg": false
-          },
           "nullPointMode": "connected",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "span": 3,
+          "stack": false,
           "steppedLine": false,
-          "tooltip": {
-            "value_type": "cumulative",
-            "shared": false
-          },
           "targets": [
             {
-              "target": "ontrack.job.mean"
+              "fields": [
+                {
+                  "func": "mean",
+                  "name": "value"
+                }
+              ],
+              "groupBy": [
+                {
+                  "interval": "10s",
+                  "type": "time"
+                }
+              ],
+              "measurement": "threads",
+              "query": "SELECT mean(\"value\") AS \"value\" FROM \"threads\" WHERE $timeFilter GROUP BY time(10s)",
+              "refId": "A",
+              "tags": []
             }
           ],
-          "aliasColors": {},
-          "seriesOverrides": [],
-          "links": []
-        }
-      ]
-    },
-    {
-      "title": "New row",
-      "height": "250px",
-      "editable": true,
-      "collapse": false,
-      "panels": [
-        {
-          "title": "Artifactory Sync job",
-          "error": false,
-          "span": 4,
-          "editable": true,
-          "type": "graph",
-          "id": 6,
-          "datasource": null,
-          "renderer": "flot",
-          "x-axis": true,
-          "y-axis": true,
-          "y_formats": [
-            "ms",
-            "short"
-          ],
-          "grid": {
-            "leftMax": null,
-            "rightMax": null,
-            "leftMin": null,
-            "rightMin": null,
-            "threshold1": null,
-            "threshold2": null,
-            "threshold1Color": "rgba(216, 200, 27, 0.27)",
-            "threshold2Color": "rgba(234, 112, 112, 0.22)"
-          },
-          "lines": true,
-          "fill": 0,
-          "linewidth": 1,
-          "points": false,
-          "pointradius": 5,
-          "bars": false,
-          "stack": false,
-          "percentage": false,
-          "legend": {
-            "show": true,
-            "values": false,
-            "min": false,
-            "max": false,
-            "current": false,
-            "total": false,
-            "avg": false
-          },
-          "nullPointMode": "connected",
-          "steppedLine": false,
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Threads",
           "tooltip": {
-            "value_type": "cumulative",
-            "shared": false
+            "shared": true,
+            "value_type": "cumulative"
           },
-          "targets": [
-            {
-              "target": "ontrack.job-category.ArtifactoryPromotionSync.mean"
-            }
-          ],
-          "aliasColors": {},
-          "seriesOverrides": [],
-          "links": []
-        },
-        {
-          "title": "SVN Index job",
-          "error": false,
-          "span": 4,
-          "editable": true,
           "type": "graph",
-          "id": 7,
-          "datasource": null,
-          "renderer": "flot",
-          "x-axis": true,
-          "y-axis": true,
-          "y_formats": [
-            "ms",
-            "short"
-          ],
-          "grid": {
-            "leftMax": null,
-            "rightMax": null,
-            "leftMin": null,
-            "rightMin": null,
-            "threshold1": null,
-            "threshold2": null,
-            "threshold1Color": "rgba(216, 200, 27, 0.27)",
-            "threshold2Color": "rgba(234, 112, 112, 0.22)"
-          },
-          "lines": true,
-          "fill": 0,
-          "linewidth": 1,
-          "points": false,
-          "pointradius": 5,
-          "bars": false,
-          "stack": false,
-          "percentage": false,
-          "legend": {
-            "show": true,
-            "values": false,
-            "min": false,
-            "max": false,
-            "current": false,
-            "total": false,
-            "avg": false
-          },
-          "nullPointMode": "connected",
-          "steppedLine": false,
-          "tooltip": {
-            "value_type": "cumulative",
-            "shared": false
-          },
-          "targets": [
-            {
-              "target": "ontrack.job-category.SVNIndexLatest.mean"
-            }
-          ],
-          "aliasColors": {},
-          "seriesOverrides": [],
-          "links": []
-        },
-        {
-          "title": "SVN build sync job",
-          "error": false,
-          "span": 4,
-          "editable": true,
-          "type": "graph",
-          "id": 8,
-          "datasource": null,
-          "renderer": "flot",
-          "x-axis": true,
-          "y-axis": true,
-          "y_formats": [
-            "ms",
-            "short"
-          ],
-          "grid": {
-            "leftMax": null,
-            "rightMax": null,
-            "leftMin": null,
-            "rightMin": null,
-            "threshold1": null,
-            "threshold2": null,
-            "threshold1Color": "rgba(216, 200, 27, 0.27)",
-            "threshold2Color": "rgba(234, 112, 112, 0.22)"
-          },
-          "lines": true,
-          "fill": 0,
-          "linewidth": 1,
-          "points": false,
-          "pointradius": 5,
-          "bars": false,
-          "stack": false,
-          "percentage": false,
-          "legend": {
-            "show": true,
-            "values": false,
-            "min": false,
-            "max": false,
-            "current": false,
-            "total": false,
-            "avg": false
-          },
-          "nullPointMode": "connected",
-          "steppedLine": false,
-          "tooltip": {
-            "value_type": "cumulative",
-            "shared": false
-          },
-          "targets": [
-            {
-              "target": "ontrack.job-category.SVNSync.mean"
-            }
-          ],
-          "aliasColors": {},
-          "seriesOverrides": [],
-          "links": []
-        }
-      ]
-    },
-    {
-      "title": "New row",
-      "height": "250px",
-      "editable": true,
-      "collapse": false,
-      "panels": [
-        {
-          "title": "Git indexation job",
-          "error": false,
-          "span": 12,
-          "editable": true,
-          "type": "graph",
-          "id": 9,
-          "datasource": null,
-          "renderer": "flot",
-          "x-axis": true,
-          "y-axis": true,
-          "y_formats": [
-            "ms",
-            "short"
-          ],
-          "grid": {
-            "leftMax": null,
-            "rightMax": null,
-            "leftMin": null,
-            "rightMin": null,
-            "threshold1": null,
-            "threshold2": null,
-            "threshold1Color": "rgba(216, 200, 27, 0.27)",
-            "threshold2Color": "rgba(234, 112, 112, 0.22)"
-          },
-          "lines": true,
-          "fill": 0,
-          "linewidth": 1,
-          "points": false,
-          "pointradius": 5,
-          "bars": false,
-          "stack": false,
-          "percentage": false,
-          "legend": {
-            "show": true,
-            "values": false,
-            "min": false,
-            "max": false,
-            "current": false,
-            "total": false,
-            "avg": false
-          },
-          "nullPointMode": "connected",
-          "steppedLine": false,
-          "tooltip": {
-            "value_type": "cumulative",
-            "shared": false
-          },
-          "targets": [
-            {
-              "target": "ontrack.job-category.GitIndexation.mean"
-            }
-          ],
-          "aliasColors": {},
-          "seriesOverrides": [],
-          "links": []
-        }
-      ]
-    },
-    {
-      "title": "New row",
-      "height": "250px",
-      "editable": true,
-      "collapse": false,
-      "panels": [
-        {
-          "title": "Events & properties",
-          "error": false,
-          "span": 12,
-          "editable": true,
-          "type": "graph",
-          "id": 10,
-          "datasource": null,
-          "renderer": "flot",
           "x-axis": true,
           "y-axis": true,
           "y_formats": [
             "short",
             "short"
-          ],
+          ]
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "datasource": "ontrack",
+          "editable": true,
+          "error": false,
+          "fill": 1,
           "grid": {
+            "leftLogBase": 1,
             "leftMax": null,
-            "rightMax": null,
             "leftMin": null,
+            "rightLogBase": 1,
+            "rightMax": null,
             "rightMin": null,
             "threshold1": null,
-            "threshold2": null,
             "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
             "threshold2Color": "rgba(234, 112, 112, 0.22)"
           },
-          "lines": true,
-          "fill": 0,
-          "linewidth": 1,
-          "points": false,
-          "pointradius": 5,
-          "bars": false,
-          "stack": false,
-          "percentage": false,
+          "id": 6,
           "legend": {
-            "show": true,
-            "values": false,
-            "min": false,
-            "max": false,
+            "avg": false,
             "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
             "total": false,
-            "avg": false
+            "values": false
           },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
           "nullPointMode": "connected",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "span": 3,
+          "stack": false,
           "steppedLine": false,
-          "tooltip": {
-            "value_type": "cumulative",
-            "shared": false
-          },
           "targets": [
             {
-              "target": "ontrack.counter.entity.property"
-            },
-            {
-              "target": "ontrack.counter.entity.event"
+              "fields": [
+                {
+                  "func": "mean",
+                  "name": "value"
+                }
+              ],
+              "groupBy": [
+                {
+                  "interval": "auto",
+                  "type": "time"
+                }
+              ],
+              "query": "select \"value\" from \"httpsessions.active\"",
+              "rawQuery": true,
+              "refId": "A",
+              "tags": []
             }
           ],
-          "aliasColors": {},
-          "seriesOverrides": [],
-          "links": []
-        }
-      ]
-    },
-    {
-      "title": "New row",
-      "height": "250px",
-      "editable": true,
-      "collapse": false,
-      "panels": [
-        {
-          "title": "Memory",
-          "error": false,
-          "span": 12,
-          "editable": true,
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Sessions",
+          "tooltip": {
+            "shared": true,
+            "value_type": "cumulative"
+          },
           "type": "graph",
-          "id": 11,
-          "datasource": null,
-          "renderer": "flot",
           "x-axis": true,
           "y-axis": true,
           "y_formats": [
-            "bytes",
+            "short",
             "short"
-          ],
+          ]
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "datasource": "ontrack",
+          "decimals": 0,
+          "editable": true,
+          "error": false,
+          "fill": 1,
           "grid": {
+            "leftLogBase": 1,
             "leftMax": null,
+            "leftMin": 0,
+            "rightLogBase": 1,
             "rightMax": null,
-            "leftMin": null,
-            "rightMin": null,
+            "rightMin": 0,
             "threshold1": null,
-            "threshold2": null,
             "threshold1Color": "rgba(216, 200, 27, 0.27)",
-            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)",
+            "thresholdLine": false
+          },
+          "id": 8,
+          "leftYAxisLabel": "Time",
+          "legend": {
+            "avg": false,
+            "current": false,
+            "hideEmpty": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "total": false,
+            "values": false
           },
           "lines": true,
-          "fill": 0,
-          "linewidth": 1,
-          "points": false,
-          "pointradius": 5,
-          "bars": false,
-          "stack": false,
-          "percentage": false,
-          "legend": {
-            "show": true,
-            "values": false,
-            "min": false,
-            "max": false,
-            "current": false,
-            "total": false,
-            "avg": false
-          },
+          "linewidth": 2,
+          "links": [],
           "nullPointMode": "connected",
-          "steppedLine": false,
-          "tooltip": {
-            "value_type": "cumulative",
-            "shared": false
-          },
-          "targets": [
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "rightYAxisLabel": "Time",
+          "seriesOverrides": [
             {
-              "target": "ontrack.heap"
+              "alias": "gauge.response.info",
+              "yaxis": 1
             },
             {
-              "target": "ontrack.mem"
+              "alias": "gauge.response.structure.projects.projectId.branches",
+              "yaxis": 2
             }
           ],
-          "aliasColors": {},
-          "seriesOverrides": [],
-          "links": []
+          "span": 3,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "fields": [
+                {
+                  "func": "mean",
+                  "name": "value"
+                }
+              ],
+              "groupBy": [
+                {
+                  "interval": "auto",
+                  "type": "time"
+                }
+              ],
+              "measurement": "gauge.response.info",
+              "query": "SELECT mean(\"value\") AS \"value\" FROM \"gauge.response.info\" WHERE $timeFilter GROUP BY time($interval)",
+              "refId": "A",
+              "tags": []
+            },
+            {
+              "fields": [
+                {
+                  "func": "mean",
+                  "name": "value"
+                }
+              ],
+              "groupBy": [
+                {
+                  "interval": "auto",
+                  "type": "time"
+                }
+              ],
+              "hide": false,
+              "measurement": "gauge.response.structure.projects.projectId.branches",
+              "query": "SELECT mean(\"value\") AS \"value\" FROM \"gauge.response.structure.projects.projectId.branches\" WHERE $timeFilter GROUP BY time($interval)",
+              "refId": "B",
+              "tags": []
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Response times",
+          "tooltip": {
+            "shared": true,
+            "value_type": "cumulative"
+          },
+          "transparent": false,
+          "type": "graph",
+          "x-axis": true,
+          "y-axis": true,
+          "y_formats": [
+            "ms",
+            "ms"
+          ]
         }
-      ]
-    }
-  ],
-  "nav": [
+      ],
+      "title": "New row"
+    },
     {
-      "type": "timepicker",
       "collapse": false,
-      "enable": true,
-      "status": "Stable",
-      "time_options": [
-        "5m",
-        "15m",
-        "1h",
-        "6h",
-        "12h",
-        "24h",
-        "2d",
-        "7d",
-        "30d"
+      "editable": true,
+      "height": "250px",
+      "panels": [
+        {
+          "aliasColors": {},
+          "bars": false,
+          "datasource": "ontrack",
+          "editable": true,
+          "error": false,
+          "fill": 1,
+          "grid": {
+            "leftLogBase": 1,
+            "leftMax": null,
+            "leftMin": null,
+            "rightLogBase": 1,
+            "rightMax": null,
+            "rightMin": null,
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "id": 5,
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "nullPointMode": "connected",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "span": 6,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "fields": [
+                {
+                  "func": "mean",
+                  "name": "value"
+                }
+              ],
+              "groupBy": [
+                {
+                  "interval": "10s",
+                  "type": "time"
+                }
+              ],
+              "measurement": "job.count",
+              "query": "SELECT mean(\"value\") AS \"value\" FROM \"job.count\" WHERE $timeFilter GROUP BY time(10s)",
+              "rawQuery": false,
+              "refId": "A",
+              "tags": []
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Jobs",
+          "tooltip": {
+            "shared": true,
+            "value_type": "cumulative"
+          },
+          "type": "graph",
+          "x-axis": true,
+          "y-axis": true,
+          "y_formats": [
+            "short",
+            "short"
+          ]
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "datasource": "ontrack",
+          "editable": true,
+          "error": false,
+          "fill": 1,
+          "grid": {
+            "leftLogBase": 1,
+            "leftMax": null,
+            "leftMin": null,
+            "rightLogBase": 1,
+            "rightMax": null,
+            "rightMin": null,
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "id": 7,
+          "leftYAxisLabel": "Time",
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "nullPointMode": "connected",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "rightYAxisLabel": "",
+          "seriesOverrides": [],
+          "span": 6,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "fields": [
+                {
+                  "func": "mean",
+                  "name": "value"
+                }
+              ],
+              "groupBy": [
+                {
+                  "interval": "10s",
+                  "type": "time"
+                }
+              ],
+              "measurement": "job-category.GitIndexation.snapshot.mean",
+              "query": "SELECT mean(\"value\") AS \"value\" FROM \"job-category.GitIndexation.snapshot.mean\" WHERE $timeFilter GROUP BY time(10s)",
+              "refId": "A",
+              "tags": []
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Git indexation",
+          "tooltip": {
+            "shared": true,
+            "value_type": "cumulative"
+          },
+          "type": "graph",
+          "x-axis": true,
+          "y-axis": true,
+          "y_formats": [
+            "ms",
+            "short"
+          ]
+        }
       ],
-      "refresh_intervals": [
-        "5s",
-        "10s",
-        "30s",
-        "1m",
-        "5m",
-        "15m",
-        "30m",
-        "1h",
-        "2h",
-        "1d"
-      ],
-      "now": true,
-      "notice": false
+      "title": "New row"
     }
   ],
   "time": {
     "from": "now-6h",
     "to": "now"
+  },
+  "timepicker": {
+    "enable": false,
+    "now": true,
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ],
+    "time_options": [
+      "5m",
+      "15m",
+      "1h",
+      "6h",
+      "12h",
+      "24h",
+      "2d",
+      "7d",
+      "30d"
+    ],
+    "type": "timepicker"
   },
   "templating": {
     "list": []
@@ -572,6 +746,7 @@
     "list": []
   },
   "refresh": "5s",
-  "version": 6,
-  "hideAllLegends": false
+  "schemaVersion": 7,
+  "version": 3,
+  "links": []
 }
