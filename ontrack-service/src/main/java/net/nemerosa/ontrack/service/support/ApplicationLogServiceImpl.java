@@ -58,6 +58,7 @@ public class ApplicationLogServiceImpl implements ApplicationLogService {
                 ).withException(exception)
         );
         counterService.increment("error");
+        counterService.increment(String.format("error.%s", source.getSimpleName()));
     }
 
     private synchronized void log(ApplicationLogEntry entry) {
