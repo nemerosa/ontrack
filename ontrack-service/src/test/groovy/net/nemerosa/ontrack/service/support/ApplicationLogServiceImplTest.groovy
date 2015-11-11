@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.Page
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.junit.Test
+import org.springframework.boot.actuate.metrics.CounterService
 
 import static org.mockito.Mockito.mock
 
@@ -14,9 +15,11 @@ class ApplicationLogServiceImplTest {
         OntrackConfigProperties ontrackConfigProperties = new OntrackConfigProperties();
         ontrackConfigProperties.applicationLogMaxEntries = 10
         SecurityService securityService = mock(SecurityService)
+        CounterService counterService = mock(CounterService)
         ApplicationLogServiceImpl service = new ApplicationLogServiceImpl(
                 ontrackConfigProperties,
-                securityService, counterService
+                securityService,
+                counterService
         )
         // Creates two entries
         service.error(new RuntimeException("Test 1"), ApplicationLogServiceImplTest, "test1", "test1", "test1")
