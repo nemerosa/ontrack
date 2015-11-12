@@ -27,6 +27,7 @@ var options = minimist(process.argv.slice(2), knownOptions);
 
 var web = 'src';
 var webPath = './' + web;
+var assetResources = webPath + '/assets/**';
 var lessResources = webPath + '/less/*.less';
 var jsResources = webPath + '/app/**/*.js';
 var templateResources = webPath + '/app/**/*.html';
@@ -44,6 +45,7 @@ var output = './' + outputPath;
 var outputCss = './' + outputPath + '/css';
 var outputJs = './' + outputPath + '/js';
 var outputFonts = './' + outputPath + '/fonts';
+var outputAssets = './' + outputPath + '/assets';
 
 // Vendor resources
 
@@ -65,10 +67,6 @@ var vendorResources = [
 // TODO Vendor CSS
 //'vendor/angular-multi-select/angular-multi-select.css',
 //'vendor/angular-taglist/css/angular-taglist-directive.css'
-
-// TODO Copy of assets
-
-// TODO Copy of fonts
 
 // Cleaning
 
@@ -132,8 +130,19 @@ gulp.task('less', function () {
 // Fonts
 
 gulp.task('fonts', function () {
-    return gulp.src(vendor + '/font-awesome/fonts/*.*')
+    return gulp
+        .src(vendor + '/font-awesome/fonts/*.*')
+        .pipe(debug({title: 'fonts:input'}))
         .pipe(gulp.dest(outputFonts));
+});
+
+// Copy of assets
+
+gulp.task('assets', function () {
+    return gulp
+        .src(assetResources)
+        .pipe(debug({title: 'assets:input'}))
+        .pipe(gulp.dest(outputAssets));
 });
 
 // Injection in index.html
@@ -156,7 +165,7 @@ gulp.task('index:dev', ['less', 'fonts', 'templates'], function () {
         .pipe(debug({title: 'index:dev:output'}));
 });
 
-gulp.task('index:prod', ['less', 'fonts', 'templates', 'js:concat'], function () {
+gulp.task('index:prod', ['less', 'assets', 'fonts', 'templates', 'js:concat'], function () {
     var cssSources = gulp.src([outputCss + '/*.css'], {read: false});
     var jsSources = gulp.src(outputJs + '/*.js', {read: false});
 
