@@ -36,11 +36,12 @@ var vendor = './vendor';
 
 var build = 'build/web';
 
-var buildPath = build + '/tmp';
+var buildPath = build + '/dev';
 var buildTemplates = buildPath + '/templates';
 var buildAngular = buildPath + '/angular';
+var buildCss = buildPath + '/css';
 
-var outputPath = build + '/main';
+var outputPath = build + '/prod';
 var output = './' + outputPath;
 var outputCss = './' + outputPath + '/css';
 var outputJs = './' + outputPath + '/js';
@@ -126,7 +127,7 @@ gulp.task('less', function () {
         .pipe(less())
         .pipe(debug({title: 'less:output:'}))
         .pipe(concat('ci-' + options.version + '.css'))
-        .pipe(gulp.dest(outputCss));
+        .pipe(gulp.dest(buildCss));
 });
 
 // Concatenation of all CSS files, including the one generated from less
@@ -167,7 +168,7 @@ gulp.task('assets', function () {
 // Injection in index.html
 
 gulp.task('index:dev', ['less', 'fonts', 'templates'], function () {
-    var cssSources = gulp.src([outputCss + '/*.css'], {read: false});
+    var cssSources = gulp.src([buildCss + '/*.css'], {read: false});
     var vendorJsSources = gulp.src(vendorJsResources, {read: false});
     var vendorCssSources = gulp.src(vendorCssResources, {read: false});
     var appSources = gulp.src([buildTemplates + '/*.js', jsResources]).pipe(ngFilesort());
@@ -182,7 +183,7 @@ gulp.task('index:dev', ['less', 'fonts', 'templates'], function () {
                 appSources
             ),
             {relative: false, ignorePath: [outputPath, web, buildPath], addRootSlash: false}))
-        .pipe(gulp.dest(output))
+        .pipe(gulp.dest(buildPath))
         .pipe(debug({title: 'index:dev:output'}));
 });
 
