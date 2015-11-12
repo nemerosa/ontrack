@@ -3,7 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.moowork.gradle:gradle-node-plugin:0.10'
+        classpath 'com.moowork.gradle:gradle-node-plugin:0.11'
     }
 }
 
@@ -15,8 +15,8 @@ apply plugin: 'com.moowork.node'
 // Node environment
 
 node {
-    version = '0.12.2'
-    npmVersion = '2.7.5'
+    version = '4.2.2'
+    npmVersion = '4.2.2'
     download = true
 }
 
