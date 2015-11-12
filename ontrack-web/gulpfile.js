@@ -49,7 +49,7 @@ var outputAssets = './' + outputPath + '/assets';
 
 // Vendor resources
 
-var vendorResources = [
+var vendorJsResources = [
     'jquery/dist/jquery.js',
     'jquery-ui/jquery-ui.js',
     'angular/angular.js',
@@ -64,9 +64,12 @@ var vendorResources = [
         return vendor + '/' + rel;
     });
 
-// TODO Vendor CSS
-//'vendor/angular-multi-select/angular-multi-select.css',
-//'vendor/angular-taglist/css/angular-taglist-directive.css'
+var vendorCssResources = [
+    'angular-multi-select/angular-multi-select.css',
+    'angular-taglist/css/angular-taglist-directive.css'
+].map(function (rel) {
+        return vendor + '/' + rel;
+    });
 
 // Cleaning
 
@@ -104,7 +107,7 @@ gulp.task('js:angular', ['lint', 'templates'], function () {
 });
 
 gulp.task('js:concat', ['js:angular'], function () {
-    var jsSource = vendorResources;
+    var jsSource = vendorJsResources;
     jsSource.push(buildAngular + '/*.js');
     return gulp.src(jsSource)
         .pipe(debug({title: 'js:concat:input'}))
@@ -119,12 +122,28 @@ gulp.task('js:concat', ['js:angular'], function () {
 
 gulp.task('less', function () {
     return gulp.src(lessResources)
-        .pipe(debug({title: 'less:'}))
+        .pipe(debug({title: 'less:input:'}))
         .pipe(less())
+        .pipe(debug({title: 'less:output:'}))
+        .pipe(concat('ci-' + options.version + '.css'))
+        .pipe(gulp.dest(outputCss));
+});
+
+// Concatenation of all CSS files, including the one generated from less
+
+gulp.task('css:concat', function () {
+    return series(
+        gulp.src(lessResources)
+            .pipe(debug({title: 'less:input:'}))
+            .pipe(less())
+            .pipe(debug({title: 'less:output:'})),
+        gulp.src(vendorCssResources)
+    )
+        .pipe(debug({title: 'css:concat:input'}))
         .pipe(minifyCss())
         .pipe(concat('ci-' + options.version + '.css'))
-        .pipe(gulp.dest(outputCss))
-        .pipe(liveReload());
+        .pipe(debug({title: 'css:concat:output'}))
+        .pipe(gulp.dest(outputCss));
 });
 
 // Fonts
@@ -149,7 +168,8 @@ gulp.task('assets', function () {
 
 gulp.task('index:dev', ['less', 'fonts', 'templates'], function () {
     var cssSources = gulp.src([outputCss + '/*.css'], {read: false});
-    var vendorSources = gulp.src(vendorResources, {read: false});
+    var vendorJsSources = gulp.src(vendorJsResources, {read: false});
+    var vendorCssSources = gulp.src(vendorCssResources, {read: false});
     var appSources = gulp.src([buildTemplates + '/*.js', jsResources]).pipe(ngFilesort());
 
     return gulp.src(indexResource)
@@ -157,7 +177,8 @@ gulp.task('index:dev', ['less', 'fonts', 'templates'], function () {
         .pipe(inject(
             series(
                 cssSources,
-                vendorSources,
+                vendorJsSources,
+                vendorCssSources,
                 appSources
             ),
             {relative: false, ignorePath: [outputPath, web, buildPath], addRootSlash: false}))
@@ -165,7 +186,7 @@ gulp.task('index:dev', ['less', 'fonts', 'templates'], function () {
         .pipe(debug({title: 'index:dev:output'}));
 });
 
-gulp.task('index:prod', ['less', 'assets', 'fonts', 'templates', 'js:concat'], function () {
+gulp.task('index:prod', ['css:concat', 'assets', 'fonts', 'templates', 'js:concat'], function () {
     var cssSources = gulp.src([outputCss + '/*.css'], {read: false});
     var jsSources = gulp.src(outputJs + '/*.js', {read: false});
 
