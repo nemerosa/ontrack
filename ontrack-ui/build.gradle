@@ -51,11 +51,7 @@ dependencies {
 
 clean << {
     project.delete 'src/main/resources/application.properties'
-    project.delete 'src/main/resources/static/assets'
-    project.delete 'src/main/resources/static/fonts'
-    project.delete 'src/main/resources/static/app'
-    project.delete 'src/main/resources/static/vendor'
-    project.delete 'src/main/resources/static/index.html'
+    project.delete 'src/main/resources/static'
 }
 
 /**
@@ -64,7 +60,7 @@ clean << {
 
 task copyWebResources(dependsOn: ':ontrack-web:build') << {
     project.copy {
-        from project(':ontrack-web').tasks.build.output
+        from project(':ontrack-web').tasks.build.outputDir
         into project.file('src/main/resources/static')
     }
 }
