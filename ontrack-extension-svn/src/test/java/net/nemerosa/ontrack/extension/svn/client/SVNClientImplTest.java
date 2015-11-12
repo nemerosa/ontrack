@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.svn.client;
 import net.nemerosa.ontrack.extension.svn.db.SVNEventDao;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration;
+import net.nemerosa.ontrack.model.support.EnvService;
 import net.nemerosa.ontrack.tx.TransactionService;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +19,8 @@ public class SVNClientImplTest {
     public void before() {
         SVNEventDao svnEventDao = mock(SVNEventDao.class);
         TransactionService transactionService = mock(TransactionService.class);
-        client = new SVNClientImpl(svnEventDao, transactionService);
+        EnvService envService = mock(EnvService.class);
+        client = new SVNClientImpl(svnEventDao, envService, transactionService);
     }
 
     @Test

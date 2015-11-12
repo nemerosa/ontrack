@@ -11,10 +11,13 @@ import net.nemerosa.ontrack.extension.svn.model.SVNReference;
 import net.nemerosa.ontrack.extension.svn.model.SVNRevisionPath;
 import net.nemerosa.ontrack.extension.svn.support.SVNLogEntryCollector;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
+import net.nemerosa.ontrack.model.support.EnvService;
 import net.nemerosa.ontrack.tx.Transaction;
 import net.nemerosa.ontrack.tx.TransactionService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.tmatesoft.svn.core.*;
@@ -25,30 +28,40 @@ import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.wc.*;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Component
 public class SVNClientImpl implements SVNClient {
 
     public static final int HISTORY_MAX_DEPTH = 6;
 
+    @SuppressWarnings("FieldCanBeLocal")
+    private final Logger logger = LoggerFactory.getLogger(SVNClient.class);
     private final SVNEventDao svnEventDao;
     private final TransactionService transactionService;
 
     private final Pattern pathWithRevision = Pattern.compile("(.*)@(\\d+)$");
 
     @Autowired
-    public SVNClientImpl(SVNEventDao svnEventDao, TransactionService transactionService) {
+    public SVNClientImpl(SVNEventDao svnEventDao, EnvService envService, TransactionService transactionService) {
         this.svnEventDao = svnEventDao;
         this.transactionService = transactionService;
+        // Spooling directory
+        File spoolDirectory = envService.getWorkingDir("svn", "spooling");
+        logger.info("[svn] Using Spooling directory at {}", spoolDirectory.getAbsolutePath());
         // Repository factories
         SVNRepositoryFactoryImpl.setup();
         DAVRepositoryFactory.setup(
                 // Using spooling
-                new DefaultHTTPConnectionFactory(null, true, null)
+                new DefaultHTTPConnectionFactory(
+                        spoolDirectory,
+                        true,
+                        null)
         );
     }
 
@@ -133,11 +146,7 @@ public class SVNClientImpl implements SVNClient {
                             log(repository, source, endRevision, startRevision, endRevision, true, false, 0, false, collector);
                         }
                     }
-                    List<Long> revisions = new ArrayList<>();
-                    for (SVNLogEntry entry : collector.getEntries()) {
-                        revisions.add(entry.getRevision());
-                    }
-                    return revisions;
+                    return collector.getEntries().stream().map(SVNLogEntry::getRevision).collect(Collectors.toList());
                 }
             } else {
                 // One of the revisions (R-1 or R) is missing
@@ -416,7 +425,7 @@ public class SVNClientImpl implements SVNClient {
                             String svnUser = repository.getConfiguration().getUser();
                             String svnPassword = repository.getConfiguration().getPassword();
                             if (StringUtils.isNotBlank(svnUser) && StringUtils.isNotBlank(svnPassword)) {
-                                clientManager.setAuthenticationManager(new BasicAuthenticationManager(svnUser, svnPassword));
+                                clientManager.setAuthenticationManager(BasicAuthenticationManager.newInstance(svnUser, svnPassword.toCharArray()));
                             }
                             // OK
                             return new SVNSessionImpl(clientManager);
