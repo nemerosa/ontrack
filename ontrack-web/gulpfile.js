@@ -31,7 +31,7 @@ var lessResources = webPath + '/less/*.less';
 var jsResources = webPath + '/app/**/*.js';
 var templateResources = webPath + '/app/**/*.html';
 var indexResource = webPath + '/index.html';
-var vendor = webPath + '/vendor';
+var vendor = './vendor';
 
 var build = 'build/web';
 
