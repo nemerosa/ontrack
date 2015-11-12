@@ -26,6 +26,7 @@ import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.dav.http.DefaultHTTPConnectionFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.wc.*;
+import org.tmatesoft.svn.util.SVNDebugLog;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -54,6 +55,8 @@ public class SVNClientImpl implements SVNClient {
         // Spooling directory
         File spoolDirectory = envService.getWorkingDir("svn", "spooling");
         logger.info("[svn] Using Spooling directory at {}", spoolDirectory.getAbsolutePath());
+        // Custom logger
+        SVNDebugLog.setDefaultLog(new SVNClientLogger());
         // Repository factories
         SVNRepositoryFactoryImpl.setup();
         DAVRepositoryFactory.setup(
