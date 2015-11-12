@@ -5,11 +5,15 @@ import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration;
 import net.nemerosa.ontrack.model.support.EnvService;
 import net.nemerosa.ontrack.tx.TransactionService;
+import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
+
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class SVNClientImplTest {
 
@@ -19,7 +23,11 @@ public class SVNClientImplTest {
     public void before() {
         SVNEventDao svnEventDao = mock(SVNEventDao.class);
         TransactionService transactionService = mock(TransactionService.class);
+
         EnvService envService = mock(EnvService.class);
+        File dir = FileUtils.getTempDirectory();
+        when(envService.getWorkingDir("svn", "spooling")).thenReturn(dir);
+
         client = new SVNClientImpl(svnEventDao, envService, transactionService);
     }
 
