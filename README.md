@@ -1,6 +1,8 @@
 ontrack
 =======
 
+[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/nemerosa/ontrack.svg)](http://isitmaintained.com/project/nemerosa/ontrack "Average time to resolve an issue")
+
 Continuous delivery monitoring.
 
 ![Ontrack builds](http://nemerosa.github.io/ontrack/images/ontrack-builds.png)
