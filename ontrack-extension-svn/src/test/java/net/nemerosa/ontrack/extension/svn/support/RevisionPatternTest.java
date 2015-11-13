@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.svn.support;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -32,6 +33,18 @@ public class RevisionPatternTest {
         assertFalse(r.extractRevision("11.8.4-123456").isPresent());
         assertEquals(123456L, r.extractRevision("11.8.4.5-123456").getAsLong());
         assertFalse(r.extractRevision("11.8.4.5-v123456").isPresent());
+    }
+
+    @Test
+    public void clone_no_replacement() {
+        RevisionPattern r = new RevisionPattern("11.8.4*-{revision}");
+        assertEquals("11.8.4*-{revision}", r.clone(value -> StringUtils.replace(value, "${sourceName}", "1.0")).getPattern());
+    }
+
+    @Test
+    public void clone_replacement() {
+        RevisionPattern r = new RevisionPattern("${sourceName}*-{revision}");
+        assertEquals("1.0*-{revision}", r.clone(value -> StringUtils.replace(value, "${sourceName}", "1.0")).getPattern());
     }
 
 }

@@ -46,7 +46,7 @@ public class RevisionPatternSvnRevisionLink implements BuildSvnRevisionLink<Revi
 
     @Override
     public RevisionPattern clone(RevisionPattern data, Function<String, String> replacementFunction) {
-        return data;
+        return data.clone(replacementFunction);
     }
 
     @Override
