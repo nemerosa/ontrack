@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.beans.ConstructorProperties;
 import java.util.OptionalLong;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,5 +64,11 @@ public class RevisionPattern {
                 "*",
                 ".*"
         ) + "$";
+    }
+
+    public RevisionPattern clone(Function<String, String> replacementFunction) {
+        return new RevisionPattern(
+            replacementFunction.apply(pattern)
+        );
     }
 }
