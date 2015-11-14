@@ -1,0 +1,144 @@
+package net.nemerosa.ontrack.acceptance
+
+import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
+import org.junit.Test
+
+import static net.nemerosa.ontrack.test.TestUtils.uid
+
+/**
+ * Acceptance tests for the access to the decorations
+ */
+@AcceptanceTestSuite
+class ACCDSLDecorations extends AbstractACCDSL {
+
+    @Test
+    void 'Auto promotion property decoration for an auto promotion level'() {
+
+        // Creating a project and a branch
+        def projectName = uid('P')
+        ontrack.project(projectName) {
+            branch('B', '')
+        }
+        def branch = ontrack.branch(projectName, 'B')
+
+        // Creating 3 validation stamps
+        (1..3).each { no ->
+            branch {
+                validationStamp "VS${no}"
+            }
+        }
+
+        // Creating an auto promoted promotion level
+        branch {
+            promotionLevel('PL') {
+                config {
+                    autoPromotion 'VS2', 'VS3'
+                }
+            }
+        }
+
+        // Creating a normal promotion level
+        branch {
+            promotionLevel('PLN')
+        }
+
+        // Gets the decoration on the promotion level
+        assert ontrack.promotionLevel(projectName, 'B', 'PL').autoPromotionPropertyDecoration.booleanValue()
+        assert ontrack.promotionLevel(projectName, 'B', 'PLN').autoPromotionPropertyDecoration == null
+    }
+
+    @Test
+    void 'Release decoration on a build'() {
+        // Creating a branch
+        def project = uid('P')
+        ontrack.project(project).branch('1.0')
+        // Creating a build
+        def build = ontrack.branch(project, '1.0').build('1', 'Build 1')
+        // No decoration
+        assert build.releaseDecoration == null
+        // Setting the Label property
+        build.config {
+            label 'RC'
+        }
+        // Decoration
+        assert build.releaseDecoration == 'RC'
+    }
+
+    @Test
+    void 'Message decorations on projects, branches and builds'() {
+        def name = uid('P')
+        ontrack.project(name) {
+            branch('test') {
+                build('1')
+            }
+        }
+        def project = ontrack.project(name)
+        def branch = ontrack.branch(name, 'test')
+        def build = ontrack.build(name, 'test', '1')
+        // No decorations yet
+        assert project.messageDecoration == null
+        assert branch.messageDecoration == null
+        assert build.messageDecoration == null
+        // Project decorations
+        project.config.message('Information', 'INFO')
+        assert project.messageDecoration == [type: 'INFO', text: 'Information']
+        // Branch decorations
+        branch.config.message('Warning', 'WARNING')
+        assert branch.messageDecoration == [type: 'WARNING', text: 'Warning']
+        // Build decorations
+        build.config.message('Error', 'ERROR')
+        assert build.messageDecoration == [type: 'ERROR', text: 'Error']
+    }
+
+    @Test
+    void 'Build links decorations'() {
+
+        // Creating projects, branches and builds
+
+        def p1 = uid('P1')
+        ontrack.project(p1) {
+            branch('B1', '') {
+                build('1.0', '')
+                build('1.1', '')
+            }
+        }
+
+        def p2 = uid('P2')
+        ontrack.project(p2) {
+            branch('B2', '') {
+                build('2.0', '')
+                build('2.1', '')
+            }
+        }
+
+        def p3 = uid('P3')
+
+        // Build ids
+
+        ontrack.build(p1, 'B1', '1.1').id
+        ontrack.build(p2, 'B2', '2.0').id
+
+        // Links
+        ontrack.build(p1, 'B1', '1.0').config {
+            // Same project
+            buildLink p1, '1.1'
+            // Other project
+            buildLink p2, '2.0'
+            // Unexisting build
+            buildLink p2, '2.2'
+            // Unexisting project
+            buildLink p3, '3.0'
+        }
+
+        // Gets the link decorations
+        def buildLinks = ontrack.build(p1, 'B1', '1.0').buildLinkDecorations
+        assert buildLinks.collect { [it.project, it.build] } == [
+                [p1, '1.1'],
+                [p2, '2.0'],
+                [p2, '2.2'],
+                [p3, '3.0'],
+        ]
+
+    }
+
+}

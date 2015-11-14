@@ -122,7 +122,7 @@ class Build extends AbstractProjectResource {
     /**
      * Build links decorations.
      */
-    List<?> getBuildLinkDecoration() {
+    List<?> getBuildLinkDecorations() {
         getDecorations('net.nemerosa.ontrack.extension.general.BuildLinkDecorationExtension')
     }
 

@@ -42,7 +42,7 @@ class PromotionLevel extends AbstractProjectResource {
     /**
      * Auto promotion decoration (for a promotion level)
      */
-    boolean getAutoPromotionPropertyDecoration() {
-        getDecoration('net.nemerosa.ontrack.extension.general.AutoPromotionPropertyDecorator') as boolean
+    Boolean getAutoPromotionPropertyDecoration() {
+        getDecoration('net.nemerosa.ontrack.extension.general.AutoPromotionPropertyDecorator') as Boolean
     }
 }

@@ -98,14 +98,15 @@ abstract class AbstractProjectResource extends AbstractResource implements Proje
      * Returns <code>null</code> if not defined or the JSON data is defined.
      */
     def getDecoration(String type) {
-        return getDecorations(type).first()
+        def decorations = getDecorations(type)
+        return decorations.empty ? null : decorations[0]
     }
 
     /**
      * Message decoration. Defines a <code>type</code> and a <code>text</code>
      */
-    List<?> getMessageDecoration() {
-        getDecorations('net.nemerosa.ontrack.extension.general.MessageDecorationExtension')
+    Map<String, ?> getMessageDecoration() {
+        getDecoration('net.nemerosa.ontrack.extension.general.MessageDecorationExtension') as Map
     }
 
     /**
