@@ -84,14 +84,16 @@ gulp.task('lint', function () {
     return gulp.src(jsResources)
         .pipe(debug({title: 'lint:'}))
         .pipe(jshint())
-        .pipe(jshint.reporter('default'));
+        .pipe(jshint.reporter('default'))
+        .pipe(liveReload());
 });
 
 gulp.task('templates', function () {
     return gulp.src(templateResources)
         .pipe(debug({title: 'templates:'}))
         .pipe(templateCache({module: 'ontrack', root: 'app/'}))
-        .pipe(gulp.dest(buildTemplates));
+        .pipe(gulp.dest(buildTemplates))
+        .pipe(liveReload());
 });
 
 /**
@@ -127,7 +129,8 @@ gulp.task('less', function () {
         .pipe(less())
         .pipe(debug({title: 'less:output:'}))
         .pipe(concat('ci-' + options.version + '.css'))
-        .pipe(gulp.dest(buildCss));
+        .pipe(gulp.dest(buildCss))
+        .pipe(liveReload());
 });
 
 // Concatenation of all CSS files, including the one generated from less
@@ -184,7 +187,8 @@ gulp.task('index:dev', ['less', 'fonts', 'templates'], function () {
             ),
             {relative: false, ignorePath: [outputPath, web, buildPath], addRootSlash: false}))
         .pipe(gulp.dest(buildPath))
-        .pipe(debug({title: 'index:dev:output'}));
+        .pipe(debug({title: 'index:dev:output'}))
+        .pipe(liveReload());
 });
 
 gulp.task('index:prod', ['css:concat', 'assets', 'fonts', 'templates', 'js:concat'], function () {
