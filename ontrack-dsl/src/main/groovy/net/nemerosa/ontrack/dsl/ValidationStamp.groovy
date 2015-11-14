@@ -38,4 +38,11 @@ class ValidationStamp extends AbstractProjectResource {
     Document getImage() {
         ontrack.download(link('image'))
     }
+
+    /**
+     * Validation stamp weather decoration: <code>weather</code> and <code>text</code>
+     */
+    def getValidationStampWeatherDecoration() {
+        getDecoration('net.nemerosa.ontrack.extension.general.ValidationStampWeatherDecorationExtension')
+    }
 }

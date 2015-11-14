@@ -68,4 +68,51 @@ abstract class AbstractProjectResource extends AbstractResource implements Proje
     def delete() {
         ontrack.delete(link('delete'))
     }
+
+    /**
+     * List of decorations for this entity.
+     *
+     * Each item in the list has a:
+     *
+     * <ul>
+     *     <li><code>decorationType</code> - qualified name of the decoration
+     *     <li><code>data</code> - JSON data of the decoration
+     * </ul>
+     */
+    List<?> getDecorations() {
+        return ontrack.get(link('decorations')).resources;
+    }
+
+    /**
+     * Gets the decoration for this entity and a given decoration qualified name.
+     */
+    List<?> getDecorations(String type) {
+        return decorations
+                .findAll { it.decorationType == type }
+                .collect { it.data }
+    }
+
+    /**
+     * Gets the first decoration for this entity and a given decoration qualified name.
+     *
+     * Returns <code>null</code> if not defined or the JSON data is defined.
+     */
+    def getDecoration(String type) {
+        return getDecorations(type).first()
+    }
+
+    /**
+     * Message decoration. Defines a <code>type</code> and a <code>text</code>
+     */
+    List<?> getMessageDecoration() {
+        getDecorations('net.nemerosa.ontrack.extension.general.MessageDecorationExtension')
+    }
+
+    /**
+     * Jenkins job decoration (state of the job)
+     */
+    String getJenkinsJobDecoration() {
+        getDecoration('net.nemerosa.ontrack.extension.jenkins.JenkinsJobDecorationExtension') as String
+    }
+
 }

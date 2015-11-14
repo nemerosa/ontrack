@@ -112,4 +112,25 @@ class Build extends AbstractProjectResource {
         }
     }
 
+    /**
+     * Release decoration
+     */
+    String getReleaseDecoration() {
+        getDecoration('net.nemerosa.ontrack.extension.general.ReleaseDecorationExtension') as String
+    }
+
+    /**
+     * Build links decorations.
+     */
+    List<?> getBuildLinkDecoration() {
+        getDecorations('net.nemerosa.ontrack.extension.general.BuildLinkDecorationExtension')
+    }
+
+    /**
+     * SVN revision decoration
+     */
+    Long getSvnRevisionDecoration() {
+        getDecoration('net.nemerosa.ontrack.extension.svn.SVNRevisionDecorationExtension') as Long
+    }
+
 }

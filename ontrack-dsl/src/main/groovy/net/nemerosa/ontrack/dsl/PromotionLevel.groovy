@@ -38,4 +38,11 @@ class PromotionLevel extends AbstractProjectResource {
     Document getImage() {
         ontrack.download(link('image'))
     }
+
+    /**
+     * Auto promotion decoration (for a promotion level)
+     */
+    boolean getAutoPromotionPropertyDecoration() {
+        getDecoration('net.nemerosa.ontrack.extension.general.AutoPromotionPropertyDecorator') as boolean
+    }
 }
