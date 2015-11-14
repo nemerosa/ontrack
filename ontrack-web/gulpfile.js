@@ -90,7 +90,7 @@ gulp.task('lint', function () {
 gulp.task('templates', function () {
     return gulp.src(templateResources)
         .pipe(debug({title: 'templates:'}))
-        .pipe(templateCache({module: 'ci', root: 'app/'}))
+        .pipe(templateCache({module: 'ontrack', root: 'app/'}))
         .pipe(gulp.dest(buildTemplates));
 });
 
