@@ -1,29 +1,20 @@
 package net.nemerosa.ontrack.boot.support;
 
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+
 @Component
+@Data
 @ConfigurationProperties(prefix = "ontrack.dev")
 public class DevSettings {
 
-    private String target;
-    private String staticDir;
+    private File web = new File(System.getProperty("user.dir"), "ontrack-web");
+    private String dev = "build/web/dev";
+    private String prod = "build/web/prod";
+    private String src = "src";
+    private String vendor = "vendor";
 
-    public String getTarget() {
-        return target;
-    }
-
-    public void setTarget(String target) {
-        this.target = target;
-    }
-
-    public String getStaticDir() {
-        return staticDir;
-    }
-
-    public void setStaticDir(String staticDir) {
-        this.staticDir = staticDir;
-    }
-    
 }

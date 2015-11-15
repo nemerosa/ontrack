@@ -5,8 +5,6 @@ var ontrack = angular.module('ontrack', [
         'multi-select',
         'angular_taglist_directive',
         'ngSanitize',
-        // Templates as JS
-        'ot.templates',
         // Directives
         'ot.directive.view',
         'ot.directive.misc',

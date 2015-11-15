@@ -6,13 +6,15 @@ adding the following program arguments:
 
     --spring.profiles.active=dev
 
-Additionally, one must compile the Web static resources in `dev` mode by running a Grunt command into the
-`ontrack-web` module:
+Additionally, one must compile the Web static resources in `dev` mode by running:
 
-    grunt dev
+    ./gradlew dev
 
-or:
+You can also monitor the changes in web resources and make the browser reload the page automatically by running:
 
-    grunt watch
+    ./gradlew watch
 
-By running `watch`, this makes the static resources changes available to the browser using LiveReload.
+This command is blocking.
+
+> Note that your browser must support [LiveReload](http://livereload.com/).
+

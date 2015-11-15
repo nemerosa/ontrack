@@ -10,6 +10,8 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import java.io.File;
+
 @Configuration
 @Profile(RunProfile.DEV)
 public class DevWebConfig extends WebMvcConfigurerAdapter {
@@ -21,23 +23,47 @@ public class DevWebConfig extends WebMvcConfigurerAdapter {
 
     /**
      * At development time, we want the static resources served directly
-     * from the <code>ontrack-web</code> project, under the <code>target/dev</code>
-     * directory.
+     * from the <code>ontrack-web</code> project, under the <code>build/web/dev</code> and <code>build/web/prod</code>
+     * directories.
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        String staticDir = devSettings.getStaticDir();
-        log.info("Static web resources from: " + staticDir);
-        String prefix = "file:";
-        String dir = prefix + staticDir;
-        if (!dir.endsWith("/")) {
-            dir += "/";
-        }
-        registry.addResourceHandler("/app/**").addResourceLocations(dir + "app/");
-        registry.addResourceHandler("/assets/**").addResourceLocations(dir + "assets/");
-        registry.addResourceHandler("/fonts/**").addResourceLocations(dir + "fonts/");
-        registry.addResourceHandler("/vendor/**").addResourceLocations(dir + "vendor/");
-        registry.addResourceHandler("index.html").addResourceLocations(dir);
+
+        // Warning
+        log.warn("[dev] Running in DEV mode");
+
+        // Compiled production resources
+
+        String prod = getPath(devSettings.getProd());
+        log.info("[dev] Compiled prod web resources from: " + prod);
+        registry.addResourceHandler("/fonts/**").addResourceLocations(prod + "/fonts/");
+
+        // Compiler dev resources
+
+        String dev = getPath(devSettings.getDev());
+        log.info("[dev] Compiled dev web resources from: " + dev);
+        registry.addResourceHandler("/css/**").addResourceLocations(dev + "/css/");
+        registry.addResourceHandler("/templates/**").addResourceLocations(dev + "/templates/");
+        registry.addResourceHandler("index.html").addResourceLocations(dev + "/");
+
+        // Direct access to the sources
+
+        String source = getPath(devSettings.getSrc());
+        log.info("[dev] Web sources from: " + source);
+        registry.addResourceHandler("/app/**").addResourceLocations(source + "/app/");
+        registry.addResourceHandler("/assets/**").addResourceLocations(source + "/assets/");
+
+        // Vendor resources
+        String vendor = getPath(devSettings.getVendor());
+        log.info("[dev] Vendor sources from: " + vendor);
+        registry.addResourceHandler("/vendor/**").addResourceLocations(vendor + "/");
+    }
+
+    private String getPath(String dirName) {
+        return "file:" + new File(
+                devSettings.getWeb(),
+                dirName
+        ).getAbsolutePath();
     }
 
     @Override
