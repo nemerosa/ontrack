@@ -2,17 +2,16 @@
 influxdb:
   image: tutum/influxdb:0.9
   ports:
-    - "8083"
-    - "8086"
+    - "38083:8083"
+    - "38086:8086"
   environment:
     PRE_CREATE_DB: "ontrack"
 # Grafana container
 grafana:
-  image: grafana/grafana:latest
+  build: ./grafana
   ports:
-    - "3000"
+    - "33000:3000"
   links:
     - "influxdb:influxdb"
   volumes:
-    - "./grafana/etc:/etc/grafana"
-    - "./grafana/lib:/var/lib/grafana"
+    - "./dashboards:/usr/lib/grafana/dashboards"
