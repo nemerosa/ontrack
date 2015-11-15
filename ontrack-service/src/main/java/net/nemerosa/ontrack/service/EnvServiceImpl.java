@@ -22,6 +22,7 @@ import java.io.IOException;
 public class EnvServiceImpl implements EnvService {
 
     private final Logger logger = LoggerFactory.getLogger(EnvService.class);
+    private final String defaultProfiles;
     private final String profiles;
     private final VersionInfo version;
     private final File home;
@@ -30,6 +31,7 @@ public class EnvServiceImpl implements EnvService {
     public EnvServiceImpl(VersionInfoConfig version,
                           OntrackConfigProperties configProperties,
                           ApplicationContext ctx) {
+        this.defaultProfiles = StringUtils.join(ctx.getEnvironment().getDefaultProfiles(), ",");
         this.profiles = StringUtils.join(ctx.getEnvironment().getActiveProfiles(), ",");
         // Version information from the configuration
         this.version = version.toInfo();
@@ -61,14 +63,15 @@ public class EnvServiceImpl implements EnvService {
 
     @PostConstruct
     public void init() throws FileNotFoundException {
-        logger.info("[env] With JDK:        {}", System.getProperty("java.version"));
-        logger.info("[env] With profiles:   {}", profiles);
-        logger.info("[version] Display:     {}", version.getDisplay());
-        logger.info("[version] Full:        {}", version.getFull());
-        logger.info("[version] Branch:      {}", version.getBranch());
-        logger.info("[version] Build:       {}", version.getBuild());
-        logger.info("[version] Commit:      {}", version.getCommit());
-        logger.info("[version] Source:      {}", version.getSource());
-        logger.info("[version] Source type: {}", version.getSourceType());
+        logger.info("[env] With JDK:              {}", System.getProperty("java.version"));
+        logger.info("[env] With default profiles: {}", defaultProfiles);
+        logger.info("[env] With active profiles:  {}", profiles);
+        logger.info("[version] Display:           {}", version.getDisplay());
+        logger.info("[version] Full:              {}", version.getFull());
+        logger.info("[version] Branch:            {}", version.getBranch());
+        logger.info("[version] Build:             {}", version.getBuild());
+        logger.info("[version] Commit:            {}", version.getCommit());
+        logger.info("[version] Source:            {}", version.getSource());
+        logger.info("[version] Source type:       {}", version.getSourceType());
     }
 }
