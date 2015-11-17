@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.ldap;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.DistinguishedName;
 import org.springframework.security.core.GrantedAuthority;

@@ -12,12 +12,12 @@ allprojects {
  * Common versions
  */
 
-def springBootVersion = '1.2.4.RELEASE'
-def springVersion = '4.1.5.RELEASE'
-def springSecurityVersion = '3.2.5.RELEASE'
-def httpClientVersion = '4.3.4'
-def slf4jVersion = '1.7.12'
-def metricsVersion = '3.1.0'
+def springBootVersion = '3.0.0.RELEASE'
+def springVersion = '4.2.3.RELEASE'
+def springSecurityVersion = '4.0.3.RELEASE'
+def httpClientVersion = '4.5.1'
+def slf4jVersion = '1.7.13'
+def metricsVersion = '3.1.2'
 
 /**
  * List of dependencies
@@ -28,8 +28,8 @@ ext {
             // Misc
             commons_lang3               : 'org.apache.commons:commons-lang3:3.3.2',
             commons_io                  : 'commons-io:commons-io:2.4',
-            jackson_databind            : 'com.fasterxml.jackson.core:jackson-databind:2.3.3',
-            guava                       : 'com.google.guava:guava:17.0',
+            jackson_databind            : 'com.fasterxml.jackson.core:jackson-databind:2.6.3',
+            guava                       : 'com.google.guava:guava:18.0',
             dbinit                      : 'net.sf.dbinit:dbinit:1.4.0',
             h2                          : 'com.h2database:h2:1.4.189',
             args4j                      : 'args4j:args4j:2.0.29',
