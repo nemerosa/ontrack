@@ -59,7 +59,7 @@ public class ResourceDecoratorSerializer<T> extends BeanSerializerBase {
     }
 
     @Override
-    protected BeanSerializerBase withFilterId(Object filterId) {
+    public BeanSerializerBase withFilterId(Object filterId) {
         throw new UnsupportedOperationException("withFilterId");
     }
 
