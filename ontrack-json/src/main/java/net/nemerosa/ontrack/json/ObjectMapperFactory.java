@@ -11,9 +11,13 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
 
+/**
+ * Note that support for @ConstructorProperties will be available in Jackson 2.7.0
+ * (see https://github.com/FasterXML/jackson-databind/issues/905)
+ */
 public final class ObjectMapperFactory {
 
-    public static final Version JSON_MODULE_VERSION = new Version(1, 0, 0, null, "net.nemerosa.ontrack", "iteach-json");
+    public static final Version JSON_MODULE_VERSION = new Version(1, 0, 0, null, "net.nemerosa.ontrack", "ontrack-json");
 
     public static ObjectMapper create() {
         ObjectMapper mapper = new ObjectMapper();
