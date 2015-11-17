@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.metrics.Metric;
+import org.springframework.boot.actuate.metrics.dropwizard.DropwizardMetricServices;
 import org.springframework.boot.actuate.metrics.export.AbstractMetricExporter;
 import org.springframework.boot.actuate.metrics.writer.DropwizardMetricWriter;
 import org.springframework.stereotype.Component;
@@ -18,18 +19,20 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-@Component
+// @Component
+@Deprecated
+// FIXME See how Ontrack metrics are exported to the outside
 public class DefaultMetricsExporter extends AbstractMetricExporter {
 
     private final Logger logger = LoggerFactory.getLogger(DefaultMetricsExporter.class);
 
     private final OntrackConfigProperties config;
-    private final DropwizardMetricWriter metricWriter;
+    private final DropwizardMetricServices metricWriter;
     private final ScheduledExecutorService executor;
     private final Collection<MetricsSource> metricsSources;
 
     @Autowired
-    public DefaultMetricsExporter(OntrackConfigProperties config, DropwizardMetricWriter metricWriter, Collection<MetricsSource> metricsSources) {
+    public DefaultMetricsExporter(OntrackConfigProperties config, DropwizardMetricServices metricWriter, Collection<MetricsSource> metricsSources) {
         super("");
         this.config = config;
         this.metricWriter = metricWriter;
@@ -67,7 +70,7 @@ public class DefaultMetricsExporter extends AbstractMetricExporter {
 
     private void write(Metric<?> metric) {
         logger.trace("{} -> {}", metric.getName(), metric.getValue());
-        metricWriter.set(metric);
+        // TODO metricWriter.set(metric);
     }
 
 }
