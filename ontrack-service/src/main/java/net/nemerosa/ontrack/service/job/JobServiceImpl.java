@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service.job;
 
-import com.codahale.metrics.*;
+import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.Table;
 import com.google.common.collect.Tables;
@@ -43,7 +43,7 @@ public class JobServiceImpl implements ScheduledService,
 
     private final AtomicLong syncCount = new AtomicLong();
     private final Table<String, String, RegisteredJob> registeredJobs = Tables.newCustomTable(
-            new HashMap<String, Map<String, RegisteredJob>>(),
+            new HashMap<>(),
             HashMap::new
     );
 
