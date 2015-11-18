@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.metrics.Metric;
 import org.springframework.boot.actuate.metrics.dropwizard.DropwizardMetricServices;
 import org.springframework.boot.actuate.metrics.export.AbstractMetricExporter;
-import org.springframework.boot.actuate.metrics.writer.DropwizardMetricWriter;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -19,9 +18,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-// @Component
-@Deprecated
-// FIXME See how Ontrack metrics are exported to the outside
+@Component
 public class DefaultMetricsExporter extends AbstractMetricExporter {
 
     private final Logger logger = LoggerFactory.getLogger(DefaultMetricsExporter.class);
@@ -70,7 +67,7 @@ public class DefaultMetricsExporter extends AbstractMetricExporter {
 
     private void write(Metric<?> metric) {
         logger.trace("{} -> {}", metric.getName(), metric.getValue());
-        // TODO metricWriter.set(metric);
+        metricWriter.submit(metric.getName(), metric.getValue().doubleValue());
     }
 
 }
