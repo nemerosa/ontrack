@@ -1,12 +1,10 @@
 package net.nemerosa.ontrack.extension.artifactory;
 
-import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
-import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClient;
-import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClientFactory;
 import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfiguration;
 import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfigurationService;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.model.Ack;
+import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -28,14 +26,12 @@ public class ArtifactoryController extends AbstractExtensionController<Artifacto
 
     private final ArtifactoryConfigurationService configurationService;
     private final SecurityService securityService;
-    private final ArtifactoryClientFactory artifactoryClientFactory;
 
     @Autowired
-    public ArtifactoryController(ArtifactoryExtensionFeature feature, ArtifactoryConfigurationService configurationService, SecurityService securityService, ArtifactoryClientFactory artifactoryClientFactory) {
+    public ArtifactoryController(ArtifactoryExtensionFeature feature, ArtifactoryConfigurationService configurationService, SecurityService securityService) {
         super(feature);
         this.configurationService = configurationService;
         this.securityService = securityService;
-        this.artifactoryClientFactory = artifactoryClientFactory;
     }
 
     @Override
@@ -79,15 +75,7 @@ public class ArtifactoryController extends AbstractExtensionController<Artifacto
      */
     @RequestMapping(value = "configurations/test", method = RequestMethod.POST)
     public ConnectionResult testConfiguration(@RequestBody ArtifactoryConfiguration configuration) {
-        try {
-            ArtifactoryClient client = artifactoryClientFactory.getClient(configuration);
-            // Gets the basic info
-            client.getBuildNames();
-            // OK
-            return ConnectionResult.ok();
-        } catch (Exception ex) {
-            return ConnectionResult.error(ex.getMessage());
-        }
+        return configurationService.test(configuration);
     }
 
     /**

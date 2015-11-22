@@ -1,10 +1,9 @@
 package net.nemerosa.ontrack.extension.jira;
 
-import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
-import net.nemerosa.ontrack.extension.jira.tx.JIRASession;
 import net.nemerosa.ontrack.extension.jira.tx.JIRASessionFactory;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.model.Ack;
+import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -77,14 +76,7 @@ public class JIRAController extends AbstractExtensionController<JIRAExtensionFea
      */
     @RequestMapping(value = "configurations/test", method = RequestMethod.POST)
     public ConnectionResult testConfiguration(@RequestBody JIRAConfiguration configuration) {
-        try (JIRASession jiraSession = jiraSessionFactory.create(configuration)) {
-            // Gets the list of projects
-            jiraSession.getClient().getProjects();
-            // OK
-            return ConnectionResult.ok();
-        } catch (Exception ex) {
-            return ConnectionResult.error(ex.getMessage());
-        }
+        return jiraConfigurationService.test(configuration);
     }
 
     /**

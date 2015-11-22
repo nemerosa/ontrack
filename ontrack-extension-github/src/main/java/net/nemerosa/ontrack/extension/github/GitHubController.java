@@ -1,12 +1,10 @@
 package net.nemerosa.ontrack.extension.github;
 
-import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
-import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClient;
-import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory;
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration;
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.model.Ack;
+import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -27,17 +25,14 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 public class GitHubController extends AbstractExtensionController<GitHubExtensionFeature> {
 
     private final GitHubConfigurationService configurationService;
-    private final OntrackGitHubClientFactory gitHubClientFactory;
     private final SecurityService securityService;
 
     @Autowired
     public GitHubController(GitHubExtensionFeature feature,
                             GitHubConfigurationService configurationService,
-                            OntrackGitHubClientFactory gitHubClientFactory,
                             SecurityService securityService) {
         super(feature);
         this.configurationService = configurationService;
-        this.gitHubClientFactory = gitHubClientFactory;
         this.securityService = securityService;
     }
 
@@ -71,16 +66,7 @@ public class GitHubController extends AbstractExtensionController<GitHubExtensio
      */
     @RequestMapping(value = "configurations/test", method = RequestMethod.POST)
     public ConnectionResult testConfiguration(@RequestBody GitHubEngineConfiguration configuration) {
-        try {
-            // Gets the client
-            OntrackGitHubClient client = gitHubClientFactory.create(configuration);
-            // Gets the list of repositories
-            client.getRepositories();
-            // OK
-            return ConnectionResult.ok();
-        } catch (Exception ex) {
-            return ConnectionResult.error(ex.getMessage());
-        }
+        return configurationService.test(configuration);
     }
 
     /**

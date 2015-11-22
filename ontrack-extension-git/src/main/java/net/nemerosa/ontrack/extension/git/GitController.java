@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.git;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.api.model.FileDiffChangeLogRequest;
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest;
@@ -18,9 +17,9 @@ import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogIssue;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogUUIDException;
 import net.nemerosa.ontrack.extension.scm.model.SCMDocumentNotFoundException;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
-import net.nemerosa.ontrack.git.GitRepositoryClientFactory;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.buildfilter.BuildDiff;
+import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -58,7 +57,6 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
     private final GitConfigurationService configurationService;
     private final IssueServiceRegistry issueServiceRegistry;
     private final SecurityService securityService;
-    private final GitRepositoryClientFactory repositoryClientFactory;
 
     private final Cache<String, GitChangeLog> logCache;
 
@@ -68,14 +66,13 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
                          GitService gitService,
                          GitConfigurationService configurationService,
                          IssueServiceRegistry issueServiceRegistry,
-                         SecurityService securityService, GitRepositoryClientFactory repositoryClientFactory) {
+                         SecurityService securityService) {
         super(feature);
         this.structureService = structureService;
         this.gitService = gitService;
         this.configurationService = configurationService;
         this.issueServiceRegistry = issueServiceRegistry;
         this.securityService = securityService;
-        this.repositoryClientFactory = repositoryClientFactory;
         // Cache
         logCache = CacheBuilder.newBuilder()
                 .maximumSize(20)
@@ -124,12 +121,7 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
      */
     @RequestMapping(value = "configurations/test", method = RequestMethod.POST)
     public ConnectionResult testConfiguration(@RequestBody BasicGitConfiguration configuration) {
-        try {
-            repositoryClientFactory.getClient(configuration.getGitRepository()).test();
-            return ConnectionResult.ok();
-        } catch (Exception ex) {
-            return ConnectionResult.error(ex.getMessage());
-        }
+        return configurationService.test(configuration);
     }
 
     /**
