@@ -22,14 +22,16 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
     private final EncryptionService encryptionService;
     private final EventPostService eventPostService;
     private final EventFactory eventFactory;
+    private final OntrackConfigProperties ontrackConfigProperties;
 
-    public AbstractConfigurationService(Class<T> configurationClass, ConfigurationRepository configurationRepository, SecurityService securityService, EncryptionService encryptionService, EventPostService eventPostService, EventFactory eventFactory) {
+    public AbstractConfigurationService(Class<T> configurationClass, ConfigurationRepository configurationRepository, SecurityService securityService, EncryptionService encryptionService, EventPostService eventPostService, EventFactory eventFactory, OntrackConfigProperties ontrackConfigProperties) {
         this.configurationClass = configurationClass;
         this.configurationRepository = configurationRepository;
         this.securityService = securityService;
         this.encryptionService = encryptionService;
         this.eventPostService = eventPostService;
         this.eventFactory = eventFactory;
+        this.ontrackConfigProperties = ontrackConfigProperties;
     }
 
     /**
@@ -119,9 +121,11 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
     }
 
     protected void validateAndCheck(T configuration) {
-        ConnectionResult result = validate(configuration);
-        if (result.getType() == ConnectionResult.ConnectionResultType.ERROR) {
-            throw new ConfigurationValidationException(configuration, result.getMessage());
+        if (ontrackConfigProperties.isConfigurationTest()) {
+            ConnectionResult result = validate(configuration);
+            if (result.getType() == ConnectionResult.ConnectionResultType.ERROR) {
+                throw new ConfigurationValidationException(configuration, result.getMessage());
+            }
         }
     }
 

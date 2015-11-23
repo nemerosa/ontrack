@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConfigurationProperties(prefix = "ontrack.extension.svn")
+@Deprecated
 public class SVNConfigProperties {
 
     /**

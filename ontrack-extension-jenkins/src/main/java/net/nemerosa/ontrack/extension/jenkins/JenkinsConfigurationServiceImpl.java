@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.model.security.EncryptionService;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
 import net.nemerosa.ontrack.model.support.ConnectionResult;
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,8 +21,8 @@ public class JenkinsConfigurationServiceImpl extends AbstractConfigurationServic
     private final JenkinsClientFactory jenkinsClientFactory;
 
     @Autowired
-    public JenkinsConfigurationServiceImpl(ConfigurationRepository configurationRepository, SecurityService securityService, EncryptionService encryptionService, EventPostService eventPostService, EventFactory eventFactory, JenkinsClientFactory jenkinsClientFactory) {
-        super(JenkinsConfiguration.class, configurationRepository, securityService, encryptionService, eventPostService, eventFactory);
+    public JenkinsConfigurationServiceImpl(ConfigurationRepository configurationRepository, SecurityService securityService, EncryptionService encryptionService, EventPostService eventPostService, EventFactory eventFactory, JenkinsClientFactory jenkinsClientFactory, OntrackConfigProperties ontrackConfigProperties) {
+        super(JenkinsConfiguration.class, configurationRepository, securityService, encryptionService, eventPostService, eventFactory, ontrackConfigProperties);
         this.jenkinsClientFactory = jenkinsClientFactory;
     }
 

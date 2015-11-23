@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.model.security.EncryptionService;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
 import net.nemerosa.ontrack.model.support.ConnectionResult;
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,8 +22,8 @@ public class GitHubConfigurationServiceImpl extends AbstractConfigurationService
     private final OntrackGitHubClientFactory gitHubClientFactory;
 
     @Autowired
-    public GitHubConfigurationServiceImpl(ConfigurationRepository configurationRepository, SecurityService securityService, EncryptionService encryptionService, EventPostService eventPostService, EventFactory eventFactory, OntrackGitHubClientFactory gitHubClientFactory) {
-        super(GitHubEngineConfiguration.class, configurationRepository, securityService, encryptionService, eventPostService, eventFactory);
+    public GitHubConfigurationServiceImpl(ConfigurationRepository configurationRepository, SecurityService securityService, EncryptionService encryptionService, EventPostService eventPostService, EventFactory eventFactory, OntrackGitHubClientFactory gitHubClientFactory, OntrackConfigProperties ontrackConfigProperties) {
+        super(GitHubEngineConfiguration.class, configurationRepository, securityService, encryptionService, eventPostService, eventFactory, ontrackConfigProperties);
         this.gitHubClientFactory = gitHubClientFactory;
     }
 

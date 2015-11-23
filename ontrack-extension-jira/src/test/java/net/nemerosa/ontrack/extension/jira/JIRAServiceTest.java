@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.security.EncryptionService;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,8 +34,10 @@ public class JIRAServiceTest {
         JIRASessionFactory jiraSessionFactory = mock(JIRASessionFactory.class);
         when(jiraSessionFactory.create(any(JIRAConfiguration.class))).thenReturn(jiraSession);
 
+        OntrackConfigProperties ontrackConfigProperties = new OntrackConfigProperties();
+
         jiraService = new JIRAConfigurationServiceImpl(configurationRepository, securityService, encryptionService,
-                mock(EventPostService.class), mock(EventFactory.class), jiraSessionFactory);
+                mock(EventPostService.class), mock(EventFactory.class), jiraSessionFactory, ontrackConfigProperties);
     }
 
     @Test(expected = IllegalArgumentException.class)

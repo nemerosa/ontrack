@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.model.security.EncryptionService;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
 import net.nemerosa.ontrack.model.support.ConnectionResult;
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,8 +23,8 @@ public class StashConfigurationServiceImpl extends AbstractConfigurationService<
     private final ClientFactory clientFactory;
 
     @Autowired
-    public StashConfigurationServiceImpl(ConfigurationRepository configurationRepository, SecurityService securityService, EncryptionService encryptionService, EventPostService eventPostService, EventFactory eventFactory, ClientFactory clientFactory) {
-        super(StashConfiguration.class, configurationRepository, securityService, encryptionService, eventPostService, eventFactory);
+    public StashConfigurationServiceImpl(ConfigurationRepository configurationRepository, SecurityService securityService, EncryptionService encryptionService, EventPostService eventPostService, EventFactory eventFactory, ClientFactory clientFactory, OntrackConfigProperties ontrackConfigProperties) {
+        super(StashConfiguration.class, configurationRepository, securityService, encryptionService, eventPostService, eventFactory, ontrackConfigProperties);
         this.clientFactory = clientFactory;
     }
 

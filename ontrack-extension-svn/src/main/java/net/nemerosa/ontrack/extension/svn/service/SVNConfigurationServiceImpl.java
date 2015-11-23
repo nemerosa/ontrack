@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepositoryDao;
 import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration;
 import net.nemerosa.ontrack.extension.svn.model.SVNURLFormatException;
-import net.nemerosa.ontrack.extension.svn.support.SVNConfigProperties;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
 import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventPostService;
@@ -14,6 +13,7 @@ import net.nemerosa.ontrack.model.security.EncryptionService;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
 import net.nemerosa.ontrack.model.support.ConnectionResult;
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
 import net.nemerosa.ontrack.tx.Transaction;
 import net.nemerosa.ontrack.tx.TransactionService;
 import org.apache.commons.lang3.StringUtils;
@@ -35,15 +35,15 @@ public class SVNConfigurationServiceImpl extends AbstractConfigurationService<SV
     private final Logger logger = LoggerFactory.getLogger(SVNConfigurationService.class);
 
     private final SVNRepositoryDao repositoryDao;
-    private final SVNConfigProperties svnConfigProperties;
+    private final OntrackConfigProperties ontrackConfigProperties;
     private final TransactionService transactionService;
     private final SVNClient svnClient;
 
     @Autowired
-    public SVNConfigurationServiceImpl(ConfigurationRepository configurationRepository, SecurityService securityService, EncryptionService encryptionService, SVNRepositoryDao repositoryDao, EventPostService eventPostService, EventFactory eventFactory, SVNConfigProperties svnConfigProperties, TransactionService transactionService, SVNClient svnClient) {
-        super(SVNConfiguration.class, configurationRepository, securityService, encryptionService, eventPostService, eventFactory);
+    public SVNConfigurationServiceImpl(ConfigurationRepository configurationRepository, SecurityService securityService, EncryptionService encryptionService, SVNRepositoryDao repositoryDao, EventPostService eventPostService, EventFactory eventFactory, OntrackConfigProperties ontrackConfigProperties, TransactionService transactionService, SVNClient svnClient) {
+        super(SVNConfiguration.class, configurationRepository, securityService, encryptionService, eventPostService, eventFactory, ontrackConfigProperties);
         this.repositoryDao = repositoryDao;
-        this.svnConfigProperties = svnConfigProperties;
+        this.ontrackConfigProperties = ontrackConfigProperties;
         this.transactionService = transactionService;
         this.svnClient = svnClient;
     }
@@ -67,7 +67,7 @@ public class SVNConfigurationServiceImpl extends AbstractConfigurationService<SV
                     url
             );
         }
-        if (svnConfigProperties.isTest()) {
+        if (ontrackConfigProperties.isConfigurationTest()) {
             //noinspection unused
             try (Transaction tx = transactionService.start()) {
                 // Creates a repository

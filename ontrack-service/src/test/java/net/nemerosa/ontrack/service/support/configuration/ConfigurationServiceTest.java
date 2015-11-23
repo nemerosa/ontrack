@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.security.EncryptionService;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -34,12 +35,14 @@ public class ConfigurationServiceTest {
         EncryptionService encryptionService = mock(EncryptionService.class);
         eventPostService = mock(EventPostService.class);
         eventFactory = mock(EventFactory.class);
+        OntrackConfigProperties ontrackConfigProperties = new OntrackConfigProperties();
         configurationService = new TestConfigurationServiceImpl(
                 configurationRepository,
                 securityService,
                 encryptionService,
                 eventPostService,
-                eventFactory
+                eventFactory,
+                ontrackConfigProperties
         );
     }
 

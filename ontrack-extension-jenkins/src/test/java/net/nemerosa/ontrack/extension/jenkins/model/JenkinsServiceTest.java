@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.security.EncryptionService;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,8 +34,10 @@ public class JenkinsServiceTest {
         JenkinsClient okJenkinsClient = mock(JenkinsClient.class);
         when(jenkinsClientFactory.getClient(any(JenkinsConfiguration.class))).thenReturn(okJenkinsClient);
 
+        OntrackConfigProperties ontrackConfigProperties = new OntrackConfigProperties();
+
         jenkinsService = new JenkinsConfigurationServiceImpl(configurationRepository, securityService, encryptionService,
-                mock(EventPostService.class), mock(EventFactory.class), jenkinsClientFactory);
+                mock(EventPostService.class), mock(EventFactory.class), jenkinsClientFactory, ontrackConfigProperties);
     }
 
     @Test(expected = IllegalArgumentException.class)
