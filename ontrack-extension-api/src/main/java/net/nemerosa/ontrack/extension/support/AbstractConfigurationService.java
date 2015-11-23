@@ -58,10 +58,10 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
     @Override
     public T newConfiguration(T configuration) {
         checkAccess();
-        validate(configuration);
+        validateAndCheck(configuration);
         configurationRepository.save(encrypt(configuration));
         eventPostService.post(eventFactory.newConfiguration(configuration));
-        return configuration;
+        return configuration.obfuscate();
     }
 
     @Override
@@ -92,7 +92,7 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
         checkAccess();
         Validate.isTrue(StringUtils.equals(name, configuration.getName()), "Configuration name must match");
         T configToSave = injectCredentials(configuration);
-        validate(configToSave);
+        validateAndCheck(configToSave);
         configurationRepository.save(encrypt(configToSave));
         eventPostService.post(eventFactory.updateConfiguration(configuration));
     }
@@ -116,6 +116,13 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
             target = configuration;
         }
         return target;
+    }
+
+    protected void validateAndCheck(T configuration) {
+        ConnectionResult result = validate(configuration);
+        if (result.getType() == ConnectionResult.ConnectionResultType.ERROR) {
+            throw new ConfigurationValidationException(result.getMessage());
+        }
     }
 
     @Override

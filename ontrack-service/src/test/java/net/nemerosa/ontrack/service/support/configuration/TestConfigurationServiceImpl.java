@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.security.EncryptionService;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
 import net.nemerosa.ontrack.model.support.ConnectionResult;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,14 @@ public class TestConfigurationServiceImpl extends AbstractConfigurationService<T
 
     @Override
     protected ConnectionResult validate(TestConfiguration configuration) {
-        return ConnectionResult.ok();
+        if (StringUtils.equals("check", configuration.getUser())) {
+            if (StringUtils.equals("test", configuration.getPassword())) {
+                return ConnectionResult.ok();
+            } else {
+                return ConnectionResult.error("Wrong password");
+            }
+        } else {
+            return ConnectionResult.ok();
+        }
     }
 }
