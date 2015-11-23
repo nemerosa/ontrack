@@ -71,7 +71,7 @@ public class ConfigurationServiceTest {
                 config,
                 s -> s.replaceAll("test", "new")
         );
-        assertEquals(config("new"), replacedConfig);
+        assertEquals(config("new").withPassword(""), replacedConfig);
     }
 
     @Test
