@@ -1,12 +1,10 @@
 package net.nemerosa.ontrack.boot.ui;
 
-import net.nemerosa.ontrack.extension.jenkins.JenkinsConfiguration;
-import net.nemerosa.ontrack.extension.jenkins.JenkinsController;
-import net.nemerosa.ontrack.extension.jenkins.JenkinsJobProperty;
-import net.nemerosa.ontrack.extension.jenkins.JenkinsJobPropertyType;
+import net.nemerosa.ontrack.extension.general.MessageProperty;
+import net.nemerosa.ontrack.extension.general.MessagePropertyType;
+import net.nemerosa.ontrack.extension.general.MessageType;
 import net.nemerosa.ontrack.model.form.Field;
 import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.ProjectCreation;
 import net.nemerosa.ontrack.model.security.ProjectView;
@@ -19,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Optional;
 
 import static net.nemerosa.ontrack.json.JsonUtils.object;
-import static net.nemerosa.ontrack.test.TestUtils.uid;
 import static org.junit.Assert.*;
 
 /**
@@ -29,9 +26,6 @@ public class PropertyControllerIT extends AbstractWebTestSupport {
 
     @Autowired
     private PropertyController controller;
-
-    @Autowired
-    private JenkinsController jenkinsController;
 
     @Autowired
     private StructureService structureService;
@@ -91,51 +85,40 @@ public class PropertyControllerIT extends AbstractWebTestSupport {
         Project project = asUser().with(ProjectCreation.class).call(() -> structureService.newProject(
                 Project.of(nameDescription())
         ));
-        // Creates a Jenkins configuration
-        String configurationName = uid("C");
-        asUser().with(GlobalSettings.class).call(() -> jenkinsController.newConfiguration(
-                new JenkinsConfiguration(
-                        configurationName,
-                        "http://jenkins",
-                        "",
-                        ""
-                )
-        ));
         asUser()
                 .with(project.id(), ProjectConfig.class)
                 .call(
                         () -> {
-                            controller.editProperty(ProjectEntityType.PROJECT, project.getId(), JenkinsJobPropertyType.class.getName(),
+                            controller.editProperty(ProjectEntityType.PROJECT, project.getId(), MessagePropertyType.class.getName(),
                                     object()
-                                            .with("configuration", configurationName)
-                                            .with("job", "MyJob")
+                                            .with("type", "INFO")
+                                            .with("text", "Message")
                                             .end()
                             );
                             // Gets the property
-                            Resource<Property<?>> propertyResource = controller.getPropertyValue(ProjectEntityType.PROJECT, project.getId(), JenkinsJobPropertyType.class.getName());
+                            Resource<Property<?>> propertyResource = controller.getPropertyValue(ProjectEntityType.PROJECT, project.getId(), MessagePropertyType.class.getName());
                             assertNotNull(propertyResource);
                             @SuppressWarnings("unchecked")
-                            Property<JenkinsJobProperty> property = (Property<JenkinsJobProperty>) propertyResource.getData();
+                            Property<MessageProperty> property = (Property<MessageProperty>) propertyResource.getData();
                             // Checks the property
                             assertFalse(property.isEmpty());
-                            JenkinsJobProperty value = property.getValue();
+                            MessageProperty value = property.getValue();
                             assertNotNull(value);
                             // Checks the property content
-                            assertEquals("MyJob", value.getJob());
-                            assertEquals(configurationName, value.getConfiguration().getName());
-                            assertEquals("http://jenkins/job/MyJob", value.getUrl());
+                            assertEquals("Message", value.getText());
+                            assertEquals(MessageType.INFO, value.getType());
                             // Gets the edition form
-                            Form form = controller.getPropertyEditionForm(ProjectEntityType.PROJECT, project.getId(), JenkinsJobPropertyType.class.getName());
+                            Form form = controller.getPropertyEditionForm(ProjectEntityType.PROJECT, project.getId(), MessagePropertyType.class.getName());
                             assertEquals(2, form.getFields().size());
                             {
-                                Field f = form.getField("configuration");
+                                Field f = form.getField("type");
                                 assertNotNull(f);
-                                assertEquals(configurationName, f.getValue());
+                                assertEquals("INFO", f.getValue());
                             }
                             {
-                                Field f = form.getField("job");
+                                Field f = form.getField("text");
                                 assertNotNull(f);
-                                assertEquals("MyJob", f.getValue());
+                                assertEquals("Message", f.getValue());
                             }
                             // End
                             return null;
