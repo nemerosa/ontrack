@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.jira;
 
+import net.nemerosa.ontrack.extension.jira.client.JIRAClient;
+import net.nemerosa.ontrack.extension.jira.tx.JIRASession;
 import net.nemerosa.ontrack.extension.jira.tx.JIRASessionFactory;
 import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventPostService;
@@ -24,7 +26,13 @@ public class JIRAServiceTest {
         SecurityService securityService = mock(SecurityService.class);
         configurationRepository = mock(ConfigurationRepository.class);
         encryptionService = mock(EncryptionService.class);
+
+        JIRASession jiraSession = mock(JIRASession.class);
+        when(jiraSession.getClient()).thenReturn(mock(JIRAClient.class));
+
         JIRASessionFactory jiraSessionFactory = mock(JIRASessionFactory.class);
+        when(jiraSessionFactory.create(any(JIRAConfiguration.class))).thenReturn(jiraSession);
+
         jiraService = new JIRAConfigurationServiceImpl(configurationRepository, securityService, encryptionService,
                 mock(EventPostService.class), mock(EventFactory.class), jiraSessionFactory);
     }
