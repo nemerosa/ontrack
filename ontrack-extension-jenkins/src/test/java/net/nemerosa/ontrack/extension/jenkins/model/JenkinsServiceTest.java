@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.jenkins.model;
 import net.nemerosa.ontrack.extension.jenkins.JenkinsConfiguration;
 import net.nemerosa.ontrack.extension.jenkins.JenkinsConfigurationService;
 import net.nemerosa.ontrack.extension.jenkins.JenkinsConfigurationServiceImpl;
+import net.nemerosa.ontrack.extension.jenkins.client.JenkinsClient;
 import net.nemerosa.ontrack.extension.jenkins.client.JenkinsClientFactory;
 import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventPostService;
@@ -27,7 +28,11 @@ public class JenkinsServiceTest {
         SecurityService securityService = mock(SecurityService.class);
         configurationRepository = mock(ConfigurationRepository.class);
         encryptionService = mock(EncryptionService.class);
+
         JenkinsClientFactory jenkinsClientFactory = mock(JenkinsClientFactory.class);
+        JenkinsClient okJenkinsClient = mock(JenkinsClient.class);
+        when(jenkinsClientFactory.getClient(any(JenkinsConfiguration.class))).thenReturn(okJenkinsClient);
+
         jenkinsService = new JenkinsConfigurationServiceImpl(configurationRepository, securityService, encryptionService,
                 mock(EventPostService.class), mock(EventFactory.class), jenkinsClientFactory);
     }

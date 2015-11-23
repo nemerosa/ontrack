@@ -121,7 +121,7 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
     protected void validateAndCheck(T configuration) {
         ConnectionResult result = validate(configuration);
         if (result.getType() == ConnectionResult.ConnectionResultType.ERROR) {
-            throw new ConfigurationValidationException(result.getMessage());
+            throw new ConfigurationValidationException(configuration, result.getMessage());
         }
     }
 
