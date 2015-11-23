@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.support;
 
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
+import net.nemerosa.ontrack.model.support.ConnectionResult;
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration;
 
 import java.util.List;
@@ -30,6 +31,11 @@ public interface ConfigurationService<T extends UserPasswordConfiguration> {
     Optional<T> getOptionalConfiguration(String name);
 
     void deleteConfiguration(String name);
+
+    /**
+     * Tests a configuration
+     */
+    ConnectionResult test(T configuration);
 
     /**
      * Gets the former password if new password is blank for the same user. For a new user,

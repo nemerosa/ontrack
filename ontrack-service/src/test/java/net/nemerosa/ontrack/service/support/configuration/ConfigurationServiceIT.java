@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service.support.configuration;
 
+import net.nemerosa.ontrack.extension.support.ConfigurationValidationException;
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport;
 import net.nemerosa.ontrack.model.security.EncryptionService;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
@@ -10,6 +11,7 @@ import net.nemerosa.ontrack.model.structure.PropertyService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
 import net.nemerosa.ontrack.service.support.property.TestProperty;
 import net.nemerosa.ontrack.service.support.property.TestPropertyType;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -35,6 +37,72 @@ public class ConfigurationServiceIT extends AbstractServiceTestSupport {
     private PropertyService propertyService;
 
     @Test
+    public void validate_ok_on_new_configuration() throws Exception {
+        TestConfiguration configuration = new TestConfiguration(uid("T"), "check", "test");
+        TestConfiguration savedConfig = asUser().with(GlobalSettings.class).call(() ->
+                        configurationService.newConfiguration(configuration)
+        );
+        assertEquals(configuration.getName(), savedConfig.getName());
+        assertTrue(StringUtils.isEmpty(savedConfig.getPassword()));
+    }
+
+    @Test(expected = ConfigurationValidationException.class)
+    public void validate_nok_on_new_configuration() throws Exception {
+        TestConfiguration configuration = new TestConfiguration(uid("T"), "check", "xxx");
+        asUser().with(GlobalSettings.class).call(() ->
+                        configurationService.newConfiguration(configuration)
+        );
+    }
+
+    @Test
+    public void validate_ok_on_updated_configuration_with_old_password() throws Exception {
+        // Creates a configuration
+        String name = uid("T");
+        TestConfiguration configuration = new TestConfiguration(name, "check", "test");
+        asUser().with(GlobalSettings.class).call(() ->
+                        configurationService.newConfiguration(configuration)
+        );
+        // Updates the configuration and fills the password
+        TestConfiguration updatedConfiguration = new TestConfiguration(name, "check", "test");
+        asUser().with(GlobalSettings.class).call(() -> {
+            configurationService.updateConfiguration(name, updatedConfiguration);
+            return null;
+        });
+    }
+
+    @Test
+    public void validate_ok_on_updated_configuration_without_old_password() throws Exception {
+        // Creates a configuration
+        String name = uid("T");
+        TestConfiguration configuration = new TestConfiguration(name, "check", "test");
+        asUser().with(GlobalSettings.class).call(() ->
+                        configurationService.newConfiguration(configuration)
+        );
+        // Updates the configuration and fills the password
+        TestConfiguration updatedConfiguration = new TestConfiguration(name, "check", "");
+        asUser().with(GlobalSettings.class).call(() -> {
+            configurationService.updateConfiguration(name, updatedConfiguration);
+            return null;
+        });
+    }
+
+    @Test(expected = ConfigurationValidationException.class)
+    public void validate_nok_on_updated_configuration_with_wrong_old_password() throws Exception {
+        // Creates a configuration
+        String name = uid("T");
+        TestConfiguration configuration = new TestConfiguration(name, "check", "test");
+        asUser().with(GlobalSettings.class).call(() ->
+                        configurationService.newConfiguration(configuration)
+        );
+        // Updates the configuration and fills the password
+        TestConfiguration updatedConfiguration = new TestConfiguration(name, "check", "xxx");
+        asUser().with(GlobalSettings.class).call(() -> {
+            configurationService.updateConfiguration(name, updatedConfiguration);
+            return null;
+        });
+    }
+
+    @Test
     public void encryption() {
         String crypted = encryptionService.encrypt("test");
         assertNotEquals("test", crypted);
@@ -49,8 +117,9 @@ public class ConfigurationServiceIT extends AbstractServiceTestSupport {
             // Saves this configuration in the database
             TestConfiguration savedConfiguration = configurationService.newConfiguration(configuration);
             // The returned password is not encrypted (we may need it)
-            assertEquals(PLAIN_PASSWORD, savedConfiguration.getPassword());
+            assertEquals("", savedConfiguration.getPassword());
             // Loads the configuration
+            // The returned password is not encrypted (we may need it)
             TestConfiguration loadedConfiguration = configurationService.getConfiguration("test1");
             assertEquals(PLAIN_PASSWORD, loadedConfiguration.getPassword());
             // Now, checks the raw result in the repository

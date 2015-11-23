@@ -50,14 +50,15 @@ class SVNConfigurationServiceIT extends AbstractServiceTestSupport {
 
     @Test(expected = SVNURLFormatException)
     void 'No trailing slash on the URL'() {
-        svnService.test(SVNConfiguration.of("test", "svn://localhost/"))
+        configurationService.test(SVNConfiguration.of("test", "svn://localhost/")
+                .withUser("test").withPassword("test"))
     }
 
     @Test
     @IfProfileValue(name = "svn", value = "true")
     void 'SVN configuration must point to the repository root - nok'() {
         repo.mkdir "SVNConfigurationSubFolder", "Sub folder"
-        def result = svnService.test(
+        def result = configurationService.test(
                 SVNConfiguration.of("test", "svn://localhost/SVNConfigurationSubFolder")
                         .withUser("test").withPassword("test")
         )
@@ -68,7 +69,7 @@ class SVNConfigurationServiceIT extends AbstractServiceTestSupport {
     @Test
     @IfProfileValue(name = "svn", value = "true")
     void 'SVN configuration must point to the repository root'() {
-        def result = svnService.test(
+        def result = configurationService.test(
                 SVNConfiguration.of("test", "svn://localhost")
                         .withUser("test").withPassword("test")
         )

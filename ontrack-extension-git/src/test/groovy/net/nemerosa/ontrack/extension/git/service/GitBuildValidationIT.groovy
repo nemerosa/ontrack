@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.git.service
 
+import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.api.model.BuildValidationException
 import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
@@ -7,8 +8,8 @@ import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropert
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationPropertyType
-import net.nemerosa.ontrack.extension.scm.support.TagPattern
 import net.nemerosa.ontrack.extension.git.support.TagPatternBuildNameGitCommitLink
+import net.nemerosa.ontrack.extension.scm.support.TagPattern
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectEdit
@@ -19,6 +20,7 @@ import net.nemerosa.ontrack.model.structure.PropertyService
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.test.context.ActiveProfiles
 
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd
 import static net.nemerosa.ontrack.test.TestUtils.uid
@@ -26,6 +28,7 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
 /**
  * Tests for #187 - validation of the build name
  */
+@ActiveProfiles(profiles = [RunProfile.UNIT_TEST, "git.mock"])
 class GitBuildValidationIT extends AbstractServiceTestSupport {
 
     @Autowired

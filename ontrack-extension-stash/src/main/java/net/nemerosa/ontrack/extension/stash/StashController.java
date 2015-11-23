@@ -1,14 +1,11 @@
 package net.nemerosa.ontrack.extension.stash;
 
-import net.nemerosa.ontrack.client.OTHttpClient;
-import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.stash.model.StashConfiguration;
 import net.nemerosa.ontrack.extension.stash.service.StashConfigurationService;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
-import net.nemerosa.ontrack.extension.support.client.ClientConnection;
-import net.nemerosa.ontrack.extension.support.client.ClientFactory;
 import net.nemerosa.ontrack.model.Ack;
+import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -30,19 +27,16 @@ public class StashController extends AbstractExtensionController<StashExtensionF
     private final StashConfigurationService configurationService;
     private final SecurityService securityService;
     private final IssueServiceRegistry issueServiceRegistry;
-    private final ClientFactory clientFactory;
 
     @Autowired
     public StashController(StashExtensionFeature feature,
                            StashConfigurationService configurationService,
                            SecurityService securityService,
-                           IssueServiceRegistry issueServiceRegistry,
-                           ClientFactory clientFactory) {
+                           IssueServiceRegistry issueServiceRegistry) {
         super(feature);
         this.configurationService = configurationService;
         this.securityService = securityService;
         this.issueServiceRegistry = issueServiceRegistry;
-        this.clientFactory = clientFactory;
     }
 
     @Override
@@ -75,22 +69,7 @@ public class StashController extends AbstractExtensionController<StashExtensionF
      */
     @RequestMapping(value = "configurations/test", method = RequestMethod.POST)
     public ConnectionResult testConfiguration(@RequestBody StashConfiguration configuration) {
-        try {
-            OTHttpClient client = clientFactory.getHttpClient(
-                    new ClientConnection(
-                            configuration.getUrl(),
-                            configuration.getUser(),
-                            configuration.getPassword()
-                    )
-            );
-            if (client.get(content -> true, "projects")) {
-                return ConnectionResult.ok();
-            } else {
-                return ConnectionResult.error("Cannot get the content of the Stash home page");
-            }
-        } catch (Exception ex) {
-            return ConnectionResult.error(ex.getMessage());
-        }
+        return configurationService.test(configuration);
     }
 
     /**

@@ -5,10 +5,7 @@ import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.security.EncryptionService;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.support.Configuration;
-import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
-import net.nemerosa.ontrack.model.support.ConfigurationRepository;
-import net.nemerosa.ontrack.model.support.UserPasswordConfiguration;
+import net.nemerosa.ontrack.model.support.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
@@ -25,14 +22,16 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
     private final EncryptionService encryptionService;
     private final EventPostService eventPostService;
     private final EventFactory eventFactory;
+    private final OntrackConfigProperties ontrackConfigProperties;
 
-    public AbstractConfigurationService(Class<T> configurationClass, ConfigurationRepository configurationRepository, SecurityService securityService, EncryptionService encryptionService, EventPostService eventPostService, EventFactory eventFactory) {
+    public AbstractConfigurationService(Class<T> configurationClass, ConfigurationRepository configurationRepository, SecurityService securityService, EncryptionService encryptionService, EventPostService eventPostService, EventFactory eventFactory, OntrackConfigProperties ontrackConfigProperties) {
         this.configurationClass = configurationClass;
         this.configurationRepository = configurationRepository;
         this.securityService = securityService;
         this.encryptionService = encryptionService;
         this.eventPostService = eventPostService;
         this.eventFactory = eventFactory;
+        this.ontrackConfigProperties = ontrackConfigProperties;
     }
 
     /**
@@ -61,9 +60,10 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
     @Override
     public T newConfiguration(T configuration) {
         checkAccess();
+        validateAndCheck(configuration);
         configurationRepository.save(encrypt(configuration));
         eventPostService.post(eventFactory.newConfiguration(configuration));
-        return configuration;
+        return configuration.obfuscate();
     }
 
     @Override
@@ -93,20 +93,52 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
     public void updateConfiguration(String name, T configuration) {
         checkAccess();
         Validate.isTrue(StringUtils.equals(name, configuration.getName()), "Configuration name must match");
-        T configToSave;
-        if (StringUtils.isBlank(configuration.getPassword())) {
-            T oldConfig = getConfiguration(name);
-            if (StringUtils.equals(oldConfig.getUser(), configuration.getUser())) {
-                configToSave = configuration.withPassword(oldConfig.getPassword());
-            } else {
-                configToSave = configuration;
-            }
-        } else {
-            configToSave = configuration;
-        }
+        T configToSave = injectCredentials(configuration);
+        validateAndCheck(configToSave);
         configurationRepository.save(encrypt(configToSave));
         eventPostService.post(eventFactory.updateConfiguration(configuration));
     }
+
+    /**
+     * Adjust a configuration so that it contains a password if
+     * 1) the password is empty
+     * 2) the configuration already exists
+     * 3) the user name is the same
+     */
+    protected T injectCredentials(T configuration) {
+        T target;
+        if (StringUtils.isBlank(configuration.getPassword())) {
+            T oldConfig = getConfiguration(configuration.getName());
+            if (StringUtils.equals(oldConfig.getUser(), configuration.getUser())) {
+                target = configuration.withPassword(oldConfig.getPassword());
+            } else {
+                target = configuration;
+            }
+        } else {
+            target = configuration;
+        }
+        return target;
+    }
+
+    protected void validateAndCheck(T configuration) {
+        if (ontrackConfigProperties.isConfigurationTest()) {
+            ConnectionResult result = validate(configuration);
+            if (result.getType() == ConnectionResult.ConnectionResultType.ERROR) {
+                throw new ConfigurationValidationException(configuration, result.getMessage());
+            }
+        }
+    }
+
+    @Override
+    public ConnectionResult test(T configuration) {
+        return validate(injectCredentials(configuration));
+    }
+
+    /**
+     * Validates a configuration
+     */
+    protected abstract ConnectionResult validate(T configuration);
+
 
     @Override
     public T replaceConfiguration(T configuration, Function<String, String> replacementFunction) throws ConfigurationNotFoundException {

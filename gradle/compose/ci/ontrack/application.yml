@@ -18,12 +18,10 @@ endpoints:
 
 # Ontrack configuration
 ontrack:
-  # Disabling the test of the SVN configurations
-  extension:
-    svn:
-      test: false
-  # Integration with InfluxDB for the metrics
   config:
+    # Disabling the test of the external configurations
+    configuration-test: false
+    # Integration with InfluxDB for the metrics
     metrics-period: 5
   metrics:
     influxdb:

@@ -15,6 +15,8 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.PropertyService
 import net.nemerosa.ontrack.model.structure.StructureService
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.annotation.ProfileValueSourceConfiguration
@@ -41,6 +43,18 @@ class SVNBuildValidationIT extends AbstractServiceTestSupport {
 
     @Autowired
     private TagNamePatternSvnRevisionLink tagNamePatternSvnRevisionLink;
+
+    private SVNTestRepo repo
+
+    @Before
+    void 'SVN repository: start'() {
+        repo = SVNTestRepo.get('SVNBuildValidationIT')
+    }
+
+    @After
+    void 'SVN repository: stop'() {
+        repo.stop()
+    }
 
     /**
      * Validates a build according to the branch SCM policy.

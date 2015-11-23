@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.svn;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.api.model.FileDiffChangeLogRequest;
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest;
@@ -20,6 +19,7 @@ import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.extension.svn.service.*;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.buildfilter.BuildDiff;
+import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -27,6 +27,7 @@ import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import net.nemerosa.ontrack.model.support.ConnectionResult;
+import net.nemerosa.ontrack.model.support.UserPasswordConfiguration;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
@@ -117,12 +118,12 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     /**
      * Test for a configuration
      *
-     * @see SVNService#test(SVNConfiguration)
+     * @see SVNConfigurationService#test(UserPasswordConfiguration)
      */
     @RequestMapping(value = "configurations/test", method = RequestMethod.POST)
     public ConnectionResult testConfiguration(@RequestBody SVNConfiguration configuration) {
         // Delegates to the SVNService
-        return svnService.test(configuration);
+        return svnConfigurationService.test(configuration);
     }
 
     /**
@@ -138,15 +139,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
      */
     @RequestMapping(value = "configurations/create", method = RequestMethod.POST)
     public SVNConfiguration newConfiguration(@RequestBody SVNConfiguration configuration) {
-        validateConfiguration(configuration);
         return svnConfigurationService.newConfiguration(configuration);
-    }
-
-    /**
-     * Validating the configuration
-     */
-    protected void validateConfiguration(SVNConfiguration configuration) {
-        svnService.test(configuration).onErrorThrow(message -> new SVNConfigurationValidationException(message));
     }
 
     /**
@@ -241,7 +234,6 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
      */
     @RequestMapping(value = "configurations/{name}/update", method = RequestMethod.PUT)
     public SVNConfiguration updateConfiguration(@PathVariable String name, @RequestBody SVNConfiguration configuration) {
-        validateConfiguration(configuration);
         svnConfigurationService.updateConfiguration(name, configuration);
         return getConfiguration(name);
     }

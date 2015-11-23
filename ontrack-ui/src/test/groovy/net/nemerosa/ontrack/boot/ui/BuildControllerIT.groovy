@@ -1,19 +1,15 @@
 package net.nemerosa.ontrack.boot.ui
 
-import net.nemerosa.ontrack.extension.jenkins.JenkinsBuildProperty
-import net.nemerosa.ontrack.extension.jenkins.JenkinsBuildPropertyType
-import net.nemerosa.ontrack.extension.jenkins.JenkinsConfiguration
-import net.nemerosa.ontrack.extension.jenkins.JenkinsController
+import net.nemerosa.ontrack.extension.general.ReleaseProperty
+import net.nemerosa.ontrack.extension.general.ReleasePropertyType
 import net.nemerosa.ontrack.model.security.BranchCreate
-import net.nemerosa.ontrack.model.security.BuildCreate
-import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectCreation
+import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.structure.*
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 
 import static net.nemerosa.ontrack.json.JsonUtils.object
-import static net.nemerosa.ontrack.test.TestUtils.uid
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertNotNull
 
@@ -24,9 +20,6 @@ class BuildControllerIT extends AbstractWebTestSupport {
 
     @Autowired
     StructureService structureService;
-
-    @Autowired
-    JenkinsController jenkinsController;
 
     @Autowired
     PropertyService propertyService;
@@ -45,20 +38,8 @@ class BuildControllerIT extends AbstractWebTestSupport {
                     Branch.of(project, nameDescription())
             )
         }
-        // Creates a Jenkins configuration
-        String configurationName = uid("C");
-        asUser().with(GlobalSettings).call {
-            jenkinsController.newConfiguration(
-                    new JenkinsConfiguration(
-                            configurationName,
-                            "http://jenkins",
-                            "",
-                            ""
-                    )
-            )
-        }
-        // Creates a build with a Jenkins build property
-        Build build = asUser().with(project, BuildCreate).call {
+        // Creates a build with a release property
+        Build build = asUser().with(project, ProjectEdit).call {
             buildController.newBuild(
                     branch.getId(),
                     new BuildRequest(
@@ -66,11 +47,9 @@ class BuildControllerIT extends AbstractWebTestSupport {
                             "Build 12",
                             Collections.singletonList(
                                     new PropertyCreationRequest(
-                                            JenkinsBuildPropertyType.class.getName(),
+                                            ReleasePropertyType.class.getName(),
                                             object()
-                                                    .with("configuration", configurationName)
-                                                    .with("job", "MyJob")
-                                                    .with("build", 12)
+                                                    .with("name", "RC")
                                                     .end()
                                     )
                             )
@@ -83,11 +62,8 @@ class BuildControllerIT extends AbstractWebTestSupport {
         assertEquals("12", build.getName());
         assertEquals("Build 12", build.getDescription());
         // Checks the Jenkins build property
-        Property<JenkinsBuildProperty> property = propertyService.getProperty(build, JenkinsBuildPropertyType.class.getName());
+        Property<ReleaseProperty> property = propertyService.getProperty(build, ReleasePropertyType.class.getName());
         assertNotNull(property);
-        assertEquals(configurationName, property.getValue().getConfiguration().getName());
-        assertEquals("MyJob", property.getValue().getJob());
-        assertEquals(12, property.getValue().getBuild());
-        assertEquals("http://jenkins/job/MyJob/12", property.getValue().getUrl());
+        assertEquals("RC", property.getValue().getName());
     }
 }

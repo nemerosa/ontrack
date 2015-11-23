@@ -1,10 +1,8 @@
 package net.nemerosa.ontrack.extension.jenkins;
 
-import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
-import net.nemerosa.ontrack.extension.jenkins.client.JenkinsClient;
-import net.nemerosa.ontrack.extension.jenkins.client.JenkinsClientFactory;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.model.Ack;
+import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -25,14 +23,12 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 public class JenkinsController extends AbstractExtensionController<JenkinsExtensionFeature> {
 
     private final JenkinsConfigurationService jenkinsService;
-    private final JenkinsClientFactory jenkinsClientFactory;
     private final SecurityService securityService;
 
     @Autowired
-    public JenkinsController(JenkinsExtensionFeature feature, JenkinsConfigurationService jenkinsService, JenkinsClientFactory jenkinsClientFactory, SecurityService securityService) {
+    public JenkinsController(JenkinsExtensionFeature feature, JenkinsConfigurationService jenkinsService, SecurityService securityService) {
         super(feature);
         this.jenkinsService = jenkinsService;
-        this.jenkinsClientFactory = jenkinsClientFactory;
         this.securityService = securityService;
     }
 
@@ -77,15 +73,7 @@ public class JenkinsController extends AbstractExtensionController<JenkinsExtens
      */
     @RequestMapping(value = "configurations/test", method = RequestMethod.POST)
     public ConnectionResult testConfiguration(@RequestBody JenkinsConfiguration configuration) {
-        JenkinsClient client = jenkinsClientFactory.getClient(configuration);
-        try {
-            // Gets the basic info
-            client.getInfo();
-            // OK
-            return ConnectionResult.ok();
-        } catch (Exception ex) {
-            return ConnectionResult.error(ex.getMessage());
-        }
+        return jenkinsService.test(configuration);
     }
 
     /**

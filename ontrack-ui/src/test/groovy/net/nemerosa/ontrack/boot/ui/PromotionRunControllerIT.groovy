@@ -1,11 +1,10 @@
 package net.nemerosa.ontrack.boot.ui
 
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.extension.jenkins.JenkinsBuildPropertyType
-import net.nemerosa.ontrack.extension.jenkins.JenkinsConfiguration
-import net.nemerosa.ontrack.extension.jenkins.JenkinsConfigurationService
+import net.nemerosa.ontrack.extension.general.MessagePropertyType
+import net.nemerosa.ontrack.extension.general.MessageType
+import net.nemerosa.ontrack.extension.general.ReleasePropertyType
 import net.nemerosa.ontrack.json.JsonUtils
-import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.structure.PromotionRunRequest
 import net.nemerosa.ontrack.model.structure.PropertyCreationRequest
@@ -22,9 +21,6 @@ class PromotionRunControllerIT extends AbstractWebTestSupport {
 
     @Autowired
     private PropertyService propertyService
-
-    @Autowired
-    private JenkinsConfigurationService jenkinsConfigurationService
 
     @Test
     void 'New promotion run'() {
@@ -68,36 +64,23 @@ class PromotionRunControllerIT extends AbstractWebTestSupport {
                 "Run",
                 [
                         new PropertyCreationRequest(
-                                JenkinsBuildPropertyType.class.name,
+                                MessagePropertyType.class.name,
                                 JsonUtils.object()
-                                        .with('configuration', 'MyConfig')
-                                        .with('job', 'MyJob')
-                                        .with('build', 1)
+                                        .with('type', 'INFO')
+                                        .with('text', 'Message')
                                         .end()
                         )
                 ]
         )
-        // Creates a Jenkins configuration
-        asUser().with(GlobalSettings).call {
-            jenkinsConfigurationService.newConfiguration(
-                    new JenkinsConfiguration(
-                            'MyConfig',
-                            'http://jenkins.nemerosa.net',
-                            'test',
-                            'test'
-                    )
-            )
-        }
-        // Call
         def run = asUser().with(promotionLevel, ProjectEdit).call {
             controller.newPromotionRun(build.id, request)
         }
         // Checks
         assert run != null
-        def property = propertyService.getProperty(run, JenkinsBuildPropertyType)
+        def property = propertyService.getProperty(run, MessagePropertyType)
         assert !property.empty
-        assert property.value.build == 1
-        assert property.value.job == 'MyJob'
+        assert property.value.type == MessageType.INFO
+        assert property.value.text == 'Message'
     }
 
 }
