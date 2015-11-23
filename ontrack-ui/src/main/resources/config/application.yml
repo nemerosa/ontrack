@@ -24,3 +24,10 @@ management:
 security:
   basic:
     enabled: false
+
+# General information
+# The version information is generated in /application.properties by the build
+info:
+  app:
+    name: Ontrack
+    description: Continuous Delivery Traceability and Monitoring

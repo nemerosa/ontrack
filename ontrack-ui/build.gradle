@@ -79,6 +79,16 @@ ontrack.version.build = ${rootProject.versioning.info.build}
 ontrack.version.commit = ${rootProject.versioning.info.commit}
 ontrack.version.source = ${rootProject.versioning.info.branch}
 ontrack.version.sourceType = ${rootProject.versioning.info.branchType}
+# For the /manage/info endpoint
+info.app.version = ${rootProject.versioning.info.display}
+info.build.date = ${new Date().format("yyyy-MM-dd'T'HH:mm:ss")}
+info.build.display = ${rootProject.versioning.info.display}
+info.build.full = ${rootProject.versioning.info.full}
+info.build.branch = ${rootProject.versioning.info.branchId}
+info.build.build = ${rootProject.versioning.info.build}
+info.build.commit = ${rootProject.versioning.info.commit}
+info.build.source = ${rootProject.versioning.info.branch}
+info.build.sourceType = ${rootProject.versioning.info.branchType}
 """
 }
 
