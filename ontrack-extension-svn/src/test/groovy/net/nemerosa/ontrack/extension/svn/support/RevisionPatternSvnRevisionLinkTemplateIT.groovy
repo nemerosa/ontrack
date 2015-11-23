@@ -10,6 +10,8 @@ import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.structure.*
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 
@@ -26,6 +28,18 @@ class RevisionPatternSvnRevisionLinkTemplateIT extends AbstractServiceTestSuppor
 
     @Autowired
     private RevisionPatternSvnRevisionLink link
+
+    private SVNTestRepo repo
+
+    @Before
+    void 'SVN repository: start'() {
+        repo = SVNTestRepo.get('RevisionPatternSvnRevisionLinkTemplateIT')
+    }
+
+    @After
+    void 'SVN repository: stop'() {
+        repo.stop()
+    }
 
     @Test
     void 'Templating with configurable revision pattern'() {
