@@ -1,0 +1,26 @@
+# Application properties
+
+# Spring configuration
+spring:
+  # Default profile
+  profiles:
+    default: prod
+  # AOP configuration
+  aop:
+    proxyTargetClass: true
+  # Datasource configuration
+  datasource:
+    username: ontrack
+    password: ontrack
+
+
+# Management
+management:
+  context-path: "/manage"
+
+# Security
+
+# No security by default for the application end points
+security:
+  basic:
+    enabled: false

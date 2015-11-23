@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.model.security;
 
 import lombok.Data;
-import net.nemerosa.ontrack.model.security.Account;
-import net.nemerosa.ontrack.model.security.AccountHolder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,7 +14,7 @@ public class AccountUserDetails implements UserDetails, AccountHolder {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return AuthorityUtils.createAuthorityList(account.getRole().name());
+        return AuthorityUtils.createAuthorityList(account.getRole().getRoleName());
     }
 
     @Override
