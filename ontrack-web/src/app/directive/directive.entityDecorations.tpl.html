@@ -1,3 +1,3 @@
 <span class="ot-decoration ot-decoration-{{decoration.decorationType}}" ng-repeat="decoration in decorations.resources">
-    <ng-include src="'app/extension/decoration/' + decoration.decorationType + '.tpl.html'"></ng-include>
+    <ng-include src="'app/extension/' + decoration.feature.id + '/decoration/' + decoration.decorationType + '.tpl.html'"></ng-include>
 </span>
