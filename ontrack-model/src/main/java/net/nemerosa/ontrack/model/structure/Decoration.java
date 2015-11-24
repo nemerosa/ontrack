@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
 import org.apache.commons.lang3.Validate;
 
 /**
@@ -19,7 +20,7 @@ public class Decoration<T> {
      * Which {@link Decorator} has created this decoration
      */
     @JsonIgnore
-    private final Class<? extends Decorator> decorator;
+    private final Decorator<T> decorator;
 
     /**
      * Data associated with the decoration
@@ -29,14 +30,8 @@ public class Decoration<T> {
     /**
      * Basic construction. Only the data is required
      */
-    public static <T> Decoration<T> of(Decorator decorator, T data) {
-        return of(decorator.getClass(), data);
-    }
-
-    /**
-     * Basic construction. Only the data is required
-     */
-    public static <T> Decoration<T> of(Class<? extends Decorator> decorator, T data) {
+    public static <T> Decoration<T> of(Decorator<T> decorator, T data) {
+        Validate.notNull(decorator, "The decorator is required");
         Validate.notNull(data, "The decoration data is required");
         return new Decoration<>(decorator, data);
     }
@@ -45,7 +40,14 @@ public class Decoration<T> {
      * Gets the decoration type for the decorator name.
      */
     public String getDecorationType() {
-        return decorator.getName();
+        return decorator.getClass().getName();
+    }
+
+    /**
+     * Extension feature description
+     */
+    public ExtensionFeatureDescription getFeature() {
+        return decorator.getFeature().getFeatureDescription();
     }
 
 }

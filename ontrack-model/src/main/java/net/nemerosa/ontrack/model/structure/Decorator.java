@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.model.structure;
 
+import net.nemerosa.ontrack.model.extension.Extension;
+
 import java.util.List;
 
 /**
@@ -7,7 +9,7 @@ import java.util.List;
  *
  * @param <T> Type of data associated with the decorations.
  */
-public interface Decorator<T> {
+public interface Decorator<T> extends Extension {
 
     /**
      * Gets a list of decorations for this entity.

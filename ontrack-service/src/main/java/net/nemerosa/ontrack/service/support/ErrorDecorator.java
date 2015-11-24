@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.support;
 
 import net.nemerosa.ontrack.common.BaseException;
+import net.nemerosa.ontrack.model.extension.ExtensionFeature;
 import net.nemerosa.ontrack.model.structure.Decoration;
 import net.nemerosa.ontrack.model.structure.Decorator;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
@@ -19,7 +20,7 @@ public class ErrorDecorator implements Decorator<String> {
 
     public Decoration<String> getDecoration(Exception ex) {
         return Decoration.of(
-                ErrorDecorator.class,
+                this,
                 getErrorMessage(ex)
         );
     }
@@ -30,5 +31,10 @@ public class ErrorDecorator implements Decorator<String> {
         } else {
             return "Problem while getting decoration";
         }
+    }
+
+    @Override
+    public ExtensionFeature getFeature() {
+        return CoreExtensionFeature.INSTANCE;
     }
 }

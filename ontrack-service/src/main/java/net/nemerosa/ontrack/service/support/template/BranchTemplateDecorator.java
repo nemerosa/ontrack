@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.service.support.template;
 
+import net.nemerosa.ontrack.model.extension.ExtensionFeature;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.service.support.CoreExtensionFeature;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -31,4 +33,8 @@ public class BranchTemplateDecorator implements Decorator<BranchType> {
         }
     }
 
+    @Override
+    public ExtensionFeature getFeature() {
+        return CoreExtensionFeature.INSTANCE;
+    }
 }
