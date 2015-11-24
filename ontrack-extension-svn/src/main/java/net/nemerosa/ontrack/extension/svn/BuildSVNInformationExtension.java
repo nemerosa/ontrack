@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.svn;
 
 import net.nemerosa.ontrack.extension.api.EntityInformationExtension;
+import net.nemerosa.ontrack.extension.api.model.EntityInformation;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty;
@@ -47,7 +48,7 @@ public class BuildSVNInformationExtension extends AbstractExtension implements E
     }
 
     @Override
-    public Optional<Object> getInformation(ProjectEntity entity) {
+    public Optional<EntityInformation> getInformation(ProjectEntity entity) {
         if (entity instanceof Build) {
             Build build = (Build) entity;
             // Gets the branch SVN information
@@ -60,7 +61,12 @@ public class BuildSVNInformationExtension extends AbstractExtension implements E
                 SVNRepository repository = svnService.getRepository(projectConfigurationProperty.getValue().getConfiguration().getName());
                 // Gets the build history
                 try (Transaction ignored = transactionService.start()) {
-                    return Optional.of(svnChangeLogService.getBuildSVNHistory(repository, build));
+                    return Optional.of(
+                            new EntityInformation(
+                                    this,
+                                    svnChangeLogService.getBuildSVNHistory(repository, build)
+                            )
+                    );
                 }
             }
         } else {
