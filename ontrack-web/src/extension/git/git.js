@@ -9,7 +9,7 @@ angular.module('ontrack.extension.git', [
         return {
             restrict: 'E',
             transclude: true,
-            templateUrl: 'app/extension/git/directive.commit.summary.tpl.html',
+            templateUrl: 'extension/git/directive.commit.summary.tpl.html',
             scope: {
                 uiCommit: '=',
                 title: '@'
@@ -19,7 +19,7 @@ angular.module('ontrack.extension.git', [
     .directive('otExtensionGitCommitBuilds', function () {
         return {
             restrict: 'E',
-            templateUrl: 'app/extension/git/directive.commit.builds.tpl.html',
+            templateUrl: 'extension/git/directive.commit.builds.tpl.html',
             scope: {
                 commitInfo: '='
             }
@@ -28,7 +28,7 @@ angular.module('ontrack.extension.git', [
     .directive('otExtensionGitCommitPromotions', function () {
         return {
             restrict: 'E',
-            templateUrl: 'app/extension/git/directive.commit.promotions.tpl.html',
+            templateUrl: 'extension/git/directive.commit.promotions.tpl.html',
             scope: {
                 commitInfo: '='
             }

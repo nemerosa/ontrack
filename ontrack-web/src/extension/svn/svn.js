@@ -14,7 +14,7 @@ angular.module('ontrack.extension.svn', [
         // SVN configurations
         $stateProvider.state('svn-configurations', {
             url: '/extension/svn/configurations',
-            templateUrl: 'app/extension/svn/svn.configurations.tpl.html',
+            templateUrl: 'extension/svn/svn.configurations.tpl.html',
             controller: 'SVNConfigurationsCtrl'
         });
 
@@ -82,7 +82,7 @@ angular.module('ontrack.extension.svn', [
         // Configuration indexation
         $scope.indexation = function (configuration) {
             $modal.open({
-                templateUrl: 'app/extension/svn/svn.dialog.indexation.tpl.html',
+                templateUrl: 'extension/svn/svn.dialog.indexation.tpl.html',
                 controller: 'svnDialogIndexation',
                 resolve: {
                     config: function () {
@@ -98,7 +98,7 @@ angular.module('ontrack.extension.svn', [
     .directive('otExtensionSvnRevisionSummary', function () {
         return {
             restrict: 'E',
-            templateUrl: 'app/extension/svn/directive.revision.summary.tpl.html',
+            templateUrl: 'extension/svn/directive.revision.summary.tpl.html',
             transclude: true,
             scope: {
                 revisionInfo: '=',
@@ -109,7 +109,7 @@ angular.module('ontrack.extension.svn', [
     .directive('otExtensionSvnRevisionBuilds', function () {
         return {
             restrict: 'E',
-            templateUrl: 'app/extension/svn/directive.revision.builds.tpl.html',
+            templateUrl: 'extension/svn/directive.revision.builds.tpl.html',
             scope: {
                 ontrackSvnRevisionInfo: '=',
                 mergedRevisionInfos: '='
@@ -119,7 +119,7 @@ angular.module('ontrack.extension.svn', [
     .directive('otExtensionSvnRevisionPromotions', function () {
         return {
             restrict: 'E',
-            templateUrl: 'app/extension/svn/directive.revision.promotions.tpl.html',
+            templateUrl: 'extension/svn/directive.revision.promotions.tpl.html',
             scope: {
                 ontrackSvnRevisionInfo: '=',
                 mergedRevisionInfos: '='

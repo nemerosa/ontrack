@@ -8,7 +8,7 @@ angular.module('ontrack.extension.jenkins', [
         // Jenkins configurations
         $stateProvider.state('jenkins-configurations', {
             url: '/extension/jenkins/configurations',
-            templateUrl: 'app/extension/jenkins/jenkins.configurations.tpl.html',
+            templateUrl: 'extension/jenkins/jenkins.configurations.tpl.html',
             controller: 'JenkinsConfigurationsCtrl'
         });
     })

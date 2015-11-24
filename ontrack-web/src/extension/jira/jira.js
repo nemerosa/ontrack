@@ -8,7 +8,7 @@ angular.module('ontrack.extension.jira', [
         // Jira configurations
         $stateProvider.state('jira-configurations', {
             url: '/extension/jira/configurations',
-            templateUrl: 'app/extension/jira/jira.configurations.tpl.html',
+            templateUrl: 'extension/jira/jira.configurations.tpl.html',
             controller: 'JiraConfigurationsCtrl'
         });
     })

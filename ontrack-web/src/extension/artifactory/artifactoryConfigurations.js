@@ -8,7 +8,7 @@ angular.module('ot.extension.artifactory.configuration', [
         // Artifactory configurations
         $stateProvider.state('artifactory-configurations', {
             url: '/extension/artifactory/configurations',
-            templateUrl: 'app/extension/artifactory/artifactory.configurations.tpl.html',
+            templateUrl: 'extension/artifactory/artifactory.configurations.tpl.html',
             controller: 'ArtifactoryConfigurationsCtrl'
         });
     })

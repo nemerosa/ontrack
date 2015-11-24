@@ -8,7 +8,7 @@ angular.module('ot.extension.svn.changelog', [
         // SVN configurations
         $stateProvider.state('svn-changelog', {
             url: '/extension/svn/changelog?from&to',
-            templateUrl: 'app/extension/svn/svn.changelog.tpl.html',
+            templateUrl: 'extension/svn/svn.changelog.tpl.html',
             controller: 'SVNChangeLogCtrl'
         });
     })

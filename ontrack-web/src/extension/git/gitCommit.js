@@ -5,7 +5,7 @@ angular.module('ot.extension.git.commit', [
     .config(function ($stateProvider) {
         $stateProvider.state('git-commit', {
             url: '/extension/git/{branch}/commit/{commit}',
-            templateUrl: 'app/extension/git/git.commit.tpl.html',
+            templateUrl: 'extension/git/git.commit.tpl.html',
             controller: 'GitCommitCtrl'
         });
     })

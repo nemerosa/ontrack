@@ -5,7 +5,7 @@ angular.module('ot.extension.git.issue', [
     .config(function ($stateProvider) {
         $stateProvider.state('git-issue', {
             url: '/extension/git/{branch}/issue/{issue}',
-            templateUrl: 'app/extension/git/git.issue.tpl.html',
+            templateUrl: 'extension/git/git.issue.tpl.html',
             controller: 'GitIssueCtrl'
         });
     })

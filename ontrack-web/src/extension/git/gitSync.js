@@ -6,7 +6,7 @@ angular.module('ot.extension.git.sync', [
     .config(function ($stateProvider) {
         $stateProvider.state('git-sync', {
             url: '/extension/git/sync/{branch}',
-            templateUrl: 'app/extension/git/git.sync.tpl.html',
+            templateUrl: 'extension/git/git.sync.tpl.html',
             controller: 'GitSyncCtrl'
         });
     })

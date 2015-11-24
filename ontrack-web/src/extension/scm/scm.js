@@ -5,7 +5,7 @@ angular.module('ontrack.extension.scm', [
     .directive('otScmChangelogBuild', function () {
         return {
             restrict: 'E',
-            templateUrl: 'app/extension/scm/directive.scmChangelogBuild.tpl.html',
+            templateUrl: 'extension/scm/directive.scmChangelogBuild.tpl.html',
             scope: {
                 scmBuildView: '='
             },
@@ -15,7 +15,7 @@ angular.module('ontrack.extension.scm', [
     .directive('otScmChangelogIssueValidations', function () {
         return {
             restrict: 'E',
-            templateUrl: 'app/extension/scm/directive.scmChangelogIssueValidations.tpl.html',
+            templateUrl: 'extension/scm/directive.scmChangelogIssueValidations.tpl.html',
             scope: {
                 changeLogIssue: '='
             }
@@ -24,7 +24,7 @@ angular.module('ontrack.extension.scm', [
     .directive('otExtensionScmIssueCommitBranchInfos', function () {
         return {
             restrict: 'E',
-            templateUrl: 'app/extension/scm/directive.scmIssueCommitBranchInfos.tpl.html',
+            templateUrl: 'extension/scm/directive.scmIssueCommitBranchInfos.tpl.html',
             scope: {
                 infos: '='
             }
@@ -33,7 +33,7 @@ angular.module('ontrack.extension.scm', [
     .directive('otExtensionScmChangelogFilechangefilter', function (otScmChangelogFilechangefilterService) {
         return {
             restrict: 'E',
-            templateUrl: 'app/extension/scm/directive.scmChangelogFilechangefilter.tpl.html',
+            templateUrl: 'extension/scm/directive.scmChangelogFilechangefilter.tpl.html',
             scope: {
                 changeLog: '=',
                 filterCallback: '='
@@ -229,7 +229,7 @@ angular.module('ontrack.extension.scm', [
                 var link = changeLog._diff;
                 link += $interpolate('?from={{from}}&to={{to}}&patterns={{patterns}}')(params);
                 $modal.open({
-                    templateUrl: 'app/extension/scm/dialog.scmDiff.tpl.html',
+                    templateUrl: 'extension/scm/dialog.scmDiff.tpl.html',
                     controller: 'otExtensionScmDialogDiff',
                     resolve: {
                         config: function () {
@@ -388,7 +388,7 @@ angular.module('ontrack.extension.scm', [
             var projectId = config.changeLog.project.id;
 
             $modal.open({
-                templateUrl: 'app/extension/scm/scmChangeLogExport.tpl.html',
+                templateUrl: 'extension/scm/scmChangeLogExport.tpl.html',
                 controller: function ($scope, $modalInstance) {
                     $scope.config = config;
                     // Export request

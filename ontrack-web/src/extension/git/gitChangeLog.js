@@ -8,7 +8,7 @@ angular.module('ot.extension.git.changelog', [
     .config(function ($stateProvider) {
         $stateProvider.state('git-changelog', {
             url: '/extension/git/changelog?from&to',
-            templateUrl: 'app/extension/git/git.changelog.tpl.html',
+            templateUrl: 'extension/git/git.changelog.tpl.html',
             controller: 'GitChangeLogCtrl'
         });
     })

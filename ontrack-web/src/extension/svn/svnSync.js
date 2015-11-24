@@ -6,7 +6,7 @@ angular.module('ot.extension.svn.sync', [
     .config(function ($stateProvider) {
         $stateProvider.state('svn-sync', {
             url: '/extension/svn/sync/{branch}',
-            templateUrl: 'app/extension/svn/svn.sync.tpl.html',
+            templateUrl: 'extension/svn/svn.sync.tpl.html',
             controller: 'SVNSyncCtrl'
         });
     })

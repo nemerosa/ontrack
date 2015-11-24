@@ -5,7 +5,7 @@ angular.module('ot.extension.svn.revision', [
     .config(function ($stateProvider) {
         $stateProvider.state('svn-revision', {
             url: '/extension/svn/revision/{configuration}/{revision}',
-            templateUrl: 'app/extension/svn/svn.revision.tpl.html',
+            templateUrl: 'extension/svn/svn.revision.tpl.html',
             controller: 'SVNRevisionCtrl'
         });
     })

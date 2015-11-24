@@ -8,7 +8,7 @@ angular.module('ot.extension.stash.configuration', [
         // Artifactory configurations
         $stateProvider.state('stash-configurations', {
             url: '/extension/stash/configurations',
-            templateUrl: 'app/extension/stash/stash.configurations.tpl.html',
+            templateUrl: 'extension/stash/stash.configurations.tpl.html',
             controller: 'StashConfigurationsCtrl'
         });
     })

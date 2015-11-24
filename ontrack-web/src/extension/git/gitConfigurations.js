@@ -8,7 +8,7 @@ angular.module('ot.extension.git.configuration', [
         // Artifactory configurations
         $stateProvider.state('git-configurations', {
             url: '/extension/git/configurations',
-            templateUrl: 'app/extension/git/git.configurations.tpl.html',
+            templateUrl: 'extension/git/git.configurations.tpl.html',
             controller: 'GitConfigurationsCtrl'
         });
     })

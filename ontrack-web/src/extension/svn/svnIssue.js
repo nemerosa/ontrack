@@ -5,7 +5,7 @@ angular.module('ot.extension.svn.issue', [
     .config(function ($stateProvider) {
         $stateProvider.state('svn-issue', {
             url: '/extension/svn/issue/{configuration}/{issue}',
-            templateUrl: 'app/extension/svn/svn.issue.tpl.html',
+            templateUrl: 'extension/svn/svn.issue.tpl.html',
             controller: 'SVNIssueCtrl'
         });
     })

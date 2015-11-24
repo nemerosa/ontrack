@@ -7,7 +7,7 @@ angular.module('ontrack.extension.combined', [
         // Combined issue service configurations
         $stateProvider.state('combined-issue-service-configurations', {
             url: '/extension/combined/configurations',
-            templateUrl: 'app/extension/combined/combined.configurations.tpl.html',
+            templateUrl: 'extension/combined/combined.configurations.tpl.html',
             controller: 'CombinedConfigurationsCtrl'
         });
     })
@@ -72,7 +72,7 @@ angular.module('ontrack.extension.combined', [
     .directive('otExtensionJiraIssueLink', function () {
         return {
             restrict: 'E',
-            templateUrl: 'app/extension/jira/directive.jiraIssueLink.tpl.html',
+            templateUrl: 'extension/jira/directive.jiraIssueLink.tpl.html',
             scope: {
                 issue: '='
             }
