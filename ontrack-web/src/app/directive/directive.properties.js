@@ -33,7 +33,7 @@ angular.module('ot.directive.properties', [
 
                     // Getting the path to a property's template
                     scope.getTemplatePath = function (property) {
-                        return 'app/extension/' + property.typeDescriptor.feature.id + '/property/' + property.typeDescriptor.typeName + '.tpl.html';
+                        return 'extension/' + property.typeDescriptor.feature.id + '/property/' + property.typeDescriptor.typeName + '.tpl.html';
                     };
 
                     // Adding a property

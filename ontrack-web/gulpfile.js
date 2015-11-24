@@ -29,8 +29,14 @@ var web = 'src';
 var webPath = './' + web;
 var assetResources = webPath + '/assets/**';
 var lessResources = webPath + '/less/*.less';
-var jsResources = webPath + '/app/**/*.js';
+
+var coreJsResources = webPath + '/app/**/*.js';
+var extensionJsResources = webPath + '/extension/**/*.js';
+var jsResources = [coreJsResources, extensionJsResources];
+
 var templateResources = webPath + '/app/**/*.html';
+var extensionTemplateResources = webPath + '/extension/**/*.html';
+
 var indexResource = webPath + '/index.html';
 var vendor = './vendor';
 
@@ -174,7 +180,7 @@ gulp.task('index:dev', ['less', 'fonts', 'templates'], function () {
     var cssSources = gulp.src([buildCss + '/*.css'], {read: false});
     var vendorJsSources = gulp.src(vendorJsResources, {read: false});
     var vendorCssSources = gulp.src(vendorCssResources, {read: false});
-    var appSources = gulp.src([buildTemplates + '/*.js', jsResources]).pipe(ngFilesort());
+    var appSources = gulp.src([buildTemplates + '/*.js'].concat(jsResources)).pipe(ngFilesort());
 
     return gulp.src(indexResource)
         .pipe(debug({title: 'index:dev:input'}))
