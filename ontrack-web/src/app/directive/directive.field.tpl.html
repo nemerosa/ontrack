@@ -104,6 +104,6 @@
 
 <!-- Help message -->
 <span class="help-block" ng-if="field.help">
-    <span ng-if="helpFile(field.help)"><span ng-include="'app/' + helpFile(field.help)"></span></span>
+    <span ng-if="helpFile(field.help)"><span ng-include="helpFile(field.help)"></span></span>
     <span ng-if="!helpFile(field.help)">{{field.help}}</span>
 </span>

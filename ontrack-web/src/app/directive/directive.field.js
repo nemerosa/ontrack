@@ -18,7 +18,12 @@ angular.module('ot.directive.field', [
                     if (helpString) {
                         var m = helpString.match(/^@file:(.*)/);
                         if (m) {
-                            return m[1];
+                            var path = m[1];
+                            if (path.indexOf('extension/') == 0) {
+                                return path;
+                            } else {
+                                return 'app/' + path;
+                            }
                         } else {
                             return '';
                         }
