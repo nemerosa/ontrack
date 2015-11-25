@@ -2,14 +2,19 @@ package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.model.events.Event;
 import net.nemerosa.ontrack.model.events.EventQueryService;
-import net.nemerosa.ontrack.model.structure.ID;
-import net.nemerosa.ontrack.model.structure.ProjectEntityType;
+import net.nemerosa.ontrack.model.exceptions.PropertyTypeNotFoundException;
+import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.model.support.NameValue;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Pagination;
 import net.nemerosa.ontrack.ui.resource.Resources;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -21,11 +26,15 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 @RequestMapping("/events")
 public class EventController extends AbstractResourceController {
 
+    private final Logger logger = LoggerFactory.getLogger(EventController.class);
+
     private final EventQueryService eventQueryService;
+    private final PropertyService propertyService;
 
     @Autowired
-    public EventController(EventQueryService eventQueryService) {
+    public EventController(EventQueryService eventQueryService, PropertyService propertyService) {
         this.eventQueryService = eventQueryService;
+        this.propertyService = propertyService;
     }
 
     /**
@@ -109,8 +118,32 @@ public class EventController extends AbstractResourceController {
                 event.getSignature(),
                 event.getEntities(),
                 event.getRef(),
-                event.getValues()
+                event.getValues(),
+                computeData(event)
         );
+    }
+
+    protected Map<String, ?> computeData(Event event) {
+        // Result
+        Map<String, ? super Object> result = new HashMap<>();
+        // Any property in values?
+        NameValue property = event.getValues().get("property");
+        if (property != null) {
+            String propertyName = property.getName();
+            // Gets the property type by name
+            try {
+                PropertyType<?> propertyType = propertyService.getPropertyTypeByName(propertyName);
+                result.put(
+                        "property",
+                        PropertyTypeDescriptor.of(propertyType)
+                );
+            } catch (PropertyTypeNotFoundException ignored) {
+                // Logs and ignores
+                logger.warn("[event] Could not find property type for {}", propertyName);
+            }
+        }
+        // OK
+        return result;
     }
 
 }

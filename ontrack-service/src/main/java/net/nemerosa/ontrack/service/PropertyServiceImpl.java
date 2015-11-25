@@ -53,7 +53,8 @@ public class PropertyServiceImpl implements PropertyService {
         return result;
     }
 
-    protected <T> PropertyType<T> getPropertyTypeByName(String propertyTypeName) {
+    @Override
+    public <T> PropertyType<T> getPropertyTypeByName(String propertyTypeName) {
         //noinspection unchecked
         return (PropertyType<T>) getPropertyTypes().stream()
                 .filter(p -> StringUtils.equals(propertyTypeName, p.getClass().getName()))

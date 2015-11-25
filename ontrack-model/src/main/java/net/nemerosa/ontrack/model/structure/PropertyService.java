@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.model.structure;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.model.Ack;
+import net.nemerosa.ontrack.model.exceptions.PropertyTypeNotFoundException;
 import net.nemerosa.ontrack.model.form.Form;
 
 import java.util.Collection;
@@ -19,6 +20,16 @@ public interface PropertyService {
      * List of all property types
      */
     List<PropertyType<?>> getPropertyTypes();
+
+    /**
+     * Gets a property type using its name
+     *
+     * @param propertyTypeName Fully qualified name of the property type
+     * @param <T>              Type of property
+     * @return Property type
+     * @throws PropertyTypeNotFoundException If not found
+     */
+    <T> PropertyType<T> getPropertyTypeByName(String propertyTypeName);
 
     /**
      * List of property values for a given entity and for the current user.

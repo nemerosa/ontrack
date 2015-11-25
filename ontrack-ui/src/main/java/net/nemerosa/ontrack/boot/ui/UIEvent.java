@@ -18,4 +18,9 @@ public class UIEvent {
     private final ProjectEntityType ref;
     private final Map<String, NameValue> values;
 
+    /**
+     * Additional data processed from the values or entities
+     */
+    private final Map<String, ?> data;
+
 }
