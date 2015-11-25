@@ -109,7 +109,7 @@ gulp.task('templates', function () {
  * Sorted and annotated Angular files
  */
 gulp.task('js:angular', ['lint', 'templates'], function () {
-    return gulp.src([buildTemplates + '/*.js', jsResources])
+    return gulp.src([buildTemplates + '/*.js'].concat(jsResources))
         .pipe(debug({title: 'js:angular:input'}))
         .pipe(ngAnnotate())
         .pipe(ngFilesort())
