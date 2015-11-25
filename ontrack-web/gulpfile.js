@@ -28,7 +28,10 @@ var options = minimist(process.argv.slice(2), knownOptions);
 var web = 'src';
 var webPath = './' + web;
 var assetResources = webPath + '/assets/**';
-var lessResources = webPath + '/less/*.less';
+
+var coreLessResources = webPath + '/less/*.less';
+var extensionLessResources = webPath + '/extension/*/less/*.less';
+var lessResources = [coreLessResources, extensionLessResources];
 
 var coreJsResources = webPath + '/app/**/*.js';
 var extensionJsResources = webPath + '/extension/**/*.js';
