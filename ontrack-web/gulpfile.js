@@ -105,10 +105,18 @@ gulp.task('templates', function () {
         .pipe(liveReload());
 });
 
+gulp.task('extensions:templates', function () {
+    return gulp.src(extensionTemplateResources)
+        .pipe(debug({title: 'extensions:templates:'}))
+        .pipe(templateCache({module: 'ontrack', root: 'extension/', filename: 'extensions-templates.js'}))
+        .pipe(gulp.dest(buildTemplates))
+        .pipe(liveReload());
+});
+
 /**
  * Sorted and annotated Angular files
  */
-gulp.task('js:angular', ['lint', 'templates'], function () {
+gulp.task('js:angular', ['lint', 'templates', 'extensions:templates'], function () {
     return gulp.src([buildTemplates + '/*.js'].concat(jsResources))
         .pipe(debug({title: 'js:angular:input'}))
         .pipe(ngAnnotate())
@@ -179,7 +187,7 @@ gulp.task('assets', function () {
 
 // Injection in index.html
 
-gulp.task('index:dev', ['less', 'fonts', 'templates'], function () {
+gulp.task('index:dev', ['less', 'fonts', 'templates', 'extensions:templates'], function () {
     var cssSources = gulp.src([buildCss + '/*.css'], {read: false});
     var vendorJsSources = gulp.src(vendorJsResources, {read: false});
     var vendorCssSources = gulp.src(vendorCssResources, {read: false});
@@ -200,7 +208,7 @@ gulp.task('index:dev', ['less', 'fonts', 'templates'], function () {
         .pipe(liveReload());
 });
 
-gulp.task('index:prod', ['css:concat', 'assets', 'fonts', 'templates', 'js:concat'], function () {
+gulp.task('index:prod', ['css:concat', 'assets', 'fonts', 'templates', 'extensions:templates', 'js:concat'], function () {
     var cssSources = gulp.src([outputCss + '/*.css'], {read: false});
     var jsSources = gulp.src(outputJs + '/*.js', {read: false});
 
@@ -228,6 +236,7 @@ gulp.task('watch', function () {
     liveReload.listen();
     gulp.watch(lessResources, ['less']);
     gulp.watch(indexResource, ['index:dev']);
-    gulp.watch(jsResources, ['lint', 'index:dev']);
+    gulp.watch(jsResources, ['index:dev']);
     gulp.watch(templateResources, ['templates']);
+    gulp.watch(extensionTemplateResources, ['extensions:templates']);
 });
