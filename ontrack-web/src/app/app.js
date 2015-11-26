@@ -40,15 +40,15 @@ var ontrack = angular.module('ontrack', [
         'ot.view.admin.predefined-validation-stamps',
         'ot.view.admin.predefined-promotion-levels',
         // Extensions
-        'ontrack.extension.jenkins',
-        'ontrack.extension.svn',
-        'ontrack.extension.jira',
-        'ontrack.extension.combined',
-        'ontrack.extension.artifactory',
-        'ontrack.extension.git',
-        'ontrack.extension.github',
-        'ontrack.extension.stash',
-        'ontrack.extension.ldap'
+        // TODO 'ontrack.extension.jenkins',
+        // TODO 'ontrack.extension.svn',
+        // TODO 'ontrack.extension.jira',
+        // TODO 'ontrack.extension.combined',
+        // TODO 'ontrack.extension.artifactory',
+        // TODO 'ontrack.extension.git',
+        // TODO 'ontrack.extension.github',
+        // TODO 'ontrack.extension.stash',
+        // TODO 'ontrack.extension.ldap'
     ])
         // HTTP configuration
         .config(function ($httpProvider) {

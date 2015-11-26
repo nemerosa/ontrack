@@ -1,6 +1,5 @@
 angular.module('ontrack.extension.scm', [
-    'ot.service.form',
-    'ontrack.extension.scm.dialog.diff'
+    'ot.service.form'
 ])
     .directive('otScmChangelogBuild', function () {
         return {
@@ -480,5 +479,13 @@ angular.module('ontrack.extension.scm', [
         };
 
         return self;
+    })
+    .controller('otExtensionScmDialogDiff', function ($scope, $modalInstance, config) {
+        // General configuration
+        $scope.config = config;
+        // Cancelling the dialog
+        $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+        };
     })
 ;

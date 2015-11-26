@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.model.extension;
 
 import lombok.Data;
 import lombok.experimental.Builder;
+import lombok.experimental.Wither;
 
 /**
  * Options for a feature
@@ -20,6 +21,7 @@ public class ExtensionFeatureOptions {
     /**
      * Does the extension provides some web components?
      */
+    @Wither
     private final boolean gui;
 
 }
