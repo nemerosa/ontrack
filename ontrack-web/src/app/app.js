@@ -93,9 +93,12 @@ var ontrack = angular.module('ontrack', [
             $log.debug('[app] Loading extensions...');
             ot.pageCall($http.get('extensions')).then(function (extensions) {
                 extensions.resources.forEach(function (extension) {
-                    $log.debug('[app] Loading extension [' + extension.id + '] ' + extension.name + '...');
-                    // Loading the extension dynamically
-                    $ocLazyLoad.load('extension/' + extension.id + '/module.js');
+                    $log.debug('[app] Extension [' + extension.id + '] ' + extension.name + '...');
+                    if (extension.options.gui) {
+                        $log.debug('[app] Loading extension GUI for [' + extension.id + ']...');
+                        // Loading the extension dynamically
+                        $ocLazyLoad.load('extension/' + extension.id + '/module.js');
+                    }
                 });
             });
 
