@@ -5,6 +5,7 @@ var ontrack = angular.module('ontrack', [
         'multi-select',
         'angular_taglist_directive',
         'ngSanitize',
+        'oc.lazyLoad',
         // Directives
         'ot.directive.view',
         'ot.directive.misc',
@@ -83,7 +84,7 @@ var ontrack = angular.module('ontrack', [
             $urlRouterProvider.otherwise("/home");
         })
         // Main controller
-        .controller('AppCtrl', function ($log, $scope, $rootScope, $state, $http, ot, otUserService, otInfoService, otTaskService, otFormService) {
+        .controller('AppCtrl', function ($log, $scope, $rootScope, $state, $http, $ocLazyLoad, ot, otUserService, otInfoService, otTaskService, otFormService) {
 
             /**
              * Loading the extensions
@@ -92,8 +93,9 @@ var ontrack = angular.module('ontrack', [
             $log.debug('[app] Loading extensions...');
             ot.pageCall($http.get('extensions')).then(function (extensions) {
                 extensions.resources.forEach(function (extension) {
-                    $log.debug('[app] Extension [' + extension.id + '] ' + extension.name);
-                    // TODO Loading the extension dynamically
+                    $log.debug('[app] Loading extension [' + extension.id + '] ' + extension.name + '...');
+                    // Loading the extension dynamically
+                    $ocLazyLoad.load('extension/' + extension.id + '/module.js');
                 });
             });
 
