@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.support;
 
 import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.support.ConfigurationService;
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthAggregator;

@@ -18,6 +18,7 @@ dependencies {
     compile libraries.metrics_core
 
     testCompile project(':ontrack-it-utils')
+    testCompile project(path: ':ontrack-extension-api', configuration: 'testArtifacts')
     testRuntime project(':ontrack-repository-impl')
 
     // Dependencies needed for LDAP integration tests

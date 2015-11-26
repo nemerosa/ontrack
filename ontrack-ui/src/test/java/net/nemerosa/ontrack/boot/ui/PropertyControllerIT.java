@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.boot.ui;
 
-import net.nemerosa.ontrack.extension.general.MessageProperty;
-import net.nemerosa.ontrack.extension.general.MessagePropertyType;
-import net.nemerosa.ontrack.extension.general.MessageType;
+import net.nemerosa.ontrack.extension.api.support.TestSimpleProperty;
+import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType;
 import net.nemerosa.ontrack.model.form.Field;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.ProjectCreation;
+import net.nemerosa.ontrack.model.security.ProjectEdit;
 import net.nemerosa.ontrack.model.security.ProjectView;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.resource.Resource;
@@ -86,37 +86,30 @@ public class PropertyControllerIT extends AbstractWebTestSupport {
                 Project.of(nameDescription())
         ));
         asUser()
-                .with(project.id(), ProjectConfig.class)
+                .with(project.id(), ProjectEdit.class)
                 .call(
                         () -> {
-                            controller.editProperty(ProjectEntityType.PROJECT, project.getId(), MessagePropertyType.class.getName(),
+                            controller.editProperty(ProjectEntityType.PROJECT, project.getId(), TestSimplePropertyType.class.getName(),
                                     object()
-                                            .with("type", "INFO")
-                                            .with("text", "Message")
+                                            .with("value", "Message")
                                             .end()
                             );
                             // Gets the property
-                            Resource<Property<?>> propertyResource = controller.getPropertyValue(ProjectEntityType.PROJECT, project.getId(), MessagePropertyType.class.getName());
+                            Resource<Property<?>> propertyResource = controller.getPropertyValue(ProjectEntityType.PROJECT, project.getId(), TestSimplePropertyType.class.getName());
                             assertNotNull(propertyResource);
                             @SuppressWarnings("unchecked")
-                            Property<MessageProperty> property = (Property<MessageProperty>) propertyResource.getData();
+                            Property<TestSimpleProperty> property = (Property<TestSimpleProperty>) propertyResource.getData();
                             // Checks the property
                             assertFalse(property.isEmpty());
-                            MessageProperty value = property.getValue();
+                            TestSimpleProperty value = property.getValue();
                             assertNotNull(value);
                             // Checks the property content
-                            assertEquals("Message", value.getText());
-                            assertEquals(MessageType.INFO, value.getType());
+                            assertEquals("Message", value.getValue());
                             // Gets the edition form
-                            Form form = controller.getPropertyEditionForm(ProjectEntityType.PROJECT, project.getId(), MessagePropertyType.class.getName());
-                            assertEquals(2, form.getFields().size());
+                            Form form = controller.getPropertyEditionForm(ProjectEntityType.PROJECT, project.getId(), TestSimplePropertyType.class.getName());
+                            assertEquals(1, form.getFields().size());
                             {
-                                Field f = form.getField("type");
-                                assertNotNull(f);
-                                assertEquals("INFO", f.getValue());
-                            }
-                            {
-                                Field f = form.getField("text");
+                                Field f = form.getField("value");
                                 assertNotNull(f);
                                 assertEquals("Message", f.getValue());
                             }

@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.git;
 
 import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration;
 import net.nemerosa.ontrack.extension.support.ConfigurationHealthIndicator;
-import net.nemerosa.ontrack.extension.support.ConfigurationService;
+import net.nemerosa.ontrack.model.support.ConfigurationService;
 import net.nemerosa.ontrack.git.GitRepositoryClient;
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory;
 import net.nemerosa.ontrack.model.security.SecurityService;

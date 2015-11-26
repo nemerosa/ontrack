@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.service.support.configuration;
+package net.nemerosa.ontrack.extension.api.support;
 
 import net.nemerosa.ontrack.extension.support.AbstractConfigurationService;
 import net.nemerosa.ontrack.model.events.EventFactory;

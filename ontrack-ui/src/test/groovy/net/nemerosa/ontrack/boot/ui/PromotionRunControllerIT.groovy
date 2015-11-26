@@ -1,9 +1,7 @@
 package net.nemerosa.ontrack.boot.ui
 
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.extension.general.MessagePropertyType
-import net.nemerosa.ontrack.extension.general.MessageType
-import net.nemerosa.ontrack.extension.general.ReleasePropertyType
+import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.structure.PromotionRunRequest
@@ -64,10 +62,9 @@ class PromotionRunControllerIT extends AbstractWebTestSupport {
                 "Run",
                 [
                         new PropertyCreationRequest(
-                                MessagePropertyType.class.name,
+                                TestSimplePropertyType.class.name,
                                 JsonUtils.object()
-                                        .with('type', 'INFO')
-                                        .with('text', 'Message')
+                                        .with('value', 'Message')
                                         .end()
                         )
                 ]
@@ -77,10 +74,9 @@ class PromotionRunControllerIT extends AbstractWebTestSupport {
         }
         // Checks
         assert run != null
-        def property = propertyService.getProperty(run, MessagePropertyType)
+        def property = propertyService.getProperty(run, TestSimplePropertyType)
         assert !property.empty
-        assert property.value.type == MessageType.INFO
-        assert property.value.text == 'Message'
+        assert property.value.value == 'Message'
     }
 
 }

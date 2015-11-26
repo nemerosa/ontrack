@@ -6,8 +6,8 @@ import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.exceptions.*
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.service.support.property.TestProperty
-import net.nemerosa.ontrack.service.support.property.TestPropertyType
+import net.nemerosa.ontrack.extension.api.support.TestProperty
+import net.nemerosa.ontrack.extension.api.support.TestPropertyType
 import net.nemerosa.ontrack.service.support.template.FixedListTemplateSynchronisationSource
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.Test

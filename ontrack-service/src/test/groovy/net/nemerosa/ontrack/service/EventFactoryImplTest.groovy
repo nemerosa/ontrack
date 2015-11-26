@@ -7,7 +7,7 @@ import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.NameValue
 import net.nemerosa.ontrack.service.events.EventFactoryImpl
-import net.nemerosa.ontrack.service.support.property.TestPropertyType
+import net.nemerosa.ontrack.extension.api.support.TestPropertyType
 import org.junit.Test
 
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd

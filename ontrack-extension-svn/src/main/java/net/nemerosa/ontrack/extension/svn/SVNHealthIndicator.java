@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.svn;
 
 import net.nemerosa.ontrack.extension.support.ConfigurationHealthIndicator;
-import net.nemerosa.ontrack.extension.support.ConfigurationService;
+import net.nemerosa.ontrack.model.support.ConfigurationService;
 import net.nemerosa.ontrack.extension.svn.client.SVNClient;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration;

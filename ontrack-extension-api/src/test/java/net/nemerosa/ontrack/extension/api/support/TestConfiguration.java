@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.service.support.configuration;
+package net.nemerosa.ontrack.extension.api.support;
 
 import lombok.Data;
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration;

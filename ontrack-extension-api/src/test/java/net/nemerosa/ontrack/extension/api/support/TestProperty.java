@@ -1,10 +1,9 @@
-package net.nemerosa.ontrack.service.support.property;
+package net.nemerosa.ontrack.extension.api.support;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.nemerosa.ontrack.model.support.ConfigurationProperty;
-import net.nemerosa.ontrack.service.support.configuration.TestConfiguration;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PUBLIC)

@@ -26,6 +26,7 @@ dependencies {
 
     testCompile project(':ontrack-test-utils')
     testCompile project(':ontrack-it-utils')
+    testCompile project(path: ':ontrack-extension-api', configuration: 'testArtifacts')
     testCompile libraries.groovy
 
     // List of extensions

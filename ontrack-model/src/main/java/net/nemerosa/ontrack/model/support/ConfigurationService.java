@@ -1,6 +1,7 @@
-package net.nemerosa.ontrack.extension.support;
+package net.nemerosa.ontrack.model.support;
 
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
+import net.nemerosa.ontrack.model.support.ConfigurationNotFoundException;
 import net.nemerosa.ontrack.model.support.ConnectionResult;
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration;
 

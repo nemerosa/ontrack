@@ -1,14 +1,11 @@
-package net.nemerosa.ontrack.extension.support;
+package net.nemerosa.ontrack.model.support;
 
 import net.nemerosa.ontrack.model.exceptions.InputException;
 import net.nemerosa.ontrack.model.support.Configuration;
-import net.nemerosa.ontrack.model.support.UserPasswordConfiguration;
 import org.apache.commons.lang3.StringUtils;
 
 /**
  * Thrown when a validation error occurs when creating or updating a configuration.
- *
- * @see AbstractConfigurationService#validateAndCheck(UserPasswordConfiguration)
  */
 public class ConfigurationValidationException extends InputException {
     public ConfigurationValidationException(Configuration<?> configuration, String message) {
