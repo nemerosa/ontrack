@@ -69,7 +69,8 @@ var vendorJsResources = [
     'angular-taglist/js/angular-taglist-directive.js',
     'angular-sanitize/angular-sanitize.js',
     'angular-bootstrap/ui-bootstrap-tpls.js',
-    'moment/min/moment.min.js'
+    'moment/min/moment.min.js',
+    'oclazyload/dist/ocLazyLoad.min.js'
 ].map(function (rel) {
         return vendor + '/' + rel;
     });
