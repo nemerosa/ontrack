@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.service.security;
 
+import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.extension.Extension;
 import net.nemerosa.ontrack.model.extension.ExtensionFeature;
-import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.support.StartupService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +11,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,7 +54,6 @@ public class ExtensionManagerImpl implements ExtensionManager, StartupService {
         for (ExtensionFeature feature : extensionFeatures) {
             logger.info("[extensions] * {} [{}]", feature.getName(), feature.getId());
         }
-        // TODO Adds the loaded features into the management access points
     }
 
     @Override
@@ -64,6 +64,13 @@ public class ExtensionManagerImpl implements ExtensionManager, StartupService {
                 .collect(Collectors.<Extension>toList());
         //noinspection unchecked
         return (Collection<T>) collection;
+    }
+
+    @Override
+    public List<ExtensionFeature> getExtensionFeatures() {
+        return applicationContext.getBeansOfType(ExtensionFeature.class).values().stream()
+                .sorted(Comparator.comparing(ExtensionFeature::getName))
+                .collect(Collectors.toList());
     }
 
 }
