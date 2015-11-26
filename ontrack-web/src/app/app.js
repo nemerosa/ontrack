@@ -86,6 +86,18 @@ var ontrack = angular.module('ontrack', [
         .controller('AppCtrl', function ($log, $scope, $rootScope, $state, $http, ot, otUserService, otInfoService, otTaskService, otFormService) {
 
             /**
+             * Loading the extensions
+             */
+            // TODO Loading mask
+            $log.debug('[app] Loading extensions...');
+            ot.pageCall($http.get('extensions')).then(function (extensions) {
+                extensions.resources.forEach(function (extension) {
+                    $log.debug('[app] Extension [' + extension.id + '] ' + extension.name);
+                    // TODO Loading the extension dynamically
+                });
+            });
+
+            /**
              * User mgt
              */
 
