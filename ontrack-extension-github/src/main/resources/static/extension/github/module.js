@@ -1,5 +1,4 @@
-angular.module('ot.extension.github.configuration', [
-    'ui.router',
+angular.module('ontrack.extension.github', [
     'ot.service.core',
     'ot.service.configuration',
     'ot.service.form'

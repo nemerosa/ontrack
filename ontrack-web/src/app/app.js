@@ -45,7 +45,6 @@ var ontrack = angular.module('ontrack', [
         // TODO 'ontrack.extension.jira',
         // TODO 'ontrack.extension.combined',
         // TODO 'ontrack.extension.artifactory',
-        // TODO 'ontrack.extension.github',
         // TODO 'ontrack.extension.stash',
         // TODO 'ontrack.extension.ldap'
     ])
