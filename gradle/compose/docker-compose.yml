@@ -7,8 +7,6 @@ influxdb:
 # Grafana container
 grafana:
   build: ./common/grafana
-  ports:
-    - "3000"
   links:
     - "influxdb:influxdb"
 
