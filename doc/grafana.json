@@ -149,7 +149,7 @@
                 }
               ],
               "measurement": "counter.entity.event",
-              "query": "SELECT derivative(\"value\", 1m) as \"1m\" FROM \"gauge.entity.event\"",
+              "query": "SELECT derivative(\"value\", 10s) as \"1m\" FROM \"gauge.entity.event\"",
               "rawQuery": true,
               "refId": "A",
               "tags": []
@@ -594,7 +594,7 @@
               "fields": [
                 {
                   "func": "mean",
-                  "name": "value"
+                  "name": "count"
                 }
               ],
               "groupBy": [
@@ -603,8 +603,8 @@
                   "type": "time"
                 }
               ],
-              "measurement": "count",
-              "query": "SELECT mean(\"value\") AS \"value\" FROM \"count\" WHERE $timeFilter GROUP BY time(10s)",
+              "measurement": "counter.job",
+              "query": "SELECT mean(\"count\") AS \"count\" FROM \"counter.job\" WHERE $timeFilter GROUP BY time(10s)",
               "rawQuery": false,
               "refId": "A",
               "tags": []
@@ -673,7 +673,7 @@
               "fields": [
                 {
                   "func": "mean",
-                  "name": "value"
+                  "name": "count"
                 }
               ],
               "groupBy": [
@@ -682,8 +682,8 @@
                   "type": "time"
                 }
               ],
-              "measurement": "job-category.GitIndexation.snapshot.mean",
-              "query": "SELECT mean(\"value\") AS \"value\" FROM \"job-category.GitIndexation.snapshot.mean\" WHERE $timeFilter GROUP BY time(10s)",
+              "measurement": "counter.job-category.GitIndexation",
+              "query": "SELECT mean(\"count\") AS \"count\" FROM \"counter.job-category.GitIndexation\" WHERE $timeFilter GROUP BY time(10s)",
               "refId": "A",
               "tags": []
             }
@@ -708,7 +708,7 @@
     }
   ],
   "time": {
-    "from": "now-6h",
+    "from": "now-15m",
     "to": "now"
   },
   "timepicker": {
