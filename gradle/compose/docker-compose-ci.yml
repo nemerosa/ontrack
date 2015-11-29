@@ -5,6 +5,11 @@ influxdb:
     - "8083"
     - "8086"
 
+# Grafana
+grafana:
+  ports:
+    - "3000"
+
 # Ontrack container
 ontrack:
   environment:
