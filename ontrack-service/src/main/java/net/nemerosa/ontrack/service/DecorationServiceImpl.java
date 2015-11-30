@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
@@ -24,15 +23,11 @@ import java.util.stream.Stream;
 public class DecorationServiceImpl implements DecorationService {
 
     private final ExtensionManager extensionManager;
-    private final List<Decorator> builtinDecorators;
     private final SecurityService securityService;
 
     @Autowired
-    public DecorationServiceImpl(ExtensionManager extensionManager, List<Decorator> builtinDecorators, SecurityService securityService) {
+    public DecorationServiceImpl(ExtensionManager extensionManager, SecurityService securityService) {
         this.extensionManager = extensionManager;
-        this.builtinDecorators = builtinDecorators.stream()
-                .filter(decorator -> !(decorator instanceof DecorationExtension))
-                .collect(Collectors.toList());
         this.securityService = securityService;
     }
 
@@ -42,28 +37,15 @@ public class DecorationServiceImpl implements DecorationService {
         Function<Decorator, Stream<Decoration<?>>> securedDecoratorFunction = securityService.runner(
                 decorator -> getDecorations(entity, decorator).stream()
         );
-        List<Decoration<?>> decorations = new ArrayList<>();
-        // Built-in decorations
-        decorations.addAll(
-                builtinDecorators.stream()
-                        // ... and gets the decorations
-                        .flatMap(securedDecoratorFunction)
-                                // OK
-                        .collect(Collectors.toList())
-        );
-        // Extended decorations
-        decorations.addAll(
-                extensionManager.getExtensions(DecorationExtension.class)
-                        .stream()
-                                // ... and filters per entity
-                        .filter(decorator -> decorator.getScope().contains(entity.getProjectEntityType()))
-                                // ... and gets the decoration
-                        .flatMap(securedDecoratorFunction)
-                                // OK
-                        .collect(Collectors.toList())
-        );
         // OK
-        return decorations;
+        return extensionManager.getExtensions(DecorationExtension.class)
+                .stream()
+                        // ... and filters per entity
+                .filter(decorator -> decorator.getScope().contains(entity.getProjectEntityType()))
+                        // ... and gets the decoration
+                .flatMap(securedDecoratorFunction)
+                        // OK
+                .collect(Collectors.toList());
     }
 
     /**
