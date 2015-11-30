@@ -40,7 +40,6 @@ var ontrack = angular.module('ontrack', [
         'ot.view.admin.predefined-validation-stamps',
         'ot.view.admin.predefined-promotion-levels',
         // Extensions
-        // TODO 'ontrack.extension.artifactory',
         // TODO 'ontrack.extension.stash',
         // TODO 'ontrack.extension.ldap'
     ])

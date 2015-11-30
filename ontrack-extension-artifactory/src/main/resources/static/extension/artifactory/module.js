@@ -1,4 +1,4 @@
-angular.module('ot.extension.artifactory.configuration', [
+angular.module('ontrack.extension.artifactory', [
     'ui.router',
     'ot.service.core',
     'ot.service.configuration',
@@ -41,7 +41,7 @@ angular.module('ot.extension.artifactory.configuration', [
             otFormService.display({
                 uri: $scope.configurations._create,
                 title: "Artifactory configuration",
-                buttons: [ otConfigurationService.testButton($scope.configurations._test) ],
+                buttons: [otConfigurationService.testButton($scope.configurations._test)],
                 submit: function (data) {
                     return ot.call($http.post($scope.configurations._create, data));
                 }
@@ -65,7 +65,7 @@ angular.module('ot.extension.artifactory.configuration', [
             otFormService.display({
                 uri: configuration._update,
                 title: "Artifactory configuration",
-                buttons: [ otConfigurationService.testButton($scope.configurations._test) ],
+                buttons: [otConfigurationService.testButton($scope.configurations._test)],
                 submit: function (data) {
                     return ot.call($http.put(configuration._update, data));
                 }
