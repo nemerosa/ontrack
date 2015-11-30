@@ -38,9 +38,7 @@ var ontrack = angular.module('ontrack', [
         'ot.view.admin.project-acl',
         'ot.view.admin.console',
         'ot.view.admin.predefined-validation-stamps',
-        'ot.view.admin.predefined-promotion-levels',
-        // Extensions
-        // TODO 'ontrack.extension.ldap'
+        'ot.view.admin.predefined-promotion-levels'
     ])
         // HTTP configuration
         .config(function ($httpProvider) {
