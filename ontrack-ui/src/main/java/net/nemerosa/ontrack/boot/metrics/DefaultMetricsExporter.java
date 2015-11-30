@@ -44,10 +44,15 @@ public class DefaultMetricsExporter extends AbstractMetricExporter {
 
     @PostConstruct
     public void run() {
-        logger.info("Scheduling export of metrics");
+        logger.info("[metrics] Scheduling export of metrics");
+        // List of metrics to export
+        metricsSources.forEach(
+                metricsSource -> logger.info("[metrics] Source: {}", metricsSource.getClass().getName())
+        );
+        // Scheduling of the export
         executor.scheduleAtFixedRate(() -> {
             try {
-                logger.trace("Exporting...");
+                logger.trace("[metrics] Exporting...");
                 export();
             } catch (RuntimeException ex) {
                 logger.error("RuntimeException thrown from {}#export. Exception was suppressed.", getClass().getSimpleName(), ex);
@@ -66,7 +71,7 @@ public class DefaultMetricsExporter extends AbstractMetricExporter {
     }
 
     private void write(Metric<?> metric) {
-        logger.trace("{} -> {}", metric.getName(), metric.getValue());
+        logger.trace("[metrics] {} -> {}", metric.getName(), metric.getValue());
         metricWriter.submit(metric.getName(), metric.getValue().doubleValue());
     }
 

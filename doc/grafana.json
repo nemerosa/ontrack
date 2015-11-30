@@ -71,7 +71,7 @@
                 }
               ],
               "measurement": "counter.entity.build",
-              "query": "SELECT \"value\" FROM \"counter.entity.build\"",
+              "query": "SELECT \"value\" FROM \"gauge.entity.build\"",
               "rawQuery": true,
               "refId": "A",
               "tags": []
@@ -149,7 +149,7 @@
                 }
               ],
               "measurement": "counter.entity.event",
-              "query": "SELECT derivative(\"value\", 1m) as \"1m\" FROM \"counter.entity.event\"",
+              "query": "SELECT derivative(\"value\", 10s) as \"1m\" FROM \"gauge.entity.event\"",
               "rawQuery": true,
               "refId": "A",
               "tags": []
@@ -237,8 +237,8 @@
                 }
               ],
               "hide": false,
-              "measurement": "heap.used",
-              "query": "SELECT mean(\"value\") AS \"value\" FROM \"heap.used\" WHERE $timeFilter GROUP BY time(2m)",
+              "measurement": "gauge.heap",
+              "query": "SELECT mean(\"value\") AS \"value\" FROM \"gauge.heap\" WHERE $timeFilter GROUP BY time(2m)",
               "refId": "A",
               "tags": []
             },
@@ -255,8 +255,8 @@
                   "type": "time"
                 }
               ],
-              "measurement": "heap.committed",
-              "query": "SELECT mean(\"value\") AS \"value\" FROM \"heap.committed\" WHERE $timeFilter GROUP BY time($interval)",
+              "measurement": "gauge.heap.committed",
+              "query": "SELECT mean(\"value\") AS \"value\" FROM \"gauge.heap.committed\" WHERE $timeFilter GROUP BY time($interval)",
               "refId": "B",
               "tags": []
             }
@@ -332,8 +332,8 @@
                   "type": "time"
                 }
               ],
-              "measurement": "threads",
-              "query": "SELECT mean(\"value\") AS \"value\" FROM \"threads\" WHERE $timeFilter GROUP BY time(10s)",
+              "measurement": "gauge.threads",
+              "query": "SELECT mean(\"value\") AS \"value\" FROM \"gauge.threads\" WHERE $timeFilter GROUP BY time(10s)",
               "refId": "A",
               "tags": []
             }
@@ -408,7 +408,7 @@
                   "type": "time"
                 }
               ],
-              "query": "select \"value\" from \"httpsessions.active\"",
+              "query": "select \"value\" from \"gauge.httpsessions.active\"",
               "rawQuery": true,
               "refId": "A",
               "tags": []
@@ -594,7 +594,7 @@
               "fields": [
                 {
                   "func": "mean",
-                  "name": "value"
+                  "name": "count"
                 }
               ],
               "groupBy": [
@@ -603,8 +603,8 @@
                   "type": "time"
                 }
               ],
-              "measurement": "job.count",
-              "query": "SELECT mean(\"value\") AS \"value\" FROM \"job.count\" WHERE $timeFilter GROUP BY time(10s)",
+              "measurement": "counter.job",
+              "query": "SELECT mean(\"count\") AS \"count\" FROM \"counter.job\" WHERE $timeFilter GROUP BY time(10s)",
               "rawQuery": false,
               "refId": "A",
               "tags": []
@@ -673,7 +673,7 @@
               "fields": [
                 {
                   "func": "mean",
-                  "name": "value"
+                  "name": "count"
                 }
               ],
               "groupBy": [
@@ -682,8 +682,8 @@
                   "type": "time"
                 }
               ],
-              "measurement": "job-category.GitIndexation.snapshot.mean",
-              "query": "SELECT mean(\"value\") AS \"value\" FROM \"job-category.GitIndexation.snapshot.mean\" WHERE $timeFilter GROUP BY time(10s)",
+              "measurement": "counter.job-category.GitIndexation",
+              "query": "SELECT mean(\"count\") AS \"count\" FROM \"counter.job-category.GitIndexation\" WHERE $timeFilter GROUP BY time(10s)",
               "refId": "A",
               "tags": []
             }
@@ -708,7 +708,7 @@
     }
   ],
   "time": {
-    "from": "now-6h",
+    "from": "now-15m",
     "to": "now"
   },
   "timepicker": {
@@ -747,6 +747,6 @@
   },
   "refresh": "5s",
   "schemaVersion": 7,
-  "version": 3,
+  "version": 0,
   "links": []
 }
