@@ -1,4 +1,4 @@
-angular.module('ot.extension.stash.configuration', [
+angular.module('ontrack.extension.stash', [
     'ui.router',
     'ot.service.core',
     'ot.service.configuration',
