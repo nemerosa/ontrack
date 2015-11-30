@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service;
 
+import net.nemerosa.ontrack.common.BaseException;
 import net.nemerosa.ontrack.extension.api.DecorationExtension;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -7,7 +8,6 @@ import net.nemerosa.ontrack.model.structure.Decoration;
 import net.nemerosa.ontrack.model.structure.DecorationService;
 import net.nemerosa.ontrack.model.structure.Decorator;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
-import net.nemerosa.ontrack.service.support.ErrorDecorator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +26,6 @@ public class DecorationServiceImpl implements DecorationService {
     private final ExtensionManager extensionManager;
     private final List<Decorator> builtinDecorators;
     private final SecurityService securityService;
-    private final ErrorDecorator errorDecorator = new ErrorDecorator();
 
     @Autowired
     public DecorationServiceImpl(ExtensionManager extensionManager, List<Decorator> builtinDecorators, SecurityService securityService) {
@@ -74,7 +73,20 @@ public class DecorationServiceImpl implements DecorationService {
         try {
             return decorator.getDecorations(entity);
         } catch (Exception ex) {
-            return Collections.singletonList(errorDecorator.getDecoration(ex));
+            return Collections.singletonList(
+                    Decoration.error(decorator, getErrorMessage(ex))
+            );
+        }
+    }
+
+    /**
+     * Decoration error message
+     */
+    protected String getErrorMessage(Exception ex) {
+        if (ex instanceof BaseException) {
+            return ex.getMessage();
+        } else {
+            return "Problem while getting decoration";
         }
     }
 }
