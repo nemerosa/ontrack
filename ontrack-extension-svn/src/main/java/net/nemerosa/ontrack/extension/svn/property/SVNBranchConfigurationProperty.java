@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.svn.property;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import net.nemerosa.ontrack.extension.svn.model.BranchPathRequiredException;
 import net.nemerosa.ontrack.model.structure.ServiceConfiguration;
 import org.apache.commons.lang3.StringUtils;
 
@@ -24,6 +25,14 @@ public class SVNBranchConfigurationProperty {
      * @see {@link net.nemerosa.ontrack.extension.svn.model.BuildSvnRevisionLink}
      */
     private final ServiceConfiguration buildRevisionLink;
+
+    public SVNBranchConfigurationProperty(String branchPath, ServiceConfiguration buildRevisionLink) {
+        if (StringUtils.isBlank(branchPath)) {
+            throw new BranchPathRequiredException();
+        }
+        this.branchPath = branchPath;
+        this.buildRevisionLink = buildRevisionLink;
+    }
 
     /**
      * Returns a path which has been cleaned from its trailing or leading components.
