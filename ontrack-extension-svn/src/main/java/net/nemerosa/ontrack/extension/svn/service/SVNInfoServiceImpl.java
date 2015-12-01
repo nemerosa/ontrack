@@ -64,7 +64,7 @@ public class SVNInfoServiceImpl implements SVNInfoService {
         svnService.forEachConfiguredBranch(
                 config -> Objects.equals(configurationName, config.getConfiguration().getName()),
                 (branch, branchConfig) -> {
-                    String branchPath = branchConfig.getBranchPath();
+                    String branchPath = branchConfig.getCuredBranchPath();
                     // List of linked issues
                     Collection<String> linkedIssues = configuredIssueService.getLinkedIssues(branch.getProject(), issue).stream()
                             .map(Issue::getKey)
@@ -116,7 +116,7 @@ public class SVNInfoServiceImpl implements SVNInfoService {
             svnService.forEachConfiguredBranch(
                     config -> Objects.equals(configurationName, config.getConfiguration().getName()),
                     (candidate, branchConfig) -> {
-                        String branchPath = branchConfig.getBranchPath();
+                        String branchPath = branchConfig.getCuredBranchPath();
                         if (Objects.equals(br.getPath(), branchPath)) {
                             rBranch.set(candidate);
                         }
