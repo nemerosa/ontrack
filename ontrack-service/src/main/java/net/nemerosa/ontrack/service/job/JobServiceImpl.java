@@ -297,7 +297,11 @@ public class JobServiceImpl implements ScheduledService,
                 .filter(RegisteredJob::isDisabled)
                 .count()
         ));
-        // TODO Total number of jobs in error
+        // Total number of jobs in error
+        metrics.add(new Metric<>("gauge.jobs.error", jobs.stream()
+                .filter(RegisteredJob::isInError)
+                .count()
+        ));
 
         // Per categories
         registeredJobs.rowMap().forEach((category, idMap) -> {
@@ -311,7 +315,10 @@ public class JobServiceImpl implements ScheduledService,
             metrics.add(new Metric<>("gauge.jobs." + category + ".disabled", idMap.values().stream()
                     .filter(RegisteredJob::isDisabled)
                     .count()));
-            // TODO Total number of jobs in error per category
+            // Total number of jobs in error per category
+            metrics.add(new Metric<>("gauge.jobs." + category + ".error", idMap.values().stream()
+                    .filter(RegisteredJob::isInError)
+                    .count()));
         });
 
         // OK
