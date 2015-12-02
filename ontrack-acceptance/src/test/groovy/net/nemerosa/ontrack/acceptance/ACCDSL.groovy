@@ -35,6 +35,21 @@ class ACCDSL extends AbstractACCDSL {
     }
 
     @Test
+    void 'Project default description is empty'() {
+        def name = uid('P')
+        ontrack.project(name) {
+            config {
+                autoValidationStamp()
+            }
+            branch('template', "Template for all branches", true)
+        }
+        // Checks the project description
+        assert ontrack.project(name).description == ''
+        // Checks the branch description
+        assert ontrack.branch(name, 'template').description == 'Template for all branches'
+    }
+
+    @Test
     @AcceptanceTest(AcceptanceTestContext.SMOKE)
     void 'Project branches'() {
         // Project and two branches

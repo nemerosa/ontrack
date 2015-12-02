@@ -87,13 +87,13 @@ public class RevisionPatternSvnRevisionLink implements BuildSvnRevisionLink<Revi
 
     @Override
     public String getBuildPath(RevisionPattern data, Build build, SVNBranchConfigurationProperty branchConfigurationProperty) {
-        return branchConfigurationProperty.getBranchPath() + "@" + getRevision(data, build, branchConfigurationProperty).getAsLong();
+        return branchConfigurationProperty.getCuredBranchPath() + "@" + getRevision(data, build, branchConfigurationProperty).getAsLong();
     }
 
     @Override
     public Optional<Build> getEarliestBuild(RevisionPattern data, Branch branch, SVNLocation location, SVNLocation firstCopy, SVNBranchConfigurationProperty branchConfigurationProperty) {
         // Checks the path
-        if (StringUtils.equals(branchConfigurationProperty.getBranchPath(), location.getPath())) {
+        if (StringUtils.equals(branchConfigurationProperty.getCuredBranchPath(), location.getPath())) {
             return structureService.findBuild(
                     branch.getId(),
                     build -> {

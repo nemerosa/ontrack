@@ -1,7 +1,10 @@
 package net.nemerosa.ontrack.extension.svn.property;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import net.nemerosa.ontrack.extension.svn.model.BranchPathRequiredException;
 import net.nemerosa.ontrack.model.structure.ServiceConfiguration;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Associates a {@link net.nemerosa.ontrack.model.structure.Branch branch} with a path in a Subversion repository
@@ -23,4 +26,24 @@ public class SVNBranchConfigurationProperty {
      */
     private final ServiceConfiguration buildRevisionLink;
 
+    public SVNBranchConfigurationProperty(String branchPath, ServiceConfiguration buildRevisionLink) {
+        if (StringUtils.isBlank(branchPath)) {
+            throw new BranchPathRequiredException();
+        }
+        this.branchPath = branchPath;
+        this.buildRevisionLink = buildRevisionLink;
+    }
+
+    /**
+     * Returns a path which has been cleaned from its trailing or leading components.
+     */
+    @JsonIgnore
+    public String getCuredBranchPath() {
+        String trim = StringUtils.trim(branchPath);
+        if ("/".equals(trim)) {
+            return trim;
+        } else {
+            return StringUtils.stripEnd(trim, "/");
+        }
+    }
 }

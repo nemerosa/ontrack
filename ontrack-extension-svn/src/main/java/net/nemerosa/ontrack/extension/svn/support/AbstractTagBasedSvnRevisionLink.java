@@ -83,7 +83,7 @@ public abstract class AbstractTagBasedSvnRevisionLink<T> implements IndexableBui
                     // Repository for the branch
                     SVNRepository svnRepository = svnService.getRequiredSVNRepository(build.getBranch());
                     // Gets the tag path
-                    return svnService.getTagPathForTagName(svnRepository, branchConfigurationProperty.getBranchPath(), tagName);
+                    return svnService.getTagPathForTagName(svnRepository, branchConfigurationProperty.getCuredBranchPath(), tagName);
                 });
     }
 
@@ -91,7 +91,7 @@ public abstract class AbstractTagBasedSvnRevisionLink<T> implements IndexableBui
         // Repository for the branch
         SVNRepository svnRepository = svnService.getRequiredSVNRepository(branch);
         // Gets the base path
-        Optional<String> oBasePath = svnService.getBasePath(svnRepository, branchConfigurationProperty.getBranchPath());
+        Optional<String> oBasePath = svnService.getBasePath(svnRepository, branchConfigurationProperty.getCuredBranchPath());
         if (!oBasePath.isPresent()) {
             return Optional.empty();
         }

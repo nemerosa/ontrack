@@ -7,6 +7,7 @@ import com.google.common.collect.Tables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.job.*;
+import net.nemerosa.ontrack.model.metrics.OntrackMetrics;
 import net.nemerosa.ontrack.model.security.ApplicationManagement;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.*;
@@ -14,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.metrics.CounterService;
+import org.springframework.boot.actuate.metrics.Metric;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
@@ -28,6 +30,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class JobServiceImpl implements ScheduledService,
+        OntrackMetrics,
         JobService,
         ApplicationInfoProvider,
         StartupService,
@@ -42,6 +45,10 @@ public class JobServiceImpl implements ScheduledService,
     private final MetricRegistry metricRegistry;
 
     private final AtomicLong syncCount = new AtomicLong();
+
+    /**
+     * Category x ID -> Job
+     */
     private final Table<String, String, RegisteredJob> registeredJobs = Tables.newCustomTable(
             new HashMap<>(),
             HashMap::new
@@ -119,7 +126,9 @@ public class JobServiceImpl implements ScheduledService,
                 registeredJob.getRunCount(),
                 registeredJob.getLastRunDate(),
                 registeredJob.getLastRunDurationMs(),
-                registeredJob.getNextRunDate()
+                registeredJob.getNextRunDate(),
+                registeredJob.getLastErrorCount(),
+                registeredJob.getLastError()
         );
     }
 
@@ -270,5 +279,51 @@ public class JobServiceImpl implements ScheduledService,
         };
         // Submitting the task
         executor.submit(monitoredTask);
+    }
+
+    @Override
+    public Collection<Metric<?>> metrics() {
+        List<Metric<?>> metrics = new ArrayList<>();
+
+        // Overall counts
+        Collection<RegisteredJob> jobs = registeredJobs.values();
+        // Total number of jobs
+        metrics.add(new Metric<>("gauge.jobs", jobs.size()));
+        // Total number of running jobs
+        metrics.add(new Metric<>("gauge.jobs.running", jobs.stream()
+                .filter(RegisteredJob::isRunning)
+                .count()
+        ));
+        // Total number of disabled jobs
+        metrics.add(new Metric<>("gauge.jobs.disabled", jobs.stream()
+                .filter(RegisteredJob::isDisabled)
+                .count()
+        ));
+        // Total number of jobs in error
+        metrics.add(new Metric<>("gauge.jobs.error", jobs.stream()
+                .filter(RegisteredJob::isInError)
+                .count()
+        ));
+
+        // Per categories
+        registeredJobs.rowMap().forEach((category, idMap) -> {
+            // Total number of jobs per category
+            metrics.add(new Metric<>("gauge.jobs." + category, idMap.values().size()));
+            // Total number of running jobs per category
+            metrics.add(new Metric<>("gauge.jobs." + category + ".running", idMap.values().stream()
+                    .filter(RegisteredJob::isRunning)
+                    .count()));
+            // Total number of disabled jobs per category
+            metrics.add(new Metric<>("gauge.jobs." + category + ".disabled", idMap.values().stream()
+                    .filter(RegisteredJob::isDisabled)
+                    .count()));
+            // Total number of jobs in error per category
+            metrics.add(new Metric<>("gauge.jobs." + category + ".error", idMap.values().stream()
+                    .filter(RegisteredJob::isInError)
+                    .count()));
+        });
+
+        // OK
+        return metrics;
     }
 }
