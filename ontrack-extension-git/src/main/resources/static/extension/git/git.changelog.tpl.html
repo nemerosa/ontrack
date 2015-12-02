@@ -130,19 +130,19 @@
                                 <ot-loading>Commits are loading...</ot-loading>
                             </div>
                         </div>
-                        <div class="panel-body ot-extension-git-changelog-commit-container" ng-if="commits">
-                            <div class="ot-extension-git-changelog-commit-graph">
+                        <div class="panel-body ot-panel-padded" ng-if="commits">
+                            <div class="pull-left">
                                 <canvas git-plot="commits.log.plot"></canvas>
                             </div>
-                            <div class="ot-extension-git-changelog-commit"
+                            <div class="ot-graph-line"
                                  ng-repeat="gitUICommit in commits.log.commits">
-                                <span class="ot-extension-git-changelog-code" ng-if="!gitUICommit.link">{{gitUICommit.commit.shortId}}</span>
-                                <span class="ot-extension-git-changelog-code" ng-if="gitUICommit.link"><a href="{{gitUICommit.link}}" target="_blank">{{gitUICommit.commit.shortId}}</a></span>
-                                <span class="ot-extension-git-changelog-message" ng-bind-html="gitUICommit.annotatedMessage"></span>
-                                <span class="ot-extension-git-changelog-author">
+                                <span class="ot-graph-code" ng-if="!gitUICommit.link">{{gitUICommit.commit.shortId}}</span>
+                                <span class="ot-graph-code" ng-if="gitUICommit.link"><a href="{{gitUICommit.link}}" target="_blank">{{gitUICommit.commit.shortId}}</a></span>
+                                <span class="ot-graph-message" ng-bind-html="gitUICommit.annotatedMessage"></span>
+                                <span class="ot-graph-label">
                                     {{gitUICommit.commit.author.name}}
                                 </span>
-                                <span class="ot-extension-git-changelog-date">
+                                <span class="ot-graph-label">
                                     {{gitUICommit.commit.commitTime | date:'mediumDate'}}
                                     {{gitUICommit.commit.commitTime | date:'shortTime'}}
                                 </span>
@@ -233,8 +233,8 @@
                         <div class="panel-body ot-extension-scm-changelog-filefilter" ng-show="files">
                             <ot-extension-scm-changelog-filechangefilter change-log="changeLog" filter-callback="changeLogFileFilterConfig.callback"></ot-extension-scm-changelog-filechangefilter>
                         </div>
-                        <div class="panel-body ot-extension-git-changelog-files" ng-show="files">
-                            <div class="ot-extension-git-changelog-file"
+                        <div class="panel-body ot-panel-padded" ng-show="files">
+                            <div class="ot-line-no-overflow ot-line-hover ot-line-border"
                                  ng-repeat="changeLogFile in files.list | filter:changeLogFileFilterConfig.filter">
                                 <span class="ot-scm-changelog-revision ot-scm-changetype-{{changeLogFile.changeType | lowercase}}">
                                     <span class="ot-scm-changetype-icon" title="{{changeLogFile.changeType | lowercase}}"></span>
