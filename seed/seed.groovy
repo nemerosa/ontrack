@@ -84,7 +84,10 @@ if (['master', 'feature', 'release', 'hotfix'].contains(branchType)) {
 
     // Build job
     freeStyleJob("${PROJECT}-${NAME}-build") {
-        logRotator(-1, 40)
+        logRotator {
+            numToKeep(40)
+            artifactNumToKeep(5)
+        }
         deliveryPipelineConfiguration('Commit', 'Build')
         jdk 'JDK8u25'
         scm {
@@ -149,7 +152,10 @@ build
     // Local acceptance job
 
     freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
-        logRotator(numToKeep = 40)
+        logRotator {
+            numToKeep(40)
+            artifactNumToKeep(5)
+        }
         deliveryPipelineConfiguration('Commit', 'Local acceptance')
         jdk 'JDK8u25'
         parameters {
@@ -214,7 +220,10 @@ ciAcceptanceTest -PacceptanceJar=ontrack-acceptance.jar
         // Debian package acceptance job
 
         freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-debian") {
-            logRotator(numToKeep = 40)
+            logRotator {
+                numToKeep(40)
+                artifactNumToKeep(5)
+            }
             deliveryPipelineConfiguration('Commit', 'Debian package acceptance')
             jdk 'JDK8u25'
             parameters {
@@ -252,7 +261,10 @@ debAcceptanceTest
 
         centOsVersions.each { centOsVersion ->
             freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-centos-${centOsVersion}") {
-                logRotator(numToKeep = 40)
+                logRotator {
+                    numToKeep(40)
+                    artifactNumToKeep(5)
+                }
                 deliveryPipelineConfiguration('Commit', "CentOS ${centOsVersion} package acceptance")
                 jdk 'JDK8u25'
                 parameters {
@@ -292,7 +304,10 @@ rpmAcceptanceTest${centOsVersion}
     // Docker push
 
     freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-docker-push") {
-        logRotator(numToKeep = 40)
+        logRotator {
+            numToKeep(40)
+            artifactNumToKeep(5)
+        }
         deliveryPipelineConfiguration('Acceptance', 'Docker push')
         jdk 'JDK8u25'
         parameters {
@@ -331,7 +346,10 @@ docker logout
     // Digital Ocean acceptance job
 
     freeStyleJob("${PROJECT}-${NAME}-acceptance-do") {
-        logRotator(numToKeep = 40)
+        logRotator {
+            numToKeep(40)
+            artifactNumToKeep(5)
+        }
         deliveryPipelineConfiguration('Acceptance', 'Digital Ocean')
         jdk 'JDK8u25'
         parameters {
@@ -377,7 +395,10 @@ docker logout
     // Available for all branches, with some restrictions (no tagging) for non release branches
 
     freeStyleJob("${PROJECT}-${NAME}-publish") {
-        logRotator(numToKeep = 40)
+        logRotator {
+            numToKeep(40)
+            artifactNumToKeep(5)
+        }
         deliveryPipelineConfiguration('Release', 'Publish')
         jdk 'JDK8u25'
         parameters {
@@ -465,7 +486,10 @@ label VERSION_DISPLAY
         // Production deployment
 
         freeStyleJob("${PROJECT}-${NAME}-production") {
-            logRotator(numToKeep = 40)
+            logRotator {
+                numToKeep(40)
+                artifactNumToKeep(5)
+            }
             deliveryPipelineConfiguration('Release', 'Production')
             jdk 'JDK8u25'
             parameters {
@@ -504,7 +528,10 @@ productionUpgrade
         // Production acceptance test
 
         freeStyleJob("${PROJECT}-${NAME}-acceptance-production") {
-            logRotator(numToKeep = 40)
+            logRotator {
+                numToKeep(40)
+                artifactNumToKeep(5)
+            }
             deliveryPipelineConfiguration('Release', 'Production acceptance')
             jdk 'JDK8u25'
             parameters {
