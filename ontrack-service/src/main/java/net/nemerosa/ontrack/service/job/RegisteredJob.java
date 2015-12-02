@@ -98,6 +98,7 @@ public class RegisteredJob {
             } catch (RuntimeException ex) {
                 lastErrorCount.incrementAndGet();
                 lastError.set(ex.getMessage());
+                throw ex;
             } finally {
                 // End
                 run.set(null);
@@ -139,6 +140,14 @@ public class RegisteredJob {
 
     public ApplicationInfo getApplicationInfo() {
         return Optional.ofNullable(run.get()).map(task -> ApplicationInfo.info(task.getInfo())).orElse(null);
+    }
+
+    public long getLastErrorCount() {
+        return lastErrorCount.get();
+    }
+
+    public String getLastError() {
+        return lastError.get();
     }
 
     public long getRunCount() {

@@ -16,5 +16,7 @@ public class JobStatus {
     private final LocalDateTime lastRunDate;
     private final long lastRunDurationMs;
     private final LocalDateTime nextRunDate;
+    private final long lastErrorCount;
+    private final String lastError;
 
 }
