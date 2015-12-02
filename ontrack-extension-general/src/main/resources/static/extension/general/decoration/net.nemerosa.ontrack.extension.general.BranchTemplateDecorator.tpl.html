@@ -1,1 +1,6 @@
-<span class="net-nemerosa-ontrack-extension-general-BranchTemplateDecorator-{{decoration.data}}"></span>
+<span ng-if="decoration.data == 'TEMPLATE_INSTANCE'">
+    <span class="fa fa-link text-info"></span>
+</span>
+<span ng-if="decoration.data == 'TEMPLATE_DEFINITION'">
+    <span class="fa fa-share-alt text-success"></span>
+</span>
