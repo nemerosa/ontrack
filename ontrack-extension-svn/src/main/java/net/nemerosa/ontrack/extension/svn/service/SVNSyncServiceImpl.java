@@ -108,7 +108,7 @@ public class SVNSyncServiceImpl implements SVNSyncService, JobProvider {
         // Link
         ConfiguredBuildSvnRevisionLink<?> revisionLink = buildSvnRevisionLinkService.getConfiguredBuildSvnRevisionLink(branchConfigurationProperty.getBuildRevisionLink());
         // Gets the base path
-        svnService.getBasePath(repository, branchConfigurationProperty.getBranchPath()).ifPresent(basePath -> {
+        svnService.getBasePath(repository, branchConfigurationProperty.getCuredBranchPath()).ifPresent(basePath -> {
             // Tags path
             String tagsPath = basePath + "/tags";
             // Gets the list of tags from the copy events, filtering them
@@ -116,7 +116,7 @@ public class SVNSyncServiceImpl implements SVNSyncService, JobProvider {
                     // In this repository
                     repository.getId(),
                     // from path...
-                    branchConfigurationProperty.getBranchPath(),
+                    branchConfigurationProperty.getCuredBranchPath(),
                     // to path with prefix...
                     tagsPath,
                     // filter the target path with...

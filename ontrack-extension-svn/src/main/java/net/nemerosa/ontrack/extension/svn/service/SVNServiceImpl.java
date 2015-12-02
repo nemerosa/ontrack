@@ -228,7 +228,7 @@ public class SVNServiceImpl implements SVNService {
                     SVNBranchConfigurationPropertyType.class
             ).option();
             if (oSvnBranchConfigurationProperty.isPresent()) {
-                String pathInBranch = StringUtils.stripEnd(oSvnBranchConfigurationProperty.get().getBranchPath(), "/")
+                String pathInBranch = oSvnBranchConfigurationProperty.get().getCuredBranchPath()
                         + "/"
                         + StringUtils.stripStart(path, "/");
                 try (Transaction ignored = transactionService.start()) {
