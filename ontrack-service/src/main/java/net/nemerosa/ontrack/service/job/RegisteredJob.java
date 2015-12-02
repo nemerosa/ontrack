@@ -1,10 +1,10 @@
 package net.nemerosa.ontrack.service.job;
 
+import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.model.job.Job;
 import net.nemerosa.ontrack.model.job.JobDescriptor;
 import net.nemerosa.ontrack.model.job.JobTask;
 import net.nemerosa.ontrack.model.support.ApplicationInfo;
-import net.nemerosa.ontrack.common.Time;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -25,6 +25,8 @@ public class RegisteredJob {
     private final AtomicReference<LocalDateTime> lastRunDate = new AtomicReference<>();
     private final AtomicReference<LocalDateTime> end = new AtomicReference<>(null);
     private final AtomicLong lastRunDurationMs = new AtomicLong();
+    private final AtomicLong lastErrorCount = new AtomicLong();
+    private final AtomicReference<String> lastError = new AtomicReference<>(null);
 
     protected RegisteredJob(Job job, long sync) {
         this.job = job;
@@ -50,6 +52,10 @@ public class RegisteredJob {
 
     public boolean isRunning() {
         return run.get() != null;
+    }
+
+    public boolean isInError() {
+        return lastErrorCount.get() > 0;
     }
 
     public boolean isDisabled() {
@@ -86,6 +92,13 @@ public class RegisteredJob {
                     long _end = System.currentTimeMillis();
                     lastRunDurationMs.set(_end - _start);
                 }
+                // No error - resetting the counters
+                lastErrorCount.set(0);
+                lastError.set(null);
+            } catch (RuntimeException ex) {
+                lastErrorCount.incrementAndGet();
+                lastError.set(ex.getMessage());
+                throw ex;
             } finally {
                 // End
                 run.set(null);
@@ -127,6 +140,14 @@ public class RegisteredJob {
 
     public ApplicationInfo getApplicationInfo() {
         return Optional.ofNullable(run.get()).map(task -> ApplicationInfo.info(task.getInfo())).orElse(null);
+    }
+
+    public long getLastErrorCount() {
+        return lastErrorCount.get();
+    }
+
+    public String getLastError() {
+        return lastError.get();
     }
 
     public long getRunCount() {

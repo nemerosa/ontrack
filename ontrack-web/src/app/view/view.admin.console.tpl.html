@@ -114,6 +114,7 @@
                     <th>Schedule</th>
                     <th>Run count</th>
                     <th>Last duration</th>
+                    <th>Error(s)</th>
                     <th>Last run</th>
                     <th>Next run</th>
                 </tr>
@@ -169,6 +170,13 @@
                     </td>
                     <td>
                         {{jobDuration(job.lastRunDurationMs)}}
+                    </td>
+                    <td>
+                        <span ng-if="job.lastErrorCount == 0">-</span>
+                        <span ng-if="job.lastErrorCount > 0" title="{{job.lastError}}">
+                            <span class="fa fa-times text-danger"></span>
+                            {{job.lastErrorCount}}
+                        </span>
                     </td>
                     <td>
                         {{job.lastRunDate | date:'shortDate'}}
