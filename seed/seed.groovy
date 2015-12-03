@@ -628,3 +628,7 @@ ontrack.project('${SEED_PROJECT}') {
         }
     }
 }
+
+// Fires the queue job upon generation
+
+queue("${SEED_PROJECT}-${SEED_BRANCH}-setup")
