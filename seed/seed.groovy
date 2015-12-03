@@ -604,7 +604,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-setup") {
     configure { node ->
         // TODO #367 Checks if the project exists already before configuring it?
         // TODO #366 Build commit link based on pattern
-        node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackDSLStep' {
+        node / 'builders' / 'net.nemerosa.ontrack.jenkins.OntrackDSLStep' {
             'usingText' true
             'scriptText' """\
 ontrack.project('${SEED_PROJECT}') {
