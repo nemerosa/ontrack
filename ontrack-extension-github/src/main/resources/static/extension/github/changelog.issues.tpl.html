@@ -16,13 +16,26 @@
             <code><a href="{{changeLogIssue.issue.url}}">{{changeLogIssue.issue.displayKey}}</a></code>
         </td>
         <td>
-            <span class="ot-extension-github-state ot-extension-github-state-{{changeLogIssue.issue.state}}">{{changeLogIssue.issue.state}}</span>
+            <span class="label"
+                    ng-class="{
+                    'label-success': (changeLogIssue.issue.state == 'open'),
+                    'label-danger': (changeLogIssue.issue.state != 'open')
+                    }">
+                {{changeLogIssue.issue.state}}
+            </span>
         </td>
         <td>
             <span>{{changeLogIssue.issue.title}}</span>
         </td>
         <td>
-            <a class="ot-extension-github-state ot-extension-github-state-{{changeLogIssue.issue.milestone.state}}" ng-if="changeLogIssue.issue.milestone" href="{{changeLogIssue.issue.milestone.url}}">{{changeLogIssue.issue.milestone.title}}</a>
+            <a class="label"
+               ng-class="{
+                    'label-success': (changeLogIssue.issue.milestone.state == 'open'),
+                    'label-danger': (changeLogIssue.issue.milestone.state != 'open')
+                    }"
+               ng-if="changeLogIssue.issue.milestone" href="{{changeLogIssue.issue.milestone.url}}">
+                {{changeLogIssue.issue.milestone.title}}
+            </a>
         </td>
         <td>
             <a ng-if="changeLogIssue.issue.assignee" href="{{changeLogIssue.issue.assignee.url}}">{{changeLogIssue.issue.assignee.login}}</a>
@@ -30,9 +43,9 @@
         <td>
             <span>{{changeLogIssue.issue.updatedAt | date:'mediumDate'}}</span>
         </td>
-        <td>
+        <td class="ot-label-suite">
             <span ng-repeat="label in changeLogIssue.issue.labels"
-                  class="ot-extension-github-label"
+                  class="label label-info"
                   ng-style="{'background-color': '#' + label.color + ' !important'}"
                     >{{label.name}}</span>
         </td>
