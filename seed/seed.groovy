@@ -75,33 +75,30 @@ def centOsVersions = [
         '6',
 ]
 
-// Keeps only some version types
-if (['master', 'feature', 'release', 'hotfix'].contains(branchType)) {
+// Normalised branch name
+def NAME = BRANCH.replaceAll(/[^A-Za-z0-9\.\-_]/, '-')
+println "\tGenerating ${NAME}..."
 
-    // Normalised branch name
-    def NAME = BRANCH.replaceAll(/[^A-Za-z0-9\.\-_]/, '-')
-    println "\tGenerating ${NAME}..."
-
-    // Build job
-    freeStyleJob("${PROJECT}-${NAME}-build") {
-        logRotator {
-            numToKeep(40)
-            artifactNumToKeep(5)
-        }
-        deliveryPipelineConfiguration('Commit', 'Build')
-        jdk 'JDK8u25'
-        scm {
-            git {
-                remote {
-                    url "git@github.com:nemerosa/ontrack.git"
-                    branch "origin/${BRANCH}"
-                }
-                wipeOutWorkspace()
-                localBranch "${BRANCH}"
+// Build job
+freeStyleJob("${PROJECT}-${NAME}-build") {
+    logRotator {
+        numToKeep(40)
+        artifactNumToKeep(5)
+    }
+    deliveryPipelineConfiguration('Commit', 'Build')
+    jdk 'JDK8u25'
+    scm {
+        git {
+            remote {
+                url "git@github.com:nemerosa/ontrack.git"
+                branch "origin/${BRANCH}"
             }
+            wipeOutWorkspace()
+            localBranch "${BRANCH}"
         }
-        steps {
-            gradle '''\
+    }
+    steps {
+        gradle '''\
 clean
 versionDisplay
 versionFile
@@ -114,49 +111,117 @@ build
 --profile
 --parallel
 '''
-            environmentVariables {
-                propertiesFile 'build/version.properties'
-            }
+        environmentVariables {
+            propertiesFile 'build/version.properties'
         }
-        publishers {
-            archiveJunit("**/build/test-results/*.xml")
-            archiveArtifacts {
-                pattern 'ontrack-ui/build/libs/ontrack-ui-*.jar'
-                pattern 'ontrack-acceptance/build/libs/ontrack-acceptance.jar' // No version needed here
-                pattern 'ontrack-dsl/build/libs/ontrack-dsl-*.jar'
-                pattern 'ontrack-dsl/build/poms/ontrack-dsl-*.pom'
-                pattern 'build/distributions/ontrack-*-delivery.zip'
-                pattern 'build/distributions/ontrack*.deb'
-                pattern 'build/distributions/ontrack*.rpm'
-            }
-            tasks(
-                    '**/*.java,**/*.groovy,**/*.xml,**/*.html,**/*.js',
-                    '**/target/**,**/node_modules/**,**/vendor/**',
-                    'FIXME', 'TODO', '@Deprecated', true
-            )
-            downstreamParameterized {
-                trigger("${PROJECT}-${NAME}-acceptance-local", 'SUCCESS', false) {
-                    propertiesFile('build/version.properties')
-                }
-            }
+    }
+    publishers {
+        archiveJunit("**/build/test-results/*.xml")
+        archiveArtifacts {
+            pattern 'ontrack-ui/build/libs/ontrack-ui-*.jar'
+            pattern 'ontrack-acceptance/build/libs/ontrack-acceptance.jar' // No version needed here
+            pattern 'ontrack-dsl/build/libs/ontrack-dsl-*.jar'
+            pattern 'ontrack-dsl/build/poms/ontrack-dsl-*.pom'
+            pattern 'build/distributions/ontrack-*-delivery.zip'
+            pattern 'build/distributions/ontrack*.deb'
+            pattern 'build/distributions/ontrack*.rpm'
         }
-        configure { node ->
-            node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackBuildNotifier' {
-                'project'('ontrack')
-                'branch'(NAME)
-                'build'('${VERSION_BUILD}')
+        tasks(
+                '**/*.java,**/*.groovy,**/*.xml,**/*.html,**/*.js',
+                '**/target/**,**/node_modules/**,**/vendor/**',
+                'FIXME', 'TODO', '@Deprecated', true
+        )
+        downstreamParameterized {
+            trigger("${PROJECT}-${NAME}-acceptance-local", 'SUCCESS', false) {
+                propertiesFile('build/version.properties')
             }
         }
     }
+    configure { node ->
+        node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackBuildNotifier' {
+            'project'('ontrack')
+            'branch'(NAME)
+            'build'('${VERSION_BUILD}')
+        }
+    }
+}
 
-    // Local acceptance job
+// Local acceptance job
 
-    freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
+freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
+    logRotator {
+        numToKeep(40)
+        artifactNumToKeep(5)
+    }
+    deliveryPipelineConfiguration('Commit', 'Local acceptance')
+    jdk 'JDK8u25'
+    parameters {
+        stringParam('VERSION_FULL', '', '')
+        stringParam('VERSION_COMMIT', '', '')
+        stringParam('VERSION_BUILD', '', '')
+        stringParam('VERSION_DISPLAY', '', '')
+    }
+    wrappers {
+        xvfb('default')
+    }
+    extractDeliveryArtifacts delegate
+    steps {
+        // Runs the CI acceptance tests
+        gradle """\
+ciAcceptanceTest -PacceptanceJar=ontrack-acceptance.jar
+"""
+    }
+    publishers {
+        archiveJunit('*-tests.xml')
+        if (release) {
+            downstreamParameterized {
+                trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-debian", 'SUCCESS', false) {
+                    currentBuild()
+                }
+                centOsVersions.each { centOsVersion ->
+                    trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-centos-${centOsVersion}", 'SUCCESS', false) {
+                        currentBuild()
+                    }
+                }
+            }
+        }
+        if (release) {
+            downstreamParameterized {
+                trigger("${SEED_PROJECT}-${SEED_BRANCH}-docker-push", 'SUCCESS', false) {
+                    currentBuild()
+                }
+            }
+        } else {
+            buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${PROJECT}-${NAME}-docker-push") {
+                parameters {
+                    currentBuild()
+                }
+            }
+        }
+    }
+    configure { node ->
+        node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
+            'project'('ontrack')
+            'branch'(NAME)
+            'build'('${VERSION_BUILD}')
+            'validationStamp'('ACCEPTANCE')
+        }
+    }
+}
+
+// OS packages jobs
+// Only for releases
+
+if (release) {
+
+    // Debian package acceptance job
+
+    freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-debian") {
         logRotator {
             numToKeep(40)
             artifactNumToKeep(5)
         }
-        deliveryPipelineConfiguration('Commit', 'Local acceptance')
+        deliveryPipelineConfiguration('Commit', 'Debian package acceptance')
         jdk 'JDK8u25'
         parameters {
             stringParam('VERSION_FULL', '', '')
@@ -171,60 +236,33 @@ build
         steps {
             // Runs the CI acceptance tests
             gradle """\
-ciAcceptanceTest -PacceptanceJar=ontrack-acceptance.jar
+debAcceptanceTest
+-PacceptanceJar=ontrack-acceptance.jar
+-PacceptanceDebianDistributionDir=.
 """
         }
         publishers {
             archiveJunit('*-tests.xml')
-            if (release) {
-                downstreamParameterized {
-                    trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-debian", 'SUCCESS', false) {
-                        currentBuild()
-                    }
-                    centOsVersions.each { centOsVersion ->
-                        trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-centos-${centOsVersion}", 'SUCCESS', false) {
-                            currentBuild()
-                        }
-                    }
-                }
-            }
-            if (release) {
-                downstreamParameterized {
-                    trigger("${SEED_PROJECT}-${SEED_BRANCH}-docker-push", 'SUCCESS', false) {
-                        currentBuild()
-                    }
-                }
-            } else {
-                buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${PROJECT}-${NAME}-docker-push") {
-                    parameters {
-                        currentBuild()
-                    }
-                }
-            }
         }
         configure { node ->
             node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
                 'project'('ontrack')
                 'branch'(NAME)
                 'build'('${VERSION_BUILD}')
-                'validationStamp'('ACCEPTANCE')
+                'validationStamp'('ACCEPTANCE.DEBIAN')
             }
         }
     }
 
-    // OS packages jobs
-    // Only for releases
+    // CentOS package acceptance job
 
-    if (release) {
-
-        // Debian package acceptance job
-
-        freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-debian") {
+    centOsVersions.each { centOsVersion ->
+        freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-centos-${centOsVersion}") {
             logRotator {
                 numToKeep(40)
                 artifactNumToKeep(5)
             }
-            deliveryPipelineConfiguration('Commit', 'Debian package acceptance')
+            deliveryPipelineConfiguration('Commit', "CentOS ${centOsVersion} package acceptance")
             jdk 'JDK8u25'
             parameters {
                 stringParam('VERSION_FULL', '', '')
@@ -239,9 +277,9 @@ ciAcceptanceTest -PacceptanceJar=ontrack-acceptance.jar
             steps {
                 // Runs the CI acceptance tests
                 gradle """\
-debAcceptanceTest
+rpmAcceptanceTest${centOsVersion}
 -PacceptanceJar=ontrack-acceptance.jar
--PacceptanceDebianDistributionDir=.
+-PacceptanceRpmDistributionDir=.
 """
             }
             publishers {
@@ -252,105 +290,204 @@ debAcceptanceTest
                     'project'('ontrack')
                     'branch'(NAME)
                     'build'('${VERSION_BUILD}')
-                    'validationStamp'('ACCEPTANCE.DEBIAN')
+                    'validationStamp'("ACCEPTANCE.CENTOS.${centOsVersion}")
                 }
             }
         }
-
-        // CentOS package acceptance job
-
-        centOsVersions.each { centOsVersion ->
-            freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-centos-${centOsVersion}") {
-                logRotator {
-                    numToKeep(40)
-                    artifactNumToKeep(5)
-                }
-                deliveryPipelineConfiguration('Commit', "CentOS ${centOsVersion} package acceptance")
-                jdk 'JDK8u25'
-                parameters {
-                    stringParam('VERSION_FULL', '', '')
-                    stringParam('VERSION_COMMIT', '', '')
-                    stringParam('VERSION_BUILD', '', '')
-                    stringParam('VERSION_DISPLAY', '', '')
-                }
-                wrappers {
-                    xvfb('default')
-                }
-                extractDeliveryArtifacts delegate
-                steps {
-                    // Runs the CI acceptance tests
-                    gradle """\
-rpmAcceptanceTest${centOsVersion}
--PacceptanceJar=ontrack-acceptance.jar
--PacceptanceRpmDistributionDir=.
-"""
-                }
-                publishers {
-                    archiveJunit('*-tests.xml')
-                }
-                configure { node ->
-                    node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
-                        'project'('ontrack')
-                        'branch'(NAME)
-                        'build'('${VERSION_BUILD}')
-                        'validationStamp'("ACCEPTANCE.CENTOS.${centOsVersion}")
-                    }
-                }
-            }
-        }
-
     }
 
-    // Docker push
+}
 
-    freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-docker-push") {
-        logRotator {
-            numToKeep(40)
-            artifactNumToKeep(5)
-        }
-        deliveryPipelineConfiguration('Acceptance', 'Docker push')
-        jdk 'JDK8u25'
-        parameters {
-            stringParam('VERSION_FULL', '', '')
-            stringParam('VERSION_COMMIT', '', '')
-            stringParam('VERSION_BUILD', '', '')
-            stringParam('VERSION_DISPLAY', '', '')
-        }
-        wrappers {
-            injectPasswords()
-        }
-        steps {
-            shell """\
+// Docker push
+
+freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-docker-push") {
+    logRotator {
+        numToKeep(40)
+        artifactNumToKeep(5)
+    }
+    deliveryPipelineConfiguration('Acceptance', 'Docker push')
+    jdk 'JDK8u25'
+    parameters {
+        stringParam('VERSION_FULL', '', '')
+        stringParam('VERSION_COMMIT', '', '')
+        stringParam('VERSION_BUILD', '', '')
+        stringParam('VERSION_DISPLAY', '', '')
+    }
+    wrappers {
+        injectPasswords()
+    }
+    steps {
+        shell """\
 docker login --email="damien.coraboeuf+nemerosa@gmail.com" --username="nemerosa" --password="\${DOCKER_PASSWORD}"
 docker push nemerosa/ontrack:\${VERSION_FULL}
 docker logout
 """
+    }
+    publishers {
+        downstreamParameterized {
+            trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do", 'SUCCESS', false) {
+                currentBuild()
+            }
         }
+    }
+    configure { node ->
+        node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
+            'project'('ontrack')
+            'branch'(SEED_BRANCH)
+            'build'('${VERSION_BUILD}')
+            'validationStamp'('DOCKER')
+        }
+    }
+}
+
+// Digital Ocean acceptance job
+
+freeStyleJob("${PROJECT}-${NAME}-acceptance-do") {
+    logRotator {
+        numToKeep(40)
+        artifactNumToKeep(5)
+    }
+    deliveryPipelineConfiguration('Acceptance', 'Digital Ocean')
+    jdk 'JDK8u25'
+    parameters {
+        stringParam('VERSION_FULL', '', '')
+        stringParam('VERSION_COMMIT', '', '')
+        stringParam('VERSION_BUILD', '', '')
+        stringParam('VERSION_DISPLAY', '', '')
+    }
+    wrappers {
+        injectPasswords()
+        xvfb('default')
+    }
+    extractDeliveryArtifacts delegate
+    steps {
+        // Runs the CI acceptance tests
+        shell '''\
+./gradlew \\
+    doAcceptanceTest \\
+    -PacceptanceJar=ontrack-acceptance.jar \\
+    -PdigitalOceanAccessToken=${DO_TOKEN} \\
+    -PontrackVersion=${VERSION_FULL}
+'''
+    }
+    publishers {
+        archiveJunit('*-tests.xml')
+        buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${PROJECT}-${NAME}-publish") {
+            parameters {
+                currentBuild()
+            }
+        }
+    }
+    configure { node ->
+        node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
+            'project'('ontrack')
+            'branch'(NAME)
+            'build'('${VERSION_BUILD}')
+            'validationStamp'('ACCEPTANCE.DO')
+        }
+    }
+}
+
+// Publish job
+// Available for all branches, with some restrictions (no tagging) for non release branches
+
+freeStyleJob("${PROJECT}-${NAME}-publish") {
+    logRotator {
+        numToKeep(40)
+        artifactNumToKeep(5)
+    }
+    deliveryPipelineConfiguration('Release', 'Publish')
+    jdk 'JDK8u25'
+    parameters {
+        stringParam('VERSION_FULL', '', '')
+        stringParam('VERSION_COMMIT', '', '')
+        stringParam('VERSION_BUILD', '', '')
+        stringParam('VERSION_DISPLAY', '', '')
+    }
+    wrappers {
+        injectPasswords()
+    }
+    extractDeliveryArtifacts delegate
+    steps {
+        // Publication
+        if (release) {
+            gradle """\
+--build-file publication.gradle
+--info
+--profile
+--stacktrace
+-Ppublication
+-PontrackVersion=\${VERSION_DISPLAY}
+-PontrackVersionCommit=\${VERSION_COMMIT}
+-PontrackVersionFull=\${VERSION_FULL}
+-PontrackReleaseBranch=${SEED_BRANCH}
+publicationRelease
+"""
+        } else {
+            gradle """\
+--build-file publication.gradle
+--info
+--profile
+--stacktrace
+-Ppublication
+-PontrackVersion=\${VERSION_DISPLAY}
+-PontrackVersionCommit=\${VERSION_COMMIT}
+-PontrackVersionFull=\${VERSION_FULL}
+-PontrackReleaseBranch=${SEED_BRANCH}
+publicationMaven
+"""
+        }
+        if (release) {
+            shell """\
+docker tag --force nemerosa/ontrack:\${VERSION_FULL} nemerosa/ontrack:latest
+docker tag --force nemerosa/ontrack:\${VERSION_FULL} nemerosa/ontrack:\${VERSION_DISPLAY}
+docker login --email="damien.coraboeuf+nemerosa@gmail.com" --username="nemerosa" --password="\${DOCKER_PASSWORD}"
+docker push nemerosa/ontrack:\${VERSION_DISPLAY}
+docker push nemerosa/ontrack:latest
+docker logout
+"""
+        }
+    }
+    if (release) {
         publishers {
-            downstreamParameterized {
-                trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do", 'SUCCESS', false) {
+            buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${SEED_PROJECT}-${SEED_BRANCH}-production") {
+                parameters {
                     currentBuild()
                 }
             }
         }
-        configure { node ->
-            node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
-                'project'('ontrack')
-                'branch'(SEED_BRANCH)
-                'build'('${VERSION_BUILD}')
-                'validationStamp'('DOCKER')
-            }
+    }
+    configure { node ->
+        node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackPromotedRunNotifier' {
+            'project'('ontrack')
+            'branch'(NAME)
+            'build'('${VERSION_BUILD}')
+            'promotionLevel'('RELEASE')
+        }
+        node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackDSLNotifier' {
+            'usingText' true
+            'scriptText' """\
+ontrack.build('ontrack', '${NAME}', VERSION_BUILD).config {
+label VERSION_DISPLAY
+}
+"""
+            injectEnvironment 'VERSION_BUILD,VERSION_DISPLAY'
+            injectProperties ''
+            ontrackLog false
         }
     }
+}
 
-    // Digital Ocean acceptance job
+if (release) {
 
-    freeStyleJob("${PROJECT}-${NAME}-acceptance-do") {
+    // Production deployment
+
+    freeStyleJob("${PROJECT}-${NAME}-production") {
         logRotator {
             numToKeep(40)
             artifactNumToKeep(5)
         }
-        deliveryPipelineConfiguration('Acceptance', 'Digital Ocean')
+        deliveryPipelineConfiguration('Release', 'Production')
         jdk 'JDK8u25'
         parameters {
             stringParam('VERSION_FULL', '', '')
@@ -364,42 +501,35 @@ docker logout
         }
         extractDeliveryArtifacts delegate
         steps {
-            // Runs the CI acceptance tests
-            shell '''\
-./gradlew \\
-    doAcceptanceTest \\
-    -PacceptanceJar=ontrack-acceptance.jar \\
-    -PdigitalOceanAccessToken=${DO_TOKEN} \\
-    -PontrackVersion=${VERSION_FULL}
+            gradle '''\
+--build-file production.gradle
+--info
+--profile
+-Ppublication
+productionUpgrade
+-PontrackVersion=${VERSION_DISPLAY}
 '''
         }
         publishers {
-            archiveJunit('*-tests.xml')
-            buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${PROJECT}-${NAME}-publish") {
-                parameters {
+            archiveArtifacts {
+                pattern 'build/*.tgz'
+            }
+            downstreamParameterized {
+                trigger("${PROJECT}-${NAME}-acceptance-production", 'SUCCESS', false) {
                     currentBuild()
                 }
             }
         }
-        configure { node ->
-            node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
-                'project'('ontrack')
-                'branch'(NAME)
-                'build'('${VERSION_BUILD}')
-                'validationStamp'('ACCEPTANCE.DO')
-            }
-        }
     }
 
-    // Publish job
-    // Available for all branches, with some restrictions (no tagging) for non release branches
+    // Production acceptance test
 
-    freeStyleJob("${PROJECT}-${NAME}-publish") {
+    freeStyleJob("${PROJECT}-${NAME}-acceptance-production") {
         logRotator {
             numToKeep(40)
             artifactNumToKeep(5)
         }
-        deliveryPipelineConfiguration('Release', 'Publish')
+        deliveryPipelineConfiguration('Release', 'Production acceptance')
         jdk 'JDK8u25'
         parameters {
             stringParam('VERSION_FULL', '', '')
@@ -409,144 +539,11 @@ docker logout
         }
         wrappers {
             injectPasswords()
+            xvfb('default')
         }
         extractDeliveryArtifacts delegate
         steps {
-            // Publication
-            if (release) {
-                gradle """\
---build-file publication.gradle
---info
---profile
---stacktrace
--Ppublication
--PontrackVersion=\${VERSION_DISPLAY}
--PontrackVersionCommit=\${VERSION_COMMIT}
--PontrackVersionFull=\${VERSION_FULL}
--PontrackReleaseBranch=${SEED_BRANCH}
-publicationRelease
-"""
-            } else {
-                gradle """\
---build-file publication.gradle
---info
---profile
---stacktrace
--Ppublication
--PontrackVersion=\${VERSION_DISPLAY}
--PontrackVersionCommit=\${VERSION_COMMIT}
--PontrackVersionFull=\${VERSION_FULL}
--PontrackReleaseBranch=${SEED_BRANCH}
-publicationMaven
-"""
-            }
-            if (release) {
-                shell """\
-docker tag --force nemerosa/ontrack:\${VERSION_FULL} nemerosa/ontrack:latest
-docker tag --force nemerosa/ontrack:\${VERSION_FULL} nemerosa/ontrack:\${VERSION_DISPLAY}
-docker login --email="damien.coraboeuf+nemerosa@gmail.com" --username="nemerosa" --password="\${DOCKER_PASSWORD}"
-docker push nemerosa/ontrack:\${VERSION_DISPLAY}
-docker push nemerosa/ontrack:latest
-docker logout
-"""
-            }
-        }
-        if (release) {
-            publishers {
-                buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${SEED_PROJECT}-${SEED_BRANCH}-production") {
-                    parameters {
-                        currentBuild()
-                    }
-                }
-            }
-        }
-        configure { node ->
-            node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackPromotedRunNotifier' {
-                'project'('ontrack')
-                'branch'(NAME)
-                'build'('${VERSION_BUILD}')
-                'promotionLevel'('RELEASE')
-            }
-            node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackDSLNotifier' {
-                'usingText' true
-                'scriptText' """\
-ontrack.build('ontrack', '${NAME}', VERSION_BUILD).config {
-label VERSION_DISPLAY
-}
-"""
-                injectEnvironment 'VERSION_BUILD,VERSION_DISPLAY'
-                injectProperties ''
-                ontrackLog false
-            }
-        }
-    }
-
-    if (release) {
-
-        // Production deployment
-
-        freeStyleJob("${PROJECT}-${NAME}-production") {
-            logRotator {
-                numToKeep(40)
-                artifactNumToKeep(5)
-            }
-            deliveryPipelineConfiguration('Release', 'Production')
-            jdk 'JDK8u25'
-            parameters {
-                stringParam('VERSION_FULL', '', '')
-                stringParam('VERSION_COMMIT', '', '')
-                stringParam('VERSION_BUILD', '', '')
-                stringParam('VERSION_DISPLAY', '', '')
-            }
-            wrappers {
-                injectPasswords()
-                xvfb('default')
-            }
-            extractDeliveryArtifacts delegate
-            steps {
-                gradle '''\
---build-file production.gradle
---info
---profile
--Ppublication
-productionUpgrade
--PontrackVersion=${VERSION_DISPLAY}
-'''
-            }
-            publishers {
-                archiveArtifacts {
-                    pattern 'build/*.tgz'
-                }
-                downstreamParameterized {
-                    trigger("${PROJECT}-${NAME}-acceptance-production", 'SUCCESS', false) {
-                        currentBuild()
-                    }
-                }
-            }
-        }
-
-        // Production acceptance test
-
-        freeStyleJob("${PROJECT}-${NAME}-acceptance-production") {
-            logRotator {
-                numToKeep(40)
-                artifactNumToKeep(5)
-            }
-            deliveryPipelineConfiguration('Release', 'Production acceptance')
-            jdk 'JDK8u25'
-            parameters {
-                stringParam('VERSION_FULL', '', '')
-                stringParam('VERSION_COMMIT', '', '')
-                stringParam('VERSION_BUILD', '', '')
-                stringParam('VERSION_DISPLAY', '', '')
-            }
-            wrappers {
-                injectPasswords()
-                xvfb('default')
-            }
-            extractDeliveryArtifacts delegate
-            steps {
-                gradle '''\
+            gradle '''\
 --build-file production.gradle
 --info
 --profile
@@ -554,43 +551,38 @@ productionUpgrade
 productionTest
 -PacceptanceJar=ontrack-acceptance.jar
 '''
-            }
-            publishers {
-                archiveJunit('*-tests.xml')
-            }
-            configure { node ->
-                node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
-                    'project'('ontrack')
-                    'branch'(NAME)
-                    'build'('${VERSION_BUILD}')
-                    'validationStamp'('ONTRACK.SMOKE')
-                }
-            }
-            configure { node ->
-                node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackPromotedRunNotifier' {
-                    'project'('ontrack')
-                    'branch'(NAME)
-                    'build'('${VERSION_BUILD}')
-                    'promotionLevel'('ONTRACK')
-                }
+        }
+        publishers {
+            archiveJunit('*-tests.xml')
+        }
+        configure { node ->
+            node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
+                'project'('ontrack')
+                'branch'(NAME)
+                'build'('${VERSION_BUILD}')
+                'validationStamp'('ONTRACK.SMOKE')
             }
         }
-
-    }
-
-    // Pipeline view
-
-    deliveryPipelineView('Pipeline') {
-        pipelineInstances(4)
-        enableManualTriggers()
-        showChangeLog()
-        updateInterval(5)
-        pipelines {
-            component("ontrack-${NAME}", "${PROJECT}-${NAME}-build")
+        configure { node ->
+            node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackPromotedRunNotifier' {
+                'project'('ontrack')
+                'branch'(NAME)
+                'build'('${VERSION_BUILD}')
+                'promotionLevel'('ONTRACK')
+            }
         }
     }
 
+}
 
-} else {
-    println "\tSkipping ${BRANCH}."
+// Pipeline view
+
+deliveryPipelineView('Pipeline') {
+    pipelineInstances(4)
+    enableManualTriggers()
+    showChangeLog()
+    updateInterval(5)
+    pipelines {
+        component("ontrack-${NAME}", "${PROJECT}-${NAME}-build")
+    }
 }
