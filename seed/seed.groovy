@@ -128,8 +128,11 @@ build
                 'FIXME', 'TODO', '@Deprecated', true
         )
         downstreamParameterized {
-            trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local", 'SUCCESS', false) {
-                propertiesFile('build/version.properties')
+            trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
+                condition('SUCCESS')
+                parameters {
+                    propertiesFile('build/version.properties')
+                }
             }
         }
     }
@@ -321,8 +324,11 @@ docker logout
     }
     publishers {
         downstreamParameterized {
-            trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do", 'SUCCESS', false) {
-                currentBuild()
+            trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
+                condition('SUCCESS')
+                parameters {
+                    currentBuild()
+                }
             }
         }
     }
@@ -637,7 +643,9 @@ ontrack.branch('${SEED_PROJECT}', 'template').instance '${SEED_BRANCH}', [
         downstreamParameterized {
             // Explicitly fires the build after setup
             // The global Seed property `pipeline-start-auto` has been set to `no`
-            trigger("${SEED_PROJECT}-${SEED_BRANCH}-build", 'SUCCESS', true) {
+            trigger("${SEED_PROJECT}-${SEED_BRANCH}-build") {
+                condition('SUCCESS')
+                triggerWithNoParameters()
             }
         }
     }
