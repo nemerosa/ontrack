@@ -610,7 +610,7 @@ ontrack.project('${SEED_PROJECT}') {
             parameter 'scmPath', 'Name of the GIT branch', 'trunk'
         }
         config {
-            gitBranch '${BRANCH}', [
+            gitBranch '\${scmPath}', [
                 buildCommitLink: [
                     id: 'commit',
                     data: [
@@ -624,7 +624,7 @@ ontrack.project('${SEED_PROJECT}') {
 """
             injectEnvironment ''
             injectProperties ''
-            ontrackLog false
+            ontrackLog true
         }
     }
 }
