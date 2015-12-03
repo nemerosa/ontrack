@@ -75,12 +75,8 @@ def centOsVersions = [
         '6',
 ]
 
-// Normalised branch name
-def NAME = BRANCH.replaceAll(/[^A-Za-z0-9\.\-_]/, '-')
-println "\tGenerating ${NAME}..."
-
 // Build job
-freeStyleJob("${PROJECT}-${NAME}-build") {
+job("${SEED_PROJECT}-${SEED_BRANCH}-build") {
     logRotator {
         numToKeep(40)
         artifactNumToKeep(5)
@@ -132,7 +128,7 @@ build
                 'FIXME', 'TODO', '@Deprecated', true
         )
         downstreamParameterized {
-            trigger("${PROJECT}-${NAME}-acceptance-local", 'SUCCESS', false) {
+            trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local", 'SUCCESS', false) {
                 propertiesFile('build/version.properties')
             }
         }
@@ -148,7 +144,7 @@ build
 
 // Local acceptance job
 
-freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
+job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     logRotator {
         numToKeep(40)
         artifactNumToKeep(5)
@@ -192,7 +188,7 @@ ciAcceptanceTest -PacceptanceJar=ontrack-acceptance.jar
                 }
             }
         } else {
-            buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${PROJECT}-${NAME}-docker-push") {
+            buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${SEED_PROJECT}-${SEED_BRANCH}-docker-push") {
                 parameters {
                     currentBuild()
                 }
@@ -216,7 +212,7 @@ if (release) {
 
     // Debian package acceptance job
 
-    freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-debian") {
+    job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-debian") {
         logRotator {
             numToKeep(40)
             artifactNumToKeep(5)
@@ -257,7 +253,7 @@ debAcceptanceTest
     // CentOS package acceptance job
 
     centOsVersions.each { centOsVersion ->
-        freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-centos-${centOsVersion}") {
+        job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-centos-${centOsVersion}") {
             logRotator {
                 numToKeep(40)
                 artifactNumToKeep(5)
@@ -300,7 +296,7 @@ rpmAcceptanceTest${centOsVersion}
 
 // Docker push
 
-freeStyleJob("${SEED_PROJECT}-${SEED_BRANCH}-docker-push") {
+job("${SEED_PROJECT}-${SEED_BRANCH}-docker-push") {
     logRotator {
         numToKeep(40)
         artifactNumToKeep(5)
@@ -342,7 +338,7 @@ docker logout
 
 // Digital Ocean acceptance job
 
-freeStyleJob("${PROJECT}-${NAME}-acceptance-do") {
+job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
     logRotator {
         numToKeep(40)
         artifactNumToKeep(5)
@@ -372,7 +368,7 @@ freeStyleJob("${PROJECT}-${NAME}-acceptance-do") {
     }
     publishers {
         archiveJunit('*-tests.xml')
-        buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${PROJECT}-${NAME}-publish") {
+        buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${SEED_PROJECT}-${SEED_BRANCH}-publish") {
             parameters {
                 currentBuild()
             }
@@ -391,7 +387,7 @@ freeStyleJob("${PROJECT}-${NAME}-acceptance-do") {
 // Publish job
 // Available for all branches, with some restrictions (no tagging) for non release branches
 
-freeStyleJob("${PROJECT}-${NAME}-publish") {
+job("${SEED_PROJECT}-${SEED_BRANCH}-publish") {
     logRotator {
         numToKeep(40)
         artifactNumToKeep(5)
@@ -467,7 +463,7 @@ docker logout
         node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackDSLNotifier' {
             'usingText' true
             'scriptText' """\
-ontrack.build('ontrack', '${NAME}', VERSION_BUILD).config {
+ontrack.build('ontrack', '${SEED_BRANCH}', VERSION_BUILD).config {
 label VERSION_DISPLAY
 }
 """
@@ -482,7 +478,7 @@ if (release) {
 
     // Production deployment
 
-    freeStyleJob("${PROJECT}-${NAME}-production") {
+    job("${SEED_PROJECT}-${SEED_BRANCH}-production") {
         logRotator {
             numToKeep(40)
             artifactNumToKeep(5)
@@ -515,7 +511,7 @@ productionUpgrade
                 pattern 'build/*.tgz'
             }
             downstreamParameterized {
-                trigger("${PROJECT}-${NAME}-acceptance-production", 'SUCCESS', false) {
+                trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-production", 'SUCCESS', false) {
                     currentBuild()
                 }
             }
@@ -524,7 +520,7 @@ productionUpgrade
 
     // Production acceptance test
 
-    freeStyleJob("${PROJECT}-${NAME}-acceptance-production") {
+    job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-production") {
         logRotator {
             numToKeep(40)
             artifactNumToKeep(5)
@@ -583,6 +579,6 @@ deliveryPipelineView('Pipeline') {
     showChangeLog()
     updateInterval(5)
     pipelines {
-        component("ontrack-${NAME}", "${PROJECT}-${NAME}-build")
+        component("ontrack-${SEED_BRANCH}", "${SEED_PROJECT}-${SEED_BRANCH}-build")
     }
 }
