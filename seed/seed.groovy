@@ -135,8 +135,8 @@ build
     }
     configure { node ->
         node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackBuildNotifier' {
-            'project'('ontrack')
-            'branch'(NAME)
+            'project'(SEED_PROJECT)
+            'branch'(SEED_BRANCH)
             'build'('${VERSION_BUILD}')
         }
     }
@@ -197,8 +197,8 @@ ciAcceptanceTest -PacceptanceJar=ontrack-acceptance.jar
     }
     configure { node ->
         node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
-            'project'('ontrack')
-            'branch'(NAME)
+            'project'(SEED_PROJECT)
+            'branch'(SEED_BRANCH)
             'build'('${VERSION_BUILD}')
             'validationStamp'('ACCEPTANCE')
         }
@@ -242,8 +242,8 @@ debAcceptanceTest
         }
         configure { node ->
             node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
-                'project'('ontrack')
-                'branch'(NAME)
+                'project'(SEED_PROJECT)
+                'branch'(SEED_BRANCH)
                 'build'('${VERSION_BUILD}')
                 'validationStamp'('ACCEPTANCE.DEBIAN')
             }
@@ -283,8 +283,8 @@ rpmAcceptanceTest${centOsVersion}
             }
             configure { node ->
                 node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
-                    'project'('ontrack')
-                    'branch'(NAME)
+                    'project'(SEED_PROJECT)
+                    'branch'(SEED_BRANCH)
                     'build'('${VERSION_BUILD}')
                     'validationStamp'("ACCEPTANCE.CENTOS.${centOsVersion}")
                 }
@@ -328,7 +328,7 @@ docker logout
     }
     configure { node ->
         node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
-            'project'('ontrack')
+            'project'(SEED_PROJECT)
             'branch'(SEED_BRANCH)
             'build'('${VERSION_BUILD}')
             'validationStamp'('DOCKER')
@@ -376,8 +376,8 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
     }
     configure { node ->
         node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
-            'project'('ontrack')
-            'branch'(NAME)
+            'project'(SEED_PROJECT)
+            'branch'(SEED_BRANCH)
             'build'('${VERSION_BUILD}')
             'validationStamp'('ACCEPTANCE.DO')
         }
@@ -455,15 +455,15 @@ docker logout
     }
     configure { node ->
         node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackPromotedRunNotifier' {
-            'project'('ontrack')
-            'branch'(NAME)
+            'project'(SEED_PROJECT)
+            'branch'(SEED_BRANCH)
             'build'('${VERSION_BUILD}')
             'promotionLevel'('RELEASE')
         }
         node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackDSLNotifier' {
             'usingText' true
             'scriptText' """\
-ontrack.build('ontrack', '${SEED_BRANCH}', VERSION_BUILD).config {
+ontrack.build('${SEED_PROJECT}', '${SEED_BRANCH}', VERSION_BUILD).config {
 label VERSION_DISPLAY
 }
 """
@@ -553,16 +553,16 @@ productionTest
         }
         configure { node ->
             node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
-                'project'('ontrack')
-                'branch'(NAME)
+                'project'(SEED_PROJECT)
+                'branch'(SEED_BRANCH)
                 'build'('${VERSION_BUILD}')
                 'validationStamp'('ONTRACK.SMOKE')
             }
         }
         configure { node ->
             node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackPromotedRunNotifier' {
-                'project'('ontrack')
-                'branch'(NAME)
+                'project'(SEED_PROJECT)
+                'branch'(SEED_BRANCH)
                 'build'('${VERSION_BUILD}')
                 'promotionLevel'('ONTRACK')
             }
