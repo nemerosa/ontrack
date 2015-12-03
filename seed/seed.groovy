@@ -633,10 +633,12 @@ ontrack.branch('${SEED_PROJECT}', 'template').instance '${SEED_BRANCH}', [
             ontrackLog true
         }
     }
-    downstreamParameterized {
-        // Explicitly fires the build after setup
-        // The global Seed property `pipeline-auto` has been set to `no`
-        trigger("${SEED_PROJECT}-${SEED_BRANCH}-build", 'SUCCESS', true) {
+    publishers {
+        downstreamParameterized {
+            // Explicitly fires the build after setup
+            // The global Seed property `pipeline-auto` has been set to `no`
+            trigger("${SEED_PROJECT}-${SEED_BRANCH}-build", 'SUCCESS', true) {
+            }
         }
     }
 }
