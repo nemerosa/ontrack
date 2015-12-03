@@ -17,9 +17,9 @@
             <div class="col-md-12">
                 <h3><small>Validation runs</small></h3>
                 <span ng-repeat="validationStampRunView in scmBuildView.buildView.validationStampRunViews"
-                      class="ot-extension-scm-validationStampRunView"
+                      class="ot-view-validation-stamp-run-view"
                         ng-class="{
-                            'ot-extension-scm-validationStampRunView-norun': !validationStampRunView.validationRun.length
+                            'ot-view-validation-stamp-run-view-norun': !validationStampRunView.validationRun.length
                         }">
                     <ot-validation-stamp-run-view validation-stamp-run-view="validationStampRunView"></ot-validation-stamp-run-view>
                 </span>

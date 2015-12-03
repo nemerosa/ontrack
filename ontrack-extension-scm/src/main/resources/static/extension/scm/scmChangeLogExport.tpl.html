@@ -21,9 +21,9 @@
     <div class="form-group">
         <label class="col-md-3">Grouping:</label>
 
-        <div class="col-md-9 ot-extension-scm-changelog-grouping">
+        <div class="col-md-9 ot-field-grouping">
             <div class="form-group" ng-repeat="group in exportRequest.grouping">
-                <div class="col-md-11 ot-extension-scm-changelog-grouping-input">
+                <div class="col-md-11 ot-field-grouping-input">
                     <div class="input-group">
                         <input ng-model="group.name" type="text" class="form-control" placeholder="Group" />
                         <span class="input-group-addon">
@@ -33,7 +33,7 @@
                     </div>
                 </div>
                 <!-- Group removal -->
-                <div class="col-md-1 ot-extension-scm-changelog-grouping-delete">
+                <div class="col-md-1 ot-field-grouping-delete">
                     <span class="ot-command ot-command-delete" title="Removes group." ng-click="removeGroup(exportRequest.grouping, group)"></span>
                 </div>
             </div>

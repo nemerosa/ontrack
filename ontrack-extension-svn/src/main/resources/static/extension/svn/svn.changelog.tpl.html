@@ -13,23 +13,20 @@
 
             <!-- Main content -->
             <div class="row">
-                <div class="col-md-12 ot-extension-scm-changelog-commands">
+                <div class="col-md-12 ot-header-commands">
                     <button class="btn btn-default" ng-click="changeLogRevisions()" ng-disabled="revisionsLoading">
                         <ot-loading ng-if="revisionsLoading"></ot-loading>
-                        <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="revisions || revisionsLoading"></span>
-                        <span class="ot-extension-scm-changelog-command-loading"></span>
+                        <span class="ot-header-command-unloaded" ng-hide="revisions || revisionsLoading"></span>
                         {{revisionsCommand}}
                     </button>
                     <button ng-if="changeLog._issues" class="btn btn-default" ng-click="changeLogIssues()" ng-disabled="issuesLoading">
                         <ot-loading ng-if="issuesLoading"></ot-loading>
-                        <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="issues || issuesLoading"></span>
-                        <span class="ot-extension-scm-changelog-command-loading"></span>
+                        <span class="ot-header-command-unloaded" ng-hide="issues || issuesLoading"></span>
                         {{issuesCommand}}
                     </button>
                     <button class="btn btn-default" ng-click="changeLogFiles()" ng-disabled="filesLoading">
                         <ot-loading ng-if="filesLoading"></ot-loading>
-                        <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="files || filesLoading"></span>
-                        <span class="ot-extension-scm-changelog-command-loading"></span>
+                        <span class="ot-header-command-unloaded" ng-hide="files || filesLoading"></span>
                         {{filesCommand}}
                     </button>
                 </div>
@@ -92,14 +89,12 @@
                             <div class="pull-right">
                                 <a class="btn btn-default btn-xs" ng-if="changeLog._issues" ng-click="changeLogIssues()" ng-disabled="issuesLoading">
                                     <ot-loading ng-if="issuesLoading"></ot-loading>
-                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="issues || issuesLoading"></span>
-                                    <span class="ot-extension-scm-changelog-command-loading"></span>
+                                    <span class="ot-header-command-unloaded" ng-hide="issues || issuesLoading"></span>
                                     {{issuesCommand}}
                                 </a>
                                 <a class="btn btn-default btn-xs" ng-click="changeLogFiles()" ng-disabled="filesLoading">
                                     <ot-loading ng-if="filesLoading"></ot-loading>
-                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="files || filesLoading"></span>
-                                    <span class="ot-extension-scm-changelog-command-loading"></span>
+                                    <span class="ot-header-command-unloaded" ng-hide="files || filesLoading"></span>
                                     {{filesCommand}}
                                 </a>
                             </div>
@@ -158,14 +153,12 @@
                             <div class="pull-right">
                                 <a class="btn btn-default btn-xs" ng-click="changeLogRevisions()" ng-disabled="revisionsLoading">
                                     <ot-loading ng-if="revisionsLoading"></ot-loading>
-                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="revisions || revisionsLoading"></span>
-                                    <span class="ot-extension-scm-changelog-command-loading"></span>
+                                    <span class="ot-header-command-unloaded" ng-hide="revisions || revisionsLoading"></span>
                                     {{revisionsCommand}}
                                 </a>
                                 <a class="btn btn-default btn-xs" ng-click="changeLogFiles()" ng-disabled="filesLoading">
                                     <ot-loading ng-if="filesLoading"></ot-loading>
-                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="files || filesLoading"></span>
-                                    <span class="ot-extension-scm-changelog-command-loading"></span>
+                                    <span class="ot-header-command-unloaded" ng-hide="files || filesLoading"></span>
                                     {{filesCommand}}
                                 </a>
                                 <a class="btn btn-default btn-xs" ng-click="changeLogExport()">
@@ -203,14 +196,12 @@
                             <div class="pull-right">
                                 <a class="btn btn-default btn-xs" ng-click="changeLogRevisions()" ng-disabled="revisionsLoading">
                                     <ot-loading ng-if="revisionsLoading"></ot-loading>
-                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="revisions || revisionsLoading"></span>
-                                    <span class="ot-extension-scm-changelog-command-loading"></span>
+                                    <span class="ot-header-command-unloaded" ng-hide="revisions || revisionsLoading"></span>
                                     {{revisionsCommand}}
                                 </a>
                                 <a class="btn btn-default btn-xs" ng-if="changeLog._issues" ng-click="changeLogIssues()" ng-disabled="issuesLoading">
                                     <ot-loading ng-if="issuesLoading"></ot-loading>
-                                    <span class="ot-extension-scm-changelog-command-unloaded" ng-hide="issues || issuesLoading"></span>
-                                    <span class="ot-extension-scm-changelog-command-loading"></span>
+                                    <span class="ot-header-command-unloaded" ng-hide="issues || issuesLoading"></span>
                                     {{issuesCommand}}
                                 </a>
                             </div>
@@ -225,7 +216,7 @@
                         <div class="panel-body ot-description" ng-show="filesLoading">
                             <ot-loading>File changes are loading...</ot-loading>
                         </div>
-                        <div class="panel-body ot-extension-scm-changelog-filefilter" ng-show="files">
+                        <div class="panel-body ot-panel-padded" ng-show="files">
                             <ot-extension-scm-changelog-filechangefilter change-log="changeLog" filter-callback="changeLogFileFilterConfig.callback"></ot-extension-scm-changelog-filechangefilter>
                         </div>
                         <div class="panel-body ot-extension-svn-changelog-files" ng-show="files">
@@ -234,8 +225,8 @@
                                 <a href="{{svnChangeLogFile.url}}">
                                     {{svnChangeLogFile.path}}
                                 </a>
-                                <span ng-repeat="svnChangeLogFileChange in svnChangeLogFile.changes" class="ot-scm-changelog-revision ot-scm-changetype-{{svnChangeLogFileChange.changeType | lowercase}}">
-                                    <span class="ot-scm-changetype-icon"></span>
+                                <span ng-repeat="svnChangeLogFileChange in svnChangeLogFile.changes" class="ot-label-change ot-label-change-{{svnChangeLogFileChange.changeType | lowercase}}">
+                                    <span class="ot-label-change-icon"></span>
                                     <a href="{{svnChangeLogFileChange.url}}"
                                        title="{{svnChangeLogFileChange.revisionInfo.message}} ({{svnChangeLogFileChange.revisionInfo.dateTime | date:'mediumDate'}})">
                                         {{svnChangeLogFileChange.revisionInfo.revision}}
