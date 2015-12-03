@@ -36,7 +36,7 @@ angular.module('ot.view.admin.accounts', [
                         view.commands.unshift({
                             id: action.id,
                             name: action.name,
-                            cls: 'ot-command-admin-' + action.id,
+                            cls: 'ot-command-admin-action',
                             link: action.uri
                         });
                     });
