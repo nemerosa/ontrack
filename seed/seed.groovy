@@ -582,3 +582,49 @@ deliveryPipelineView('Pipeline') {
         component("ontrack-${SEED_BRANCH}", "${SEED_PROJECT}-${SEED_BRANCH}-build")
     }
 }
+
+// Setup
+
+
+job("${SEED_PROJECT}-${SEED_BRANCH}-setup") {
+    logRotator {
+        numToKeep(40)
+        artifactNumToKeep(1)
+    }
+    jdk 'JDK8u25'
+    wrappers {
+        injectPasswords()
+    }
+    configure { node ->
+        node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackDSLStep' {
+            'usingText' true
+            'scriptText' """\
+ontrack.project('${SEED_PROJECT}') {
+    config {
+        autoValidationStamp()
+        autoPromotionLevel()
+        gitHub 'github.com', repository: 'nemerosa/ontrack'
+    }
+    branch('template', "", true) {
+        template {
+            parameter 'scmPath', 'Name of the GIT branch', 'trunk'
+        }
+        config {
+            gitBranch '${BRANCH}', [
+                buildCommitLink: [
+                    id: 'commit',
+                    data: [
+                        abbreviated: true
+                    ]
+                ]
+            ]
+        }
+    }
+}
+"""
+            injectEnvironment ''
+            injectProperties ''
+            ontrackLog false
+        }
+    }
+}
