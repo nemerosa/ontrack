@@ -605,17 +605,15 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-setup") {
         node / 'builders' / 'net.nemerosa.ontrack.jenkins.OntrackDSLStep' {
             'usingText' true
             'scriptText' """\
-ontrack.project('${SEED_PROJECT}').branch('${SEED_BRANCH}', true) {
-    config {
-        gitBranch '${BRANCH}', [
-            buildCommitLink: [
-                id: 'commit',
-                data: [
-                    abbreviated: true
-                ]
+ontrack.project('${SEED_PROJECT}').branch('${SEED_BRANCH}', true).config {
+    gitBranch '${BRANCH}', [
+        buildCommitLink: [
+            id: 'commit',
+            data: [
+                abbreviated: true
             ]
         ]
-    }
+    ]
 }
 """
             injectEnvironment ''
