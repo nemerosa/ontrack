@@ -602,37 +602,19 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-setup") {
         injectPasswords()
     }
     configure { node ->
-        // TODO #367 Checks if the project exists already before configuring it?
-        // TODO #366 Build commit link based on pattern
         node / 'builders' / 'net.nemerosa.ontrack.jenkins.OntrackDSLStep' {
             'usingText' true
             'scriptText' """\
-ontrack.project('${SEED_PROJECT}') {
-    config {
-        autoValidationStamp()
-        autoPromotionLevel()
-        gitHub 'github.com', repository: 'nemerosa/ontrack'
-    }
-    branch('template', "", true) {
-        template {
-            parameter 'scmPath', 'Name of the GIT branch', 'trunk'
-        }
-        config {
-            gitBranch '\${scmPath}', [
-                buildCommitLink: [
-                    id: 'commit',
-                    data: [
-                        abbreviated: true
-                    ]
-                ]
+ontrack.project('${SEED_PROJECT}').branch('${SEED_BRANCH}', 'Pipeline for ${BRANCH}', true).config {
+    gitBranch '${BRANCH}', [
+        buildCommitLink: [
+            id: 'commit',
+            data: [
+                abbreviated: true
             ]
-        }
-    }
+        ]
+    ]
 }
-// Creates or updates the branch
-ontrack.branch('${SEED_PROJECT}', 'template').instance '${SEED_BRANCH}', [
-    scmPath: '${BRANCH}'
-]
 """
             injectEnvironment ''
             injectProperties ''
