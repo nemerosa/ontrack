@@ -602,8 +602,6 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-setup") {
         injectPasswords()
     }
     configure { node ->
-        // TODO #367 Checks if the project exists already before configuring it?
-        // TODO #366 Build commit link based on pattern
         node / 'builders' / 'net.nemerosa.ontrack.jenkins.OntrackDSLStep' {
             'usingText' true
             'scriptText' """\
