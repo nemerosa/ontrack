@@ -42,7 +42,7 @@
                                 <h3>
                                     <small>History</small>
                                 </h3>
-                                <ul class="ot-extension-svn-build-history">
+                                <ul>
                                     <li ng-repeat="reference in changeLog.scmBuildFrom.scm.references">
                                         <a href="{{reference.url}}">
                                             {{reference.path}}
@@ -63,7 +63,7 @@
                                 <h3>
                                     <small>History</small>
                                 </h3>
-                                <ul class="ot-extension-svn-build-history">
+                                <ul>
                                     <li ng-repeat="reference in changeLog.scmBuildTo.scm.references">
                                         <a href="{{reference.url}}">
                                             {{reference.path}}
@@ -109,7 +109,7 @@
                                 <ot-loading>Revisions are loading...</ot-loading>
                             </div>
                             <!-- Merge -->
-                            <table class="table table-condensed table-hover ot-extension-svn-changelog-revisions" ng-show="revisions">
+                            <table class="table table-condensed table-hover" ng-show="revisions">
                                 <thead>
                                 <tr>
                                     <th>Revision</th>
@@ -128,7 +128,7 @@
                                     <td>
                                         {{svnChangeLogRevision.author}}
                                     </td>
-                                    <td class="ot-extension-svn-changelog-revisions-date">
+                                    <td class="ot-line-no-overflow">
                                         {{svnChangeLogRevision.revisionDate | date:'mediumDate'}}
                                         {{svnChangeLogRevision.revisionDate | date:'shortTime'}}
                                     </td>
@@ -219,8 +219,8 @@
                         <div class="panel-body ot-panel-padded" ng-show="files">
                             <ot-extension-scm-changelog-filechangefilter change-log="changeLog" filter-callback="changeLogFileFilterConfig.callback"></ot-extension-scm-changelog-filechangefilter>
                         </div>
-                        <div class="panel-body ot-extension-svn-changelog-files" ng-show="files">
-                            <div class="ot-extension-svn-changelog-file"
+                        <div class="panel-body ot-panel-padded" ng-show="files">
+                            <div class="ot-line-no-overflow ot-line-hover ot-line-border"
                                  ng-repeat="svnChangeLogFile in files.list | filter:changeLogFileFilterConfig.filter">
                                 <a href="{{svnChangeLogFile.url}}">
                                     {{svnChangeLogFile.path}}
