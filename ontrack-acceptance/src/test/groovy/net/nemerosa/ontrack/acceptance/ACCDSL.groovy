@@ -50,6 +50,22 @@ class ACCDSL extends AbstractACCDSL {
     }
 
     @Test
+    void 'List of projects'() {
+        def name = uid('P')
+        ontrack.project(name)
+        assert ontrack.projects.find { it.name == name } != null
+    }
+
+    @Test
+    void 'Finding a project by name'() {
+        def name = uid('P')
+        def name2 = uid('P')
+        ontrack.project(name)
+        assert ontrack.findProject(name) != null
+        assert ontrack.findProject(name2) == null
+    }
+
+    @Test
     @AcceptanceTest(AcceptanceTestContext.SMOKE)
     void 'Project branches'() {
         // Project and two branches

@@ -24,17 +24,35 @@ class Ontrack {
         this.httpClient = httpClient
     }
 
-    Project project(String name, String description = '') {
-        // Gets the list of projects and looks for an existing project
+    /**
+     * Gets the list of projects
+     */
+    List<Project> getProjects() {
+        return get('structure/projects').resources.collect {
+            new Project(this, get(it._self))
+        }
+    }
+
+    /**
+     * Looks for a project by its name
+     * @param name Name of the project
+     * @return Project or null is not found
+     */
+    Project findProject(String name) {
         def projectNode = get("structure/projects").resources.find {
             it.name == name
         }
-        // If project exists, loads it
         if (projectNode) {
-            new Project(
-                    this,
-                    get(projectNode._self)
-            )
+            return new Project(this, get(projectNode._self))
+        } else {
+            return null
+        }
+    }
+
+    Project project(String name, String description = '') {
+        def project = findProject(name)
+        if (project) {
+            return project
         }
         // If it does not exist, creates it
         else {
