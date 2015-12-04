@@ -607,32 +607,18 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-setup") {
         node / 'builders' / 'net.nemerosa.ontrack.jenkins.OntrackDSLStep' {
             'usingText' true
             'scriptText' """\
-ontrack.project('${SEED_PROJECT}') {
+ontrack.project('${SEED_PROJECT}').branch('${SEED_BRANCH}') {
     config {
-        autoValidationStamp()
-        autoPromotionLevel()
-        gitHub 'github.com', repository: 'nemerosa/ontrack'
-    }
-    branch('template', "", true) {
-        template {
-            parameter 'scmPath', 'Name of the GIT branch', 'trunk'
-        }
-        config {
-            gitBranch '\${scmPath}', [
-                buildCommitLink: [
-                    id: 'commit',
-                    data: [
-                        abbreviated: true
-                    ]
+        gitBranch '${BRANCH}', [
+            buildCommitLink: [
+                id: 'commit',
+                data: [
+                    abbreviated: true
                 ]
             ]
-        }
+        ]
     }
 }
-// Creates or updates the branch
-ontrack.branch('${SEED_PROJECT}', 'template').instance '${SEED_BRANCH}', [
-    scmPath: '${BRANCH}'
-]
 """
             injectEnvironment ''
             injectProperties ''
