@@ -76,7 +76,7 @@ var ontrack = angular.module('ontrack', [
             $urlRouterProvider.deferIntercept();
         })
         // Initialisation work
-        .run(function ($log, $http, $ocLazyLoad, $q, $urlRouter, ot, otUserService, otInfoService) {
+        .run(function ($rootScope, $log, $http, $ocLazyLoad, $q, $urlRouter, ot, otUserService, otInfoService) {
             /**
              * Loading the extensions
              */
@@ -105,6 +105,8 @@ var ontrack = angular.module('ontrack', [
                 // Resumes the routing
                 $urlRouter.listen();
                 $urlRouter.sync();
+                // Loading is done
+                $rootScope.appReady = true;
             });
 
             /**
@@ -208,10 +210,8 @@ var ontrack = angular.module('ontrack', [
     ;
 
 // Bootstrapping
-// TODO Enables routing only when application extensions are all loaded
-// TODO Loading mask
 
-angular.element(document).ready(function ($log) {
+angular.element(document).ready(function () {
     if (console) console.log('[app] Bootstrapping the application');
     angular.bootstrap(document, ['ontrack']);
 });

@@ -113,9 +113,22 @@
         </div>
     </div>
 
+    <!-- Loading mask -->
+
+    <div id="ontrack-loading" class="container-fluid" ng-hide="appReady">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert alert-info">
+                    <span class="ot-loading-indicator"></span>
+                    Ontrack is loading its components and will be available shortly...
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- View container -->
 
-    <div id="ontrack-view" ui-view>
+    <div id="ontrack-view" ng-show="appReady" ui-view>
     </div>
 
     <!-- Footer and version information -->
