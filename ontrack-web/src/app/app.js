@@ -72,22 +72,39 @@ var ontrack = angular.module('ontrack', [
         .config(function ($stateProvider, $urlRouterProvider) {
             // For any unmatched url, redirect to /home
             $urlRouterProvider.otherwise("/home");
+            // Disables routing until extensions are loaded
+            $urlRouterProvider.deferIntercept();
         })
         // Initialisation work
-        .run(function ($log, $http, $ocLazyLoad, ot, otUserService, otInfoService) {
+        .run(function ($log, $http, $ocLazyLoad, $q, $urlRouter, ot, otUserService, otInfoService) {
             /**
              * Loading the extensions
              */
             $log.debug('[app] Loading extensions...');
             ot.pageCall($http.get('extensions')).then(function (extensions) {
-                extensions.resources.forEach(function (extension) {
+                // Gets all promises of load
+                var promises = extensions.resources.map(function (extension) {
                     $log.debug('[app] Extension [' + extension.id + '] ' + extension.name + '...');
                     if (extension.options.gui) {
                         $log.debug('[app] Loading extension GUI for [' + extension.id + ']...');
                         // Loading the extension dynamically
-                        $ocLazyLoad.load('extension/' + extension.id + '/module.js');
+                        // Returning the promise
+                        return $ocLazyLoad.load('extension/' + extension.id + '/module.js');
+                    } else {
+                        // No load
+                        return null;
                     }
+                }).filter(function (promise) {
+                    return promise != null;
                 });
+                // Returns all promises
+                return $q.all(promises);
+            }).then(function () {
+                // Everything has been loaded
+                $log.debug('[app] All extensions have been loaded - resuming the routing');
+                // Resumes the routing
+                $urlRouter.listen();
+                $urlRouter.sync();
             });
 
             /**
