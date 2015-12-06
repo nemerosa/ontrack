@@ -70,16 +70,14 @@ var ontrack = angular.module('ontrack', [
         })
         // Routing configuration
         .config(function ($stateProvider, $urlRouterProvider) {
-            // For any unmatched url, redirect to /state1
+            // For any unmatched url, redirect to /home
             $urlRouterProvider.otherwise("/home");
         })
-        // Main controller
-        .controller('AppCtrl', function ($log, $scope, $rootScope, $state, $http, $ocLazyLoad, ot, otUserService, otInfoService, otTaskService, otFormService) {
-
+        // Initialisation work
+        .run(function ($log, $http, $ocLazyLoad, ot, otUserService, otInfoService) {
             /**
              * Loading the extensions
              */
-            // TODO Loading mask
             $log.debug('[app] Loading extensions...');
             ot.pageCall($http.get('extensions')).then(function (extensions) {
                 extensions.resources.forEach(function (extension) {
@@ -96,8 +94,19 @@ var ontrack = angular.module('ontrack', [
              * User mgt
              */
 
-                // User heart beat initialisation at startup
             otUserService.init();
+
+            /**
+             * Application info mgt
+             */
+
+            otInfoService.init();
+        })
+        // Main controller
+        .controller('AppCtrl', function ($log, $scope, $rootScope, $state, $http, ot, otUserService, otInfoService, otTaskService, otFormService) {
+
+            $log.debug('[app] Initialising the app controller...');
+
 
             // User status
             $scope.logged = function () {
@@ -122,8 +131,6 @@ var ontrack = angular.module('ontrack', [
             /**
              * Application info mgt
              */
-
-            otInfoService.init();
 
             $scope.displayVersionInfo = function (versionInfo) {
                 otInfoService.displayVersionInfo(versionInfo);
@@ -182,3 +189,12 @@ var ontrack = angular.module('ontrack', [
 
         })
     ;
+
+// Bootstrapping
+// TODO Enables routing only when application extensions are all loaded
+// TODO Loading mask
+
+angular.element(document).ready(function ($log) {
+    if (console) console.log('[app] Bootstrapping the application');
+    angular.bootstrap(document, ['ontrack']);
+});
