@@ -93,6 +93,9 @@ var ontrack = angular.module('ontrack', [
                         return $ocLazyLoad.load(extensionPath).then(function (result) {
                             $log.debug('[app] Extension [' + extension.id + '] GUI module has been loaded.');
                             return result;
+                        }, function (error) {
+                            $log.error('[app] Extension [' + extension.id + '] Error at loading: ' + error);
+                            return $q.reject(error);
                         });
                     } else {
                         // No load
@@ -104,6 +107,7 @@ var ontrack = angular.module('ontrack', [
                 // Returns all promises
                 return $q.all(promises);
             }).then(function () {
+                // FIXME Displays any error
                 // Loading is done
                 $log.debug('[app] All extensions have been loaded - application ready');
                 $rootScope.appReady = true;
