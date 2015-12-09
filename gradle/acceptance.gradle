@@ -89,6 +89,7 @@ task doStart(type: ComposeUp) {
             ONTRACK_VERSION: ontrackVersion,
             JAVA_OPTIONS: '-Xmx256m',
     ]
+    size = '1gb'
     mustRunAfter doEnv
 }
 
