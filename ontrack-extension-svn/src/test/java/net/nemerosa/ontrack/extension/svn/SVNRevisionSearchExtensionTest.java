@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.svn;
 
+import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature;
 import net.nemerosa.ontrack.extension.svn.service.SVNConfigurationService;
 import net.nemerosa.ontrack.extension.svn.service.SVNService;
 import net.nemerosa.ontrack.ui.controller.URIBuilder;
@@ -12,7 +13,7 @@ import static org.mockito.Mockito.mock;
 public class SVNRevisionSearchExtensionTest {
 
     private final SVNRevisionSearchExtension extension = new SVNRevisionSearchExtension(
-            new SVNExtensionFeature(),
+            new SVNExtensionFeature(new SCMExtensionFeature()),
             mock(URIBuilder.class),
             mock(SVNConfigurationService.class),
             mock(SVNService.class)

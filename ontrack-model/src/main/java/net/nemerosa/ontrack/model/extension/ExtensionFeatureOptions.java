@@ -4,6 +4,9 @@ import lombok.Data;
 import lombok.experimental.Builder;
 import lombok.experimental.Wither;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Options for a feature
  */
@@ -23,5 +26,26 @@ public class ExtensionFeatureOptions {
      */
     @Wither
     private final boolean gui;
+
+    /**
+     * List of extensions this feature depends on.
+     */
+    @Wither
+    private final Set<ExtensionFeatureDescription> dependencies;
+
+    /**
+     * Adds a dependency
+     */
+    public ExtensionFeatureOptions withDependency(ExtensionFeature feature) {
+        Set<ExtensionFeatureDescription> existing = this.dependencies;
+        Set<ExtensionFeatureDescription> newDependencies;
+        if (existing == null) {
+            newDependencies = new HashSet<>();
+        } else {
+            newDependencies = new HashSet<>(existing);
+        }
+        newDependencies.add(feature.getFeatureDescription());
+        return withDependencies(newDependencies);
+    }
 
 }

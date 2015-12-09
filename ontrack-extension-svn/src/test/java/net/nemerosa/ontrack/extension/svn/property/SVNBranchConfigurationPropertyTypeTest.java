@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.svn.property;
 
+import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature;
 import net.nemerosa.ontrack.extension.svn.SVNExtensionFeature;
 import net.nemerosa.ontrack.extension.svn.model.BuildSvnRevisionLinkService;
 import net.nemerosa.ontrack.extension.svn.service.SVNService;
@@ -34,7 +35,7 @@ public class SVNBranchConfigurationPropertyTypeTest {
                 mock(StructureService.class));
 
         SVNBranchConfigurationPropertyType propertyType = new SVNBranchConfigurationPropertyType(
-                new SVNExtensionFeature(),
+                new SVNExtensionFeature(new SCMExtensionFeature()),
                 propertiesService,
                 buildSvnRevisionLinkService,
                 tagNameSvnRevisionLink
@@ -61,7 +62,7 @@ public class SVNBranchConfigurationPropertyTypeTest {
                 mock(StructureService.class));
 
         SVNBranchConfigurationPropertyType propertyType = new SVNBranchConfigurationPropertyType(
-                new SVNExtensionFeature(),
+                new SVNExtensionFeature(new SCMExtensionFeature()),
                 propertiesService,
                 buildSvnRevisionLinkService,
                 tagNameSvnRevisionLink);
