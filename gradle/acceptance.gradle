@@ -85,7 +85,10 @@ task doStart(type: ComposeUp) {
     projectFiles = ['docker-compose.yml', 'docker-compose-do.yml']
     projectName = 'do'
     forceRecreate = true
-    environment = [ONTRACK_VERSION: ontrackVersion]
+    environment = [
+            ONTRACK_VERSION: ontrackVersion,
+            JAVA_OPTIONS: '-Xmx256m',
+    ]
     mustRunAfter doEnv
 }
 
