@@ -82,30 +82,33 @@ var ontrack = angular.module('ontrack', [
              */
             $log.debug('[app] Loading extensions...');
             ot.pageCall($http.get('extensions')).then(function (extensionList) {
-                // Gets all promises of load
-                var promises = extensionList.extensions.map(function (extension) {
-                    $log.debug('[app] Extension [' + extension.id + '] ' + extension.name + '...');
-                    if (extension.options.gui) {
-                        // Loading the extension dynamically at...
-                        var extensionPath = 'extension/' + extension.id + '/module.js';
-                        $log.debug('[app] Extension [' + extension.id + '] Loading GUI module at ' + extensionPath + '...');
-                        // Returning the promise
-                        return $ocLazyLoad.load(extensionPath).then(function (result) {
-                            $log.debug('[app] Extension [' + extension.id + '] GUI module has been loaded.');
-                            return result;
-                        }, function (error) {
-                            $log.error('[app] Extension [' + extension.id + '] Error at loading: ' + error);
-                            return $q.reject(error);
-                        });
-                    } else {
-                        // No load
-                        return null;
-                    }
-                }).filter(function (promise) {
-                    return promise != null;
+                // Creates a start promise
+                var d = $q.defer();
+                d.resolve();
+                var promise = d.promise;
+                // Appends the load of extensions
+                extensionList.extensions.forEach(function (extension) {
+                     promise = promise.then(function (result) {
+                         $log.debug('[app] Extension [' + extension.id + '] ' + extension.name + '...');
+                         if (extension.options.gui) {
+                             // Loading the extension dynamically at...
+                             var extensionPath = 'extension/' + extension.id + '/module.js';
+                             $log.debug('[app] Extension [' + extension.id + '] Loading GUI module at ' + extensionPath + '...');
+                             // Returning the promise
+                             return $ocLazyLoad.load(extensionPath).then(function (result) {
+                                 $log.debug('[app] Extension [' + extension.id + '] GUI module has been loaded.');
+                                 return result;
+                             }, function (error) {
+                                 $log.error('[app] Extension [' + extension.id + '] Error at loading: ' + error);
+                                 return $q.reject(error);
+                             });
+                         } else {
+                             return result;
+                         }
+                     });
                 });
-                // Returns all promises
-                return $q.all(promises);
+                // Returns the promise
+                return promise;
             }).then(function () {
                 // FIXME Displays any error
                 // Loading is done
