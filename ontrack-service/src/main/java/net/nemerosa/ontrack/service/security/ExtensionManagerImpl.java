@@ -70,13 +70,6 @@ public class ExtensionManagerImpl implements ExtensionManager, StartupService {
     }
 
     @Override
-    public List<ExtensionFeature> getExtensionFeatures() {
-        return applicationContext.getBeansOfType(ExtensionFeature.class).values().stream()
-                .sorted(Comparator.comparing(ExtensionFeature::getName))
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public ExtensionList getExtensionList() {
         // Gets the list of all extensions
         List<ExtensionFeatureDescription> extensionFeatures = applicationContext.getBeansOfType(ExtensionFeature.class).values().stream()

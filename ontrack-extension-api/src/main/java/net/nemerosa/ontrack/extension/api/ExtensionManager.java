@@ -12,11 +12,6 @@ public interface ExtensionManager {
     <T extends Extension> Collection<T> getExtensions(Class<T> extensionType);
 
     /**
-     * Gets the list of all accessible extensions.
-     */
-    List<ExtensionFeature> getExtensionFeatures();
-
-    /**
      * Gets the list of extensions and the associated dependency graph
      */
     ExtensionList getExtensionList();
