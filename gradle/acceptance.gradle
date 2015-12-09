@@ -57,6 +57,7 @@ task doSetup(type: DOSetup) {
     apiToken = digitalOceanAccessToken
     dropletName = "ontrack-acceptance-${ontrackVersion}"
     region = project.properties.acceptanceRegion
+    size = '1gb'
 }
 
 task doTeardown(type: Exec) {
@@ -89,7 +90,6 @@ task doStart(type: ComposeUp) {
             ONTRACK_VERSION: ontrackVersion,
             JAVA_OPTIONS: '-Xmx256m',
     ]
-    size = '1gb'
     mustRunAfter doEnv
 }
 
