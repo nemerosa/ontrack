@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.git.model.GitConfigurator
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
+import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
 import net.nemerosa.ontrack.extension.scm.service.SCMService
 import net.nemerosa.ontrack.git.GitRepositoryClient
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory
@@ -80,7 +81,7 @@ class GitServiceImplTest {
             when(propertyService.getProperty(branch, GitBranchConfigurationPropertyType)).thenReturn(
                     new Property<GitBranchConfigurationProperty>(
                             new GitBranchConfigurationPropertyType(
-                                    new GitExtensionFeature(),
+                                    new GitExtensionFeature(new SCMExtensionFeature()),
                                     buildGitCommitLinkService
                             ),
                             null,

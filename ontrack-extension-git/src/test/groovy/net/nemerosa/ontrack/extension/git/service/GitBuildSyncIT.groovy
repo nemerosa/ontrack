@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
 import net.nemerosa.ontrack.extension.git.model.GitBranchConfiguration
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
+import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
 import net.nemerosa.ontrack.extension.scm.support.TagPattern
 import net.nemerosa.ontrack.extension.git.support.TagPatternBuildNameGitCommitLink
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
@@ -82,7 +83,7 @@ class GitBuildSyncIT {
         when(propertyService.getProperty(branch, GitBranchConfigurationPropertyType)).thenReturn(
                 Property.of(
                         new GitBranchConfigurationPropertyType(
-                                new GitExtensionFeature(),
+                                new GitExtensionFeature(new SCMExtensionFeature()),
                                 buildGitCommitLinkService
                         ),
                         new GitBranchConfigurationProperty(
