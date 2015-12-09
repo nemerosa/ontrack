@@ -81,9 +81,9 @@ var ontrack = angular.module('ontrack', [
              * Loading the extensions
              */
             $log.debug('[app] Loading extensions...');
-            ot.pageCall($http.get('extensions')).then(function (extensions) {
+            ot.pageCall($http.get('extensions')).then(function (extensionList) {
                 // Gets all promises of load
-                var promises = extensions.resources.map(function (extension) {
+                var promises = extensionList.extensions.map(function (extension) {
                     $log.debug('[app] Extension [' + extension.id + '] ' + extension.name + '...');
                     if (extension.options.gui) {
                         // Loading the extension dynamically at...
