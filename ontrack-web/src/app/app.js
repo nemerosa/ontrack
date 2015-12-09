@@ -86,10 +86,14 @@ var ontrack = angular.module('ontrack', [
                 var promises = extensions.resources.map(function (extension) {
                     $log.debug('[app] Extension [' + extension.id + '] ' + extension.name + '...');
                     if (extension.options.gui) {
-                        $log.debug('[app] Loading extension GUI for [' + extension.id + ']...');
-                        // Loading the extension dynamically
+                        // Loading the extension dynamically at...
+                        var extensionPath = 'extension/' + extension.id + '/module.js';
+                        $log.debug('[app] Extension [' + extension.id + '] Loading GUI module at ' + extensionPath + '...');
                         // Returning the promise
-                        return $ocLazyLoad.load('extension/' + extension.id + '/module.js');
+                        return $ocLazyLoad.load(extensionPath).then(function (result) {
+                            $log.debug('[app] Extension [' + extension.id + '] GUI module has been loaded.');
+                            return result;
+                        });
                     } else {
                         // No load
                         return null;
@@ -100,13 +104,14 @@ var ontrack = angular.module('ontrack', [
                 // Returns all promises
                 return $q.all(promises);
             }).then(function () {
+                // Loading is done
+                $log.debug('[app] All extensions have been loaded - application ready');
+                $rootScope.appReady = true;
                 // Everything has been loaded
                 $log.debug('[app] All extensions have been loaded - resuming the routing');
                 // Resumes the routing
                 $urlRouter.listen();
                 $urlRouter.sync();
-                // Loading is done
-                $rootScope.appReady = true;
             });
 
             /**
