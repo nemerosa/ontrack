@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.experimental.Builder;
 import lombok.experimental.Wither;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,6 +20,7 @@ public class ExtensionFeatureOptions {
      */
     public static final ExtensionFeatureOptions DEFAULT = builder()
             .gui(false)
+            .dependencies(Collections.<ExtensionFeatureDescription>emptySet())
             .build();
 
     /**

@@ -16,7 +16,8 @@ public class ExtensionList {
     private final List<ExtensionFeatureDescription> extensions;
 
     /**
-     * TODO Tree of extensions to load (dependencies first, and then their clients, etc.)
+     * Load order (dependencies first, and then their clients, etc.)
      */
+    private final List<String> order;
 
 }

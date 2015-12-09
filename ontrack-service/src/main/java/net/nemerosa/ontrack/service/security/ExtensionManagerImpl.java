@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.support.StartupService;
 import org.jgrapht.alg.CycleDetector;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.traverse.TopologicalOrderIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,7 +96,7 @@ public class ExtensionManagerImpl implements ExtensionManager, StartupService {
         // Adds the dependencies as edges
         extensionFeatures.forEach(source ->
                 source.getOptions().getDependencies().forEach(target ->
-                                g.addEdge(source.getId(), target.getId())
+                                g.addEdge(target.getId(), source.getId())
                 ));
 
         // Cycle detection
@@ -124,10 +125,27 @@ public class ExtensionManagerImpl implements ExtensionManager, StartupService {
             throw new ExtensionCycleException(cycles);
         }
 
-        // OK
-        return new ExtensionList(
-                extensionFeatures
-        );
+        // No cycle
+        else {
+
+            // Topological order to collect the leaf dependencies first
+            // See https://en.wikipedia.org/wiki/Dependency_graph
+            TopologicalOrderIterator<String, DefaultEdge> orderIterator =
+                    new TopologicalOrderIterator<>(g);
+
+            // Order to extensions to load
+            List<String> order = new ArrayList<>();
+            while (orderIterator.hasNext()) {
+                String extension = orderIterator.next();
+                order.add(extension);
+            }
+
+            // OK
+            return new ExtensionList(
+                    extensionFeatures,
+                    order
+            );
+        }
     }
 
 }
