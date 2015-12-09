@@ -96,7 +96,7 @@ public class ExtensionManagerImpl implements ExtensionManager, StartupService {
         // Adds the dependencies as edges
         extensionFeatures.forEach(source ->
                 source.getOptions().getDependencies().forEach(target ->
-                                g.addEdge(target.getId(), source.getId())
+                                g.addEdge(target, source.getId())
                 ));
 
         // Cycle detection

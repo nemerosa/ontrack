@@ -20,7 +20,7 @@ public class ExtensionFeatureOptions {
      */
     public static final ExtensionFeatureOptions DEFAULT = builder()
             .gui(false)
-            .dependencies(Collections.<ExtensionFeatureDescription>emptySet())
+            .dependencies(Collections.<String>emptySet())
             .build();
 
     /**
@@ -30,23 +30,23 @@ public class ExtensionFeatureOptions {
     private final boolean gui;
 
     /**
-     * List of extensions this feature depends on.
+     * List of extensions IDs this feature depends on.
      */
     @Wither
-    private final Set<ExtensionFeatureDescription> dependencies;
+    private final Set<String> dependencies;
 
     /**
      * Adds a dependency
      */
     public ExtensionFeatureOptions withDependency(ExtensionFeature feature) {
-        Set<ExtensionFeatureDescription> existing = this.dependencies;
-        Set<ExtensionFeatureDescription> newDependencies;
+        Set<String> existing = this.dependencies;
+        Set<String> newDependencies;
         if (existing == null) {
             newDependencies = new HashSet<>();
         } else {
             newDependencies = new HashSet<>(existing);
         }
-        newDependencies.add(feature.getFeatureDescription());
+        newDependencies.add(feature.getId());
         return withDependencies(newDependencies);
     }
 
