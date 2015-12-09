@@ -15,9 +15,4 @@ public class ExtensionList {
      */
     private final List<ExtensionFeatureDescription> extensions;
 
-    /**
-     * Load order (dependencies first, and then their clients, etc.)
-     */
-    private final List<String> order;
-
 }

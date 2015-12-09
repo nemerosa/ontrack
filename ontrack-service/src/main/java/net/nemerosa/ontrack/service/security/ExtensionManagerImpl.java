@@ -14,6 +14,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -133,10 +134,17 @@ public class ExtensionManagerImpl implements ExtensionManager, StartupService {
                 order.add(extension);
             }
 
+            // Indexation of extensions per ID
+            Map<String, ExtensionFeatureDescription> index = extensionFeatures.stream().collect(Collectors.toMap(
+                    ExtensionFeatureDescription::getId,
+                    Function.identity()
+            ));
+
             // OK
             return new ExtensionList(
-                    extensionFeatures,
-                    order
+                    order.stream()
+                            .map(index::get)
+                            .collect(Collectors.toList())
             );
         }
     }
