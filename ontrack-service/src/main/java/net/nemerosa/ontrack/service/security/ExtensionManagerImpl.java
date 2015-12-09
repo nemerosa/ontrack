@@ -3,6 +3,8 @@ package net.nemerosa.ontrack.service.security;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.extension.Extension;
 import net.nemerosa.ontrack.model.extension.ExtensionFeature;
+import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
+import net.nemerosa.ontrack.model.extension.ExtensionList;
 import net.nemerosa.ontrack.model.support.StartupService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,6 +73,19 @@ public class ExtensionManagerImpl implements ExtensionManager, StartupService {
         return applicationContext.getBeansOfType(ExtensionFeature.class).values().stream()
                 .sorted(Comparator.comparing(ExtensionFeature::getName))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public ExtensionList getExtensionList() {
+        // Gets the list of all extensions
+        List<ExtensionFeatureDescription> extensionFeatures = applicationContext.getBeansOfType(ExtensionFeature.class).values().stream()
+                .map(ExtensionFeature::getFeatureDescription)
+                .sorted(Comparator.comparing(ExtensionFeatureDescription::getName))
+                .collect(Collectors.toList());
+        // OK
+        return new ExtensionList(
+                extensionFeatures
+        );
     }
 
 }

@@ -33,6 +33,7 @@ ext {
             dbinit                      : 'net.sf.dbinit:dbinit:1.4.0',
             h2                          : 'com.h2database:h2:1.4.189',
             args4j                      : 'args4j:args4j:2.0.29',
+            jgrapht                     : 'org.jgrapht:jgrapht-core:0.9.1',
 
             // Spring
             spring_context              : "org.springframework:spring-context:${springVersion}",
