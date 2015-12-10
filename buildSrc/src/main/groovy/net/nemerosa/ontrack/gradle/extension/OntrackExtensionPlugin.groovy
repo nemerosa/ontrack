@@ -12,8 +12,21 @@ class OntrackExtensionPlugin implements Plugin<Project> {
         println "[ontrack] Applying Ontrack plugin to ${project.path}"
 
         /**
+         * Project's configuration
+         */
+
+        project.extensions.create('ontrack', OntrackExtension)
+
+        /**
+         * Checks the project's configuration
+         */
+
+        project.tasks.create('ontrackCheck', OntrackCheck)
+
+        /**
          * NPM setup
          */
+
         project.apply plugin: 'com.moowork.node'
         project.node {
             version = '4.2.2'
@@ -81,9 +94,9 @@ class OntrackExtensionPlugin implements Plugin<Project> {
 
         project.tasks.jar {
             dependsOn 'web'
+            dependsOn 'ontrackCheck'
             from('build/web/dist') {
-                // FIXME Module ID
-                into 'static/extension/xxx/'
+                into { "static/extension/${project.extensions.ontrack.id}/" }
             }
             exclude 'static/**/*.js'
             exclude 'static/**/*.html'
