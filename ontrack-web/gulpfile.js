@@ -29,16 +29,11 @@ var web = 'src';
 var webPath = './' + web;
 var assetResources = webPath + '/assets/**';
 
-var coreLessResources = webPath + '/less/*.less';
-var extensionLessResources = webPath + '/extension/*/less/*.less';
-var lessResources = [coreLessResources, extensionLessResources];
+var lessResources = webPath + '/less/*.less';
 
-var coreJsResources = webPath + '/app/**/*.js';
-var extensionJsResources = webPath + '/extension/**/*.js';
-var jsResources = [coreJsResources, extensionJsResources];
+var jsResources = webPath + '/app/**/*.js';
 
 var templateResources = webPath + '/app/**/*.html';
-var extensionTemplateResources = webPath + '/extension/**/*.html';
 
 var indexResource = webPath + '/index.html';
 var vendor = './vendor';
@@ -106,19 +101,11 @@ gulp.task('templates', function () {
         .pipe(liveReload());
 });
 
-gulp.task('extensions:templates', function () {
-    return gulp.src(extensionTemplateResources)
-        .pipe(debug({title: 'extensions:templates:'}))
-        .pipe(templateCache({module: 'ontrack', root: 'extension/', filename: 'extensions-templates.js'}))
-        .pipe(gulp.dest(buildTemplates))
-        .pipe(liveReload());
-});
-
 /**
  * Sorted and annotated Angular files
  */
-gulp.task('js:angular', ['lint', 'templates', 'extensions:templates'], function () {
-    return gulp.src([buildTemplates + '/*.js'].concat(jsResources))
+gulp.task('js:angular', ['lint', 'templates'], function () {
+    return gulp.src([buildTemplates + '/*.js', jsResources])
         .pipe(debug({title: 'js:angular:input'}))
         .pipe(ngAnnotate())
         .pipe(ngFilesort())
@@ -188,11 +175,11 @@ gulp.task('assets', function () {
 
 // Injection in index.html
 
-gulp.task('index:dev', ['less', 'fonts', 'templates', 'extensions:templates'], function () {
+gulp.task('index:dev', ['less', 'fonts', 'templates'], function () {
     var cssSources = gulp.src([buildCss + '/*.css'], {read: false});
     var vendorJsSources = gulp.src(vendorJsResources, {read: false});
     var vendorCssSources = gulp.src(vendorCssResources, {read: false});
-    var appSources = gulp.src([buildTemplates + '/*.js'].concat(jsResources)).pipe(ngFilesort());
+    var appSources = gulp.src([buildTemplates + '/*.js', jsResources]).pipe(ngFilesort());
 
     return gulp.src(indexResource)
         .pipe(debug({title: 'index:dev:input'}))
@@ -209,7 +196,7 @@ gulp.task('index:dev', ['less', 'fonts', 'templates', 'extensions:templates'], f
         .pipe(liveReload());
 });
 
-gulp.task('index:prod', ['css:concat', 'assets', 'fonts', 'templates', 'extensions:templates', 'js:concat'], function () {
+gulp.task('index:prod', ['css:concat', 'assets', 'fonts', 'templates', 'js:concat'], function () {
     var cssSources = gulp.src([outputCss + '/*.css'], {read: false});
     var jsSources = gulp.src(outputJs + '/*.js', {read: false});
 
@@ -239,5 +226,4 @@ gulp.task('watch', function () {
     gulp.watch(indexResource, ['index:dev']);
     gulp.watch(jsResources, ['index:dev']);
     gulp.watch(templateResources, ['templates']);
-    gulp.watch(extensionTemplateResources, ['extensions:templates']);
 });
