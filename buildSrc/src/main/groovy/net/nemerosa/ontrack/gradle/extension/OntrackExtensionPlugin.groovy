@@ -65,7 +65,11 @@ class OntrackExtensionPlugin implements Plugin<Project> {
             dependsOn 'npmPackages'
             workingDir = project.file('build')
             script = project.file('build/node_modules/gulp/bin/gulp')
-            args = ['default', '--version', project.version]
+            args = [
+                    'default',
+                    '--version', project.version,
+                    '--src', project.file('src/main/resources/static')
+            ]
 //            inputs.dir file('src')
 //            inputs.file file('bower.json')
 //            inputs.file file('gulpfile.js')
