@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.gradle.extension
 
+import com.moowork.gradle.node.task.NodeTask
 import com.moowork.gradle.node.task.NpmTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.tasks.Copy
 
 class OntrackExtensionPlugin implements Plugin<Project> {
 
@@ -36,24 +36,44 @@ class OntrackExtensionPlugin implements Plugin<Project> {
             args = [ 'config', 'set', 'cache', npmCacheDir ]
         }
 
-        project.tasks.create('npmPackageFile') {
-            description "Copies the package.json in the build directory of the extension module"
+        project.tasks.create('npmPrepareFiles') {
+            description "Copies the package.json & gulpfile.js in the build directory of the extension module"
             doLast {
-                def source = getClass().getResourceAsStream('/extension/package.json')
                 project.mkdir 'build'
-                project.file('build/package.json').text = source.text
+                // package.json
+                project.file('build/package.json').text = getClass().getResourceAsStream('/extension/package.json').text
+                // gulpfile.js
+                project.file('build/gulpfile.js').text = getClass().getResourceAsStream('/extension/gulpfile.js').text
             }
         }
 
         project.tasks.create('npmPackages', NpmTask) {
             dependsOn project.tasks.npmCacheConfig
-            dependsOn project.tasks.npmPackageFile
+            dependsOn project.tasks.npmPrepareFiles
             description "Install Node.js packages"
             workingDir = project.file('build')
             args = [ 'install' ]
             inputs.files project.file('build/package.json')
             outputs.files project.file('build/node_modules')
         }
+
+        /**
+         * Gulp call
+         */
+
+        project.tasks.create('web', NodeTask) {
+            dependsOn 'npmPackages'
+            workingDir = project.file('build')
+            script = project.file('build/node_modules/gulp/bin/gulp')
+            args = ['default', '--version', project.version]
+//            inputs.dir file('src')
+//            inputs.file file('bower.json')
+//            inputs.file file('gulpfile.js')
+//            inputs.file file('package.json')
+//            ext.outputDir = file('build/web/prod')
+//            outputs.dir outputDir
+        }
+
     }
 
 }
