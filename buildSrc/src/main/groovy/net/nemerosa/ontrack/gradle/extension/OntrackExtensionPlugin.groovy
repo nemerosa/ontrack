@@ -75,6 +75,15 @@ class OntrackExtensionPlugin implements Plugin<Project> {
             outputs.file outputFile
         }
 
+        /**
+         * Update of the JAR task
+         */
+
+        project.tasks.jar {
+            exclude 'static/**/*.js'
+            exclude 'static/**/*.html'
+        }
+
     }
 
 }
