@@ -23,6 +23,9 @@ EXPOSE 8080
 # Profile
 ENV PROFILE prod
 
+# Java options
+ENV JAVA_OPTIONS ''
+
 # Copies the Ontrack JAR
 COPY ontrack.jar /opt/ontrack/
 

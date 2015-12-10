@@ -13,5 +13,7 @@ grafana:
 # Ontrack container
 ontrack:
   image: nemerosa/ontrack:latest
+  environment:
+    JAVA_OPTIONS: "${JAVA_OPTIONS}"
   links:
     - "influxdb:influxdb"
