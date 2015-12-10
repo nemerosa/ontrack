@@ -1,5 +1,10 @@
 apply plugin: 'groovy'
 
+repositories {
+    jcenter()
+}
+
 dependencies {
     compile gradleApi()
+    compile 'com.moowork.gradle:gradle-node-plugin:0.11'
 }
