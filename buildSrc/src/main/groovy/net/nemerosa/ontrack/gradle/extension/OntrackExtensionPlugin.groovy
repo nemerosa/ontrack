@@ -80,6 +80,11 @@ class OntrackExtensionPlugin implements Plugin<Project> {
          */
 
         project.tasks.jar {
+            dependsOn 'web'
+            from('build/web/dist') {
+                // FIXME Module ID
+                into 'static/extension/xxx/'
+            }
             exclude 'static/**/*.js'
             exclude 'static/**/*.html'
         }
