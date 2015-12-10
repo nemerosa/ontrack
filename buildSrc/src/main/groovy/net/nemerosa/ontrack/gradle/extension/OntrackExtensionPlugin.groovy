@@ -70,12 +70,9 @@ class OntrackExtensionPlugin implements Plugin<Project> {
                     '--version', project.version,
                     '--src', project.file('src/main/resources/static')
             ]
-//            inputs.dir file('src')
-//            inputs.file file('bower.json')
-//            inputs.file file('gulpfile.js')
-//            inputs.file file('package.json')
-//            ext.outputDir = file('build/web/prod')
-//            outputs.dir outputDir
+            inputs.dir project.file('src/main/resources/static')
+            ext.outputFile = project.file('build/web/dist/module.js')
+            outputs.file outputFile
         }
 
     }

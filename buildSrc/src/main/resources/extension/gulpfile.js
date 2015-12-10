@@ -33,13 +33,13 @@ var jsSources = src + '/**/*.js';
 
 var build = '.'; // Current directory
 
-var buildPath = build + '/dev';
+var buildPath = build + '/web';
 var buildTemplates = buildPath + '/templates';
-var buildAngular = buildPath + '/angular';
+var buildDist = buildPath + '/dist';
 
 // NG templates
 
-gulp.task('templates', function () {
+gulp.task('js:templates', function () {
     return gulp.src(templateSources)
         .pipe(debug({title: 'templates:input:'}))
         .pipe(templateCache({module: 'ontrack', root: ''}))
@@ -60,17 +60,17 @@ gulp.task('js:lint', function () {
 
 // Sorted and annotated Angular files
 
-gulp.task('js:angular', ['js:lint', 'templates'], function () {
+gulp.task('js', ['js:lint', 'js:templates'], function () {
     return gulp.src([buildTemplates + '/*.js', jsSources])
-        .pipe(debug({title: 'js:angular:input'}))
+        .pipe(debug({title: 'js:input'}))
         .pipe(ngAnnotate())
         .pipe(ngFilesort())
-        .pipe(concat('ci-angular.js'))
-        .pipe(gulp.dest(buildAngular))
-        .pipe(debug({title: 'js:angular:output'}));
+        .pipe(uglify())
+        .pipe(concat('module.js'))
+        .pipe(gulp.dest(buildDist))
+        .pipe(debug({title: 'js:output'}));
 });
 
 // Default build
 
-//gulp.task('default', ['templates']);
-gulp.task('default', ['js:angular']);
+gulp.task('default', ['js']);
