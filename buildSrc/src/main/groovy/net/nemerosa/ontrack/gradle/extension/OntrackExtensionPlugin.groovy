@@ -83,13 +83,33 @@ class OntrackExtensionPlugin implements Plugin<Project> {
         }
 
         /**
+         * Version file
+         */
+
+        project.tasks.create('ontrackProperties') {
+            description "Prepares the ontrack META-INF file"
+            doLast {
+                project.file("build/ontrack.properties").text = """\
+# Ontrack extension properties
+version = ${project.version}
+"""
+            }
+        }
+
+        /**
          * Update of the JAR task
          */
 
         project.tasks.jar {
             dependsOn 'web'
+            dependsOn 'ontrackProperties'
             from('build/web/dist') {
                 into { "static/extension/${project.extensions.ontrack.id(project)}/" }
+            }
+            from('build') {
+                include 'ontrack.properties'
+                into "META-INF/ontrack/extension/"
+                rename { "${project.extensions.ontrack.id(project)}.properties" }
             }
             exclude 'static/**/*.js'
             exclude 'static/**/*.html'
