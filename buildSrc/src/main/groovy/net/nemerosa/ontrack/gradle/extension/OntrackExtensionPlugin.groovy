@@ -34,34 +34,49 @@ class OntrackExtensionPlugin implements Plugin<Project> {
 
         project.ext {
             cacheDir = project.gradle.getGradleUserHomeDir() as String ?: "${System.getProperty("user.home")}/.cache/gradle"
+            npmCacheDir = "${cacheDir}/caches/npm"
+            ontrackCacheDir = "${cacheDir}/caches/ontrack/extension"
         }
 
         project.tasks.create('npmCacheConfig', NpmTask) {
-            description "Configure the NPM cache"
-            def npmCacheDir = "${project.ext.cacheDir}/caches/npm"
-            outputs.files project.file(npmCacheDir)
-            args = [ 'config', 'set', 'cache', npmCacheDir ]
+            doFirst {
+                println "[ontrack] Configure the NPM cache in ${project.npmCacheDir}"
+            }
+            args = [ 'config', 'set', 'cache', project.npmCacheDir ]
+            outputs.files project.file(project.npmCacheDir)
         }
 
-        project.tasks.create('npmPrepareFiles') {
-            description "Copies the package.json & gulpfile.js in the build directory of the extension module"
+        project.tasks.create('copyPackageJson') {
+            outputs.files new File(project.ontrackCacheDir as String, 'package.json')
             doLast {
-                project.mkdir 'build'
-                // package.json
-                project.file('build/package.json').text = getClass().getResourceAsStream('/extension/package.json').text
-                // gulpfile.js
-                project.file('build/gulpfile.js').text = getClass().getResourceAsStream('/extension/gulpfile.js').text
+                println "[ontrack] Copies the package.json file to ${project.ontrackCacheDir}"
+                project.mkdir new File(project.ontrackCacheDir as String)
+                new File(project.ontrackCacheDir as String, 'package.json').text = getClass().getResourceAsStream('/extension/package.json').text
+            }
+        }
+
+        project.tasks.create('copyGulpFile') {
+            outputs.files new File(project.ontrackCacheDir as String, 'gulpfile.js')
+            doLast {
+                println "[ontrack] Copies the gulpfile.js file to ${project.buildDir}"
+                project.mkdir new File(project.ontrackCacheDir as String)
+                new File(project.ontrackCacheDir as String, 'gulpfile.js').text = getClass().getResourceAsStream('/extension/gulpfile.js').text
             }
         }
 
         project.tasks.create('npmPackages', NpmTask) {
+            def nodeModulesDir = new File(project.ontrackCacheDir as String, 'node_modules')
+
             dependsOn project.tasks.npmCacheConfig
-            dependsOn project.tasks.npmPrepareFiles
-            description "Install Node.js packages"
-            workingDir = project.file('build')
+            dependsOn project.tasks.copyPackageJson
+
+            inputs.files new File(project.ontrackCacheDir as String, 'package.json')
+            outputs.dir nodeModulesDir
+
+            doFirst { println "[ontrack] Install Node.js packages in ${nodeModulesDir}" }
+
+            workingDir = new File(project.ontrackCacheDir as String)
             args = [ 'install' ]
-            inputs.files project.file('build/package.json')
-            outputs.files project.file('build/node_modules')
         }
 
         /**
@@ -70,16 +85,24 @@ class OntrackExtensionPlugin implements Plugin<Project> {
 
         project.tasks.create('web', NodeTask) {
             dependsOn 'npmPackages'
-            workingDir = project.file('build')
-            script = project.file('build/node_modules/gulp/bin/gulp')
+            dependsOn 'copyGulpFile'
+
+            inputs.dir project.file('src/main/resources/static')
+            outputs.file project.file('build/web/dist/module.js')
+
+            doFirst {
+                project.mkdir project.buildDir
+                println "[ontrack] Generating web resources of ${project.extensions.ontrack.id(project)} in ${project.buildDir}"
+            }
+
+            workingDir = new File(project.ontrackCacheDir as String)
+            script = new File(new File(project.ontrackCacheDir as String, 'node_modules'), 'gulp/bin/gulp')
             args = [
                     'default',
                     '--version', project.version,
-                    '--src', project.file('src/main/resources/static')
+                    '--src', project.file('src/main/resources/static'),
+                    '--target', project.buildDir
             ]
-            inputs.dir project.file('src/main/resources/static')
-            ext.outputFile = project.file('build/web/dist/module.js')
-            outputs.file outputFile
         }
 
         /**

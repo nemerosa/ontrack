@@ -16,7 +16,7 @@ var minimist = require('minimist');
 // Arguments
 
 var knownOptions = {
-    string: ['version', 'src'],
+    string: ['version', 'src', 'target'],
     default: {version: 'snapshot'}
 };
 
@@ -31,7 +31,7 @@ var jsSources = src + '/**/*.js';
 
 // Targets
 
-var build = '.'; // Current directory
+var build = options.target;
 
 var buildPath = build + '/web';
 var buildTemplates = buildPath + '/templates';
