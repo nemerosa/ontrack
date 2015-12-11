@@ -94,6 +94,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-build") {
         }
     }
     steps {
+        // TODO Restore parallel build when https://github.com/srs/gradle-node-plugin/issues/91 is fixed
         gradle '''\
 clean
 versionDisplay
@@ -105,7 +106,6 @@ osPackages
 build
 --info
 --profile
---parallel
 '''
         environmentVariables {
             propertiesFile 'build/version.properties'
