@@ -19,4 +19,9 @@ public class TestExtensionFeature implements ExtensionFeature {
     public String getDescription() {
         return "Extensions for tests";
     }
+
+    @Override
+    public String getVersion() {
+        return "test";
+    }
 }
