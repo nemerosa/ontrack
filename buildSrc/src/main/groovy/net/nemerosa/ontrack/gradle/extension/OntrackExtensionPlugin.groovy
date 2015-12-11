@@ -43,11 +43,11 @@ class OntrackExtensionPlugin implements Plugin<Project> {
                 println "[ontrack] Configure the NPM cache in ${project.npmCacheDir}"
             }
             args = [ 'config', 'set', 'cache', project.npmCacheDir ]
-            outputs.files project.file(project.npmCacheDir)
+            outputs.dir project.file(project.npmCacheDir)
         }
 
         project.tasks.create('copyPackageJson') {
-            outputs.files new File(project.ontrackCacheDir as String, 'package.json')
+            outputs.file new File(project.ontrackCacheDir as String, 'package.json')
             doLast {
                 println "[ontrack] Copies the package.json file to ${project.ontrackCacheDir}"
                 project.mkdir new File(project.ontrackCacheDir as String)
@@ -56,7 +56,7 @@ class OntrackExtensionPlugin implements Plugin<Project> {
         }
 
         project.tasks.create('copyGulpFile') {
-            outputs.files new File(project.ontrackCacheDir as String, 'gulpfile.js')
+            outputs.file new File(project.ontrackCacheDir as String, 'gulpfile.js')
             doLast {
                 println "[ontrack] Copies the gulpfile.js file to ${project.buildDir}"
                 project.mkdir new File(project.ontrackCacheDir as String)
@@ -70,7 +70,7 @@ class OntrackExtensionPlugin implements Plugin<Project> {
             dependsOn project.tasks.npmCacheConfig
             dependsOn project.tasks.copyPackageJson
 
-            inputs.files new File(project.ontrackCacheDir as String, 'package.json')
+            inputs.file new File(project.ontrackCacheDir as String, 'package.json')
             outputs.dir nodeModulesDir
 
             doFirst { println "[ontrack] Install Node.js packages in ${nodeModulesDir}" }
