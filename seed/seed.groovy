@@ -105,7 +105,6 @@ osPackages
 build
 --info
 --profile
---parallel
 '''
         environmentVariables {
             propertiesFile 'build/version.properties'
