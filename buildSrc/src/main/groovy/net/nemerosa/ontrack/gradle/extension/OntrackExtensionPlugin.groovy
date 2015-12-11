@@ -18,12 +18,6 @@ class OntrackExtensionPlugin implements Plugin<Project> {
         project.extensions.create('ontrack', OntrackExtension)
 
         /**
-         * Checks the project's configuration
-         */
-
-        project.tasks.create('ontrackCheck', OntrackCheck)
-
-        /**
          * NPM setup
          */
 
@@ -94,9 +88,8 @@ class OntrackExtensionPlugin implements Plugin<Project> {
 
         project.tasks.jar {
             dependsOn 'web'
-            dependsOn 'ontrackCheck'
             from('build/web/dist') {
-                into { "static/extension/${project.extensions.ontrack.id}/" }
+                into { "static/extension/${project.extensions.ontrack.id(project)}/" }
             }
             exclude 'static/**/*.js'
             exclude 'static/**/*.html'
