@@ -4,7 +4,6 @@ import net.nemerosa.ontrack.extension.api.support.TestSimpleProperty;
 import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType;
 import net.nemerosa.ontrack.model.form.Field;
 import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.ProjectCreation;
 import net.nemerosa.ontrack.model.security.ProjectEdit;
 import net.nemerosa.ontrack.model.security.ProjectView;
@@ -40,17 +39,17 @@ public class PropertyControllerIT extends AbstractWebTestSupport {
         ));
         Entity.isEntityDefined(project, "Project is defined");
         // Gets the properties for this project
-        Resources<Resource<Property<?>>> properties = asUser().with(project.id(), ProjectConfig.class).call(() ->
-                        controller.getProperties(ProjectEntityType.PROJECT, project.getId())
+        Resources<Resource<Property<?>>> properties = asUser().with(project.id(), ProjectEdit.class).call(() ->
+                controller.getProperties(ProjectEntityType.PROJECT, project.getId())
         );
         // Checks there is at least the Jenkins Job property
         assertNotNull("Properties should not be null", properties);
         Optional<Property<?>> property = properties.getResources().stream()
                 .map(Resource::getData)
-                .filter(p -> "Jenkins Job".equals(p.getType().getName()))
+                .filter(p -> "Value".equals(p.getType().getName()))
                 .findFirst();
-        assertTrue("At least the Jenkins Job property should have been found", property.isPresent());
-        assertTrue("The Jenkins Job property should be editable", property.get().isEditable());
+        assertTrue("At least the Value property should have been found", property.isPresent());
+        assertTrue("The Value property should be editable", property.get().isEditable());
     }
 
     /**
@@ -64,16 +63,16 @@ public class PropertyControllerIT extends AbstractWebTestSupport {
         Entity.isEntityDefined(project, "Project is defined");
         // Gets the properties for this project
         Resources<Resource<Property<?>>> properties = asUser().with(project.id(), ProjectView.class).call(() ->
-                        controller.getProperties(ProjectEntityType.PROJECT, project.getId())
+                controller.getProperties(ProjectEntityType.PROJECT, project.getId())
         );
         // Checks there is at least the Jenkins Job property
         assertNotNull("Properties should not be null", properties);
         Optional<Property<?>> property = properties.getResources().stream()
                 .map(Resource::getData)
-                .filter(p -> "Jenkins Job".equals(p.getType().getName()))
+                .filter(p -> "Value".equals(p.getType().getName()))
                 .findFirst();
-        assertTrue("At least the Jenkins Job property should have been found", property.isPresent());
-        assertFalse("The Jenkins Job property should not be editable", property.get().isEditable());
+        assertTrue("At least the Value property should have been found", property.isPresent());
+        assertFalse("The Value property should not be editable", property.get().isEditable());
     }
 
     /**
