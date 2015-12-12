@@ -50,8 +50,9 @@ public class ExtensionManagerImpl implements ExtensionManager, StartupService {
     public void start() {
         logger.info("[extensions] Loading the extensions");
         extensions = applicationContext.getBeansOfType(Extension.class).values();
-        logger.info("[extensions] Number of loaded extensions: {}", extensions.size());
         Collection<? extends ExtensionFeature> extensionFeatures = applicationContext.getBeansOfType(ExtensionFeature.class).values();
+        logger.info("[extensions] Number of loaded extension features: {}", extensionFeatures.size());
+        logger.info("[extensions] Number of loaded extensions: {}", extensions.size());
         logger.info("[extensions] Extension features:");
         for (ExtensionFeature feature : extensionFeatures) {
             logger.info("[extensions] * {} [{}]", feature.getName(), feature.getId());
