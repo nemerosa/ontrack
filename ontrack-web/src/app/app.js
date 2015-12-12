@@ -91,8 +91,15 @@ var ontrack = angular.module('ontrack', [
                      promise = promise.then(function (result) {
                          $log.debug('[app] Extension [' + extension.id + '] ' + extension.name + '...');
                          if (extension.options.gui) {
+                             // Computing the path to the extension
+                             var extensionPath;
+                             var extensionVersion = extension.version;
+                             if (extensionVersion && extensionVersion != 'none') {
+                                 extensionPath = 'extension/' + extension.id + '/' + extensionVersion + '/module.js';
+                             } else {
+                                 extensionPath = 'extension/' + extension.id + '/module.js';
+                             }
                              // Loading the extension dynamically at...
-                             var extensionPath = 'extension/' + extension.id + '/module.js';
                              $log.debug('[app] Extension [' + extension.id + '] Loading GUI module at ' + extensionPath + '...');
                              // Returning the promise
                              return $ocLazyLoad.load(extensionPath).then(function (result) {

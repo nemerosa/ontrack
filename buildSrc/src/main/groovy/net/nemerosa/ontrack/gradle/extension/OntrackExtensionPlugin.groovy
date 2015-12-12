@@ -127,7 +127,7 @@ version = ${project.version}
             dependsOn 'web'
             dependsOn 'ontrackProperties'
             from('build/web/dist') {
-                into { "static/extension/${project.extensions.ontrack.id(project)}/" }
+                into { "static/extension/${project.extensions.ontrack.id(project)}/${project.version}/" }
             }
             from('build') {
                 include 'ontrack.properties'
