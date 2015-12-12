@@ -16,7 +16,7 @@ var minimist = require('minimist');
 // Arguments
 
 var knownOptions = {
-    string: ['version', 'src', 'target'],
+    string: ['extension', 'version', 'src', 'target'],
     default: {version: 'snapshot'}
 };
 
@@ -38,11 +38,17 @@ var buildTemplates = buildPath + '/templates';
 var buildDist = buildPath + '/dist';
 
 // NG templates
+// By default, the 'gulp-angular-templatecache' registers a `run` hook into the main application module. But when
+// we load the extensions, it's already too late and this methid won't be run.
+// We have to explicitly register a module and have its initialisation being run.
+
+var TEMPLATE_HEADER = 'angular.module("<%= module %>"<%= standalone %>).run(["$log", "$templateCache", function($log, $templateCache) { ' +
+    '$log.info("Loading templates for ' + options.extension + ' @ ' + options.version + '");';
 
 gulp.task('js:templates', function () {
     return gulp.src(templateSources)
         .pipe(debug({title: 'templates:input:'}))
-        .pipe(templateCache({module: 'ontrack', root: ''}))
+        .pipe(templateCache({module: 'ontrack-extension-' + options.extension + '-templates', standalone: true, root: '', templateHeader: TEMPLATE_HEADER}))
         .pipe(gulp.dest(buildTemplates))
         .pipe(debug({title: 'templates:output:'}))
         ;

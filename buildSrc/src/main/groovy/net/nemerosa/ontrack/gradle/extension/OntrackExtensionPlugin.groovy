@@ -47,7 +47,8 @@ class OntrackExtensionPlugin implements Plugin<Project> {
         }
 
         project.tasks.create('copyPackageJson') {
-            outputs.file new File(project.ontrackCacheDir as String, 'package.json')
+            // Without any input reference, the target file will never be replaced
+            // outputs.file new File(project.ontrackCacheDir as String, 'package.json')
             doLast {
                 println "[ontrack] Copies the package.json file to ${project.ontrackCacheDir}"
                 project.mkdir new File(project.ontrackCacheDir as String)
@@ -56,9 +57,10 @@ class OntrackExtensionPlugin implements Plugin<Project> {
         }
 
         project.tasks.create('copyGulpFile') {
-            outputs.file new File(project.ontrackCacheDir as String, 'gulpfile.js')
+            // Without any input reference, the target file will never be replaced
+            // outputs.file new File(project.ontrackCacheDir as String, 'gulpfile.js')
             doLast {
-                println "[ontrack] Copies the gulpfile.js file to ${project.buildDir}"
+                println "[ontrack] Copies the gulpfile.js file to ${project.ontrackCacheDir}"
                 project.mkdir new File(project.ontrackCacheDir as String)
                 new File(project.ontrackCacheDir as String, 'gulpfile.js').text = getClass().getResourceAsStream('/extension/gulpfile.js').text
             }
@@ -99,6 +101,7 @@ class OntrackExtensionPlugin implements Plugin<Project> {
             script = new File(new File(project.ontrackCacheDir as String, 'node_modules'), 'gulp/bin/gulp')
             args = [
                     'default',
+                    '--extension', project.extensions.ontrack.id(project),
                     '--version', project.version,
                     '--src', project.file('src/main/resources/static'),
                     '--target', project.buildDir
