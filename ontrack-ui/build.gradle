@@ -29,20 +29,6 @@ dependencies {
     testCompile project(path: ':ontrack-extension-api', configuration: 'testArtifacts')
     testCompile libraries.groovy
 
-    // List of extensions
-    runtime project(':ontrack-extension-general')
-    runtime project(':ontrack-extension-jenkins')
-    runtime project(':ontrack-extension-jira')
-    runtime project(':ontrack-extension-svn')
-    runtime project(':ontrack-extension-artifactory')
-    runtime project(':ontrack-extension-git')
-    runtime project(':ontrack-extension-github')
-    runtime project(':ontrack-extension-stash')
-    runtime project(':ontrack-extension-combined')
-    runtime project(':ontrack-extension-ldap')
-    runtime project(':ontrack-extension-stale')
-    runtime project(':ontrack-extension-metrics-graphite')
-    runtime project(':ontrack-extension-metrics-influxdb')
 }
 
 /**
