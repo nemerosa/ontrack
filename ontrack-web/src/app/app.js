@@ -126,6 +126,9 @@ var ontrack = angular.module('ontrack', [
                 // Resumes the routing
                 $urlRouter.listen();
                 $urlRouter.sync();
+            }, function (error) {
+                $log.error('[app] Could not load the application: ' + error.message);
+                $rootScope.appLoadingError = error.message;
             });
 
             /**

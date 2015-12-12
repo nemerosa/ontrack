@@ -115,12 +115,29 @@
 
     <!-- Loading mask -->
 
-    <div id="ontrack-loading" class="container-fluid" ng-hide="appReady">
+    <div id="ontrack-loading" class="container-fluid" ng-show="!appReady && !appLoadingError">
         <div class="row">
             <div class="col-md-12">
                 <div class="alert alert-info">
                     <span class="ot-loading-indicator"></span>
                     Ontrack is loading its components and will be available shortly...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading error -->
+
+    <div id="ontrack-loading-error" class="container-fluid" ng-show="appLoadingError">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert alert-danger">
+                    <p>
+                        Ontrack application could not be loaded.
+                    </p>
+                    <p>
+                        <code>{{appLoadingError}}</code>
+                    </p>
                 </div>
             </div>
         </div>
