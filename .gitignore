@@ -15,4 +15,5 @@ build
 /release.sh
 /release
 /ontrack-dsl-*
+/extensions
 /LOG_FILE_IS_UNDEFINED*
