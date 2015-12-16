@@ -146,12 +146,14 @@ version = ${project.version}
          * provided by Ontrack itself.
          */
 
-//        project.configurations {
-//            module {
-//                exclude group: 'net.nemerosa.ontrack'
-//                extendsFrom 'runtime'
-//            }
-//        }
+        project.configurations {
+            moduleDependencies {
+                exclude group: 'net.nemerosa.ontrack'
+                exclude group: 'org.springframework'
+                exclude module: 'lombok'
+                extendsFrom project.configurations.runtime
+            }
+        }
 
         /**
          * Spring Boot packaging as a module
@@ -160,7 +162,7 @@ version = ${project.version}
         project.apply plugin: 'spring-boot'
         project.springBoot {
             layout = 'MODULE'
-            // TODO Use custom configuration to exclude Ontrack dependencies
+            customConfiguration = 'moduleDependencies'
         }
 
     }
