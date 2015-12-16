@@ -149,7 +149,7 @@ version = ${project.version}
         project.configurations {
             moduleDependencies {
                 extendsFrom project.configurations.runtime
-                exclude group: 'net.nemerosa.ontrack' // include group: 'net.nemerosa.ontrack.lib'
+                exclude group: 'net.nemerosa.ontrack'
                 exclude group: 'org.springframework'
                 exclude group: 'org.apache.httpcomponents'
                 exclude group: 'org.codehaus.groovy'
