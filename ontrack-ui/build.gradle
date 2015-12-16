@@ -51,6 +51,10 @@ task copyWebResources(dependsOn: ':ontrack-web:build') << {
     }
 }
 
+/**
+ * Generates the version information in a file, useable from the code
+ */
+
 task generateVersionInfo << {
     // Amends the application.properties file with version information
     File file = project.file('src/main/resources/application.properties')
@@ -78,8 +82,17 @@ info.build.sourceType = ${rootProject.versioning.info.branchType}
 """
 }
 
-build.dependsOn copyWebResources
-build.dependsOn generateVersionInfo
+jar.dependsOn copyWebResources
+jar.dependsOn generateVersionInfo
 
 processResources.mustRunAfter copyWebResources
 processResources.mustRunAfter generateVersionInfo
+
+/**
+ * Spring boot packaging
+ */
+
+springBoot {
+    // Allowing the declaration of external extensions, packaged using the Spring Boot Module format
+    layout = 'ZIP'
+}
