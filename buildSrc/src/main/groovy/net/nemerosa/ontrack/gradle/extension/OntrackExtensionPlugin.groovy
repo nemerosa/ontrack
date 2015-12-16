@@ -141,6 +141,28 @@ version = ${project.version}
             exclude 'static/**/*.html'
         }
 
+        /**
+         * Custom configuration to package a module's own dependencies, minus the ones
+         * provided by Ontrack itself.
+         */
+
+//        project.configurations {
+//            module {
+//                exclude group: 'net.nemerosa.ontrack'
+//                extendsFrom 'runtime'
+//            }
+//        }
+
+        /**
+         * Spring Boot packaging as a module
+         */
+
+        project.apply plugin: 'spring-boot'
+        project.springBoot {
+            layout = 'MODULE'
+            // TODO Use custom configuration to exclude Ontrack dependencies
+        }
+
     }
 
 }
