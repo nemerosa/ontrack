@@ -1,5 +1,6 @@
 apply plugin: 'groovy'
 
+group = 'net.nemerosa.ontrack.lib'
 description = "Git client for Ontrack."
 
 dependencies {

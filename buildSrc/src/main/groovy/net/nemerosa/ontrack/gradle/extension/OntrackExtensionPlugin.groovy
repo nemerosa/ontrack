@@ -148,10 +148,15 @@ version = ${project.version}
 
         project.configurations {
             moduleDependencies {
-                exclude group: 'net.nemerosa.ontrack'
-                exclude group: 'org.springframework'
-                exclude module: 'lombok'
                 extendsFrom project.configurations.runtime
+                exclude group: 'net.nemerosa.ontrack' // include group: 'net.nemerosa.ontrack.lib'
+                exclude group: 'org.springframework'
+                exclude group: 'org.apache.httpcomponents'
+                exclude group: 'org.codehaus.groovy'
+                exclude group: 'org.projectlombok'
+                exclude group: 'org.slf4j'
+                exclude group: 'commons-io'
+                exclude group: 'com.google.guava'
             }
         }
 
