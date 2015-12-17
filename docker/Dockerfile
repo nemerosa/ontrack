@@ -16,6 +16,9 @@ VOLUME /var/ontrack/data
 # Configuration volume
 VOLUME /var/ontrack/conf
 
+# Directory which contains the extensions
+VOLUME /var/ontrack/extensions
+
 # Exposing the ports
 EXPOSE 443
 EXPOSE 8080
