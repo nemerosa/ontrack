@@ -168,6 +168,9 @@ angular.module('ot.view.branch', [
                         .filter(function (theBranch) {
                             return theBranch.id != branchId;
                         })
+                        .filter(function (theBranch) {
+                            return (!theBranch.disabled) && (theBranch.type != 'TEMPLATE_DEFINITION');
+                        })
                         .map(function (theBranch) {
                             return {
                                 id: 'switch-' + theBranch.id,
