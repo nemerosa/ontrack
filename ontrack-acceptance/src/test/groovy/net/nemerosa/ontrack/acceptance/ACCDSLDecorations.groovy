@@ -12,6 +12,22 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
 class ACCDSLDecorations extends AbstractACCDSL {
 
     @Test
+    void 'Access to the decoration images'() {
+        def projectName = uid('P')
+        ontrack.project(projectName) {
+            branch('B') {
+                validationStamp 'VS'
+                (1..5).each {
+                    build "${it}"
+                }
+            }
+        }
+        (1..5).each {
+            ontrack.build(projectName, 'B', "${it}").validate 'VS', 'PASSED'
+        }
+    }
+
+    @Test
     void 'Auto promotion property decoration for an auto promotion level'() {
 
         // Creating a project and a branch
