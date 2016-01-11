@@ -35,12 +35,12 @@ public class StashProjectConfigurationPropertyType extends AbstractPropertyType<
 
     @Override
     public String getName() {
-        return "Stash configuration";
+        return "BitBucket configuration";
     }
 
     @Override
     public String getDescription() {
-        return "Associates the project with a Stash repository";
+        return "Associates the project with a BitBucket repository";
     }
 
     @Override
@@ -64,19 +64,19 @@ public class StashProjectConfigurationPropertyType extends AbstractPropertyType<
                 .with(
                         Selection.of("configuration")
                                 .label("Configuration")
-                                .help("Stash configuration to use to access the repository")
+                                .help("BitBucket configuration to use to access the repository")
                                 .items(configurationService.getConfigurationDescriptors())
                                 .value(value != null ? value.getConfiguration().getName() : null)
                 )
                 .with(
                         Text.of("project")
                                 .label("Project")
-                                .help("ID of the Stash project")
+                                .help("ID of the BitBucket project")
                 )
                 .with(
                         Text.of("repository")
                                 .label("Repository")
-                                .help("Repository in the Stash project")
+                                .help("Repository in the BitBucket project")
                 )
                 ;
     }
