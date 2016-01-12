@@ -3,10 +3,10 @@ package net.nemerosa.ontrack.extension.stash.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
-import net.nemerosa.ontrack.model.support.UserPasswordConfiguration;
 import net.nemerosa.ontrack.model.form.*;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import net.nemerosa.ontrack.model.support.UserPassword;
+import net.nemerosa.ontrack.model.support.UserPasswordConfiguration;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -82,7 +82,7 @@ public class StashConfiguration implements UserPasswordConfiguration<StashConfig
                 .with(
                         Text.of("url")
                                 .label("URL")
-                                .validation("URL to the Stash instance"))
+                                .help("URL to the BitBucket instance (https://bitbucket.org for example)"))
                 .with(
                         Text.of("user")
                                 .label("User")
@@ -150,4 +150,11 @@ public class StashConfiguration implements UserPasswordConfiguration<StashConfig
         }
     }
 
+    /**
+     * Checks if this configuration denotes any BitBucket Cloud instance
+     */
+    @JsonIgnore
+    public boolean isCloud() {
+        return StringUtils.contains(url, "bitbucket.org");
+    }
 }
