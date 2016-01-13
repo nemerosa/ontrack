@@ -280,8 +280,10 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                         existingIssue.add(gitUICommit);
                     } else {
                         Issue issue = configuredIssueService.getIssue(key);
-                        existingIssue = GitChangeLogIssue.of(issue, gitUICommit);
-                        issues.put(key, existingIssue);
+                        if (issue != null) {
+                            existingIssue = GitChangeLogIssue.of(issue, gitUICommit);
+                            issues.put(key, existingIssue);
+                        }
                     }
                 }
             }
