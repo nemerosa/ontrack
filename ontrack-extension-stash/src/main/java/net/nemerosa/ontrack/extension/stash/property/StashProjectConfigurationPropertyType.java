@@ -72,11 +72,13 @@ public class StashProjectConfigurationPropertyType extends AbstractPropertyType<
                         Text.of("project")
                                 .label("Project")
                                 .help("ID of the BitBucket project")
+                                .value(value != null ? value.getProject() : null)
                 )
                 .with(
                         Text.of("repository")
                                 .label("Repository")
                                 .help("Repository in the BitBucket project")
+                                .value(value != null ? value.getRepository() : null)
                 )
                 ;
     }
