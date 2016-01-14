@@ -1,6 +1,9 @@
 package net.nemerosa.ontrack.acceptance
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.client.JsonClient
+import net.nemerosa.ontrack.client.JsonClientImpl
+import net.nemerosa.ontrack.client.OTHttpClientBuilder
 import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.OntrackConnection
 import net.nemerosa.ontrack.dsl.http.OTMessageClientException
@@ -27,6 +30,14 @@ class AcceptanceTestClient extends AcceptanceSupport {
         return ontrackBuilder
                 .authenticate(user, password)
                 .build()
+    }
+
+    protected JsonClient getJsonClient() {
+        return new JsonClientImpl(
+                OTHttpClientBuilder.create(baseURL, sslDisabled)
+                        .withCredentials('admin', adminPassword)
+                        .build()
+        )
     }
 
     protected OntrackConnection getOntrackBuilder() {

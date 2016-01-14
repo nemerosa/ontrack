@@ -104,16 +104,23 @@ public class OTHttpClientImpl implements OTHttpClient {
     public Document download(String path, Object... parameters) {
         HttpGet get = new HttpGet(getUrl(path));
         return request(get, (request, response, entity) -> {
-            // Gets the content as bytes
-            byte[] bytes = EntityUtils.toByteArray(entity);
-            if (bytes == null || bytes.length == 0) {
-                return Document.EMPTY;
-            }
-            // OK
-            return new Document(
-                    entity.getContentType().getValue(),
-                    bytes
-            );
+            return handleErrorCode(request, response, () -> {
+                // Gets the content as bytes
+                byte[] bytes;
+                try {
+                    bytes = EntityUtils.toByteArray(entity);
+                } catch (IOException e) {
+                    throw new ClientIOException(request, e);
+                }
+                if (bytes == null || bytes.length == 0) {
+                    return Document.EMPTY;
+                }
+                // OK
+                return new Document(
+                        entity.getContentType().getValue(),
+                        bytes
+                );
+            });
         });
     }
 
@@ -168,14 +175,12 @@ public class OTHttpClientImpl implements OTHttpClient {
         }
     }
 
-    protected <T> T baseHandleResponse(HttpRequestBase request, HttpResponse response, HttpEntity entity,
-                                       EntityParser<T> entityParser) throws ParseException, IOException {
-        // Parses the response
+    protected <T> T handleErrorCode(HttpRequestBase request, HttpResponse response, Supplier<T> supplier) throws IOException {
         int statusCode = response.getStatusLine().getStatusCode();
         if (statusCode == HttpStatus.SC_OK ||
                 statusCode == HttpStatus.SC_CREATED ||
                 statusCode == HttpStatus.SC_ACCEPTED) {
-            return entityParser.parse(entity);
+            return supplier.get();
         } else if (statusCode == HttpStatus.SC_BAD_REQUEST) {
             throw new ClientValidationException(getMessage(response));
         } else if (statusCode == HttpStatus.SC_UNAUTHORIZED) {
@@ -204,6 +209,17 @@ public class OTHttpClientImpl implements OTHttpClient {
                     statusCode,
                     response.getStatusLine().getReasonPhrase());
         }
+    }
+
+    protected <T> T baseHandleResponse(HttpRequestBase request, HttpResponse response, HttpEntity entity,
+                                       EntityParser<T> entityParser) throws ParseException, IOException {
+        return handleErrorCode(request, response, () -> {
+            try {
+                return entityParser.parse(entity);
+            } catch (IOException e) {
+                throw new ClientIOException(request, e);
+            }
+        });
     }
 
     private static String getMessage(HttpResponse response) throws IOException {

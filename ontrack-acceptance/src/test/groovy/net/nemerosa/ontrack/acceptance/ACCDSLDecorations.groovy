@@ -12,6 +12,17 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
 class ACCDSLDecorations extends AbstractACCDSL {
 
     @Test
+    void 'Accessing the image of a decoration'() {
+        String path = 'extension/general/decoration/net.nemerosa.ontrack.extension.general.ReleaseDecorationExtension/release.png'
+        // Accesses the raw content of the image
+        def document = jsonClient.download(path)
+        // Checks the document
+        assert document != null
+        assert document.type == 'image/png'
+        assert document.content.length == 123
+    }
+
+    @Test
     void 'Auto promotion property decoration for an auto promotion level'() {
 
         // Creating a project and a branch
