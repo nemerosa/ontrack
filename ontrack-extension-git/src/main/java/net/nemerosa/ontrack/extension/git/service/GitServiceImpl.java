@@ -504,6 +504,18 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         }
     }
 
+    @Override
+    public Ack projectSync(Project project) {
+        Optional<GitConfiguration> projectConfiguration = getProjectConfiguration(project);
+        if (projectConfiguration.isPresent()) {
+            // TODO Creates a job
+            // TODO Schedules the job
+            return Ack.OK;
+        } else {
+            return Ack.NOK;
+        }
+    }
+
     private OntrackGitCommitInfo getOntrackGitCommitInfo(String commit) {
         // Reference data
         AtomicReference<GitCommit> theCommit = new AtomicReference<>();

@@ -110,4 +110,13 @@ public interface GitService {
      * Downloads the file at the given path for a branch
      */
     Optional<String> download(Branch branch, String path);
+
+    /**
+     * Synchronises the Git repository attached to this project.
+     *
+     * @param project Project
+     * @return Result. The synchronisation will occur asynchronously, but the acknowledgment returns
+     * if the project did contain a Git configuration or not.
+     */
+    Ack projectSync(Project project);
 }

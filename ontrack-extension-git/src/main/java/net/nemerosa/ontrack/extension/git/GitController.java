@@ -386,4 +386,16 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
                         () -> new SCMDocumentNotFoundException(path)
                 );
     }
+
+    /**
+     * Synchronises the Git repository attached to this project.
+     *
+     * @param projectId ID of the project
+     * @return Result. The synchronisation will occur asynchronously, but the acknowledgment returns
+     * if the project did contain a Git configuration or not.
+     */
+    @RequestMapping(value = "project-sync/{projectId}")
+    public Ack projectSync(@PathVariable ID projectId) {
+        return gitService.projectSync(structureService.getProject(projectId));
+    }
 }
