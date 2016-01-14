@@ -508,9 +508,10 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     public Ack projectSync(Project project) {
         Optional<GitConfiguration> projectConfiguration = getProjectConfiguration(project);
         if (projectConfiguration.isPresent()) {
-            // TODO Creates a job
-            // TODO Schedules the job
-            return Ack.OK;
+            // Creates a job
+            Job job = createIndexationJob(projectConfiguration.get());
+            // Schedules the job
+            return jobQueueService.queue(job);
         } else {
             return Ack.NOK;
         }
@@ -589,15 +590,15 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         return configuredBuildGitCommitLink.getLink()
                 // ... by getting candidate references
                 .getBuildCandidateReferences(commit, branch, client, branchConfiguration, configuredBuildGitCommitLink.getData())
-                        // ... gets the builds
+                // ... gets the builds
                 .map(buildName -> structureService.findBuildByName(branch.getProject().getName(), branch.getName(), buildName))
-                        // ... filter on existing builds
+                // ... filter on existing builds
                 .filter(Optional::isPresent).map(Optional::get)
-                        // ... filter the builds using the link
+                // ... filter the builds using the link
                 .filter(build -> configuredBuildGitCommitLink.getLink().isBuildEligible(build, configuredBuildGitCommitLink.getData()))
-                        // ... sort by decreasing date
+                // ... sort by decreasing date
                 .sorted((o1, o2) -> (o1.id() - o2.id()))
-                        // ... takes the first build
+                // ... takes the first build
                 .findFirst();
     }
 
