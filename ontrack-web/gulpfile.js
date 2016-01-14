@@ -28,6 +28,7 @@ var options = minimist(process.argv.slice(2), knownOptions);
 var web = 'src';
 var webPath = './' + web;
 var assetResources = webPath + '/assets/**';
+var extensionAssetResources = [webPath + '/extension/**/*.png'];
 
 var coreLessResources = webPath + '/less/*.less';
 var extensionLessResources = webPath + '/extension/*/less/*.less';
@@ -56,6 +57,7 @@ var outputCss = './' + outputPath + '/css';
 var outputJs = './' + outputPath + '/js';
 var outputFonts = './' + outputPath + '/fonts';
 var outputAssets = './' + outputPath + '/assets';
+var outputExtensionAssets = './' + outputPath + '/extension/';
 
 // Vendor resources
 
@@ -185,9 +187,16 @@ gulp.task('assets', function () {
         .pipe(gulp.dest(outputAssets));
 });
 
+gulp.task('extensionAssets', function () {
+    return gulp
+        .src(extensionAssetResources)
+        .pipe(debug({title: 'assets:input:extensions'}))
+        .pipe(gulp.dest(outputExtensionAssets));
+});
+
 // Injection in index.html
 
-gulp.task('index:dev', ['less', 'fonts', 'templates', 'extensions:templates'], function () {
+gulp.task('index:dev', ['less', 'templates', 'extensions:templates'], function () {
     var cssSources = gulp.src([buildCss + '/*.css'], {read: false});
     var vendorJsSources = gulp.src(vendorJsResources, {read: false});
     var vendorCssSources = gulp.src(vendorCssResources, {read: false});
@@ -208,7 +217,7 @@ gulp.task('index:dev', ['less', 'fonts', 'templates', 'extensions:templates'], f
         .pipe(liveReload());
 });
 
-gulp.task('index:prod', ['css:concat', 'assets', 'fonts', 'templates', 'extensions:templates', 'js:concat'], function () {
+gulp.task('index:prod', ['css:concat', 'templates', 'extensions:templates', 'js:concat'], function () {
     var cssSources = gulp.src([outputCss + '/*.css'], {read: false});
     var jsSources = gulp.src(outputJs + '/*.js', {read: false});
 
@@ -226,9 +235,9 @@ gulp.task('index:prod', ['css:concat', 'assets', 'fonts', 'templates', 'extensio
 
 // Default build
 
-gulp.task('dev', ['index:dev']);
+gulp.task('dev', ['index:dev', 'fonts']);
 
-gulp.task('default', ['index:prod']);
+gulp.task('default', ['index:prod', 'assets', 'extensionAssets', 'fonts']);
 
 // Watch setup
 
