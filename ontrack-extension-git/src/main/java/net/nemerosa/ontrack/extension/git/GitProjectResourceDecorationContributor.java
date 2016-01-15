@@ -24,7 +24,7 @@ public class GitProjectResourceDecorationContributor implements ResourceDecorati
 
     @Override
     public void contribute(LinksBuilder linksBuilder, ProjectEntity projectEntity) {
-        if (projectEntity.getProjectEntityType() == ProjectEntityType.BRANCH) {
+        if (projectEntity.getProjectEntityType() == ProjectEntityType.PROJECT) {
             Project project = (Project) projectEntity;
             if (gitService.getProjectConfiguration(project).isPresent()) {
                 linksBuilder.link(
