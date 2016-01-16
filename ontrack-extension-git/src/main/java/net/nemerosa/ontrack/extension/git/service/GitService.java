@@ -119,4 +119,12 @@ public interface GitService {
      * if the project did contain a Git configuration or not.
      */
     Ack projectSync(Project project);
+
+    /**
+     * Gets the Git synchronisation information.
+     *
+     * @param project Project configured for Git
+     * @return Synchronisation information
+     */
+    GitSynchronisationInfo getProjectGitSyncInfo(Project project);
 }

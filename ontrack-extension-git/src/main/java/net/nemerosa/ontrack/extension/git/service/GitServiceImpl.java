@@ -517,6 +517,22 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         }
     }
 
+    @Override
+    public GitSynchronisationInfo getProjectGitSyncInfo(Project project) {
+        return getProjectConfiguration(project)
+                .map(this::getGitSynchronisationInfo)
+                .orElseThrow(() -> new GitProjectNotConfiguredException(project.getId()));
+    }
+
+    private GitSynchronisationInfo getGitSynchronisationInfo(GitConfiguration gitConfiguration) {
+        return new GitSynchronisationInfo(
+                gitConfiguration.getType(),
+                gitConfiguration.getName(),
+                gitConfiguration.getRemote(),
+                gitConfiguration.getIndexationInterval()
+        );
+    }
+
     private OntrackGitCommitInfo getOntrackGitCommitInfo(String commit) {
         // Reference data
         AtomicReference<GitCommit> theCommit = new AtomicReference<>();

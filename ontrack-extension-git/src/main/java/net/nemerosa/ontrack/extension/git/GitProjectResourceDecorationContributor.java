@@ -29,7 +29,7 @@ public class GitProjectResourceDecorationContributor implements ResourceDecorati
             if (gitService.getProjectConfiguration(project).isPresent()) {
                 linksBuilder.link(
                         "_gitSync",
-                        on(GitController.class).projectSync(project.getId()),
+                        on(GitController.class).getProjectGitSyncInfo(project.getId()),
                         ProjectConfig.class, projectEntity
                 );
             }

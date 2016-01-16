@@ -30,6 +30,10 @@ angular.module('ontrack.extension.git', [
             view.commands = [
                 ot.viewCloseCommand('/project/' + project.id)
             ];
+            // Loads the Git synchronisation information
+            return ot.pageCall($http.get(project._gitSync));
+        }).then(function (gitSyncInfo) {
+            $scope.gitSyncInfo = gitSyncInfo;
         });
     })
     .directive('otExtensionGitCommitSummary', function () {

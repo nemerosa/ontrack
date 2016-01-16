@@ -388,14 +388,14 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
     }
 
     /**
-     * Synchronises the Git repository attached to this project.
+     * Gets the Git synchronisation information.
      *
      * @param projectId ID of the project
-     * @return Result. The synchronisation will occur asynchronously, but the acknowledgment returns
-     * if the project did contain a Git configuration or not.
+     * @return Synchronisation information
      */
-    @RequestMapping(value = "project-sync/{projectId}")
-    public Ack projectSync(@PathVariable ID projectId) {
-        return gitService.projectSync(structureService.getProject(projectId));
+    @RequestMapping(value = "project-sync/{projectId}", method = RequestMethod.GET)
+    public GitSynchronisationInfo getProjectGitSyncInfo(@PathVariable ID projectId) {
+        return gitService.getProjectGitSyncInfo(structureService.getProject(projectId));
     }
+
 }
