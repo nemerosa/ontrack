@@ -530,11 +530,13 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         // Gets the status
         GitSynchronisationStatus status = client.getSynchronisationStatus();
         // Collects the branch info
-        Map<String, GitCommit> branches;
+        List<GitSynchronisationInfoBranch> branches;
         if (status == GitSynchronisationStatus.IDLE) {
-            branches = client.getBranches();
+            branches = client.getBranches().entrySet().stream()
+                    .map(entry -> new GitSynchronisationInfoBranch(entry.getKey(), entry.getValue()))
+                    .collect(Collectors.toList());
         } else {
-            branches = Collections.emptyMap();
+            branches = Collections.emptyList();
         }
         // OK
         return new GitSynchronisationInfo(

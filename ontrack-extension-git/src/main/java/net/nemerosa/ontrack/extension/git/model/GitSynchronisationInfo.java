@@ -1,10 +1,9 @@
 package net.nemerosa.ontrack.extension.git.model;
 
 import lombok.Data;
-import net.nemerosa.ontrack.git.model.GitCommit;
 import net.nemerosa.ontrack.git.model.GitSynchronisationStatus;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * Information about a Git repository and the ways to synchronise it.
@@ -43,6 +42,6 @@ public class GitSynchronisationInfo {
      * Synchronisation status, index of commits per branch. If no branch is present, it
      * means that the repository was never synched.
      */
-    private final Map<String, GitCommit> branches;
+    private final List<GitSynchronisationInfoBranch> branches;
 
 }

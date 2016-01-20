@@ -24,7 +24,8 @@
                     <p>
                         Automatic indexation:
                         <b ng-if="gitSyncInfo.indexationInterval <= 0">None</b>
-                        <b ng-if="gitSyncInfo.indexationInterval > 0">Every {{gitSyncInfo.indexationInterval}} minute<span ng-if="gitSyncInfo.indexationInterval > 1">s</span></b>
+                        <b ng-if="gitSyncInfo.indexationInterval > 0">Every {{gitSyncInfo.indexationInterval}}
+                            minute<span ng-if="gitSyncInfo.indexationInterval > 1">s</span></b>
                     </p>
                 </div>
             </div>
@@ -39,10 +40,42 @@
                         Synchronisation status
                     </div>
                 </div>
-                <div class="panel-body">
-                    <!-- TODO Synchronisation status -->
-                    TODO
+                <div class="panel-body" ng-if="gitSyncInfo.status == 'NONE'">
+                    <div class="alert alert-warning">
+                        No synchronisation was ever done for this repository. Please synchronise in order to
+                        be able to extract Git related information.
+                    </div>
                 </div>
+                <div class="panel-body" ng-if="gitSyncInfo.status == 'RUNNING'">
+                    <div class="alert alert-info">
+                        Synchronisation is currently running. Please refresh later to get the latest information.
+                    </div>
+                </div>
+                <table class="table table-condensed table-hover" ng-if="gitSyncInfo.status == 'IDLE'">
+                    <thead>
+                    <tr>
+                        <th>Branch</th>
+                        <th>Commit</th>
+                        <th>Author</th>
+                        <th>Time</th>
+                        <th>Message</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="branch in gitSyncInfo.branches">
+                        <td><b>{{branch.name}}</b></td>
+                        <td><code>{{branch.commit.shortId}}</code></td>
+                        <td>{{branch.commit.author.name}}</td>
+                        <td>
+                            {{branch.commit.commitTime | date:'mediumDate'}}
+                            {{branch.commit.commitTime | date:'shortTime'}}
+                        </td>
+                        <td>
+                            {{branch.commit.shortMessage}}
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
