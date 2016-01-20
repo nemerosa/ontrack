@@ -13,4 +13,9 @@ public class GitSynchronisationRequest {
      */
     private final boolean reset;
 
+    /**
+     * Normal sync request
+     */
+    public static final GitSynchronisationRequest SYNC = new GitSynchronisationRequest(false);
+
 }

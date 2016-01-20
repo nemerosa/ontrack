@@ -509,17 +509,21 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         securityService.checkProjectFunction(project, ProjectConfig.class);
         Optional<GitConfiguration> projectConfiguration = getProjectConfiguration(project);
         if (projectConfiguration.isPresent()) {
-            // Reset the repository?
-            if (request.isReset()) {
-                gitRepositoryClientFactory.getClient(projectConfiguration.get().getGitRepository()).reset();
-            }
-            // Creates a job
-            Job job = createIndexationJob(projectConfiguration.get());
-            // Schedules the job
-            return jobQueueService.queue(job);
+            return sync(projectConfiguration.get(), request);
         } else {
             return Ack.NOK;
         }
+    }
+
+    @Override
+    public Ack sync(GitConfiguration gitConfiguration, GitSynchronisationRequest request) {// Reset the repository?
+        if (request.isReset()) {
+            gitRepositoryClientFactory.getClient(gitConfiguration.getGitRepository()).reset();
+        }
+        // Creates a job
+        Job job = createIndexationJob(gitConfiguration);
+        // Schedules the job
+        return jobQueueService.queue(job);
     }
 
     @Override
@@ -536,11 +540,9 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         // Gets the status
         GitSynchronisationStatus status = client.getSynchronisationStatus();
         // Collects the branch info
-        List<GitSynchronisationInfoBranch> branches;
+        List<GitBranchInfo> branches;
         if (status == GitSynchronisationStatus.IDLE) {
-            branches = client.getBranches().entrySet().stream()
-                    .map(entry -> new GitSynchronisationInfoBranch(entry.getKey(), entry.getValue()))
-                    .collect(Collectors.toList());
+            branches = client.getBranches().getBranches();
         } else {
             branches = Collections.emptyList();
         }

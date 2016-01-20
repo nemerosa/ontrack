@@ -313,10 +313,10 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
     }
 
     @Override
-    public Map<String, GitCommit> getBranches() {
+    public GitBranchesInfo getBranches() {
         if (!isClonedOrCloning()) {
             // No synchronisation - not returning anything
-            return Collections.emptyMap();
+            return GitBranchesInfo.empty();
         } else if (sync.tryLock()) {
             try {
                 // Rev walk
@@ -339,7 +339,11 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
                     }
                 }
                 // OK
-                return index;
+                return new GitBranchesInfo(
+                        index.entrySet().stream()
+                                .map(entry -> new GitBranchInfo(entry.getKey(), entry.getValue()))
+                                .collect(Collectors.toList())
+                );
             } catch (GitAPIException e) {
                 throw new GitRepositoryAPIException(repository.getRemote(), e);
             } catch (IOException e) {
@@ -349,7 +353,7 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
             }
         } else {
             // Sync going on - not returning anything
-            return Collections.emptyMap();
+            return GitBranchesInfo.empty();
         }
     }
 

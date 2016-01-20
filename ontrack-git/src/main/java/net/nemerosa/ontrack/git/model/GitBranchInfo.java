@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.git.model;
+package net.nemerosa.ontrack.git.model;
 
 import lombok.Data;
 import net.nemerosa.ontrack.git.model.GitCommit;
@@ -7,7 +7,7 @@ import net.nemerosa.ontrack.git.model.GitCommit;
  * Information about a branch in a Git repository.
  */
 @Data
-public class GitSynchronisationInfoBranch {
+public class GitBranchInfo {
 
     /**
      * Name of the branch

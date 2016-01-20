@@ -5,7 +5,6 @@ import org.eclipse.jgit.revwalk.RevCommit;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -148,7 +147,7 @@ public interface GitRepositoryClient {
      * Gets the list of all local branches, and their last commit. If the repository is not synched, or is currently
      * being synched, the map is returned empty.
      */
-    Map<String, GitCommit> getBranches();
+    GitBranchesInfo getBranches();
 
     /**
      * Resets the repository. Performs even if there is a synchronisation going on.
