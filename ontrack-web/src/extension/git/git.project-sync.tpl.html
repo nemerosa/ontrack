@@ -88,48 +88,45 @@
                         Synchronisation actions
                     </div>
                 </div>
-                <div class="panel-body">
-                    <!-- TODO Do not use a table for the layout -->
-                    <table>
-                        <tr>
-                            <td>
-                                <!-- TODO Synchronise action -->
-                                <button type="button" class="btn btn-info">
-                                    <span class="fa fa-download"></span>
-                                    Synchronise
-                                </button>
-                            </td>
-                            <td>
-                                Gets the latest commits from the remote repository. No reset done. The repository
-                                might have to be cloned first if not already done.
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <!-- TODO Reset action -->
-                                <button type="button" class="btn btn-warning">
-                                    <span class="fa fa-refresh"></span>
-                                    Reset
-                                </button>
-                            </td>
-                            <td>
-                                Resets the repository and clones it from scratch. This can take some time, depending
-                                on the size of the repository.
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <a href="#/project/{{project.id}}" class="btn btn-link">
-                                    <span class="fa fa-times"></span>
-                                    Close
-                                </a>
-                            </td>
-                            <td>
-                                Returns to the project page without doing anything.
-                            </td>
-                        </tr>
-                    </table>
-                </div>
+                <table class="table table-hover table-condensed">
+                    <tr>
+                        <td>
+                            <!-- TODO Synchronise action -->
+                            <button type="button" class="btn btn-info">
+                                <span class="fa fa-download"></span>
+                                Synchronise
+                            </button>
+                        </td>
+                        <td>
+                            Gets the latest commits from the remote repository. No reset done. The repository
+                            might have to be cloned first if not already done.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <!-- TODO Reset action -->
+                            <button type="button" class="btn btn-warning">
+                                <span class="fa fa-refresh"></span>
+                                Reset
+                            </button>
+                        </td>
+                        <td>
+                            Resets the repository and clones it from scratch. This can take some time, depending
+                            on the size of the repository.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a href="#/project/{{project.id}}" class="btn btn-link">
+                                <span class="fa fa-times"></span>
+                                Close
+                            </a>
+                        </td>
+                        <td>
+                            Returns to the project page without doing anything.
+                        </td>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>
