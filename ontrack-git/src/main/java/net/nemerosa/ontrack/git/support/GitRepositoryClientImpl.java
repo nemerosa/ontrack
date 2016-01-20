@@ -97,7 +97,7 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
         if (sync.tryLock()) {
             try {
                 // Clone or update?
-                if (new File(repositoryDir, ".git").exists()) {
+                if (isClonedOrCloning()) {
                     // Fetch
                     fetch(logger);
                 } else {
@@ -110,6 +110,10 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
         } else {
             logger.accept(format("[git] %s is already synchronising, trying later", repositoryDir));
         }
+    }
+
+    protected boolean isClonedOrCloning() {
+        return new File(repositoryDir, ".git").exists();
     }
 
     protected synchronized void fetch(Consumer<String> logger) {
@@ -136,7 +140,7 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
             throw new GitRepositoryAPIException(repository.getRemote(), e);
         }
         // Check
-        if (!new File(repositoryDir, ".git").exists()) {
+        if (!isClonedOrCloning()) {
             throw new GitRepositoryCannotCloneException(repository.getRemote());
         }
         // Done
@@ -293,6 +297,56 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
         sync(logger::debug);
         // Git show
         return GitClientSupport.showPath(repositoryDir, getBranchRef(branch), path);
+    }
+
+    @Override
+    public GitSynchronisationStatus getSynchronisationStatus() {
+        if (sync.isLocked()) {
+            return GitSynchronisationStatus.RUNNING;
+        } else if (isClonedOrCloning()) {
+            return GitSynchronisationStatus.IDLE;
+        } else {
+            return GitSynchronisationStatus.NONE;
+        }
+    }
+
+    @Override
+    public Map<String, GitCommit> getBranches() {
+        if (!isClonedOrCloning()) {
+            // No synchronisation - not returning anything
+            return Collections.emptyMap();
+        } else if (sync.tryLock()) {
+            try {
+                // Rev walk
+                Repository repo = git.getRepository();
+                RevWalk revWalk = new RevWalk(repo);
+                // Gets the list of local branches
+                List<Ref> branchRefs = git.branchList().call();
+                // For all the branches
+                Map<String, GitCommit> index = new TreeMap<>();
+                for (Ref ref : branchRefs) {
+                    // Gets the name of the branch
+                    String branchName = StringUtils.removeStart(ref.getName(), "refs/heads/");
+                    // Gets the commit for this ref
+                    RevCommit revCommit = revWalk.parseCommit(ref.getObjectId());
+                    // Commit info
+                    GitCommit gitCommit = toCommit(revCommit);
+                    // Indexation
+                    index.put(branchName, gitCommit);
+                }
+                // OK
+                return index;
+            } catch (GitAPIException e) {
+                throw new GitRepositoryAPIException(repository.getRemote(), e);
+            } catch (IOException e) {
+                throw new GitRepositoryIOException(repository.getRemote(), e);
+            } finally {
+                sync.unlock();
+            }
+        } else {
+            // Sync going on - not returning anything
+            return Collections.emptyMap();
+        }
     }
 
     private void formatDiffEntry(DiffFormatter formatter, DiffEntry entry) {

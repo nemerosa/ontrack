@@ -525,11 +525,25 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     private GitSynchronisationInfo getGitSynchronisationInfo(GitConfiguration gitConfiguration) {
+        // Gets the client for this configuration
+        GitRepositoryClient client = gitRepositoryClientFactory.getClient(gitConfiguration.getGitRepository());
+        // Gets the status
+        GitSynchronisationStatus status = client.getSynchronisationStatus();
+        // Collects the branch info
+        Map<String, GitCommit> branches;
+        if (status == GitSynchronisationStatus.IDLE) {
+            branches = client.getBranches();
+        } else {
+            branches = Collections.emptyMap();
+        }
+        // OK
         return new GitSynchronisationInfo(
                 gitConfiguration.getType(),
                 gitConfiguration.getName(),
                 gitConfiguration.getRemote(),
-                gitConfiguration.getIndexationInterval()
+                gitConfiguration.getIndexationInterval(),
+                status,
+                branches
         );
     }
 

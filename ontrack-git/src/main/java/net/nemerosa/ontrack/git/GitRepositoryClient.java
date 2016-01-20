@@ -1,13 +1,11 @@
 package net.nemerosa.ontrack.git;
 
-import net.nemerosa.ontrack.git.model.GitCommit;
-import net.nemerosa.ontrack.git.model.GitDiff;
-import net.nemerosa.ontrack.git.model.GitLog;
-import net.nemerosa.ontrack.git.model.GitTag;
+import net.nemerosa.ontrack.git.model.*;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -140,4 +138,15 @@ public interface GitRepositoryClient {
      * Downloads a document
      */
     Optional<String> download(String branch, String path);
+
+    /**
+     * Gets the synchronisation status
+     */
+    GitSynchronisationStatus getSynchronisationStatus();
+
+    /**
+     * Gets the list of all local branches, and their last commit. If the repository is not synched, or is currently
+     * being synched, the map is returned empty.
+     */
+    Map<String, GitCommit> getBranches();
 }

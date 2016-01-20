@@ -3,11 +3,41 @@ package net.nemerosa.ontrack.git.support
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.git.GitRepository
 import net.nemerosa.ontrack.git.GitRepositoryClient
+import net.nemerosa.ontrack.git.model.GitCommit
 import org.junit.Test
 
 import java.util.stream.Collectors
 
 class GitRepositoryClientImplTest {
+
+    /**
+     * <pre>
+     *     *   C4 (master)
+     *     | * C3 (2.1)
+     *     |/
+     *     * C2
+     *     * C1
+     * </pre>
+     */
+    @Test
+    void 'List of local branches with their commits'() {
+        prepare {
+            git 'init'
+            commit 1
+            commit 2
+            git 'checkout', '-b', '2.1'
+            commit 3
+            git 'checkout', 'master'
+            commit 4
+
+            git 'log', '--oneline', '--graph', '--decorate', '--all'
+        } and { repoClient, repo ->
+            def branches = repoClient.branches as Map<String, GitCommit>
+            assert branches.size() == 2
+            assert branches['master'].shortMessage == 'Commit 4'
+            assert branches['2.1'].shortMessage == 'Commit 3'
+        }
+    }
 
     @Test
     void 'Log: between HEAD and a commit ~ 1'() {
