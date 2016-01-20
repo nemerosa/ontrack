@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.git.exceptions.*;
 import net.nemerosa.ontrack.git.model.*;
 import net.nemerosa.ontrack.git.model.plot.GPlot;
 import net.nemerosa.ontrack.git.model.plot.GitPlotRenderer;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
@@ -349,6 +350,15 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
         } else {
             // Sync going on - not returning anything
             return Collections.emptyMap();
+        }
+    }
+
+    @Override
+    public void reset() {
+        try {
+            FileUtils.forceDelete(repositoryDir);
+        } catch (IOException e) {
+            throw new GitRepositoryIOException(repository.getRemote(), e);
         }
     }
 

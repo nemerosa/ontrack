@@ -22,6 +22,7 @@ import net.nemerosa.ontrack.model.buildfilter.BuildDiff;
 import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
+import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.ID;
@@ -395,7 +396,17 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
      */
     @RequestMapping(value = "project-sync/{projectId}", method = RequestMethod.GET)
     public GitSynchronisationInfo getProjectGitSyncInfo(@PathVariable ID projectId) {
-        return gitService.getProjectGitSyncInfo(structureService.getProject(projectId));
+        Project project = structureService.getProject(projectId);
+        return gitService.getProjectGitSyncInfo(project);
+    }
+
+    /**
+     * Launching the synchronisation
+     */
+    @RequestMapping(value = "project-sync/{projectId}", method = RequestMethod.POST)
+    public Ack projectGitSync(@PathVariable ID projectId, @RequestBody GitSynchronisationRequest request) {
+        Project project = structureService.getProject(projectId);
+        return gitService.projectSync(project, request);
     }
 
 }

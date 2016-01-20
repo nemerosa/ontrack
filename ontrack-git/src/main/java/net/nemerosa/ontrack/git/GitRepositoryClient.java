@@ -149,4 +149,9 @@ public interface GitRepositoryClient {
      * being synched, the map is returned empty.
      */
     Map<String, GitCommit> getBranches();
+
+    /**
+     * Resets the repository. Performs even if there is a synchronisation going on.
+     */
+    void reset();
 }

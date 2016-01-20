@@ -505,9 +505,14 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     @Override
-    public Ack projectSync(Project project) {
+    public Ack projectSync(Project project, GitSynchronisationRequest request) {
+        securityService.checkProjectFunction(project, ProjectConfig.class);
         Optional<GitConfiguration> projectConfiguration = getProjectConfiguration(project);
         if (projectConfiguration.isPresent()) {
+            // Reset the repository?
+            if (request.isReset()) {
+                gitRepositoryClientFactory.getClient(projectConfiguration.get().getGitRepository()).reset();
+            }
             // Creates a job
             Job job = createIndexationJob(projectConfiguration.get());
             // Schedules the job
@@ -519,6 +524,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
 
     @Override
     public GitSynchronisationInfo getProjectGitSyncInfo(Project project) {
+        securityService.checkProjectFunction(project, ProjectConfig.class);
         return getProjectConfiguration(project)
                 .map(this::getGitSynchronisationInfo)
                 .orElseThrow(() -> new GitProjectNotConfiguredException(project.getId()));
