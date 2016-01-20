@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.git.model.plot.GitPlotRenderer;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
@@ -321,18 +322,20 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
                 Repository repo = git.getRepository();
                 RevWalk revWalk = new RevWalk(repo);
                 // Gets the list of local branches
-                List<Ref> branchRefs = git.branchList().call();
+                List<Ref> branchRefs = git.branchList().setListMode(ListBranchCommand.ListMode.REMOTE).call();
                 // For all the branches
                 Map<String, GitCommit> index = new TreeMap<>();
                 for (Ref ref : branchRefs) {
                     // Gets the name of the branch
-                    String branchName = StringUtils.removeStart(ref.getName(), "refs/heads/");
-                    // Gets the commit for this ref
-                    RevCommit revCommit = revWalk.parseCommit(ref.getObjectId());
-                    // Commit info
-                    GitCommit gitCommit = toCommit(revCommit);
-                    // Indexation
-                    index.put(branchName, gitCommit);
+                    String branchName = StringUtils.removeStart(ref.getName(), "refs/remotes/origin/");
+                    if (!StringUtils.equals("HEAD", branchName)) {
+                        // Gets the commit for this ref
+                        RevCommit revCommit = revWalk.parseCommit(ref.getObjectId());
+                        // Commit info
+                        GitCommit gitCommit = toCommit(revCommit);
+                        // Indexation
+                        index.put(branchName, gitCommit);
+                    }
                 }
                 // OK
                 return index;

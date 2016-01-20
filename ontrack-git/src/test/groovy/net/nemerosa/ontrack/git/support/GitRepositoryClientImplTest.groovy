@@ -32,10 +32,14 @@ class GitRepositoryClientImplTest {
 
             git 'log', '--oneline', '--graph', '--decorate', '--all'
         } and { repoClient, repo ->
-            def branches = repoClient.branches as Map<String, GitCommit>
-            assert branches.size() == 2
-            assert branches['master'].shortMessage == 'Commit 4'
-            assert branches['2.1'].shortMessage == 'Commit 3'
+            prepare {
+                git 'clone', repo.dir.absolutePath, '.'
+            } and { cloneClient, clone ->
+                def branches = cloneClient.branches as Map<String, GitCommit>
+                assert branches.size() == 2
+                assert branches['master'].shortMessage == 'Commit 4'
+                assert branches['2.1'].shortMessage == 'Commit 3'
+            }
         }
     }
 
