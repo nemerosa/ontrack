@@ -15,7 +15,7 @@ angular.module('ontrack.extension.git', [
             controller: 'GitProjectSyncCtrl'
         });
     })
-    .controller('GitProjectSyncCtrl', function ($http, $scope, $stateParams, ot, otStructureService) {
+    .controller('GitProjectSyncCtrl', function ($http, $scope, $stateParams, ot, otStructureService, otNotificationService) {
         // Gets the project ID from the parameters
         var projectId = $stateParams.projectId;
         // View definition
@@ -35,6 +35,19 @@ angular.module('ontrack.extension.git', [
         }).then(function (gitSyncInfo) {
             $scope.gitSyncInfo = gitSyncInfo;
         });
+        // Project synchronisation
+        $scope.projectSync = function (reset) {
+            $scope.synchronising = true;
+            ot.pageCall($http.post($scope.project._gitSync, {reset: reset})).then(function (ack) {
+                if (!ack.success) {
+                    otNotificationService.error("The Git synchronisation could be launched.");
+                } else {
+                    otNotificationService.success("The Git synchronisation has been launched in the background.");
+                }
+            }).finally(function () {
+                $scope.synchronising = false;
+            });
+        };
     })
     .directive('otExtensionGitCommitSummary', function () {
         return {
