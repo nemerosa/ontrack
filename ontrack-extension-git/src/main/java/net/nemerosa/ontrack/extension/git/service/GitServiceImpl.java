@@ -485,16 +485,13 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     @Override
     public Optional<String> download(Branch branch, String path) {
         securityService.checkProjectFunction(branch, ProjectConfig.class);
-        Transaction tx = transactionService.start();
-        try {
+        return transactionService.doInTransaction(() -> {
             GitBranchConfiguration branchConfiguration = getRequiredBranchConfiguration(branch);
             GitRepositoryClient client = gitRepositoryClientFactory.getClient(
                     branchConfiguration.getConfiguration().getGitRepository()
             );
             return client.download(branchConfiguration.getBranch(), path);
-        } finally {
-            tx.close();
-        }
+        });
     }
 
     @Override
