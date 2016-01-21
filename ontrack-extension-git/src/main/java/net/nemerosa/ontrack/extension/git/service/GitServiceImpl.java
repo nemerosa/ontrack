@@ -173,6 +173,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             // Forces Git sync before
             boolean syncError;
             try {
+                // TODO Sync and then...
                 client.sync(logger::debug);
                 syncError = false;
             } catch (GitRepositorySyncException ex) {
@@ -867,6 +868,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         boolean override = !confProperty.isEmpty() && confProperty.getValue().isOverride();
         // Makes sure of synchronization
         info.post("Synchronizing before importing");
+        // TODO Sync and then...
         gitClient.sync(info::post);
         // Gets the list of tags
         info.post("Getting list of tags");

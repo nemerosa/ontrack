@@ -30,6 +30,7 @@ public class GitHealthIndicator extends ConfigurationHealthIndicator<BasicGitCon
     protected Health getHealth(BasicGitConfiguration config) {
         try {
             GitRepositoryClient client = repositoryClientFactory.getClient(config.getGitRepository());
+            // TODO Sync and then...
             client.sync(logger::debug);
             return Health.up().build();
         } catch (Exception ex) {
