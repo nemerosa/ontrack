@@ -92,10 +92,12 @@ public class JobServiceImpl implements ScheduledService,
     }
 
     @Override
-    public boolean accept(Job job) {
-        // FIXME Use optional future
-        return !idInSameGroupRunning(job.getGroup(), job.getId())
-                && runJob(registerJob(-1L, job), true).isPresent();
+    public Optional<Future<?>> accept(Job job) {
+        if (idInSameGroupRunning(job.getGroup(), job.getId())) {
+            return Optional.empty();
+        } else {
+            return runJob(registerJob(-1L, job), true);
+        }
     }
 
     @Override

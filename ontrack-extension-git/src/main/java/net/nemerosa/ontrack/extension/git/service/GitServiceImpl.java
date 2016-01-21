@@ -39,6 +39,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
@@ -141,7 +142,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         Optional<GitBranchConfiguration> branchConfiguration = getBranchConfiguration(branch);
         // If valid, launches a job
         if (branchConfiguration.isPresent() && branchConfiguration.get().getBuildCommitLink().getLink() instanceof IndexableBuildGitCommitLink) {
-            return jobQueueService.queue(createBuildSyncJob(branch, branchConfiguration.get()));
+            return Ack.validate(jobQueueService.queue(createBuildSyncJob(branch, branchConfiguration.get())).isPresent());
         }
         // Else, nothing has happened
         else {
@@ -510,14 +511,14 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         securityService.checkProjectFunction(project, ProjectConfig.class);
         Optional<GitConfiguration> projectConfiguration = getProjectConfiguration(project);
         if (projectConfiguration.isPresent()) {
-            return sync(projectConfiguration.get(), request);
+            return Ack.validate(sync(projectConfiguration.get(), request).isPresent());
         } else {
             return Ack.NOK;
         }
     }
 
     @Override
-    public Ack sync(GitConfiguration gitConfiguration, GitSynchronisationRequest request) {// Reset the repository?
+    public Optional<Future<?>> sync(GitConfiguration gitConfiguration, GitSynchronisationRequest request) {// Reset the repository?
         if (request.isReset()) {
             gitRepositoryClientFactory.getClient(gitConfiguration.getGitRepository()).reset();
         }

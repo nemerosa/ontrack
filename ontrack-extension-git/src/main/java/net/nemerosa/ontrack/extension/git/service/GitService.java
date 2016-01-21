@@ -10,6 +10,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Future;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
@@ -129,7 +130,7 @@ public interface GitService {
      * @return Result. The synchronisation will occur asynchronously, but the acknowledgment returns if the
      * synchronisation was actually launched.
      */
-    Ack sync(GitConfiguration gitConfiguration, GitSynchronisationRequest request);
+    Optional<Future<?>> sync(GitConfiguration gitConfiguration, GitSynchronisationRequest request);
 
     /**
      * Gets the Git synchronisation information.

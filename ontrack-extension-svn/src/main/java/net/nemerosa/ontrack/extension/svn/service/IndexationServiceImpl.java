@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.svn.service;
 
+import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtension;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
@@ -15,7 +16,6 @@ import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.job.*;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.tx.Transaction;
 import net.nemerosa.ontrack.tx.TransactionService;
 import org.apache.commons.lang3.StringUtils;
@@ -85,56 +85,58 @@ public class IndexationServiceImpl implements IndexationService, JobProvider {
     @Override
     public Ack indexFromLatest(String name) {
         SVNConfiguration configuration = configurationService.getConfiguration(name);
-        return jobQueueService.queue(createIndexFromLatestJob(configuration));
+        return Ack.validate(jobQueueService.queue(createIndexFromLatestJob(configuration)).isPresent());
     }
 
     @Override
     public Ack indexRange(String name, IndexationRange range) {
-        return jobQueueService.queue(new Job() {
+        return Ack.validate(
+                jobQueueService.queue(new Job() {
 
-            @Override
-            public boolean isDisabled() {
-                return false;
-            }
+                    @Override
+                    public boolean isDisabled() {
+                        return false;
+                    }
 
-            @Override
-            public String getGroup() {
-                return SVN_INDEXATION_JOB_GROUP;
-            }
+                    @Override
+                    public String getGroup() {
+                        return SVN_INDEXATION_JOB_GROUP;
+                    }
 
-            @Override
-            public String getCategory() {
-                return "SVNIndexRange";
-            }
+                    @Override
+                    public String getCategory() {
+                        return "SVNIndexRange";
+                    }
 
-            @Override
-            public String getId() {
-                return name;
-            }
+                    @Override
+                    public String getId() {
+                        return name;
+                    }
 
-            @Override
-            public String getDescription() {
-                return String.format(
-                        "SVN range indexation for %s, from %d to %d",
-                        name,
-                        range.getFrom(),
-                        range.getTo()
-                );
-            }
+                    @Override
+                    public String getDescription() {
+                        return String.format(
+                                "SVN range indexation for %s, from %d to %d",
+                                name,
+                                range.getFrom(),
+                                range.getTo()
+                        );
+                    }
 
-            @Override
-            public int getInterval() {
-                return 0;
-            }
+                    @Override
+                    public int getInterval() {
+                        return 0;
+                    }
 
-            @Override
-            public JobTask createTask() {
-                SVNRepository repository = getRepositoryByName(name);
-                return new RunnableJobTask(info ->
-                        indexRange(repository, range.getFrom(), range.getTo(), info)
-                );
-            }
-        });
+                    @Override
+                    public JobTask createTask() {
+                        SVNRepository repository = getRepositoryByName(name);
+                        return new RunnableJobTask(info ->
+                                indexRange(repository, range.getFrom(), range.getTo(), info)
+                        );
+                    }
+                }).isPresent()
+        );
     }
 
     @Override
@@ -183,7 +185,9 @@ public class IndexationServiceImpl implements IndexationService, JobProvider {
             }
         };
         // OK, launches a new indexation
-        return jobQueueService.queue(reindexJob);
+        return Ack.validate(
+                jobQueueService.queue(reindexJob).isPresent()
+        );
     }
 
     private void fullReindexation(String name, JobInfoListener infoListener) {
