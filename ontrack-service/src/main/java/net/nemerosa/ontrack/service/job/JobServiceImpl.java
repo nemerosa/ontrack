@@ -5,7 +5,6 @@ import com.codahale.metrics.Timer;
 import com.google.common.collect.Table;
 import com.google.common.collect.Tables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.job.*;
 import net.nemerosa.ontrack.model.metrics.OntrackMetrics;
 import net.nemerosa.ontrack.model.security.ApplicationManagement;
@@ -24,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -93,8 +93,9 @@ public class JobServiceImpl implements ScheduledService,
 
     @Override
     public boolean accept(Job job) {
+        // FIXME Use optional future
         return !idInSameGroupRunning(job.getGroup(), job.getId())
-                && runJob(registerJob(-1L, job), true);
+                && runJob(registerJob(-1L, job), true).isPresent();
     }
 
     @Override
@@ -106,14 +107,14 @@ public class JobServiceImpl implements ScheduledService,
     }
 
     @Override
-    public Ack launchJob(long id) {
+    public Optional<Future<?>> launchJob(long id) {
         // Checks rights
         securityService.checkGlobalFunction(ApplicationManagement.class);
         // Gets a registered job
         return registeredJobs.values().stream()
                 .filter(j -> j.getId() == id)
                 .findFirst()
-                .map(j -> Ack.validate(runJob(j, true)))
+                .map(j -> runJob(j, true))
                 .orElseThrow(() -> new JobNotFoundException(id));
     }
 
@@ -201,27 +202,25 @@ public class JobServiceImpl implements ScheduledService,
         }
     }
 
-    protected boolean runJob(RegisteredJob registeredJob, boolean forceEarly) {
+    protected Optional<Future<?>> runJob(RegisteredJob registeredJob, boolean forceEarly) {
         if (registeredJob.isDisabled()) {
             logger.debug("[job] Job disabled: {}", registeredJob);
-            return false;
+            return Optional.empty();
         } else if (idInSameGroupRunning(registeredJob)) {
             logger.debug("[job] Same group running: {}", registeredJob);
-            return false;
+            return Optional.empty();
         } else if (registeredJob.isRunning()) {
             logger.debug("[job] Still running: {}", registeredJob);
-            return false;
+            return Optional.empty();
         } else if (forceEarly) {
             logger.debug("[job] Starting forced: {}", registeredJob);
-            start(registeredJob);
-            return true;
+            return Optional.of(start(registeredJob));
         } else if (registeredJob.mustStart()) {
             logger.debug("[job] Starting: {}", registeredJob);
-            start(registeredJob);
-            return true;
+            return Optional.of(start(registeredJob));
         } else {
             logger.debug("[job] Idle: {}", registeredJob);
-            return false;
+            return Optional.empty();
         }
     }
 
@@ -236,7 +235,7 @@ public class JobServiceImpl implements ScheduledService,
                 .isPresent();
     }
 
-    protected void start(RegisteredJob registeredJob) {
+    protected Future<?> start(RegisteredJob registeredJob) {
         // Raw task to execute
         Runnable task = registeredJob.createTask();
         // Running it as admin
@@ -278,7 +277,7 @@ public class JobServiceImpl implements ScheduledService,
             }
         };
         // Submitting the task
-        executor.submit(monitoredTask);
+        return executor.submit(monitoredTask);
     }
 
     @Override
