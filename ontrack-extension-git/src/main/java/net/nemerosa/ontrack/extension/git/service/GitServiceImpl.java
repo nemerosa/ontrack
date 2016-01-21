@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.git.service;
 
 import com.google.common.collect.Lists;
+import net.nemerosa.ontrack.common.FutureUtils;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequestDifferenceProjectException;
 import net.nemerosa.ontrack.extension.git.model.*;
@@ -33,8 +34,6 @@ import net.nemerosa.ontrack.tx.Transaction;
 import net.nemerosa.ontrack.tx.TransactionService;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,7 +50,6 @@ import static java.lang.String.format;
 @Service
 public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration, GitBuildInfo, GitChangeLogIssue> implements GitService, JobProvider {
 
-    private final Logger logger = LoggerFactory.getLogger(GitService.class);
     private final PropertyService propertyService;
     private final IssueServiceRegistry issueServiceRegistry;
     private final JobQueueService jobQueueService;
@@ -171,42 +169,51 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             if (project.id() != otherProject.id()) {
                 throw new BuildDiffRequestDifferenceProjectException();
             }
-            GitRepositoryClient client = getGitRepositoryClient(project);
-            // Forces Git sync before
-            boolean syncError;
-            try {
-                // TODO Sync and then...
-                client.sync(logger::debug);
-                syncError = false;
-            } catch (GitRepositorySyncException ex) {
-                applicationLogService.error(
-                        ex,
-                        GitService.class,
-                        project.getName(),
-                        String.format(
-                                "Change log for %s",
-                                project.getName()
-                        ),
-                        String.format(
-                                "%s (%s/%s -> %s/%s)",
-                                project.getName(),
-                                buildFrom.getBranch().getName(),
-                                buildFrom.getName(),
-                                buildTo.getBranch().getName(),
-                                buildTo.getName()
-                        )
+            // Project Git configuration
+            Optional<GitConfiguration> oProjectConfiguration = getProjectConfiguration(project);
+            if (oProjectConfiguration.isPresent()) {
+                // Forces Git sync before
+                boolean syncError;
+                try {
+                    GitConfiguration gitConfiguration = oProjectConfiguration.get();
+                    syncAndWait(gitConfiguration);
+                    syncError = false;
+                } catch (GitRepositorySyncException ex) {
+                    applicationLogService.error(
+                            ex,
+                            GitService.class,
+                            project.getName(),
+                            String.format(
+                                    "Change log for %s",
+                                    project.getName()
+                            ),
+                            String.format(
+                                    "%s (%s/%s -> %s/%s)",
+                                    project.getName(),
+                                    buildFrom.getBranch().getName(),
+                                    buildFrom.getName(),
+                                    buildTo.getBranch().getName(),
+                                    buildTo.getName()
+                            )
+                    );
+                    syncError = true;
+                }
+                // Change log computation
+                return new GitChangeLog(
+                        UUID.randomUUID().toString(),
+                        project,
+                        getSCMBuildView(buildFrom.getId()),
+                        getSCMBuildView(buildTo.getId()),
+                        syncError
                 );
-                syncError = true;
+            } else {
+                throw new GitProjectNotConfiguredException(project.getId());
             }
-            // Change log computation
-            return new GitChangeLog(
-                    UUID.randomUUID().toString(),
-                    project,
-                    getSCMBuildView(buildFrom.getId()),
-                    getSCMBuildView(buildTo.getId()),
-                    syncError
-            );
         }
+    }
+
+    protected Object syncAndWait(GitConfiguration gitConfiguration) {
+        return FutureUtils.wait("Synchronisation for " + gitConfiguration.getName(), sync(gitConfiguration, GitSynchronisationRequest.SYNC));
     }
 
     protected GitConfiguration getRequiredProjectConfiguration(Project project) {
@@ -857,8 +864,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         boolean override = !confProperty.isEmpty() && confProperty.getValue().isOverride();
         // Makes sure of synchronization
         info.post("Synchronizing before importing");
-        // TODO Sync and then...
-        gitClient.sync(info::post);
+        syncAndWait(configuration);
         // Gets the list of tags
         info.post("Getting list of tags");
         Collection<GitTag> tags = gitClient.getTags();
