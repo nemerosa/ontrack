@@ -10,6 +10,9 @@ import org.junit.Test
 import org.springframework.boot.actuate.metrics.CounterService
 import org.springframework.context.ApplicationContext
 
+import java.util.concurrent.Future
+import java.util.concurrent.TimeUnit
+
 import static org.mockito.Mockito.mock
 
 class JobServiceImplTest {
@@ -40,7 +43,7 @@ class JobServiceImplTest {
     void 'Running job: disabled'() {
         TestJob job = TestJob.create(1, true)
         RegisteredJob rj = service.registerJob(0, job)
-        assert !service.runJob(rj, false)
+        assert !service.runJob(rj, false).present
         assert job.count == 0
     }
 
@@ -50,9 +53,9 @@ class JobServiceImplTest {
         TestJob jobLong = TestJob.create(2).longRunning()
         RegisteredJob rj = service.registerJob(0, job)
         RegisteredJob rjLong = service.registerJob(0, jobLong)
-        assert service.runJob(rjLong, true)
+        assert service.runJob(rjLong, true).present
         Thread.sleep 500
-        assert !service.runJob(rj, true)
+        assert !service.runJob(rj, true).present
     }
 
     @Test
@@ -61,7 +64,7 @@ class JobServiceImplTest {
         RegisteredJob rjLong = service.registerJob(0, jobLong)
         assert service.runJob(rjLong, true)
         Thread.sleep 500
-        assert !service.runJob(rjLong, true)
+        assert !service.runJob(rjLong, true).present
     }
 
     @Test
@@ -77,9 +80,38 @@ class JobServiceImplTest {
         TestJob jobLong = TestJob.create(2).longRunning()
         RegisteredJob rj = service.registerJob(0, job)
         RegisteredJob rjLong = service.registerJob(0, jobLong)
-        assert service.runJob(rjLong, true)
+        assert service.runJob(rjLong, true).present
         Thread.sleep 500
         assert service.idInSameGroupRunning(rj)
+    }
+
+    @Test
+    void 'Job run'() {
+        def job = TestJob.create(1)
+        def rj = service.registerJob(0, job)
+        def o = service.runJob(rj, true)
+        assert o != null
+        assert o.present
+        o.get().get(1, TimeUnit.SECONDS)
+        assert job.count == 1
+    }
+
+    @Test
+    void 'Cancel job'() {
+        def job = TestJob.create(2).longRunning()
+        def rj = service.registerJob(0, job)
+        def o = service.runJob(rj, true)
+        assert o != null
+        assert o.present
+        def future = o.get()
+        assert !future.done
+        assert !future.cancelled
+        // Cancels the job
+        future.cancel(true)
+        // Checks
+        assert future.done
+        assert future.cancelled
+        assert job.count == 0
     }
 
 }
