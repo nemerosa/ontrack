@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.git.support
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.git.GitRepository
 import net.nemerosa.ontrack.git.GitRepositoryClient
-import net.nemerosa.ontrack.git.model.GitCommit
+import net.nemerosa.ontrack.git.model.GitBranchesInfo
 import org.junit.Test
 
 import java.util.stream.Collectors
@@ -35,10 +35,14 @@ class GitRepositoryClientImplTest {
             prepare {
                 git 'clone', repo.dir.absolutePath, '.'
             } and { cloneClient, clone ->
-                def branches = cloneClient.branches as Map<String, GitCommit>
-                assert branches.size() == 2
-                assert branches['master'].shortMessage == 'Commit 4'
-                assert branches['2.1'].shortMessage == 'Commit 3'
+                def branches = cloneClient.branches as GitBranchesInfo
+                assert branches.branches.size() == 2
+
+                assert branches.branches[0].name == '2.1'
+                assert branches.branches[0].commit.shortMessage == 'Commit 3'
+
+                assert branches.branches[1].name == 'master'
+                assert branches.branches[1].commit.shortMessage == 'Commit 4'
             }
         }
     }
@@ -247,7 +251,7 @@ class GitRepositoryClientImplTest {
     @Test
     void 'Get tags'() {
         prepare { prepareBranches it } withClone { GitRepositoryClient client, clientRepo, origin ->
-            client.sync({println it})
+            client.sync({ println it })
             def expectedDate = Time.now().toLocalDate();
             assert client.tags.collect { it.name } == ['v2.1', 'v2.2']
             assert client.tags.collect { it.time.toLocalDate() } == [expectedDate, expectedDate]
