@@ -142,7 +142,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         Optional<GitBranchConfiguration> branchConfiguration = getBranchConfiguration(branch);
         // If valid, launches a job
         if (branchConfiguration.isPresent() && branchConfiguration.get().getBuildCommitLink().getLink() instanceof IndexableBuildGitCommitLink) {
-            return Ack.validate(jobQueueService.queue(createBuildSyncJob(branch, branchConfiguration.get())).isPresent());
+            return Ack.validate(jobQueueService.queue(createBuildSyncJob(branch, branchConfiguration.get())));
         }
         // Else, nothing has happened
         else {
