@@ -14,6 +14,7 @@ import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepr
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceNotConfiguredException;
 import net.nemerosa.ontrack.extension.scm.model.SCMBuildView;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFileChangeType;
+import net.nemerosa.ontrack.extension.scm.model.SCMIssueCommitBranchInfo;
 import net.nemerosa.ontrack.extension.scm.service.AbstractSCMChangeLogService;
 import net.nemerosa.ontrack.extension.scm.service.SCMService;
 import net.nemerosa.ontrack.git.GitRepositoryClient;
@@ -416,17 +417,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                     SCMIssueCommitBranchInfo branchInfo = SCMIssueCommitBranchInfo.of(branch);
                     // Gets the last build for this branch
                     Optional<Build> buildAfterCommit = getEarliestBuildAfterCommit(commitId, branch, branchConfiguration, client);
-                    if (buildAfterCommit.isPresent()) {
-                        Build build = buildAfterCommit.get();
-                        // Gets the build view
-                        BuildView buildView = structureService.getBuildView(build);
-                        // Adds it to the list
-                        branchInfo = branchInfo.withBuildView(buildView);
-                        // Collects the promotions for the branch
-                        branchInfo = branchInfo.withBranchStatusView(
-                                structureService.getEarliestPromotionsAfterBuild(build)
-                        );
-                    }
+                    branchInfo = scmService.getBranchInfo(buildAfterCommit, branchInfo);
                     // Adds the info
                     commitInfo.add(branchInfo);
                 }

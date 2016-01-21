@@ -4,7 +4,7 @@ import org.junit.Test
 
 class SCMServiceImplTest {
 
-    private SCMServiceImpl service = new SCMServiceImpl()
+    private SCMServiceImpl service = new SCMServiceImpl(structureService)
 
     @Test
     void 'One pattern'() {

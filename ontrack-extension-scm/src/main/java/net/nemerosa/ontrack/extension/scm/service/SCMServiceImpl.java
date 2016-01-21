@@ -1,10 +1,15 @@
 package net.nemerosa.ontrack.extension.scm.service;
 
-import com.google.common.base.Predicates;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFile;
+import net.nemerosa.ontrack.extension.scm.model.SCMIssueCommitBranchInfo;
+import net.nemerosa.ontrack.model.structure.Build;
+import net.nemerosa.ontrack.model.structure.BuildView;
+import net.nemerosa.ontrack.model.structure.StructureService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -12,6 +17,13 @@ import java.util.stream.Collectors;
 
 @Service
 public class SCMServiceImpl implements SCMService {
+
+    private final StructureService structureService;
+
+    @Autowired
+    public SCMServiceImpl(StructureService structureService) {
+        this.structureService = structureService;
+    }
 
     @Override
     public <T extends SCMChangeLogFile> String diff(List<T> changeLogFiles, List<String> patterns, Function<T, String> diffFn) {
@@ -48,6 +60,24 @@ public class SCMServiceImpl implements SCMService {
                             pattern -> pattern.matcher(path).matches()
                     );
         }
+    }
+
+    @Override
+    public SCMIssueCommitBranchInfo getBranchInfo(Optional<Build> buildAfterCommit, SCMIssueCommitBranchInfo branchInfo) {
+        SCMIssueCommitBranchInfo info = branchInfo;
+        if (buildAfterCommit.isPresent()) {
+            Build build = buildAfterCommit.get();
+            // Gets the build view
+            BuildView buildView = structureService.getBuildView(build);
+            // Adds it to the list
+            info = info.withBuildView(buildView);
+            // Collects the promotions for the branch
+            info = info.withBranchStatusView(
+                    structureService.getEarliestPromotionsAfterBuild(build)
+            );
+        }
+        // OK
+        return info;
     }
 
 }
