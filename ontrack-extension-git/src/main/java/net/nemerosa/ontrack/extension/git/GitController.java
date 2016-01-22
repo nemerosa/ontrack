@@ -22,7 +22,6 @@ import net.nemerosa.ontrack.model.buildfilter.BuildDiff;
 import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
-import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.ID;
@@ -181,7 +180,7 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
      */
     @RequestMapping(value = "sync/{branchId}", method = RequestMethod.POST)
     public Ack launchBuildSync(@PathVariable ID branchId) {
-        return gitService.launchBuildSync(branchId);
+        return Ack.validate(gitService.launchBuildSync(branchId, false));
     }
 
     /**

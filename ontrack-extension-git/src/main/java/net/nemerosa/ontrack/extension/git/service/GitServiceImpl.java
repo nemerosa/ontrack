@@ -34,11 +34,14 @@ import net.nemerosa.ontrack.tx.Transaction;
 import net.nemerosa.ontrack.tx.TransactionService;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
@@ -48,7 +51,10 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 
 @Service
+@Transactional
 public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration, GitBuildInfo, GitChangeLogIssue> implements GitService, JobProvider {
+
+    private final Logger logger = LoggerFactory.getLogger(GitService.class);
 
     private final PropertyService propertyService;
     private final IssueServiceRegistry issueServiceRegistry;
@@ -134,18 +140,23 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     @Override
-    public Ack launchBuildSync(ID branchId) {
+    public Optional<Future<?>> launchBuildSync(ID branchId, boolean synchronous) {
         // Gets the branch
         Branch branch = structureService.getBranch(branchId);
         // Gets its configuration
         Optional<GitBranchConfiguration> branchConfiguration = getBranchConfiguration(branch);
         // If valid, launches a job
         if (branchConfiguration.isPresent() && branchConfiguration.get().getBuildCommitLink().getLink() instanceof IndexableBuildGitCommitLink) {
-            return Ack.validate(jobQueueService.queue(createBuildSyncJob(branch, branchConfiguration.get())));
+            if (synchronous) {
+                buildSync(branch, branchConfiguration.get(), logger::debug);
+                return Optional.of(CompletableFuture.completedFuture(Boolean.TRUE));
+            } else {
+                return jobQueueService.queue(createBuildSyncJob(branch, branchConfiguration.get()));
+            }
         }
         // Else, nothing has happened
         else {
-            return Ack.NOK;
+            return Optional.empty();
         }
     }
 
