@@ -6,9 +6,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class DefaultJobScheduler implements JobScheduler {
 
@@ -40,16 +39,27 @@ public class DefaultJobScheduler implements JobScheduler {
         // Creates and starts the scheduled service
         logger.info("[job] Starting service {}", job.getKey());
         JobScheduledService jobScheduledService = new JobScheduledService(decoratedTask, schedule, scheduledExecutorService);
-        // Starts the service
         // Registration
         services.put(job.getKey(), jobScheduledService);
     }
 
+    @Override
+    public Future<?> fireImmediately(JobKey jobKey) {
+        // Gets the existing scheduled service
+        JobScheduledService jobScheduledService = services.get(jobKey);
+        if (jobScheduledService == null) {
+            throw new JobNotScheduledException(jobKey);
+        }
+        // Fires the job immediately
+        return jobScheduledService.fireImmediately();
+    }
 
     private class JobScheduledService implements Runnable {
 
         private final Runnable decoratedTask;
         private final ScheduledFuture<?> scheduledFuture;
+
+        private AtomicReference<CompletableFuture<?>> completableFuture = new AtomicReference<>();
 
         private JobScheduledService(Runnable decoratedTask, Schedule schedule, ScheduledExecutorService scheduledExecutorService) {
             this.decoratedTask = decoratedTask;
@@ -63,12 +73,33 @@ public class DefaultJobScheduler implements JobScheduler {
 
         @Override
         public void run() {
-            decoratedTask.run();
+            fireImmediately();
         }
 
         public void cancel() {
             scheduledFuture.cancel(false);
             // The decorated task might still run
+        }
+
+        public Future<?> fireImmediately() {
+            return completableFuture.updateAndGet(this::optionallyFireTask);
+        }
+
+        protected CompletableFuture<?> optionallyFireTask(CompletableFuture<?> runningCompletableFuture) {
+            if (runningCompletableFuture != null) {
+                return runningCompletableFuture;
+            } else {
+                return fireTask();
+            }
+        }
+
+        protected CompletableFuture<Void> fireTask() {
+            return CompletableFuture
+                    .runAsync(decoratedTask, scheduledExecutorService)
+                    .whenComplete((ignored, ex) -> {
+                        completableFuture.set(null);
+                        // TODO Stores the exception
+                    });
         }
     }
 }

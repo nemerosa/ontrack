@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.job;
 
+import java.util.concurrent.Future;
+
 public interface JobScheduler {
 
     /**
@@ -11,5 +13,10 @@ public interface JobScheduler {
     // TODO Gets list of job statuses
 
     // TODO Fires a job immediately
+
+    /**
+     * Fires a job immediately, without waiting the schedule
+     */
+    Future<?> fireImmediately(JobKey jobKey);
 
 }
