@@ -23,4 +23,9 @@ public class CountJob implements Job {
             System.out.println("Count = " + count);
         };
     }
+
+    @Override
+    public String getDescription() {
+        return "Count";
+    }
 }

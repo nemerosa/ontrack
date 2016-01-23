@@ -1,19 +1,18 @@
 package net.nemerosa.ontrack.job.support;
 
-import net.nemerosa.ontrack.job.JobScheduler;
-import net.nemerosa.ontrack.job.NOPJobDecorator;
-import net.nemerosa.ontrack.job.Schedule;
+import net.nemerosa.ontrack.job.*;
 import org.junit.Test;
 
+import java.util.Map;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class DefaultJobSchedulerTest {
 
-    // TODO Statuses
     // TODO Errors
+    // TODO Removing a job
 
     @Test
     public void schedule() throws InterruptedException {
@@ -62,7 +61,11 @@ public class DefaultJobSchedulerTest {
         LongCountJob job = new LongCountJob();
         // Fires now
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
+        // After 2 seconds, nothing has happened yet
+        Thread.sleep(2000);
         assertEquals(0, job.getCount());
+        // Checks its status
+        assertTrue(jobScheduler.getJobStatus(job.getKey()).isRunning());
         // Fires immediately and waits for the result
         Future<?> future = jobScheduler.fireImmediately(job.getKey());
         // The job is already running, count is still 0
@@ -70,6 +73,31 @@ public class DefaultJobSchedulerTest {
         // Waits until completion
         future.get(1, TimeUnit.MINUTES);
         assertEquals(1, job.getCount());
+    }
+
+    @Test
+    public void statuses() throws InterruptedException, ExecutionException, TimeoutException {
+        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService);
+
+        LongCountJob longCountJob = new LongCountJob();
+        jobScheduler.schedule(longCountJob, Schedule.EVERY_SECOND);
+
+        CountJob countJob = new CountJob();
+        jobScheduler.schedule(countJob, Schedule.EVERY_SECOND.after(60));
+
+        // After 2 seconds, the long job is already running, not the short one
+        Thread.sleep(2000);
+        Map<JobKey, JobStatus> statuses = jobScheduler.getJobStatuses().stream().collect(Collectors.toMap(
+                JobStatus::getKey,
+                status -> status
+        ));
+
+        JobStatus longStatus = statuses.get(longCountJob.getKey());
+        assertTrue(longStatus.isRunning());
+
+        JobStatus shortStatus = statuses.get(countJob.getKey());
+        assertFalse(shortStatus.isRunning());
     }
 
 }

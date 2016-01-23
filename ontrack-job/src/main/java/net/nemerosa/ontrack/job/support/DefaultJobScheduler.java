@@ -4,10 +4,12 @@ import net.nemerosa.ontrack.job.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 public class DefaultJobScheduler implements JobScheduler {
 
@@ -38,9 +40,27 @@ public class DefaultJobScheduler implements JobScheduler {
         Runnable decoratedTask = jobDecorator.decorate(job, jobTask);
         // Creates and starts the scheduled service
         logger.info("[job] Starting service {}", job.getKey());
-        JobScheduledService jobScheduledService = new JobScheduledService(decoratedTask, schedule, scheduledExecutorService);
+        // TODO Copy stats from old schedule
+        JobScheduledService jobScheduledService = new JobScheduledService(job, decoratedTask, schedule, scheduledExecutorService);
         // Registration
         services.put(job.getKey(), jobScheduledService);
+    }
+
+    @Override
+    public JobStatus getJobStatus(JobKey key) {
+        JobScheduledService existingService = services.get(key);
+        if (existingService != null) {
+            return existingService.getJobStatus();
+        } else {
+            throw new JobNotScheduledException(key);
+        }
+    }
+
+    @Override
+    public Collection<JobStatus> getJobStatuses() {
+        return services.values().stream()
+                .map(JobScheduledService::getJobStatus)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -56,12 +76,14 @@ public class DefaultJobScheduler implements JobScheduler {
 
     private class JobScheduledService implements Runnable {
 
+        private final Job job;
         private final Runnable decoratedTask;
         private final ScheduledFuture<?> scheduledFuture;
 
         private AtomicReference<CompletableFuture<?>> completableFuture = new AtomicReference<>();
 
-        private JobScheduledService(Runnable decoratedTask, Schedule schedule, ScheduledExecutorService scheduledExecutorService) {
+        private JobScheduledService(Job job, Runnable decoratedTask, Schedule schedule, ScheduledExecutorService scheduledExecutorService) {
+            this.job = job;
             this.decoratedTask = decoratedTask;
             scheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(
                     this,
@@ -100,6 +122,20 @@ public class DefaultJobScheduler implements JobScheduler {
                         completableFuture.set(null);
                         // TODO Stores the exception
                     });
+        }
+
+        public JobStatus getJobStatus() {
+            return new JobStatus(
+                    job.getKey(),
+                    job.getDescription(),
+                    completableFuture.get() != null,
+                    0, // TODO Run count
+                    null, // TODO Last run date
+                    0, // TODO Duration of last run
+                    null, // TODO Next execution
+                    0, // TODO Last error count
+                    null // TODO Last error message
+            );
         }
     }
 }

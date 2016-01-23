@@ -11,4 +11,9 @@ public interface Job {
      * Task to be run by the job
      */
     Runnable getTask();
+
+    /**
+     * Gets a description for the job
+     */
+    String getDescription();
 }

@@ -9,7 +9,7 @@ public class LongCountJob implements Job {
 
     @Override
     public JobKey getKey() {
-        return new JobKey("test", "count");
+        return new JobKey("test", "long-count");
     }
 
     public int getCount() {
@@ -27,5 +27,10 @@ public class LongCountJob implements Job {
             count++;
             System.out.println("Count = " + count);
         };
+    }
+
+    @Override
+    public String getDescription() {
+        return "Long count";
     }
 }
