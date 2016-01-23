@@ -44,6 +44,10 @@ angular.module('ontrack.extension.git', [
                 } else {
                     otNotificationService.success("The Git synchronisation has been launched in the background.");
                 }
+                // Loads the Git synchronisation information
+                return ot.pageCall($http.get($scope.project._gitSync));
+            }).then(function (gitSyncInfo){
+                $scope.gitSyncInfo = gitSyncInfo;
             }).finally(function () {
                 $scope.synchronising = false;
             });
