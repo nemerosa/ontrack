@@ -33,9 +33,11 @@ ext {
             dbinit                      : 'net.sf.dbinit:dbinit:1.4.0',
             h2                          : 'com.h2database:h2:1.4.189',
             args4j                      : 'args4j:args4j:2.0.29',
+            quartz                      : 'org.quartz-scheduler:quartz:2.2.2',
 
             // Spring
             spring_context              : "org.springframework:spring-context:${springVersion}",
+            spring_context_support      : "org.springframework:spring-context-support:${springVersion}",
             spring_jdbc                 : "org.springframework:spring-jdbc:${springVersion}",
             spring_tx                   : "org.springframework:spring-tx:${springVersion}",
             spring_webmvc               : "org.springframework:spring-webmvc:${springVersion}",
