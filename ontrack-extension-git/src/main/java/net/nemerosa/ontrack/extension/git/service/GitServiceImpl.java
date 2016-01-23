@@ -836,9 +836,11 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             @Override
             public String getDescription() {
                 return format(
-                        "Git indexation for %s",
-                        config.getName()
-                );
+                        "Git indexation for %s (%s @ %s)",
+                        config.getRemote(),
+                        config.getName(),
+                        config.getType()
+                        );
             }
 
             @Override
