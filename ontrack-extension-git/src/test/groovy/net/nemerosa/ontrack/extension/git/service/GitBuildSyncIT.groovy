@@ -20,13 +20,11 @@ import net.nemerosa.ontrack.model.structure.StructureService
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 
-import static net.nemerosa.ontrack.git.support.GitRepositoryClientImplTest.prepare
+import static net.nemerosa.ontrack.git.support.GitRepo.prepare
 import static net.nemerosa.ontrack.test.TestUtils.uid
 
 /**
  * Testing the sync between builds and Git tags.
- *
- * @see GitService#launchBuildSync(net.nemerosa.ontrack.model.structure.ID)
  */
 class GitBuildSyncIT extends AbstractServiceTestSupport {
 

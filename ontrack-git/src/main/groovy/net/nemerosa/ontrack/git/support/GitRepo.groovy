@@ -16,6 +16,55 @@ class GitRepo {
         this.dir = dir
     }
 
+    /**
+     * Preparing a repository
+     */
+    def static prepare(Closure preparation) {
+        def origin = new GitRepo()
+        preparation.delegate = origin
+        preparation(origin)
+        [
+                withClone: { clientAction ->
+                    try {
+                        File wd = File.createTempDir('ontrack-git', '')
+                        try {
+                            // Client
+                            def client = cloneRepo(wd, origin)
+                            // Utility test access
+                            def clientRepo = new GitRepo(wd)
+                            // Runs the action
+                            clientAction(client, clientRepo, origin)
+                        } finally {
+                            wd.deleteDir()
+                        }
+                    } finally {
+                        origin.close()
+                    }
+                },
+                and      : { clientAction ->
+                    clientAction(origin.client, origin)
+                }
+        ]
+    }
+
+    /**
+     * Cloning a local test repository
+     */
+    static GitRepositoryClient cloneRepo(File wd, GitRepo origin) {
+        // Repository definition for the `origin` repository
+        GitRepository originRepository = new GitRepository(
+                'file',
+                'test',
+                origin.dir.absolutePath,
+                '', ''
+        )
+        // Creates the client
+        new GitRepositoryClientImpl(
+                wd,
+                originRepository
+        )
+    }
+
     @Override
     String toString() {
         return dir.toString()
