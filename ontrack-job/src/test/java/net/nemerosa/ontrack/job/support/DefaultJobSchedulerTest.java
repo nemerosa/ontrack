@@ -35,4 +35,21 @@ public class DefaultJobSchedulerTest {
         assertEquals(1, job.getCount());
     }
 
+    @Test
+    public void fire_immediately_in_concurrency() throws InterruptedException, ExecutionException, TimeoutException {
+        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService);
+        LongCountJob job = new LongCountJob();
+        // Fires now
+        jobScheduler.schedule(job, Schedule.EVERY_SECOND);
+        assertEquals(0, job.getCount());
+        // Fires immediately and waits for the result
+        Future<?> future = jobScheduler.fireImmediately(job.getKey());
+        // The job is already running, count is still 0
+        assertEquals(0, job.getCount());
+        // Waits until completion
+        future.get(1, TimeUnit.MINUTES);
+        assertEquals(1, job.getCount());
+    }
+
 }
