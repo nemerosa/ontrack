@@ -65,7 +65,7 @@ public class DefaultJobScheduler implements JobScheduler {
             this.decoratedTask = decoratedTask;
             scheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(
                     this,
-                    0,
+                    schedule.getInitialPeriod(),
                     schedule.getPeriod(),
                     schedule.getUnit()
             );

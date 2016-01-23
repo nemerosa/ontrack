@@ -37,9 +37,9 @@ public class DefaultJobSchedulerTest {
         assertTrue(count == 3);
         // Then every minute
         jobScheduler.schedule(job, new Schedule(1, 1, TimeUnit.MINUTES));
-        // Checks after three more seconds than the count has not moved only by one
+        // Checks after three more seconds than the count has not moved
         Thread.sleep(3000);
-        assertEquals(count + 1, job.getCount());
+        assertEquals(count, job.getCount());
     }
 
     @Test
