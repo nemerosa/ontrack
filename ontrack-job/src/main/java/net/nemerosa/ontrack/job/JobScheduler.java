@@ -12,8 +12,6 @@ public interface JobScheduler {
 
     // TODO Gets list of job statuses
 
-    // TODO Fires a job immediately
-
     /**
      * Fires a job immediately, without waiting the schedule
      */

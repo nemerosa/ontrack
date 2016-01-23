@@ -12,6 +12,9 @@ import static org.junit.Assert.assertTrue;
 
 public class DefaultJobSchedulerTest {
 
+    // TODO Statuses
+    // TODO Errors
+
     @Test
     public void schedule() throws InterruptedException {
         ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
@@ -20,6 +23,23 @@ public class DefaultJobSchedulerTest {
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
         Thread.sleep(3000);
         assertTrue(job.getCount() >= 2);
+    }
+
+    @Test
+    public void reschedule() throws InterruptedException {
+        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService);
+        CountJob job = new CountJob();
+        // Initially every second
+        jobScheduler.schedule(job, Schedule.EVERY_SECOND);
+        Thread.sleep(2500);
+        int count = job.getCount();
+        assertTrue(count == 3);
+        // Then every minute
+        jobScheduler.schedule(job, new Schedule(1, 1, TimeUnit.MINUTES));
+        // Checks after three more seconds than the count has not moved only by one
+        Thread.sleep(3000);
+        assertEquals(count + 1, job.getCount());
     }
 
     @Test
