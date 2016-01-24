@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.job.support;
 
 import net.nemerosa.ontrack.job.*;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +47,8 @@ public class DefaultJobPortal implements JobPortal, Job {
     protected void register(JobProvider jobProvider) {
         logger.debug("[job-portal] Running the registration for {}", jobProvider);
         Collection<JobDefinition> jobDefinitions = jobProvider.getJobs();
+        // Checks type consistency
+        jobDefinitions.forEach(jobDefinition -> checkJobType(jobProvider, jobDefinition));
         // Get all keys
         Set<JobKey> jobKeys = jobDefinitions.stream().map(definition -> definition.getJob().getKey()).collect(Collectors.toSet());
         // Get keys of jobs being already registered
@@ -57,6 +60,16 @@ public class DefaultJobPortal implements JobPortal, Job {
         jobToUnschedule.forEach(jobScheduler::unschedule);
         // Reschedule jobs (only when different schedule)
         jobDefinitions.forEach(this::reschedule);
+    }
+
+    protected void checkJobType(JobProvider jobProvider, JobDefinition jobDefinition) {
+        if (!StringUtils.equals(jobProvider.getType(), jobDefinition.getJob().getKey().getType())) {
+            throw new JobProviderTypeInconsistencyException(
+                    jobProvider.getClass(),
+                    jobProvider.getType(),
+                    jobDefinition.getJob().getKey()
+            );
+        }
     }
 
     protected void reschedule(JobDefinition jobDefinition) {
