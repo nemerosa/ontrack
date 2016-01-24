@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.job.support;
 
+import com.google.common.collect.ImmutableSet;
 import net.nemerosa.ontrack.job.*;
 import org.junit.Test;
 
@@ -178,6 +179,36 @@ public class DefaultJobSchedulerTest {
         test_with_pause(
                 (jobScheduler, job) -> jobScheduler.pause(),
                 (jobScheduler, job) -> jobScheduler.resume()
+        );
+    }
+
+    @Test
+    public void keys() throws InterruptedException, ExecutionException, TimeoutException {
+        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService);
+
+        LongCountJob longCountJob = new LongCountJob();
+        CountJob countJob = new CountJob();
+
+        jobScheduler.schedule(longCountJob, Schedule.EVERY_SECOND);
+        jobScheduler.schedule(countJob, Schedule.EVERY_SECOND);
+        OtherTypeJob otherTypeJob = new OtherTypeJob();
+
+        jobScheduler.schedule(otherTypeJob, Schedule.EVERY_SECOND);
+
+        assertEquals(
+                ImmutableSet.of(longCountJob.getKey(), countJob.getKey(), otherTypeJob.getKey()),
+                jobScheduler.getAllJobKeys()
+        );
+
+        assertEquals(
+                ImmutableSet.of(longCountJob.getKey(), countJob.getKey()),
+                jobScheduler.getJobKeysOfType("test")
+        );
+
+        assertEquals(
+                ImmutableSet.of(otherTypeJob.getKey()),
+                jobScheduler.getJobKeysOfType("test-other")
         );
     }
 

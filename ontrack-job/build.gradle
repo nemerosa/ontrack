@@ -4,4 +4,6 @@ dependencies {
     compile project(':ontrack-common')
     compile libraries.spring_context
     compile libraries.slf4j_api
+
+    testCompile libraries.guava
 }

@@ -42,6 +42,18 @@ public interface JobScheduler {
     JobStatus getJobStatus(JobKey key);
 
     /**
+     * Gets all the job keys
+     */
+    Collection<JobKey> getAllJobKeys();
+
+    /**
+     * Gets all the job keys for a type of job
+     *
+     * @see JobKey#getType()
+     */
+    Collection<JobKey> getJobKeysOfType(String type);
+
+    /**
      * Gets the list of job statuses
      */
     Collection<JobStatus> getJobStatuses();
