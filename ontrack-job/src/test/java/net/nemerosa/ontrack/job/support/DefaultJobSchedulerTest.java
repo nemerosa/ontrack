@@ -65,7 +65,7 @@ public class DefaultJobSchedulerTest {
         Thread.sleep(2000);
         assertEquals(0, job.getCount());
         // Checks its status
-        assertTrue(jobScheduler.getJobStatus(job.getKey()).isRunning());
+        assertTrue(jobScheduler.getJobStatus(job.getKey()).get().isRunning());
         // Fires immediately and waits for the result
         Future<?> future = jobScheduler.fireImmediately(job.getKey());
         // The job is already running, count is still 0
@@ -122,7 +122,7 @@ public class DefaultJobSchedulerTest {
         // Fires now
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
         // The job is now running
-        assertTrue(jobScheduler.getJobStatus(job.getKey()).isRunning());
+        assertTrue(jobScheduler.getJobStatus(job.getKey()).get().isRunning());
         // Now, removes the job
         jobScheduler.unschedule(job.getKey());
         // Waits a bit, and checks the job has stopped running
@@ -138,14 +138,14 @@ public class DefaultJobSchedulerTest {
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
         // After some seconds, the job keeps running and has only failed
         Thread.sleep(2500);
-        JobStatus status = jobScheduler.getJobStatus(job.getKey());
+        JobStatus status = jobScheduler.getJobStatus(job.getKey()).get();
         assertEquals(3, status.getLastErrorCount());
         assertEquals("Failure", status.getLastError());
         // Now, fixes the job
         job.setFail(false);
         // Waits a bit, and checks the job is now OK
         Thread.sleep(2500);
-        status = jobScheduler.getJobStatus(job.getKey());
+        status = jobScheduler.getJobStatus(job.getKey()).get();
         assertEquals(0, status.getLastErrorCount());
         assertNull(status.getLastError());
     }
@@ -241,10 +241,10 @@ public class DefaultJobSchedulerTest {
         jobScheduler.fireImmediately(new JobKey("test", "x"));
     }
 
-    @Test(expected = JobNotScheduledException.class)
+    @Test
     public void job_status_for_not_schedule_job() {
         JobScheduler jobScheduler = createJobScheduler();
-        jobScheduler.getJobStatus(new JobKey("test", "x"));
+        assertFalse(jobScheduler.getJobStatus(new JobKey("test", "x")).isPresent());
     }
 
 }

@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -93,12 +94,12 @@ public class DefaultJobScheduler implements JobScheduler {
     }
 
     @Override
-    public JobStatus getJobStatus(JobKey key) {
+    public Optional<JobStatus> getJobStatus(JobKey key) {
         JobScheduledService existingService = services.get(key);
         if (existingService != null) {
-            return existingService.getJobStatus();
+            return Optional.of(existingService.getJobStatus());
         } else {
-            throw new JobNotScheduledException(key);
+            return Optional.empty();
         }
     }
 

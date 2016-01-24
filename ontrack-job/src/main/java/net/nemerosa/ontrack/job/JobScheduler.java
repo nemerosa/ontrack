@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.job;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.concurrent.Future;
 
 public interface JobScheduler {
@@ -39,7 +40,7 @@ public interface JobScheduler {
     /**
      * Gets the status for a job
      */
-    JobStatus getJobStatus(JobKey key);
+    Optional<JobStatus> getJobStatus(JobKey key);
 
     /**
      * Gets all the job keys

@@ -5,10 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class DefaultJobPortal implements JobPortal, Job {
@@ -72,8 +69,8 @@ public class DefaultJobPortal implements JobPortal, Job {
 
     protected void reschedule(JobDefinition jobDefinition) {
         JobKey key = jobDefinition.getJob().getKey();
-        JobStatus jobStatus = jobScheduler.getJobStatus(key);
-        if (jobStatus.getSchedule().sameDelayThan(jobDefinition.getSchedule())) {
+        Optional<JobStatus> jobStatus = jobScheduler.getJobStatus(key);
+        if (jobStatus.isPresent() && jobStatus.get().getSchedule().sameDelayThan(jobDefinition.getSchedule())) {
             logger.debug("[job][system][job-portal] Not rescheduling [{}][{}] - same schedule", key.getType(), key.getId());
         } else {
             logger.debug("[job][system][job-portal] Rescheduling [{}][{}] with schedule {}", key.getType(), key.getId(), jobDefinition.getSchedule());
