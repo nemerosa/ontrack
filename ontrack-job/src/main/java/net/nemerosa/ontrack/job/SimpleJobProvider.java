@@ -6,7 +6,7 @@ import java.util.LinkedList;
 public class SimpleJobProvider implements JobProvider {
 
     private final String type;
-    private final Collection<JobDefinition> jobs = new LinkedList<>();
+    private Collection<JobDefinition> jobs = new LinkedList<>();
 
     public SimpleJobProvider(String type) {
         this.type = type;
@@ -22,10 +22,10 @@ public class SimpleJobProvider implements JobProvider {
         return jobs;
     }
 
-    public SimpleJobProvider withJobs(Schedule schedule, Job... jobs) {
+    public void setJobs(Schedule schedule, Job... jobs) {
+        this.jobs.clear();
         for (Job job : jobs) {
             this.jobs.add(new JobDefinition(job, schedule));
         }
-        return this;
     }
 }

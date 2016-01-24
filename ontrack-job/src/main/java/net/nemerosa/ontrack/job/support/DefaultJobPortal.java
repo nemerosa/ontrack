@@ -52,9 +52,14 @@ public class DefaultJobPortal implements JobPortal, Job {
         Set<JobKey> jobToUnschedule = new HashSet<>(scheduledKeys);
         jobToUnschedule.removeAll(jobKeys);
         // Removes the unscheduled jobs
-        jobToUnschedule.forEach(jobScheduler::unschedule);
+        jobToUnschedule.forEach(this::unschedule);
         // Reschedule jobs (only when different schedule)
         jobDefinitions.forEach(this::reschedule);
+    }
+
+    private void unschedule(JobKey key) {
+        logger.debug("[job][system][job-portal] Unscheduling [{}][{}]", key.getType(), key.getId());
+        jobScheduler.unschedule(key);
     }
 
     protected void checkJobType(JobProvider jobProvider, JobDefinition jobDefinition) {
