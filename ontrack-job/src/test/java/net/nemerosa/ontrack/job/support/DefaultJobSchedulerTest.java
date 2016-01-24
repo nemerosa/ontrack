@@ -11,8 +11,6 @@ import static org.junit.Assert.*;
 
 public class DefaultJobSchedulerTest {
 
-    // TODO Errors
-
     @Test
     public void schedule() throws InterruptedException {
         ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
@@ -114,6 +112,27 @@ public class DefaultJobSchedulerTest {
         // Waits a bit, and checks the job has stopped running
         Thread.sleep(2500);
         assertEquals(3, job.getCount());
+    }
+
+    @Test
+    public void job_failures() throws InterruptedException, ExecutionException, TimeoutException {
+        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService);
+        ErrorJob job = new ErrorJob();
+        // Fires now
+        jobScheduler.schedule(job, Schedule.EVERY_SECOND);
+        // After some seconds, the job keeps running and has only failed
+        Thread.sleep(2500);
+        JobStatus status = jobScheduler.getJobStatus(job.getKey());
+        assertEquals(3, status.getLastErrorCount());
+        assertEquals("Failure", status.getLastError());
+        // Now, fixes the job
+        job.setFail(false);
+        // Waits a bit, and checks the job is now OK
+        Thread.sleep(2500);
+        status = jobScheduler.getJobStatus(job.getKey());
+        assertEquals(0, status.getLastErrorCount());
+        assertNull(status.getLastError());
     }
 
 }

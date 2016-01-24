@@ -1,13 +1,17 @@
 package net.nemerosa.ontrack.job.support;
 
+import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.job.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -40,8 +44,8 @@ public class DefaultJobScheduler implements JobScheduler {
         Runnable decoratedTask = jobDecorator.decorate(job, jobTask);
         // Creates and starts the scheduled service
         logger.info("[job] Starting service {}", job.getKey());
-        // TODO Copy stats from old schedule
-        JobScheduledService jobScheduledService = new JobScheduledService(job, decoratedTask, schedule, scheduledExecutorService);
+        // Copy stats from old schedule
+        JobScheduledService jobScheduledService = new JobScheduledService(job, decoratedTask, schedule, scheduledExecutorService, existingService);
         // Registration
         services.put(job.getKey(), jobScheduledService);
     }
@@ -85,14 +89,31 @@ public class DefaultJobScheduler implements JobScheduler {
     private class JobScheduledService implements Runnable {
 
         private final Job job;
-        private final Runnable decoratedTask;
+        private final Schedule schedule;
+        private final Runnable monitoredTask;
         private final ScheduledFuture<?> scheduledFuture;
 
-        private AtomicReference<CompletableFuture<?>> completableFuture = new AtomicReference<>();
+        private final AtomicReference<CompletableFuture<?>> completableFuture = new AtomicReference<>();
 
-        private JobScheduledService(Job job, Runnable decoratedTask, Schedule schedule, ScheduledExecutorService scheduledExecutorService) {
+        private final AtomicLong runCount = new AtomicLong();
+        private final AtomicReference<LocalDateTime> lastRunDate = new AtomicReference<>();
+        private final AtomicLong lastRunDurationMs = new AtomicLong();
+        private final AtomicLong lastErrorCount = new AtomicLong();
+        private final AtomicReference<String> lastError = new AtomicReference<>(null);
+
+        private JobScheduledService(Job job, Runnable decoratedTask, Schedule schedule, ScheduledExecutorService scheduledExecutorService, JobScheduledService old) {
             this.job = job;
-            this.decoratedTask = decoratedTask;
+            this.schedule = schedule;
+            this.monitoredTask = new MonitoredTask(decoratedTask);
+            // Copies stats from old service
+            if (old != null) {
+                runCount.set(old.runCount.get());
+                lastRunDate.set(old.lastRunDate.get());
+                lastRunDurationMs.set(old.lastRunDurationMs.get());
+                lastErrorCount.set(old.lastErrorCount.get());
+                lastError.set(old.lastError.get());
+            }
+            // Scheduling now
             scheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(
                     this,
                     schedule.getInitialPeriod(),
@@ -129,11 +150,8 @@ public class DefaultJobScheduler implements JobScheduler {
 
         protected CompletableFuture<Void> fireTask() {
             return CompletableFuture
-                    .runAsync(decoratedTask, scheduledExecutorService)
-                    .whenComplete((ignored, ex) -> {
-                        completableFuture.set(null);
-                        // TODO Stores the exception
-                    });
+                    .runAsync(monitoredTask, scheduledExecutorService)
+                    .whenComplete((ignored, ex) -> completableFuture.set(null));
         }
 
         public JobStatus getJobStatus() {
@@ -141,13 +159,54 @@ public class DefaultJobScheduler implements JobScheduler {
                     job.getKey(),
                     job.getDescription(),
                     completableFuture.get() != null,
-                    0, // TODO Run count
-                    null, // TODO Last run date
-                    0, // TODO Duration of last run
-                    null, // TODO Next execution
-                    0, // TODO Last error count
-                    null // TODO Last error message
+                    runCount.get(),
+                    lastRunDate.get(),
+                    lastRunDurationMs.get(),
+                    getNextRunDate(),
+                    lastErrorCount.get(),
+                    lastError.get()
             );
+        }
+
+        private LocalDateTime getNextRunDate() {
+            LocalDateTime date = lastRunDate.get();
+            if (date != null) {
+                return date.plus(schedule.toMiliseconds(), ChronoUnit.MILLIS);
+            } else {
+                return null;
+            }
+        }
+
+        private class MonitoredTask implements Runnable {
+
+            private final Runnable decoratedTask;
+
+            public MonitoredTask(Runnable decoratedTask) {
+                this.decoratedTask = decoratedTask;
+            }
+
+            @Override
+            public void run() {
+                try {
+                    lastRunDate.set(Time.now());
+                    runCount.incrementAndGet();
+                    // Runs the job
+                    long _start = System.currentTimeMillis();
+                    try {
+                        decoratedTask.run();
+                    } finally {
+                        long _end = System.currentTimeMillis();
+                        lastRunDurationMs.set(_end - _start);
+                    }
+                    // No error - resetting the counters
+                    lastErrorCount.set(0);
+                    lastError.set(null);
+                } catch (RuntimeException ex) {
+                    lastErrorCount.incrementAndGet();
+                    lastError.set(ex.getMessage());
+                    throw ex;
+                }
+            }
         }
     }
 }
