@@ -12,7 +12,7 @@ public class DefaultJobPortalTest {
 
     @Test
     public void portal() throws InterruptedException {
-        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, Executors.newSingleThreadScheduledExecutor());
+        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, Executors.newSingleThreadScheduledExecutor(), SimpleJobErrorReport.INSTANCE);
         JobPortal jobPortal = new DefaultJobPortal(jobScheduler, Schedule.EVERY_MINUTE);
 
         // Counts

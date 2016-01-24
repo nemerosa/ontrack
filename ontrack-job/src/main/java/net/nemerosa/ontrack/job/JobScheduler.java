@@ -3,8 +3,6 @@ package net.nemerosa.ontrack.job;
 import java.util.Collection;
 import java.util.concurrent.Future;
 
-// TODO Job error reporter
-
 public interface JobScheduler {
 
     /**

@@ -22,13 +22,15 @@ public class DefaultJobScheduler implements JobScheduler {
 
     private final JobDecorator jobDecorator;
     private final ScheduledExecutorService scheduledExecutorService;
+    private final JobErrorReporter jobErrorReporter;
 
     private final Map<JobKey, JobScheduledService> services = new ConcurrentHashMap<>(new TreeMap<>());
     private final AtomicBoolean schedulerPaused = new AtomicBoolean(false);
 
-    public DefaultJobScheduler(JobDecorator jobDecorator, ScheduledExecutorService scheduledExecutorService) {
+    public DefaultJobScheduler(JobDecorator jobDecorator, ScheduledExecutorService scheduledExecutorService, JobErrorReporter jobErrorReporter) {
         this.jobDecorator = jobDecorator;
         this.scheduledExecutorService = scheduledExecutorService;
+        this.jobErrorReporter = jobErrorReporter;
     }
 
     @Override
@@ -242,6 +244,7 @@ public class DefaultJobScheduler implements JobScheduler {
             @Override
             public void run() {
                 if (isEnabled()) {
+                    // TODO Job listener (for metrics)
                     try {
                         logger.debug("[job][{}][{}] Running now", job.getKey().getType(), job.getKey().getId());
                         lastRunDate.set(Time.now());
@@ -256,11 +259,13 @@ public class DefaultJobScheduler implements JobScheduler {
                         // No error - resetting the counters
                         lastErrorCount.set(0);
                         lastError.set(null);
-                    } catch (RuntimeException ex) {
+                    } catch (Exception ex) {
                         lastErrorCount.incrementAndGet();
                         lastError.set(ex.getMessage());
                         logger.error("[job][{}][{}] Error: {}", job.getKey().getType(), job.getKey().getId(), ex.getMessage());
-                        // TODO Error reporter
+                        // Reporter
+                        jobErrorReporter.onJobError(getJobStatus(), ex);
+                        // Rethrows the error
                         throw ex;
                     }
                 } else {
