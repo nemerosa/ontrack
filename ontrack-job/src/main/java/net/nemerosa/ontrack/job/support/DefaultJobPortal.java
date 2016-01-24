@@ -31,21 +31,19 @@ public class DefaultJobPortal implements JobPortal, Job {
 
     @Override
     public JobKey getKey() {
-        return new JobKey("job", "portal");
+        return new JobKey("system", "job-portal");
     }
 
     @Override
     public Runnable getTask() {
         return () -> {
-            logger.debug("[job-portal] Running the registration");
-            for (JobProvider jobProvider : jobProviders) {
-                register(jobProvider);
-            }
+            logger.debug("[job][system][job-portal] Running the registration for {} providers", jobProviders.size());
+            jobProviders.forEach(this::register);
         };
     }
 
     protected void register(JobProvider jobProvider) {
-        logger.debug("[job-portal] Running the registration for {}", jobProvider);
+        logger.debug("[job][system][job-portal] Running the registration for {}", jobProvider);
         Collection<JobDefinition> jobDefinitions = jobProvider.getJobs();
         // Checks type consistency
         jobDefinitions.forEach(jobDefinition -> checkJobType(jobProvider, jobDefinition));
@@ -76,9 +74,9 @@ public class DefaultJobPortal implements JobPortal, Job {
         JobKey key = jobDefinition.getJob().getKey();
         JobStatus jobStatus = jobScheduler.getJobStatus(key);
         if (jobStatus.getSchedule().sameDelayThan(jobDefinition.getSchedule())) {
-            logger.debug("[job-portal] Not rescheduling {} - same schedule", key);
+            logger.debug("[job][system][job-portal] Not rescheduling [{}][{}] - same schedule", key.getType(), key.getId());
         } else {
-            logger.debug("[job-portal] Rescheduling {} with schedule {}", key, jobDefinition.getSchedule());
+            logger.debug("[job][system][job-portal] Rescheduling [{}][{}] with schedule {}", key.getType(), key.getId(), jobDefinition.getSchedule());
             jobScheduler.schedule(jobDefinition.getJob(), jobDefinition.getSchedule());
         }
     }

@@ -33,11 +33,11 @@ public class DefaultJobScheduler implements JobScheduler {
 
     @Override
     public void schedule(Job job, Schedule schedule) {
-        logger.info("[job] Scheduling {} with schedule {}", job.getKey(), schedule);
+        logger.info("[job][{}][{}] Scheduling with {}", job.getKey().getType(), job.getKey().getId(), schedule);
         // Manages existing schedule
         JobScheduledService existingService = services.remove(job.getKey());
         if (existingService != null) {
-            logger.info("[job] Stopping existing service for {}", job.getKey());
+            logger.info("[job][{}][{}] Stopping existing schedule", job.getKey().getType(), job.getKey().getId());
             existingService.cancel(false);
         }
         // Gets the job task
@@ -45,7 +45,7 @@ public class DefaultJobScheduler implements JobScheduler {
         // Decorates the task
         Runnable decoratedTask = jobDecorator.decorate(job, jobTask);
         // Creates and starts the scheduled service
-        logger.info("[job] Starting service {}", job.getKey());
+        logger.info("[job][{}][{}] Starting service", job.getKey().getType(), job.getKey().getId());
         // Copy stats from old schedule
         JobScheduledService jobScheduledService = new JobScheduledService(job, decoratedTask, schedule, scheduledExecutorService, existingService);
         // Registration
@@ -243,7 +243,7 @@ public class DefaultJobScheduler implements JobScheduler {
             public void run() {
                 if (isEnabled()) {
                     try {
-                        logger.debug("[job] {} running now", job.getKey());
+                        logger.debug("[job][{}][{}] Running now", job.getKey().getType(), job.getKey().getId());
                         lastRunDate.set(Time.now());
                         runCount.incrementAndGet();
                         // Runs the job
@@ -252,18 +252,19 @@ public class DefaultJobScheduler implements JobScheduler {
                         // No error, counting time
                         long _end = System.currentTimeMillis();
                         lastRunDurationMs.set(_end - _start);
-                        logger.debug("[job] {} ran in {} ms", job.getKey(), lastRunDurationMs.get());
+                        logger.debug("[job][{}][{}] Ran in {} ms", job.getKey().getType(), job.getKey().getId(), lastRunDurationMs.get());
                         // No error - resetting the counters
                         lastErrorCount.set(0);
                         lastError.set(null);
                     } catch (RuntimeException ex) {
                         lastErrorCount.incrementAndGet();
                         lastError.set(ex.getMessage());
-                        logger.debug("[job] {} in error", job.getKey());
+                        logger.error("[job][{}][{}] Error: {}", job.getKey().getType(), job.getKey().getId(), ex.getMessage());
+                        // TODO Error reporter
                         throw ex;
                     }
                 } else {
-                    logger.debug("[job] {} is not enabled", job.getKey());
+                    logger.debug("[job][{}][{}] Not enabled", job.getKey().getType(), job.getKey().getId());
                 }
             }
         }

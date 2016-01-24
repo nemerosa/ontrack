@@ -20,6 +20,7 @@ public class Schedule {
     }
 
     public static final Schedule EVERY_SECOND = everySeconds(1);
+    public static final Schedule EVERY_MINUTE = everySeconds(60);
 
     public Schedule after(int initial) {
         return new Schedule(
