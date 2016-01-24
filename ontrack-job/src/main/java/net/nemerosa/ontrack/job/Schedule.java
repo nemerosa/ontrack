@@ -28,4 +28,9 @@ public class Schedule {
                 unit
         );
     }
+
+    public boolean sameDelayThan(Schedule schedule) {
+        return this.period == schedule.period && this.unit.equals(schedule.unit);
+    }
+
 }

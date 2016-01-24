@@ -4,6 +4,8 @@ import java.util.Collection;
 
 public interface JobProvider {
 
-    Collection<Job> getJobs();
+    String getType();
+
+    Collection<JobDefinition> getJobs();
 
 }

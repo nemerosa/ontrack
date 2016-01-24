@@ -202,6 +202,7 @@ public class DefaultJobScheduler implements JobScheduler {
         public JobStatus getJobStatus() {
             return new JobStatus(
                     job.getKey(),
+                    schedule,
                     job.getDescription(),
                     completableFuture.get() != null,
                     runCount.get(),

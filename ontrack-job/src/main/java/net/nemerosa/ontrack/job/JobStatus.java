@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 public class JobStatus {
 
     private final JobKey key;
+    private final Schedule schedule;
     private final String description;
     private final boolean running;
     private final long runCount;
