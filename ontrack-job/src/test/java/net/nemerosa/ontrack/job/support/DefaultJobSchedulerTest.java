@@ -122,6 +122,7 @@ public class DefaultJobSchedulerTest {
         // Fires now
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
         // The job is now running
+        Thread.sleep(1000);
         assertTrue(jobScheduler.getJobStatus(job.getKey()).get().isRunning());
         // Now, removes the job
         jobScheduler.unschedule(job.getKey());
