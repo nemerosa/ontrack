@@ -22,15 +22,15 @@ public class DefaultJobScheduler implements JobScheduler {
 
     private final JobDecorator jobDecorator;
     private final ScheduledExecutorService scheduledExecutorService;
-    private final JobErrorReporter jobErrorReporter;
+    private final JobListener jobListener;
 
     private final Map<JobKey, JobScheduledService> services = new ConcurrentHashMap<>(new TreeMap<>());
     private final AtomicBoolean schedulerPaused = new AtomicBoolean(false);
 
-    public DefaultJobScheduler(JobDecorator jobDecorator, ScheduledExecutorService scheduledExecutorService, JobErrorReporter jobErrorReporter) {
+    public DefaultJobScheduler(JobDecorator jobDecorator, ScheduledExecutorService scheduledExecutorService, JobListener jobListener) {
         this.jobDecorator = jobDecorator;
         this.scheduledExecutorService = scheduledExecutorService;
-        this.jobErrorReporter = jobErrorReporter;
+        this.jobListener = jobListener;
     }
 
     @Override
@@ -244,11 +244,12 @@ public class DefaultJobScheduler implements JobScheduler {
             @Override
             public void run() {
                 if (isEnabled()) {
-                    // TODO Job listener (for metrics)
                     try {
                         logger.debug("[job][{}][{}] Running now", job.getKey().getType(), job.getKey().getId());
                         lastRunDate.set(Time.now());
                         runCount.incrementAndGet();
+                        // Starting
+                        jobListener.onJobStart(job.getKey());
                         // Runs the job
                         long _start = System.currentTimeMillis();
                         decoratedTask.run();
@@ -256,6 +257,8 @@ public class DefaultJobScheduler implements JobScheduler {
                         long _end = System.currentTimeMillis();
                         lastRunDurationMs.set(_end - _start);
                         logger.debug("[job][{}][{}] Ran in {} ms", job.getKey().getType(), job.getKey().getId(), lastRunDurationMs.get());
+                        // Starting
+                        jobListener.onJobEnd(job.getKey(), lastRunDurationMs.get());
                         // No error - resetting the counters
                         lastErrorCount.set(0);
                         lastError.set(null);
@@ -264,9 +267,16 @@ public class DefaultJobScheduler implements JobScheduler {
                         lastError.set(ex.getMessage());
                         logger.error("[job][{}][{}] Error: {}", job.getKey().getType(), job.getKey().getId(), ex.getMessage());
                         // Reporter
-                        jobErrorReporter.onJobError(getJobStatus(), ex);
+                        logger.error(
+                                String.format("[job][%s][%s] Error", job.getKey().getType(), job.getKey().getId()),
+                                ex
+                        );
+                        jobListener.onJobError(job.getKey(), ex);
                         // Rethrows the error
                         throw ex;
+                    } finally {
+                        // Starting
+                        jobListener.onJobComplete(job.getKey());
                     }
                 } else {
                     logger.debug("[job][{}][{}] Not enabled", job.getKey().getType(), job.getKey().getId());

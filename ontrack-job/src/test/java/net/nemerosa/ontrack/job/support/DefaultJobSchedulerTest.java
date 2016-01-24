@@ -13,10 +13,14 @@ import static org.junit.Assert.*;
 
 public class DefaultJobSchedulerTest {
 
+    protected JobScheduler createJobScheduler() {
+        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        return new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService, NOPJobListener.INSTANCE);
+    }
+
     @Test
     public void schedule() throws InterruptedException {
-        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService, SimpleJobErrorReport.INSTANCE);
+        JobScheduler jobScheduler = createJobScheduler();
         CountJob job = new CountJob();
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
         Thread.sleep(3000);
@@ -25,8 +29,7 @@ public class DefaultJobSchedulerTest {
 
     @Test
     public void reschedule() throws InterruptedException {
-        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService, SimpleJobErrorReport.INSTANCE);
+        JobScheduler jobScheduler = createJobScheduler();
         CountJob job = new CountJob();
         // Initially every second
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
@@ -42,8 +45,7 @@ public class DefaultJobSchedulerTest {
 
     @Test
     public void fire_immediately() throws InterruptedException, ExecutionException, TimeoutException {
-        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService, SimpleJobErrorReport.INSTANCE);
+        JobScheduler jobScheduler = createJobScheduler();
         CountJob job = new CountJob();
         // Fires far in the future
         jobScheduler.schedule(job, Schedule.everySeconds(60).after(60));
@@ -55,8 +57,7 @@ public class DefaultJobSchedulerTest {
 
     @Test
     public void fire_immediately_in_concurrency() throws InterruptedException, ExecutionException, TimeoutException {
-        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService, SimpleJobErrorReport.INSTANCE);
+        JobScheduler jobScheduler = createJobScheduler();
         LongCountJob job = new LongCountJob();
         // Fires now
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
@@ -76,8 +77,7 @@ public class DefaultJobSchedulerTest {
 
     @Test
     public void statuses() throws InterruptedException, ExecutionException, TimeoutException {
-        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService, SimpleJobErrorReport.INSTANCE);
+        JobScheduler jobScheduler = createJobScheduler();
 
         LongCountJob longCountJob = new LongCountJob();
         jobScheduler.schedule(longCountJob, Schedule.EVERY_SECOND);
@@ -101,8 +101,7 @@ public class DefaultJobSchedulerTest {
 
     @Test
     public void removing_a_running_job() throws InterruptedException, ExecutionException, TimeoutException {
-        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService, SimpleJobErrorReport.INSTANCE);
+        JobScheduler jobScheduler = createJobScheduler();
         CountJob job = new CountJob();
         // Fires now
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
@@ -118,8 +117,7 @@ public class DefaultJobSchedulerTest {
 
     @Test
     public void removing_a_long_running_job() throws InterruptedException, ExecutionException, TimeoutException {
-        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService, SimpleJobErrorReport.INSTANCE);
+        JobScheduler jobScheduler = createJobScheduler();
         LongCountJob job = new LongCountJob();
         // Fires now
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
@@ -134,8 +132,7 @@ public class DefaultJobSchedulerTest {
 
     @Test
     public void job_failures() throws InterruptedException, ExecutionException, TimeoutException {
-        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService, SimpleJobErrorReport.INSTANCE);
+        JobScheduler jobScheduler = createJobScheduler();
         ErrorJob job = new ErrorJob();
         // Fires now
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
@@ -154,8 +151,7 @@ public class DefaultJobSchedulerTest {
     }
 
     protected void test_with_pause(BiConsumer<JobScheduler, PauseableJob> pause, BiConsumer<JobScheduler, PauseableJob> resume) throws InterruptedException, ExecutionException, TimeoutException {
-        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService, SimpleJobErrorReport.INSTANCE);
+        JobScheduler jobScheduler = createJobScheduler();
         PauseableJob job = new PauseableJob();
         // Fires now
         jobScheduler.schedule(job, Schedule.EVERY_SECOND);
@@ -200,8 +196,7 @@ public class DefaultJobSchedulerTest {
 
     @Test
     public void keys() throws InterruptedException, ExecutionException, TimeoutException {
-        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService, SimpleJobErrorReport.INSTANCE);
+        JobScheduler jobScheduler = createJobScheduler();
 
         LongCountJob longCountJob = new LongCountJob();
         CountJob countJob = new CountJob();
@@ -230,29 +225,25 @@ public class DefaultJobSchedulerTest {
 
     @Test(expected = JobNotScheduledException.class)
     public void pause_for_not_schedule_job() {
-        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService, SimpleJobErrorReport.INSTANCE);
+        JobScheduler jobScheduler = createJobScheduler();
         jobScheduler.pause(new JobKey("test", "x"));
     }
 
     @Test(expected = JobNotScheduledException.class)
     public void resume_for_not_schedule_job() {
-        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService, SimpleJobErrorReport.INSTANCE);
+        JobScheduler jobScheduler = createJobScheduler();
         jobScheduler.resume(new JobKey("test", "x"));
     }
 
     @Test(expected = JobNotScheduledException.class)
     public void fire_immediately_for_not_schedule_job() {
-        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService, SimpleJobErrorReport.INSTANCE);
+        JobScheduler jobScheduler = createJobScheduler();
         jobScheduler.fireImmediately(new JobKey("test", "x"));
     }
 
     @Test(expected = JobNotScheduledException.class)
     public void job_status_for_not_schedule_job() {
-        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService, SimpleJobErrorReport.INSTANCE);
+        JobScheduler jobScheduler = createJobScheduler();
         jobScheduler.getJobStatus(new JobKey("test", "x"));
     }
 
