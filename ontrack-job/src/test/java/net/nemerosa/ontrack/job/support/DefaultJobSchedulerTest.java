@@ -12,7 +12,6 @@ import static org.junit.Assert.*;
 public class DefaultJobSchedulerTest {
 
     // TODO Errors
-    // TODO Removing a job
 
     @Test
     public void schedule() throws InterruptedException {
@@ -98,6 +97,23 @@ public class DefaultJobSchedulerTest {
 
         JobStatus shortStatus = statuses.get(countJob.getKey());
         assertFalse(shortStatus.isRunning());
+    }
+
+    @Test
+    public void removing_a_running_job() throws InterruptedException, ExecutionException, TimeoutException {
+        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService);
+        CountJob job = new CountJob();
+        // Fires now
+        jobScheduler.schedule(job, Schedule.EVERY_SECOND);
+        // After some seconds, the job keeps running
+        Thread.sleep(2500);
+        assertEquals(3, job.getCount());
+        // Now, removes the job
+        jobScheduler.unschedule(job.getKey());
+        // Waits a bit, and checks the job has stopped running
+        Thread.sleep(2500);
+        assertEquals(3, job.getCount());
     }
 
 }

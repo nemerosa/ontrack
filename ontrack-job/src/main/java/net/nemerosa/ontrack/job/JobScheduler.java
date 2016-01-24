@@ -12,6 +12,11 @@ public interface JobScheduler {
     void schedule(Job job, Schedule schedule);
 
     /**
+     * Removes a job from the scheduler. Any running execution will be stopped immediately.
+     */
+    void unschedule(JobKey key);
+
+    /**
      * Gets the status for a job
      */
     JobStatus getJobStatus(JobKey key);

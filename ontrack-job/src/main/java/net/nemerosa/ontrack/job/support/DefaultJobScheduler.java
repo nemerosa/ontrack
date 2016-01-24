@@ -32,7 +32,7 @@ public class DefaultJobScheduler implements JobScheduler {
         JobScheduledService existingService = services.remove(job.getKey());
         if (existingService != null) {
             logger.info("[job] Stopping existing service for {}", job.getKey());
-            existingService.cancel();
+            existingService.cancel(false);
         }
         // Gets the job task
         Runnable jobTask = job.getTask();
@@ -44,6 +44,14 @@ public class DefaultJobScheduler implements JobScheduler {
         JobScheduledService jobScheduledService = new JobScheduledService(job, decoratedTask, schedule, scheduledExecutorService);
         // Registration
         services.put(job.getKey(), jobScheduledService);
+    }
+
+    @Override
+    public void unschedule(JobKey key) {
+        JobScheduledService existingService = services.remove(key);
+        if (existingService != null) {
+            existingService.cancel(true);
+        }
     }
 
     @Override
@@ -98,9 +106,13 @@ public class DefaultJobScheduler implements JobScheduler {
             fireImmediately();
         }
 
-        public void cancel() {
+        public void cancel(boolean forceStop) {
             scheduledFuture.cancel(false);
             // The decorated task might still run
+            CompletableFuture<?> future = this.completableFuture.get();
+            if (forceStop && future != null && !future.isDone() && !future.isCancelled()) {
+                future.cancel(true);
+            }
         }
 
         public Future<?> fireImmediately() {
