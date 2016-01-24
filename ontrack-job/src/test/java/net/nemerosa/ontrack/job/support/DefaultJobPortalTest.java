@@ -8,6 +8,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiFunction;
 
+import static org.junit.Assert.assertEquals;
+
 public class DefaultJobPortalTest {
 
     @Test
@@ -40,6 +42,11 @@ public class DefaultJobPortalTest {
 
         // Waits some time
         Thread.sleep(2500);
+
+        // Counts must have been increased
+        assertEquals(3, count1.get());
+        assertEquals(3, count2.get());
+        assertEquals(3, count3.get());
     }
 
 }
