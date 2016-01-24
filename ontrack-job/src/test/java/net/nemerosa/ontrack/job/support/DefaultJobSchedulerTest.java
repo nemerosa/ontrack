@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
@@ -133,6 +134,51 @@ public class DefaultJobSchedulerTest {
         status = jobScheduler.getJobStatus(job.getKey());
         assertEquals(0, status.getLastErrorCount());
         assertNull(status.getLastError());
+    }
+
+    protected void test_with_pause(BiConsumer<JobScheduler, PauseableJob> pause, BiConsumer<JobScheduler, PauseableJob> resume) throws InterruptedException, ExecutionException, TimeoutException {
+        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService);
+        PauseableJob job = new PauseableJob();
+        // Fires now
+        jobScheduler.schedule(job, Schedule.EVERY_SECOND);
+        // After some seconds, the job keeps running
+        Thread.sleep(2500);
+        assertEquals(3, job.getCount());
+        // Pauses
+        pause.accept(jobScheduler, job);
+        // After some seconds, the job has not run
+        Thread.sleep(2000);
+        assertEquals(3, job.getCount());
+        // Resumes the job
+        resume.accept(jobScheduler, job);
+        // After some seconds, the job has started again
+        Thread.sleep(2000);
+        assertEquals(5, job.getCount());
+    }
+
+    @Test
+    public void job_pause() throws InterruptedException, ExecutionException, TimeoutException {
+        test_with_pause(
+                (jobScheduler, job) -> job.pause(),
+                (jobScheduler, job) -> job.resume()
+        );
+    }
+
+    @Test
+    public void job_schedule_pause() throws InterruptedException, ExecutionException, TimeoutException {
+        test_with_pause(
+                (jobScheduler, job) -> jobScheduler.pause(job.getKey()),
+                (jobScheduler, job) -> jobScheduler.resume(job.getKey())
+        );
+    }
+
+    @Test
+    public void scheduler_pause() throws InterruptedException, ExecutionException, TimeoutException {
+        test_with_pause(
+                (jobScheduler, job) -> jobScheduler.pause(),
+                (jobScheduler, job) -> jobScheduler.resume()
+        );
     }
 
 }

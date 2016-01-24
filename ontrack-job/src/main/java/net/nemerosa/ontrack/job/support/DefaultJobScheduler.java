@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -23,6 +24,7 @@ public class DefaultJobScheduler implements JobScheduler {
     private final ScheduledExecutorService scheduledExecutorService;
 
     private final Map<JobKey, JobScheduledService> services = new ConcurrentHashMap<>(new TreeMap<>());
+    private final AtomicBoolean schedulerPaused = new AtomicBoolean(false);
 
     public DefaultJobScheduler(JobDecorator jobDecorator, ScheduledExecutorService scheduledExecutorService) {
         this.jobDecorator = jobDecorator;
@@ -55,6 +57,36 @@ public class DefaultJobScheduler implements JobScheduler {
         JobScheduledService existingService = services.remove(key);
         if (existingService != null) {
             existingService.cancel(true);
+        }
+    }
+
+    @Override
+    public void pause() {
+        schedulerPaused.set(true);
+    }
+
+    @Override
+    public void resume() {
+        schedulerPaused.set(false);
+    }
+
+    @Override
+    public void pause(JobKey key) {
+        JobScheduledService existingService = services.get(key);
+        if (existingService != null) {
+            existingService.pause();
+        } else {
+            throw new JobNotScheduledException(key);
+        }
+    }
+
+    @Override
+    public void resume(JobKey key) {
+        JobScheduledService existingService = services.get(key);
+        if (existingService != null) {
+            existingService.resume();
+        } else {
+            throw new JobNotScheduledException(key);
         }
     }
 
@@ -93,6 +125,7 @@ public class DefaultJobScheduler implements JobScheduler {
         private final Runnable monitoredTask;
         private final ScheduledFuture<?> scheduledFuture;
 
+        private final AtomicBoolean paused = new AtomicBoolean(false);
         private final AtomicReference<CompletableFuture<?>> completableFuture = new AtomicReference<>();
 
         private final AtomicLong runCount = new AtomicLong();
@@ -177,6 +210,14 @@ public class DefaultJobScheduler implements JobScheduler {
             }
         }
 
+        public void pause() {
+            paused.set(true);
+        }
+
+        public void resume() {
+            paused.set(false);
+        }
+
         private class MonitoredTask implements Runnable {
 
             private final Runnable decoratedTask;
@@ -187,26 +228,35 @@ public class DefaultJobScheduler implements JobScheduler {
 
             @Override
             public void run() {
-                try {
-                    lastRunDate.set(Time.now());
-                    runCount.incrementAndGet();
-                    // Runs the job
-                    long _start = System.currentTimeMillis();
+                if (isEnabled()) {
                     try {
+                        logger.debug("[job] {} running now", job.getKey());
+                        lastRunDate.set(Time.now());
+                        runCount.incrementAndGet();
+                        // Runs the job
+                        long _start = System.currentTimeMillis();
                         decoratedTask.run();
-                    } finally {
+                        // No error, counting time
                         long _end = System.currentTimeMillis();
                         lastRunDurationMs.set(_end - _start);
+                        logger.debug("[job] {} ran in {} ms", job.getKey(), lastRunDurationMs.get());
+                        // No error - resetting the counters
+                        lastErrorCount.set(0);
+                        lastError.set(null);
+                    } catch (RuntimeException ex) {
+                        lastErrorCount.incrementAndGet();
+                        lastError.set(ex.getMessage());
+                        logger.debug("[job] {} in error", job.getKey());
+                        throw ex;
                     }
-                    // No error - resetting the counters
-                    lastErrorCount.set(0);
-                    lastError.set(null);
-                } catch (RuntimeException ex) {
-                    lastErrorCount.incrementAndGet();
-                    lastError.set(ex.getMessage());
-                    throw ex;
+                } else {
+                    logger.debug("[job] {} is not enabled", job.getKey());
                 }
             }
+        }
+
+        private boolean isEnabled() {
+            return !job.isDisabled() && !paused.get() && !schedulerPaused.get();
         }
     }
 }

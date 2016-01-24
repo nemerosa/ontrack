@@ -17,6 +17,26 @@ public interface JobScheduler {
     void unschedule(JobKey key);
 
     /**
+     * Pauses the scheduler
+     */
+    void pause();
+
+    /**
+     * Resumes the scheduler
+     */
+    void resume();
+
+    /**
+     * Pauses the execution of a job
+     */
+    void pause(JobKey key);
+
+    /**
+     * Resumes the execution of a job
+     */
+    void resume(JobKey key);
+
+    /**
      * Gets the status for a job
      */
     JobStatus getJobStatus(JobKey key);

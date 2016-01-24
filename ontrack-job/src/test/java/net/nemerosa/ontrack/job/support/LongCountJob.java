@@ -33,4 +33,9 @@ public class LongCountJob implements Job {
     public String getDescription() {
         return "Long count";
     }
+
+    @Override
+    public boolean isDisabled() {
+        return false;
+    }
 }

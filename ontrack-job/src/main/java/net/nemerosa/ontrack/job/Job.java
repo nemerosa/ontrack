@@ -16,4 +16,10 @@ public interface Job {
      * Gets a description for the job
      */
     String getDescription();
+
+    /**
+     * Is the job disabled for the next run?
+     */
+    boolean isDisabled();
+
 }

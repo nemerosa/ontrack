@@ -30,4 +30,9 @@ public class ErrorJob implements Job {
     public String getDescription() {
         return "Failure";
     }
+
+    @Override
+    public boolean isDisabled() {
+        return false;
+    }
 }
