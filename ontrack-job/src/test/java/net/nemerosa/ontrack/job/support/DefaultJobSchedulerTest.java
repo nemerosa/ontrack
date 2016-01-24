@@ -117,6 +117,22 @@ public class DefaultJobSchedulerTest {
     }
 
     @Test
+    public void removing_a_long_running_job() throws InterruptedException, ExecutionException, TimeoutException {
+        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService);
+        LongCountJob job = new LongCountJob();
+        // Fires now
+        jobScheduler.schedule(job, Schedule.EVERY_SECOND);
+        // The job is now running
+        assertTrue(jobScheduler.getJobStatus(job.getKey()).isRunning());
+        // Now, removes the job
+        jobScheduler.unschedule(job.getKey());
+        // Waits a bit, and checks the job has stopped running
+        Thread.sleep(1000);
+        assertEquals(0, job.getCount());
+    }
+
+    @Test
     public void job_failures() throws InterruptedException, ExecutionException, TimeoutException {
         ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
         JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService);
@@ -210,6 +226,34 @@ public class DefaultJobSchedulerTest {
                 ImmutableSet.of(otherTypeJob.getKey()),
                 jobScheduler.getJobKeysOfType("test-other")
         );
+    }
+
+    @Test(expected = JobNotScheduledException.class)
+    public void pause_for_not_schedule_job() {
+        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService);
+        jobScheduler.pause(new JobKey("test", "x"));
+    }
+
+    @Test(expected = JobNotScheduledException.class)
+    public void resume_for_not_schedule_job() {
+        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService);
+        jobScheduler.resume(new JobKey("test", "x"));
+    }
+
+    @Test(expected = JobNotScheduledException.class)
+    public void fire_immediately_for_not_schedule_job() {
+        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService);
+        jobScheduler.fireImmediately(new JobKey("test", "x"));
+    }
+
+    @Test(expected = JobNotScheduledException.class)
+    public void job_status_for_not_schedule_job() {
+        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService);
+        jobScheduler.getJobStatus(new JobKey("test", "x"));
     }
 
 }
