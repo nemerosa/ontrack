@@ -2,9 +2,12 @@ package net.nemerosa.ontrack.job.support;
 
 import net.nemerosa.ontrack.job.*;
 import net.nemerosa.ontrack.job.builder.JobBuilder;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiFunction;
 
@@ -17,8 +20,20 @@ public class DefaultJobPortalTest {
                     .withTask(atomicLong::incrementAndGet)
                     .build();
 
+    private ScheduledExecutorService scheduledExecutorService;
+
+    @Before
+    public void before() {
+        scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+    }
+
+    @After
+    public void after() {
+        scheduledExecutorService.shutdownNow();
+    }
+
     protected JobPortal createJobPortal() {
-        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, Executors.newSingleThreadScheduledExecutor(), NOPJobListener.INSTANCE);
+        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService, NOPJobListener.INSTANCE);
         return new DefaultJobPortal(jobScheduler, Schedule.EVERY_SECOND);
     }
 
