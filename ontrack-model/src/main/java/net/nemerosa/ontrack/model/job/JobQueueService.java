@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.model.job;
 import java.util.Optional;
 import java.util.concurrent.Future;
 
+@Deprecated
 public interface JobQueueService {
 
     /**
