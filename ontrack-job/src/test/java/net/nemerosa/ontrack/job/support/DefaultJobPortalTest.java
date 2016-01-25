@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiFunction;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class DefaultJobPortalTest {
 
@@ -105,13 +106,13 @@ public class DefaultJobPortalTest {
         jobProvider.setJobs(Schedule.EVERY_SECOND, job1, job2, job4);
 
         // Waits some time
-        Thread.sleep(3000);
+        Thread.sleep(4500);
 
         // Counts must have been increased, and some must have stopped
-        assertEquals(6, count1.get());
-        assertEquals(6, count2.get());
-        assertEquals(4, count3.get());
-        assertEquals(3, count4.get());
+        assertEquals(7, count1.get());
+        assertEquals(7, count2.get());
+        assertTrue(count3.get() == 3 || count3.get() == 4); // The job 3 might have been still running when it was unscheduled
+        assertEquals(4, count4.get());
 
     }
 
