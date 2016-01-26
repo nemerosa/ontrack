@@ -11,4 +11,9 @@ public interface JobPortal {
      */
     void registerJobProvider(JobProvider jobProvider);
 
+    /**
+     * Access to the underlying scheduler
+     */
+    JobScheduler getJobScheduler();
+
 }

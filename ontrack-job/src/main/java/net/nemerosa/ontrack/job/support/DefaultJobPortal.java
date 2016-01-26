@@ -27,6 +27,11 @@ public class DefaultJobPortal implements JobPortal, Job {
     }
 
     @Override
+    public JobScheduler getJobScheduler() {
+        return jobScheduler;
+    }
+
+    @Override
     public JobKey getKey() {
         return new JobKey("system", "job-portal");
     }
