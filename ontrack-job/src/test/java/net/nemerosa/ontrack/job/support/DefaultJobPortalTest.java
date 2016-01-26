@@ -2,13 +2,17 @@ package net.nemerosa.ontrack.job.support;
 
 import net.nemerosa.ontrack.job.*;
 import net.nemerosa.ontrack.job.builder.JobBuilder;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiFunction;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class DefaultJobPortalTest {
 
@@ -17,8 +21,20 @@ public class DefaultJobPortalTest {
                     .withTask(atomicLong::incrementAndGet)
                     .build();
 
+    private ScheduledExecutorService scheduledExecutorService;
+
+    @Before
+    public void before() {
+        scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+    }
+
+    @After
+    public void after() {
+        scheduledExecutorService.shutdownNow();
+    }
+
     protected JobPortal createJobPortal() {
-        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, Executors.newSingleThreadScheduledExecutor(), NOPJobListener.INSTANCE);
+        JobScheduler jobScheduler = new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService, NOPJobListener.INSTANCE);
         return new DefaultJobPortal(jobScheduler, Schedule.EVERY_SECOND);
     }
 
@@ -47,9 +63,9 @@ public class DefaultJobPortalTest {
         Thread.sleep(2500);
 
         // Counts must have been increased
-        assertEquals(3, count1.get());
-        assertEquals(3, count2.get());
-        assertEquals(3, count3.get());
+        assertTrue(count1.get() >= 2);
+        assertTrue(count2.get() >= 2);
+        assertTrue(count3.get() >= 2);
     }
 
     @Test
@@ -81,22 +97,22 @@ public class DefaultJobPortalTest {
         Thread.sleep(2500);
 
         // Counts must have been increased
-        assertEquals(3, count1.get());
-        assertEquals(3, count2.get());
-        assertEquals(3, count3.get());
+        assertTrue(count1.get() >= 2);
+        assertTrue(count2.get() >= 2);
+        assertTrue(count3.get() >= 2);
         assertEquals(0, count4.get());
 
         // Removes one job, adds another
         jobProvider.setJobs(Schedule.EVERY_SECOND, job1, job2, job4);
 
         // Waits some time
-        Thread.sleep(3000);
+        Thread.sleep(4500);
 
         // Counts must have been increased, and some must have stopped
-        assertEquals(6, count1.get());
-        assertEquals(6, count2.get());
-        assertEquals(4, count3.get());
-        assertEquals(3, count4.get());
+        assertTrue(count1.get() >= 6);
+        assertTrue(count2.get() >= 6);
+        assertTrue(count3.get() <= 4); // The job 3 might have been still running when it was unscheduled
+        assertTrue(count4.get() >= 3);
 
     }
 

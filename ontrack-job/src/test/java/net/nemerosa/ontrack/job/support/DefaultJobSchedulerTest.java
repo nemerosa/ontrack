@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.job.support;
 
 import com.google.common.collect.ImmutableSet;
 import net.nemerosa.ontrack.job.*;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Map;
@@ -13,8 +15,19 @@ import static org.junit.Assert.*;
 
 public class DefaultJobSchedulerTest {
 
+    private ScheduledExecutorService scheduledExecutorService;
+
+    @Before
+    public void before() {
+        scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+    }
+
+    @After
+    public void after() {
+        scheduledExecutorService.shutdownNow();
+    }
+
     protected JobScheduler createJobScheduler() {
-        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
         return new DefaultJobScheduler(NOPJobDecorator.INSTANCE, scheduledExecutorService, NOPJobListener.INSTANCE);
     }
 
