@@ -63,9 +63,9 @@ public class DefaultJobPortalTest {
         Thread.sleep(2500);
 
         // Counts must have been increased
-        assertEquals(3, count1.get());
-        assertEquals(3, count2.get());
-        assertEquals(3, count3.get());
+        assertTrue(count1.get() >= 2);
+        assertTrue(count2.get() >= 2);
+        assertTrue(count3.get() >= 2);
     }
 
     @Test
@@ -97,9 +97,9 @@ public class DefaultJobPortalTest {
         Thread.sleep(2500);
 
         // Counts must have been increased
-        assertEquals(3, count1.get());
-        assertEquals(3, count2.get());
-        assertEquals(3, count3.get());
+        assertTrue(count1.get() >= 2);
+        assertTrue(count2.get() >= 2);
+        assertTrue(count3.get() >= 2);
         assertEquals(0, count4.get());
 
         // Removes one job, adds another
@@ -109,10 +109,10 @@ public class DefaultJobPortalTest {
         Thread.sleep(4500);
 
         // Counts must have been increased, and some must have stopped
-        assertEquals(7, count1.get());
-        assertEquals(7, count2.get());
-        assertTrue(count3.get() == 3 || count3.get() == 4); // The job 3 might have been still running when it was unscheduled
-        assertEquals(4, count4.get());
+        assertTrue(count1.get() >= 6);
+        assertTrue(count2.get() >= 6);
+        assertTrue(count3.get() <= 4); // The job 3 might have been still running when it was unscheduled
+        assertTrue(count4.get() >= 3);
 
     }
 
