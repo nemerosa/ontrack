@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.model.job;
 /**
  * Defines a job that can run asynchronously.
  */
+@Deprecated
 public interface Job {
 
     /**

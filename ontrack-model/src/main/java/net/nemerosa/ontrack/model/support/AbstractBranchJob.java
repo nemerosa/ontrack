@@ -1,13 +1,13 @@
-package net.nemerosa.ontrack.model.job;
+package net.nemerosa.ontrack.model.support;
 
+import net.nemerosa.ontrack.job.Job;
 import net.nemerosa.ontrack.model.structure.Branch;
 
-@Deprecated
-public abstract class BranchJob implements Job {
+public abstract class AbstractBranchJob implements Job {
 
     private final Branch branch;
 
-    protected BranchJob(Branch branch) {
+    protected AbstractBranchJob(Branch branch) {
         this.branch = branch;
     }
 

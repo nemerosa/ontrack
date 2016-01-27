@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.job;
 
+import java.util.concurrent.Future;
+
 /**
  * The <code>JobPortal</code> is used by {@link JobDefinitionProvider providers of jobs} to register their list of jobs.
  * Regularly, the registered jobs will be synchronised with the {@link JobScheduler job scheduler}.
@@ -15,5 +17,12 @@ public interface JobPortal {
      * Access to the underlying scheduler
      */
     JobScheduler getJobScheduler();
+
+    /**
+     * Fires a job key
+     */
+    default Future<?> fireImmediately(JobKey key) {
+        return getJobScheduler().fireImmediately(key);
+    }
 
 }

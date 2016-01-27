@@ -7,16 +7,14 @@ import net.nemerosa.ontrack.job.JobType;
 
 public class JobBuilder {
 
-    private final JobType type;
-    private final String id;
+    private final JobKey key;
     private String description = "";
     private Runnable task = () -> {
     };
     private boolean disabled = false;
 
-    public JobBuilder(JobType type, String id) {
-        this.type = type;
-        this.id = id;
+    public JobBuilder(JobKey key) {
+        this.key = key;
     }
 
     public JobBuilder withDescription(String value) {
@@ -38,7 +36,7 @@ public class JobBuilder {
         return new Job() {
             @Override
             public JobKey getKey() {
-                return new JobKey(type, id);
+                return key;
             }
 
             @Override
@@ -59,7 +57,11 @@ public class JobBuilder {
     }
 
     public static JobBuilder create(JobType type, String id) {
-        return new JobBuilder(type, id);
+        return create(type.getKey(id));
+    }
+
+    public static JobBuilder create(JobKey key) {
+        return new JobBuilder(key);
     }
 
 }
