@@ -36,15 +36,15 @@ public class DefaultJobScheduler implements JobScheduler {
 
     @Override
     public void schedule(Job job, Schedule schedule) {
-        logger.info("[job][{}][{}] Scheduling with {}", job.getKey().getType(), job.getKey().getId(), schedule);
+        logger.info("[job][{}][{}] Scheduling with {}", job.getKey().getType().getKey(), job.getKey().getId(), schedule);
         // Manages existing schedule
         JobScheduledService existingService = services.remove(job.getKey());
         if (existingService != null) {
-            logger.info("[job][{}][{}] Stopping existing schedule", job.getKey().getType(), job.getKey().getId());
+            logger.info("[job][{}][{}] Stopping existing schedule", job.getKey().getType().getKey(), job.getKey().getId());
             existingService.cancel(false);
         }
         // Creates and starts the scheduled service
-        logger.info("[job][{}][{}] Starting service", job.getKey().getType(), job.getKey().getId());
+        logger.info("[job][{}][{}] Starting service", job.getKey().getType().getKey(), job.getKey().getId());
         // Copy stats from old schedule
         JobScheduledService jobScheduledService = new JobScheduledService(job, schedule, scheduledExecutorService, existingService);
         // Registration
@@ -245,7 +245,7 @@ public class DefaultJobScheduler implements JobScheduler {
             public void run() {
                 if (isEnabled()) {
                     try {
-                        logger.debug("[job][{}][{}] Running now", job.getKey().getType(), job.getKey().getId());
+                        logger.debug("[job][{}][{}] Running now", job.getKey().getType().getKey(), job.getKey().getId());
                         lastRunDate.set(Time.now());
                         runCount.incrementAndGet();
                         // Starting
@@ -255,7 +255,7 @@ public class DefaultJobScheduler implements JobScheduler {
                         job.getTask().run(progress -> {
                             jobListener.onJobProgress(job.getKey(), progress);
                             logger.debug("[job][{}][{}] {}",
-                                    job.getKey().getType(),
+                                    job.getKey().getType().getKey(),
                                     job.getKey().getId(),
                                     progress.getText()
                             );
@@ -264,7 +264,7 @@ public class DefaultJobScheduler implements JobScheduler {
                         // No error, counting time
                         long _end = System.currentTimeMillis();
                         lastRunDurationMs.set(_end - _start);
-                        logger.debug("[job][{}][{}] Ran in {} ms", job.getKey().getType(), job.getKey().getId(), lastRunDurationMs.get());
+                        logger.debug("[job][{}][{}] Ran in {} ms", job.getKey().getType().getKey(), job.getKey().getId(), lastRunDurationMs.get());
                         // Starting
                         jobListener.onJobEnd(job.getKey(), lastRunDurationMs.get());
                         // No error - resetting the counters
@@ -273,10 +273,10 @@ public class DefaultJobScheduler implements JobScheduler {
                     } catch (Exception ex) {
                         lastErrorCount.incrementAndGet();
                         lastError.set(ex.getMessage());
-                        logger.error("[job][{}][{}] Error: {}", job.getKey().getType(), job.getKey().getId(), ex.getMessage());
+                        logger.error("[job][{}][{}] Error: {}", job.getKey().getType().getKey(), job.getKey().getId(), ex.getMessage());
                         // Reporter
                         logger.error(
-                                String.format("[job][%s][%s] Error", job.getKey().getType(), job.getKey().getId()),
+                                String.format("[job][%s][%s] Error", job.getKey().getType().getKey(), job.getKey().getId()),
                                 ex
                         );
                         jobListener.onJobError(job.getKey(), ex);
@@ -288,7 +288,7 @@ public class DefaultJobScheduler implements JobScheduler {
                         jobListener.onJobComplete(job.getKey());
                     }
                 } else {
-                    logger.debug("[job][{}][{}] Not enabled", job.getKey().getType(), job.getKey().getId());
+                    logger.debug("[job][{}][{}] Not enabled", job.getKey().getType().getKey(), job.getKey().getId());
                 }
             }
         }

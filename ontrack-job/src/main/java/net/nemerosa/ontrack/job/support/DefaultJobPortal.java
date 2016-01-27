@@ -56,8 +56,8 @@ public class DefaultJobPortal implements JobPortal, Job {
     }
 
     protected void register(JobDefinitionProvider jobProvider) {
-        logger.debug("[job][system][job-portal] Running the registration for {}", jobProvider);
         Collection<JobDefinition> jobDefinitions = jobProvider.getJobs();
+        logger.debug("[job][system][job-portal] Running the registration for {}: {} job(s)", jobProvider, jobDefinitions.size());
         // Checks type consistency
         jobDefinitions.forEach(jobDefinition -> checkJobType(jobProvider, jobDefinition));
         // Get all keys
