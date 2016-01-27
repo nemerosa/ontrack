@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.job.support;
 
 import net.nemerosa.ontrack.job.*;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,6 +8,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class DefaultJobPortal implements JobPortal, Job {
+
+    private static final JobCategory SYSTEM_CATEGORY = JobCategory.of("system").withName("System");
+
+    private static final JobType PORTAL_JOB = SYSTEM_CATEGORY.getType("portal").withName("Job portal");
+
 
     private final Logger logger = LoggerFactory.getLogger(JobPortal.class);
 
@@ -28,7 +32,7 @@ public class DefaultJobPortal implements JobPortal, Job {
 
     @Override
     public JobKey getKey() {
-        return new JobKey("system", "job-portal");
+        return PORTAL_JOB.getKey("job-registration");
     }
 
     @Override
@@ -47,7 +51,7 @@ public class DefaultJobPortal implements JobPortal, Job {
         // Get all keys
         Set<JobKey> jobKeys = jobDefinitions.stream().map(definition -> definition.getJob().getKey()).collect(Collectors.toSet());
         // Get keys of jobs being already registered
-        Collection<JobKey> scheduledKeys = jobScheduler.getJobKeysOfType(jobProvider.getType());
+        Collection<JobKey> scheduledKeys = jobScheduler.getJobKeysOfCategory(jobProvider.getJobCategory());
         // Gets the keys of the jobs not being scheduled yet
         Set<JobKey> jobToUnschedule = new HashSet<>(scheduledKeys);
         jobToUnschedule.removeAll(jobKeys);
@@ -63,10 +67,10 @@ public class DefaultJobPortal implements JobPortal, Job {
     }
 
     protected void checkJobType(JobDefinitionProvider jobProvider, JobDefinition jobDefinition) {
-        if (!StringUtils.equals(jobProvider.getType(), jobDefinition.getJob().getKey().getType())) {
+        if (!jobDefinition.getJob().getKey().sameCategory(jobProvider.getJobCategory())) {
             throw new JobProviderTypeInconsistencyException(
                     jobProvider.getClass(),
-                    jobProvider.getType(),
+                    jobProvider.getJobCategory(),
                     jobDefinition.getJob().getKey()
             );
         }

@@ -105,9 +105,16 @@ public class DefaultJobScheduler implements JobScheduler {
     }
 
     @Override
-    public Collection<JobKey> getJobKeysOfType(String type) {
+    public Collection<JobKey> getJobKeysOfType(JobType type) {
         return getAllJobKeys().stream()
                 .filter(key -> key.sameType(type))
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Collection<JobKey> getJobKeysOfCategory(JobCategory category) {
+        return getAllJobKeys().stream()
+                .filter(key -> key.sameCategory(category))
                 .collect(Collectors.toSet());
     }
 

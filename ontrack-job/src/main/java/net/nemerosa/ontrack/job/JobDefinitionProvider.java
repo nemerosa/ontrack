@@ -4,7 +4,7 @@ import java.util.Collection;
 
 public interface JobDefinitionProvider {
 
-    String getType();
+    JobCategory getJobCategory();
 
     Collection<JobDefinition> getJobs();
 

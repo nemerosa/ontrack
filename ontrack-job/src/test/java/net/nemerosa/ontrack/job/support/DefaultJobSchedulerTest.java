@@ -228,37 +228,37 @@ public class DefaultJobSchedulerTest {
 
         assertEquals(
                 ImmutableSet.of(longCountJob.getKey(), countJob.getKey()),
-                jobScheduler.getJobKeysOfType("test")
+                jobScheduler.getJobKeysOfCategory(Fixtures.TEST_CATEGORY)
         );
 
         assertEquals(
                 ImmutableSet.of(otherTypeJob.getKey()),
-                jobScheduler.getJobKeysOfType("test-other")
+                jobScheduler.getJobKeysOfCategory(Fixtures.TEST_OTHER_CATEGORY)
         );
     }
 
     @Test(expected = JobNotScheduledException.class)
     public void pause_for_not_schedule_job() {
         JobScheduler jobScheduler = createJobScheduler();
-        jobScheduler.pause(new JobKey("test", "x"));
+        jobScheduler.pause(JobCategory.of("test").getType("test").getKey("x"));
     }
 
     @Test(expected = JobNotScheduledException.class)
     public void resume_for_not_schedule_job() {
         JobScheduler jobScheduler = createJobScheduler();
-        jobScheduler.resume(new JobKey("test", "x"));
+        jobScheduler.resume(JobCategory.of("test").getType("test").getKey("x"));
     }
 
     @Test(expected = JobNotScheduledException.class)
     public void fire_immediately_for_not_schedule_job() {
         JobScheduler jobScheduler = createJobScheduler();
-        jobScheduler.fireImmediately(new JobKey("test", "x"));
+        jobScheduler.fireImmediately(JobCategory.of("test").getType("test").getKey("x"));
     }
 
     @Test
     public void job_status_for_not_schedule_job() {
         JobScheduler jobScheduler = createJobScheduler();
-        assertFalse(jobScheduler.getJobStatus(new JobKey("test", "x")).isPresent());
+        assertFalse(jobScheduler.getJobStatus(JobCategory.of("test").getType("test").getKey("x")).isPresent());
     }
 
 }

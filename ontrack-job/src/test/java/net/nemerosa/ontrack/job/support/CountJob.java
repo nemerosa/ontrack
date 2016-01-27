@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.job.support;
 
-import net.nemerosa.ontrack.job.Job;
-import net.nemerosa.ontrack.job.JobKey;
-import net.nemerosa.ontrack.job.JobRun;
-import net.nemerosa.ontrack.job.JobRunProgress;
+import net.nemerosa.ontrack.job.*;
 
 public class CountJob implements Job {
 
@@ -11,7 +8,7 @@ public class CountJob implements Job {
 
     @Override
     public JobKey getKey() {
-        return new JobKey("test", "count");
+        return Fixtures.TEST_CATEGORY.getType("count").getKey("count");
     }
 
     public int getCount() {

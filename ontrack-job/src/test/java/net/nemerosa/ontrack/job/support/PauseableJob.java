@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.job.support;
 
+import net.nemerosa.ontrack.job.Fixtures;
 import net.nemerosa.ontrack.job.Job;
 import net.nemerosa.ontrack.job.JobKey;
 import net.nemerosa.ontrack.job.JobRun;
@@ -11,7 +12,7 @@ public class PauseableJob implements Job {
 
     @Override
     public JobKey getKey() {
-        return new JobKey("test", "pauseable");
+        return Fixtures.TEST_CATEGORY.getType("pauseable").getKey("pauseable");
     }
 
     public int getCount() {

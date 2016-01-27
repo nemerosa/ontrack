@@ -1,15 +1,24 @@
 package net.nemerosa.ontrack.job;
 
-import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
+import lombok.Value;
 
-@Data
+import java.util.Objects;
+
+@Value
 public class JobKey {
 
-    private final String type;
+    private final JobType type;
     private final String id;
 
-    public boolean sameType(String type) {
-        return StringUtils.equals(this.type, type);
+    public static JobKey of(JobType type, String id) {
+        return new JobKey(type, id);
+    }
+
+    public boolean sameType(JobType type) {
+        return Objects.equals(this.type, type);
+    }
+
+    public boolean sameCategory(JobCategory category) {
+        return Objects.equals(this.type.getCategory(), category);
     }
 }
