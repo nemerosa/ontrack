@@ -39,4 +39,8 @@ public interface JobPortal {
         }
     }
 
+    /**
+     * Fires the job portal registration now
+     */
+    Future<?> fire();
 }

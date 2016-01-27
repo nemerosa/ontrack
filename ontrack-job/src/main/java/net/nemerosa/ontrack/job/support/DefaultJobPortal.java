@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 public class DefaultJobPortal implements JobPortal, Job {
@@ -34,6 +35,11 @@ public class DefaultJobPortal implements JobPortal, Job {
     @Override
     public JobScheduler getJobScheduler() {
         return jobScheduler;
+    }
+
+    @Override
+    public Future<?> fire() {
+        return jobScheduler.fireImmediately(getKey());
     }
 
     @Override
