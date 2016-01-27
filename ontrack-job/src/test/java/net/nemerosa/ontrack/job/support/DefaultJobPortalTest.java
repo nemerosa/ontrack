@@ -53,7 +53,7 @@ public class DefaultJobPortalTest {
         Job job3 = jobCreation.apply(3, count3);
 
         // Job provider
-        SimpleJobProvider jobProvider = new SimpleJobProvider("test");
+        SimpleJobDefinitionProvider jobProvider = new SimpleJobDefinitionProvider("test");
         jobProvider.setJobs(Schedule.EVERY_SECOND, job1, job2, job3);
 
         // Registration in the portal
@@ -87,7 +87,7 @@ public class DefaultJobPortalTest {
         Job job4 = jobCreation.apply(4, count4);
 
         // Job provider
-        SimpleJobProvider jobProvider = new SimpleJobProvider("test");
+        SimpleJobDefinitionProvider jobProvider = new SimpleJobDefinitionProvider("test");
         jobProvider.setJobs(Schedule.EVERY_SECOND, job1, job2, job3);
 
         // Registration in the portal
