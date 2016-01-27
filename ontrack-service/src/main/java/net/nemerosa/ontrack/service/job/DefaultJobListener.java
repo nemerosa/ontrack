@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service.job;
 
 import net.nemerosa.ontrack.job.JobKey;
 import net.nemerosa.ontrack.job.JobListener;
+import net.nemerosa.ontrack.job.JobRunProgress;
 import net.nemerosa.ontrack.model.support.ApplicationLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -61,5 +62,11 @@ public class DefaultJobListener implements JobListener {
 
     @Override
     public void onJobComplete(JobKey key) {
+    }
+
+    @Override
+    public void onJobProgress(JobKey key, JobRunProgress progress) {
+        // FIXME Method net.nemerosa.ontrack.service.job.DefaultJobListener.onJobProgress
+
     }
 }
