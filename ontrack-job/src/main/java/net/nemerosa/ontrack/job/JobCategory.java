@@ -18,4 +18,12 @@ public class JobCategory {
         return JobType.of(this, key);
     }
 
+    @Override
+    public String toString() {
+        return String.format(
+                "[%s]",
+                key
+        );
+    }
+
 }

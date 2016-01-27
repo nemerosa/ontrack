@@ -21,4 +21,13 @@ public class JobKey {
     public boolean sameCategory(JobCategory category) {
         return Objects.equals(this.type.getCategory(), category);
     }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "[%s][%s]",
+                type,
+                id
+        );
+    }
 }

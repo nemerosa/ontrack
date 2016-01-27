@@ -19,4 +19,13 @@ public class JobType {
         return JobKey.of(this, id);
     }
 
+    @Override
+    public String toString() {
+        return String.format(
+                "[%s][%s]",
+                category,
+                key
+        );
+    }
+
 }
