@@ -19,6 +19,10 @@ public class Schedule {
         return new Schedule(0, seconds, TimeUnit.SECONDS);
     }
 
+    public static Schedule everyMinutes(long minutes) {
+        return new Schedule(0, minutes, TimeUnit.MINUTES);
+    }
+
     public static final Schedule EVERY_SECOND = everySeconds(1);
     public static final Schedule EVERY_MINUTE = everySeconds(60);
 
@@ -33,5 +37,4 @@ public class Schedule {
     public boolean sameDelayThan(Schedule schedule) {
         return this.period == schedule.period && this.unit.equals(schedule.unit);
     }
-
 }

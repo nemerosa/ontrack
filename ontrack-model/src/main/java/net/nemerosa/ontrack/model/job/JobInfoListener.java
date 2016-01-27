@@ -5,6 +5,7 @@ package net.nemerosa.ontrack.model.job;
  * from the running {@linkplain net.nemerosa.ontrack.model.job.Job jobs}.
  */
 @FunctionalInterface
+@Deprecated
 public interface JobInfoListener {
 
     void post(String message);
