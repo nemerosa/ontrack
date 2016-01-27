@@ -27,6 +27,7 @@ public class DefaultJobPortal implements JobPortal, Job {
 
     @Override
     public void registerJobProvider(JobDefinitionProvider jobProvider) {
+        logger.info("[job][system][job-portal] Registering {}", jobProvider);
         jobProviders.add(jobProvider);
     }
 

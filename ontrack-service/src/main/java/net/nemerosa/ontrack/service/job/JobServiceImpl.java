@@ -145,7 +145,8 @@ public class JobServiceImpl implements ScheduledService,
 
     @Override
     public Runnable getTask() {
-        return securityService.runAsAdmin(this::syncJobs);
+        return () -> {};
+        // FIXME return securityService.runAsAdmin(this::syncJobs);
     }
 
     @Override

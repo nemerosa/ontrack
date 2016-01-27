@@ -39,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
@@ -92,6 +93,11 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         this.buildGitCommitLinkService = buildGitCommitLinkService;
         this.gitConfigurators = gitConfigurators;
         this.scmService = scmService;
+    }
+
+    @PostConstruct
+    public void jobRegistration() {
+        jobPortal.registerJobProvider(this);
     }
 
     @Override
