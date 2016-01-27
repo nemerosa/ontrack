@@ -43,14 +43,10 @@ public class DefaultJobScheduler implements JobScheduler {
             logger.info("[job][{}][{}] Stopping existing schedule", job.getKey().getType(), job.getKey().getId());
             existingService.cancel(false);
         }
-        // Gets the job task
-        Runnable jobTask = job.getTask();
-        // Decorates the task
-        Runnable decoratedTask = jobDecorator.decorate(job, jobTask);
         // Creates and starts the scheduled service
         logger.info("[job][{}][{}] Starting service", job.getKey().getType(), job.getKey().getId());
         // Copy stats from old schedule
-        JobScheduledService jobScheduledService = new JobScheduledService(job, decoratedTask, schedule, scheduledExecutorService, existingService);
+        JobScheduledService jobScheduledService = new JobScheduledService(job, schedule, scheduledExecutorService, existingService);
         // Registration
         services.put(job.getKey(), jobScheduledService);
     }
@@ -143,16 +139,17 @@ public class DefaultJobScheduler implements JobScheduler {
         private final AtomicBoolean paused = new AtomicBoolean(false);
         private final AtomicReference<CompletableFuture<?>> completableFuture = new AtomicReference<>();
 
+        private final AtomicReference<JobRunProgress> runProgress = new AtomicReference<>();
         private final AtomicLong runCount = new AtomicLong();
         private final AtomicReference<LocalDateTime> lastRunDate = new AtomicReference<>();
         private final AtomicLong lastRunDurationMs = new AtomicLong();
         private final AtomicLong lastErrorCount = new AtomicLong();
         private final AtomicReference<String> lastError = new AtomicReference<>(null);
 
-        private JobScheduledService(Job job, Runnable decoratedTask, Schedule schedule, ScheduledExecutorService scheduledExecutorService, JobScheduledService old) {
+        private JobScheduledService(Job job, Schedule schedule, ScheduledExecutorService scheduledExecutorService, JobScheduledService old) {
             this.job = job;
             this.schedule = schedule;
-            this.monitoredTask = new MonitoredTask(decoratedTask);
+            this.monitoredTask = jobDecorator.decorate(job, new MonitoredTask());
             // Copies stats from old service
             if (old != null) {
                 runCount.set(old.runCount.get());
@@ -208,6 +205,7 @@ public class DefaultJobScheduler implements JobScheduler {
                     schedule,
                     job.getDescription(),
                     completableFuture.get() != null,
+                    runProgress.get(),
                     runCount.get(),
                     lastRunDate.get(),
                     lastRunDurationMs.get(),
@@ -236,12 +234,6 @@ public class DefaultJobScheduler implements JobScheduler {
 
         private class MonitoredTask implements Runnable {
 
-            private final Runnable decoratedTask;
-
-            public MonitoredTask(Runnable decoratedTask) {
-                this.decoratedTask = decoratedTask;
-            }
-
             @Override
             public void run() {
                 if (isEnabled()) {
@@ -253,7 +245,15 @@ public class DefaultJobScheduler implements JobScheduler {
                         jobListener.onJobStart(job.getKey());
                         // Runs the job
                         long _start = System.currentTimeMillis();
-                        decoratedTask.run();
+                        job.getTask().run(progress -> {
+                            jobListener.onJobProgress(job.getKey(), progress);
+                            logger.debug("[job][{}][{}] {}",
+                                    job.getKey().getType(),
+                                    job.getKey().getId(),
+                                    progress.getText()
+                            );
+                            runProgress.set(progress);
+                        });
                         // No error, counting time
                         long _end = System.currentTimeMillis();
                         lastRunDurationMs.set(_end - _start);
@@ -276,6 +276,7 @@ public class DefaultJobScheduler implements JobScheduler {
                         // Rethrows the error
                         throw ex;
                     } finally {
+                        runProgress.set(null);
                         // Starting
                         jobListener.onJobComplete(job.getKey());
                     }

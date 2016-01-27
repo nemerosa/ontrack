@@ -32,8 +32,8 @@ public class DefaultJobPortal implements JobPortal, Job {
     }
 
     @Override
-    public Runnable getTask() {
-        return () -> {
+    public JobRun getTask() {
+        return (listener) -> {
             logger.debug("[job][system][job-portal] Running the registration for {} providers", jobProviders.size());
             jobProviders.forEach(this::register);
         };

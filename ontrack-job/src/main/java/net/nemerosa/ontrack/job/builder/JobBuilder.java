@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.job.builder;
 
 import net.nemerosa.ontrack.job.Job;
 import net.nemerosa.ontrack.job.JobKey;
+import net.nemerosa.ontrack.job.JobRun;
 
 public class JobBuilder {
 
@@ -40,8 +41,8 @@ public class JobBuilder {
             }
 
             @Override
-            public Runnable getTask() {
-                return task;
+            public JobRun getTask() {
+                return (listener) -> task.run();
             }
 
             @Override

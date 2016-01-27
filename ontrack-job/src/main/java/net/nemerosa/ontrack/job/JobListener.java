@@ -10,4 +10,6 @@ public interface JobListener {
 
     void onJobComplete(JobKey key);
 
+    void onJobProgress(JobKey key, JobRunProgress progress);
+
 }
