@@ -1,5 +1,8 @@
 package net.nemerosa.ontrack.job;
 
+import net.nemerosa.ontrack.job.support.JobNotScheduledException;
+
+import java.util.Optional;
 import java.util.concurrent.Future;
 
 /**
@@ -23,6 +26,17 @@ public interface JobPortal {
      */
     default Future<?> fireImmediately(JobKey key) {
         return getJobScheduler().fireImmediately(key);
+    }
+
+    /**
+     * Fires a job key if possible
+     */
+    default Optional<Future<?>> fireImmediatelyIfPossible(JobKey key) {
+        try {
+            return Optional.of(getJobScheduler().fireImmediately(key));
+        } catch (JobNotScheduledException ex) {
+            return Optional.empty();
+        }
     }
 
 }

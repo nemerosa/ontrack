@@ -100,7 +100,7 @@ class GitBuildSyncIT extends AbstractServiceTestSupport {
                 )
 
                 // Build synchronisation
-                def optionalFuture = gitService.launchBuildSync(branch.id, true)
+                def optionalFuture = gitService.launchBuildSync(branch.id)
                 assert optionalFuture.present
                 def future = optionalFuture.get()
 

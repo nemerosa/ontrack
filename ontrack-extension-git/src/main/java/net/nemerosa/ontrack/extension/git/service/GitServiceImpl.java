@@ -153,9 +153,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         Optional<GitBranchConfiguration> branchConfiguration = getBranchConfiguration(branch);
         // If valid, launches a job
         if (branchConfiguration.isPresent() && branchConfiguration.get().getBuildCommitLink().getLink() instanceof IndexableBuildGitCommitLink) {
-            return Optional.of(
-                    jobPortal.fireImmediately(getGitBranchSyncJobKey(branch))
-            );
+            return jobPortal.fireImmediatelyIfPossible(getGitBranchSyncJobKey(branch));
         }
         // Else, nothing has happened
         else {
@@ -533,7 +531,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             gitRepositoryClientFactory.getClient(gitConfiguration.getGitRepository()).reset();
         }
         // Schedules the job
-        return Optional.of(jobPortal.getJobScheduler().fireImmediately(getGitIndexationJobKey(gitConfiguration)));
+        return jobPortal.fireImmediatelyIfPossible(getGitIndexationJobKey(gitConfiguration));
     }
 
     @Override
