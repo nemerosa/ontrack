@@ -14,7 +14,7 @@ public class DefaultJobPortal implements JobPortal, Job {
 
     private final JobScheduler jobScheduler;
 
-    private final Collection<JobProvider> jobProviders = new ArrayList<>();
+    private final Collection<JobDefinitionProvider> jobProviders = new ArrayList<>();
 
     public DefaultJobPortal(JobScheduler jobScheduler, Schedule schedule) {
         this.jobScheduler = jobScheduler;
@@ -22,7 +22,7 @@ public class DefaultJobPortal implements JobPortal, Job {
     }
 
     @Override
-    public void registerJobProvider(JobProvider jobProvider) {
+    public void registerJobProvider(JobDefinitionProvider jobProvider) {
         jobProviders.add(jobProvider);
     }
 
@@ -37,14 +37,14 @@ public class DefaultJobPortal implements JobPortal, Job {
     }
 
     @Override
-    public Runnable getTask() {
-        return () -> {
+    public JobRun getTask() {
+        return (listener) -> {
             logger.debug("[job][system][job-portal] Running the registration for {} providers", jobProviders.size());
             jobProviders.forEach(this::register);
         };
     }
 
-    protected void register(JobProvider jobProvider) {
+    protected void register(JobDefinitionProvider jobProvider) {
         logger.debug("[job][system][job-portal] Running the registration for {}", jobProvider);
         Collection<JobDefinition> jobDefinitions = jobProvider.getJobs();
         // Checks type consistency
@@ -67,7 +67,7 @@ public class DefaultJobPortal implements JobPortal, Job {
         jobScheduler.unschedule(key);
     }
 
-    protected void checkJobType(JobProvider jobProvider, JobDefinition jobDefinition) {
+    protected void checkJobType(JobDefinitionProvider jobProvider, JobDefinition jobDefinition) {
         if (!StringUtils.equals(jobProvider.getType(), jobDefinition.getJob().getKey().getType())) {
             throw new JobProviderTypeInconsistencyException(
                     jobProvider.getClass(),

@@ -11,6 +11,7 @@ public class JobStatus {
     private final Schedule schedule;
     private final String description;
     private final boolean running;
+    private final JobRunProgress progress;
     private final long runCount;
     private final LocalDateTime lastRunDate;
     private final long lastRunDurationMs;

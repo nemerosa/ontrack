@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.job.support;
 
 import net.nemerosa.ontrack.job.Job;
 import net.nemerosa.ontrack.job.JobKey;
+import net.nemerosa.ontrack.job.JobRun;
 
 public class PauseableJob implements Job {
 
@@ -18,8 +19,8 @@ public class PauseableJob implements Job {
     }
 
     @Override
-    public Runnable getTask() {
-        return () -> {
+    public JobRun getTask() {
+        return (listener) -> {
             count++;
             System.out.println("Count = " + count);
         };

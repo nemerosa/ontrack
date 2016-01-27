@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.job;
 
 import java.util.Collection;
 
-public interface JobProvider {
+public interface JobDefinitionProvider {
 
     String getType();
 

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.job.support;
 
 import net.nemerosa.ontrack.job.Job;
 import net.nemerosa.ontrack.job.JobKey;
+import net.nemerosa.ontrack.job.JobRun;
 
 public class ErrorJob implements Job {
 
@@ -17,8 +18,8 @@ public class ErrorJob implements Job {
     }
 
     @Override
-    public Runnable getTask() {
-        return () -> {
+    public JobRun getTask() {
+        return (listener) -> {
             System.out.println("Failing = " + fail);
             if (fail) {
                 throw new RuntimeException("Failure");

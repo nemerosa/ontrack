@@ -19,4 +19,8 @@ public class NOPJobListener implements JobListener {
     @Override
     public void onJobComplete(JobKey key) {
     }
+
+    @Override
+    public void onJobProgress(JobKey key, JobRunProgress progress) {
+    }
 }

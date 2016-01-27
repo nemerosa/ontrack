@@ -3,12 +3,12 @@ package net.nemerosa.ontrack.job;
 import java.util.Collection;
 import java.util.LinkedList;
 
-public class SimpleJobProvider implements JobProvider {
+public class SimpleJobDefinitionProvider implements JobDefinitionProvider {
 
     private final String type;
     private Collection<JobDefinition> jobs = new LinkedList<>();
 
-    public SimpleJobProvider(String type) {
+    public SimpleJobDefinitionProvider(String type) {
         this.type = type;
     }
 
