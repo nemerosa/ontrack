@@ -5,16 +5,16 @@ import java.util.LinkedList;
 
 public class SimpleJobDefinitionProvider implements JobDefinitionProvider {
 
-    private final String type;
+    private final JobType type;
     private Collection<JobDefinition> jobs = new LinkedList<>();
 
-    public SimpleJobDefinitionProvider(String type) {
+    public SimpleJobDefinitionProvider(JobType type) {
         this.type = type;
     }
 
     @Override
-    public String getType() {
-        return type;
+    public JobCategory getJobCategory() {
+        return type.getCategory();
     }
 
     @Override

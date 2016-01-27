@@ -22,6 +22,8 @@ import net.nemerosa.ontrack.git.GitRepositoryClient;
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory;
 import net.nemerosa.ontrack.git.exceptions.GitRepositorySyncException;
 import net.nemerosa.ontrack.git.model.*;
+import net.nemerosa.ontrack.job.JobCategory;
+import net.nemerosa.ontrack.job.JobType;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.job.*;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
@@ -53,6 +55,11 @@ import static java.lang.String.format;
 @Service
 @Transactional
 public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration, GitBuildInfo, GitChangeLogIssue> implements GitService, JobProvider {
+
+    private static final JobCategory GIT_JOB_CATEGORY = JobCategory.of("git").withName("Git");
+
+    private static final JobType GIT_INDEXATION_JOB = GIT_JOB_CATEGORY.getType("git-indexation").withName("Git indexation");
+    private static final JobType GIT_BUILD_SYNC_JOB = GIT_JOB_CATEGORY.getType("git-build-sync").withName("Git build synchronisation");
 
     private final Logger logger = LoggerFactory.getLogger(GitService.class);
 
@@ -840,7 +847,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                         config.getRemote(),
                         config.getName(),
                         config.getType()
-                        );
+                );
             }
 
             @Override

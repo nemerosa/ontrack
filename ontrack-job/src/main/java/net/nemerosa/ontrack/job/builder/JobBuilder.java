@@ -3,17 +3,18 @@ package net.nemerosa.ontrack.job.builder;
 import net.nemerosa.ontrack.job.Job;
 import net.nemerosa.ontrack.job.JobKey;
 import net.nemerosa.ontrack.job.JobRun;
+import net.nemerosa.ontrack.job.JobType;
 
 public class JobBuilder {
 
-    private final String type;
+    private final JobType type;
     private final String id;
     private String description = "";
     private Runnable task = () -> {
     };
     private boolean disabled = false;
 
-    public JobBuilder(String type, String id) {
+    public JobBuilder(JobType type, String id) {
         this.type = type;
         this.id = id;
     }
@@ -57,7 +58,7 @@ public class JobBuilder {
         };
     }
 
-    public static JobBuilder create(String type, String id) {
+    public static JobBuilder create(JobType type, String id) {
         return new JobBuilder(type, id);
     }
 

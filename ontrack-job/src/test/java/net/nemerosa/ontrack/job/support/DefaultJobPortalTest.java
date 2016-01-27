@@ -16,8 +16,10 @@ import static org.junit.Assert.assertTrue;
 
 public class DefaultJobPortalTest {
 
-    private final BiFunction<Integer, AtomicLong, Job> jobCreation = (no, atomicLong) ->
-            JobBuilder.create("test", "job-" + no)
+    private static final JobType JOB_TYPE = Fixtures.TEST_CATEGORY.getType("test");
+
+    private final BiFunction<Integer, AtomicLong, Job> jobCreation =
+            (no, atomicLong) -> JobBuilder.create(JOB_TYPE, "job-" + no)
                     .withTask(atomicLong::incrementAndGet)
                     .build();
 
@@ -53,7 +55,7 @@ public class DefaultJobPortalTest {
         Job job3 = jobCreation.apply(3, count3);
 
         // Job provider
-        SimpleJobDefinitionProvider jobProvider = new SimpleJobDefinitionProvider("test");
+        SimpleJobDefinitionProvider jobProvider = new SimpleJobDefinitionProvider(JOB_TYPE);
         jobProvider.setJobs(Schedule.EVERY_SECOND, job1, job2, job3);
 
         // Registration in the portal
@@ -87,7 +89,7 @@ public class DefaultJobPortalTest {
         Job job4 = jobCreation.apply(4, count4);
 
         // Job provider
-        SimpleJobDefinitionProvider jobProvider = new SimpleJobDefinitionProvider("test");
+        SimpleJobDefinitionProvider jobProvider = new SimpleJobDefinitionProvider(JOB_TYPE);
         jobProvider.setJobs(Schedule.EVERY_SECOND, job1, job2, job3);
 
         // Registration in the portal

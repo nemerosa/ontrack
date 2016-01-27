@@ -52,7 +52,14 @@ public interface JobScheduler {
      *
      * @see JobKey#getType()
      */
-    Collection<JobKey> getJobKeysOfType(String type);
+    Collection<JobKey> getJobKeysOfType(JobType type);
+
+    /**
+     * Gets all the job keys for a category of jobs
+     *
+     * @see JobType#getCategory()
+     */
+    Collection<JobKey> getJobKeysOfCategory(JobCategory category);
 
     /**
      * Gets the list of job statuses
