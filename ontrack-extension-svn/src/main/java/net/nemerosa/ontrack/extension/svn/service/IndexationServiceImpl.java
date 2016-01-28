@@ -43,6 +43,8 @@ public class IndexationServiceImpl implements IndexationService, StartupService 
             .getType("svn-indexation")
             .withName("SVN Indexation");
 
+    private static final String INDEXATION_RANGE_PARAMETER = "range";
+
     private final Logger logger = LoggerFactory.getLogger(IndexationService.class);
     private final TransactionTemplate transactionTemplate;
     private final SVNConfigurationService configurationService;
@@ -94,8 +96,12 @@ public class IndexationServiceImpl implements IndexationService, StartupService 
 
     @Override
     public Ack indexRange(String name, IndexationRange range) {
-        // FIXME Fires the indexation job with some additional parameters
-        return Ack.NOK;
+        SVNConfiguration configuration = configurationService.getConfiguration(name);
+        jobScheduler.fireImmediately(
+                getIndexationJobKey(configuration),
+                Collections.singletonMap(INDEXATION_RANGE_PARAMETER, range)
+        );
+        return Ack.OK;
     }
 
     @Override
@@ -160,19 +166,32 @@ public class IndexationServiceImpl implements IndexationService, StartupService 
     protected void indexFromLatest(SVNRepository repository, JobRunListener runListener) {
         securityService.checkGlobalFunction(GlobalSettings.class);
         try (Transaction ignored = transactionService.start()) {
-            // Loads the repository information
-            SVNURL url = SVNUtils.toURL(repository.getConfiguration().getUrl());
-            // Last scanned revision
-            long lastScannedRevision = revisionDao.getLast(repository.getId());
-            if (lastScannedRevision <= 0) {
-                lastScannedRevision = repository.getConfiguration().getIndexationStart();
+            // Range of the indexation
+            long from;
+            long to;
+            // Gets the indexation range if any
+            Optional<IndexationRange> range = runListener.getParam(INDEXATION_RANGE_PARAMETER);
+            if (range.isPresent()) {
+                from = range.get().getFrom();
+                to = range.get().getTo();
+            } else {
+                // Loads the repository information
+                SVNURL url = SVNUtils.toURL(repository.getConfiguration().getUrl());
+                // Last scanned revision
+                long lastScannedRevision = revisionDao.getLast(repository.getId());
+                if (lastScannedRevision <= 0) {
+                    lastScannedRevision = repository.getConfiguration().getIndexationStart();
+                }
+                // HEAD revision
+                long repositoryRevision = svnClient.getRepositoryRevision(repository, url);
+                // Logging
+                logger.info("[svn-indexation] Repository={}, LastScannedRevision={}", repository.getId(), lastScannedRevision);
+                // Range
+                from = lastScannedRevision + 1;
+                to = repositoryRevision;
             }
-            // Logging
-            logger.info("[svn-indexation] Repository={}, LastScannedRevision={}", repository.getId(), lastScannedRevision);
-            // HEAD revision
-            long repositoryRevision = svnClient.getRepositoryRevision(repository, url);
             // Request index of the range
-            indexRange(repository, lastScannedRevision + 1, repositoryRevision, runListener);
+            indexRange(repository, from, to, runListener);
         }
 
     }
