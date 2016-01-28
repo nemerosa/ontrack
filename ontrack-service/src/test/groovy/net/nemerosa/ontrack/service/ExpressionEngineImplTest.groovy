@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.model.exceptions.ExpressionCompilationException
 import net.nemerosa.ontrack.model.structure.ExpressionEngine
+import org.apache.commons.lang3.SystemUtils
 import org.junit.Test
 
 import static org.junit.Assert.fail
@@ -66,17 +67,17 @@ class ExpressionEngineImplTest {
     }
 
     @Test(expected = ExpressionCompilationException)
-    void 'Compilation: no such property'() {
+    void 'Compilation - no such property'() {
         engine.resolve('x', [sourceName: 'test'])
     }
 
     @Test(expected = ExpressionCompilationException)
-    void 'Secure resolve: no closure'() {
+    void 'Secure resolve - no closure'() {
         engine.resolve('sourceName + { "test" }', [sourceName: 'test'])
     }
 
     @Test(expected = ExpressionCompilationException)
-    void 'Secure resolve: runtime not authorised'() {
+    void 'Secure resolve - runtime not authorised'() {
         engine.resolve('sourceName + Runtime.runtime.freeMemory()', [sourceName: 'test'])
     }
 
@@ -92,29 +93,35 @@ Expression "${expression}" cannot be compiled:
     }
 
     @Test
-    void 'Secure resolve: runtime not authorised - output message'() {
-        on('sourceName + Runtime.runtime.totalMemory()', [sourceName: 'test']) {
-            'java.lang.Runtime class cannot be accessed.'
+    void 'Secure resolve - runtime not authorised - output message'() {
+        if (!SystemUtils.IS_OS_WINDOWS) {
+            on('sourceName + Runtime.runtime.totalMemory()', [sourceName: 'test']) {
+                'java.lang.Runtime class cannot be accessed.'
+            }
         }
     }
 
     @Test
-    void 'Secure resolve: system not authorised'() {
-        on('sourceName + System.getenv("PATH")', [sourceName: 'test']) {
-            "java.lang.System class cannot be accessed."
+    void 'Secure resolve - system not authorised'() {
+        if (!SystemUtils.IS_OS_WINDOWS) {
+            on('sourceName + System.getenv("PATH")', [sourceName: 'test']) {
+                "java.lang.System class cannot be accessed."
+            }
         }
     }
 
     @Test
-    void 'Secure resolve: execute not authorised'() {
-        on('sourceName + "ls".execute()', [sourceName: 'test']) {
-            // Hmmm, this test won't work on Windows...
-            "java.lang.UNIXProcess class cannot be accessed."
+    void 'Secure resolve - execute not authorised'() {
+        if (!SystemUtils.IS_OS_WINDOWS){
+            on('sourceName + "ls".execute()', [sourceName: 'test']) {
+                // Hmmm, this test won't work on Windows...
+                "java.lang.UNIXProcess class cannot be accessed."
+            }
         }
     }
 
     @Test
-    void 'Secure resolve: regex: replacement'() {
+    void 'Secure resolve - regex - replacement'() {
         assert engine.resolve('sourceName.replaceAll("_", ".")', [sourceName: '1_0']) == '1.0'
     }
 
