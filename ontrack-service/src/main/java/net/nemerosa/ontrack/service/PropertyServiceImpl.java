@@ -120,6 +120,8 @@ public class PropertyServiceImpl implements PropertyService {
             if (ack.isSuccess()) {
                 // Property deletion event
                 eventPostService.post(eventFactory.propertyDelete(entity, propertyType));
+                // Listener
+                propertyType.onPropertyDeleted(entity);
             }
             // OK
             return ack;
@@ -163,6 +165,8 @@ public class PropertyServiceImpl implements PropertyService {
         );
         // Property change event
         eventPostService.post(eventFactory.propertyChange(entity, propertyType));
+        // Listener
+        propertyType.onPropertyChanged(entity, value);
         // OK
         return Ack.OK;
     }

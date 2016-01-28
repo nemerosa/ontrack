@@ -147,4 +147,21 @@ public interface PropertyType<T> extends Extension {
     default T copy(ProjectEntity sourceEntity, T value, ProjectEntity targetEntity, Function<String, String> replacementFn) {
         return replaceValue(value, replacementFn);
     }
+
+    /**
+     * This method is called when the property value changes (created or updated) for an entity
+     *
+     * @param entity Entity for which the property is changed
+     * @param value  New value
+     */
+    default void onPropertyChanged(ProjectEntity entity, T value) {
+    }
+
+    /**
+     * This method is called when the property is deleted for an entity
+     *
+     * @param entity Entity for which the property is deleted
+     */
+    default void onPropertyDeleted(ProjectEntity entity) {
+    }
 }
