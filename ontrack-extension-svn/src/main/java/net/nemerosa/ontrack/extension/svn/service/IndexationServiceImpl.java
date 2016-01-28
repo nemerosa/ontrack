@@ -40,10 +40,6 @@ import java.util.function.Consumer;
 @Service
 public class IndexationServiceImpl implements IndexationService, StartupService, ConfigurationServiceListener<SVNConfiguration> {
 
-    private static final JobType INDEXATION_JOB = SVNService.SVN_JOB_CATEGORY
-            .getType("svn-indexation")
-            .withName("SVN Indexation");
-
     private static final String INDEXATION_RANGE_PARAMETER = "range";
 
     private final Logger logger = LoggerFactory.getLogger(IndexationService.class);

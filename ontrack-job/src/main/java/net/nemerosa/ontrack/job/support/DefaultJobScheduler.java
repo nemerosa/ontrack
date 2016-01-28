@@ -236,9 +236,11 @@ public class DefaultJobScheduler implements JobScheduler {
         }
 
         private LocalDateTime getNextRunDate() {
-            LocalDateTime date = lastRunDate.get();
-            if (date != null) {
-                return date.plus(schedule.toMiliseconds(), ChronoUnit.MILLIS);
+            if (scheduledFuture != null) {
+                return Time.now().plus(
+                        scheduledFuture.getDelay(TimeUnit.SECONDS),
+                        ChronoUnit.SECONDS
+                );
             } else {
                 return null;
             }
