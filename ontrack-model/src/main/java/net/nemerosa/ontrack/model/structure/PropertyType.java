@@ -160,8 +160,9 @@ public interface PropertyType<T> extends Extension {
     /**
      * This method is called when the property is deleted for an entity
      *
-     * @param entity Entity for which the property is deleted
+     * @param entity   Entity for which the property is deleted
+     * @param oldValue Old value
      */
-    default void onPropertyDeleted(ProjectEntity entity) {
+    default void onPropertyDeleted(ProjectEntity entity, T oldValue) {
     }
 }

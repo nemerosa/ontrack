@@ -27,10 +27,7 @@ import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.model.support.AbstractBranchJob;
-import net.nemerosa.ontrack.model.support.ApplicationLogService;
-import net.nemerosa.ontrack.model.support.MessageAnnotationUtils;
-import net.nemerosa.ontrack.model.support.MessageAnnotator;
+import net.nemerosa.ontrack.model.support.*;
 import net.nemerosa.ontrack.tx.Transaction;
 import net.nemerosa.ontrack.tx.TransactionService;
 import org.apache.commons.lang3.StringUtils;
@@ -39,7 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
@@ -51,7 +47,7 @@ import static java.lang.String.format;
 
 @Service
 @Transactional
-public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration, GitBuildInfo, GitChangeLogIssue> implements GitService, JobDefinitionProvider {
+public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration, GitBuildInfo, GitChangeLogIssue> implements GitService, StartupService {
 
     private static final JobCategory GIT_JOB_CATEGORY = JobCategory.of("git").withName("Git");
 
@@ -60,7 +56,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
 
     private final PropertyService propertyService;
     private final IssueServiceRegistry issueServiceRegistry;
-    private final JobPortal jobPortal;
+    private final JobScheduler jobScheduler;
     private final SecurityService securityService;
     private final TransactionService transactionService;
     private final ApplicationLogService applicationLogService;
@@ -74,7 +70,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             StructureService structureService,
             PropertyService propertyService,
             IssueServiceRegistry issueServiceRegistry,
-            JobPortal jobPortal,
+            JobScheduler jobScheduler,
             SecurityService securityService,
             TransactionService transactionService,
             ApplicationLogService applicationLogService,
@@ -85,7 +81,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         super(structureService, propertyService);
         this.propertyService = propertyService;
         this.issueServiceRegistry = issueServiceRegistry;
-        this.jobPortal = jobPortal;
+        this.jobScheduler = jobScheduler;
         this.securityService = securityService;
         this.transactionService = transactionService;
         this.applicationLogService = applicationLogService;
@@ -93,11 +89,6 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         this.buildGitCommitLinkService = buildGitCommitLinkService;
         this.gitConfigurators = gitConfigurators;
         this.scmService = scmService;
-    }
-
-    @PostConstruct
-    public void jobRegistration() {
-        jobPortal.registerJobProvider(this);
     }
 
     @Override
@@ -126,24 +117,27 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     @Override
-    public JobCategory getJobCategory() {
-        return GIT_JOB_CATEGORY;
+    public String getName() {
+        return "Git jobs registration";
     }
 
     @Override
-    public Collection<JobDefinition> getJobs() {
-        Collection<JobDefinition> jobs = new ArrayList<>();
+    public int startupOrder() {
+        return StartupService.JOB_REGISTRATION;
+    }
+
+    @Override
+    public void start() {
         // Indexation of repositories, based on projects actually linked
-        forEachConfiguredProject((project, configuration) -> jobs.add(createIndexationJob(configuration)));
+        forEachConfiguredProject((project, configuration) -> scheduleGitIndexation(configuration));
         // Synchronisation of branch builds with tags when applicable
         forEachConfiguredBranch((branch, branchConfiguration) -> {
             // Build/tag sync job
             if (branchConfiguration.getBuildTagInterval() > 0
                     && branchConfiguration.getBuildCommitLink().getLink() instanceof IndexableBuildGitCommitLink) {
-                jobs.add(createBuildSyncJob(branch, branchConfiguration));
+                // FIXME jobs.add(createBuildSyncJob(branch, branchConfiguration));
             }
         });
-        return jobs;
     }
 
     @Override
@@ -159,7 +153,8 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         Optional<GitBranchConfiguration> branchConfiguration = getBranchConfiguration(branch);
         // If valid, launches a job
         if (branchConfiguration.isPresent() && branchConfiguration.get().getBuildCommitLink().getLink() instanceof IndexableBuildGitCommitLink) {
-            return jobPortal.fireImmediatelyIfPossible(getGitBranchSyncJobKey(branch));
+            // FIXME return jobPortal.fireImmediatelyIfPossible(getGitBranchSyncJobKey(branch));
+            return Optional.empty();
         }
         // Else, nothing has happened
         else {
@@ -537,7 +532,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             gitRepositoryClientFactory.getClient(gitConfiguration.getGitRepository()).reset();
         }
         // Schedules the job
-        return jobPortal.fireImmediatelyIfPossible(getGitIndexationJobKey(gitConfiguration));
+        return Optional.of(jobScheduler.fireImmediately(getGitIndexationJobKey(gitConfiguration)));
     }
 
     @Override
@@ -827,36 +822,33 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         return GIT_INDEXATION_JOB.getKey(config.getGitRepository().getId());
     }
 
-    private JobDefinition createIndexationJob(GitConfiguration config) {
-        return new JobDefinition(
-                new Job() {
-                    @Override
-                    public JobKey getKey() {
-                        return getGitIndexationJobKey(config);
-                    }
+    private Job createIndexationJob(GitConfiguration config) {
+        return new Job() {
+            @Override
+            public JobKey getKey() {
+                return getGitIndexationJobKey(config);
+            }
 
-                    @Override
-                    public JobRun getTask() {
-                        return (runListener -> index(config, runListener));
-                    }
+            @Override
+            public JobRun getTask() {
+                return (runListener -> index(config, runListener));
+            }
 
-                    @Override
-                    public String getDescription() {
-                        return format(
-                                "Git indexation for %s (%s @ %s)",
-                                config.getRemote(),
-                                config.getName(),
-                                config.getType()
-                        );
-                    }
+            @Override
+            public String getDescription() {
+                return format(
+                        "Git indexation for %s (%s @ %s)",
+                        config.getRemote(),
+                        config.getName(),
+                        config.getType()
+                );
+            }
 
-                    @Override
-                    public boolean isDisabled() {
-                        return false;
-                    }
-                },
-                Schedule.everyMinutes(config.getIndexationInterval())
-        );
+            @Override
+            public boolean isDisabled() {
+                return false;
+            }
+        };
     }
 
     protected <T> void buildSync(Branch branch, GitBranchConfiguration branchConfiguration, JobRunListener listener) {
@@ -931,4 +923,16 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         client.sync(listener.logger());
     }
 
+    @Override
+    public void scheduleGitIndexation(GitConfiguration configuration) {
+        jobScheduler.schedule(
+                createIndexationJob(configuration),
+                Schedule.everyMinutes(configuration.getIndexationInterval())
+        );
+    }
+
+    @Override
+    public void unscheduleGitIndexation(GitConfiguration configuration) {
+        jobScheduler.unschedule(getGitIndexationJobKey(configuration));
+    }
 }

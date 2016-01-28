@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.job;
 import lombok.Data;
 
 @Data
+@Deprecated
 public class JobDefinition {
 
     private final Job job;

@@ -48,7 +48,7 @@ class GitServiceImplTest {
                 structureService,
                 propertyService,
                 mock(IssueServiceRegistry),
-                mock(JobPortal),
+                mock(JobPortal), jobScheduler,
                 mock(SecurityService),
                 mock(TransactionService),
                 mock(ApplicationLogService),

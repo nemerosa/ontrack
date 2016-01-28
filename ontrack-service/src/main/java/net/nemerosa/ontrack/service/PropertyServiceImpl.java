@@ -121,7 +121,7 @@ public class PropertyServiceImpl implements PropertyService {
                 // Property deletion event
                 eventPostService.post(eventFactory.propertyDelete(entity, propertyType));
                 // Listener
-                propertyType.onPropertyDeleted(entity);
+                propertyType.onPropertyDeleted(entity, value);
             }
             // OK
             return ack;

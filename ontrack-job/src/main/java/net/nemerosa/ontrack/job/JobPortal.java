@@ -9,6 +9,7 @@ import java.util.concurrent.Future;
  * The <code>JobPortal</code> is used by {@link JobDefinitionProvider providers of jobs} to register their list of jobs.
  * Regularly, the registered jobs will be synchronised with the {@link JobScheduler job scheduler}.
  */
+@Deprecated
 public interface JobPortal {
 
     /**

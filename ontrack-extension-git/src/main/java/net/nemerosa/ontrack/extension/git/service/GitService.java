@@ -139,4 +139,14 @@ public interface GitService {
      * @return Synchronisation information
      */
     GitSynchronisationInfo getProjectGitSyncInfo(Project project);
+
+    /**
+     * Schedules some Git indexation
+     */
+    void scheduleGitIndexation(GitConfiguration configuration);
+
+    /**
+     * Unschedules some Git indexation
+     */
+    void unscheduleGitIndexation(GitConfiguration configuration);
 }
