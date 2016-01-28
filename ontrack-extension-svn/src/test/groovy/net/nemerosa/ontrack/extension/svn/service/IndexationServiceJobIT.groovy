@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.svn.service
 
+import net.nemerosa.ontrack.extension.svn.db.SVNRepository
+import net.nemerosa.ontrack.extension.svn.db.SVNRepositoryDao
 import net.nemerosa.ontrack.extension.svn.support.SVNProfileValueSource
 import net.nemerosa.ontrack.extension.svn.support.SVNTestRepo
 import net.nemerosa.ontrack.extension.svn.support.SVNTestUtils
@@ -36,15 +38,25 @@ class IndexationServiceJobIT extends AbstractServiceTestSupport {
     private SVNConfigurationService configurationService
 
     @Autowired
+    private SVNRepositoryDao repositoryDao
+
+    @Autowired
     private JobScheduler jobScheduler
 
     @Test
     @IfProfileValue(name = "svn", value = "true")
     void 'Scheduling and unscheduling'() {
 
+        // Definition of the repository
+
+        def configuration = SVNTestUtils.repository().configuration
+        def repositoryId = repositoryDao.getOrCreateByName(configuration.name)
+        def repository = SVNRepository.of(repositoryId, configuration, null)
+
+
         // New configuration
 
-        def configuration = SVNTestUtils.repository().configuration.withIndexationInterval(0)
+        configuration = repository.configuration
         asUser().with(GlobalSettings).call {
             configurationService.newConfiguration(configuration)
         }
@@ -57,7 +69,7 @@ class IndexationServiceJobIT extends AbstractServiceTestSupport {
 
         // Updating the configuration
 
-        configuration = SVNTestUtils.repository().configuration.withIndexationInterval(10)
+        configuration = repository.configuration.withIndexationInterval(10)
         asUser().with(GlobalSettings).call {
             configurationService.updateConfiguration(configuration.name, configuration)
         }
