@@ -166,12 +166,17 @@ public class DefaultJobScheduler implements JobScheduler {
                 lastError.set(old.lastError.get());
             }
             // Scheduling now
-            scheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(
-                    this,
-                    schedule.getInitialPeriod(),
-                    schedule.getPeriod(),
-                    schedule.getUnit()
-            );
+            if (schedule.getPeriod() > 0) {
+                scheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(
+                        this,
+                        schedule.getInitialPeriod(),
+                        schedule.getPeriod(),
+                        schedule.getUnit()
+                );
+            } else {
+                logger.debug("[job]{} Job not scheduled since period = 0", job.getKey());
+                scheduledFuture = null;
+            }
         }
 
         @Override

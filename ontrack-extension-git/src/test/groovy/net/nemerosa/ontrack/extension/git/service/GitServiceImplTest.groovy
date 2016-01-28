@@ -10,7 +10,7 @@ import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
 import net.nemerosa.ontrack.extension.scm.service.SCMService
 import net.nemerosa.ontrack.git.GitRepositoryClient
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory
-import net.nemerosa.ontrack.job.JobPortal
+import net.nemerosa.ontrack.job.JobScheduler
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.ApplicationLogService
@@ -48,7 +48,7 @@ class GitServiceImplTest {
                 structureService,
                 propertyService,
                 mock(IssueServiceRegistry),
-                mock(JobPortal), jobScheduler,
+                mock(JobScheduler),
                 mock(SecurityService),
                 mock(TransactionService),
                 mock(ApplicationLogService),
