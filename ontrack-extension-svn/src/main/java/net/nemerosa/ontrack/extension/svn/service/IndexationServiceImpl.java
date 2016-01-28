@@ -12,10 +12,11 @@ import net.nemerosa.ontrack.extension.svn.model.LastRevisionInfo;
 import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration;
 import net.nemerosa.ontrack.extension.svn.model.SVNIndexationException;
 import net.nemerosa.ontrack.extension.svn.support.SVNUtils;
+import net.nemerosa.ontrack.job.*;
 import net.nemerosa.ontrack.model.Ack;
-import net.nemerosa.ontrack.model.job.*;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.support.StartupService;
 import net.nemerosa.ontrack.tx.Transaction;
 import net.nemerosa.ontrack.tx.TransactionService;
 import org.apache.commons.lang3.StringUtils;
@@ -34,12 +35,14 @@ import org.tmatesoft.svn.core.wc.SVNRevision;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 @Service
-public class IndexationServiceImpl implements IndexationService, JobProvider {
+public class IndexationServiceImpl implements IndexationService, StartupService {
 
-    public static final String SVN_INDEXATION_JOB_GROUP = "SVNIndexation";
+    private static final JobType INDEXATION_JOB = SVNService.SVN_JOB_CATEGORY
+            .getType("svn-indexation")
+            .withName("SVN Indexation");
+
     private final Logger logger = LoggerFactory.getLogger(IndexationService.class);
     private final TransactionTemplate transactionTemplate;
     private final SVNConfigurationService configurationService;
@@ -51,7 +54,7 @@ public class IndexationServiceImpl implements IndexationService, JobProvider {
     private final SecurityService securityService;
     private final TransactionService transactionService;
     private final ApplicationContext applicationContext;
-    private final JobQueueService jobQueueService;
+    private final JobScheduler jobScheduler;
 
     @Autowired
     public IndexationServiceImpl(
@@ -65,10 +68,10 @@ public class IndexationServiceImpl implements IndexationService, JobProvider {
             SecurityService securityService,
             TransactionService transactionService,
             ApplicationContext applicationContext,
-            JobQueueService jobQueueService) {
+            JobScheduler jobScheduler) {
         this.applicationContext = applicationContext;
         this.issueRevisionDao = issueRevisionDao;
-        this.jobQueueService = jobQueueService;
+        this.jobScheduler = jobScheduler;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
         this.configurationService = configurationService;
         this.repositoryDao = repositoryDao;
@@ -85,124 +88,26 @@ public class IndexationServiceImpl implements IndexationService, JobProvider {
     @Override
     public Ack indexFromLatest(String name) {
         SVNConfiguration configuration = configurationService.getConfiguration(name);
-        return Ack.validate(jobQueueService.queue(createIndexFromLatestJob(configuration)).isPresent());
+        jobScheduler.fireImmediately(getIndexationJobKey(configuration));
+        return Ack.OK;
     }
 
     @Override
     public Ack indexRange(String name, IndexationRange range) {
-        return Ack.validate(
-                jobQueueService.queue(new Job() {
-
-                    @Override
-                    public boolean isDisabled() {
-                        return false;
-                    }
-
-                    @Override
-                    public String getGroup() {
-                        return SVN_INDEXATION_JOB_GROUP;
-                    }
-
-                    @Override
-                    public String getCategory() {
-                        return "SVNIndexRange";
-                    }
-
-                    @Override
-                    public String getId() {
-                        return name;
-                    }
-
-                    @Override
-                    public String getDescription() {
-                        return String.format(
-                                "SVN range indexation for %s, from %d to %d",
-                                name,
-                                range.getFrom(),
-                                range.getTo()
-                        );
-                    }
-
-                    @Override
-                    public int getInterval() {
-                        return 0;
-                    }
-
-                    @Override
-                    public JobTask createTask() {
-                        SVNRepository repository = getRepositoryByName(name);
-                        return new RunnableJobTask(info ->
-                                indexRange(repository, range.getFrom(), range.getTo(), info)
-                        );
-                    }
-                }).isPresent()
-        );
+        // FIXME Fires the indexation job with some additional parameters
+        return Ack.NOK;
     }
 
     @Override
     public Ack reindex(String name) {
-        // Reindex job
-        Job reindexJob = new Job() {
-
-            @Override
-            public boolean isDisabled() {
-                return false;
-            }
-
-            @Override
-            public String getGroup() {
-                return SVN_INDEXATION_JOB_GROUP;
-            }
-
-            @Override
-            public String getCategory() {
-                return "SVNReIndex";
-            }
-
-            @Override
-            public String getId() {
-                return name;
-            }
-
-            @Override
-            public String getDescription() {
-                return String.format(
-                        "SVN full reindexation for %s",
-                        name
-                );
-            }
-
-            @Override
-            public int getInterval() {
-                return 0;
-            }
-
-            @Override
-            public JobTask createTask() {
-                return new RunnableJobTask(
-                        info -> fullReindexation(name, info)
-                );
-            }
-        };
-        // OK, launches a new indexation
-        return Ack.validate(
-                jobQueueService.queue(reindexJob).isPresent()
-        );
-    }
-
-    private void fullReindexation(String name, JobInfoListener infoListener) {
         // Gets the repository if it exists
         Integer repositoryId = repositoryDao.findByName(name);
         // If it exists, delete it
         if (repositoryId != null) {
             repositoryDao.delete(repositoryId);
         }
-        // Creates the repository entry
-        repositoryId = repositoryDao.create(name);
-        // Gets the configuration
-        SVNRepository repository = loadRepository(repositoryId, name);
-        // Index from latest
-        indexFromLatest(repository, infoListener);
+        // Fires the indexation
+        return indexFromLatest(name);
     }
 
     protected SVNRepository getRepositoryByName(String name) {
@@ -252,7 +157,7 @@ public class IndexationServiceImpl implements IndexationService, JobProvider {
         }
     }
 
-    protected void indexFromLatest(SVNRepository repository, JobInfoListener infoListener) {
+    protected void indexFromLatest(SVNRepository repository, JobRunListener runListener) {
         securityService.checkGlobalFunction(GlobalSettings.class);
         try (Transaction ignored = transactionService.start()) {
             // Loads the repository information
@@ -267,12 +172,12 @@ public class IndexationServiceImpl implements IndexationService, JobProvider {
             // HEAD revision
             long repositoryRevision = svnClient.getRepositoryRevision(repository, url);
             // Request index of the range
-            indexRange(repository, lastScannedRevision + 1, repositoryRevision, infoListener);
+            indexRange(repository, lastScannedRevision + 1, repositoryRevision, runListener);
         }
 
     }
 
-    private void indexRange(SVNRepository repository, Long from, Long to, JobInfoListener infoListener) {
+    private void indexRange(SVNRepository repository, Long from, Long to, JobRunListener runListener) {
         logger.info("[svn-indexation] Repository={}, Range={}->{}", repository.getConfiguration().getName(), from, to);
         long min;
         long max;
@@ -285,19 +190,50 @@ public class IndexationServiceImpl implements IndexationService, JobProvider {
             max = Math.max(from, to);
         }
         // Indexation
-        index(repository, min, max, infoListener);
+        index(repository, min, max, runListener);
     }
 
     @Override
-    public Collection<Job> getJobs() {
-        return getSvnConfigurations().stream()
-                .filter(config -> config.getIndexationInterval() > 0)
-                .map(this::createIndexFromLatestJob)
-                .collect(Collectors.toList());
+    public String getName() {
+        return "SVN Indexation";
     }
 
-    protected Job createIndexFromLatestJob(SVNConfiguration configuration) {
-        return new Job() {
+    @Override
+    public int startupOrder() {
+        return JOB_REGISTRATION;
+    }
+
+    @Override
+    public void start() {
+        getSvnConfigurations().forEach(this::scheduleSvnIndexation);
+    }
+
+    private void scheduleSvnIndexation(SVNConfiguration config) {
+        jobScheduler.schedule(
+                createIndexFromLatestJob(config),
+                Schedule.everyMinutes(config.getIndexationInterval())
+        );
+    }
+
+    protected JobKey getIndexationJobKey(SVNConfiguration configuration) {
+        return INDEXATION_JOB.getKey(configuration.getName());
+    }
+
+    protected net.nemerosa.ontrack.job.Job createIndexFromLatestJob(SVNConfiguration configuration) {
+        return new net.nemerosa.ontrack.job.Job() {
+
+            @Override
+            public JobKey getKey() {
+                return getIndexationJobKey(configuration);
+            }
+
+            @Override
+            public JobRun getTask() {
+                return runListener -> indexFromLatest(
+                        getRepositoryByName(configuration.getName()),
+                        runListener
+                );
+            }
 
             @Override
             public boolean isDisabled() {
@@ -305,40 +241,10 @@ public class IndexationServiceImpl implements IndexationService, JobProvider {
             }
 
             @Override
-            public String getGroup() {
-                return SVN_INDEXATION_JOB_GROUP;
-            }
-
-            @Override
-            public String getCategory() {
-                return "SVNIndexLatest";
-            }
-
-            @Override
-            public String getId() {
-                return configuration.getName();
-            }
-
-            @Override
             public String getDescription() {
                 return String.format(
                         "SVN indexation from latest for %s",
                         configuration.getName()
-                );
-            }
-
-            @Override
-            public int getInterval() {
-                return configuration.getIndexationInterval();
-            }
-
-            @Override
-            public JobTask createTask() {
-                return new RunnableJobTask(
-                        info -> indexFromLatest(
-                                getRepositoryByName(configuration.getName()),
-                                info
-                        )
                 );
             }
         };
@@ -425,15 +331,16 @@ public class IndexationServiceImpl implements IndexationService, JobProvider {
                     message
             );
             // For each issue in the message
-            for (String issueKey : issues) {
-                // Checks that the issue has not already been associated with this revision
-                if (!revisionIssues.contains(issueKey)) {
-                    revisionIssues.add(issueKey);
-                    logger.info(String.format("     Indexing revision %d <-> %s", revision, issueKey));
+            issues.stream()
+                    // Checks that the issue has not already been associated with this revision
+                    .filter(issueKey -> !revisionIssues.contains(issueKey))
                     // Indexes this issue
-                    issueRevisionDao.link(repository.getId(), revision, issueKey);
-                }
-            }
+                    .forEach(issueKey -> {
+                        revisionIssues.add(issueKey);
+                        logger.info(String.format("     Indexing revision %d <-> %s", revision, issueKey));
+                        // Indexes this issue
+                        issueRevisionDao.link(repository.getId(), revision, issueKey);
+                    });
         }
     }
 
@@ -524,7 +431,7 @@ public class IndexationServiceImpl implements IndexationService, JobProvider {
      * Indexation of a range in a thread for one repository - since it is called by a single thread executor, we can
      * be sure that only one call of this method is running at one time for one given repository.
      */
-    protected void index(SVNRepository repository, long from, long to, JobInfoListener infoListener) {
+    protected void index(SVNRepository repository, long from, long to, JobRunListener runListener) {
         // Ordering
         if (from > to) {
             long t = from;
@@ -556,15 +463,13 @@ public class IndexationServiceImpl implements IndexationService, JobProvider {
             SVNRevision fromRevision = SVNRevision.create(from);
             SVNRevision toRevision = SVNRevision.create(to);
             // Calls the indexer, including merge revisions
-            IndexationHandler handler = new IndexationHandler(repository, revision -> infoListener.post(
-                    String.format(
-                            "Indexation on %s is running (%d to %d - at %d - %d%%)",
-                            repository.getConfiguration().getName(),
-                            min,
-                            max,
-                            revision,
-                            Math.round(100.0 * (revision - min + 1) / (max - min + 1))
-                    )
+            IndexationHandler handler = new IndexationHandler(repository, revision -> runListener.message(
+                    "Indexation on %s is running (%d to %d - at %d - %d%%)",
+                    repository.getConfiguration().getName(),
+                    min,
+                    max,
+                    revision,
+                    Math.round(100.0 * (revision - min + 1) / (max - min + 1))
             ));
             svnClient.log(repository, url, SVNRevision.HEAD, fromRevision, toRevision, true, true, 0, false, handler);
         }

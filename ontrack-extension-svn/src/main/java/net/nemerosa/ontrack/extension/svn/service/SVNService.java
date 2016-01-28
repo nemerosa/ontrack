@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.svn.db.TCopyEvent;
 import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationProperty;
 import net.nemerosa.ontrack.extension.svn.property.SVNProjectConfigurationProperty;
+import net.nemerosa.ontrack.job.JobCategory;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ID;
 
@@ -17,6 +18,8 @@ import java.util.function.Predicate;
  * Layer on top of the basic Subversion client and of the repositories.
  */
 public interface SVNService {
+
+    JobCategory SVN_JOB_CATEGORY = JobCategory.of("svn").withName("Subversion");
 
     /**
      * Gets the information about a revision
