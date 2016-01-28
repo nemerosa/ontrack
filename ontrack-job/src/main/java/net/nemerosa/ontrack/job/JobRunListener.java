@@ -2,12 +2,16 @@ package net.nemerosa.ontrack.job;
 
 import org.slf4j.Logger;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 
-@FunctionalInterface
 public interface JobRunListener {
 
     void progress(JobRunProgress value);
+
+    default <T> Optional<T> getParam(String key) {
+        return Optional.empty();
+    }
 
     default Consumer<String> logger() {
         return s -> progress(JobRunProgress.message(s));
@@ -18,9 +22,7 @@ public interface JobRunListener {
     }
 
     static JobRunListener logger(Logger logger) {
-        return (value) -> {
-            logger.debug(value.getText());
-        };
+        return value -> logger.debug(value.getText());
     }
 
 }

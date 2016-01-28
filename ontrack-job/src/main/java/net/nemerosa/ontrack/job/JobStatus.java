@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.job;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Data
 public class JobStatus {
@@ -11,6 +12,7 @@ public class JobStatus {
     private final Schedule schedule;
     private final String description;
     private final boolean running;
+    private final Map<String, ?> parameters;
     private final JobRunProgress progress;
     private final long runCount;
     private final LocalDateTime lastRunDate;

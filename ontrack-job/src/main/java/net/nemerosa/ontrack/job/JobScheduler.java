@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.job;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Future;
 
@@ -70,5 +71,10 @@ public interface JobScheduler {
      * Fires a job immediately, without waiting the schedule
      */
     Future<?> fireImmediately(JobKey jobKey);
+
+    /**
+     * Fires a job immediately, without waiting the schedule, and passes additional parameters.
+     */
+    Future<?> fireImmediately(JobKey jobKey, Map<String, ?> parameters);
 
 }

@@ -6,6 +6,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.*;
 import java.util.function.BiConsumer;
@@ -259,6 +260,25 @@ public class DefaultJobSchedulerTest {
     public void job_status_for_not_schedule_job() {
         JobScheduler jobScheduler = createJobScheduler();
         assertFalse(jobScheduler.getJobStatus(JobCategory.of("test").getType("test").getKey("x")).isPresent());
+    }
+
+    @Test
+    public void job_with_param() throws InterruptedException, ExecutionException, TimeoutException {
+        JobScheduler jobScheduler = createJobScheduler();
+        ParamJob job = new ParamJob();
+        jobScheduler.schedule(job, Schedule.EVERY_MINUTE.after(1)); // Not fired immediately
+        // Fires manually, without any parameter
+        jobScheduler.fireImmediately(job.getKey()).get(1, TimeUnit.SECONDS);
+        assertEquals(1, job.getCount());
+        assertNull(job.getValue());
+        // Fires manually, with one parameter
+        jobScheduler.fireImmediately(job.getKey(), Collections.singletonMap("text", "Test")).get(1, TimeUnit.SECONDS);
+        assertEquals(2, job.getCount());
+        assertEquals("Test", job.getValue());
+        // Fires manually, without any parameter
+        jobScheduler.fireImmediately(job.getKey()).get(1, TimeUnit.SECONDS);
+        assertEquals(3, job.getCount());
+        assertNull(job.getValue());
     }
 
 }

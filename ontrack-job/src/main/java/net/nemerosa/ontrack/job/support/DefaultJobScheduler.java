@@ -7,10 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -127,13 +124,18 @@ public class DefaultJobScheduler implements JobScheduler {
 
     @Override
     public Future<?> fireImmediately(JobKey jobKey) {
+        return fireImmediately(jobKey, Collections.emptyMap());
+    }
+
+    @Override
+    public Future<?> fireImmediately(JobKey jobKey, Map<String, ?> parameters) {
         // Gets the existing scheduled service
         JobScheduledService jobScheduledService = services.get(jobKey);
         if (jobScheduledService == null) {
             throw new JobNotScheduledException(jobKey);
         }
         // Fires the job immediately
-        return jobScheduledService.fireImmediately();
+        return jobScheduledService.fireImmediately(parameters);
     }
 
     private class JobScheduledService implements Runnable {
@@ -144,6 +146,8 @@ public class DefaultJobScheduler implements JobScheduler {
         private final ScheduledFuture<?> scheduledFuture;
 
         private final AtomicBoolean paused = new AtomicBoolean(false);
+
+        private final AtomicReference<Map<String, ?>> runParameters = new AtomicReference<>();
         private final AtomicReference<CompletableFuture<?>> completableFuture = new AtomicReference<>();
 
         private final AtomicReference<JobRunProgress> runProgress = new AtomicReference<>();
@@ -181,7 +185,7 @@ public class DefaultJobScheduler implements JobScheduler {
 
         @Override
         public void run() {
-            fireImmediately();
+            fireImmediately(Collections.emptyMap());
         }
 
         public void cancel(boolean forceStop) {
@@ -193,19 +197,20 @@ public class DefaultJobScheduler implements JobScheduler {
             }
         }
 
-        public Future<?> fireImmediately() {
-            return completableFuture.updateAndGet(this::optionallyFireTask);
+        public Future<?> fireImmediately(Map<String, ?> parameters) {
+            return completableFuture.updateAndGet(cf -> optionallyFireTask(cf, parameters));
         }
 
-        protected CompletableFuture<?> optionallyFireTask(CompletableFuture<?> runningCompletableFuture) {
+        protected CompletableFuture<?> optionallyFireTask(CompletableFuture<?> runningCompletableFuture, Map<String, ?> parameters) {
             if (runningCompletableFuture != null) {
                 return runningCompletableFuture;
             } else {
-                return fireTask();
+                return fireTask(parameters);
             }
         }
 
-        protected CompletableFuture<Void> fireTask() {
+        protected CompletableFuture<Void> fireTask(Map<String, ?> parameters) {
+            runParameters.set(parameters);
             return CompletableFuture
                     .runAsync(monitoredTask, scheduledExecutorService)
                     .whenComplete((ignored, ex) -> completableFuture.set(null));
@@ -217,6 +222,7 @@ public class DefaultJobScheduler implements JobScheduler {
                     schedule,
                     job.getDescription(),
                     completableFuture.get() != null,
+                    runParameters.get(),
                     runProgress.get(),
                     runCount.get(),
                     lastRunDate.get(),
@@ -244,6 +250,32 @@ public class DefaultJobScheduler implements JobScheduler {
             paused.set(false);
         }
 
+        private class DefaultJobRunListener implements JobRunListener {
+
+            @Override
+            public void progress(JobRunProgress progress) {
+                jobListener.onJobProgress(job.getKey(), progress);
+                logger.debug("[job][{}][{}] {}",
+                        job.getKey().getType().getKey(),
+                        job.getKey().getId(),
+                        progress.getText()
+                );
+                runProgress.set(progress);
+            }
+
+            @Override
+            public <T> Optional<T> getParam(String key) {
+                Map<String, ?> parameters = runParameters.get();
+                if (parameters != null) {
+                    @SuppressWarnings("unchecked")
+                    T t = (T) parameters.get(key);
+                    return Optional.ofNullable(t);
+                } else {
+                    return Optional.empty();
+                }
+            }
+        }
+
         private class MonitoredTask implements Runnable {
 
             @Override
@@ -257,15 +289,7 @@ public class DefaultJobScheduler implements JobScheduler {
                         jobListener.onJobStart(job.getKey());
                         // Runs the job
                         long _start = System.currentTimeMillis();
-                        job.getTask().run(progress -> {
-                            jobListener.onJobProgress(job.getKey(), progress);
-                            logger.debug("[job][{}][{}] {}",
-                                    job.getKey().getType().getKey(),
-                                    job.getKey().getId(),
-                                    progress.getText()
-                            );
-                            runProgress.set(progress);
-                        });
+                        job.getTask().run(new DefaultJobRunListener());
                         // No error, counting time
                         long _end = System.currentTimeMillis();
                         lastRunDurationMs.set(_end - _start);
@@ -289,6 +313,8 @@ public class DefaultJobScheduler implements JobScheduler {
                         throw ex;
                     } finally {
                         runProgress.set(null);
+                        // Removes any parameter
+                        runParameters.set(null);
                         // Starting
                         jobListener.onJobComplete(job.getKey());
                     }
