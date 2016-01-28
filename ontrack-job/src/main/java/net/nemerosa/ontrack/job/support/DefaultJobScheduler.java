@@ -189,7 +189,9 @@ public class DefaultJobScheduler implements JobScheduler {
         }
 
         public void cancel(boolean forceStop) {
-            scheduledFuture.cancel(false);
+            if (scheduledFuture != null) {
+                scheduledFuture.cancel(false);
+            }
             // The decorated task might still run
             CompletableFuture<?> future = this.completableFuture.get();
             if (forceStop && future != null && !future.isDone() && !future.isCancelled()) {

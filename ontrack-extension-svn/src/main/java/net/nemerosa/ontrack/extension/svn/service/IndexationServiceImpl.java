@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.issues.IssueServiceExtension;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
+import net.nemerosa.ontrack.extension.support.ConfigurationServiceListener;
 import net.nemerosa.ontrack.extension.svn.client.SVNClient;
 import net.nemerosa.ontrack.extension.svn.db.*;
 import net.nemerosa.ontrack.extension.svn.model.IndexationRange;
@@ -37,7 +38,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 @Service
-public class IndexationServiceImpl implements IndexationService, StartupService {
+public class IndexationServiceImpl implements IndexationService, StartupService, ConfigurationServiceListener<SVNConfiguration> {
 
     private static final JobType INDEXATION_JOB = SVNService.SVN_JOB_CATEGORY
             .getType("svn-indexation")
@@ -76,6 +77,7 @@ public class IndexationServiceImpl implements IndexationService, StartupService 
         this.jobScheduler = jobScheduler;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
         this.configurationService = configurationService;
+        this.configurationService.addConfigurationServiceListener(this);
         this.repositoryDao = repositoryDao;
         this.revisionDao = revisionDao;
         this.eventDao = eventDao;
@@ -227,11 +229,15 @@ public class IndexationServiceImpl implements IndexationService, StartupService 
         getSvnConfigurations().forEach(this::scheduleSvnIndexation);
     }
 
-    private void scheduleSvnIndexation(SVNConfiguration config) {
+    protected void scheduleSvnIndexation(SVNConfiguration config) {
         jobScheduler.schedule(
                 createIndexFromLatestJob(config),
                 Schedule.everyMinutes(config.getIndexationInterval())
         );
+    }
+
+    protected void unscheduleSvnIndexation(SVNConfiguration config) {
+        jobScheduler.unschedule(getIndexationJobKey(config));
     }
 
     protected JobKey getIndexationJobKey(SVNConfiguration configuration) {
@@ -272,6 +278,21 @@ public class IndexationServiceImpl implements IndexationService, StartupService 
     @SuppressWarnings("Convert2MethodRef")
     protected List<SVNConfiguration> getSvnConfigurations() {
         return securityService.asAdmin(() -> configurationService.getConfigurations());
+    }
+
+    @Override
+    public void onNewConfiguration(SVNConfiguration configuration) {
+        scheduleSvnIndexation(configuration);
+    }
+
+    @Override
+    public void onUpdatedConfiguration(SVNConfiguration configuration) {
+        scheduleSvnIndexation(configuration);
+    }
+
+    @Override
+    public void onDeletedConfiguration(SVNConfiguration configuration) {
+        unscheduleSvnIndexation(configuration);
     }
 
     private class IndexationHandler implements ISVNLogEntryHandler {
