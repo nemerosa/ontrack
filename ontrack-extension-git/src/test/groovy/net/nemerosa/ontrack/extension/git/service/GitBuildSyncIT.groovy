@@ -100,12 +100,7 @@ class GitBuildSyncIT extends AbstractServiceTestSupport {
                 )
 
                 // Build synchronisation
-                def optionalFuture = gitService.launchBuildSync(branch.id)
-                assert optionalFuture.present
-                def future = optionalFuture.get()
-
-                // Waits for the completion of the job
-                FutureUtils.wait("Build sync", future, 3600)
+                gitService.launchBuildSync(branch.id, true)
 
                 // Checks the builds have been created
                 assert !structureService.findBuildByName(project.name, branch.name, '1.1.6').present

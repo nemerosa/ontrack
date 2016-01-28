@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.job;
 
+import org.slf4j.Logger;
+
 import java.util.function.Consumer;
 
 @FunctionalInterface
@@ -13,6 +15,12 @@ public interface JobRunListener {
 
     default void message(String pattern, Object... parameters) {
         progress(JobRunProgress.message(pattern, parameters));
+    }
+
+    static JobRunListener logger(Logger logger) {
+        return (value) -> {
+            logger.debug(value.getText());
+        };
     }
 
 }

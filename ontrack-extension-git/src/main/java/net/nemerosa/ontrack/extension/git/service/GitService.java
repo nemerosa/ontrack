@@ -38,7 +38,7 @@ public interface GitService {
     /**
      * Launches the build/tag synchronisation for a branch
      */
-    Optional<Future<?>> launchBuildSync(ID branchId);
+    Optional<Future<?>> launchBuildSync(ID branchId, boolean synchronous);
 
     /**
      * Change log

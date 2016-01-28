@@ -32,6 +32,8 @@ import net.nemerosa.ontrack.tx.Transaction;
 import net.nemerosa.ontrack.tx.TransactionService;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,6 +55,8 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
 
     private static final JobType GIT_INDEXATION_JOB = GIT_JOB_CATEGORY.getType("git-indexation").withName("Git indexation");
     private static final JobType GIT_BUILD_SYNC_JOB = GIT_JOB_CATEGORY.getType("git-build-sync").withName("Git build synchronisation");
+
+    private final Logger logger = LoggerFactory.getLogger(GitService.class);
 
     private final PropertyService propertyService;
     private final IssueServiceRegistry issueServiceRegistry;
@@ -149,14 +153,19 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     @Override
-    public Optional<Future<?>> launchBuildSync(ID branchId) {
+    public Optional<Future<?>> launchBuildSync(ID branchId, boolean synchronous) {
         // Gets the branch
         Branch branch = structureService.getBranch(branchId);
         // Gets its configuration
         Optional<GitBranchConfiguration> branchConfiguration = getBranchConfiguration(branch);
         // If valid, launches a job
         if (branchConfiguration.isPresent() && branchConfiguration.get().getBuildCommitLink().getLink() instanceof IndexableBuildGitCommitLink) {
-            return Optional.of(jobScheduler.fireImmediately(getGitBranchSyncJobKey(branch)));
+            if (synchronous) {
+                buildSync(branch, branchConfiguration.get(), JobRunListener.logger(logger));
+                return Optional.empty();
+            } else {
+                return Optional.of(jobScheduler.fireImmediately(getGitBranchSyncJobKey(branch)));
+            }
         }
         // Else, nothing has happened
         else {
