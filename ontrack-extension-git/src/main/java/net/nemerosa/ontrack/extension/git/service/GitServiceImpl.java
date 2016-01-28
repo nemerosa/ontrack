@@ -135,7 +135,10 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             // Build/tag sync job
             if (branchConfiguration.getBuildTagInterval() > 0
                     && branchConfiguration.getBuildCommitLink().getLink() instanceof IndexableBuildGitCommitLink) {
-                // FIXME jobs.add(createBuildSyncJob(branch, branchConfiguration));
+                jobScheduler.schedule(
+                        createBuildSyncJob(branch),
+                        Schedule.everyMinutes(branchConfiguration.getBuildTagInterval())
+                );
             }
         });
     }
@@ -153,8 +156,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         Optional<GitBranchConfiguration> branchConfiguration = getBranchConfiguration(branch);
         // If valid, launches a job
         if (branchConfiguration.isPresent() && branchConfiguration.get().getBuildCommitLink().getLink() instanceof IndexableBuildGitCommitLink) {
-            // FIXME return jobPortal.fireImmediatelyIfPossible(getGitBranchSyncJobKey(branch));
-            return Optional.empty();
+            return Optional.of(jobScheduler.fireImmediately(getGitBranchSyncJobKey(branch)));
         }
         // Else, nothing has happened
         else {
@@ -788,30 +790,29 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         );
     }
 
-    private JobDefinition createBuildSyncJob(Branch branch, GitBranchConfiguration configuration) {
-        return JobDefinition.withJob(
-                new AbstractBranchJob(branch) {
+    private Job createBuildSyncJob(Branch branch) {
+        GitBranchConfiguration configuration = getRequiredBranchConfiguration(branch);
+        return new AbstractBranchJob(branch) {
 
-                    @Override
-                    public JobKey getKey() {
-                        return getGitBranchSyncJobKey(branch);
-                    }
+            @Override
+            public JobKey getKey() {
+                return getGitBranchSyncJobKey(branch);
+            }
 
-                    @Override
-                    public JobRun getTask() {
-                        return listener -> buildSync(branch, configuration, listener);
-                    }
+            @Override
+            public JobRun getTask() {
+                return listener -> buildSync(branch, configuration, listener);
+            }
 
-                    @Override
-                    public String getDescription() {
-                        return format(
-                                "Git build/tag synchro for branch %s/%s",
-                                branch.getProject().getName(),
-                                branch.getName()
-                        );
-                    }
-                })
-                .withSchedule(Schedule.everyMinutes(configuration.getBuildTagInterval()));
+            @Override
+            public String getDescription() {
+                return format(
+                        "Git build/tag synchro for branch %s/%s",
+                        branch.getProject().getName(),
+                        branch.getName()
+                );
+            }
+        };
     }
 
     protected JobKey getGitBranchSyncJobKey(Branch branch) {
@@ -934,5 +935,22 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     @Override
     public void unscheduleGitIndexation(GitConfiguration configuration) {
         jobScheduler.unschedule(getGitIndexationJobKey(configuration));
+    }
+
+    @Override
+    public void scheduleGitBuildSync(Branch branch, GitBranchConfigurationProperty property) {
+        if (property.getBuildTagInterval() > 0) {
+            jobScheduler.schedule(
+                    createBuildSyncJob(branch),
+                    Schedule.everyMinutes(property.getBuildTagInterval())
+            );
+        } else {
+            unscheduleGitBuildSync(branch, property);
+        }
+    }
+
+    @Override
+    public void unscheduleGitBuildSync(Branch branch, GitBranchConfigurationProperty property) {
+        jobScheduler.unschedule(getGitBranchSyncJobKey(branch));
     }
 }

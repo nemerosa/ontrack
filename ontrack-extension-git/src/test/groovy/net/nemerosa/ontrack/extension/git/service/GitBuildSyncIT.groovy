@@ -95,7 +95,7 @@ class GitBuildSyncIT extends AbstractServiceTestSupport {
                                         tagPatternBuildNameGitCommitLink,
                                         new TagPattern('1.2.*')
                                 ).toServiceConfiguration(),
-                                false, 0
+                                false, 1
                         )
                 )
 
@@ -104,7 +104,7 @@ class GitBuildSyncIT extends AbstractServiceTestSupport {
                 assert optionalFuture.present
                 def future = optionalFuture.get()
 
-                // FIXME Waits for the completion of the job
+                // Waits for the completion of the job
                 FutureUtils.wait("Build sync", future, 3600)
 
                 // Checks the builds have been created

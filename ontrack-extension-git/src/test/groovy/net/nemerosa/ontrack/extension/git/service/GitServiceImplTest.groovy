@@ -81,7 +81,7 @@ class GitServiceImplTest {
                     new Property<GitBranchConfigurationProperty>(
                             new GitBranchConfigurationPropertyType(
                                     new GitExtensionFeature(),
-                                    buildGitCommitLinkService
+                                    buildGitCommitLinkService, gitService
                             ),
                             null,
                             false
