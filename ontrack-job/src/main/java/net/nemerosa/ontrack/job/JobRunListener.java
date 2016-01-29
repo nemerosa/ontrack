@@ -25,4 +25,8 @@ public interface JobRunListener {
         return value -> logger.debug(value.getText());
     }
 
+    static JobRunListener out() {
+        return value -> System.out.println(value.getText());
+    }
+
 }
