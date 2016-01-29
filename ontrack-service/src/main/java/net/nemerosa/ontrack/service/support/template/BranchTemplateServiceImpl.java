@@ -96,6 +96,13 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, Startup
         }
         // Saves the definition
         branchTemplateRepository.setTemplateDefinition(branchId, templateDefinition);
+        // Schedules (or reschedules the job)
+        scheduleTemplateDefinitionSyncJob(
+                new BranchTemplateDefinition(
+                        branchId,
+                        templateDefinition
+                )
+        );
         // Reloads the branch
         return structureService.getBranch(branchId);
     }
