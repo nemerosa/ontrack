@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.*;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
@@ -279,6 +280,29 @@ public class DefaultJobSchedulerTest {
         jobScheduler.fireImmediately(job.getKey()).get(1, TimeUnit.SECONDS);
         assertEquals(3, job.getCount());
         assertNull(job.getValue());
+    }
+
+    @Test
+    public void invalid_job() throws InterruptedException, ExecutionException, TimeoutException {
+        JobScheduler jobScheduler = createJobScheduler();
+        ValidJob job = new ValidJob();
+        // Fires now
+        jobScheduler.schedule(job, Schedule.EVERY_SECOND);
+        // After some seconds, the job keeps running
+        Thread.sleep(2500);
+        assertEquals(3, job.getCount());
+        // Invalidates the job
+        job.invalidate();
+        // The status indicates the job is no longer valid, but is still there
+        Optional<JobStatus> status = jobScheduler.getJobStatus(job.getKey());
+        assertTrue(status.isPresent());
+        assertFalse(status.get().isValid());
+        assertNull(status.get().getNextRunDate());
+        // After some seconds, the job has not run
+        Thread.sleep(1000);
+        assertEquals(3, job.getCount());
+        // ... and it's gone
+        assertFalse(jobScheduler.getJobStatus(job.getKey()).isPresent());
     }
 
 }

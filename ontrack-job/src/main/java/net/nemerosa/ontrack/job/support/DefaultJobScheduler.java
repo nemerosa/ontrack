@@ -219,24 +219,26 @@ public class DefaultJobScheduler implements JobScheduler {
         }
 
         public JobStatus getJobStatus() {
+            boolean valid = job.isValid();
             return new JobStatus(
                     job.getKey(),
                     schedule,
                     job.getDescription(),
                     completableFuture.get() != null,
+                    valid,
                     runParameters.get(),
                     runProgress.get(),
                     runCount.get(),
                     lastRunDate.get(),
                     lastRunDurationMs.get(),
-                    getNextRunDate(),
+                    getNextRunDate(valid),
                     lastErrorCount.get(),
                     lastError.get()
             );
         }
 
-        private LocalDateTime getNextRunDate() {
-            if (scheduledFuture != null) {
+        private LocalDateTime getNextRunDate(boolean valid) {
+            if (valid && scheduledFuture != null) {
                 return Time.now().plus(
                         scheduledFuture.getDelay(TimeUnit.SECONDS),
                         ChronoUnit.SECONDS
@@ -284,46 +286,51 @@ public class DefaultJobScheduler implements JobScheduler {
 
             @Override
             public void run() {
-                if (isEnabled()) {
-                    try {
-                        logger.debug("[job][{}][{}] Running now", job.getKey().getType().getKey(), job.getKey().getId());
-                        lastRunDate.set(Time.now());
-                        runCount.incrementAndGet();
-                        // Starting
-                        jobListener.onJobStart(job.getKey());
-                        // Runs the job
-                        long _start = System.currentTimeMillis();
-                        job.getTask().run(new DefaultJobRunListener());
-                        // No error, counting time
-                        long _end = System.currentTimeMillis();
-                        lastRunDurationMs.set(_end - _start);
-                        logger.debug("[job][{}][{}] Ran in {} ms", job.getKey().getType().getKey(), job.getKey().getId(), lastRunDurationMs.get());
-                        // Starting
-                        jobListener.onJobEnd(job.getKey(), lastRunDurationMs.get());
-                        // No error - resetting the counters
-                        lastErrorCount.set(0);
-                        lastError.set(null);
-                    } catch (Exception ex) {
-                        lastErrorCount.incrementAndGet();
-                        lastError.set(ex.getMessage());
-                        logger.error("[job][{}][{}] Error: {}", job.getKey().getType().getKey(), job.getKey().getId(), ex.getMessage());
-                        // Reporter
-                        logger.error(
-                                String.format("[job][%s][%s] Error", job.getKey().getType().getKey(), job.getKey().getId()),
-                                ex
-                        );
-                        jobListener.onJobError(job.getKey(), ex);
-                        // Rethrows the error
-                        throw ex;
-                    } finally {
-                        runProgress.set(null);
-                        // Removes any parameter
-                        runParameters.set(null);
-                        // Starting
-                        jobListener.onJobComplete(job.getKey());
+                if (job.isValid()) {
+                    if (isEnabled()) {
+                        try {
+                            logger.debug("[job][{}][{}] Running now", job.getKey().getType().getKey(), job.getKey().getId());
+                            lastRunDate.set(Time.now());
+                            runCount.incrementAndGet();
+                            // Starting
+                            jobListener.onJobStart(job.getKey());
+                            // Runs the job
+                            long _start = System.currentTimeMillis();
+                            job.getTask().run(new DefaultJobRunListener());
+                            // No error, counting time
+                            long _end = System.currentTimeMillis();
+                            lastRunDurationMs.set(_end - _start);
+                            logger.debug("[job][{}][{}] Ran in {} ms", job.getKey().getType().getKey(), job.getKey().getId(), lastRunDurationMs.get());
+                            // Starting
+                            jobListener.onJobEnd(job.getKey(), lastRunDurationMs.get());
+                            // No error - resetting the counters
+                            lastErrorCount.set(0);
+                            lastError.set(null);
+                        } catch (Exception ex) {
+                            lastErrorCount.incrementAndGet();
+                            lastError.set(ex.getMessage());
+                            logger.error("[job][{}][{}] Error: {}", job.getKey().getType().getKey(), job.getKey().getId(), ex.getMessage());
+                            // Reporter
+                            logger.error(
+                                    String.format("[job][%s][%s] Error", job.getKey().getType().getKey(), job.getKey().getId()),
+                                    ex
+                            );
+                            jobListener.onJobError(job.getKey(), ex);
+                            // Rethrows the error
+                            throw ex;
+                        } finally {
+                            runProgress.set(null);
+                            // Removes any parameter
+                            runParameters.set(null);
+                            // Starting
+                            jobListener.onJobComplete(job.getKey());
+                        }
+                    } else {
+                        logger.debug("[job][{}][{}] Not enabled", job.getKey().getType().getKey(), job.getKey().getId());
                     }
                 } else {
-                    logger.debug("[job][{}][{}] Not enabled", job.getKey().getType().getKey(), job.getKey().getId());
+                    logger.debug("[job]{} Not valid - removing from schedule", job.getKey());
+                    unschedule(job.getKey());
                 }
             }
         }
