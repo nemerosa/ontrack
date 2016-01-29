@@ -821,6 +821,11 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                         branch.getName()
                 );
             }
+
+            @Override
+            public boolean isValid() {
+                return structureService.findBranchByName(branch.getProject().getName(), branch.getName()).isPresent();
+            }
         };
     }
 

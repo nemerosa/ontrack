@@ -259,6 +259,11 @@ public class SVNSyncServiceImpl implements SVNSyncService, StartupService {
                 );
             }
 
+            @Override
+            public boolean isValid() {
+                return structureService.findBranchByName(branch.getProject().getName(), branch.getName()).isPresent();
+            }
+
         };
     }
 
