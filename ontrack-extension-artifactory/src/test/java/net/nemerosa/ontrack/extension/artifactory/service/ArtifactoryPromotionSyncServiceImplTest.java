@@ -7,16 +7,16 @@ import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClientFactor
 import net.nemerosa.ontrack.extension.artifactory.model.ArtifactoryStatus;
 import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncProperty;
 import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncPropertyType;
-import net.nemerosa.ontrack.model.job.Job;
+import net.nemerosa.ontrack.job.Job;
+import net.nemerosa.ontrack.job.JobScheduler;
+import net.nemerosa.ontrack.job.Schedule;
 import net.nemerosa.ontrack.model.structure.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
@@ -30,17 +30,19 @@ public class ArtifactoryPromotionSyncServiceImplTest {
     private PromotionLevel promotionLevel;
     PropertyService propertyService;
     private Build build;
+    private JobScheduler jobScheduler;
 
     @Before
     public void setup() {
         structureService = mock(StructureService.class);
         propertyService = mock(PropertyService.class);
         ArtifactoryClientFactory artifactoryClientFactory = mock(ArtifactoryClientFactory.class);
+        jobScheduler = mock(JobScheduler.class);
         service = new ArtifactoryPromotionSyncServiceImpl(
                 structureService,
                 propertyService,
-                artifactoryClientFactory
-        );
+                artifactoryClientFactory,
+                jobScheduler);
 
         // Fake Artifactory client
         artifactoryClient = mock(ArtifactoryClient.class);
@@ -141,9 +143,8 @@ public class ArtifactoryPromotionSyncServiceImplTest {
         when(structureService.getProjectList()).thenReturn(Collections.singletonList(project));
         when(structureService.getBranchesForProject(project.getId())).thenReturn(Collections.singletonList(branch));
         // Gets the list of jobs
-        Collection<Job> jobs = service.getJobs();
-        assertEquals(1, jobs.size());
-        assertEquals("10", jobs.stream().findFirst().get().getId());
+        service.start();
+        verify(jobScheduler, times(1)).schedule(any(Job.class), eq(Schedule.everyMinutes(10)));
     }
 
     @Test
@@ -154,8 +155,8 @@ public class ArtifactoryPromotionSyncServiceImplTest {
         when(structureService.getProjectList()).thenReturn(Collections.singletonList(project));
         when(structureService.getBranchesForProject(project.getId())).thenReturn(Collections.singletonList(branch));
         // Gets the list of jobs
-        Collection<Job> jobs = service.getJobs();
-        assertEquals(0, jobs.size());
+        service.start();
+        verifyZeroInteractions(jobScheduler);
     }
 
 }
