@@ -238,7 +238,7 @@ public class SVNSyncServiceImpl implements SVNSyncService, StartupService {
     }
 
     protected Job createJob(Branch branch) {
-        return new AbstractBranchJob(branch) {
+        return new AbstractBranchJob(structureService, branch) {
 
             @Override
             public JobKey getKey() {
@@ -257,11 +257,6 @@ public class SVNSyncServiceImpl implements SVNSyncService, StartupService {
                         branch.getProject().getName(),
                         branch.getName()
                 );
-            }
-
-            @Override
-            public boolean isValid() {
-                return structureService.findBranchByName(branch.getProject().getName(), branch.getName()).isPresent();
             }
 
         };

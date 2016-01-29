@@ -284,7 +284,7 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, Startup
         // Loading the branch
         Branch branch = structureService.getBranch(btd.getBranchId());
         // Creating the job
-        return new AbstractBranchJob(branch) {
+        return new AbstractBranchJob(structureService, branch) {
 
             @Override
             public JobKey getKey() {
@@ -303,11 +303,6 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, Startup
                         branch.getProject().getName(),
                         branch.getName()
                 );
-            }
-
-            @Override
-            public boolean isValid() {
-                return structureService.findBranchByName(branch.getProject().getName(), branch.getName()).isPresent();
             }
         };
     }

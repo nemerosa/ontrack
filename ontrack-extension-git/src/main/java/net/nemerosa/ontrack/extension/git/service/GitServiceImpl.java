@@ -801,7 +801,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
 
     private Job createBuildSyncJob(Branch branch) {
         GitBranchConfiguration configuration = getRequiredBranchConfiguration(branch);
-        return new AbstractBranchJob(branch) {
+        return new AbstractBranchJob(structureService, branch) {
 
             @Override
             public JobKey getKey() {
@@ -820,11 +820,6 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                         branch.getProject().getName(),
                         branch.getName()
                 );
-            }
-
-            @Override
-            public boolean isValid() {
-                return structureService.findBranchByName(branch.getProject().getName(), branch.getName()).isPresent();
             }
         };
     }

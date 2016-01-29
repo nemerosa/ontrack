@@ -86,7 +86,7 @@ public class ArtifactoryPromotionSyncServiceImpl implements StartupService {
     private Job getBranchSyncJob(Branch branch) {
         return propertyService.getProperty(branch, ArtifactoryPromotionSyncPropertyType.class).option()
                 .map(syncProperty ->
-                        new AbstractBranchJob(branch) {
+                        new AbstractBranchJob(structureService, branch) {
                             @Override
                             public JobKey getKey() {
                                 return getBranchSyncJobKey(branch);
