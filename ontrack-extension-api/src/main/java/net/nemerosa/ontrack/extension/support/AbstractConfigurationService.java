@@ -89,10 +89,10 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
         T configuration = configurationRepository.find(configurationClass, name).get();
         // Notifies of the deletion BEFORE the actual deletion, giving a change to the listeners to list access the configuration
         eventPostService.post(eventFactory.deleteConfiguration(configuration));
-        // Actual deletion
-        configurationRepository.delete(configurationClass, name);
         // Listeners
         listeners.forEach(listener -> listener.onDeletedConfiguration(configuration));
+        // Actual deletion
+        configurationRepository.delete(configurationClass, name);
     }
 
     @Override

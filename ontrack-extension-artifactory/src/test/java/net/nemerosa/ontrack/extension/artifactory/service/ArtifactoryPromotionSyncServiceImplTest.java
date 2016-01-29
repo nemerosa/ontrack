@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.extension.artifactory.ArtifactoryExtensionFeature;
 import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClient;
 import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClientFactory;
+import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfigurationService;
 import net.nemerosa.ontrack.extension.artifactory.model.ArtifactoryStatus;
 import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncProperty;
 import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncPropertyType;
@@ -31,18 +32,22 @@ public class ArtifactoryPromotionSyncServiceImplTest {
     PropertyService propertyService;
     private Build build;
     private JobScheduler jobScheduler;
+    private ArtifactoryPromotionSyncService artifactoryPromotionSyncService;
 
     @Before
     public void setup() {
         structureService = mock(StructureService.class);
         propertyService = mock(PropertyService.class);
         ArtifactoryClientFactory artifactoryClientFactory = mock(ArtifactoryClientFactory.class);
+        artifactoryPromotionSyncService = mock(ArtifactoryPromotionSyncService.class);
         jobScheduler = mock(JobScheduler.class);
+        ArtifactoryConfigurationService configurationService = mock(ArtifactoryConfigurationService.class);
         service = new ArtifactoryPromotionSyncServiceImpl(
                 structureService,
                 propertyService,
                 artifactoryClientFactory,
-                jobScheduler);
+                jobScheduler,
+                configurationService);
 
         // Fake Artifactory client
         artifactoryClient = mock(ArtifactoryClient.class);
@@ -130,8 +135,8 @@ public class ArtifactoryPromotionSyncServiceImplTest {
         Property<ArtifactoryPromotionSyncProperty> property = Property.of(
                 new ArtifactoryPromotionSyncPropertyType(
                         new ArtifactoryExtensionFeature(),
-                        null
-                ),
+                        null,
+                        artifactoryPromotionSyncService),
                 new ArtifactoryPromotionSyncProperty(
                         null,
                         "",

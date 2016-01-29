@@ -4,13 +4,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClient;
 import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClientFactory;
 import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfiguration;
+import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfigurationService;
 import net.nemerosa.ontrack.extension.artifactory.model.ArtifactoryStatus;
 import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncProperty;
 import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncPropertyType;
+import net.nemerosa.ontrack.extension.support.ConfigurationServiceListener;
 import net.nemerosa.ontrack.job.*;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.AbstractBranchJob;
 import net.nemerosa.ontrack.model.support.StartupService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +27,7 @@ import java.util.stream.Collectors;
 import static org.apache.commons.lang3.StringUtils.replace;
 
 @Service
-public class ArtifactoryPromotionSyncServiceImpl implements StartupService {
+public class ArtifactoryPromotionSyncServiceImpl implements ArtifactoryPromotionSyncService, StartupService, ConfigurationServiceListener<ArtifactoryConfiguration> {
 
     private static final JobType ARTIFACTORY_BUILD_SYNC_JOB =
             JobCategory.of("artifactory").withName("Artifactory")
@@ -38,11 +41,12 @@ public class ArtifactoryPromotionSyncServiceImpl implements StartupService {
     private final JobScheduler jobScheduler;
 
     @Autowired
-    public ArtifactoryPromotionSyncServiceImpl(StructureService structureService, PropertyService propertyService, ArtifactoryClientFactory artifactoryClientFactory, JobScheduler jobScheduler) {
+    public ArtifactoryPromotionSyncServiceImpl(StructureService structureService, PropertyService propertyService, ArtifactoryClientFactory artifactoryClientFactory, JobScheduler jobScheduler, ArtifactoryConfigurationService configurationService) {
         this.structureService = structureService;
         this.propertyService = propertyService;
         this.artifactoryClientFactory = artifactoryClientFactory;
         this.jobScheduler = jobScheduler;
+        configurationService.addConfigurationServiceListener(this);
     }
 
     @Override
@@ -69,6 +73,7 @@ public class ArtifactoryPromotionSyncServiceImpl implements StartupService {
                 .forEach(this::scheduleArtifactoryBuildSync);
     }
 
+    @Override
     public void scheduleArtifactoryBuildSync(Branch branch) {
         propertyService.getProperty(branch, ArtifactoryPromotionSyncPropertyType.class).option().ifPresent(
                 syncProperty ->
@@ -77,6 +82,20 @@ public class ArtifactoryPromotionSyncServiceImpl implements StartupService {
                                 Schedule.everyMinutes(syncProperty.getInterval())
                         )
         );
+    }
+
+    @Override
+    public void unscheduleArtifactoryBuildSync(Branch branch) {
+        jobScheduler.unschedule(getBranchSyncJobKey(branch));
+    }
+
+    @Override
+    public void onDeletedConfiguration(ArtifactoryConfiguration configuration) {
+        propertyService.searchWithPropertyValue(
+                ArtifactoryPromotionSyncPropertyType.class,
+                (entityType, id) -> entityType.getEntityFn(structureService).apply(id),
+                syncProperty -> StringUtils.equals(syncProperty.getConfiguration().getName(), configuration.getName())
+        ).forEach(entity -> unscheduleArtifactoryBuildSync((Branch) entity));
     }
 
     private JobKey getBranchSyncJobKey(Branch branch) {
