@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.support.ApplicationInfo;
 import java.time.LocalDateTime;
 
 @Data
+@Deprecated
 public class JobStatus {
 
     private final long id;

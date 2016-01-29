@@ -77,4 +77,10 @@ public interface JobScheduler {
      */
     Future<?> fireImmediately(JobKey jobKey, Map<String, ?> parameters);
 
+    /**
+     * Fires a job immediately using its ID
+     *
+     * @see JobStatus#getId()
+     */
+    Future<?> fireImmediately(long id);
 }

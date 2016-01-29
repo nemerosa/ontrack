@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.boot.resources;
 
 import net.nemerosa.ontrack.boot.ui.AdminController;
-import net.nemerosa.ontrack.model.job.JobStatus;
+import net.nemerosa.ontrack.job.JobStatus;
 import net.nemerosa.ontrack.model.security.ApplicationManagement;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
 import net.nemerosa.ontrack.ui.resource.Link;
@@ -27,9 +27,10 @@ public class JobStatusResourceDecorator extends AbstractResourceDecorator<JobSta
                         "_launch",
                         on(AdminController.class).launchJob(jobStatus.getId()),
                         resourceContext.isGlobalFunctionGranted(ApplicationManagement.class)
-                                && !jobStatus.getDescriptor().isDisabled()
+                                && !jobStatus.isDisabled()
+                                && jobStatus.isValid()
                 )
-                        // OK
+                // OK
                 .build();
     }
 

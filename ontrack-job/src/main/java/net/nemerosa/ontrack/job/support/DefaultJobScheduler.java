@@ -25,6 +25,8 @@ public class DefaultJobScheduler implements JobScheduler {
     private final Map<JobKey, JobScheduledService> services = new ConcurrentHashMap<>(new TreeMap<>());
     private final AtomicBoolean schedulerPaused = new AtomicBoolean(false);
 
+    private final AtomicLong idGenerator = new AtomicLong();
+
     public DefaultJobScheduler(JobDecorator jobDecorator, ScheduledExecutorService scheduledExecutorService, JobListener jobListener) {
         this.jobDecorator = jobDecorator;
         this.scheduledExecutorService = scheduledExecutorService;
@@ -123,6 +125,16 @@ public class DefaultJobScheduler implements JobScheduler {
     }
 
     @Override
+    public Future<?> fireImmediately(long id) {
+        return services.values().stream()
+                .filter(service -> service.getId() == id)
+                .map(JobScheduledService::getJobKey)
+                .findFirst()
+                .map(this::fireImmediately)
+                .orElse(null);
+    }
+
+    @Override
     public Future<?> fireImmediately(JobKey jobKey) {
         return fireImmediately(jobKey, Collections.emptyMap());
     }
@@ -140,6 +152,7 @@ public class DefaultJobScheduler implements JobScheduler {
 
     private class JobScheduledService implements Runnable {
 
+        private final long id;
         private final Job job;
         private final Schedule schedule;
         private final Runnable monitoredTask;
@@ -158,6 +171,7 @@ public class DefaultJobScheduler implements JobScheduler {
         private final AtomicReference<String> lastError = new AtomicReference<>(null);
 
         private JobScheduledService(Job job, Schedule schedule, ScheduledExecutorService scheduledExecutorService, JobScheduledService old) {
+            this.id = idGenerator.incrementAndGet();
             this.job = job;
             this.schedule = schedule;
             this.monitoredTask = jobDecorator.decorate(job, new MonitoredTask());
@@ -181,6 +195,14 @@ public class DefaultJobScheduler implements JobScheduler {
                 logger.debug("[job]{} Job not scheduled since period = 0", job.getKey());
                 scheduledFuture = null;
             }
+        }
+
+        public long getId() {
+            return id;
+        }
+
+        public JobKey getJobKey() {
+            return job.getKey();
         }
 
         @Override
@@ -221,11 +243,14 @@ public class DefaultJobScheduler implements JobScheduler {
         public JobStatus getJobStatus() {
             boolean valid = job.isValid();
             return new JobStatus(
+                    id,
                     job.getKey(),
                     schedule,
                     job.getDescription(),
                     completableFuture.get() != null,
                     valid,
+                    paused.get() || schedulerPaused.get(),
+                    job.isDisabled(),
                     runParameters.get(),
                     runProgress.get(),
                     runCount.get(),

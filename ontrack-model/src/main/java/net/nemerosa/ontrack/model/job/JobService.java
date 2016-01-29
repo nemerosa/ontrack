@@ -9,6 +9,7 @@ import java.util.concurrent.Future;
 /**
  * Job orchestrator.
  */
+@Deprecated
 public interface JobService {
 
     /**
