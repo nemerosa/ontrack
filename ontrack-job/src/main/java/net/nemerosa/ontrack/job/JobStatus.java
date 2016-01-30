@@ -25,4 +25,18 @@ public class JobStatus {
     private final long lastErrorCount;
     private final String lastError;
 
+    public JobState getState() {
+        if (running) {
+            return JobState.RUNNING;
+        } else if (!valid) {
+            return JobState.INVALID;
+        } else if (disabled) {
+            return JobState.DISABLED;
+        } else if (paused) {
+            return JobState.PAUSED;
+        } else {
+            return JobState.IDLE;
+        }
+    }
+
 }

@@ -114,8 +114,8 @@
                     <th>Category</th>
                     <th>Type</th>
                     <th>Description</th>
-                    <th>Action</th>
                     <th>State</th>
+                    <th>Action</th>
                     <th>Schedule</th>
                     <th>Run count</th>
                     <th>Last duration</th>
@@ -143,18 +143,21 @@
                         <!-- TODO Parameters -->
                     </td>
                     <td>
+                        <span ng-if="job.state == 'IDLE'" class="fa fa-cog fa-2x text-muted" title="Idle"></span>
+                        <span ng-if="job.state == 'RUNNING'" class="fa fa-cog fa-spin fa-2x text-success" title="Running"></span>
+                        <span ng-if="job.state == 'PAUSED'" class="fa fa-pause fa-2x text-info" title="Paused"></span>
+                        <span ng-if="job.state == 'DISABLED'" class="fa fa-ban fa-2x text-muted" title="Disabled"></span>
+                        <span ng-if="job.state == 'INVALID'" class="fa fa-trash fa-2x text-danger" title="Invalid - will be removed at next run"></span>
+                    </td>
+                    <td>
                         <!-- TODO Action: pause -->
                         <!-- TODO Action: resume -->
+                        <!-- TODO Action: delete -->
                         <span
                                 ng-if="job._launch"
                                 title="Launch {{job.descriptor.description}}"
                                 ng-click="launchJob(job)"
                                 class="fa fa-play ot-command"></span>
-                    </td>
-                    <td>
-                        <!-- TODO Use BIG icons -->
-                        <span ng-if="job.descriptor.disabled">Disabled</span>
-                        <span ng-if="!job.descriptor.disabled">Enabled</span>
                     </td>
                     <td>
                         {{job.schedule.periodText}}
