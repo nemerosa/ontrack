@@ -31,12 +31,12 @@ public interface JobScheduler {
     /**
      * Pauses the execution of a job
      */
-    void pause(JobKey key);
+    boolean pause(JobKey key);
 
     /**
      * Resumes the execution of a job
      */
-    void resume(JobKey key);
+    boolean resume(JobKey key);
 
     /**
      * Gets the status for a job
@@ -78,9 +78,7 @@ public interface JobScheduler {
     Future<?> fireImmediately(JobKey jobKey, Map<String, ?> parameters);
 
     /**
-     * Fires a job immediately using its ID
-     *
-     * @see JobStatus#getId()
+     * Gets the job key for a job id
      */
-    Future<?> fireImmediately(long id);
+    Optional<JobKey> getJobKey(long id);
 }

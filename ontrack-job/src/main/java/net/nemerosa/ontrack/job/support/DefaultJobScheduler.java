@@ -69,20 +69,22 @@ public class DefaultJobScheduler implements JobScheduler {
     }
 
     @Override
-    public void pause(JobKey key) {
+    public boolean pause(JobKey key) {
         JobScheduledService existingService = services.get(key);
         if (existingService != null) {
             existingService.pause();
+            return true;
         } else {
             throw new JobNotScheduledException(key);
         }
     }
 
     @Override
-    public void resume(JobKey key) {
+    public boolean resume(JobKey key) {
         JobScheduledService existingService = services.get(key);
         if (existingService != null) {
             existingService.resume();
+            return true;
         } else {
             throw new JobNotScheduledException(key);
         }
@@ -96,6 +98,14 @@ public class DefaultJobScheduler implements JobScheduler {
         } else {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Optional<JobKey> getJobKey(long id) {
+        return services.values().stream()
+                .filter(service -> service.getId() == id)
+                .map(JobScheduledService::getJobKey)
+                .findFirst();
     }
 
     @Override
@@ -122,16 +132,6 @@ public class DefaultJobScheduler implements JobScheduler {
         return services.values().stream()
                 .map(JobScheduledService::getJobStatus)
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public Future<?> fireImmediately(long id) {
-        return services.values().stream()
-                .filter(service -> service.getId() == id)
-                .map(JobScheduledService::getJobKey)
-                .findFirst()
-                .map(this::fireImmediately)
-                .orElse(null);
     }
 
     @Override

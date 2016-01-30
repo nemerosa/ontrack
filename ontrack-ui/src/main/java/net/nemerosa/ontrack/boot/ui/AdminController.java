@@ -103,15 +103,34 @@ public class AdminController extends AbstractResourceController {
         );
     }
 
-    // TODO Pauses a job
-    // TODO Resumes a job
-
     /**
      * Launches a job
      */
     @RequestMapping(value = "jobs/{id:\\d+}", method = RequestMethod.POST)
     public Ack launchJob(@PathVariable long id) {
-        return Ack.validate(jobScheduler.fireImmediately(id) != null);
+        return jobScheduler.getJobKey(id)
+                .map(key -> Ack.validate(jobScheduler.fireImmediately(key) != null))
+                .orElse(Ack.NOK);
+    }
+
+    /**
+     * Pauses a job
+     */
+    @RequestMapping(value = "jobs/{id:\\d+}/pause", method = RequestMethod.POST)
+    public Ack pauseJob(@PathVariable long id) {
+        return jobScheduler.getJobKey(id)
+                .map(key -> Ack.validate(jobScheduler.pause(key)))
+                .orElse(Ack.NOK);
+    }
+
+    /**
+     * Resumes a job
+     */
+    @RequestMapping(value = "jobs/{id:\\d+}/resume", method = RequestMethod.POST)
+    public Ack resumeJob(@PathVariable long id) {
+        return jobScheduler.getJobKey(id)
+                .map(key -> Ack.validate(jobScheduler.resume(key)))
+                .orElse(Ack.NOK);
     }
 
 }

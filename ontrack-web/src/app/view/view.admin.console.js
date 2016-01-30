@@ -81,6 +81,34 @@ angular.module('ot.view.admin.console', [
             });
         };
 
+        // Pausing a job
+        $scope.pauseJob = function (job) {
+            ot.pageCall($http.post(job._pause)).then(function (ack) {
+                // Notification
+                if (ack.success) {
+                    otNotificationService.success("Job was paused.");
+                } else {
+                    otNotificationService.warning("Job could not be paused.");
+                }
+                // Reloads the jobs in any case
+                loadJobs();
+            });
+        };
+
+        // Resuming a job
+        $scope.resumeJob = function (job) {
+            ot.pageCall($http.post(job._resume)).then(function (ack) {
+                // Notification
+                if (ack.success) {
+                    otNotificationService.success("Job schedule was resumed.");
+                } else {
+                    otNotificationService.warning("Job could not be resumed.");
+                }
+                // Reloads the jobs in any case
+                loadJobs();
+            });
+        };
+
         // Showing the error for a status message
         $scope.showError = function (config) {
             config.errorShown = true;
