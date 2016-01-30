@@ -150,7 +150,6 @@
                         <span ng-if="job.state == 'INVALID'" class="fa fa-trash fa-2x text-danger" title="Invalid - will be removed at next run"></span>
                     </td>
                     <td>
-                        <!-- TODO Action: delete -->
                         <span
                                 ng-if="job._launch"
                                 title="Launches this job immediately"
@@ -166,6 +165,11 @@
                                 title="Resumes this job - automatic schedule will be restored"
                                 ng-click="resumeJob(job)"
                                 class="fa fa-refresh fa-2x ot-command"></span>
+                        <span
+                                ng-if="job._delete"
+                                title="Deletes this job"
+                                ng-click="deleteJob(job)"
+                                class="fa fa-trash fa-2x ot-command"></span>
                     </td>
                     <td>
                         {{job.schedule.periodText}}

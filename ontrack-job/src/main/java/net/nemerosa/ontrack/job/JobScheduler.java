@@ -16,7 +16,7 @@ public interface JobScheduler {
     /**
      * Removes a job from the scheduler. Any running execution will be stopped immediately.
      */
-    void unschedule(JobKey key);
+    boolean unschedule(JobKey key);
 
     /**
      * Pauses the scheduler

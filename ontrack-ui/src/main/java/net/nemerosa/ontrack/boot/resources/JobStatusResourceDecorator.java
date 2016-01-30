@@ -49,6 +49,13 @@ public class JobStatusResourceDecorator extends AbstractResourceDecorator<JobSta
                                 && !jobStatus.isDisabled()
                                 && jobStatus.isValid()
                 )
+                // Deleting a job
+                .link(
+                        "_delete",
+                        on(AdminController.class).deleteJob(jobStatus.getId()),
+                        resourceContext.isGlobalFunctionGranted(ApplicationManagement.class)
+                                && !jobStatus.isValid()
+                )
                 // OK
                 .build();
     }

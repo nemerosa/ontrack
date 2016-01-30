@@ -109,6 +109,20 @@ angular.module('ot.view.admin.console', [
             });
         };
 
+        // Deletes a job
+        $scope.deleteJob = function (job) {
+            ot.pageCall($http.delete(job._delete)).then(function (ack) {
+                // Notification
+                if (ack.success) {
+                    otNotificationService.success("Job schedule was removed.");
+                } else {
+                    otNotificationService.warning("Job could not be removed.");
+                }
+                // Reloads the jobs in any case
+                loadJobs();
+            });
+        };
+
         // Showing the error for a status message
         $scope.showError = function (config) {
             config.errorShown = true;

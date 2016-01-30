@@ -51,10 +51,13 @@ public class DefaultJobScheduler implements JobScheduler {
     }
 
     @Override
-    public void unschedule(JobKey key) {
+    public boolean unschedule(JobKey key) {
         JobScheduledService existingService = services.remove(key);
         if (existingService != null) {
             existingService.cancel(true);
+            return true;
+        } else {
+            return false;
         }
     }
 
