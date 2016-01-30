@@ -816,9 +816,9 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             @Override
             public String getDescription() {
                 return format(
-                        "Git build/tag synchro for branch %s/%s",
-                        branch.getProject().getName(),
-                        branch.getName()
+                        "Branch %s @ %s",
+                        branch.getName(),
+                        branch.getProject().getName()
                 );
             }
 
@@ -853,7 +853,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             @Override
             public String getDescription() {
                 return format(
-                        "Git indexation for %s (%s @ %s)",
+                        "%s (%s @ %s)",
                         config.getRemote(),
                         config.getName(),
                         config.getType()
