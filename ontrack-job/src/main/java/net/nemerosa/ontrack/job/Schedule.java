@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.job;
 
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.concurrent.TimeUnit;
 
@@ -10,6 +11,16 @@ public class Schedule {
     private final long initialPeriod;
     private final long period;
     private final TimeUnit unit;
+
+    public String getPeriodText() {
+        if (period <= 0) {
+            return "Manually";
+        } else if (period == 1) {
+            return "Every " + StringUtils.substringBeforeLast(unit.name().toLowerCase(), "s");
+        } else {
+            return "Every " + period + " " + unit.name().toLowerCase();
+        }
+    }
 
     public long toMiliseconds() {
         return TimeUnit.MILLISECONDS.convert(period, unit);
