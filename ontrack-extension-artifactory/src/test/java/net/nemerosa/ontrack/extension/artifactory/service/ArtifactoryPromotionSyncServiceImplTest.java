@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionS
 import net.nemerosa.ontrack.job.Job;
 import net.nemerosa.ontrack.job.JobScheduler;
 import net.nemerosa.ontrack.job.Schedule;
+import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,12 +43,21 @@ public class ArtifactoryPromotionSyncServiceImplTest {
         artifactoryPromotionSyncService = mock(ArtifactoryPromotionSyncService.class);
         jobScheduler = mock(JobScheduler.class);
         ArtifactoryConfigurationService configurationService = mock(ArtifactoryConfigurationService.class);
+
+        SecurityService securityService = mock(SecurityService.class);
+        doAnswer(invocation -> {
+            Runnable run = (Runnable) invocation.getArguments()[0];
+            run.run();
+            return null;
+        }).when(securityService).asAdmin(any(Runnable.class));
+
         service = new ArtifactoryPromotionSyncServiceImpl(
                 structureService,
                 propertyService,
                 artifactoryClientFactory,
                 jobScheduler,
-                configurationService);
+                configurationService,
+                securityService);
 
         // Fake Artifactory client
         artifactoryClient = mock(ArtifactoryClient.class);

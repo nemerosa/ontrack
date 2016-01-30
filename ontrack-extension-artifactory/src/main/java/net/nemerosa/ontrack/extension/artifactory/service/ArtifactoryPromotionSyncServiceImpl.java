@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionS
 import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncPropertyType;
 import net.nemerosa.ontrack.extension.support.ConfigurationServiceListener;
 import net.nemerosa.ontrack.job.*;
+import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.AbstractBranchJob;
 import net.nemerosa.ontrack.model.support.StartupService;
@@ -39,13 +40,15 @@ public class ArtifactoryPromotionSyncServiceImpl implements ArtifactoryPromotion
     private final PropertyService propertyService;
     private final ArtifactoryClientFactory artifactoryClientFactory;
     private final JobScheduler jobScheduler;
+    private final SecurityService securityService;
 
     @Autowired
-    public ArtifactoryPromotionSyncServiceImpl(StructureService structureService, PropertyService propertyService, ArtifactoryClientFactory artifactoryClientFactory, JobScheduler jobScheduler, ArtifactoryConfigurationService configurationService) {
+    public ArtifactoryPromotionSyncServiceImpl(StructureService structureService, PropertyService propertyService, ArtifactoryClientFactory artifactoryClientFactory, JobScheduler jobScheduler, ArtifactoryConfigurationService configurationService, SecurityService securityService) {
         this.structureService = structureService;
         this.propertyService = propertyService;
         this.artifactoryClientFactory = artifactoryClientFactory;
         this.jobScheduler = jobScheduler;
+        this.securityService = securityService;
         configurationService.addConfigurationServiceListener(this);
     }
 
@@ -61,16 +64,18 @@ public class ArtifactoryPromotionSyncServiceImpl implements ArtifactoryPromotion
 
     @Override
     public void start() {
-        // For all projects...
-        structureService.getProjectList().stream()
-                // ... and their branches
-                .flatMap(project -> structureService.getBranchesForProject(project.getId()).stream())
-                // ... only if not a template
-                .filter(branch -> branch.getType() != BranchType.TEMPLATE_DEFINITION)
-                // ... gets those with the sync. property
-                .filter(branch -> propertyService.hasProperty(branch, ArtifactoryPromotionSyncPropertyType.class))
-                // ... creates the job
-                .forEach(this::scheduleArtifactoryBuildSync);
+        securityService.asAdmin(() -> {
+            // For all projects...
+            structureService.getProjectList().stream()
+                    // ... and their branches
+                    .flatMap(project -> structureService.getBranchesForProject(project.getId()).stream())
+                    // ... only if not a template
+                    .filter(branch -> branch.getType() != BranchType.TEMPLATE_DEFINITION)
+                    // ... gets those with the sync. property
+                    .filter(branch -> propertyService.hasProperty(branch, ArtifactoryPromotionSyncPropertyType.class))
+                    // ... creates the job
+                    .forEach(this::scheduleArtifactoryBuildSync);
+        });
     }
 
     @Override

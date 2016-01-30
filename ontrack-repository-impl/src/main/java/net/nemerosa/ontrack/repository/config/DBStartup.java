@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.repository.config;
 
-import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.StartupService;
 import net.nemerosa.ontrack.repository.support.DBInitConfig;
 import net.sf.dbinit.DBInit;
@@ -24,11 +23,9 @@ public class DBStartup {
 
     private final List<DBInitConfig> dbInitConfigs;
     private final List<StartupService> startupServices;
-    private final SecurityService securityService;
 
     @Autowired
-    public DBStartup(List<DBInitConfig> dbInitConfigs, List<StartupService> startupServices, SecurityService securityService) {
-        this.securityService = securityService;
+    public DBStartup(List<DBInitConfig> dbInitConfigs, List<StartupService> startupServices) {
         // Sorts the DB configurations
         this.dbInitConfigs = new ArrayList<>(dbInitConfigs);
         Collections.sort(
@@ -47,22 +44,18 @@ public class DBStartup {
     @PostConstruct
     public void init() {
 
-        securityService.asAdmin(() -> {
+        logger.info("[db] DB initialisation.");
+        for (DBInitConfig dbInitConfig : dbInitConfigs) {
+            logger.info("[db] DB initialisation for \"{}\"", dbInitConfig.getName());
+            DBInit dbInit = dbInitConfig.createConfig();
+            dbInit.run();
+        }
 
-            logger.info("[db] DB initialisation.");
-            for (DBInitConfig dbInitConfig : dbInitConfigs) {
-                logger.info("[db] DB initialisation for \"{}\"", dbInitConfig.getName());
-                DBInit dbInit = dbInitConfig.createConfig();
-                dbInit.run();
-            }
-
-            logger.info("[startup] Running startup services");
-            for (StartupService startupService : startupServices) {
-                logger.info("[startup] Starting service \"{}\"", startupService.getName());
-                startupService.start();
-            }
-
-        });
+        logger.info("[startup] Running startup services");
+        for (StartupService startupService : startupServices) {
+            logger.info("[startup] Starting service \"{}\"", startupService.getName());
+            startupService.start();
+        }
 
     }
 }
