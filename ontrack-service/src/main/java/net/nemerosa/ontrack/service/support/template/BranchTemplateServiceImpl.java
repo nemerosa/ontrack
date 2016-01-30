@@ -304,6 +304,12 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, Startup
                         branch.getName()
                 );
             }
+
+            @Override
+            public boolean isValid() {
+                return super.isValid() &&
+                        getTemplateDefinition(branch.getId()).isPresent();
+            }
         };
     }
 

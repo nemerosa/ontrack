@@ -259,6 +259,13 @@ public class SVNSyncServiceImpl implements SVNSyncService, StartupService {
                 );
             }
 
+            @Override
+            public boolean isValid() {
+                return super.isValid() &&
+                        propertyService.hasProperty(branch, SVNSyncPropertyType.class) &&
+                        svnService.getSVNRepository(branch).isPresent()
+                        ;
+            }
         };
     }
 

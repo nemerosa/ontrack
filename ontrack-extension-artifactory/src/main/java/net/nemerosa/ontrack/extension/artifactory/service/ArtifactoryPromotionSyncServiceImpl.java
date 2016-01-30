@@ -124,6 +124,12 @@ public class ArtifactoryPromotionSyncServiceImpl implements ArtifactoryPromotion
                                         branch.getName()
                                 );
                             }
+
+                            @Override
+                            public boolean isValid() {
+                                return super.isValid() &&
+                                        propertyService.hasProperty(branch, ArtifactoryPromotionSyncPropertyType.class);
+                            }
                         }
                 )
                 .orElseThrow(() -> new IllegalStateException("Branch not configured for Artifactory"));

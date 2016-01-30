@@ -177,6 +177,10 @@ public class StalePropertyType extends AbstractPropertyType<StaleProperty> imple
                 return project.isDisabled();
             }
 
+            @Override
+            public boolean isValid() {
+                return propertyService.hasProperty(project, StalePropertyType.class);
+            }
         };
     }
 

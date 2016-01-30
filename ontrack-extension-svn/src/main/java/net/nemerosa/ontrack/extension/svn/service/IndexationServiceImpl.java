@@ -240,8 +240,8 @@ public class IndexationServiceImpl implements IndexationService, StartupService,
         return INDEXATION_JOB.getKey(configuration.getName());
     }
 
-    protected net.nemerosa.ontrack.job.Job createIndexFromLatestJob(SVNConfiguration configuration) {
-        return new net.nemerosa.ontrack.job.Job() {
+    protected Job createIndexFromLatestJob(SVNConfiguration configuration) {
+        return new Job() {
 
             @Override
             public JobKey getKey() {
