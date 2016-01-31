@@ -6,7 +6,7 @@ public interface JobListener {
 
     void onJobEnd(JobKey key, long milliseconds);
 
-    void onJobError(JobKey key, Exception ex);
+    void onJobError(JobStatus key, Exception ex);
 
     void onJobComplete(JobKey key);
 

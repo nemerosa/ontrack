@@ -3,6 +3,9 @@ package net.nemerosa.ontrack.service.job;
 import net.nemerosa.ontrack.job.JobKey;
 import net.nemerosa.ontrack.job.JobListener;
 import net.nemerosa.ontrack.job.JobRunProgress;
+import net.nemerosa.ontrack.job.JobStatus;
+import net.nemerosa.ontrack.model.structure.NameDescription;
+import net.nemerosa.ontrack.model.support.ApplicationLogEntry;
 import net.nemerosa.ontrack.model.support.ApplicationLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,7 +15,6 @@ public class DefaultJobListener implements JobListener {
 
     private final ApplicationLogService logService;
 
-    // FIXME Error management
     // TODO Metrics
 
     /**
@@ -46,18 +48,19 @@ public class DefaultJobListener implements JobListener {
     }
 
     @Override
-    public void onJobError(JobKey key, Exception ex) {
-//        logService.error(
-//                ex,
-//                getClass(),
-//                String.format(
-//                        "%s/%s",
-//                        key.getType(),
-//                        key.getId()
-//                ),
-//                registeredJob.getJobDescription(),
-//                Optional.ofNullable(registeredJob.getApplicationInfo()).map(ApplicationInfo::getMessage).orElse(null)
-//        );
+    public void onJobError(JobStatus status, Exception ex) {
+        JobKey key = status.getKey();
+        logService.log(
+                ApplicationLogEntry.error(
+                        ex,
+                        NameDescription.nd(
+                                key.getType().toString(),
+                                key.getType().getName()
+                        ),
+                        status.getDescription()
+                ).withDetail("job.key", key.getId())
+                        .withDetail("job.progress", status.getProgressText())
+        );
     }
 
     @Override
@@ -66,7 +69,5 @@ public class DefaultJobListener implements JobListener {
 
     @Override
     public void onJobProgress(JobKey key, JobRunProgress progress) {
-        // FIXME Method net.nemerosa.ontrack.service.job.DefaultJobListener.onJobProgress
-
     }
 }

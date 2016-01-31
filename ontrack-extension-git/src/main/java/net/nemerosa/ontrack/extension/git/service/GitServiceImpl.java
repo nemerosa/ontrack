@@ -209,7 +209,8 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                                     NameDescription.nd(
                                             "git-sync",
                                             "Git synchronisation issue"
-                                    )
+                                    ),
+                                    gitConfiguration.getRemote()
                             ).withDetail("project", project.getName())
                                     .withDetail("git-name", gitConfiguration.getName())
                                     .withDetail("git-remote", gitConfiguration.getRemote())
@@ -926,11 +927,12 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     private void index(GitConfiguration config, JobRunListener listener) {
-        listener.message("Git sync for %s", config.getName());
-        // Gets the client for this configuration
-        GitRepositoryClient client = gitRepositoryClientFactory.getClient(config.getGitRepository());
-        // Launches the synchronisation
-        client.sync(listener.logger());
+        throw new RuntimeException("Test for application log");
+//        listener.message("Git sync for %s", config.getName());
+//        // Gets the client for this configuration
+//        GitRepositoryClient client = gitRepositoryClientFactory.getClient(config.getGitRepository());
+//        // Launches the synchronisation
+//        client.sync(listener.logger());
     }
 
     @Override

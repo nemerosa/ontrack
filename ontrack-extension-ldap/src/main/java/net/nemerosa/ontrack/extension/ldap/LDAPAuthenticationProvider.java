@@ -63,8 +63,9 @@ public class LDAPAuthenticationProvider extends AbstractUserDetailsAuthenticatio
                                 NameDescription.nd(
                                         "ldap-authentication",
                                         "LDAP Authentication problem"
-                                )
-                        ).withDetail("authentication", authentication.getName())
+                                ),
+                                authentication.getName()
+                        )
                 );
                 // Rejects the authentication
                 return Optional.empty();

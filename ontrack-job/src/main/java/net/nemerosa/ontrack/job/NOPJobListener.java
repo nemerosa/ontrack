@@ -13,7 +13,7 @@ public class NOPJobListener implements JobListener {
     }
 
     @Override
-    public void onJobError(JobKey key, Exception ex) {
+    public void onJobError(JobStatus status, Exception ex) {
     }
 
     @Override

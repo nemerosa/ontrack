@@ -61,4 +61,8 @@ public class JobStatus {
     public boolean canBeDeleted() {
         return !valid;
     }
+
+    public String getProgressText() {
+        return progress != null ? progress.getText() : "";
+    }
 }

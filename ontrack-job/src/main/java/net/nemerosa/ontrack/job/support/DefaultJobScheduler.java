@@ -355,11 +355,7 @@ public class DefaultJobScheduler implements JobScheduler {
                             lastError.set(ex.getMessage());
                             logger.error("[job]{} Error: {}", job.getKey(), ex.getMessage());
                             // Reporter
-                            logger.error(
-                                    String.format("[job]%s Error", job.getKey()),
-                                    ex
-                            );
-                            jobListener.onJobError(job.getKey(), ex);
+                            jobListener.onJobError(getJobStatus(), ex);
                             // Rethrows the error
                             throw ex;
                         } finally {

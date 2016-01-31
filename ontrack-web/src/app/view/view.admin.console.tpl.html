@@ -218,8 +218,8 @@
                 <tr>
                     <th>Level</th>
                     <th>Timestamp</th>
-                    <th>Source</th>
-                    <th>Identifier</th>
+                    <th>Type</th>
+                    <th>Information</th>
                     <th>Details</th>
                 </tr>
                 </thead>
@@ -233,10 +233,11 @@
                         {{log.timestamp | date:'mediumTime'}}
                     </td>
                     <td>
-                        {{log.source}}
+                        <code>{{log.type.name}}</code>
+                        {{log.type.description}}
                     </td>
                     <td>
-                        {{log.identifier}}
+                        {{log.information}}
                     </td>
                     <td>
                         <button class="btn btn-default btn-xs" ng-click="showLogDetails(log)">
