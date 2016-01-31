@@ -39,4 +39,25 @@ public class JobStatus {
         }
     }
 
+    public boolean canRun() {
+        return !running
+                && !disabled
+                && valid;
+    }
+
+    public boolean canPause() {
+        return !paused
+                && !disabled
+                && valid;
+    }
+
+    public boolean canResume() {
+        return paused
+                && !disabled
+                && valid;
+    }
+
+    public boolean canBeDeleted() {
+        return !valid;
+    }
 }

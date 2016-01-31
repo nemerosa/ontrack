@@ -27,34 +27,28 @@ public class JobStatusResourceDecorator extends AbstractResourceDecorator<JobSta
                         "_launch",
                         on(AdminController.class).launchJob(jobStatus.getId()),
                         resourceContext.isGlobalFunctionGranted(ApplicationManagement.class)
-                                && !jobStatus.isRunning()
-                                && !jobStatus.isDisabled()
-                                && jobStatus.isValid()
+                                && jobStatus.canRun()
                 )
                 // Pausing a job
                 .link(
                         "_pause",
                         on(AdminController.class).pauseJob(jobStatus.getId()),
                         resourceContext.isGlobalFunctionGranted(ApplicationManagement.class)
-                                && !jobStatus.isPaused()
-                                && !jobStatus.isDisabled()
-                                && jobStatus.isValid()
+                                && jobStatus.canPause()
                 )
                 // Resuming a job
                 .link(
                         "_resume",
                         on(AdminController.class).resumeJob(jobStatus.getId()),
                         resourceContext.isGlobalFunctionGranted(ApplicationManagement.class)
-                                && jobStatus.isPaused()
-                                && !jobStatus.isDisabled()
-                                && jobStatus.isValid()
+                                && jobStatus.canResume()
                 )
                 // Deleting a job
                 .link(
                         "_delete",
                         on(AdminController.class).deleteJob(jobStatus.getId()),
                         resourceContext.isGlobalFunctionGranted(ApplicationManagement.class)
-                                && !jobStatus.isValid()
+                                && jobStatus.canBeDeleted()
                 )
                 // OK
                 .build();
