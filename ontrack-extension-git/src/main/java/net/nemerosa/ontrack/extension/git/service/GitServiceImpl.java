@@ -198,27 +198,21 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             if (oProjectConfiguration.isPresent()) {
                 // Forces Git sync before
                 boolean syncError;
+                GitConfiguration gitConfiguration = oProjectConfiguration.get();
                 try {
-                    GitConfiguration gitConfiguration = oProjectConfiguration.get();
                     syncAndWait(gitConfiguration);
                     syncError = false;
                 } catch (GitRepositorySyncException ex) {
-                    applicationLogService.error(
-                            ex,
-                            GitService.class,
-                            project.getName(),
-                            String.format(
-                                    "Change log for %s",
-                                    project.getName()
-                            ),
-                            String.format(
-                                    "%s (%s/%s -> %s/%s)",
-                                    project.getName(),
-                                    buildFrom.getBranch().getName(),
-                                    buildFrom.getName(),
-                                    buildTo.getBranch().getName(),
-                                    buildTo.getName()
-                            )
+                    applicationLogService.log(
+                            ApplicationLogEntry.error(
+                                    ex,
+                                    NameDescription.nd(
+                                            "git-sync",
+                                            "Git synchronisation issue"
+                                    )
+                            ).withDetail("project", project.getName())
+                                    .withDetail("git-name", gitConfiguration.getName())
+                                    .withDetail("git-remote", gitConfiguration.getRemote())
                     );
                     syncError = true;
                 }

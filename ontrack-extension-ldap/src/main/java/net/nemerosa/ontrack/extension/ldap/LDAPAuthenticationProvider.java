@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.ldap;
 
 import net.nemerosa.ontrack.model.security.*;
+import net.nemerosa.ontrack.model.structure.NameDescription;
+import net.nemerosa.ontrack.model.support.ApplicationLogEntry;
 import net.nemerosa.ontrack.model.support.ApplicationLogService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,12 +57,14 @@ public class LDAPAuthenticationProvider extends AbstractUserDetailsAuthenticatio
                 ldapAuthentication = ldapAuthenticationProvider.authenticate(authentication);
             } catch (Exception ex) {
                 // Cannot use the LDAP, logs the error
-                applicationLogService.error(
-                        ex,
-                        LDAPAuthenticationProvider.class,
-                        "ldap",
-                        "",
-                        "Cannot authenticate using the LDAP"
+                applicationLogService.log(
+                        ApplicationLogEntry.error(
+                                ex,
+                                NameDescription.nd(
+                                        "ldap-authentication",
+                                        "LDAP Authentication problem"
+                                )
+                        ).withDetail("authentication", authentication.getName())
                 );
                 // Rejects the authentication
                 return Optional.empty();
@@ -78,7 +82,7 @@ public class LDAPAuthenticationProvider extends AbstractUserDetailsAuthenticatio
                 }
                 // Gets any existing account
                 Optional<Account> existingAccount = securityService.asAdmin(() ->
-                                accountService.findUserByNameAndSource(username, ldapAuthenticationSourceProvider)
+                        accountService.findUserByNameAndSource(username, ldapAuthenticationSourceProvider)
                 );
                 if (!existingAccount.isPresent()) {
                     // If not found, auto-registers the account using the LDAP details
@@ -87,19 +91,19 @@ public class LDAPAuthenticationProvider extends AbstractUserDetailsAuthenticatio
                         if (StringUtils.isNotBlank(userDetails.getEmail())) {
                             // Registration
                             return securityService.asAdmin(() -> Optional.of(
-                                            new AuthenticatedAccount(
-                                                    accountService.create(
-                                                            new AccountInput(
-                                                                    name,
-                                                                    userDetails.getFullName(),
-                                                                    userDetails.getEmail(),
-                                                                    "",
-                                                                    Collections.emptyList()
-                                                            ),
-                                                            LDAPAuthenticationSourceProvider.LDAP_AUTHENTICATION_SOURCE
+                                    new AuthenticatedAccount(
+                                            accountService.create(
+                                                    new AccountInput(
+                                                            name,
+                                                            userDetails.getFullName(),
+                                                            userDetails.getEmail(),
+                                                            "",
+                                                            Collections.emptyList()
                                                     ),
-                                                    userDetails
-                                            )
+                                                    LDAPAuthenticationSourceProvider.LDAP_AUTHENTICATION_SOURCE
+                                            ),
+                                            userDetails
+                                    )
                                     )
                             );
                         } else {

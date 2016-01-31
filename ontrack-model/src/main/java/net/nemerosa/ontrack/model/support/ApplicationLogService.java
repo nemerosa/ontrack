@@ -20,14 +20,7 @@ public interface ApplicationLogService {
     List<ApplicationLogEntry> getLogEntries(Page page);
 
     /**
-     * Logs an error.
-     *
-     * @param exception  Exception associated with this error, can be null
-     * @param source     General source of the error (cannot be null)
-     * @param identifier Identifier within the source (might be null)
-     * @param context    Descriptive message for the source
-     * @param info       Additional information
+     * Logs an entry
      */
-    void error(Throwable exception, Class<?> source, String identifier, String context, String info);
-
+    void log(ApplicationLogEntry entry);
 }

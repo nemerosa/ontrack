@@ -3,10 +3,13 @@ package net.nemerosa.ontrack.model.support;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.experimental.Wither;
 import net.nemerosa.ontrack.common.Time;
-import org.apache.commons.lang3.exception.ExceptionUtils;
+import net.nemerosa.ontrack.model.structure.NameDescription;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Application log entry.
@@ -17,25 +20,25 @@ public class ApplicationLogEntry {
 
     private final ApplicationLogEntryLevel level;
     private final LocalDateTime timestamp;
-    private final String source;
-    private final String identifier;
-    private final String context;
-    private final String info;
-    private final String detail;
+    @Wither
+    private final String authentication;
+    private final NameDescription type;
+    @Wither
+    private final Throwable exception;
+    private final Map<String, String> details = new LinkedHashMap<>();
 
-    public ApplicationLogEntry(ApplicationLogEntryLevel level, Class<?> source, String identifier, String context, String info) {
-        this(level, Time.now(), source.getName(), identifier, context, info, null);
+    public static ApplicationLogEntry error(Throwable exception, NameDescription type) {
+        return new ApplicationLogEntry(
+                ApplicationLogEntryLevel.ERROR,
+                Time.now(),
+                null,
+                type,
+                null
+        ).withException(exception);
     }
 
-    public ApplicationLogEntry withException(Throwable exception) {
-        return new ApplicationLogEntry(
-                level,
-                timestamp,
-                source,
-                identifier,
-                context,
-                info,
-                ExceptionUtils.getStackTrace(exception)
-        );
+    public ApplicationLogEntry withDetail(String name, String value) {
+        details.put(name, value);
+        return this;
     }
 }
