@@ -10,7 +10,8 @@ import net.nemerosa.ontrack.model.structure.NameDescription;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -33,7 +34,8 @@ public class ApplicationLogEntry {
     private final Throwable exception;
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     @JsonIgnore
-    private final Map<String, String> details = new LinkedHashMap<>();
+    @Wither(AccessLevel.PRIVATE)
+    private final Map<String, String> details;
 
     public static ApplicationLogEntry error(Throwable exception, NameDescription type, String information) {
         return new ApplicationLogEntry(
@@ -42,13 +44,15 @@ public class ApplicationLogEntry {
                 null,
                 type,
                 information,
-                null
+                null,
+                Collections.emptyMap()
         ).withException(exception);
     }
 
     public ApplicationLogEntry withDetail(String name, String value) {
-        details.put(name, value);
-        return this;
+        Map<String, String> map = new HashMap<>(details);
+        map.put(name, value);
+        return withDetails(map);
     }
 
     public List<NameDescription> getDetailList() {
