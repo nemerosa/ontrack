@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.service.job;
 
-import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.job.Job;
 import net.nemerosa.ontrack.model.job.JobConsumer;
 import net.nemerosa.ontrack.model.job.JobQueueAccessService;
@@ -9,7 +8,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Future;
 
 @Service
 public class JobQueueServiceImpl implements JobQueueService, JobQueueAccessService {
@@ -25,12 +26,14 @@ public class JobQueueServiceImpl implements JobQueueService, JobQueueAccessServi
      * At least one consumer must have accepted the job.
      */
     @Override
-    public Ack queue(Job job) {
-        boolean accepted = false;
+    public Optional<Future<?>> queue(Job job) {
         for (JobConsumer consumer : consumers) {
-            accepted = accepted || consumer.accept(job);
+            Optional<Future<?>> futureOptional = consumer.accept(job);
+            if (futureOptional.isPresent()) {
+                return futureOptional;
+            }
         }
-        return Ack.validate(accepted);
+        return Optional.empty();
     }
 
 }

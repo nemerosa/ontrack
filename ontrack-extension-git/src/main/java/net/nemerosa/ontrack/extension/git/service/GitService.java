@@ -10,6 +10,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Future;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
@@ -36,7 +37,7 @@ public interface GitService {
     /**
      * Launches the build/tag synchronisation for a branch
      */
-    Ack launchBuildSync(ID branchId);
+    Optional<Future<?>> launchBuildSync(ID branchId, boolean synchronous);
 
     /**
      * Change log
@@ -110,4 +111,32 @@ public interface GitService {
      * Downloads the file at the given path for a branch
      */
     Optional<String> download(Branch branch, String path);
+
+    /**
+     * Synchronises the Git repository attached to this project.
+     *
+     * @param project Project
+     * @param request Sync request
+     * @return Result. The synchronisation will occur asynchronously, but the acknowledgment returns
+     * if the project did contain a Git configuration or not.
+     */
+    Ack projectSync(Project project, GitSynchronisationRequest request);
+
+    /**
+     * Synchronises the Git repository attached to this configuration.
+     *
+     * @param gitConfiguration Configuration to sync
+     * @param request          Sync request
+     * @return Result. The synchronisation will occur asynchronously, but the acknowledgment returns if the
+     * synchronisation was actually launched.
+     */
+    Optional<Future<?>> sync(GitConfiguration gitConfiguration, GitSynchronisationRequest request);
+
+    /**
+     * Gets the Git synchronisation information.
+     *
+     * @param project Project configured for Git
+     * @return Synchronisation information
+     */
+    GitSynchronisationInfo getProjectGitSyncInfo(Project project);
 }

@@ -3,15 +3,53 @@ package net.nemerosa.ontrack.git.support
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.git.GitRepository
 import net.nemerosa.ontrack.git.GitRepositoryClient
+import net.nemerosa.ontrack.git.model.GitBranchesInfo
 import org.junit.Test
 
 import java.util.stream.Collectors
 
 class GitRepositoryClientImplTest {
 
+    /**
+     * <pre>
+     *     *   C4 (master)
+     *     | * C3 (2.1)
+     *     |/
+     *     * C2
+     *     * C1
+     * </pre>
+     */
+    @Test
+    void 'List of local branches with their commits'() {
+        GitRepo.prepare {
+            git 'init'
+            commit 1
+            commit 2
+            git 'checkout', '-b', '2.1'
+            commit 3
+            git 'checkout', 'master'
+            commit 4
+
+            git 'log', '--oneline', '--graph', '--decorate', '--all'
+        } and { repoClient, repo ->
+            GitRepo.prepare {
+                git 'clone', repo.dir.absolutePath, '.'
+            } and { cloneClient, clone ->
+                def branches = cloneClient.branches as GitBranchesInfo
+                assert branches.branches.size() == 2
+
+                assert branches.branches[0].name == '2.1'
+                assert branches.branches[0].commit.shortMessage == 'Commit 3'
+
+                assert branches.branches[1].name == 'master'
+                assert branches.branches[1].commit.shortMessage == 'Commit 4'
+            }
+        }
+    }
+
     @Test
     void 'Log: between HEAD and a commit ~ 1'() {
-        prepare {
+        GitRepo.prepare {
             git 'init'
             (1..6).each {
                 commit it
@@ -27,7 +65,7 @@ class GitRepositoryClientImplTest {
 
     @Test
     void 'Graph: between commits'() {
-        prepare {
+        GitRepo.prepare {
             git 'init'
             commit 1
             commit 2
@@ -73,7 +111,7 @@ class GitRepositoryClientImplTest {
      */
     @Test
     void 'Log: between tags on different branches'() {
-        prepare {
+        GitRepo.prepare {
             git 'init'
             commit 1
             commit 2
@@ -114,7 +152,7 @@ class GitRepositoryClientImplTest {
      */
     @Test
     void 'Log: between tags on different hierarchical branches'() {
-        prepare {
+        GitRepo.prepare {
             prepareBranches it
         } and { repoClient, repo ->
             def log = repoClient.graph('v2.2', 'v2.1')
@@ -136,7 +174,7 @@ class GitRepositoryClientImplTest {
      */
     @Test
     void 'Scanning: on a branch'() {
-        prepare { prepareBranches it } withClone { client, clientRepo, origin ->
+        GitRepo.prepare { prepareBranches it } withClone { client, clientRepo, origin ->
             client.sync({ println it })
             def result = client.scanCommits('2.1', { revCommit ->
                 revCommit.shortMessage == 'Commit 6'
@@ -150,7 +188,7 @@ class GitRepositoryClientImplTest {
      */
     @Test
     void 'Tag containing a commit'() {
-        prepare { prepareBranches it } withClone { GitRepositoryClient client, GitRepo clientRepo, origin ->
+        GitRepo.prepare { prepareBranches it } withClone { GitRepositoryClient client, GitRepo clientRepo, origin ->
             client.sync({ println it })
             // No further tag
             assert client.getTagsWhichContainCommit(clientRepo.commitLookup('Commit 13')) == []
@@ -165,7 +203,7 @@ class GitRepositoryClientImplTest {
 
     @Test
     void 'Log: between tags'() {
-        prepare {
+        GitRepo.prepare {
             git 'init'
             commit 1
             commit 2
@@ -187,7 +225,7 @@ class GitRepositoryClientImplTest {
 
     @Test
     void 'Collection of remote branches'() {
-        prepare {
+        GitRepo.prepare {
             // Initialises a Git repository
             git 'init'
 
@@ -200,7 +238,7 @@ class GitRepositoryClientImplTest {
             // Log
             git 'log', '--oneline', '--graph', '--decorate', '--all'
         } and { repoClient, repo ->
-            prepare {
+            GitRepo.prepare {
                 git 'clone', repo.dir.absolutePath, '.'
             } and { cloneClient, clone ->
                 def branches = cloneClient.remoteBranches
@@ -212,8 +250,8 @@ class GitRepositoryClientImplTest {
 
     @Test
     void 'Get tags'() {
-        prepare { prepareBranches it } withClone { GitRepositoryClient client, clientRepo, origin ->
-            client.sync({println it})
+        GitRepo.prepare { prepareBranches it } withClone { GitRepositoryClient client, clientRepo, origin ->
+            client.sync({ println it })
             def expectedDate = Time.now().toLocalDate();
             assert client.tags.collect { it.name } == ['v2.1', 'v2.2']
             assert client.tags.collect { it.time.toLocalDate() } == [expectedDate, expectedDate]
@@ -222,7 +260,7 @@ class GitRepositoryClientImplTest {
 
     @Test
     void 'Clone and fetch'() {
-        prepare {
+        GitRepo.prepare {
             // Initialises a Git repository
             git 'init'
             // Commits 1..4
@@ -254,55 +292,6 @@ class GitRepositoryClientImplTest {
                 assert cloneRepo.commitLookup("Commit $it") != null
             }
         }
-    }
-
-    /**
-     * Preparing a repository
-     */
-    def static prepare(Closure preparation) {
-        def origin = new GitRepo()
-        preparation.delegate = origin
-        preparation(origin)
-        [
-                withClone: { clientAction ->
-                    try {
-                        File wd = File.createTempDir('ontrack-git', '')
-                        try {
-                            // Client
-                            def client = cloneRepo(wd, origin)
-                            // Utility test access
-                            def clientRepo = new GitRepo(wd)
-                            // Runs the action
-                            clientAction(client, clientRepo, origin)
-                        } finally {
-                            wd.deleteDir()
-                        }
-                    } finally {
-                        origin.close()
-                    }
-                },
-                and      : { clientAction ->
-                    clientAction(origin.client, origin)
-                }
-        ]
-    }
-
-    /**
-     * Cloning a local test repository
-     */
-    static GitRepositoryClient cloneRepo(File wd, GitRepo origin) {
-        // Repository definition for the `origin` repository
-        GitRepository originRepository = new GitRepository(
-                'file',
-                'test',
-                origin.dir.absolutePath,
-                '', ''
-        )
-        // Creates the client
-        new GitRepositoryClientImpl(
-                wd,
-                originRepository
-        )
     }
 
     /**

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.git.model;
 
 import lombok.Data;
+import net.nemerosa.ontrack.extension.scm.model.SCMIssueCommitBranchInfo;
 
 import java.util.ArrayList;
 import java.util.List;

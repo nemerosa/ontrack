@@ -28,6 +28,7 @@ var options = minimist(process.argv.slice(2), knownOptions);
 var web = 'src';
 var webPath = './' + web;
 var assetResources = webPath + '/assets/**';
+var extensionAssetResources = [webPath + '/extension/**/*.png'];
 
 var lessResources = webPath + '/less/*.less';
 
@@ -51,6 +52,7 @@ var outputCss = './' + outputPath + '/css';
 var outputJs = './' + outputPath + '/js';
 var outputFonts = './' + outputPath + '/fonts';
 var outputAssets = './' + outputPath + '/assets';
+var outputExtensionAssets = './' + outputPath + '/extension/';
 
 // Vendor resources
 
@@ -173,6 +175,13 @@ gulp.task('assets', function () {
         .pipe(gulp.dest(outputAssets));
 });
 
+gulp.task('extensionAssets', function () {
+    return gulp
+        .src(extensionAssetResources)
+        .pipe(debug({title: 'assets:input:extensions'}))
+        .pipe(gulp.dest(outputExtensionAssets));
+});
+
 // Injection in index.html
 
 gulp.task('index:dev', ['less', 'fonts', 'templates'], function () {
@@ -214,9 +223,9 @@ gulp.task('index:prod', ['css:concat', 'assets', 'fonts', 'templates', 'js:conca
 
 // Default build
 
-gulp.task('dev', ['index:dev']);
+gulp.task('dev', ['index:dev', 'fonts']);
 
-gulp.task('default', ['index:prod']);
+gulp.task('default', ['index:prod', 'assets', 'extensionAssets', 'fonts']);
 
 // Watch setup
 

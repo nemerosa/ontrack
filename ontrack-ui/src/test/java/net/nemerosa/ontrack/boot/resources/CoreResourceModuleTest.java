@@ -37,7 +37,7 @@ public class CoreResourceModuleTest {
                         new DefaultResourceModule(
                                 Arrays.asList(
                                         new ConnectedAccountResourceDecorator(),
-                                        new ProjectResourceDecorator(),
+                                        new ProjectResourceDecorator(resourceDecorationContributorService),
                                         new BranchResourceDecorator(resourceDecorationContributorService, structureService),
                                         new PromotionLevelResourceDecorator(),
                                         new ValidationStampResourceDecorator(),

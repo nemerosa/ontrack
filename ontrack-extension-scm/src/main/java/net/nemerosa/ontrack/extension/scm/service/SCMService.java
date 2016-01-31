@@ -1,8 +1,11 @@
 package net.nemerosa.ontrack.extension.scm.service;
 
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFile;
+import net.nemerosa.ontrack.extension.scm.model.SCMIssueCommitBranchInfo;
+import net.nemerosa.ontrack.model.structure.Build;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -14,4 +17,10 @@ public interface SCMService {
     <T extends SCMChangeLogFile> String diff(List<T> changeLogFiles, List<String> patterns, Function<T, String> diffFn);
 
     Predicate<String> getPathFilter(List<String> patterns);
+
+    /**
+     * Completes information about a branch by extracting additional
+     * information from a build
+     */
+    SCMIssueCommitBranchInfo getBranchInfo(Optional<Build> buildAfterCommit, SCMIssueCommitBranchInfo branchInfo);
 }

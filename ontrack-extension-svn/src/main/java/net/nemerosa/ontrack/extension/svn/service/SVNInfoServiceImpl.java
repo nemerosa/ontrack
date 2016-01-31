@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.svn.service;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.scm.model.SCMIssueCommitBranchInfo;
+import net.nemerosa.ontrack.extension.scm.service.SCMService;
 import net.nemerosa.ontrack.extension.svn.db.SVNIssueRevisionDao;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.db.SVNRevisionDao;
@@ -30,6 +31,7 @@ public class SVNInfoServiceImpl implements SVNInfoService {
     private final BuildSvnRevisionLinkService buildSvnRevisionLinkService;
     private final SVNIssueRevisionDao issueRevisionDao;
     private final SVNRevisionDao revisionDao;
+    private final SCMService scmService;
 
     @Autowired
     public SVNInfoServiceImpl(StructureService structureService,
@@ -37,13 +39,14 @@ public class SVNInfoServiceImpl implements SVNInfoService {
                               SVNService svnService,
                               BuildSvnRevisionLinkService buildSvnRevisionLinkService,
                               SVNIssueRevisionDao issueRevisionDao,
-                              SVNRevisionDao revisionDao) {
+                              SVNRevisionDao revisionDao, SCMService scmService) {
         this.structureService = structureService;
         this.propertyService = propertyService;
         this.svnService = svnService;
         this.buildSvnRevisionLinkService = buildSvnRevisionLinkService;
         this.issueRevisionDao = issueRevisionDao;
         this.revisionDao = revisionDao;
+        this.scmService = scmService;
     }
 
     @Override
@@ -130,17 +133,7 @@ public class SVNInfoServiceImpl implements SVNInfoService {
                 SVNLocation firstCopy = svnService.getFirstCopyAfter(repository, basicInfo.toLocation());
                 // Identifies a possible build given the path/revision and the first copy
                 Optional<Build> buildAfterCommit = lookupBuild(basicInfo.toLocation(), firstCopy, branch);
-                if (buildAfterCommit.isPresent()) {
-                    Build build = buildAfterCommit.get();
-                    // Gets the build view
-                    BuildView buildView = structureService.getBuildView(build);
-                    // Adds it to the list
-                    branchInfo = branchInfo.withBuildView(buildView);
-                    // Collects the promotions for the branch
-                    branchInfo = branchInfo.withBranchStatusView(
-                            structureService.getEarliestPromotionsAfterBuild(build)
-                    );
-                }
+                branchInfo = scmService.getBranchInfo(buildAfterCommit, branchInfo);
                 // OK
                 issueRevisionInfo.add(branchInfo);
             }

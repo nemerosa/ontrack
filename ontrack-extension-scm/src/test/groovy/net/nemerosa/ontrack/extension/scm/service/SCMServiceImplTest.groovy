@@ -1,10 +1,13 @@
 package net.nemerosa.ontrack.extension.scm.service
 
+import net.nemerosa.ontrack.model.structure.StructureService
 import org.junit.Test
+import org.mockito.Mockito
 
 class SCMServiceImplTest {
 
-    private SCMServiceImpl service = new SCMServiceImpl()
+    private StructureService structureService = Mockito.mock(StructureService)
+    private SCMServiceImpl service = new SCMServiceImpl(structureService)
 
     @Test
     void 'One pattern'() {
