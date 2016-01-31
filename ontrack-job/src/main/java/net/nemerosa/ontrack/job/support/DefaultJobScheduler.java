@@ -35,15 +35,15 @@ public class DefaultJobScheduler implements JobScheduler {
 
     @Override
     public void schedule(Job job, Schedule schedule) {
-        logger.info("[job][{}][{}] Scheduling with {}", job.getKey().getType().getKey(), job.getKey().getId(), schedule);
+        logger.info("[job]{} Scheduling with {}", job.getKey(), schedule);
         // Manages existing schedule
         JobScheduledService existingService = services.remove(job.getKey());
         if (existingService != null) {
-            logger.info("[job][{}][{}] Stopping existing schedule", job.getKey().getType().getKey(), job.getKey().getId());
+            logger.info("[job]{} Stopping existing schedule", job.getKey());
             existingService.cancel(false);
         }
         // Creates and starts the scheduled service
-        logger.info("[job][{}][{}] Starting service", job.getKey().getType().getKey(), job.getKey().getId());
+        logger.info("[job]{} Starting service", job.getKey());
         // Copy stats from old schedule
         JobScheduledService jobScheduledService = new JobScheduledService(job, schedule, scheduledExecutorService, existingService);
         // Registration
@@ -154,7 +154,7 @@ public class DefaultJobScheduler implements JobScheduler {
             throw new JobNotScheduledException(jobKey);
         }
         // Fires the job immediately
-        return jobScheduledService.fireImmediately(parameters);
+        return jobScheduledService.fireImmediately(true, parameters);
     }
 
     private class JobScheduledService implements Runnable {
@@ -162,7 +162,6 @@ public class DefaultJobScheduler implements JobScheduler {
         private final long id;
         private final Job job;
         private final Schedule schedule;
-        private final Runnable monitoredTask;
         private final ScheduledFuture<?> scheduledFuture;
 
         private final AtomicBoolean paused = new AtomicBoolean(false);
@@ -181,7 +180,6 @@ public class DefaultJobScheduler implements JobScheduler {
             this.id = idGenerator.incrementAndGet();
             this.job = job;
             this.schedule = schedule;
-            this.monitoredTask = jobDecorator.decorate(job, new MonitoredTask());
             // Copies stats from old service
             if (old != null) {
                 runCount.set(old.runCount.get());
@@ -214,7 +212,7 @@ public class DefaultJobScheduler implements JobScheduler {
 
         @Override
         public void run() {
-            fireImmediately(Collections.emptyMap());
+            fireImmediately(false, Collections.emptyMap());
         }
 
         public void cancel(boolean forceStop) {
@@ -228,22 +226,26 @@ public class DefaultJobScheduler implements JobScheduler {
             }
         }
 
-        public Future<?> fireImmediately(Map<String, ?> parameters) {
-            return completableFuture.updateAndGet(cf -> optionallyFireTask(cf, parameters));
+        public Future<?> fireImmediately(boolean force, Map<String, ?> parameters) {
+            return completableFuture.updateAndGet(cf -> optionallyFireTask(cf, force, parameters));
         }
 
-        protected CompletableFuture<?> optionallyFireTask(CompletableFuture<?> runningCompletableFuture, Map<String, ?> parameters) {
+        protected CompletableFuture<?> optionallyFireTask(CompletableFuture<?> runningCompletableFuture, boolean force, Map<String, ?> parameters) {
             if (runningCompletableFuture != null) {
+                /*
+                 * If the task is already running, we do not run it in concurrency,
+                 * even if force is set to true
+                 */
                 return runningCompletableFuture;
             } else {
-                return fireTask(parameters);
+                return fireTask(force, parameters);
             }
         }
 
-        protected CompletableFuture<Void> fireTask(Map<String, ?> parameters) {
+        protected CompletableFuture<Void> fireTask(boolean force, Map<String, ?> parameters) {
             runParameters.set(parameters);
             return CompletableFuture
-                    .runAsync(monitoredTask, scheduledExecutorService)
+                    .runAsync(jobDecorator.decorate(job, new MonitoredTask(force)), scheduledExecutorService)
                     .whenComplete((ignored, ex) -> completableFuture.set(null));
         }
 
@@ -293,9 +295,8 @@ public class DefaultJobScheduler implements JobScheduler {
             @Override
             public void progress(JobRunProgress progress) {
                 jobListener.onJobProgress(job.getKey(), progress);
-                logger.debug("[job][{}][{}] {}",
-                        job.getKey().getType().getKey(),
-                        job.getKey().getId(),
+                logger.debug("[job]{} {}",
+                        job.getKey(),
                         progress.getText()
                 );
                 runProgress.set(progress);
@@ -316,12 +317,19 @@ public class DefaultJobScheduler implements JobScheduler {
 
         private class MonitoredTask implements Runnable {
 
+            private final boolean force;
+
+            private MonitoredTask(boolean force) {
+                this.force = force;
+            }
+
             @Override
             public void run() {
+                logger.debug("[job]{} Trying to run now - forced = {}", job.getKey(), force);
                 if (job.isValid()) {
-                    if (isEnabled()) {
+                    if (canRunNow(force)) {
                         try {
-                            logger.debug("[job][{}][{}] Running now", job.getKey().getType().getKey(), job.getKey().getId());
+                            logger.debug("[job]{} Running now", job.getKey());
                             lastRunDate.set(Time.now());
                             runCount.incrementAndGet();
                             // Starting
@@ -332,7 +340,7 @@ public class DefaultJobScheduler implements JobScheduler {
                             // No error, counting time
                             long _end = System.currentTimeMillis();
                             lastRunDurationMs.set(_end - _start);
-                            logger.debug("[job][{}][{}] Ran in {} ms", job.getKey().getType().getKey(), job.getKey().getId(), lastRunDurationMs.get());
+                            logger.debug("[job]{} Ran in {} ms", job.getKey(), lastRunDurationMs.get());
                             // Starting
                             jobListener.onJobEnd(job.getKey(), lastRunDurationMs.get());
                             // No error - resetting the counters
@@ -341,10 +349,10 @@ public class DefaultJobScheduler implements JobScheduler {
                         } catch (Exception ex) {
                             lastErrorCount.incrementAndGet();
                             lastError.set(ex.getMessage());
-                            logger.error("[job][{}][{}] Error: {}", job.getKey().getType().getKey(), job.getKey().getId(), ex.getMessage());
+                            logger.error("[job]{} Error: {}", job.getKey(), ex.getMessage());
                             // Reporter
                             logger.error(
-                                    String.format("[job][%s][%s] Error", job.getKey().getType().getKey(), job.getKey().getId()),
+                                    String.format("[job]%s Error", job.getKey()),
                                     ex
                             );
                             jobListener.onJobError(job.getKey(), ex);
@@ -358,7 +366,7 @@ public class DefaultJobScheduler implements JobScheduler {
                             jobListener.onJobComplete(job.getKey());
                         }
                     } else {
-                        logger.debug("[job][{}][{}] Not enabled", job.getKey().getType().getKey(), job.getKey().getId());
+                        logger.debug("[job]{} Not allowed to run now", job.getKey());
                     }
                 } else {
                     logger.debug("[job]{} Not valid - removing from schedule", job.getKey());
@@ -367,8 +375,15 @@ public class DefaultJobScheduler implements JobScheduler {
             }
         }
 
-        private boolean isEnabled() {
-            return !job.isDisabled() && !paused.get() && !schedulerPaused.get();
+        /**
+         * A job can run if:
+         *
+         * * not disabled
+         * * AND (forced OR not paused)
+         * * AND schedule NOT paused
+         */
+        private boolean canRunNow(boolean force) {
+            return !job.isDisabled() && (!paused.get() || force) && !schedulerPaused.get();
         }
     }
 }

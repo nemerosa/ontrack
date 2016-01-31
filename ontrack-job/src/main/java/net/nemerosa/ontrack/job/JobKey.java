@@ -25,7 +25,7 @@ public class JobKey {
     @Override
     public String toString() {
         return String.format(
-                "[%s][%s]",
+                "%s[%s]",
                 type,
                 id
         );
