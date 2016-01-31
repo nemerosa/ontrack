@@ -258,7 +258,7 @@ public class DefaultJobScheduler implements JobScheduler {
                     job.getDescription(),
                     completableFuture.get() != null,
                     valid,
-                    paused.get() || schedulerPaused.get(),
+                    paused.get(),
                     job.isDisabled(),
                     runParameters.get(),
                     runProgress.get(),
@@ -283,11 +283,15 @@ public class DefaultJobScheduler implements JobScheduler {
         }
 
         public void pause() {
-            paused.set(true);
+            if (scheduledFuture != null) {
+                paused.set(true);
+            }
         }
 
         public void resume() {
-            paused.set(false);
+            if (scheduledFuture != null) {
+                paused.set(false);
+            }
         }
 
         private class DefaultJobRunListener implements JobRunListener {
@@ -377,7 +381,7 @@ public class DefaultJobScheduler implements JobScheduler {
 
         /**
          * A job can run if:
-         *
+         * <p>
          * * not disabled
          * * AND (forced OR not paused)
          * * AND schedule NOT paused

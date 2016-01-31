@@ -46,7 +46,8 @@ public class JobStatus {
     }
 
     public boolean canPause() {
-        return !paused
+        return schedule.getPeriod() > 0
+                && !paused
                 && !disabled
                 && valid;
     }

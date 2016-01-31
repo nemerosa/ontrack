@@ -340,6 +340,21 @@ public class DefaultJobSchedulerTest {
     }
 
     @Test
+    public void not_scheduled_job_cannot_be_paused() throws InterruptedException, ExecutionException, TimeoutException {
+        JobScheduler jobScheduler = createJobScheduler();
+        CountJob job = new CountJob();
+        // No schedule
+        jobScheduler.schedule(job, Schedule.NONE);
+        Thread.sleep(1500);
+        // After a few seconds, the count has NOT moved
+        assertEquals(0, job.getCount());
+        // Pausing the job
+        jobScheduler.pause(job.getKey());
+        // Not paused
+        assertFalse(jobScheduler.getJobStatus(job.getKey()).get().isPaused());
+    }
+
+    @Test
     public void disabled_job_cannot_be_fired() throws InterruptedException, ExecutionException, TimeoutException {
         JobScheduler jobScheduler = createJobScheduler();
         PauseableJob job = new PauseableJob();
