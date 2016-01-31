@@ -110,7 +110,7 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
                 sync.unlock();
             }
         } else {
-            logger.accept(format("[git] %s is already synchronising, trying later", repositoryDir));
+            logger.accept(format("[git] %s is already synchronising, trying later", repository.getRemote()));
         }
     }
 
@@ -119,7 +119,7 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
     }
 
     protected synchronized void fetch(Consumer<String> logger) {
-        logger.accept(format("[git] Pulling %s into %s", repository.getRemote(), repositoryDir));
+        logger.accept(format("[git] Pulling %s", repository.getRemote()));
         try {
             git.fetch()
                     .setCredentialsProvider(credentialsProvider)
@@ -131,7 +131,7 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
     }
 
     protected synchronized void cloneRemote(Consumer<String> logger) {
-        logger.accept(format("[git] Cloning %s into %s", repository.getRemote(), repositoryDir));
+        logger.accept(format("[git] Cloning %s", repository.getRemote()));
         try {
             new CloneCommand()
                     .setCredentialsProvider(credentialsProvider)

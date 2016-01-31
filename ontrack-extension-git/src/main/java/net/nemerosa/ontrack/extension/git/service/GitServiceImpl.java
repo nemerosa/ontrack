@@ -932,7 +932,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     private void index(GitConfiguration config, JobRunListener listener) {
-        listener.progress(JobRunProgress.message("Git sync for %s", config.getName()));
+        listener.message("Git sync for %s", config.getName());
         // Gets the client for this configuration
         GitRepositoryClient client = gitRepositoryClientFactory.getClient(config.getGitRepository());
         // Launches the synchronisation
