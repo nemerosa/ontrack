@@ -34,8 +34,9 @@ public class Schedule {
         return new Schedule(0, minutes, TimeUnit.MINUTES);
     }
 
+    public static final Schedule NONE = everySeconds(0);
     public static final Schedule EVERY_SECOND = everySeconds(1);
-    public static final Schedule EVERY_MINUTE = everySeconds(60);
+    public static final Schedule EVERY_MINUTE = everyMinutes(1);
     public static final Schedule EVERY_DAY = new Schedule(0, 1, TimeUnit.DAYS);
 
     public Schedule after(int initial) {

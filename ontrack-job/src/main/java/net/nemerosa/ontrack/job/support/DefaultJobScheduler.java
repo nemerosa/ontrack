@@ -52,9 +52,13 @@ public class DefaultJobScheduler implements JobScheduler {
 
     @Override
     public boolean unschedule(JobKey key) {
+        return unschedule(key, true);
+    }
+
+    protected boolean unschedule(JobKey key, boolean forceStop) {
         JobScheduledService existingService = services.remove(key);
         if (existingService != null) {
-            existingService.cancel(true);
+            existingService.cancel(forceStop);
             return true;
         } else {
             return false;
@@ -358,7 +362,7 @@ public class DefaultJobScheduler implements JobScheduler {
                     }
                 } else {
                     logger.debug("[job]{} Not valid - removing from schedule", job.getKey());
-                    unschedule(job.getKey());
+                    unschedule(job.getKey(), false);
                 }
             }
         }

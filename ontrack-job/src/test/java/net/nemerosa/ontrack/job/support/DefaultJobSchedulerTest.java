@@ -305,4 +305,71 @@ public class DefaultJobSchedulerTest {
         assertFalse(jobScheduler.getJobStatus(job.getKey()).isPresent());
     }
 
+    @Test
+    public void paused_job_can_be_fired() throws InterruptedException, ExecutionException {
+        JobScheduler jobScheduler = createJobScheduler();
+        CountJob job = new CountJob();
+        // Initially every second
+        jobScheduler.schedule(job, Schedule.EVERY_SECOND);
+        Thread.sleep(2500);
+        // After a few seconds, the count has moved
+        int count = job.getCount();
+        assertEquals(3, count);
+        // Pauses the job now
+        jobScheduler.pause(job.getKey());
+        // Not running
+        Thread.sleep(2500);
+        assertEquals(3, count);
+        // Forcing the run
+        jobScheduler.fireImmediately(job.getKey()).get();
+        assertEquals(4, count);
+    }
+
+    @Test
+    public void not_scheduled_job_can_be_fired() throws InterruptedException, ExecutionException {
+        JobScheduler jobScheduler = createJobScheduler();
+        CountJob job = new CountJob();
+        // No schedule
+        jobScheduler.schedule(job, Schedule.NONE);
+        Thread.sleep(1500);
+        // After a few seconds, the count has NOT moved
+        assertEquals(0, job.getCount());
+        // Forcing the run
+        jobScheduler.fireImmediately(job.getKey()).get();
+        assertEquals(1, job.getCount());
+    }
+
+    @Test
+    public void disabled_job_cannot_be_fired() throws InterruptedException, ExecutionException {
+        JobScheduler jobScheduler = createJobScheduler();
+        PauseableJob job = new PauseableJob();
+        job.pause();
+        // Initially every second
+        jobScheduler.schedule(job, Schedule.EVERY_SECOND);
+        Thread.sleep(2500);
+        // After a few seconds, the count has NOT moved
+        int count = job.getCount();
+        assertEquals(0, count);
+        // Forcing the run
+        jobScheduler.fireImmediately(job.getKey()).get();
+        // ... to not avail
+        assertEquals(0, count);
+    }
+
+    @Test
+    public void invalid_job_cannot_be_fired() throws InterruptedException, ExecutionException {
+        JobScheduler jobScheduler = createJobScheduler();
+        ValidJob job = new ValidJob();
+        job.invalidate();
+        // Schedules, but not now
+        jobScheduler.schedule(job, Schedule.EVERY_MINUTE.after(1));
+        // Forcing the run
+        Thread.sleep(2500);
+        jobScheduler.fireImmediately(job.getKey()).get();
+        // ... to not avail
+        assertEquals(0, job.getCount());
+        // ... and it's now gone
+        assertFalse(jobScheduler.getJobStatus(job.getKey()).isPresent());
+    }
+
 }
