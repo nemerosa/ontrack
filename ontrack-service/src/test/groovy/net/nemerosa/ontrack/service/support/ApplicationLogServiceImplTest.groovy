@@ -30,18 +30,22 @@ class ApplicationLogServiceImplTest {
         // Creates two entries
         service.log(ApplicationLogEntry.error(
                 new RuntimeException("Test 1"),
-                NameDescription.nd("test1", "Test 1")
+                NameDescription.nd("test", "Test"),
+                "Test 1"
         ))
         service.log(ApplicationLogEntry.error(
                 new RuntimeException("Test 2"),
-                NameDescription.nd("test2", "Test 2")
+                NameDescription.nd("test", "Test"),
+                "Test 2"
         ))
         // Gets the entries
         def entries = service.getLogEntries(new Page())
         // Checks the order
         assert entries.size() == 2
-        assert entries[0].type.name == "test2"
-        assert entries[1].type.name == "test1"
+        assert entries[0].type.name == "test"
+        assert entries[0].information == "Test 2"
+        assert entries[1].type.name == "test"
+        assert entries[1].information == "Test 1"
     }
 
 }
