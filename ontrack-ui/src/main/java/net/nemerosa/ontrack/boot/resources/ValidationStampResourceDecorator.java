@@ -25,27 +25,29 @@ public class ValidationStampResourceDecorator extends AbstractResourceDecorator<
     public List<Link> links(ValidationStamp validationStamp, ResourceContext resourceContext) {
         return resourceContext.links()
                 .self(on(ValidationStampController.class).getValidationStamp(validationStamp.getId()))
-                        // Branch link
+                // Branch link
                 .link("_branch", on(BranchController.class).getBranch(validationStamp.getBranch().getId()))
-                        // Project link
+                // Project link
                 .link("_project", on(ProjectController.class).getProject(validationStamp.getBranch().getProject().getId()))
-                        // Image link
+                // Image link
                 .link(Link.IMAGE_LINK, on(ValidationStampController.class).getValidationStampImage_(validationStamp.getId()))
-                        // Update link
+                // Update link
                 .update(on(ValidationStampController.class).updateValidationStampForm(validationStamp.getId()), ValidationStampEdit.class, validationStamp.projectId())
-                        // Delete link
+                // Delete link
                 .delete(on(ValidationStampController.class).deleteValidationStamp(validationStamp.getId()), ValidationStampDelete.class, validationStamp.projectId())
-                        // TODO Next validation stamp
-                        // TODO Previous validation stamp
-                        // Actual properties for this validation stamp
+                // TODO Next validation stamp
+                // TODO Previous validation stamp
+                // Actual properties for this validation stamp
                 .link("_properties", on(PropertyController.class).getProperties(ProjectEntityType.VALIDATION_STAMP, validationStamp.getId()))
-                        // Decorations
+                // Decorations
                 .link("_decorations", on(DecorationsController.class).getDecorations(validationStamp.getProjectEntityType(), validationStamp.getId()))
-                        // List of runs
+                // List of runs
                 .link("_runs", on(ValidationRunController.class).getValidationRunsForValidationStamp(validationStamp.getId(), 0, 10))
-                        // Events
+                // Events
                 .link("_events", on(EventController.class).getEvents(validationStamp.getProjectEntityType(), validationStamp.getId(), 0, 10))
-                        // OK
+                // Page
+                .page(validationStamp)
+                // OK
                 .build();
     }
 

@@ -43,11 +43,13 @@ public class ValidationRunResourceDecorator extends AbstractResourceDecorator<Va
                                 ValidationRunStatusChange.class
                         ) && !validationRun.getLastStatus().getStatusID().getFollowingStatuses().isEmpty()
                 )
-                        // Actual properties for this entity
+                // Actual properties for this entity
                 .link("_properties", on(PropertyController.class).getProperties(validationRun.getProjectEntityType(), validationRun.getId()))
-                        // Decorations
+                // Decorations
                 .link("_decorations", on(DecorationsController.class).getDecorations(validationRun.getProjectEntityType(), validationRun.getId()))
-                        // OK
+                // Page
+                .page(validationRun)
+                // OK
                 .build();
     }
 
