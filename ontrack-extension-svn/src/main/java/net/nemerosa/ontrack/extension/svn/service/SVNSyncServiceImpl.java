@@ -211,12 +211,13 @@ public class SVNSyncServiceImpl implements SVNSyncService, StartupService {
 
     @Override
     public void start() {
-        getSVNConfiguredBranches()
+        securityService.asAdmin(() -> getSVNConfiguredBranches()
                 .filter(branch -> {
                     Property<SVNSyncProperty> svnSync = propertyService.getProperty(branch, SVNSyncPropertyType.class);
                     return !svnSync.isEmpty();
                 })
-                .forEach(this::scheduleSVNBuildSync);
+                .forEach(this::scheduleSVNBuildSync)
+        );
     }
 
     @Override
