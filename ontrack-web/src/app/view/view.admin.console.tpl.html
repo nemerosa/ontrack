@@ -126,8 +126,7 @@
                 </thead>
                 <tbody>
                 <tr ng-repeat="job in jobs.resources | filter:jobFilter"
-                    ng-show="showDisabled || !job.descriptor.disabled"
-                    ng-class="{'success': job.running, 'text-muted': job.descriptor.disabled}">
+                    class="ot-job ot-job-{{job.state.toLowerCase()}}">
                     <td>
                         {{job.id}}
                     </td>
