@@ -120,17 +120,15 @@
                         </ul>
                     </div>
 
-                    <!-- TODO Type filter -->
-                    <!-- TODO Link to category -->
+                    <!-- Type filter -->
                     <div class="form-group dropdown">
                         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                            Any type
-                            <!-- TODO Use selected item -->
+                            {{selectedJobType.name}}
                             <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu" role="menu">
-                            <!-- TODO Use JS list -->
-                            <li><a class="ot-action" ng-click="jobTypeFilter()">Any type</a></li>
+                            <li><a class="ot-action" ng-click="setJobType(defaultJobType)">{{defaultJobType.name}}</a></li>
+                            <li ng-repeat="type in selectedJobCategory.types"><a class="ot-action" ng-click="setJobType(type)">{{type.name}}</a></li>
                         </ul>
                     </div>
 
@@ -187,8 +185,6 @@
                     </td>
                     <td>
                         {{job.description}}
-                        <!-- TODO Progress -->
-                        <!-- TODO Parameters -->
                     </td>
                     <td>
                         <span ng-if="job.state == 'IDLE'" class="fa fa-cog fa-2x text-muted" title="Idle"></span>

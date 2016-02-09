@@ -22,10 +22,12 @@ angular.module('ot.view.admin.console', [
             });
         }
 
-        // Selected category
+        // Selected category & types
         //noinspection UnnecessaryLocalVariableJS
         var defaultJobCategory = {id: '', name: "Any category", types: []};
+        $scope.defaultJobType = {id: '', name: "Any type"};
         $scope.selectedJobCategory = defaultJobCategory;
+        $scope.selectedJobType = $scope.defaultJobType;
 
         // Loads the jobs
         function loadJobs() {
@@ -54,7 +56,17 @@ angular.module('ot.view.admin.console', [
                         };
                         jobCategories.push(category);
                     }
-                    // TODO Types
+                    // Existing type
+                    var type = category.types.find(function (type) {
+                        return type.id == typeId;
+                    });
+                    if (!type) {
+                        type = {
+                            id: typeId,
+                            name: typeName
+                        };
+                        category.types.push(type);
+                    }
                 });
                 $scope.jobCategories = jobCategories;
             });
@@ -177,10 +189,20 @@ angular.module('ot.view.admin.console', [
         // Job category filter
         $scope.setJobCategory = function (value) {
             $scope.selectedJobCategory = value;
+            $scope.selectedJobType = $scope.defaultJobType;
         };
 
         function jobCategoryFilter(job) {
             return $scope.selectedJobCategory.id == '' || $scope.selectedJobCategory.id == job.key.type.category.key;
+        }
+
+        // Job type filter
+        $scope.setJobType = function (value) {
+            $scope.selectedJobType = value;
+        };
+
+        function jobTypeFilter(job) {
+            return $scope.selectedJobType.id == '' || $scope.selectedJobType.id == job.key.type.key;
         }
 
         // Job filter
@@ -191,7 +213,8 @@ angular.module('ot.view.admin.console', [
 
         $scope.jobFilter = function (job) {
             return jobStatusFilter(job)
-                && jobCategoryFilter(job);
+                && jobCategoryFilter(job)
+                && jobTypeFilter(job);
         };
 
     })
