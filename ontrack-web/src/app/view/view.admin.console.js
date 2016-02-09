@@ -1,8 +1,8 @@
 angular.module('ot.view.admin.console', [
-    'ui.router',
-    'ot.service.core',
-    'ot.service.task'
-])
+        'ui.router',
+        'ot.service.core',
+        'ot.service.task'
+    ])
     .config(function ($stateProvider) {
         $stateProvider.state('admin-console', {
             url: '/admin-console',
@@ -131,6 +131,30 @@ angular.module('ot.view.admin.console', [
         // Showing the details for a status message
         $scope.showDetails = function (config) {
             config.detailsShown = true;
+        };
+
+        // Job status filter
+        $scope.jobStatuses = [
+            {id: '', name: "Any status"},
+            {id: 'IDLE', name: "Idle jobs"},
+            {id: 'RUNNING', name: "Running jobs"},
+            {id: 'PAUSED', name: "Paused jobs"},
+            {id: 'DISABLED', name: "Disabled jobs"},
+            {id: 'INVALID', name: "Invalid jobs"}
+        ];
+        $scope.selectedJobStatus = $scope.jobStatuses[0];
+        $scope.setJobStatus = function (value) {
+            $scope.selectedJobStatus = value;
+        };
+
+        // Job filter
+
+        function jobStatusFilter(job) {
+            return $scope.selectedJobStatus.id == '' || $scope.selectedJobStatus.id == job.state;
+        }
+
+        $scope.jobFilter = function (job) {
+            return jobStatusFilter(job);
         };
 
     })

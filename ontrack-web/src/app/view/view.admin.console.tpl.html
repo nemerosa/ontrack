@@ -96,21 +96,16 @@
 
                     <p></p>
 
-                    <!-- TODO Status filter -->
+                    <!-- Status filter -->
                     <div class="form-group dropdown">
                         <button type="button" class="btn btn-default dropdown-toggle form-control" data-toggle="dropdown">
-                            Any status
-                            <!-- TODO Use selected item -->
+                            {{selectedJobStatus.name}}
                             <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu" role="menu">
-                            <!-- TODO Use JS list -->
-                            <li><a class="ot-action" ng-click="jobStatusFilter()">Any status</a></li>
-                            <li><a class="ot-action" ng-click="jobStatusFilter('IDLE')">Idle</a></li>
-                            <li><a class="ot-action" ng-click="jobStatusFilter('RUNNING')">Running</a></li>
-                            <li><a class="ot-action" ng-click="jobStatusFilter('PAUSED')">Paused</a></li>
-                            <li><a class="ot-action" ng-click="jobStatusFilter('DISABLED')">Disabled</a></li>
-                            <li><a class="ot-action" ng-click="jobStatusFilter('INVALID')">Invalid</a></li>
+                            <li ng-repeat="jobStatus in jobStatuses">
+                                <a class="ot-action" ng-click="setJobStatus(jobStatus)">{{jobStatus.name}}</a>
+                            </li>
                         </ul>
                     </div>
 
