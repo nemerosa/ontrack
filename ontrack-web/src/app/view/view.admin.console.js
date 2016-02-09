@@ -186,6 +186,20 @@ angular.module('ot.view.admin.console', [
             $scope.selectedJobStatus = value;
         };
 
+        // Job error filter
+        $scope.jobErrors = [
+            {check: false, name: "Any error status"},
+            {check: true, name: "Jobs in error"}
+        ];
+        $scope.selectedJobError = $scope.jobErrors[0];
+        $scope.setJobError = function (value) {
+            $scope.selectedJobError = value;
+        };
+
+        function jobErrorFilter(job) {
+            return !$scope.selectedJobError.check || job.lastErrorCount > 0;
+        }
+
         // Job category filter
         $scope.setJobCategory = function (value) {
             $scope.selectedJobCategory = value;
@@ -214,7 +228,8 @@ angular.module('ot.view.admin.console', [
         $scope.jobFilter = function (job) {
             return jobStatusFilter(job)
                 && jobCategoryFilter(job)
-                && jobTypeFilter(job);
+                && jobTypeFilter(job)
+                && jobErrorFilter(job);
         };
 
     })

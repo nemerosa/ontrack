@@ -132,17 +132,14 @@
                         </ul>
                     </div>
 
-                    <!-- TODO Error filter -->
+                    <!-- Error filter -->
                     <div class="form-group dropdown">
                         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                            Any error status
-                            <!-- TODO Use selected item -->
+                            {{selectedJobError.name}}
                             <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu" role="menu">
-                            <!-- TODO Use JS list -->
-                            <li><a class="ot-action" ng-click="jobErrorFilter(false)">Any error status</a></li>
-                            <li><a class="ot-action" ng-click="jobErrorFilter(true)">In error</a></li>
+                            <li ng-repeat="error in jobErrors"><a class="ot-action" ng-click="setJobError(error)">{{error.name}}</a></li>
                         </ul>
                     </div>
 
@@ -150,6 +147,8 @@
                     <div class="form-group">
                         <input class="form-control col-md-4" type="text" ng-model="jobDescriptionFilter" placeholder="Description filter"/>
                     </div>
+
+                    <!-- TODO Clear filter -->
 
                 </div>
             </div>
