@@ -91,21 +91,77 @@
     <div class="row" ng-show="tab == 'jobs'">
         <div class="col-md-12">
 
-            <br/>
+            <div class="row">
+                <div class="col-md-12 form-inline">
 
-            <p class="ot-description">
-                List of registered jobs and their status.
-                <button class="btn btn-link pull-right" ng-show="!showDisabled" ng-click="showDisabled = true;">
-                    <span class="ot-command-show-disabled"></span>
-                    Show disabled jobs
-                </button>
-                <button class="btn btn-link pull-right" ng-show="showDisabled" ng-click="showDisabled = false;">
-                    <span class="ot-command-hide-disabled"></span>
-                    Hide disabled jobs
-                </button>
-                <input class="form-control col-md-3 pull-right" type="text" ng-model="jobFilter"
-                       placeholder="Filter the jobs"/>
-            </p>
+                    <p></p>
+
+                    <!-- TODO Status filter -->
+                    <div class="form-group dropdown">
+                        <button type="button" class="btn btn-default dropdown-toggle form-control" data-toggle="dropdown">
+                            Any status
+                            <!-- TODO Use selected item -->
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <!-- TODO Use JS list -->
+                            <li><a class="ot-action" ng-click="jobStatusFilter()">Any status</a></li>
+                            <li><a class="ot-action" ng-click="jobStatusFilter('IDLE')">Idle</a></li>
+                            <li><a class="ot-action" ng-click="jobStatusFilter('RUNNING')">Running</a></li>
+                            <li><a class="ot-action" ng-click="jobStatusFilter('PAUSED')">Paused</a></li>
+                            <li><a class="ot-action" ng-click="jobStatusFilter('DISABLED')">Disabled</a></li>
+                            <li><a class="ot-action" ng-click="jobStatusFilter('INVALID')">Invalid</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- TODO Category filter -->
+                    <div class="form-group dropdown">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                            Any category
+                            <!-- TODO Use selected item -->
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <!-- TODO Use JS list -->
+                            <li><a class="ot-action" ng-click="jobCategoryFilter()">Any category</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- TODO Type filter -->
+                    <!-- TODO Link to category -->
+                    <div class="form-group dropdown">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                            Any type
+                            <!-- TODO Use selected item -->
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <!-- TODO Use JS list -->
+                            <li><a class="ot-action" ng-click="jobTypeFilter()">Any type</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- TODO Error filter -->
+                    <div class="form-group dropdown">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                            Any error status
+                            <!-- TODO Use selected item -->
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <!-- TODO Use JS list -->
+                            <li><a class="ot-action" ng-click="jobErrorFilter(false)">Any error status</a></li>
+                            <li><a class="ot-action" ng-click="jobErrorFilter(true)">In error</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- TODO Description filter (text box) -->
+                    <div class="form-group">
+                        <input class="form-control col-md-4" type="text" ng-model="jobDescriptionFilter" placeholder="Description filter"/>
+                    </div>
+
+                </div>
+            </div>
 
             <table class="ot-admin-console-jobs" ng-if="jobs">
                 <thead>
