@@ -22,6 +22,11 @@ angular.module('ot.view.admin.console', [
             });
         }
 
+        // Selected category
+        //noinspection UnnecessaryLocalVariableJS
+        var defaultJobCategory = {id: '', name: "Any category", types: []};
+        $scope.selectedJobCategory = defaultJobCategory;
+
         // Loads the jobs
         function loadJobs() {
             ot.call($http.get('admin/jobs')).then(function (jobs) {
@@ -30,6 +35,28 @@ angular.module('ot.view.admin.console', [
                     ot.viewApiCommand(jobs._self),
                     ot.viewCloseCommand('/home')
                 ];
+                // Computes the categories & types
+                var jobCategories = [defaultJobCategory];
+                $scope.jobs.resources.forEach(function (job) {
+                    var categoryId = job.key.type.category.key;
+                    var categoryName = job.key.type.category.name;
+                    var typeId = job.key.type.key;
+                    var typeName = job.key.type.name;
+                    // Existing category
+                    var category = jobCategories.find(function (cat) {
+                        return cat.id == categoryId;
+                    });
+                    if (!category) {
+                        category = {
+                            id: categoryId,
+                            name: categoryName,
+                            types: []
+                        };
+                        jobCategories.push(category);
+                    }
+                    // TODO Types
+                });
+                $scope.jobCategories = jobCategories;
             });
         }
 
@@ -147,6 +174,15 @@ angular.module('ot.view.admin.console', [
             $scope.selectedJobStatus = value;
         };
 
+        // Job category filter
+        $scope.setJobCategory = function (value) {
+            $scope.selectedJobCategory = value;
+        };
+
+        function jobCategoryFilter(job) {
+            return $scope.selectedJobCategory.id == '' || $scope.selectedJobCategory.id == job.key.type.category.key;
+        }
+
         // Job filter
 
         function jobStatusFilter(job) {
@@ -154,7 +190,8 @@ angular.module('ot.view.admin.console', [
         }
 
         $scope.jobFilter = function (job) {
-            return jobStatusFilter(job);
+            return jobStatusFilter(job)
+                && jobCategoryFilter(job);
         };
 
     })
