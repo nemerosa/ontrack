@@ -243,10 +243,10 @@ angular.module('ot.view.admin.console', [
         }
 
         // Job description filter
-        $scope.jobDescription = '';
+        $scope.jobDescription = {value: ''};
 
         function jobDescriptionFilter(job) {
-            return $scope.jobDescription == '' || job.description.toLowerCase().indexOf($scope.jobDescription.toLowerCase()) >= 0;
+            return $scope.jobDescription.value == '' || job.description.toLowerCase().indexOf($scope.jobDescription.value.toLowerCase()) >= 0;
         }
 
         // Job filter
@@ -256,7 +256,7 @@ angular.module('ot.view.admin.console', [
             $scope.selectedJobCategory = defaultJobCategory;
             $scope.selectedJobType = $scope.defaultJobType;
             $scope.selectedJobError = $scope.jobErrors[0];
-            $scope.jobDescription = '';
+            $scope.jobDescription.value = '';
         };
 
         $scope.jobFilter = function (job) {
