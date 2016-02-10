@@ -22,6 +22,23 @@ angular.module('ot.view.admin.console', [
             });
         }
 
+        // Job selections
+        // We cannot use a flag at job item level since the list of jobs
+        // is refreshed every 30 seconds
+        $scope.jobSelection = {};
+
+        // Selects all jobs
+        $scope.selectAllJobs = function () {
+            $scope.jobs.resources.forEach(function (job) {
+                $scope.jobSelection[job.id] = true;
+            });
+        };
+
+        // Selects no job
+        $scope.selectNoJob = function () {
+            $scope.jobSelection = {};
+        };
+
         // Selected category & types
         //noinspection UnnecessaryLocalVariableJS
         var defaultJobCategory = {id: '', name: "Any category", types: []};
