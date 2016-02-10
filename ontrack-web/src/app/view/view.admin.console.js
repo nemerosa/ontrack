@@ -267,5 +267,23 @@ angular.module('ot.view.admin.console', [
                 && jobDescriptionFilter(job);
         };
 
+        // Pause & resume all jobs
+
+        $scope.pauseAllSelected = function () {
+            $scope.jobs.resources.forEach(function (job) {
+                if ($scope.jobSelection[job.id] && job._pause) {
+                    $scope.pauseJob(job);
+                }
+            });
+        };
+
+        $scope.resumeAllSelected = function () {
+            $scope.jobs.resources.forEach(function (job) {
+                if ($scope.jobSelection[job.id] && job._resume) {
+                    $scope.resumeJob(job);
+                }
+            });
+        };
+
     })
 ;

@@ -159,6 +159,7 @@
                                 <span class="fa fa-ban"></span>
                                 Clear filter
                             </a></li>
+
                             <li><a class="ot-action" ng-click="selectAllJobs()">
                                 <span class="fa fa-check-square-o"></span>
                                 Select all jobs
@@ -167,11 +168,18 @@
                                 <span class="fa fa-square-o"></span>
                                 Clear job selection
                             </a></li>
+
+                            <li><a class="ot-action" ng-click="pauseAllSelected()">
+                                <span class="fa fa-pause"></span>
+                                Pause all selected jobs
+                            </a></li>
+
+                            <li><a class="ot-action" ng-click="resumeAllSelected()">
+                                <span class="fa fa-refresh"></span>
+                                Resume all selected jobs
+                            </a></li>
                         </ul>
                     </div>
-
-                    <!-- TODO Pause all selected -->
-                    <!-- TODO Resume all selected -->
 
                 </div>
             </div>
