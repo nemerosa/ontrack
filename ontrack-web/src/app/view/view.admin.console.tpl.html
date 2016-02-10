@@ -148,7 +148,20 @@
                         <input class="form-control col-md-4" type="text" ng-model="jobDescription" placeholder="Description filter"/>
                     </div>
 
-                    <!-- TODO Clear filter -->
+                    <!-- Menu -->
+                    <div class="form-group dropdown">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                            Actions
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a class="ot-action" ng-click="clearJobFilter()">
+                                <span class="fa fa-ban"></span>
+                                Clear filter
+                            </a></li>
+                        </ul>
+                    </div>
+
                     <!-- TODO Selection of jobs -->
                     <!-- TODO Pause all selected -->
                     <!-- TODO Resume all selected -->

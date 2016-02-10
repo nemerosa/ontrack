@@ -229,11 +229,18 @@ angular.module('ot.view.admin.console', [
         $scope.jobDescription = '';
 
         function jobDescriptionFilter(job) {
-            console.log('job.description=', job.description, ' -- [' + $scope.jobDescription + ']');
             return $scope.jobDescription == '' || job.description.toLowerCase().indexOf($scope.jobDescription.toLowerCase()) >= 0;
         }
 
         // Job filter
+
+        $scope.clearJobFilter = function () {
+            $scope.selectedJobStatus = $scope.jobStatuses[0];
+            $scope.selectedJobCategory = defaultJobCategory;
+            $scope.selectedJobType = $scope.defaultJobType;
+            $scope.selectedJobError = $scope.jobErrors[0];
+            $scope.jobDescription = '';
+        };
 
         $scope.jobFilter = function (job) {
             return jobStatusFilter(job)
