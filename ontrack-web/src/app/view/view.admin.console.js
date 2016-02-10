@@ -181,10 +181,16 @@ angular.module('ot.view.admin.console', [
             {id: 'DISABLED', name: "Disabled jobs"},
             {id: 'INVALID', name: "Invalid jobs"}
         ];
+
         $scope.selectedJobStatus = $scope.jobStatuses[0];
+
         $scope.setJobStatus = function (value) {
             $scope.selectedJobStatus = value;
         };
+
+        function jobStatusFilter(job) {
+            return $scope.selectedJobStatus.id == '' || $scope.selectedJobStatus.id == job.state;
+        }
 
         // Job error filter
         $scope.jobErrors = [
@@ -219,17 +225,22 @@ angular.module('ot.view.admin.console', [
             return $scope.selectedJobType.id == '' || $scope.selectedJobType.id == job.key.type.key;
         }
 
-        // Job filter
+        // Job description filter
+        $scope.jobDescription = '';
 
-        function jobStatusFilter(job) {
-            return $scope.selectedJobStatus.id == '' || $scope.selectedJobStatus.id == job.state;
+        function jobDescriptionFilter(job) {
+            console.log('job.description=', job.description, ' -- [' + $scope.jobDescription + ']');
+            return $scope.jobDescription == '' || job.description.toLowerCase().indexOf($scope.jobDescription.toLowerCase()) >= 0;
         }
+
+        // Job filter
 
         $scope.jobFilter = function (job) {
             return jobStatusFilter(job)
                 && jobCategoryFilter(job)
                 && jobTypeFilter(job)
-                && jobErrorFilter(job);
+                && jobErrorFilter(job)
+                && jobDescriptionFilter(job);
         };
 
     })
