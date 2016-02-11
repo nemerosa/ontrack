@@ -112,7 +112,16 @@ angular.module('ot.extension.svn.changelog', [
 
             // Shows a diff for a file
             $scope.showFileDiff = function (changeLog, svnChangeLogFile) {
-                otScmChangelogFilechangefilterService.diffFileFilter(changeLog, svnChangeLogFile.path);
+                if (!$scope.diffLoading) {
+                    $scope.diffLoading = true;
+                    svnChangeLogFile.diffLoading = true;
+                    otScmChangelogFilechangefilterService
+                        .diffFileFilter(changeLog, svnChangeLogFile.path)
+                        .finally(function () {
+                            svnChangeLogFile.diffLoading = false;
+                            $scope.diffLoading = false;
+                        });
+                }
             };
         });
 

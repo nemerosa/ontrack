@@ -241,7 +241,8 @@
                                         {{svnChangeLogFileChange.revisionInfo.revision}}
                                     </a>
                                 </span>
-                                <span class="fa fa-download ot-command" title="Shows diff" ng-click="showFileDiff(changeLog, svnChangeLogFile)"></span>
+                                <span ng-hide="svnChangeLogFile.diffLoading || diffLoading" class="fa fa-download ot-command" title="Shows diff" ng-click="showFileDiff(changeLog, svnChangeLogFile)"></span>
+                                <span ng-show="svnChangeLogFile.diffLoading" class="fa fa-spin fa-spinner ot-command" title="Diff is loading..."></span>
                             </div>
                         </div>
                     </div>
