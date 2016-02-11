@@ -112,7 +112,16 @@ angular.module('ot.extension.git.changelog', [
 
             // Shows the diff for a file
             $scope.showFileDiff = function (changelog, changeLogFile) {
-                otScmChangelogFilechangefilterService.diffFileFilter(changeLog, changeLogFile.oldPath ? changeLogFile.oldPath : changeLogFile.newPath);
+                if (!$scope.diffLoading) {
+                    $scope.diffLoading = true;
+                    changeLogFile.diffLoading = true;
+                    otScmChangelogFilechangefilterService
+                        .diffFileFilter(changeLog, changeLogFile.oldPath ? changeLogFile.oldPath : changeLogFile.newPath)
+                        .finally(function () {
+                            changeLogFile.diffLoading = false;
+                            $scope.diffLoading = false;
+                        });
+                }
             };
 
         });
