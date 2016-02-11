@@ -109,6 +109,11 @@ angular.module('ot.extension.svn.changelog', [
                     exportIssuesLink: changeLog._exportIssues
                 });
             };
+
+            // Shows a diff for a file
+            $scope.showFileDiff = function (changeLog, svnChangeLogFile) {
+                otScmChangelogFilechangefilterService.diffFileFilter(changeLog, svnChangeLogFile.path);
+            };
         });
 
     })
