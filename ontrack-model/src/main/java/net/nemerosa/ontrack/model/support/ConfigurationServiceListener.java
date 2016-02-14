@@ -1,6 +1,4 @@
-package net.nemerosa.ontrack.extension.support;
-
-import net.nemerosa.ontrack.model.support.UserPasswordConfiguration;
+package net.nemerosa.ontrack.model.support;
 
 public interface ConfigurationServiceListener<T extends UserPasswordConfiguration> {
 

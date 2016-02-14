@@ -1,10 +1,5 @@
 package net.nemerosa.ontrack.model.support;
 
-import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
-import net.nemerosa.ontrack.model.support.ConfigurationNotFoundException;
-import net.nemerosa.ontrack.model.support.ConnectionResult;
-import net.nemerosa.ontrack.model.support.UserPasswordConfiguration;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;

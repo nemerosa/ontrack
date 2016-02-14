@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.extension.issues.IssueServiceExtension;
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
-import net.nemerosa.ontrack.extension.support.ConfigurationServiceListener;
+import net.nemerosa.ontrack.model.support.ConfigurationServiceListener;
 import net.nemerosa.ontrack.extension.svn.client.SVNClient;
 import net.nemerosa.ontrack.extension.svn.db.*;
 import net.nemerosa.ontrack.extension.svn.model.IndexationRange;

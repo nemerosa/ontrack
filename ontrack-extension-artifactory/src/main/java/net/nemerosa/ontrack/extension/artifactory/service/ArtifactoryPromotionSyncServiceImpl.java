@@ -8,7 +8,7 @@ import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfi
 import net.nemerosa.ontrack.extension.artifactory.model.ArtifactoryStatus;
 import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncProperty;
 import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncPropertyType;
-import net.nemerosa.ontrack.extension.support.ConfigurationServiceListener;
+import net.nemerosa.ontrack.model.support.ConfigurationServiceListener;
 import net.nemerosa.ontrack.job.*;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
