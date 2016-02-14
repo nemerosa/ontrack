@@ -118,6 +118,8 @@ build
             pattern 'ontrack-acceptance/build/libs/ontrack-acceptance.jar' // No version needed here
             pattern 'ontrack-dsl/build/libs/ontrack-dsl-*.jar'
             pattern 'ontrack-dsl/build/poms/ontrack-dsl-*.pom'
+            pattern 'ontrack-extension-plugin/build/libs/ontrack-extension-plugin-*.jar'
+            pattern 'ontrack-extension-plugin/build/poms/ontrack-extension-plugin-*.pom'
             pattern 'build/distributions/ontrack-*-delivery.zip'
             pattern 'build/distributions/ontrack*.deb'
             pattern 'build/distributions/ontrack*.rpm'
