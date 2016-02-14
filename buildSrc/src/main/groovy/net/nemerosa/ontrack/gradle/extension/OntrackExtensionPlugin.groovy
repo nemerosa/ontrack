@@ -9,7 +9,7 @@ class OntrackExtensionPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        println "[ontrack] Applying Ontrack plugin to ${project.path}"
+        println "[ontrack] Applying INTERNAL Ontrack plugin to ${project.path}"
 
         /**
          * Project's configuration
