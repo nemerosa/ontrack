@@ -62,7 +62,7 @@ ext {
             http_mime                   : "org.apache.httpcomponents:httpmime:${httpClientVersion}",
 
             // Groovy
-            groovy                      : 'org.codehaus.groovy:groovy-all:2.4.3',
+            groovy                      : 'org.codehaus.groovy:groovy-all:2.4.4',
             groovy_sandbox              : 'org.kohsuke:groovy-sandbox:1.7',
 
             // Logging
