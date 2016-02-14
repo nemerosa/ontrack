@@ -232,6 +232,20 @@ angular.module('ontrack.extension.svn', [
                     exportIssuesLink: changeLog._exportIssues
                 });
             };
+
+            // Shows a diff for a file
+            $scope.showFileDiff = function (changeLog, svnChangeLogFile) {
+                if (!$scope.diffLoading) {
+                    $scope.diffLoading = true;
+                    svnChangeLogFile.diffLoading = true;
+                    otScmChangelogFilechangefilterService
+                        .diffFileFilter(changeLog, svnChangeLogFile.path)
+                        .finally(function () {
+                            svnChangeLogFile.diffLoading = false;
+                            $scope.diffLoading = false;
+                        });
+                }
+            };
         });
 
     })
