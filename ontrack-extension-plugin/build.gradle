@@ -1,6 +1,7 @@
 description "Gradle plugin to create an Ontrack extension."
 
 apply plugin: 'groovy'
+apply plugin: 'maven'
 
 repositories {
     jcenter()
