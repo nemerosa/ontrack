@@ -21,14 +21,6 @@ class OntrackExtensionPlugin implements Plugin<Project> {
         project.extensions.create('ontrack', OntrackExtension)
 
         /**
-         * TODO Configures the extension project automatically
-         */
-
-        /**
-         * TODO Adds Ontrack dependencies automatically
-         */
-
-        /**
          * NPM setup
          */
 
