@@ -94,6 +94,7 @@ public class CoreResourceModuleTest {
                         .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:PROJECT,1")
                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:PROJECT,1,0,10")
                         .with("_disable", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#disableProject:1")
+                        .with("_page", "urn:test:#:entity:PROJECT:1")
                         .end(),
                 p
         );
@@ -121,6 +122,7 @@ public class CoreResourceModuleTest {
                         .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:PROJECT,1")
                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:PROJECT,1,0,10")
                         .with("_enable", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#enableProject:1")
+                        .with("_page", "urn:test:#:entity:PROJECT:1")
                         .end(),
                 p
         );
@@ -155,6 +157,7 @@ public class CoreResourceModuleTest {
                                         .with("_actions", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getActions:PROJECT,1")
                                         .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:PROJECT,1")
                                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:PROJECT,1,0,10")
+                                        .with("_page", "urn:test:#:entity:PROJECT:1")
                                         .end()
                         )
                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranch:1")
@@ -173,6 +176,7 @@ public class CoreResourceModuleTest {
                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:BRANCH,1,0,10")
                         .with("_templateDefinition", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getTemplateDefinition:1")
                         .with("_templateInstanceConnect", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#connectTemplateInstance:1")
+                        .with("_page", "urn:test:#:entity:BRANCH:1")
                         .end(),
                 b
         );
@@ -207,6 +211,7 @@ public class CoreResourceModuleTest {
                                         .with("_actions", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getActions:PROJECT,1")
                                         .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:PROJECT,1")
                                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:PROJECT,1,0,10")
+                                        .with("_page", "urn:test:#:entity:PROJECT:1")
                                         .end()
                         )
                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranch:1")
@@ -226,6 +231,7 @@ public class CoreResourceModuleTest {
                         .with("_templateInstance", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getTemplateInstance:1")
                         .with("_templateInstanceDisconnect", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#disconnectTemplateInstance:1")
                         .with("_templateInstanceSync", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#syncTemplateInstance:1")
+                        .with("_page", "urn:test:#:entity:BRANCH:1")
                         .end(),
                 b
         );
@@ -261,6 +267,7 @@ public class CoreResourceModuleTest {
                                         .with("_actions", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getActions:PROJECT,1")
                                         .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:PROJECT,1")
                                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:PROJECT,1,0,10")
+                                        .with("_page", "urn:test:#:entity:PROJECT:1")
                                         .end()
                         )
                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranch:1")
@@ -278,6 +285,7 @@ public class CoreResourceModuleTest {
                         .with("_buildFilterSave", "urn:test:net.nemerosa.ontrack.boot.ui.BuildFilterController#createFilter:1,")
                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:BRANCH,1,0,10")
                         .with("_templateInstanceConnect", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#connectTemplateInstance:1")
+                        .with("_page", "urn:test:#:entity:BRANCH:1")
                         .end(),
                 b
         );
@@ -312,6 +320,7 @@ public class CoreResourceModuleTest {
                                         .with("_actions", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getActions:PROJECT,1")
                                         .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:PROJECT,1")
                                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:PROJECT,1,0,10")
+                                        .with("_page", "urn:test:#:entity:PROJECT:1")
                                         .end()
                         )
                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranch:1")
@@ -331,6 +340,7 @@ public class CoreResourceModuleTest {
                         .with("_templateDefinition", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getTemplateDefinition:1")
                         .with("_templateSync", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#syncTemplateDefinition:1")
                         .with("_templateInstanceCreate", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#singleTemplateInstanceForm:1")
+                        .with("_page", "urn:test:#:entity:BRANCH:1")
                         .end(),
                 b
         );
@@ -365,6 +375,7 @@ public class CoreResourceModuleTest {
                                         .with("_actions", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getActions:PROJECT,1")
                                         .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:PROJECT,1")
                                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:PROJECT,1,0,10")
+                                        .with("_page", "urn:test:#:entity:PROJECT:1")
                                         .end()
                         )
                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranch:1")
@@ -383,6 +394,7 @@ public class CoreResourceModuleTest {
                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:BRANCH,1,0,10")
                         .with("_templateSync", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#syncTemplateDefinition:1")
                         .with("_templateInstanceCreate", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#singleTemplateInstanceForm:1")
+                        .with("_page", "urn:test:#:entity:BRANCH:1")
                         .end(),
                 b
         );
@@ -417,6 +429,7 @@ public class CoreResourceModuleTest {
                                         .with("_actions", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getActions:PROJECT,1")
                                         .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:PROJECT,1")
                                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:PROJECT,1,0,10")
+                                        .with("_page", "urn:test:#:entity:PROJECT:1")
                                         .end()
                         )
                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranch:1")
@@ -433,6 +446,7 @@ public class CoreResourceModuleTest {
                         .with("_buildFilterForms", "urn:test:net.nemerosa.ontrack.boot.ui.BuildFilterController#buildFilterForms:1")
                         .with("_buildFilterSave", "urn:test:net.nemerosa.ontrack.boot.ui.BuildFilterController#createFilter:1,")
                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:BRANCH,1,0,10")
+                        .with("_page", "urn:test:#:entity:BRANCH:1")
                         .end(),
                 b
         );
@@ -466,6 +480,7 @@ public class CoreResourceModuleTest {
                                         .with("_actions", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getActions:PROJECT,1")
                                         .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:PROJECT,1")
                                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:PROJECT,1,0,10")
+                                        .with("_page", "urn:test:#:entity:PROJECT:1")
                                         .end()
                         )
                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranch:1")
@@ -482,6 +497,7 @@ public class CoreResourceModuleTest {
                         .with("_buildFilterForms", "urn:test:net.nemerosa.ontrack.boot.ui.BuildFilterController#buildFilterForms:1")
                         .with("_buildFilterSave", "urn:test:net.nemerosa.ontrack.boot.ui.BuildFilterController#createFilter:1,")
                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:BRANCH,1,0,10")
+                        .with("_page", "urn:test:#:entity:BRANCH:1")
                         .end(),
                 b
         );
@@ -526,6 +542,7 @@ public class CoreResourceModuleTest {
                                                         .with("_actions", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getActions:PROJECT,1")
                                                         .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:PROJECT,1")
                                                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:PROJECT,1,0,10")
+                                                        .with("_page", "urn:test:#:entity:PROJECT:1")
                                                         .end()
                                         )
                                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranch:1")
@@ -542,6 +559,7 @@ public class CoreResourceModuleTest {
                                         .with("_buildFilterForms", "urn:test:net.nemerosa.ontrack.boot.ui.BuildFilterController#buildFilterForms:1")
                                         .with("_buildFilterSave", "urn:test:net.nemerosa.ontrack.boot.ui.BuildFilterController#createFilter:1,")
                                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:BRANCH,1,0,10")
+                                        .with("_page", "urn:test:#:entity:BRANCH:1")
                                         .end()
                         )
                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.BuildController#getBuild:1")
@@ -554,7 +572,7 @@ public class CoreResourceModuleTest {
                         .with("_extra", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getInformation:BUILD,1")
                         .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:BUILD,1")
                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:BUILD,1,0,10")
-                        .with("_page", "urn:test:#:build/1")
+                        .with("_page", "urn:test:#:entity:BUILD:1")
                         .end(),
                 build
         );
@@ -579,6 +597,7 @@ public class CoreResourceModuleTest {
                         .with("_actions", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getActions:PROJECT,1")
                         .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:PROJECT,1")
                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:PROJECT,1,0,10")
+                        .with("_page", "urn:test:#:entity:PROJECT:1")
                         .end(),
                 p
         );
@@ -606,6 +625,7 @@ public class CoreResourceModuleTest {
                         .with("_properties", "urn:test:net.nemerosa.ontrack.boot.ui.PropertyController#getProperties:PROMOTION_LEVEL,1")
                         .with("_runs", "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionRunView:1")
                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:PROMOTION_LEVEL,1,0,10")
+                        .with("_page", "urn:test:#:entity:PROMOTION_LEVEL:1")
                         .end(),
                 pl,
                 Branch.class
@@ -645,6 +665,7 @@ public class CoreResourceModuleTest {
                                         .with("_actions", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getActions:PROJECT,1")
                                         .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:PROJECT,1")
                                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:PROJECT,1,0,10")
+                                        .with("_page", "urn:test:#:entity:PROJECT:1")
                                         .end())
                                 .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranch:1")
                                 .with("_project", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
@@ -660,6 +681,7 @@ public class CoreResourceModuleTest {
                                 .with("_buildFilterForms", "urn:test:net.nemerosa.ontrack.boot.ui.BuildFilterController#buildFilterForms:1")
                                 .with("_buildFilterSave", "urn:test:net.nemerosa.ontrack.boot.ui.BuildFilterController#createFilter:1,")
                                 .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:BRANCH,1,0,10")
+                                .with("_page", "urn:test:#:entity:BRANCH:1")
                                 .end())
                         .with("image", false)
                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionLevel:1")
@@ -670,6 +692,7 @@ public class CoreResourceModuleTest {
                         .with("_properties", "urn:test:net.nemerosa.ontrack.boot.ui.PropertyController#getProperties:PROMOTION_LEVEL,1")
                         .with("_runs", "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionRunView:1")
                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:PROMOTION_LEVEL,1,0,10")
+                        .with("_page", "urn:test:#:entity:PROMOTION_LEVEL:1")
                         .end(),
                 pl
         );
@@ -712,6 +735,7 @@ public class CoreResourceModuleTest {
                                         .with("_buildFilterForms", "urn:test:net.nemerosa.ontrack.boot.ui.BuildFilterController#buildFilterForms:1")
                                         .with("_buildFilterSave", "urn:test:net.nemerosa.ontrack.boot.ui.BuildFilterController#createFilter:1,")
                                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:BRANCH,1,0,10")
+                                        .with("_page", "urn:test:#:entity:BRANCH:1")
                                         .end())
                                 .with(object()
                                         .with("id", 2)
@@ -733,6 +757,7 @@ public class CoreResourceModuleTest {
                                         .with("_buildFilterForms", "urn:test:net.nemerosa.ontrack.boot.ui.BuildFilterController#buildFilterForms:2")
                                         .with("_buildFilterSave", "urn:test:net.nemerosa.ontrack.boot.ui.BuildFilterController#createFilter:2,")
                                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:BRANCH,2,0,10")
+                                        .with("_page", "urn:test:#:entity:BRANCH:2")
                                         .end())
                                 .end())
                         .end(),

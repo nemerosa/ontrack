@@ -95,17 +95,12 @@ class GitBuildSyncIT extends AbstractServiceTestSupport {
                                         tagPatternBuildNameGitCommitLink,
                                         new TagPattern('1.2.*')
                                 ).toServiceConfiguration(),
-                                false, 0
+                                false, 1
                         )
                 )
 
                 // Build synchronisation
-                def optionalFuture = gitService.launchBuildSync(branch.id, true)
-                assert optionalFuture.present
-                def future = optionalFuture.get()
-
-                // FIXME Waits for the completion of the job
-                FutureUtils.wait("Build sync", future, 3600)
+                gitService.launchBuildSync(branch.id, true)
 
                 // Checks the builds have been created
                 assert !structureService.findBuildByName(project.name, branch.name, '1.1.6').present

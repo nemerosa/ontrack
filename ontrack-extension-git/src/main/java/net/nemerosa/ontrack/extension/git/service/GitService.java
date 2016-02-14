@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.git.service;
 
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.git.model.*;
+import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ID;
@@ -139,4 +140,18 @@ public interface GitService {
      * @return Synchronisation information
      */
     GitSynchronisationInfo getProjectGitSyncInfo(Project project);
+
+    /**
+     * Schedules some Git indexation
+     */
+    void scheduleGitIndexation(GitConfiguration configuration);
+
+    /**
+     * Unschedules some Git indexation
+     */
+    void unscheduleGitIndexation(GitConfiguration configuration);
+
+    void scheduleGitBuildSync(Branch branch, GitBranchConfigurationProperty property);
+
+    void unscheduleGitBuildSync(Branch branch, GitBranchConfigurationProperty property);
 }

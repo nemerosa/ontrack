@@ -4,17 +4,22 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClient;
 import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClientFactory;
 import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfiguration;
+import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfigurationService;
 import net.nemerosa.ontrack.extension.artifactory.model.ArtifactoryStatus;
 import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncProperty;
 import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncPropertyType;
-import net.nemerosa.ontrack.model.job.*;
+import net.nemerosa.ontrack.extension.support.ConfigurationServiceListener;
+import net.nemerosa.ontrack.job.*;
+import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.model.support.AbstractBranchJob;
+import net.nemerosa.ontrack.model.support.StartupService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -23,78 +28,119 @@ import java.util.stream.Collectors;
 import static org.apache.commons.lang3.StringUtils.replace;
 
 @Service
-public class ArtifactoryPromotionSyncServiceImpl implements JobProvider {
+public class ArtifactoryPromotionSyncServiceImpl implements ArtifactoryPromotionSyncService, StartupService, ConfigurationServiceListener<ArtifactoryConfiguration> {
+
+    private static final JobType ARTIFACTORY_BUILD_SYNC_JOB =
+            JobCategory.of("artifactory").withName("Artifactory")
+                    .getType("build-sync").withName("Artifactory Build synchronisation");
 
     private final Logger logger = LoggerFactory.getLogger(ArtifactoryPromotionSyncServiceImpl.class);
+
     private final StructureService structureService;
     private final PropertyService propertyService;
     private final ArtifactoryClientFactory artifactoryClientFactory;
+    private final JobScheduler jobScheduler;
+    private final SecurityService securityService;
 
     @Autowired
-    public ArtifactoryPromotionSyncServiceImpl(StructureService structureService, PropertyService propertyService, ArtifactoryClientFactory artifactoryClientFactory) {
+    public ArtifactoryPromotionSyncServiceImpl(StructureService structureService, PropertyService propertyService, ArtifactoryClientFactory artifactoryClientFactory, JobScheduler jobScheduler, ArtifactoryConfigurationService configurationService, SecurityService securityService) {
         this.structureService = structureService;
         this.propertyService = propertyService;
         this.artifactoryClientFactory = artifactoryClientFactory;
+        this.jobScheduler = jobScheduler;
+        this.securityService = securityService;
+        configurationService.addConfigurationServiceListener(this);
     }
 
     @Override
-    public Collection<Job> getJobs() {
-        // For all projects...
-        return structureService.getProjectList().stream()
-                // ... and their branches
-                .flatMap(project -> structureService.getBranchesForProject(project.getId()).stream())
-                        // ... only if not a template
-                .filter(branch -> branch.getType() != BranchType.TEMPLATE_DEFINITION)
-                        // ... gets those with the sync. property
-                .filter(branch -> propertyService.hasProperty(branch, ArtifactoryPromotionSyncPropertyType.class))
-                        // ... creates the job
-                .map(this::getBranchSyncJob)
-                        // ... filters on null
-                .filter(job -> job != null)
-                        // OK
-                .collect(Collectors.toList());
+    public String getName() {
+        return "Registration of Artifactory build sync jobs";
+    }
+
+    @Override
+    public int startupOrder() {
+        return JOB_REGISTRATION;
+    }
+
+    @Override
+    public void start() {
+        securityService.asAdmin(() -> {
+            // For all projects...
+            structureService.getProjectList().stream()
+                    // ... and their branches
+                    .flatMap(project -> structureService.getBranchesForProject(project.getId()).stream())
+                    // ... only if not a template
+                    .filter(branch -> branch.getType() != BranchType.TEMPLATE_DEFINITION)
+                    // ... gets those with the sync. property
+                    .filter(branch -> propertyService.hasProperty(branch, ArtifactoryPromotionSyncPropertyType.class))
+                    // ... creates the job
+                    .forEach(this::scheduleArtifactoryBuildSync);
+        });
+    }
+
+    @Override
+    public void scheduleArtifactoryBuildSync(Branch branch) {
+        propertyService.getProperty(branch, ArtifactoryPromotionSyncPropertyType.class).option().ifPresent(
+                syncProperty ->
+                        jobScheduler.schedule(
+                                getBranchSyncJob(branch),
+                                Schedule.everyMinutes(syncProperty.getInterval())
+                        )
+        );
+    }
+
+    @Override
+    public void unscheduleArtifactoryBuildSync(Branch branch) {
+        jobScheduler.unschedule(getBranchSyncJobKey(branch));
+    }
+
+    @Override
+    public void onDeletedConfiguration(ArtifactoryConfiguration configuration) {
+        propertyService.searchWithPropertyValue(
+                ArtifactoryPromotionSyncPropertyType.class,
+                (entityType, id) -> entityType.getEntityFn(structureService).apply(id),
+                syncProperty -> StringUtils.equals(syncProperty.getConfiguration().getName(), configuration.getName())
+        ).forEach(entity -> unscheduleArtifactoryBuildSync((Branch) entity));
+    }
+
+    private JobKey getBranchSyncJobKey(Branch branch) {
+        return ARTIFACTORY_BUILD_SYNC_JOB.getKey(branch.getId().toString());
     }
 
     private Job getBranchSyncJob(Branch branch) {
-        Property<ArtifactoryPromotionSyncProperty> syncProperty = propertyService.getProperty(branch, ArtifactoryPromotionSyncPropertyType.class);
-        if (syncProperty.isEmpty()) {
-            return null;
-        } else {
-            return new BranchJob(branch) {
+        return propertyService.getProperty(branch, ArtifactoryPromotionSyncPropertyType.class).option()
+                .map(syncProperty ->
+                        new AbstractBranchJob(structureService, branch) {
+                            @Override
+                            public JobKey getKey() {
+                                return getBranchSyncJobKey(branch);
+                            }
 
-                @Override
-                public String getCategory() {
-                    return "ArtifactoryPromotionSync";
-                }
+                            @Override
+                            public JobRun getTask() {
+                                return runListener -> sync(branch, runListener);
+                            }
 
-                @Override
-                public String getId() {
-                    return String.valueOf(branch.getId());
-                }
+                            @Override
+                            public String getDescription() {
+                                return String.format(
+                                        "Synchronisation of promotions with Artifactory for branch %s/%s",
+                                        branch.getProject().getName(),
+                                        branch.getName()
+                                );
+                            }
 
-                @Override
-                public String getDescription() {
-                    return String.format(
-                            "Synchronisation of promotions with Artifactory for branch %s/%s",
-                            branch.getProject().getName(),
-                            branch.getName()
-                    );
-                }
-
-                @Override
-                public int getInterval() {
-                    return syncProperty.getValue().getInterval();
-                }
-
-                @Override
-                public JobTask createTask() {
-                    return new RunnableJobTask(info -> sync(branch, info));
-                }
-            };
-        }
+                            @Override
+                            public boolean isValid() {
+                                return super.isValid() &&
+                                        propertyService.hasProperty(branch, ArtifactoryPromotionSyncPropertyType.class);
+                            }
+                        }
+                )
+                .orElseThrow(() -> new IllegalStateException("Branch not configured for Artifactory"));
     }
 
-    private void sync(Branch branch, JobInfoListener info) {
+    private void sync(Branch branch, JobRunListener listener) {
         // Gets the sync properties
         Property<ArtifactoryPromotionSyncProperty> syncProperty = propertyService.getProperty(branch, ArtifactoryPromotionSyncPropertyType.class);
         if (syncProperty.isEmpty()) {
@@ -109,7 +155,7 @@ public class ArtifactoryPromotionSyncServiceImpl implements JobProvider {
                 buildName,
                 buildNameFilter);
         logger.info("[artifactory-sync] {}", log);
-        info.post(log);
+        listener.message(log);
         // Build name filter
         Pattern buildNamePattern = Pattern.compile(
                 replace(replace(buildNameFilter, ".", "\\."), "*", ".*")
@@ -123,11 +169,11 @@ public class ArtifactoryPromotionSyncServiceImpl implements JobProvider {
                 .collect(Collectors.toList());
         // Synchronises the promotion levels for each build
         for (String buildNumber : buildNumbers) {
-            syncBuild(branch, buildName, buildNumber, client, info);
+            syncBuild(branch, buildName, buildNumber, client, listener);
         }
     }
 
-    protected void syncBuild(Branch branch, String artifactoryBuildName, String buildName, ArtifactoryClient client, JobInfoListener info) {
+    protected void syncBuild(Branch branch, String artifactoryBuildName, String buildName, ArtifactoryClient client, JobRunListener listener) {
         // Looks for the build
         Optional<Build> buildOpt = structureService.findBuildByName(
                 branch.getProject().getName(),
@@ -141,7 +187,7 @@ public class ArtifactoryPromotionSyncServiceImpl implements JobProvider {
                     branch.getName(),
                     buildName);
             logger.debug("[artifactory-sync] {}", log);
-            info.post(log);
+            listener.message(log);
             // Gets the build information from Artifactory
             JsonNode buildInfo = client.getBuildInfo(artifactoryBuildName, buildName);
             // Gets the list of statuses

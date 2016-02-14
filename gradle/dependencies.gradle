@@ -37,6 +37,7 @@ ext {
 
             // Spring
             spring_context              : "org.springframework:spring-context:${springVersion}",
+            spring_context_support      : "org.springframework:spring-context-support:${springVersion}",
             spring_jdbc                 : "org.springframework:spring-jdbc:${springVersion}",
             spring_tx                   : "org.springframework:spring-tx:${springVersion}",
             spring_webmvc               : "org.springframework:spring-webmvc:${springVersion}",

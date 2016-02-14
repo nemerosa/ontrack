@@ -26,7 +26,7 @@ public class PromotionRunResourceDecorator extends AbstractResourceDecorator<Pro
         return resourceContext.links()
                 // Self
                 .self(on(PromotionRunController.class).getPromotionRun(promotionRun.getId()))
-                        // List of runs for the build and promotion level
+                // List of runs for the build and promotion level
                 .link(
                         "_all",
                         on(PromotionRunController.class).getPromotionRunsForBuildAndPromotionLevel(
@@ -34,18 +34,20 @@ public class PromotionRunResourceDecorator extends AbstractResourceDecorator<Pro
                                 promotionRun.getPromotionLevel().getId()
                         )
                 )
-                        // Deletion
+                // Deletion
                 .delete(on(PromotionRunController.class).deletePromotionRun(promotionRun.getId()), PromotionRunDelete.class, promotionRun.projectId())
-                        // Actual properties for this item
+                // Actual properties for this item
                 .link("_properties", on(PropertyController.class).getProperties(promotionRun.getProjectEntityType(), promotionRun.getId()))
-                        // Image
+                // Image
                 .link(
                         Link.IMAGE_LINK,
                         on(PromotionLevelController.class).getPromotionLevelImage_(
                                 promotionRun.getPromotionLevel().getId()
                         )
                 )
-                        // OK
+                // Page
+                .page(promotionRun)
+                // OK
                 .build();
     }
 

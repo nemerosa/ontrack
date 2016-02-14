@@ -38,6 +38,11 @@ public class OntrackConfigProperties {
      */
     private boolean configurationTest = true;
 
+    /**
+     * Job configuration
+     */
+    private JobConfigProperties jobs = new JobConfigProperties();
+
     @PostConstruct
     public void log() {
         if (!configurationTest) {

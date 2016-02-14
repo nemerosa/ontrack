@@ -6,16 +6,14 @@ import net.nemerosa.ontrack.extension.git.model.BuildGitCommitLink;
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink;
 import net.nemerosa.ontrack.extension.git.model.IndexableBuildGitCommitLink;
 import net.nemerosa.ontrack.extension.git.service.BuildGitCommitLinkService;
+import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.extension.git.support.TagBuildNameGitCommitLink;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
 import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.form.*;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.structure.ProjectEntity;
-import net.nemerosa.ontrack.model.structure.ProjectEntityType;
-import net.nemerosa.ontrack.model.structure.ServiceConfiguration;
-import net.nemerosa.ontrack.model.structure.ServiceConfigurationSource;
+import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -29,11 +27,13 @@ import java.util.stream.Collectors;
 public class GitBranchConfigurationPropertyType extends AbstractPropertyType<GitBranchConfigurationProperty> {
 
     private final BuildGitCommitLinkService buildGitCommitLinkService;
+    private final GitService gitService;
 
     @Autowired
-    public GitBranchConfigurationPropertyType(GitExtensionFeature extensionFeature, BuildGitCommitLinkService buildGitCommitLinkService) {
+    public GitBranchConfigurationPropertyType(GitExtensionFeature extensionFeature, BuildGitCommitLinkService buildGitCommitLinkService, GitService gitService) {
         super(extensionFeature);
         this.buildGitCommitLinkService = buildGitCommitLinkService;
+        this.gitService = gitService;
     }
 
     @Override
@@ -179,5 +179,15 @@ public class GitBranchConfigurationPropertyType extends AbstractPropertyType<Git
                 linkId,
                 node
         );
+    }
+
+    @Override
+    public void onPropertyChanged(ProjectEntity entity, GitBranchConfigurationProperty value) {
+        gitService.scheduleGitBuildSync((Branch) entity, value);
+    }
+
+    @Override
+    public void onPropertyDeleted(ProjectEntity entity, GitBranchConfigurationProperty oldValue) {
+        gitService.unscheduleGitBuildSync((Branch) entity, oldValue);
     }
 }

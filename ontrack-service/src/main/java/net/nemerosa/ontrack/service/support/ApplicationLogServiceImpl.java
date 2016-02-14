@@ -1,12 +1,13 @@
 package net.nemerosa.ontrack.service.support;
 
+import net.nemerosa.ontrack.common.Time;
+import net.nemerosa.ontrack.model.security.Account;
 import net.nemerosa.ontrack.model.security.ApplicationManagement;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry;
-import net.nemerosa.ontrack.model.support.ApplicationLogEntryLevel;
 import net.nemerosa.ontrack.model.support.ApplicationLogService;
-import net.nemerosa.ontrack.model.support.Page;
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
+import net.nemerosa.ontrack.model.support.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ApplicationLogServiceImpl implements ApplicationLogService {
@@ -37,37 +39,37 @@ public class ApplicationLogServiceImpl implements ApplicationLogService {
     }
 
     @Override
-    public void error(Throwable exception, Class<?> source, String identifier, String context, String info) {
-        logger.error(
-                String.format(
-                        "[%s/%s] [%s] [%s]",
-                        source,
-                        identifier,
-                        context,
-                        info
-                ),
-                exception
+    public void log(ApplicationLogEntry entry) {
+        ApplicationLogEntry signedEntry = entry.withAuthentication(
+                securityService.getAccount().map(Account::getName).orElse("anonymous")
         );
-        log(
-                new ApplicationLogEntry(
-                        ApplicationLogEntryLevel.ERROR,
-                        source,
-                        identifier,
-                        context,
-                        info
-                ).withException(exception)
-        );
-        counterService.increment("error");
-        counterService.increment(String.format("error.%s", source.getSimpleName()));
+        doLog(signedEntry);
     }
 
-    private synchronized void log(ApplicationLogEntry entry) {
+    private synchronized void doLog(ApplicationLogEntry entry) {
+        // Logging
+        logger.error(
+                String.format(
+                        "[%s] name=%s,authentication=%s,timestamp=%s,%s",
+                        entry.getLevel(),
+                        entry.getType().getName(),
+                        entry.getAuthentication(),
+                        Time.forStorage(entry.getTimestamp()),
+                        entry.getDetails().entrySet().stream()
+                                .map(e -> String.format("%s=%s", e.getKey(), e.getValue()))
+                                .collect(Collectors.joining(","))
+                ),
+                entry.getException()
+        );
         // Storage
         entries.addFirst(entry);
         // Pruning
         while (entries.size() > maxEntries) {
             entries.removeLast();
         }
+        // Metrics
+        counterService.increment("error");
+        counterService.increment(String.format("error.%s", entry.getType().getName()));
     }
 
     @Override

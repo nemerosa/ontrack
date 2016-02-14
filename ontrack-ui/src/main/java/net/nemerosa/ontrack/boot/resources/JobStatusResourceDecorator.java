@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.boot.resources;
 
 import net.nemerosa.ontrack.boot.ui.AdminController;
-import net.nemerosa.ontrack.model.job.JobStatus;
+import net.nemerosa.ontrack.job.JobStatus;
 import net.nemerosa.ontrack.model.security.ApplicationManagement;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
 import net.nemerosa.ontrack.ui.resource.Link;
@@ -27,9 +27,30 @@ public class JobStatusResourceDecorator extends AbstractResourceDecorator<JobSta
                         "_launch",
                         on(AdminController.class).launchJob(jobStatus.getId()),
                         resourceContext.isGlobalFunctionGranted(ApplicationManagement.class)
-                                && !jobStatus.getDescriptor().isDisabled()
+                                && jobStatus.canRun()
                 )
-                        // OK
+                // Pausing a job
+                .link(
+                        "_pause",
+                        on(AdminController.class).pauseJob(jobStatus.getId()),
+                        resourceContext.isGlobalFunctionGranted(ApplicationManagement.class)
+                                && jobStatus.canPause()
+                )
+                // Resuming a job
+                .link(
+                        "_resume",
+                        on(AdminController.class).resumeJob(jobStatus.getId()),
+                        resourceContext.isGlobalFunctionGranted(ApplicationManagement.class)
+                                && jobStatus.canResume()
+                )
+                // Deleting a job
+                .link(
+                        "_delete",
+                        on(AdminController.class).deleteJob(jobStatus.getId()),
+                        resourceContext.isGlobalFunctionGranted(ApplicationManagement.class)
+                                && jobStatus.canBeDeleted()
+                )
+                // OK
                 .build();
     }
 

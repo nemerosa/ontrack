@@ -66,4 +66,9 @@ public interface ConfigurationService<T extends UserPasswordConfiguration> {
      * Type of configuration handled by this service
      */
     Class<T> getConfigurationType();
+
+    /**
+     * Adds a configuration event listener to this service
+     */
+    void addConfigurationServiceListener(ConfigurationServiceListener<T> listener);
 }

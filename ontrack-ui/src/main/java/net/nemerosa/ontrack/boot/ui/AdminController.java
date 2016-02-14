@@ -1,8 +1,10 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import net.nemerosa.ontrack.job.JobScheduler;
+import net.nemerosa.ontrack.job.JobStatus;
 import net.nemerosa.ontrack.model.Ack;
-import net.nemerosa.ontrack.model.job.JobService;
-import net.nemerosa.ontrack.model.job.JobStatus;
+import net.nemerosa.ontrack.model.security.ApplicationManagement;
+import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry;
 import net.nemerosa.ontrack.model.support.ApplicationLogService;
 import net.nemerosa.ontrack.model.support.Page;
@@ -26,15 +28,17 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 @RequestMapping("/admin")
 public class AdminController extends AbstractResourceController {
 
-    private final JobService jobService;
+    private final JobScheduler jobScheduler;
     private final ApplicationLogService applicationLogService;
     private final HealthEndpoint healthEndpoint;
+    private final SecurityService securityService;
 
     @Autowired
-    public AdminController(JobService jobService, ApplicationLogService applicationLogService, HealthEndpoint healthEndpoint) {
-        this.jobService = jobService;
+    public AdminController(JobScheduler jobScheduler, ApplicationLogService applicationLogService, HealthEndpoint healthEndpoint, SecurityService securityService) {
+        this.jobScheduler = jobScheduler;
         this.applicationLogService = applicationLogService;
         this.healthEndpoint = healthEndpoint;
+        this.securityService = securityService;
     }
 
     /**
@@ -98,7 +102,7 @@ public class AdminController extends AbstractResourceController {
     @RequestMapping(value = "jobs", method = RequestMethod.GET)
     public Resources<JobStatus> getJobs() {
         return Resources.of(
-                jobService.getJobStatuses(),
+                jobScheduler.getJobStatuses(),
                 uri(on(getClass()).getJobs())
         );
     }
@@ -108,7 +112,44 @@ public class AdminController extends AbstractResourceController {
      */
     @RequestMapping(value = "jobs/{id:\\d+}", method = RequestMethod.POST)
     public Ack launchJob(@PathVariable long id) {
-        return Ack.validate(jobService.launchJob(id).isPresent());
+        securityService.checkGlobalFunction(ApplicationManagement.class);
+        return jobScheduler.getJobKey(id)
+                .map(key -> Ack.validate(jobScheduler.fireImmediately(key) != null))
+                .orElse(Ack.NOK);
+    }
+
+    /**
+     * Pauses a job
+     */
+    @RequestMapping(value = "jobs/{id:\\d+}/pause", method = RequestMethod.POST)
+    public Ack pauseJob(@PathVariable long id) {
+        securityService.checkGlobalFunction(ApplicationManagement.class);
+        return jobScheduler.getJobKey(id)
+                .map(key -> Ack.validate(jobScheduler.pause(key)))
+                .orElse(Ack.NOK);
+    }
+
+    /**
+     * Resumes a job
+     */
+    @RequestMapping(value = "jobs/{id:\\d+}/resume", method = RequestMethod.POST)
+    public Ack resumeJob(@PathVariable long id) {
+        securityService.checkGlobalFunction(ApplicationManagement.class);
+        return jobScheduler.getJobKey(id)
+                .map(key -> Ack.validate(jobScheduler.resume(key)))
+                .orElse(Ack.NOK);
+    }
+
+    /**
+     * Deleting a job
+     */
+    @RequestMapping(value = "jobs/{id:\\d+}", method = RequestMethod.DELETE)
+    public Ack deleteJob(@PathVariable long id) {
+        securityService.checkGlobalFunction(ApplicationManagement.class);
+        return jobScheduler.getJobKey(id)
+                .filter(key -> !jobScheduler.getJobStatus(key).get().isValid())
+                .map(key -> Ack.validate(jobScheduler.unschedule(key)))
+                .orElse(Ack.NOK);
     }
 
 }

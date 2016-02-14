@@ -74,7 +74,9 @@ public class ProjectResourceDecorator extends AbstractResourceDecorator<Project>
                         on(ProjectController.class).disableProject(project.getId()),
                         resourceContext.isProjectFunctionGranted(project.id(), ProjectEdit.class)
                                 && !project.isDisabled()
-                );
+                )
+                // Page
+                .page(project);
         // Contributions
         resourceDecorationContributorService.contribute(linksBuilder, project);
         // OK

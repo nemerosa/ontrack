@@ -11,7 +11,7 @@ import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
 import net.nemerosa.ontrack.extension.scm.service.SCMService
 import net.nemerosa.ontrack.git.GitRepositoryClient
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory
-import net.nemerosa.ontrack.model.job.JobQueueService
+import net.nemerosa.ontrack.job.JobScheduler
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.ApplicationLogService
@@ -49,7 +49,7 @@ class GitServiceImplTest {
                 structureService,
                 propertyService,
                 mock(IssueServiceRegistry),
-                mock(JobQueueService),
+                mock(JobScheduler),
                 mock(SecurityService),
                 mock(TransactionService),
                 mock(ApplicationLogService),
@@ -82,7 +82,8 @@ class GitServiceImplTest {
                     new Property<GitBranchConfigurationProperty>(
                             new GitBranchConfigurationPropertyType(
                                     new GitExtensionFeature(new SCMExtensionFeature()),
-                                    buildGitCommitLinkService
+                                    buildGitCommitLinkService,
+                                    gitService
                             ),
                             null,
                             false

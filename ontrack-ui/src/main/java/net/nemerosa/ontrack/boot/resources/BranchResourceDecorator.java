@@ -34,99 +34,99 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                 .link(
                         "_project",
                         on(ProjectController.class).getProject(branch.getProject().getId()))
-                        // Build creation
+                // Build creation
                 .link(
                         "_createBuild",
                         on(BuildController.class).newBuild(branch.getId(), null),
                         branch.getType() != BranchType.TEMPLATE_DEFINITION &&
                                 resourceContext.isProjectFunctionGranted(branch, BuildCreate.class)
                 )
-                        // Promotion level creation
+                // Promotion level creation
                 .link(
                         "_createPromotionLevel",
                         on(PromotionLevelController.class).newPromotionLevelForm(branch.getId()),
                         PromotionLevelCreate.class, branch.getProject().id()
                 )
-                        // Promotion level list
+                // Promotion level list
                 .link(
                         "_promotionLevels",
                         on(PromotionLevelController.class).getPromotionLevelListForBranch(branch.getId())
                 )
-                        // Validation stamp creation
+                // Validation stamp creation
                 .link(
                         "_createValidationStamp",
                         on(ValidationStampController.class).newValidationStampForm(branch.getId()),
                         ValidationStampCreate.class, branch.getProject().id()
                 )
-                        // Validation stamp list
+                // Validation stamp list
                 .link(
                         "_validationStamps",
                         on(ValidationStampController.class).getValidationStampListForBranch(branch.getId())
                 )
-                        // All branches for the same project
+                // All branches for the same project
                 .link(
                         "_branches",
                         on(BranchController.class).getBranchListForProject(branch.getProjectId())
                 )
-                        // Actual properties for this build
+                // Actual properties for this build
                 .link("_properties", on(PropertyController.class).getProperties(ProjectEntityType.BRANCH, branch.getId()))
-                        // Actions
+                // Actions
                 .link("_actions", on(ProjectEntityExtensionController.class).getActions(ProjectEntityType.BRANCH, branch.getId()))
-                        // Update link (with authorisation)
+                // Update link (with authorisation)
                 .update(on(BranchController.class).getUpdateForm(branch.getId()), BranchEdit.class, branch.projectId())
-                        // Bulk update
+                // Bulk update
                 .link(
                         "_bulkUpdate",
                         on(BranchController.class).bulkUpdate(branch.getId()),
                         BranchEdit.class, branch
                 )
-                        // Delete link
+                // Delete link
                 .delete(on(BranchController.class).deleteBranch(branch.getId()), BranchDelete.class, branch.projectId())
-                        // View link
+                // View link
                 .link("_status", on(BranchController.class).getBranchStatusView(branch.getId()))
-                        // Builds link
+                // Builds link
                 .link("_view", on(BranchController.class).buildView(branch.getId()))
-                        // Decorations
+                // Decorations
                 .link("_decorations", on(DecorationsController.class).getDecorations(branch.getProjectEntityType(), branch.getId()))
-                        // Build filters
+                // Build filters
                 .link("_buildFilterResources", on(BuildFilterController.class).buildFilters(branch.getId()))
-                        // Build filter forms
+                // Build filter forms
                 .link("_buildFilterForms", on(BuildFilterController.class).buildFilterForms(branch.getId()))
-                        // Saving a filter
+                // Saving a filter
                 .link("_buildFilterSave", on(BuildFilterController.class).createFilter(branch.getId(), null))
-                        // Sharing a filter
+                // Sharing a filter
                 .link("_buildFilterShare", on(BuildFilterController.class).createFilter(branch.getId(), null), BranchFilterMgt.class, branch)
-                        // Reordering of promotion levels
+                // Reordering of promotion levels
                 .link(
                         "_reorderPromotionLevels",
                         on(PromotionLevelController.class).reorderPromotionLevelListForBranch(branch.getId(), null),
                         PromotionLevelEdit.class,
                         branch.projectId()
                 )
-                        // Reordering of validation stamps
+                // Reordering of validation stamps
                 .link(
                         "_reorderValidationStamps",
                         on(ValidationStampController.class).reorderValidationStampListForBranch(branch.getId(), null),
                         ValidationStampEdit.class,
                         branch.projectId()
                 )
-                        // Copy of a configuration from another branch
+                // Copy of a configuration from another branch
                 .link(
                         "_copy",
                         on(BranchController.class).copy(branch.getId()),
                         BranchEdit.class,
                         branch.projectId()
                 )
-                        // Clone to another branch
+                // Clone to another branch
                 .link(
                         "_clone",
                         on(BranchController.class).clone(branch.getId()),
                         BranchCreate.class,
                         branch.projectId()
                 )
-                        // Events
+                // Events
                 .link("_events", on(EventController.class).getEvents(branch.getProjectEntityType(), branch.getId(), 0, 10))
-                        // Enable
+                // Enable
                 .link(
                         "_enable",
                         on(BranchController.class).enableBranch(branch.getId()),
@@ -134,7 +134,7 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                                 && branch.isDisabled()
                                 && branch.getType() != BranchType.TEMPLATE_DEFINITION
                 )
-                        // Disable
+                // Disable
                 .link(
                         "_disable",
                         on(BranchController.class).disableBranch(branch.getId()),
@@ -142,7 +142,7 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                                 && !branch.isDisabled()
                                 && branch.getType() != BranchType.TEMPLATE_DEFINITION
                 )
-                        // Template definition creation
+                // Template definition creation
                 .link(
                         "_templateDefinition",
                         on(BranchController.class).getTemplateDefinition(branch.getId()),
@@ -150,7 +150,7 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                                 && (structureService.getBuildCount(branch) == 0)
                                 && resourceContext.isProjectFunctionGranted(branch, BranchTemplateMgt.class)
                 )
-                        // Template synchronisation
+                // Template synchronisation
                 .link(
                         "_templateSync",
                         on(BranchController.class).syncTemplateDefinition(branch.getId()),
@@ -159,7 +159,7 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                                 || resourceContext.isProjectFunctionGranted(branch, BranchTemplateSync.class)
                         )
                 )
-                        // Template instance creation
+                // Template instance creation
                 .link(
                         "_templateInstanceCreate",
                         on(BranchController.class).singleTemplateInstanceForm(branch.getId()),
@@ -168,28 +168,28 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                                 || resourceContext.isProjectFunctionGranted(branch, BranchTemplateSync.class)
                         )
                 )
-                        // Template instance
+                // Template instance
                 .link(
                         "_templateInstance",
                         on(BranchController.class).getTemplateInstance(branch.getId()),
                         branch.getType() == BranchType.TEMPLATE_INSTANCE
                                 && resourceContext.isProjectFunctionGranted(branch, BranchTemplateMgt.class)
                 )
-                        // Template instance disconnection
+                // Template instance disconnection
                 .link(
                         "_templateInstanceDisconnect",
                         on(BranchController.class).disconnectTemplateInstance(branch.getId()),
                         branch.getType() == BranchType.TEMPLATE_INSTANCE
                                 && resourceContext.isProjectFunctionGranted(branch, BranchTemplateMgt.class)
                 )
-                        // Template instance connection
+                // Template instance connection
                 .link(
                         "_templateInstanceConnect",
                         on(BranchController.class).connectTemplateInstance(branch.getId()),
                         branch.getType() == BranchType.CLASSIC
                                 && resourceContext.isProjectFunctionGranted(branch, BranchTemplateMgt.class)
                 )
-                        // Template instance synchronisation
+                // Template instance synchronisation
                 .link(
                         "_templateInstanceSync",
                         on(BranchController.class).syncTemplateInstance(branch.getId()),
@@ -197,7 +197,9 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                                 && (resourceContext.isProjectFunctionGranted(branch, BranchTemplateMgt.class)
                                 || resourceContext.isProjectFunctionGranted(branch, BranchTemplateSync.class)
                         )
-                );
+                )
+                // Page
+                .page(branch);
         // Contributions
         resourceDecorationContributorService.contribute(linksBuilder, branch);
         // OK

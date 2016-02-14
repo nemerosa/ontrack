@@ -1,5 +1,9 @@
 package net.nemerosa.ontrack.extension.stale
 
+import net.nemerosa.ontrack.job.Job
+import net.nemerosa.ontrack.job.JobRunListener
+import net.nemerosa.ontrack.job.JobScheduler
+import net.nemerosa.ontrack.job.Schedule
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventQueryService
@@ -11,14 +15,16 @@ import java.time.LocalDateTime
 
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd
 import static org.mockito.Matchers.any
+import static org.mockito.Matchers.eq
 import static org.mockito.Mockito.*
 
 class StaleBranchesJobTest {
 
-    private StaleBranchesJobProvider job
+    private StalePropertyType propertyType
     private StructureService structureService
     private PropertyService propertyService
     private EventQueryService eventQueryService
+    private JobScheduler jobScheduler
     private Project project
     private Branch branch
     private LocalDateTime now
@@ -30,15 +36,21 @@ class StaleBranchesJobTest {
         structureService = mock(StructureService)
         propertyService = mock(PropertyService)
         eventQueryService = mock(EventQueryService)
-        job = new StaleBranchesJobProvider(
+        jobScheduler = mock(JobScheduler)
+        propertyType = new StalePropertyType(
+                new StaleExtensionFeature(),
                 structureService,
                 propertyService,
                 eventQueryService,
+                jobScheduler
         )
 
 
         project = Project.of(nd('P', '')).withId(ID.of(1))
         branch = Branch.of(project, nd('B', '')).withId(ID.of(1))
+
+        // Structure
+        when(structureService.getProjectList()).thenReturn([project])
 
         // By default, no build
         when(structureService.getLastBuild(any(ID))).thenReturn(Optional.empty())
@@ -56,7 +68,7 @@ class StaleBranchesJobTest {
         // Branch creation for deletion (normally)
         configureBranchCreationEvent(11)
 
-        job.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
+        propertyType.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
 
         verify(structureService, never()).deleteBranch(any(ID))
         verify(structureService, never()).saveBranch(any(Branch))
@@ -67,7 +79,7 @@ class StaleBranchesJobTest {
         // Last build for deletion
         configureBuild(11)
 
-        job.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
+        propertyType.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
 
         verify(structureService).deleteBranch(branch.id)
         verify(structureService, never()).saveBranch(any(Branch))
@@ -80,7 +92,7 @@ class StaleBranchesJobTest {
         // Last build for deletion
         configureBuild(11)
 
-        job.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
+        propertyType.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
 
         verify(structureService, never()).deleteBranch(any(ID))
         verify(structureService).saveBranch(branch.withDisabled(true))
@@ -91,7 +103,7 @@ class StaleBranchesJobTest {
         // Last build for disabling
         configureBuild(6)
 
-        job.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
+        propertyType.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
 
         verify(structureService, never()).deleteBranch(any(ID))
         verify(structureService).saveBranch(branch.withDisabled(true))
@@ -102,7 +114,7 @@ class StaleBranchesJobTest {
         // Last build still OK
         configureBuild(4)
 
-        job.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
+        propertyType.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
 
         verify(structureService, never()).deleteBranch(any(ID))
         verify(structureService, never()).saveBranch(any(Branch))
@@ -113,7 +125,7 @@ class StaleBranchesJobTest {
         // Configure branch for deletion
         configureBranchCreationEvent(11)
 
-        job.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
+        propertyType.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
 
         verify(structureService).deleteBranch(branch.id)
         verify(structureService, never()).saveBranch(any(Branch))
@@ -124,7 +136,7 @@ class StaleBranchesJobTest {
         // Configure branch for disabling
         configureBranchCreationEvent(6)
 
-        job.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
+        propertyType.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
 
         verify(structureService, never()).deleteBranch(any(ID))
         verify(structureService).saveBranch(branch.withDisabled(true))
@@ -135,7 +147,7 @@ class StaleBranchesJobTest {
         // Configure branch for OK
         configureBranchCreationEvent(4)
 
-        job.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
+        propertyType.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
 
         verify(structureService, never()).deleteBranch(any(ID))
         verify(structureService, never()).saveBranch(any(Branch))
@@ -143,7 +155,7 @@ class StaleBranchesJobTest {
 
     @Test
     void 'Not touching a branch when no branch creation time'() {
-        job.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
+        propertyType.detectAndManageStaleBranch(branch, disablingTime, deletingTime)
 
         verify(structureService, never()).deleteBranch(any(ID))
         verify(structureService, never()).saveBranch(any(Branch))
@@ -154,7 +166,7 @@ class StaleBranchesJobTest {
         // No configuration
         configureProject(null)
         // Call
-        job.detectAndManageStaleBranches({ println it }, project)
+        propertyType.detectAndManageStaleBranches({ println it }, project)
         // Check
         verify(structureService, never()).getBranchesForProject(any(ID))
     }
@@ -164,28 +176,73 @@ class StaleBranchesJobTest {
         // No configuration
         configureProject(StaleProperty.create())
         // Call
-        job.detectAndManageStaleBranches({ println it }, project)
+        propertyType.detectAndManageStaleBranches({ println it }, project)
         // Check
         verify(structureService, never()).getBranchesForProject(any(ID))
     }
 
     @Test
     void 'Scan for project with disabling duration'() {
-        // No configuration
+        // Configuration
         configureProject(StaleProperty.create().withDisablingDuration(1))
         // Call
-        job.detectAndManageStaleBranches({ println it }, project)
+        propertyType.detectAndManageStaleBranches(JobRunListener.out(), project)
         // Check
         verify(structureService).getBranchesForProject(project.id)
+    }
+
+    @Test
+    void 'Configured projects do schedule jobs at startup'() {
+        // Configuration
+        configureProject(StaleProperty.create().withDisablingDuration(1))
+        // Scheduling jobs
+        propertyType.start()
+        // Verifies the job has been scheduled
+        verify(jobScheduler, times(1)).schedule(any(Job), eq(Schedule.EVERY_DAY))
+    }
+
+    @Test
+    void 'Unconfigured projects do schedule jobs at startup'() {
+        // No configuration
+        configureProject(null)
+        // Scheduling jobs
+        propertyType.start()
+        // Verifies that no job has been scheduled
+        verify(jobScheduler, times(0)).schedule(any(Job), any(Schedule))
+    }
+
+    @Test
+    void 'Configuring a project does schedule a job'() {
+        // Configuration
+        def property = StaleProperty.create().withDisablingDuration(1)
+        configureProject(property)
+        propertyType.onPropertyChanged(project, property)
+        // Verifies the job has been scheduled
+        verify(jobScheduler, times(1)).schedule(any(Job), eq(Schedule.EVERY_DAY))
+    }
+
+    @Test
+    void 'Unconfiguring a project does unschedule a job'() {
+        // Configuration
+        def property = StaleProperty.create().withDisablingDuration(1)
+        configureProject(property)
+        propertyType.onPropertyChanged(project, property)
+        // Verifies the job has been scheduled
+        verify(jobScheduler, times(1)).schedule(any(Job), eq(Schedule.EVERY_DAY))
+        // Unconfigures the project
+        propertyType.onPropertyDeleted(project, property)
+        // Verifies the job has been unscheduled
+        verify(jobScheduler, times(1)).unschedule(StalePropertyType.STALE_BRANCH_JOB.getKey(String.valueOf(project.id)))
     }
 
     protected def configureProject(StaleProperty property) {
         when(propertyService.getProperty(project, StalePropertyType)).thenReturn(
                 Property.of(
-                        new StalePropertyType(),
+                        propertyType,
                         property
                 )
         )
+        when(propertyService.hasProperty(project, StalePropertyType)).thenReturn(property != null)
     }
 
     protected def configureBranchCreationEvent(int branchAge) {
