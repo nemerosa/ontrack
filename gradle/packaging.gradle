@@ -36,3 +36,5 @@ task publicationPackage(type: Zip) {
         }
     }
 }
+
+build.dependsOn publicationPackage
