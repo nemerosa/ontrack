@@ -26,6 +26,7 @@ class OntrackExtensionPlugin implements Plugin<Project> {
             version = '4.2.2'
             npmVersion = '4.2.2'
             download = true
+            workDir = project.file("${project.projectDir}/.gradle/nodejs")
         }
 
         /**
