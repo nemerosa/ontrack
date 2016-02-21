@@ -121,6 +121,8 @@ publicationPackage
             pattern 'build/distributions/ontrack-*-delivery.zip'
             pattern 'build/distributions/ontrack*.deb'
             pattern 'build/distributions/ontrack*.rpm'
+            exclude 'ontrack-ui/build/libs/ontrack-ui-*-javadoc.jar'
+            exclude 'ontrack-ui/build/libs/ontrack-ui-*-sources.jar'
         }
         tasks(
                 '**/*.java,**/*.groovy,**/*.xml,**/*.html,**/*.js',
