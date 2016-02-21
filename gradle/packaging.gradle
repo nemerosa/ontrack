@@ -31,7 +31,7 @@ task publicationPackage(type: Zip) {
                 from jar
                 if (tasks.findByName('javadocJar')) from javadocJar
                 if (tasks.findByName('sourceJar')) from sourceJar
-                if (tasks.findByName('writeNewPom')) from writeNewPom.output
+                if (tasks.findByName('pomFile')) from pomFile.output
             }
         }
     }

@@ -44,6 +44,7 @@ configure(javaProjects) {
      */
 
     apply plugin: 'java'
+    apply plugin: 'maven'
 
     dependencies {
         // TODO Lombok not to be released
@@ -98,12 +99,50 @@ configure(javaProjects) {
         from sourceSets.main.allSource
     }
 
+    // POM file
+
+    task pomFile {
+        ext.output = "${buildDir}/poms/${project.name}-${version}.pom"
+        doLast {
+            pom {
+                project {
+                    version versioning.info.display
+                    name project.name
+                    description project.description
+                    url 'http://nemerosa.github.io/ontrack'
+                    licenses {
+                        license {
+                            name 'The MIT License (MIT)'
+                            url 'http://opensource.org/licenses/MIT'
+                            distribution 'repo'
+                        }
+                    }
+                    scm {
+                        url 'https://github.com/nemerosa/ontrack'
+                        connection 'scm:git://github.com/nemerosa/ontrack'
+                        developerConnection 'scm:git:git://github.com/nemerosa/ontrack'
+                    }
+                    developers {
+                        developer {
+                            id 'dcoraboeuf'
+                            name 'Damien Coraboeuf'
+                            email 'damien.coraboeuf@gmail.com'
+                        }
+                    }
+                }
+            }.writeTo(output)
+        }
+    }
+
     // Archives for Javadoc and Sources
 
     artifacts {
         archives javadocJar
         archives sourceJar
+        archives file: file("${buildDir}/poms/${project.name}-${version}.pom"), type: 'pom', builtBy: pomFile
     }
+
+    assemble.dependsOn 'pomFile'
 
 }
 
