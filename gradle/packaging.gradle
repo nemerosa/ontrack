@@ -22,13 +22,12 @@ build.dependsOn deliveryPackage
 
 // ZIP package which contains all artifacts to be published
 
-subprojects {
-    afterEvaluate {
-        // Only for Java projects
-        if (tasks.findByName('jar')) {
-            task publicationPackage(type: Zip) {
+task publicationPackage(type: Zip) {
+    classifier = 'publication'
+    subprojects {
+        afterEvaluate {
+            if (tasks.findByName('jar')) {
                 dependsOn assemble
-                classifier = 'publication'
                 from jar
                 if (tasks.findByName('javadocJar')) from javadocJar
                 if (tasks.findByName('sourceJar')) from sourceJar
