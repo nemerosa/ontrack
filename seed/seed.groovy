@@ -107,6 +107,7 @@ build
 publicationPackage
 --info
 --profile
+--parallel
 '''
         environmentVariables {
             propertiesFile 'build/version.properties'
