@@ -25,34 +25,37 @@ task sourceJar(type: Jar) {
 }
 
 // POM generation
-task writeNewPom << {
-    pom {
-        project {
-            version versioning.info.display
-            name project.name
-            description project.description
-            url 'http://nemerosa.github.io/ontrack'
-            licenses {
-                license {
-                    name 'The MIT License (MIT)'
-                    url 'http://opensource.org/licenses/MIT'
-                    distribution 'repo'
+task writeNewPom {
+    ext.output = "${buildDir}/poms/${project.name}-${version}.pom"
+    doLast {
+        pom {
+            project {
+                version versioning.info.display
+                name project.name
+                description project.description
+                url 'http://nemerosa.github.io/ontrack'
+                licenses {
+                    license {
+                        name 'The MIT License (MIT)'
+                        url 'http://opensource.org/licenses/MIT'
+                        distribution 'repo'
+                    }
+                }
+                scm {
+                    url 'https://github.com/nemerosa/ontrack'
+                    connection 'scm:git://github.com/nemerosa/ontrack'
+                    developerConnection 'scm:git:git://github.com/nemerosa/ontrack'
+                }
+                developers {
+                    developer {
+                        id 'dcoraboeuf'
+                        name 'Damien Coraboeuf'
+                        email 'damien.coraboeuf@gmail.com'
+                    }
                 }
             }
-            scm {
-                url 'https://github.com/nemerosa/ontrack'
-                connection 'scm:git://github.com/nemerosa/ontrack'
-                developerConnection 'scm:git:git://github.com/nemerosa/ontrack'
-            }
-            developers {
-                developer {
-                    id 'dcoraboeuf'
-                    name 'Damien Coraboeuf'
-                    email 'damien.coraboeuf@gmail.com'
-                }
-            }
-        }
-    }.writeTo("${buildDir}/poms/${project.name}-${version}.pom")
+        }.writeTo(output)
+    }
 }
 
 // Archives for Javadoc and Sources
