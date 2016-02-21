@@ -7,7 +7,7 @@ import net.nemerosa.ontrack.extension.issues.IssueServiceExtension;
 
 /**
  * This class is used to represent an {@link net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration}
- * to a client. The proposed {@link #getId() id} is composed from the
+ * to a client. The proposed {@link #id id} is composed from the
  * {@link net.nemerosa.ontrack.extension.issues.IssueServiceExtension#getId() service id} and from the
  * {@link IssueServiceConfiguration#getName() configuration name}, separated by <code>//</code>.
  *

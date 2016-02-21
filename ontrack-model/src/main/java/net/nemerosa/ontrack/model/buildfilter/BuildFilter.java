@@ -25,9 +25,9 @@ public interface BuildFilter {
      * @param buildViewSupplier If the filter needs to access the
      *                          {@link net.nemerosa.ontrack.model.structure.BuildView BuildView}
      *                          for this build, it can call this supplier to load it on demand.
-     * @return Result of the filter. The {@link BuildFilterResult#isGoingOn() goingOn} property must be set to
+     * @return Result of the filter. The {@link BuildFilterResult#goingOn goingOn} property must be set to
      * <code>true</code> if the filtering must go on with following builds. The
-     * {@link net.nemerosa.ontrack.model.buildfilter.BuildFilterResult#isAccept() accept} property must be set to
+     * {@link BuildFilterResult#accept accept} property must be set to
      * <code>true</code> if the build must be added to the list (note that the filter could add it directly to
      * the list and return <code>false</code> instead)
      */

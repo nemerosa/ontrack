@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.job;
 
+import net.nemerosa.ontrack.job.support.JobNotScheduledException;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -10,11 +12,17 @@ public interface JobScheduler {
     /**
      * Schedules or reschedules a job in the scheduler. If the job is already running,
      * does not stop its current execution.
+     *
+     * @param job      Job to schedule
+     * @param schedule Schedule for the job
      */
     void schedule(Job job, Schedule schedule);
 
     /**
      * Removes a job from the scheduler. Any running execution will be stopped immediately.
+     *
+     * @param key Key of the job to unschedule
+     * @return True if the job was running and had to be stopped
      */
     boolean unschedule(JobKey key);
 
@@ -30,50 +38,78 @@ public interface JobScheduler {
 
     /**
      * Pauses the execution of a job
+     *
+     * @param key Key of the job to pause
+     * @return <code>true</code> if the job was paused
+     * @throws JobNotScheduledException If the job is not scheduled
      */
     boolean pause(JobKey key);
 
     /**
      * Resumes the execution of a job
+     *
+     * @param key Key of the job to resume
+     * @return <code>true</code> if the job was resumed
+     * @throws JobNotScheduledException If the job is not scheduled
      */
     boolean resume(JobKey key);
 
     /**
      * Gets the status for a job
+     *
+     * @param key Key of the job to get a status for
+     * @return The job status or empty if not found.
      */
     Optional<JobStatus> getJobStatus(JobKey key);
 
     /**
      * Gets all the job keys
+     *
+     * @return List of all job keys, never null
      */
     Collection<JobKey> getAllJobKeys();
 
     /**
      * Gets all the job keys for a type of job
      *
-     * @see JobKey#getType()
+     * @param type Job type
+     * @return List of job keys for this type
      */
+    @SuppressWarnings("unused")
     Collection<JobKey> getJobKeysOfType(JobType type);
 
     /**
      * Gets all the job keys for a category of jobs
      *
-     * @see JobType#getCategory()
+     * @param category Job category
+     * @return List of job keys for this category
      */
     Collection<JobKey> getJobKeysOfCategory(JobCategory category);
 
     /**
      * Gets the list of job statuses
+     *
+     * @return All job statuses (never null)
      */
     Collection<JobStatus> getJobStatuses();
 
     /**
      * Fires a job immediately, without waiting the schedule
+     *
+     * @param jobKey Key of the job to fire immediately
+     * @return Future for the job execution
+     * @throws JobNotScheduledException If the job is not scheduled
      */
     Future<?> fireImmediately(JobKey jobKey);
 
     /**
      * Fires a job immediately, without waiting the schedule, and passes additional parameters.
+     *
+     * @param jobKey     Key of the job to fire immediately
+     * @param parameters List of parameters to give for this job execution
+     * @return Future for the job execution
+     * @throws JobNotScheduledException If the job is not scheduled
+     * @see JobRunListener#getParam(String)
      */
     Future<?> fireImmediately(JobKey jobKey, Map<String, ?> parameters);
 

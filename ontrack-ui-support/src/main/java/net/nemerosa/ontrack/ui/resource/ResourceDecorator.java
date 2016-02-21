@@ -14,7 +14,6 @@ public interface ResourceDecorator<T> {
     /**
      * This method is called to give this decorator an opportunity to change the content of the model object
      * before it is serialized. A typical use is the obfuscation of sensitive data before it is sent to the client.
-     * <p/>
      * By default, this method returns the same bean.
      *
      * @param bean Model object

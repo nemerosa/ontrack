@@ -12,7 +12,7 @@ public class MetaInfoProperty {
     private final List<MetaInfoPropertyItem> items;
 
     /**
-     * Does one of the items match the name->value? The value can be blank (meaning all values)
+     * Does one of the items match the name-&gt;value? The value can be blank (meaning all values)
      * or contains wildcards (*).
      */
     public boolean matchNameValue(String name, String value) {

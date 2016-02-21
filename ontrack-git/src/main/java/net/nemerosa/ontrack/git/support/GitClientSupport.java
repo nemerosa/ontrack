@@ -34,12 +34,10 @@ public class GitClientSupport {
 
     /**
      * Output of a file
-     * <p>
      * Same as:
      * <pre>
-     *         git show $branch:$path
-     *     </pre>
-     * </p>
+     * git show $branch:$path
+     * </pre>
      *
      * @param wd       Repository directory
      * @param commitId Commit-ish to search

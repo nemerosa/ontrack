@@ -45,7 +45,7 @@ public class BuildLinkPropertyItem {
     }
 
     /**
-     * Does one of the items match the project->build? The value can be blank (meaning all values)
+     * Does one of the items match the project-&gt;build? The value can be blank (meaning all values)
      * or contains wildcards (*).
      */
     public boolean match(String projectPattern, String buildPattern) {

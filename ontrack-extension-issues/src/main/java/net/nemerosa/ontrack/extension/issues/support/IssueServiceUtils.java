@@ -26,7 +26,7 @@ public final class IssueServiceUtils {
      * and a grouping specification.
      *
      * @param issueTypes            Issue types
-     * @param groupingSpecification Group -> (Group types)
+     * @param groupingSpecification Group -&gt; (Group types)
      * @return List of group the issue belongs to
      */
     public static Set<String> getIssueGroups(Collection<String> issueTypes, Map<String, Set<String>> groupingSpecification) {

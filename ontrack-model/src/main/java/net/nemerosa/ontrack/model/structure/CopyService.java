@@ -8,7 +8,7 @@ import java.util.function.Function;
 public interface CopyService {
 
     /**
-     * Copies the configuration of the {@linkplain BranchCopyRequest#getSourceBranchId() source branch}
+     * Copies the configuration of the {@linkplain BranchCopyRequest#sourceBranchId source branch}
      * to the target branch.
      */
     Branch copy(Branch branch, BranchCopyRequest request);

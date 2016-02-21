@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * This field allows a user to select several items into a list.
  * <p>
- * The {@link #getItems() items} property contains the {@link net.nemerosa.ontrack.model.support.Selectable selectable}
+ * The {@link #items items} property contains the {@link net.nemerosa.ontrack.model.support.Selectable selectable}
  * items.
  * <p>
  * The value returned by this field will be a list of {@link net.nemerosa.ontrack.model.support.Selectable#getId() id}s.

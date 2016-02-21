@@ -41,7 +41,7 @@ public class ExtensionManagerImpl implements ExtensionManager, StartupService {
     }
 
     /**
-     * Startup: loads the extensions & features from the application context.
+     * Startup: loads the extensions &amp; features from the application context.
      * <p>
      * This cannot be done at construction time because of dependency cycle between
      * some extensions that need access to the extension manager.
