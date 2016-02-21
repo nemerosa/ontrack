@@ -79,6 +79,32 @@ configure(javaProjects) {
         }
     }
 
+    // Javadoc
+
+    javadoc {
+        // FIXME Fix Javadoc errors
+        failOnError = false
+    }
+
+    task javadocJar(type: Jar) {
+        classifier = 'javadoc'
+        from javadoc
+    }
+
+    // Sources
+
+    task sourceJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    // Archives for Javadoc and Sources
+
+    artifacts {
+        archives javadocJar
+        archives sourceJar
+    }
+
 }
 
 /**

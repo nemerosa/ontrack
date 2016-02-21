@@ -13,15 +13,9 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-gradle-plugin:1.3.0.RELEASE'
 }
 
-task javadocJar(type: Jar) {
-    classifier = 'javadoc'
+javadocJar {
     from javadoc
     from groovydoc
-}
-
-task sourceJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
 }
 
 // POM generation
@@ -60,8 +54,6 @@ task writeNewPom {
 
 // Archives for Javadoc and Sources
 artifacts {
-    archives javadocJar
-    archives sourceJar
     archives file: file("${buildDir}/poms/${project.name}-${version}.pom"), type: 'pom', builtBy: writeNewPom
 }
 
