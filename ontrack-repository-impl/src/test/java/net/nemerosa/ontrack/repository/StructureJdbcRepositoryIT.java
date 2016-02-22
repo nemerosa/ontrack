@@ -1,15 +1,11 @@
 package net.nemerosa.ontrack.repository;
 
-import net.nemerosa.ontrack.model.structure.Branch;
-import net.nemerosa.ontrack.model.structure.ID;
-import net.nemerosa.ontrack.model.structure.NameDescription;
-import net.nemerosa.ontrack.model.structure.Project;
+import net.nemerosa.ontrack.model.structure.*;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
 import static net.nemerosa.ontrack.test.TestUtils.uid;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class StructureJdbcRepositoryIT extends AbstractRepositoryTestSupport {
 
@@ -30,6 +26,22 @@ public class StructureJdbcRepositoryIT extends AbstractRepositoryTestSupport {
         // Checks
         assertNotNull("Branch is defined", branch);
         assertTrue("Branch ID is defined", ID.isDefined(branch.getId()));
+    }
+
+    @Test
+    public void create_build_with_long_name() {
+        // Creates a ranch
+        Branch branch = do_create_branch();
+        // Creates a build for this branch, with a very long name
+        String buildName = StringUtils.repeat("b", 150);
+        Build build = structureRepository.newBuild(Build.of(
+                branch,
+                NameDescription.nd(buildName, ""),
+                Signature.of("test")
+        ));
+        // Checks
+        assertNotNull("Build is defined", build);
+        assertTrue("Build ID is defined", ID.isDefined(build.getId()));
     }
 
     @Test
