@@ -49,10 +49,8 @@ task deliveryDescriptor {
         output << "version.full = ${project.versioning.info.full}\n"
         output << "version.scm = ${project.versioning.info.scm}\n"
         // Modules
-        output << "# Comma-separated list of modules"
-        output << "modules = " + project.subprojects
-                .findAll { it.tasks.findByName('jar') }
-                .collect { it.name }.join(',')
+        output << "# Comma-separated list of modules\n"
+        output << "modules = ${project.subprojects.findAll { it.tasks.findByName('jar') }.collect { it.name }.join(',')}\n"
     }
 }
 
@@ -73,18 +71,9 @@ task deliveryPackage(type: Zip) {
     // All artifacts
     dependsOn publicationPackage
     from publicationPackage
-    // UI only
-    project(':ontrack-ui').afterEvaluate {
-        from(project(':ontrack-ui').tasks.jar) {
-            rename { x -> 'ontrack-ui.jar' }
-        }
-    }
-    // Acceptance only
-    project(':ontrack-acceptance').afterEvaluate {
-        from(project(':ontrack-acceptance').tasks.jar) {
-            rename { x -> 'ontrack-acceptance.jar' }
-        }
-    }
+    // Descriptor
+    dependsOn deliveryDescriptor
+    from deliveryDescriptor.output
 }
 
 build.dependsOn deliveryPackage
