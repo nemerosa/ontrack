@@ -159,7 +159,17 @@ build
                 }
             }
         }
-        // TODO Use display version & Git commit
+        // Use display version & Git commit
+        ontrackDsl {
+            log()
+            environment 'VERSION_DISPLAY'
+            environment 'GIT_COMMIT'
+            script """\
+def build = ontrack.branch('${SEED_PROJECT}', '${SEED_BRANCH}').build(VERSION_DISPLAY, '', true)
+build.config.gitCommit GIT_COMMIT
+"""
+
+        }
         ontrackBuild SEED_PROJECT, SEED_BRANCH, '${VERSION_BUILD}'
     }
 }
@@ -214,8 +224,8 @@ ciAcceptanceTest -PacceptanceJar=ontrack-acceptance.jar
                 }
             }
         }
-        // TODO Use display version
-        ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_BUILD}', 'ACCEPTANCE'
+        // Use display version
+        ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'ACCEPTANCE'
     }
 }
 
@@ -251,8 +261,8 @@ debAcceptanceTest
         }
         publishers {
             archiveJunit('*-tests.xml')
-            // TODO Use display version
-            ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_BUILD}', 'ACCEPTANCE.DEBIAN'
+            // Use display version
+            ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'ACCEPTANCE.DEBIAN'
         }
     }
 
@@ -284,8 +294,8 @@ rpmAcceptanceTest${centOsVersion}
             }
             publishers {
                 archiveJunit('*-tests.xml')
-                // TODO Use display version
-                ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_BUILD}', "ACCEPTANCE.CENTOS.${centOsVersion}"
+                // Use display version
+                ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', "ACCEPTANCE.CENTOS.${centOsVersion}"
             }
         }
     }
@@ -324,8 +334,8 @@ docker logout
                 }
             }
         }
-        // TODO Use display version
-        ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_BUILD}', 'DOCKER'
+        // Use display version
+        ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'DOCKER'
     }
 }
 
@@ -436,15 +446,15 @@ docker logout
         }
     }
     publishers {
-        // TODO Use display version
-        ontrackPromotion SEED_PROJECT, SEED_BRANCH, '${VERSION_BUILD}', 'RELEASE'
-        // TODO Use display version
+        // Use display version
+        ontrackPromotion SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'RELEASE'
+        // Use display version
         ontrackDsl {
             environment 'VERSION_BUILD'
             environment 'VERSION_DISPLAY'
             log()
             script """\
-ontrack.build('${SEED_PROJECT}', '${SEED_BRANCH}', VERSION_BUILD).config {
+ontrack.build('${SEED_PROJECT}', '${SEED_BRANCH}', VERSION_DISPLAY).config {
 label VERSION_DISPLAY
 }
 """
@@ -456,7 +466,6 @@ if (release) {
 
     // Production deployment
 
-    // FIXME Version link
     job("${SEED_PROJECT}-${SEED_BRANCH}-production") {
         logRotator {
             numToKeep(40)
@@ -465,10 +474,8 @@ if (release) {
         deliveryPipelineConfiguration('Release', 'Production')
         jdk 'JDK8u25'
         parameters {
-            stringParam('VERSION_FULL', '', '')
-            stringParam('VERSION_COMMIT', '', '')
-            stringParam('VERSION_BUILD', '', '')
-            stringParam('VERSION_DISPLAY', '', '')
+            // Link on version
+            stringParam('VERSION', '', '')
         }
         wrappers {
             injectPasswords()
@@ -499,7 +506,6 @@ productionUpgrade
 
     // Production acceptance test
 
-    // FIXME Version link
     job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-production") {
         logRotator {
             numToKeep(40)
@@ -508,16 +514,14 @@ productionUpgrade
         deliveryPipelineConfiguration('Release', 'Production acceptance')
         jdk 'JDK8u25'
         parameters {
-            stringParam('VERSION_FULL', '', '')
-            stringParam('VERSION_COMMIT', '', '')
-            stringParam('VERSION_BUILD', '', '')
-            stringParam('VERSION_DISPLAY', '', '')
+            // Link on version
+            stringParam('VERSION', '', '')
         }
         wrappers {
             injectPasswords()
             xvfb('default')
         }
-        extractDeliveryArtifacts delegate
+        extractDeliveryArtifacts delegate, 'ontrack-acceptance'
         steps {
             gradle '''\
 --build-file production.gradle
@@ -530,8 +534,8 @@ productionTest
         }
         publishers {
             archiveJunit('*-tests.xml')
-            ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_BUILD}', 'ONTRACK.SMOKE'
-            ontrackPromotion SEED_PROJECT, SEED_BRANCH, '${VERSION_BUILD}', 'ONTRACK'
+            ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'ONTRACK.SMOKE'
+            ontrackPromotion SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'ONTRACK'
         }
     }
 
@@ -568,10 +572,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-setup") {
 ontrack.project('${SEED_PROJECT}').branch('${SEED_BRANCH}', 'Pipeline for ${BRANCH}', true).config {
     gitBranch '${BRANCH}', [
         buildCommitLink: [
-            id: 'commit',
-            data: [
-                abbreviated: true
-            ]
+            id: 'git-commit-property'
         ]
     ]
 }
