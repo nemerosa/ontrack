@@ -155,7 +155,7 @@ build
                 condition('SUCCESS')
                 parameters {
                     // Link based on full version
-                    property 'VERSION', '${VERSION_FULL}'
+                    predefinedProp 'VERSION', '${VERSION_FULL}'
                 }
             }
         }
