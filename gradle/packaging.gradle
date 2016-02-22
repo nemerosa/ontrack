@@ -8,7 +8,7 @@
  * - the UI JAR artifact
  * - the Acceptance JAR artifact
  * - a ZIP containing ALL artifacts (POM files, JAR, Javadoc & Sources)
- * - an `ontrack.yml` file which contains the list of modules & the version information
+ * - an `ontrack.properties` file which contains the list of modules & the version information
  */
 
 apply plugin: 'base'
@@ -28,6 +28,31 @@ task publicationPackage(type: Zip) {
                 if (tasks.findByName('pomFile')) from pomFile.output
             }
         }
+    }
+}
+
+// Ontrack descriptor
+
+task deliveryDescriptor {
+    ext.output = project.file('build/ontrack.properties')
+    doLast {
+        output.text = "# Ontrack properties\n"
+        // Version
+        output << "# Version information"
+        output << "version.build = ${project.versioning.info.build}\n"
+        output << "version.branch = ${project.versioning.info.branch}\n"
+        output << "version.base = ${project.versioning.info.base}\n"
+        output << "version.branchId = ${project.versioning.info.branchId}\n"
+        output << "version.branchType = ${project.versioning.info.branchType}\n"
+        output << "version.commit = ${project.versioning.info.commit}\n"
+        output << "version.display = ${project.versioning.info.display}\n"
+        output << "version.full = ${project.versioning.info.full}\n"
+        output << "version.scm = ${project.versioning.info.scm}\n"
+        // Modules
+        output << "# Comma-separated list of modules"
+        output << "modules = " + project.subprojects
+                .findAll { it.tasks.findByName('jar') }
+                .collect { it.name }.join(',')
     }
 }
 
