@@ -40,18 +40,18 @@ task deliveryDescriptor {
         output.text = "# Ontrack properties\n"
         // Version
         output << "# Version information"
-        output << "version.build = ${project.versioning.info.build}\n"
-        output << "version.branch = ${project.versioning.info.branch}\n"
-        output << "version.base = ${project.versioning.info.base}\n"
-        output << "version.branchId = ${project.versioning.info.branchId}\n"
-        output << "version.branchType = ${project.versioning.info.branchType}\n"
-        output << "version.commit = ${project.versioning.info.commit}\n"
-        output << "version.display = ${project.versioning.info.display}\n"
-        output << "version.full = ${project.versioning.info.full}\n"
-        output << "version.scm = ${project.versioning.info.scm}\n"
+        output << "VERSION_BUILD = ${project.versioning.info.build}\n"
+        output << "VERSION_BRANCH = ${project.versioning.info.branch}\n"
+        output << "VERSION_BASE = ${project.versioning.info.base}\n"
+        output << "VERSION_BRANCHID = ${project.versioning.info.branchId}\n"
+        output << "VERSION_BRANCHTYPE = ${project.versioning.info.branchType}\n"
+        output << "VERSION_COMMIT = ${project.versioning.info.commit}\n"
+        output << "VERSION_DISPLAY = ${project.versioning.info.display}\n"
+        output << "VERSION_FULL = ${project.versioning.info.full}\n"
+        output << "VERSION_SCM = ${project.versioning.info.scm}\n"
         // Modules
         output << "# Comma-separated list of modules\n"
-        output << "modules = ${project.subprojects.findAll { it.tasks.findByName('jar') }.collect { it.name }.join(',')}\n"
+        output << "MODULES = ${project.subprojects.findAll { it.tasks.findByName('jar') }.collect { it.name }.join(',')}\n"
     }
 }
 

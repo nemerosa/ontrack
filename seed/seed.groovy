@@ -52,8 +52,11 @@ println "BRANCH = ${BRANCH}"
 println "\tBranchType = ${branchType}"
 boolean release = branchType == 'release'
 
-// Extracting the delivery
-def extractDeliveryArtifacts(Object dsl) {
+/**
+ * Extracting the delivery archive
+ * @param modules List of modules to extract from the delivery / publication archuve
+ */
+def extractDeliveryArtifacts(Object dsl, String... modules) {
     dsl.steps {
         // Cleaning the workspace
         shell 'rm -rf ${WORKSPACE}'
@@ -64,8 +67,32 @@ def extractDeliveryArtifacts(Object dsl) {
                 upstreamBuild(true)
             }
         }
+        // Checks the version (ZIP contains the VERSION_FULL parameter)
+        // Expanding the delivery ZIP
+        shell '''\
+# Checks the version (ZIP contains the VERSION_FULL parameter)
+if [ -f "ontrack-${VERSION_FULL}-delivery.zip" ]
+then
+   # Expanding the delivery ZIP
+   unzip ontrack-${VERSION_FULL}-delivery.zip
+else
+   echo "Cannot find ontrack-${VERSION_FULL}-delivery.zip"
+   exit 1
+fi
+'''
         // Expanding the delivery ZIP
         shell 'unzip ontrack-*-delivery.zip'
+        // Injects the version
+        environmentVariables {
+            propertiesFile 'ontrack.properties'
+        }
+        // Extraction of modules
+        if (modules && modules.length > 0) {
+            // Extracting the publication archive
+            shell 'unzip ontrack-publication.zip -d publication'
+            // Moves the artifacts
+            shell """${modules.collect{ "mv publication/${it}-\${VERSION}.jar ." }.join('\n')}"""
+        }
     }
 }
 
@@ -103,7 +130,6 @@ integrationTest
 dockerLatest
 osPackages
 build
-publicationPackage
 --info
 --profile
 --parallel
@@ -115,14 +141,9 @@ publicationPackage
     publishers {
         archiveJunit("**/build/test-results/*.xml")
         archiveArtifacts {
-            pattern 'ontrack-ui/build/libs/ontrack-ui-*.jar'
-            pattern 'ontrack-acceptance/build/libs/ontrack-acceptance.jar' // No version needed here
-            pattern 'build/distributions/ontrack-*-publication.zip'
             pattern 'build/distributions/ontrack-*-delivery.zip'
             pattern 'build/distributions/ontrack*.deb'
             pattern 'build/distributions/ontrack*.rpm'
-            exclude 'ontrack-ui/build/libs/ontrack-ui-*-javadoc.jar'
-            exclude 'ontrack-ui/build/libs/ontrack-ui-*-sources.jar'
         }
         tasks(
                 '**/*.java,**/*.groovy,**/*.xml,**/*.html,**/*.js',
@@ -133,10 +154,12 @@ publicationPackage
             trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
                 condition('SUCCESS')
                 parameters {
-                    propertiesFile('build/version.properties')
+                    // Link based on full version
+                    property 'VERSION', '${VERSION_FULL}'
                 }
             }
         }
+        // TODO Use display version & Git commit
         ontrackBuild SEED_PROJECT, SEED_BRANCH, '${VERSION_BUILD}'
     }
 }
@@ -151,15 +174,13 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     deliveryPipelineConfiguration('Commit', 'Local acceptance')
     jdk 'JDK8u25'
     parameters {
-        stringParam('VERSION_FULL', '', '')
-        stringParam('VERSION_COMMIT', '', '')
-        stringParam('VERSION_BUILD', '', '')
-        stringParam('VERSION_DISPLAY', '', '')
+        // Link based on full version
+        stringParam('VERSION', '', '')
     }
     wrappers {
         xvfb('default')
     }
-    extractDeliveryArtifacts delegate
+    extractDeliveryArtifacts delegate, 'ontrack-acceptance'
     steps {
         // Runs the CI acceptance tests
         gradle """\
@@ -183,16 +204,17 @@ ciAcceptanceTest -PacceptanceJar=ontrack-acceptance.jar
         if (release) {
             downstreamParameterized {
                 trigger("${SEED_PROJECT}-${SEED_BRANCH}-docker-push", 'SUCCESS', false) {
-                    currentBuild()
+                    currentBuild() // VERSION
                 }
             }
         } else {
             buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${SEED_PROJECT}-${SEED_BRANCH}-docker-push") {
                 parameters {
-                    currentBuild()
+                    currentBuild() // VERSION
                 }
             }
         }
+        // TODO Use display version
         ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_BUILD}', 'ACCEPTANCE'
     }
 }
@@ -212,15 +234,13 @@ if (release) {
         deliveryPipelineConfiguration('Commit', 'Debian package acceptance')
         jdk 'JDK8u25'
         parameters {
-            stringParam('VERSION_FULL', '', '')
-            stringParam('VERSION_COMMIT', '', '')
-            stringParam('VERSION_BUILD', '', '')
-            stringParam('VERSION_DISPLAY', '', '')
+            // Link based on full version
+            stringParam('VERSION', '', '')
         }
         wrappers {
             xvfb('default')
         }
-        extractDeliveryArtifacts delegate
+        extractDeliveryArtifacts delegate, 'ontrack-acceptance'
         steps {
             // Runs the CI acceptance tests
             gradle """\
@@ -231,6 +251,7 @@ debAcceptanceTest
         }
         publishers {
             archiveJunit('*-tests.xml')
+            // TODO Use display version
             ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_BUILD}', 'ACCEPTANCE.DEBIAN'
         }
     }
@@ -246,15 +267,13 @@ debAcceptanceTest
             deliveryPipelineConfiguration('Commit', "CentOS ${centOsVersion} package acceptance")
             jdk 'JDK8u25'
             parameters {
-                stringParam('VERSION_FULL', '', '')
-                stringParam('VERSION_COMMIT', '', '')
-                stringParam('VERSION_BUILD', '', '')
-                stringParam('VERSION_DISPLAY', '', '')
+                // Link based on full version
+                stringParam('VERSION', '', '')
             }
             wrappers {
                 xvfb('default')
             }
-            extractDeliveryArtifacts delegate
+            extractDeliveryArtifacts delegate, 'ontrack-acceptance'
             steps {
                 // Runs the CI acceptance tests
                 gradle """\
@@ -265,6 +284,7 @@ rpmAcceptanceTest${centOsVersion}
             }
             publishers {
                 archiveJunit('*-tests.xml')
+                // TODO Use display version
                 ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_BUILD}', "ACCEPTANCE.CENTOS.${centOsVersion}"
             }
         }
@@ -282,10 +302,8 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-docker-push") {
     deliveryPipelineConfiguration('Acceptance', 'Docker push')
     jdk 'JDK8u25'
     parameters {
-        stringParam('VERSION_FULL', '', '')
-        stringParam('VERSION_COMMIT', '', '')
-        stringParam('VERSION_BUILD', '', '')
-        stringParam('VERSION_DISPLAY', '', '')
+        // Link based on full version
+        stringParam('VERSION', '', '')
     }
     wrappers {
         injectPasswords()
@@ -293,7 +311,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-docker-push") {
     steps {
         shell """\
 docker login --email="damien.coraboeuf+nemerosa@gmail.com" --username="nemerosa" --password="\${DOCKER_PASSWORD}"
-docker push nemerosa/ontrack:\${VERSION_FULL}
+docker push nemerosa/ontrack:\${VERSION}
 docker logout
 """
     }
@@ -302,10 +320,11 @@ docker logout
             trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
                 condition('SUCCESS')
                 parameters {
-                    currentBuild()
+                    currentBuild() // VERSION
                 }
             }
         }
+        // TODO Use display version
         ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_BUILD}', 'DOCKER'
     }
 }
@@ -320,16 +339,14 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
     deliveryPipelineConfiguration('Acceptance', 'Digital Ocean')
     jdk 'JDK8u25'
     parameters {
-        stringParam('VERSION_FULL', '', '')
-        stringParam('VERSION_COMMIT', '', '')
-        stringParam('VERSION_BUILD', '', '')
-        stringParam('VERSION_DISPLAY', '', '')
+        // Link based on full version
+        stringParam('VERSION', '', '')
     }
     wrappers {
         injectPasswords()
         xvfb('default')
     }
-    extractDeliveryArtifacts delegate
+    extractDeliveryArtifacts delegate, 'ontrack-acceptance'
     steps {
         // Runs the CI acceptance tests
         shell '''\
@@ -337,7 +354,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
     doAcceptanceTest \\
     -PacceptanceJar=ontrack-acceptance.jar \\
     -PdigitalOceanAccessToken=${DO_TOKEN} \\
-    -PontrackVersion=${VERSION_FULL}
+    -PontrackVersion=${VERSION}
 '''
     }
     publishers {
@@ -362,10 +379,8 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-publish") {
     deliveryPipelineConfiguration('Release', 'Publish')
     jdk 'JDK8u25'
     parameters {
-        stringParam('VERSION_FULL', '', '')
-        stringParam('VERSION_COMMIT', '', '')
-        stringParam('VERSION_BUILD', '', '')
-        stringParam('VERSION_DISPLAY', '', '')
+        // Link based on full version
+        stringParam('VERSION', '', '')
     }
     wrappers {
         injectPasswords()
@@ -415,13 +430,15 @@ docker logout
         publishers {
             buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${SEED_PROJECT}-${SEED_BRANCH}-production") {
                 parameters {
-                    currentBuild()
+                    currentBuild() // VERSION
                 }
             }
         }
     }
     publishers {
+        // TODO Use display version
         ontrackPromotion SEED_PROJECT, SEED_BRANCH, '${VERSION_BUILD}', 'RELEASE'
+        // TODO Use display version
         ontrackDsl {
             environment 'VERSION_BUILD'
             environment 'VERSION_DISPLAY'
@@ -439,6 +456,7 @@ if (release) {
 
     // Production deployment
 
+    // FIXME Version link
     job("${SEED_PROJECT}-${SEED_BRANCH}-production") {
         logRotator {
             numToKeep(40)
@@ -481,6 +499,7 @@ productionUpgrade
 
     // Production acceptance test
 
+    // FIXME Version link
     job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-production") {
         logRotator {
             numToKeep(40)
