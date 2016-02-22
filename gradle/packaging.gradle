@@ -36,6 +36,7 @@ task publicationPackage(type: Zip) {
 task deliveryDescriptor {
     ext.output = project.file('build/ontrack.properties')
     doLast {
+        (output as File).parentFile.mkdirs()
         output.text = "# Ontrack properties\n"
         // Version
         output << "# Version information"
