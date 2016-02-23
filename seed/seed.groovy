@@ -67,21 +67,21 @@ def extractDeliveryArtifacts(Object dsl, String... modules) {
                 upstreamBuild(true)
             }
         }
-        // Checks the version (ZIP contains the VERSION_FULL parameter)
+        // Checks the version (ZIP contains the VERSION parameter)
         // Expanding the delivery ZIP
         shell '''\
-# Checks the version (ZIP contains the VERSION_FULL parameter)
-if [ -f "ontrack-${VERSION_FULL}-delivery.zip" ]
+# Checks the version (ZIP contains the VERSION parameter)
+if [ -f "ontrack-${VERSION}-delivery.zip" ]
 then
    # Expanding the delivery ZIP
-   unzip ontrack-${VERSION_FULL}-delivery.zip
+   unzip ontrack-${VERSION}-delivery.zip
 else
-   echo "Cannot find ontrack-${VERSION_FULL}-delivery.zip"
+   echo "Cannot find ontrack-${VERSION}-delivery.zip"
    exit 1
 fi
 '''
         // Expanding the delivery ZIP
-        shell 'unzip ontrack-*-delivery.zip'
+        shell 'unzip ontrack-${VERSION}-delivery.zip'
         // Injects the version
         environmentVariables {
             propertiesFile 'ontrack.properties'
