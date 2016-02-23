@@ -170,7 +170,6 @@ build.config.gitCommit GIT_COMMIT
 """
 
         }
-        ontrackBuild SEED_PROJECT, SEED_BRANCH, '${VERSION_BUILD}'
     }
 }
 
