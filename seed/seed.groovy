@@ -80,8 +80,6 @@ else
    exit 1
 fi
 '''
-        // Expanding the delivery ZIP
-        shell 'unzip ontrack-${VERSION}-delivery.zip'
         // Injects the version
         environmentVariables {
             propertiesFile 'ontrack.properties'
