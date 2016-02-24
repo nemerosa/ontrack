@@ -190,9 +190,13 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     extractDeliveryArtifacts delegate, 'ontrack-acceptance'
     steps {
         // Runs the CI acceptance tests
-        gradle """\
-ciAcceptanceTest -PacceptanceJar=ontrack-acceptance.jar
-"""
+        gradle '''\
+ciAcceptanceTest
+-PacceptanceJar=ontrack-acceptance-${VERSION}.jar
+--info
+--profile
+--stacktrace
+'''
     }
     publishers {
         archiveJunit('*-tests.xml')
