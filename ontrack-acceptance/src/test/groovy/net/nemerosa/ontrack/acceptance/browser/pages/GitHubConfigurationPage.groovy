@@ -19,7 +19,7 @@ class GitHubConfigurationPage extends AbstractHeaderPage {
     }
 
     public GitHubConfigurationDialog createConfiguration(Closure closure) {
-        def command = $('.ot-command-new')
+        def command = browser.findElement('.ot-command-new')
         command.click()
         GitHubConfigurationDialog dialog = new GitHubConfigurationDialog(browser).waitFor()
         closure.delegate = dialog

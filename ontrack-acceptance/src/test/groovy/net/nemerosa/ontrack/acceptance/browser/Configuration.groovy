@@ -85,6 +85,10 @@ public class Configuration {
         )
     }
 
+    public WebElement findElement(String css) {
+        findElement(By.cssSelector(css))
+    }
+
     public Collection<WebElement> findElements(By by) {
         new FluentWait<WebDriver>(driver)
                 .withTimeout(implicitWait, TimeUnit.SECONDS)
