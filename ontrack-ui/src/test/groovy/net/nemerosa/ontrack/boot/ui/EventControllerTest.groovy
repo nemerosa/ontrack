@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.boot.ui
 
-import net.nemerosa.ontrack.extension.general.GeneralExtensionFeature
-import net.nemerosa.ontrack.extension.general.ReleasePropertyType
+import net.nemerosa.ontrack.extension.api.support.TestExtensionFeature
+import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventQueryService
@@ -21,9 +21,9 @@ class EventControllerTest {
     @Test
     void 'Event property values are converted into property descriptions'() {
         PropertyService propertyService = mock(PropertyService.class);
-        when(propertyService.getPropertyTypeByName(ReleasePropertyType.class.getName())).thenReturn(
-                new ReleasePropertyType(
-                        new GeneralExtensionFeature()
+        when(propertyService.getPropertyTypeByName(TestSimplePropertyType.class.getName())).thenReturn(
+                new TestSimplePropertyType(
+                        new TestExtensionFeature()
                 )
         );
 
@@ -40,7 +40,7 @@ class EventControllerTest {
                 Collections.singletonMap(
                         "property",
                         new NameValue(
-                                ReleasePropertyType.class.getName(),
+                                TestSimplePropertyType.class.getName(),
                                 "Release"
                         )
                 )

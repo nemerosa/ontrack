@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.git.service;
 
 import com.google.common.collect.Lists;
+import net.nemerosa.ontrack.common.FutureUtils;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequestDifferenceProjectException;
 import net.nemerosa.ontrack.extension.git.model.*;
@@ -14,20 +15,19 @@ import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepr
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceNotConfiguredException;
 import net.nemerosa.ontrack.extension.scm.model.SCMBuildView;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFileChangeType;
+import net.nemerosa.ontrack.extension.scm.model.SCMIssueCommitBranchInfo;
 import net.nemerosa.ontrack.extension.scm.service.AbstractSCMChangeLogService;
 import net.nemerosa.ontrack.extension.scm.service.SCMService;
 import net.nemerosa.ontrack.git.GitRepositoryClient;
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory;
 import net.nemerosa.ontrack.git.exceptions.GitRepositorySyncException;
 import net.nemerosa.ontrack.git.model.*;
+import net.nemerosa.ontrack.job.*;
 import net.nemerosa.ontrack.model.Ack;
-import net.nemerosa.ontrack.model.job.*;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.model.support.ApplicationLogService;
-import net.nemerosa.ontrack.model.support.MessageAnnotationUtils;
-import net.nemerosa.ontrack.model.support.MessageAnnotator;
+import net.nemerosa.ontrack.model.support.*;
 import net.nemerosa.ontrack.tx.Transaction;
 import net.nemerosa.ontrack.tx.TransactionService;
 import org.apache.commons.lang3.StringUtils;
@@ -39,6 +39,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
@@ -47,12 +48,19 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 
 @Service
-public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration, GitBuildInfo, GitChangeLogIssue> implements GitService, JobProvider {
+@Transactional
+public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration, GitBuildInfo, GitChangeLogIssue> implements GitService, StartupService {
+
+    private static final JobCategory GIT_JOB_CATEGORY = JobCategory.of("git").withName("Git");
+
+    private static final JobType GIT_INDEXATION_JOB = GIT_JOB_CATEGORY.getType("git-indexation").withName("Git indexation");
+    private static final JobType GIT_BUILD_SYNC_JOB = GIT_JOB_CATEGORY.getType("git-build-sync").withName("Git build synchronisation");
 
     private final Logger logger = LoggerFactory.getLogger(GitService.class);
+
     private final PropertyService propertyService;
     private final IssueServiceRegistry issueServiceRegistry;
-    private final JobQueueService jobQueueService;
+    private final JobScheduler jobScheduler;
     private final SecurityService securityService;
     private final TransactionService transactionService;
     private final ApplicationLogService applicationLogService;
@@ -66,7 +74,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             StructureService structureService,
             PropertyService propertyService,
             IssueServiceRegistry issueServiceRegistry,
-            JobQueueService jobQueueService,
+            JobScheduler jobScheduler,
             SecurityService securityService,
             TransactionService transactionService,
             ApplicationLogService applicationLogService,
@@ -77,7 +85,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         super(structureService, propertyService);
         this.propertyService = propertyService;
         this.issueServiceRegistry = issueServiceRegistry;
-        this.jobQueueService = jobQueueService;
+        this.jobScheduler = jobScheduler;
         this.securityService = securityService;
         this.transactionService = transactionService;
         this.applicationLogService = applicationLogService;
@@ -113,19 +121,30 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     @Override
-    public Collection<Job> getJobs() {
-        Collection<Job> jobs = new ArrayList<>();
+    public String getName() {
+        return "Git jobs registration";
+    }
+
+    @Override
+    public int startupOrder() {
+        return StartupService.JOB_REGISTRATION;
+    }
+
+    @Override
+    public void start() {
         // Indexation of repositories, based on projects actually linked
-        forEachConfiguredProject((project, configuration) -> jobs.add(createIndexationJob(configuration)));
+        forEachConfiguredProject((project, configuration) -> scheduleGitIndexation(configuration));
         // Synchronisation of branch builds with tags when applicable
         forEachConfiguredBranch((branch, branchConfiguration) -> {
             // Build/tag sync job
             if (branchConfiguration.getBuildTagInterval() > 0
                     && branchConfiguration.getBuildCommitLink().getLink() instanceof IndexableBuildGitCommitLink) {
-                jobs.add(createBuildSyncJob(branch, branchConfiguration));
+                jobScheduler.schedule(
+                        createBuildSyncJob(branch),
+                        Schedule.everyMinutes(branchConfiguration.getBuildTagInterval())
+                );
             }
         });
-        return jobs;
     }
 
     @Override
@@ -134,18 +153,23 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     @Override
-    public Ack launchBuildSync(ID branchId) {
+    public Optional<Future<?>> launchBuildSync(ID branchId, boolean synchronous) {
         // Gets the branch
         Branch branch = structureService.getBranch(branchId);
         // Gets its configuration
         Optional<GitBranchConfiguration> branchConfiguration = getBranchConfiguration(branch);
         // If valid, launches a job
         if (branchConfiguration.isPresent() && branchConfiguration.get().getBuildCommitLink().getLink() instanceof IndexableBuildGitCommitLink) {
-            return jobQueueService.queue(createBuildSyncJob(branch, branchConfiguration.get()));
+            if (synchronous) {
+                buildSync(branch, branchConfiguration.get(), JobRunListener.logger(logger));
+                return Optional.empty();
+            } else {
+                return Optional.of(jobScheduler.fireImmediately(getGitBranchSyncJobKey(branch)));
+            }
         }
         // Else, nothing has happened
         else {
-            return Ack.NOK;
+            return Optional.empty();
         }
     }
 
@@ -169,41 +193,46 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             if (project.id() != otherProject.id()) {
                 throw new BuildDiffRequestDifferenceProjectException();
             }
-            GitRepositoryClient client = getGitRepositoryClient(project);
-            // Forces Git sync before
-            boolean syncError;
-            try {
-                client.sync(logger::debug);
-                syncError = false;
-            } catch (GitRepositorySyncException ex) {
-                applicationLogService.error(
-                        ex,
-                        GitService.class,
-                        project.getName(),
-                        String.format(
-                                "Change log for %s",
-                                project.getName()
-                        ),
-                        String.format(
-                                "%s (%s/%s -> %s/%s)",
-                                project.getName(),
-                                buildFrom.getBranch().getName(),
-                                buildFrom.getName(),
-                                buildTo.getBranch().getName(),
-                                buildTo.getName()
-                        )
+            // Project Git configuration
+            Optional<GitConfiguration> oProjectConfiguration = getProjectConfiguration(project);
+            if (oProjectConfiguration.isPresent()) {
+                // Forces Git sync before
+                boolean syncError;
+                GitConfiguration gitConfiguration = oProjectConfiguration.get();
+                try {
+                    syncAndWait(gitConfiguration);
+                    syncError = false;
+                } catch (GitRepositorySyncException ex) {
+                    applicationLogService.log(
+                            ApplicationLogEntry.error(
+                                    ex,
+                                    NameDescription.nd(
+                                            "git-sync",
+                                            "Git synchronisation issue"
+                                    ),
+                                    gitConfiguration.getRemote()
+                            ).withDetail("project", project.getName())
+                                    .withDetail("git-name", gitConfiguration.getName())
+                                    .withDetail("git-remote", gitConfiguration.getRemote())
+                    );
+                    syncError = true;
+                }
+                // Change log computation
+                return new GitChangeLog(
+                        UUID.randomUUID().toString(),
+                        project,
+                        getSCMBuildView(buildFrom.getId()),
+                        getSCMBuildView(buildTo.getId()),
+                        syncError
                 );
-                syncError = true;
+            } else {
+                throw new GitProjectNotConfiguredException(project.getId());
             }
-            // Change log computation
-            return new GitChangeLog(
-                    UUID.randomUUID().toString(),
-                    project,
-                    getSCMBuildView(buildFrom.getId()),
-                    getSCMBuildView(buildTo.getId()),
-                    syncError
-            );
         }
+    }
+
+    protected Object syncAndWait(GitConfiguration gitConfiguration) {
+        return FutureUtils.wait("Synchronisation for " + gitConfiguration.getName(), sync(gitConfiguration, GitSynchronisationRequest.SYNC));
     }
 
     protected GitConfiguration getRequiredProjectConfiguration(Project project) {
@@ -280,8 +309,10 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                         existingIssue.add(gitUICommit);
                     } else {
                         Issue issue = configuredIssueService.getIssue(key);
-                        existingIssue = GitChangeLogIssue.of(issue, gitUICommit);
-                        issues.put(key, existingIssue);
+                        if (issue != null) {
+                            existingIssue = GitChangeLogIssue.of(issue, gitUICommit);
+                            issues.put(key, existingIssue);
+                        }
                     }
                 }
             }
@@ -412,17 +443,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                     SCMIssueCommitBranchInfo branchInfo = SCMIssueCommitBranchInfo.of(branch);
                     // Gets the last build for this branch
                     Optional<Build> buildAfterCommit = getEarliestBuildAfterCommit(commitId, branch, branchConfiguration, client);
-                    if (buildAfterCommit.isPresent()) {
-                        Build build = buildAfterCommit.get();
-                        // Gets the build view
-                        BuildView buildView = structureService.getBuildView(build);
-                        // Adds it to the list
-                        branchInfo = branchInfo.withBuildView(buildView);
-                        // Collects the promotions for the branch
-                        branchInfo = branchInfo.withBranchStatusView(
-                                structureService.getEarliestPromotionsAfterBuild(build)
-                        );
-                    }
+                    branchInfo = scmService.getBranchInfo(buildAfterCommit, branchInfo);
                     // Adds the info
                     commitInfo.add(branchInfo);
                 }
@@ -490,16 +511,65 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     @Override
     public Optional<String> download(Branch branch, String path) {
         securityService.checkProjectFunction(branch, ProjectConfig.class);
-        Transaction tx = transactionService.start();
-        try {
+        return transactionService.doInTransaction(() -> {
             GitBranchConfiguration branchConfiguration = getRequiredBranchConfiguration(branch);
             GitRepositoryClient client = gitRepositoryClientFactory.getClient(
                     branchConfiguration.getConfiguration().getGitRepository()
             );
             return client.download(branchConfiguration.getBranch(), path);
-        } finally {
-            tx.close();
+        });
+    }
+
+    @Override
+    public Ack projectSync(Project project, GitSynchronisationRequest request) {
+        securityService.checkProjectFunction(project, ProjectConfig.class);
+        Optional<GitConfiguration> projectConfiguration = getProjectConfiguration(project);
+        if (projectConfiguration.isPresent()) {
+            return Ack.validate(sync(projectConfiguration.get(), request).isPresent());
+        } else {
+            return Ack.NOK;
         }
+    }
+
+    @Override
+    public Optional<Future<?>> sync(GitConfiguration gitConfiguration, GitSynchronisationRequest request) {
+        // Reset the repository?
+        if (request.isReset()) {
+            gitRepositoryClientFactory.getClient(gitConfiguration.getGitRepository()).reset();
+        }
+        // Schedules the job
+        return Optional.of(jobScheduler.fireImmediately(getGitIndexationJobKey(gitConfiguration)));
+    }
+
+    @Override
+    public GitSynchronisationInfo getProjectGitSyncInfo(Project project) {
+        securityService.checkProjectFunction(project, ProjectConfig.class);
+        return getProjectConfiguration(project)
+                .map(this::getGitSynchronisationInfo)
+                .orElseThrow(() -> new GitProjectNotConfiguredException(project.getId()));
+    }
+
+    private GitSynchronisationInfo getGitSynchronisationInfo(GitConfiguration gitConfiguration) {
+        // Gets the client for this configuration
+        GitRepositoryClient client = gitRepositoryClientFactory.getClient(gitConfiguration.getGitRepository());
+        // Gets the status
+        GitSynchronisationStatus status = client.getSynchronisationStatus();
+        // Collects the branch info
+        List<GitBranchInfo> branches;
+        if (status == GitSynchronisationStatus.IDLE) {
+            branches = client.getBranches().getBranches();
+        } else {
+            branches = Collections.emptyList();
+        }
+        // OK
+        return new GitSynchronisationInfo(
+                gitConfiguration.getType(),
+                gitConfiguration.getName(),
+                gitConfiguration.getRemote(),
+                gitConfiguration.getIndexationInterval(),
+                status,
+                branches
+        );
     }
 
     private OntrackGitCommitInfo getOntrackGitCommitInfo(String commit) {
@@ -575,15 +645,15 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         return configuredBuildGitCommitLink.getLink()
                 // ... by getting candidate references
                 .getBuildCandidateReferences(commit, branch, client, branchConfiguration, configuredBuildGitCommitLink.getData())
-                        // ... gets the builds
+                // ... gets the builds
                 .map(buildName -> structureService.findBuildByName(branch.getProject().getName(), branch.getName(), buildName))
-                        // ... filter on existing builds
+                // ... filter on existing builds
                 .filter(Optional::isPresent).map(Optional::get)
-                        // ... filter the builds using the link
+                // ... filter the builds using the link
                 .filter(build -> configuredBuildGitCommitLink.getLink().isBuildEligible(build, configuredBuildGitCommitLink.getData()))
-                        // ... sort by decreasing date
+                // ... sort by decreasing date
                 .sorted((o1, o2) -> (o1.id() - o2.id()))
-                        // ... takes the first build
+                // ... takes the first build
                 .findFirst();
     }
 
@@ -724,57 +794,64 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         );
     }
 
-    private Job createBuildSyncJob(Branch branch, GitBranchConfiguration configuration) {
-        return new BranchJob(branch) {
+    private Job createBuildSyncJob(Branch branch) {
+        GitBranchConfiguration configuration = getRequiredBranchConfiguration(branch);
+        return new AbstractBranchJob(structureService, branch) {
 
             @Override
-            public String getCategory() {
-                return "GitBuildTagSync";
+            public JobKey getKey() {
+                return getGitBranchSyncJobKey(branch);
             }
 
             @Override
-            public String getId() {
-                return String.valueOf(branch.getId());
+            public JobRun getTask() {
+                return listener -> buildSync(branch, configuration, listener);
             }
 
             @Override
             public String getDescription() {
                 return format(
-                        "Git build/tag synchro for branch %s/%s",
-                        branch.getProject().getName(),
-                        branch.getName()
+                        "Branch %s @ %s",
+                        branch.getName(),
+                        branch.getProject().getName()
                 );
             }
 
             @Override
-            public int getInterval() {
-                return configuration.getBuildTagInterval();
-            }
-
-            @Override
-            public JobTask createTask() {
-                return new RunnableJobTask(info -> buildSync(branch, configuration, info));
+            public boolean isDisabled() {
+                return super.isDisabled() &&
+                        isBranchConfiguredForGit(branch);
             }
         };
+    }
+
+    protected JobKey getGitBranchSyncJobKey(Branch branch) {
+        return GIT_BUILD_SYNC_JOB.getKey(String.valueOf(branch.getId()));
+    }
+
+    private JobKey getGitIndexationJobKey(GitConfiguration config) {
+        return GIT_INDEXATION_JOB.getKey(config.getGitRepository().getId());
     }
 
     private Job createIndexationJob(GitConfiguration config) {
         return new Job() {
             @Override
-            public String getCategory() {
-                return "GitIndexation";
+            public JobKey getKey() {
+                return getGitIndexationJobKey(config);
             }
 
             @Override
-            public String getId() {
-                return config.getGitRepository().getId();
+            public JobRun getTask() {
+                return (runListener -> index(config, runListener));
             }
 
             @Override
             public String getDescription() {
                 return format(
-                        "Git indexation for %s",
-                        config.getName()
+                        "%s (%s @ %s)",
+                        config.getRemote(),
+                        config.getName(),
+                        config.getType()
                 );
             }
 
@@ -782,23 +859,11 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             public boolean isDisabled() {
                 return false;
             }
-
-            @Override
-            public int getInterval() {
-                return config.getIndexationInterval();
-            }
-
-            @Override
-            public JobTask createTask() {
-                return new RunnableJobTask(
-                        info -> index(config, info)
-                );
-            }
         };
     }
 
-    protected <T> void buildSync(Branch branch, GitBranchConfiguration branchConfiguration, JobInfoListener info) {
-        info.post(format("Git build/tag sync for %s/%s", branch.getProject().getName(), branch.getName()));
+    protected <T> void buildSync(Branch branch, GitBranchConfiguration branchConfiguration, JobRunListener listener) {
+        listener.message("Git build/tag sync for %s/%s", branch.getProject().getName(), branch.getName());
         GitConfiguration configuration = branchConfiguration.getConfiguration();
         // Gets the branch Git client
         GitRepositoryClient gitClient = gitRepositoryClientFactory.getClient(configuration.getGitRepository());
@@ -811,31 +876,31 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         Property<GitBranchConfigurationProperty> confProperty = propertyService.getProperty(branch, GitBranchConfigurationPropertyType.class);
         boolean override = !confProperty.isEmpty() && confProperty.getValue().isOverride();
         // Makes sure of synchronization
-        info.post("Synchronizing before importing");
-        gitClient.sync(info::post);
+        listener.message("Synchronizing before importing");
+        syncAndWait(configuration);
         // Gets the list of tags
-        info.post("Getting list of tags");
+        listener.message("Getting list of tags");
         Collection<GitTag> tags = gitClient.getTags();
         // Creates the builds
-        info.post("Creating builds from tags");
+        listener.message("Creating builds from tags");
         for (GitTag tag : tags) {
             String tagName = tag.getName();
             // Filters the tags according to the branch tag pattern
             link.getBuildNameFromTagName(tagName, linkData).ifPresent(buildNameCandidate -> {
                 String buildName = NameDescription.escapeName(buildNameCandidate);
-                info.post(format("Build %s from tag %s", buildName, tagName));
+                listener.message(format("Build %s from tag %s", buildName, tagName));
                 // Existing build?
                 boolean createBuild;
                 Optional<Build> build = structureService.findBuildByName(branch.getProject().getName(), branch.getName(), buildName);
                 if (build.isPresent()) {
                     if (override) {
                         // Deletes the build
-                        info.post(format("Deleting existing build %s", buildName));
+                        listener.message("Deleting existing build %s", buildName);
                         structureService.deleteBuild(build.get().getId());
                         createBuild = true;
                     } else {
                         // Keeps the build
-                        info.post(format("Build %s already exists", buildName));
+                        listener.message("Build %s already exists", buildName);
                         createBuild = false;
                     }
                 } else {
@@ -843,7 +908,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                 }
                 // Actual creation
                 if (createBuild) {
-                    info.post(format("Creating build %s from tag %s", buildName, tagName));
+                    listener.message("Creating build %s from tag %s", buildName, tagName);
                     structureService.newBuild(
                             Build.of(
                                     branch,
@@ -861,12 +926,41 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         }
     }
 
-    private void index(GitConfiguration config, JobInfoListener info) {
-        info.post(format("Git sync for %s", config.getName()));
+    private void index(GitConfiguration config, JobRunListener listener) {
+        listener.message("Git sync for %s", config.getName());
         // Gets the client for this configuration
         GitRepositoryClient client = gitRepositoryClientFactory.getClient(config.getGitRepository());
         // Launches the synchronisation
-        client.sync(info::post);
+        client.sync(listener.logger());
     }
 
+    @Override
+    public void scheduleGitIndexation(GitConfiguration configuration) {
+        jobScheduler.schedule(
+                createIndexationJob(configuration),
+                Schedule.everyMinutes(configuration.getIndexationInterval())
+        );
+    }
+
+    @Override
+    public void unscheduleGitIndexation(GitConfiguration configuration) {
+        jobScheduler.unschedule(getGitIndexationJobKey(configuration));
+    }
+
+    @Override
+    public void scheduleGitBuildSync(Branch branch, GitBranchConfigurationProperty property) {
+        if (property.getBuildTagInterval() > 0) {
+            jobScheduler.schedule(
+                    createBuildSyncJob(branch),
+                    Schedule.everyMinutes(property.getBuildTagInterval())
+            );
+        } else {
+            unscheduleGitBuildSync(branch, property);
+        }
+    }
+
+    @Override
+    public void unscheduleGitBuildSync(Branch branch, GitBranchConfigurationProperty property) {
+        jobScheduler.unschedule(getGitBranchSyncJobKey(branch));
+    }
 }

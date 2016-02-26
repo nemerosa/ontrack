@@ -28,12 +28,26 @@ public class Decoration<T> {
     private final T data;
 
     /**
+     * Error data
+     */
+    private final String error;
+
+    /**
      * Basic construction. Only the data is required
      */
     public static <T> Decoration<T> of(Decorator<T> decorator, T data) {
         Validate.notNull(decorator, "The decorator is required");
         Validate.notNull(data, "The decoration data is required");
-        return new Decoration<>(decorator, data);
+        return new Decoration<>(decorator, data, null);
+    }
+
+    /**
+     * Basic construction. With an error
+     */
+    public static <T> Decoration<T> error(Decorator<T> decorator, String error) {
+        Validate.notNull(decorator, "The decorator is required");
+        Validate.notBlank(error, "The decoration error is required");
+        return new Decoration<>(decorator, null, error);
     }
 
     /**

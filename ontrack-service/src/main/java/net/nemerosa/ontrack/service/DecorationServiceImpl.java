@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service;
 
+import net.nemerosa.ontrack.common.BaseException;
 import net.nemerosa.ontrack.extension.api.DecorationExtension;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -7,12 +8,10 @@ import net.nemerosa.ontrack.model.structure.Decoration;
 import net.nemerosa.ontrack.model.structure.DecorationService;
 import net.nemerosa.ontrack.model.structure.Decorator;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
-import net.nemerosa.ontrack.service.support.ErrorDecorator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
@@ -24,16 +23,11 @@ import java.util.stream.Stream;
 public class DecorationServiceImpl implements DecorationService {
 
     private final ExtensionManager extensionManager;
-    private final List<Decorator> builtinDecorators;
     private final SecurityService securityService;
-    private final ErrorDecorator errorDecorator = new ErrorDecorator();
 
     @Autowired
-    public DecorationServiceImpl(ExtensionManager extensionManager, List<Decorator> builtinDecorators, SecurityService securityService) {
+    public DecorationServiceImpl(ExtensionManager extensionManager, SecurityService securityService) {
         this.extensionManager = extensionManager;
-        this.builtinDecorators = builtinDecorators.stream()
-                .filter(decorator -> !(decorator instanceof DecorationExtension))
-                .collect(Collectors.toList());
         this.securityService = securityService;
     }
 
@@ -43,28 +37,15 @@ public class DecorationServiceImpl implements DecorationService {
         Function<Decorator, Stream<Decoration<?>>> securedDecoratorFunction = securityService.runner(
                 decorator -> getDecorations(entity, decorator).stream()
         );
-        List<Decoration<?>> decorations = new ArrayList<>();
-        // Built-in decorations
-        decorations.addAll(
-                builtinDecorators.stream()
-                        // ... and gets the decorations
-                        .flatMap(securedDecoratorFunction)
-                                // OK
-                        .collect(Collectors.toList())
-        );
-        // Extended decorations
-        decorations.addAll(
-                extensionManager.getExtensions(DecorationExtension.class)
-                        .stream()
-                                // ... and filters per entity
-                        .filter(decorator -> decorator.getScope().contains(entity.getProjectEntityType()))
-                                // ... and gets the decoration
-                        .flatMap(securedDecoratorFunction)
-                                // OK
-                        .collect(Collectors.toList())
-        );
         // OK
-        return decorations;
+        return extensionManager.getExtensions(DecorationExtension.class)
+                .stream()
+                        // ... and filters per entity
+                .filter(decorator -> decorator.getScope().contains(entity.getProjectEntityType()))
+                        // ... and gets the decoration
+                .flatMap(securedDecoratorFunction)
+                        // OK
+                .collect(Collectors.toList());
     }
 
     /**
@@ -74,7 +55,20 @@ public class DecorationServiceImpl implements DecorationService {
         try {
             return decorator.getDecorations(entity);
         } catch (Exception ex) {
-            return Collections.singletonList(errorDecorator.getDecoration(ex));
+            return Collections.singletonList(
+                    Decoration.error(decorator, getErrorMessage(ex))
+            );
+        }
+    }
+
+    /**
+     * Decoration error message
+     */
+    protected String getErrorMessage(Exception ex) {
+        if (ex instanceof BaseException) {
+            return ex.getMessage();
+        } else {
+            return "Problem while getting decoration";
         }
     }
 }

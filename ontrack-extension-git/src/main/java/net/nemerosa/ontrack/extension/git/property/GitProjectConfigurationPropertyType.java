@@ -4,8 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.common.MapBuilder;
 import net.nemerosa.ontrack.extension.git.GitExtensionFeature;
 import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration;
+import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.git.service.GitConfigurationService;
-import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
+import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Selection;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
@@ -21,14 +22,14 @@ import java.util.Set;
 import java.util.function.Function;
 
 @Component
-public class GitProjectConfigurationPropertyType extends AbstractPropertyType<GitProjectConfigurationProperty>
+public class GitProjectConfigurationPropertyType extends AbstractGitProjectConfigurationPropertyType<GitProjectConfigurationProperty>
         implements ConfigurationPropertyType<BasicGitConfiguration, GitProjectConfigurationProperty> {
 
     private final GitConfigurationService configurationService;
 
     @Autowired
-    public GitProjectConfigurationPropertyType(GitExtensionFeature extensionFeature, GitConfigurationService configurationService) {
-        super(extensionFeature);
+    public GitProjectConfigurationPropertyType(GitExtensionFeature extensionFeature, GitConfigurationService configurationService, GitService gitService) {
+        super(extensionFeature, gitService);
         this.configurationService = configurationService;
     }
 
@@ -106,4 +107,8 @@ public class GitProjectConfigurationPropertyType extends AbstractPropertyType<Gi
         );
     }
 
+    @Override
+    protected GitConfiguration getGitConfiguration(GitProjectConfigurationProperty value) {
+        return value.getConfiguration();
+    }
 }

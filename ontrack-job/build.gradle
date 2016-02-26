@@ -1,0 +1,11 @@
+description = "Abstract management of identified jobs."
+
+dependencies {
+    compile project(':ontrack-common')
+    compile libraries.spring_context
+    compile libraries.slf4j_api
+
+    testCompile libraries.guava
+
+    testRuntime libraries.slf4j_log4j
+}

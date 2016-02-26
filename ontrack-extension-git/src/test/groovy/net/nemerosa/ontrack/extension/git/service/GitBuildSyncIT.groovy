@@ -1,134 +1,114 @@
 package net.nemerosa.ontrack.extension.git.service
 
-import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.extension.git.GitExtensionFeature
+import net.nemerosa.ontrack.common.FutureUtils
 import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
-import net.nemerosa.ontrack.extension.git.model.GitBranchConfiguration
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
-import net.nemerosa.ontrack.extension.scm.support.TagPattern
+import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationProperty
+import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.support.TagPatternBuildNameGitCommitLink
-import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
-import net.nemerosa.ontrack.extension.scm.service.SCMService
-import net.nemerosa.ontrack.git.GitRepositoryClient
+import net.nemerosa.ontrack.extension.scm.support.TagPattern
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory
-import net.nemerosa.ontrack.git.model.GitTag
-import net.nemerosa.ontrack.model.job.JobQueueService
-import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.model.support.ApplicationLogService
-import net.nemerosa.ontrack.tx.TransactionService
-import org.junit.Before
+import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.model.security.GlobalSettings
+import net.nemerosa.ontrack.model.security.ProjectEdit
+import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.model.structure.PropertyService
+import net.nemerosa.ontrack.model.structure.StructureService
 import org.junit.Test
+import org.springframework.beans.factory.annotation.Autowired
 
-import static net.nemerosa.ontrack.model.structure.NameDescription.nd
-import static org.mockito.Mockito.*
+import static net.nemerosa.ontrack.git.support.GitRepo.prepare
+import static net.nemerosa.ontrack.test.TestUtils.uid
 
 /**
  * Testing the sync between builds and Git tags.
- *
- * @see GitService#launchBuildSync(net.nemerosa.ontrack.model.structure.ID)
  */
-class GitBuildSyncIT {
+class GitBuildSyncIT extends AbstractServiceTestSupport {
 
-    private GitServiceImpl gitService
+    @Autowired
+    private GitService gitService
+    @Autowired
     private StructureService structureService
+    @Autowired
     private PropertyService propertyService
+    @Autowired
     private GitRepositoryClientFactory gitClientFactory
-    private GitRepositoryClient gitClient
-
-    /**
-     * Service
-     */
-    @Before
-    void 'Git service'() {
-        gitClientFactory = mock(GitRepositoryClientFactory)
-        gitClient = mock(GitRepositoryClient)
-
-        structureService = mock(StructureService)
-        propertyService = mock(PropertyService)
-
-        def securityService = mock(SecurityService)
-        when(securityService.getCurrentSignature()).thenReturn(Signature.of('user'))
-
-        gitService = new GitServiceImpl(
-                structureService,
-                propertyService,
-                mock(IssueServiceRegistry),
-                mock(JobQueueService),
-                securityService,
-                mock(TransactionService),
-                mock(ApplicationLogService),
-                gitClientFactory,
-                mock(BuildGitCommitLinkService),
-                [],
-                mock(SCMService)
-        )
-    }
+    @Autowired
+    private GitConfigurationService gitConfigurationService
+    @Autowired
+    private TagPatternBuildNameGitCommitLink tagPatternBuildNameGitCommitLink
 
     @Test
     void 'Master sync'() {
-        Project project = Project.of(nd('P', "Project")).withId(ID.of(1))
-        Branch branch = Branch.of(project, nd('1.2', "Branch 1.2")).withId(ID.of(2))
+        // Git repo
+        prepare {
 
-        BuildGitCommitLinkService buildGitCommitLinkService = mock(BuildGitCommitLinkService)
+            int no = 0
+            git 'init'
 
-        when(structureService.findBuildByName(eq('P'), eq('1.2'), anyString())).thenReturn(Optional.empty())
+            commit no++
+            git 'tag', '1.1.6'
+            commit no++
+            git 'tag', '1.1.7'
+            commit no++
+            git 'tag', '1.2.0'
+            commit no++
+            git 'tag', '1.2.1'
+            commit no
+            git 'tag', '1.2.2'
 
-        def configuredBuildGitCommitLink = new ConfiguredBuildGitCommitLink<>(
-                new TagPatternBuildNameGitCommitLink(),
-                new TagPattern("1.2.*"))
-        when(propertyService.getProperty(branch, GitBranchConfigurationPropertyType)).thenReturn(
-                Property.of(
-                        new GitBranchConfigurationPropertyType(
-                                new GitExtensionFeature(),
-                                buildGitCommitLinkService
-                        ),
+            git 'log', '--oneline', '--graph', '--decorate', '--all'
+
+        } and { client, repo ->
+
+            // Create a Git configuration
+            String gitConfigurationName = uid('C')
+            BasicGitConfiguration gitConfiguration = asUser().with(GlobalSettings).call {
+                gitConfigurationService.newConfiguration(
+                        BasicGitConfiguration.empty()
+                                .withName(gitConfigurationName)
+                                .withRemote("file://${repo.dir.absolutePath}")
+                )
+            }
+
+            // Creates a project and branch
+            Branch branch = doCreateBranch()
+            Project project = branch.project
+
+            // Configures the project and the branch
+            asUser().with(project, ProjectEdit).call {
+                propertyService.editProperty(
+                        project,
+                        GitProjectConfigurationPropertyType,
+                        new GitProjectConfigurationProperty(gitConfiguration)
+                )
+                // ...  & the branch with a link based on commits
+                propertyService.editProperty(
+                        branch,
+                        GitBranchConfigurationPropertyType,
                         new GitBranchConfigurationProperty(
                                 'master',
-                                configuredBuildGitCommitLink.toServiceConfiguration(),
-                                true,
-                                0
+                                new ConfiguredBuildGitCommitLink<>(
+                                        tagPatternBuildNameGitCommitLink,
+                                        new TagPattern('1.2.*')
+                                ).toServiceConfiguration(),
+                                false, 1
                         )
                 )
-        )
 
-        def gitConfiguration = BasicGitConfiguration.empty()
-        def gitBranchConfiguration = new GitBranchConfiguration(
-                gitConfiguration,
-                'master',
-                configuredBuildGitCommitLink,
-                false,
-                0
-        )
-        when(gitClientFactory.getClient(gitConfiguration.gitRepository)).thenReturn(gitClient)
+                // Build synchronisation
+                gitService.launchBuildSync(branch.id, true)
 
-        when(gitClient.getTags()).thenReturn([
-                new GitTag('1.1.6', Time.now()),
-                new GitTag('1.1.7', Time.now()),
-                new GitTag('1.2.0', Time.now()),
-                new GitTag('1.2.1', Time.now()),
-                new GitTag('1.2.2', Time.now()),
-        ])
-
-        gitService.buildSync(
-                branch,
-                gitBranchConfiguration,
-                { message -> println message }
-        )
-
-        ['1.2.0', '1.2.1', '1.2.2'].each { String tagName ->
-            verify(structureService, times(3)).newBuild(
-                    Build.of(
-                            branch,
-                            nd(
-                                    tagName,
-                                    "Imported from Git tag ${tagName}"
-                            ),
-                            any(Signature)
-                    )
-            );
+                // Checks the builds have been created
+                assert !structureService.findBuildByName(project.name, branch.name, '1.1.6').present
+                assert !structureService.findBuildByName(project.name, branch.name, '1.1.7').present
+                assert structureService.findBuildByName(project.name, branch.name, '1.2.0').present
+                assert structureService.findBuildByName(project.name, branch.name, '1.2.1').present
+                assert structureService.findBuildByName(project.name, branch.name, '1.2.2').present
+            }
         }
     }
 

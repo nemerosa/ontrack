@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.model.support.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -23,6 +24,8 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
     private final EventPostService eventPostService;
     private final EventFactory eventFactory;
     private final OntrackConfigProperties ontrackConfigProperties;
+
+    private final List<ConfigurationServiceListener<T>> listeners = new LinkedList<>();
 
     public AbstractConfigurationService(Class<T> configurationClass, ConfigurationRepository configurationRepository, SecurityService securityService, EncryptionService encryptionService, EventPostService eventPostService, EventFactory eventFactory, OntrackConfigProperties ontrackConfigProperties) {
         this.configurationClass = configurationClass;
@@ -63,6 +66,7 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
         validateAndCheck(configuration);
         configurationRepository.save(encrypt(configuration));
         eventPostService.post(eventFactory.newConfiguration(configuration));
+        listeners.forEach(listener -> listener.onNewConfiguration(configuration));
         return configuration.obfuscate();
     }
 
@@ -85,6 +89,8 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
         T configuration = configurationRepository.find(configurationClass, name).get();
         // Notifies of the deletion BEFORE the actual deletion, giving a change to the listeners to list access the configuration
         eventPostService.post(eventFactory.deleteConfiguration(configuration));
+        // Listeners
+        listeners.forEach(listener -> listener.onDeletedConfiguration(configuration));
         // Actual deletion
         configurationRepository.delete(configurationClass, name);
     }
@@ -97,6 +103,7 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
         validateAndCheck(configToSave);
         configurationRepository.save(encrypt(configToSave));
         eventPostService.post(eventFactory.updateConfiguration(configuration));
+        listeners.forEach(listener -> listener.onUpdatedConfiguration(configuration));
     }
 
     /**
@@ -171,6 +178,11 @@ public abstract class AbstractConfigurationService<T extends UserPasswordConfigu
                         config.getPassword()
                 )
         );
+    }
+
+    @Override
+    public void addConfigurationServiceListener(ConfigurationServiceListener<T> listener) {
+        listeners.add(listener);
     }
 
     protected T decrypt(T config) {

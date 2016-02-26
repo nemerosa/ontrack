@@ -1,6 +1,9 @@
 package net.nemerosa.ontrack.service.support.configuration;
 
-import net.nemerosa.ontrack.extension.support.ConfigurationNotFoundException;
+import net.nemerosa.ontrack.extension.api.support.TestConfiguration;
+import net.nemerosa.ontrack.extension.api.support.TestConfigurationService;
+import net.nemerosa.ontrack.extension.api.support.TestConfigurationServiceImpl;
+import net.nemerosa.ontrack.model.support.ConfigurationNotFoundException;
 import net.nemerosa.ontrack.model.events.Event;
 import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventPostService;
@@ -15,7 +18,7 @@ import org.junit.Test;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static net.nemerosa.ontrack.service.support.configuration.TestConfiguration.config;
+import static net.nemerosa.ontrack.extension.api.support.TestConfiguration.config;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.*;

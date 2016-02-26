@@ -27,21 +27,23 @@ public class PromotionLevelResourceDecorator extends AbstractResourceDecorator<P
                 .link("_branch", on(BranchController.class).getBranch(promotionLevel.getBranch().getId()))
                 .link("_project", on(ProjectController.class).getProject(promotionLevel.getBranch().getProject().getId()))
                 .link(Link.IMAGE_LINK, on(PromotionLevelController.class).getPromotionLevelImage_(promotionLevel.getId()))
-                        // Update
+                // Update
                 .update(on(PromotionLevelController.class).updatePromotionLevelForm(promotionLevel.getId()), PromotionLevelEdit.class, promotionLevel.projectId())
-                        // Delete
+                // Delete
                 .delete(on(PromotionLevelController.class).deletePromotionLevel(promotionLevel.getId()), PromotionLevelDelete.class, promotionLevel.projectId())
-                        // TODO Next promotion level
-                        // TODO Previous promotion level
-                        // Decorations
+                // TODO Next promotion level
+                // TODO Previous promotion level
+                // Decorations
                 .link("_decorations", on(DecorationsController.class).getDecorations(promotionLevel.getProjectEntityType(), promotionLevel.getId()))
-                        // Actual properties for this item
+                // Actual properties for this item
                 .link("_properties", on(PropertyController.class).getProperties(promotionLevel.getProjectEntityType(), promotionLevel.getId()))
-                        // Promotion runs
+                // Promotion runs
                 .link("_runs", on(PromotionLevelController.class).getPromotionRunView(promotionLevel.getId()))
-                        // Events
+                // Events
                 .link("_events", on(EventController.class).getEvents(promotionLevel.getProjectEntityType(), promotionLevel.getId(), 0, 10))
-                        // OK
+                // Page
+                .page(promotionLevel)
+                // OK
                 .build();
     }
 

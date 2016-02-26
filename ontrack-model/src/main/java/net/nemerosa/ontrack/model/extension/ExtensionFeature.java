@@ -8,11 +8,22 @@ public interface ExtensionFeature {
 
     String getDescription();
 
+    /**
+     * Gets the version of this feature
+     */
+    String getVersion();
+
+    default ExtensionFeatureOptions getOptions() {
+        return ExtensionFeatureOptions.DEFAULT;
+    }
+
     default ExtensionFeatureDescription getFeatureDescription() {
         return new ExtensionFeatureDescription(
                 getId(),
                 getName(),
-                getDescription()
+                getDescription(),
+                getVersion(),
+                getOptions()
         );
     }
 

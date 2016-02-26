@@ -180,7 +180,7 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
      */
     @RequestMapping(value = "sync/{branchId}", method = RequestMethod.POST)
     public Ack launchBuildSync(@PathVariable ID branchId) {
-        return gitService.launchBuildSync(branchId);
+        return Ack.validate(gitService.launchBuildSync(branchId, false));
     }
 
     /**
@@ -386,4 +386,26 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
                         () -> new SCMDocumentNotFoundException(path)
                 );
     }
+
+    /**
+     * Gets the Git synchronisation information.
+     *
+     * @param projectId ID of the project
+     * @return Synchronisation information
+     */
+    @RequestMapping(value = "project-sync/{projectId}", method = RequestMethod.GET)
+    public GitSynchronisationInfo getProjectGitSyncInfo(@PathVariable ID projectId) {
+        Project project = structureService.getProject(projectId);
+        return gitService.getProjectGitSyncInfo(project);
+    }
+
+    /**
+     * Launching the synchronisation
+     */
+    @RequestMapping(value = "project-sync/{projectId}", method = RequestMethod.POST)
+    public Ack projectGitSync(@PathVariable ID projectId, @RequestBody GitSynchronisationRequest request) {
+        Project project = structureService.getProject(projectId);
+        return gitService.projectSync(project, request);
+    }
+
 }

@@ -8,18 +8,28 @@
         <dt>Timestamp</dt>
         <dd>{{data.timestamp | date:'fullDate'}} {{data.timestamp | date:'mediumTime'}}</dd>
 
-        <dt>Source</dt>
-        <dd>{{data.source}}</dd>
-
-        <dt>Identifier</dt>
-        <dd>{{data.identifier}}</dd>
-
-        <dt ng-if="data.info">Info</dt>
-        <dd ng-if="data.info">{{data.info}}</dd>
-
-        <dt>Details</dt>
+        <dt>Type</dt>
         <dd>
-            <textarea class="form-control" readonly="readonly" ng-bind="data.detail" rows="8"></textarea>
+            <code>{{data.type.name}}</code>
+            {{data.type.description}}
+        </dd>
+
+        <dt>Information</dt>
+        <dd>{{data.information}}</dd>
+
+        <dt ng-if="data.detailList">Details</dt>
+        <dd ng-if="data.detailList">
+            <ul>
+                <li ng-repeat="detail in data.detailList">
+                    <b>{{detail.name}}</b>:
+                    {{detail.description}}
+                </li>
+            </ul>
+        </dd>
+
+        <dt ng-if="data.stacktrace">Stacktrace</dt>
+        <dd ng-if="data.stacktrace">
+            <textarea class="form-control" readonly="readonly" ng-bind="data.stacktrace" rows="8"></textarea>
         </dd>
     </dl>
 

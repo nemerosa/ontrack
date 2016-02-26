@@ -94,6 +94,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-build") {
         }
     }
     steps {
+        // TODO Restore parallel build when https://github.com/srs/gradle-node-plugin/issues/91 is fixed
         gradle '''\
 clean
 versionDisplay
@@ -105,7 +106,6 @@ osPackages
 build
 --info
 --profile
---parallel
 '''
         environmentVariables {
             propertiesFile 'build/version.properties'
@@ -135,13 +135,7 @@ build
                 }
             }
         }
-    }
-    configure { node ->
-        node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackBuildNotifier' {
-            'project'(SEED_PROJECT)
-            'branch'(SEED_BRANCH)
-            'build'('${VERSION_BUILD}')
-        }
+        ontrackBuild SEED_PROJECT, SEED_BRANCH, '${VERSION_BUILD}'
     }
 }
 
@@ -197,14 +191,7 @@ ciAcceptanceTest -PacceptanceJar=ontrack-acceptance.jar
                 }
             }
         }
-    }
-    configure { node ->
-        node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
-            'project'(SEED_PROJECT)
-            'branch'(SEED_BRANCH)
-            'build'('${VERSION_BUILD}')
-            'validationStamp'('ACCEPTANCE')
-        }
+        ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_BUILD}', 'ACCEPTANCE'
     }
 }
 
@@ -242,14 +229,7 @@ debAcceptanceTest
         }
         publishers {
             archiveJunit('*-tests.xml')
-        }
-        configure { node ->
-            node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
-                'project'(SEED_PROJECT)
-                'branch'(SEED_BRANCH)
-                'build'('${VERSION_BUILD}')
-                'validationStamp'('ACCEPTANCE.DEBIAN')
-            }
+            ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_BUILD}', 'ACCEPTANCE.DEBIAN'
         }
     }
 
@@ -283,14 +263,7 @@ rpmAcceptanceTest${centOsVersion}
             }
             publishers {
                 archiveJunit('*-tests.xml')
-            }
-            configure { node ->
-                node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
-                    'project'(SEED_PROJECT)
-                    'branch'(SEED_BRANCH)
-                    'build'('${VERSION_BUILD}')
-                    'validationStamp'("ACCEPTANCE.CENTOS.${centOsVersion}")
-                }
+                ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_BUILD}', "ACCEPTANCE.CENTOS.${centOsVersion}"
             }
         }
     }
@@ -331,14 +304,7 @@ docker logout
                 }
             }
         }
-    }
-    configure { node ->
-        node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
-            'project'(SEED_PROJECT)
-            'branch'(SEED_BRANCH)
-            'build'('${VERSION_BUILD}')
-            'validationStamp'('DOCKER')
-        }
+        ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_BUILD}', 'DOCKER'
     }
 }
 
@@ -379,14 +345,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
                 currentBuild()
             }
         }
-    }
-    configure { node ->
-        node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
-            'project'(SEED_PROJECT)
-            'branch'(SEED_BRANCH)
-            'build'('${VERSION_BUILD}')
-            'validationStamp'('ACCEPTANCE.DO')
-        }
+        ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_BUILD}', 'ACCEPTANCE.DO'
     }
 }
 
@@ -459,23 +418,17 @@ docker logout
             }
         }
     }
-    configure { node ->
-        node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackPromotedRunNotifier' {
-            'project'(SEED_PROJECT)
-            'branch'(SEED_BRANCH)
-            'build'('${VERSION_BUILD}')
-            'promotionLevel'('RELEASE')
-        }
-        node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackDSLNotifier' {
-            'usingText' true
-            'scriptText' """\
+    publishers {
+        ontrackPromotion SEED_PROJECT, SEED_BRANCH, '${VERSION_BUILD}', 'RELEASE'
+        ontrackDsl {
+            environment 'VERSION_BUILD'
+            environment 'VERSION_DISPLAY'
+            log()
+            script """\
 ontrack.build('${SEED_PROJECT}', '${SEED_BRANCH}', VERSION_BUILD).config {
 label VERSION_DISPLAY
 }
 """
-            injectEnvironment 'VERSION_BUILD,VERSION_DISPLAY'
-            injectProperties ''
-            ontrackLog false
         }
     }
 }
@@ -556,22 +509,8 @@ productionTest
         }
         publishers {
             archiveJunit('*-tests.xml')
-        }
-        configure { node ->
-            node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackValidationRunNotifier' {
-                'project'(SEED_PROJECT)
-                'branch'(SEED_BRANCH)
-                'build'('${VERSION_BUILD}')
-                'validationStamp'('ONTRACK.SMOKE')
-            }
-        }
-        configure { node ->
-            node / 'publishers' / 'net.nemerosa.ontrack.jenkins.OntrackPromotedRunNotifier' {
-                'project'(SEED_PROJECT)
-                'branch'(SEED_BRANCH)
-                'build'('${VERSION_BUILD}')
-                'promotionLevel'('ONTRACK')
-            }
+            ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_BUILD}', 'ONTRACK.SMOKE'
+            ontrackPromotion SEED_PROJECT, SEED_BRANCH, '${VERSION_BUILD}', 'ONTRACK'
         }
     }
 
@@ -601,10 +540,10 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-setup") {
     wrappers {
         injectPasswords()
     }
-    configure { node ->
-        node / 'builders' / 'net.nemerosa.ontrack.jenkins.OntrackDSLStep' {
-            'usingText' true
-            'scriptText' """\
+    steps {
+        ontrackDsl {
+            log()
+            script """\
 ontrack.project('${SEED_PROJECT}').branch('${SEED_BRANCH}', 'Pipeline for ${BRANCH}', true).config {
     gitBranch '${BRANCH}', [
         buildCommitLink: [
@@ -616,9 +555,6 @@ ontrack.project('${SEED_PROJECT}').branch('${SEED_BRANCH}', 'Pipeline for ${BRAN
     ]
 }
 """
-            injectEnvironment ''
-            injectProperties ''
-            ontrackLog true
         }
     }
     publishers {

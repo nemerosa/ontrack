@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.boot.ui
 
-import net.nemerosa.ontrack.extension.general.ReleaseProperty
-import net.nemerosa.ontrack.extension.general.ReleasePropertyType
+import net.nemerosa.ontrack.extension.api.support.TestSimpleProperty
+import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType
 import net.nemerosa.ontrack.model.security.BranchCreate
 import net.nemerosa.ontrack.model.security.ProjectCreation
 import net.nemerosa.ontrack.model.security.ProjectEdit
@@ -47,9 +47,9 @@ class BuildControllerIT extends AbstractWebTestSupport {
                             "Build 12",
                             Collections.singletonList(
                                     new PropertyCreationRequest(
-                                            ReleasePropertyType.class.getName(),
+                                            TestSimplePropertyType.class.getName(),
                                             object()
-                                                    .with("name", "RC")
+                                                    .with("value", "RC")
                                                     .end()
                                     )
                             )
@@ -62,8 +62,8 @@ class BuildControllerIT extends AbstractWebTestSupport {
         assertEquals("12", build.getName());
         assertEquals("Build 12", build.getDescription());
         // Checks the Jenkins build property
-        Property<ReleaseProperty> property = propertyService.getProperty(build, ReleasePropertyType.class.getName());
+        Property<TestSimpleProperty> property = propertyService.getProperty(build, TestSimplePropertyType.class.getName());
         assertNotNull(property);
-        assertEquals("RC", property.getValue().getName());
+        assertEquals("RC", property.getValue().getValue());
     }
 }

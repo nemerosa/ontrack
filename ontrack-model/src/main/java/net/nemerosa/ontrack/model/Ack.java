@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.model;
 
 import lombok.Data;
 
+import java.util.Optional;
+
 @Data
 public class Ack {
 
@@ -10,6 +12,10 @@ public class Ack {
 
     public static Ack validate(boolean test) {
         return test ? OK : NOK;
+    }
+
+    public static Ack validate(Optional<?> optional) {
+        return optional != null ? validate(optional.isPresent()) : NOK;
     }
 
     public static Ack one(int count) {

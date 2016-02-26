@@ -7,8 +7,8 @@ import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.BranchCloneRequest
 import net.nemerosa.ontrack.model.structure.CopyService
 import net.nemerosa.ontrack.model.structure.PropertyService
-import net.nemerosa.ontrack.service.support.property.TestProperty
-import net.nemerosa.ontrack.service.support.property.TestPropertyType
+import net.nemerosa.ontrack.extension.api.support.TestProperty
+import net.nemerosa.ontrack.extension.api.support.TestPropertyType
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired

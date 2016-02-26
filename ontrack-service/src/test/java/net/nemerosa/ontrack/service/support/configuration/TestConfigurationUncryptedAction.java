@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service.support.configuration;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.nemerosa.ontrack.extension.api.support.TestConfiguration;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.support.DBMigrationAction;
 import org.springframework.stereotype.Component;

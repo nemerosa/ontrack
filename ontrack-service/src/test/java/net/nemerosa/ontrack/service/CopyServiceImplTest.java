@@ -4,9 +4,9 @@ import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.security.ProjectEdit;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.service.support.property.TestExtensionFeature;
-import net.nemerosa.ontrack.service.support.property.TestProperty;
-import net.nemerosa.ontrack.service.support.property.TestPropertyType;
+import net.nemerosa.ontrack.extension.api.support.TestExtensionFeature;
+import net.nemerosa.ontrack.extension.api.support.TestProperty;
+import net.nemerosa.ontrack.extension.api.support.TestPropertyType;
 import org.junit.Before;
 import org.junit.Test;
 

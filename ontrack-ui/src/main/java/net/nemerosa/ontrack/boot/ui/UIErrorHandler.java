@@ -2,8 +2,8 @@ package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.model.exceptions.InputException;
 import net.nemerosa.ontrack.model.exceptions.NotFoundException;
-import net.nemerosa.ontrack.model.security.Account;
-import net.nemerosa.ontrack.model.security.SecurityService;
+import net.nemerosa.ontrack.model.structure.NameDescription;
+import net.nemerosa.ontrack.model.support.ApplicationLogEntry;
 import net.nemerosa.ontrack.model.support.ApplicationLogService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +27,11 @@ public class UIErrorHandler {
 
     private final MessageSource messageSource;
     private final ApplicationLogService applicationLogService;
-    private final SecurityService securityService;
 
     @Autowired
-    public UIErrorHandler(MessageSource messageSource, ApplicationLogService applicationLogService, SecurityService securityService) {
+    public UIErrorHandler(MessageSource messageSource, ApplicationLogService applicationLogService) {
         this.messageSource = messageSource;
         this.applicationLogService = applicationLogService;
-        this.securityService = securityService;
     }
 
     @ExceptionHandler(NotFoundException.class)
@@ -100,19 +98,18 @@ public class UIErrorHandler {
         // Returns a message to display to the user
         String message = "An error has occurred.";
         // Logs the error in the application
-        applicationLogService.error(
-                ex,
-                getClass(),
-                request.getServletPath(),
-                getSecurityContext(),
-                ex.getMessage()
+        applicationLogService.log(
+                ApplicationLogEntry.error(
+                        ex,
+                        NameDescription.nd(
+                                "ui-error",
+                                "Error display to the user"
+                        ),
+                        request.getServletPath()
+                )
         );
         // OK
         return getMessageResponse(HttpStatus.INTERNAL_SERVER_ERROR, message);
-    }
-
-    private String getSecurityContext() {
-        return securityService.getAccount().map(Account::getName).orElse("anonymous");
     }
 
     protected ResponseEntity<UIErrorMessage> getMessageResponse(HttpStatus status, String message) {

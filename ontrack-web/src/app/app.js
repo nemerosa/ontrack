@@ -5,6 +5,7 @@ var ontrack = angular.module('ontrack', [
         'multi-select',
         'angular_taglist_directive',
         'ngSanitize',
+        'oc.lazyLoad',
         // Directives
         'ot.directive.view',
         'ot.directive.misc',
@@ -37,17 +38,7 @@ var ontrack = angular.module('ontrack', [
         'ot.view.admin.project-acl',
         'ot.view.admin.console',
         'ot.view.admin.predefined-validation-stamps',
-        'ot.view.admin.predefined-promotion-levels',
-        // Extensions
-        'ontrack.extension.jenkins',
-        'ontrack.extension.svn',
-        'ontrack.extension.jira',
-        'ontrack.extension.combined',
-        'ontrack.extension.artifactory',
-        'ontrack.extension.git',
-        'ontrack.extension.github',
-        'ontrack.extension.stash',
-        'ontrack.extension.ldap'
+        'ot.view.admin.predefined-promotion-levels'
     ])
         // HTTP configuration
         .config(function ($httpProvider) {
@@ -79,18 +70,84 @@ var ontrack = angular.module('ontrack', [
         })
         // Routing configuration
         .config(function ($stateProvider, $urlRouterProvider) {
-            // For any unmatched url, redirect to /state1
+            // For any unmatched url, redirect to /home
             $urlRouterProvider.otherwise("/home");
+            // Disables routing until extensions are loaded
+            $urlRouterProvider.deferIntercept();
         })
-        // Main controller
-        .controller('AppCtrl', function ($log, $scope, $rootScope, $state, $http, ot, otUserService, otInfoService, otTaskService, otFormService) {
+        // Initialisation work
+        .run(function ($rootScope, $log, $http, $ocLazyLoad, $q, $urlRouter, ot, otUserService, otInfoService) {
+            /**
+             * Loading the extensions
+             */
+            $log.debug('[app] Loading extensions...');
+            ot.pageCall($http.get('extensions')).then(function (extensionList) {
+                // Creates a start promise
+                var d = $q.defer();
+                d.resolve();
+                var promise = d.promise;
+                // Appends the load of extensions
+                extensionList.extensions.forEach(function (extension) {
+                     promise = promise.then(function (result) {
+                         $log.debug('[app] Extension [' + extension.id + '] ' + extension.name + '...');
+                         if (extension.options.gui) {
+                             // Computing the path to the extension
+                             var extensionPath;
+                             var extensionVersion = extension.version;
+                             if (extensionVersion && extensionVersion != 'none') {
+                                 extensionPath = 'extension/' + extension.id + '/' + extensionVersion + '/module.js';
+                             } else {
+                                 extensionPath = 'extension/' + extension.id + '/module.js';
+                             }
+                             // Loading the extension dynamically at...
+                             $log.debug('[app] Extension [' + extension.id + '] Loading GUI module at ' + extensionPath + '...');
+                             // Returning the promise
+                             return $ocLazyLoad.load(extensionPath).then(function (result) {
+                                 $log.debug('[app] Extension [' + extension.id + '] GUI module has been loaded.');
+                                 return result;
+                             }, function (error) {
+                                 $log.error('[app] Extension [' + extension.id + '] Error at loading: ' + error);
+                                 return $q.reject(error);
+                             });
+                         } else {
+                             return result;
+                         }
+                     });
+                });
+                // Returns the promise
+                return promise;
+            }).then(function () {
+                // FIXME Displays any error
+                // Loading is done
+                $log.debug('[app] All extensions have been loaded - application ready');
+                $rootScope.appReady = true;
+                // Everything has been loaded
+                $log.debug('[app] All extensions have been loaded - resuming the routing');
+                // Resumes the routing
+                $urlRouter.listen();
+                $urlRouter.sync();
+            }, function (error) {
+                $log.error('[app] Could not load the application: ' + error.message);
+                $rootScope.appLoadingError = error.message;
+            });
 
             /**
              * User mgt
              */
 
-                // User heart beat initialisation at startup
             otUserService.init();
+
+            /**
+             * Application info mgt
+             */
+
+            otInfoService.init();
+        })
+        // Main controller
+        .controller('AppCtrl', function ($log, $scope, $rootScope, $state, $http, ot, otUserService, otInfoService, otTaskService, otFormService) {
+
+            $log.debug('[app] Initialising the app controller...');
+
 
             // User status
             $scope.logged = function () {
@@ -115,8 +172,6 @@ var ontrack = angular.module('ontrack', [
             /**
              * Application info mgt
              */
-
-            otInfoService.init();
 
             $scope.displayVersionInfo = function (versionInfo) {
                 otInfoService.displayVersionInfo(versionInfo);
@@ -175,3 +230,10 @@ var ontrack = angular.module('ontrack', [
 
         })
     ;
+
+// Bootstrapping
+
+angular.element(document).ready(function () {
+    if (console) console.log('[app] Bootstrapping the application');
+    angular.bootstrap(document, ['ontrack']);
+});

@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.artifactory;
 import net.nemerosa.ontrack.extension.artifactory.client.ArtifactoryClientFactory;
 import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfiguration;
 import net.nemerosa.ontrack.extension.support.ConfigurationHealthIndicator;
-import net.nemerosa.ontrack.extension.support.ConfigurationService;
+import net.nemerosa.ontrack.model.support.ConfigurationService;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.health.Health;

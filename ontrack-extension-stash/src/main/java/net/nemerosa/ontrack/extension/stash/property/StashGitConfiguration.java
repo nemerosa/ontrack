@@ -25,10 +25,17 @@ public class StashGitConfiguration implements GitConfiguration {
         return property.getConfiguration().getName();
     }
 
+    /**
+     * Checks if this configuration denotes any BitBucket Cloud instance
+     */
+    protected boolean isCloud() {
+        return property.getConfiguration().isCloud();
+    }
+
     @Override
     public String getRemote() {
         return format(
-                "%s/scm/%s/%s.git",
+                getRemoteFormat(),
                 property.getConfiguration().getUrl(),
                 property.getProject(),
                 property.getRepository()
@@ -43,7 +50,7 @@ public class StashGitConfiguration implements GitConfiguration {
     @Override
     public String getCommitLink() {
         return format(
-                "%s/projects/%s/repos/%s/commits/{commit}",
+                getCommitLinkFormat(),
                 property.getConfiguration().getUrl(),
                 property.getProject(),
                 property.getRepository()
@@ -53,7 +60,7 @@ public class StashGitConfiguration implements GitConfiguration {
     @Override
     public String getFileAtCommitLink() {
         return format(
-                "%s/projects/%s/repos/%s/browse/{path}?at={commit",
+                getFileAtCommitLinkFormat(),
                 property.getConfiguration().getUrl(),
                 property.getProject(),
                 property.getRepository()
@@ -68,5 +75,17 @@ public class StashGitConfiguration implements GitConfiguration {
     @Override
     public String getIssueServiceConfigurationIdentifier() {
         return property.getConfiguration().getIssueServiceConfigurationIdentifier();
+    }
+
+    protected String getFileAtCommitLinkFormat() {
+        return isCloud() ? "%s/%s/%s/src/{commit}/{path}" : "%s/projects/%s/repos/%s/browse/{path}?at={commit}";
+    }
+
+    protected String getCommitLinkFormat() {
+        return isCloud() ? "%s/%s/%s/commits/{commit}" : "%s/projects/%s/repos/%s/commits/{commit}";
+    }
+
+    protected String getRemoteFormat() {
+        return isCloud() ? "%s/%s/%s.git" : "%s/scm/%s/%s.git";
     }
 }

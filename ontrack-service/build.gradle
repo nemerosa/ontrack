@@ -4,6 +4,7 @@ dependencies {
     compile project(':ontrack-model')
     compile project(':ontrack-repository')
     compile project(':ontrack-extension-api')
+    compile project(':ontrack-job')
     compile libraries.spring_boot
     compile libraries.spring_context
     compile libraries.spring_tx
@@ -16,8 +17,10 @@ dependencies {
     compile libraries.groovy_sandbox
     compile libraries.spring_boot_starter_actuator
     compile libraries.metrics_core
+    compile libraries.jgrapht
 
     testCompile project(':ontrack-it-utils')
+    testCompile project(path: ':ontrack-extension-api', configuration: 'testArtifacts')
     testRuntime project(':ontrack-repository-impl')
 
     // Dependencies needed for LDAP integration tests

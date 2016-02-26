@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.jenkins;
 
 import net.nemerosa.ontrack.extension.jenkins.client.JenkinsClientFactory;
 import net.nemerosa.ontrack.extension.support.ConfigurationHealthIndicator;
-import net.nemerosa.ontrack.extension.support.ConfigurationService;
+import net.nemerosa.ontrack.model.support.ConfigurationService;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.health.Health;

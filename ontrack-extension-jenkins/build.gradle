@@ -1,3 +1,6 @@
+import net.nemerosa.ontrack.gradle.extension.OntrackExtensionPlugin
+
+apply plugin: OntrackExtensionPlugin
 apply plugin: 'groovy'
 
 dependencies {

@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.service.support.configuration;
 
-import net.nemerosa.ontrack.extension.support.ConfigurationValidationException;
+import net.nemerosa.ontrack.extension.api.support.TestConfiguration;
+import net.nemerosa.ontrack.extension.api.support.TestConfigurationService;
+import net.nemerosa.ontrack.model.support.ConfigurationValidationException;
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport;
 import net.nemerosa.ontrack.model.security.EncryptionService;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
@@ -9,16 +11,16 @@ import net.nemerosa.ontrack.model.security.ProjectView;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.PropertyService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
-import net.nemerosa.ontrack.service.support.property.TestProperty;
-import net.nemerosa.ontrack.service.support.property.TestPropertyType;
+import net.nemerosa.ontrack.extension.api.support.TestProperty;
+import net.nemerosa.ontrack.extension.api.support.TestPropertyType;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
 
-import static net.nemerosa.ontrack.service.support.configuration.TestConfiguration.PLAIN_PASSWORD;
-import static net.nemerosa.ontrack.service.support.configuration.TestConfiguration.config;
+import static net.nemerosa.ontrack.extension.api.support.TestConfiguration.PLAIN_PASSWORD;
+import static net.nemerosa.ontrack.extension.api.support.TestConfiguration.config;
 import static net.nemerosa.ontrack.test.TestUtils.uid;
 import static org.junit.Assert.*;
 

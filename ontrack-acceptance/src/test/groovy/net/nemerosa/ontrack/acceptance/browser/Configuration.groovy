@@ -120,7 +120,7 @@ public class Configuration {
             // Takes a screenshot
             screenshot("timeout");
             // The error is still there
-            throw new TimeoutException("Could not get ${message} in time", ex);
+            throw new TimeoutException("Could not get ${message} in less than ${seconds} seconds", ex);
         }
     }
 

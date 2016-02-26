@@ -9,9 +9,11 @@ import net.nemerosa.ontrack.git.exceptions.*;
 import net.nemerosa.ontrack.git.model.*;
 import net.nemerosa.ontrack.git.model.plot.GPlot;
 import net.nemerosa.ontrack.git.model.plot.GitPlotRenderer;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
@@ -97,7 +99,7 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
         if (sync.tryLock()) {
             try {
                 // Clone or update?
-                if (new File(repositoryDir, ".git").exists()) {
+                if (isClonedOrCloning()) {
                     // Fetch
                     fetch(logger);
                 } else {
@@ -108,12 +110,16 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
                 sync.unlock();
             }
         } else {
-            logger.accept(format("[git] %s is already synchronising, trying later", repositoryDir));
+            logger.accept(format("[git] %s is already synchronising, trying later", repository.getRemote()));
         }
     }
 
+    protected boolean isClonedOrCloning() {
+        return new File(repositoryDir, ".git").exists();
+    }
+
     protected synchronized void fetch(Consumer<String> logger) {
-        logger.accept(format("[git] Pulling %s into %s", repository.getRemote(), repositoryDir));
+        logger.accept(format("[git] Pulling %s", repository.getRemote()));
         try {
             git.fetch()
                     .setCredentialsProvider(credentialsProvider)
@@ -125,7 +131,7 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
     }
 
     protected synchronized void cloneRemote(Consumer<String> logger) {
-        logger.accept(format("[git] Cloning %s into %s", repository.getRemote(), repositoryDir));
+        logger.accept(format("[git] Cloning %s", repository.getRemote()));
         try {
             new CloneCommand()
                     .setCredentialsProvider(credentialsProvider)
@@ -136,7 +142,7 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
             throw new GitRepositoryAPIException(repository.getRemote(), e);
         }
         // Check
-        if (!new File(repositoryDir, ".git").exists()) {
+        if (!isClonedOrCloning()) {
             throw new GitRepositoryCannotCloneException(repository.getRemote());
         }
         // Done
@@ -293,6 +299,71 @@ public class GitRepositoryClientImpl implements GitRepositoryClient {
         sync(logger::debug);
         // Git show
         return GitClientSupport.showPath(repositoryDir, getBranchRef(branch), path);
+    }
+
+    @Override
+    public GitSynchronisationStatus getSynchronisationStatus() {
+        if (sync.isLocked()) {
+            return GitSynchronisationStatus.RUNNING;
+        } else if (isClonedOrCloning()) {
+            return GitSynchronisationStatus.IDLE;
+        } else {
+            return GitSynchronisationStatus.NONE;
+        }
+    }
+
+    @Override
+    public GitBranchesInfo getBranches() {
+        if (!isClonedOrCloning()) {
+            // No synchronisation - not returning anything
+            return GitBranchesInfo.empty();
+        } else if (sync.tryLock()) {
+            try {
+                // Rev walk
+                Repository repo = git.getRepository();
+                RevWalk revWalk = new RevWalk(repo);
+                // Gets the list of local branches
+                List<Ref> branchRefs = git.branchList().setListMode(ListBranchCommand.ListMode.REMOTE).call();
+                // For all the branches
+                Map<String, GitCommit> index = new TreeMap<>();
+                for (Ref ref : branchRefs) {
+                    // Gets the name of the branch
+                    String branchName = StringUtils.removeStart(ref.getName(), "refs/remotes/origin/");
+                    if (!StringUtils.equals("HEAD", branchName)) {
+                        // Gets the commit for this ref
+                        RevCommit revCommit = revWalk.parseCommit(ref.getObjectId());
+                        // Commit info
+                        GitCommit gitCommit = toCommit(revCommit);
+                        // Indexation
+                        index.put(branchName, gitCommit);
+                    }
+                }
+                // OK
+                return new GitBranchesInfo(
+                        index.entrySet().stream()
+                                .map(entry -> new GitBranchInfo(entry.getKey(), entry.getValue()))
+                                .collect(Collectors.toList())
+                );
+            } catch (GitAPIException e) {
+                throw new GitRepositoryAPIException(repository.getRemote(), e);
+            } catch (IOException e) {
+                throw new GitRepositoryIOException(repository.getRemote(), e);
+            } finally {
+                sync.unlock();
+            }
+        } else {
+            // Sync going on - not returning anything
+            return GitBranchesInfo.empty();
+        }
+    }
+
+    @Override
+    public void reset() {
+        try {
+            FileUtils.forceDelete(repositoryDir);
+        } catch (IOException e) {
+            throw new GitRepositoryIOException(repository.getRemote(), e);
+        }
     }
 
     private void formatDiffEntry(DiffFormatter formatter, DiffEntry entry) {

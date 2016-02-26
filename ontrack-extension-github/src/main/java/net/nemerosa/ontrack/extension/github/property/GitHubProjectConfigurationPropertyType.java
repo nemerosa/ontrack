@@ -2,10 +2,12 @@ package net.nemerosa.ontrack.extension.github.property;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.common.MapBuilder;
+import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
+import net.nemerosa.ontrack.extension.git.property.AbstractGitProjectConfigurationPropertyType;
+import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.extension.github.GitHubExtensionFeature;
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration;
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService;
-import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Int;
 import net.nemerosa.ontrack.model.form.Selection;
@@ -23,14 +25,15 @@ import java.util.Set;
 import java.util.function.Function;
 
 @Component
-public class GitHubProjectConfigurationPropertyType extends AbstractPropertyType<GitHubProjectConfigurationProperty>
+public class GitHubProjectConfigurationPropertyType
+        extends AbstractGitProjectConfigurationPropertyType<GitHubProjectConfigurationProperty>
         implements ConfigurationPropertyType<GitHubEngineConfiguration, GitHubProjectConfigurationProperty> {
 
     private final GitHubConfigurationService configurationService;
 
     @Autowired
-    public GitHubProjectConfigurationPropertyType(GitHubExtensionFeature extensionFeature, GitHubConfigurationService configurationService) {
-        super(extensionFeature);
+    public GitHubProjectConfigurationPropertyType(GitHubExtensionFeature extensionFeature, GitHubConfigurationService configurationService, GitService gitService) {
+        super(extensionFeature, gitService);
         this.configurationService = configurationService;
     }
 
@@ -131,4 +134,8 @@ public class GitHubProjectConfigurationPropertyType extends AbstractPropertyType
         );
     }
 
+    @Override
+    protected GitConfiguration getGitConfiguration(GitHubProjectConfigurationProperty value) {
+        return value.getGitConfiguration();
+    }
 }

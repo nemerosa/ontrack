@@ -2,10 +2,12 @@ package net.nemerosa.ontrack.extension.stash.property;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.common.MapBuilder;
+import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
+import net.nemerosa.ontrack.extension.git.property.AbstractGitProjectConfigurationPropertyType;
+import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.extension.stash.StashExtensionFeature;
 import net.nemerosa.ontrack.extension.stash.model.StashConfiguration;
 import net.nemerosa.ontrack.extension.stash.service.StashConfigurationService;
-import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Selection;
 import net.nemerosa.ontrack.model.form.Text;
@@ -22,25 +24,25 @@ import java.util.Set;
 import java.util.function.Function;
 
 @Component
-public class StashProjectConfigurationPropertyType extends AbstractPropertyType<StashProjectConfigurationProperty>
+public class StashProjectConfigurationPropertyType extends AbstractGitProjectConfigurationPropertyType<StashProjectConfigurationProperty>
         implements ConfigurationPropertyType<StashConfiguration, StashProjectConfigurationProperty> {
 
     private final StashConfigurationService configurationService;
 
     @Autowired
-    public StashProjectConfigurationPropertyType(StashExtensionFeature extensionFeature, StashConfigurationService configurationService) {
-        super(extensionFeature);
+    public StashProjectConfigurationPropertyType(StashExtensionFeature extensionFeature, StashConfigurationService configurationService, GitService gitService) {
+        super(extensionFeature, gitService);
         this.configurationService = configurationService;
     }
 
     @Override
     public String getName() {
-        return "Stash configuration";
+        return "BitBucket configuration";
     }
 
     @Override
     public String getDescription() {
-        return "Associates the project with a Stash repository";
+        return "Associates the project with a BitBucket repository";
     }
 
     @Override
@@ -64,19 +66,21 @@ public class StashProjectConfigurationPropertyType extends AbstractPropertyType<
                 .with(
                         Selection.of("configuration")
                                 .label("Configuration")
-                                .help("Stash configuration to use to access the repository")
+                                .help("BitBucket configuration to use to access the repository")
                                 .items(configurationService.getConfigurationDescriptors())
                                 .value(value != null ? value.getConfiguration().getName() : null)
                 )
                 .with(
                         Text.of("project")
                                 .label("Project")
-                                .help("ID of the Stash project")
+                                .help("ID of the BitBucket project")
+                                .value(value != null ? value.getProject() : null)
                 )
                 .with(
                         Text.of("repository")
                                 .label("Repository")
-                                .help("Repository in the Stash project")
+                                .help("Repository in the BitBucket project")
+                                .value(value != null ? value.getRepository() : null)
                 )
                 ;
     }
@@ -124,4 +128,8 @@ public class StashProjectConfigurationPropertyType extends AbstractPropertyType<
         );
     }
 
+    @Override
+    protected GitConfiguration getGitConfiguration(StashProjectConfigurationProperty value) {
+        return value.getGitConfiguration();
+    }
 }

@@ -1,12 +1,14 @@
 package net.nemerosa.ontrack.service.support.template;
 
+import net.nemerosa.ontrack.job.*;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.exceptions.*;
-import net.nemerosa.ontrack.model.job.*;
 import net.nemerosa.ontrack.model.security.BranchTemplateMgt;
 import net.nemerosa.ontrack.model.security.BranchTemplateSync;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
+import net.nemerosa.ontrack.model.support.AbstractBranchJob;
+import net.nemerosa.ontrack.model.support.StartupService;
 import net.nemerosa.ontrack.repository.BranchTemplateRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -25,7 +27,11 @@ import static java.lang.String.format;
 
 @Service
 @Transactional
-public class BranchTemplateServiceImpl implements BranchTemplateService, JobProvider {
+public class BranchTemplateServiceImpl implements BranchTemplateService, StartupService {
+
+    public static final JobType BRANCH_TEMPLATE_SYNC_JOB =
+            JobCategory.of("template").withName("Templates")
+                    .getType("template-sync").withName("Branch template sync");
 
     private final Logger logger = LoggerFactory.getLogger(BranchTemplateService.class);
 
@@ -35,15 +41,17 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
     private final ExpressionEngine expressionEngine;
     private final CopyService copyService;
     private final TemplateSynchronisationService templateSynchronisationService;
+    private final JobScheduler jobScheduler;
 
     @Autowired
-    public BranchTemplateServiceImpl(StructureService structureService, SecurityService securityService, BranchTemplateRepository branchTemplateRepository, ExpressionEngine expressionEngine, CopyService copyService, TemplateSynchronisationService templateSynchronisationService) {
+    public BranchTemplateServiceImpl(StructureService structureService, SecurityService securityService, BranchTemplateRepository branchTemplateRepository, ExpressionEngine expressionEngine, CopyService copyService, TemplateSynchronisationService templateSynchronisationService, JobScheduler jobScheduler) {
         this.structureService = structureService;
         this.securityService = securityService;
         this.branchTemplateRepository = branchTemplateRepository;
         this.expressionEngine = expressionEngine;
         this.copyService = copyService;
         this.templateSynchronisationService = templateSynchronisationService;
+        this.jobScheduler = jobScheduler;
     }
 
     @Override
@@ -88,6 +96,13 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
         }
         // Saves the definition
         branchTemplateRepository.setTemplateDefinition(branchId, templateDefinition);
+        // Schedules (or reschedules the job)
+        scheduleTemplateDefinitionSyncJob(
+                new BranchTemplateDefinition(
+                        branchId,
+                        templateDefinition
+                )
+        );
         // Reloads the branch
         return structureService.getBranch(branchId);
     }
@@ -237,30 +252,48 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
     }
 
     @Override
-    public Collection<Job> getJobs() {
-        // Gets all template definitions
-        return branchTemplateRepository.getTemplateDefinitions().stream()
-                // ... filters on interval
-                .filter(btd -> (btd.getTemplateDefinition().getInterval() > 0))
-                        // ... and creates a sync. job
-                .map(this::createTemplateDefinitionSyncJob)
-                        // ... ok
-                .collect(Collectors.toList());
+    public String getName() {
+        return "Registration of branch template synchronisation jobs";
+    }
+
+    @Override
+    public int startupOrder() {
+        return JOB_REGISTRATION;
+    }
+
+    @Override
+    public void start() {
+        // For all template definitions
+        branchTemplateRepository.getTemplateDefinitions().stream()
+                // ... and creates a sync. job
+                .forEach(this::scheduleTemplateDefinitionSyncJob);
+    }
+
+    protected void scheduleTemplateDefinitionSyncJob(BranchTemplateDefinition btd) {
+        jobScheduler.schedule(
+                createTemplateDefinitionSyncJob(btd),
+                Schedule.everyMinutes(btd.getTemplateDefinition().getInterval())
+        );
+    }
+
+    protected JobKey getTemplateDefinitionSyncJobKey(BranchTemplateDefinition btd) {
+        return BRANCH_TEMPLATE_SYNC_JOB.getKey(btd.getBranchId().toString());
     }
 
     protected Job createTemplateDefinitionSyncJob(BranchTemplateDefinition btd) {
         // Loading the branch
         Branch branch = structureService.getBranch(btd.getBranchId());
         // Creating the job
-        return new BranchJob(branch) {
+        return new AbstractBranchJob(structureService, branch) {
+
             @Override
-            public String getCategory() {
-                return "BranchTemplateSync";
+            public JobKey getKey() {
+                return getTemplateDefinitionSyncJobKey(btd);
             }
 
             @Override
-            public String getId() {
-                return btd.getBranchId().toString();
+            public JobRun getTask() {
+                return runListener -> syncTemplateDefinition(branch.getId(), runListener);
             }
 
             @Override
@@ -273,22 +306,16 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
             }
 
             @Override
-            public int getInterval() {
-                return btd.getTemplateDefinition().getInterval();
-            }
-
-            @Override
-            public JobTask createTask() {
-                return new RunnableJobTask(info ->
-                        syncTemplateDefinition(branch.getId(), info)
-                );
+            public boolean isValid() {
+                return super.isValid() &&
+                        getTemplateDefinition(branch.getId()).isPresent();
             }
         };
     }
 
     @Override
     public BranchTemplateSyncResults sync(ID branchId) {
-        return syncTemplateDefinition(branchId, logger::info);
+        return syncTemplateDefinition(branchId, JobRunListener.logger(logger));
     }
 
     @Override
@@ -299,27 +326,27 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
                 securityService.isProjectFunctionGranted(instance, BranchTemplateSync.class)) {
             // Checks this is an instance
             TemplateInstance templateInstance = getTemplateInstance(branchId).orElseThrow(() ->
-                            new BranchNotTemplateInstanceException(branchId)
+                    new BranchNotTemplateInstanceException(branchId)
             );
             // Gets the template definition
             TemplateDefinition templateDefinition = getTemplateDefinition(templateInstance.getTemplateDefinitionId()).orElseThrow(() ->
-                            new BranchNotTemplateDefinitionException(templateInstance.getTemplateDefinitionId())
+                    new BranchNotTemplateDefinitionException(templateInstance.getTemplateDefinitionId())
             );
             // Template branch
             Branch template = structureService.getBranch(templateInstance.getTemplateDefinitionId());
             // Now, we have to "run as" admin since the permission to sync was granted
             // but might not be enough to create branches and such.
             securityService.asAdmin(() ->
-                            updateTemplateInstance(
+                    updateTemplateInstance(
+                            instance.getName(),
+                            instance,
+                            template,
+                            new BranchTemplateInstanceSingleRequest(
                                     instance.getName(),
-                                    instance,
-                                    template,
-                                    new BranchTemplateInstanceSingleRequest(
-                                            instance.getName(),
-                                            true,
-                                            templateInstance.getParameterMap()
-                                    ),
-                                    templateDefinition)
+                                    true,
+                                    templateInstance.getParameterMap()
+                            ),
+                            templateDefinition)
             );
             // OK
             return Ack.OK;
@@ -364,7 +391,7 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
         return structureService.getBranch(branchId);
     }
 
-    protected BranchTemplateSyncResults syncTemplateDefinition(ID branchId, JobInfoListener info) {
+    protected BranchTemplateSyncResults syncTemplateDefinition(ID branchId, JobRunListener listener) {
         // Gets the branch
         Branch branch = structureService.getBranch(branchId);
         // Gets the rights on the project
@@ -372,15 +399,15 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
                 securityService.isProjectFunctionGranted(branch, BranchTemplateSync.class)) {
             // Now, we have to "run as" admin since the permission to sync was granted
             // but might not be enough to create branches and such.
-            return securityService.runAsAdmin(() -> doSyncTemplateDefinition(branchId, info)).get();
+            return securityService.runAsAdmin(() -> doSyncTemplateDefinition(branchId, listener)).get();
         } else {
             throw new AccessDeniedException("Cannot synchronise branches.");
         }
     }
 
-    private BranchTemplateSyncResults doSyncTemplateDefinition(ID branchId, JobInfoListener info) {
+    private BranchTemplateSyncResults doSyncTemplateDefinition(ID branchId, JobRunListener listener) {
         // Loads the template definition
-        info.post(format("Loading template definition for %s", branchId));
+        listener.message("Loading template definition for %s", branchId);
         TemplateDefinition templateDefinition = getTemplateDefinition(branchId)
                 .orElseThrow(() -> new BranchNotTemplateDefinitionException(branchId));
         // Gets the source of the branch names to synchronise with
@@ -389,36 +416,36 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
                         templateDefinition.getSynchronisationSourceConfig().getId()
                 );
         // Using the source
-        return syncTemplateDefinition(branchId, templateDefinition, templateSynchronisationSource, info);
+        return syncTemplateDefinition(branchId, templateDefinition, templateSynchronisationSource, listener);
     }
 
     protected <T> BranchTemplateSyncResults syncTemplateDefinition(
             ID branchId,
             TemplateDefinition templateDefinition,
             TemplateSynchronisationSource<T> templateSynchronisationSource,
-            JobInfoListener info) {
+            JobRunListener listener) {
         // Parsing of the configuration data
         T config = templateSynchronisationSource.parseConfig(templateDefinition.getSynchronisationSourceConfig().getData());
         // Loads the branch
         Branch templateBranch = structureService.getBranch(branchId);
         // Logging
-        info.post(format("Getting template sync. sources from %s", templateSynchronisationSource.getName()));
+        listener.message("Getting template sync. sources from %s", templateSynchronisationSource.getName());
         // Getting the list of names
         List<String> sourceNames = templateSynchronisationSource.getBranchNames(templateBranch, config);
         // Sync on those names
-        return syncTemplateDefinition(templateBranch, templateDefinition, sourceNames, info);
+        return syncTemplateDefinition(templateBranch, templateDefinition, sourceNames, listener);
     }
 
     protected BranchTemplateSyncResults syncTemplateDefinition(
             Branch templateBranch,
             TemplateDefinition templateDefinition,
             List<String> sourceNames,
-            JobInfoListener info) {
+            JobRunListener listener) {
         BranchTemplateSyncResults results = new BranchTemplateSyncResults();
         // Sync for each branch in the source names
         List<String> branchNames = new ArrayList<>();
         for (String sourceName : sourceNames) {
-            BranchTemplateSyncResult result = syncTemplateDefinition(templateBranch, templateDefinition, sourceName, info);
+            BranchTemplateSyncResult result = syncTemplateDefinition(templateBranch, templateDefinition, sourceName, listener);
             branchNames.add(result.getBranchName());
             results.addResult(result);
         }
@@ -458,9 +485,9 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
         }
     }
 
-    protected BranchTemplateSyncResult syncTemplateDefinition(Branch templateBranch, TemplateDefinition templateDefinition, String sourceName, JobInfoListener info) {
+    protected BranchTemplateSyncResult syncTemplateDefinition(Branch templateBranch, TemplateDefinition templateDefinition, String sourceName, JobRunListener listener) {
         // Logging
-        info.post(format("Sync. %s --> %s", templateBranch.getName(), sourceName));
+        listener.message("Sync. %s --> %s", templateBranch.getName(), sourceName);
         // Gets the target branch, if it exists
         String branchName = NameDescription.escapeName(sourceName);
         Optional<Branch> targetBranch = structureService.findBranchByName(
@@ -481,7 +508,7 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
                             structureService.getBranch(existingTemplateInstance.get().getTemplateDefinitionId()).getName()
                     );
                 } else {
-                    info.post(format("%s exists - updating", branchName));
+                    listener.message("%s exists - updating", branchName);
                     updateTemplateInstance(
                             sourceName,
                             targetBranch.get(),
@@ -497,7 +524,7 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
         }
         // If it does not exist, creates it and updates it
         else {
-            info.post(format("%s does not exists - creating and updating", branchName));
+            listener.message("%s does not exists - creating and updating", branchName);
             Branch instance = createBranchForTemplateInstance(templateBranch, sourceName);
             updateTemplateInstance(
                     sourceName,

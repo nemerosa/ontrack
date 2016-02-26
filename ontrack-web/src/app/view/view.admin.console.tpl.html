@@ -38,45 +38,50 @@
                     </td>
                 </tr>
                 <!-- Per section -->
-                <tbody ng-repeat="(sectionName, section) in health" ng-if="sectionName != '_self' && sectionName != 'status'">
-                    <!-- Section status -->
-                    <tr class="active">
-                        <td class="ot-health-status-span">
-                            &nbsp;
-                        </td>
-                        <td>
-                            <ot-health-status value="section"></ot-health-status>
-                        </td>
-                        <td colspan="5">
-                            {{sectionName}} status
-                        </td>
-                    </tr>
-                    <!-- Section details -->
-                    <tr ng-repeat="(configName, config) in section" ng-if="sectionName != 'dataSource' && sectionName != 'db' && configName != 'status'">
-                        <td class="ot-health-status-span">
-                            &nbsp;
-                        </td>
-                        <td class="ot-health-status-span">
-                            &nbsp;
-                        </td>
-                        <td class="ot-health-status">
-                            <ot-health-status value="config"></ot-health-status>
-                        </td>
-                        <td>
-                            <b>{{configName}}</b>
-                        </td>
-                        <td>
-                            <a ng-click="showDetails(config)" ng-if="!config.error" ng-hide="config.detailsShown" class="ot-action">Details</a>
-                            <a ng-click="showError(config)" ng-if="config.error" ng-hide="config.errorShown" class="ot-action">Error</a>
-                            <p ng-show="config.errorShown">
-                                {{config.error}}
-                            </p>
-                            <p ng-show="config.detailsShown" ng-repeat="(detailName, detail) in config" ng-if="detailName != 'status' && detailName != 'detailsShown'">
-                                <b>{{detailName}}</b>:
-                                {{detail}}
-                            </p>
-                        </td>
-                    </tr>
+                <tbody ng-repeat="(sectionName, section) in health"
+                       ng-if="sectionName != '_self' && sectionName != 'status'">
+                <!-- Section status -->
+                <tr class="active">
+                    <td class="ot-health-status-span">
+                        &nbsp;
+                    </td>
+                    <td>
+                        <ot-health-status value="section"></ot-health-status>
+                    </td>
+                    <td colspan="5">
+                        {{sectionName}} status
+                    </td>
+                </tr>
+                <!-- Section details -->
+                <tr ng-repeat="(configName, config) in section"
+                    ng-if="sectionName != 'dataSource' && sectionName != 'db' && configName != 'status'">
+                    <td class="ot-health-status-span">
+                        &nbsp;
+                    </td>
+                    <td class="ot-health-status-span">
+                        &nbsp;
+                    </td>
+                    <td class="ot-health-status">
+                        <ot-health-status value="config"></ot-health-status>
+                    </td>
+                    <td>
+                        <b>{{configName}}</b>
+                    </td>
+                    <td>
+                        <a ng-click="showDetails(config)" ng-if="!config.error" ng-hide="config.detailsShown"
+                           class="ot-action">Details</a>
+                        <a ng-click="showError(config)" ng-if="config.error" ng-hide="config.errorShown"
+                           class="ot-action">Error</a>
+                        <p ng-show="config.errorShown">
+                            {{config.error}}
+                        </p>
+                        <p ng-show="config.detailsShown" ng-repeat="(detailName, detail) in config"
+                           ng-if="detailName != 'status' && detailName != 'detailsShown'">
+                            <b>{{detailName}}</b>:
+                            {{detail}}
+                        </p>
+                    </td>
+                </tr>
                 </tbody>
             </table>
         </div>
@@ -86,31 +91,109 @@
     <div class="row" ng-show="tab == 'jobs'">
         <div class="col-md-12">
 
-            <br/>
+            <div class="row">
+                <div class="col-md-12 form-inline">
 
-            <p class="ot-description">
-                List of registered jobs and their status.
-                <button class="btn btn-link pull-right" ng-show="!showDisabled" ng-click="showDisabled = true;">
-                    <span class="ot-command-show-disabled"></span>
-                    Show disabled jobs
-                </button>
-                <button class="btn btn-link pull-right" ng-show="showDisabled" ng-click="showDisabled = false;">
-                    <span class="ot-command-hide-disabled"></span>
-                    Hide disabled jobs
-                </button>
-                <input class="form-control col-md-3 pull-right" type="text" ng-model="jobFilter"
-                       placeholder="Filter the jobs"/>
-            </p>
+                    <p></p>
+
+                    <!-- Status filter -->
+                    <div class="form-group dropdown">
+                        <button type="button" class="btn btn-default dropdown-toggle form-control" data-toggle="dropdown">
+                            {{selectedJobStatus.name}}
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li ng-repeat="jobStatus in jobStatuses">
+                                <a class="ot-action" ng-click="setJobStatus(jobStatus)">{{jobStatus.name}}</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Category filter -->
+                    <div class="form-group dropdown">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                            {{selectedJobCategory.name}}
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li ng-repeat="jobCategory in jobCategories"><a class="ot-action" ng-click="setJobCategory(jobCategory)">{{jobCategory.name}}</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Type filter -->
+                    <div class="form-group dropdown">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                            {{selectedJobType.name}}
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a class="ot-action" ng-click="setJobType(defaultJobType)">{{defaultJobType.name}}</a></li>
+                            <li ng-repeat="type in selectedJobCategory.types"><a class="ot-action" ng-click="setJobType(type)">{{type.name}}</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Error filter -->
+                    <div class="form-group dropdown">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                            {{selectedJobError.name}}
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li ng-repeat="error in jobErrors"><a class="ot-action" ng-click="setJobError(error)">{{error.name}}</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Description filter (text box) -->
+                    <div class="form-group">
+                        <input class="form-control col-md-4" type="text" ng-model="jobDescription.value" placeholder="Description filter"/>
+                    </div>
+
+                    <!-- Menu -->
+                    <div class="form-group dropdown">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                            Actions
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a class="ot-action" ng-click="clearJobFilter()">
+                                <span class="fa fa-ban"></span>
+                                Clear filter
+                            </a></li>
+
+                            <li><a class="ot-action" ng-click="selectAllJobs()">
+                                <span class="fa fa-check-square-o"></span>
+                                Select all jobs
+                            </a></li>
+                            <li><a class="ot-action" ng-click="selectNoJob()">
+                                <span class="fa fa-square-o"></span>
+                                Clear job selection
+                            </a></li>
+
+                            <li><a class="ot-action" ng-click="pauseAllSelected()">
+                                <span class="fa fa-pause"></span>
+                                Pause all selected jobs
+                            </a></li>
+
+                            <li><a class="ot-action" ng-click="resumeAllSelected()">
+                                <span class="fa fa-refresh"></span>
+                                Resume all selected jobs
+                            </a></li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
 
             <table class="ot-admin-console-jobs" ng-if="jobs">
                 <thead>
                 <tr>
+                    <th>&nbsp;</th>
                     <th>ID</th>
                     <th>Category</th>
+                    <th>Type</th>
                     <th>Description</th>
-                    <th>Action</th>
                     <th>State</th>
-                    <th>Status</th>
+                    <th>Action</th>
                     <th>Schedule</th>
                     <th>Run count</th>
                     <th>Last duration</th>
@@ -121,49 +204,53 @@
                 </thead>
                 <tbody>
                 <tr ng-repeat="job in jobs.resources | filter:jobFilter"
-                    ng-show="showDisabled || !job.descriptor.disabled"
-                    ng-class="{'success': job.running, 'text-muted': job.descriptor.disabled}">
+                    class="ot-job ot-job-{{job.state.toLowerCase()}}">
+                    <td>
+                        <input type="checkbox" ng-model="jobSelection[job.id]" title="Select job: {{job.description}}" />
+                    </td>
                     <td>
                         {{job.id}}
                     </td>
                     <td>
-                        {{job.descriptor.category}}
+                        {{job.key.type.category.name}}
                     </td>
                     <td>
-                        <p>
-                            {{job.descriptor.description}}
-                        </p>
-
-                        <p class="ot-description" ng-if="job.info">
-                            <span class="fa fa-arrow-right"></span>
-                            {{job.info.message}}
-                        </p>
+                        {{job.key.type.name}}
+                    </td>
+                    <td>
+                        {{job.description}}
+                    </td>
+                    <td>
+                        <span ng-if="job.state == 'IDLE'" class="fa fa-cog fa-2x text-muted" title="Idle"></span>
+                        <span ng-if="job.state == 'RUNNING'" class="fa fa-cog fa-spin fa-2x text-success" title="Running"></span>
+                        <span ng-if="job.state == 'PAUSED'" class="fa fa-pause fa-2x text-info" title="Paused"></span>
+                        <span ng-if="job.state == 'DISABLED'" class="fa fa-ban fa-2x text-muted" title="Disabled"></span>
+                        <span ng-if="job.state == 'INVALID'" class="fa fa-trash fa-2x text-danger" title="Invalid - will be removed at next run"></span>
                     </td>
                     <td>
                         <span
                                 ng-if="job._launch"
-                                title="Launch {{job.descriptor.description}}"
+                                title="Launches this job immediately"
                                 ng-click="launchJob(job)"
-                                class="fa fa-play ot-command"></span>
+                                class="fa fa-play fa-2x ot-command"></span>
+                        <span
+                                ng-if="job._pause"
+                                title="Pauses this job - automatic schedule will be on hold"
+                                ng-click="pauseJob(job)"
+                                class="fa fa-pause fa-2x ot-command"></span>
+                        <span
+                                ng-if="job._resume"
+                                title="Resumes this job - automatic schedule will be restored"
+                                ng-click="resumeJob(job)"
+                                class="fa fa-refresh fa-2x ot-command"></span>
+                        <span
+                                ng-if="job._delete"
+                                title="Deletes this job"
+                                ng-click="deleteJob(job)"
+                                class="fa fa-trash fa-2x ot-command"></span>
                     </td>
                     <td>
-                        <span ng-if="job.descriptor.disabled">Disabled</span>
-                        <span ng-if="!job.descriptor.disabled">Enabled</span>
-                    </td>
-                    <td>
-                        <span class="fa fa-spinner fa-spin text-success" ng-if="job.running"></span>
-                        <span class="fa fa-spinner text-muted" ng-if="!job.running"></span>
-                    </td>
-                    <td>
-                            <span ng-if="job.descriptor.interval == 0">
-                                Manually
-                            </span>
-                            <span ng-if="job.descriptor.interval == 1">
-                                Every minute
-                            </span>
-                            <span ng-if="job.descriptor.interval > 1">
-                                Every {{job.descriptor.interval}} minutes
-                            </span>
+                        {{job.schedule.periodText}}
                     </td>
                     <td>
                         {{job.runCount}}
@@ -209,8 +296,8 @@
                 <tr>
                     <th>Level</th>
                     <th>Timestamp</th>
-                    <th>Source</th>
-                    <th>Identifier</th>
+                    <th>Type</th>
+                    <th>Information</th>
                     <th>Details</th>
                 </tr>
                 </thead>
@@ -224,10 +311,11 @@
                         {{log.timestamp | date:'mediumTime'}}
                     </td>
                     <td>
-                        {{log.source}}
+                        <code>{{log.type.name}}</code>
+                        {{log.type.description}}
                     </td>
                     <td>
-                        {{log.identifier}}
+                        {{log.information}}
                     </td>
                     <td>
                         <button class="btn btn-default btn-xs" ng-click="showLogDetails(log)">

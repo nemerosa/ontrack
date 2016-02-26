@@ -1,4 +1,4 @@
 dependencies {
     compile libraries.metrics_core
-    compile project(':ontrack-extension-metrics-support')
+    compile project(':ontrack-extension-support')
 }

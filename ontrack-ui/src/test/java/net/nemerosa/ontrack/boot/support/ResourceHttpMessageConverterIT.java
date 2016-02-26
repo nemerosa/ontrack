@@ -84,6 +84,7 @@ public class ResourceHttpMessageConverterIT extends AbstractServiceTestSupport {
                                         .with("_actions", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getActions:PROJECT,1")
                                         .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:PROJECT,1")
                                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:PROJECT,1,0,10")
+                                        .with("_page", "urn:test:#:entity:PROJECT:1")
                                         .end()
                         )
                         .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranch:1")
@@ -100,6 +101,7 @@ public class ResourceHttpMessageConverterIT extends AbstractServiceTestSupport {
                         .with("_buildFilterForms", "urn:test:net.nemerosa.ontrack.boot.ui.BuildFilterController#buildFilterForms:1")
                         .with("_buildFilterSave", "urn:test:net.nemerosa.ontrack.boot.ui.BuildFilterController#createFilter:1,")
                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:BRANCH,1,0,10")
+                        .with("_page", "urn:test:#:entity:BRANCH:1")
                         .end(),
                 node
         );

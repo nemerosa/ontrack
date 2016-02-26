@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/html" ng-app="ontrack" ng-controller="AppCtrl">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="utf-8">
     <title>ontrack</title>
@@ -12,7 +12,7 @@
     <!-- endinject -->
 
 </head>
-<body>
+<body ng-cloak ng-controller="AppCtrl">
 
 <div>
 
@@ -113,9 +113,39 @@
         </div>
     </div>
 
+    <!-- Loading mask -->
+
+    <div id="ontrack-loading" class="container-fluid" ng-show="!appReady && !appLoadingError">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert alert-info">
+                    <span class="ot-loading-indicator"></span>
+                    Ontrack is loading its components and will be available shortly...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading error -->
+
+    <div id="ontrack-loading-error" class="container-fluid" ng-show="appLoadingError">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert alert-danger">
+                    <p>
+                        Ontrack application could not be loaded.
+                    </p>
+                    <p>
+                        <code>{{appLoadingError}}</code>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- View container -->
 
-    <div id="ontrack-view" ui-view>
+    <div id="ontrack-view" ng-show="appReady" ui-view>
     </div>
 
     <!-- Footer and version information -->

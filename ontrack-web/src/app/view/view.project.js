@@ -144,6 +144,7 @@ angular.module('ot.view.project', [
                         }
                     },
                     ot.viewApiCommand($scope.project._self),
+                    ot.viewActionsCommand($scope.project._actions),
                     ot.viewCloseCommand('/home')
                 ];
             });

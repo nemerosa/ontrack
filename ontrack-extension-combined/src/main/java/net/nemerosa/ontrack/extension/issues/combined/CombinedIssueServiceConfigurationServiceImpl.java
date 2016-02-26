@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.issues.combined;
 
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
-import net.nemerosa.ontrack.extension.support.ConfigurationNotFoundException;
+import net.nemerosa.ontrack.model.support.ConfigurationNotFoundException;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
