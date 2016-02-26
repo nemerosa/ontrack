@@ -319,6 +319,8 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-docker-push") {
     wrappers {
         injectPasswords()
     }
+    // Extracts the version information
+    extractDeliveryArtifacts delegate
     steps {
         shell """\
 docker login --email="damien.coraboeuf+nemerosa@gmail.com" --username="nemerosa" --password="\${DOCKER_PASSWORD}"
@@ -405,7 +407,6 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-publish") {
 --info
 --profile
 --stacktrace
--Ppublication
 -PontrackVersion=\${VERSION_DISPLAY}
 -PontrackVersionCommit=\${VERSION_COMMIT}
 -PontrackVersionFull=\${VERSION_FULL}
@@ -418,7 +419,6 @@ publicationRelease
 --info
 --profile
 --stacktrace
--Ppublication
 -PontrackVersion=\${VERSION_DISPLAY}
 -PontrackVersionCommit=\${VERSION_COMMIT}
 -PontrackVersionFull=\${VERSION_FULL}
@@ -456,7 +456,7 @@ docker logout
             log()
             script """\
 ontrack.build('${SEED_PROJECT}', '${SEED_BRANCH}', VERSION_DISPLAY).config {
-label VERSION_DISPLAY
+    label VERSION_DISPLAY
 }
 """
         }
@@ -488,7 +488,6 @@ if (release) {
 --build-file production.gradle
 --info
 --profile
--Ppublication
 productionUpgrade
 -PontrackVersion=${VERSION_DISPLAY}
 '''
@@ -528,7 +527,6 @@ productionUpgrade
 --build-file production.gradle
 --info
 --profile
--Ppublication
 productionTest
 -PacceptanceJar=ontrack-acceptance.jar
 '''
