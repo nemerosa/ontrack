@@ -269,7 +269,7 @@ debAcceptanceTest
 
     // CentOS package acceptance job
 
-    centOsVersions.each { centOsVersion ->
+    centOsVersions.each { String centOsVersion ->
         job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-centos-${centOsVersion}") {
             logRotator {
                 numToKeep(40)
