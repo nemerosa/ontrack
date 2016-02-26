@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.acceptance
 import net.nemerosa.ontrack.acceptance.browser.pages.BranchPage
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import org.junit.Test
+import org.openqa.selenium.By
 
 import static net.nemerosa.ontrack.acceptance.browser.Browser.browser
 import static net.nemerosa.ontrack.acceptance.steps.BasicSteps.loginAsAdmin
@@ -69,12 +70,17 @@ class ACCBrowserBigBranchView extends AcceptanceTestClient {
             loginAsAdmin(browser)
             // Goes to the branch page
             BranchPage branchPage = goTo(BranchPage, [id: branch.id])
+            long start = System.currentTimeMillis()
             // BP
             println branchPage
             // Screenshot before loading
             browser.screenshot 'big-branch-loading'
-            // TODO Sync with display of one validation run
-            // TODO Timing of the load
+            // Sync with display of one validation run (img.ot-validation-run-status)
+            browser.findElement(By.cssSelector('img.ot-validation-run-status'))
+            // Timing of the load
+            long end = System.currentTimeMillis()
+            long duration = (end - start)
+            println "Duration = ${duration} ms"
             // Screenshot after loading of view
             browser.screenshot 'big-branch-loaded'
         }
