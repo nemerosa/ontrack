@@ -71,10 +71,12 @@ class ACCBrowserBigBranchView extends AcceptanceTestClient {
             BranchPage branchPage = goTo(BranchPage, [id: branch.id])
             // BP
             println branchPage
-            // TODO Screenshot before loading
+            // Screenshot before loading
+            browser.screenshot 'big-branch-loading'
             // TODO Sync with display of one validation run
             // TODO Timing of the load
-            // TODO Screenshot after loading of view
+            // Screenshot after loading of view
+            browser.screenshot 'big-branch-loaded'
         }
 
     }
