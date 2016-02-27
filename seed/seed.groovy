@@ -362,12 +362,11 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
     extractDeliveryArtifacts delegate, 'ontrack-acceptance'
     steps {
         // Runs the CI acceptance tests
-        shell '''\
-./gradlew \\
-    doAcceptanceTest \\
-    -PacceptanceJar=ontrack-acceptance.jar \\
-    -PdigitalOceanAccessToken=${DO_TOKEN} \\
-    -PontrackVersion=${VERSION}
+        gradle '''\
+doAcceptanceTest
+-PacceptanceJar=ontrack-acceptance.jar
+-PdigitalOceanAccessToken=${DO_TOKEN}
+-PontrackVersion=${VERSION}
 '''
     }
     publishers {
@@ -377,7 +376,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
                 currentBuild()
             }
         }
-        ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_BUILD}', 'ACCEPTANCE.DO'
+        ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'ACCEPTANCE.DO'
     }
 }
 
