@@ -256,7 +256,7 @@ if (release) {
             // Runs the CI acceptance tests
             gradle """\
 debAcceptanceTest
--PacceptanceJar=ontrack-acceptance.jar
+-PacceptanceJar=ontrack-acceptance-\${VERSION}.jar
 -PacceptanceDebianDistributionDir=.
 """
         }
@@ -289,7 +289,7 @@ debAcceptanceTest
                 // Runs the CI acceptance tests
                 gradle """\
 rpmAcceptanceTest${centOsVersion}
--PacceptanceJar=ontrack-acceptance.jar
+-PacceptanceJar=ontrack-acceptance-\${VERSION}.jar
 -PacceptanceRpmDistributionDir=.
 """
             }
@@ -364,7 +364,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
         // Runs the CI acceptance tests
         gradle '''\
 doAcceptanceTest
--PacceptanceJar=ontrack-acceptance.jar
+-PacceptanceJar=ontrack-acceptance-${VERSION}.jar
 -PdigitalOceanAccessToken=${DO_TOKEN}
 -PontrackVersion=${VERSION}
 '''
@@ -527,7 +527,7 @@ productionUpgrade
 --info
 --profile
 productionTest
--PacceptanceJar=ontrack-acceptance.jar
+-PacceptanceJar=ontrack-acceptance-${VERSION}.jar
 '''
         }
         publishers {
