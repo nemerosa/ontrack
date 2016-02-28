@@ -84,10 +84,10 @@ fi
         environmentVariables {
             propertiesFile 'ontrack.properties'
         }
+        // Extracting the publication archive
+        shell 'unzip ontrack-publication.zip -d publication'
         // Extraction of modules
-        if (modules && modules.length > 0) {
-            // Extracting the publication archive
-            shell 'unzip ontrack-publication.zip -d publication'
+        if (extract) {
             // Moves the artifacts
             shell """${modules.collect{ "mv publication/${it}-\${VERSION}.jar ." }.join('\n')}"""
         }

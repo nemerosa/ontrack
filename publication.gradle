@@ -38,10 +38,10 @@ println "Modules = ${modules}"
 
 artifacts {
     modules.each { module ->
-        archives file: file("${module}-${ontrackVersionFull}.pom"), name: module, extension: 'pom'
-        archives file: file("${module}-${ontrackVersionFull}.jar"), name: module
-        archives file: file("${module}-${ontrackVersionFull}-sources.jar"), name: module, classifier: 'sources'
-        archives file: file("${module}-${ontrackVersionFull}-javadoc.jar"), name: module, classifier: 'javadoc'
+        archives file: file("publication/${module}-${ontrackVersionFull}.pom"), name: module, extension: 'pom'
+        archives file: file("publication/${module}-${ontrackVersionFull}.jar"), name: module
+        archives file: file("publication/${module}-${ontrackVersionFull}-sources.jar"), name: module, classifier: 'sources'
+        archives file: file("publication/${module}-${ontrackVersionFull}-javadoc.jar"), name: module, classifier: 'javadoc'
     }
 }
 
