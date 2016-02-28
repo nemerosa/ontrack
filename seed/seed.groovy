@@ -87,7 +87,7 @@ fi
         // Extracting the publication archive
         shell 'unzip ontrack-publication.zip -d publication'
         // Extraction of modules
-        if (extract) {
+        if (modules && modules.length > 0) {
             // Moves the artifacts
             shell """${modules.collect{ "mv publication/${it}-\${VERSION}.jar ." }.join('\n')}"""
         }
