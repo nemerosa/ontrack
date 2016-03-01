@@ -95,7 +95,7 @@ fi
 }
 
 // CentOS versions to tests
-def centOsVersions = [
+List<String> centOsVersions = [
         '7',
         '6',
 ]

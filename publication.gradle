@@ -55,6 +55,12 @@ uploadArchives {
             repository(url: ossrhUrl) {
                 authentication(userName: ossrhUser, password: ossrhPassword)
             }
+            modules.each { module ->
+                addFilter(module) { artifact, file ->
+                    artifact.name == module
+                }
+                pom(module).artifactId = module
+            }
         }
     }
 }
