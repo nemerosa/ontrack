@@ -15,6 +15,12 @@ class OntrackExtensionPlugin implements Plugin<Project> {
         println "[ontrack] Applying Ontrack plugin to ${project.path}"
 
         /**
+         * Java project
+         */
+
+        project.apply plugin: 'java'
+
+        /**
          * Project's configuration
          */
 
