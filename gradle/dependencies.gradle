@@ -13,10 +13,10 @@ allprojects {
  */
 
 def springBootVersion = '1.3.3.RELEASE'
-def springVersion = '4.2.3.RELEASE'
+def springVersion = '4.2.5.RELEASE'
 def springSecurityVersion = '4.0.3.RELEASE'
 def httpClientVersion = '4.5.1'
-def slf4jVersion = '1.7.13'
+def slf4jVersion = '1.7.16'
 def metricsVersion = '3.1.2'
 
 /**
@@ -62,7 +62,7 @@ ext {
             http_mime                   : "org.apache.httpcomponents:httpmime:${httpClientVersion}",
 
             // Groovy
-            groovy                      : 'org.codehaus.groovy:groovy-all:2.4.4',
+            groovy                      : 'org.codehaus.groovy:groovy-all:2.4.6',
             groovy_sandbox              : 'org.kohsuke:groovy-sandbox:1.7',
 
             // Logging
