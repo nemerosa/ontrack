@@ -7,7 +7,7 @@ target
 work
 .DS_Store
 build
-/.gradle
+.gradle
 *.txt
 *.pid
 /*-tests.xml
