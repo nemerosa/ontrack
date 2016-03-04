@@ -102,7 +102,7 @@ public class StashController extends AbstractExtensionController<StashExtensionF
     /**
      * Gets one configuration
      */
-    @RequestMapping(value = "configurations/{name}", method = RequestMethod.GET)
+    @RequestMapping(value = "configurations/{name:.*}", method = RequestMethod.GET)
     public StashConfiguration getConfiguration(@PathVariable String name) {
         return configurationService.getConfiguration(name);
     }
@@ -110,7 +110,7 @@ public class StashController extends AbstractExtensionController<StashExtensionF
     /**
      * Deleting one configuration
      */
-    @RequestMapping(value = "configurations/{name}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "configurations/{name:.*}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Ack deleteConfiguration(@PathVariable String name) {
         configurationService.deleteConfiguration(name);
@@ -120,7 +120,7 @@ public class StashController extends AbstractExtensionController<StashExtensionF
     /**
      * Update form
      */
-    @RequestMapping(value = "configurations/{name}/update", method = RequestMethod.GET)
+    @RequestMapping(value = "configurations/{name:.*}/update", method = RequestMethod.GET)
     public Form updateConfigurationForm(@PathVariable String name) {
         return configurationService.getConfiguration(name).asForm(issueServiceRegistry.getAvailableIssueServiceConfigurations());
     }
@@ -128,7 +128,7 @@ public class StashController extends AbstractExtensionController<StashExtensionF
     /**
      * Updating one configuration
      */
-    @RequestMapping(value = "configurations/{name}/update", method = RequestMethod.PUT)
+    @RequestMapping(value = "configurations/{name:.*}/update", method = RequestMethod.PUT)
     public StashConfiguration updateConfiguration(@PathVariable String name, @RequestBody StashConfiguration configuration) {
         configurationService.updateConfiguration(name, configuration);
         return getConfiguration(name);

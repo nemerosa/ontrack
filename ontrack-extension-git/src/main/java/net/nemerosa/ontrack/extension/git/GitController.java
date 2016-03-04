@@ -143,7 +143,7 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
     /**
      * Gets one configuration
      */
-    @RequestMapping(value = "configurations/{name}", method = RequestMethod.GET)
+    @RequestMapping(value = "configurations/{name:.*}", method = RequestMethod.GET)
     public BasicGitConfiguration getConfiguration(@PathVariable String name) {
         return configurationService.getConfiguration(name);
     }
@@ -151,7 +151,7 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
     /**
      * Deleting one configuration
      */
-    @RequestMapping(value = "configurations/{name}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "configurations/{name:.*}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Ack deleteConfiguration(@PathVariable String name) {
         configurationService.deleteConfiguration(name);
@@ -161,7 +161,7 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
     /**
      * Update form
      */
-    @RequestMapping(value = "configurations/{name}/update", method = RequestMethod.GET)
+    @RequestMapping(value = "configurations/{name:.*}/update", method = RequestMethod.GET)
     public Form updateConfigurationForm(@PathVariable String name) {
         return configurationService.getConfiguration(name).asForm(issueServiceRegistry.getAvailableIssueServiceConfigurations());
     }
@@ -169,7 +169,7 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
     /**
      * Updating one configuration
      */
-    @RequestMapping(value = "configurations/{name}/update", method = RequestMethod.PUT)
+    @RequestMapping(value = "configurations/{name:.*}/update", method = RequestMethod.PUT)
     public BasicGitConfiguration updateConfiguration(@PathVariable String name, @RequestBody BasicGitConfiguration configuration) {
         configurationService.updateConfiguration(name, configuration);
         return getConfiguration(name);

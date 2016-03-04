@@ -145,7 +145,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     /**
      * Gets one configuration
      */
-    @RequestMapping(value = "configurations/{name}", method = RequestMethod.GET)
+    @RequestMapping(value = "configurations/{name:.*}", method = RequestMethod.GET)
     public SVNConfiguration getConfiguration(@PathVariable String name) {
         return svnConfigurationService.getConfiguration(name);
     }
@@ -153,7 +153,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     /**
      * Gets the last revision for a configuration
      */
-    @RequestMapping(value = "configurations/{name}/indexation", method = RequestMethod.GET)
+    @RequestMapping(value = "configurations/{name:.*}/indexation", method = RequestMethod.GET)
     @ResponseBody
     public LastRevisionInfo getLastRevisionInfo(@PathVariable String name) {
         return indexationService.getLastRevisionInfo(name);
@@ -162,7 +162,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     /**
      * Indexation from latest
      */
-    @RequestMapping(value = "configurations/{name}/indexation/latest", method = RequestMethod.POST)
+    @RequestMapping(value = "configurations/{name:.*}/indexation/latest", method = RequestMethod.POST)
     @ResponseBody
     public Ack indexFromLatest(@PathVariable String name) {
         return indexationService.indexFromLatest(name);
@@ -171,7 +171,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     /**
      * Indexation of a range (form)
      */
-    @RequestMapping(value = "configurations/{name}/indexation/range", method = RequestMethod.GET)
+    @RequestMapping(value = "configurations/{name:.*}/indexation/range", method = RequestMethod.GET)
     @ResponseBody
     public Form indexRange(@PathVariable String name) {
         // Gets the latest revision info
@@ -196,7 +196,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     /**
      * Indexation of a range
      */
-    @RequestMapping(value = "configurations/{name}/indexation/range", method = RequestMethod.POST)
+    @RequestMapping(value = "configurations/{name:.*}/indexation/range", method = RequestMethod.POST)
     @ResponseBody
     public Ack indexRange(@PathVariable String name, @RequestBody IndexationRange range) {
         return indexationService.indexRange(name, range);
@@ -205,7 +205,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     /**
      * Full indexation
      */
-    @RequestMapping(value = "configurations/{name}/indexation/full", method = RequestMethod.POST)
+    @RequestMapping(value = "configurations/{name:.*}/indexation/full", method = RequestMethod.POST)
     @ResponseBody
     public Ack full(@PathVariable String name) {
         return indexationService.reindex(name);
@@ -214,7 +214,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     /**
      * Deleting one configuration
      */
-    @RequestMapping(value = "configurations/{name}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "configurations/{name:.*}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Ack deleteConfiguration(@PathVariable String name) {
         svnConfigurationService.deleteConfiguration(name);
@@ -224,7 +224,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     /**
      * Update form
      */
-    @RequestMapping(value = "configurations/{name}/update", method = RequestMethod.GET)
+    @RequestMapping(value = "configurations/{name:.*}/update", method = RequestMethod.GET)
     public Form updateConfigurationForm(@PathVariable String name) {
         return svnConfigurationService.getConfiguration(name).asForm(issueServiceRegistry.getAvailableIssueServiceConfigurations());
     }
@@ -232,7 +232,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     /**
      * Updating one configuration
      */
-    @RequestMapping(value = "configurations/{name}/update", method = RequestMethod.PUT)
+    @RequestMapping(value = "configurations/{name:.*}/update", method = RequestMethod.PUT)
     public SVNConfiguration updateConfiguration(@PathVariable String name, @RequestBody SVNConfiguration configuration) {
         svnConfigurationService.updateConfiguration(name, configuration);
         return getConfiguration(name);
@@ -390,7 +390,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     /**
      * Gets the summary for an issue in a repository
      */
-    @RequestMapping(value = "configuration/{configuration}/issue/{key}", method = RequestMethod.GET)
+    @RequestMapping(value = "configuration/{configuration:.*}/issue/{key}", method = RequestMethod.GET)
     public Resource<OntrackSVNIssueInfo> issueInfo(@PathVariable String configuration, @PathVariable String key) {
         return Resource.of(
                 svnInfoService.getIssueInfo(configuration, key),
@@ -401,7 +401,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     /**
      * Gets the summary for a revision in a repository
      */
-    @RequestMapping(value = "configuration/{configuration}/revision/{revision}", method = RequestMethod.GET)
+    @RequestMapping(value = "configuration/{configuration:.*}/revision/{revision}", method = RequestMethod.GET)
     public Resource<OntrackSVNRevisionInfo> revisionInfo(@PathVariable String configuration, @PathVariable long revision) {
         return Resource.of(
                 svnInfoService.getOntrackRevisionInfo(
