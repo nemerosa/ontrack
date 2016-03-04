@@ -98,7 +98,11 @@
 
                     <!-- Status filter -->
                     <div class="form-group dropdown">
-                        <button type="button" class="btn btn-default dropdown-toggle form-control" data-toggle="dropdown">
+                        <button type="button" class="btn dropdown-toggle" data-toggle="dropdown"
+                                ng-class="{
+                                    'btn-info': selectedJobStatus.id != '',
+                                    'btn-default': selectedJobStatus.id == ''
+                                    }">
                             {{selectedJobStatus.name}}
                             <span class="caret"></span>
                         </button>
@@ -111,7 +115,11 @@
 
                     <!-- Category filter -->
                     <div class="form-group dropdown">
-                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                        <button type="button" class="btn dropdown-toggle" data-toggle="dropdown"
+                                ng-class="{
+                                    'btn-info': selectedJobCategory.id != '',
+                                    'btn-default': selectedJobCategory.id == ''
+                                    }">
                             {{selectedJobCategory.name}}
                             <span class="caret"></span>
                         </button>
@@ -122,7 +130,11 @@
 
                     <!-- Type filter -->
                     <div class="form-group dropdown">
-                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                        <button type="button" class="btn dropdown-toggle" data-toggle="dropdown"
+                                ng-class="{
+                                    'btn-info': selectedJobType.id != '',
+                                    'btn-default': selectedJobType.id == ''
+                                    }">
                             {{selectedJobType.name}}
                             <span class="caret"></span>
                         </button>
@@ -134,7 +146,11 @@
 
                     <!-- Error filter -->
                     <div class="form-group dropdown">
-                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                        <button type="button" class="btn dropdown-toggle" data-toggle="dropdown"
+                                ng-class="{
+                                    'btn-info': selectedJobError.check,
+                                    'btn-default': !selectedJobError.check
+                                    }">
                             {{selectedJobError.name}}
                             <span class="caret"></span>
                         </button>
@@ -145,7 +161,10 @@
 
                     <!-- Description filter (text box) -->
                     <div class="form-group">
-                        <input class="form-control col-md-4" type="text" ng-model="jobDescription.value" placeholder="Description filter"/>
+                        <input class="form-control col-md-4" type="text" ng-model="jobDescription.value" placeholder="Description filter"
+                               ng-class="{
+                                'bg-info': jobDescription.value
+                               }"/>
                     </div>
 
                     <!-- Menu -->
