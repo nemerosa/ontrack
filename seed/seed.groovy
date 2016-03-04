@@ -263,7 +263,7 @@ rpmAcceptanceTest${centOsVersion}
             }
             publishers {
                 archiveJunit('*-tests.xml')
-                ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_BUILD}', "ACCEPTANCE.CENTOS.${centOsVersion}"
+                ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_BUILD}', "ACCEPTANCE.CENTOS.${centOsVersion}" as String
             }
         }
     }
