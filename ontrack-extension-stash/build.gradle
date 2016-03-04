@@ -6,10 +6,8 @@ dependencies {
     compile project(':ontrack-extension-git')
 
     testCompile project(':ontrack-test-utils')
-
     testCompile project(':ontrack-it-utils')
-    testCompile libraries.groovy
+    testCompile libraries.spring_boot_starter_actuator
     testRuntime project(':ontrack-service')
     testRuntime project(':ontrack-repository-impl')
-    testRuntime libraries.spring_boot_starter_web
 }
