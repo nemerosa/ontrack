@@ -4,6 +4,7 @@ import com.moowork.gradle.node.task.NodeTask
 import com.moowork.gradle.node.task.NpmTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.tasks.JavaExec
 
 /**
  * Plugin to create, manage, package and test an Ontrack extension.
@@ -12,13 +13,38 @@ class OntrackExtensionPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        println "[ontrack] Applying Ontrack plugin to ${project.path}"
+
+        /**
+         * Reading the version information
+         */
+
+        Properties properties = new Properties()
+        getClass().getResourceAsStream('/META-INF/gradle-plugins/ontrack.properties').withStream { properties.load(it) }
+        String version = properties.getProperty('implementation-version')
+
+        println "[ontrack] Applying Ontrack plugin v${version} to ${project.path}"
 
         /**
          * Java project
          */
 
         project.apply plugin: 'java'
+
+        /**
+         * Default dependencies
+         */
+
+        project.configurations {
+            ontrack {
+                extendsFrom runtime
+            }
+        }
+
+        project.dependencies {
+            compile "net.nemerosa.ontrack:ontrack-extension-support:${version}"
+
+            ontrack "net.nemerosa.ontrack:ontrack-ui:${version}"
+        }
 
         /**
          * Project's configuration
@@ -178,5 +204,15 @@ version = ${project.version}
             layout = 'MODULE'
             customConfiguration = 'moduleDependencies'
         }
+
+        /**
+         * Running the extension in Ontrack
+         */
+
+        project.tasks.create('ontrackRun', JavaExec) {
+            classpath = project.configurations.ontrack + project.sourceSets.main.runtimeClasspath
+            main = 'net.nemerosa.ontrack.boot.Application'
+        }
+
     }
 }

@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 description "Gradle plugin to create an Ontrack extension."
 
 apply plugin: 'groovy'
@@ -15,4 +17,8 @@ dependencies {
 javadocJar {
     from javadoc
     from groovydoc
+}
+
+processResources {
+    filter(ReplaceTokens, tokens: [version: project.version])
 }
