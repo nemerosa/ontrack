@@ -103,7 +103,8 @@
                     <th>Name</th>
                     <th>Description</th>
                     <th>Version</th>
-                    <th>Options</th>
+                    <th>GUI</th>
+                    <th>Dependencies</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -114,6 +115,8 @@
                     <td>{{extension.version}}</td>
                     <td>
                         <span class="label label-info" ng-if="extension.options.gui">GUI</span>
+                    </td>
+                    <td>
                         <span class="label label-success" ng-repeat="dependency in extension.options.dependencies">{{dependency}}</span>
                     </td>
                 </tr>
