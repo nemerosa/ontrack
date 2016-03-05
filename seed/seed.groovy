@@ -295,8 +295,7 @@ rpmAcceptanceTest${centOsVersion}
             }
             publishers {
                 archiveJunit('*-tests.xml')
-                // Use display version
-                ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', "ACCEPTANCE.CENTOS.${centOsVersion}"
+                ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', "ACCEPTANCE.CENTOS.${centOsVersion}" as String
             }
         }
     }

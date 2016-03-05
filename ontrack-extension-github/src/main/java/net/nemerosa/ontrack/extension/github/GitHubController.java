@@ -117,7 +117,7 @@ public class GitHubController extends AbstractExtensionController<GitHubExtensio
     /**
      * Update form
      */
-    @RequestMapping(value = "configurations/{name}/update", method = RequestMethod.GET)
+    @RequestMapping(value = "configurations/{name:.*}/update", method = RequestMethod.GET)
     public Form updateConfigurationForm(@PathVariable String name) {
         return configurationService.getConfiguration(name).asForm();
     }
@@ -125,7 +125,7 @@ public class GitHubController extends AbstractExtensionController<GitHubExtensio
     /**
      * Updating one configuration
      */
-    @RequestMapping(value = "configurations/{name}/update", method = RequestMethod.PUT)
+    @RequestMapping(value = "configurations/{name:.*}/update", method = RequestMethod.PUT)
     public GitHubEngineConfiguration updateConfiguration(@PathVariable String name, @RequestBody GitHubEngineConfiguration configuration) {
         configurationService.updateConfiguration(name, configuration);
         return getConfiguration(name);
