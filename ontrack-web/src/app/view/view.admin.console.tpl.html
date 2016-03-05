@@ -6,6 +6,8 @@
                 <li role="presentation" ng-class="{'active':(!tab || tab == 'status')}"><a role="tab"
                                                                                            ng-click="tab = 'status'">Status</a>
                 </li>
+                <li role="presentation" ng-class="{'active': tab == 'extensions'}"><a role="tab"
+                                                                                ng-click="tab = 'extensions'">Extensions</a></li>
                 <li role="presentation" ng-class="{'active': tab == 'jobs'}"><a role="tab"
                                                                                 ng-click="tab = 'jobs'">Jobs</a></li>
                 <li role="presentation" ng-class="{'active': tab == 'log'}"><a role="tab" ng-click="tab = 'log'">Log</a>
@@ -80,6 +82,39 @@
                             <b>{{detailName}}</b>:
                             {{detail}}
                         </p>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row" ng-show="tab == 'extensions'">
+        <div class="col-md-12">
+            <br/>
+            <div class="alert alert-info" ng-hide="extensions">
+                <span class="ot-loading-indicator"></span>
+                Loading the extension list...
+            </div>
+            <table class="table table-hover table-bordered" ng-show="extensions">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Version</th>
+                    <th>Options</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="extension in extensions.extensions">
+                    <td><code>{{extension.id}}</code></td>
+                    <td>{{extension.name}}</td>
+                    <td>{{extension.description}}</td>
+                    <td>{{extension.version}}</td>
+                    <td>
+                        <span class="label label-info" ng-if="extension.options.gui">GUI</span>
+                        <span class="label label-success" ng-repeat="dependency in extension.options.dependencies">{{dependency}}</span>
                     </td>
                 </tr>
                 </tbody>

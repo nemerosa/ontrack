@@ -22,6 +22,13 @@ angular.module('ot.view.admin.console', [
             });
         }
 
+        // Loads the extensions
+        function loadExtensions() {
+            ot.call($http.get('extensions')).then(function (extensions) {
+                $scope.extensions = extensions;
+            });
+        }
+
         // Job selections
         // We cannot use a flag at job item level since the list of jobs
         // is refreshed every 30 seconds
@@ -105,6 +112,7 @@ angular.module('ot.view.admin.console', [
         loadJobs();
         loadLogs();
         loadHealth();
+        loadExtensions();
 
         var interval = 10 * 1000; // 10 seconds
         otTaskService.register('Admin Console Load Jobs', loadJobs, interval);
