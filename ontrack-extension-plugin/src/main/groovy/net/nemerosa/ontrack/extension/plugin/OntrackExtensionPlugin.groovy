@@ -212,6 +212,8 @@ version = ${project.version}
         project.tasks.create('ontrackRun', JavaExec) {
             classpath = project.configurations.ontrack + project.sourceSets.main.runtimeClasspath
             main = 'net.nemerosa.ontrack.boot.Application'
+            // Local database
+            args '--spring.datasource.url=jdbc:h2:./work/ontrack/db/data;MODE=MYSQL;DB_CLOSE_ON_EXIT=FALSE;DEFRAG_ALWAYS=TRUE'
         }
 
     }
