@@ -11,6 +11,18 @@ class OntrackExtension {
     static final String PREFIX = 'ontrack-extension-'
 
     /**
+     * Linked project
+     */
+    private final Project project
+
+    /**
+     * Constructor
+     */
+    OntrackExtension(Project project) {
+        this.project = project
+    }
+
+    /**
      * ID of the extension (required)
      */
     String id
@@ -25,7 +37,7 @@ class OntrackExtension {
     /**
      * Dynamic computation of the ID if not specified
      */
-    String id(Project project) {
+    String id() {
         if (this.id) {
             return id
         } else if (project.name.startsWith(PREFIX)) {
@@ -43,5 +55,14 @@ ontrack {
         }
     }
 
+    /**
+     * Registers an ontrack core extension
+     */
+    void uses(String extension) {
+        def version = project.ontrackVersion as String
+        project.dependencies {
+            compile "net.nemerosa.ontrack:ontrack-extension-${extension}:${version}"
+        }
+    }
 
 }

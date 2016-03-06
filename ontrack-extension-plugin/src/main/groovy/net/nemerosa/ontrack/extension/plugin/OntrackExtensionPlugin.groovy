@@ -20,9 +20,10 @@ class OntrackExtensionPlugin implements Plugin<Project> {
 
         Properties properties = new Properties()
         getClass().getResourceAsStream('/META-INF/gradle-plugins/ontrack.properties').withStream { properties.load(it) }
-        String version = properties.getProperty('implementation-version')
+        String ontrackVersion = properties.getProperty('implementation-version')
+        project.ext.ontrackVersion = ontrackVersion
 
-        println "[ontrack] Applying Ontrack plugin v${version} to ${project.path}"
+        println "[ontrack] Applying Ontrack plugin v${ontrackVersion} to ${project.path}"
 
         /**
          * Java project
@@ -41,16 +42,16 @@ class OntrackExtensionPlugin implements Plugin<Project> {
         }
 
         project.dependencies {
-            compile "net.nemerosa.ontrack:ontrack-extension-support:${version}"
+            compile "net.nemerosa.ontrack:ontrack-extension-support:${ontrackVersion}"
 
-            ontrack "net.nemerosa.ontrack:ontrack-ui:${version}"
+            ontrack "net.nemerosa.ontrack:ontrack-ui:${ontrackVersion}"
         }
 
         /**
          * Project's configuration
          */
 
-        project.extensions.create('ontrack', OntrackExtension)
+        project.extensions.create('ontrack', OntrackExtension, project)
 
         /**
          * NPM setup
@@ -58,7 +59,7 @@ class OntrackExtensionPlugin implements Plugin<Project> {
 
         project.apply plugin: 'com.moowork.node'
         project.node {
-            version = '4.2.2'
+            ontrackVersion = '4.2.2'
             npmVersion = '4.2.2'
             download = true
         }
@@ -129,14 +130,14 @@ class OntrackExtensionPlugin implements Plugin<Project> {
 
             doFirst {
                 project.mkdir project.buildDir
-                println "[ontrack] Generating web resources of ${project.extensions.ontrack.id(project)} in ${project.buildDir}"
+                println "[ontrack] Generating web resources of ${project.extensions.ontrack.id()} in ${project.buildDir}"
             }
 
             workingDir = new File(project.ontrackCacheDir as String)
             script = new File(new File(project.ontrackCacheDir as String, 'node_modules'), 'gulp/bin/gulp')
             args = [
                     'default',
-                    '--extension', project.extensions.ontrack.id(project),
+                    '--extension', project.extensions.ontrack.id(),
                     '--version', project.version,
                     '--src', project.file('src/main/resources/static'),
                     '--target', project.buildDir
@@ -165,12 +166,12 @@ version = ${project.version}
             dependsOn 'web'
             dependsOn 'ontrackProperties'
             from('build/web/dist') {
-                into { "static/extension/${project.extensions.ontrack.id(project)}/${project.version}/" }
+                into { "static/extension/${project.extensions.ontrack.id()}/${project.version}/" }
             }
             from('build') {
                 include 'ontrack.properties'
                 into "META-INF/ontrack/extension/"
-                rename { "${project.extensions.ontrack.id(project)}.properties" }
+                rename { "${project.extensions.ontrack.id()}.properties" }
             }
             exclude 'static/**/*.js'
             exclude 'static/**/*.html'
