@@ -23,7 +23,7 @@ class OntrackExtensionPlugin implements Plugin<Project> {
         String ontrackVersion = properties.getProperty('implementation-version')
         project.ext.ontrackVersion = ontrackVersion
 
-        println "[ontrack] Applying Ontrack plugin v${ontrackVersion} to ${project.path}"
+        println "[ontrack] Applying Ontrack plugin v${ontrackVersion} to ${project.name}"
 
         /**
          * Java project
@@ -59,7 +59,7 @@ class OntrackExtensionPlugin implements Plugin<Project> {
 
         project.apply plugin: 'com.moowork.node'
         project.node {
-            ontrackVersion = '4.2.2'
+            version = '4.2.2'
             npmVersion = '4.2.2'
             download = true
         }
