@@ -10,7 +10,7 @@ import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class StandardBuildFilterData implements StandardFilterDataBuilder {
+public class StandardBuildFilterData implements StandardFilterDataBuilder<StandardBuildFilterData> {
 
     private final int count;
     @Wither

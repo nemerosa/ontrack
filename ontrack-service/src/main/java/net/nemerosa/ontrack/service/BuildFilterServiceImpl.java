@@ -51,77 +51,95 @@ public class BuildFilterServiceImpl implements BuildFilterService {
         return DefaultBuildFilter.INSTANCE;
     }
 
+    public class DefaultStandardFilterBuilder implements StandardFilterBuilder {
+
+        private StandardBuildFilterData data;
+
+        public DefaultStandardFilterBuilder(int count) {
+            data = StandardBuildFilterData.of(count);
+        }
+
+        @Override
+        public BuildFilter build() {
+            return new StandardBuildFilter(data, propertyService);
+        }
+
+        @Override
+        public StandardFilterBuilder withSincePromotionLevel(String sincePromotionLevel) {
+            data = data.withSincePromotionLevel(sincePromotionLevel);
+            return this;
+        }
+
+        @Override
+        public StandardFilterBuilder withWithPromotionLevel(String withPromotionLevel) {
+            data = data.withWithPromotionLevel(withPromotionLevel);
+            return this;
+        }
+
+        @Override
+        public StandardFilterBuilder withAfterDate(LocalDate afterDate) {
+            data = data.withAfterDate(afterDate);
+            return this;
+        }
+
+        @Override
+        public StandardFilterBuilder withBeforeDate(LocalDate beforeDate) {
+            data = data.withBeforeDate(beforeDate);
+            return this;
+        }
+
+        @Override
+        public StandardFilterBuilder withSinceValidationStamp(String sinceValidationStamp) {
+            data = data.withSinceValidationStamp(sinceValidationStamp);
+            return this;
+        }
+
+        @Override
+        public StandardFilterBuilder withSinceValidationStampStatus(String sinceValidationStampStatus) {
+            data = data.withSinceValidationStampStatus(sinceValidationStampStatus);
+            return this;
+        }
+
+        @Override
+        public StandardFilterBuilder withWithValidationStamp(String withValidationStamp) {
+            data = data.withWithValidationStamp(withValidationStamp);
+            return this;
+        }
+
+        @Override
+        public StandardFilterBuilder withWithValidationStampStatus(String withValidationStampStatus) {
+            data = data.withWithValidationStampStatus(withValidationStampStatus);
+            return this;
+        }
+
+        @Override
+        public StandardFilterBuilder withWithProperty(String withProperty) {
+            data = data.withWithProperty(withProperty);
+            return this;
+        }
+
+        @Override
+        public StandardFilterBuilder withWithPropertyValue(String withPropertyValue) {
+            data = data.withWithPropertyValue(withPropertyValue);
+            return this;
+        }
+
+        @Override
+        public StandardFilterBuilder withSinceProperty(String sinceProperty) {
+            data = data.withSinceProperty(sinceProperty);
+            return this;
+        }
+
+        @Override
+        public StandardFilterBuilder withSincePropertyValue(String sincePropertyValue) {
+            data = data.withSincePropertyValue(sincePropertyValue);
+            return this;
+        }
+    }
+
     @Override
     public StandardFilterBuilder standardFilter(int count) {
-        return new StandardFilterBuilder() {
-
-            private final StandardBuildFilterData data = StandardBuildFilterData.of(count);
-
-            @Override
-            public BuildFilter build() {
-                return new StandardBuildFilter(data, propertyService);
-            }
-
-            @Override
-            public StandardBuildFilterData withSincePromotionLevel(String sincePromotionLevel) {
-                return data.withSincePromotionLevel(sincePromotionLevel);
-            }
-
-            @Override
-            public StandardBuildFilterData withWithPromotionLevel(String withPromotionLevel) {
-                return data.withWithPromotionLevel(withPromotionLevel);
-            }
-
-            @Override
-            public StandardBuildFilterData withAfterDate(LocalDate afterDate) {
-                return data.withAfterDate(afterDate);
-            }
-
-            @Override
-            public StandardBuildFilterData withBeforeDate(LocalDate beforeDate) {
-                return data.withBeforeDate(beforeDate);
-            }
-
-            @Override
-            public StandardBuildFilterData withSinceValidationStamp(String sinceValidationStamp) {
-                return data.withSinceValidationStamp(sinceValidationStamp);
-            }
-
-            @Override
-            public StandardBuildFilterData withSinceValidationStampStatus(String sinceValidationStampStatus) {
-                return data.withSinceValidationStampStatus(sinceValidationStampStatus);
-            }
-
-            @Override
-            public StandardBuildFilterData withWithValidationStamp(String withValidationStamp) {
-                return data.withWithValidationStamp(withValidationStamp);
-            }
-
-            @Override
-            public StandardBuildFilterData withWithValidationStampStatus(String withValidationStampStatus) {
-                return data.withWithValidationStampStatus(withValidationStampStatus);
-            }
-
-            @Override
-            public StandardBuildFilterData withWithProperty(String withProperty) {
-                return data.withWithProperty(withProperty);
-            }
-
-            @Override
-            public StandardBuildFilterData withWithPropertyValue(String withPropertyValue) {
-                return data.withWithPropertyValue(withPropertyValue);
-            }
-
-            @Override
-            public StandardBuildFilterData withSinceProperty(String sinceProperty) {
-                return data.withSinceProperty(sinceProperty);
-            }
-
-            @Override
-            public StandardBuildFilterData withSincePropertyValue(String sincePropertyValue) {
-                return data.withSincePropertyValue(sincePropertyValue);
-            }
-        };
+        return new DefaultStandardFilterBuilder(count);
     }
 
     @Override

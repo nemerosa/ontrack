@@ -2,29 +2,29 @@ package net.nemerosa.ontrack.model.buildfilter;
 
 import java.time.LocalDate;
 
-public interface StandardFilterDataBuilder {
+public interface StandardFilterDataBuilder<T extends StandardFilterDataBuilder<T>> {
 
-    StandardFilterDataBuilder withSincePromotionLevel(String sincePromotionLevel);
+    T withSincePromotionLevel(String sincePromotionLevel);
 
-    StandardFilterDataBuilder withWithPromotionLevel(String withPromotionLevel);
+    T withWithPromotionLevel(String withPromotionLevel);
 
-    StandardFilterDataBuilder withAfterDate(LocalDate afterDate);
+    T withAfterDate(LocalDate afterDate);
 
-    StandardFilterDataBuilder withBeforeDate(LocalDate beforeDate);
+    T withBeforeDate(LocalDate beforeDate);
 
-    StandardFilterDataBuilder withSinceValidationStamp(String sinceValidationStamp);
+    T withSinceValidationStamp(String sinceValidationStamp);
 
-    StandardFilterDataBuilder withSinceValidationStampStatus(String sinceValidationStampStatus);
+    T withSinceValidationStampStatus(String sinceValidationStampStatus);
 
-    StandardFilterDataBuilder withWithValidationStamp(String withValidationStamp);
+    T withWithValidationStamp(String withValidationStamp);
 
-    StandardFilterDataBuilder withWithValidationStampStatus(String withValidationStampStatus);
+    T withWithValidationStampStatus(String withValidationStampStatus);
 
-    StandardFilterDataBuilder withWithProperty(String withProperty);
+    T withWithProperty(String withProperty);
 
-    StandardFilterDataBuilder withWithPropertyValue(String withPropertyValue);
+    T withWithPropertyValue(String withPropertyValue);
 
-    StandardFilterDataBuilder withSinceProperty(String sinceProperty);
+    T withSinceProperty(String sinceProperty);
 
-    StandardFilterDataBuilder withSincePropertyValue(String sincePropertyValue);
+    T withSincePropertyValue(String sincePropertyValue);
 }
