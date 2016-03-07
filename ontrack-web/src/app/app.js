@@ -117,7 +117,6 @@ var ontrack = angular.module('ontrack', [
                 // Returns the promise
                 return promise;
             }).then(function () {
-                // FIXME Displays any error
                 // Loading is done
                 $log.debug('[app] All extensions have been loaded - application ready');
                 $rootScope.appReady = true;
