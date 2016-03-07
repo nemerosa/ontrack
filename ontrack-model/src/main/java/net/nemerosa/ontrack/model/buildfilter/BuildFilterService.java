@@ -19,6 +19,11 @@ public interface BuildFilterService {
     BuildFilter defaultFilter();
 
     /**
+     * Builds a standard build filter
+     */
+    StandardFilterBuilder standardFilter(int count);
+
+    /**
      * Gets the list of all existing filters.
      *
      * @param branchId Branch to get the filters for

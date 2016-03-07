@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.model.security.BranchFilterMgt;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ID;
+import net.nemerosa.ontrack.model.structure.PropertyService;
 import net.nemerosa.ontrack.model.structure.StructureService;
 import net.nemerosa.ontrack.repository.BuildFilterRepository;
 import net.nemerosa.ontrack.repository.TBuildFilter;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -30,21 +32,96 @@ public class BuildFilterServiceImpl implements BuildFilterService {
     private final BuildFilterRepository buildFilterRepository;
     private final StructureService structureService;
     private final SecurityService securityService;
+    private final PropertyService propertyService;
 
     @Autowired
     public BuildFilterServiceImpl(
             Collection<BuildFilterProvider<?>> buildFilterProviders,
             BuildFilterRepository buildFilterRepository,
-            StructureService structureService, SecurityService securityService) {
+            StructureService structureService, SecurityService securityService, PropertyService propertyService) {
         this.buildFilterProviders = buildFilterProviders;
         this.buildFilterRepository = buildFilterRepository;
         this.structureService = structureService;
         this.securityService = securityService;
+        this.propertyService = propertyService;
     }
 
     @Override
     public BuildFilter defaultFilter() {
         return DefaultBuildFilter.INSTANCE;
+    }
+
+    @Override
+    public StandardFilterBuilder standardFilter(int count) {
+        return new StandardFilterBuilder() {
+
+            private final StandardBuildFilterData data = StandardBuildFilterData.of(count);
+
+            @Override
+            public BuildFilter build() {
+                return new StandardBuildFilter(data, propertyService);
+            }
+
+            @Override
+            public StandardBuildFilterData withSincePromotionLevel(String sincePromotionLevel) {
+                return data.withSincePromotionLevel(sincePromotionLevel);
+            }
+
+            @Override
+            public StandardBuildFilterData withWithPromotionLevel(String withPromotionLevel) {
+                return data.withWithPromotionLevel(withPromotionLevel);
+            }
+
+            @Override
+            public StandardBuildFilterData withAfterDate(LocalDate afterDate) {
+                return data.withAfterDate(afterDate);
+            }
+
+            @Override
+            public StandardBuildFilterData withBeforeDate(LocalDate beforeDate) {
+                return data.withBeforeDate(beforeDate);
+            }
+
+            @Override
+            public StandardBuildFilterData withSinceValidationStamp(String sinceValidationStamp) {
+                return data.withSinceValidationStamp(sinceValidationStamp);
+            }
+
+            @Override
+            public StandardBuildFilterData withSinceValidationStampStatus(String sinceValidationStampStatus) {
+                return data.withSinceValidationStampStatus(sinceValidationStampStatus);
+            }
+
+            @Override
+            public StandardBuildFilterData withWithValidationStamp(String withValidationStamp) {
+                return data.withWithValidationStamp(withValidationStamp);
+            }
+
+            @Override
+            public StandardBuildFilterData withWithValidationStampStatus(String withValidationStampStatus) {
+                return data.withWithValidationStampStatus(withValidationStampStatus);
+            }
+
+            @Override
+            public StandardBuildFilterData withWithProperty(String withProperty) {
+                return data.withWithProperty(withProperty);
+            }
+
+            @Override
+            public StandardBuildFilterData withWithPropertyValue(String withPropertyValue) {
+                return data.withWithPropertyValue(withPropertyValue);
+            }
+
+            @Override
+            public StandardBuildFilterData withSinceProperty(String sinceProperty) {
+                return data.withSinceProperty(sinceProperty);
+            }
+
+            @Override
+            public StandardBuildFilterData withSincePropertyValue(String sincePropertyValue) {
+                return data.withSincePropertyValue(sincePropertyValue);
+            }
+        };
     }
 
     @Override
@@ -165,13 +242,13 @@ public class BuildFilterServiceImpl implements BuildFilterService {
     public void copyToBranch(ID sourceBranchId, ID targetBranchId) {
         // Gets all the filters for the source branch
         buildFilterRepository.findForBranch(sourceBranchId.getValue()).forEach(filter ->
-                        buildFilterRepository.save(
-                                filter.getAccountId(),
-                                targetBranchId.get(),
-                                filter.getName(),
-                                filter.getType(),
-                                filter.getData()
-                        )
+                buildFilterRepository.save(
+                        filter.getAccountId(),
+                        targetBranchId.get(),
+                        filter.getName(),
+                        filter.getType(),
+                        filter.getData()
+                )
         );
     }
 
@@ -197,13 +274,13 @@ public class BuildFilterServiceImpl implements BuildFilterService {
 
     private <T> Optional<BuildFilterResource<T>> loadBuildFilterResource(BuildFilterProvider<T> provider, Branch branch, boolean shared, String name, JsonNode data) {
         return provider.parse(data).map(parsedData ->
-                        new BuildFilterResource<>(
-                                branch,
-                                shared,
-                                name,
-                                provider.getClass().getName(),
-                                parsedData
-                        )
+                new BuildFilterResource<>(
+                        branch,
+                        shared,
+                        name,
+                        provider.getClass().getName(),
+                        parsedData
+                )
         );
     }
 

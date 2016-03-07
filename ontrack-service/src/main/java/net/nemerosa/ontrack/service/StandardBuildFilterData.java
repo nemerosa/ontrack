@@ -4,12 +4,13 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Wither;
+import net.nemerosa.ontrack.model.buildfilter.StandardFilterDataBuilder;
 
 import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class StandardBuildFilterData {
+public class StandardBuildFilterData implements StandardFilterDataBuilder {
 
     private final int count;
     @Wither
