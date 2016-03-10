@@ -36,8 +36,6 @@ class JenkinsJobDecorationExtensionTest {
                         'http://jenkins/MyBuild',
                         JenkinsJobResult.SUCCESS,
                         JenkinsJobState.IDLE,
-                        [],
-                        null
                 )
         )
         when(jenkinsClientFactory.getClient(jenkinsConfiguration)).thenReturn(client)
