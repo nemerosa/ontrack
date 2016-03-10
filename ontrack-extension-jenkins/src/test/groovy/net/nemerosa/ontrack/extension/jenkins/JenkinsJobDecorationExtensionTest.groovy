@@ -30,12 +30,10 @@ class JenkinsJobDecorationExtensionTest {
         def jenkinsConfiguration = new JenkinsConfiguration('Jenkins', 'http://jenkins', '', '')
 
         JenkinsClient client = mock(JenkinsClient)
-        when(client.getJob('MyBuild', false)).thenReturn(
+        when(client.getJob('MyBuild')).thenReturn(
                 new JenkinsJob(
                         'MyBuild',
-                        'http://jenkins/MyBuild',
-                        JenkinsJobResult.SUCCESS,
-                        JenkinsJobState.IDLE,
+                        'http://jenkins/job/MyBuild'
                 )
         )
         when(jenkinsClientFactory.getClient(jenkinsConfiguration)).thenReturn(client)
@@ -68,7 +66,10 @@ class JenkinsJobDecorationExtensionTest {
         assert decorations.size() == 1
         def decoration = decorations[0]
         assert decoration.decorationType == 'net.nemerosa.ontrack.extension.jenkins.JenkinsJobDecorationExtension'
-        assert decoration.data == JenkinsJobState.IDLE
+        assert decoration.data == new JenkinsJob(
+                'MyBuild',
+                'http://jenkins/job/MyBuild'
+        )
     }
 
     @Test

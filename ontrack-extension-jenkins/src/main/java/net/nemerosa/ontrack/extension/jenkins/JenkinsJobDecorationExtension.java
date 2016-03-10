@@ -4,7 +4,6 @@ import net.nemerosa.ontrack.extension.api.DecorationExtension;
 import net.nemerosa.ontrack.extension.jenkins.client.JenkinsClient;
 import net.nemerosa.ontrack.extension.jenkins.client.JenkinsClientFactory;
 import net.nemerosa.ontrack.extension.jenkins.client.JenkinsJob;
-import net.nemerosa.ontrack.extension.jenkins.client.JenkinsJobState;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
 import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,7 @@ import java.util.List;
  * Provides a decoration that displays the state of a running job.
  */
 @Component
-public class JenkinsJobDecorationExtension extends AbstractExtension implements DecorationExtension<JenkinsJobState> {
+public class JenkinsJobDecorationExtension extends AbstractExtension implements DecorationExtension<JenkinsJob> {
 
     private final PropertyService propertyService;
     private final JenkinsClientFactory jenkinsClientFactory;
@@ -41,7 +40,7 @@ public class JenkinsJobDecorationExtension extends AbstractExtension implements 
     }
 
     @Override
-    public List<Decoration<JenkinsJobState>> getDecorations(ProjectEntity entity) {
+    public List<Decoration<JenkinsJob>> getDecorations(ProjectEntity entity) {
         // Gets the Jenkins Job property for this entity, if any
         Property<JenkinsJobProperty> property = propertyService.getProperty(entity, JenkinsJobPropertyType.class.getName());
         if (property.isEmpty()) {
@@ -54,7 +53,7 @@ public class JenkinsJobDecorationExtension extends AbstractExtension implements 
             // Gets a client
             JenkinsClient jenkinsClient = jenkinsClientFactory.getClient(property.getValue().getConfiguration());
             // Gets the Jenkins job
-            JenkinsJob job = jenkinsClient.getJob(property.getValue().getJob(), false);
+            JenkinsJob job = jenkinsClient.getJob(property.getValue().getJob());
             // Gets the decoration for the job
             return Collections.singletonList(
                     getDecoration(job)
@@ -62,8 +61,8 @@ public class JenkinsJobDecorationExtension extends AbstractExtension implements 
         }
     }
 
-    private Decoration<JenkinsJobState> getDecoration(JenkinsJob job) {
-        return Decoration.of(this, job.getState());
+    private Decoration<JenkinsJob> getDecoration(JenkinsJob job) {
+        return Decoration.of(this, job);
     }
 
 }

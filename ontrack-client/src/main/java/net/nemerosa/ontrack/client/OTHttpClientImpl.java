@@ -38,7 +38,8 @@ public class OTHttpClientImpl implements OTHttpClient {
         return url;
     }
 
-    protected String getUrl(String path, Object... parameters) {
+    @Override
+    public String getUrl(String path, Object... parameters) {
         if (StringUtils.startsWith(path, "http")) {
             return format(path, parameters);
         } else {

@@ -13,6 +13,15 @@ public interface OTHttpClient {
 
     URL getUrl();
 
+    /**
+     * Gets the URL for a relative path
+     *
+     * @param path       Relative path
+     * @param parameters Parameter for the relative path parameters (if any)
+     * @return Absolute URL
+     */
+    String getUrl(String path, Object... parameters);
+
     <T> T get(ResponseParser<T> responseParser, String path, Object... parameters);
 
     <T> T delete(ResponseParser<T> responseParser, String path, Object... parameters);

@@ -77,6 +77,11 @@ public class JsonClientImpl implements JsonClient {
     }
 
     @Override
+    public String getUrl(String path, Object... parameters) {
+        return httpClient.getUrl(path, parameters);
+    }
+
+    @Override
     public JsonNode toNode(Object data) {
         return objectMapper.valueToTree(data);
     }

@@ -18,4 +18,13 @@ public interface JsonClient {
     JsonNode upload(String name, Document o, String fileName, String path, Object... parameters);
 
     Document download(String path, Object... parameters);
+
+    /**
+     * Gets the URL for a relative path
+     *
+     * @param path       Relative path
+     * @param parameters Parameter for the relative path parameters (if any)
+     * @return Absolute URL
+     */
+    String getUrl(String path, Object... parameters);
 }

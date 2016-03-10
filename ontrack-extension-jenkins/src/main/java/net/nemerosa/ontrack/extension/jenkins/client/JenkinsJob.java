@@ -7,9 +7,5 @@ public class JenkinsJob {
 
     private final String name;
     private final String url;
-    @Deprecated
-    private final JenkinsJobResult result;
-    @Deprecated
-    private final JenkinsJobState state;
 
 }
