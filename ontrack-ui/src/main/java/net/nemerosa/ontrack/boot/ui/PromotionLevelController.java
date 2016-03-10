@@ -15,9 +15,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 
+import static net.nemerosa.ontrack.boot.ui.UIUtils.setupDefaultImageCache;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
@@ -105,7 +107,8 @@ public class PromotionLevelController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "promotionLevels/{promotionLevelId}/image", method = RequestMethod.GET)
-    public Document getPromotionLevelImage_(@PathVariable ID promotionLevelId) {
+    public Document getPromotionLevelImage_(HttpServletResponse response, @PathVariable ID promotionLevelId) {
+        setupDefaultImageCache(response);
         return structureService.getPromotionLevelImage(promotionLevelId);
     }
 

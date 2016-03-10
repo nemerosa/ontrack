@@ -14,9 +14,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 
+import static net.nemerosa.ontrack.boot.ui.UIUtils.setupDefaultImageCache;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
@@ -102,7 +104,8 @@ public class ValidationStampController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "validationStamps/{validationStampId}/image", method = RequestMethod.GET)
-    public Document getValidationStampImage_(@PathVariable ID validationStampId) {
+    public Document getValidationStampImage_(HttpServletResponse response, @PathVariable ID validationStampId) {
+        setupDefaultImageCache(response);
         return structureService.getValidationStampImage(validationStampId);
     }
 

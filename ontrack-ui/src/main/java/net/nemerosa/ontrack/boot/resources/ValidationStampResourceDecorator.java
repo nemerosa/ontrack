@@ -30,7 +30,7 @@ public class ValidationStampResourceDecorator extends AbstractResourceDecorator<
                 // Project link
                 .link("_project", on(ProjectController.class).getProject(validationStamp.getBranch().getProject().getId()))
                 // Image link
-                .link(Link.IMAGE_LINK, on(ValidationStampController.class).getValidationStampImage_(validationStamp.getId()))
+                .link(Link.IMAGE_LINK, on(ValidationStampController.class).getValidationStampImage_(null, validationStamp.getId()))
                 // Update link
                 .update(on(ValidationStampController.class).updateValidationStampForm(validationStamp.getId()), ValidationStampEdit.class, validationStamp.projectId())
                 // Delete link
