@@ -4,6 +4,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Arrays;
+import java.util.List;
+
 @EqualsAndHashCode(callSuper = false)
 @Data
 public class JenkinsJobProperty extends AbstractJenkinsProperty {
@@ -23,6 +26,13 @@ public class JenkinsJobProperty extends AbstractJenkinsProperty {
      */
     public String getUrl() {
         return String.format("%s/job/%s", getConfiguration().getUrl(), withFolders(job));
+    }
+
+    /**
+     * Derived property: job path as separate components
+     */
+    public List<String> getPathComponents() {
+        return Arrays.asList(withFolders(job).split("/job/"));
     }
 
     /**
