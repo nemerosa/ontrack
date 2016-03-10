@@ -217,23 +217,14 @@
                                 Clear filter
                             </a></li>
 
-                            <li><a class="ot-action" ng-click="selectAllJobs()">
-                                <span class="fa fa-check-square-o"></span>
-                                Select all jobs
-                            </a></li>
-                            <li><a class="ot-action" ng-click="selectNoJob()">
-                                <span class="fa fa-square-o"></span>
-                                Clear job selection
-                            </a></li>
-
                             <li><a class="ot-action" ng-click="pauseAllSelected()">
                                 <span class="fa fa-pause"></span>
-                                Pause all selected jobs
+                                Pause all visible jobs
                             </a></li>
 
                             <li><a class="ot-action" ng-click="resumeAllSelected()">
                                 <span class="fa fa-refresh"></span>
-                                Resume all selected jobs
+                                Resume all visible jobs
                             </a></li>
                         </ul>
                     </div>
@@ -244,7 +235,6 @@
             <table class="ot-admin-console-jobs" ng-if="jobs">
                 <thead>
                 <tr>
-                    <th>&nbsp;</th>
                     <th>ID</th>
                     <th>Category</th>
                     <th>Type</th>
@@ -262,9 +252,6 @@
                 <tbody>
                 <tr ng-repeat="job in jobs.resources | filter:jobFilter"
                     class="ot-job ot-job-{{job.state.toLowerCase()}}">
-                    <td>
-                        <input type="checkbox" ng-model="jobSelection[job.id]" title="Select job: {{job.description}}" />
-                    </td>
                     <td>
                         {{job.id}}
                     </td>
