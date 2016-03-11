@@ -105,8 +105,9 @@ public class ValidationStampController extends AbstractResourceController {
 
     @RequestMapping(value = "validationStamps/{validationStampId}/image", method = RequestMethod.GET)
     public Document getValidationStampImage_(HttpServletResponse response, @PathVariable ID validationStampId) {
-        setupDefaultImageCache(response);
-        return structureService.getValidationStampImage(validationStampId);
+        Document image = structureService.getValidationStampImage(validationStampId);
+        setupDefaultImageCache(response, image);
+        return image;
     }
 
     @RequestMapping(value = "validationStamps/{validationStampId}/image", method = RequestMethod.POST)
