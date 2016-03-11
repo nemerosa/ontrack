@@ -42,6 +42,7 @@ public class PromotionRunResourceDecorator extends AbstractResourceDecorator<Pro
                 .link(
                         Link.IMAGE_LINK,
                         on(PromotionLevelController.class).getPromotionLevelImage_(
+                                null,
                                 promotionRun.getPromotionLevel().getId()
                         )
                 )

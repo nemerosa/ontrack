@@ -28,7 +28,7 @@ public class ValidationRunResourceDecorator extends AbstractResourceDecorator<Va
                 .self(on(ValidationRunController.class).getValidationRun(validationRun.getId()))
                 .link(
                         Link.IMAGE_LINK,
-                        on(ValidationStampController.class).getValidationStampImage_(validationRun.getValidationStamp().getId())
+                        on(ValidationStampController.class).getValidationStampImage_(null, validationRun.getValidationStamp().getId())
                 )
                 .link(
                         "_validationStampLink",

@@ -26,7 +26,7 @@ public class PromotionLevelResourceDecorator extends AbstractResourceDecorator<P
                 .self(on(PromotionLevelController.class).getPromotionLevel(promotionLevel.getId()))
                 .link("_branch", on(BranchController.class).getBranch(promotionLevel.getBranch().getId()))
                 .link("_project", on(ProjectController.class).getProject(promotionLevel.getBranch().getProject().getId()))
-                .link(Link.IMAGE_LINK, on(PromotionLevelController.class).getPromotionLevelImage_(promotionLevel.getId()))
+                .link(Link.IMAGE_LINK, on(PromotionLevelController.class).getPromotionLevelImage_(null, promotionLevel.getId()))
                 // Update
                 .update(on(PromotionLevelController.class).updatePromotionLevelForm(promotionLevel.getId()), PromotionLevelEdit.class, promotionLevel.projectId())
                 // Delete
