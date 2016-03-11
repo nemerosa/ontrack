@@ -8,7 +8,7 @@ import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropert
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
-import net.nemerosa.ontrack.extension.scm.service.SCMService
+import net.nemerosa.ontrack.extension.scm.service.SCMUtilsService
 import net.nemerosa.ontrack.git.GitRepositoryClient
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory
 import net.nemerosa.ontrack.job.JobScheduler
@@ -56,7 +56,7 @@ class GitServiceImplTest {
                 mock(GitRepositoryClientFactory),
                 mock(BuildGitCommitLinkService),
                 [gitConfigurator],
-                mock(SCMService)
+                mock(SCMUtilsService)
         )
     }
 

@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.svn.service;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.scm.model.SCMIssueCommitBranchInfo;
-import net.nemerosa.ontrack.extension.scm.service.SCMService;
+import net.nemerosa.ontrack.extension.scm.service.SCMUtilsService;
 import net.nemerosa.ontrack.extension.svn.db.SVNIssueRevisionDao;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.db.SVNRevisionDao;
@@ -31,7 +31,7 @@ public class SVNInfoServiceImpl implements SVNInfoService {
     private final BuildSvnRevisionLinkService buildSvnRevisionLinkService;
     private final SVNIssueRevisionDao issueRevisionDao;
     private final SVNRevisionDao revisionDao;
-    private final SCMService scmService;
+    private final SCMUtilsService scmService;
 
     @Autowired
     public SVNInfoServiceImpl(StructureService structureService,
@@ -39,7 +39,7 @@ public class SVNInfoServiceImpl implements SVNInfoService {
                               SVNService svnService,
                               BuildSvnRevisionLinkService buildSvnRevisionLinkService,
                               SVNIssueRevisionDao issueRevisionDao,
-                              SVNRevisionDao revisionDao, SCMService scmService) {
+                              SVNRevisionDao revisionDao, SCMUtilsService scmService) {
         this.structureService = structureService;
         this.propertyService = propertyService;
         this.svnService = svnService;

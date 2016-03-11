@@ -17,7 +17,7 @@ import net.nemerosa.ontrack.extension.scm.model.SCMBuildView;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFileChangeType;
 import net.nemerosa.ontrack.extension.scm.model.SCMIssueCommitBranchInfo;
 import net.nemerosa.ontrack.extension.scm.service.AbstractSCMChangeLogService;
-import net.nemerosa.ontrack.extension.scm.service.SCMService;
+import net.nemerosa.ontrack.extension.scm.service.SCMUtilsService;
 import net.nemerosa.ontrack.git.GitRepositoryClient;
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory;
 import net.nemerosa.ontrack.git.exceptions.GitRepositorySyncException;
@@ -67,7 +67,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     private final GitRepositoryClientFactory gitRepositoryClientFactory;
     private final BuildGitCommitLinkService buildGitCommitLinkService;
     private final Collection<GitConfigurator> gitConfigurators;
-    private final SCMService scmService;
+    private final SCMUtilsService scmService;
 
     @Autowired
     public GitServiceImpl(
@@ -81,7 +81,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             GitRepositoryClientFactory gitRepositoryClientFactory,
             BuildGitCommitLinkService buildGitCommitLinkService,
             Collection<GitConfigurator> gitConfigurators,
-            SCMService scmService) {
+            SCMUtilsService scmService) {
         super(structureService, propertyService);
         this.propertyService = propertyService;
         this.issueServiceRegistry = issueServiceRegistry;

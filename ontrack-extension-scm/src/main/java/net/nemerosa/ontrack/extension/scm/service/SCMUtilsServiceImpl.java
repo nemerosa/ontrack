@@ -16,12 +16,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
-public class SCMServiceImpl implements SCMService {
+public class SCMUtilsServiceImpl implements SCMUtilsService {
 
     private final StructureService structureService;
 
     @Autowired
-    public SCMServiceImpl(StructureService structureService) {
+    public SCMUtilsServiceImpl(StructureService structureService) {
         this.structureService = structureService;
     }
 

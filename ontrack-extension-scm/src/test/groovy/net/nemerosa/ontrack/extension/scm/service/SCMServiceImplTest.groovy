@@ -7,7 +7,7 @@ import org.mockito.Mockito
 class SCMServiceImplTest {
 
     private StructureService structureService = Mockito.mock(StructureService)
-    private SCMServiceImpl service = new SCMServiceImpl(structureService)
+    private SCMUtilsServiceImpl service = new SCMUtilsServiceImpl(structureService)
 
     @Test
     void 'One pattern'() {

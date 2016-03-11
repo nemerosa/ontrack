@@ -12,7 +12,7 @@ import java.util.function.Predicate;
 /**
  * Generic service around the SCM
  */
-public interface SCMService {
+public interface SCMUtilsService {
 
     <T extends SCMChangeLogFile> String diff(List<T> changeLogFiles, List<String> patterns, Function<T, String> diffFn);
 

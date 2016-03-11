@@ -13,7 +13,7 @@ import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogIssue;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogUUIDException;
 import net.nemerosa.ontrack.extension.scm.model.SCMDocumentNotFoundException;
-import net.nemerosa.ontrack.extension.scm.service.SCMService;
+import net.nemerosa.ontrack.extension.scm.service.SCMUtilsService;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.extension.svn.model.*;
 import net.nemerosa.ontrack.extension.svn.service.*;
@@ -54,14 +54,14 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     private final IssueServiceRegistry issueServiceRegistry;
     private final SVNService svnService;
     private final SVNInfoService svnInfoService;
-    private final SCMService scmService;
+    private final SCMUtilsService scmService;
     private final SVNSyncService svnSyncService;
     private final SecurityService securityService;
 
     private final Cache<String, SVNChangeLog> logCache;
 
     @Autowired
-    public SVNController(SVNExtensionFeature feature, SVNConfigurationService svnConfigurationService, IndexationService indexationService, SVNChangeLogService changeLogService, IssueServiceRegistry issueServiceRegistry, SVNService svnService, SVNInfoService svnInfoService, SCMService scmService, SVNSyncService svnSyncService, SecurityService securityService) {
+    public SVNController(SVNExtensionFeature feature, SVNConfigurationService svnConfigurationService, IndexationService indexationService, SVNChangeLogService changeLogService, IssueServiceRegistry issueServiceRegistry, SVNService svnService, SVNInfoService svnInfoService, SCMUtilsService scmService, SVNSyncService svnSyncService, SecurityService securityService) {
         super(feature);
         this.svnConfigurationService = svnConfigurationService;
         this.indexationService = indexationService;
