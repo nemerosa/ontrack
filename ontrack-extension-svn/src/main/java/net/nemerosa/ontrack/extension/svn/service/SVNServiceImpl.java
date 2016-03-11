@@ -215,8 +215,7 @@ public class SVNServiceImpl implements SVNService {
     }
 
     @Override
-    public Optional<String> download(ID branchId, String path) {
-        Branch branch = structureService.getBranch(branchId);
+    public Optional<String> download(Branch branch, String path) {
         // Security check
         securityService.checkProjectFunction(branch, ProjectConfig.class);
         // If project configured...

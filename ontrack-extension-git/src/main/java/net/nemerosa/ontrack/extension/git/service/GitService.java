@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.git.service;
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest;
 import net.nemerosa.ontrack.extension.git.model.*;
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty;
+import net.nemerosa.ontrack.extension.scm.service.SCMService;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ID;
@@ -15,7 +16,7 @@ import java.util.concurrent.Future;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
-public interface GitService {
+public interface GitService extends SCMService {
 
     /**
      * Tests if a branch is correctly configured for Git.
@@ -107,11 +108,6 @@ public interface GitService {
      * Gets a diff on a list of file changes, filtering the changes using ANT-like patterns
      */
     String diff(GitChangeLog changeLog, List<String> patterns);
-
-    /**
-     * Downloads the file at the given path for a branch
-     */
-    Optional<String> download(Branch branch, String path);
 
     /**
      * Synchronises the Git repository attached to this project.

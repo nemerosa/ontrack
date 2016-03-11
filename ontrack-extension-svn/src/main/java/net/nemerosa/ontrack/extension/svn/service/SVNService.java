@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.svn.service;
 
+import net.nemerosa.ontrack.extension.scm.service.SCMService;
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository;
 import net.nemerosa.ontrack.extension.svn.db.TCopyEvent;
 import net.nemerosa.ontrack.extension.svn.model.*;
@@ -17,7 +18,7 @@ import java.util.function.Predicate;
 /**
  * Layer on top of the basic Subversion client and of the repositories.
  */
-public interface SVNService {
+public interface SVNService extends SCMService {
 
     JobCategory SVN_JOB_CATEGORY = JobCategory.of("svn").withName("Subversion");
 
@@ -85,11 +86,6 @@ public interface SVNService {
      * Gets the list of branches
      */
     List<String> getBranches(Branch branch);
-
-    /**
-     * Downloads the file at the given path for a branch
-     */
-    Optional<String> download(ID branchId, String path);
 
     /**
      * Gets the last copy event to this tag.

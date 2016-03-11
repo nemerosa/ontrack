@@ -25,6 +25,7 @@ import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.Build;
 import net.nemerosa.ontrack.model.structure.ID;
+import net.nemerosa.ontrack.model.structure.StructureService;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import net.nemerosa.ontrack.model.support.ConnectionResult;
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration;
@@ -57,11 +58,12 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
     private final SCMUtilsService scmService;
     private final SVNSyncService svnSyncService;
     private final SecurityService securityService;
+    private final StructureService structureService;
 
     private final Cache<String, SVNChangeLog> logCache;
 
     @Autowired
-    public SVNController(SVNExtensionFeature feature, SVNConfigurationService svnConfigurationService, IndexationService indexationService, SVNChangeLogService changeLogService, IssueServiceRegistry issueServiceRegistry, SVNService svnService, SVNInfoService svnInfoService, SCMUtilsService scmService, SVNSyncService svnSyncService, SecurityService securityService) {
+    public SVNController(SVNExtensionFeature feature, SVNConfigurationService svnConfigurationService, IndexationService indexationService, SVNChangeLogService changeLogService, IssueServiceRegistry issueServiceRegistry, SVNService svnService, SVNInfoService svnInfoService, SCMUtilsService scmService, SVNSyncService svnSyncService, SecurityService securityService, StructureService structureService) {
         super(feature);
         this.svnConfigurationService = svnConfigurationService;
         this.indexationService = indexationService;
@@ -72,6 +74,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
         this.scmService = scmService;
         this.svnSyncService = svnSyncService;
         this.securityService = securityService;
+        this.structureService = structureService;
         // Cache
         logCache = CacheBuilder.newBuilder()
                 .maximumSize(20)
@@ -427,7 +430,7 @@ public class SVNController extends AbstractExtensionController<SVNExtensionFeatu
      */
     @RequestMapping(value = "download/{branchId}")
     public ResponseEntity<String> download(@PathVariable ID branchId, String path) {
-        return svnService.download(branchId, path)
+        return svnService.download(structureService.getBranch(branchId), path)
                 .map(ResponseEntity::ok)
                 .orElseThrow(
                         () -> new SCMDocumentNotFoundException(path)
