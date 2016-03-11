@@ -136,8 +136,8 @@ class SVNDownloadIT extends AbstractServiceTestSupport {
          */
 
         asUser().with(project, ProjectConfig).call {
-            assert svnService.download(branch1.id, 'folder/file1').get() == 'Content 1'
-            assert svnService.download(trunk.id, 'folder/file1').get() == 'Content 2'
+            assert svnService.download(branch1, 'folder/file1').get() == 'Content 1'
+            assert svnService.download(trunk, 'folder/file1').get() == 'Content 2'
         }
 
     }
