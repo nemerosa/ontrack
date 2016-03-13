@@ -25,6 +25,11 @@ public class NOPJobListener implements JobListener {
     }
 
     @Override
+    public boolean isPausedAtStartup(JobKey key) {
+        return false;
+    }
+
+    @Override
     public void onJobPaused(JobKey key) {
     }
 

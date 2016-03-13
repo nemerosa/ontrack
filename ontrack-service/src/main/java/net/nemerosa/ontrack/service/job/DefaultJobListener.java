@@ -86,4 +86,13 @@ public class DefaultJobListener implements JobListener {
     @Override
     public void onJobProgress(JobKey key, JobRunProgress progress) {
     }
+
+    @Override
+    public boolean isPausedAtStartup(JobKey key) {
+        return settingsRepository.getBoolean(
+                JobListener.class,
+                key.toString(),
+                false
+        );
+    }
 }

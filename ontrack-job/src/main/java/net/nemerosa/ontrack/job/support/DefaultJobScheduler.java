@@ -45,7 +45,13 @@ public class DefaultJobScheduler implements JobScheduler {
         // Creates and starts the scheduled service
         logger.info("[job]{} Starting service", job.getKey());
         // Copy stats from old schedule
-        JobScheduledService jobScheduledService = new JobScheduledService(job, schedule, scheduledExecutorService, existingService);
+        JobScheduledService jobScheduledService = new JobScheduledService(
+                job,
+                schedule,
+                scheduledExecutorService,
+                existingService,
+                jobListener.isPausedAtStartup(job.getKey())
+        );
         // Registration
         services.put(job.getKey(), jobScheduledService);
     }
@@ -164,7 +170,7 @@ public class DefaultJobScheduler implements JobScheduler {
         private final Schedule schedule;
         private final ScheduledFuture<?> scheduledFuture;
 
-        private final AtomicBoolean paused = new AtomicBoolean(false);
+        private final AtomicBoolean paused;
 
         private final AtomicReference<Map<String, ?>> runParameters = new AtomicReference<>();
         private final AtomicReference<CompletableFuture<?>> completableFuture = new AtomicReference<>();
@@ -176,10 +182,15 @@ public class DefaultJobScheduler implements JobScheduler {
         private final AtomicLong lastErrorCount = new AtomicLong();
         private final AtomicReference<String> lastError = new AtomicReference<>(null);
 
-        private JobScheduledService(Job job, Schedule schedule, ScheduledExecutorService scheduledExecutorService, JobScheduledService old) {
+        private JobScheduledService(Job job, Schedule schedule, ScheduledExecutorService scheduledExecutorService, JobScheduledService old, boolean pausedAtStartup) {
             this.id = idGenerator.incrementAndGet();
             this.job = job;
             this.schedule = schedule;
+            // Paused at startup
+            this.paused = new AtomicBoolean(pausedAtStartup);
+            if (pausedAtStartup) {
+                logger.debug("[job]{} Job paused at startup");
+            }
             // Copies stats from old service
             if (old != null) {
                 runCount.set(old.runCount.get());

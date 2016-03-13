@@ -16,4 +16,5 @@ public interface JobListener {
 
     void onJobProgress(JobKey key, JobRunProgress progress);
 
+    boolean isPausedAtStartup(JobKey key);
 }
