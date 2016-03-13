@@ -49,7 +49,7 @@ import static java.lang.String.format;
 
 @Service
 @Transactional
-public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration, GitBuildInfo, GitChangeLogIssue> implements GitService, StartupService {
+public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration, GitBuildInfo, GitChangeLogIssue> implements GitService, JobProvider {
 
     private static final JobCategory GIT_JOB_CATEGORY = JobCategory.of("git").withName("Git");
 
@@ -121,30 +121,23 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     @Override
-    public String getName() {
-        return "Git jobs registration";
-    }
-
-    @Override
-    public int startupOrder() {
-        return StartupService.JOB_REGISTRATION;
-    }
-
-    @Override
-    public void start() {
+    public Collection<JobRegistration> getStartingJobs() {
+        List<JobRegistration> jobs = new ArrayList<>();
         // Indexation of repositories, based on projects actually linked
-        forEachConfiguredProject((project, configuration) -> scheduleGitIndexation(configuration));
+        forEachConfiguredProject((project, configuration) -> jobs.add(getGitIndexationJobRegistration(configuration)));
         // Synchronisation of branch builds with tags when applicable
         forEachConfiguredBranch((branch, branchConfiguration) -> {
             // Build/tag sync job
             if (branchConfiguration.getBuildTagInterval() > 0
                     && branchConfiguration.getBuildCommitLink().getLink() instanceof IndexableBuildGitCommitLink) {
-                jobScheduler.schedule(
-                        createBuildSyncJob(branch),
-                        Schedule.everyMinutes(branchConfiguration.getBuildTagInterval())
+                jobs.add(
+                        JobRegistration.of(createBuildSyncJob(branch))
+                                .everyMinutes(branchConfiguration.getBuildTagInterval())
                 );
             }
         });
+        // OK
+        return jobs;
     }
 
     @Override
@@ -934,11 +927,18 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         client.sync(listener.logger());
     }
 
+    private JobRegistration getGitIndexationJobRegistration(GitConfiguration configuration) {
+        return JobRegistration
+                .of(createIndexationJob(configuration))
+                .everyMinutes(configuration.getIndexationInterval());
+    }
+
     @Override
     public void scheduleGitIndexation(GitConfiguration configuration) {
+        JobRegistration jobRegistration = getGitIndexationJobRegistration(configuration);
         jobScheduler.schedule(
-                createIndexationJob(configuration),
-                Schedule.everyMinutes(configuration.getIndexationInterval())
+                jobRegistration.getJob(),
+                jobRegistration.getSchedule()
         );
     }
 

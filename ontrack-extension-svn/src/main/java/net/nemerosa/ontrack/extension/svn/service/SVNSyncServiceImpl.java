@@ -11,7 +11,8 @@ import net.nemerosa.ontrack.model.security.BuildCreate;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.AbstractBranchJob;
-import net.nemerosa.ontrack.model.support.StartupService;
+import net.nemerosa.ontrack.model.support.JobProvider;
+import net.nemerosa.ontrack.model.support.JobRegistration;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,13 +22,15 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-public class SVNSyncServiceImpl implements SVNSyncService, StartupService {
+public class SVNSyncServiceImpl implements SVNSyncService, JobProvider {
 
     private static final JobType SVN_BUILD_SYNC_JOB =
             SVNService.SVN_JOB_CATEGORY.getType("svn-build-sync");
@@ -200,37 +203,32 @@ public class SVNSyncServiceImpl implements SVNSyncService, StartupService {
     }
 
     @Override
-    public String getName() {
-        return "SVN Build sync jobs";
-    }
-
-    @Override
-    public int startupOrder() {
-        return JOB_REGISTRATION;
-    }
-
-    @Override
-    public void start() {
-        securityService.asAdmin(() -> getSVNConfiguredBranches()
-                .filter(branch -> {
-                    Property<SVNSyncProperty> svnSync = propertyService.getProperty(branch, SVNSyncPropertyType.class);
-                    return !svnSync.isEmpty();
-                })
-                .forEach(this::scheduleSVNBuildSync)
+    public Collection<JobRegistration> getStartingJobs() {
+        return securityService.asAdmin(() ->
+                getSVNConfiguredBranches()
+                        .filter(branch -> propertyService.getProperty(branch, SVNSyncPropertyType.class).option().isPresent())
+                        .map(this::getSVNBuildSyncJobRegistration)
+                        .collect(Collectors.toList())
         );
     }
 
-    @Override
-    public void scheduleSVNBuildSync(Branch branch) {
+    private JobRegistration getSVNBuildSyncJobRegistration(Branch branch) {
         Property<SVNSyncProperty> svnSync = propertyService.getProperty(branch, SVNSyncPropertyType.class);
         if (svnSync.isEmpty()) {
             throw new IllegalStateException("No SVN build sync is set");
         } else {
-            jobScheduler.schedule(
-                    createJob(branch),
-                    Schedule.everyMinutes(svnSync.getValue().getInterval())
-            );
+            return JobRegistration.of(createJob(branch))
+                    .everyMinutes(svnSync.getValue().getInterval());
         }
+    }
+
+    @Override
+    public void scheduleSVNBuildSync(Branch branch) {
+        JobRegistration r = getSVNBuildSyncJobRegistration(branch);
+        jobScheduler.schedule(
+                r.getJob(),
+                r.getSchedule()
+        );
     }
 
     @Override
