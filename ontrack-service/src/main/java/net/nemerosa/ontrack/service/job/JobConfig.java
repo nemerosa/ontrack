@@ -1,10 +1,15 @@
 package net.nemerosa.ontrack.service.job;
 
+import com.codahale.metrics.MetricRegistry;
+import net.nemerosa.ontrack.job.JobListener;
 import net.nemerosa.ontrack.job.JobScheduler;
 import net.nemerosa.ontrack.job.support.DefaultJobScheduler;
+import net.nemerosa.ontrack.model.support.ApplicationLogService;
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
+import net.nemerosa.ontrack.model.support.SettingsRepository;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -21,7 +26,26 @@ public class JobConfig {
     private DefaultJobDecorator jobDecorator;
 
     @Autowired
-    private DefaultJobListener jobListener;
+    private ApplicationLogService logService;
+
+    @Autowired
+    private MetricRegistry metricRegistry;
+
+    @Autowired
+    private CounterService counterService;
+
+    @Autowired
+    private SettingsRepository settingsRepository;
+
+    @Bean
+    public JobListener jobListener() {
+        return new DefaultJobListener(
+                logService,
+                metricRegistry,
+                counterService,
+                settingsRepository
+        );
+    }
 
     @Bean
     public ScheduledExecutorService jobExecutorService() {
@@ -39,7 +63,7 @@ public class JobConfig {
         return new DefaultJobScheduler(
                 jobDecorator,
                 jobExecutorService(),
-                jobListener
+                jobListener()
         );
     }
 

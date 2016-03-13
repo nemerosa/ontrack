@@ -9,14 +9,11 @@ import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry;
 import net.nemerosa.ontrack.model.support.ApplicationLogService;
 import net.nemerosa.ontrack.model.support.SettingsRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.metrics.CounterService;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.TimeUnit;
 
-@Component
 public class DefaultJobListener implements JobListener {
 
     private final ApplicationLogService logService;
@@ -24,7 +21,6 @@ public class DefaultJobListener implements JobListener {
     private final CounterService counterService;
     private final SettingsRepository settingsRepository;
 
-    @Autowired
     public DefaultJobListener(ApplicationLogService logService, MetricRegistry metricRegistry, CounterService counterService, SettingsRepository settingsRepository) {
         this.logService = logService;
         this.metricRegistry = metricRegistry;
