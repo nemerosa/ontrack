@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 
@@ -12,8 +13,21 @@ import java.util.*;
 public final class JsonUtils {
 
     private static final JsonNodeFactory factory = JsonNodeFactory.instance;
+    private static final ObjectMapper mapper = ObjectMapperFactory.create();
 
     private JsonUtils() {
+    }
+
+    public static <V> V parse(JsonNode node, Class<V> type) {
+        try {
+            return mapper.treeToValue(node, type);
+        } catch (JsonProcessingException e) {
+            throw new JsonParseException(e);
+        }
+    }
+
+    public static JsonNode format(Object value) {
+        return mapper.valueToTree(value);
     }
 
     public static ObjectBuilder object() {

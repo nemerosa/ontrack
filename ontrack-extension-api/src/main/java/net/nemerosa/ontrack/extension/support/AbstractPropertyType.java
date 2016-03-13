@@ -1,9 +1,8 @@
 package net.nemerosa.ontrack.extension.support;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import net.nemerosa.ontrack.json.ObjectMapperFactory;
+import net.nemerosa.ontrack.json.JsonParseException;
+import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.exceptions.PropertyTypeStorageReadException;
 import net.nemerosa.ontrack.model.exceptions.PropertyValidationException;
 import net.nemerosa.ontrack.model.extension.ExtensionFeature;
@@ -12,8 +11,6 @@ import net.nemerosa.ontrack.model.structure.PropertyType;
 import org.apache.commons.lang3.StringUtils;
 
 public abstract class AbstractPropertyType<T> implements PropertyType<T> {
-
-    private static final ObjectMapper mapper = ObjectMapperFactory.create();
 
     private final ExtensionFeature extensionFeature;
 
@@ -38,14 +35,14 @@ public abstract class AbstractPropertyType<T> implements PropertyType<T> {
 
     protected static <V> V parse(JsonNode node, Class<V> type) {
         try {
-            return mapper.treeToValue(node, type);
-        } catch (JsonProcessingException e) {
+            return JsonUtils.parse(node, type);
+        } catch (JsonParseException e) {
             throw new PropertyTypeStorageReadException(type, e);
         }
     }
 
     protected static JsonNode format(Object value) {
-        return mapper.valueToTree(value);
+        return JsonUtils.format(value);
     }
 
     protected void validateNotBlank(String value, String message) {
