@@ -285,12 +285,14 @@ public class DefaultJobScheduler implements JobScheduler {
         public void pause() {
             if (scheduledFuture != null) {
                 paused.set(true);
+                jobListener.onJobPaused(job.getKey());
             }
         }
 
         public void resume() {
             if (scheduledFuture != null) {
                 paused.set(false);
+                jobListener.onJobResumed(job.getKey());
             }
         }
 

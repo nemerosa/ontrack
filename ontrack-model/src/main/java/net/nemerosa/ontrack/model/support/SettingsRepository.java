@@ -4,6 +4,8 @@ import java.util.function.Function;
 
 public interface SettingsRepository {
 
+    void delete(Class<?> category, String name);
+
     boolean getBoolean(Class<?> category, String name, boolean defaultValue);
 
     void setBoolean(Class<?> category, String name, boolean value);

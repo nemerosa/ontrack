@@ -4,6 +4,10 @@ public interface JobListener {
 
     void onJobStart(JobKey key);
 
+    void onJobPaused(JobKey key);
+
+    void onJobResumed(JobKey key);
+
     void onJobEnd(JobKey key, long milliseconds);
 
     void onJobError(JobStatus key, Exception ex);

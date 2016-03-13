@@ -8,9 +8,11 @@ import net.nemerosa.ontrack.job.JobStatus;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry;
 import net.nemerosa.ontrack.model.support.ApplicationLogService;
+import net.nemerosa.ontrack.model.support.SettingsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.TimeUnit;
 
@@ -20,12 +22,14 @@ public class DefaultJobListener implements JobListener {
     private final ApplicationLogService logService;
     private final MetricRegistry metricRegistry;
     private final CounterService counterService;
+    private final SettingsRepository settingsRepository;
 
     @Autowired
-    public DefaultJobListener(ApplicationLogService logService, MetricRegistry metricRegistry, CounterService counterService) {
+    public DefaultJobListener(ApplicationLogService logService, MetricRegistry metricRegistry, CounterService counterService, SettingsRepository settingsRepository) {
         this.logService = logService;
         this.metricRegistry = metricRegistry;
         this.counterService = counterService;
+        this.settingsRepository = settingsRepository;
     }
 
     protected String getJobTypeMetric(JobKey key) {
@@ -36,6 +40,18 @@ public class DefaultJobListener implements JobListener {
     public void onJobStart(JobKey key) {
         counterService.increment("job");
         counterService.increment(getJobTypeMetric(key));
+    }
+
+    @Override
+    @Transactional
+    public void onJobPaused(JobKey key) {
+        settingsRepository.setBoolean(JobListener.class, key.toString(), true);
+    }
+
+    @Override
+    @Transactional
+    public void onJobResumed(JobKey key) {
+        settingsRepository.delete(JobListener.class, key.toString());
     }
 
     @Override
