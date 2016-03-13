@@ -189,7 +189,7 @@ public class DefaultJobScheduler implements JobScheduler {
             // Paused at startup
             this.paused = new AtomicBoolean(pausedAtStartup);
             if (pausedAtStartup) {
-                logger.debug("[job]{} Job paused at startup");
+                logger.debug("[job]{} Job paused at startup", job.getKey());
             }
             // Copies stats from old service
             if (old != null) {
