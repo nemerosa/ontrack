@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.job.JobScheduler;
 import net.nemerosa.ontrack.model.support.JobProvider;
 import net.nemerosa.ontrack.model.support.StartupService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -18,9 +19,9 @@ public class JobStartup implements StartupService {
     private final Collection<JobProvider> jobProviders;
 
     @Autowired
-    public JobStartup(JobScheduler jobScheduler, Collection<JobProvider> jobProviders) {
+    public JobStartup(JobScheduler jobScheduler, ApplicationContext applicationContext) {
         this.jobScheduler = jobScheduler;
-        this.jobProviders = jobProviders;
+        this.jobProviders = applicationContext.getBeansOfType(JobProvider.class).values();
     }
 
     @Override
