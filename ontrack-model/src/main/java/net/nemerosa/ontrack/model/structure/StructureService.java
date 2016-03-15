@@ -56,6 +56,9 @@ public interface StructureService {
      */
     Optional<Build> findBuildAfterUsingNumericForm(ID id, String buildName);
 
+    /**
+     * Gets an aggregated view of a build, with its promotion runs, validation stamps and decorations.
+     */
     BuildView getBuildView(Build build);
 
     Build getLastBuildForBranch(Branch branch);

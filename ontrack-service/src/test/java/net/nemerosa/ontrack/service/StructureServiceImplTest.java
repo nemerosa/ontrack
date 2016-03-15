@@ -36,6 +36,7 @@ public class StructureServiceImplTest {
         PropertyService propertyService = mock(PropertyService.class);
         PredefinedPromotionLevelService predefinedPromotionLevelService = mock(PredefinedPromotionLevelService.class);
         PredefinedValidationStampService predefinedValidationStampService = mock(PredefinedValidationStampService.class);
+        DecorationService decorationService = mock(DecorationService.class);
         service = new StructureServiceImpl(
                 securityService,
                 eventService,
@@ -45,7 +46,8 @@ public class StructureServiceImplTest {
                 extensionManager,
                 propertyService,
                 predefinedPromotionLevelService,
-                predefinedValidationStampService);
+                predefinedValidationStampService,
+                decorationService);
         // Model
         Project project = Project.of(nd("P", "Project")).withId(ID.of(1));
         Branch branch = Branch.of(project, nd("B", "Branch")).withId(ID.of(1));

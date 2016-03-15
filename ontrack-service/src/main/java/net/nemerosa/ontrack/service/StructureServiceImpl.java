@@ -58,9 +58,10 @@ public class StructureServiceImpl implements StructureService {
     private final PropertyService propertyService;
     private final PredefinedPromotionLevelService predefinedPromotionLevelService;
     private final PredefinedValidationStampService predefinedValidationStampService;
+    private final DecorationService decorationService;
 
     @Autowired
-    public StructureServiceImpl(SecurityService securityService, EventPostService eventPostService, EventFactory eventFactory, ValidationRunStatusService validationRunStatusService, StructureRepository structureRepository, ExtensionManager extensionManager, PropertyService propertyService, PredefinedPromotionLevelService predefinedPromotionLevelService, PredefinedValidationStampService predefinedValidationStampService) {
+    public StructureServiceImpl(SecurityService securityService, EventPostService eventPostService, EventFactory eventFactory, ValidationRunStatusService validationRunStatusService, StructureRepository structureRepository, ExtensionManager extensionManager, PropertyService propertyService, PredefinedPromotionLevelService predefinedPromotionLevelService, PredefinedValidationStampService predefinedValidationStampService, DecorationService decorationService) {
         this.securityService = securityService;
         this.eventPostService = eventPostService;
         this.eventFactory = eventFactory;
@@ -70,6 +71,7 @@ public class StructureServiceImpl implements StructureService {
         this.propertyService = propertyService;
         this.predefinedPromotionLevelService = predefinedPromotionLevelService;
         this.predefinedValidationStampService = predefinedValidationStampService;
+        this.decorationService = decorationService;
     }
 
     @Override
@@ -765,6 +767,7 @@ public class StructureServiceImpl implements StructureService {
     @Override
     public BuildView getBuildView(Build build) {
         return BuildView.of(build)
+                .withDecorations(decorationService.getDecorations(build))
                 .withPromotionRuns(getLastPromotionRunsForBuild(build.getId()))
                 .withValidationStampRunViews(getValidationStampRunViewsForBuild(build));
     }
