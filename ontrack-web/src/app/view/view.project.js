@@ -17,12 +17,16 @@ angular.module('ot.view.project', [
         var projectId = $stateParams.projectId;
         // Loading the branches
         function loadBranches() {
+            $scope.loadingBranches = true;
             ot.call($http.get($scope.project._branches)).then(function (branchCollection) {
                 $scope.branchCollection = branchCollection;
                 // Loading the branch status view for each branch
                 angular.forEach(branchCollection.resources, function (branch) {
+                    branch.loadingView = true;
                     ot.call($http.get(branch._status)).then(function (branchStatusView) {
                         branch.branchStatusView = branchStatusView;
+                    }).finally(function () {
+                        branch.loadingView = false;
                     });
                 });
                 // View commands
@@ -147,6 +151,8 @@ angular.module('ot.view.project', [
                     ot.viewActionsCommand($scope.project._actions),
                     ot.viewCloseCommand('/home')
                 ];
+            }).finally(function() {
+                $scope.loadingBranches = false;
             });
         }
 

@@ -6,6 +6,15 @@
 
     <div class="row">
         <div class="col-md-12">
+            <div class="alert alert-info" ng-show="loadingBranches">
+                <span class="ot-loading-indicator"></span>
+                Loading the project branches...
+            </div>
+        </div>
+    </div>
+
+    <div class="row" ng-hide="loadingBranches">
+        <div class="col-md-12">
             <ot-section-title>Branches</ot-section-title>
             <ot-noentry list="branchCollection.resources">
                 No branch has been created yet.
@@ -46,7 +55,12 @@
                                         class="ot-command ot-command-delete"></span>
                             </td>
                             <td>
+                                <div class="ot-project-branch-promotion text-muted" ng-show="branch.loadingView">
+                                    <span class="ot-loading-indicator"></span>
+                                    Loading promotions...
+                                </div>
                                 <div class="ot-project-branch-promotion"
+                                     ng-hide="branch.loadingView"
                                      ng-if="branch.branchStatusView.latestBuild">
                                     <span class="ot-description">Latest</span>
                                     <span class="fa fa-arrow-right"></span>
@@ -56,6 +70,7 @@
                                     </a>
                                 </div>
                                 <div class="ot-project-branch-promotion"
+                                     ng-hide="branch.loadingView"
                                      ng-if="!branch.branchStatusView.latestBuild">
                                     <span class="ot-description">
                                         <span class="fa fa-ban" title="No build on this branch"></span>
@@ -63,6 +78,7 @@
                                     </span>
                                 </div>
                                 <div class="ot-project-branch-promotion"
+                                     ng-hide="branch.loadingView"
                                      ng-repeat="promotionView in branch.branchStatusView.promotions">
                                     <span ng-if="promotionView.promotionRun">
                                         <a href="#/promotionLevel/{{promotionView.promotionLevel.id}}">
