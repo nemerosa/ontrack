@@ -16,6 +16,7 @@ import net.nemerosa.ontrack.extension.issues.model.IssueServiceNotConfiguredExce
 import net.nemerosa.ontrack.extension.scm.model.SCMBuildView;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFileChangeType;
 import net.nemerosa.ontrack.extension.scm.model.SCMIssueCommitBranchInfo;
+import net.nemerosa.ontrack.extension.scm.model.SCMPathInfo;
 import net.nemerosa.ontrack.extension.scm.service.AbstractSCMChangeLogService;
 import net.nemerosa.ontrack.extension.scm.service.SCMUtilsService;
 import net.nemerosa.ontrack.git.GitRepositoryClient;
@@ -962,5 +963,18 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     @Override
     public void unscheduleGitBuildSync(Branch branch, GitBranchConfigurationProperty property) {
         jobScheduler.unschedule(getGitBranchSyncJobKey(branch));
+    }
+
+    @Override
+    public Optional<SCMPathInfo> getSCMPathInfo(Branch branch) {
+        return getBranchConfiguration(branch)
+                .map(gitBranchConfiguration ->
+                        new SCMPathInfo(
+                                "git",
+                                gitBranchConfiguration.getConfiguration().getRemote(),
+                                gitBranchConfiguration.getBranch(),
+                                null
+                        )
+                );
     }
 }

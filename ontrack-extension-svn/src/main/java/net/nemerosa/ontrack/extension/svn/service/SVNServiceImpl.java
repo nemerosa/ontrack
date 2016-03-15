@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.svn.service;
 
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
+import net.nemerosa.ontrack.extension.scm.model.SCMPathInfo;
 import net.nemerosa.ontrack.extension.svn.client.SVNClient;
 import net.nemerosa.ontrack.extension.svn.db.*;
 import net.nemerosa.ontrack.extension.svn.model.*;
@@ -186,7 +187,7 @@ public class SVNServiceImpl implements SVNService {
     public SVNRepository getRequiredSVNRepository(Branch branch) {
         return getSVNRepository(branch)
                 .orElseThrow(() ->
-                                new MissingSVNProjectConfigurationException(branch.getProject().getName())
+                        new MissingSVNProjectConfigurationException(branch.getProject().getName())
                 );
     }
 
@@ -262,4 +263,18 @@ public class SVNServiceImpl implements SVNService {
         return eventDao.getFirstCopyAfter(repository.getId(), location);
     }
 
+    @Override
+    public Optional<SCMPathInfo> getSCMPathInfo(Branch branch) {
+        return propertyService.getProperty(
+                branch,
+                SVNBranchConfigurationPropertyType.class
+        ).option().map(property ->
+                new SCMPathInfo(
+                        "svn",
+                        property.getCuredBranchPath(),
+                        null,
+                        null
+                )
+        );
+    }
 }
