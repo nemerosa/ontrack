@@ -45,6 +45,15 @@ public class ProjectController extends AbstractResourceController {
                 .with(Link.CREATE, uri(on(ProjectController.class).newProject(null)), securityService.isGlobalFunctionGranted(ProjectCreation.class));
     }
 
+    @RequestMapping(value = "view", method = RequestMethod.GET)
+    public Resources<ProjectStatusView> getProjectStatusViews() {
+        return Resources.of(
+                structureService.getProjectStatusViews(),
+                uri(on(ProjectController.class).getProjectStatusViews())
+        )
+                .with(Link.CREATE, uri(on(ProjectController.class).newProject(null)), securityService.isGlobalFunctionGranted(ProjectCreation.class));
+    }
+
     @RequestMapping(value = "create", method = RequestMethod.GET)
     public Form newProjectForm() {
         return Project.form();

@@ -1,8 +1,16 @@
 <ot-view>
-    <ot-noentry list="projectCollection.resources">
+    <div class="row" ng-show="loadingProjects">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <span class="ot-loading-indicator"></span>
+                Loading the list of projects...
+            </div>
+        </div>
+    </div>
+    <ot-noentry ng-hide="loadingProjects" list="projectStatusViews">
         No project has been created yet, or no right is granted for you to see at least one of them.
     </ot-noentry>
-    <div class="row" ng-if="projectCollection.resources">
+    <div class="row" ng-if="projectStatusViews">
         <div class="col-md-12">
             <div class="row">
                 <div class="col-md-12 ot-home-header">
@@ -19,28 +27,30 @@
             </div>
             <table class="ot-home-projects">
                 <tbody>
-                <tr ng-repeat="project in projectCollection.resources | filter:{name:projectNameFilter}"
-                    ng-show="showDisabled || (!project.disabled && !project.allBranchesDisabled)">
-                    <td ng-class="{'ot-entity-disabled': project.disabled}">
-                        <a href="#/project/{{project.id}}">
-                            {{project.name}}
+                <!-- FIXME filter -->
+                <!-- FIXME allBranchesDisabled -->
+                <tr ng-repeat="projectStatusView in projectStatusViews | filter:projectNameFilter"
+                    ng-show="showDisabled || (!projectStatusView.project.disabled && !projectStatusView.project.allBranchesDisabled)">
+                    <td ng-class="{'ot-entity-disabled': projectStatusView.project.disabled}">
+                        <a href="#/project/{{projectStatusView.project.id}}">
+                            {{projectStatusView.project.name}}
                         </a>
-                        <ot-entity-decorations entity="project"></ot-entity-decorations>
+                        <ot-entity-embedded-decorations decorations="projectStatusView.decorations"></ot-entity-embedded-decorations>
                     </td>
                     <td>
-                        <div class="ot-home-branch" ng-if="project.branchStatusViews.resources.length == 0">
+                        <div class="ot-home-branch" ng-if="projectStatusView.branchStatusViews.length == 0">
                             <span class="ot-description">
                                 <span class="fa fa-ban" title="No branch on this project"></span>
                                 No branch
                             </span>
                         </div>
                         <div class="ot-home-branch"
-                             ng-repeat="branchStatusView in project.branchStatusViews.resources"
+                             ng-repeat="branchStatusView in projectStatusView.branchStatusViews"
                              ng-show="showDisabled || !(branchStatusView.branch.disabled || branchStatusView.branch.type == 'TEMPLATE_DEFINITION')">
                             <span class="ot-home-branch-name ot-decoration-list"
                                   ng-class="{'ot-entity-disabled': branchStatusView.branch.disabled}">
                                 <a href="#/branch/{{branchStatusView.branch.id}}">{{branchStatusView.branch.name}}</a>
-                                <ot-entity-decorations entity="branchStatusView.branch"></ot-entity-decorations>
+                                <ot-entity-embedded-decorations decorations="branchStatusView.decorations"></ot-entity-embedded-decorations>
                             </span>
                             <span ng-if="branchStatusView.lastPromotionView" class="ot-home-branch-promotion">
                                 <a href="#/promotionLevel/{{branchStatusView.lastPromotionView.promotionLevel.id}}">

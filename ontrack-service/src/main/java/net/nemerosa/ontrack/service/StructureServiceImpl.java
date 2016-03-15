@@ -75,6 +75,17 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public List<ProjectStatusView> getProjectStatusViews() {
+        return getProjectList().stream()
+                .map(project -> new ProjectStatusView(
+                        project,
+                        decorationService.getDecorations(project),
+                        getBranchStatusViews(project.getId())
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public Project newProject(Project project) {
         isEntityNew(project, "Project must be defined");
         securityService.checkGlobalFunction(ProjectCreation.class);
@@ -748,10 +759,10 @@ public class StructureServiceImpl implements StructureService {
                 ).get(0),
                 getPromotionLevelListForBranch(build.getBranch().getId()).stream()
                         .map(promotionLevel ->
-                                        new PromotionView(
-                                                promotionLevel,
-                                                getEarliestPromotionRunAfterBuild(promotionLevel, build).orElse(null)
-                                        )
+                                new PromotionView(
+                                        promotionLevel,
+                                        getEarliestPromotionRunAfterBuild(promotionLevel, build).orElse(null)
+                                )
                         )
                         .collect(Collectors.toList())
         );

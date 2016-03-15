@@ -20,19 +20,10 @@ angular.module('ot.view.home', [
         };
         // Loading the project list
         function loadProjects() {
-            otStructureService.getProjects().then(function (projectCollection) {
-                $scope.projectCollection = projectCollection;
-                // Loading the projects' views
-                angular.forEach($scope.projectCollection.resources, function (project) {
-                    ot.call($http.get(project._branchStatusViews)).then(function (branchStatusViews) {
-                        project.branchStatusViews = branchStatusViews;
-                        // All branches disabled?
-                        project.allBranchesDisabled = branchStatusViews.resources.length > 0 &&
-                            branchStatusViews.resources.every(function (branchStatusView) {
-                                return branchStatusView.branch.disabled || branchStatusView.branch.type == 'TEMPLATE_DEFINITION';
-                            });
-                    });
-                });
+            $scope.loadingProjects = true;
+            ot.pageCall($http.get('structure/projects/view')).then(function (projectStatusViewResources) {
+                $scope.projectStatusViewResources = projectStatusViewResources;
+                $scope.projectStatusViews = projectStatusViewResources.resources;
                 // Commands
                 $rootScope.view.commands = [
                     {
@@ -40,10 +31,10 @@ angular.module('ot.view.home', [
                         name: 'Create project',
                         cls: 'ot-command-project-new',
                         condition: function () {
-                            return projectCollection._create;
+                            return projectStatusViewResources._create;
                         },
                         action: function () {
-                            otStructureService.createProject(projectCollection._create).then(loadProjects);
+                            otStructureService.createProject(projectStatusViewResources._create).then(loadProjects);
                         }
                     }, {
                         id: 'showDisabled',
@@ -71,6 +62,8 @@ angular.module('ot.view.home', [
                         link: '/api-doc'
                     }
                 ];
+            }).finally(function () {
+                $scope.loadingProjects = false;
             });
             // Any notification?
             if (code) {

@@ -10,6 +10,8 @@ import java.util.function.Predicate;
 
 public interface StructureService {
 
+    List<ProjectStatusView> getProjectStatusViews();
+
     // Projects
 
     Project newProject(Project project);
