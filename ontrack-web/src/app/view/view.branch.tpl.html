@@ -78,12 +78,12 @@
         </div>
         <div class="col-md-4">
             <ot-section-title>Validation stamps</ot-section-title>
-            <ot-noentry list="validationStampCollection.resources">
+            <ot-noentry list="validationStamps">
                 No validation stamp has been created yet.
             </ot-noentry>
-            <div ng-if="validationStampCollection.resources" class="ot-entity-sortable-list"
-                 ui-sortable="validationStampSortOptions" ng-model="validationStampCollection.resources">
-                <div ng-repeat="validationStamp in validationStampCollection.resources" class="ot-entity-sortable-list-item">
+            <div ng-if="validationStamps" class="ot-entity-sortable-list"
+                 ui-sortable="validationStampSortOptions" ng-model="validationStamps">
+                <div ng-repeat="validationStamp in validationStamps" class="ot-entity-sortable-list-item">
                     <span class="ot-entity-sortable-list-handle"
                           ng-if="branch._reorderValidationStamps"
                           title="Move this to reorder the validation stamps">&nbsp;</span>

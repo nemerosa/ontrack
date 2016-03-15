@@ -63,6 +63,11 @@ public class BranchResourceDecorator extends AbstractResourceDecorator<Branch> {
                         "_validationStamps",
                         on(ValidationStampController.class).getValidationStampListForBranch(branch.getId())
                 )
+                // Validation stamp list with view
+                .link(
+                        "_validationStampViews",
+                        on(ValidationStampController.class).getValidationStampViewListForBranch(branch.getId())
+                )
                 // All branches for the same project
                 .link(
                         "_branches",

@@ -139,13 +139,17 @@ angular.module('ot.view.branch', [
 
         // Loading the validation stamps
         function loadValidationStamps() {
-            ot.call($http.get($scope.branch._validationStamps)).then(function (collection) {
-                $scope.validationStampCollection = collection;
+            ot.call($http.get($scope.branch._validationStampViews)).then(function (resourcesForViews) {
+                $scope.validationStampViewResources = resourcesForViews;
+                $scope.validationStampViews = resourcesForViews.resources;
+                $scope.validationStamps = resourcesForViews.resources.map(function (view) {
+                    return view.validationStamp;
+                });
                 $scope.validationStampSortOptions = {
                     disabled: !$scope.branch._reorderValidationStamps,
                     stop: function (event, ui) {
-                        var ids = $scope.validationStampCollection.resources.map(function (pl) {
-                            return pl.id;
+                        var ids = $scope.validationStamps.map(function (vs) {
+                            return vs.id;
                         });
                         ot.call($http.put(
                             $scope.branch._reorderValidationStamps,
