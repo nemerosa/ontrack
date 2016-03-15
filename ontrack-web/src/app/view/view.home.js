@@ -18,6 +18,8 @@ angular.module('ot.view.home', [
             // Commands
             commands: []
         };
+        // No initial filter
+        $scope.projectNameFilter = '';
         // Loading the project list
         function loadProjects() {
             $scope.loadingProjects = true;
