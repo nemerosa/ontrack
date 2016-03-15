@@ -74,32 +74,28 @@ angular.module('ot.directive.entity', [
             }
         };
     })
-    .directive('otEntityDecorations', function ($http, ot, otTaskService) {
-        function updateEntityDecorations(scope, entity) {
-            ot.call($http.get(entity._decorations)).then(function (decorations) {
+    .directive('otEntityDecorations', function ($http, ot) {
+        function updateEntityDecorations(scope, entity, decorations) {
+            if (decorations) {
                 scope.decorations = decorations;
-            });
+            } else {
+                ot.call($http.get(entity._decorations)).then(function (decorations) {
+                    scope.decorations = decorations.resources;
+                });
+            }
         }
 
         return {
             restrict: 'E',
             templateUrl: 'app/directive/directive.entityDecorations.tpl.html',
             scope: {
-                entity: '='
+                entity: '=',
+                decorations: '='
             },
             link: function (scope) {
                 scope.$watch('entity', function () {
                     if (scope.entity) {
-                        updateEntityDecorations(scope, scope.entity);
-                        // Unique task name
-                        var taskName = scope.entity._decorations;
-                        otTaskService.register(
-                            taskName,
-                            function () {
-                                updateEntityDecorations(scope, scope.entity);
-                            },
-                            60000 // 1 minute is more than enough
-                        );
+                        updateEntityDecorations(scope, scope.entity, scope.decorations);
                     }
                 });
             }
