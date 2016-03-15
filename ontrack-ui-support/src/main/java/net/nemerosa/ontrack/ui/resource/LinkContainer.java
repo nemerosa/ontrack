@@ -11,7 +11,16 @@ import java.util.Map;
 public abstract class LinkContainer<L extends LinkContainer<L>> {
 
     private final URI _self;
-    private final Map<String, URI> links = new LinkedHashMap<>();
+    private final Map<String, URI> links;
+
+    protected LinkContainer(URI uri) {
+        this(uri, new LinkedHashMap<>());
+    }
+
+    protected LinkContainer(URI uri, Map<String, URI> links) {
+        this._self = uri;
+        this.links = links;
+    }
 
     public L with(String name, URI uri, boolean authorized) {
         if (authorized) {
@@ -37,4 +46,9 @@ public abstract class LinkContainer<L extends LinkContainer<L>> {
         return links;
     }
 
+    public L withLinks(Map<String, URI> links) {
+        this.links.putAll(links);
+        //noinspection unchecked
+        return (L) this;
+    }
 }

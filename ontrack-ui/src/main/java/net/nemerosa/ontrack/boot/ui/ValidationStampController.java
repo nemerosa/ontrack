@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,11 +28,13 @@ public class ValidationStampController extends AbstractResourceController {
 
     private final StructureService structureService;
     private final SecurityService securityService;
+    private final DecorationService decorationService;
 
     @Autowired
-    public ValidationStampController(StructureService structureService, SecurityService securityService) {
+    public ValidationStampController(StructureService structureService, SecurityService securityService, DecorationService decorationService) {
         this.structureService = structureService;
         this.securityService = securityService;
+        this.decorationService = decorationService;
     }
 
     // Validation stamps
@@ -50,6 +53,18 @@ public class ValidationStampController extends AbstractResourceController {
                         securityService.isProjectFunctionGranted(branch.getProject().id(), ValidationStampCreate.class)
                 )
                 ;
+    }
+
+    @RequestMapping(value = "branches/{branchId}/validationStamps/view", method = RequestMethod.GET)
+    @Transactional
+    public Resources<ValidationStampView> getValidationStampViewListForBranch(@PathVariable ID branchId) {
+        return getValidationStampListForBranch(branchId)
+                .transform(validationStamp ->
+                        ValidationStampView.of(
+                                validationStamp,
+                                decorationService.getDecorations(validationStamp)
+                        )
+                );
     }
 
     @RequestMapping(value = "branches/{branchId}/validationStamps/reorder", method = RequestMethod.PUT)

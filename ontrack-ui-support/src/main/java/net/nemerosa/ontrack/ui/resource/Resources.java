@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.structure.ViewSupplier;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -42,5 +43,18 @@ public class Resources<T> extends LinkContainer<Resources<T>> implements ViewSup
 
     public Resources<T> withPagination(Pagination pagination) {
         return this.pagination == pagination ? this : new Resources<>(this.resources, get_self(), pagination, this.viewType);
+    }
+
+    /**
+     * Creates a new <code>Resources</code> object by transforming the elements in the underlying collection.
+     * The links and the pagination are kept but not the view type.
+     */
+    public <V> Resources<V> transform(Function<T, V> fn) {
+        return new Resources<>(
+                resources.stream().map(fn).collect(Collectors.toList()),
+                get_self(),
+                pagination,
+                Object.class
+        ).withLinks(getLinks());
     }
 }
