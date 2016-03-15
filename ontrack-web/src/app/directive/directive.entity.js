@@ -75,29 +75,33 @@ angular.module('ot.directive.entity', [
         };
     })
     .directive('otEntityDecorations', function ($http, ot) {
-        function updateEntityDecorations(scope, entity, decorations) {
-            if (decorations) {
-                scope.decorations = decorations;
-            } else {
-                ot.call($http.get(entity._decorations)).then(function (decorations) {
-                    scope.decorations = decorations.resources;
-                });
-            }
+        function updateEntityDecorations(scope, entity) {
+            ot.call($http.get(entity._decorations)).then(function (decorations) {
+                scope.decorations = decorations.resources;
+            });
         }
 
         return {
             restrict: 'E',
             templateUrl: 'app/directive/directive.entityDecorations.tpl.html',
             scope: {
-                entity: '=',
-                decorations: '='
+                entity: '='
             },
             link: function (scope) {
                 scope.$watch('entity', function () {
                     if (scope.entity) {
-                        updateEntityDecorations(scope, scope.entity, scope.decorations);
+                        updateEntityDecorations(scope, scope.entity);
                     }
                 });
+            }
+        };
+    })
+    .directive('otEntityEmbeddedDecorations', function ($http, ot) {
+        return {
+            restrict: 'E',
+            templateUrl: 'app/directive/directive.entityDecorations.tpl.html',
+            scope: {
+                decorations: '='
             }
         };
     })
