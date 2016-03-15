@@ -208,11 +208,7 @@ public class NamedBuildFilterTest {
                 Collections.emptyList(),
                 branch,
                 build,
-                () -> new BuildView(
-                        build,
-                        Collections.emptyList(),
-                        Collections.emptyList()
-                )
+                () -> BuildView.of(build)
         );
     }
 
@@ -221,18 +217,17 @@ public class NamedBuildFilterTest {
                 Collections.emptyList(),
                 branch,
                 build,
-                () -> new BuildView(
-                        build,
-                        Arrays.asList(promotionLevels).stream()
-                                .map(promotionLevel -> PromotionRun.of(
-                                        build,
-                                        promotionLevel,
-                                        Signature.of("test"),
-                                        ""
-                                ))
-                                .collect(Collectors.toList()),
-                        Collections.emptyList()
-                )
+                () -> BuildView.of(build)
+                        .withPromotionRuns(
+                                Arrays.asList(promotionLevels).stream()
+                                        .map(promotionLevel -> PromotionRun.of(
+                                                build,
+                                                promotionLevel,
+                                                Signature.of("test"),
+                                                ""
+                                        ))
+                                        .collect(Collectors.toList())
+                        )
         );
     }
 

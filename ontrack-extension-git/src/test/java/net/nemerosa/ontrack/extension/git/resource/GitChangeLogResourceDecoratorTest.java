@@ -18,7 +18,6 @@ import org.junit.Test;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -51,14 +50,14 @@ public class GitChangeLogResourceDecoratorTest {
         Branch branch = Branch.of(project, nd("B", "Branch")).withId(ID.of(10));
 
         List<BuildView> buildView = Arrays.asList(1, 2).stream()
-                .map(it -> new BuildView(
-                                Build.of(
-                                        branch,
-                                        nd(String.valueOf(it), "Build " + it),
-                                        Signature.of(LocalDateTime.of(2014, 12, 5, 21, 53), "user")
-                                ).withId(ID.of(it)),
-                                Collections.emptyList(),
-                                Collections.emptyList()
+                .map(it -> BuildView.of(
+                        Build.of(
+                                branch,
+                                nd(String.valueOf(it), "Build " + it),
+                                Signature.of(LocalDateTime.of(2014, 12, 5, 21, 53), "user")
+                        ).withId(
+                                ID.of(it)
+                        )
                         )
                 )
                 .collect(Collectors.toList());
@@ -167,14 +166,12 @@ public class GitChangeLogResourceDecoratorTest {
         Branch branch = Branch.of(project, nd("B", "Branch")).withId(ID.of(10));
 
         List<BuildView> buildView = Arrays.asList(1, 2).stream()
-                .map(it -> new BuildView(
-                                Build.of(
-                                        branch,
-                                        nd(String.valueOf(it), "Build " + it),
-                                        Signature.of(LocalDateTime.of(2014, 12, 5, 21, 53), "user")
-                                ).withId(ID.of(it)),
-                                Collections.emptyList(),
-                                Collections.emptyList()
+                .map(it -> BuildView.of(
+                        Build.of(
+                                branch,
+                                nd(String.valueOf(it), "Build " + it),
+                                Signature.of(LocalDateTime.of(2014, 12, 5, 21, 53), "user")
+                        ).withId(ID.of(it))
                         )
                 )
                 .collect(Collectors.toList());

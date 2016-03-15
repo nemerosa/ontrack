@@ -62,11 +62,7 @@ public class StandardBuildFilterTest {
                 Collections.emptyList(),
                 branch,
                 build,
-                () -> new BuildView(
-                        build,
-                        Collections.emptyList(),
-                        Collections.emptyList()
-                )
+                () -> BuildView.of(build)
         );
         assertNotNull(result);
         assertTrue(result.isGoingOn());
@@ -100,24 +96,24 @@ public class StandardBuildFilterTest {
                 Collections.emptyList(),
                 branch,
                 build,
-                () -> new BuildView(
-                        build,
-                        Arrays.asList(
-                                PromotionRun.of(
-                                        build,
-                                        copper,
-                                        Signature.of("test"),
-                                        ""
-                                ),
-                                PromotionRun.of(
-                                        build,
-                                        bronze,
-                                        Signature.of("test"),
-                                        ""
+                () -> BuildView.of(build)
+                        .withPromotionRuns(
+                                Arrays.asList(
+                                        PromotionRun.of(
+                                                build,
+                                                copper,
+                                                Signature.of("test"),
+                                                ""
+                                        ),
+                                        PromotionRun.of(
+                                                build,
+                                                bronze,
+                                                Signature.of("test"),
+                                                ""
+                                        )
+
                                 )
-                        ),
-                        Collections.emptyList()
-                )
+                        )
         );
         assertNotNull(result);
         assertFalse("Not going on after Bronze build", result.isGoingOn());
@@ -151,18 +147,17 @@ public class StandardBuildFilterTest {
                 Collections.emptyList(),
                 branch,
                 build,
-                () -> new BuildView(
-                        build,
-                        Arrays.asList(
-                                PromotionRun.of(
-                                        build,
-                                        bronze,
-                                        Signature.of("test"),
-                                        ""
+                () -> BuildView.of(build)
+                        .withPromotionRuns(
+                                Collections.singletonList(
+                                        PromotionRun.of(
+                                                build,
+                                                bronze,
+                                                Signature.of("test"),
+                                                ""
+                                        )
                                 )
-                        ),
-                        Collections.emptyList()
-                )
+                        )
         );
         assertNotNull(result);
         assertFalse("Not going on after Bronze build", result.isGoingOn());

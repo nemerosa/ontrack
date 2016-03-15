@@ -764,11 +764,9 @@ public class StructureServiceImpl implements StructureService {
 
     @Override
     public BuildView getBuildView(Build build) {
-        return new BuildView(
-                build,
-                getLastPromotionRunsForBuild(build.getId()),
-                getValidationStampRunViewsForBuild(build)
-        );
+        return BuildView.of(build)
+                .withPromotionRuns(getLastPromotionRunsForBuild(build.getId()))
+                .withValidationStampRunViews(getValidationStampRunViewsForBuild(build));
     }
 
     @Override
