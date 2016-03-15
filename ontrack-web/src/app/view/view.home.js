@@ -24,6 +24,12 @@ angular.module('ot.view.home', [
             ot.pageCall($http.get('structure/projects/view')).then(function (projectStatusViewResources) {
                 $scope.projectStatusViewResources = projectStatusViewResources;
                 $scope.projectStatusViews = projectStatusViewResources.resources;
+                // All branches disabled status computation
+                $scope.projectStatusViews.forEach(function (projectStatusView) {
+                    projectStatusView.allBranchesDisabled = projectStatusView.branchStatusViews.every(function (branchStatusView) {
+                        return branchStatusView.branch.disabled || branchStatusView.branch.type == 'TEMPLATE_DEFINITION';
+                    });
+                });
                 // Commands
                 $rootScope.view.commands = [
                     {

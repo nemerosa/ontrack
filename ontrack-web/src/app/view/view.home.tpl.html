@@ -28,9 +28,8 @@
             <table class="ot-home-projects">
                 <tbody>
                 <!-- FIXME filter -->
-                <!-- FIXME allBranchesDisabled -->
                 <tr ng-repeat="projectStatusView in projectStatusViews | filter:projectNameFilter"
-                    ng-show="showDisabled || (!projectStatusView.project.disabled && !projectStatusView.project.allBranchesDisabled)">
+                    ng-show="showDisabled || (!projectStatusView.project.disabled && !projectStatusView.allBranchesDisabled)">
                     <td ng-class="{'ot-entity-disabled': projectStatusView.project.disabled}">
                         <a href="#/project/{{projectStatusView.project.id}}">
                             {{projectStatusView.project.name}}

@@ -51,6 +51,7 @@ public class JenkinsJobDecorationExtension extends AbstractExtension implements 
                 return Collections.emptyList();
             }
             // Gets a client
+            // FIXME getJob does not need a full HTTP client
             JenkinsClient jenkinsClient = jenkinsClientFactory.getClient(property.getValue().getConfiguration());
             // Gets the Jenkins job
             JenkinsJob job = jenkinsClient.getJob(property.getValue().getJob());
