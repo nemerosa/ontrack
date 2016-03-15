@@ -463,7 +463,7 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
 
     @Test(expected = AccessDeniedException)
     void 'Instance sync - not granted'() {
-        doInstanceSync(ProjectStatusView)
+        doInstanceSync(ProjectView)
     }
 
     protected void doInstanceSync(Class<? extends ProjectFunction> fn) {
@@ -499,7 +499,7 @@ class BranchTemplateServiceIT extends AbstractServiceTestSupport {
         }
 
         // Checks the new promotion level
-        asUser().with(template, ProjectStatusView).call {
+        asUser().with(template, ProjectView).call {
             assert structureService.findPromotionLevelByName(instance.project.name, instance.name, 'GOLD').present
         }
     }
