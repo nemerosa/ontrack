@@ -11,6 +11,7 @@ import java.util.List;
 public class BranchStatusView implements View {
 
     private final Branch branch;
+    private final List<Decoration<?>> decorations;
     private final Build latestBuild;
     private final List<PromotionView> promotions;
 

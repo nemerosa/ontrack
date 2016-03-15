@@ -156,6 +156,7 @@ public class StructureServiceImpl implements StructureService {
     public BranchStatusView getBranchStatusView(Branch branch) {
         return new BranchStatusView(
                 branch,
+                decorationService.getDecorations(branch),
                 getLastBuildForBranch(branch),
                 getPromotionLevelListForBranch(branch.getId()).stream()
                         .map(this::toPromotionView)
@@ -740,6 +741,7 @@ public class StructureServiceImpl implements StructureService {
     public BranchStatusView getEarliestPromotionsAfterBuild(Build build) {
         return new BranchStatusView(
                 build.getBranch(),
+                decorationService.getDecorations(build.getBranch()),
                 getFilteredBuilds(
                         build.getBranch().getId(),
                         new DefaultBuildFilter(1)
