@@ -45,12 +45,7 @@ public class OTHttpClientBuilder {
     private final HttpHost host;
     private String username;
     private String password;
-    private OTHttpClientLogger clientLogger = new OTHttpClientLogger() {
-        @Override
-        public void trace(String message) {
-            logger.debug(message);
-        }
-    };
+    private OTHttpClientLogger clientLogger = logger::debug;
 
     protected OTHttpClientBuilder(String url, boolean disableSsl) {
         try {
@@ -66,6 +61,7 @@ public class OTHttpClientBuilder {
         );
     }
 
+    @SuppressWarnings("unused")
     public OTHttpClientBuilder withLogger(OTHttpClientLogger httpClientLogger) {
         this.clientLogger = httpClientLogger;
         return this;
@@ -131,7 +127,6 @@ public class OTHttpClientBuilder {
                     SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER
             );
         } else {
-            logger.debug("Using default secure SSL socket factory.");
             sslSocketFactory = SSLConnectionSocketFactory.getSocketFactory();
         }
 
