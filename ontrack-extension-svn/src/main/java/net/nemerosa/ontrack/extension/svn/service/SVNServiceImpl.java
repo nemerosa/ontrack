@@ -268,13 +268,15 @@ public class SVNServiceImpl implements SVNService {
         return propertyService.getProperty(
                 branch,
                 SVNBranchConfigurationPropertyType.class
-        ).option().map(property ->
-                new SCMPathInfo(
-                        "svn",
-                        property.getCuredBranchPath(),
-                        null,
-                        null
-                )
+        ).option().map(property -> {
+                    SVNRepository svnRepository = getSVNRepository(branch).get();
+                    return new SCMPathInfo(
+                            "svn",
+                            getBasePath(svnRepository, property.getCuredBranchPath()).get(),
+                            null,
+                            null
+                    );
+                }
         );
     }
 }
