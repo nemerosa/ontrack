@@ -2,11 +2,8 @@ package net.nemerosa.ontrack.tx;
 
 import com.google.common.collect.Table;
 import com.google.common.collect.Tables;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -14,7 +11,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Service
 public class DefaultTransactionService implements TransactionService {
 
-    private final Logger logger = LoggerFactory.getLogger(TransactionService.class);
     private final ThreadLocal<Stack<ITransaction>> transaction = new ThreadLocal<>();
 
     @Override
@@ -59,8 +55,6 @@ public class DefaultTransactionService implements TransactionService {
     }
 
     protected ITransaction createTransaction() {
-        logger.debug("Creating transaction");
-
         // Creates the transaction
         return new TransactionImpl(tx -> {
             Stack<ITransaction> stack = transaction.get();
@@ -71,13 +65,13 @@ public class DefaultTransactionService implements TransactionService {
         });
     }
 
-    private static interface ITransaction extends Transaction {
+    private interface ITransaction extends Transaction {
 
         void reuse();
 
     }
 
-    private static interface TransactionCallback {
+    private interface TransactionCallback {
 
         void remove(ITransaction tx);
 
@@ -89,7 +83,7 @@ public class DefaultTransactionService implements TransactionService {
         private final AtomicInteger count = new AtomicInteger(1);
         private final Table<Class<? extends TransactionResource>, Object, TransactionResource> resources = Tables
                 .newCustomTable(
-                        new ConcurrentHashMap<Class<? extends TransactionResource>, Map<Object, TransactionResource>>(),
+                        new ConcurrentHashMap<>(),
                         ConcurrentHashMap::new
                 );
 
