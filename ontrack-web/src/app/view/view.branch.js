@@ -52,15 +52,15 @@ angular.module('ot.view.branch', [
                 otValidationStampFilterService.saveSelection($scope.branch, selection);
             });
         };
-        $scope.validationStampFilter = function (validationStamp) {
-            return !$scope.validationStampSelection || $scope.validationStampSelection.indexOf(validationStamp.name) >= 0;
+        $scope.validationStampFilter = function (validationStampView) {
+            return !$scope.validationStampSelection || $scope.validationStampSelection.indexOf(validationStampView.validationStamp.name) >= 0;
         };
         $scope.validationStampRunViewFilter = function (validationStampRunView) {
             return $scope.validationStampFilter(validationStampRunView.validationStamp);
         };
         $scope.validationStampFilterCount = function (plus) {
-            if ($scope.validationStampCollection) {
-                return plus + $scope.validationStampCollection.resources.filter($scope.validationStampFilter).length;
+            if ($scope.validationStampViews) {
+                return plus + $scope.validationStampViews.filter($scope.validationStampFilter).length;
             } else {
                 return plus;
             }

@@ -24,7 +24,7 @@
             <!-- Validation stamp filtering -->
             <button class="ot-branch-build-view-validation-stamp-filter"
                     title="Filter the validation stamps"
-                    ng-if="validationStampCollection.resources.length > 10"
+                    ng-if="validationStampViews.length > 10"
                     ng-class="{
                     'ot-branch-build-view-validation-stamp-filter-enabled': validationStampSelection,
                     'ot-branch-build-view-validation-stamp-filter-disabled': !validationStampSelection
@@ -39,15 +39,15 @@
             </button>
         </th>
         <!-- All validation stamps -->
-        <th ng-repeat="validationStamp in validationStampCollection.resources | filter:validationStampFilter" class="ot-branch-build-view-validation">
-            <ot-entity-image entity="validationStamp" link="#/validationStamp/{{validationStamp.id}}"></ot-entity-image>
+        <th ng-repeat="validationStampView in validationStampViews | filter:validationStampFilter" class="ot-branch-build-view-validation">
+            <ot-entity-image entity="validationStampView.validationStamp" link="#/validationStamp/{{validationStampView.validationStamp.id}}"></ot-entity-image>
         </th>
     </tr>
     <!-- Validation stamps decorations -->
     <tr>
         <!-- For each validation stamp -->
-        <th ng-repeat="validationStamp in validationStampCollection.resources | filter:validationStampFilter" class="ot-branch-build-view-validation">
-            <ot-entity-decorations entity="validationStamp"></ot-entity-decorations>
+        <th ng-repeat="validationStampView in validationStampViews | filter:validationStampFilter" class="ot-branch-build-view-validation">
+            <ot-entity-embedded-decorations decorations="validationStampView.decorations"></ot-entity-embedded-decorations>
         </th>
     </tr>
     </thead>
