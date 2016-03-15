@@ -18,28 +18,20 @@ angular.module('ot.view.project', [
         // Loading the branches
         function loadBranches() {
             $scope.loadingBranches = true;
-            ot.call($http.get($scope.project._branches)).then(function (branchCollection) {
-                $scope.branchCollection = branchCollection;
-                // Loading the branch status view for each branch
-                angular.forEach(branchCollection.resources, function (branch) {
-                    branch.loadingView = true;
-                    ot.call($http.get(branch._status)).then(function (branchStatusView) {
-                        branch.branchStatusView = branchStatusView;
-                    }).finally(function () {
-                        branch.loadingView = false;
-                    });
-                });
+            ot.call($http.get($scope.project._branchStatusViews)).then(function (branchStatusViewsResources) {
+                $scope.branchStatusViewsResources = branchStatusViewsResources;
+                $scope.branchStatusViews = branchStatusViewsResources.resources;
                 // View commands
                 view.commands = [
                     {
                         condition: function () {
-                            return branchCollection._create;
+                            return branchStatusViewsResources._create;
                         },
                         id: 'createBranch',
                         name: "Create branch",
                         cls: 'ot-command-branch-new',
                         action: function () {
-                            otStructureService.create(branchCollection._create, "New branch").then(loadBranches);
+                            otStructureService.create(branchStatusViewsResources._create, "New branch").then(loadBranches);
                         }
                     },
                     {

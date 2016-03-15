@@ -66,7 +66,13 @@ public class ProjectController extends AbstractResourceController {
         return Resources.of(
                 structureService.getBranchStatusViews(projectId),
                 uri(on(ProjectController.class).getBranchStatusViews(projectId))
-        ).forView(BranchStatusView.class);
+        )
+                .forView(BranchStatusView.class)
+                .with(
+                        Link.CREATE,
+                        uri(on(ProjectController.class).newProject(null)),
+                        securityService.isGlobalFunctionGranted(ProjectCreation.class)
+                );
     }
 
     @RequestMapping(value = "{projectId}", method = RequestMethod.GET)
