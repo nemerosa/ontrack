@@ -31,7 +31,7 @@
                     </div>
                     <table class="ot-project-branches">
                         <tbody>
-                        <tr ng-repeat="branchStatusView in branchStatusViews | filter:branchNameFilter"
+                        <tr ng-repeat="branchStatusView in branchStatusViews | filter:{branch: {name: branchNameFilter}}"
                             ng-show="showDisabled || !(branchStatusView.branch.disabled || branchStatusView.branch.type == 'TEMPLATE_DEFINITION')">
                             <td class="ot-project-branch-name ot-decoration-list"
                                 ng-class="{'ot-entity-disabled': branchStatusView.branch.disabled}">
