@@ -272,7 +272,7 @@ public class SVNServiceImpl implements SVNService {
                     SVNRepository svnRepository = getSVNRepository(branch).get();
                     return new SCMPathInfo(
                             "svn",
-                            getBasePath(svnRepository, property.getCuredBranchPath()).get(),
+                            svnRepository.getUrl(property.getCuredBranchPath()),
                             null,
                             null
                     );
