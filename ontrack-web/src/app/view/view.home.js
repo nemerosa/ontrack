@@ -1,8 +1,8 @@
 angular.module('ot.view.home', [
-    'ui.router',
-    'ot.service.structure',
-    'ot.service.core'
-])
+        'ui.router',
+        'ot.service.structure',
+        'ot.service.core'
+    ])
     .config(function ($stateProvider) {
         $stateProvider.state('home', {
             url: '/home',
@@ -28,9 +28,10 @@ angular.module('ot.view.home', [
                 $scope.projectStatusViews = projectStatusViewResources.resources;
                 // All branches disabled status computation
                 $scope.projectStatusViews.forEach(function (projectStatusView) {
-                    projectStatusView.allBranchesDisabled = projectStatusView.branchStatusViews.every(function (branchStatusView) {
-                        return branchStatusView.branch.disabled || branchStatusView.branch.type == 'TEMPLATE_DEFINITION';
-                    });
+                    projectStatusView.allBranchesDisabled = projectStatusView.branchStatusViews.length > 0 &&
+                        projectStatusView.branchStatusViews.every(function (branchStatusView) {
+                            return branchStatusView.branch.disabled || branchStatusView.branch.type == 'TEMPLATE_DEFINITION';
+                        });
                 });
                 // Commands
                 $rootScope.view.commands = [
