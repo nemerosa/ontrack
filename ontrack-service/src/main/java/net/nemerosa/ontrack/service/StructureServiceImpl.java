@@ -374,7 +374,7 @@ public class StructureServiceImpl implements StructureService {
         // Filter for the builds
         Predicate<Build> buildPredicate = build -> {
             // Build view
-            Supplier<BuildView> buildViewSupplier = CachedSupplier.of(() -> getBuildView(build));
+            Supplier<BuildView> buildViewSupplier = CachedSupplier.of(() -> getBuildView(build, false));
             // Branch name
             boolean accept;
             accept = !StringUtils.isNotBlank(form.getBranchName())
@@ -433,7 +433,7 @@ public class StructureServiceImpl implements StructureService {
                 builds,
                 branch,
                 build,
-                CachedSupplier.of(() -> getBuildView(build))
+                CachedSupplier.of(() -> getBuildView(build, false))
         );
         // Adding the build
         if (result.isAccept()) {
@@ -778,11 +778,14 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
-    public BuildView getBuildView(Build build) {
-        return BuildView.of(build)
-                .withDecorations(decorationService.getDecorations(build))
+    public BuildView getBuildView(Build build, boolean withDecorations) {
+        BuildView view = BuildView.of(build)
                 .withPromotionRuns(getLastPromotionRunsForBuild(build.getId()))
                 .withValidationStampRunViews(getValidationStampRunViewsForBuild(build));
+        if (withDecorations) {
+            view = view.withDecorations(decorationService.getDecorations(build));
+        }
+        return view;
     }
 
     @Override

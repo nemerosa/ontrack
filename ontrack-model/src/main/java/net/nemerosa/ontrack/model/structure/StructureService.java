@@ -61,7 +61,7 @@ public interface StructureService {
     /**
      * Gets an aggregated view of a build, with its promotion runs, validation stamps and decorations.
      */
-    BuildView getBuildView(Build build);
+    BuildView getBuildView(Build build, boolean withDecorations);
 
     Build getLastBuildForBranch(Branch branch);
 

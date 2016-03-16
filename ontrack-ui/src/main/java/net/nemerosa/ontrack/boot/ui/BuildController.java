@@ -112,7 +112,7 @@ public class BuildController extends AbstractResourceController {
     public Resources<BuildView> buildSearch(@PathVariable ID projectId, @Valid BuildSearchForm form) {
         return Resources.of(
                 structureService.buildSearch(projectId, form).stream()
-                        .map(structureService::getBuildView)
+                        .map(build -> structureService.getBuildView(build, true))
                         .collect(Collectors.toList()),
                 uri(on(getClass()).buildSearch(projectId, form)))
                 .forView(BuildView.class)

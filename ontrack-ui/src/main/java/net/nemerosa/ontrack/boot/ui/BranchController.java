@@ -199,7 +199,7 @@ public class BranchController extends AbstractResourceController {
      * Gets the form for a bulk update of the branch
      */
     @RequestMapping(value = "branches/{branchId}/update/bulk", method = RequestMethod.GET)
-    public Form bulkUpdate(@PathVariable ID branchId) {
+    public Form bulkUpdate(@SuppressWarnings("UnusedParameters") @PathVariable ID branchId) {
         return Form.create()
                 .with(
                         Replacements.of("replacements")
@@ -475,7 +475,7 @@ public class BranchController extends AbstractResourceController {
         // Gets the views for each build
         return new BranchBuildView(
                 builds.stream()
-                        .map(structureService::getBuildView)
+                        .map(build -> structureService.getBuildView(build, true))
                         .collect(Collectors.toList()),
                 buildDiffActions
         );

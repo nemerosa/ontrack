@@ -24,7 +24,7 @@ public abstract class AbstractSCMChangeLogService<S, T, I extends SCMChangeLogIs
     }
 
     protected BuildView getBuildView(ID id) {
-        return structureService.getBuildView(structureService.getBuild(id));
+        return structureService.getBuildView(structureService.getBuild(id), true);
     }
 
 

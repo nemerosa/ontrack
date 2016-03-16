@@ -68,7 +68,7 @@ public class SCMUtilsServiceImpl implements SCMUtilsService {
         if (buildAfterCommit.isPresent()) {
             Build build = buildAfterCommit.get();
             // Gets the build view
-            BuildView buildView = structureService.getBuildView(build);
+            BuildView buildView = structureService.getBuildView(build, true);
             // Adds it to the list
             info = info.withBuildView(buildView);
             // Collects the promotions for the branch

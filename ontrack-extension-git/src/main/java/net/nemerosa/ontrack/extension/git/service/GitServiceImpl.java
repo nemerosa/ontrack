@@ -602,7 +602,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
                         // ... and it present collect its data
                         .ifPresent(build -> {
                             // Gets the build view
-                            BuildView buildView = structureService.getBuildView(build);
+                            BuildView buildView = structureService.getBuildView(build, true);
                             // Adds it to the list
                             buildViews.add(buildView);
                             // Collects the promotions for the branch

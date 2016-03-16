@@ -187,7 +187,7 @@ public class SVNInfoServiceImpl implements SVNInfoService {
                         // Build found
                         if (build.isPresent()) {
                             // Gets the build view
-                            BuildView buildView = structureService.getBuildView(build.get());
+                            BuildView buildView = structureService.getBuildView(build.get(), true);
                             // Adds it to the list
                             buildViews.add(buildView);
                             // Collects the promotions for the branch
