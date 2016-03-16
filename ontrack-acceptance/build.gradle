@@ -17,7 +17,7 @@ dependencies {
     testCompile libraries.groovy
     testCompile libraries.spring_boot_starter
 
-    testCompile 'org.seleniumhq.selenium:selenium-java:2.48.2'
+    testCompile 'org.seleniumhq.selenium:selenium-java:2.53.0'
 
     testRuntime libraries.log4j
 }
