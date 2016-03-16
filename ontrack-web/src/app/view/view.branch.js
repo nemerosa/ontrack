@@ -56,7 +56,7 @@ angular.module('ot.view.branch', [
             return !$scope.validationStampSelection || $scope.validationStampSelection.indexOf(validationStampView.validationStamp.name) >= 0;
         };
         $scope.validationStampRunViewFilter = function (validationStampRunView) {
-            return $scope.validationStampFilter(validationStampRunView.validationStamp);
+            return $scope.validationStampFilter({validationStamp: validationStampRunView.validationStamp});
         };
         $scope.validationStampFilterCount = function (plus) {
             if ($scope.validationStampViews) {
