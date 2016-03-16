@@ -91,4 +91,14 @@ class StructureServiceIT extends AbstractServiceTestSupport {
         ))
     }
 
+    @Test
+    void 'Project status view'() {
+        // Creating branches
+        def project = doCreateProject()
+        (1..5).each { doCreateBranch(project, nd("1.0.${it}", "")) }
+        // Gets the branch status views
+        def views = asUser().with(project, ProjectView).call { structureService.getBranchStatusViews(project.id) }
+        assert views.size() == 5
+    }
+
 }

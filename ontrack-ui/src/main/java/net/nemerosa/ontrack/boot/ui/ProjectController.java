@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Replacements;
 import net.nemerosa.ontrack.model.form.Text;
+import net.nemerosa.ontrack.model.security.BranchCreate;
 import net.nemerosa.ontrack.model.security.ProjectCreation;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
@@ -79,8 +80,8 @@ public class ProjectController extends AbstractResourceController {
                 .forView(BranchStatusView.class)
                 .with(
                         Link.CREATE,
-                        uri(on(ProjectController.class).newProject(null)),
-                        securityService.isGlobalFunctionGranted(ProjectCreation.class)
+                        uri(on(BranchController.class).newBranch(projectId, null)),
+                        securityService.isProjectFunctionGranted(projectId.get(), BranchCreate.class)
                 );
     }
 
