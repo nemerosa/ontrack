@@ -21,13 +21,19 @@ class ACCGitHubExtension extends AcceptanceTestClient {
             String configurationName = TestUtils.uid('C')
             // Logs in
             def homePage = loginAsAdmin(browser)
+            // Screenshot after login
+            browser.screenshot 'github-after-login'
             // Goes to the GitHub configuration page
             def configurationPage = homePage.selectUserMenu(GitHubConfigurationPage, 'github-configurations-link')
+            // Screenshot after login
+            browser.screenshot 'github-configuration-page-before'
             // Creates a configuration
             configurationPage.createConfiguration {
+                browser.screenshot 'github-configuration-dialog'
                 name = configurationName
             }
             // Checks the configuration is displayed
+            browser.screenshot 'github-configuration-page-after'
             def configuration = configurationPage.getConfiguration(configurationName)
             assert configuration != null
             assert configuration.name == configurationName
