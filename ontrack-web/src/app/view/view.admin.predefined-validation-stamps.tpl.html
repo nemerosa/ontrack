@@ -1,5 +1,13 @@
 <ot-view>
 
+    <div class="ot-home-filter input-group col-md-4 form-inline">
+        <input class="form-control"
+               type="text"
+               ng-model="filterToken"
+               placeholder="Filter on validation stamp names"/>
+        <span class="input-group-addon"><span class="fa fa-filter"></span></span>
+    </div>
+
     <table class="table table-hover" ng-if="predefinedValidationStamps.resources">
         <thead>
             <tr>
@@ -9,7 +17,7 @@
             </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="predefinedValidationStamp in predefinedValidationStamps.resources">
+        <tr ng-repeat="predefinedValidationStamp in predefinedValidationStamps.resources | filter: {name: filterToken}">
             <td>
                 <ot-entity-image entity="predefinedValidationStamp">
                     {{predefinedValidationStamp.name}}
