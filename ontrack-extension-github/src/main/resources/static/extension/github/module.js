@@ -15,6 +15,7 @@ angular.module('ontrack.extension.github', [
         var view = ot.view();
         view.title = 'GitHub configurations';
         view.description = 'Management of the GitHub configurations.';
+        view.commands = [];
 
         // Loading the Artifactory configurations
         function load() {
