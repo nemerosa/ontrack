@@ -1,9 +1,16 @@
 <ot-view>
 
+    <div class="ot-home-filter input-group col-md-4 form-inline">
+        <input class="form-control"
+               type="text"
+               ng-model="filterToken"
+               placeholder="Filter on promotion level names"/>
+        <span class="input-group-addon"><span class="fa fa-filter"></span></span>
+    </div>
 
     <div ng-if="predefinedPromotionLevels.resources" class="ot-entity-sortable-list"
          ui-sortable="predefinedPromotionLevelSortOptions" ng-model="predefinedPromotionLevels.resources">
-        <div ng-repeat="promotionLevel in predefinedPromotionLevels.resources" class="ot-entity-sortable-list-item row">
+        <div ng-repeat="promotionLevel in predefinedPromotionLevels.resources | filter: {name: filterToken}" class="ot-entity-sortable-list-item row">
             <div class="col-md-1">
                     <span class="ot-entity-sortable-list-handle"
                           ng-if="predefinedPromotionLevels._reorderPromotionLevels"
