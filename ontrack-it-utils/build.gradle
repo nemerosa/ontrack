@@ -10,7 +10,8 @@ dependencies {
     compile libraries.slf4j_api
     compile libraries.spring_boot_starter_actuator
 
-    // TODO Postgresql
+    runtime libraries.postgresql
+    // TODO Remove H2
     runtime libraries.h2
     runtime libraries.metrics_core
 }

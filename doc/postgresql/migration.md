@@ -1,7 +1,7 @@
 ## Remaining actions
 
 * [x] add Flyway dependency
-* [ ] add Postgresql dependency
+* [x] add Postgresql dependency
 * [ ] remove all DB migration actions
 * [ ] replace DBInit startup hooks by Flyway callbacks
 * [ ] use Postgresql for integration tests
