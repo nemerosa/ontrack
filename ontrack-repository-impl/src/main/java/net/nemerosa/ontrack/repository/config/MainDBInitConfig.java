@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.repository.config;
 import net.nemerosa.ontrack.repository.support.AbstractDBInitConfig;
 import net.nemerosa.ontrack.repository.support.ConfiguredDBInit;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
@@ -13,12 +12,9 @@ public class MainDBInitConfig extends AbstractDBInitConfig {
 
     public static final int VERSION = 27;
 
-    private final ApplicationContext applicationContext;
-
     @Autowired
-    public MainDBInitConfig(DataSource dataSource, ApplicationContext applicationContext) {
+    public MainDBInitConfig(DataSource dataSource) {
         super(dataSource);
-        this.applicationContext = applicationContext;
     }
 
     @Override
