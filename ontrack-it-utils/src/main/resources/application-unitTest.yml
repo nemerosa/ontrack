@@ -1,7 +1,4 @@
-# Application properties
-
-# Static resources
-# See DevSettings
+# Configuration for the integration tests
 
 # Database connection
 # Add postgresql in your /etc/hosts
