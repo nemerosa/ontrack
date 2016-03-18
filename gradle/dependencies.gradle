@@ -31,7 +31,6 @@ ext {
             jackson_databind            : 'com.fasterxml.jackson.core:jackson-databind:2.6.3',
             guava                       : 'com.google.guava:guava:18.0',
             dbinit                      : 'net.sf.dbinit:dbinit:1.4.0',
-            h2                          : 'com.h2database:h2:1.4.189',
             postgresql                  : 'org.postgresql:postgresql:9.4.1208',
             flyway                      : 'org.flywaydb:flyway-core:4.0',
             args4j                      : 'args4j:args4j:2.0.29',

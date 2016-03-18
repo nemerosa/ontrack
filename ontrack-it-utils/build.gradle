@@ -11,7 +11,5 @@ dependencies {
     compile libraries.spring_boot_starter_actuator
 
     runtime libraries.postgresql
-    // TODO Remove H2
-    runtime libraries.h2
     runtime libraries.metrics_core
 }

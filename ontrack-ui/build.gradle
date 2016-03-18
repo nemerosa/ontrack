@@ -23,8 +23,6 @@ dependencies {
     runtime libraries.spring_boot_starter_aop
     runtime libraries.spring_boot_starter_jdbc
     runtime libraries.postgresql
-    // TODO Remove H2
-    runtime libraries.h2
     runtime libraries.flyway
 
     testCompile project(':ontrack-test-utils')
