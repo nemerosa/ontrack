@@ -22,7 +22,9 @@ dependencies {
     runtime project(':ontrack-repository-impl')
     runtime libraries.spring_boot_starter_aop
     runtime libraries.spring_boot_starter_jdbc
+    // TODO Postgresql
     runtime libraries.h2
+    runtime libraries.flyway
 
     testCompile project(':ontrack-test-utils')
     testCompile project(':ontrack-it-utils')

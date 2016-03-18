@@ -1,5 +1,9 @@
 # Application properties
 
+# Flyway configuration
+flyway:
+  baseline-on-migrate: true
+
 # Spring configuration
 spring:
   # Default profile

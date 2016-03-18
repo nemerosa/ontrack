@@ -9,7 +9,8 @@ dependencies {
     compile libraries.spring_boot_starter_jdbc
     compile libraries.slf4j_api
     compile libraries.spring_boot_starter_actuator
-    
+
+    // TODO Postgresql
     runtime libraries.h2
     runtime libraries.metrics_core
 }

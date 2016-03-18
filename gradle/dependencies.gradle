@@ -32,6 +32,7 @@ ext {
             guava                       : 'com.google.guava:guava:18.0',
             dbinit                      : 'net.sf.dbinit:dbinit:1.4.0',
             h2                          : 'com.h2database:h2:1.4.189',
+            flyway                      : 'org.flywaydb:flyway-core:4.0',
             args4j                      : 'args4j:args4j:2.0.29',
             jgrapht                     : 'org.jgrapht:jgrapht-core:0.9.1',
 
