@@ -46,6 +46,6 @@ class GitHubConfigurationPage extends AbstractHeaderPage {
 
     @Override
     void waitFor() {
-        browser.waitUntil("Page title") { pageTitle.displayed }
+        browser.waitUntil("Create a configuration") { configurationCreate.displayed }
     }
 }
