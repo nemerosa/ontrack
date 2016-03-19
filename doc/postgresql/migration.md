@@ -3,8 +3,8 @@
 * [x] add Flyway dependency
 * [x] add Postgresql dependency
 * [x] remove all DB migration actions
-* [~] replace DBInit startup hooks by Flyway callbacks - DBStartup deleted
-* [ ] remove H2
+* [x] replace DBInit startup hooks by Flyway callbacks - DBStartup deleted
+* [x] remove H2
 * [ ] use Postgresql for integration tests
 * [ ] use Postgresql for development - Docker
 * [ ] use Postgresql for development - instance

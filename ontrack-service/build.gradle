@@ -18,6 +18,7 @@ dependencies {
     compile libraries.spring_boot_starter_actuator
     compile libraries.metrics_core
     compile libraries.jgrapht
+    compile libraries.flyway
 
     testCompile project(':ontrack-it-utils')
     testCompile project(path: ':ontrack-extension-api', configuration: 'testArtifacts')
