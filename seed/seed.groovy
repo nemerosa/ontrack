@@ -129,6 +129,7 @@ dockerLatest
 osPackages
 build
 --info
+--stacktrace
 --profile
 --parallel
 '''
