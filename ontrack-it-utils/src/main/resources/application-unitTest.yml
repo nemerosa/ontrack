@@ -1,9 +1,0 @@
-# Configuration for the integration tests
-
-# Database connection
-# Add postgresql in your /etc/hosts
-spring:
-  datasource:
-    url: "jdbc:postgresql://postgresql/ontrack"
-    username: ontrack
-    password: ontrack
