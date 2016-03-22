@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.acceptance
 import net.nemerosa.ontrack.acceptance.browser.pages.GitHubConfigurationPage
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import net.nemerosa.ontrack.test.TestUtils
-import org.junit.Ignore
 import org.junit.Test
 
 import static net.nemerosa.ontrack.acceptance.browser.Browser.browser
@@ -13,7 +12,6 @@ import static net.nemerosa.ontrack.acceptance.steps.BasicSteps.loginAsAdmin
  * GUI tests about the `github` extension.
  */
 @AcceptanceTestSuite
-@Ignore
 class ACCGitHubExtension extends AcceptanceTestClient {
 
     @Test

@@ -11,9 +11,6 @@ import org.openqa.selenium.support.FindBy
  */
 class GitHubConfigurationPage extends AbstractHeaderPage {
 
-    @FindBy(className = 'ot-command-new')
-    protected WebElement configurationCreate;
-
     GitHubConfigurationPage(Browser browser) {
         super(browser)
     }
@@ -46,6 +43,9 @@ class GitHubConfigurationPage extends AbstractHeaderPage {
 
     @Override
     void waitFor() {
+        browser.screenshot 'github-configuration-before-waiting'
+        sleep 2000 // Waiting two seconds
+        browser.screenshot 'github-configuration-waiting'
         browser.waitUntil("Create a configuration") { browser.findElement(By.id("github-configuration-create")).displayed }
     }
 }
