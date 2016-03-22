@@ -19,7 +19,7 @@ class GitHubConfigurationPage extends AbstractHeaderPage {
     }
 
     public GitHubConfigurationDialog createConfiguration(Closure closure) {
-        def command = browser.findElement('.ot-command-new')
+        def command = browser.findElement(By.id("github-configuration-create"))
         command.click()
         GitHubConfigurationDialog dialog = new GitHubConfigurationDialog(browser).waitFor()
         closure.delegate = dialog
@@ -41,6 +41,6 @@ class GitHubConfigurationPage extends AbstractHeaderPage {
 
     @Override
     void waitFor() {
-        browser.waitUntil("Create a configuration") { browser.findElement('.ot-command-new').displayed }
+        browser.waitUntil("Create a configuration") { browser.findElement(By.id("github-configuration-create")).displayed }
     }
 }
