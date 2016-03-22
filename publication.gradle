@@ -38,10 +38,10 @@ println "Modules = ${modules}"
 
 artifacts {
     modules.each { module ->
-        archives file: file("publication/${module}-${ontrackVersionFull}.pom"), name: module, type: 'pom'
-        archives file: file("publication/${module}-${ontrackVersionFull}.jar"), name: module
-        archives file: file("publication/${module}-${ontrackVersionFull}-sources.jar"), name: module, classifier: 'sources'
-        archives file: file("publication/${module}-${ontrackVersionFull}-javadoc.jar"), name: module, classifier: 'javadoc'
+        archives file: file("publication/${module}-${ontrackVersion}.pom"), name: module, type: 'pom'
+        archives file: file("publication/${module}-${ontrackVersion}.jar"), name: module
+        archives file: file("publication/${module}-${ontrackVersion}-sources.jar"), name: module, classifier: 'sources'
+        archives file: file("publication/${module}-${ontrackVersion}-javadoc.jar"), name: module, classifier: 'javadoc'
     }
 }
 
@@ -251,7 +251,7 @@ task publicationGitHubReleaseJarUpload(type: GitHubReleaseUpload) {
     dependsOn publicationGitHubReleaseCreate
     fileName = 'ontrack.jar'
     fileType = 'application/zip'
-    file = project.file("publication/ontrack-ui-${ontrackVersionFull}.jar")
+    file = project.file("publication/ontrack-ui-${ontrackVersion}.jar")
 }
 
 task publicationGitHubReleaseDebianUpload(type: GitHubReleaseUpload) {
