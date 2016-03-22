@@ -16,7 +16,7 @@ task dockerBuild(type: Exec, dependsOn: dockerPrepareEnv) {
     args = [
             'build',
             '--tag',
-            "nemerosa/ontrack:${versioning.info.full}",
+            "nemerosa/ontrack:${versioning.info.display}",
             project.file('docker')
     ]
 }
@@ -26,7 +26,7 @@ task dockerLatest(type: Exec, dependsOn: dockerBuild) {
     args = [
             'tag',
             '--force',
-            "nemerosa/ontrack:${versioning.info.full}",
+            "nemerosa/ontrack:${versioning.info.display}",
             "nemerosa/ontrack:latest",
     ]
 }

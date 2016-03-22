@@ -154,7 +154,7 @@ build
                 condition('SUCCESS')
                 parameters {
                     // Link based on full version
-                    predefinedProp 'VERSION', '${VERSION_FULL}'
+                    predefinedProp 'VERSION', '${VERSION_DISPLAY}'
                 }
             }
         }
@@ -408,7 +408,6 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-publish") {
 --stacktrace
 -PontrackVersion=\${VERSION_DISPLAY}
 -PontrackVersionCommit=\${VERSION_COMMIT}
--PontrackVersionFull=\${VERSION_FULL}
 -PontrackReleaseBranch=${SEED_BRANCH}
 publicationRelease
 """
@@ -420,15 +419,14 @@ publicationRelease
 --stacktrace
 -PontrackVersion=\${VERSION_DISPLAY}
 -PontrackVersionCommit=\${VERSION_COMMIT}
--PontrackVersionFull=\${VERSION_FULL}
 -PontrackReleaseBranch=${SEED_BRANCH}
 publicationMaven
 """
         }
         if (release) {
             shell """\
-docker tag --force nemerosa/ontrack:\${VERSION_FULL} nemerosa/ontrack:latest
-docker tag --force nemerosa/ontrack:\${VERSION_FULL} nemerosa/ontrack:\${VERSION_DISPLAY}
+docker tag --force nemerosa/ontrack:\${VERSION_DISPLAY} nemerosa/ontrack:latest
+docker tag --force nemerosa/ontrack:\${VERSION_DISPLAY} nemerosa/ontrack:\${VERSION_DISPLAY}
 docker login --email="damien.coraboeuf+nemerosa@gmail.com" --username="nemerosa" --password="\${DOCKER_PASSWORD}"
 docker push nemerosa/ontrack:\${VERSION_DISPLAY}
 docker push nemerosa/ontrack:latest

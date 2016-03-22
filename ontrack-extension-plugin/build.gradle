@@ -20,5 +20,5 @@ javadocJar {
 }
 
 processResources {
-    filter(ReplaceTokens, tokens: [version: project.version])
+    filter(ReplaceTokens, tokens: [version: project.versioning.info.display])
 }

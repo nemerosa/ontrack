@@ -41,7 +41,9 @@ class GitHubConfigurationPage extends AbstractHeaderPage {
 
     @Override
     void waitFor() {
-        browser.screenshot 'github-configuration-page-waiting'
+        browser.screenshot 'github-configuration-before-waiting'
+        sleep 2000 // Waiting two seconds
+        browser.screenshot 'github-configuration-waiting'
         browser.waitUntil("Create a configuration") { browser.findElement(By.id("github-configuration-create")).displayed }
     }
 }
