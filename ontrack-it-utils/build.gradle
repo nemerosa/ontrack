@@ -11,5 +11,7 @@ dependencies {
     compile libraries.spring_boot_starter_actuator
 
     runtime libraries.postgresql
+    runtime libraries.flyway
     runtime libraries.metrics_core
+    runtime libraries.validation_impl
 }

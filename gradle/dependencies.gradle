@@ -81,6 +81,7 @@ ext {
 
             // Other
             lombok                      : 'org.projectlombok:lombok:1.14.4',
-            validation_api              : 'javax.validation:validation-api:1.1.0.Final'
+            validation_api              : 'javax.validation:validation-api:1.1.0.Final',
+            validation_impl             : 'org.hibernate:hibernate-validator:5.2.4.Final',
     ]
 }
