@@ -2,7 +2,8 @@ package net.nemerosa.ontrack.service.support.configuration;
 
 import net.nemerosa.ontrack.extension.api.support.TestConfiguration;
 import net.nemerosa.ontrack.extension.api.support.TestConfigurationService;
-import net.nemerosa.ontrack.model.support.ConfigurationValidationException;
+import net.nemerosa.ontrack.extension.api.support.TestProperty;
+import net.nemerosa.ontrack.extension.api.support.TestPropertyType;
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport;
 import net.nemerosa.ontrack.model.security.EncryptionService;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
@@ -11,8 +12,7 @@ import net.nemerosa.ontrack.model.security.ProjectView;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.PropertyService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
-import net.nemerosa.ontrack.extension.api.support.TestProperty;
-import net.nemerosa.ontrack.extension.api.support.TestPropertyType;
+import net.nemerosa.ontrack.model.support.ConfigurationValidationException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +42,7 @@ public class ConfigurationServiceIT extends AbstractServiceTestSupport {
     public void validate_ok_on_new_configuration() throws Exception {
         TestConfiguration configuration = new TestConfiguration(uid("T"), "check", "test");
         TestConfiguration savedConfig = asUser().with(GlobalSettings.class).call(() ->
-                        configurationService.newConfiguration(configuration)
+                configurationService.newConfiguration(configuration)
         );
         assertEquals(configuration.getName(), savedConfig.getName());
         assertTrue(StringUtils.isEmpty(savedConfig.getPassword()));
@@ -52,7 +52,7 @@ public class ConfigurationServiceIT extends AbstractServiceTestSupport {
     public void validate_nok_on_new_configuration() throws Exception {
         TestConfiguration configuration = new TestConfiguration(uid("T"), "check", "xxx");
         asUser().with(GlobalSettings.class).call(() ->
-                        configurationService.newConfiguration(configuration)
+                configurationService.newConfiguration(configuration)
         );
     }
 
@@ -62,7 +62,7 @@ public class ConfigurationServiceIT extends AbstractServiceTestSupport {
         String name = uid("T");
         TestConfiguration configuration = new TestConfiguration(name, "check", "test");
         asUser().with(GlobalSettings.class).call(() ->
-                        configurationService.newConfiguration(configuration)
+                configurationService.newConfiguration(configuration)
         );
         // Updates the configuration and fills the password
         TestConfiguration updatedConfiguration = new TestConfiguration(name, "check", "test");
@@ -78,7 +78,7 @@ public class ConfigurationServiceIT extends AbstractServiceTestSupport {
         String name = uid("T");
         TestConfiguration configuration = new TestConfiguration(name, "check", "test");
         asUser().with(GlobalSettings.class).call(() ->
-                        configurationService.newConfiguration(configuration)
+                configurationService.newConfiguration(configuration)
         );
         // Updates the configuration and fills the password
         TestConfiguration updatedConfiguration = new TestConfiguration(name, "check", "");
@@ -94,7 +94,7 @@ public class ConfigurationServiceIT extends AbstractServiceTestSupport {
         String name = uid("T");
         TestConfiguration configuration = new TestConfiguration(name, "check", "test");
         asUser().with(GlobalSettings.class).call(() ->
-                        configurationService.newConfiguration(configuration)
+                configurationService.newConfiguration(configuration)
         );
         // Updates the configuration and fills the password
         TestConfiguration updatedConfiguration = new TestConfiguration(name, "check", "xxx");
@@ -183,17 +183,6 @@ public class ConfigurationServiceIT extends AbstractServiceTestSupport {
         });
     }
 
-    /**
-     * Test that the plain configuration that was saved by {@link net.nemerosa.ontrack.service.support.configuration.TestConfigurationUncryptedAction}
-     * is encrypted.
-     */
-    @Test
-    public void encryptedConfigurationMigration() throws Exception {
-        Optional<TestConfiguration> conf = configurationRepository.find(TestConfiguration.class, "plain");
-        assertTrue(conf.isPresent());
-        assertNotEquals("Password should have been encrypted by migration", PLAIN_PASSWORD, conf.get().getPassword());
-    }
-
     @Test(expected = IllegalArgumentException.class)
     public void update_name_check() throws Exception {
         asUser().with(GlobalSettings.class).call(() -> {
@@ -253,37 +242,37 @@ public class ConfigurationServiceIT extends AbstractServiceTestSupport {
         Project p2 = doCreateProject();
         // Sets the properties
         asUser().with(p1, ProjectEdit.class).call(() ->
-                        propertyService.editProperty(
-                                p1,
-                                TestPropertyType.class,
-                                TestProperty.of(conf1, "1")
-                        )
+                propertyService.editProperty(
+                        p1,
+                        TestPropertyType.class,
+                        TestProperty.of(conf1, "1")
+                )
         );
         asUser().with(p2, ProjectEdit.class).call(() ->
-                        propertyService.editProperty(
-                                p2,
-                                TestPropertyType.class,
-                                TestProperty.of(conf2, "2")
-                        )
+                propertyService.editProperty(
+                        p2,
+                        TestPropertyType.class,
+                        TestProperty.of(conf2, "2")
+                )
         );
         // Assert the properties are there
         asUser().with(p1, ProjectView.class).execute(() ->
-                        assertTrue(propertyService.hasProperty(p1, TestPropertyType.class))
+                assertTrue(propertyService.hasProperty(p1, TestPropertyType.class))
         );
         asUser().with(p2, ProjectView.class).execute(() ->
-                        assertTrue(propertyService.hasProperty(p2, TestPropertyType.class))
+                assertTrue(propertyService.hasProperty(p2, TestPropertyType.class))
         );
         // Deletes the first configuration
         asUser().with(GlobalSettings.class).execute(() ->
-                        configurationService.deleteConfiguration(conf1Name)
+                configurationService.deleteConfiguration(conf1Name)
         );
         // Checks the property 1 is gone
         asUser().with(p1, ProjectView.class).execute(() ->
-                        assertFalse("Project configuration should be gone", propertyService.hasProperty(p1, TestPropertyType.class))
+                assertFalse("Project configuration should be gone", propertyService.hasProperty(p1, TestPropertyType.class))
         );
         // ... but not the second one
         asUser().with(p2, ProjectView.class).execute(() ->
-                        assertTrue(propertyService.hasProperty(p2, TestPropertyType.class))
+                assertTrue(propertyService.hasProperty(p2, TestPropertyType.class))
         );
     }
 
