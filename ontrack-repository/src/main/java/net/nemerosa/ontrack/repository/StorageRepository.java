@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.repository;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -26,4 +28,18 @@ public interface StorageRepository {
      * @return Data or empty if not found
      */
     Optional<JsonNode> retrieveJson(String store, String key);
+
+    /**
+     * Lists all keys for a store
+     *
+     * @param store Store (typically an extension class name)
+     */
+    List<String> getKeys(String store);
+
+    /**
+     * Gets all the data for a store
+     *
+     * @param store Store (typically an extension class name)
+     */
+    Map<String, JsonNode> getData(String store);
 }

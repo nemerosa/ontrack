@@ -7,6 +7,9 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -43,5 +46,29 @@ public class StorageJdbcRepository extends AbstractJdbcRepository implements Sto
                     return readJson(rs, "DATA");
                 }
         );
+    }
+
+    @Override
+    public List<String> getKeys(String store) {
+        return getNamedParameterJdbcTemplate().queryForList(
+                "SELECT NAME FROM STORAGE WHERE STORE = :store ORDER BY NAME",
+                params("store", store),
+                String.class
+        );
+    }
+
+    @Override
+    public Map<String, JsonNode> getData(String store) {
+        Map<String, JsonNode> results = new LinkedHashMap<>();
+        getNamedParameterJdbcTemplate().query(
+                "SELECT NAME, DATA FROM STORAGE WHERE STORE = :store ORDER BY NAME",
+                params("store", store),
+                rs -> {
+                    String name = rs.getString("NAME");
+                    JsonNode node = readJson(rs, "DATA");
+                    results.put(name, node);
+                }
+        );
+        return results;
     }
 }

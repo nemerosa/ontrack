@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -28,5 +30,15 @@ public class StorageServiceImpl implements StorageService {
     @Override
     public Optional<JsonNode> retrieveJson(String store, String key) {
         return repository.retrieveJson(store, key);
+    }
+
+    @Override
+    public List<String> getKeys(String store) {
+        return repository.getKeys(store);
+    }
+
+    @Override
+    public Map<String, JsonNode> getData(String store) {
+        return repository.getData(store);
     }
 }
