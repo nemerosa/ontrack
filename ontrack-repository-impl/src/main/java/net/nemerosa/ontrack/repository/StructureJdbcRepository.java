@@ -318,8 +318,8 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     public Optional<Build> findBuildAfterUsingNumericForm(ID branchId, String buildName) {
         return Optional.ofNullable(
                 getFirstItem(
-                        "SELECT * FROM (SELECT * FROM BUILDS WHERE BRANCHID = :branch AND NAME REGEXP '[0-9]+') " +
-                                "WHERE CONVERT(NAME,INT) >= CONVERT(:name,INT) ORDER BY CONVERT(NAME,INT) " +
+                        "SELECT * FROM (SELECT * FROM BUILDS WHERE BRANCHID = :branch AND NAME ~ '[0-9]+') AS MATCH_BUILDS " +
+                                "WHERE CAST(NAME AS INT) >= CAST(:name AS INT) ORDER BY CAST(NAME AS INT) " +
                                 "LIMIT 1",
                         params("branch", branchId.getValue()).addValue("name", buildName),
                         (rs, rowNum) -> toBuild(rs, this::getBranch)
