@@ -12,6 +12,7 @@ class BasicSteps {
             def home = goTo HomePage, [:]
             home.login 'admin', adminPassword
             waitUntil("User name is 'Administrator'") { home.header.userName == 'Administrator' }
+            waitUntil("Project creation button is displayed") { home.menuLoaded }
             home
         }
     }

@@ -36,4 +36,8 @@ public class HomePage extends AbstractHeaderPage {
         $(By.linkText(name)).click()
         browser.at(ProjectPage)
     }
+
+    boolean isMenuLoaded() {
+        $('.ot-command-project-new').displayed
+    }
 }

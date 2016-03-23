@@ -3,16 +3,11 @@ package net.nemerosa.ontrack.acceptance.browser.pages
 import net.nemerosa.ontrack.acceptance.browser.Browser
 import net.nemerosa.ontrack.acceptance.browser.dialogs.GitHubConfigurationDialog
 import org.openqa.selenium.By
-import org.openqa.selenium.WebElement
-import org.openqa.selenium.support.FindBy
 
 /**
  * GitHub configuration page.
  */
 class GitHubConfigurationPage extends AbstractHeaderPage {
-
-    @FindBy(className = 'ot-command-new')
-    protected WebElement configurationCreate;
 
     GitHubConfigurationPage(Browser browser) {
         super(browser)
@@ -24,7 +19,7 @@ class GitHubConfigurationPage extends AbstractHeaderPage {
     }
 
     public GitHubConfigurationDialog createConfiguration(Closure closure) {
-        def command = configurationCreate
+        def command = browser.findElement(By.id("github-configuration-create"))
         command.click()
         GitHubConfigurationDialog dialog = new GitHubConfigurationDialog(browser).waitFor()
         closure.delegate = dialog
@@ -46,6 +41,9 @@ class GitHubConfigurationPage extends AbstractHeaderPage {
 
     @Override
     void waitFor() {
-        browser.waitUntil("Create a configuration") { configurationCreate.displayed }
+        browser.screenshot 'github-configuration-before-waiting'
+        sleep 2000 // Waiting two seconds
+        browser.screenshot 'github-configuration-waiting'
+        browser.waitUntil("Create a configuration") { browser.findElement(By.id("github-configuration-create")).displayed }
     }
 }

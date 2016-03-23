@@ -17,7 +17,7 @@ ospackage {
     preInstall file('gradle/os-package/preInstall.sh')
     postInstall file('gradle/os-package/postInstall.sh')
 
-    from(project(':ontrack-ui').files("build/libs/ontrack-ui-${versioning.info.full}.jar")) {
+    from(project(':ontrack-ui').files("build/libs/ontrack-ui-${versioning.info.display}.jar")) {
         into '/opt/ontrack/lib'
         rename '.*', 'ontrack.jar'
     }
