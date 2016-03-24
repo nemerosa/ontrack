@@ -52,6 +52,7 @@ public class ProjectController extends AbstractResourceController {
                 structureService.getProjectStatusViews(),
                 uri(on(ProjectController.class).getProjectStatusViews())
         )
+                .forView(ProjectStatusView.class)
                 .with(Link.CREATE, uri(on(ProjectController.class).newProject(null)), securityService.isGlobalFunctionGranted(ProjectCreation.class));
     }
 
