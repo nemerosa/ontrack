@@ -55,8 +55,8 @@ public class ApplicationLogServiceImpl implements ApplicationLogService {
                         entry.getType().getName(),
                         entry.getAuthentication(),
                         Time.forStorage(entry.getTimestamp()),
-                        entry.getDetails().entrySet().stream()
-                                .map(e -> String.format("%s=%s", e.getKey(), e.getValue()))
+                        entry.getDetailList().stream()
+                                .map(nd -> String.format("%s=%s", nd.getName(), nd.getDescription()))
                                 .collect(Collectors.joining(","))
                 ),
                 entry.getException()
