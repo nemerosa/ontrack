@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.experimental.Wither;
 import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.model.structure.NameDescription;
@@ -29,12 +30,12 @@ public class ApplicationLogEntry {
     private final String authentication;
     private final NameDescription type;
     private final String information;
-    @Wither
-    @JsonIgnore
+    @Wither(AccessLevel.PRIVATE)
     private final Throwable exception;
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     @JsonIgnore
     @Wither(AccessLevel.PRIVATE)
+    @Getter(AccessLevel.PRIVATE)
     private final Map<String, String> details;
 
     public static ApplicationLogEntry error(Throwable exception, NameDescription type, String information) {
@@ -59,6 +60,11 @@ public class ApplicationLogEntry {
         return details.entrySet().stream()
                 .map(entry -> NameDescription.nd(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
+    }
+
+    @JsonIgnore
+    public Throwable getException() {
+        return exception;
     }
 
     public String getStacktrace() {
