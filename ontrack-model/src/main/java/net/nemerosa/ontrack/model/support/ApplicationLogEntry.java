@@ -30,8 +30,6 @@ public class ApplicationLogEntry {
     private final String authentication;
     private final NameDescription type;
     private final String information;
-    @JsonIgnore
-    @Getter(AccessLevel.PRIVATE)
     @Wither(AccessLevel.PRIVATE)
     private final Throwable exception;
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
@@ -62,6 +60,11 @@ public class ApplicationLogEntry {
         return details.entrySet().stream()
                 .map(entry -> NameDescription.nd(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
+    }
+
+    @JsonIgnore
+    public Throwable getException() {
+        return exception;
     }
 
     public String getStacktrace() {
