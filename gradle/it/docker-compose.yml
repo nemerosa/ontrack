@@ -5,3 +5,5 @@ db:
     POSTGRES_DB      : ontrack
     POSTGRES_USER    : ontrack
     POSTGRES_PASSWORD: ontrack
+  ports:
+    - "5432"

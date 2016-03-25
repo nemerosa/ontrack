@@ -41,6 +41,12 @@ task preIntegrationTest(type: ComposeUp) {
     projectFiles = ['docker-compose.yml']
     projectName = project.properties.itProject
     forceRecreate = false
+    // When done
+    doLast {
+        def jdbcUrl = "jdbc:postgresql://${host}:${getPublishedPort('db', 5432)}/ontrack"
+        project.ext.itJdbcUrl = jdbcUrl
+        logger.info("JDBC URL = ${jdbcUrl}")
+    }
 }
 
 // Post-integration tests: stopping Postgresql
@@ -100,6 +106,12 @@ configure(javaProjects) {
         }
         dependsOn preIntegrationTest
         finalizedBy postIntegrationTest
+        /**
+         * Sets the JDBC URL
+         */
+        systemProperty 'spring.datasource.url', itJdbcUrl
+        systemProperty 'spring.datasource.username', itJdbcUsername
+        systemProperty 'spring.datasource.password', itJdbcPassword
     }
 
     // Acceptance tests
