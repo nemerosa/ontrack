@@ -1,3 +1,8 @@
+import net.nemerosa.ontrack.gradle.ComposeStop
+import net.nemerosa.ontrack.gradle.ComposeUp
+import net.nemerosa.ontrack.gradle.DockerStart
+import net.nemerosa.ontrack.gradle.DockerStop
+
 plugins {
     id 'net.nemerosa.versioning' version '1.6.0'
     id 'nebula.os-package' version '2.2.6'
@@ -23,6 +28,30 @@ apply from: "$rootDir/gradle/dependencies.gradle"
  */
 
 task build
+
+/**
+ * Integration test environment
+ */
+
+// Pre-integration tests: starting Postgresql
+
+task preIntegrationTest(type: ComposeUp) {
+    machine = project.properties.itMachine
+    dir = file("${rootDir}/gradle/it")
+    projectFiles = ['docker-compose.yml']
+    projectName = project.properties.itProject
+    forceRecreate = false
+}
+
+// Post-integration tests: stopping Postgresql
+
+task postIntegrationTest(type: ComposeStop) {
+    machine = project.properties.itMachine
+    dir = file("${rootDir}/gradle/it")
+    projectFiles = ['docker-compose.yml']
+    projectName = project.properties.itProject
+    remove = true
+}
 
 /**
  * Java projects
