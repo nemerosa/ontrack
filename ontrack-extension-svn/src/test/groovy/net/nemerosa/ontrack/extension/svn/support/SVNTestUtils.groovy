@@ -3,6 +3,8 @@ package net.nemerosa.ontrack.extension.svn.support
 import net.nemerosa.ontrack.extension.svn.db.SVNRepository
 import net.nemerosa.ontrack.extension.svn.model.SVNConfiguration
 
+import static net.nemerosa.ontrack.test.TestUtils.uid
+
 final class SVNTestUtils {
 
     private SVNTestUtils() {
@@ -12,7 +14,7 @@ final class SVNTestUtils {
         SVNRepository.of(
                 1,
                 new SVNConfiguration(
-                        "test",
+                        uid("C"),
                         "svn://localhost",
                         "test",
                         "test",
