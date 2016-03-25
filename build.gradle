@@ -98,6 +98,8 @@ configure(javaProjects) {
         reports {
             html.enabled = false
         }
+        dependsOn preIntegrationTest
+        finalizedBy postIntegrationTest
     }
 
     // Acceptance tests
