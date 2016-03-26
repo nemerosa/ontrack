@@ -109,9 +109,9 @@ configure(javaProjects) {
         /**
          * Sets the JDBC URL
          */
-        systemProperty 'spring.datasource.url', itJdbcUrl
-        systemProperty 'spring.datasource.username', itJdbcUsername
-        systemProperty 'spring.datasource.password', itJdbcPassword
+        systemProperty 'it.jdbc.url', itJdbcUrl
+        systemProperty 'it.jdbc.user', itJdbcUsername
+        systemProperty 'it.jdbc.password', itJdbcPassword
     }
 
     // Acceptance tests

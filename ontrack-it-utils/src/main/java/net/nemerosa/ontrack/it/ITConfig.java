@@ -32,18 +32,20 @@ public class ITConfig {
     @Bean
     public DataSource dataSource() throws IOException {
         // Configuration using system properties
-        String dbURL = System.getProperty("test.jdbc.url", "jdbc:postgresql://postgresql/ontrack");
-        String dbUser = System.getProperty("test.jdbc.user", "ontrack");
-        String dbPassword = System.getProperty("test.jdbc.password", "ontrack");
+        String dbURL = System.getProperty("it.jdbc.url", "jdbc:postgresql://postgresql/ontrack");
+        String dbUser = System.getProperty("it.jdbc.user", "ontrack");
+        String dbPassword = System.getProperty("it.jdbc.password", "ontrack");
 
         logger.info("Using database at {}", dbURL);
         org.apache.tomcat.jdbc.pool.DataSource pool = new org.apache.tomcat.jdbc.pool.DataSource();
+        pool.setDriverClassName("org.postgresql.Driver");
         pool.setUrl(dbURL);
         pool.setUsername(dbUser);
         pool.setPassword(dbPassword);
         pool.setDefaultAutoCommit(false);
-        pool.setInitialSize(1);
-        pool.setMaxActive(2);
+        pool.setInitialSize(10);
+        pool.setMaxIdle(10);
+        pool.setMaxActive(20);
         return pool;
     }
 
