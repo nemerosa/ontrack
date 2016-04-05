@@ -204,7 +204,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     @Override
     public void builds(Project project, Predicate<Build> buildPredicate) {
         getNamedParameterJdbcTemplate().execute(
-                "SELECT B.* FROM BUILDS B INNER JOIN BRANCHES R WHERE R.ID = B.BRANCHID AND R.PROJECTID = :projectId ORDER BY B.ID DESC",
+                "SELECT B.* FROM BUILDS B INNER JOIN BRANCHES R ON R.ID = B.BRANCHID AND R.PROJECTID = :projectId ORDER BY B.ID DESC",
                 params("projectId", project.id()),
                 ps -> {
                     ResultSet rs = ps.executeQuery();
