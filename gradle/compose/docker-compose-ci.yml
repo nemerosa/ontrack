@@ -20,3 +20,15 @@ ontrack:
     - "/dev/urandom:/dev/random"
   ports:
     - "443"
+  links:
+    - "postgresql:postgresql"
+
+# Postgresql database
+postgresql:
+  image: postgres:9.5.1
+  environment:
+    POSTGRES_DB      : ontrack
+    POSTGRES_USER    : ontrack
+    POSTGRES_PASSWORD: ontrack
+  ports:
+    - "5432"
