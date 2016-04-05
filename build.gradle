@@ -33,6 +33,12 @@ task build
  * Integration test environment
  */
 
+ext {
+    itJdbcUrl = project.properties.itJdbcUrl
+    itJdbcUsername = project.properties.itJdbcUsername
+    itJdbcPassword = project.properties.itJdbcPassword
+}
+
 // Pre-integration tests: starting Postgresql
 
 task preIntegrationTest(type: ComposeUp) {
@@ -45,7 +51,7 @@ task preIntegrationTest(type: ComposeUp) {
     doLast {
         def jdbcUrl = "jdbc:postgresql://${host}:${getPublishedPort('db', 5432)}/ontrack"
         project.ext.itJdbcUrl = jdbcUrl
-        logger.info("JDBC URL = ${jdbcUrl}")
+        logger.info("JDBC URL = ${project.ext.itJdbcUrl}")
     }
 }
 
@@ -109,9 +115,12 @@ configure(javaProjects) {
         /**
          * Sets the JDBC URL
          */
-        systemProperty 'it.jdbc.url', itJdbcUrl
-        systemProperty 'it.jdbc.user', itJdbcUsername
-        systemProperty 'it.jdbc.password', itJdbcPassword
+        doFirst {
+            println "Setting JDBC URL for IT: ${rootProject.ext.itJdbcUrl}"
+            systemProperty 'it.jdbc.url', rootProject.ext.itJdbcUrl
+            systemProperty 'it.jdbc.user', rootProject.ext.itJdbcUsername
+            systemProperty 'it.jdbc.password', rootProject.ext.itJdbcPassword
+        }
     }
 
     // Acceptance tests
