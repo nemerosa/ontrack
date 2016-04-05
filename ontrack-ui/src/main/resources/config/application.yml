@@ -7,16 +7,17 @@ flyway:
 
 # Spring configuration
 spring:
+  # Default database connection
+  datasource:
+    url: "jdbc:postgresql://postgresql/ontrack"
+    username: ontrack
+    password: ontrack
   # Default profile
   profiles:
     default: prod
   # AOP configuration
   aop:
     proxyTargetClass: true
-  # Datasource configuration
-  datasource:
-    username: ontrack
-    password: ontrack
 
 
 # Management
