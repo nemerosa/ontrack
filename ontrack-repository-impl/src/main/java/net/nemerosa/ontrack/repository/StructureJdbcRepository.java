@@ -738,7 +738,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     @Override
     public List<ValidationRun> getValidationRunsForBuild(Build build, Function<String, ValidationRunStatusID> validationRunStatusService) {
         return getNamedParameterJdbcTemplate().query(
-                "SELECT * FROM VALIDATION_RUNS WHERE BUILDID = :buildId",
+                "SELECT * FROM VALIDATION_RUNS WHERE BUILDID = :buildId ORDER BY ID",
                 params("buildId", build.id()),
                 (rs, rowNum) -> toValidationRun(
                         rs,
