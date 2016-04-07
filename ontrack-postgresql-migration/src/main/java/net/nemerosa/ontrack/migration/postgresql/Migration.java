@@ -46,6 +46,27 @@ public class Migration {
         }
 
         /**
+         * Global data
+         */
+
+        // CONFIGURATIONS
+        // TODO JSON
+        copy("CONFIGURATIONS", "ID", "TYPE", "NAME", "CONTENT");
+
+        // SETTINGS
+        copy("SETTINGS", "CATEGORY", "NAME", "VALUE");
+
+        // PREDEFINED_PROMOTION_LEVELS
+        copy("PREDEFINED_PROMOTION_LEVELS", "ID", "ORDERNB", "NAME", "DESCRIPTION", "IMAGETYPE", "IMAGEBYTES");
+
+        // PREDEFINED_VALIDATION_STAMPS
+        copy("PREDEFINED_VALIDATION_STAMPS", "ID", "OWNER", "PROMOTION_LEVEL", "ORDERNB", "NAME", "DESCRIPTION", "IMAGETYPE", "IMAGEBYTES");
+
+        // STORAGE
+        // TODO JSON
+        copy("STORAGE", "STORE", "NAME", "DATA");
+
+        /**
          * Entities
          */
 
@@ -89,28 +110,6 @@ public class Migration {
 
         // BRANCH_TEMPLATE_INSTANCE_PARAMS
         copy("BRANCH_TEMPLATE_INSTANCE_PARAMS", "BRANCHID", "NAME", "VALUE");
-
-        /**
-         * Global data
-         */
-
-        // CONFIGURATIONS
-        // TODO JSON
-        copy("CONFIGURATIONS", "ID", "TYPE", "NAME", "CONTENT");
-
-        // SETTINGS
-        copy("SETTINGS", "CATEGORY", "NAME", "VALUE");
-
-        // PREDEFINED_PROMOTION_LEVELS
-        copy("PREDEFINED_PROMOTION_LEVELS", "ID", "ORDERNB", "NAME", "DESCRIPTION", "IMAGETYPE", "IMAGEBYTES");
-
-        // PREDEFINED_VALIDATION_STAMPS
-        // FIXME Problems with some blobs
-        // copy("PREDEFINED_VALIDATION_STAMPS", "ID", "OWNER", "PROMOTION_LEVEL", "ORDERNB", "NAME", "DESCRIPTION", "IMAGETYPE", "IMAGEBYTES");
-
-        // STORAGE
-        // TODO JSON
-        copy("STORAGE", "STORE", "NAME", "DATA");
 
         /**
          * Entity data
@@ -238,7 +237,16 @@ public class Migration {
         txTemplate.execute(new TransactionCallbackWithoutResult() {
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus status) {
-                task.run();
+                try {
+                    task.run();
+                } catch (Exception ex) {
+                    String message = ex.getMessage();
+                    if (StringUtils.contains(message, "Block not found") && migrationProperties.isSkipBlobErrors()) {
+                        logger.warn("Ignoring BLOB read error: {}", message);
+                    } else {
+                        throw ex;
+                    }
+                }
             }
         });
     }

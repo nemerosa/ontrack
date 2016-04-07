@@ -11,6 +11,7 @@ public class MigrationProperties {
 
     private boolean cleanup = false;
     private boolean skipEvents = false;
+    private boolean skipBlobErrors = false;
     private DatabaseProperties h2 = new DatabaseProperties();
     private DatabaseProperties postgresql = new DatabaseProperties();
 
