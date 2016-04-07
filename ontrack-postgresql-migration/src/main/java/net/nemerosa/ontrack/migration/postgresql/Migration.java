@@ -42,12 +42,25 @@ public class Migration {
             cleanup();
         }
         // PROJECTS
-        migrateProjects();
+        tx(() -> simpleMigration(
+                "Projects",
+                "SELECT * FROM PROJECTS",
+                Collections.emptyMap(),
+                "INSERT INTO PROJECTS (ID, NAME, DESCRIPTION, DISABLED) VALUES (:ID, :NAME, :DESCRIPTION, :DISABLED)"
+        ));
+
+        // BRANCHES
+        tx(() -> simpleMigration(
+                "Branches",
+                "SELECT * FROM BRANCHES",
+                Collections.emptyMap(),
+                "INSERT INTO BRANCHES (ID, PROJECTID, NAME, DESCRIPTION, DISABLED) VALUES (:ID, :PROJECTID, :NAME, :DESCRIPTION, :DISABLED)"
+        ));
+
         // TODO ACCOUNTS
         // TODO ACCOUNT_GROUPS
         // TODO ACCOUNT_GROUP_LINK
         // TODO ACCOUNT_GROUP_MAPPING
-        // TODO BRANCHES
         // TODO BRANCH_TEMPLATE_DEFINITIONS
         // TODO BRANCH_TEMPLATE_DEFINITION_PARAMS
         // TODO BRANCH_TEMPLATE_INSTANCES
@@ -94,16 +107,11 @@ public class Migration {
         });
     }
 
-    private void migrateProjects() {
+    private void tx(Runnable task) {
         txTemplate.execute(new TransactionCallbackWithoutResult() {
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus status) {
-                simpleMigration(
-                        "Projects",
-                        "SELECT * FROM PROJECTS",
-                        Collections.emptyMap(),
-                        "INSERT INTO PROJECTS (ID, NAME, DESCRIPTION, DISABLED) VALUES (:ID, :NAME, :DESCRIPTION, :DISABLED)"
-                );
+                task.run();
             }
         });
     }
