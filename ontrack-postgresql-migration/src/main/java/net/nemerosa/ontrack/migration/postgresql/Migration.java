@@ -45,8 +45,6 @@ public class Migration {
             cleanup();
         }
 
-        // FIXME Update of sequences
-
         // PROJECTS
         copy("PROJECTS", "ID", "NAME", "DESCRIPTION", "DISABLED");
 
@@ -95,6 +93,46 @@ public class Migration {
         // TODO VALIDATION_RUN_STATUSES
         // TODO VALIDATION_STAMPS
 
+        // Update of sequences
+        updateSequences();
+
+    }
+
+    private void updateSequences() {
+        logger.info("Resetting the sequences...");
+        String[] tables = {
+                "ACCOUNT_GROUP_MAPPING",
+                "ACCOUNT_GROUPS",
+                "ACCOUNTS",
+                "BRANCHES",
+                "BUILDS",
+                "CONFIGURATIONS",
+                "ENTITY_DATA",
+                "EVENTS",
+                "EXT_SVN_REPOSITORY",
+                "PREDEFINED_PROMOTION_LEVELS",
+                "PREDEFINED_VALIDATION_STAMPS",
+                "PROJECTS",
+                "PROMOTION_LEVELS",
+                "PROMOTION_RUNS",
+                "PROPERTIES",
+                "VALIDATION_RUN_STATUSES",
+                "VALIDATION_RUNS",
+                "VALIDATION_STAMPS",
+        };
+        tx(() -> Arrays.asList(tables).stream().forEach(table -> {
+            Integer max = postgresql.queryForObject(
+                    String.format("SELECT MAX(ID) AS ID FROM %s", table),
+                    Collections.emptyMap(),
+                    Integer.class
+            );
+            int value = max != null ? max + 1 : 1;
+            postgresql.update(
+                    String.format("ALTER SEQUENCE %s_ID_SEQ RESTART WITH %d", table, value),
+                    Collections.emptyMap()
+            );
+            logger.info("Resetting sequence for {} to {}.", table, value);
+        }));
     }
 
     private void cleanup() {
