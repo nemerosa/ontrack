@@ -63,6 +63,9 @@ public class Migration {
         // PROMOTION_RUNS
         copy("PROMOTION_RUNS", "ID", "BUILDID", "PROMOTIONLEVELID", "CREATION", "CREATOR", "DESCRIPTION");
 
+        // VALIDATION_RUNS
+        copy("VALIDATION_RUNS", "ID", "BUILDID", "VALIDATIONSTAMPID");
+
         // ACCOUNTS
         copy("ACCOUNTS", "ID", "NAME", "FULLNAME", "EMAIL", "MODE", "PASSWORD", "ROLE");
 
@@ -95,7 +98,6 @@ public class Migration {
         // TODO SETTINGS
         // TODO SHARED_BUILD_FILTERS
         // TODO STORAGE
-        // TODO VALIDATION_RUNS
         // TODO VALIDATION_RUN_STATUSES
 
         // Update of sequences
