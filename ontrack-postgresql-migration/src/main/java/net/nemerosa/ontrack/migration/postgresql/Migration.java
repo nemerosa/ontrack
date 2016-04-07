@@ -48,28 +48,13 @@ public class Migration {
         // FIXME Update of sequences
 
         // PROJECTS
-        tx(() -> simpleMigration(
-                "Projects",
-                "SELECT * FROM PROJECTS",
-                Collections.emptyMap(),
-                "INSERT INTO PROJECTS (ID, NAME, DESCRIPTION, DISABLED) VALUES (:ID, :NAME, :DESCRIPTION, :DISABLED)"
-        ));
+        copy("PROJECTS", "ID", "NAME", "DESCRIPTION", "DISABLED");
 
         // BRANCHES
-        tx(() -> simpleMigration(
-                "Branches",
-                "SELECT * FROM BRANCHES",
-                Collections.emptyMap(),
-                "INSERT INTO BRANCHES (ID, PROJECTID, NAME, DESCRIPTION, DISABLED) VALUES (:ID, :PROJECTID, :NAME, :DESCRIPTION, :DISABLED)"
-        ));
+        copy("BRANCHES", "ID", "PROJECTID", "NAME", "DESCRIPTION", "DISABLED");
 
         // PROMOTION_LEVELS
-        tx(() -> simpleMigration(
-                "Promotion levels",
-                "SELECT * FROM PROMOTION_LEVELS",
-                Collections.emptyMap(),
-                "INSERT INTO PROMOTION_LEVELS (ID, BRANCHID, ORDERNB, NAME, DESCRIPTION, IMAGETYPE, IMAGEBYTES) VALUES (:ID, :BRANCHID, :ORDERNB, :NAME, :DESCRIPTION, :IMAGETYPE, :IMAGEBYTES)"
-        ));
+        copy("PROMOTION_LEVELS", "ID", "BRANCHID", "ORDERNB", "NAME", "DESCRIPTION", "IMAGETYPE", "IMAGEBYTES");
 
         // ACCOUNTS
         copy("ACCOUNTS", "ID", "NAME", "FULLNAME", "EMAIL", "MODE", "PASSWORD", "ROLE");
