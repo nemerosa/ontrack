@@ -66,6 +66,9 @@ public class Migration {
         // VALIDATION_RUNS
         copy("VALIDATION_RUNS", "ID", "BUILDID", "VALIDATIONSTAMPID");
 
+        // VALIDATION_RUN_STATUSES
+        copy("VALIDATION_RUN_STATUSES", "ID", "VALIDATIONRUNID", "VALIDATIONRUNSTATUSID", "CREATION", "CREATOR", "DESCRIPTION");
+
         // ACCOUNTS
         copy("ACCOUNTS", "ID", "NAME", "FULLNAME", "EMAIL", "MODE", "PASSWORD", "ROLE");
 
@@ -98,7 +101,6 @@ public class Migration {
         // TODO SETTINGS
         // TODO SHARED_BUILD_FILTERS
         // TODO STORAGE
-        // TODO VALIDATION_RUN_STATUSES
 
         // Update of sequences
         updateSequences();
