@@ -91,7 +91,7 @@ public class Migration {
         copy("BRANCH_TEMPLATE_INSTANCE_PARAMS", "BRANCHID", "NAME", "VALUE");
 
         /**
-         * Configurations
+         * Global data
          */
 
         // CONFIGURATIONS
@@ -100,6 +100,15 @@ public class Migration {
 
         // SETTINGS
         copy("SETTINGS", "CATEGORY", "NAME", "VALUE");
+
+        // PREDEFINED_PROMOTION_LEVELS
+        copy("PREDEFINED_PROMOTION_LEVELS", "ID", "ORDERNB", "NAME", "DESCRIPTION", "IMAGETYPE", "IMAGEBYTES");
+
+        // PREDEFINED_VALIDATION_STAMPS
+        // FIXME Problems with some blobs
+        // copy("PREDEFINED_VALIDATION_STAMPS", "ID", "OWNER", "PROMOTION_LEVEL", "ORDERNB", "NAME", "DESCRIPTION", "IMAGETYPE", "IMAGEBYTES");
+
+        // TODO STORAGE
 
         /**
          * Entity data
@@ -152,9 +161,6 @@ public class Migration {
         copy("BUILD_FILTERS", "ACCOUNTID", "BRANCHID", "NAME", "TYPE", "DATA");
 
         // TODO EVENTS
-        // TODO PREDEFINED_PROMOTION_LEVELS
-        // TODO PREDEFINED_VALIDATION_STAMPS
-        // TODO STORAGE
 
         // Subversion
         // Subversion tables do not need to be migrated - they will be filled on demand
