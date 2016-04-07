@@ -14,5 +14,6 @@ dependencies {
     compile libraries.spring_boot_starter_jdbc
 
     runtime 'com.h2database:h2:1.4.189'
+    runtime libraries.postgresql
 
 }

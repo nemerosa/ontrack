@@ -39,7 +39,7 @@ public class Migration {
                 "Projects",
                 "SELECT * FROM PROJECTS",
                 Collections.emptyMap(),
-                "INSERT INTO PROJECTS (ID, NAME, DESCRIPTION, DISABLED) VALUES (:id, :name, :description, :disabled)"
+                "INSERT INTO PROJECTS (ID, NAME, DESCRIPTION, DISABLED) VALUES (:ID, :NAME, :DESCRIPTION, :DISABLED)"
         );
     }
 

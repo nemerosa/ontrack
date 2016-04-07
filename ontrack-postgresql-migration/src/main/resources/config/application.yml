@@ -1,7 +1,7 @@
 ontrack:
   migration:
     h2:
-      url: "jdbc:h2:./data;MODE=MYSQL;DB_CLOSE_ON_EXIT=FALSE;DEFRAG_ALWAYS=TRUE"
+      url: "jdbc:h2:/Users/damien/Documents/dev/projects/ontrack/c2p/database/data;MODE=MYSQL;DB_CLOSE_ON_EXIT=FALSE;DEFRAG_ALWAYS=TRUE"
       username: ontrack
       password: ontrack
     postgresql:
