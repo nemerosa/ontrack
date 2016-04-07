@@ -74,6 +74,14 @@ public class Migration {
         copy("VALIDATION_RUN_STATUSES", "ID", "VALIDATIONRUNID", "VALIDATIONRUNSTATUSID", "CREATION", "CREATOR", "DESCRIPTION");
 
         /**
+         * Configurations
+         */
+
+        // CONFIGURATIONS
+        // TODO JSON
+        copy("CONFIGURATIONS", "ID", "TYPE", "NAME", "CONTENT");
+
+        /**
          * Entity data
          */
 
@@ -95,7 +103,6 @@ public class Migration {
         // TODO BRANCH_TEMPLATE_INSTANCES
         // TODO BRANCH_TEMPLATE_INSTANCE_PARAMS
         // TODO BUILD_FILTERS
-        // TODO CONFIGURATIONS
         // TODO EVENTS
         // TODO EXT_SVN_COPY
         // TODO EXT_SVN_MERGE_REVISION
