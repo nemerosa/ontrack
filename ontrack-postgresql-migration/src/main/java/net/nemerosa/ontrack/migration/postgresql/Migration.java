@@ -91,6 +91,10 @@ public class Migration {
         // ENTITY_DATA
         copy("ENTITY_DATA", "ID", "PROJECT", "BRANCH", "PROMOTION_LEVEL", "VALIDATION_STAMP", "BUILD", "PROMOTION_RUN", "VALIDATION_RUN", "NAME", "VALUE");
 
+        // PROPERTIES
+        // TODO JSON
+        copy("PROPERTIES", "ID", "PROJECT", "BRANCH", "PROMOTION_LEVEL", "VALIDATION_STAMP", "BUILD", "PROMOTION_RUN", "VALIDATION_RUN", "TYPE", "SEARCHKEY", "JSON");
+
         /**
          * ACL
          */
@@ -114,7 +118,6 @@ public class Migration {
         // TODO PREDEFINED_VALIDATION_STAMPS
         // TODO PREFERENCES
         // TODO PROJECT_AUTHORIZATIONS
-        // TODO PROPERTIES
         // TODO SHARED_BUILD_FILTERS
         // TODO STORAGE
 
