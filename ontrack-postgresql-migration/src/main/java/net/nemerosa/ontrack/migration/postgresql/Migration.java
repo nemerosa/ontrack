@@ -81,6 +81,9 @@ public class Migration {
         // TODO JSON
         copy("CONFIGURATIONS", "ID", "TYPE", "NAME", "CONTENT");
 
+        // SETTINGS
+        copy("SETTINGS", "CATEGORY", "NAME", "VALUE");
+
         /**
          * Entity data
          */
@@ -104,13 +107,6 @@ public class Migration {
         // TODO BRANCH_TEMPLATE_INSTANCE_PARAMS
         // TODO BUILD_FILTERS
         // TODO EVENTS
-        // TODO EXT_SVN_COPY
-        // TODO EXT_SVN_MERGE_REVISION
-        // TODO EXT_SVN_REPOSITORY
-        // TODO EXT_SVN_REVISION
-        // TODO EXT_SVN_REVISION_ISSUE
-        // TODO EXT_SVN_STOP
-        // TODO EXT_SVN_VERSION
         // TODO GLOBAL_AUTHORIZATIONS
         // TODO GROUP_GLOBAL_AUTHORIZATIONS
         // TODO GROUP_PROJECT_AUTHORIZATIONS
@@ -119,9 +115,11 @@ public class Migration {
         // TODO PREFERENCES
         // TODO PROJECT_AUTHORIZATIONS
         // TODO PROPERTIES
-        // TODO SETTINGS
         // TODO SHARED_BUILD_FILTERS
         // TODO STORAGE
+
+        // Subversion
+        // Subversion tables do not need to be migrated - they will be filled on demand
 
         // Update of sequences
         updateSequences();
