@@ -45,6 +45,10 @@ public class Migration {
             cleanup();
         }
 
+        /**
+         * Entities
+         */
+
         // PROJECTS
         copy("PROJECTS", "ID", "NAME", "DESCRIPTION", "DISABLED");
 
@@ -69,6 +73,17 @@ public class Migration {
         // VALIDATION_RUN_STATUSES
         copy("VALIDATION_RUN_STATUSES", "ID", "VALIDATIONRUNID", "VALIDATIONRUNSTATUSID", "CREATION", "CREATOR", "DESCRIPTION");
 
+        /**
+         * Entity data
+         */
+
+        // ENTITY_DATA
+        copy("ENTITY_DATA", "ID", "PROJECT", "BRANCH", "PROMOTION_LEVEL", "VALIDATION_STAMP", "BUILD", "PROMOTION_RUN", "VALIDATION_RUN", "NAME", "VALUE");
+
+        /**
+         * ACL
+         */
+
         // ACCOUNTS
         copy("ACCOUNTS", "ID", "NAME", "FULLNAME", "EMAIL", "MODE", "PASSWORD", "ROLE");
 
@@ -81,7 +96,6 @@ public class Migration {
         // TODO BRANCH_TEMPLATE_INSTANCE_PARAMS
         // TODO BUILD_FILTERS
         // TODO CONFIGURATIONS
-        // TODO ENTITY_DATA
         // TODO EVENTS
         // TODO EXT_SVN_COPY
         // TODO EXT_SVN_MERGE_REVISION
