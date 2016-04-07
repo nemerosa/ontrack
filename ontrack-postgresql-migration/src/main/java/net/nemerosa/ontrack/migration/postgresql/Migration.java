@@ -57,6 +57,9 @@ public class Migration {
         // VALIDATION_STAMPS
         copy("VALIDATION_STAMPS", "ID", "BRANCHID", "OWNER", "PROMOTION_LEVEL", "ORDERNB", "NAME", "DESCRIPTION", "IMAGETYPE", "IMAGEBYTES");
 
+        // BUILDS
+        copy("BUILDS", "ID", "BRANCHID", "NAME", "DESCRIPTION", "CREATION", "CREATOR");
+
         // ACCOUNTS
         copy("ACCOUNTS", "ID", "NAME", "FULLNAME", "EMAIL", "MODE", "PASSWORD", "ROLE");
 
@@ -67,7 +70,6 @@ public class Migration {
         // TODO BRANCH_TEMPLATE_DEFINITION_PARAMS
         // TODO BRANCH_TEMPLATE_INSTANCES
         // TODO BRANCH_TEMPLATE_INSTANCE_PARAMS
-        // TODO BUILDS
         // TODO BUILD_FILTERS
         // TODO CONFIGURATIONS
         // TODO ENTITY_DATA
