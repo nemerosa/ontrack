@@ -50,8 +50,7 @@ public class Migration {
          */
 
         // CONFIGURATIONS
-        // TODO JSON
-        copy("CONFIGURATIONS", "ID", "TYPE", "NAME", "CONTENT");
+        copy("CONFIGURATIONS", "ID", "TYPE", "NAME", "CONTENT::JSONB");
 
         // SETTINGS
         copy("SETTINGS", "CATEGORY", "NAME", "VALUE");
@@ -63,8 +62,7 @@ public class Migration {
         copy("PREDEFINED_VALIDATION_STAMPS", "ID", "NAME", "DESCRIPTION", "IMAGETYPE", "IMAGEBYTES");
 
         // STORAGE
-        // TODO JSON
-        copy("STORAGE", "STORE", "NAME", "DATA");
+        copy("STORAGE", "STORE", "NAME", "DATA::JSONB");
 
         /**
          * Entities
@@ -99,8 +97,7 @@ public class Migration {
          */
 
         // BRANCH_TEMPLATE_DEFINITIONS
-        // TODO JSON
-        copy("BRANCH_TEMPLATE_DEFINITIONS", "BRANCHID", "ABSENCEPOLICY", "SYNCINTERVAL", "SYNCHRONISATIONSOURCEID", "SYNCHRONISATIONSOURCECONFIG");
+        copy("BRANCH_TEMPLATE_DEFINITIONS", "BRANCHID", "ABSENCEPOLICY", "SYNCINTERVAL", "SYNCHRONISATIONSOURCEID", "SYNCHRONISATIONSOURCECONFIG::JSONB");
 
         // BRANCH_TEMPLATE_DEFINITION_PARAMS
         copy("BRANCH_TEMPLATE_DEFINITION_PARAMS", "BRANCHID", "NAME", "DESCRIPTION", "EXPRESSION");
@@ -116,15 +113,13 @@ public class Migration {
          */
 
         // ENTITY_DATA
-        copy("ENTITY_DATA", "ID", "PROJECT", "BRANCH", "PROMOTION_LEVEL", "VALIDATION_STAMP", "BUILD", "PROMOTION_RUN", "VALIDATION_RUN", "NAME", "VALUE");
+        copy("ENTITY_DATA", "ID", "PROJECT", "BRANCH", "PROMOTION_LEVEL", "VALIDATION_STAMP", "BUILD", "PROMOTION_RUN", "VALIDATION_RUN", "NAME", "VALUE::JSONB");
 
         // PROPERTIES
-        // TODO JSON
-        copy("PROPERTIES", "ID", "PROJECT", "BRANCH", "PROMOTION_LEVEL", "VALIDATION_STAMP", "BUILD", "PROMOTION_RUN", "VALIDATION_RUN", "TYPE", "SEARCHKEY", "JSON");
+        copy("PROPERTIES", "ID", "PROJECT", "BRANCH", "PROMOTION_LEVEL", "VALIDATION_STAMP", "BUILD", "PROMOTION_RUN", "VALIDATION_RUN", "TYPE", "SEARCHKEY", "JSON::JSONB");
 
         // SHARED_BUILD_FILTERS
-        // TODO JSON
-        copy("SHARED_BUILD_FILTERS", "BRANCHID", "NAME", "TYPE", "DATA");
+        copy("SHARED_BUILD_FILTERS", "BRANCHID", "NAME", "TYPE", "DATA::JSONB");
 
         // EVENTS
         if (migrationProperties.isSkipEvents()) {
@@ -165,8 +160,7 @@ public class Migration {
         copy("PREFERENCES", "ACCOUNTID", "TYPE", "CONTENT");
 
         // BUILD_FILTERS
-        // TODO JSON
-        copy("BUILD_FILTERS", "ACCOUNTID", "BRANCHID", "NAME", "TYPE", "DATA");
+        copy("BUILD_FILTERS", "ACCOUNTID", "BRANCHID", "NAME", "TYPE", "DATA::JSONB");
 
         // Subversion
         // Subversion tables do not need to be migrated - they will be filled on demand
@@ -254,7 +248,7 @@ public class Migration {
     private void copy(String table, String... columns) {
         String h2Query = String.format("SELECT * FROM %s", table);
 
-        String insert = StringUtils.join(columns, ",");
+        String insert = Arrays.asList(columns).stream().map(column -> StringUtils.substringBefore(column, "::")).collect(Collectors.joining(","));
         String values = Arrays.asList(columns).stream().map(column -> ":" + column).collect(Collectors.joining(","));
         String postgresqlUpdate = String.format("INSERT INTO %s (%s) VALUES (%s)", table, insert, values);
 
