@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.migration.postgresql;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +14,10 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.sql.DataSource;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class Migration {
@@ -68,7 +71,9 @@ public class Migration {
                 "INSERT INTO PROMOTION_LEVELS (ID, BRANCHID, ORDERNB, NAME, DESCRIPTION, IMAGETYPE, IMAGEBYTES) VALUES (:ID, :BRANCHID, :ORDERNB, :NAME, :DESCRIPTION, :IMAGETYPE, :IMAGEBYTES)"
         ));
 
-        // TODO ACCOUNTS
+        // ACCOUNTS
+        copy("ACCOUNTS", "ID", "NAME", "FULLNAME", "EMAIL", "MODE", "PASSWORD", "ROLE");
+
         // TODO ACCOUNT_GROUPS
         // TODO ACCOUNT_GROUP_LINK
         // TODO ACCOUNT_GROUP_MAPPING
@@ -109,10 +114,20 @@ public class Migration {
 
     private void cleanup() {
         logger.info("Cleanup of target database...");
-        txTemplate.execute(new TransactionCallbackWithoutResult() {
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                postgresql.update("DELETE FROM PROJECTS", Collections.emptyMap());
+        String[] tables = {
+                "ACCOUNTS",
+                "ACCOUNT_GROUPS",
+                "CONFIGURATIONS",
+                "EXT_SVN_REPOSITORY",
+                "PREDEFINED_PROMOTION_LEVELS",
+                "PREDEFINED_VALIDATION_STAMPS",
+                "PROJECTS",
+                "SETTINGS",
+                "STORAGE",
+        };
+        tx(() -> {
+            for (String table : tables) {
+                postgresql.update(String.format("DELETE FROM %s", table), Collections.emptyMap());
             }
         });
     }
@@ -124,6 +139,21 @@ public class Migration {
                 task.run();
             }
         });
+    }
+
+    private void copy(String table, String... columns) {
+        String h2Query = String.format("SELECT * FROM %s", table);
+
+        String insert = StringUtils.join(columns, ",");
+        String values = Arrays.asList(columns).stream().map(column -> ":" + column).collect(Collectors.joining(","));
+        String postgresqlUpdate = String.format("INSERT INTO %s (%s) VALUES (%s)", table, insert, values);
+
+        tx(() -> simpleMigration(
+                table,
+                h2Query,
+                Collections.emptyMap(),
+                postgresqlUpdate
+        ));
     }
 
     private void simpleMigration(String name, String h2Query, Map<String, Object> h2Params, String postgresqlUpdate) {
