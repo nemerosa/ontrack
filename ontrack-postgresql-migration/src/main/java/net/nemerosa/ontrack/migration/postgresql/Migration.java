@@ -54,6 +54,9 @@ public class Migration {
         // PROMOTION_LEVELS
         copy("PROMOTION_LEVELS", "ID", "BRANCHID", "ORDERNB", "NAME", "DESCRIPTION", "IMAGETYPE", "IMAGEBYTES");
 
+        // VALIDATION_STAMPS
+        copy("VALIDATION_STAMPS", "ID", "BRANCHID", "OWNER", "PROMOTION_LEVEL", "ORDERNB", "NAME", "DESCRIPTION", "IMAGETYPE", "IMAGEBYTES");
+
         // ACCOUNTS
         copy("ACCOUNTS", "ID", "NAME", "FULLNAME", "EMAIL", "MODE", "PASSWORD", "ROLE");
 
@@ -91,7 +94,6 @@ public class Migration {
         // TODO STORAGE
         // TODO VALIDATION_RUNS
         // TODO VALIDATION_RUN_STATUSES
-        // TODO VALIDATION_STAMPS
 
         // Update of sequences
         updateSequences();
