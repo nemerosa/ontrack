@@ -6,13 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.flyway.FlywayProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
+import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
+import java.util.Collections;
 
 @Configuration
 @SpringBootApplication
@@ -23,6 +26,14 @@ public class MigrationTool {
 
     @Autowired
     private MigrationProperties migrationProperties;
+
+    @Autowired
+    private FlywayProperties flywayProperties;
+
+    @PostConstruct
+    public void start() {
+        flywayProperties.setLocations(Collections.singletonList("classpath:/ontrack/sql"));
+    }
 
     public static void main(String[] args) {
         SpringApplication application = new SpringApplication(MigrationTool.class);

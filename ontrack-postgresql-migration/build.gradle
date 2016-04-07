@@ -12,7 +12,9 @@ apply plugin: 'spring-boot'
 dependencies {
     compile libraries.spring_boot_starter
     compile libraries.spring_boot_starter_jdbc
+    compile libraries.flyway
 
+    runtime project(':ontrack-database')
     runtime 'com.h2database:h2:1.4.189'
     runtime libraries.postgresql
 
