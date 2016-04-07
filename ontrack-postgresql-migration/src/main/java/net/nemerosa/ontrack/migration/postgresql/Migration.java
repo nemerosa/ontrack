@@ -21,12 +21,14 @@ public class Migration {
 
     private final Logger logger = LoggerFactory.getLogger(Migration.class);
 
+    private final MigrationProperties migrationProperties;
     private final NamedParameterJdbcTemplate h2;
     private final NamedParameterJdbcTemplate postgresql;
     private final TransactionTemplate txTemplate;
 
     @Autowired
-    public Migration(@Qualifier("h2") DataSource h2Datasource, @Qualifier("postgresql") DataSource postgresqlDatasource) {
+    public Migration(@Qualifier("h2") DataSource h2Datasource, @Qualifier("postgresql") DataSource postgresqlDatasource, MigrationProperties migrationProperties) {
+        this.migrationProperties = migrationProperties;
         h2 = new NamedParameterJdbcTemplate(h2Datasource);
         postgresql = new NamedParameterJdbcTemplate(postgresqlDatasource);
 
@@ -35,13 +37,25 @@ public class Migration {
     }
 
     public void run() {
+        // Cleanup?
+        if (migrationProperties.isCleanup()) {
+            cleanup();
+        }
         // Projects
         migrateProjects();
-        // FIXME Method net.nemerosa.ontrack.migration.postgresql.Migration.run
+    }
+
+    private void cleanup() {
+        logger.info("Cleanup of target database...");
+        txTemplate.execute(new TransactionCallbackWithoutResult() {
+            @Override
+            protected void doInTransactionWithoutResult(TransactionStatus status) {
+                postgresql.update("DELETE FROM PROJECTS", Collections.emptyMap());
+            }
+        });
     }
 
     private void migrateProjects() {
-        logger.info("Migrating projects...");
         txTemplate.execute(new TransactionCallbackWithoutResult() {
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus status) {
