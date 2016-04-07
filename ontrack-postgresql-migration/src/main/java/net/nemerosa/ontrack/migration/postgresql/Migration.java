@@ -41,6 +41,9 @@ public class Migration {
         if (migrationProperties.isCleanup()) {
             cleanup();
         }
+
+        // FIXME Update of sequences
+
         // PROJECTS
         tx(() -> simpleMigration(
                 "Projects",
@@ -55,6 +58,14 @@ public class Migration {
                 "SELECT * FROM BRANCHES",
                 Collections.emptyMap(),
                 "INSERT INTO BRANCHES (ID, PROJECTID, NAME, DESCRIPTION, DISABLED) VALUES (:ID, :PROJECTID, :NAME, :DESCRIPTION, :DISABLED)"
+        ));
+
+        // PROMOTION_LEVELS
+        tx(() -> simpleMigration(
+                "Promotion levels",
+                "SELECT * FROM PROMOTION_LEVELS",
+                Collections.emptyMap(),
+                "INSERT INTO PROMOTION_LEVELS (ID, BRANCHID, ORDERNB, NAME, DESCRIPTION, IMAGETYPE, IMAGEBYTES) VALUES (:ID, :BRANCHID, :ORDERNB, :NAME, :DESCRIPTION, :IMAGETYPE, :IMAGEBYTES)"
         ));
 
         // TODO ACCOUNTS
@@ -85,7 +96,6 @@ public class Migration {
         // TODO PREDEFINED_VALIDATION_STAMPS
         // TODO PREFERENCES
         // TODO PROJECT_AUTHORIZATIONS
-        // TODO PROMOTION_LEVELS
         // TODO PROMOTION_RUNS
         // TODO PROPERTIES
         // TODO SETTINGS
