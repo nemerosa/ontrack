@@ -112,6 +112,10 @@ public class Migration {
         // TODO JSON
         copy("PROPERTIES", "ID", "PROJECT", "BRANCH", "PROMOTION_LEVEL", "VALIDATION_STAMP", "BUILD", "PROMOTION_RUN", "VALIDATION_RUN", "TYPE", "SEARCHKEY", "JSON");
 
+        // SHARED_BUILD_FILTERS
+        // TODO JSON
+        copy("SHARED_BUILD_FILTERS", "BRANCHID", "NAME", "TYPE", "DATA");
+
         /**
          * ACL
          */
@@ -143,11 +147,13 @@ public class Migration {
         // PREFERENCES
         copy("PREFERENCES", "ACCOUNTID", "TYPE", "CONTENT");
 
-        // TODO BUILD_FILTERS
+        // BUILD_FILTERS
+        // TODO JSON
+        copy("BUILD_FILTERS", "ACCOUNTID", "BRANCHID", "NAME", "TYPE", "DATA");
+
         // TODO EVENTS
         // TODO PREDEFINED_PROMOTION_LEVELS
         // TODO PREDEFINED_VALIDATION_STAMPS
-        // TODO SHARED_BUILD_FILTERS
         // TODO STORAGE
 
         // Subversion
