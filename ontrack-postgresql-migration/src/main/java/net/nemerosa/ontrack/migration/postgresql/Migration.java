@@ -108,7 +108,9 @@ public class Migration {
         // FIXME Problems with some blobs
         // copy("PREDEFINED_VALIDATION_STAMPS", "ID", "OWNER", "PROMOTION_LEVEL", "ORDERNB", "NAME", "DESCRIPTION", "IMAGETYPE", "IMAGEBYTES");
 
-        // TODO STORAGE
+        // STORAGE
+        // TODO JSON
+        copy("STORAGE", "STORE", "NAME", "DATA");
 
         /**
          * Entity data
@@ -124,6 +126,13 @@ public class Migration {
         // SHARED_BUILD_FILTERS
         // TODO JSON
         copy("SHARED_BUILD_FILTERS", "BRANCHID", "NAME", "TYPE", "DATA");
+
+        // EVENTS
+        if (migrationProperties.isSkipEvents()) {
+            logger.warn("Skipping events migration");
+        } else {
+            copy("EVENTS", "ID", "PROJECT", "BRANCH", "PROMOTION_LEVEL", "VALIDATION_STAMP", "BUILD", "PROMOTION_RUN", "VALIDATION_RUN", "EVENT_TYPE", "REF", "EVENT_VALUES", "EVENT_TIME", "EVENT_USER");
+        }
 
         /**
          * ACL
@@ -159,8 +168,6 @@ public class Migration {
         // BUILD_FILTERS
         // TODO JSON
         copy("BUILD_FILTERS", "ACCOUNTID", "BRANCHID", "NAME", "TYPE", "DATA");
-
-        // TODO EVENTS
 
         // Subversion
         // Subversion tables do not need to be migrated - they will be filled on demand

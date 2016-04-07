@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 public class MigrationProperties {
 
     private boolean cleanup = false;
+    private boolean skipEvents = false;
     private DatabaseProperties h2 = new DatabaseProperties();
     private DatabaseProperties postgresql = new DatabaseProperties();
 
