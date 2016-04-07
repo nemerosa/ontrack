@@ -41,8 +41,47 @@ public class Migration {
         if (migrationProperties.isCleanup()) {
             cleanup();
         }
-        // Projects
+        // PROJECTS
         migrateProjects();
+        // TODO ACCOUNTS
+        // TODO ACCOUNT_GROUPS
+        // TODO ACCOUNT_GROUP_LINK
+        // TODO ACCOUNT_GROUP_MAPPING
+        // TODO BRANCHES
+        // TODO BRANCH_TEMPLATE_DEFINITIONS
+        // TODO BRANCH_TEMPLATE_DEFINITION_PARAMS
+        // TODO BRANCH_TEMPLATE_INSTANCES
+        // TODO BRANCH_TEMPLATE_INSTANCE_PARAMS
+        // TODO BUILDS
+        // TODO BUILD_FILTERS
+        // TODO CONFIGURATIONS
+        // TODO ENTITY_DATA
+        // TODO EVENTS
+        // TODO EXT_SVN_COPY
+        // TODO EXT_SVN_MERGE_REVISION
+        // TODO EXT_SVN_REPOSITORY
+        // TODO EXT_SVN_REVISION
+        // TODO EXT_SVN_REVISION_ISSUE
+        // TODO EXT_SVN_STOP
+        // TODO EXT_SVN_VERSION
+        // TODO GLOBAL_AUTHORIZATIONS
+        // TODO GROUP_GLOBAL_AUTHORIZATIONS
+        // TODO GROUP_PROJECT_AUTHORIZATIONS
+        // TODO ONTRACK_VERSION
+        // TODO PREDEFINED_PROMOTION_LEVELS
+        // TODO PREDEFINED_VALIDATION_STAMPS
+        // TODO PREFERENCES
+        // TODO PROJECT_AUTHORIZATIONS
+        // TODO PROMOTION_LEVELS
+        // TODO PROMOTION_RUNS
+        // TODO PROPERTIES
+        // TODO SETTINGS
+        // TODO SHARED_BUILD_FILTERS
+        // TODO STORAGE
+        // TODO VALIDATION_RUNS
+        // TODO VALIDATION_RUN_STATUSES
+        // TODO VALIDATION_STAMPS
+
     }
 
     private void cleanup() {
