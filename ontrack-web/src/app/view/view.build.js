@@ -84,6 +84,27 @@ angular.module('ot.view.build', [
                     ot.viewApiCommand(build._self),
                     ot.viewCloseCommand('/branch/' + build.branch.id)
                 ];
+                // Gets a reference to the next build
+                ot.call($http.get(build._next)).then(function (nextBuild) {
+                    if (nextBuild.id) {
+                        view.commands.splice(0, 0, {
+                            id: 'nextBuild',
+                            name: "Next build",
+                            cls: 'ot-command-next',
+                            link: 'build/' + nextBuild.id
+                        });
+                    }
+                    return ot.call($http.get(build._previous));
+                }).then(function (previousBuild) {
+                    if (previousBuild.id) {
+                        view.commands.splice(0, 0, {
+                            id: 'previousBuild',
+                            name: "Previous build",
+                            cls: 'ot-command-previous',
+                            link: 'build/' + previousBuild.id
+                        });
+                    }
+                });
             });
         }
 
