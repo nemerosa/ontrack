@@ -101,4 +101,44 @@ class StructureServiceIT extends AbstractServiceTestSupport {
         assert views.size() == 5
     }
 
+    @Test
+    void 'Previous build'() {
+        def branch = doCreateBranch()
+        def build1 = doCreateBuild(branch, nd("1", ""))
+        def build2 = doCreateBuild(branch, nd("2", ""))
+        // Gets the previous build of 2
+        def o = asUser().with(branch, ProjectView).call { structureService.getPreviousBuild(build2.id) }
+        assert o.present
+        assert o.get().id == build1.id
+    }
+
+    @Test
+    void 'No previous build'() {
+        def branch = doCreateBranch()
+        def build = doCreateBuild(branch, nd("1", ""))
+        // Gets the previous build of 1
+        def o = asUser().with(branch, ProjectView).call { structureService.getPreviousBuild(build.id) }
+        assert !o.present
+    }
+
+    @Test
+    void 'Next build'() {
+        def branch = doCreateBranch()
+        def build1 = doCreateBuild(branch, nd("1", ""))
+        def build2 = doCreateBuild(branch, nd("2", ""))
+        // Gets the next build of 1
+        def o = asUser().with(branch, ProjectView).call { structureService.getNextBuild(build1.id) }
+        assert o.present
+        assert o.get().id == build2.id
+    }
+
+    @Test
+    void 'No next build'() {
+        def branch = doCreateBranch()
+        def build = doCreateBuild(branch, nd("1", ""))
+        // Gets the next build of 1
+        def o = asUser().with(branch, ProjectView).call { structureService.getNextBuild(build.id) }
+        assert !o.present
+    }
+
 }
