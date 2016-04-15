@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.acceptance
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTest
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import net.nemerosa.ontrack.dsl.*
@@ -104,6 +105,27 @@ class ACCDSL extends AbstractACCDSL {
         Branch branch = createBuildsAndPromotions()
         def builds = ontrack.project(branch.project).search(promotionName: 'BRONZE')
         assert builds.collect { it.name } == ['2']
+    }
+
+    @Test
+    void 'Build previous and next'() {
+        // Project and branch
+        def name = uid('P')
+        def project = ontrack.project(name)
+        def branch = project.branch('master', '')
+        // Builds
+        def build1 = branch.build('1', '')
+        def build2 = branch.build('2', '')
+        def build3 = branch.build('3', '')
+        // Build 1 has no previous build
+        assert build1.previousBuild == null
+        assert build1.nextBuild.name == '2'
+        // Build 2 has previous and next builds
+        assert build2.previousBuild.name == '1'
+        assert build2.nextBuild.name == '3'
+        // Build 3 has no next build
+        assert build3.previousBuild.name == '2'
+        assert build3.nextBuild == null
     }
 
     @Test
