@@ -255,6 +255,16 @@ public class StructureServiceImpl implements StructureService {
         return structureRepository.deleteBuild(buildId);
     }
 
+    @Override
+    public Optional<Build> getPreviousBuild(ID buildId) {
+        return structureRepository.getPreviousBuild(getBuild(buildId));
+    }
+
+    @Override
+    public Optional<Build> getNextBuild(ID buildId) {
+        return structureRepository.getNextBuild(getBuild(buildId));
+    }
+
     protected void validateBuild(Build build) {
         extensionManager.getExtensions(BuildValidationExtension.class).forEach(
                 x -> x.validateBuild(build)
