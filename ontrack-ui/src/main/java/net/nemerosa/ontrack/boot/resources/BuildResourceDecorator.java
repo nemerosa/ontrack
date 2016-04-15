@@ -65,6 +65,10 @@ public class BuildResourceDecorator extends AbstractResourceDecorator<Build> {
                         on(BuildController.class).updateBuildSignatureForm(build.getId()),
                         ProjectEdit.class, build
                 )
+                // Previous & next build
+                .link("_previous", on(BuildController.class).getPreviousBuild(build.getId()))
+                .link("_next", on(BuildController.class).getNextBuild(build.getId()))
+                // Page
                 .page(build);
         // Contributions
         resourceDecorationContributorService.contribute(linksBuilder, build);
