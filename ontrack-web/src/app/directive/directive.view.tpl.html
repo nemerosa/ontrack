@@ -27,6 +27,10 @@
                         <span class="{{command.cls}}"></span>
                         {{command.name}}
                     </a>
+                    <a ng-if="command.absoluteLink" href="{{command.absoluteLink}}" class="ot-command ot-view-command-name" title="{{command.title}}">
+                        <span class="{{command.cls}}"></span>
+                        {{command.name}}
+                    </a>
                     <div class="btn-group ot-command-group" ng-if="command.group" ng-show="command.actions">
                         <button type="button" class="btn btn-default dropdown-toggle ot-command" data-toggle="dropdown">
                             <span class="{{command.cls}}"></span>

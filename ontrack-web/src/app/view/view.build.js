@@ -91,7 +91,7 @@ angular.module('ot.view.build', [
                             id: 'nextBuild',
                             name: "Next build",
                             cls: 'ot-command-next',
-                            link: 'build/' + nextBuild.id,
+                            absoluteLink: nextBuild._page,
                             title: "Go to build " + nextBuild.name
                         });
                     }
@@ -102,9 +102,19 @@ angular.module('ot.view.build', [
                             id: 'previousBuild',
                             name: "Previous build",
                             cls: 'ot-command-previous',
-                            link: 'build/' + previousBuild.id,
+                            absoluteLink: previousBuild._page,
                             title: "Go to build " + previousBuild.name
                         });
+                        // Change log since previous?
+                        if (build._changeLogPage) {
+                            view.commands.splice(0, 0, {
+                                id: 'changeLogSincePreviousBuild',
+                                name: "Change log",
+                                cls: 'ot-command-changelog',
+                                absoluteLink: build._changeLogPage + '?from=' + previousBuild.id + '&to=' + build.id,
+                                title: "Change log since " + previousBuild.name
+                            });
+                        }
                     }
                 });
             });
