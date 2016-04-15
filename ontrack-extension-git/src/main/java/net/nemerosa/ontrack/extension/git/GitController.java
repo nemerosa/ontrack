@@ -40,6 +40,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -258,7 +259,7 @@ public class GitController extends AbstractExtensionController<GitExtensionFeatu
                 );
         // Content type
         HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set("Content-Type", exportedChangeLogIssues.getFormat());
+        responseHeaders.set("Content-Type", exportedChangeLogIssues.getFormat() + "; charset=utf-8");
         // Body and headers
         return new ResponseEntity<>(exportedChangeLogIssues.getContent(), responseHeaders, HttpStatus.OK);
     }

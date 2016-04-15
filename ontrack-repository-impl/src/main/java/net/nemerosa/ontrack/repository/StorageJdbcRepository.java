@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.repository;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
@@ -60,10 +61,11 @@ public class StorageJdbcRepository extends AbstractJdbcRepository implements Sto
     @Override
     public Map<String, JsonNode> getData(String store) {
         Map<String, JsonNode> results = new LinkedHashMap<>();
+        //noinspection RedundantCast
         getNamedParameterJdbcTemplate().query(
                 "SELECT NAME, DATA FROM STORAGE WHERE STORE = :store ORDER BY NAME",
                 params("store", store),
-                rs -> {
+                (RowCallbackHandler) rs -> {
                     String name = rs.getString("NAME");
                     JsonNode node = readJson(rs, "DATA");
                     results.put(name, node);
