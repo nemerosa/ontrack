@@ -91,7 +91,8 @@ angular.module('ot.view.build', [
                             id: 'nextBuild',
                             name: "Next build",
                             cls: 'ot-command-next',
-                            link: 'build/' + nextBuild.id
+                            link: 'build/' + nextBuild.id,
+                            title: "Go to build " + nextBuild.name
                         });
                     }
                     return ot.call($http.get(build._previous));
@@ -101,7 +102,8 @@ angular.module('ot.view.build', [
                             id: 'previousBuild',
                             name: "Previous build",
                             cls: 'ot-command-previous',
-                            link: 'build/' + previousBuild.id
+                            link: 'build/' + previousBuild.id,
+                            title: "Go to build " + previousBuild.name
                         });
                     }
                 });
