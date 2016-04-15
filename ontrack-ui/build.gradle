@@ -26,7 +26,7 @@ dependencies {
 
     testCompile project(':ontrack-test-utils')
     testCompile project(':ontrack-it-utils')
-    testCompile project(path: ':ontrack-extension-api', configuration: 'testArtifacts')
+    testCompile project(':ontrack-extension-api').sourceSets.test.output
     testCompile libraries.groovy
 
     // List of extensions to include in core

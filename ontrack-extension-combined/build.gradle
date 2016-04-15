@@ -6,6 +6,6 @@ apply plugin: OntrackExtensionPlugin
 dependencies {
     compile project(':ontrack-extension-issues')
 
-    testCompile project (path: ":ontrack-extension-issues", configuration: 'testArtifacts')
+    testCompile project(':ontrack-extension-issues').sourceSets.test.output
     testCompile libraries.groovy
 }
