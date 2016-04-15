@@ -12,7 +12,7 @@ dependencies {
     compile libraries.commons_io
 
     testCompile project(':ontrack-it-utils')
-    testCompile project (path: ":ontrack-extension-issues", configuration: 'testArtifacts')
+    testCompile project(':ontrack-extension-issues').sourceSets.test.output
     testCompile libraries.groovy
     testRuntime project(':ontrack-service')
     testRuntime project(':ontrack-repository-impl')

@@ -20,7 +20,7 @@ dependencies {
     compile libraries.jgrapht
 
     testCompile project(':ontrack-it-utils')
-    testCompile project(path: ':ontrack-extension-api', configuration: 'testArtifacts')
+    testCompile project(':ontrack-extension-api').sourceSets.test.output
     testRuntime project(':ontrack-repository-impl')
 
     // Dependencies needed for LDAP integration tests
