@@ -1,5 +1,5 @@
 plugins {
-    id 'net.nemerosa.versioning' version '1.6.0'
+    id 'net.nemerosa.versioning' version '1.7.0'
     id 'nebula.os-package' version '2.2.6'
 }
 
