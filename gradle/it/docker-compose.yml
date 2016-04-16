@@ -1,6 +1,6 @@
 # Database
 db:
-  image: postgres:9.5.1
+  image: postgres:9.5.2
   environment:
     POSTGRES_DB      : ontrack
     POSTGRES_USER    : ontrack
