@@ -224,7 +224,6 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
 
-
     @Override
     public Build getLastBuildForBranch(Branch branch) {
         return getFirstItem(
@@ -333,6 +332,24 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 "SELECT COUNT(ID) FROM BUILDS WHERE BRANCHID = :branchId",
                 params("branchId", branch.id()),
                 Integer.class
+        );
+    }
+
+    @Override
+    public Optional<Build> getPreviousBuild(Build build) {
+        return getOptional(
+                "SELECT * FROM BUILDS WHERE BRANCHID = :branch AND ID < :id ORDER BY ID DESC LIMIT 1",
+                params("branch", build.getBranch().id()).addValue("id", build.id()),
+                (rs, rowNum) -> toBuild(rs, this::getBranch)
+        );
+    }
+
+    @Override
+    public Optional<Build> getNextBuild(Build build) {
+        return getOptional(
+                "SELECT * FROM BUILDS WHERE BRANCHID = :branch AND ID > :id ORDER BY ID ASC LIMIT 1",
+                params("branch", build.getBranch().id()).addValue("id", build.id()),
+                (rs, rowNum) -> toBuild(rs, this::getBranch)
         );
     }
 

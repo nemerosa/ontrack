@@ -53,6 +53,10 @@ public interface StructureRepository {
 
     int getBuildCount(Branch branch);
 
+    Optional<Build> getPreviousBuild(Build build);
+
+    Optional<Build> getNextBuild(Build build);
+
     /**
      * Iterates over the builds of the branch, from the newest to the oldest, until
      * the <code>buildPredicate</code> returns <code>false</code>.

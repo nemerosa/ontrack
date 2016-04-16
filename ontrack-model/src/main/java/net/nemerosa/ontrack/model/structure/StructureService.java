@@ -72,6 +72,10 @@ public interface StructureService {
 
     Ack deleteBuild(ID buildId);
 
+    Optional<Build> getPreviousBuild(ID buildId);
+
+    Optional<Build> getNextBuild(ID buildId);
+
     /**
      * Branch builds
      */

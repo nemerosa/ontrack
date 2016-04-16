@@ -88,6 +88,32 @@ class Build extends AbstractProjectResource {
     }
 
     /**
+     * Previous build
+     * @return Null if none
+     */
+    Build getPreviousBuild() {
+        def json = ontrack.get(link('previous'))
+        if (json) {
+            return new Build(ontrack, json)
+        } else {
+            return null
+        }
+    }
+
+    /**
+     * Next build
+     * @return Null if none
+     */
+    Build getNextBuild() {
+        def json = ontrack.get(link('next'))
+        if (json) {
+            return new Build(ontrack, json)
+        } else {
+            return null
+        }
+    }
+
+    /**
      * Gets the change log between this build and another one.
      *
      * If no change log is available, because the associated branch is not configured for example,

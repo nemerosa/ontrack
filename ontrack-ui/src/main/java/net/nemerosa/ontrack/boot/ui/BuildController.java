@@ -14,6 +14,8 @@ import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -217,5 +219,26 @@ public class BuildController extends AbstractResourceController {
     public Build getBuild(@PathVariable ID buildId) {
         return structureService.getBuild(buildId);
     }
+
+    /**
+     * Gets the previous build
+     */
+    @RequestMapping(value = "builds/{buildId}/previous", method = RequestMethod.GET)
+    public ResponseEntity<Build> getPreviousBuild(@PathVariable ID buildId) {
+        return structureService.getPreviousBuild(buildId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.status(HttpStatus.NO_CONTENT).body(null));
+    }
+
+    /**
+     * Gets the next build
+     */
+    @RequestMapping(value = "builds/{buildId}/next", method = RequestMethod.GET)
+    public ResponseEntity<Build> getNextBuild(@PathVariable ID buildId) {
+        return structureService.getNextBuild(buildId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.status(HttpStatus.NO_CONTENT).body(null));
+    }
+
 
 }

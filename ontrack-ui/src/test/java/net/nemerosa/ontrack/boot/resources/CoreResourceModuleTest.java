@@ -580,6 +580,8 @@ public class CoreResourceModuleTest {
                         .with("_extra", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getInformation:BUILD,1")
                         .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:BUILD,1")
                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:BUILD,1,0,10")
+                        .with("_previous", "urn:test:net.nemerosa.ontrack.boot.ui.BuildController#getPreviousBuild:1")
+                        .with("_next", "urn:test:net.nemerosa.ontrack.boot.ui.BuildController#getNextBuild:1")
                         .with("_page", "urn:test:#:entity:BUILD:1")
                         .end(),
                 build

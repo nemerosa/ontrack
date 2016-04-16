@@ -19,11 +19,15 @@
             <div class="ot-view-commands">
                 <span ng-repeat="command in view.commands" id="{{command.id}}"
                       ng-if="!command.condition || command.condition()" class="ot-view-command">
-                    <span ng-if="command.action" ng-click="command.action()" class="ot-command ot-view-command-name">
+                    <span ng-if="command.action" ng-click="command.action()" class="ot-command ot-view-command-name" title="{{command.title}}">
                         <span class="{{command.cls}}"></span>
                         {{command.name}}
                     </span>
-                    <a ng-if="command.link" href="#{{command.link}}" class="ot-command ot-view-command-name">
+                    <a ng-if="command.link" href="#{{command.link}}" class="ot-command ot-view-command-name" title="{{command.title}}">
+                        <span class="{{command.cls}}"></span>
+                        {{command.name}}
+                    </a>
+                    <a ng-if="command.absoluteLink" href="{{command.absoluteLink}}" class="ot-command ot-view-command-name" title="{{command.title}}">
                         <span class="{{command.cls}}"></span>
                         {{command.name}}
                     </a>
