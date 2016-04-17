@@ -6,7 +6,7 @@
  * The package version does not accept versions like the ones generated
  * from the Versioning plugin for the feature branches for example.
  */
-def packageVersion = versioning.info.branchType != 'release' ? '0.0.0' : versioning.info.display
+def packageVersion = versioning.info.branchType != 'release' ? '0.0.0' : versioning.info.display.replaceAll(/[^0-9\.-_]/, '')
 
 ospackage {
     packageName = 'ontrack'
