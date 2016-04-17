@@ -27,3 +27,17 @@ ontrack:
     - "/dev/random:/dev/random"
   ports:
     - "443:443"
+  links:
+    - "postgresql:postgresql"
+
+# Postgresql database
+postgresql:
+  image: postgres:9.5.2
+  environment:
+    POSTGRES_DB      : ontrack
+    POSTGRES_USER    : ontrack
+    POSTGRES_PASSWORD: ${ONTRACK_POSTGRES_PASSWORD}
+  volumes:
+    - "/var/lib/postgresql/data:/var/lib/postgresql/data"
+  ports:
+    - "5432:5432"

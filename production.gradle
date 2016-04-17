@@ -16,28 +16,10 @@ buildscript {
 
 import net.nemerosa.httpclient.*
 import net.nemerosa.httpclient.json.*
-import net.nemerosa.ontrack.gradle.AbstractCDTask
 import net.nemerosa.ontrack.gradle.ComposeStop
 import net.nemerosa.ontrack.gradle.ComposeUp
 import net.nemerosa.ontrack.gradle.DOSetup
 import net.nemerosa.ontrack.gradle.RemoteAcceptanceTest
-
-class ProductionRestore extends AbstractCDTask {
-
-    /**
-     * Location of the TGZ backup file
-     */
-    File backup
-
-    @TaskAction
-    void run() {
-        // Copies the TGZ on the remote machine
-        execute 'docker-machine', 'scp', backup.absolutePath, "${project.properties.productionMachine}:/var/ontrack/${backup.name}"
-        // Extracts the TGZ
-        execute 'docker-machine', 'ssh', project.properties.productionMachine, "tar xzvf /var/ontrack/${backup.name} -C /var/ontrack/data"
-    }
-
-}
 
 class ProductionVersion extends DefaultTask {
 
@@ -98,54 +80,13 @@ task productionEnv {
 
 task productionVersion(type: ProductionVersion)
 
-task productionBackup {
-    dependsOn 'productionVersion'
-    doFirst {
-        // Classifier
-        def version = productionVersion.version
-        def classifier = version ?: new Date().format('yyyMMddHHmmss')
-        // Paths
-        def remotePath = "/var/ontrack/backup-${classifier}.tgz"
-        def localPath = new File(buildDir, "backup-${classifier}.tgz").absolutePath
-        // Creates a TAR
-        println "[${name}] Creating backup on ${project.properties.productionMachine} at ${remotePath}"
-        project.exec {
-            executable 'docker-machine'
-            args = [
-                    'ssh', project.properties.productionMachine,
-                    "tar czvf ${remotePath} --exclude=git --exclude=log -C /var/ontrack/data ."
-            ]
-        }
-        // Creates the local directory
-        buildDir.mkdirs()
-        // Gets the TAR locally
-        println "[${name}] Getting local backup at ${localPath}"
-        project.exec {
-            executable 'docker-machine'
-            args = [
-                    'scp',
-                    "${project.properties.productionMachine}:${remotePath}",
-                    localPath
-            ]
-        }
-    }
-}
-
 task productionStop(type: ComposeStop) {
-    dependsOn 'productionBackup'
     machine = project.properties.productionMachine
     dir = file("${rootDir}/gradle/compose")
     projectFiles = ['docker-compose.yml', 'docker-compose-prod.yml']
     projectName = 'prod'
     remove = false
     environment = [ONTRACK_VERSION: ontrackVersion]
-}
-
-if (hasProperty('backup')) {
-    task productionRestore(type: ProductionRestore) {
-        // dependsOn productionStop
-        backup = new File(project.properties.backup as String)
-    }
 }
 
 task productionStart(type: ComposeUp) {
@@ -157,6 +98,7 @@ task productionStart(type: ComposeUp) {
     forceRecreate = true
     environment = [
             ONTRACK_VERSION: ontrackVersion,
+            ONTRACK_POSTGRES_PASSWORD: productionPostgresPassword,
     ]
     mustRunAfter productionEnv
 }
