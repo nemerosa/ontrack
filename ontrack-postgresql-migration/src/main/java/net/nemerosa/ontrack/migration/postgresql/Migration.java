@@ -126,7 +126,7 @@ public class Migration {
         if (migrationProperties.isSkipEvents()) {
             logger.warn("Skipping events migration");
         } else {
-            copy("EVENTS", "ID", "PROJECT", "BRANCH", "PROMOTION_LEVEL", "VALIDATION_STAMP", "BUILD", "PROMOTION_RUN", "VALIDATION_RUN", "EVENT_TYPE", "REF", "EVENT_VALUES", "EVENT_TIME", "EVENT_USER");
+            copyEvents();
         }
 
         /**
@@ -169,6 +169,57 @@ public class Migration {
         // Update of sequences
         updateSequences();
 
+    }
+
+    private void copyEvents() {
+        String h2Query = "SELECT * FROM EVENTS";
+
+        String[] columns = new String[]{"ID", "PROJECT", "BRANCH", "PROMOTION_LEVEL", "VALIDATION_STAMP", "BUILD", "PROMOTION_RUN", "VALIDATION_RUN", "EVENT_TYPE", "REF", "EVENT_VALUES", "EVENT_TIME", "EVENT_USER"};
+        String insert = Arrays.asList(columns).stream().map(column -> StringUtils.substringBefore(column, "::")).collect(Collectors.joining(","));
+        String values = Arrays.asList(columns).stream().map(column -> ":" + column).collect(Collectors.joining(","));
+        String postgresqlUpdate = String.format("INSERT INTO TMP_EVENTS (%s) VALUES (%s)", insert, values);
+
+        tx(() -> {
+            // Makes sure TMP_EVENTS is dropped
+            postgresql.getJdbcOperations().execute("DROP TABLE IF EXISTS TMP_EVENTS");
+            // Creates temporary `events` table, without any contraint
+            logger.info("Creating TMP_EVENTS...");
+            postgresql.getJdbcOperations().execute("CREATE TABLE TMP_EVENTS " +
+                    "( " +
+                    "  ID INTEGER , " +
+                    "  EVENT_TYPE CHARACTER VARYING(120), " +
+                    "  PROJECT INTEGER, " +
+                    "  BRANCH INTEGER, " +
+                    "  PROMOTION_LEVEL INTEGER, " +
+                    "  VALIDATION_STAMP INTEGER, " +
+                    "  BUILD INTEGER, " +
+                    "  PROMOTION_RUN INTEGER, " +
+                    "  VALIDATION_RUN INTEGER, " +
+                    "  REF CHARACTER VARYING(20), " +
+                    "  EVENT_VALUES CHARACTER VARYING(500), " +
+                    "  EVENT_TIME CHARACTER VARYING(24), " +
+                    "  EVENT_USER CHARACTER VARYING(40) " +
+                    ");");
+
+            logger.info("Migrating EVENTS to TMP_{} (no check)...", "EVENTS");
+            List<Map<String, Object>> sources = h2.queryForList(h2Query, Collections.emptyMap());
+            int count = sources.size();
+            @SuppressWarnings("unchecked")
+            Map<String, ?>[] array = sources.toArray(new Map[sources.size()]);
+            postgresql.batchUpdate(postgresqlUpdate, array);
+
+            // Copying the tmp
+            logger.info("Copying TMP_EVENTS into EVENTS...");
+            postgresql.getJdbcOperations().execute("INSERT INTO EVENTS SELECT * FROM TMP_EVENTS");
+
+            // Deletes tmp table
+            logger.info("Deleting TMP_EVENTS...");
+            postgresql.getJdbcOperations().execute("DROP TABLE TMP_EVENTS;");
+
+            // OK
+            logger.info("{} count = {}...", "EVENTS", count);
+
+        });
     }
 
     private void updateSequences() {
@@ -218,6 +269,7 @@ public class Migration {
                 "PREDEFINED_PROMOTION_LEVELS",
                 "PREDEFINED_VALIDATION_STAMPS",
                 "PROJECTS",
+                "EVENTS",
                 "SETTINGS",
                 "STORAGE",
         };
