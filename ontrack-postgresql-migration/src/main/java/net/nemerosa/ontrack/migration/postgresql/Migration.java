@@ -270,13 +270,11 @@ public class Migration {
                     postgresqlUpdate,
                     (PreparedStatementCallback<Void>) ps -> {
                         int index = 0;
+                        int tosend = 0;
                         for (Map<String, Object> source : sources) {
                             index++;
-                            if (index % 1000 == 0) {
-                                logger.info("Migrating EVENTS to TMP_EVENTS (no check) {}/{}", index, size);
-                            }
                             int i = 1;
-                            ps.setInt(i++, (Integer) source.get("ID"));
+                            ps.setObject(i++, source.get("ID"));
                             ps.setObject(i++, source.get("PROJECT"));
                             ps.setObject(i++, source.get("BRANCH"));
                             ps.setObject(i++, source.get("PROMOTION_LEVEL"));
@@ -284,14 +282,23 @@ public class Migration {
                             ps.setObject(i++, source.get("BUILD"));
                             ps.setObject(i++, source.get("PROMOTION_RUN"));
                             ps.setObject(i++, source.get("VALIDATION_RUN"));
-                            ps.setString(i++, (String) source.get("EVENT_TYPE"));
-                            ps.setString(i++, (String) source.get("REF"));
-                            ps.setString(i++, (String) source.get("EVENT_VALUES"));
-                            ps.setString(i++, (String) source.get("EVENT_TIME"));
-                            ps.setString(i++, (String) source.get("EVENT_USER"));
+                            ps.setObject(i++, source.get("EVENT_TYPE"));
+                            ps.setObject(i++, source.get("REF"));
+                            ps.setObject(i++, source.get("EVENT_VALUES"));
+                            ps.setObject(i++, source.get("EVENT_TIME"));
+                            ps.setObject(i++, source.get("EVENT_USER"));
                             ps.addBatch();
+                            tosend++;
+                            if (tosend % 1000 == 0) {
+                                logger.info("Migrating EVENTS to TMP_EVENTS (no check) {}/{}", index, size);
+                                ps.executeBatch();
+                                tosend = 0;
+                            }
                         }
-                        ps.executeBatch();
+                        // Final statement
+                        if (tosend > 0) {
+                            ps.executeBatch();
+                        }
                         return null;
                     }
             );
