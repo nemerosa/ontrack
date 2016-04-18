@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Component;
@@ -230,8 +231,12 @@ public class Migration {
 
         String[] columns = new String[]{"ID", "PROJECT", "BRANCH", "PROMOTION_LEVEL", "VALIDATION_STAMP", "BUILD", "PROMOTION_RUN", "VALIDATION_RUN", "EVENT_TYPE", "REF", "EVENT_VALUES", "EVENT_TIME", "EVENT_USER"};
         String insert = Arrays.asList(columns).stream().map(column -> StringUtils.substringBefore(column, "::")).collect(Collectors.joining(","));
-        String values = Arrays.asList(columns).stream().map(column -> ":" + column).collect(Collectors.joining(","));
-        String postgresqlUpdate = String.format("INSERT INTO TMP_EVENTS (%s) VALUES (%s)", insert, values);
+        // String values = Arrays.asList(columns).stream().map(column -> ":" + column).collect(Collectors.joining(","));
+        String postgresqlUpdate = String.format(
+                "INSERT INTO TMP_EVENTS (%s) VALUES (%s)",
+                insert,
+                StringUtils.repeat("?", ",", columns.length)
+        );
 
         tx(() -> {
             // Makes sure TMP_EVENTS is dropped
@@ -259,10 +264,38 @@ public class Migration {
         int count = intx(() -> {
             logger.info("Migrating EVENTS to TMP_{} (no check)...", "EVENTS");
             List<Map<String, Object>> sources = h2.queryForList(h2Query, Collections.emptyMap());
-            @SuppressWarnings("unchecked")
-            Map<String, ?>[] array = sources.toArray(new Map[sources.size()]);
-            postgresql.batchUpdate(postgresqlUpdate, array);
-            return sources.size();
+            int size = sources.size();
+
+            postgresql.getJdbcOperations().execute(
+                    postgresqlUpdate,
+                    (PreparedStatementCallback<Void>) ps -> {
+                        int index = 0;
+                        for (Map<String, Object> source : sources) {
+                            index++;
+                            if (index % 1000 == 0) {
+                                logger.info("Migrating EVENTS to TMP_EVENTS (no check) {}/{}", index, size);
+                            }
+                            int i = 1;
+                            ps.setInt(i++, (Integer) source.get("ID"));
+                            ps.setObject(i++, source.get("PROJECT"));
+                            ps.setObject(i++, source.get("BRANCH"));
+                            ps.setObject(i++, source.get("PROMOTION_LEVEL"));
+                            ps.setObject(i++, source.get("VALIDATION_STAMP"));
+                            ps.setObject(i++, source.get("BUILD"));
+                            ps.setObject(i++, source.get("PROMOTION_RUN"));
+                            ps.setObject(i++, source.get("VALIDATION_RUN"));
+                            ps.setString(i++, (String) source.get("EVENT_TYPE"));
+                            ps.setString(i++, (String) source.get("REF"));
+                            ps.setString(i++, (String) source.get("EVENT_VALUES"));
+                            ps.setString(i++, (String) source.get("EVENT_TIME"));
+                            ps.setString(i++, (String) source.get("EVENT_USER"));
+                            ps.addBatch();
+                        }
+                        ps.executeBatch();
+                        return null;
+                    }
+            );
+            return size;
         });
 
         tx(() -> {
