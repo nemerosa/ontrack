@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
+
 @Component
 public class Migration {
 
@@ -119,7 +121,7 @@ public class Migration {
         copy("ENTITY_DATA", "ID", "PROJECT", "BRANCH", "PROMOTION_LEVEL", "VALIDATION_STAMP", "BUILD", "PROMOTION_RUN", "VALIDATION_RUN", "NAME", "VALUE::JSONB");
 
         // PROPERTIES
-        copyProperties();
+        // FIXME copyProperties();
 
         // SHARED_BUILD_FILTERS
         copy("SHARED_BUILD_FILTERS", "BRANCHID", "NAME", "TYPE", "DATA::JSONB");
@@ -175,11 +177,11 @@ public class Migration {
 
     private void copyProperties() {
         String[] columns = new String[]{"ID", "PROJECT", "BRANCH", "PROMOTION_LEVEL", "VALIDATION_STAMP", "BUILD", "PROMOTION_RUN", "VALIDATION_RUN", "TYPE", "SEARCHKEY", "JSON::JSONB"};
-        String h2Query = String.format("SELECT * FROM %s", "PROPERTIES");
+        String h2Query = format("SELECT * FROM %s", "PROPERTIES");
 
         String insert = Arrays.asList(columns).stream().map(column -> StringUtils.substringBefore(column, "::")).collect(Collectors.joining(","));
         String values = Arrays.asList(columns).stream().map(column -> ":" + column).collect(Collectors.joining(","));
-        String postgresqlUpdate = String.format("INSERT INTO %s (%s) VALUES (%s)", "TMP_PROPERTIES", insert, values);
+        String postgresqlUpdate = format("INSERT INTO %s (%s) VALUES (%s)", "TMP_PROPERTIES", insert, values);
 
         tx(() -> {
             // Makes sure TMP_PROPERTIES is dropped
@@ -227,42 +229,49 @@ public class Migration {
     }
 
     private void copyEvents() {
-        String h2Query = "SELECT * FROM EVENTS";
+        copyWithTmp(
+                "EVENTS",
+                "CREATE TABLE TMP_EVENTS " +
+                        "( " +
+                        "  ID INTEGER PRIMARY KEY, " +
+                        "  EVENT_TYPE CHARACTER VARYING(120), " +
+                        "  PROJECT INTEGER, " +
+                        "  BRANCH INTEGER, " +
+                        "  PROMOTION_LEVEL INTEGER, " +
+                        "  VALIDATION_STAMP INTEGER, " +
+                        "  BUILD INTEGER, " +
+                        "  PROMOTION_RUN INTEGER, " +
+                        "  VALIDATION_RUN INTEGER, " +
+                        "  REF CHARACTER VARYING(20), " +
+                        "  EVENT_VALUES CHARACTER VARYING(500), " +
+                        "  EVENT_TIME CHARACTER VARYING(24), " +
+                        "  EVENT_USER CHARACTER VARYING(40) " +
+                        ");",
+                "ID", "PROJECT", "BRANCH", "PROMOTION_LEVEL", "VALIDATION_STAMP", "BUILD", "PROMOTION_RUN", "VALIDATION_RUN", "EVENT_TYPE", "REF", "EVENT_VALUES", "EVENT_TIME", "EVENT_USER"
+        );
+    }
 
-        String[] columns = new String[]{"ID", "PROJECT", "BRANCH", "PROMOTION_LEVEL", "VALIDATION_STAMP", "BUILD", "PROMOTION_RUN", "VALIDATION_RUN", "EVENT_TYPE", "REF", "EVENT_VALUES", "EVENT_TIME", "EVENT_USER"};
+    private void copyWithTmp(String table, String tmpCreation, String... columns) {
+        String h2Query = format("SELECT * FROM %s", table);
+
         String insert = Arrays.asList(columns).stream().map(column -> StringUtils.substringBefore(column, "::")).collect(Collectors.joining(","));
-        // String values = Arrays.asList(columns).stream().map(column -> ":" + column).collect(Collectors.joining(","));
-        String postgresqlUpdate = String.format(
-                "INSERT INTO TMP_EVENTS (%s) VALUES (%s)",
+        String postgresqlUpdate = format(
+                "INSERT INTO TMP_%s (%s) VALUES (%s)",
+                table,
                 insert,
                 StringUtils.repeat("?", ",", columns.length)
         );
 
         tx(() -> {
-            // Makes sure TMP_EVENTS is dropped
-            postgresql.getJdbcOperations().execute("DROP TABLE IF EXISTS TMP_EVENTS");
-            // Creates temporary `events` table, without any contraint
-            logger.info("Creating TMP_EVENTS...");
-            postgresql.getJdbcOperations().execute("CREATE TABLE TMP_EVENTS " +
-                    "( " +
-                    "  ID INTEGER PRIMARY KEY, " +
-                    "  EVENT_TYPE CHARACTER VARYING(120), " +
-                    "  PROJECT INTEGER, " +
-                    "  BRANCH INTEGER, " +
-                    "  PROMOTION_LEVEL INTEGER, " +
-                    "  VALIDATION_STAMP INTEGER, " +
-                    "  BUILD INTEGER, " +
-                    "  PROMOTION_RUN INTEGER, " +
-                    "  VALIDATION_RUN INTEGER, " +
-                    "  REF CHARACTER VARYING(20), " +
-                    "  EVENT_VALUES CHARACTER VARYING(500), " +
-                    "  EVENT_TIME CHARACTER VARYING(24), " +
-                    "  EVENT_USER CHARACTER VARYING(40) " +
-                    ");");
+            // Makes sure temp table is dropped
+            postgresql.getJdbcOperations().execute(format("DROP TABLE IF EXISTS TMP_%s", table));
+            // Creates temporary table, without any contraint
+            logger.info(format("Creating TMP_%s...", table));
+            postgresql.getJdbcOperations().execute(tmpCreation);
         });
 
         int count = intx(() -> {
-            logger.info("Migrating EVENTS to TMP_{} (no check)...", "EVENTS");
+            logger.info("Migrating {} to TMP_{} (no check)...", table, table);
             List<Map<String, Object>> sources = h2.queryForList(h2Query, Collections.emptyMap());
             int size = sources.size();
 
@@ -274,29 +283,20 @@ public class Migration {
                         for (Map<String, Object> source : sources) {
                             index++;
                             int i = 1;
-                            ps.setObject(i++, source.get("ID"));
-                            ps.setObject(i++, source.get("PROJECT"));
-                            ps.setObject(i++, source.get("BRANCH"));
-                            ps.setObject(i++, source.get("PROMOTION_LEVEL"));
-                            ps.setObject(i++, source.get("VALIDATION_STAMP"));
-                            ps.setObject(i++, source.get("BUILD"));
-                            ps.setObject(i++, source.get("PROMOTION_RUN"));
-                            ps.setObject(i++, source.get("VALIDATION_RUN"));
-                            ps.setObject(i++, source.get("EVENT_TYPE"));
-                            ps.setObject(i++, source.get("REF"));
-                            ps.setObject(i++, source.get("EVENT_VALUES"));
-                            ps.setObject(i++, source.get("EVENT_TIME"));
-                            ps.setObject(i++, source.get("EVENT_USER"));
+                            for (String column : columns) {
+                                ps.setObject(i++, source.get(column));
+                            }
                             ps.addBatch();
                             tosend++;
                             if (tosend % 1000 == 0) {
-                                logger.info("Migrating EVENTS to TMP_EVENTS (no check) {}/{}", index, size);
+                                logger.info("Migrating {} to TMP_{} (no check) {}/{}", table, table, index, size);
                                 ps.executeBatch();
                                 tosend = 0;
                             }
                         }
                         // Final statement
                         if (tosend > 0) {
+                            logger.info("Migrating {} to TMP_{} (no check) {}/{}", table, table, index, size);
                             ps.executeBatch();
                         }
                         return null;
@@ -307,12 +307,12 @@ public class Migration {
 
         tx(() -> {
             // Copying the tmp
-            logger.info("Copying TMP_EVENTS into EVENTS...");
-            postgresql.getJdbcOperations().execute("INSERT INTO EVENTS SELECT * FROM TMP_EVENTS");
+            logger.info("Copying TMP_{} into {}...", table, table);
+            postgresql.getJdbcOperations().execute(format("INSERT INTO %s SELECT * FROM TMP_%s", table, table));
 
             // Deletes tmp table
-            logger.info("Deleting TMP_EVENTS...");
-            postgresql.getJdbcOperations().execute("DROP TABLE TMP_EVENTS;");
+            logger.info("Deleting TMP_{}...", table);
+            postgresql.getJdbcOperations().execute(format("DROP TABLE TMP_%s;", table));
         });
 
         // OK
@@ -343,13 +343,13 @@ public class Migration {
         };
         tx(() -> Arrays.asList(tables).stream().forEach(table -> {
             Integer max = postgresql.queryForObject(
-                    String.format("SELECT MAX(ID) AS ID FROM %s", table),
+                    format("SELECT MAX(ID) AS ID FROM %s", table),
                     Collections.emptyMap(),
                     Integer.class
             );
             int value = max != null ? max + 1 : 1;
             postgresql.update(
-                    String.format("ALTER SEQUENCE %s_ID_SEQ RESTART WITH %d", table, value),
+                    format("ALTER SEQUENCE %s_ID_SEQ RESTART WITH %d", table, value),
                     Collections.emptyMap()
             );
             logger.info("Resetting sequence for {} to {}.", table, value);
@@ -372,7 +372,7 @@ public class Migration {
         };
         tx(() -> {
             for (String table : tables) {
-                postgresql.update(String.format("DELETE FROM %s", table), Collections.emptyMap());
+                postgresql.update(format("DELETE FROM %s", table), Collections.emptyMap());
             }
         });
     }
@@ -400,11 +400,11 @@ public class Migration {
     }
 
     private void copy(String table, String... columns) {
-        String h2Query = String.format("SELECT * FROM %s", table);
+        String h2Query = format("SELECT * FROM %s", table);
 
         String insert = Arrays.asList(columns).stream().map(column -> StringUtils.substringBefore(column, "::")).collect(Collectors.joining(","));
         String values = Arrays.asList(columns).stream().map(column -> ":" + column).collect(Collectors.joining(","));
-        String postgresqlUpdate = String.format("INSERT INTO %s (%s) VALUES (%s)", table, insert, values);
+        String postgresqlUpdate = format("INSERT INTO %s (%s) VALUES (%s)", table, insert, values);
 
         tx(() -> simpleMigration(
                 table,
