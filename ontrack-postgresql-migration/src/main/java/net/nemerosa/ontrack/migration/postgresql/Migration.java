@@ -16,6 +16,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import javax.sql.DataSource;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -262,10 +263,11 @@ public class Migration {
 
     private void simpleMigration(String name, String h2Query, Map<String, Object> h2Params, String postgresqlUpdate) {
         logger.info("Migrating {}...", name);
-        long count = h2.queryForList(h2Query, h2Params)
-                .stream()
-                .map(it -> postgresql.update(postgresqlUpdate, it))
-                .count();
+        List<Map<String, Object>> sources = h2.queryForList(h2Query, h2Params);
+        int count = sources.size();
+        @SuppressWarnings("unchecked")
+        Map<String, ?>[] array = sources.toArray(new Map[sources.size()]);
+        postgresql.batchUpdate(postgresqlUpdate, array);
         logger.info("{} count = {}...", name, count);
     }
 
