@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Component
@@ -117,7 +118,7 @@ public class Migration {
         copy("ENTITY_DATA", "ID", "PROJECT", "BRANCH", "PROMOTION_LEVEL", "VALIDATION_STAMP", "BUILD", "PROMOTION_RUN", "VALIDATION_RUN", "NAME", "VALUE::JSONB");
 
         // PROPERTIES
-        copy("PROPERTIES", "ID", "PROJECT", "BRANCH", "PROMOTION_LEVEL", "VALIDATION_STAMP", "BUILD", "PROMOTION_RUN", "VALIDATION_RUN", "TYPE", "SEARCHKEY", "JSON::JSONB");
+        copyProperties();
 
         // SHARED_BUILD_FILTERS
         copy("SHARED_BUILD_FILTERS", "BRANCHID", "NAME", "TYPE", "DATA::JSONB");
@@ -171,6 +172,59 @@ public class Migration {
 
     }
 
+    private void copyProperties() {
+        String[] columns = new String[]{"ID", "PROJECT", "BRANCH", "PROMOTION_LEVEL", "VALIDATION_STAMP", "BUILD", "PROMOTION_RUN", "VALIDATION_RUN", "TYPE", "SEARCHKEY", "JSON::JSONB"};
+        String h2Query = String.format("SELECT * FROM %s", "PROPERTIES");
+
+        String insert = Arrays.asList(columns).stream().map(column -> StringUtils.substringBefore(column, "::")).collect(Collectors.joining(","));
+        String values = Arrays.asList(columns).stream().map(column -> ":" + column).collect(Collectors.joining(","));
+        String postgresqlUpdate = String.format("INSERT INTO %s (%s) VALUES (%s)", "TMP_PROPERTIES", insert, values);
+
+        tx(() -> {
+            // Makes sure TMP_PROPERTIES is dropped
+            postgresql.getJdbcOperations().execute("DROP TABLE IF EXISTS TMP_PROPERTIES");
+            // Creates temporary table
+            logger.info("Creating TMP_PROPERTIES...");
+            postgresql.getJdbcOperations().execute("CREATE TABLE TMP_PROPERTIES " +
+                    "( " +
+                    "  ID INTEGER PRIMARY KEY, " +
+                    "  TYPE CHARACTER VARYING(150), " +
+                    "  PROJECT INTEGER, " +
+                    "  BRANCH INTEGER, " +
+                    "  PROMOTION_LEVEL INTEGER, " +
+                    "  VALIDATION_STAMP INTEGER, " +
+                    "  BUILD INTEGER, " +
+                    "  PROMOTION_RUN INTEGER, " +
+                    "  VALIDATION_RUN INTEGER, " +
+                    "  SEARCHKEY CHARACTER VARYING(200), " +
+                    "  JSON JSONB " +
+                    ");");
+        });
+
+        int count = intx(() -> {
+            // Copy to tmp space
+            logger.info("Migrating PROPERTIES to TMP_PROPERTIES (no check)...");
+            List<Map<String, Object>> sources = h2.queryForList(h2Query, Collections.emptyMap());
+            @SuppressWarnings("unchecked")
+            Map<String, ?>[] array = sources.toArray(new Map[sources.size()]);
+            postgresql.batchUpdate(postgresqlUpdate, array);
+            return sources.size();
+        });
+
+        tx(() -> {
+            // Copying the tmp
+            logger.info("Copying TMP_PROPERTIES into PROPERTIES...");
+            postgresql.getJdbcOperations().execute("INSERT INTO PROPERTIES SELECT * FROM TMP_PROPERTIES");
+
+            // Deletes tmp table
+            logger.info("Deleting TMP_PROPERTIES...");
+            postgresql.getJdbcOperations().execute("DROP TABLE TMP_PROPERTIES;");
+        });
+
+        // OK
+        logger.info("{} count = {}...", "PROPERTIES", count);
+    }
+
     private void copyEvents() {
         String h2Query = "SELECT * FROM EVENTS";
 
@@ -186,7 +240,7 @@ public class Migration {
             logger.info("Creating TMP_EVENTS...");
             postgresql.getJdbcOperations().execute("CREATE TABLE TMP_EVENTS " +
                     "( " +
-                    "  ID INTEGER , " +
+                    "  ID INTEGER PRIMARY KEY, " +
                     "  EVENT_TYPE CHARACTER VARYING(120), " +
                     "  PROJECT INTEGER, " +
                     "  BRANCH INTEGER, " +
@@ -200,14 +254,18 @@ public class Migration {
                     "  EVENT_TIME CHARACTER VARYING(24), " +
                     "  EVENT_USER CHARACTER VARYING(40) " +
                     ");");
+        });
 
+        int count = intx(() -> {
             logger.info("Migrating EVENTS to TMP_{} (no check)...", "EVENTS");
             List<Map<String, Object>> sources = h2.queryForList(h2Query, Collections.emptyMap());
-            int count = sources.size();
             @SuppressWarnings("unchecked")
             Map<String, ?>[] array = sources.toArray(new Map[sources.size()]);
             postgresql.batchUpdate(postgresqlUpdate, array);
+            return sources.size();
+        });
 
+        tx(() -> {
             // Copying the tmp
             logger.info("Copying TMP_EVENTS into EVENTS...");
             postgresql.getJdbcOperations().execute("INSERT INTO EVENTS SELECT * FROM TMP_EVENTS");
@@ -215,11 +273,10 @@ public class Migration {
             // Deletes tmp table
             logger.info("Deleting TMP_EVENTS...");
             postgresql.getJdbcOperations().execute("DROP TABLE TMP_EVENTS;");
-
-            // OK
-            logger.info("{} count = {}...", "EVENTS", count);
-
         });
+
+        // OK
+        logger.info("{} count = {}...", "EVENTS", count);
     }
 
     private void updateSequences() {
@@ -296,6 +353,10 @@ public class Migration {
                 }
             }
         });
+    }
+
+    private <T> T intx(Supplier<T> supplier) {
+        return txTemplate.execute(status -> supplier.get());
     }
 
     private void copy(String table, String... columns) {
