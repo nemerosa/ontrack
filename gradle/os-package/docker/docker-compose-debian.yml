@@ -4,3 +4,5 @@ ontrack:
   command: /bin/cat
   links:
     - "postgresql:postgresql"
+  ports:
+      - "8080"

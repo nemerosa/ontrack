@@ -41,7 +41,7 @@ task debDockerStop(type: ComposeStop) {
 }
 
 task debAcceptanceTest(type: RemoteAcceptanceTest) {
-    acceptanceUrl = { "http://${project.properties.acceptanceHost}:${debDockerRun.getActualPort(8080)}" }
+    acceptanceUrl = { "http://${project.properties.acceptanceHost}:${debDockerRun.getPublishedPort('ontrack', 8080)}" }
     acceptanceContext = 'smoke' // Only basic test
     disableSsl = true
     dependsOn debDockerStart
