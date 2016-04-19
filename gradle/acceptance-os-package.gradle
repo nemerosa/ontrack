@@ -25,13 +25,11 @@ task debDockerRun(type: ComposeUp, dependsOn: debDockerPrepare) {
     forceRecreate = true
 }
 
-task debDockerStart(type: ComposeRun, dependsOn: debDockerRun) {
-    machine = project.properties.ciMachine
-    dir = file("${rootDir}/gradle/os-package/docker")
-    projectFiles = ['docker-compose.yml', 'docker-compose-debian.yml']
-    projectName = 'ci-debian'
-    service = 'ontrack'
-    commands = ['service', 'ontrack', 'start']
+task debDockerStart(type: DockerExec, dependsOn: debDockerRun) {
+    containerName = 'cidebian_ontrack_1'
+    commands = [
+            start: ['service', 'ontrack', 'start'],
+    ]
 }
 
 task debDockerStop(type: ComposeStop) {
