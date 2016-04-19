@@ -1,0 +1,6 @@
+ontrack:
+  build: ./debian
+  tty: true
+  command: /bin/cat
+  links:
+    - "postgresql:postgresql"
