@@ -39,7 +39,7 @@ EXT_DIR="$DATA_DIR/extensions"
 SPRINGBOOTAPP_JAVA_OPTIONS="-Dloader.path=$EXT_DIR"
 
 # spring boot options
-SPRINGBOOTAPP_OPTIONS="--logging.file=$LOG_DIR/$PROJECT_NAME.log --ontrack.config.applicationWorkingDir=$DATA_DIR/files \"--spring.datasource.url=jdbc:h2:$DATA_DIR/database/data;MODE=MYSQL;DB_CLOSE_ON_EXIT=FALSE;DEFRAG_ALWAYS=TRUE\""
+SPRINGBOOTAPP_OPTIONS="--logging.file=$LOG_DIR/$PROJECT_NAME.log --ontrack.config.applicationWorkingDir=$DATA_DIR/files"
 
 RETVAL=0
 
