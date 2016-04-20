@@ -1,0 +1,8 @@
+ontrack:
+  build: ./centos/${CENTOS_VERSION}
+  tty: true
+  command: /bin/cat
+  links:
+    - "postgresql:postgresql"
+  ports:
+      - "8080"

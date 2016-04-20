@@ -63,36 +63,37 @@ task debAcceptanceTest(type: RemoteAcceptanceTest) {
         }
     }
 
-    tasks.create("rpmDockerBuild${centOsVersion}", DockerBuild) {
+    tasks.create("rpmDockerRun${centOsVersion}", ComposeUp) {
         dependsOn "rpmDockerPrepare${centOsVersion}"
-        dir = file("gradle/os-package/docker/centos/${centOsVersion}")
-        tag = "nemerosa/ontrack-centos:${centOsVersion}"
-    }
-
-    tasks.create("rpmDockerRun${centOsVersion}", DockerStart) {
-        dependsOn "rpmDockerBuild${centOsVersion}"
-        image = "nemerosa/ontrack-centos:${centOsVersion}"
-        tty = true
-        command = '/bin/cat'
-        ports = [8080: 0]
+        machine = project.properties.ciMachine
+        dir = file("${rootDir}/gradle/os-package/docker")
+        projectFiles = ['docker-compose.yml', 'docker-compose-centos.yml']
+        environment = [CENTOS_VERSION: centOsVersion]
+        projectName = "ci-centos-${centOsVersion}"
+        forceRecreate = true
     }
 
     tasks.create("rpmDockerStart${centOsVersion}", DockerExec) {
         dependsOn "rpmDockerRun${centOsVersion}"
-        startTask = "rpmDockerRun${centOsVersion}"
+        containerName = "cicentos${centOsVersion}_ontrack_1"
         commands = [
                 start: ['/etc/init.d/ontrack', 'start'],
         ]
     }
 
-    tasks.create("rpmDockerStop${centOsVersion}", DockerStop) {
-        startTask = "rpmDockerRun${centOsVersion}"
+    tasks.create("rpmDockerStop${centOsVersion}", ComposeStop) {
+        machine = project.properties.ciMachine
+        dir = file("${rootDir}/gradle/os-package/docker")
+        projectFiles = ['docker-compose.yml', 'docker-compose-centos.yml']
+        environment = [CENTOS_VERSION: centOsVersion]
+        projectName = "ci-centos-${centOsVersion}"
+        remove = true
     }
 
     tasks.create("rpmAcceptanceTest${centOsVersion}", RemoteAcceptanceTest) {
         acceptanceUrl = {
-            DockerStart run = project.tasks.getByName("rpmDockerRun${centOsVersion}") as DockerStart
-            return "http://${project.properties.acceptanceHost}:${run.getActualPort(8080)}"
+            ComposeUp run = project.tasks.getByName("rpmDockerRun${centOsVersion}") as ComposeUp
+            return "http://${project.properties.acceptanceHost}:${run.getPublishedPort('ontrack', 8080)}"
         }
         acceptanceContext = 'smoke' // Only basic test
         disableSsl = true
