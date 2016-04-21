@@ -474,6 +474,8 @@ if (release) {
         parameters {
             // Link on version
             stringParam('VERSION', '', '')
+            // Postgresql database password
+            password
         }
         wrappers {
             injectPasswords()
@@ -487,12 +489,10 @@ if (release) {
 --profile
 productionUpgrade
 -PontrackVersion=${VERSION_DISPLAY}
+-PproductionPostgresPassword=${ONTRACK_POSTGRESQL_PASSWORD}
 '''
         }
         publishers {
-            archiveArtifacts {
-                pattern 'build/*.tgz'
-            }
             downstreamParameterized {
                 trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-production", 'SUCCESS', false) {
                     currentBuild()

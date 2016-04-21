@@ -24,7 +24,7 @@ ontrack:
     - "/var/ontrack/conf:/var/ontrack/conf"
     - "/var/ontrack/data:/var/ontrack/data"
       # Using the random source from the host
-    - "/dev/random:/dev/random"
+    - "/dev/urandom:/dev/random"
   ports:
     - "443:443"
   links:
