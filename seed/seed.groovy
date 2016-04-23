@@ -474,8 +474,6 @@ if (release) {
         parameters {
             // Link on version
             stringParam('VERSION', '', '')
-            // Postgresql database password
-            password
         }
         wrappers {
             injectPasswords()
