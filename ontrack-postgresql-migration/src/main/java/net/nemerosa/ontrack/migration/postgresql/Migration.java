@@ -227,7 +227,9 @@ public class Migration {
                 "INSERT INTO TMP_%s (%s) VALUES (%s)",
                 table,
                 insert,
-                StringUtils.repeat("?", ",", columns.length)
+                Arrays.asList(columns).stream()
+                        .map(column -> "?" + (StringUtils.contains(column, "::") ? "::" + StringUtils.substringAfter(column, "::") : ""))
+                        .collect(Collectors.joining(","))
         );
 
         tx(() -> {
@@ -252,7 +254,7 @@ public class Migration {
                             index++;
                             int i = 1;
                             for (String column : columns) {
-                                ps.setObject(i++, source.get(column));
+                                ps.setObject(i++, source.get(StringUtils.substringBefore(column, "::")));
                             }
                             ps.addBatch();
                             tosend++;
