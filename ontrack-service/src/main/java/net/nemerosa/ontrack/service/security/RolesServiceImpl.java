@@ -67,7 +67,7 @@ public class RolesServiceImpl implements RolesService, StartupService {
 
     @Override
     public int startupOrder() {
-        return 50;
+        return SYSTEM_REGISTRATION;
     }
 
     @Override

@@ -9,6 +9,10 @@ import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
 public class StartupStrategy implements FlywayMigrationStrategy {
 
@@ -26,10 +30,24 @@ public class StartupStrategy implements FlywayMigrationStrategy {
         // Migrating the database
         logger.info("Migrating the database...");
         flyway.migrate();
+
+        // Getting the startup services
+        List<StartupService> startupServices = applicationContext.getBeansOfType(StartupService.class).values().stream()
+                // ... order them by starting number
+                .sorted(Comparator.comparing(StartupService::startupOrder))
+                // ... getting the list
+                .collect(Collectors.toList());
+
+        // Logging
+        logger.info("List of startup services...");
+        startupServices.forEach(startupService ->
+                logger.info("[{}] {}", startupService.startupOrder(), startupService.getName())
+        );
+
         // Startup services
         logger.info("Starting startup services...");
-        applicationContext.getBeansOfType(StartupService.class).values().forEach(startupService -> {
-            logger.info("Starting {}", startupService.getName());
+        startupServices.forEach(startupService -> {
+            logger.info("Starting [{}] {}", startupService.startupOrder(), startupService.getName());
             startupService.start();
         });
     }

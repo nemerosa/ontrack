@@ -37,7 +37,7 @@ public class ExtensionManagerImpl implements ExtensionManager, StartupService {
 
     @Override
     public int startupOrder() {
-        return 2;
+        return SYSTEM;
     }
 
     /**
