@@ -48,7 +48,7 @@ public class APIController extends AbstractResourceController {
     public APIController(
             ApplicationContext applicationContext,
             @Qualifier("requestMappingHandlerMapping")
-            RequestMappingHandlerMapping handlerMapping) {
+                    RequestMappingHandlerMapping handlerMapping) {
         this.applicationContext = applicationContext;
         this.handlerMapping = handlerMapping;
     }
@@ -111,7 +111,7 @@ public class APIController extends AbstractResourceController {
         Collection<Object> controllers = applicationContext.getBeansWithAnnotation(Controller.class).values();
         controllers.forEach(controller -> {
             APIInfo apiInfo = new APIInfo(
-                    controller.getClass().getName(),
+                    cleanProxiedClassName(controller.getClass()),
                     getAPIName(controller.getClass())
             );
             // Root request mapping
@@ -139,6 +139,13 @@ public class APIController extends AbstractResourceController {
         return apiInfos;
     }
 
+    private String cleanProxiedClassName(Class<?> controllerClass) {
+        return StringUtils.substringBefore(
+                controllerClass.getName(),
+                "$$" // Cleanup proxied classed
+        );
+    }
+
     private NameDescription getAPIName(Class<?> controllerClass) {
         API api = AnnotationUtils.findAnnotation(controllerClass, API.class);
         return api != null ?
@@ -146,7 +153,7 @@ public class APIController extends AbstractResourceController {
                 nd(
                         capitalize(
                                 asDisplayName(
-                                        StringUtils.removeEnd(controllerClass.getSimpleName(), "Controller")
+                                        StringUtils.removeEnd(cleanProxiedClassName(controllerClass), "Controller")
                                 )
                         ),
                         ""
