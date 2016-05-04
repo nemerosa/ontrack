@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.general
 
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
-import net.nemerosa.ontrack.model.security.BuildEdit
+import net.nemerosa.ontrack.model.security.BuildConfig
 import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.structure.PropertyService
 import net.nemerosa.ontrack.model.structure.SearchResult
@@ -27,7 +27,7 @@ class BuildLinkSearchExtensionIT extends AbstractServiceTestSupport {
         def target = doCreateBuild()
         def targetPrefix = target.name[0..5]
         // Build link on the build
-        asUser().with(build, BuildEdit).call {
+        asUser().with(build, BuildConfig).call {
             propertyService.editProperty(
                     build,
                     BuildLinkPropertyType,
@@ -65,7 +65,7 @@ class BuildLinkSearchExtensionIT extends AbstractServiceTestSupport {
         def build2 = doCreateBuild(branch, nd("1.2", "Build 2"))
         // Meta info on the build
         [build1, build2].each { build ->
-            asUser().with(build, BuildEdit).call {
+            asUser().with(build, BuildConfig).call {
                 propertyService.editProperty(
                         build,
                         BuildLinkPropertyType,
@@ -108,7 +108,7 @@ class BuildLinkSearchExtensionIT extends AbstractServiceTestSupport {
         def build1 = doCreateBuild(branch, nd("1", "Build 1"))
         def build2 = doCreateBuild(branch, nd("2", "Build 2"))
         // Meta info on the builds
-        asUser().with(branch, BuildEdit).call {
+        asUser().with(branch, BuildConfig).call {
             [build1, build2].eachWithIndex { build, index ->
                 propertyService.editProperty(
                         build,
