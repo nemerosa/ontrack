@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.general
 
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.model.security.AccountService
 import net.nemerosa.ontrack.model.security.BuildConfig
 import net.nemerosa.ontrack.model.security.BuildCreate
 import net.nemerosa.ontrack.model.security.BuildEdit
@@ -21,6 +22,79 @@ class BuildLinkSearchExtensionIT extends AbstractServiceTestSupport {
 
     @Autowired
     private PropertyService propertyService
+
+    @Autowired
+    private AccountService accountService
+
+    @Test
+    void 'Automation role can create links'() {
+        // Creates a build
+        def build = doCreateBuild()
+        // Creates a second build to link
+        def target = doCreateBuild()
+        // Build link creation
+        asGlobalRole("AUTOMATION").call {
+            propertyService.editProperty(
+                    build,
+                    BuildLinkPropertyType,
+                    new BuildLinkProperty([
+                            BuildLinkPropertyItem.of(target)
+                    ])
+            )
+        }
+        // The build link is created
+        def o = asUser().withView(build).call {
+            propertyService.getProperty(
+                    build,
+                    BuildLinkPropertyType
+            ).option()
+        }
+        assert o.present: "Build link created"
+    }
+
+    @Test
+    void 'Controller role can create links'() {
+        // Creates a build
+        def build = doCreateBuild()
+        // Creates a second build to link
+        def target = doCreateBuild()
+        // Build link creation
+        asGlobalRole("CONTROLLER").call {
+            propertyService.editProperty(
+                    build,
+                    BuildLinkPropertyType,
+                    new BuildLinkProperty([
+                            BuildLinkPropertyItem.of(target)
+                    ])
+            )
+        }
+        // The build link is created
+        def o = asUser().withView(build).call {
+            propertyService.getProperty(
+                    build,
+                    BuildLinkPropertyType
+            ).option()
+        }
+        assert o.present: "Build link created"
+    }
+
+    @Test(expected = AccessDeniedException)
+    void 'Creator role cannot create links'() {
+        // Creates a build
+        def build = doCreateBuild()
+        // Creates a second build to link
+        def target = doCreateBuild()
+        // Build link creation
+        asGlobalRole("CREATOR").call {
+            propertyService.editProperty(
+                    build,
+                    BuildLinkPropertyType,
+                    new BuildLinkProperty([
+                            BuildLinkPropertyItem.of(target)
+                    ])
+            )
+        }
+    }
 
     @Test
     void 'Build config function grants access to create links'() {

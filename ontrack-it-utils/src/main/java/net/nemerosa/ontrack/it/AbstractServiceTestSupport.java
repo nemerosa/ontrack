@@ -37,6 +37,20 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
         });
     }
 
+    protected Account doCreateAccountWithGlobalRole(String role) throws Exception {
+        Account account = doCreateAccount();
+        return asUser().with(AccountManagement.class).call(() -> {
+            accountService.saveGlobalPermission(
+                    PermissionTargetType.ACCOUNT,
+                    account.id(),
+                    new PermissionInput(role)
+            );
+            return accountService.withACL(
+                    AuthenticatedAccount.of(account)
+            );
+        });
+    }
+
     protected Project doCreateProject() throws Exception {
         return doCreateProject(nameDescription());
     }
@@ -90,25 +104,25 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
 
     public ValidationStamp doCreateValidationStamp(Branch branch, NameDescription nameDescription) throws Exception {
         return asUser().with(branch.getProject().id(), ValidationStampCreate.class).call(() ->
-                        structureService.newValidationStamp(
-                                ValidationStamp.of(
-                                        branch,
-                                        nameDescription
-                                )
+                structureService.newValidationStamp(
+                        ValidationStamp.of(
+                                branch,
+                                nameDescription
                         )
+                )
         );
     }
 
     protected PromotionRun doPromote(Build build, PromotionLevel promotionLevel, String description) throws Exception {
         return asUser().with(build.projectId(), PromotionRunCreate.class).call(() ->
-                        structureService.newPromotionRun(
-                                PromotionRun.of(
-                                        build,
-                                        promotionLevel,
-                                        Signature.of("test"),
-                                        description
-                                )
+                structureService.newPromotionRun(
+                        PromotionRun.of(
+                                build,
+                                promotionLevel,
+                                Signature.of("test"),
+                                description
                         )
+                )
         );
     }
 
@@ -120,11 +134,15 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
         return new AccountCall(account);
     }
 
+    protected AccountCall asGlobalRole(String role) throws Exception {
+        return new AccountCall(doCreateAccountWithGlobalRole(role));
+    }
+
     protected <T> T view(ProjectEntity projectEntity, Callable<T> callable) throws Exception {
         return asUser().with(projectEntity.projectId(), ProjectView.class).call(callable);
     }
 
-    protected static interface ContextCall {
+    protected interface ContextCall {
         <T> T call(Callable<T> call) throws Exception;
     }
 
