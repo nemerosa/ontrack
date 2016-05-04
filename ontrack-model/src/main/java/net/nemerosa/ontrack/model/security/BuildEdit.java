@@ -1,4 +1,4 @@
 package net.nemerosa.ontrack.model.security;
 
-public interface BuildEdit extends ProjectView {
+public interface BuildEdit extends BuildConfig {
 }

@@ -189,6 +189,7 @@ public class RolesServiceImpl implements RolesService, StartupService {
                         ValidationStampEdit.class,
                         ProjectView.class,
                         BuildCreate.class,
+                        BuildConfig.class,
                         PromotionRunCreate.class,
                         ValidationRunCreate.class,
                         BranchTemplateSync.class
@@ -203,6 +204,7 @@ public class RolesServiceImpl implements RolesService, StartupService {
                 Arrays.asList(
                         ProjectView.class,
                         BuildCreate.class,
+                        BuildConfig.class,
                         PromotionRunCreate.class,
                         ValidationRunCreate.class,
                         BranchTemplateSync.class
