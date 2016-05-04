@@ -2,11 +2,14 @@ package net.nemerosa.ontrack.extension.general
 
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.security.BuildConfig
+import net.nemerosa.ontrack.model.security.BuildCreate
+import net.nemerosa.ontrack.model.security.BuildEdit
 import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.structure.PropertyService
 import net.nemerosa.ontrack.model.structure.SearchResult
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.access.AccessDeniedException
 
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd
 import static org.junit.Assert.assertEquals
@@ -18,6 +21,76 @@ class BuildLinkSearchExtensionIT extends AbstractServiceTestSupport {
 
     @Autowired
     private PropertyService propertyService
+
+    @Test
+    void 'Build config function grants access to create links'() {
+        // Creates a build
+        def build = doCreateBuild()
+        // Creates a second build to link
+        def target = doCreateBuild()
+        // Build link creation
+        asUser().with(build, BuildConfig).call {
+            propertyService.editProperty(
+                    build,
+                    BuildLinkPropertyType,
+                    new BuildLinkProperty([
+                            BuildLinkPropertyItem.of(target)
+                    ])
+            )
+        }
+        // The build link is created
+        def o = asUser().withView(build).call {
+            propertyService.getProperty(
+                    build,
+                    BuildLinkPropertyType
+            ).option()
+        }
+        assert o.present: "Build link created"
+    }
+
+    @Test
+    void 'Build edit function grants access to create links'() {
+        // Creates a build
+        def build = doCreateBuild()
+        // Creates a second build to link
+        def target = doCreateBuild()
+        // Build link creation
+        asUser().with(build, BuildEdit).call {
+            propertyService.editProperty(
+                    build,
+                    BuildLinkPropertyType,
+                    new BuildLinkProperty([
+                            BuildLinkPropertyItem.of(target)
+                    ])
+            )
+        }
+        // The build link is created
+        def o = asUser().withView(build).call {
+            propertyService.getProperty(
+                    build,
+                    BuildLinkPropertyType
+            ).option()
+        }
+        assert o.present: "Build link created"
+    }
+
+    @Test(expected = AccessDeniedException)
+    void 'Build create function does not grant access to create links'() {
+        // Creates a build
+        def build = doCreateBuild()
+        // Creates a second build to link
+        def target = doCreateBuild()
+        // Build link creation
+        asUser().with(build, BuildCreate).call {
+            propertyService.editProperty(
+                    build,
+                    BuildLinkPropertyType,
+                    new BuildLinkProperty([
+                            BuildLinkPropertyItem.of(target)
+                    ])
+            )
+        }
+    }
 
     @Test
     void 'Searching on build link property - found one build'() {
