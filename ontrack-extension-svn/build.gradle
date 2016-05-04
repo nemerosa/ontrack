@@ -9,7 +9,7 @@ dependencies {
     compile project(':ontrack-tx')
     compile libraries.spring_tx
 
-    compile 'org.tmatesoft.svnkit:svnkit:1.8.11'
+    compile 'org.tmatesoft.svnkit:svnkit:1.8.12'
 
     testCompile project(':ontrack-it-utils')
     testCompile project(':ontrack-extension-issues').sourceSets.test.output
