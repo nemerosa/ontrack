@@ -94,7 +94,7 @@ public interface PropertyService {
     /**
      * Deletes the value of a property.
      *
-     * @param entity Type      of the entity to edit
+     * @param entity Type of the entity to edit
      * @param propertyTypeName Fully qualified name of the property to delete
      */
     Ack deleteProperty(ProjectEntity entity, String propertyTypeName);
@@ -102,7 +102,7 @@ public interface PropertyService {
     /**
      * Deletes the value of a property.
      *
-     * @param entity Type  of the entity to edit
+     * @param entity Type of the entity to edit
      * @param propertyType Class of the property to delete
      */
     default <T> Ack deleteProperty(ProjectEntity entity, Class<? extends PropertyType<T>> propertyType) {
