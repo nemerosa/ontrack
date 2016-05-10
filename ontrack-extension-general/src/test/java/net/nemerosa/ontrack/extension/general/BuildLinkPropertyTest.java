@@ -5,12 +5,12 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static net.nemerosa.ontrack.json.JsonUtils.array;
 import static net.nemerosa.ontrack.json.JsonUtils.object;
 import static net.nemerosa.ontrack.test.TestUtils.assertJsonRead;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class BuildLinkPropertyTest {
 
@@ -116,6 +116,25 @@ public class BuildLinkPropertyTest {
                                 BuildLinkPropertyItem.of("name", "value")
                         )
                 ).match("name", null)
+        );
+    }
+
+    @Test
+    public void removing_duplicates() {
+        BuildLinkProperty property = new BuildLinkProperty(
+                Arrays.asList(
+                        new BuildLinkPropertyItem("P1", "1"),
+                        new BuildLinkPropertyItem("P2", "2"),
+                        new BuildLinkPropertyItem("P2", "2")
+                )
+        );
+        List<BuildLinkPropertyItem> links = property.getLinks();
+        assertEquals(
+                Arrays.asList(
+                        new BuildLinkPropertyItem("P1", "1"),
+                        new BuildLinkPropertyItem("P2", "2")
+                ),
+                links
         );
     }
 
