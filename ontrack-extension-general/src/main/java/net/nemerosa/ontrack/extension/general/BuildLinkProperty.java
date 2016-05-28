@@ -3,13 +3,25 @@ package net.nemerosa.ontrack.extension.general;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
+import java.beans.ConstructorProperties;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Data
 public class BuildLinkProperty {
 
     private final List<BuildLinkPropertyItem> links;
+
+    /**
+     * Constructor, which filters out the duplicates.
+     */
+    @ConstructorProperties({"links"})
+    public BuildLinkProperty(List<BuildLinkPropertyItem> links) {
+        this.links = links.stream()
+                .distinct()
+                .collect(Collectors.toList());
+    }
 
     /**
      * Does one of the items match the project-&gt;build? The value can be blank (meaning all values)

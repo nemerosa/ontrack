@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.MultiForm;
 import net.nemerosa.ontrack.model.form.Text;
-import net.nemerosa.ontrack.model.security.BuildEdit;
+import net.nemerosa.ontrack.model.security.BuildConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
@@ -43,7 +43,7 @@ public class BuildLinkPropertyType extends AbstractPropertyType<BuildLinkPropert
 
     @Override
     public boolean canEdit(ProjectEntity entity, SecurityService securityService) {
-        return securityService.isProjectFunctionGranted(entity, BuildEdit.class);
+        return securityService.isProjectFunctionGranted(entity, BuildConfig.class);
     }
 
     @Override

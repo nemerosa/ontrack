@@ -47,6 +47,7 @@ public interface RolesService {
             ValidationStampEdit.class,
             ValidationStampDelete.class,
             BuildCreate.class,
+            BuildConfig.class,
             BuildEdit.class,
             BuildDelete.class,
             ValidationRunCreate.class,
