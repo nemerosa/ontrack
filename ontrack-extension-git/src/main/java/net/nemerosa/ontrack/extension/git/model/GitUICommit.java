@@ -30,6 +30,11 @@ public class GitUICommit implements SCMChangeLogCommit {
     }
 
     @Override
+    public String getAuthorEmail() {
+        return commit.getCommitter().getEmail();
+    }
+
+    @Override
     public LocalDateTime getTimestamp() {
         return commit.getCommitTime();
     }

@@ -31,4 +31,9 @@ public class SVNChangeLogRevision implements SCMChangeLogCommit {
     public LocalDateTime getTimestamp() {
         return revisionDate;
     }
+
+    @Override
+    public String getAuthorEmail() {
+        return null;
+    }
 }
