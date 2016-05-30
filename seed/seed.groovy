@@ -114,8 +114,10 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-build") {
                 url "git@github.com:nemerosa/ontrack.git"
                 branch "origin/${BRANCH}"
             }
-            wipeOutWorkspace()
-            localBranch "${BRANCH}"
+            extensions {
+                wipeOutWorkspace()
+                localBranch "${BRANCH}"
+            }
         }
     }
     steps {
@@ -203,20 +205,29 @@ ciAcceptanceTest
         archiveJunit('*-tests.xml')
         if (release) {
             downstreamParameterized {
-                trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-debian", 'SUCCESS', false) {
-                    currentBuild()
+                trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-debian") {
+                    condition 'SUCCESS'
+                    parameters {
+                        currentBuild()
+                    }
                 }
                 centOsVersions.each { centOsVersion ->
-                    trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-centos-${centOsVersion}", 'SUCCESS', false) {
-                        currentBuild()
+                    trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-centos-${centOsVersion}") {
+                        condition 'SUCCESS'
+                        parameters {
+                            currentBuild()
+                        }
                     }
                 }
             }
         }
         if (release) {
             downstreamParameterized {
-                trigger("${SEED_PROJECT}-${SEED_BRANCH}-docker-push", 'SUCCESS', false) {
-                    currentBuild() // VERSION
+                trigger("${SEED_PROJECT}-${SEED_BRANCH}-docker-push") {
+                    condition 'SUCCESS'
+                    parameters {
+                        currentBuild()
+                    }
                 }
             }
         } else {
@@ -494,8 +505,11 @@ productionUpgrade
                 pattern 'build/*.tgz'
             }
             downstreamParameterized {
-                trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-production", 'SUCCESS', false) {
-                    currentBuild()
+                trigger("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-production") {
+                    condition 'SUCCESS'
+                    parameters {
+                        currentBuild()
+                    }
                 }
             }
         }
