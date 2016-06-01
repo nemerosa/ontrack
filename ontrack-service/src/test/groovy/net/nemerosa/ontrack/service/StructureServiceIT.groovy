@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.security.BuildEdit
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.security.ProjectView
+import net.nemerosa.ontrack.model.structure.BuildSearchForm
 import net.nemerosa.ontrack.model.structure.Signature
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.test.TestUtils
@@ -139,6 +140,31 @@ class StructureServiceIT extends AbstractServiceTestSupport {
         // Gets the next build of 1
         def o = asUser().with(branch, ProjectView).call { structureService.getNextBuild(build.id) }
         assert !o.present
+    }
+
+    @Test
+    void 'Safe pattern build search based on branch'() {
+        def project = doCreateProject()
+        def branch = doCreateBranch(project, nd('Branch 1', ''))
+        def build = doCreateBuild(branch, nd('Build 1', ''))
+        // Correct pattern
+        def builds = asUser().withView(build).call { structureService.buildSearch(build.project.id, new BuildSearchForm().withBranchName('.*1$')) }
+        assert builds*.id == [build.id]
+        // Incorrect pattern (unmatched parenthesis)
+        builds = asUser().withView(build).call { structureService.buildSearch(build.project.id, new BuildSearchForm().withBranchName('.*1)')) }
+        assert builds.empty: "No match, but no failure"
+    }
+
+    @Test
+    void 'Safe pattern build search based on build'() {
+        def branch = doCreateBranch()
+        def build = doCreateBuild(branch, nd('Build 1', ''))
+        // Correct pattern
+        def builds = asUser().withView(build).call { structureService.buildSearch(build.project.id, new BuildSearchForm().withBuildName('.*1$')) }
+        assert builds*.id == [build.id]
+        // Incorrect pattern (unmatched parenthesis)
+        builds = asUser().withView(build).call { structureService.buildSearch(build.project.id, new BuildSearchForm().withBuildName('.*1)')) }
+        assert builds.empty: "No match, but no failure"
     }
 
 }
