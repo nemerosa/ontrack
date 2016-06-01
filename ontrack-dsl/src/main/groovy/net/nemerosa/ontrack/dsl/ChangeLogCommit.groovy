@@ -25,6 +25,13 @@ class ChangeLogCommit extends AbstractResource {
     }
 
     /**
+     * Mail of the author of the commit. Can be <code>null</code> if not available.
+     */
+    String getAuthorEmail() {
+        node['authorEmail']
+    }
+
+    /**
      * Timestamp of the commit
      */
     String getTimestamp() {

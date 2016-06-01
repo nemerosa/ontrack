@@ -13,12 +13,33 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public final class Utils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
 
     private Utils() {
+    }
+
+    /**
+     * Exception safe regex match (to protect against malformed expressions)
+     */
+    public static boolean safeRegexMatch(String pattern, String value) {
+        if (StringUtils.isNotBlank(pattern)) {
+            if (value == null) {
+                return false;
+            } else {
+                try {
+                    return Pattern.matches(pattern, value);
+                } catch (PatternSyntaxException ex) {
+                    return false;
+                }
+            }
+        } else {
+            return false;
+        }
     }
 
     /**

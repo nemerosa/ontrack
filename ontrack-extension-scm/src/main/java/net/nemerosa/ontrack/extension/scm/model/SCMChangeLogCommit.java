@@ -25,6 +25,11 @@ public interface SCMChangeLogCommit {
     String getAuthor();
 
     /**
+     * Mail of the author of the commit. Can be <code>null</code> if not available.
+     */
+    String getAuthorEmail();
+
+    /**
      * Timestamp of the commit
      */
     LocalDateTime getTimestamp();
