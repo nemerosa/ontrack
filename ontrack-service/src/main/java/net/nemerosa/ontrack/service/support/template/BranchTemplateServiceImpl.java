@@ -404,12 +404,16 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, JobProv
         TemplateDefinition templateDefinition = getTemplateDefinition(branchId)
                 .orElseThrow(() -> new BranchNotTemplateDefinitionException(branchId));
         // Gets the source of the branch names to synchronise with
-        TemplateSynchronisationSource<?> templateSynchronisationSource =
+        Optional<TemplateSynchronisationSource<?>> templateSynchronisationSource =
                 templateSynchronisationService.getSynchronisationSource(
                         templateDefinition.getSynchronisationSourceConfig().getId()
                 );
-        // Using the source
-        return syncTemplateDefinition(branchId, templateDefinition, templateSynchronisationSource, listener);
+        if (templateSynchronisationSource.isPresent()) {
+            // Using the source
+            return syncTemplateDefinition(branchId, templateDefinition, templateSynchronisationSource.get(), listener);
+        } else {
+            return BranchTemplateSyncResults.empty();
+        }
     }
 
     protected <T> BranchTemplateSyncResults syncTemplateDefinition(
