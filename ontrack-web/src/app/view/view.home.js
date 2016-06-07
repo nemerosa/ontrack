@@ -1,7 +1,8 @@
 angular.module('ot.view.home', [
         'ui.router',
         'ot.service.structure',
-        'ot.service.core'
+        'ot.service.core',
+        'ot.service.user'
     ])
     .config(function ($stateProvider) {
         $stateProvider.state('home', {
@@ -10,7 +11,7 @@ angular.module('ot.view.home', [
             controller: 'HomeCtrl'
         });
     })
-    .controller('HomeCtrl', function ($rootScope, $location, $scope, $http, ot, otStructureService, otNotificationService) {
+    .controller('HomeCtrl', function ($rootScope, $location, $scope, $http, ot, otStructureService, otUserService) {
         var code = $location.search().code;
         $rootScope.view = {
             // Title
@@ -77,7 +78,12 @@ angular.module('ot.view.home', [
             // Any notification?
             if (code) {
                 if (code == 403) {
-                    otNotificationService.error("Due to the access to an unauthorized resource, you have been redirected to the home page.");
+                    if (otUserService.logged()) {
+                        otNotificationService.error("Due to the access to an unauthorized resource, you have been redirected to the home page.");
+                    } else {
+                        // FIXME Callback URL
+                        otUserService.login();
+                    }
                 }
             }
         }
