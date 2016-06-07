@@ -18,11 +18,13 @@ public class Browser {
         configuration
     }
 
-    public <P extends Page> P goTo(Class<P> pageClass, Map<String, Object> parameters) {
+    public <P extends Page> P goTo(Class<P> pageClass, Map<String, Object> parameters = [:], boolean wait = true) {
         P page = page(pageClass)
         String path = page.getPath(parameters);
         configuration.goTo(path);
-        page.waitFor();
+        if (wait) {
+            page.waitFor();
+        }
         return page;
     }
 
