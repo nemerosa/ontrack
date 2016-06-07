@@ -11,7 +11,7 @@ angular.module('ot.view.home', [
             controller: 'HomeCtrl'
         });
     })
-    .controller('HomeCtrl', function ($rootScope, $location, $scope, $http, ot, otStructureService, otUserService) {
+    .controller('HomeCtrl', function ($rootScope, $location, $scope, $http, ot, otStructureService, otNotificationService, otUserService) {
         var code = $location.search().code;
         $rootScope.view = {
             // Title
@@ -81,8 +81,12 @@ angular.module('ot.view.home', [
                     if (otUserService.logged()) {
                         otNotificationService.error("Due to the access to an unauthorized resource, you have been redirected to the home page.");
                     } else {
-                        // FIXME Callback URL
-                        otUserService.login();
+                        otUserService.login().then(function () {
+                            // FIXME Callback URL
+                            $log.debug('[app] Reloading callback URL after signing in.');
+                        }, function () {
+                            otNotificationService.error("You cannot access the request resource.");
+                        });
                     }
                 }
             }
