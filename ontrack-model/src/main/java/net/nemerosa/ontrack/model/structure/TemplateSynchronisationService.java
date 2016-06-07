@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.model.structure;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TemplateSynchronisationService {
 
@@ -12,5 +13,5 @@ public interface TemplateSynchronisationService {
     /**
      * Gets a sync. source using its ID.
      */
-    TemplateSynchronisationSource<?> getSynchronisationSource(String id);
+    Optional<TemplateSynchronisationSource<?>> getSynchronisationSource(String id);
 }
