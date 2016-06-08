@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service.security;
 
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport;
 import net.nemerosa.ontrack.model.security.*;
+import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.StructureService;
 import net.nemerosa.ontrack.test.TestUtils;
@@ -105,13 +106,36 @@ public class AccountServiceIT extends AbstractServiceTestSupport {
         assertFalse("As a normal user, must not have any project grant", account.isGranted(project, ValidationStampEdit.class));
     }
 
+    /**
+     * Regression test for #427
+     */
+    @Test
+    public void admin_can_delete_promotion_run() throws Exception {
+        // Creates an account
+        ID id = account().getId();
+        // Assigns the Administrator role to this account
+        asUser().with(AccountManagement.class).call(() -> accountService.saveGlobalPermission(
+                PermissionTargetType.ACCOUNT,
+                id.get(),
+                new PermissionInput("ADMINISTRATOR")
+        ));
+        // Gets the ACL of the account
+        Account account = asUser().with(AccountManagement.class).call(() -> accountService.withACL(
+                AuthenticatedAccount.of(accountService.getAccount(id))
+        ));
+        // Creates any project
+        Project project = doCreateProject();
+        // Checks the account can delete a promotion run
+        assertTrue("An administrator must be granted the promotion run deletion", account.isGranted(project.id(), PromotionRunDelete.class));
+    }
+
     private Account account() throws Exception {
         return asUser().with(AccountManagement.class).call(() -> accountService.create(new AccountInput(
                 TestUtils.uid("A"),
                 "Test account",
                 "test@test.com",
                 "secret",
-                Collections.<Integer>emptyList()
+                Collections.emptyList()
         )));
     }
 
