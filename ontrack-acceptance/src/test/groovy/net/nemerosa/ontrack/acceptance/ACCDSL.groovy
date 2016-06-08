@@ -250,6 +250,19 @@ class ACCDSL extends AbstractACCDSL {
     }
 
     @Test
+    void 'Promotion run deletion'() {
+        def branch = createBuildsAndPromotions()
+        // Creates two runs
+        ontrack.build(branch.project, branch.name, '2').promote('BRONZE')
+        ontrack.build(branch.project, branch.name, '2').promote('BRONZE')
+        // Gets the promotion runs
+        def runs = ontrack.build(branch.project, branch.name, '2').promotionRuns
+        def run = runs.get(0)
+        def deleteLink = run.link('delete')
+        assert deleteLink == "${baseURL}/structure/promotionRuns/${run.id}" as String
+    }
+
+    @Test
     void 'Branch validation stamps'() {
         def name = uid('P')
         ontrack.project(name) {
