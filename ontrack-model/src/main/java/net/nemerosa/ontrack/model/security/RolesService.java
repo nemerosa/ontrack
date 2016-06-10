@@ -52,7 +52,8 @@ public interface RolesService {
             BuildDelete.class,
             ValidationRunCreate.class,
             ValidationRunStatusChange.class,
-            PromotionRunCreate.class
+            PromotionRunCreate.class,
+            PromotionRunDelete.class
     );
 
     /**

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.boot.resources;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.ontrack.json.JsonUtils;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.MockURIBuilder;
@@ -9,6 +10,7 @@ import net.nemerosa.ontrack.ui.resource.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -792,6 +794,23 @@ public class CoreResourceModuleTest {
                         .end(),
                 AccountGroup.of("Admins", "Administrators")
         );
+    }
+
+    @Test
+    public void promotion_run_delete_granted() throws IOException {
+        // Objects
+        Project p = Project.of(new NameDescription("P", "Project")).withId(ID.of(1));
+        Branch b = Branch.of(p, new NameDescription("B", "Branch")).withId(ID.of(1)).withType(BranchType.TEMPLATE_DEFINITION);
+        PromotionLevel pl = PromotionLevel.of(b, NameDescription.nd("PL", "Promotion Level")).withId(ID.of(1));
+        Build build = Build.of(b, NameDescription.nd("1", "Build 1"), Signature.of("test")).withId(ID.of(1));
+        PromotionRun run = PromotionRun.of(build, pl, Signature.of("test"), "Run").withId(ID.of(1));
+        // Security
+        when(securityService.isProjectFunctionGranted(1, PromotionRunDelete.class)).thenReturn(true);
+        // Serialization
+        JsonNode node = mapper.getObjectMapper().readTree(mapper.write(run));
+        // Checks the _delete link is present
+        String delete = JsonUtils.get(node, "_delete");
+        assertEquals("urn:test:net.nemerosa.ontrack.boot.ui.PromotionRunController#deletePromotionRun:1", delete);
     }
 
 }
