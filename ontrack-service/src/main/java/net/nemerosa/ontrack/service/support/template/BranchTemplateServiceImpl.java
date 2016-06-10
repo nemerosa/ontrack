@@ -8,7 +8,8 @@ import net.nemerosa.ontrack.model.security.BranchTemplateSync;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.AbstractBranchJob;
-import net.nemerosa.ontrack.model.support.StartupService;
+import net.nemerosa.ontrack.model.support.JobProvider;
+import net.nemerosa.ontrack.model.support.JobRegistration;
 import net.nemerosa.ontrack.repository.BranchTemplateRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -27,7 +28,7 @@ import static java.lang.String.format;
 
 @Service
 @Transactional
-public class BranchTemplateServiceImpl implements BranchTemplateService, StartupService {
+public class BranchTemplateServiceImpl implements BranchTemplateService, JobProvider {
 
     public static final JobType BRANCH_TEMPLATE_SYNC_JOB =
             JobCategory.of("template").withName("Templates")
@@ -252,21 +253,13 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, Startup
     }
 
     @Override
-    public String getName() {
-        return "Registration of branch template synchronisation jobs";
-    }
-
-    @Override
-    public int startupOrder() {
-        return JOB_REGISTRATION;
-    }
-
-    @Override
-    public void start() {
-        // For all template definitions
-        branchTemplateRepository.getTemplateDefinitions().stream()
-                // ... and creates a sync. job
-                .forEach(this::scheduleTemplateDefinitionSyncJob);
+    public Collection<JobRegistration> getStartingJobs() {
+        return branchTemplateRepository.getTemplateDefinitions().stream()
+                .map(btd ->
+                        JobRegistration
+                                .of(createTemplateDefinitionSyncJob(btd))
+                                .everyMinutes(btd.getTemplateDefinition().getInterval()))
+                .collect(Collectors.toList());
     }
 
     protected void scheduleTemplateDefinitionSyncJob(BranchTemplateDefinition btd) {
@@ -411,12 +404,16 @@ public class BranchTemplateServiceImpl implements BranchTemplateService, Startup
         TemplateDefinition templateDefinition = getTemplateDefinition(branchId)
                 .orElseThrow(() -> new BranchNotTemplateDefinitionException(branchId));
         // Gets the source of the branch names to synchronise with
-        TemplateSynchronisationSource<?> templateSynchronisationSource =
+        Optional<TemplateSynchronisationSource<?>> templateSynchronisationSource =
                 templateSynchronisationService.getSynchronisationSource(
                         templateDefinition.getSynchronisationSourceConfig().getId()
                 );
-        // Using the source
-        return syncTemplateDefinition(branchId, templateDefinition, templateSynchronisationSource, listener);
+        if (templateSynchronisationSource.isPresent()) {
+            // Using the source
+            return syncTemplateDefinition(branchId, templateDefinition, templateSynchronisationSource.get(), listener);
+        } else {
+            return BranchTemplateSyncResults.empty();
+        }
     }
 
     protected <T> BranchTemplateSyncResults syncTemplateDefinition(

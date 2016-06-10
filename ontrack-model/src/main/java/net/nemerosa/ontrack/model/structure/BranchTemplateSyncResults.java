@@ -11,6 +11,10 @@ import java.util.List;
 @Data
 public class BranchTemplateSyncResults {
 
+    public static BranchTemplateSyncResults empty() {
+        return new BranchTemplateSyncResults();
+    }
+
     private final List<BranchTemplateSyncResult> branches = new ArrayList<>();
 
     public void addResult(BranchTemplateSyncResult result) {

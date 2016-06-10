@@ -4,6 +4,7 @@ import com.google.common.collect.Iterables;
 import net.nemerosa.ontrack.common.CachedSupplier;
 import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.common.Time;
+import net.nemerosa.ontrack.common.Utils;
 import net.nemerosa.ontrack.extension.api.BuildValidationExtension;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.Ack;
@@ -38,7 +39,6 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static net.nemerosa.ontrack.model.structure.Entity.isEntityDefined;
@@ -388,10 +388,10 @@ public class StructureServiceImpl implements StructureService {
             // Branch name
             boolean accept;
             accept = !StringUtils.isNotBlank(form.getBranchName())
-                    || Pattern.matches(form.getBranchName(), build.getBranch().getName());
+                    || Utils.safeRegexMatch(form.getBranchName(), build.getBranch().getName());
             // Build name
             if (accept && StringUtils.isNotBlank(form.getBuildName())) {
-                accept = Pattern.matches(form.getBuildName(), build.getName());
+                accept = Utils.safeRegexMatch(form.getBuildName(), build.getName());
             }
             // Promotion name
             if (accept && StringUtils.isNotBlank(form.getPromotionName())) {
