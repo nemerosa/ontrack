@@ -115,6 +115,7 @@ angular.module('ot.service.core', [
                 })
                 .error(function (response) {
                     if (response.status == 403) {
+                        $log.debug('[403] HTTP 403 received - current location = ' + location.href);
                         // Goes back to the home back and refreshes with a status
                         location.href = '#/home?code=403&url=' + encodeURIComponent(location.href);
                         // Rejects the current closure
