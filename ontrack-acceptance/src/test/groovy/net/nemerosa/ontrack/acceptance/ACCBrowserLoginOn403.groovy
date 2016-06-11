@@ -21,8 +21,8 @@ class ACCBrowserLoginOn403 extends AcceptanceTestClient {
             // Tries to go to unauthorised page
             browser.goTo AccountManagementPage, [:], false
             // This should be rejected - and we should be on the login page
-            HomePage home = browser.at(HomePage)
             browser.screenshot 'access-rejected'
+            HomePage home = browser.page(HomePage)
             home.header.checkOnLogin()
             // Now, we login as admin
             home.header.doLogin('admin', adminPassword)

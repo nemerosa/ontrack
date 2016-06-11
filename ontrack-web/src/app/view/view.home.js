@@ -80,9 +80,12 @@ angular.module('ot.view.home', [
             // Any notification?
             if (code) {
                 if (code == 403) {
+                    $log.debug('[app] 403 - received');
                     if (otUserService.logged()) {
+                        $log.debug('[app] 403 - user already logged - error notification');
                         otNotificationService.error("Due to the access to an unauthorized resource, you have been redirected to the home page.");
                     } else {
+                        $log.debug('[app] 403 - user not logged - login redirection - callback URL = ' + url);
                         otUserService.login().then(function () {
                             if (url) {
                                 // Callback URL

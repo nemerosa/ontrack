@@ -42,7 +42,7 @@ public class Browser {
         page
     }
 
-    protected <P extends Page> P page(Class<P> pageClass) {
+    public <P extends Page> P page(Class<P> pageClass) {
         P page;
         try {
             page = ConstructorUtils.invokeExactConstructor(pageClass, this);
