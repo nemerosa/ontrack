@@ -25,7 +25,7 @@ class ACCBrowserLoginOn403 extends AcceptanceTestClient {
             HomePage home = browser.page(HomePage)
             home.header.checkOnLogin()
             // Now, we login as admin
-            home.header.doLogin('admin', adminPassword)
+            home.header.doLogin('admin', adminPassword, 3000)
             // And we should be redirected to the account management page
             browser.screenshot 'access-granted'
             browser.at AccountManagementPage

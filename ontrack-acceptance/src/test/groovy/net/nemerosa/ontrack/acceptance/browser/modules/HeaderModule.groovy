@@ -25,7 +25,7 @@ public class HeaderModule extends AbstractModule {
         assert $(By.name("password")).displayed
     }
 
-    public void doLogin(String name, String password) {
+    public void doLogin(String name, String password, long waitMs = 500) {
         browser.screenshot("login-displayed");
 
         WebElement tName = $(By.name("name"));
@@ -50,7 +50,7 @@ public class HeaderModule extends AbstractModule {
          *
          * Waiting a bit
          */
-        sleep 500
+        sleep waitMs
     }
 
 }
