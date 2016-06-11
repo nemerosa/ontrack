@@ -8,9 +8,6 @@ import net.nemerosa.ontrack.extension.svn.support.SVNTestRepo
 import net.nemerosa.ontrack.extension.svn.support.SVNTestUtils
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.security.GlobalSettings
-import org.apache.commons.io.FileUtils
-import org.junit.AfterClass
-import org.junit.BeforeClass
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.annotation.IfProfileValue
@@ -21,18 +18,6 @@ import org.springframework.test.annotation.ProfileValueSourceConfiguration
  */
 @ProfileValueSourceConfiguration(SVNProfileValueSource)
 class IndexationServiceIT extends AbstractServiceTestSupport {
-
-    private static SVNTestRepo repo
-
-    @BeforeClass
-    static void 'SVN repository: start'() {
-        repo = SVNTestRepo.get('IndexationServiceIT')
-    }
-
-    @AfterClass
-    static void 'SVN repository: stop'() {
-        repo.stop()
-    }
 
     @Autowired
     private IndexationService indexationService
@@ -50,49 +35,49 @@ class IndexationServiceIT extends AbstractServiceTestSupport {
         /**
          * Preparation of a SVN project with branch merged into the trunk
          */
+        SVNTestRepo.withSvnRepo('IndexationServiceIT') { SVNTestRepo repo ->
 
-        File wd = new File('build/work/IndexationServiceIT/IndexationOfMergeInfo')
-        FileUtils.forceMkdir(wd)
-        // Few commits on the trunk
-        repo.mkdir 'IndexationOfMergeInfo/trunk', 'Trunk'
-        (1..3).each { repo.mkdir "IndexationOfMergeInfo/trunk/$it", "$it" }
-        // Creating the branch and add some commits to merge later
-        repo.copy 'IndexationOfMergeInfo/trunk', 'IndexationOfMergeInfo/branches/MyBranch', 'MyBranch'
-        (4..6).each { repo.mkdir "IndexationOfMergeInfo/branches/MyBranch/$it", "Branch $it" }
-        // Few commits on the trunk
-        (7..9).each { repo.mkdir "IndexationOfMergeInfo/trunk/$it", "$it" }
-        // Merges the branch into the trunk (revision = 11)
-        repo.merge wd, 'IndexationOfMergeInfo/branches/MyBranch', 'IndexationOfMergeInfo/trunk', 'Merge'
+            // Few commits on the trunk
+            repo.mkdir 'IndexationOfMergeInfo/trunk', 'Trunk'
+            (1..3).each { repo.mkdir "IndexationOfMergeInfo/trunk/$it", "$it" }
+            // Creating the branch and add some commits to merge later
+            long revision = repo.copy 'IndexationOfMergeInfo/trunk', 'IndexationOfMergeInfo/branches/MyBranch', 'MyBranch'
+            (4..6).each { repo.mkdir "IndexationOfMergeInfo/branches/MyBranch/$it", "Branch $it" }
+            // Few commits on the trunk
+            (7..9).each { repo.mkdir "IndexationOfMergeInfo/trunk/$it", "$it" }
+            // Merges the branch into the trunk (revision = 11)
+            repo.merge "IndexationOfMergeInfo/branches/MyBranch@${revision}", 'IndexationOfMergeInfo/trunk', 'Merge'
 
-        /**
-         * Definition of the repository
-         */
+            /**
+             * Definition of the repository
+             */
 
-        def configuration = SVNTestUtils.repository().configuration
-        def repositoryId = repositoryDao.getOrCreateByName(configuration.name)
-        def repository = SVNRepository.of(repositoryId, configuration, null)
+            def configuration = SVNTestUtils.repository(repo.url.toString()).configuration
+            def repositoryId = repositoryDao.getOrCreateByName(configuration.name)
+            def repository = SVNRepository.of(repositoryId, configuration, null)
 
-        /**
-         * Indexation of this repository
-         */
+            /**
+             * Indexation of this repository
+             */
 
-        asUser().with(GlobalSettings).call {
-            ((IndexationServiceImpl) indexationService).indexFromLatest(repository, { println it })
-        }
+            asUser().with(GlobalSettings).call {
+                ((IndexationServiceImpl) indexationService).indexFromLatest(repository, { println it })
+            }
 
-        /**
-         * Makes sure the merge is registered
-         */
+            /**
+             * Makes sure the merge is registered
+             */
 
-        (5..8).each {
-            assert revisionDao.getMergesForRevision(repositoryId, it) == [12]
-        }
+            (5..8).each {
+                assert revisionDao.getMergesForRevision(repositoryId, it) == [12]
+            }
 
-        /**
-         * Checks the branch extraction
-         */
-        (6..8).each {
-            assert revisionDao.get(repositoryId, it).branch == '/IndexationOfMergeInfo/branches/MyBranch'
+            /**
+             * Checks the branch extraction
+             */
+            (6..8).each {
+                assert revisionDao.get(repositoryId, it).branch == '/IndexationOfMergeInfo/branches/MyBranch'
+            }
         }
 
     }
