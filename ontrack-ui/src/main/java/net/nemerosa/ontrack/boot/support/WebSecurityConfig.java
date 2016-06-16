@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.support;
 
+import net.nemerosa.ontrack.model.security.UserSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +13,8 @@ import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 
+import java.util.List;
+
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -21,6 +24,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private List<UserSource> userSources;
 
     /**
      * By default, all queries are accessible anonymously. Security is enforced at service level.
@@ -74,7 +80,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public BasicRememberMeUserDetailsService basicRememberMeUserDetailsService() {
-        return new BasicRememberMeUserDetailsService();
+        return new BasicRememberMeUserDetailsService(userSources);
     }
 
     @Override
