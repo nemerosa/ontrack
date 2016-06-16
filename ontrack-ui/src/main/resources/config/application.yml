@@ -31,3 +31,12 @@ info:
   app:
     name: Ontrack
     description: Continuous Delivery Traceability and Monitoring
+
+# Session configuration
+# This can be overridden at installation level
+#server:
+#  session:
+#    # One hour for the session
+#    timeout: 3600
+#    cookie:
+#      max-age: 3600
