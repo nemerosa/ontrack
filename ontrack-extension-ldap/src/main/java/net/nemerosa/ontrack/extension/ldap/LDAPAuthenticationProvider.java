@@ -166,7 +166,12 @@ public class LDAPAuthenticationProvider extends AbstractUserDetailsAuthenticatio
 
     @Override
     public Optional<AccountUserDetails> loadUser(String username) {
-        // FIXME Remove the cache entry on logout
         return Optional.ofNullable(cache.get(username));
     }
+
+    @Override
+    public void onLogout(String username) {
+        cache.remove(username);
+    }
+    
 }

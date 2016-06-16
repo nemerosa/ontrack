@@ -55,6 +55,13 @@ public class PasswordAuthenticationProvider extends AbstractUserDetailsAuthentic
                 .map(AccountUserDetails::new);
     }
 
+    /**
+     * Nothing to do since there is no cache.
+     */
+    @Override
+    public void onLogout(String username) {
+    }
+
     @Override
     protected UserDetails retrieveUser(String username, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
         return loadUser(username)

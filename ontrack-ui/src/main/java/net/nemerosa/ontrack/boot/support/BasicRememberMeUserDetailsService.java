@@ -1,14 +1,18 @@
 package net.nemerosa.ontrack.boot.support;
 
 import net.nemerosa.ontrack.model.security.UserSource;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Optional;
 
-public class BasicRememberMeUserDetailsService implements UserDetailsService {
+public class BasicRememberMeUserDetailsService implements UserDetailsService, LogoutHandler {
 
     private final List<UserSource> userSources;
 
@@ -26,4 +30,8 @@ public class BasicRememberMeUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("Cannot load user using its name"));
     }
 
+    @Override
+    public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        userSources.forEach(userSource -> userSource.onLogout(authentication.getName()));
+    }
 }

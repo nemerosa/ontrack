@@ -9,4 +9,5 @@ public interface UserSource {
 
     Optional<AccountUserDetails> loadUser(String username);
 
+    void onLogout(String username);
 }

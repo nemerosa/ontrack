@@ -46,6 +46,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .logout()
                 .logoutUrl("/user/logout")
                 .logoutSuccessUrl("/user/logged-out")
+                .addLogoutHandler(basicRememberMeUserDetailsService())
                 .and()
             // FIXME CSRF protection for a stateless API?
             //.csrf().requireCsrfProtectionMatcher(new CSRFRequestMatcher()).and()
