@@ -9,10 +9,12 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.codec.Hex;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 
+import java.security.SecureRandom;
 import java.util.List;
 
 @Configuration
@@ -33,8 +35,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        // FIXME Gets a secure random key
-        String rememberBeKey = "...";
+        // Gets a secure random key for the remember be token key
+        SecureRandom random = new SecureRandom();
+        byte[] randomBytes = new byte[64];
+        random.nextBytes(randomBytes);
+        String rememberBeKey = new String(Hex.encode(randomBytes));
         // @formatter:off
         http.antMatcher("/**")
             // Only BASIC authentication
