@@ -73,15 +73,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public RememberMeServices rememberMeServices(String rememberBeKey) {
-        InMemoryTokenRepositoryImpl rememberMeTokenRepository = new InMemoryTokenRepositoryImpl();
-        PersistentTokenBasedRememberMeServices services = new PersistentTokenBasedRememberMeServices(
+        return new PersistentTokenBasedRememberMeServices(
                 rememberBeKey,
                 basicRememberMeUserDetailsService(),
-                rememberMeTokenRepository
+                new InMemoryTokenRepositoryImpl()
         );
-        // FIXME No, this should be requested by a parameter at login time
-        services.setAlwaysRemember(true);
-        return services;
     }
 
     @Bean
