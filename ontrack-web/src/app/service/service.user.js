@@ -56,7 +56,7 @@ angular.module('ot.service.user', [
                 submit: function (data) {
                     var d = $q.defer();
                     $http.post(
-                        $rootScope.user.login + "?remember-me=true",
+                        $rootScope.user.login + "?remember-me=" + (data.rememberMe === true),
                         {},
                         {
                             headers: {

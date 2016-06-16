@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.api.UserMenuExtension;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Password;
+import net.nemerosa.ontrack.model.form.YesNo;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.support.Action;
 import net.nemerosa.ontrack.model.support.PasswordChange;
@@ -52,7 +53,9 @@ public class UserController extends AbstractResourceController {
     public Form loginForm() {
         return Form.create()
                 .name()
-                .password();
+                .password()
+                .with(YesNo.of("rememberMe").label("Remember me").value(false))
+                ;
     }
 
     @RequestMapping(value = "login", method = RequestMethod.POST)
