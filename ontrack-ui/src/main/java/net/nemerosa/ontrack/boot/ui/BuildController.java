@@ -252,7 +252,7 @@ public class BuildController extends AbstractResourceController {
         return Resources.of(
                 structureService.getBuildLinksFrom(structureService.getBuild(buildId)),
                 uri(on(getClass()).getBuildLinksFrom(buildId))
-        );
+        ).forView(Build.class);
     }
 
     /**
@@ -266,7 +266,7 @@ public class BuildController extends AbstractResourceController {
         return Resources.of(
                 structureService.getBuildLinksTo(structureService.getBuild(buildId)),
                 uri(on(getClass()).getBuildLinksFrom(buildId))
-        );
+        ).forView(Build.class);
     }
 
     /**
