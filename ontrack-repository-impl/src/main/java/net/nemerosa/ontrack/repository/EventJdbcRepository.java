@@ -16,10 +16,7 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -122,6 +119,15 @@ public class EventJdbcRepository extends AbstractJdbcRepository implements Event
                         .addValue("count", count)
                         .addValue("offset", offset),
                 (rs, num) -> toEvent(rs, entityLoader, eventTypeLoader)
+        );
+    }
+
+    @Override
+    public Optional<Signature> getLastEventSignature(ProjectEntityType entityType, ID entityId, EventType eventType) {
+        return getOptional(
+                format("SELECT * FROM EVENTS WHERE %s = :entityId AND EVENT_TYPE = :eventType ORDER BY ID DESC LIMIT 1", entityType.name()),
+                params("entityId", entityId.get()).addValue("eventType", eventType.getId()),
+                (ResultSet rs, int num) -> readSignature(rs, "event_time", "event_user")
         );
     }
 
