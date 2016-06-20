@@ -243,6 +243,45 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         );
     }
 
+    @Override
+    public void addBuildLink(ID fromBuildId, ID toBuildId) {
+        deleteBuildLink(fromBuildId, toBuildId);
+        getNamedParameterJdbcTemplate().update(
+                "INSERT INTO BUILD_LINKS(BUILDID, TARGETBUILDID) VALUES (:fromBuildId, :toBuildId)",
+                params("fromBuildId", fromBuildId.get()).addValue("toBuildId", toBuildId.get())
+        );
+    }
+
+    @Override
+    public void deleteBuildLink(ID fromBuildId, ID toBuildId) {
+        getNamedParameterJdbcTemplate().update(
+                "DELETE FROM BUILD_LINKS WHERE BUILDID = :fromBuildId AND TARGETBUILDID = :toBuildId",
+                params("fromBuildId", fromBuildId.get()).addValue("toBuildId", toBuildId.get())
+        );
+    }
+
+    @Override
+    public List<Build> getBuildLinks(ID buildId) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT T.* FROM BUILDS T " +
+                        "INNER JOIN BUILD_LINKS BL ON BL.TARGETBUILDID = T.ID " +
+                        "WHERE BL.BUILDID = :buildId",
+                params("buildId", buildId.get()),
+                (rs, num) -> toBuild(rs, this::getBranch)
+        );
+    }
+
+    @Override
+    public List<Build> getBuildLinksFrom(ID buildId) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT F.* FROM BUILDS F " +
+                        "INNER JOIN BUILD_LINKS BL ON BL.BUILDID = F.ID " +
+                        "WHERE BL.TARGETBUILDID = :buildId",
+                params("buildId", buildId.get()),
+                (rs, num) -> toBuild(rs, this::getBranch)
+        );
+    }
+
     protected Build toBuild(ResultSet rs, Function<ID, Branch> branchSupplier) throws SQLException {
         return Build.of(
                 branchSupplier.apply(id(rs, "branchId")),

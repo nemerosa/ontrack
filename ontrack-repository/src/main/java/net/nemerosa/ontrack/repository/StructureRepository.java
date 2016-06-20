@@ -80,6 +80,18 @@ public interface StructureRepository {
 
     Ack deleteBuild(ID buildId);
 
+    /**
+     * Build links
+     */
+
+    void addBuildLink(ID fromBuildId, ID toBuildId);
+
+    void deleteBuildLink(ID fromBuildId, ID toBuildId);
+
+    List<Build> getBuildLinks(ID buildId);
+
+    List<Build> getBuildLinksFrom(ID buildId);
+
     // Promotion levels
 
     List<PromotionLevel> getPromotionLevelListForBranch(ID branchId);

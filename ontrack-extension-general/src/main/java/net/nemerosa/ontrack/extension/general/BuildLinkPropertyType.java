@@ -19,6 +19,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
+@Deprecated
 public class BuildLinkPropertyType extends AbstractPropertyType<BuildLinkProperty> {
 
     @Autowired

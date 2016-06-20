@@ -454,6 +454,36 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public void addBuildLink(Build fromBuild, Build toBuild) {
+        securityService.checkProjectFunction(fromBuild, BuildEdit.class);
+        securityService.checkProjectFunction(toBuild, ProjectView.class);
+        structureRepository.addBuildLink(fromBuild.getId(), toBuild.getId());
+    }
+
+    @Override
+    public void deleteBuildLink(Build fromBuild, Build toBuild) {
+        securityService.checkProjectFunction(fromBuild, BuildEdit.class);
+        securityService.checkProjectFunction(toBuild, ProjectView.class);
+        structureRepository.deleteBuildLink(fromBuild.getId(), toBuild.getId());
+    }
+
+    @Override
+    public List<Build> getBuildLinks(Build build) {
+        securityService.checkProjectFunction(build, ProjectView.class);
+        return structureRepository.getBuildLinks(build.getId()).stream()
+                .filter(b -> securityService.isProjectFunctionGranted(b, ProjectView.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Build> getBuildDependencies(Build build) {
+        securityService.checkProjectFunction(build, ProjectView.class);
+        return structureRepository.getBuildLinksFrom(build.getId()).stream()
+                .filter(b -> securityService.isProjectFunctionGranted(b, ProjectView.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<ValidationStampRunView> getValidationStampRunViewsForBuild(Build build) {
         // Gets all validation stamps
         List<ValidationStamp> stamps = getValidationStampListForBranch(build.getBranch().getId());

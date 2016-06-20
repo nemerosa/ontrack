@@ -77,8 +77,16 @@ public interface StructureService {
     Optional<Build> getNextBuild(ID buildId);
 
     /**
-     * Branch builds
+     * Build links
      */
+
+    void addBuildLink(Build fromBuild, Build toBuild);
+
+    void deleteBuildLink(Build fromBuild, Build toBuild);
+
+    List<Build> getBuildLinks(Build build);
+
+    List<Build> getBuildDependencies(Build build);
 
     /**
      * Looks for the first build which matches a given predicate.
