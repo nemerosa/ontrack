@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Data
+@Deprecated
 public class BuildLinkProperty {
 
     private final List<BuildLinkPropertyItem> links;

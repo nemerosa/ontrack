@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 @Data
+@Deprecated
 public class BuildLinkPropertyItem {
 
     private final String project;
