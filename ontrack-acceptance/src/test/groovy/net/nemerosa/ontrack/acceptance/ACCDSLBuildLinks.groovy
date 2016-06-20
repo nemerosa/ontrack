@@ -18,6 +18,14 @@ class ACCDSLBuildLinks extends AbstractACCDSL {
         // Creating two builds with some build links
         def p1 = uid('P1')
         def p2 = uid('P2')
+
+        ontrack.project(p2) {
+            branch('B2') {
+                build('2.0')
+                build('3.0')
+            }
+        }
+
         ontrack.project(p1) {
             branch('B1') {
                 build('1.1') {
@@ -28,6 +36,7 @@ class ACCDSLBuildLinks extends AbstractACCDSL {
                 }
             }
         }
+
         // Build id
         def id = ontrack.build(p1, 'B1', '1.1').id
         // Performs a search
@@ -36,7 +45,7 @@ class ACCDSLBuildLinks extends AbstractACCDSL {
         assert results.size() == 1
         SearchResult result = results[0]
         assert result.title == "Build ${p1}/B1/1.1"
-        assert result.description == "${p2} -> 2.0"
+        assert result.description == "${p1} -> 1.1"
         assert result.uri == "${baseURL}/structure/builds/${id}"
         assert result.page == "${baseURL}/#/build/${id}"
     }
