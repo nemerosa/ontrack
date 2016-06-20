@@ -88,6 +88,8 @@ public interface StructureService {
 
     List<Build> getBuildDependencies(Build build);
 
+    List<Build> searchBuildsLinkedTo(String projectName, String buildPattern);
+
     /**
      * Looks for the first build which matches a given predicate.
      *

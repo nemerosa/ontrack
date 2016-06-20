@@ -484,6 +484,14 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public List<Build> searchBuildsLinkedTo(String projectName, String buildPattern) {
+        return structureRepository.searchBuildsLinkedTo(projectName, buildPattern)
+                .stream()
+                .filter(b -> securityService.isProjectFunctionGranted(b, ProjectView.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<ValidationStampRunView> getValidationStampRunViewsForBuild(Build build) {
         // Gets all validation stamps
         List<ValidationStamp> stamps = getValidationStampListForBranch(build.getBranch().getId());

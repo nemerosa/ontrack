@@ -282,6 +282,20 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         );
     }
 
+    @Override
+    public List<Build> searchBuildsLinkedTo(String projectName, String buildPattern) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT F.* FROM BUILDS F " +
+                        "INNER JOIN BUILD_LINKS BL ON BL.BUILDID = F.ID " +
+                        "INNER JOIN BUILDS T ON BL.TARGETBUILDID = T.ID " +
+                        "INNER JOIN BRANCHES BR ON BR.ID = T.BRANCHID " +
+                        "INNER JOIN PROJECTS P ON P.ID = BR.PROJECTID " +
+                        "WHERE T.NAME LIKE :buildNamePattern AND P.NAME = :projectName",
+                params("buildNamePattern", buildPattern + "%").addValue("projectName", projectName),
+                (rs, num) -> toBuild(rs, this::getBranch)
+        );
+    }
+
     protected Build toBuild(ResultSet rs, Function<ID, Branch> branchSupplier) throws SQLException {
         return Build.of(
                 branchSupplier.apply(id(rs, "branchId")),

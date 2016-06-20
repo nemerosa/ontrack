@@ -92,6 +92,8 @@ public interface StructureRepository {
 
     List<Build> getBuildLinksFrom(ID buildId);
 
+    List<Build> searchBuildsLinkedTo(String projectName, String buildPattern);
+
     // Promotion levels
 
     List<PromotionLevel> getPromotionLevelListForBranch(ID branchId);
