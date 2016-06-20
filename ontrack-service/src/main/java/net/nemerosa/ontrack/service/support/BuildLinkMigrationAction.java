@@ -76,7 +76,11 @@ public class BuildLinkMigrationAction implements DBMigrationAction {
             try (PreparedStatement ps = connection.prepareStatement("INSERT INTO BUILD_LINKS (BUILDID, TARGETBUILDID) VALUES (?, ?)")) {
                 ps.setInt(1, buildId);
                 ps.setInt(2, targetBuildId);
-                ps.executeUpdate();
+                try {
+                    ps.executeUpdate();
+                } catch (SQLException ignored) {
+                    // Ignoring exceptions (likely to be duplications)
+                }
             }
         }
     }
