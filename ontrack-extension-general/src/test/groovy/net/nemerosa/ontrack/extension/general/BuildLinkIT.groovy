@@ -41,9 +41,77 @@ class BuildLinkIT extends AbstractServiceTestSupport {
         assert targets.find { it.name == target.name }
     }
 
-    // TODO ACL on build targets
-    // TODO Adding twice a build
-    // TODO Adding and deleting a link
+    @Test(expected = AccessDeniedException)
+    void 'Build config is needed on source build to create a link'() {
+        // Creates a build
+        def build = doCreateBuild()
+        // Creates a second build to link
+        def target = doCreateBuild()
+        // Build link creation
+        asUser().withView(target).call {
+            structureService.addBuildLink(build, target)
+        }
+    }
+
+    @Test(expected = AccessDeniedException)
+    void 'Build view is needed on target build to create a link'() {
+        // Creates a build
+        def build = doCreateBuild()
+        // Creates a second build to link
+        def target = doCreateBuild()
+        // Build link creation
+        asUser().with(build, BuildConfig).call {
+            structureService.addBuildLink(build, target)
+        }
+    }
+
+    @Test
+    void 'Adding and deleting a build'() {
+        // Creates a build
+        def build = doCreateBuild()
+        // Creates a second build to link
+        def target = doCreateBuild()
+        // Build link creation
+        asUser().with(build, BuildConfig).withView(target).call {
+            structureService.addBuildLink(build, target)
+        }
+        // The build link is created
+        def targets = asUser().withView(build).withView(target).call {
+            structureService.getBuildLinks(build)
+        }
+        assert !targets.empty
+        assert targets.find { it.name == target.name }
+        // Deleting the build
+        asUser().with(build, BuildConfig).withView(target).call {
+            structureService.deleteBuildLink(build, target)
+        }
+        // The build link is deleted
+        targets = asUser().withView(build).withView(target).call {
+            structureService.getBuildLinks(build)
+        }
+        assert targets.empty
+    }
+
+    @Test
+    void 'Adding twice a build'() {
+        // Creates a build
+        def build = doCreateBuild()
+        // Creates a second build to link
+        def target = doCreateBuild()
+        // Build link creation
+        asUser().with(build, BuildConfig).withView(target).call {
+            structureService.addBuildLink(build, target)
+            // ... twice
+            structureService.addBuildLink(build, target)
+        }
+        // The build link is created
+        def targets = asUser().withView(build).withView(target).call {
+            structureService.getBuildLinks(build)
+        }
+        assert !targets.empty
+        assert targets.size() == 1
+        assert targets.find { it.name == target.name }
+    }
 
     @Test
     void 'Controller role can create links'() {
