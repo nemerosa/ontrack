@@ -60,17 +60,17 @@ public class BuildLinkSearchExtension extends AbstractExtension implements Searc
             List<Build> builds = structureService.searchBuildsLinkedTo(project, buildName);
             // Returns search results
             return builds.stream()
-                    .map(build -> toSearchResult(build, project))
+                    .map(this::toSearchResult)
                     .collect(Collectors.toList());
         } else {
             return Collections.emptyList();
         }
     }
 
-    protected SearchResult toSearchResult(Build build, String project) {
+    protected SearchResult toSearchResult(Build build) {
         return new SearchResult(
                 build.getEntityDisplayName(),
-                String.format("%s -> %s", build.getProject().getName(), build),
+                String.format("%s -> %s", build.getProject().getName(), build.getName()),
                 uriBuilder.getEntityURI(build),
                 uriBuilder.getEntityPage(build),
                 100

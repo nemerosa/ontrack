@@ -455,14 +455,14 @@ public class StructureServiceImpl implements StructureService {
 
     @Override
     public void addBuildLink(Build fromBuild, Build toBuild) {
-        securityService.checkProjectFunction(fromBuild, BuildEdit.class);
+        securityService.checkProjectFunction(fromBuild, BuildConfig.class);
         securityService.checkProjectFunction(toBuild, ProjectView.class);
         structureRepository.addBuildLink(fromBuild.getId(), toBuild.getId());
     }
 
     @Override
     public void deleteBuildLink(Build fromBuild, Build toBuild) {
-        securityService.checkProjectFunction(fromBuild, BuildEdit.class);
+        securityService.checkProjectFunction(fromBuild, BuildConfig.class);
         securityService.checkProjectFunction(toBuild, ProjectView.class);
         structureRepository.deleteBuildLink(fromBuild.getId(), toBuild.getId());
     }

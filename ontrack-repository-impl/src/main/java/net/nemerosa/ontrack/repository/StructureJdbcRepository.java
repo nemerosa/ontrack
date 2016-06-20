@@ -276,7 +276,8 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         return getNamedParameterJdbcTemplate().query(
                 "SELECT F.* FROM BUILDS F " +
                         "INNER JOIN BUILD_LINKS BL ON BL.BUILDID = F.ID " +
-                        "WHERE BL.TARGETBUILDID = :buildId",
+                        "WHERE BL.TARGETBUILDID = :buildId " +
+                        "ORDER BY F.ID DESC",
                 params("buildId", buildId.get()),
                 (rs, num) -> toBuild(rs, this::getBranch)
         );
@@ -290,8 +291,9 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                         "INNER JOIN BUILDS T ON BL.TARGETBUILDID = T.ID " +
                         "INNER JOIN BRANCHES BR ON BR.ID = T.BRANCHID " +
                         "INNER JOIN PROJECTS P ON P.ID = BR.PROJECTID " +
-                        "WHERE T.NAME LIKE :buildNamePattern AND P.NAME = :projectName",
-                params("buildNamePattern", buildPattern + "%").addValue("projectName", projectName),
+                        "WHERE T.NAME LIKE :buildNamePattern AND P.NAME = :projectName " +
+                        "ORDER BY F.ID DESC",
+                params("buildNamePattern", StringUtils.replace(buildPattern, "*", "%")).addValue("projectName", projectName),
                 (rs, num) -> toBuild(rs, this::getBranch)
         );
     }
