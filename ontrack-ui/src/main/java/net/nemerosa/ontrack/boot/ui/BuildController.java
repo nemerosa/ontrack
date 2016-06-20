@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.boot.ui;
 import net.nemerosa.ontrack.extension.api.BuildDiffExtension;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.Ack;
+import net.nemerosa.ontrack.model.exceptions.ProjectNotFoundException;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.form.Int;
 import net.nemerosa.ontrack.model.form.Selection;
@@ -269,6 +270,41 @@ public class BuildController extends AbstractResourceController {
     }
 
     /**
+     * Form to create a link between a build and another
+     *
+     * @param buildId From this build...
+     * @return List of builds
+     */
+    @RequestMapping(value = "builds/{buildId}/links", method = RequestMethod.GET)
+    public Form getBuildLinkForm(@PathVariable ID buildId) {
+        return Form.create()
+                .with(Text.of("project").label("Project name"))
+                .with(Text.of("build").label("Build name"));
+    }
+
+    /**
+     * Create a link between a build and another, using a form.
+     *
+     * @param buildId From this build...
+     * @return List of builds
+     */
+    @RequestMapping(value = "builds/{buildId}/links", method = RequestMethod.PUT)
+    public Build createBuildLinkFromForm(@PathVariable ID buildId, @RequestBody BuildLinkForm form) {
+        Build build = structureService.getBuild(buildId);
+        Project targetProject = structureService.findProjectByName(form.getProject())
+                .orElseThrow(() -> new ProjectNotFoundException(form.getProject()));
+        List<Build> targetBuilds = structureService.buildSearch(
+                targetProject.getId(),
+                new BuildSearchForm().withBuildName(form.getBuild())
+        );
+        if (targetBuilds.size() == 1) {
+            structureService.addBuildLink(build, targetBuilds.get(0));
+        }
+        // OK
+        return build;
+    }
+
+    /**
      * Creates a link between a build and another
      *
      * @param buildId       From this build...
@@ -297,5 +333,5 @@ public class BuildController extends AbstractResourceController {
         structureService.deleteBuildLink(build, targetBuild);
         return build;
     }
-    
+
 }

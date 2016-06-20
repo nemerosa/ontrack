@@ -71,6 +71,7 @@ public class BuildResourceDecorator extends AbstractResourceDecorator<Build> {
                 // Build links
                 .link("_buildLinksFrom", on(BuildController.class).getBuildLinksFrom(build.getId()))
                 .link("_buildLinksTo", on(BuildController.class).getBuildLinksTo(build.getId()))
+                .link("_buildLinks", on(BuildController.class).getBuildLinkForm(build.getId()))
                 // Page
                 .page(build);
         // Contributions
