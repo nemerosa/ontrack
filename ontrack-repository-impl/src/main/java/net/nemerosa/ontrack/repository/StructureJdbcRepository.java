@@ -261,7 +261,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
-    public List<Build> getBuildLinks(ID buildId) {
+    public List<Build> getBuildLinksFrom(ID buildId) {
         return getNamedParameterJdbcTemplate().query(
                 "SELECT T.* FROM BUILDS T " +
                         "INNER JOIN BUILD_LINKS BL ON BL.TARGETBUILDID = T.ID " +
@@ -272,7 +272,7 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
-    public List<Build> getBuildLinksFrom(ID buildId) {
+    public List<Build> getBuildLinksTo(ID buildId) {
         return getNamedParameterJdbcTemplate().query(
                 "SELECT F.* FROM BUILDS F " +
                         "INNER JOIN BUILD_LINKS BL ON BL.BUILDID = F.ID " +

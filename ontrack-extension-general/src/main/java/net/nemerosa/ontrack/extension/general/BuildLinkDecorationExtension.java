@@ -31,7 +31,7 @@ public class BuildLinkDecorationExtension extends AbstractExtension implements D
 
     @Override
     public List<Decoration<BuildLinkDecoration>> getDecorations(ProjectEntity entity) {
-        return structureService.getBuildLinks((Build) entity).stream()
+        return structureService.getBuildLinksFrom((Build) entity).stream()
                 .map(this::getDecoration)
                 .collect(Collectors.toList());
     }

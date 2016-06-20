@@ -88,9 +88,9 @@ public interface StructureRepository {
 
     void deleteBuildLink(ID fromBuildId, ID toBuildId);
 
-    List<Build> getBuildLinks(ID buildId);
-
     List<Build> getBuildLinksFrom(ID buildId);
+
+    List<Build> getBuildLinksTo(ID buildId);
 
     List<Build> searchBuildsLinkedTo(String projectName, String buildPattern);
 

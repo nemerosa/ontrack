@@ -68,6 +68,9 @@ public class BuildResourceDecorator extends AbstractResourceDecorator<Build> {
                 // Previous & next build
                 .link("_previous", on(BuildController.class).getPreviousBuild(build.getId()))
                 .link("_next", on(BuildController.class).getNextBuild(build.getId()))
+                // Build links
+                .link("_buildLinksFrom", on(BuildController.class).getBuildLinksFrom(build.getId()))
+                .link("_buildLinksTo", on(BuildController.class).getBuildLinksTo(build.getId()))
                 // Page
                 .page(build);
         // Contributions

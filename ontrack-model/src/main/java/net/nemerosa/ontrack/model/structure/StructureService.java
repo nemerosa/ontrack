@@ -84,9 +84,9 @@ public interface StructureService {
 
     void deleteBuildLink(Build fromBuild, Build toBuild);
 
-    List<Build> getBuildLinks(Build build);
+    List<Build> getBuildLinksFrom(Build build);
 
-    List<Build> getBuildDependencies(Build build);
+    List<Build> getBuildLinksTo(Build build);
 
     List<Build> searchBuildsLinkedTo(String projectName, String buildPattern);
 

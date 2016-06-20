@@ -35,7 +35,7 @@ class BuildLinkIT extends AbstractServiceTestSupport {
         }
         // The build link is created
         def targets = asUser().withView(build).withView(target).call {
-            structureService.getBuildLinks(build)
+            structureService.getBuildLinksFrom(build)
         }
         assert !targets.empty
         assert targets.find { it.name == target.name }
@@ -77,7 +77,7 @@ class BuildLinkIT extends AbstractServiceTestSupport {
         }
         // The build link is created
         def targets = asUser().withView(build).withView(target).call {
-            structureService.getBuildLinks(build)
+            structureService.getBuildLinksFrom(build)
         }
         assert !targets.empty
         assert targets.find { it.name == target.name }
@@ -87,7 +87,7 @@ class BuildLinkIT extends AbstractServiceTestSupport {
         }
         // The build link is deleted
         targets = asUser().withView(build).withView(target).call {
-            structureService.getBuildLinks(build)
+            structureService.getBuildLinksFrom(build)
         }
         assert targets.empty
     }
@@ -106,7 +106,7 @@ class BuildLinkIT extends AbstractServiceTestSupport {
         }
         // The build link is created
         def targets = asUser().withView(build).withView(target).call {
-            structureService.getBuildLinks(build)
+            structureService.getBuildLinksFrom(build)
         }
         assert !targets.empty
         assert targets.size() == 1
@@ -125,7 +125,7 @@ class BuildLinkIT extends AbstractServiceTestSupport {
         }
         // The build link is created
         def targets = asUser().withView(build).withView(target).call {
-            structureService.getBuildLinks(build)
+            structureService.getBuildLinksFrom(build)
         }
         assert !targets.empty
         assert targets.find { it.name == target.name }
@@ -155,7 +155,7 @@ class BuildLinkIT extends AbstractServiceTestSupport {
         }
         // The build link is created
         def targets = asUser().withView(build).withView(target).call {
-            structureService.getBuildLinks(build)
+            structureService.getBuildLinksFrom(build)
         }
         assert !targets.empty
         assert targets.find { it.name == target.name }
@@ -173,7 +173,7 @@ class BuildLinkIT extends AbstractServiceTestSupport {
         }
         // The build link is created
         def targets = asUser().withView(build).withView(target).call {
-            structureService.getBuildLinks(build)
+            structureService.getBuildLinksFrom(build)
         }
         assert !targets.empty
         assert targets.find { it.name == target.name }

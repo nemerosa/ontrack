@@ -468,17 +468,17 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
-    public List<Build> getBuildLinks(Build build) {
+    public List<Build> getBuildLinksFrom(Build build) {
         securityService.checkProjectFunction(build, ProjectView.class);
-        return structureRepository.getBuildLinks(build.getId()).stream()
+        return structureRepository.getBuildLinksFrom(build.getId()).stream()
                 .filter(b -> securityService.isProjectFunctionGranted(b, ProjectView.class))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<Build> getBuildDependencies(Build build) {
+    public List<Build> getBuildLinksTo(Build build) {
         securityService.checkProjectFunction(build, ProjectView.class);
-        return structureRepository.getBuildLinksFrom(build.getId()).stream()
+        return structureRepository.getBuildLinksTo(build.getId()).stream()
                 .filter(b -> securityService.isProjectFunctionGranted(b, ProjectView.class))
                 .collect(Collectors.toList());
     }

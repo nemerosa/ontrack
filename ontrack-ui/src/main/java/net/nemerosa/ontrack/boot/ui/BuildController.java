@@ -240,5 +240,62 @@ public class BuildController extends AbstractResourceController {
                 .orElse(ResponseEntity.status(HttpStatus.NO_CONTENT).body(null));
     }
 
+    /**
+     * Gets the build links FROM this build.
+     *
+     * @param buildId Build to get the links from
+     * @return List of builds
+     */
+    @RequestMapping(value = "builds/{buildId}/links/from", method = RequestMethod.GET)
+    public Resources<Build> getBuildLinksFrom(@PathVariable ID buildId) {
+        return Resources.of(
+                structureService.getBuildLinksFrom(structureService.getBuild(buildId)),
+                uri(on(getClass()).getBuildLinksFrom(buildId))
+        );
+    }
 
+    /**
+     * Gets the build links TO this build.
+     *
+     * @param buildId Build to get the links to
+     * @return List of builds
+     */
+    @RequestMapping(value = "builds/{buildId}/links/to", method = RequestMethod.GET)
+    public Resources<Build> getBuildLinksTo(@PathVariable ID buildId) {
+        return Resources.of(
+                structureService.getBuildLinksTo(structureService.getBuild(buildId)),
+                uri(on(getClass()).getBuildLinksFrom(buildId))
+        );
+    }
+
+    /**
+     * Creates a link between a build and another
+     *
+     * @param buildId       From this build...
+     * @param targetBuildId ... to this build
+     * @return List of builds
+     */
+    @RequestMapping(value = "builds/{buildId}/links/{targetBuildId}", method = RequestMethod.PUT)
+    public Build addBuildLink(@PathVariable ID buildId, @PathVariable ID targetBuildId) {
+        Build build = structureService.getBuild(buildId);
+        Build targetBuild = structureService.getBuild(targetBuildId);
+        structureService.addBuildLink(build, targetBuild);
+        return build;
+    }
+
+    /**
+     * Deletes a link between a build and another
+     *
+     * @param buildId       From this build...
+     * @param targetBuildId ... to this build
+     * @return List of builds
+     */
+    @RequestMapping(value = "builds/{buildId}/links/{targetBuildId}", method = RequestMethod.DELETE)
+    public Build deleteBuildLink(@PathVariable ID buildId, @PathVariable ID targetBuildId) {
+        Build build = structureService.getBuild(buildId);
+        Build targetBuild = structureService.getBuild(targetBuildId);
+        structureService.deleteBuildLink(build, targetBuild);
+        return build;
+    }
+    
 }
