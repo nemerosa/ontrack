@@ -14,12 +14,14 @@ import java.util.Collections;
 import static net.nemerosa.ontrack.json.JsonUtils.object;
 import static net.nemerosa.ontrack.test.TestUtils.assertJsonRead;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 
 public class StandardBuildFilterTest {
 
     private Branch branch;
     private Build build;
     private PropertyService propertyService;
+    private StructureService structureService;
     private PromotionLevel copper;
     private PromotionLevel bronze;
 
@@ -34,6 +36,8 @@ public class StandardBuildFilterTest {
         );
         copper = PromotionLevel.of(branch, new NameDescription("COPPER", ""));
         bronze = PromotionLevel.of(branch, new NameDescription("BRONZE", ""));
+        propertyService = mock(PropertyService.class);
+        structureService = mock(StructureService.class);
     }
 
     /**
@@ -56,7 +60,8 @@ public class StandardBuildFilterTest {
     public void since_promotion_level__none_before_is_accepted() {
         StandardBuildFilter filter = new StandardBuildFilter(
                 StandardBuildFilterData.of(5).withSincePromotionLevel("COPPER"),
-                propertyService
+                propertyService,
+                structureService
         );
         BuildFilterResult result = filter.filter(
                 Collections.emptyList(),
@@ -90,7 +95,8 @@ public class StandardBuildFilterTest {
     public void with_since_promotion_level__last_one_accepted() {
         StandardBuildFilter filter = new StandardBuildFilter(
                 StandardBuildFilterData.of(5).withSincePromotionLevel("BRONZE").withWithPromotionLevel("COPPER"),
-                propertyService
+                propertyService,
+                structureService
         );
         BuildFilterResult result = filter.filter(
                 Collections.emptyList(),
@@ -141,7 +147,8 @@ public class StandardBuildFilterTest {
     public void with_since_promotion_level__last_one_accepted_when_not_promoted() {
         StandardBuildFilter filter = new StandardBuildFilter(
                 StandardBuildFilterData.of(5).withSincePromotionLevel("BRONZE").withWithPromotionLevel("COPPER"),
-                propertyService
+                propertyService,
+                structureService
         );
         BuildFilterResult result = filter.filter(
                 Collections.emptyList(),
@@ -168,7 +175,8 @@ public class StandardBuildFilterTest {
     public void afterDate_nok() {
         StandardBuildFilter filter = new StandardBuildFilter(
                 StandardBuildFilterData.of(5).withAfterDate(LocalDate.of(2014, 7, 16)),
-                propertyService
+                propertyService,
+                structureService
         );
         BuildFilterResult result = filter.filter(
                 Collections.emptyList(),
@@ -185,7 +193,8 @@ public class StandardBuildFilterTest {
     public void afterDate_ok() {
         StandardBuildFilter filter = new StandardBuildFilter(
                 StandardBuildFilterData.of(5).withAfterDate(LocalDate.of(2014, 7, 12)),
-                propertyService
+                propertyService,
+                structureService
         );
         BuildFilterResult result = filter.filter(
                 Collections.emptyList(),
@@ -202,7 +211,8 @@ public class StandardBuildFilterTest {
     public void afterDate_same() {
         StandardBuildFilter filter = new StandardBuildFilter(
                 StandardBuildFilterData.of(5).withAfterDate(LocalDate.of(2014, 7, 14)),
-                propertyService
+                propertyService,
+                structureService
         );
         BuildFilterResult result = filter.filter(
                 Collections.emptyList(),
@@ -219,7 +229,8 @@ public class StandardBuildFilterTest {
     public void beforeDate_nok() {
         StandardBuildFilter filter = new StandardBuildFilter(
                 StandardBuildFilterData.of(5).withBeforeDate(LocalDate.of(2014, 7, 12)),
-                propertyService
+                propertyService,
+                structureService
         );
         BuildFilterResult result = filter.filter(
                 Collections.emptyList(),
@@ -236,7 +247,8 @@ public class StandardBuildFilterTest {
     public void beforeDate_ok() {
         StandardBuildFilter filter = new StandardBuildFilter(
                 StandardBuildFilterData.of(5).withBeforeDate(LocalDate.of(2014, 7, 16)),
-                propertyService
+                propertyService,
+                structureService
         );
         BuildFilterResult result = filter.filter(
                 Collections.emptyList(),
@@ -252,8 +264,9 @@ public class StandardBuildFilterTest {
     @Test
     public void beforeDate_same() {
         StandardBuildFilter filter = new StandardBuildFilter(
-                StandardBuildFilterData.of(5).withAfterDate(LocalDate.of(2014, 7, 14)),
-                propertyService
+                StandardBuildFilterData.of(5).withBeforeDate(LocalDate.of(2014, 7, 14)),
+                propertyService,
+                structureService
         );
         BuildFilterResult result = filter.filter(
                 Collections.emptyList(),
