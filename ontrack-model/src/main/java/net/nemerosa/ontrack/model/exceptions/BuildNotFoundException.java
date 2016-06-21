@@ -11,4 +11,8 @@ public class BuildNotFoundException extends NotFoundException {
     public BuildNotFoundException(String project, String branch, String build) {
         super("Build not found: %s/%s/%s", project, branch, build);
     }
+
+    public BuildNotFoundException(String project, String build) {
+        super("Build not found: %s/%s", project, build);
+    }
 }

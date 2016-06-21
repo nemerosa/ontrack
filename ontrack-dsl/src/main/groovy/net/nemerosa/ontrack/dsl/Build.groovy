@@ -161,10 +161,10 @@ class Build extends AbstractProjectResource {
                 link('buildLinks'),
                 [
                         addOnly: true,
-                        links  : [
+                        links  : [[
                                 project: project,
                                 build  : build,
-                        ]
+                        ]]
                 ]
         )
     }

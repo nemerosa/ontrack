@@ -13,10 +13,7 @@ import net.nemerosa.ontrack.model.buildfilter.BuildFilterResult;
 import net.nemerosa.ontrack.model.buildfilter.DefaultBuildFilter;
 import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventPostService;
-import net.nemerosa.ontrack.model.exceptions.BranchTemplateCannotHaveBuildException;
-import net.nemerosa.ontrack.model.exceptions.PromotionLevelNotFoundException;
-import net.nemerosa.ontrack.model.exceptions.ReorderingSizeException;
-import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException;
+import net.nemerosa.ontrack.model.exceptions.*;
 import net.nemerosa.ontrack.model.extension.PromotionLevelPropertyType;
 import net.nemerosa.ontrack.model.extension.ValidationStampPropertyType;
 import net.nemerosa.ontrack.model.security.*;
@@ -504,20 +501,22 @@ public class StructureServiceImpl implements StructureService {
         // Loops through the new links
         form.getLinks().forEach(item -> {
             // Gets the project if possible
-            findProjectByName(item.getProject()).ifPresent(project -> {
-                // Finds the build if possible (exact match - no regex)
-                List<Build> builds = buildSearch(project.getId(), new BuildSearchForm()
-                        .withMaximumCount(1)
-                        .withBuildName(item.getBuild())
-                        .withBuildExactMatch(true)
-                );
-                if (!builds.isEmpty()) {
-                    Build target = builds.get(0);
-                    // Adds the link
-                    addBuildLink(build, target);
-                    addedLinks.add(target.getId());
-                }
-            });
+            Project project = findProjectByName(item.getProject())
+                    .orElseThrow(() -> new ProjectNotFoundException(item.getProject()));
+            // Finds the build if possible (exact match - no regex)
+            List<Build> builds = buildSearch(project.getId(), new BuildSearchForm()
+                    .withMaximumCount(1)
+                    .withBuildName(item.getBuild())
+                    .withBuildExactMatch(true)
+            );
+            if (!builds.isEmpty()) {
+                Build target = builds.get(0);
+                // Adds the link
+                addBuildLink(build, target);
+                addedLinks.add(target.getId());
+            } else {
+                throw new BuildNotFoundException(item.getProject(), item.getBuild());
+            }
         });
         // Deletes all authorised links which were not added again
         if (!form.isAddOnly()) {

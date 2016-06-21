@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.general
 
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
+import net.nemerosa.ontrack.model.exceptions.ProjectNotFoundException
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.BuildLinkForm
 import net.nemerosa.ontrack.model.structure.BuildLinkFormItem
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
 
 import static net.nemerosa.ontrack.model.structure.NameDescription.nd
+import static net.nemerosa.ontrack.test.TestUtils.uid
 import static org.junit.Assert.assertEquals
 
 class BuildLinkIT extends AbstractServiceTestSupport {
@@ -24,6 +27,50 @@ class BuildLinkIT extends AbstractServiceTestSupport {
 
     @Autowired
     private AccountService accountService
+
+    @Test(expected = ProjectNotFoundException)
+    void 'Edition of links - project not found at all'() {
+        def source = doCreateBuild()
+        asUser().with(source, BuildConfig).call {
+            // Adds the link using a form
+            structureService.editBuildLinks(
+                    source,
+                    new BuildLinkForm(false, [
+                            new BuildLinkFormItem(uid('P'), 'xxx'),
+                    ])
+            )
+        }
+    }
+
+    @Test(expected = ProjectNotFoundException)
+    void 'Edition of links - project not authorised'() {
+        def source = doCreateBuild()
+        def target = doCreateBuild()
+        asUser().with(source, BuildConfig).call {
+            // Adds the link using a form
+            structureService.editBuildLinks(
+                    source,
+                    new BuildLinkForm(false, [
+                            new BuildLinkFormItem(target.project.name, target.name),
+                    ])
+            )
+        }
+    }
+
+    @Test(expected = BuildNotFoundException)
+    void 'Edition of links - build not found'() {
+        def source = doCreateBuild()
+        def target = doCreateProject()
+        asUser().with(source, BuildConfig).withView(target).call {
+            // Adds the link using a form
+            structureService.editBuildLinks(
+                    source,
+                    new BuildLinkForm(false, [
+                            new BuildLinkFormItem(target.name, 'xxx'),
+                    ])
+            )
+        }
+    }
 
     @Test
     void 'Edition of links - full rights - adding one link'() {
