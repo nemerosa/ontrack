@@ -87,7 +87,7 @@ class ACCDSLBuildLinks extends AbstractACCDSL {
         // Gets the links
         def buildLinks = ontrack.build(p1, 'B1', '1.0').buildLinks
 
-        def collect = buildLinks.collect { [it.project, it.name, it.link('page')] }
+        def collect = buildLinks.collect { [it.project, it.name, it.page] }
         println collect
         assert collect == [
                 [p1, '1.1', "${baseURL}/#/build/${b111}"],

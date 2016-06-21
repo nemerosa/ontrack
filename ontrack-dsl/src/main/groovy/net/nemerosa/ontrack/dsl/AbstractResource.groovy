@@ -23,6 +23,10 @@ class AbstractResource {
         }
     }
 
+    public String getPage() {
+        return link('page')
+    }
+
     public String optionalLink(String name) {
         String linkName = name.startsWith('_') ? name : '_' + name
         if (node[linkName]) {
