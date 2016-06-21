@@ -135,6 +135,18 @@ public class BuildFilterServiceImpl implements BuildFilterService {
             data = data.withSincePropertyValue(sincePropertyValue);
             return this;
         }
+
+        @Override
+        public StandardFilterBuilder withLinkedFrom(String linkedFrom) {
+            data = data.withLinkedFrom(linkedFrom);
+            return this;
+        }
+
+        @Override
+        public StandardFilterBuilder withLinkedTo(String linkedTo) {
+            data = data.withLinkedTo(linkedTo);
+            return this;
+        }
     }
 
     @Override
