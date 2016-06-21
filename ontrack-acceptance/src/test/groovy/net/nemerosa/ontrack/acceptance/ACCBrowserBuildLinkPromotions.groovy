@@ -37,7 +37,7 @@ class ACCBrowserBuildLinkPromotions extends AcceptanceTestClient {
 
         // Link from another build
         def build2 = ontrack.build(projectName, 'B', '2')
-        build2.config.buildLink projectName, '1'
+        build2.buildLink projectName, '1'
 
         // Goes to the build page
         browser { browser ->
