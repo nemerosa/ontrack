@@ -154,7 +154,7 @@ angular.module('ot.view.build', [
 
         // Management of build links
         function manageBuildLinks() {
-            otStructureService.create($scope.build._buildLinks, 'Build links').then(loadBuild);
+            otStructureService.update($scope.build._buildLinks, 'Build links').then(loadBuild);
         }
 
         // Promotion

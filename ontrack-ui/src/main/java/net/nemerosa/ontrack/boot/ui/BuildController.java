@@ -274,7 +274,7 @@ public class BuildController extends AbstractResourceController {
     @RequestMapping(value = "builds/{buildId}/links", method = RequestMethod.GET)
     public Form getBuildLinkForm(@PathVariable ID buildId) {
         // Gets the form values
-        List<BuildLinkFormItem> items = structureService.getBuildLinksTo(structureService.getBuild(buildId))
+        List<BuildLinkFormItem> items = structureService.getBuildLinksFrom(structureService.getBuild(buildId))
                 .stream()
                 .map(build -> new BuildLinkFormItem(build.getProject().getName(), build.getName()))
                 .collect(Collectors.toList());
