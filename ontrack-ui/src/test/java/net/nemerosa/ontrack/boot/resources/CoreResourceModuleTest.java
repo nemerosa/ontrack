@@ -586,7 +586,6 @@ public class CoreResourceModuleTest {
                         .with("_next", "urn:test:net.nemerosa.ontrack.boot.ui.BuildController#getNextBuild:1")
                         .with("_buildLinksFrom", "urn:test:net.nemerosa.ontrack.boot.ui.BuildController#getBuildLinksFrom:1")
                         .with("_buildLinksTo", "urn:test:net.nemerosa.ontrack.boot.ui.BuildController#getBuildLinksTo:1")
-                        .with("_buildLinks", "urn:test:net.nemerosa.ontrack.boot.ui.BuildController#getBuildLinkForm:1")
                         .with("_page", "urn:test:#:entity:BUILD:1")
                         .end(),
                 build
