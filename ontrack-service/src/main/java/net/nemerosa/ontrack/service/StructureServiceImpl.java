@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 import static net.nemerosa.ontrack.model.structure.Entity.isEntityDefined;
 import static net.nemerosa.ontrack.model.structure.Entity.isEntityNew;
 import static net.nemerosa.ontrack.service.ImageHelper.checkImage;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Service
 @Transactional
@@ -415,6 +416,20 @@ public class StructureServiceImpl implements StructureService {
                         build,
                         form.getProperty(),
                         form.getPropertyValue());
+            }
+            // Linked from
+            String linkedFrom = form.getLinkedFrom();
+            if (accept && isNotBlank(linkedFrom)) {
+                String projectName = StringUtils.substringBefore(linkedFrom, ":");
+                String buildPattern = StringUtils.substringAfter(linkedFrom, ":");
+                accept = isLinkedFrom(build, projectName, buildPattern);
+            }
+            // Linked to
+            String linkedTo = form.getLinkedTo();
+            if (accept && isNotBlank(linkedTo)) {
+                String projectName = StringUtils.substringBefore(linkedTo, ":");
+                String buildPattern = StringUtils.substringAfter(linkedTo, ":");
+                accept = isLinkedTo(build, projectName, buildPattern);
             }
             // Accepting the build into the list?
             if (accept) {

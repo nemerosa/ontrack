@@ -7,10 +7,7 @@ import net.nemerosa.ontrack.model.exceptions.ProjectNotFoundException
 import net.nemerosa.ontrack.model.security.BuildConfig
 import net.nemerosa.ontrack.model.security.BuildCreate
 import net.nemerosa.ontrack.model.security.BuildEdit
-import net.nemerosa.ontrack.model.structure.Branch
-import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.model.structure.BuildLinkForm
-import net.nemerosa.ontrack.model.structure.BuildLinkFormItem
+import net.nemerosa.ontrack.model.structure.*
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
@@ -504,6 +501,84 @@ class BuildLinkIT extends AbstractServiceTestSupport {
             def builds = structureService.getFilteredBuilds(
                     target.id,
                     buildFilterService.standardFilter(10).withLinkedFrom(pattern).build()
+            )
+            assert expected*.id == builds*.id
+        }
+    }
+
+    @Test
+    void 'Project search on build linked from'() {
+        // Source branch
+        def source = doCreateBranch()
+        def b1 = doCreateBuild(source, nd('1.0.0', ''))
+        def b2 = doCreateBuild(source, nd('1.1.0', ''))
+        // Target branch
+        def target = doCreateBranch()
+        def t1 = doCreateBuild(target, nd('2.0.0', ''))
+        def t2 = doCreateBuild(target, nd('2.1.0', ''))
+        // Creates links
+        asUser().withView(target).with(source, BuildConfig).call {
+            structureService.addBuildLink(b1, t1)
+            structureService.addBuildLink(b2, t2)
+        }
+        // Standard filter on project
+        assertProjectLinkedFromFilter source, target, source.project.name, [t2, t1]
+        // Standard filter on project and all builds
+        assertProjectLinkedFromFilter source, target, "${source.project.name}:", [t2, t1]
+        // Standard filter on project and all builds, using *
+        assertProjectLinkedFromFilter source, target, "${source.project.name}:*", [t2, t1]
+        // Standard filter on project and common build prefix
+        assertProjectLinkedFromFilter source, target, "${source.project.name}:1*", [t2, t1]
+        // Standard filter on project and prefix for one
+        assertProjectLinkedFromFilter source, target, "${source.project.name}:1.0*", [t1]
+        // Standard filter on project and exact build
+        assertProjectLinkedFromFilter source, target, "${source.project.name}:1.0.0", [t1]
+    }
+
+    private void assertProjectLinkedFromFilter(Branch source, Branch target, String pattern, List<Build> expected) {
+        asUserWithView(source, target).call {
+            def builds = structureService.buildSearch(
+                    target.project.id,
+                    new BuildSearchForm().withLinkedFrom(pattern)
+            )
+            assert expected*.id == builds*.id
+        }
+    }
+
+    @Test
+    void 'Project search on linked to'() {
+        // Source branch
+        def source = doCreateBranch()
+        def b1 = doCreateBuild(source, nd('1.0.0', ''))
+        def b2 = doCreateBuild(source, nd('1.1.0', ''))
+        // Target branch
+        def target = doCreateBranch()
+        def t1 = doCreateBuild(target, nd('2.0.0', ''))
+        def t2 = doCreateBuild(target, nd('2.1.0', ''))
+        // Creates links
+        asUser().withView(target).with(source, BuildConfig).call {
+            structureService.addBuildLink(b1, t1)
+            structureService.addBuildLink(b2, t2)
+        }
+        // Standard filter on project
+        assertProjectLinkedToFilter source, target, target.project.name, [b2, b1]
+        // Standard filter on project and all builds
+        assertProjectLinkedToFilter source, target, "${target.project.name}:", [b2, b1]
+        // Standard filter on project and all builds, using *
+        assertProjectLinkedToFilter source, target, "${target.project.name}:*", [b2, b1]
+        // Standard filter on project and common build prefix
+        assertProjectLinkedToFilter source, target, "${target.project.name}:2*", [b2, b1]
+        // Standard filter on project and prefix for one
+        assertProjectLinkedToFilter source, target, "${target.project.name}:2.0*", [b1]
+        // Standard filter on project and exact build
+        assertProjectLinkedToFilter source, target, "${target.project.name}:2.0.0", [b1]
+    }
+
+    private void assertProjectLinkedToFilter(Branch source, Branch target, String pattern, List<Build> expected) {
+        asUserWithView(source, target).call {
+            def builds = structureService.buildSearch(
+                    source.project.id,
+                    new BuildSearchForm().withLinkedTo(pattern)
             )
             assert expected*.id == builds*.id
         }
