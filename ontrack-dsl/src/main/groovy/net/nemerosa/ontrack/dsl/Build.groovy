@@ -160,8 +160,11 @@ class Build extends AbstractProjectResource {
         ontrack.put(
                 link('buildLinks'),
                 [
-                        project: project,
-                        build  : build,
+                        addOnly: true,
+                        links  : [
+                                project: project,
+                                build  : build,
+                        ]
                 ]
         )
     }

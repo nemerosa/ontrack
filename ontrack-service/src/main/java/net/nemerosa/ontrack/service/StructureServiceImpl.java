@@ -520,13 +520,15 @@ public class StructureServiceImpl implements StructureService {
             });
         });
         // Deletes all authorised links which were not added again
-        // Other links, not authorised to view, were not subject to edition and are not visible
-        Set<ID> linksToDelete = new HashSet<>(authorisedExistingLinks);
-        linksToDelete.removeAll(addedLinks);
-        linksToDelete.forEach(id -> deleteBuildLink(
-                build,
-                getBuild(id)
-        ));
+        if (!form.isAddOnly()) {
+            // Other links, not authorised to view, were not subject to edition and are not visible
+            Set<ID> linksToDelete = new HashSet<>(authorisedExistingLinks);
+            linksToDelete.removeAll(addedLinks);
+            linksToDelete.forEach(id -> deleteBuildLink(
+                    build,
+                    getBuild(id)
+            ));
+        }
     }
 
     @Override
