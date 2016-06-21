@@ -2,10 +2,11 @@ package net.nemerosa.ontrack.model.structure;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class BuildLinkForm {
 
-    private final String project;
-    private final String build;
+    private final List<BuildLinkFormItem> links;
 
 }

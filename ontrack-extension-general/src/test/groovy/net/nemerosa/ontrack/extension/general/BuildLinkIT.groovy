@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.general
 
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.security.*
+import net.nemerosa.ontrack.model.structure.BuildLinkForm
+import net.nemerosa.ontrack.model.structure.BuildLinkFormItem
 import net.nemerosa.ontrack.model.structure.PropertyService
 import net.nemerosa.ontrack.model.structure.SearchResult
 import org.junit.Test
@@ -22,6 +24,116 @@ class BuildLinkIT extends AbstractServiceTestSupport {
 
     @Autowired
     private AccountService accountService
+
+    @Test
+    void 'Edition of links - full rights - adding one link'() {
+        def source = doCreateBuild()
+        def target1 = doCreateBuild()
+        def target2 = doCreateBuild()
+        def target3 = doCreateBuild()
+        asUser().with(source, BuildConfig).withView(target1).call {
+            structureService.addBuildLink(source, target1)
+        }
+        asUser().with(source, BuildConfig).withView(target2).call {
+            structureService.addBuildLink(source, target2)
+        }
+        asUser().with(source, BuildConfig).withView(target1).withView(target2).withView(target3).call {
+            // Adds the link using a form
+            structureService.editBuildLinks(
+                    source,
+                    new BuildLinkForm([
+                            new BuildLinkFormItem(target1.project.name, target1.name), // Existing
+                            new BuildLinkFormItem(target2.project.name, target2.name), // Existing
+                            new BuildLinkFormItem(target3.project.name, target3.name), // New
+                    ])
+            )
+            // Checks all builds are still linked
+            assert [target1.id, target2.id, target3.id] as Set == structureService.getBuildLinksFrom(source)*.id as Set
+        }
+    }
+
+    @Test
+    void 'Edition of links - full rights - adding and removing'() {
+        def source = doCreateBuild()
+        def target1 = doCreateBuild()
+        def target2 = doCreateBuild()
+        def target3 = doCreateBuild()
+        asUser().with(source, BuildConfig).withView(target1).call {
+            structureService.addBuildLink(source, target1)
+        }
+        asUser().with(source, BuildConfig).withView(target2).call {
+            structureService.addBuildLink(source, target2)
+        }
+        asUser().with(source, BuildConfig).withView(target1).withView(target2).withView(target3).call {
+            // Adds the link using a form
+            structureService.editBuildLinks(
+                    source,
+                    new BuildLinkForm([
+                            new BuildLinkFormItem(target1.project.name, target1.name), // Existing
+                            // new BuildLinkFormItem(target2.project.name, target2.name), // Removing
+                            new BuildLinkFormItem(target3.project.name, target3.name), // New
+                    ])
+            )
+            // Checks all builds are still linked
+            assert [target1.id, target3.id] as Set == structureService.getBuildLinksFrom(source)*.id as Set
+        }
+    }
+
+    @Test
+    void 'Edition of links - partial rights - adding one link'() {
+        def source = doCreateBuild()
+        def target1 = doCreateBuild()
+        def target2 = doCreateBuild()
+        def target3 = doCreateBuild()
+        asUser().with(source, BuildConfig).withView(target1).call {
+            structureService.addBuildLink(source, target1)
+        }
+        asUser().with(source, BuildConfig).withView(target2).call {
+            structureService.addBuildLink(source, target2)
+        }
+        asUser().with(source, BuildConfig).withView(target1).withView(target3).call {
+            // Adds the link using a form
+            structureService.editBuildLinks(
+                    source,
+                    new BuildLinkForm([
+                            new BuildLinkFormItem(target1.project.name, target1.name), // Existing
+                            new BuildLinkFormItem(target3.project.name, target3.name), // New
+                    ])
+            )
+        }
+        asUser().with(source, BuildConfig).withView(target1).withView(target2).withView(target3).call {
+            // Checks all builds are still linked
+            assert [target1.id, target2.id, target3.id] as Set == structureService.getBuildLinksFrom(source)*.id as Set
+        }
+    }
+
+    @Test
+    void 'Edition of links - partial rights - adding and removing'() {
+        def source = doCreateBuild()
+        def target1 = doCreateBuild()
+        def target2 = doCreateBuild()
+        def target3 = doCreateBuild()
+        asUser().with(source, BuildConfig).withView(target1).call {
+            structureService.addBuildLink(source, target1)
+        }
+        asUser().with(source, BuildConfig).withView(target2).call {
+            structureService.addBuildLink(source, target2)
+        }
+        asUser().with(source, BuildConfig).withView(target1).withView(target3).call {
+            // Adds the link using a form
+            structureService.editBuildLinks(
+                    source,
+                    new BuildLinkForm([
+                            // new BuildLinkFormItem(target1.project.name, target1.name), // Removing
+                            new BuildLinkFormItem(target3.project.name, target3.name), // New
+                    ])
+            )
+        }
+        asUser().with(source, BuildConfig).withView(target1).withView(target2).withView(target3).call {
+            // Checks all builds are still linked
+            assert [target2.id, target3.id] as Set == structureService.getBuildLinksFrom(source)*.id as Set
+        }
+    }
 
     @Test
     void 'Automation role can create links'() {

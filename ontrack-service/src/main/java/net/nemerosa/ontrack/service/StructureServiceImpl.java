@@ -32,10 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -391,7 +388,11 @@ public class StructureServiceImpl implements StructureService {
                     || Utils.safeRegexMatch(form.getBranchName(), build.getBranch().getName());
             // Build name
             if (accept && StringUtils.isNotBlank(form.getBuildName())) {
-                accept = Utils.safeRegexMatch(form.getBuildName(), build.getName());
+                if (form.isBuildExactMatch()) {
+                    accept = StringUtils.equals(form.getBuildName(), build.getName());
+                } else {
+                    accept = Utils.safeRegexMatch(form.getBuildName(), build.getName());
+                }
             }
             // Promotion name
             if (accept && StringUtils.isNotBlank(form.getPromotionName())) {
@@ -489,6 +490,43 @@ public class StructureServiceImpl implements StructureService {
                 .stream()
                 .filter(b -> securityService.isProjectFunctionGranted(b, ProjectView.class))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void editBuildLinks(Build build, BuildLinkForm form) {
+        securityService.checkProjectFunction(build, BuildConfig.class);
+        // Gets the existing links, with authorisations
+        Set<ID> authorisedExistingLinks = getBuildLinksFrom(build).stream()
+                .map(Build::getId)
+                .collect(Collectors.toSet());
+        // Added links
+        Set<ID> addedLinks = new HashSet<>();
+        // Loops through the new links
+        form.getLinks().forEach(item -> {
+            // Gets the project if possible
+            findProjectByName(item.getProject()).ifPresent(project -> {
+                // Finds the build if possible (exact match - no regex)
+                List<Build> builds = buildSearch(project.getId(), new BuildSearchForm()
+                        .withMaximumCount(1)
+                        .withBuildName(item.getBuild())
+                        .withBuildExactMatch(true)
+                );
+                if (!builds.isEmpty()) {
+                    Build target = builds.get(0);
+                    // Adds the link
+                    addBuildLink(build, target);
+                    addedLinks.add(target.getId());
+                }
+            });
+        });
+        // Deletes all authorised links which were not added again
+        // Other links, not authorised to view, were not subject to edition and are not visible
+        Set<ID> linksToDelete = new HashSet<>(authorisedExistingLinks);
+        linksToDelete.removeAll(addedLinks);
+        linksToDelete.forEach(id -> deleteBuildLink(
+                build,
+                getBuild(id)
+        ));
     }
 
     @Override

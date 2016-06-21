@@ -27,6 +27,8 @@ public class BuildSearchForm {
     @Size(max = 40)
     @Wither
     private String propertyValue;
+    @Wither
+    private boolean buildExactMatch;
 
     public BuildSearchForm() {
     }

@@ -90,6 +90,8 @@ public interface StructureService {
 
     List<Build> searchBuildsLinkedTo(String projectName, String buildPattern);
 
+    void editBuildLinks(Build build, BuildLinkForm form);
+
     /**
      * Looks for the first build which matches a given predicate.
      *

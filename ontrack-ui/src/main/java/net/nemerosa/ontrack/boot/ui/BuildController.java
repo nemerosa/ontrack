@@ -3,11 +3,7 @@ package net.nemerosa.ontrack.boot.ui;
 import net.nemerosa.ontrack.extension.api.BuildDiffExtension;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.Ack;
-import net.nemerosa.ontrack.model.exceptions.ProjectNotFoundException;
-import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.form.Int;
-import net.nemerosa.ontrack.model.form.Selection;
-import net.nemerosa.ontrack.model.form.Text;
+import net.nemerosa.ontrack.model.form.*;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.Action;
@@ -277,9 +273,23 @@ public class BuildController extends AbstractResourceController {
      */
     @RequestMapping(value = "builds/{buildId}/links", method = RequestMethod.GET)
     public Form getBuildLinkForm(@PathVariable ID buildId) {
+        // Gets the form values
+        List<BuildLinkFormItem> items = structureService.getBuildLinksTo(structureService.getBuild(buildId))
+                .stream()
+                .map(build -> new BuildLinkFormItem(build.getProject().getName(), build.getName()))
+                .collect(Collectors.toList());
+        // Creates the form
         return Form.create()
-                .with(Text.of("project").label("Project name"))
-                .with(Text.of("build").label("Build name"));
+                .with(
+                        MultiForm.of(
+                                "links",
+                                Form.create()
+                                        .with(Text.of("project").label("Project name"))
+                                        .with(Text.of("build").label("Build name"))
+                        )
+                                .label("Links")
+                                .value(items)
+                );
     }
 
     /**
@@ -291,16 +301,7 @@ public class BuildController extends AbstractResourceController {
     @RequestMapping(value = "builds/{buildId}/links", method = RequestMethod.PUT)
     public Build createBuildLinkFromForm(@PathVariable ID buildId, @RequestBody BuildLinkForm form) {
         Build build = structureService.getBuild(buildId);
-        Project targetProject = structureService.findProjectByName(form.getProject())
-                .orElseThrow(() -> new ProjectNotFoundException(form.getProject()));
-        List<Build> targetBuilds = structureService.buildSearch(
-                targetProject.getId(),
-                new BuildSearchForm().withBuildName(form.getBuild())
-        );
-        if (targetBuilds.size() == 1) {
-            structureService.addBuildLink(build, targetBuilds.get(0));
-        }
-        // OK
+        structureService.editBuildLinks(build, form);
         return build;
     }
 
