@@ -506,4 +506,38 @@ class BuildLinkIT extends AbstractServiceTestSupport {
         ]
     }
 
+    @Test
+    void 'Testing the links'() {
+        // Creates all builds
+        def b1 = doCreateBuild()
+        def b2 = doCreateBuild()
+        def t1 = doCreateBuild()
+        def t2 = doCreateBuild()
+        // Creates the links
+        asUser().with(b1, BuildConfig).withView(t1).withView(t2).call {
+            structureService.addBuildLink(b1, t1)
+            structureService.addBuildLink(b1, t2)
+        }
+        asUser().with(b2, BuildConfig).withView(t2).call {
+            structureService.addBuildLink(b2, t2)
+        }
+        // With full rights
+        asUserWithView(b1, b2, t1, t2).call {
+            assert structureService.isLinkedTo(b1, t1.project.name, '')
+            assert structureService.isLinkedTo(b1, t2.project.name, '')
+            assert structureService.isLinkedTo(b1, t1.project.name, t1.name)
+            assert structureService.isLinkedTo(b1, t2.project.name, t2.name)
+            assert structureService.isLinkedTo(b1, t1.project.name, t1.name.substring(0, 5) + '*')
+            assert structureService.isLinkedTo(b1, t2.project.name, t2.name.substring(0, 5) + '*')
+
+            assert structureService.isLinkedFrom(t2, b1.project.name, '')
+            assert structureService.isLinkedFrom(t2, b1.project.name, b1.name)
+            assert structureService.isLinkedFrom(t2, b1.project.name, b1.name.substring(0, 5) + '*')
+
+            assert structureService.isLinkedFrom(t2, b2.project.name, '')
+            assert structureService.isLinkedFrom(t2, b2.project.name, b2.name)
+            assert structureService.isLinkedFrom(t2, b2.project.name, b2.name.substring(0, 5) + '*')
+        }
+    }
+
 }

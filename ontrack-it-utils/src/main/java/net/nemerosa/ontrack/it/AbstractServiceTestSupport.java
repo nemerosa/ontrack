@@ -130,6 +130,14 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
         return new UserCall();
     }
 
+    protected UserCall asUserWithView(ProjectEntity... entities) {
+        UserCall user = asUser();
+        for (ProjectEntity entity : entities) {
+            user = user.withView(entity);
+        }
+        return user;
+    }
+
     protected AccountCall asAccount(Account account) {
         return new AccountCall(account);
     }

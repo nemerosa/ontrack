@@ -61,7 +61,7 @@ public class BuildFilterServiceImpl implements BuildFilterService {
 
         @Override
         public BuildFilter build() {
-            return new StandardBuildFilter(data, propertyService);
+            return new StandardBuildFilter(data, propertyService, structureService);
         }
 
         @Override

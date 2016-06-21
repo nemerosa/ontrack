@@ -37,8 +37,12 @@ public class StandardBuildFilterData implements StandardFilterDataBuilder<Standa
     private final String sinceProperty;
     @Wither
     private final String sincePropertyValue;
+    @Wither
+    private final String linkedFrom;
+    @Wither
+    private final String linkedTo;
 
     public static StandardBuildFilterData of(int count) {
-        return new StandardBuildFilterData(count, null, null, null, null, null, null, null, null, null, null, null, null);
+        return new StandardBuildFilterData(count, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     }
 }

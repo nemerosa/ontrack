@@ -92,6 +92,10 @@ public interface StructureService {
 
     void editBuildLinks(Build build, BuildLinkForm form);
 
+    boolean isLinkedFrom(Build build, String project, String buildPattern);
+
+    boolean isLinkedTo(Build build, String project, String buildPattern);
+
     /**
      * Looks for the first build which matches a given predicate.
      *

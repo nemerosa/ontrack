@@ -364,7 +364,8 @@ public class StructureServiceImpl implements StructureService {
                 branchId,
                 new StandardBuildFilter(
                         StandardBuildFilterData.of(1),
-                        propertyService
+                        propertyService,
+                        this
                 )
         ).stream().findFirst();
     }
@@ -528,6 +529,18 @@ public class StructureServiceImpl implements StructureService {
                     getBuild(id)
             ));
         }
+    }
+
+    @Override
+    public boolean isLinkedFrom(Build build, String project, String buildPattern) {
+        securityService.checkProjectFunction(build, ProjectView.class);
+        return structureRepository.isLinkedFrom(build.getId(), project, buildPattern);
+    }
+
+    @Override
+    public boolean isLinkedTo(Build build, String project, String buildPattern) {
+        securityService.checkProjectFunction(build, ProjectView.class);
+        return structureRepository.isLinkedTo(build.getId(), project, buildPattern);
     }
 
     @Override
