@@ -59,7 +59,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             // Allows all at Web level
             .authorizeRequests()
                 .antMatchers("/**").permitAll()
-                .anyRequest().authenticated()
             // Remember be authentication token
             .and().rememberMe()
                 .rememberMeServices(rememberMeServices(rememberBeKey))
