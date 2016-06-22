@@ -58,6 +58,10 @@ public class JobStatus {
                 && valid;
     }
 
+    public boolean isError() {
+        return lastErrorCount > 0;
+    }
+
     public boolean canBeDeleted() {
         return !valid;
     }
