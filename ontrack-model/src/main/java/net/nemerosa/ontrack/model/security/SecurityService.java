@@ -31,6 +31,13 @@ public interface SecurityService {
     Account getCurrentAccount();
 
     /**
+     * Is the current user logged?
+     */
+    default boolean isLogged() {
+        return getCurrentAccount() != null;
+    }
+
+    /**
      * Returns the current logged account as an option
      */
     default Optional<Account> getAccount() {
