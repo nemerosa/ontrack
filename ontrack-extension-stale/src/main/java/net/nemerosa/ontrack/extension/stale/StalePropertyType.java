@@ -12,21 +12,20 @@ import net.nemerosa.ontrack.model.form.Int;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.model.support.StartupService;
+import net.nemerosa.ontrack.model.support.JobProvider;
+import net.nemerosa.ontrack.model.support.JobRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
-public class StalePropertyType extends AbstractPropertyType<StaleProperty> implements StartupService {
+public class StalePropertyType extends AbstractPropertyType<StaleProperty> implements JobProvider {
 
     public static final JobType STALE_BRANCH_JOB =
             JobCategory.of("cleanup").withName("Cleanup")
@@ -118,7 +117,13 @@ public class StalePropertyType extends AbstractPropertyType<StaleProperty> imple
 
     @Override
     public void onPropertyChanged(ProjectEntity entity, StaleProperty value) {
-        scheduleStaleBranchJob((Project) entity);
+        if (propertyService.hasProperty(entity.getProject(), StalePropertyType.class)) {
+            JobRegistration job = createStaleJob(entity.getProject());
+            jobScheduler.schedule(
+                    job.getJob(),
+                    job.getSchedule()
+            );
+        }
     }
 
     @Override
@@ -127,61 +132,51 @@ public class StalePropertyType extends AbstractPropertyType<StaleProperty> imple
     }
 
     @Override
-    public int startupOrder() {
-        return JOB_REGISTRATION;
-    }
-
-    @Override
-    public void start() {
+    public Collection<JobRegistration> getStartingJobs() {
         // Gets all projects...
-        structureService.getProjectList().stream()
+        return structureService.getProjectList().stream()
                 // ... which have a StaleProperty
                 .filter(project -> propertyService.hasProperty(project, StalePropertyType.class))
                 // ... and associates a job with them
-                .forEach(this::scheduleStaleBranchJob);
-    }
-
-    protected void scheduleStaleBranchJob(Project project) {
-        if (propertyService.hasProperty(project, StalePropertyType.class)) {
-            jobScheduler.schedule(
-                    createStaleJob(project),
-                    Schedule.EVERY_DAY
-            );
-        }
+                .map(this::createStaleJob)
+                // OK
+                .collect(Collectors.toList());
     }
 
     protected void unscheduleStaleBranchJob(Project project) {
         jobScheduler.unschedule(getStaleJobKey(project));
     }
 
-    protected Job createStaleJob(Project project) {
-        return new Job() {
+    protected JobRegistration createStaleJob(Project project) {
+        return JobRegistration.of(
+                new Job() {
 
-            @Override
-            public JobKey getKey() {
-                return getStaleJobKey(project);
-            }
+                    @Override
+                    public JobKey getKey() {
+                        return getStaleJobKey(project);
+                    }
 
-            @Override
-            public JobRun getTask() {
-                return runListener -> detectAndManageStaleBranches(runListener, project);
-            }
+                    @Override
+                    public JobRun getTask() {
+                        return runListener -> detectAndManageStaleBranches(runListener, project);
+                    }
 
-            @Override
-            public String getDescription() {
-                return "Detection and management of stale branches for " + project.getName();
-            }
+                    @Override
+                    public String getDescription() {
+                        return "Detection and management of stale branches for " + project.getName();
+                    }
 
-            @Override
-            public boolean isDisabled() {
-                return project.isDisabled();
-            }
+                    @Override
+                    public boolean isDisabled() {
+                        return project.isDisabled();
+                    }
 
-            @Override
-            public boolean isValid() {
-                return propertyService.hasProperty(project, StalePropertyType.class);
-            }
-        };
+                    @Override
+                    public boolean isValid() {
+                        return propertyService.hasProperty(project, StalePropertyType.class);
+                    }
+                }
+        ).withSchedule(Schedule.EVERY_DAY);
     }
 
     protected JobKey getStaleJobKey(Project project) {
@@ -225,13 +220,13 @@ public class StalePropertyType extends AbstractPropertyType<StaleProperty> imple
                 runListener.message("Scanning %s project for stale branches", project.getName());
                 trace(project, "Scanning project for stale branches");
                 structureService.getBranchesForProject(project.getId()).forEach(
-                        branch -> detectAndManageStaleBranch(branch, disablingTime, deletionTime)
+                        branch -> detectAndManageStaleBranch(branch, disablingTime, deletionTime.orElse(null))
                 );
             }
         });
     }
 
-    protected void detectAndManageStaleBranch(Branch branch, LocalDateTime disablingTime, Optional<LocalDateTime> deletionTime) {
+    protected void detectAndManageStaleBranch(Branch branch, LocalDateTime disablingTime, LocalDateTime deletionTime) {
         trace(branch.getProject(), "[%s] Scanning branch for staleness", branch.getName());
         // Templates are excluded
         if (branch.getType() == BranchType.TEMPLATE_DEFINITION) {
@@ -265,7 +260,7 @@ public class StalePropertyType extends AbstractPropertyType<StaleProperty> imple
         // Logging
         trace(branch.getProject(), "[%s] Branch last build activity: %s", branch.getName(), lastTime);
         // Deletion?
-        if (deletionTime.isPresent() && deletionTime.get().compareTo(lastTime) > 0) {
+        if (deletionTime != null && deletionTime.compareTo(lastTime) > 0) {
             trace(branch.getProject(), "[%s] Branch due for deletion", branch.getName());
             structureService.deleteBranch(branch.getId());
         } else if (disablingTime.compareTo(lastTime) > 0 && !branch.isDisabled()) {
