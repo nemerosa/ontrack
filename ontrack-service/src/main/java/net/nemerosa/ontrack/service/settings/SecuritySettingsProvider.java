@@ -22,7 +22,7 @@ public class SecuritySettingsProvider implements SettingsProvider<SecuritySettin
                 /**
                  * By default, grants view accesses to everybody.
                  */
-                .withGrantProjectViewToAll(settingsRepository.getBoolean(SecuritySettings.class, "grantProjectViewToAll", false));
+                .withGrantProjectViewToAll(settingsRepository.getBoolean(SecuritySettings.class, "grantProjectViewToAll", true));
     }
 
     @Override
