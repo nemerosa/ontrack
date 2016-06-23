@@ -102,11 +102,15 @@ public class UserController extends AbstractResourceController {
     // Resource assemblers
 
     private ConnectedAccount toAnonymousAccount() {
-        return ConnectedAccount.none();
+        return ConnectedAccount.none(isAuthenticationRequired());
+    }
+
+    private boolean isAuthenticationRequired() {
+        return !securityService.getSecuritySettings().isGrantProjectViewToAll();
     }
 
     private ConnectedAccount toLoggedAccount(Account account) {
-        return userMenu(ConnectedAccount.of(account));
+        return userMenu(ConnectedAccount.of(isAuthenticationRequired(), account));
     }
 
     private ConnectedAccount userMenu(ConnectedAccount user) {

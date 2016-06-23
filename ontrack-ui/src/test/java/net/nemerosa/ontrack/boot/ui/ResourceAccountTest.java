@@ -22,6 +22,7 @@ public class ResourceAccountTest {
         assertJsonWrite(
                 object()
                         .with("_self", "urn:user")
+                        .with("authenticationRequired", false)
                         .with("account", object()
                                 .with("id", 1)
                                 .with("name", "admin")
@@ -41,6 +42,7 @@ public class ResourceAccountTest {
                         .end(),
                 Resource.of(
                         ConnectedAccount.of(
+                                false,
                                 Account.of("admin", "Administrator", "", SecurityRole.ADMINISTRATOR, AuthenticationSource.none())
                                         .withId(ID.of(1))
                                         .lock()
@@ -55,12 +57,13 @@ public class ResourceAccountTest {
         assertJsonWrite(
                 object()
                         .with("_self", "urn:user")
+                        .with("authenticationRequired", true)
                         .with("account", (String) null)
                         .with("actions", array().end())
                         .with("logged", false)
                         .end(),
                 Resource.of(
-                        ConnectedAccount.none(),
+                        ConnectedAccount.none(true),
                         URI.create("urn:user")
                 )
         );

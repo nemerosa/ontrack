@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.model.security;
 
+import net.nemerosa.ontrack.model.settings.SecuritySettings;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.Signature;
 
@@ -8,6 +9,11 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public interface SecurityService {
+
+    /**
+     * Gets the security settings.
+     */
+    SecuritySettings getSecuritySettings();
 
     void checkGlobalFunction(Class<? extends GlobalFunction> fn);
 
