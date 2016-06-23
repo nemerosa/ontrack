@@ -19,6 +19,9 @@ public class SecuritySettingsProvider implements SettingsProvider<SecuritySettin
     @Override
     public SecuritySettings getSettings() {
         return SecuritySettings.of()
+                /**
+                 * By default, grants view accesses to everybody.
+                 */
                 .withGrantProjectViewToAll(settingsRepository.getBoolean(SecuritySettings.class, "grantProjectViewToAll", false));
     }
 
