@@ -28,6 +28,10 @@ class AcceptanceTestClient extends AcceptanceSupport {
         return getOntrackAs('admin', adminPassword)
     }
 
+    protected Ontrack getAnonymousOntrack() {
+        return ontrackBuilder.build()
+    }
+
     protected Ontrack getOntrackAs(String user, String password) {
         return ontrackBuilder
                 .authenticate(user, password)
