@@ -28,6 +28,11 @@ public class SecurityServiceImpl implements SecurityService {
     }
 
     @Override
+    public SecuritySettings getSecuritySettings() {
+        return cachedSettingsService.getCachedSettings(SecuritySettings.class);
+    }
+
+    @Override
     public void checkGlobalFunction(Class<? extends GlobalFunction> fn) {
         if (!isGlobalFunctionGranted(fn)) {
             throw new AccessDeniedException(format("Global function '%s' is not granted.", fn.getSimpleName()));

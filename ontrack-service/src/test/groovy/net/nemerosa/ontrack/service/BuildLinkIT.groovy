@@ -36,6 +36,7 @@ class BuildLinkIT extends AbstractServiceTestSupport {
 
     @Test(expected = ProjectNotFoundException)
     void 'Edition of links - project not authorised'() {
+        grantViewToAll false
         def source = doCreateBuild()
         def target = doCreateBuild()
         asUser().with(source, BuildConfig).call {
@@ -145,6 +146,7 @@ class BuildLinkIT extends AbstractServiceTestSupport {
 
     @Test
     void 'Edition of links - partial rights - adding one link'() {
+        grantViewToAll false
         def source = doCreateBuild()
         def target1 = doCreateBuild()
         def target2 = doCreateBuild()
@@ -173,6 +175,7 @@ class BuildLinkIT extends AbstractServiceTestSupport {
 
     @Test
     void 'Edition of links - partial rights - adding and removing'() {
+        grantViewToAll false
         def source = doCreateBuild()
         def target1 = doCreateBuild()
         def target2 = doCreateBuild()
@@ -258,6 +261,7 @@ class BuildLinkIT extends AbstractServiceTestSupport {
 
     @Test(expected = AccessDeniedException)
     void 'Build view is needed on target build to create a link'() {
+        grantViewToAll false
         // Creates a build
         def build = doCreateBuild()
         // Creates a second build to link

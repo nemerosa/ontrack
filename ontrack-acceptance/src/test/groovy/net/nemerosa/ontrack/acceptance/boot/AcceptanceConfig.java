@@ -67,7 +67,7 @@ class AcceptanceConfig {
     public void setSystemProperties() {
         System.setProperty("ontrack.url", url);
         System.setProperty("ontrack.admin", admin);
-        System.setProperty("ontrack.disableSSL", String.valueOf(disableSsl));
+        System.setProperty("ontrack.disableSsl", String.valueOf(disableSsl));
         System.setProperty("ontrack.implicitWait", String.valueOf(implicitWait));
     }
 

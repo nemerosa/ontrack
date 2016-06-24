@@ -77,12 +77,12 @@ public abstract class AcceptanceSupport {
     }
 
     private OTHttpClientBuilder clientBuilder() {
-        boolean disableSSL = isSslDisabled();
-        return OTHttpClientBuilder.create(getBaseURL(), disableSSL);
+        boolean disableSsl = isSslDisabled();
+        return OTHttpClientBuilder.create(getBaseURL(), disableSsl);
     }
 
     protected boolean isSslDisabled() {
-        return "true".equals(env("ontrack.disableSSL", false, "false", "Disabling SSL checks"));
+        return "true".equals(env("ontrack.disableSsl", false, "false", "Disabling SSL checks"));
     }
 
     protected String getBaseURL() {

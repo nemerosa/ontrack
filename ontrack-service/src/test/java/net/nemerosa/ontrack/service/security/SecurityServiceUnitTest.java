@@ -65,12 +65,12 @@ public class SecurityServiceUnitTest {
     }
 
     @Test
-    public void project_view_not_granted_for_anonymous_by_default() {
+    public void project_view_granted_for_anonymous_by_default() {
         when(cachedSettingsService.getCachedSettings(SecuritySettings.class)).thenReturn(
                 SecuritySettings.of()
         );
-        assertFalse(
-                "Project view is not granted by default for anonymous users",
+        assertTrue(
+                "Project view is granted by default for anonymous users",
                 securityService.isProjectFunctionGranted(1, ProjectView.class)
         );
     }

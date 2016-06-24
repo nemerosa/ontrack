@@ -19,12 +19,14 @@ import net.nemerosa.ontrack.model.extension.ValidationStampPropertyType;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService;
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService;
+import net.nemerosa.ontrack.model.settings.SecuritySettings;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.PropertyServiceHelper;
 import net.nemerosa.ontrack.repository.StructureRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -91,13 +93,16 @@ public class StructureServiceImpl implements StructureService {
 
     @Override
     public List<Project> getProjectList() {
+        SecuritySettings securitySettings = securityService.getSecuritySettings();
         List<Project> list = structureRepository.getProjectList();
-        if (securityService.isGlobalFunctionGranted(ProjectList.class)) {
+        if (securitySettings.isGrantProjectViewToAll() || securityService.isGlobalFunctionGranted(ProjectList.class)) {
             return list;
-        } else {
+        } else if (securityService.isLogged()) {
             return list.stream()
                     .filter(p -> securityService.isProjectFunctionGranted(p.id(), ProjectView.class))
                     .collect(Collectors.toList());
+        } else {
+            throw new AccessDeniedException("Authentication is required.");
         }
     }
 

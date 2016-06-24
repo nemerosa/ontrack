@@ -14,8 +14,11 @@ public class SecuritySettings {
     @Wither
     private final boolean grantProjectViewToAll;
 
+    /**
+     * By default, grants view accesses to everybody.
+     */
     public static SecuritySettings of() {
-        return new SecuritySettings(false);
+        return new SecuritySettings(true);
     }
 
     public Form form() {
