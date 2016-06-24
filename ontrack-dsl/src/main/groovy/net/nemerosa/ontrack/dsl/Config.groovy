@@ -9,6 +9,26 @@ class Config {
     }
 
     /**
+     * Gets the security settings
+     */
+    boolean getGrantProjectViewToAll() {
+        def settings = ontrack.get('settings/general-security')
+        return settings.grantProjectViewToAll
+    }
+
+    /**
+     * Updates security settings
+     */
+    def setGrantProjectViewToAll(boolean grantProjectViewToAll) {
+        ontrack.put(
+                'settings/general-security',
+                [
+                        grantProjectViewToAll: grantProjectViewToAll
+                ]
+        )
+    }
+
+    /**
      * Creates or update a GitHub configuration.
      */
 
