@@ -11,6 +11,8 @@ import org.junit.Before
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+import static net.nemerosa.ontrack.test.TestUtils.uid
+
 class AcceptanceTestClient extends AcceptanceSupport {
 
     private final Logger logger = LoggerFactory.getLogger(AcceptanceTestClient)
@@ -29,6 +31,15 @@ class AcceptanceTestClient extends AcceptanceSupport {
     protected Ontrack getOntrackAs(String user, String password) {
         return ontrackBuilder
                 .authenticate(user, password)
+                .build()
+    }
+
+    protected Ontrack getOntrackAsAnyUser() {
+        def name = uid('U')
+        def password = uid('P')
+        ontrack.admin.account(name, name, "${name}@nemerosa.net", password)
+        return ontrackBuilder
+                .authenticate(name, password)
                 .build()
     }
 
