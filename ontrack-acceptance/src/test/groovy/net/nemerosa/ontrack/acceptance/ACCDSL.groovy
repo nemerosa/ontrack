@@ -25,9 +25,7 @@ class ACCDSL extends AbstractACCDSL {
         def projectName = testBranch.project.name.asText()
         def branchName = testBranch.name.asText()
         // Removes 'grant view to all'
-        boolean oldGrant = ontrack.config.grantProjectViewToAll
-        try {
-            ontrack.config.grantProjectViewToAll = false
+        withNotGrantProjectViewToAll {
             // Anonymous client
             Ontrack ontrack = ontrackBuilder.build()
             // Branch cannot be found
@@ -37,8 +35,6 @@ class ACCDSL extends AbstractACCDSL {
             } catch (OTNotFoundException ex) {
                 assert ex.message == "Branch not found: ${projectName}/${branchName}" as String
             }
-        } finally {
-            ontrack.config.grantProjectViewToAll = oldGrant
         }
     }
 

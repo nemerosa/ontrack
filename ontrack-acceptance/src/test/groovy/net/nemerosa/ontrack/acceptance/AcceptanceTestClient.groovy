@@ -128,4 +128,15 @@ class AcceptanceTestClient extends AcceptanceSupport {
             doDeleteProject name
         }
     }
+
+    def withNotGrantProjectViewToAll(Closure action) {
+        boolean oldGrant = ontrack.config.grantProjectViewToAll
+        try {
+            ontrack.config.grantProjectViewToAll = false
+            // Action
+            action()
+        } finally {
+            ontrack.config.grantProjectViewToAll = oldGrant
+        }
+    }
 }

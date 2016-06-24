@@ -15,17 +15,19 @@ class ACCSearch extends AcceptanceTestClient {
 
     @Test
     void 'Looking for a build when anonymous does not return anything by default'() {
-        // Prerequisites
-        JsonNode build = doCreateBuild()
-        // Looking for this build as anonymous
-        def results = anonymous().post(
-                object()
-                        .with('token', build.path('name').asText())
-                        .end(),
-                'search'
-        ).get()
-        // Check
-        assert results == array().end()
+        withNotGrantProjectViewToAll {
+            // Prerequisites
+            JsonNode build = doCreateBuild()
+            // Looking for this build as anonymous
+            def results = anonymous().post(
+                    object()
+                            .with('token', build.path('name').asText())
+                            .end(),
+                    'search'
+            ).get()
+            // Check
+            assert results == array().end()
+        }
     }
 
     @Test
