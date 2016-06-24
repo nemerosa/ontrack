@@ -51,6 +51,8 @@ if (pos > 0) {
 println "BRANCH = ${BRANCH}"
 println "\tBranchType = ${branchType}"
 boolean release = branchType == 'release'
+// Only release/3.x going to production
+boolean production = release && BRANCH.startsWith('release/3')
 
 /**
  * Extracting the delivery archive
@@ -445,7 +447,7 @@ docker logout
 """
         }
     }
-    if (release) {
+    if (production) {
         publishers {
             buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${SEED_PROJECT}-${SEED_BRANCH}-production") {
                 parameters {
@@ -471,7 +473,7 @@ ontrack.build('${SEED_PROJECT}', '${SEED_BRANCH}', VERSION_DISPLAY).config {
     }
 }
 
-if (release) {
+if (production) {
 
     // Production deployment
 
