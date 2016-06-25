@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.it;
 
 import net.nemerosa.ontrack.model.security.*;
+import net.nemerosa.ontrack.model.settings.SecuritySettings;
+import net.nemerosa.ontrack.model.settings.SettingsManagerService;
 import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.TestingAuthenticationToken;
@@ -21,6 +23,9 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
 
     @Autowired
     protected StructureService structureService;
+
+    @Autowired
+    private SettingsManagerService settingsManagerService;
 
     protected Account doCreateAccount() throws Exception {
         return asUser().with(AccountManagement.class).call(() -> {
@@ -130,6 +135,14 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
         return new UserCall();
     }
 
+    protected UserCall asUserWithView(ProjectEntity... entities) {
+        UserCall user = asUser();
+        for (ProjectEntity entity : entities) {
+            user = user.withView(entity);
+        }
+        return user;
+    }
+
     protected AccountCall asAccount(Account account) {
         return new AccountCall(account);
     }
@@ -140,6 +153,14 @@ public abstract class AbstractServiceTestSupport extends AbstractITTestSupport {
 
     protected <T> T view(ProjectEntity projectEntity, Callable<T> callable) throws Exception {
         return asUser().with(projectEntity.projectId(), ProjectView.class).call(callable);
+    }
+
+    public void grantViewToAll(boolean grantViewToAll) throws Exception {
+        asUser().with(GlobalSettings.class).execute(() ->
+                settingsManagerService.saveSettings(
+                        SecuritySettings.of().withGrantProjectViewToAll(grantViewToAll)
+                )
+        );
     }
 
     protected interface ContextCall {

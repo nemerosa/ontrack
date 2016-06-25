@@ -4,9 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import org.junit.Test
 
-import static net.nemerosa.ontrack.json.JsonUtils.array
-import static net.nemerosa.ontrack.json.JsonUtils.object
-
 /**
  * Search acceptance tests.
  */
@@ -14,18 +11,25 @@ import static net.nemerosa.ontrack.json.JsonUtils.object
 class ACCSearch extends AcceptanceTestClient {
 
     @Test
-    void 'Looking for a build when anonymous does not return anything by default'() {
+    void 'With default security settings, all builds are accessible'() {
         // Prerequisites
         JsonNode build = doCreateBuild()
-        // Looking for this build as anonymous
-        def results = anonymous().post(
-                object()
-                        .with('token', build.path('name').asText())
-                        .end(),
-                'search'
-        ).get()
+        // Looking for this build as a different user
+        def results = anonymousOntrack.search(build.path('name').asText())
         // Check
-        assert results == array().end()
+        assert results.size() == 1
+    }
+
+    @Test
+    void 'Looking for a non authorised build when does not return anything'() {
+        withNotGrantProjectViewToAll {
+            // Prerequisites
+            JsonNode build = doCreateBuild()
+            // Looking for this build as a different user
+            def results = ontrackAsAnyUser.search(build.path('name').asText())
+            // Check
+            assert results.empty
+        }
     }
 
     @Test
@@ -38,16 +42,11 @@ class ACCSearch extends AcceptanceTestClient {
         String name = build.path('name').asText()
         String id = build.path('id').asText()
         // Looking for this build as admin
-        def results = admin().post(
-                object()
-                        .with('token', build.path('name').asText())
-                        .end(),
-                'search'
-        ).get()
+        def results = ontrack.search(build.path('name').asText())
         // Check
         def result = results.get(0)
-        assert result.path('title').asText() == "Build ${project}/${branch}/${name}" as String
-        assert result.path('page').asText() == "${baseURL}/#/build/${id}" as String
+        assert result.title == "Build ${project}/${branch}/${name}" as String
+        assert result.page == "${baseURL}/#/build/${id}" as String
     }
 
 }

@@ -18,11 +18,13 @@ public class Browser {
         configuration
     }
 
-    public <P extends Page> P goTo(Class<P> pageClass, Map<String, Object> parameters) {
+    public <P extends Page> P goTo(Class<P> pageClass, Map<String, Object> parameters = [:], boolean wait = true) {
         P page = page(pageClass)
         String path = page.getPath(parameters);
         configuration.goTo(path);
-        page.waitFor();
+        if (wait) {
+            page.waitFor();
+        }
         return page;
     }
 
@@ -40,7 +42,7 @@ public class Browser {
         page
     }
 
-    protected <P extends Page> P page(Class<P> pageClass) {
+    public <P extends Page> P page(Class<P> pageClass) {
         P page;
         try {
             page = ConstructorUtils.invokeExactConstructor(pageClass, this);

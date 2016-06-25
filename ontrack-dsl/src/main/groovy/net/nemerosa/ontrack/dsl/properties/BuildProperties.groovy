@@ -1,9 +1,7 @@
 package net.nemerosa.ontrack.dsl.properties
 
 import net.nemerosa.ontrack.dsl.Build
-import net.nemerosa.ontrack.dsl.BuildLink
 import net.nemerosa.ontrack.dsl.Ontrack
-import net.nemerosa.ontrack.dsl.PropertyNotFoundException
 
 class BuildProperties extends ProjectEntityProperties {
 
@@ -49,31 +47,6 @@ class BuildProperties extends ProjectEntityProperties {
      */
     def getLabel() {
         property('net.nemerosa.ontrack.extension.general.ReleasePropertyType').name
-    }
-
-    /**
-     * Build links properties
-     */
-
-    def buildLink(String project, String build) {
-        // Gets the existing list of links
-        def links = buildLinks.collect { [project: it.project, build: it.build] }
-        // Adds the link
-        links.add([project: project, build: build])
-        // Edits the property
-        property('net.nemerosa.ontrack.extension.general.BuildLinkPropertyType', [
-                links: links
-        ])
-    }
-
-    List<BuildLink> getBuildLinks() {
-        try {
-            return property('net.nemerosa.ontrack.extension.general.BuildLinkPropertyType').links.collect {
-                new BuildLink(ontrack, it)
-            }
-        } catch (PropertyNotFoundException ignored) {
-            return []
-        }
     }
 
     /**

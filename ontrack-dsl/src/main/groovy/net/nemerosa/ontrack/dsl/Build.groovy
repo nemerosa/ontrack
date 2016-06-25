@@ -27,7 +27,7 @@ class Build extends AbstractProjectResource {
                 ontrack,
                 ontrack.post(link('promote'), [
                         promotionLevelName: promotion,
-			            description : '',
+                        description       : '',
                 ])
         )
     }
@@ -44,7 +44,7 @@ class Build extends AbstractProjectResource {
                 ontrack.post(link('validate'), [
                         validationStampName  : validationStamp,
                         validationRunStatusId: validationStampStatus,
-			description : ''
+                        description          : ''
                 ])
         )
     }
@@ -150,6 +150,29 @@ class Build extends AbstractProjectResource {
      */
     List<?> getBuildLinkDecorations() {
         getDecorations('net.nemerosa.ontrack.extension.general.BuildLinkDecorationExtension')
+    }
+
+    /**
+     * Build links
+     */
+
+    def buildLink(String project, String build) {
+        ontrack.put(
+                link('buildLinks'),
+                [
+                        addOnly: true,
+                        links  : [[
+                                project: project,
+                                build  : build,
+                        ]]
+                ]
+        )
+    }
+
+    List<Build> getBuildLinks() {
+        return ontrack.get(link('buildLinksFrom')).resources.collect {
+            new Build(ontrack, it)
+        }
     }
 
     /**

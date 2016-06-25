@@ -24,14 +24,17 @@ class ACCDSL extends AbstractACCDSL {
         def testBranch = doCreateBranch()
         def projectName = testBranch.project.name.asText()
         def branchName = testBranch.name.asText()
-        // Anonymous client
-        Ontrack ontrack = ontrackBuilder.build()
-        // Branch cannot be found
-        try {
-            ontrack.branch(projectName, branchName)
-            Assert.fail "Branch access should have been forbidden"
-        } catch (OTNotFoundException ex) {
-            assert ex.message == "Branch not found: ${projectName}/${branchName}"
+        // Removes 'grant view to all'
+        withNotGrantProjectViewToAll {
+            // Anonymous client
+            Ontrack ontrack = ontrackBuilder.build()
+            // Branch cannot be found
+            try {
+                ontrack.branch(projectName, branchName)
+                Assert.fail "Branch access should have been forbidden"
+            } catch (OTNotFoundException ex) {
+                assert ex.message == "Branch not found: ${projectName}/${branchName}" as String
+            }
         }
     }
 

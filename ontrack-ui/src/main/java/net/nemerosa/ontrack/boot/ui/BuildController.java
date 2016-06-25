@@ -3,10 +3,7 @@ package net.nemerosa.ontrack.boot.ui;
 import net.nemerosa.ontrack.extension.api.BuildDiffExtension;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.Ack;
-import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.form.Int;
-import net.nemerosa.ontrack.model.form.Selection;
-import net.nemerosa.ontrack.model.form.Text;
+import net.nemerosa.ontrack.model.form.*;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.Action;
@@ -240,5 +237,102 @@ public class BuildController extends AbstractResourceController {
                 .orElse(ResponseEntity.status(HttpStatus.NO_CONTENT).body(null));
     }
 
+    /**
+     * Gets the build links FROM this build.
+     *
+     * @param buildId Build to get the links from
+     * @return List of builds
+     */
+    @RequestMapping(value = "builds/{buildId}/links/from", method = RequestMethod.GET)
+    public Resources<Build> getBuildLinksFrom(@PathVariable ID buildId) {
+        return Resources.of(
+                structureService.getBuildLinksFrom(structureService.getBuild(buildId)),
+                uri(on(getClass()).getBuildLinksFrom(buildId))
+        ).forView(Build.class);
+    }
+
+    /**
+     * Gets the build links TO this build.
+     *
+     * @param buildId Build to get the links to
+     * @return List of builds
+     */
+    @RequestMapping(value = "builds/{buildId}/links/to", method = RequestMethod.GET)
+    public Resources<Build> getBuildLinksTo(@PathVariable ID buildId) {
+        return Resources.of(
+                structureService.getBuildLinksTo(structureService.getBuild(buildId)),
+                uri(on(getClass()).getBuildLinksFrom(buildId))
+        ).forView(Build.class);
+    }
+
+    /**
+     * Form to create a link between a build and another
+     *
+     * @param buildId From this build...
+     * @return List of builds
+     */
+    @RequestMapping(value = "builds/{buildId}/links", method = RequestMethod.GET)
+    public Form getBuildLinkForm(@PathVariable ID buildId) {
+        // Gets the form values
+        List<BuildLinkFormItem> items = structureService.getBuildLinksFrom(structureService.getBuild(buildId))
+                .stream()
+                .map(build -> new BuildLinkFormItem(build.getProject().getName(), build.getName()))
+                .collect(Collectors.toList());
+        // Creates the form
+        return Form.create()
+                .with(
+                        MultiForm.of(
+                                "links",
+                                Form.create()
+                                        .with(Text.of("project").label("Project name"))
+                                        .with(Text.of("build").label("Build name"))
+                        )
+                                .label("Links")
+                                .value(items)
+                );
+    }
+
+    /**
+     * Create a link between a build and another, using a form.
+     *
+     * @param buildId From this build...
+     * @return List of builds
+     */
+    @RequestMapping(value = "builds/{buildId}/links", method = RequestMethod.PUT)
+    public Build createBuildLinkFromForm(@PathVariable ID buildId, @RequestBody BuildLinkForm form) {
+        Build build = structureService.getBuild(buildId);
+        structureService.editBuildLinks(build, form);
+        return build;
+    }
+
+    /**
+     * Creates a link between a build and another
+     *
+     * @param buildId       From this build...
+     * @param targetBuildId ... to this build
+     * @return List of builds
+     */
+    @RequestMapping(value = "builds/{buildId}/links/{targetBuildId}", method = RequestMethod.PUT)
+    public Build addBuildLink(@PathVariable ID buildId, @PathVariable ID targetBuildId) {
+        Build build = structureService.getBuild(buildId);
+        Build targetBuild = structureService.getBuild(targetBuildId);
+        structureService.addBuildLink(build, targetBuild);
+        return build;
+    }
+
+    /**
+     * Deletes a link between a build and another
+     *
+     * @param buildId       From this build...
+     * @param targetBuildId ... to this build
+     * @return List of builds
+     */
+    @RequestMapping(value = "builds/{buildId}/links/{targetBuildId}", method = RequestMethod.DELETE)
+    public Build deleteBuildLink(@PathVariable ID buildId, @PathVariable ID targetBuildId) {
+        Build build = structureService.getBuild(buildId);
+        Build targetBuild = structureService.getBuild(targetBuildId);
+        structureService.deleteBuildLink(build, targetBuild);
+        return build;
+    }
 
 }

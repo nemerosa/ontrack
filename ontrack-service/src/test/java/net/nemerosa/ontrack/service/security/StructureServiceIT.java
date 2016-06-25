@@ -62,6 +62,7 @@ public class StructureServiceIT extends AbstractServiceTestSupport {
 
     @Test
     public void getProjectList_filtered() throws Exception {
+        grantViewToAll(false);
         int[] ids = doCreateProjects();
         List<Project> list = asUser()
                 .with(ids[0], ProjectView.class)
@@ -75,6 +76,7 @@ public class StructureServiceIT extends AbstractServiceTestSupport {
 
     @Test
     public void getProjectList_none() throws Exception {
+        grantViewToAll(false);
         doCreateProjects();
         List<Project> list = asUser()
                 .call(structureService::getProjectList);

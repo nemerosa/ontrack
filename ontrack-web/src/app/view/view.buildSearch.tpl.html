@@ -73,6 +73,20 @@
                            placeholder="Maximum count"/>
                 </td>
                 <td>
+                    Linked from
+                    <span class="fa fa-question-circle text-muted"
+                          title="The build must be linked FROM the builds selected by the pattern. Syntax: PRJ:BLD where PRJ is a project name and BLD a build expression - with * as placeholder"></span>
+                    <input name="linkedFrom" ng-model="data.linkedFrom"
+                           class="form-control input-sm"/>
+                </td>
+                <td>
+                    Linked to
+                    <span class="fa fa-question-circle text-muted"
+                          title="The build must be linked TO the builds selected by the pattern. Syntax: PRJ:BLD where PRJ is a project name and BLD a build expression - with * as placeholder"></span>
+                    <input name="linkedTo" ng-model="data.linkedTo"
+                           class="form-control input-sm"/>
+                </td>
+                <td>
                     Property
                     <select ng-model="data.property"
                             ng-options="item.typeName as item.name for item in propertyField.items"
@@ -84,9 +98,6 @@
                     Property value
                     <input name="propertyValue" ng-model="data.propertyValue"
                            class="form-control input-sm"/>
-                </td>
-                <td colspan="2">
-                    &nbsp;
                 </td>
             </tr>
             </tbody>

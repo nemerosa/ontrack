@@ -17,17 +17,21 @@ import org.springframework.security.ldap.authentication.LdapAuthenticationProvid
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @Qualifier("ldap")
-public class LDAPAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
+public class LDAPAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider implements UserSource {
 
     private final AccountService accountService;
     private final LDAPProviderFactory ldapProviderFactory;
     private final LDAPAuthenticationSourceProvider ldapAuthenticationSourceProvider;
     private final SecurityService securityService;
     private final ApplicationLogService applicationLogService;
+
+    private final Map<String, AccountUserDetails> cache = new ConcurrentHashMap<>();
 
     @Autowired
     public LDAPAuthenticationProvider(
@@ -152,9 +156,22 @@ public class LDAPAuthenticationProvider extends AbstractUserDetailsAuthenticatio
 
     @Override
     protected UserDetails retrieveUser(String username, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
-        return findUser(username, authentication)
+        AccountUserDetails userDetails = findUser(username, authentication)
                 .map(accountService::withACL)
                 .map(AccountUserDetails::new)
                 .orElseThrow(() -> new UsernameNotFoundException(String.format("User %s cannot be found", username)));
+        cache.put(username, userDetails);
+        return userDetails;
     }
+
+    @Override
+    public Optional<AccountUserDetails> loadUser(String username) {
+        return Optional.ofNullable(cache.get(username));
+    }
+
+    @Override
+    public void onLogout(String username) {
+        cache.remove(username);
+    }
+    
 }

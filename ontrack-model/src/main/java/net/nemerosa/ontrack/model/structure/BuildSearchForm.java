@@ -27,6 +27,12 @@ public class BuildSearchForm {
     @Size(max = 40)
     @Wither
     private String propertyValue;
+    @Wither
+    private boolean buildExactMatch;
+    @Wither
+    private String linkedFrom;
+    @Wither
+    private String linkedTo;
 
     public BuildSearchForm() {
     }

@@ -17,6 +17,15 @@ public class HeaderModule extends AbstractModule {
 
     public void login(String name, String password) {
         $(By.linkText("Sign in")).click()
+        doLogin(name, password)
+    }
+
+    public void checkOnLogin() {
+        assert $(By.name("name")).displayed
+        assert $(By.name("password")).displayed
+    }
+
+    public void doLogin(String name, String password, long waitMs = 500) {
         browser.screenshot("login-displayed");
 
         WebElement tName = $(By.name("name"));
@@ -41,7 +50,7 @@ public class HeaderModule extends AbstractModule {
          *
          * Waiting a bit
          */
-        sleep 500
+        sleep waitMs
     }
 
 }

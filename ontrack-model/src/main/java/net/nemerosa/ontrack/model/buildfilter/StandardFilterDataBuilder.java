@@ -27,4 +27,8 @@ public interface StandardFilterDataBuilder<T extends StandardFilterDataBuilder<T
     T withSinceProperty(String sinceProperty);
 
     T withSincePropertyValue(String sincePropertyValue);
+
+    T withLinkedFrom(String linkedFrom);
+
+    T withLinkedTo(String linkedTo);
 }

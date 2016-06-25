@@ -52,9 +52,6 @@ public class DefaultJobListener implements JobListener {
 
     @Override
     public void onJobEnd(JobKey key, long milliseconds) {
-        counterService.decrement("job");
-        counterService.decrement(getJobTypeMetric(key));
-        // Durations
         metricRegistry.timer("job").update(milliseconds, TimeUnit.MILLISECONDS);
         metricRegistry.timer(getJobTypeMetric(key)).update(milliseconds, TimeUnit.MILLISECONDS);
     }
@@ -62,6 +59,8 @@ public class DefaultJobListener implements JobListener {
     @Override
     public void onJobError(JobStatus status, Exception ex) {
         JobKey key = status.getKey();
+        counterService.increment("error.job");
+        counterService.increment("error." + getJobTypeMetric(status.getKey()));
         logService.log(
                 ApplicationLogEntry.error(
                         ex,
@@ -77,6 +76,8 @@ public class DefaultJobListener implements JobListener {
 
     @Override
     public void onJobComplete(JobKey key) {
+        counterService.decrement("job");
+        counterService.decrement(getJobTypeMetric(key));
     }
 
     @Override

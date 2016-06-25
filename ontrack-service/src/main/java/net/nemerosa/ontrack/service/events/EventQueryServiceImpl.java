@@ -4,16 +4,14 @@ import net.nemerosa.ontrack.model.events.Event;
 import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventQueryService;
 import net.nemerosa.ontrack.model.events.EventType;
-import net.nemerosa.ontrack.model.structure.Entity;
-import net.nemerosa.ontrack.model.structure.ID;
-import net.nemerosa.ontrack.model.structure.ProjectEntityType;
-import net.nemerosa.ontrack.model.structure.StructureService;
+import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.repository.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -77,6 +75,11 @@ public class EventQueryServiceImpl implements EventQueryService {
                 (type, id) -> type.getEntityFn(structureService).apply(id),
                 eventFactory::toEventType
         );
+    }
+
+    @Override
+    public Optional<Signature> getLastEventSignature(ProjectEntityType entityType, ID entityId, EventType eventType) {
+        return eventRepository.getLastEventSignature(entityType, entityId, eventType);
     }
 
 }

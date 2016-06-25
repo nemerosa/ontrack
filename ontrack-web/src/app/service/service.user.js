@@ -4,7 +4,7 @@ angular.module('ot.service.user', [
     'ot.service.core',
     'ot.service.form'
 ])
-    .service('otUserService', function (ot, $q, $state, $log, $interval, $http, $rootScope, otNotificationService, otFormService) {
+    .service('otUserService', function (ot, $q, $state, $location, $log, $interval, $http, $rootScope, otNotificationService, otFormService) {
         var self = {};
 
         /**
@@ -56,7 +56,7 @@ angular.module('ot.service.user', [
                 submit: function (data) {
                     var d = $q.defer();
                     $http.post(
-                        $rootScope.user.login,
+                        $rootScope.user.login + "?remember-me=" + (data.rememberMe === true),
                         {},
                         {
                             headers: {
@@ -87,7 +87,8 @@ angular.module('ot.service.user', [
                 // Reloads the user information
                 self.loadUser();
                 // Goes back to the home page
-                $state.go('home');
+                $location.href = '/#home';
+                location.reload();
             });
         };
 

@@ -2,10 +2,18 @@
 
     <div class="panel panel-default">
         <div class="panel-heading">
-            <div class="panel-title">
-                Accounts
+            <div class="panel-title form-inline">
+                <div class="form-group">
+                    <label>Accounts</label>
+                    <input
+                            id="accountFilter"
+                            class="form-control input-sm"
+                            ng-model="accountFilter.account"
+                            type="text"
+                            placeholder="Filter (name, email, group, ...)"/>
+                </div>
                 <span class="pull-right">
-                    <button class="btn btn-default btn-xs" ng-click="createAccount()">Create account...</button>
+                    <button id="admin-accounts-create" class="form-control btn btn-default btn-xs" ng-click="createAccount()">Create account...</button>
                 </span>
             </div>
         </div>
@@ -25,7 +33,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="account in accounts.resources">
+            <tr ng-repeat="account in accounts.resources | filter:accountFilter.account">
                 <td>
                     <b>{{account.name}}</b>
                 </td>
@@ -63,10 +71,18 @@
 
     <div class="panel panel-default">
         <div class="panel-heading">
-            <div class="panel-title">
-                Account groups
+            <div class="panel-title form-inline">
+                <div class="form-group">
+                    <label>Account groups</label>
+                    <input
+                            id="accountGroupFilter"
+                            class="form-control input-sm"
+                            ng-model="accountFilter.group"
+                            type="text"
+                            placeholder="Filter (name, description)"/>
+                </div>
                 <span class="pull-right">
-                    <button class="btn btn-default btn-xs" ng-click="createGroup()">Create group...</button>
+                    <button class="form-control btn btn-default btn-xs" ng-click="createGroup()">Create group...</button>
                 </span>
             </div>
         </div>
@@ -82,7 +98,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="group in groups.resources">
+            <tr ng-repeat="group in groups.resources | filter:accountFilter.group">
                 <td>
                     <b>{{group.name}}</b>
                 </td>

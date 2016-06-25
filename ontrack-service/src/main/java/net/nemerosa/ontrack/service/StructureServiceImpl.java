@@ -13,29 +13,25 @@ import net.nemerosa.ontrack.model.buildfilter.BuildFilterResult;
 import net.nemerosa.ontrack.model.buildfilter.DefaultBuildFilter;
 import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventPostService;
-import net.nemerosa.ontrack.model.exceptions.BranchTemplateCannotHaveBuildException;
-import net.nemerosa.ontrack.model.exceptions.PromotionLevelNotFoundException;
-import net.nemerosa.ontrack.model.exceptions.ReorderingSizeException;
-import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException;
+import net.nemerosa.ontrack.model.exceptions.*;
 import net.nemerosa.ontrack.model.extension.PromotionLevelPropertyType;
 import net.nemerosa.ontrack.model.extension.ValidationStampPropertyType;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService;
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService;
+import net.nemerosa.ontrack.model.settings.SecuritySettings;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.PropertyServiceHelper;
 import net.nemerosa.ontrack.repository.StructureRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -44,6 +40,7 @@ import java.util.stream.Collectors;
 import static net.nemerosa.ontrack.model.structure.Entity.isEntityDefined;
 import static net.nemerosa.ontrack.model.structure.Entity.isEntityNew;
 import static net.nemerosa.ontrack.service.ImageHelper.checkImage;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Service
 @Transactional
@@ -96,13 +93,16 @@ public class StructureServiceImpl implements StructureService {
 
     @Override
     public List<Project> getProjectList() {
+        SecuritySettings securitySettings = securityService.getSecuritySettings();
         List<Project> list = structureRepository.getProjectList();
-        if (securityService.isGlobalFunctionGranted(ProjectList.class)) {
+        if (securitySettings.isGrantProjectViewToAll() || securityService.isGlobalFunctionGranted(ProjectList.class)) {
             return list;
-        } else {
+        } else if (securityService.isLogged()) {
             return list.stream()
                     .filter(p -> securityService.isProjectFunctionGranted(p.id(), ProjectView.class))
                     .collect(Collectors.toList());
+        } else {
+            throw new AccessDeniedException("Authentication is required.");
         }
     }
 
@@ -370,7 +370,8 @@ public class StructureServiceImpl implements StructureService {
                 branchId,
                 new StandardBuildFilter(
                         StandardBuildFilterData.of(1),
-                        propertyService
+                        propertyService,
+                        this
                 )
         ).stream().findFirst();
     }
@@ -391,7 +392,11 @@ public class StructureServiceImpl implements StructureService {
                     || Utils.safeRegexMatch(form.getBranchName(), build.getBranch().getName());
             // Build name
             if (accept && StringUtils.isNotBlank(form.getBuildName())) {
-                accept = Utils.safeRegexMatch(form.getBuildName(), build.getName());
+                if (form.isBuildExactMatch()) {
+                    accept = StringUtils.equals(form.getBuildName(), build.getName());
+                } else {
+                    accept = Utils.safeRegexMatch(form.getBuildName(), build.getName());
+                }
             }
             // Promotion name
             if (accept && StringUtils.isNotBlank(form.getPromotionName())) {
@@ -416,6 +421,20 @@ public class StructureServiceImpl implements StructureService {
                         build,
                         form.getProperty(),
                         form.getPropertyValue());
+            }
+            // Linked from
+            String linkedFrom = form.getLinkedFrom();
+            if (accept && isNotBlank(linkedFrom)) {
+                String projectName = StringUtils.substringBefore(linkedFrom, ":");
+                String buildPattern = StringUtils.substringAfter(linkedFrom, ":");
+                accept = isLinkedFrom(build, projectName, buildPattern);
+            }
+            // Linked to
+            String linkedTo = form.getLinkedTo();
+            if (accept && isNotBlank(linkedTo)) {
+                String projectName = StringUtils.substringBefore(linkedTo, ":");
+                String buildPattern = StringUtils.substringAfter(linkedTo, ":");
+                accept = isLinkedTo(build, projectName, buildPattern);
             }
             // Accepting the build into the list?
             if (accept) {
@@ -451,6 +470,97 @@ public class StructureServiceImpl implements StructureService {
         }
         // Going on?
         return result.isGoingOn();
+    }
+
+    @Override
+    public void addBuildLink(Build fromBuild, Build toBuild) {
+        securityService.checkProjectFunction(fromBuild, BuildConfig.class);
+        securityService.checkProjectFunction(toBuild, ProjectView.class);
+        structureRepository.addBuildLink(fromBuild.getId(), toBuild.getId());
+    }
+
+    @Override
+    public void deleteBuildLink(Build fromBuild, Build toBuild) {
+        securityService.checkProjectFunction(fromBuild, BuildConfig.class);
+        securityService.checkProjectFunction(toBuild, ProjectView.class);
+        structureRepository.deleteBuildLink(fromBuild.getId(), toBuild.getId());
+    }
+
+    @Override
+    public List<Build> getBuildLinksFrom(Build build) {
+        securityService.checkProjectFunction(build, ProjectView.class);
+        return structureRepository.getBuildLinksFrom(build.getId()).stream()
+                .filter(b -> securityService.isProjectFunctionGranted(b, ProjectView.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Build> getBuildLinksTo(Build build) {
+        securityService.checkProjectFunction(build, ProjectView.class);
+        return structureRepository.getBuildLinksTo(build.getId()).stream()
+                .filter(b -> securityService.isProjectFunctionGranted(b, ProjectView.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Build> searchBuildsLinkedTo(String projectName, String buildPattern) {
+        return structureRepository.searchBuildsLinkedTo(projectName, buildPattern)
+                .stream()
+                .filter(b -> securityService.isProjectFunctionGranted(b, ProjectView.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void editBuildLinks(Build build, BuildLinkForm form) {
+        securityService.checkProjectFunction(build, BuildConfig.class);
+        // Gets the existing links, with authorisations
+        Set<ID> authorisedExistingLinks = getBuildLinksFrom(build).stream()
+                .map(Build::getId)
+                .collect(Collectors.toSet());
+        // Added links
+        Set<ID> addedLinks = new HashSet<>();
+        // Loops through the new links
+        form.getLinks().forEach(item -> {
+            // Gets the project if possible
+            Project project = findProjectByName(item.getProject())
+                    .orElseThrow(() -> new ProjectNotFoundException(item.getProject()));
+            // Finds the build if possible (exact match - no regex)
+            List<Build> builds = buildSearch(project.getId(), new BuildSearchForm()
+                    .withMaximumCount(1)
+                    .withBuildName(item.getBuild())
+                    .withBuildExactMatch(true)
+            );
+            if (!builds.isEmpty()) {
+                Build target = builds.get(0);
+                // Adds the link
+                addBuildLink(build, target);
+                addedLinks.add(target.getId());
+            } else {
+                throw new BuildNotFoundException(item.getProject(), item.getBuild());
+            }
+        });
+        // Deletes all authorised links which were not added again
+        if (!form.isAddOnly()) {
+            // Other links, not authorised to view, were not subject to edition and are not visible
+            Set<ID> linksToDelete = new HashSet<>(authorisedExistingLinks);
+            linksToDelete.removeAll(addedLinks);
+            linksToDelete.forEach(id -> deleteBuildLink(
+                    build,
+                    getBuild(id)
+            ));
+        }
+    }
+
+    @Override
+    public boolean isLinkedFrom(Build build, String project, String buildPattern) {
+        securityService.checkProjectFunction(build, ProjectView.class);
+        return structureRepository.isLinkedFrom(build.getId(), project, buildPattern);
+    }
+
+    @Override
+    public boolean isLinkedTo(Build build, String project, String buildPattern) {
+        securityService.checkProjectFunction(build, ProjectView.class);
+        return structureRepository.isLinkedTo(build.getId(), project, buildPattern);
     }
 
     @Override

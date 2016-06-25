@@ -5,8 +5,10 @@ import net.nemerosa.ontrack.model.events.EventType;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
+import net.nemerosa.ontrack.model.structure.Signature;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -43,4 +45,5 @@ public interface EventRepository {
             Function<String, EventType> eventTypeLoader
     );
 
+    Optional<Signature> getLastEventSignature(ProjectEntityType entityType, ID entityId, EventType eventType);
 }

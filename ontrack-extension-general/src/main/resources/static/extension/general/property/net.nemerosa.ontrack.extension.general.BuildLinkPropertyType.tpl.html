@@ -1,7 +1,0 @@
-<p ng-repeat="link in property.value.links">
-    <span title="Build not found" ng-if="!link._buildPage">
-        <span class="fa fa-warning text-warning"></span>
-        {{link.build}} @ {{link.project}}
-    </span>
-    <a href="{{link._buildPage}}" ng-if="link._buildPage">{{link.build}} @ {{link.project}}</a>
-</p>

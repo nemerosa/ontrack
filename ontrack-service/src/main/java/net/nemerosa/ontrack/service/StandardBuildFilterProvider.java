@@ -34,7 +34,7 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
 
     @Override
     public BuildFilter filter(ID branchId, StandardBuildFilterData data) {
-        return new StandardBuildFilter(data, propertyService);
+        return new StandardBuildFilter(data, propertyService, structureService);
     }
 
     @Override
@@ -147,6 +147,24 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
                                 .length(40)
                                 .optional()
                 )
+                .with(
+                        Text.of("linkedFrom")
+                                .label("Linked from")
+                                .help("The build must be linked FROM the builds selected by the pattern.\n" +
+                                        "Syntax: PRJ:BLD where PRJ is a project name and BLD a build expression - with * as placeholder"
+                                )
+                                .length(40)
+                                .optional()
+                )
+                .with(
+                        Text.of("linkedTo")
+                                .label("Linked to")
+                                .help("The build must be linked TO the builds selected by the pattern.\n" +
+                                        "Syntax: PRJ:BLD where PRJ is a project name and BLD a build expression - with * as placeholder"
+                                )
+                                .length(40)
+                                .optional()
+                )
                 ;
     }
 
@@ -166,6 +184,8 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
                 .fill("sincePropertyValue", data.getSincePropertyValue())
                 .fill("withProperty", data.getWithProperty())
                 .fill("withPropertyValue", data.getWithPropertyValue())
+                .fill("linkedFrom", data.getLinkedFrom())
+                .fill("linkedTo", data.getLinkedTo())
                 ;
     }
 
@@ -183,7 +203,10 @@ public class StandardBuildFilterProvider extends AbstractBuildFilterProvider<Sta
                 .withSinceProperty(JsonUtils.get(data, "sinceProperty", null))
                 .withSincePropertyValue(JsonUtils.get(data, "sincePropertyValue", null))
                 .withWithProperty(JsonUtils.get(data, "withProperty", null))
-                .withWithPropertyValue(JsonUtils.get(data, "withPropertyValue", null));
+                .withWithPropertyValue(JsonUtils.get(data, "withPropertyValue", null))
+                .withLinkedFrom(JsonUtils.get(data, "linkedFrom", null))
+                .withLinkedTo(JsonUtils.get(data, "linkedTo", null))
+                ;
         return Optional.of(filter);
     }
 

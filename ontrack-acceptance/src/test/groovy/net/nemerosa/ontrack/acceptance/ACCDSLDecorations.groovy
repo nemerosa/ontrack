@@ -138,23 +138,17 @@ class ACCDSLDecorations extends AbstractACCDSL {
             }
         }
 
-        def p3 = uid('P3')
-
         // Build ids
 
         ontrack.build(p1, 'B1', '1.1').id
         ontrack.build(p2, 'B2', '2.0').id
 
         // Links
-        ontrack.build(p1, 'B1', '1.0').config {
+        ontrack.build(p1, 'B1', '1.0').with {
             // Same project
             buildLink p1, '1.1'
             // Other project
             buildLink p2, '2.0'
-            // Unexisting build
-            buildLink p2, '2.2'
-            // Unexisting project
-            buildLink p3, '3.0'
         }
 
         // Gets the link decorations
@@ -162,8 +156,6 @@ class ACCDSLDecorations extends AbstractACCDSL {
         assert buildLinks.collect { [it.project, it.build] } == [
                 [p1, '1.1'],
                 [p2, '2.0'],
-                [p2, '2.2'],
-                [p3, '3.0'],
         ]
 
     }

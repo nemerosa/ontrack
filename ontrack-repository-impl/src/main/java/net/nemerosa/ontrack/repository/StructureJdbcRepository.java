@@ -243,6 +243,101 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
         );
     }
 
+    @Override
+    public void addBuildLink(ID fromBuildId, ID toBuildId) {
+        deleteBuildLink(fromBuildId, toBuildId);
+        getNamedParameterJdbcTemplate().update(
+                "INSERT INTO BUILD_LINKS(BUILDID, TARGETBUILDID) VALUES (:fromBuildId, :toBuildId)",
+                params("fromBuildId", fromBuildId.get()).addValue("toBuildId", toBuildId.get())
+        );
+    }
+
+    @Override
+    public void deleteBuildLink(ID fromBuildId, ID toBuildId) {
+        getNamedParameterJdbcTemplate().update(
+                "DELETE FROM BUILD_LINKS WHERE BUILDID = :fromBuildId AND TARGETBUILDID = :toBuildId",
+                params("fromBuildId", fromBuildId.get()).addValue("toBuildId", toBuildId.get())
+        );
+    }
+
+    @Override
+    public List<Build> getBuildLinksFrom(ID buildId) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT T.* FROM BUILDS T " +
+                        "INNER JOIN BUILD_LINKS BL ON BL.TARGETBUILDID = T.ID " +
+                        "WHERE BL.BUILDID = :buildId",
+                params("buildId", buildId.get()),
+                (rs, num) -> toBuild(rs, this::getBranch)
+        );
+    }
+
+    @Override
+    public List<Build> getBuildLinksTo(ID buildId) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT F.* FROM BUILDS F " +
+                        "INNER JOIN BUILD_LINKS BL ON BL.BUILDID = F.ID " +
+                        "WHERE BL.TARGETBUILDID = :buildId " +
+                        "ORDER BY F.ID DESC",
+                params("buildId", buildId.get()),
+                (rs, num) -> toBuild(rs, this::getBranch)
+        );
+    }
+
+    @Override
+    public List<Build> searchBuildsLinkedTo(String projectName, String buildPattern) {
+        return getNamedParameterJdbcTemplate().query(
+                "SELECT F.* FROM BUILDS F " +
+                        "INNER JOIN BUILD_LINKS BL ON BL.BUILDID = F.ID " +
+                        "INNER JOIN BUILDS T ON BL.TARGETBUILDID = T.ID " +
+                        "INNER JOIN BRANCHES BR ON BR.ID = T.BRANCHID " +
+                        "INNER JOIN PROJECTS P ON P.ID = BR.PROJECTID " +
+                        "WHERE T.NAME LIKE :buildNamePattern AND P.NAME = :projectName " +
+                        "ORDER BY F.ID DESC",
+                params("buildNamePattern", expandBuildPattern(buildPattern)).addValue("projectName", projectName),
+                (rs, num) -> toBuild(rs, this::getBranch)
+        );
+    }
+
+    @Override
+    public boolean isLinkedFrom(ID id, String project, String buildPattern) {
+        return getOptional(
+                "SELECT BL.BUILDID FROM BUILD_LINKS BL " +
+                        "INNER JOIN BUILDS F ON BL.BUILDID = F.ID " +
+                        "INNER JOIN BRANCHES BR ON BR.ID = F.BRANCHID " +
+                        "INNER JOIN PROJECTS P ON P.ID = BR.PROJECTID " +
+                        "WHERE BL.TARGETBUILDID = :buildId AND F.NAME LIKE :buildNamePattern AND P.NAME = :projectName " +
+                        "LIMIT 1",
+                params("buildId", id.get())
+                        .addValue("buildNamePattern", expandBuildPattern(buildPattern))
+                        .addValue("projectName", project),
+                Integer.class
+        ).isPresent();
+    }
+
+    private String expandBuildPattern(String buildPattern) {
+        if (StringUtils.isBlank(buildPattern)) {
+            return "%";
+        } else {
+            return StringUtils.replace(buildPattern, "*", "%");
+        }
+    }
+
+    @Override
+    public boolean isLinkedTo(ID id, String project, String buildPattern) {
+        return getOptional(
+                "SELECT BL.TARGETBUILDID FROM BUILD_LINKS BL " +
+                        "INNER JOIN BUILDS T ON BL.TARGETBUILDID = T.ID " +
+                        "INNER JOIN BRANCHES BR ON BR.ID = T.BRANCHID " +
+                        "INNER JOIN PROJECTS P ON P.ID = BR.PROJECTID " +
+                        "WHERE BL.BUILDID = :buildId AND T.NAME LIKE :buildNamePattern AND P.NAME = :projectName " +
+                        "LIMIT 1",
+                params("buildId", id.get())
+                        .addValue("buildNamePattern", expandBuildPattern(buildPattern))
+                        .addValue("projectName", project),
+                Integer.class
+        ).isPresent();
+    }
+
     protected Build toBuild(ResultSet rs, Function<ID, Branch> branchSupplier) throws SQLException {
         return Build.of(
                 branchSupplier.apply(id(rs, "branchId")),

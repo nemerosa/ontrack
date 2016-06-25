@@ -61,7 +61,7 @@ public class BuildFilterServiceImpl implements BuildFilterService {
 
         @Override
         public BuildFilter build() {
-            return new StandardBuildFilter(data, propertyService);
+            return new StandardBuildFilter(data, propertyService, structureService);
         }
 
         @Override
@@ -133,6 +133,18 @@ public class BuildFilterServiceImpl implements BuildFilterService {
         @Override
         public StandardFilterBuilder withSincePropertyValue(String sincePropertyValue) {
             data = data.withSincePropertyValue(sincePropertyValue);
+            return this;
+        }
+
+        @Override
+        public StandardFilterBuilder withLinkedFrom(String linkedFrom) {
+            data = data.withLinkedFrom(linkedFrom);
+            return this;
+        }
+
+        @Override
+        public StandardFilterBuilder withLinkedTo(String linkedTo) {
+            data = data.withLinkedTo(linkedTo);
             return this;
         }
     }

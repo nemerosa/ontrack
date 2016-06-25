@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.buildfilter.BuildFilter;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterResult;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.PropertyServiceHelper;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -16,6 +17,7 @@ public class StandardBuildFilter implements BuildFilter {
 
     private final StandardBuildFilterData data;
     private final PropertyService propertyService;
+    private final StructureService structureService;
 
     @Override
     public BuildFilterResult filter(List<Build> builds, Branch branch, Build build, Supplier<BuildView> buildViewSupplier) {
@@ -92,6 +94,20 @@ public class StandardBuildFilter implements BuildFilter {
             result = result.acceptIf(
                     hasProperty(build, data.getWithProperty(), data.getWithPropertyValue())
             );
+        }
+        // Linked from
+        String linkedFrom = data.getLinkedFrom();
+        if (isNotBlank(linkedFrom)) {
+            String project = StringUtils.substringBefore(linkedFrom, ":");
+            String buildPattern = StringUtils.substringAfter(linkedFrom, ":");
+            result = result.acceptIf(structureService.isLinkedFrom(build, project, buildPattern));
+        }
+        // Linked to
+        String linkedTo = data.getLinkedTo();
+        if (isNotBlank(linkedTo)) {
+            String project = StringUtils.substringBefore(linkedTo, ":");
+            String buildPattern = StringUtils.substringAfter(linkedTo, ":");
+            result = result.acceptIf(structureService.isLinkedTo(build, project, buildPattern));
         }
         // OK
         return result;

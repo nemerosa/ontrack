@@ -29,7 +29,7 @@ class StaleBranchesJobTest {
     private Branch branch
     private LocalDateTime now
     private LocalDateTime disablingTime
-    private Optional<LocalDateTime> deletingTime
+    private LocalDateTime deletingTime
 
     @Before
     void before() {
@@ -58,7 +58,7 @@ class StaleBranchesJobTest {
         // Times
         now = LocalDateTime.now()
         disablingTime = now.minusDays(5)
-        deletingTime = Optional.of(now.minusDays(10))
+        deletingTime = now.minusDays(10)
     }
 
     @Test
@@ -88,7 +88,7 @@ class StaleBranchesJobTest {
     @Test
     void 'Disabling only a branch using last build time when deletion time is not set'() {
         // Deletion time is not set
-        deletingTime = Optional.empty()
+        deletingTime = null
         // Last build for deletion
         configureBuild(11)
 
@@ -166,7 +166,7 @@ class StaleBranchesJobTest {
         // No configuration
         configureProject(null)
         // Call
-        propertyType.detectAndManageStaleBranches({ println it }, project)
+        propertyType.detectAndManageStaleBranches({ println it } as JobRunListener, project)
         // Check
         verify(structureService, never()).getBranchesForProject(any(ID))
     }
@@ -176,7 +176,7 @@ class StaleBranchesJobTest {
         // No configuration
         configureProject(StaleProperty.create())
         // Call
-        propertyType.detectAndManageStaleBranches({ println it }, project)
+        propertyType.detectAndManageStaleBranches({ println it } as JobRunListener, project)
         // Check
         verify(structureService, never()).getBranchesForProject(any(ID))
     }
@@ -196,7 +196,7 @@ class StaleBranchesJobTest {
         // Configuration
         configureProject(StaleProperty.create().withDisablingDuration(1))
         // Scheduling jobs
-        propertyType.start()
+        propertyType.onPropertyChanged(project, null)
         // Verifies the job has been scheduled
         verify(jobScheduler, times(1)).schedule(any(Job), eq(Schedule.EVERY_DAY))
     }
@@ -206,7 +206,7 @@ class StaleBranchesJobTest {
         // No configuration
         configureProject(null)
         // Scheduling jobs
-        propertyType.start()
+        propertyType.onPropertyChanged(project, null)
         // Verifies that no job has been scheduled
         verify(jobScheduler, times(0)).schedule(any(Job), any(Schedule))
     }

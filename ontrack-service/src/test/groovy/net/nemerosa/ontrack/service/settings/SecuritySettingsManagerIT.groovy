@@ -20,10 +20,10 @@ class SecuritySettingsManagerIT extends AbstractServiceTestSupport {
     @Test
     void 'Saving the general settings'() {
         def settings = SecuritySettings.of()
-        assert !settings.grantProjectViewToAll
-        settings = settings.withGrantProjectViewToAll(true)
-        // Model test
         assert settings.grantProjectViewToAll
+        settings = settings.withGrantProjectViewToAll(false)
+        // Model test
+        assert !settings.grantProjectViewToAll
         // Saving the settings
         asUser().with(GlobalSettings).call {
             manager.saveSettings(settings)

@@ -1,7 +1,8 @@
 angular.module('ot.view.home', [
         'ui.router',
         'ot.service.structure',
-        'ot.service.core'
+        'ot.service.core',
+        'ot.service.user'
     ])
     .config(function ($stateProvider) {
         $stateProvider.state('home', {
@@ -10,8 +11,10 @@ angular.module('ot.view.home', [
             controller: 'HomeCtrl'
         });
     })
-    .controller('HomeCtrl', function ($rootScope, $location, $scope, $http, ot, otStructureService, otNotificationService) {
-        var code = $location.search().code;
+    .controller('HomeCtrl', function ($rootScope, $location, $log, $scope, $http, ot, otStructureService, otNotificationService, otUserService) {
+        var search = $location.search();
+        var code = search.code;
+        var url = search.url;
         $rootScope.view = {
             // Title
             title: 'Home',
@@ -74,15 +77,51 @@ angular.module('ot.view.home', [
             }).finally(function () {
                 $scope.loadingProjects = false;
             });
-            // Any notification?
-            if (code) {
-                if (code == 403) {
-                    otNotificationService.error("Due to the access to an unauthorized resource, you have been redirected to the home page.");
-                }
-            }
         }
 
-        loadProjects();
+        // Login procedure
+        $scope.accessStatus = 'undefined';
+        if (code && code == 403) {
+            $log.debug('[403] received');
+            if (otUserService.logged()) {
+                $scope.accessStatus = 'unauthorised';
+                $log.debug('[403] user already logged - error notification');
+            } else {
+                $scope.accessStatus = 'login-requested';
+                $log.debug('[403] user not logged - login redirection - callback URL = ' + url);
+                otUserService.login().then(function () {
+                    $scope.accessStatus = 'ok';
+                    if (url) {
+                        // Callback URL
+                        $log.debug('[403] reloading ' + url + 'after signing in.');
+                        location.href = url;
+                        location.reload();
+                    } else {
+                        // Reloads current page
+                        $log.debug('[403] reloading after signing in.');
+                        location.reload();
+                    }
+                }, function () {
+                    $scope.accessStatus = 'login-failed';
+                    $log.debug('[403] user cannot be logged - error notification');
+                });
+            }
+        } else if ($rootScope.user && $rootScope.user.authenticationRequired && !$rootScope.user.logged) {
+            $scope.accessStatus = 'login-requested';
+            $log.debug('user not logged and authentication is required');
+            otUserService.login().then(function () {
+                $scope.accessStatus = 'ok';
+                $log.debug('[403] reloading after signing in.');
+                location.reload();
+            }, function () {
+                $scope.accessStatus = 'login-failed';
+                $log.debug('[403] user cannot be logged - error notification');
+            });
+        } else {
+            $scope.accessStatus = 'ok';
+            // Loading the list of projects
+            loadProjects();
+        }
 
     })
 ;

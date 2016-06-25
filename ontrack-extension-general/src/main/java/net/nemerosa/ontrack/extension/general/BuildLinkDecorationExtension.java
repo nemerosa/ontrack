@@ -7,10 +7,8 @@ import net.nemerosa.ontrack.ui.controller.URIBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -18,14 +16,12 @@ public class BuildLinkDecorationExtension extends AbstractExtension implements D
 
     private final StructureService structureService;
     private final URIBuilder uriBuilder;
-    private final PropertyService propertyService;
 
     @Autowired
-    public BuildLinkDecorationExtension(GeneralExtensionFeature extensionFeature, StructureService structureService, URIBuilder uriBuilder, PropertyService propertyService) {
+    public BuildLinkDecorationExtension(GeneralExtensionFeature extensionFeature, StructureService structureService, URIBuilder uriBuilder) {
         super(extensionFeature);
         this.structureService = structureService;
         this.uriBuilder = uriBuilder;
-        this.propertyService = propertyService;
     }
 
     @Override
@@ -35,37 +31,21 @@ public class BuildLinkDecorationExtension extends AbstractExtension implements D
 
     @Override
     public List<Decoration<BuildLinkDecoration>> getDecorations(ProjectEntity entity) {
-        // Gets the `buildLink` property
-        return propertyService.getProperty(entity, BuildLinkPropertyType.class)
-                .option()
-                .map(this::getDecorations)
-                .orElse(Collections.<Decoration<BuildLinkDecoration>>emptyList());
-    }
-
-    protected List<Decoration<BuildLinkDecoration>> getDecorations(BuildLinkProperty buildLinkProperty) {
-        return buildLinkProperty.getLinks().stream()
+        return structureService.getBuildLinksFrom((Build) entity).stream()
                 .map(this::getDecoration)
                 .collect(Collectors.toList());
     }
 
-    protected Decoration<BuildLinkDecoration> getDecoration(BuildLinkPropertyItem item) {
-        Optional<Build> oBuild = item.findBuild(structureService);
-        if (oBuild.isPresent()) {
-            Build build = oBuild.get();
-            // Gets the list of promotion runs for this build
-            List<PromotionRun> promotionRuns = structureService.getLastPromotionRunsForBuild(build.getId());
-            // Decoration
-            return Decoration.of(this, new BuildLinkDecoration(
-                    item.getProject(),
-                    item.getBuild(),
-                    uriBuilder.getEntityPage(build),
-                    promotionRuns
-            ));
-        } else {
-            return Decoration.of(this, BuildLinkDecoration.found(
-                    item.getProject(),
-                    item.getBuild()));
-        }
+    protected Decoration<BuildLinkDecoration> getDecoration(Build build) {
+        // Gets the list of promotion runs for this build
+        List<PromotionRun> promotionRuns = structureService.getLastPromotionRunsForBuild(build.getId());
+        // Decoration
+        return Decoration.of(this, new BuildLinkDecoration(
+                build.getProject().getName(),
+                build.getName(),
+                uriBuilder.getEntityPage(build),
+                promotionRuns
+        ));
     }
 
 }
