@@ -5,6 +5,7 @@ dependencies {
     compile libraries.spring_boot_starter_actuator
     compile libraries.spring_context
     compile libraries.slf4j_api
+    compile libraries.flyway
 
     testCompile project(':ontrack-it-utils')
 }
