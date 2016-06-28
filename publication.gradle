@@ -306,3 +306,7 @@ task publicationRelease {
     dependsOn publicationMaven
     dependsOn publicationGitHubRelease
 }
+
+// Makes sure to not create a tag if the Maven publication is not OK
+
+publicationGitHubRelease.mustRunAfter publicationMaven
