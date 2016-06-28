@@ -126,6 +126,9 @@ public class Migration {
         // SHARED_BUILD_FILTERS
         copy("SHARED_BUILD_FILTERS", "BRANCHID", "NAME", "TYPE", "DATA::JSONB");
 
+        // BUILD_LINKS
+        copy("BUILD_LINKS", "ID", "BUILDID", "TARGETBUILDID");
+
         // EVENTS
         if (migrationProperties.isSkipEvents()) {
             logger.warn("Skipping events migration");

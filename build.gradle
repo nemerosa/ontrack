@@ -218,6 +218,12 @@ apply from: 'gradle/docker.gradle'
 apply from: 'gradle/acceptance.gradle'
 
 /**
+ * Development tasks
+ */
+
+apply from: 'gradle/development.gradle'
+
+/**
  * Acceptance tasks for OS packaging
  */
 
