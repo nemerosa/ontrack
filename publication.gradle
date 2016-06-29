@@ -69,7 +69,7 @@ nexusStaging {
     packageGroup = 'net.nemerosa'
     username = ossrhUser
     password = ossrhPassword
-    numberOfRetries = 30
+    numberOfRetries = 60
     delayBetweenRetriesInMillis = 10000 // Workaround for OSSRH-21248
 }
 
