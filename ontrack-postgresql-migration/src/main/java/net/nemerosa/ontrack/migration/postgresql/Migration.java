@@ -310,6 +310,7 @@ public class Migration {
                 "PROMOTION_LEVELS",
                 "PROMOTION_RUNS",
                 "PROPERTIES",
+                "BUILD_LINKS",
                 "VALIDATION_RUN_STATUSES",
                 "VALIDATION_RUNS",
                 "VALIDATION_STAMPS",
