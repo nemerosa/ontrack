@@ -9,7 +9,7 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.AbstractBranchJob;
 import net.nemerosa.ontrack.model.support.JobProvider;
-import net.nemerosa.ontrack.model.support.JobRegistration;
+import net.nemerosa.ontrack.job.JobRegistration;
 import net.nemerosa.ontrack.repository.BranchTemplateRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;

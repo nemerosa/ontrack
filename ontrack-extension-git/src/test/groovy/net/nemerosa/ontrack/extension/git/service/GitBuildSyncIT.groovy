@@ -11,6 +11,8 @@ import net.nemerosa.ontrack.extension.git.support.TagPatternBuildNameGitCommitLi
 import net.nemerosa.ontrack.extension.scm.support.TagPattern
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.job.JobRunListener
+import net.nemerosa.ontrack.job.orchestrator.JobOrchestrator
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.structure.Branch
@@ -40,6 +42,8 @@ class GitBuildSyncIT extends AbstractServiceTestSupport {
     private GitConfigurationService gitConfigurationService
     @Autowired
     private TagPatternBuildNameGitCommitLink tagPatternBuildNameGitCommitLink
+    @Autowired
+    private JobOrchestrator jobOrchestrator
 
     @Test
     void 'Master sync'() {
@@ -98,6 +102,9 @@ class GitBuildSyncIT extends AbstractServiceTestSupport {
                                 false, 1
                         )
                 )
+
+                // Job registration
+                jobOrchestrator.orchestrate(JobRunListener.out());
 
                 // Build synchronisation
                 gitService.launchBuildSync(branch.id, true)

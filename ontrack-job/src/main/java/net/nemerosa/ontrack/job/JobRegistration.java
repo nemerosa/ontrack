@@ -1,14 +1,10 @@
-package net.nemerosa.ontrack.model.support;
+package net.nemerosa.ontrack.job;
 
 import lombok.Data;
 import lombok.experimental.Wither;
-import net.nemerosa.ontrack.job.Job;
-import net.nemerosa.ontrack.job.Schedule;
 
 /**
  * Association of a job and a schedule for a registration at startup.
- *
- * @see JobProvider
  */
 @Data
 public class JobRegistration {

@@ -24,6 +24,7 @@ import net.nemerosa.ontrack.git.GitRepositoryClientFactory;
 import net.nemerosa.ontrack.git.exceptions.GitRepositorySyncException;
 import net.nemerosa.ontrack.git.model.*;
 import net.nemerosa.ontrack.job.*;
+import net.nemerosa.ontrack.job.orchestrator.JobOrchestratorSupplier;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -45,12 +46,13 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 
 @Service
 @Transactional
-public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration, GitBuildInfo, GitChangeLogIssue> implements GitService, JobProvider {
+public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration, GitBuildInfo, GitChangeLogIssue> implements GitService, JobOrchestratorSupplier {
 
     private static final JobCategory GIT_JOB_CATEGORY = JobCategory.of("git").withName("Git");
 
@@ -122,7 +124,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     @Override
-    public Collection<JobRegistration> getStartingJobs() {
+    public Stream<JobRegistration> collectJobRegistrations() {
         List<JobRegistration> jobs = new ArrayList<>();
         // Indexation of repositories, based on projects actually linked
         forEachConfiguredProject((project, configuration) -> jobs.add(getGitIndexationJobRegistration(configuration)));
@@ -138,7 +140,7 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
             }
         });
         // OK
-        return jobs;
+        return jobs.stream();
     }
 
     @Override
@@ -932,20 +934,6 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
         return JobRegistration
                 .of(createIndexationJob(configuration))
                 .everyMinutes(configuration.getIndexationInterval());
-    }
-
-    @Override
-    public void scheduleGitIndexation(GitConfiguration configuration) {
-        JobRegistration jobRegistration = getGitIndexationJobRegistration(configuration);
-        jobScheduler.schedule(
-                jobRegistration.getJob(),
-                jobRegistration.getSchedule()
-        );
-    }
-
-    @Override
-    public void unscheduleGitIndexation(GitConfiguration configuration) {
-        jobScheduler.unschedule(getGitIndexationJobKey(configuration));
     }
 
     @Override

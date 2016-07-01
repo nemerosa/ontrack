@@ -13,7 +13,7 @@ import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.JobProvider;
-import net.nemerosa.ontrack.model.support.JobRegistration;
+import net.nemerosa.ontrack.job.JobRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
