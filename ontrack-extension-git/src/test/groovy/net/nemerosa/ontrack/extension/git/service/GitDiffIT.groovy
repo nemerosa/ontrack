@@ -13,6 +13,8 @@ import net.nemerosa.ontrack.extension.git.support.CommitLinkConfig
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFileChangeType
 import net.nemerosa.ontrack.git.support.GitRepo
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.job.JobRunListener
+import net.nemerosa.ontrack.job.orchestrator.JobOrchestrator
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.security.ProjectView
@@ -41,6 +43,9 @@ class GitDiffIT extends AbstractServiceTestSupport {
 
     @Autowired
     private PropertyService propertyService
+
+    @Autowired
+    private JobOrchestrator jobOrchestrator
 
     private GitRepo repo
     private GitChangeLog changeLog
@@ -108,6 +113,9 @@ class GitDiffIT extends AbstractServiceTestSupport {
                     )
             )
         }
+
+        // Job registration
+        jobOrchestrator.orchestrate(JobRunListener.out());
 
         // Creates builds for the commits
         asUser().with(project, ProjectEdit).call {

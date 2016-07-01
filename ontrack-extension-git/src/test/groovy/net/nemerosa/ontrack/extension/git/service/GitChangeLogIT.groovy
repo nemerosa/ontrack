@@ -12,6 +12,8 @@ import net.nemerosa.ontrack.extension.git.support.CommitLinkConfig
 import net.nemerosa.ontrack.extension.git.support.TagBuildNameGitCommitLink
 import net.nemerosa.ontrack.git.support.GitRepo
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.job.JobRunListener
+import net.nemerosa.ontrack.job.orchestrator.JobOrchestrator
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.security.ProjectView
@@ -37,6 +39,9 @@ class GitChangeLogIT extends AbstractServiceTestSupport {
 
     @Autowired
     private GitService gitService
+
+    @Autowired
+    private JobOrchestrator jobOrchestrator
 
     @Test
     void 'Change log based on commits'() {
@@ -92,6 +97,9 @@ class GitChangeLogIT extends AbstractServiceTestSupport {
                         )
                 )
             }
+
+            // Job registration
+            jobOrchestrator.orchestrate(JobRunListener.out());
 
             // Creates builds for some commits
             asUser().with(project, ProjectEdit).call {
@@ -190,6 +198,9 @@ class GitChangeLogIT extends AbstractServiceTestSupport {
                         )
                 )
             }
+
+            // Job registration
+            jobOrchestrator.orchestrate(JobRunListener.out());
 
             // Creates builds for some tags
             asUser().with(project, ProjectEdit).call {
