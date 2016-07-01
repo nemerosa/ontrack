@@ -2,9 +2,7 @@ package net.nemerosa.ontrack.extension.github.property;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.common.MapBuilder;
-import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.git.property.AbstractGitProjectConfigurationPropertyType;
-import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.extension.github.GitHubExtensionFeature;
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration;
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService;
@@ -32,8 +30,8 @@ public class GitHubProjectConfigurationPropertyType
     private final GitHubConfigurationService configurationService;
 
     @Autowired
-    public GitHubProjectConfigurationPropertyType(GitHubExtensionFeature extensionFeature, GitHubConfigurationService configurationService, GitService gitService) {
-        super(extensionFeature, gitService);
+    public GitHubProjectConfigurationPropertyType(GitHubExtensionFeature extensionFeature, GitHubConfigurationService configurationService) {
+        super(extensionFeature);
         this.configurationService = configurationService;
     }
 
@@ -134,8 +132,4 @@ public class GitHubProjectConfigurationPropertyType
         );
     }
 
-    @Override
-    protected GitConfiguration getGitConfiguration(GitHubProjectConfigurationProperty value) {
-        return value.getGitConfiguration();
-    }
 }

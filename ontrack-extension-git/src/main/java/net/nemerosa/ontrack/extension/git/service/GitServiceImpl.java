@@ -937,20 +937,6 @@ public class GitServiceImpl extends AbstractSCMChangeLogService<GitConfiguration
     }
 
     @Override
-    public void scheduleGitIndexation(GitConfiguration configuration) {
-        JobRegistration jobRegistration = getGitIndexationJobRegistration(configuration);
-        jobScheduler.schedule(
-                jobRegistration.getJob(),
-                jobRegistration.getSchedule()
-        );
-    }
-
-    @Override
-    public void unscheduleGitIndexation(GitConfiguration configuration) {
-        jobScheduler.unschedule(getGitIndexationJobKey(configuration));
-    }
-
-    @Override
     public void scheduleGitBuildSync(Branch branch, GitBranchConfigurationProperty property) {
         if (property.getBuildTagInterval() > 0) {
             jobScheduler.schedule(

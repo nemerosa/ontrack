@@ -46,14 +46,13 @@ public class JobOrchestratorTest {
 
         JobOrchestrator orchestrator = new JobOrchestrator(
                 scheduler,
-                Schedule.NONE,
                 "Test",
                 Collections.singleton(jobOrchestrationSupplier)
         );
         JobKey key = orchestrator.getKey();
 
         // Orchestration is registered as a job, but does not run since we have a NONE schedule
-        orchestrator.start();
+        scheduler.schedule(orchestrator, Schedule.NONE);
         Optional<JobStatus> status = scheduler.getJobStatus(key);
         assertTrue(status.isPresent());
         assertNull(status.get().getNextRunDate());

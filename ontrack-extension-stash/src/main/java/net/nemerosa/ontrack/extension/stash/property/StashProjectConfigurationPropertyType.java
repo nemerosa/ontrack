@@ -2,9 +2,7 @@ package net.nemerosa.ontrack.extension.stash.property;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.common.MapBuilder;
-import net.nemerosa.ontrack.extension.git.model.GitConfiguration;
 import net.nemerosa.ontrack.extension.git.property.AbstractGitProjectConfigurationPropertyType;
-import net.nemerosa.ontrack.extension.git.service.GitService;
 import net.nemerosa.ontrack.extension.stash.StashExtensionFeature;
 import net.nemerosa.ontrack.extension.stash.model.StashConfiguration;
 import net.nemerosa.ontrack.extension.stash.service.StashConfigurationService;
@@ -30,8 +28,8 @@ public class StashProjectConfigurationPropertyType extends AbstractGitProjectCon
     private final StashConfigurationService configurationService;
 
     @Autowired
-    public StashProjectConfigurationPropertyType(StashExtensionFeature extensionFeature, StashConfigurationService configurationService, GitService gitService) {
-        super(extensionFeature, gitService);
+    public StashProjectConfigurationPropertyType(StashExtensionFeature extensionFeature, StashConfigurationService configurationService) {
+        super(extensionFeature);
         this.configurationService = configurationService;
     }
 
@@ -128,8 +126,4 @@ public class StashProjectConfigurationPropertyType extends AbstractGitProjectCon
         );
     }
 
-    @Override
-    protected GitConfiguration getGitConfiguration(StashProjectConfigurationProperty value) {
-        return value.getGitConfiguration();
-    }
 }

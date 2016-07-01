@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfigurati
 import net.nemerosa.ontrack.git.support.GitRepo
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.job.JobScheduler
+import net.nemerosa.ontrack.job.orchestrator.JobOrchestrator
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.structure.PropertyService
@@ -25,6 +26,9 @@ class GitIndexationJobIT extends AbstractServiceTestSupport {
 
     @Autowired
     private JobScheduler jobScheduler
+
+    @Autowired
+    private JobOrchestrator jobOrchestrator
 
     /**
      * Regression test for #434. Checks that changing a Git configuration does change the associated indexation job
@@ -63,6 +67,9 @@ class GitIndexationJobIT extends AbstractServiceTestSupport {
                 )
             }
 
+            // Runs the orchestration
+            jobScheduler.fireImmediately(jobOrchestrator.key).get()
+
             // Checks that the indexation job is registered
             def statuses = jobScheduler.getJobStatuses()
             def status = statuses.find {
@@ -89,6 +96,9 @@ class GitIndexationJobIT extends AbstractServiceTestSupport {
                                 .withRemote("file://${newRepo.dir.absolutePath}")
                 )
             }
+
+            // Runs the orchestration
+            jobScheduler.fireImmediately(jobOrchestrator.key).get()
 
             // Checks that the NEW indexation job is registered
             statuses = jobScheduler.getJobStatuses()

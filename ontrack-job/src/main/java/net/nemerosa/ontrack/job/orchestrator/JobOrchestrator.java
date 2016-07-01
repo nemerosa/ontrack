@@ -10,24 +10,15 @@ import java.util.stream.Collectors;
 public class JobOrchestrator implements Job {
 
     private final JobScheduler jobScheduler;
-    private final Schedule schedule;
     private final String name;
     private final Collection<JobOrchestratorSupplier> jobOrchestratorSuppliers;
 
     private final Set<JobKey> cache = new HashSet<>();
 
-    public JobOrchestrator(JobScheduler jobScheduler, Schedule schedule, String name, Collection<JobOrchestratorSupplier> jobOrchestratorSuppliers) {
+    public JobOrchestrator(JobScheduler jobScheduler, String name, Collection<JobOrchestratorSupplier> jobOrchestratorSuppliers) {
         this.jobScheduler = jobScheduler;
-        this.schedule = schedule;
         this.name = name;
         this.jobOrchestratorSuppliers = jobOrchestratorSuppliers;
-    }
-
-    public void start() {
-        jobScheduler.schedule(
-                this,
-                schedule
-        );
     }
 
     @Override

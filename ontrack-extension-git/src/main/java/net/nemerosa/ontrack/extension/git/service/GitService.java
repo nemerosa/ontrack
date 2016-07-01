@@ -137,16 +137,6 @@ public interface GitService extends SCMService {
      */
     GitSynchronisationInfo getProjectGitSyncInfo(Project project);
 
-    /**
-     * Schedules some Git indexation
-     */
-    void scheduleGitIndexation(GitConfiguration configuration);
-
-    /**
-     * Unschedules some Git indexation
-     */
-    void unscheduleGitIndexation(GitConfiguration configuration);
-
     void scheduleGitBuildSync(Branch branch, GitBranchConfigurationProperty property);
 
     void unscheduleGitBuildSync(Branch branch, GitBranchConfigurationProperty property);
