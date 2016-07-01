@@ -6,6 +6,11 @@ import lombok.experimental.Wither;
 @Value
 public class JobCategory {
 
+    /**
+     * Core category, used internally
+     */
+    public static final JobCategory CORE = JobCategory.of("core").withName("Core");
+
     private final String key;
     @Wither
     private final String name;

@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.model.support;
 
+import net.nemerosa.ontrack.job.JobRegistration;
+
 import java.util.Collection;
 
 /**
