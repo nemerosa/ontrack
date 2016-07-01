@@ -15,4 +15,9 @@ public class JobConfigProperties {
      */
     private int refresh = 1;
 
+    /**
+     * Orchestration interval
+     */
+    private int orchestration = 10;
+
 }

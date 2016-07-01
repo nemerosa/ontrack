@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.job.Schedule;
 import net.nemerosa.ontrack.job.orchestrator.JobOrchestrator;
 import net.nemerosa.ontrack.job.orchestrator.JobOrchestratorSupplier;
 import net.nemerosa.ontrack.model.support.JobProvider;
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +16,9 @@ import java.util.Collections;
 
 @Configuration
 public class JobOrchestrationConfig {
+
+    @Autowired
+    private OntrackConfigProperties configProperties;
 
     @Autowired
     private JobScheduler jobScheduler;
@@ -36,7 +40,7 @@ public class JobOrchestrationConfig {
         return () -> Collections.singleton(
                 new JobRegistration(
                         jobOrchestrator(),
-                        Schedule.EVERY_MINUTE // TODO Makes this configurable in OntrackConfigProperties
+                        Schedule.everyMinutes(configProperties.getJobs().getOrchestration())
                 )
         );
     }
