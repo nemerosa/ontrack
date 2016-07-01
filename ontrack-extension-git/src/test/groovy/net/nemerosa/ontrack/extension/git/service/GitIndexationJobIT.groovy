@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationProper
 import net.nemerosa.ontrack.extension.issues.support.MockIssueServiceConfiguration
 import net.nemerosa.ontrack.git.support.GitRepo
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.job.JobRunListener
 import net.nemerosa.ontrack.job.JobScheduler
 import net.nemerosa.ontrack.job.orchestrator.JobOrchestrator
 import net.nemerosa.ontrack.model.security.GlobalSettings
@@ -68,7 +69,7 @@ class GitIndexationJobIT extends AbstractServiceTestSupport {
             }
 
             // Runs the orchestration
-            jobScheduler.fireImmediately(jobOrchestrator.key).get()
+            jobOrchestrator.orchestrate(JobRunListener.out());
 
             // Checks that the indexation job is registered
             def statuses = jobScheduler.getJobStatuses()
@@ -98,7 +99,7 @@ class GitIndexationJobIT extends AbstractServiceTestSupport {
             }
 
             // Runs the orchestration
-            jobScheduler.fireImmediately(jobOrchestrator.key).get()
+            jobOrchestrator.orchestrate(JobRunListener.out());
 
             // Checks that the NEW indexation job is registered
             statuses = jobScheduler.getJobStatuses()

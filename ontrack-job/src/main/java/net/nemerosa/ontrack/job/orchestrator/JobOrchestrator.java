@@ -31,7 +31,7 @@ public class JobOrchestrator implements Job {
         return this::orchestrate;
     }
 
-    private synchronized void orchestrate(JobRunListener runListener) {
+    public synchronized void orchestrate(JobRunListener runListener) {
         // Complete list of registrations
         Collection<JobRegistration> registrations = jobOrchestratorSuppliers.stream()
                 .flatMap(JobOrchestratorSupplier::collectJobRegistrations)
