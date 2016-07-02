@@ -306,9 +306,17 @@ task publicationGitHubRelease {
 task publicationMaven {
     description = "Publication of the DSL library to the Maven Central"
     dependsOn 'uploadArchives'
-    dependsOn 'closeAndPromoteRepository'
+    dependsOn 'closeRepository'
+    dependsOn 'promoteRepository'
 }
-closeAndPromoteRepository.mustRunAfter uploadArchives
+promoteRepository.mustRunAfter uploadArchives
+promoteRepository.mustRunAfter closeRepository
+promoteRepository {
+    doFirst {
+        println "Waiting 30s before launching the repository promotion"
+        sleep 30000
+    }
+}
 
 task publicationRelease {
     dependsOn publicationMaven
