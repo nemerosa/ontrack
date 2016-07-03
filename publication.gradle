@@ -309,7 +309,7 @@ task publicationMaven {
     dependsOn 'closeRepository'
     dependsOn 'promoteRepository'
 }
-promoteRepository.mustRunAfter uploadArchives
+closeRepository.mustRunAfter uploadArchives
 promoteRepository.mustRunAfter closeRepository
 promoteRepository {
     doFirst {
