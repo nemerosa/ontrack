@@ -18,7 +18,8 @@ public class ProjectControllerTest {
         structureService = mock(StructureService)
         CopyService copyService = mock(CopyService)
         SecurityService securityService = mock(SecurityService)
-        controller = new ProjectController(structureService, copyService, securityService)
+        ProjectFavouriteService projectFavouriteService = mock(ProjectFavouriteService)
+        controller = new ProjectController(structureService, copyService, securityService, projectFavouriteService)
     }
 
     @Test

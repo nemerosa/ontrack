@@ -84,6 +84,7 @@ public class ResourceHttpMessageConverterIT extends AbstractServiceTestSupport {
                                         .with("_actions", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getActions:PROJECT,1")
                                         .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:PROJECT,1")
                                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:PROJECT,1,0,10")
+                                        .with("_favourite", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#favouriteProject:1")
                                         .with("_page", "urn:test:#:entity:PROJECT:1")
                                         .end()
                         )
