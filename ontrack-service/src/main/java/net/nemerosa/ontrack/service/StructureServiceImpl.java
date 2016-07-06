@@ -83,6 +83,27 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
+    public List<ProjectStatusView> getProjectStatusViewsForFavourites() {
+        return getProjectFavourites().stream()
+                .map(project -> new ProjectStatusView(
+                        project,
+                        decorationService.getDecorations(project),
+                        getBranchStatusViews(project.getId())
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Project> getProjectFavourites() {
+        // Gets the list of all authorised projects...
+        return getProjectList().stream()
+                // TODO .. filtered using the preferences
+                .filter(project -> false)
+                // .. ok
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public Project newProject(Project project) {
         isEntityNew(project, "Project must be defined");
         securityService.checkGlobalFunction(ProjectCreation.class);
