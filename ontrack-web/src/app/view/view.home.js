@@ -26,7 +26,11 @@ angular.module('ot.view.home', [
         // Loading the project list
         function loadProjects() {
             $scope.loadingProjects = true;
-            ot.pageCall($http.get('structure/projects/view')).then(function (projectStatusViewResources) {
+            ot.pageCall($http.get('structure/projects')).then(function (projectResources) {
+                $scope.projectResources = projectResources;
+            });
+            // Detailed views
+            ot.pageCall($http.get('structure/projects/favourites')).then(function (projectStatusViewResources) {
                 $scope.projectStatusViewResources = projectStatusViewResources;
                 $scope.projectStatusViews = projectStatusViewResources.resources;
                 // All branches disabled status computation

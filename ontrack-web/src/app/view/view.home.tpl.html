@@ -34,6 +34,7 @@
     </ot-noentry>
     <div class="row" ng-if="projectStatusViews">
         <div class="col-md-12">
+            <h4>Favourites</h4>
             <div class="row">
                 <div class="col-md-12 ot-home-header">
                     List of projects with the list of their branches and the highest promotion
@@ -96,6 +97,30 @@
                 </tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+    <div class="row" ng-if="projectResources.resources">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <h4>All projects</h4>
+                    <!-- TODO Name filter -->
+                </div>
+            </div>
+            <!-- TODO When no project -->
+            <div class="row">
+                <div class="col-md-3"
+                     ng-repeat="project in projectResources.resources">
+                    <div class="ot-home-project"
+                         ng-class="{'ot-entity-disabled': project.disabled}">
+                        <!-- TODO Selection for favourite -->
+                        <a href="#/project/{{project.id}}">
+                            {{project.name}}
+                        </a>
+                        <ot-entity-decorations entity="project"></ot-entity-decorations>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </ot-view>
