@@ -56,9 +56,10 @@ public class StructureServiceImpl implements StructureService {
     private final PredefinedPromotionLevelService predefinedPromotionLevelService;
     private final PredefinedValidationStampService predefinedValidationStampService;
     private final DecorationService decorationService;
+    private final ProjectFavouriteService projectFavouriteService;
 
     @Autowired
-    public StructureServiceImpl(SecurityService securityService, EventPostService eventPostService, EventFactory eventFactory, ValidationRunStatusService validationRunStatusService, StructureRepository structureRepository, ExtensionManager extensionManager, PropertyService propertyService, PredefinedPromotionLevelService predefinedPromotionLevelService, PredefinedValidationStampService predefinedValidationStampService, DecorationService decorationService) {
+    public StructureServiceImpl(SecurityService securityService, EventPostService eventPostService, EventFactory eventFactory, ValidationRunStatusService validationRunStatusService, StructureRepository structureRepository, ExtensionManager extensionManager, PropertyService propertyService, PredefinedPromotionLevelService predefinedPromotionLevelService, PredefinedValidationStampService predefinedValidationStampService, DecorationService decorationService, ProjectFavouriteService projectFavouriteService) {
         this.securityService = securityService;
         this.eventPostService = eventPostService;
         this.eventFactory = eventFactory;
@@ -69,6 +70,7 @@ public class StructureServiceImpl implements StructureService {
         this.predefinedPromotionLevelService = predefinedPromotionLevelService;
         this.predefinedValidationStampService = predefinedValidationStampService;
         this.decorationService = decorationService;
+        this.projectFavouriteService = projectFavouriteService;
     }
 
     @Override
@@ -97,8 +99,8 @@ public class StructureServiceImpl implements StructureService {
     public List<Project> getProjectFavourites() {
         // Gets the list of all authorised projects...
         return getProjectList().stream()
-                // TODO .. filtered using the preferences
-                .filter(project -> false)
+                // .. filtered using the preferences
+                .filter(projectFavouriteService::isProjectFavourite)
                 // .. ok
                 .collect(Collectors.toList());
     }
