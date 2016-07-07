@@ -83,13 +83,13 @@ public class ProjectResourceDecorator extends AbstractResourceDecorator<Project>
                 .link(
                         "_unfavourite",
                         on(ProjectController.class).unfavouriteProject(project.getId()),
-                        projectFavourite
+                        resourceContext.isLogged() && projectFavourite
                 )
                 // Not favourite --> 'favourite'
                 .link(
                         "_favourite",
                         on(ProjectController.class).favouriteProject(project.getId()),
-                        !projectFavourite
+                        resourceContext.isLogged() && !projectFavourite
                 )
                 // Page
                 .page(project);

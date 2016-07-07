@@ -36,4 +36,9 @@ public interface ResourceContext {
      * Checks if the <code>fn</code> function is granted for the current user.
      */
     boolean isGlobalFunctionGranted(Class<? extends GlobalFunction> fn);
+
+    /**
+     * Checks if the current user is logged.
+     */
+    boolean isLogged();
 }
