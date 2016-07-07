@@ -34,7 +34,10 @@
     </ot-noentry>
     <div class="row" ng-if="projectStatusViews">
         <div class="col-md-12">
-            <h4>Favourites</h4>
+            <h4>
+                <span class="fa fa-star"></span>
+                Favourites
+            </h4>
             <div class="row">
                 <div class="col-md-12 ot-home-header">
                     List of projects with the list of their branches and the highest promotion
@@ -123,7 +126,8 @@
                                 ng-click="projectFavourite(project)"
                         ></span>
                         <span
-                                class="fa fa-star ot-command"
+                                class="fa fa-star ot-action"
+                                style="color: yellow;"
                                 title="Unsets as favourite"
                                 ng-if="project._unfavourite"
                                 ng-click="projectUnfavourite(project)"

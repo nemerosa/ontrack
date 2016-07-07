@@ -83,6 +83,20 @@ angular.module('ot.view.home', [
             });
         }
 
+        // Sets a project as favourite
+        $scope.projectFavourite = function (project) {
+            if (project._favourite) {
+                ot.pageCall($http.put(project._favourite)).then(loadProjects);
+            }
+        };
+
+        // Unsets a project as favourite
+        $scope.projectUnfavourite = function (project) {
+            if (project._unfavourite) {
+                ot.pageCall($http.put(project._unfavourite)).then(loadProjects);
+            }
+        };
+
         // Login procedure
         $scope.accessStatus = 'undefined';
         if (code && code == 403) {
