@@ -103,7 +103,10 @@
         <div class="col-md-12">
             <div class="row">
                 <div class="col-md-12">
-                    <h4>All projects</h4>
+                    <h4>
+                        <span class="fa fa-book"></span>
+                        All projects
+                    </h4>
                     <!-- TODO Name filter -->
                 </div>
             </div>
@@ -113,7 +116,18 @@
                      ng-repeat="project in projectResources.resources">
                     <div class="ot-home-project"
                          ng-class="{'ot-entity-disabled': project.disabled}">
-                        <!-- TODO Selection for favourite -->
+                        <span
+                                class="fa fa-star-o ot-command"
+                                title="Sets as favourite"
+                                ng-if="project._favourite"
+                                ng-click="projectFavourite(project)"
+                        ></span>
+                        <span
+                                class="fa fa-star ot-command"
+                                title="Unsets as favourite"
+                                ng-if="project._unfavourite"
+                                ng-click="projectUnfavourite(project)"
+                        ></span>
                         <a href="#/project/{{project.id}}">
                             {{project.name}}
                         </a>
