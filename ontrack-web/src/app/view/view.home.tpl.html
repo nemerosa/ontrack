@@ -38,22 +38,9 @@
                 <span class="fa fa-star"></span>
                 Favourites
             </h4>
-            <div class="row">
-                <div class="col-md-12 ot-home-header">
-                    List of projects with the list of their branches and the highest promotion
-                    level they get promoted to.
-                    <div class="ot-home-filter input-group col-md-4">
-                        <input class="form-control"
-                               type="text"
-                               ng-model="projectNameFilter"
-                               placeholder="Filter on project names"/>
-                        <span class="input-group-addon"><span class="fa fa-search"></span></span>
-                    </div>
-                </div>
-            </div>
             <table class="ot-home-projects">
                 <tbody>
-                <tr ng-repeat="projectStatusView in projectStatusViews | filter:{project: {name: projectNameFilter}}"
+                <tr ng-repeat="projectStatusView in projectStatusViews"
                     ng-show="showDisabled || (!projectStatusView.project.disabled && !projectStatusView.allBranchesDisabled)">
                     <td ng-class="{'ot-entity-disabled': projectStatusView.project.disabled}">
                         <span
@@ -116,13 +103,25 @@
                         <span class="fa fa-book"></span>
                         All projects
                     </h4>
-                    <!-- TODO Name filter -->
+                    <!-- Name filter -->
+                    <div class="row" ng-if="projectResources.resources.length > 10">
+                        <div class="col-md-12 ot-home-header">
+                            <div class="ot-home-filter input-group col-md-4">
+                                <input class="form-control"
+                                       type="text"
+                                       ng-model="projectNameFilter"
+                                       placeholder="Filter on project names"/>
+                                <span class="input-group-addon"><span class="fa fa-search"></span></span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <!-- TODO When no project -->
             <div class="row">
                 <div class="col-md-3"
-                     ng-repeat="project in projectResources.resources">
+                     ng-repeat="project in projectResources.resources | filter:projectNameFilter"
+                     ng-show="showDisabled || !project.disabled">
                     <div class="ot-home-project"
                          ng-class="{'ot-entity-disabled': project.disabled}">
                         <span
