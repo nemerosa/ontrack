@@ -109,7 +109,7 @@
                             <div class="ot-home-filter input-group col-md-4">
                                 <input class="form-control"
                                        type="text"
-                                       ng-model="projectNameFilter"
+                                       ng-model="projectFilter.name"
                                        placeholder="Filter on project names"/>
                                 <span class="input-group-addon"><span class="fa fa-search"></span></span>
                             </div>
@@ -120,7 +120,7 @@
             <!-- TODO When no project -->
             <div class="row">
                 <div class="col-md-3"
-                     ng-repeat="project in projectResources.resources | filter:projectNameFilter"
+                     ng-repeat="project in projectResources.resources | filter:{name: projectFilter.name}"
                      ng-show="showDisabled || !project.disabled">
                     <div class="ot-home-project"
                          ng-class="{'ot-entity-disabled': project.disabled}">

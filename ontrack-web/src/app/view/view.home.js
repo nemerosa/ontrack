@@ -22,7 +22,9 @@ angular.module('ot.view.home', [
             commands: []
         };
         // No initial filter
-        $scope.projectNameFilter = '';
+        $scope.projectFilter = {
+            name: ''
+        };
         // Loading the project list
         function loadProjects() {
             $scope.loadingProjects = true;
