@@ -29,9 +29,6 @@
             </div>
         </div>
     </div>
-    <ot-noentry ng-show="accessStatus == 'ok' && !loadingProjects" list="projectStatusViews">
-        No project has been created yet, or no right is granted for you to see at least one of them.
-    </ot-noentry>
     <div class="row" ng-if="projectStatusViews">
         <div class="col-md-12">
             <h4>
@@ -95,6 +92,19 @@
             </table>
         </div>
     </div>
+    <!-- When no project -->
+    <div class="row" ng-show="accessStatus == 'ok' && projectResources.resources.length == 0">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                No project in the list.
+                        <span ng-if="projectResources._create">
+                            Create a new project by using this
+                            <a href ng-click="createProject()">link</a>.
+                        </span>
+            </div>
+        </div>
+    </div>
+    <!-- List of projects -->
     <div class="row" ng-if="projectResources.resources">
         <div class="col-md-12">
             <div class="row" ng-show="projectStatusViews.length">
@@ -103,21 +113,21 @@
                         <span class="fa fa-book"></span>
                         All projects
                     </h4>
-                    <!-- Name filter -->
-                    <div class="row" ng-if="projectResources.resources.length > 10">
-                        <div class="col-md-12 ot-home-header">
-                            <div class="ot-home-filter input-group col-md-4">
-                                <input class="form-control"
-                                       type="text"
-                                       ng-model="projectFilter.name"
-                                       placeholder="Filter on project names"/>
-                                <span class="input-group-addon"><span class="fa fa-search"></span></span>
-                            </div>
-                        </div>
+                </div>
+            </div>
+            <!-- Name filter -->
+            <div class="row" ng-if="projectResources.resources.length > 10">
+                <div class="col-md-12 ot-home-header">
+                    <div class="ot-home-filter input-group col-md-4">
+                        <input class="form-control"
+                               type="text"
+                               ng-model="projectFilter.name"
+                               placeholder="Filter on project names"/>
+                        <span class="input-group-addon"><span class="fa fa-search"></span></span>
                     </div>
                 </div>
             </div>
-            <!-- TODO When no project -->
+            <!-- List of projects -->
             <div class="row">
                 <div class="col-md-3"
                      ng-repeat="project in projectResources.resources | filter:{name: projectFilter.name}"
