@@ -12,6 +12,10 @@ public interface StructureService {
 
     List<ProjectStatusView> getProjectStatusViews();
 
+    List<ProjectStatusView> getProjectStatusViewsForFavourites();
+
+    List<Project> getProjectFavourites();
+
     // Projects
 
     Project newProject(Project project);

@@ -29,29 +29,23 @@
             </div>
         </div>
     </div>
-    <ot-noentry ng-show="accessStatus == 'ok' && !loadingProjects" list="projectStatusViews">
-        No project has been created yet, or no right is granted for you to see at least one of them.
-    </ot-noentry>
     <div class="row" ng-if="projectStatusViews">
         <div class="col-md-12">
-            <div class="row">
-                <div class="col-md-12 ot-home-header">
-                    List of projects with the list of their branches and the highest promotion
-                    level they get promoted to.
-                    <div class="ot-home-filter input-group col-md-4">
-                        <input class="form-control"
-                               type="text"
-                               ng-model="projectNameFilter"
-                               placeholder="Filter on project names"/>
-                        <span class="input-group-addon"><span class="fa fa-search"></span></span>
-                    </div>
-                </div>
-            </div>
+            <h4>
+                <span class="fa fa-star"></span>
+                Favourites
+            </h4>
             <table class="ot-home-projects">
                 <tbody>
-                <tr ng-repeat="projectStatusView in projectStatusViews | filter:{project: {name: projectNameFilter}}"
+                <tr ng-repeat="projectStatusView in projectStatusViews"
                     ng-show="showDisabled || (!projectStatusView.project.disabled && !projectStatusView.allBranchesDisabled)">
                     <td ng-class="{'ot-entity-disabled': projectStatusView.project.disabled}">
+                        <span
+                                class="fa fa-star ot-command"
+                                title="Unsets as favourite"
+                                ng-if="projectStatusView.project._unfavourite"
+                                ng-click="projectUnfavourite(projectStatusView.project)"
+                        ></span>
                         <a href="#/project/{{projectStatusView.project.id}}">
                             {{projectStatusView.project.name}}
                         </a>
@@ -96,6 +90,70 @@
                 </tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+    <!-- When no project -->
+    <div class="row" ng-show="accessStatus == 'ok' && projectResources.resources.length == 0">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                No project in the list.
+                        <span ng-if="projectResources._create">
+                            Create a new project by using this
+                            <a href ng-click="createProject()">link</a>.
+                        </span>
+            </div>
+        </div>
+    </div>
+    <!-- List of projects -->
+    <div class="row" ng-if="projectResources.resources">
+        <div class="col-md-12">
+            <div class="row" ng-show="projectStatusViews.length">
+                <div class="col-md-12">
+                    <h4>
+                        <span class="fa fa-book"></span>
+                        All projects
+                    </h4>
+                </div>
+            </div>
+            <!-- Name filter -->
+            <div class="row" ng-if="projectResources.resources.length > 10">
+                <div class="col-md-12 ot-home-header">
+                    <div class="ot-home-filter input-group col-md-4">
+                        <input class="form-control"
+                               type="text"
+                               ng-model="projectFilter.name"
+                               placeholder="Filter on project names"/>
+                        <span class="input-group-addon"><span class="fa fa-search"></span></span>
+                    </div>
+                </div>
+            </div>
+            <!-- List of projects -->
+            <div class="row">
+                <div class="col-md-3"
+                     ng-repeat="project in projectResources.resources | filter:{name: projectFilter.name}"
+                     ng-show="showDisabled || !project.disabled">
+                    <div class="ot-home-project"
+                         ng-class="{'ot-entity-disabled': project.disabled}">
+                        <span
+                                class="fa fa-star-o ot-command"
+                                title="Sets as favourite"
+                                ng-if="project._favourite"
+                                ng-click="projectFavourite(project)"
+                        ></span>
+                        <span
+                                class="fa fa-star ot-action"
+                                style="color: yellow;"
+                                title="Unsets as favourite"
+                                ng-if="project._unfavourite"
+                                ng-click="projectUnfavourite(project)"
+                        ></span>
+                        <a href="#/project/{{project.id}}">
+                            {{project.name}}
+                        </a>
+                        <ot-entity-decorations entity="project"></ot-entity-decorations>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </ot-view>

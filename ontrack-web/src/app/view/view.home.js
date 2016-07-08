@@ -22,20 +22,14 @@ angular.module('ot.view.home', [
             commands: []
         };
         // No initial filter
-        $scope.projectNameFilter = '';
+        $scope.projectFilter = {
+            name: ''
+        };
         // Loading the project list
         function loadProjects() {
             $scope.loadingProjects = true;
-            ot.pageCall($http.get('structure/projects/view')).then(function (projectStatusViewResources) {
-                $scope.projectStatusViewResources = projectStatusViewResources;
-                $scope.projectStatusViews = projectStatusViewResources.resources;
-                // All branches disabled status computation
-                $scope.projectStatusViews.forEach(function (projectStatusView) {
-                    projectStatusView.allBranchesDisabled = projectStatusView.branchStatusViews.length > 0 &&
-                        projectStatusView.branchStatusViews.every(function (branchStatusView) {
-                            return branchStatusView.branch.disabled || branchStatusView.branch.type == 'TEMPLATE_DEFINITION';
-                        });
-                });
+            ot.pageCall($http.get('structure/projects')).then(function (projectResources) {
+                $scope.projectResources = projectResources;
                 // Commands
                 $rootScope.view.commands = [
                     {
@@ -43,11 +37,9 @@ angular.module('ot.view.home', [
                         name: 'Create project',
                         cls: 'ot-command-project-new',
                         condition: function () {
-                            return projectStatusViewResources._create;
+                            return projectResources._create;
                         },
-                        action: function () {
-                            otStructureService.createProject(projectStatusViewResources._create).then(loadProjects);
-                        }
+                        action: $scope.createProject
                     }, {
                         id: 'showDisabled',
                         name: "Show all hidden items",
@@ -74,10 +66,41 @@ angular.module('ot.view.home', [
                         link: '/api-doc'
                     }
                 ];
+            });
+            // Detailed views
+            ot.pageCall($http.get('structure/projects/favourites')).then(function (projectStatusViewResources) {
+                $scope.projectStatusViewResources = projectStatusViewResources;
+                $scope.projectStatusViews = projectStatusViewResources.resources;
+                // All branches disabled status computation
+                $scope.projectStatusViews.forEach(function (projectStatusView) {
+                    projectStatusView.allBranchesDisabled = projectStatusView.branchStatusViews.length > 0 &&
+                        projectStatusView.branchStatusViews.every(function (branchStatusView) {
+                            return branchStatusView.branch.disabled || branchStatusView.branch.type == 'TEMPLATE_DEFINITION';
+                        });
+                });
             }).finally(function () {
                 $scope.loadingProjects = false;
             });
         }
+
+        // Creating a project
+        $scope.createProject = function () {
+            otStructureService.createProject($scope.projectResources._create).then(loadProjects);
+        };
+
+        // Sets a project as favourite
+        $scope.projectFavourite = function (project) {
+            if (project._favourite) {
+                ot.pageCall($http.put(project._favourite)).then(loadProjects);
+            }
+        };
+
+        // Unsets a project as favourite
+        $scope.projectUnfavourite = function (project) {
+            if (project._unfavourite) {
+                ot.pageCall($http.put(project._unfavourite)).then(loadProjects);
+            }
+        };
 
         // Login procedure
         $scope.accessStatus = 'undefined';

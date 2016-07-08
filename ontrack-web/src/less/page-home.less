@@ -8,27 +8,37 @@
   height: @height !important;
 }
 
+.ot-home-project-mixin {
+  vertical-align: top;
+  padding: @otHomeMargin;
+  border-bottom: solid @otHomeMargin white;
+  .bg-primary;
+  a {
+    color: @btn-primary-color;
+    font-weight: bold;
+  }
+  &.ot-entity-disabled {
+    opacity: 0.5;
+  }
+  .ot-decoration {
+    img {
+      .ot-icon-mini;
+    }
+  }
+}
+
+div.ot-home-project {
+  .make-project-row(@otHomeRowHeight);
+  .ot-home-project-mixin;
+  margin-bottom: 5px;
+}
+
 table.ot-home-projects {
   border-collapse: separate;
   tr {
     .make-project-row(@otHomeRowHeight);
     td:first-child {
-      vertical-align: top;
-      padding: @otHomeMargin;
-      border-bottom: solid @otHomeMargin white;
-      .bg-primary;
-      a {
-        color: @btn-primary-color;
-        font-weight: bold;
-      }
-      &.ot-entity-disabled {
-        opacity: 0.5;
-      }
-      .ot-decoration {
-        img {
-          .ot-icon-mini;
-        }
-      }
+      .ot-home-project-mixin;
     }
     .ot-home-branch {
       float: left;

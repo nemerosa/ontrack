@@ -28,18 +28,20 @@ public class CoreResourceModuleTest {
     private ResourceObjectMapper mapper;
     private SecurityService securityService;
     private StructureService structureService;
+    private ProjectFavouriteService projectFavouriteService;
 
     @Before
     public void before() {
         securityService = mock(SecurityService.class);
         structureService = mock(StructureService.class);
         ResourceDecorationContributorService resourceDecorationContributorService = mock(ResourceDecorationContributorService.class);
+        projectFavouriteService = mock(ProjectFavouriteService.class);
         mapper = new ResourceObjectMapperFactory().resourceObjectMapper(
                 Collections.singletonList(
                         new DefaultResourceModule(
                                 Arrays.asList(
                                         new ConnectedAccountResourceDecorator(),
-                                        new ProjectResourceDecorator(resourceDecorationContributorService),
+                                        new ProjectResourceDecorator(resourceDecorationContributorService, projectFavouriteService),
                                         new BranchResourceDecorator(resourceDecorationContributorService, structureService),
                                         new PromotionLevelResourceDecorator(),
                                         new ValidationStampResourceDecorator(),
@@ -96,6 +98,86 @@ public class CoreResourceModuleTest {
                         .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:PROJECT,1")
                         .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:PROJECT,1,0,10")
                         .with("_disable", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#disableProject:1")
+                        .with("_page", "urn:test:#:entity:PROJECT:1")
+                        .end(),
+                p
+        );
+    }
+
+    @Test
+    public void project_not_favourite() throws JsonProcessingException {
+        Project p = Project.of(new NameDescription("P", "Project")).withId(ID.of(1));
+        when(securityService.isLogged()).thenReturn(true);
+        assertResourceJson(
+                mapper,
+                object()
+                        .with("id", 1)
+                        .with("name", "P")
+                        .with("description", "Project")
+                        .with("disabled", false)
+                        .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
+                        .with("_branches", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranchListForProject:1")
+                        .with("_branchStatusViews", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getBranchStatusViews:1")
+                        .with("_buildSearch", "urn:test:net.nemerosa.ontrack.boot.ui.BuildController#buildSearchForm:1")
+                        .with("_buildDiffActions", "urn:test:net.nemerosa.ontrack.boot.ui.BuildController#buildDiffActions:1")
+                        .with("_properties", "urn:test:net.nemerosa.ontrack.boot.ui.PropertyController#getProperties:PROJECT,1")
+                        .with("_actions", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getActions:PROJECT,1")
+                        .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:PROJECT,1")
+                        .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:PROJECT,1,0,10")
+                        .with("_favourite", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#favouriteProject:1")
+                        .with("_page", "urn:test:#:entity:PROJECT:1")
+                        .end(),
+                p
+        );
+    }
+
+    @Test
+    public void project_no_favourite_link_if_not_logged() throws JsonProcessingException {
+        Project p = Project.of(new NameDescription("P", "Project")).withId(ID.of(1));
+        assertResourceJson(
+                mapper,
+                object()
+                        .with("id", 1)
+                        .with("name", "P")
+                        .with("description", "Project")
+                        .with("disabled", false)
+                        .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
+                        .with("_branches", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranchListForProject:1")
+                        .with("_branchStatusViews", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getBranchStatusViews:1")
+                        .with("_buildSearch", "urn:test:net.nemerosa.ontrack.boot.ui.BuildController#buildSearchForm:1")
+                        .with("_buildDiffActions", "urn:test:net.nemerosa.ontrack.boot.ui.BuildController#buildDiffActions:1")
+                        .with("_properties", "urn:test:net.nemerosa.ontrack.boot.ui.PropertyController#getProperties:PROJECT,1")
+                        .with("_actions", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getActions:PROJECT,1")
+                        .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:PROJECT,1")
+                        .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:PROJECT,1,0,10")
+                        .with("_page", "urn:test:#:entity:PROJECT:1")
+                        .end(),
+                p
+        );
+    }
+
+    @Test
+    public void project_favourite() throws JsonProcessingException {
+        Project p = Project.of(new NameDescription("P", "Project")).withId(ID.of(1));
+        when(securityService.isLogged()).thenReturn(true);
+        when(projectFavouriteService.isProjectFavourite(p)).thenReturn(true);
+        assertResourceJson(
+                mapper,
+                object()
+                        .with("id", 1)
+                        .with("name", "P")
+                        .with("description", "Project")
+                        .with("disabled", false)
+                        .with("_self", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getProject:1")
+                        .with("_branches", "urn:test:net.nemerosa.ontrack.boot.ui.BranchController#getBranchListForProject:1")
+                        .with("_branchStatusViews", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#getBranchStatusViews:1")
+                        .with("_buildSearch", "urn:test:net.nemerosa.ontrack.boot.ui.BuildController#buildSearchForm:1")
+                        .with("_buildDiffActions", "urn:test:net.nemerosa.ontrack.boot.ui.BuildController#buildDiffActions:1")
+                        .with("_properties", "urn:test:net.nemerosa.ontrack.boot.ui.PropertyController#getProperties:PROJECT,1")
+                        .with("_actions", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectEntityExtensionController#getActions:PROJECT,1")
+                        .with("_decorations", "urn:test:net.nemerosa.ontrack.boot.ui.DecorationsController#getDecorations:PROJECT,1")
+                        .with("_events", "urn:test:net.nemerosa.ontrack.boot.ui.EventController#getEvents:PROJECT,1,0,10")
+                        .with("_unfavourite", "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#unfavouriteProject:1")
                         .with("_page", "urn:test:#:entity:PROJECT:1")
                         .end(),
                 p

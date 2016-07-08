@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.boot.ui.*;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
+import net.nemerosa.ontrack.model.structure.ProjectFavouriteService;
 import net.nemerosa.ontrack.ui.resource.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,15 +17,18 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 public class ProjectResourceDecorator extends AbstractResourceDecorator<Project> {
 
     private final ResourceDecorationContributorService resourceDecorationContributorService;
+    private final ProjectFavouriteService projectFavouriteService;
 
     @Autowired
-    public ProjectResourceDecorator(ResourceDecorationContributorService resourceDecorationContributorService) {
+    public ProjectResourceDecorator(ResourceDecorationContributorService resourceDecorationContributorService, ProjectFavouriteService projectFavouriteService) {
         super(Project.class);
         this.resourceDecorationContributorService = resourceDecorationContributorService;
+        this.projectFavouriteService = projectFavouriteService;
     }
 
     @Override
     public List<Link> links(Project project, ResourceContext resourceContext) {
+        boolean projectFavourite = projectFavouriteService.isProjectFavourite(project);
         LinksBuilder linksBuilder = resourceContext.links()
                 .self(on(ProjectController.class).getProject(project.getId()))
                 // List of branches for this project
@@ -74,6 +78,18 @@ public class ProjectResourceDecorator extends AbstractResourceDecorator<Project>
                         on(ProjectController.class).disableProject(project.getId()),
                         resourceContext.isProjectFunctionGranted(project.id(), ProjectEdit.class)
                                 && !project.isDisabled()
+                )
+                // Favourite --> 'unfavourite'
+                .link(
+                        "_unfavourite",
+                        on(ProjectController.class).unfavouriteProject(project.getId()),
+                        resourceContext.isLogged() && projectFavourite
+                )
+                // Not favourite --> 'favourite'
+                .link(
+                        "_favourite",
+                        on(ProjectController.class).favouriteProject(project.getId()),
+                        resourceContext.isLogged() && !projectFavourite
                 )
                 // Page
                 .page(project);

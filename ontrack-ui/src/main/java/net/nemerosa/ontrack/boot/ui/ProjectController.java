@@ -29,12 +29,14 @@ public class ProjectController extends AbstractResourceController {
     private final StructureService structureService;
     private final CopyService copyService;
     private final SecurityService securityService;
+    private final ProjectFavouriteService projectFavouriteService;
 
     @Autowired
-    public ProjectController(StructureService structureService, CopyService copyService, SecurityService securityService) {
+    public ProjectController(StructureService structureService, CopyService copyService, SecurityService securityService, ProjectFavouriteService projectFavouriteService) {
         this.structureService = structureService;
         this.copyService = copyService;
         this.securityService = securityService;
+        this.projectFavouriteService = projectFavouriteService;
     }
 
     @RequestMapping(value = "", method = RequestMethod.GET)
@@ -51,6 +53,16 @@ public class ProjectController extends AbstractResourceController {
         return Resources.of(
                 structureService.getProjectStatusViews(),
                 uri(on(ProjectController.class).getProjectStatusViews())
+        )
+                .forView(ProjectStatusView.class)
+                .with(Link.CREATE, uri(on(ProjectController.class).newProject(null)), securityService.isGlobalFunctionGranted(ProjectCreation.class));
+    }
+
+    @RequestMapping(value = "favourites", method = RequestMethod.GET)
+    public Resources<ProjectStatusView> getProjectStatusViewsForFavourites() {
+        return Resources.of(
+                structureService.getProjectStatusViewsForFavourites(),
+                uri(on(ProjectController.class).getProjectStatusViewsForFavourites())
         )
                 .forView(ProjectStatusView.class)
                 .with(Link.CREATE, uri(on(ProjectController.class).newProject(null)), securityService.isGlobalFunctionGranted(ProjectCreation.class));
@@ -166,6 +178,20 @@ public class ProjectController extends AbstractResourceController {
         Project project = structureService.getProject(projectId);
         // Performs the clone
         return copyService.cloneProject(project, request);
+    }
+
+    @RequestMapping(value = "{projectId}/favourite", method = RequestMethod.PUT)
+    public Project favouriteProject(@PathVariable ID projectId) {
+        Project project = structureService.getProject(projectId);
+        projectFavouriteService.setProjectFavourite(project, true);
+        return project;
+    }
+
+    @RequestMapping(value = "{projectId}/unfavourite", method = RequestMethod.PUT)
+    public Project unfavouriteProject(@PathVariable ID projectId) {
+        Project project = structureService.getProject(projectId);
+        projectFavouriteService.setProjectFavourite(project, false);
+        return project;
     }
 
 }
