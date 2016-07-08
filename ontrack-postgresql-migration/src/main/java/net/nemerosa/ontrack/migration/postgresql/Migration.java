@@ -170,6 +170,9 @@ public class Migration {
         // BUILD_FILTERS
         copy("BUILD_FILTERS", "ACCOUNTID", "BRANCHID", "NAME", "TYPE", "DATA::JSONB");
 
+        // PROJECT_FAVOURITES
+        copy("PROJECT_FAVOURITES", "ID", "ACCOUNTID", "PROJECTID");
+
         // Subversion
         // Subversion tables do not need to be migrated - they will be filled on demand
 
