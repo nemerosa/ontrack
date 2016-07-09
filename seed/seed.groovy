@@ -143,6 +143,7 @@ build
 --info
 --stacktrace
 --profile
+--console plain
 --parallel
 '''
         environmentVariables {
@@ -208,6 +209,7 @@ ciAcceptanceTest
 -PacceptanceJar=ontrack-acceptance-${VERSION}.jar
 --info
 --profile
+--console plain
 --stacktrace
 '''
     }
@@ -280,6 +282,10 @@ if (release) {
 debAcceptanceTest
 -PacceptanceJar=ontrack-acceptance-\${VERSION}.jar
 -PacceptanceDebianDistributionDir=.
+--info
+--profile
+--console plain
+--stacktrace
 """
         }
         publishers {
@@ -313,6 +319,10 @@ debAcceptanceTest
 rpmAcceptanceTest${centOsVersion}
 -PacceptanceJar=ontrack-acceptance-\${VERSION}.jar
 -PacceptanceRpmDistributionDir=.
+--info
+--profile
+--console plain
+--stacktrace
 """
             }
             publishers {
@@ -388,6 +398,10 @@ doAcceptanceTest
 -PacceptanceJar=ontrack-acceptance-${VERSION}.jar
 -PdigitalOceanAccessToken=${DO_TOKEN}
 -PontrackVersion=${VERSION}
+--info
+--profile
+--console plain
+--stacktrace
 '''
     }
     publishers {
@@ -426,6 +440,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-publish") {
 --build-file publication.gradle
 --info
 --profile
+--console plain
 --stacktrace
 -PontrackVersion=\${VERSION_DISPLAY}
 -PontrackVersionCommit=\${VERSION_COMMIT}
@@ -437,6 +452,7 @@ publicationRelease
 --build-file publication.gradle
 --info
 --profile
+--console plain
 --stacktrace
 -PontrackVersion=\${VERSION_DISPLAY}
 -PontrackVersionCommit=\${VERSION_COMMIT}
@@ -506,6 +522,8 @@ if (production) {
 --build-file production.gradle
 --info
 --profile
+--console plain
+--stacktrace
 productionUpgrade
 -PontrackVersion=${VERSION_DISPLAY}
 '''
@@ -548,6 +566,8 @@ productionUpgrade
 --build-file production.gradle
 --info
 --profile
+--console plain
+--stacktrace
 productionTest
 -PacceptanceJar=ontrack-acceptance-${VERSION}.jar
 '''
