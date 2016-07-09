@@ -117,7 +117,6 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-build") {
         }
     }
     deliveryPipelineConfiguration('Commit', 'Build')
-    jdk 'JDK8u25'
     scm {
         git {
             remote {
@@ -168,6 +167,8 @@ build
                 parameters {
                     // Link based on full version
                     predefinedProp 'VERSION', '${VERSION_DISPLAY}'
+                    // Uses the same node in order to have local Docker image available
+                    sameNode()
                 }
             }
         }
@@ -193,7 +194,6 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
         artifactNumToKeep(5)
     }
     deliveryPipelineConfiguration('Commit', 'Local acceptance')
-    jdk 'JDK8u25'
     parameters {
         // Link based on full version
         stringParam('VERSION', '', '')
