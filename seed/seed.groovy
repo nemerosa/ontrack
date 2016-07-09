@@ -144,7 +144,6 @@ build
 --stacktrace
 --profile
 --console plain
---parallel
 '''
         environmentVariables {
             propertiesFile 'build/version.properties'
