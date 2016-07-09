@@ -108,7 +108,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-build") {
         numToKeep(40)
         artifactNumToKeep(5)
     }
-    label 'build'
+    label 'docker'
     wrappers {
         buildInDocker {
             dockerfile('seed/docker')
