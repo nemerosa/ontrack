@@ -140,6 +140,7 @@ integrationTest
 dockerLatest
 osPackages
 build
+-PbowerOptions='--allow-root'
 --info
 --stacktrace
 --profile
