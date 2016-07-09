@@ -108,12 +108,20 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-build") {
         numToKeep(40)
         artifactNumToKeep(5)
     }
+    label 'build'
+    wrappers {
+        buildInDocker {
+            dockerfile('seed/docker')
+            volume '/var/run/docker.sock', '/var/run/docker.sock'
+            verbose true
+        }
+    }
     deliveryPipelineConfiguration('Commit', 'Build')
     jdk 'JDK8u25'
     scm {
         git {
             remote {
-                url "git@github.com:nemerosa/ontrack.git"
+                url PROJECT_SCM_URL
                 branch "origin/${BRANCH}"
             }
             extensions {
