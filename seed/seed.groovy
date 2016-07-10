@@ -198,8 +198,14 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
         // Link based on full version
         stringParam('VERSION', '', '')
     }
+    label 'docker'
     wrappers {
         xvfb('default')
+        buildInDocker {
+            dockerfile('seed/docker')
+            volume '/var/run/docker.sock', '/var/run/docker.sock'
+            verbose true
+        }
     }
     extractDeliveryArtifacts delegate, 'ontrack-acceptance'
     steps {

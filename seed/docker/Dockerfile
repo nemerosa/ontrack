@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     git \
     subversion \
     zip \
+    xvfb \
     && rm -rf /var/lib/apt/lists/*
 
 # Installing Docker
