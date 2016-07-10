@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Alias for Xvfb
-RUN ln -s /usr/bin/xvfb-run /usr/bin/xvfb
+RUN ln -s /usr/bin/xvfb-run /usr/bin/Xvfb
 
 # Installing Docker
 RUN wget https://get.docker.com/builds/Linux/x86_64/docker-1.11.0.tgz -O docker.tgz
