@@ -200,7 +200,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     }
     label 'docker'
     wrappers {
-        xvfb('default')
+        xvfb('docker')
         buildInDocker {
             dockerfile('seed/docker')
             volume '/var/run/docker.sock', '/var/run/docker.sock'
