@@ -12,4 +12,5 @@ dependencies {
     
     runtime libraries.h2
     runtime libraries.metrics_core
+    runtime libraries.validation_impl
 }
