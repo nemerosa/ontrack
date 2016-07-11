@@ -54,9 +54,9 @@ A _global permission_ is created by associating:
 Creation:
 
 1. type the first letter of the account or the group you want to add a permission for
-1. select the account or the group
-1. select the role you want to give
-1. click on _Submit_
+2. select the account or the group
+3. select the role you want to give
+4. click on _Submit_
 
 Global permissions are created or deleted, not updated.
 
@@ -91,9 +91,9 @@ Creation:
 
 1. type the first letter of the account or the group you want to add a
    permission for
-1. select the account or the group
-1. select the role you want to give
-1. click on _Submit_
+2. select the account or the group
+3. select the role you want to give
+4. click on _Submit_
 
 Project permissions are created or deleted, not updated.
 
