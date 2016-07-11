@@ -1,6 +1,7 @@
 == Administration
 
 include::security.adoc[]
+
 include::ldap.adoc[]
 
-* TODO [[Administration console]]
+include::admin-console.adoc[]
