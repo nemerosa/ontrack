@@ -12,6 +12,8 @@ Damien Coraboeuf
 
 include::installation.adoc[]
 
+include::administration.adoc[]
+
 include::dsl.adoc[]
 
 include::contributing.adoc[]

@@ -1,0 +1,7 @@
+== Administration
+
+include::security.adoc[]
+
+* TODO [Security](Security)
+* TODO [LDAP setup](LDAP setup)
+* TODO [[Administration console]]
