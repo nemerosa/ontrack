@@ -1,0 +1,92 @@
+== DSL
+
+Ontrack provides several ways of interaction:
+
+* the graphical user interface (GUI)
+* the REST API (UI - also used internally by the GUI)
+* the Domain Specific Language (DSL)
+
+Using the DSL, you can write script files which interact remotely with your
+Ontrack instance.
+
+=== DSL Usage
+
+In some cases, like when using the
+https://github.com/nemerosa/ontrack-jenkins[Ontrack Jenkins plug-in], you can
+just write some Ontrack DSL to use it, because the configuration would have
+been done for you.
+
+In some other cases, you have to set-up the Ontrack DSL environment yourself.
+
+==== Embedded
+
+You can embed the Ontrack DSL in your own code by importing it.
+
+Using Maven:
+
+      <dependencies>
+         <groupId>net.nemerosa.ontrack</groupId>
+         <artifactId>ontrack-dsl</artifactId>
+         <version>{{ontrack-version}}</version>
+      </dependencies>
+
+Using Gradle:
+
+      compile 'net.nemerosa.ontrack:ontrack-dsl:{{ontrack-version}}'
+
+==== Standalone shell
+
+Future versions of https://github.com/nemerosa/ontrack/issues/198[Ontrack] will
+have a standalone executable JAR that you can call from the shell.
+
+==== Connection
+
+Before calling any DSL script, you have to configure an `Ontrack` instance
+which will connect to your remote Ontrack location:
+
+[source,java]
+----
+import net.nemerosa.ontrack.dsl.*;
+
+String url = "http://localhost:8080";
+String user = "admin";
+String password = "admin";
+
+Ontrack ontrack = OntrackConnection.create(url)
+   // Logging
+   .logger(new OTHttpClientLogger() {
+      public void trace(String message) {
+         System.out.println(message);
+      }
+   })
+   // Authentication
+   .authenticate(user, password)
+   // OK
+   .build();
+----
+
+==== Calling the DSL
+
+The Ontrack DSL is expressed through Groovy and can be called using the
+`GroovyShell`:
+
+[source,java]
+----
+import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
+
+Ontrack ontrack = ...
+
+Map<String, Object> values = new HashMap<>();
+values.put("ontrack", ontrack);
+Binding binding = new Binding(values);
+
+GroovyShell shell = new GroovyShell(binding);
+
+Object shellResult = shell.evaluate(script);
+----
+
+=== DSL documentation
+
+NOTE: The DSL documentation is directly generated from the source code
+in the `ontrack-dsl` module.

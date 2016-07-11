@@ -1,0 +1,62 @@
+=== Architecture
+
+==== Modules
+
+[plantuml]
+----
+include::modules.puml[]
+----
+
+NOTE: Not all modules nor links are shown here in order to keep some clarity.
+The Gradle build files in the source remain the main source of authority.
+
+Modules are used in _ontrack_ for two purposes:
+
+* isolation
+* distribution
+
+We distinguish also between:
+
+* core modules
+* extension modules
+
+Extension modules rely on the `extension-support` module to be compiled and
+tested. The link between the core modules and the extensions is done through
+the `extension-api` module, visible by the two worlds.
+
+Modules like `common`, `json`, `tx` or `client` are purely utilitarian
+(actually, they could be extracted from `ontrack` itself).
+
+The main core module is the `model` one, which defines both the API of the
+Ontrack services and the domain model.
+
+==== UI
+
+===== Resources
+
+The UI is realized by REST controllers. They manipulate the _model_ and get
+access to it through _services_.
+
+In the end, the controllers return _model_ objects that must be decorated by
+links in order to achieve Hateoas.
+
+The controllers are not directly responsible for the decoration of the model
+objects as _resources_ (model + links). This is instead the responsibility of
+the _resource decorators_.
+
+The _model_ objects are not returned as such, often their content needs to be
+filtered out. For example, when getting a list of branches for a project, we
+do not want each project to bring along its own copy of the project object.
+This is achieved using the _model filtering_ technics.
+
+===== Resource decorators
+
+TODO
+
+==== Model
+
+include::model.adoc[]
+
+==== Model filtering
+
+TODO

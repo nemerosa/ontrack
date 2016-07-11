@@ -1,0 +1,45 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3'
+    }
+}
+
+plugins {
+    id 'com.github.jruby-gradle.base' version '1.2.1'
+}
+
+apply plugin: 'base'
+apply plugin: 'org.asciidoctor.convert'
+
+asciidoctorj {
+    version = '1.5.4'
+}
+
+dependencies {
+    asciidoctor 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.11'
+    gems 'rubygems:asciidoctor-diagram:1.4.0'
+}
+
+asciidoctor {
+    dependsOn jrubyPrepare
+    requires = ['asciidoctor-diagram']
+    gemPath = jrubyPrepare.outputDir
+    logDocuments = true
+    sources {
+        include 'index.adoc'
+    }
+    backends = [
+            'html5',
+            'pdf',
+    ]
+    attributes = [
+            'ontrack-version': project.versioning.info.display,
+            'toc'            : 'left',
+    ]
+}
+
+build.dependsOn asciidoctor
