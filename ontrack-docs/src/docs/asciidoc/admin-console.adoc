@@ -18,7 +18,7 @@ administrator. From there, you can see:
 * general informations about the jobs: name, description
 * the run statistics
 
-image:admin.jobs.overview.png[Jobs]
+image:admin.jobs.overview.png[Jobs,600]
 
 ===== Filtering the jobs
 
