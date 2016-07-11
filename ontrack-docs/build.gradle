@@ -24,8 +24,15 @@ dependencies {
     gems 'rubygems:asciidoctor-diagram:1.4.0'
 }
 
+task prepareImages(type: Copy) {
+    from 'src/docs/asciidoc'
+    include '*.png'
+    into 'build/asciidoc/html5'
+}
+
 asciidoctor {
     dependsOn jrubyPrepare
+    dependsOn prepareImages
     requires = ['asciidoctor-diagram']
     gemPath = jrubyPrepare.outputDir
     logDocuments = true
