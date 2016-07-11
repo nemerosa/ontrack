@@ -1,7 +1,6 @@
 @startuml
 component [client]
 component [common]
-component [database]
 component [extension-api]
 component [extension-support]
 component [job]
@@ -30,7 +29,6 @@ component [web]
 
 [repository] --> [model]
 
-[repository-impl] -right-> [database]
 [repository-impl] --> [repository]
 [repository-impl] --> [repository-support]
 

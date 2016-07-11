@@ -19,23 +19,6 @@ To launch the integration tests or acceptance tests, see <<testing.adoc>>.
 
 ==== Launching the application
 
-Prepare a test environment by running:
-
-[source,bash]
-----
-./gradlew devInit
-----
-
-This will create a Postgresql database running in a Docker container, on port
-`5432`.
-
-TIP: To change the port of the Postgresql database container, add
-`-PdevPostgresPort=xxx` in all your commands.
-
-NOTE: The Postgresql container run in `restart` mode set to `always` - it will
-be restarted when your Docker host boots. It implies that you have to run the
-`devInit` task only once.
-
 Prepare the Web resources by launching:
 
 [source,bash]
@@ -69,5 +52,5 @@ See <<testing.adoc>>.
 
 ===== With Intellij
 
-* in `Build, Execution, Deployment > Compiler > Annotation Processors`, check `Enable annotation processing`
 * install the Lombok plugin
+* in `Build, Execution, Deployment > Compiler > Annotation Processors`, check `Enable annotation processing`

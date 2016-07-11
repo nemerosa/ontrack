@@ -25,14 +25,6 @@ In order to add the _integration tests_:
 From your IDE, you can launch both unit and integration tests using the default
 JUnit integration.
 
-NOTE: The `integrationTest` task will prepare a Postgresql database Docker
-container for the tests, which will be automatically discarded after the tests
-have run.
-
-TIP: When running the integration tests in your IDE, they will try to connect
-to a local Postgresql database running on port `5432`. See <<development.adoc>>
-for more details.
-
 ==== Acceptance tests
 
 ===== On the command line

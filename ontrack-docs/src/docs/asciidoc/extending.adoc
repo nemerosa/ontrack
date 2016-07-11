@@ -176,6 +176,39 @@ public class MyExtensionFeature extends AbstractExtensionFeature {
 }
 ----
 
+==== Writing tests for your extension
+
+Additionally to creating unit tests for your extension, you can also write
+integration tests, which will run with the Ontrack runtime enabled.
+
+NOTE: This feature is only available starting from version 2.23.1.
+
+When the `ontrack-extension-plugin` is applied to your code, it makes the
+`ontrack-it-utils` module available for the compilation of your tests.
+
+In particular, this allows you to create integration tests which inherit from
+`AbstractServiceTestSupport`, to inject directly the Ontrack services you need
+and to use utility methods to create a test environment.
+
+For example:
+
+[source,java]
+----
+public MyTest extends AbstractServiceTestSupport {
+   @Autowired
+   private StructureService structureService
+   @Test
+   public void sample_test() {
+      // Creates a project
+      Project p = doCreateProject();
+      // Can retrieve it by name...
+      asUser().withView(p).execute(() ->
+         assertTrue(structureService.findProjectByName(p.getName()).isPresent())
+      );
+   }
+}
+----
+
 ==== List of extension points
 
 Ontrack provides the following extension points:
