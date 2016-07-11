@@ -10,10 +10,10 @@ import java.util.Optional;
 @Component
 public class SCMServiceDetectorImpl implements SCMServiceDetector {
 
-    private final List<SCMServiceProvider> scmServiceProviders;
+    private List<SCMServiceProvider> scmServiceProviders;
 
-    @Autowired
-    public SCMServiceDetectorImpl(List<SCMServiceProvider> scmServiceProviders) {
+    @Autowired(required = false)
+    private void setScmServiceProviders(List<SCMServiceProvider> scmServiceProviders) {
         this.scmServiceProviders = scmServiceProviders;
     }
 
