@@ -6,3 +6,5 @@ include::usage-projects.adoc[]
 include::usage-branches.adoc[]
 
 include::usage-validation-stamps.adoc[]
+
+include::usage-promotion-levels.adoc[]
