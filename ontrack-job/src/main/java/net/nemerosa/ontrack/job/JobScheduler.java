@@ -114,6 +114,16 @@ public interface JobScheduler {
     Future<?> fireImmediately(JobKey jobKey, Map<String, ?> parameters);
 
     /**
+     * Runs a job once.
+     * <p>
+     * Registers the job, runs it and unregisters it.
+     *
+     * @param job Job to run
+     * @return Future for the job execution
+     */
+    Future<?> runOnce(Job job);
+
+    /**
      * Gets the job key for a job id
      */
     Optional<JobKey> getJobKey(long id);

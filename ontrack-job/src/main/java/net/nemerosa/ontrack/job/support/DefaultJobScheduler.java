@@ -148,12 +148,12 @@ public class DefaultJobScheduler implements JobScheduler {
     }
 
     @Override
-    public Future<?> fireImmediately(JobKey jobKey) {
+    public CompletableFuture<?> fireImmediately(JobKey jobKey) {
         return fireImmediately(jobKey, Collections.emptyMap());
     }
 
     @Override
-    public Future<?> fireImmediately(JobKey jobKey, Map<String, ?> parameters) {
+    public CompletableFuture<?> fireImmediately(JobKey jobKey, Map<String, ?> parameters) {
         // Gets the existing scheduled service
         JobScheduledService jobScheduledService = services.get(jobKey);
         if (jobScheduledService == null) {
@@ -161,6 +161,17 @@ public class DefaultJobScheduler implements JobScheduler {
         }
         // Fires the job immediately
         return jobScheduledService.fireImmediately(true, parameters);
+    }
+
+    @Override
+    public Future<?> runOnce(Job job) {
+        JobKey key = job.getKey();
+        // Registers the job, without any schedule
+        schedule(job, Schedule.NONE);
+        // Fires it immedietely
+        CompletableFuture<?> future = fireImmediately(key);
+        // On completion, unschedules the job
+        return future.whenComplete((o, throwable) -> unschedule(key));
     }
 
     private class JobScheduledService implements Runnable {
@@ -237,7 +248,7 @@ public class DefaultJobScheduler implements JobScheduler {
             }
         }
 
-        public Future<?> fireImmediately(boolean force, Map<String, ?> parameters) {
+        public CompletableFuture<?> fireImmediately(boolean force, Map<String, ?> parameters) {
             return completableFuture.updateAndGet(cf -> optionallyFireTask(cf, force, parameters));
         }
 
