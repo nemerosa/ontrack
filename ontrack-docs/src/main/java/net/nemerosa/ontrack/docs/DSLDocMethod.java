@@ -9,6 +9,11 @@ import lombok.Data;
 public class DSLDocMethod {
 
     /**
+     * ID of the method
+     */
+    private final String id;
+
+    /**
      * Name of the method
      */
     private final String name;
@@ -27,9 +32,4 @@ public class DSLDocMethod {
      * Sample
      */
     private final String sample;
-
-    public String getId() {
-        // TODO Transforms xX into x-x
-        return name.toLowerCase();
-    }
 }

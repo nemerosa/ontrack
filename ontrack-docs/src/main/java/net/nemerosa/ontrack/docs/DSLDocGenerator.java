@@ -109,15 +109,24 @@ public class DSLDocGenerator {
         DSL methodDsl = method.getAnnotation(DSL.class);
         if (methodDsl != null) {
             DSLDocMethod docMethod = new DSLDocMethod(
+                    getMethodId(methodDsl, method),
                     getMethodName(methodDsl, method),
                     getMethodSignature(method),
                     getMethodDescription(methodDsl, clazz, method),
-                    getMethodSample(clazz, method)
+                    getMethodSample(methodDsl, clazz, method)
             );
             docClass.getMethods().add(docMethod);
             // Return type
             Class<?> returnType = method.getReturnType();
             generateDocClass(doc, returnType);
+        }
+    }
+
+    private String getMethodId(DSL methodDsl, Method method) {
+        if (StringUtils.isNotBlank(methodDsl.id())) {
+            return methodDsl.id();
+        } else {
+            return method.getName();
         }
     }
 
@@ -157,8 +166,8 @@ public class DSLDocGenerator {
         return s.toString();
     }
 
-    private String getMethodSample(Class<?> clazz, Method method) throws IOException {
-        String path = String.format("/%s/%s.groovy", clazz.getName(), method.getName());
+    private String getMethodSample(DSL methodDsl, Class<?> clazz, Method method) throws IOException {
+        String path = String.format("/%s/%s.groovy", clazz.getName(), getMethodId(methodDsl, method));
         InputStream in = clazz.getResourceAsStream(path);
         if (in != null) {
             return IOUtils.toString(in);

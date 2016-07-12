@@ -53,7 +53,7 @@ class Ontrack {
         }
     }
 
-    @DSL(description = "Finds or creates a project.")
+    @DSL(description = "Finds or creates a project.", id = "project")
     Project project(String name, String description = '') {
         def project = findProject(name)
         if (project) {
@@ -74,7 +74,7 @@ class Ontrack {
         }
     }
 
-    @DSL(description = "Finds or creates a project, and configures it.")
+    @DSL(description = "Finds or creates a project, and configures it.", id = "project-closure")
     Project project(String name, String description = '', Closure closure) {
         def project = project(name, description)
         project.call(closure)

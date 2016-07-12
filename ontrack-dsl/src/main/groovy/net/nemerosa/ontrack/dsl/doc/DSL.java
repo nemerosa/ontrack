@@ -12,4 +12,9 @@ public @interface DSL {
      */
     String description() default "";
 
+    /**
+     * Optional ID for the element, used to disambiguate between several methods for example
+     */
+    String id() default "";
+
 }
