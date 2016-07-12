@@ -153,3 +153,46 @@ The task takes as parameter a `JobRunListener`.
 IMPORTANT: All job tasks run with _administrator_ privileges. _Job tasks_ can
 throw runtime exceptions - they will be caught by the _job scheduler_ and
 displayed in the <<admin-console-jobs, administration console>>.
+
+[[architecture-build-filters]]
+==== Build filters
+
+The _build filters_ are responsible for the filtering of _builds_ when listing
+them for a _branch_.
+
+[[architecture-build-filters-usage]]
+===== Usage
+
+By default, only the last 10 builds are shown for a branch, but a user can
+choose to create filters for a branch, and to select them.
+
+The filters he creates are saved for later use:
+* locally, in its local browser storage
+* remotely, on the server, if he is connected
+
+For a given branch, a filter is identified by a name. The list of available
+filters for a branch is composed of those stored locally and of those returned
+by the server. The later ones have priority when there is a name conflict.
+
+[[architecture-build-filters-implementation]]
+===== Implementation
+
+The `BuildFilter` interface defines how to use a filter. This filter takes as
+parameters:
+
+* the current list of filtered builds
+* the branch
+* the build to filter
+
+It returns two boolean results:
+
+* is the build to be kept in the list?
+* do we need to go on with looking for other builds?
+
+The `BuildFilterService` is used to manage the build filters:
+
+* by creating `BuildFilter` instances
+* by managing `BuildFilterResource` instances
+
+The service determines the type of `BuildFilter` by using its type, and uses
+injected `BuildFilterProvider`s to get an actual instance.
