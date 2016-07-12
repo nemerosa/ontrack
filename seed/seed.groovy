@@ -200,7 +200,6 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     }
     label 'docker'
     wrappers {
-        xvfb('docker')
         buildInDocker {
             dockerfile('seed/docker')
             volume '/var/run/docker.sock', '/var/run/docker.sock'
@@ -209,6 +208,12 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     }
     extractDeliveryArtifacts delegate, 'ontrack-acceptance'
     steps {
+        // Runs Xfvb in the background - it will be killed when the Docker slave is removed
+        shell '''\
+            #!/bin/bash
+            mkdir -p xvfb-${EXECUTOR_NUMBER}-${BUILD_NUMBER}
+            /usr/bin/Xvfb :${EXECUTOR_NUMBER} -screen 0 1024x768x24 -fbdir xvfb-${EXECUTOR_NUMBER}-${BUILD_NUMBER} &
+            '''
         // Runs the CI acceptance tests
         gradle '''\
 ciAcceptanceTest
