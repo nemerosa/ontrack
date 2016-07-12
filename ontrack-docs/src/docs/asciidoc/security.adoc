@@ -109,7 +109,7 @@ Accounts are created with either:
 
 * built-in authentication, with a password stored and encrypted in Ontrack
 itself
-* <<ldap.adoc,LDAP setup>>
+* <<ldap,LDAP setup>>
 
 [[security-accounts-builtin]]
 ===== Built-in accounts
@@ -142,7 +142,7 @@ them a list of global or project roles.
 
 An account can be assigned to several groups.
 
-NOTE: If LDAP is enabled, some LDAP groups can be <<ldap.adoc,LDAP setup>> to
+NOTE: If LDAP is enabled, some LDAP groups can be <<ldap-mapping,mapped>> to
 the account groups.
 
 [[security-general]]

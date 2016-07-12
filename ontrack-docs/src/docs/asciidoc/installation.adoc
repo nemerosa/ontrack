@@ -42,7 +42,7 @@ the host.
 
 You can use http://docs.docker.com/compose[Docker Compose] to deploy Ontrack
 running on HTTPS and having its metrics exported to
-<<monitoring.adoc, InfluxDB>>, and exposed through a Grafana dashboard.
+<<monitoring, InfluxDB>>, and exposed through a Grafana dashboard.
 
 Gets the source code from https://github.com/nemerosa/ontrack/tree/master/gradle/compose[GitHub].
 

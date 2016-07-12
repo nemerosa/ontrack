@@ -8,8 +8,8 @@ Extensions can also contribute to pages.
 
 Extension pages must be accessible from a location:
 
-* the <<extending-user-menu.adoc, global user menu>>
-* an <<model.adoc,entity>> page
+* the <<extending-usermenu, global user menu>>
+* an <<model,entity>> page
 
 [[extending-pages-menus-global]]
 ====== From the global user menu
@@ -87,7 +87,7 @@ would be: `extension/myextension/my-action/12`.
 ===== Extension page
 
 NOTE: Before an extension can serve some web components, it must be declared as
-being GUI related. See the <<extensions.adoc, documentation>> to enable this
+being GUI related. See the <<extensions, documentation>> to enable this
 (`ExtensionFeatureOptions.DEFAULT.withGui(true)`).
 
 The extension must define an AngularJS module file at:

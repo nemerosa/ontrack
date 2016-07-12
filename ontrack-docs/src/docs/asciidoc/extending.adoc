@@ -2,7 +2,7 @@
 === Extending Ontrack
 
 Ontrack allows extensions to contribute to the application, and actually, most
-of the core features, like <<changelogs.adoc, Git change logs>>,
+of the core features, like <<changelogs, Git change logs>>,
 are indeed extensions.
 
 This page explains how to create your own extensions and to deploy them along
@@ -220,9 +220,9 @@ public MyTest extends AbstractServiceTestSupport {
 
 Ontrack provides the following extension points:
 
-* <<extending-properties.adoc, Properties>> - allows to attach a property to an [entity](Model)
-* <<extending-decorators.adoc, Decorators>> - allows to display a decoration for an [entity](Model)
-* <<extending-user-menu.adoc, User menu action>> - allows to add an entry in the connected user menu
+* <<extending-properties, Properties>> - allows to attach a property to an [entity](Model)
+* <<extending-decorators, Decorators>> - allows to display a decoration for an [entity](Model)
+* <<extending-usermenu, User menu action>> - allows to add an entry in the connected user menu
 *  **TODO** Entity action - allows to add an action for the page of an entity
 *  **TODO** Entity information - allows to add some information into the page of an entity
 *  **TODO** Search extension - provides a search end point for global text based searches
@@ -232,7 +232,7 @@ Ontrack provides the following extension points:
 
 Other topics:
 
-* <<extending-pages.adoc, Creating pages>>
+* <<extending-pages, Creating pages>>
 * **TODO** Creating services
 * **TODO** Creating jobs
 
@@ -279,7 +279,7 @@ your extension build directory:
          --publish 8080:8080 \
          nemerosa/ontrack:{{ontrack-version}}
 
-See the <<installation.adoc, documentation>> for the Docker options.
+See the <<installation, documentation>> for the Docker options.
 
 [[extending-packaging]]
 ==== Packaging an extension
@@ -299,7 +299,7 @@ The extension is available as a JAR in `build/libs`.
 [[extending-deploying-docker]]
 ===== Using the Docker image
 
-The <<installation.adoc, Ontrack Docker image>> uses the
+The <<installation-docker, Ontrack Docker image>> uses the
 `/var/ontrack/extensions` volume to load extensions from. Bind this volume to
 your host or to a data container to start putting extensions in it.
 For example:
@@ -312,14 +312,14 @@ docker run --volume /extension/on/host:/var/ontrack/extensions ...
 [[extending-deploying-os]]
 ===== Using the CentOS or Debian/Ubuntu package
 
-The <<installation.adoc, RPM>> and <<installation.adoc, Debian>> packages both
+The <<installation-rpm, RPM>> and <<installation-debian, Debian>> packages both
 use the `/usr/lib/ontrack/extensions` directory for the location of the
 extensions JAR files.
 
 [[extending-deploying-sa]]
 ===== In standalone mode
 
-When running <<installation.adoc, Ontrack directly>>, you have to set the
+When running <<installation-sa, Ontrack directly>>, you have to set the
 `loader.path` to a directory containing the extensions JAR files:
 
 [source,bash]

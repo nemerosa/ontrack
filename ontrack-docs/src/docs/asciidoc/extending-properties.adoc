@@ -1,8 +1,8 @@
 [[extending-properties]]
 ==== Extending properties
 
-Any <<model.adoc, entity>> in Ontrack can be associated with a set of
-<<properties.adoc, properties>>. Extensions can contribute to create new ones.
+Any <<model, entity>> in Ontrack can be associated with a set of
+properties. Extensions can contribute to create new ones.
 
 A _property_ is the association some Java components and a HTML template to
 render it on the screen.
@@ -42,7 +42,7 @@ public class MyPropertyType extends AbstractPropertyType<MyProperty> {
 
 The `@Component` notation registers the property type in Ontrack.
 
-A property, or any <<extending.adoc, extension>> is always associated with an
+A property, or any <<extending, extension>> is always associated with an
 extension feature and this one is typically injected:
 
 [source,java]
@@ -58,7 +58,7 @@ Now, several methods need to be implemented:
 * `getName` and `getDescription` return respectively a display name and a short
 description for the property
 
-* `getSupportedEntityTypes` returns the set of <<model.adoc, entities>> the
+* `getSupportedEntityTypes` returns the set of <<model, entities>> the
 property can be applied to. For example, if your property can be applied only
 on projects, you can return:
 

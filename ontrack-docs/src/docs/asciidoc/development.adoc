@@ -18,7 +18,7 @@ Following tools must be installed before you can start coding with Ontrack:
 ./gradlew clean build
 ----
 
-To launch the integration tests or acceptance tests, see <<testing.adoc>>.
+To launch the integration tests or acceptance tests, see <<testing>>.
 
 [[development-launch]]
 ==== Launching the application

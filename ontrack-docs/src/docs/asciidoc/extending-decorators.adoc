@@ -2,7 +2,7 @@
 ==== Extending decorators
 
 A decorator is responsible to display a decoration (icon, text, label, etc.)
-close to an <<model.adoc, entity>> name, in the entity page itself or in a list
+close to an <<model, entity>> name, in the entity page itself or in a list
 of those entities. Extensions can contribute to create new ones.
 
 A _decorator_ is the association some Java components and a HTML template to
@@ -14,7 +14,7 @@ render it on the screen.
 First, a decorator must be associated with some data. You can use any type,
 like a `String`, an `enum` or any other  invariant POJO. In our sample,
  we'll take a `String`, which is the value of the `MyProperty` property
- described as example in <<extending-properties.adoc>>.
+ described as example in <<extending-properties>>.
 
 Then, you create the _decorator_ itself, by implementing the
 `DecorationExtension` interface and extending the `AbstractExtension`. The
@@ -29,7 +29,7 @@ public class MyDecorator extends AbstractExtension implements DecorationExtensio
 
 The `@Component` notation registers the decorator in Ontrack.
 
-A decorator, or any <<extending.adoc, extension>> is always associated with an
+A decorator, or any <<extending, extension>> is always associated with an
 extension feature and this one is typically injected. Other services can be
 injected at the same time. For example, our sample decorator needs to get a
 property on an entity so we inject the `PropertyService`:
@@ -46,7 +46,7 @@ public MyDecorator(MyExtensionFeature extensionFeature, PropertyService property
 
 Now, several methods need to be implemented:
 
-* `getScope` returns the set of <<model.adoc, entities>> the decorator can be
+* `getScope` returns the set of <<model, entities>> the decorator can be
 applied to. For example, if your property can be applied only on projects, you
 can return:
 

@@ -1,5 +1,7 @@
+[[architecture]]
 === Architecture
 
+[[architecture-modules]]
 ==== Modules
 
 [plantuml]
@@ -30,8 +32,10 @@ Modules like `common`, `json`, `tx` or `client` are purely utilitarian
 The main core module is the `model` one, which defines both the API of the
 Ontrack services and the domain model.
 
+[[architecture-ui]]
 ==== UI
 
+[[architecture-ui-resources]]
 ===== Resources
 
 The UI is realized by REST controllers. They manipulate the _model_ and get
@@ -49,18 +53,22 @@ filtered out. For example, when getting a list of branches for a project, we
 do not want each project to bring along its own copy of the project object.
 This is achieved using the _model filtering_ technics.
 
+[[architecture-ui-decorators]]
 ===== Resource decorators
 
 TODO
 
+[[architecture-model]]
 ==== Model
 
 include::model.adoc[]
 
+[[architecture-model-filtering]]
 ==== Model filtering
 
 TODO
 
+[[architecture-jobs]]
 ==== Jobs
 
 Ontrack makes a heavy use of _jobs_ in order to schedule regular activities,
@@ -83,6 +91,7 @@ of jobs to register will be determined regularly.
 The _job scheduler_ is in charge to collect all _registered jobs_ and to run
 them all.
 
+[[architecture-jobs-registration]]
 ===== Job registration
 
 A `JobRegistration` is the associated of a `Job` and of `Schedule` (run

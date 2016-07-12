@@ -1,7 +1,7 @@
 [[extending-usermenu]]
 ==== Extending the user menu
 
-An <<extending.adoc, extension>> can add a entry in the connected user menu,
+An <<extending, extension>> can add a entry in the connected user menu,
 in order to point to an extension page.
 
 [[extending-usermenu-component]]

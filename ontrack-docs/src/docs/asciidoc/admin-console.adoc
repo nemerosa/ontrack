@@ -9,12 +9,12 @@ It allows an administrator to:
 * manage the running [jobs](Architecture: jobs)
 * manage the error messages
 * see the state of the external connections
-* see the list of <<extending.adoc,extensions>>
+* see the list of <<extending,extensions>>
 
 [[admin-console-jobs]]
 ==== Managing running jobs
 
-The list of all <<architecture.adoc,registered jobs>> is visible to the
+The list of all <<architecture-jobs,registered jobs>> is visible to the
 administrator. From there, you can see:
 
 * general informations about the jobs: name, description
