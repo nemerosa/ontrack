@@ -32,9 +32,29 @@ task prepareImages(type: Copy) {
     into 'build/asciidoc/html5'
 }
 
+task generateDoc(type: JavaExec) {
+    dependsOn 'classes'
+    dependsOn ':ontrack-dsl:classes'
+    main = 'net.nemerosa.ontrack.docs.DSLDocGenerator'
+    classpath = sourceSets.main.runtimeClasspath
+    args = ['build']
+
+    inputs.dir project(':ontrack-dsl').file('src/main')
+    outputs.file 'build/dsl-generated.json'
+    outputs.file 'build/dsl-generated.adoc'
+}
+
+task prepareGeneratedDoc(type: Copy) {
+    dependsOn 'generateDoc'
+    from 'build'
+    include 'dsl-generated.adoc'
+    into 'src/docs/asciidoc'
+}
+
 asciidoctor {
     dependsOn jrubyPrepare
     dependsOn prepareImages
+    dependsOn prepareGeneratedDoc
     requires = ['asciidoctor-diagram']
     gemPath = jrubyPrepare.outputDir
     logDocuments = true

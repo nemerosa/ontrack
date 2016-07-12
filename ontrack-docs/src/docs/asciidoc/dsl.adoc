@@ -95,4 +95,5 @@ Object shellResult = shell.evaluate(script);
 [[dsl-doc]]
 === DSL documentation
 
-include::dsl-ontrack.adoc[]
+// This documented in generated
+include::dsl-generated.adoc[]

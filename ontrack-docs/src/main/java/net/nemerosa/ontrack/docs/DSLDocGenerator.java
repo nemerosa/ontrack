@@ -29,12 +29,12 @@ public class DSLDocGenerator {
         DSLDoc doc = new DSLDocGenerator().generate(Ontrack.class);
 
         // Writing the output (JSON)
-        File jsonFile = new File(dir, "doc.json");
+        File jsonFile = new File(dir, "dsl-generated.json");
         System.out.format("[doc] Writing JSON at %s%n", jsonFile);
         ObjectMapperFactory.create().writeValue(jsonFile, doc);
 
         // Writing the output (ADOC)
-        File adocFile = new File(dir, "doc.adoc");
+        File adocFile = new File(dir, "dsl-generated.adoc");
         System.out.format("[doc] Writing AsciiDoc at %s%n", adocFile);
         try (PrintWriter writer = new PrintWriter(adocFile)) {
             adoc(writer, doc);
