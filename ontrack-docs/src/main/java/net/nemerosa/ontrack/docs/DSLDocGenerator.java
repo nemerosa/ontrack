@@ -57,6 +57,8 @@ public class DSLDocGenerator {
         docClass.getMethods().forEach(
                 dslDocMethod -> adocMethod(writer, docClass, dslDocMethod)
         );
+        // Separator
+        writer.println();
     }
 
     private static void adocMethod(PrintWriter writer, DSLDocClass docClass, DSLDocMethod docMethod) {
@@ -108,7 +110,9 @@ public class DSLDocGenerator {
                     getMethodSample(clazz, method)
             );
             docClass.getMethods().add(docMethod);
-            // TODO Recursion on return & input parameters
+            // Return type
+            Class<?> returnType = method.getReturnType();
+            generateDocClass(doc, returnType);
         }
     }
 
