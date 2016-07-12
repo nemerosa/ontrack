@@ -8,6 +8,7 @@ import org.apache.commons.io.IOUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.util.Objects;
 
 /**
@@ -49,8 +50,52 @@ public class DSLDocGenerator {
                     getClassDescription(dsl, clazz)
             );
             doc.getClasses().put(clazz.getName(), docClass);
-            // TODO Methods
+            // Methods
+            Method[] methods = clazz.getMethods();
+            for (Method method : methods) {
+                generateDocMethod(doc, docClass, clazz, method);
+            }
         }
+    }
+
+    private void generateDocMethod(DSLDoc doc, DSLDocClass docClass, Class<?> clazz, Method method) throws IOException {
+        DSL methodDsl = method.getAnnotation(DSL.class);
+        if (methodDsl != null) {
+            DSLDocMethod docMethod = new DSLDocMethod(
+                    getMethodName(methodDsl, method),
+                    getMethodDescription(methodDsl, clazz, method),
+                    getMethodSample(methodDsl, clazz, method)
+            );
+            docClass.getMethods().add(docMethod);
+            // TODO Recursion on return & input parameters
+        }
+    }
+
+    private String getMethodSample(DSL methodDsl, Class<?> clazz, Method method) throws IOException {
+        InputStream in = clazz.getResourceAsStream(String.format("%s-%s.groovy", clazz.getName(), method.getName()));
+        if (in != null) {
+            return IOUtils.toString(in);
+        } else {
+            return null;
+        }
+    }
+
+    private String getMethodDescription(DSL methodDsl, Class<?> clazz, Method method) throws IOException {
+        String description = methodDsl.description();
+        if (!Objects.equals(description, "")) {
+            return description;
+        } else {
+            InputStream in = clazz.getResourceAsStream(String.format("%s-%s.txt", clazz.getName(), method.getName()));
+            if (in != null) {
+                return IOUtils.toString(in);
+            } else {
+                return null;
+            }
+        }
+    }
+
+    private String getMethodName(DSL methodDsl, Method method) {
+        return method.getName();
     }
 
     private String getClassDescription(DSL dsl, Class<?> clazz) throws IOException {

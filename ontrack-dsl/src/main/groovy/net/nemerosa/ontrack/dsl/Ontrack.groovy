@@ -29,7 +29,7 @@ class Ontrack {
     /**
      * Gets the list of projects
      */
-    @DSL
+    @DSL(description = "Gets the list of projects")
     List<Project> getProjects() {
         return get('structure/projects').resources.collect {
             new Project(this, get(it._self))
@@ -41,6 +41,7 @@ class Ontrack {
      * @param name Name of the project
      * @return Project or null is not found
      */
+    @DSL(description = "Finds a project using its name. Returns null if not found.")
     Project findProject(String name) {
         def projectNode = get("structure/projects").resources.find {
             it.name == name
