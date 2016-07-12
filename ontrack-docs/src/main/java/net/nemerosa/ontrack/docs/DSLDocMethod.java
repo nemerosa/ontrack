@@ -29,6 +29,11 @@ public class DSLDocMethod {
     private final String description;
 
     /**
+     * Long description
+     */
+    private final String longDescription;
+
+    /**
      * Sample
      */
     private final String sample;

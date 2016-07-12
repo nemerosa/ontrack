@@ -69,6 +69,9 @@ public class DSLDocGenerator {
         if (StringUtils.isNotBlank(docMethod.getDescription())) {
             writer.format("%n%s%n", docMethod.getDescription());
         }
+        if (StringUtils.isNotBlank(docMethod.getLongDescription())) {
+            writer.format("%n%s%n", docMethod.getLongDescription());
+        }
         if (StringUtils.isNotBlank(docMethod.getSample())) {
             writer.format("%n[source,groovy]%n");
             writer.format("----%n");
@@ -113,6 +116,7 @@ public class DSLDocGenerator {
                     getMethodName(methodDsl, method),
                     getMethodSignature(method),
                     getMethodDescription(methodDsl, clazz, method),
+                    getMethodLongDescription(methodDsl, clazz, method),
                     getMethodSample(methodDsl, clazz, method)
             );
             docClass.getMethods().add(docMethod);
@@ -177,7 +181,20 @@ public class DSLDocGenerator {
     }
 
     private String getMethodDescription(DSL methodDsl, Class<?> clazz, Method method) throws IOException {
-        return getDescription(methodDsl, clazz, String.format("/%s/%s", clazz.getName(), method.getName()));
+        if (StringUtils.isNotBlank(methodDsl.description())) {
+            return methodDsl.description();
+        } else {
+            return null;
+        }
+    }
+
+    private String getMethodLongDescription(DSL methodDsl, Class<?> clazz, Method method) throws IOException {
+        InputStream in = clazz.getResourceAsStream(String.format("/%s/%s.txt", clazz.getName(), getMethodId(methodDsl, method)));
+        if (in != null) {
+            return IOUtils.toString(in);
+        } else {
+            return null;
+        }
     }
 
     private String getDescription(DSL dsl, Class<?> clazz, String id) throws IOException {
