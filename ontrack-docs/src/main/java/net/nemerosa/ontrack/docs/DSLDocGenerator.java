@@ -64,15 +64,16 @@ public class DSLDocGenerator {
             DSLDocMethod docMethod = new DSLDocMethod(
                     getMethodName(methodDsl, method),
                     getMethodDescription(methodDsl, clazz, method),
-                    getMethodSample(methodDsl, clazz, method)
+                    getMethodSample(clazz, method)
             );
             docClass.getMethods().add(docMethod);
             // TODO Recursion on return & input parameters
         }
     }
 
-    private String getMethodSample(DSL methodDsl, Class<?> clazz, Method method) throws IOException {
-        InputStream in = clazz.getResourceAsStream(String.format("%s-%s.groovy", clazz.getName(), method.getName()));
+    private String getMethodSample(Class<?> clazz, Method method) throws IOException {
+        String path = String.format("/%s/%s.groovy", clazz.getName(), method.getName());
+        InputStream in = clazz.getResourceAsStream(path);
         if (in != null) {
             return IOUtils.toString(in);
         } else {
@@ -81,11 +82,15 @@ public class DSLDocGenerator {
     }
 
     private String getMethodDescription(DSL methodDsl, Class<?> clazz, Method method) throws IOException {
-        String description = methodDsl.description();
+        return getDescription(methodDsl, clazz, String.format("/%s/%s", clazz.getName(), method.getName()));
+    }
+
+    private String getDescription(DSL dsl, Class<?> clazz, String id) throws IOException {
+        String description = dsl.description();
         if (!Objects.equals(description, "")) {
             return description;
         } else {
-            InputStream in = clazz.getResourceAsStream(String.format("%s-%s.txt", clazz.getName(), method.getName()));
+            InputStream in = clazz.getResourceAsStream(String.format("%s.txt", id));
             if (in != null) {
                 return IOUtils.toString(in);
             } else {
@@ -99,17 +104,7 @@ public class DSLDocGenerator {
     }
 
     private String getClassDescription(DSL dsl, Class<?> clazz) throws IOException {
-        String description = dsl.description();
-        if (!Objects.equals(description, "")) {
-            return description;
-        } else {
-            InputStream in = clazz.getResourceAsStream(String.format("%s.txt", clazz.getName()));
-            if (in != null) {
-                return IOUtils.toString(in);
-            } else {
-                return null;
-            }
-        }
+        return getDescription(dsl, clazz, String.format("/%s/description", clazz.getName()));
     }
 
 }
