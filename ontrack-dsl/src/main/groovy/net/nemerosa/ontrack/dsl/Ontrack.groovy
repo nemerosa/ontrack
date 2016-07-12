@@ -53,6 +53,7 @@ class Ontrack {
         }
     }
 
+    @DSL(description = "Finds or creates a project.")
     Project project(String name, String description = '') {
         def project = findProject(name)
         if (project) {
@@ -73,12 +74,14 @@ class Ontrack {
         }
     }
 
+    @DSL(description = "Finds or creates a project, and configures it.")
     Project project(String name, String description = '', Closure closure) {
         def project = project(name, description)
         project.call(closure)
         project
     }
 
+    @DSL(description = "Looks for a branch in a project. Fails if not found.")
     Branch branch(String project, String branch) {
         new Branch(
                 this,
@@ -86,6 +89,7 @@ class Ontrack {
         )
     }
 
+    @DSL(description = "Looks for a promotion level by name. Fails if not found.")
     PromotionLevel promotionLevel(String project, String branch, String promotionLevel) {
         new PromotionLevel(
                 this,
@@ -93,6 +97,7 @@ class Ontrack {
         )
     }
 
+    @DSL(description = "Looks for a validation stamp by name. Fails if not found.")
     ValidationStamp validationStamp(String project, String branch, String validationStamp) {
         new ValidationStamp(
                 this,

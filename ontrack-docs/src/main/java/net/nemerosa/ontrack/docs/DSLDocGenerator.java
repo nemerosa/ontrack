@@ -87,16 +87,18 @@ public class DSLDocGenerator {
     private void generateDocClass(DSLDoc doc, Class<?> clazz) throws IOException {
         DSL dsl = clazz.getAnnotation(DSL.class);
         if (dsl != null) {
-            System.out.format("[doc] %s%n", clazz.getName());
-            DSLDocClass docClass = new DSLDocClass(
-                    clazz.getSimpleName(),
-                    getClassDescription(dsl, clazz)
-            );
-            doc.getClasses().put(clazz.getName(), docClass);
-            // Methods
-            Method[] methods = clazz.getMethods();
-            for (Method method : methods) {
-                generateDocMethod(doc, docClass, clazz, method);
+            if (!doc.getClasses().containsKey(clazz.getName())) {
+                System.out.format("[doc] %s%n", clazz.getName());
+                DSLDocClass docClass = new DSLDocClass(
+                        clazz.getSimpleName(),
+                        getClassDescription(dsl, clazz)
+                );
+                doc.getClasses().put(clazz.getName(), docClass);
+                // Methods
+                Method[] methods = clazz.getMethods();
+                for (Method method : methods) {
+                    generateDocMethod(doc, docClass, clazz, method);
+                }
             }
         }
     }
