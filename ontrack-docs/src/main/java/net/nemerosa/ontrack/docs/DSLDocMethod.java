@@ -13,7 +13,10 @@ public class DSLDocMethod {
      */
     private final String name;
 
-    // TODO Reference for return and parameters
+    /**
+     * Signature of the method
+     */
+    private final String signature;
 
     /**
      * Description
