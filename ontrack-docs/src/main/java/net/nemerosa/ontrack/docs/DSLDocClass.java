@@ -26,4 +26,8 @@ public class DSLDocClass {
      */
     private final List<DSLDocMethod> methods = new ArrayList<>();
 
+    public String getId() {
+        // TODO Transforms xX into x-x
+        return name.toLowerCase();
+    }
 }

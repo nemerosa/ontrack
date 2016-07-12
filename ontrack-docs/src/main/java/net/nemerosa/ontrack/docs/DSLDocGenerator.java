@@ -4,10 +4,12 @@ import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.dsl.doc.DSL;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
@@ -21,6 +23,7 @@ public class DSLDocGenerator {
         // String version = args[1];
 
         File dir = new File(outputPath);
+        //noinspection ResultOfMethodCallIgnored
         dir.mkdirs();
 
         DSLDoc doc = new DSLDocGenerator().generate(Ontrack.class);
@@ -29,7 +32,45 @@ public class DSLDocGenerator {
         File jsonFile = new File(dir, "doc.json");
         System.out.format("[doc] Writing JSON at %s%n", jsonFile);
         ObjectMapperFactory.create().writeValue(jsonFile, doc);
-        // TODO Writing the output (ADOC)
+
+        // Writing the output (ADOC)
+        File adocFile = new File(dir, "doc.adoc");
+        System.out.format("[doc] Writing AsciiDoc at %s%n", adocFile);
+        try (PrintWriter writer = new PrintWriter(adocFile)) {
+            adoc(writer, doc);
+        }
+    }
+
+    private static void adoc(PrintWriter writer, DSLDoc doc) {
+        doc.getClasses().values().forEach(
+                dslDocClass -> adocClass(writer, dslDocClass)
+        );
+    }
+
+    private static void adocClass(PrintWriter writer, DSLDocClass docClass) {
+        writer.format("[[dsl-%s]]%n", docClass.getId());
+        writer.format("==== %s%n", docClass.getName());
+        if (StringUtils.isNotBlank(docClass.getDescription())) {
+            writer.format("%n%s%n", docClass.getDescription());
+        }
+        // Methods
+        docClass.getMethods().forEach(
+                dslDocMethod -> adocMethod(writer, docClass, dslDocMethod)
+        );
+    }
+
+    private static void adocMethod(PrintWriter writer, DSLDocClass docClass, DSLDocMethod docMethod) {
+        writer.format("%n[[dsl-%s-%s]]%n", docClass.getId(), docMethod.getId());
+        writer.format("===== %s%n", docMethod.getName());
+        if (StringUtils.isNotBlank(docMethod.getDescription())) {
+            writer.format("%n%s%n", docMethod.getDescription());
+        }
+        if (StringUtils.isNotBlank(docMethod.getSample())) {
+            writer.format("%n[source,groovy]%n");
+            writer.format("----%n");
+            writer.println(docMethod.getSample());
+            writer.format("----%n");
+        }
     }
 
     private DSLDoc generate(Class<?> clazz) throws IOException {

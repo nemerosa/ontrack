@@ -25,4 +25,8 @@ public class DSLDocMethod {
      */
     private final String sample;
 
+    public String getId() {
+        // TODO Transforms xX into x-x
+        return name.toLowerCase();
+    }
 }
