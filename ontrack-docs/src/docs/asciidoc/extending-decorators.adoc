@@ -1,3 +1,4 @@
+[[extending-decorators]]
 ==== Extending decorators
 
 A decorator is responsible to display a decoration (icon, text, label, etc.)
@@ -7,6 +8,7 @@ of those entities. Extensions can contribute to create new ones.
 A _decorator_ is the association some Java components and a HTML template to
 render it on the screen.
 
+[[extending-decorators-java]]
 ===== Java components
 
 First, a decorator must be associated with some data. You can use any type,
@@ -75,6 +77,7 @@ public List<Decoration<String>> getDecorations(ProjectEntity entity) {
 }
 ----
 
+[[extending-decorators-web]]
 ===== Web components
 
 A HTML fragment (or template) must be created at:

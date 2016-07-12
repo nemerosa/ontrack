@@ -1,7 +1,9 @@
+[[extending-pages]]
 ==== Extending pages
 
 Extensions can also contribute to pages.
 
+[[extending-pages-menus]]
 ===== Extension menus
 
 Extension pages must be accessible from a location:
@@ -9,10 +11,12 @@ Extension pages must be accessible from a location:
 * the <<extending-user-menu.adoc, global user menu>>
 * an <<model.adoc,entity>> page
 
+[[extending-pages-menus-global]]
 ====== From the global user menu
 
 **TODO**
 
+[[extending-pages-menus-entity]]
 ====== From an entity page
 
 In order for an extension to contribute to the menu of an entity page, you have
@@ -74,10 +78,12 @@ The returned `Action` object has the following properties:
 path. So in our example, the final path for the `SAMPLE` project with id `12`
 would be: `extension/myextension/my-action/12`.
 
+[[extending-pages-global]]
 ===== Extension global settings
 
 **TODO**
 
+[[extending-pages-specific]]
 ===== Extension page
 
 NOTE: Before an extension can serve some web components, it must be declared as
@@ -193,10 +199,12 @@ tables, etc. For example:
 </ot-view>
 ----
 
+[[extending-pages-api]]
 ===== Extension API
 
 **TODO**
 
+[[extending-pages-resources]]
 ===== Extension API resource decorators
 
 **TODO**

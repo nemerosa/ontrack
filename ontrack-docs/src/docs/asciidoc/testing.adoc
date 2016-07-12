@@ -1,3 +1,4 @@
+[[testing]]
 === Testing
 
 * _unit tests_ are always run and should not access resources not load the
@@ -6,6 +7,7 @@ application context (think: fast!)
 and run against a database
 * _acceptance tests_ are run against the deployed and running application.
 
+[[testing-unit]]
 ==== Running the unit and integration tests
 
 In order to run the _unit tests_ only:
@@ -25,8 +27,10 @@ In order to add the _integration tests_:
 From your IDE, you can launch both unit and integration tests using the default
 JUnit integration.
 
+[[testing-acceptance]]
 ==== Acceptance tests
 
+[[testing-acceptance-cmd]]
 ===== On the command line
 
 NOTE: This requires Docker & Docker Compose to be installed and correctly
@@ -55,6 +59,7 @@ to the arguments.
 TIP: To only deploy the application in a container without launching any test,
 you can also run `./gradlew ciStart`.
 
+[[testing-acceptance-ide]]
 ===== From the IDE
 
 In order to develop or test acceptance tests, you might want to run them from
@@ -71,6 +76,7 @@ set the following system properties:
 ** `ontrack.disableSSL` - `true` if the server is running with a self signed
 certificate, and if you're using `https`
 
+[[testing-acceptance-sa]]
 ===== Standalone mode
 
 For testing `ontrack` in real mode, with the application to test deployed on a
@@ -104,6 +110,7 @@ tests can be excluded from the run.
 
 The results of the tests is written as a JUnit XML file, `ciAcceptance.xml`.
 
+[[testing-dev]]
 ==== Developing tests
 
 Unit tests are JUnit tests whose class name ends with `Test`.
@@ -111,10 +118,12 @@ Integration tests are JUnit tests whose class name ends with `IT`.
 Acceptance tests are JUnit tests whose class name starts with `ACC` and are
 located in the `ontrack-acceptance` module.
 
+[[testing-dev-unit]]
 ===== Unit test context
 
 Unit tests do not need any application context or any database.
 
+[[testing-dev-it]]
 ===== Integration test context
 
 Integration tests will usually load an application context and connect to a

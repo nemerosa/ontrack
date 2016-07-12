@@ -1,3 +1,4 @@
+[[index]]
 = Ontrack Reference Guide {ontrack-version}
 Damien Coraboeuf
 // ========================================================

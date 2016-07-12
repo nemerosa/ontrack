@@ -1,3 +1,4 @@
+[[extending-properties]]
 ==== Extending properties
 
 Any <<model.adoc, entity>> in Ontrack can be associated with a set of
@@ -6,6 +7,7 @@ Any <<model.adoc, entity>> in Ontrack can be associated with a set of
 A _property_ is the association some Java components and a HTML template to
 render it on the screen.
 
+[[extending-properties-java]]
 ===== Java components
 
 First, a property must be associated with some data. Just create an invariant
@@ -149,6 +151,7 @@ public MyProperty replaceValue(MyProperty value, Function<String, String> replac
 }
 ----
 
+[[extending-properties-web]]
 ===== Web components
 
 A HTML fragment (or template) must be created at:

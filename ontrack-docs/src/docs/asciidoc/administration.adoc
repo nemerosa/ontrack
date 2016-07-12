@@ -1,3 +1,4 @@
+[[administration]]
 == Administration
 
 include::security.adoc[]

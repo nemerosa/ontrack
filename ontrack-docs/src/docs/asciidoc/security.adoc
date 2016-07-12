@@ -1,8 +1,10 @@
+[[security]]
 === Security
 
 The Ontrack security is based on accounts and account groups, and on
 authorizations granted to them.
 
+[[security-concepts]]
 ==== Concepts
 
 Each action in Ontrack is associated with an _authorisation function_ and those
@@ -13,6 +15,7 @@ An _account_ can belong to several _account groups_ and his set of final
 _authorisation functions_ will be the aggregation of the rights given to the
 account and to the groups.
 
+[[security-roles]]
 ==== Roles
 
 NOTE: As of now, only roles can be assigned to groups and accounts, and the
@@ -20,6 +23,7 @@ list of roles and their associated functions is defined by Ontrack itself.
 
 Ontrack distinguishes between _global roles_ and _project roles.
 
+[[security-roles-global]]
 ===== Global roles
 
 An **ADMINISTRATOR** has access to all the functions of Ontrack, in all
@@ -60,6 +64,7 @@ Creation:
 
 Global permissions are created or deleted, not updated.
 
+[[security-roles-project]]
 ===== Project roles
 
 A project **OWNER** can perform all operations on a project but to delete it.
@@ -97,6 +102,7 @@ Creation:
 
 Project permissions are created or deleted, not updated.
 
+[[security-accounts]]
 ==== Accounts
 
 Accounts are created with either:
@@ -105,6 +111,7 @@ Accounts are created with either:
 itself
 * <<ldap.adoc,LDAP setup>>
 
+[[security-accounts-builtin]]
 ===== Built-in accounts
 
 An _administrator_ can create accounts. He must give them:
@@ -118,6 +125,7 @@ Any user can change his own password by going to the _Change password_ menu.
 
 The _administrator_ can give an account a list of global or project roles.
 
+[[security-accounts-ldap]]
 ===== LDAP accounts
 
 Accounts whose authentication is managed by the LDAP are not created directly
@@ -126,6 +134,7 @@ but are instead created at first successful login.
 As for the other types of accounts, the _administrator_ can give them a list
 of global or project roles.
 
+[[security-groups]]
 ==== Account groups
 
 An _administrator_ can create groups using a name and a description, and assign
@@ -136,6 +145,7 @@ An account can be assigned to several groups.
 NOTE: If LDAP is enabled, some LDAP groups can be <<ldap.adoc,LDAP setup>> to
 the account groups.
 
+[[security-general]]
 ==== General settings
 
 By default, all users (including anonymous ones) have access to all the

@@ -1,3 +1,4 @@
+[[admin-console]]
 === Administration console
 
 The _Administration console_ is available to the _Administrators_ only and is
@@ -10,6 +11,7 @@ It allows an administrator to:
 * see the state of the external connections
 * see the list of <<extending.adoc,extensions>>
 
+[[admin-console-jobs]]
 ==== Managing running jobs
 
 The list of all <<architecture.adoc,registered jobs>> is visible to the
@@ -20,6 +22,7 @@ administrator. From there, you can see:
 
 image:admin.jobs.overview.png[Jobs,600]
 
+[[admin-console-jobs-filter]]
 ===== Filtering the jobs
 
 The following filters are available:
@@ -35,6 +38,7 @@ The following filters are available:
 * error status - jobs whose last run raised an error
 * description - filtering using a search token on the job description
 
+[[admin-console-jobs-control]]
 ===== Controlling the jobs
 
 For one job, you can:
@@ -50,8 +54,11 @@ currently selected through the filter will be impacted.
 The same _Actions_ menu allows also to clear the current filter and to display
 all the jobs.
 
+[[admin-console-errors]]
 ==== Managing error messages
 
+[[admin-console-health]]
 ==== External connections
 
+[[admin-console-extensions]]
 ==== List of extensions

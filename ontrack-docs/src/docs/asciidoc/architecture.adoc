@@ -143,4 +143,4 @@ The task takes as parameter a `JobRunListener`.
 
 IMPORTANT: All job tasks run with _administrator_ privileges. _Job tasks_ can
 throw runtime exceptions - they will be caught by the _job scheduler_ and
-displayed in the <<administration.adoc, administration console>>.
+displayed in the <<admin-console-jobs, administration console>>.

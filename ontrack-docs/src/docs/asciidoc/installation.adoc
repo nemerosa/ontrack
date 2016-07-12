@@ -1,3 +1,4 @@
+[[installation]]
 == Installation
 
 There are several ways to install Ontrack.
@@ -7,6 +8,7 @@ There are several ways to install Ontrack.
 
 Ontrack is distributed as a Docker image on the https://hub.docker.com[Docker Hub], as `nemerosa/ontrack:{ontrack-version}`.
 
+[[installation-docker-overview]]
 ==== Overview
 
 The Ontrack image exposes the ports `443` and `8080`.
@@ -16,6 +18,7 @@ Two volumes are defined:
 * `/var/ontrack/data` - contains the data for Ontrack (files & database) but also the log files. This is typically provided through a data volume container.
 * `/var/ontrack/conf` - contains the configuration files for Ontrack (see later).
 
+[[installation-docker-basic]]
 ==== Basic deployment
 
 You can start Ontrack as a container and a shared database and configuration on the host using:
@@ -34,6 +37,7 @@ The configuration files for Ontrack can be put on the host in
 in `/var/ontrack/data`. The application will be available on port `8080` of
 the host.
 
+[[installation-docker-compose]]
 ==== Using compose to deploy Ontrack using HTTPS and Grafana/InfluxDB for metrics
 
 You can use http://docs.docker.com/compose[Docker Compose] to deploy Ontrack
@@ -42,6 +46,7 @@ running on HTTPS and having its metrics exported to
 
 Gets the source code from https://github.com/nemerosa/ontrack/tree/master/gradle/compose[GitHub].
 
+[[installation-docker-compose-preparation]]
 ===== Preparation
 
 In the `prod/ontrack` folder, put two files:
@@ -65,6 +70,7 @@ to know how to create it.
 
 WARNING: Never store those two files in a SCM
 
+[[installation-docker-compose-host]]
 ===== Docker host configuration
 
 Prepare the Docker host to have its Ontrack configuration. If you are using the
@@ -82,6 +88,7 @@ This copies the content of the `prod/ontrack` folder (three files:
 `application.yml`, `application-prod.yml` and the `.jks` file) into the
 `/var/ontrack/conf` directory of the Docker host.
 
+[[installation-docker-compose-launching]]
 ===== Launching the composition
 
 When done, you just have to run Docker Compose:
@@ -109,10 +116,17 @@ Ontrack is accessible using `https`, using the default `443` port.
 Grafana is accessible on port `3000` and the default `admin` password
 is `admin` and should be changed immediately.
 
+[[installation-rpm]]
 === RPM installation
 
+[[installation-debian]]
 === Debian installation
 
+[[installation-digitalocean]]
 === Installing at DigitalOcean
 
+[[installation-dockercloud]]
+=== Installing on Docker Cloud
+
+[[installation-sa]]
 === Standalone installation
