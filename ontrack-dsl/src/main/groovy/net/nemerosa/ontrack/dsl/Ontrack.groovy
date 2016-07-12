@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.dsl
 
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
+import net.nemerosa.ontrack.dsl.doc.DSL
 import net.nemerosa.ontrack.dsl.http.OTHttpClient
 import org.apache.http.entity.ContentType
 import org.apache.http.entity.StringEntity
@@ -9,6 +10,7 @@ import org.apache.http.entity.StringEntity
 /**
  * Entry point for the DSL.
  */
+@DSL(description = "An Ontrack instance is usually bound to the `ontrack` identifier and is the root for all DSL calls.")
 class Ontrack {
 
     /**
@@ -27,6 +29,7 @@ class Ontrack {
     /**
      * Gets the list of projects
      */
+    @DSL
     List<Project> getProjects() {
         return get('structure/projects').resources.collect {
             new Project(this, get(it._self))

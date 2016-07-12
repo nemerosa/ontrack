@@ -1,7 +1,9 @@
 package net.nemerosa.ontrack.dsl
 
+import net.nemerosa.ontrack.dsl.doc.DSL
 import net.nemerosa.ontrack.dsl.properties.ProjectProperties
 
+@DSL
 class Project extends AbstractProjectResource {
 
     Project(Ontrack ontrack, Object node) {
