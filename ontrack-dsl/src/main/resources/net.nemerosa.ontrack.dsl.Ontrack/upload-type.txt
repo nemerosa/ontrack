@@ -1,0 +1,10 @@
+Creates a multi-part upload request where the `name` part contains the content of the given input `o` object. The
+content depends on the type of object:
+
+* for a `net.nemerosa.ontrack.dsl.Document`, uploads this document - the `contentType` parameter is then ignored
+* for a `File` or `URL`, the content of the file is uploaded, using the provided `contentType`
+* for a `byte` array, the content of the array is uploaded, using the provided `contentType`
+* for a `String`:
+** if starting with `classpath:`, the remainder of the string is used as a resource path (see `URL` above)
+** if a valid `URL`, we use the string as a URL - see above
+** if any other case, we consider the string to be the path to a file - see `File` above

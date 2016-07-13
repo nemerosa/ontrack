@@ -234,7 +234,7 @@ public class DSLDocGenerator {
     }
 
     private String getMethodSample(DSL methodDsl, Class<?> clazz, Method method) throws IOException {
-        String path = String.format("/%s/%s.groovy", clazz.getName(), getMethodId(methodDsl, method));
+        String path = String.format("/%s/%s.groovy", method.getDeclaringClass().getName(), getMethodId(methodDsl, method));
         InputStream in = clazz.getResourceAsStream(path);
         if (in != null) {
             return IOUtils.toString(in);
@@ -262,7 +262,7 @@ public class DSLDocGenerator {
     }
 
     private String getMethodLongDescription(DSL methodDsl, Class<?> clazz, Method method) throws IOException {
-        InputStream in = clazz.getResourceAsStream(String.format("/%s/%s.txt", clazz.getName(), getMethodId(methodDsl, method)));
+        InputStream in = clazz.getResourceAsStream(String.format("/%s/%s.txt", method.getDeclaringClass().getName(), getMethodId(methodDsl, method)));
         if (in != null) {
             return IOUtils.toString(in);
         } else {

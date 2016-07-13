@@ -117,7 +117,7 @@ abstract class AbstractProjectResource extends AbstractResource implements Proje
     /**
      * Message decoration. Defines a <code>type</code> and a <code>text</code>
      */
-    @DSL(description = "Gets the messages for this entity")
+    @DSL(description = "Gets any message for this entity")
     Map<String, ?> getMessageDecoration() {
         getDecoration('net.nemerosa.ontrack.extension.general.MessageDecorationExtension') as Map
     }
