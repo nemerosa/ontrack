@@ -1,23 +1,29 @@
 package net.nemerosa.ontrack.dsl
 
+import net.nemerosa.ontrack.dsl.doc.DSL
+
 abstract class AbstractProjectResource extends AbstractResource implements ProjectEntity {
 
     AbstractProjectResource(Ontrack ontrack, Object node) {
         super(ontrack, node)
     }
 
+    @DSL(description = "Returns the numeric ID of this entity.")
     int getId() {
         node['id'] as int
     }
 
+    @DSL(description = "Returns the name of this entity.")
     String getName() {
         node['name']
     }
 
+    @DSL(description = "Returns any description attached to this entity.")
     String getDescription() {
         node['description']
     }
 
+    @DSL(description = "Configures this entity.")
     @Override
     def config(Closure closure) {
         closure.resolveStrategy = Closure.DELEGATE_FIRST
@@ -25,6 +31,7 @@ abstract class AbstractProjectResource extends AbstractResource implements Proje
         closure()
     }
 
+    @DSL(description = "Sets the value for a property of this entity. Prefer using dedicated DSL methods.")
     @Override
     def property(String type, Object data) {
         // Gets the list of properties
@@ -41,6 +48,7 @@ abstract class AbstractProjectResource extends AbstractResource implements Proje
         }
     }
 
+    @DSL(description = "Gets the value for a property of this entity. Prefer using dedicated DSL methods.")
     @Override
     def property(String type) {
         // Gets the list of properties
@@ -65,6 +73,7 @@ abstract class AbstractProjectResource extends AbstractResource implements Proje
     /**
      * Deletes this entity
      */
+    @DSL(description = "Deletes this entity.")
     def delete() {
         ontrack.delete(link('delete'))
     }
@@ -79,6 +88,7 @@ abstract class AbstractProjectResource extends AbstractResource implements Proje
      *     <li><code>data</code> - JSON data of the decoration
      * </ul>
      */
+    @DSL(description = "Returns the list of decorations for this entity. Each item has a `decorationType` type name and `data` as JSON.")
     List<?> getDecorations() {
         return ontrack.get(link('decorations')).resources;
     }
@@ -86,6 +96,7 @@ abstract class AbstractProjectResource extends AbstractResource implements Proje
     /**
      * Gets the decoration for this entity and a given decoration qualified name.
      */
+    @DSL(description = "Returns the list of decoration data (JSON) for a given decoration type.", id = "decorations-type")
     List<?> getDecorations(String type) {
         return decorations
                 .findAll { it.decorationType == type }
@@ -97,6 +108,7 @@ abstract class AbstractProjectResource extends AbstractResource implements Proje
      *
      * Returns <code>null</code> if not defined or the JSON data is defined.
      */
+    @DSL(description = "Gets the data for the first decoration of a given type. If no decoration is available, returns null.")
     def getDecoration(String type) {
         def decorations = getDecorations(type)
         return decorations.empty ? null : decorations[0]
@@ -105,6 +117,7 @@ abstract class AbstractProjectResource extends AbstractResource implements Proje
     /**
      * Message decoration. Defines a <code>type</code> and a <code>text</code>
      */
+    @DSL(description = "Gets the messages for this entity")
     Map<String, ?> getMessageDecoration() {
         getDecoration('net.nemerosa.ontrack.extension.general.MessageDecorationExtension') as Map
     }
@@ -112,6 +125,7 @@ abstract class AbstractProjectResource extends AbstractResource implements Proje
     /**
      * Jenkins job decoration (state of the job)
      */
+    @DSL(description = "Gets the Jenkins decoration for this entity.")
     String getJenkinsJobDecoration() {
         getDecoration('net.nemerosa.ontrack.extension.jenkins.JenkinsJobDecorationExtension') as String
     }
