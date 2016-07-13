@@ -113,7 +113,6 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-build") {
         buildInDocker {
             dockerfile('seed/docker')
             volume '/var/run/docker.sock', '/var/run/docker.sock'
-            verbose true
         }
     }
     deliveryPipelineConfiguration('Commit', 'Build')
@@ -203,7 +202,6 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
         buildInDocker {
             dockerfile('seed/docker')
             volume '/var/run/docker.sock', '/var/run/docker.sock'
-            verbose true
         }
     }
     extractDeliveryArtifacts delegate, 'ontrack-acceptance'
