@@ -105,6 +105,7 @@ class Ontrack {
         )
     }
 
+    @DSL(description = "Looks for a build by name. Fails if not found.")
     Build build(String project, String branch, String build) {
         new Build(
                 this,
