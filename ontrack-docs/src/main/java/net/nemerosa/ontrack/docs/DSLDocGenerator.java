@@ -203,6 +203,7 @@ public class DSLDocGenerator {
         // Space + name
         s.append(" ").append(method.getName());
         // Parameters
+        // TODO When DSL supports JDK8 only, then we can use the parameter names
         s.append("(");
         int i = 0;
         for (Class<?> paramType : method.getParameterTypes()) {
