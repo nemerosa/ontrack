@@ -14,6 +14,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Generation of DSL documentation
@@ -85,6 +86,19 @@ public class DSLDocGenerator {
             writer.format("%n%s%n", docMethod.getLongDescription());
         }
         adocSample(writer, docMethod.getSample());
+        // References
+        if (!docMethod.getReferences().isEmpty()) {
+            writer.format(
+                    "%nSee: %s%n",
+                    docMethod.getReferences().stream()
+                            .map(DSLDocGenerator::getRefLink)
+                            .collect(Collectors.joining(", "))
+            );
+        }
+    }
+
+    private static String getRefLink(DSLDocClass ref) {
+        return String.format("<<dsl-%s,%s>>", ref.getId(), ref.getName());
     }
 
     private DSLDoc generate(Class<?> clazz) throws IOException {
@@ -96,23 +110,30 @@ public class DSLDocGenerator {
         return doc;
     }
 
-    private void generateDocClass(DSLDoc doc, Class<?> clazz) throws IOException {
+    private DSLDocClass generateDocClass(DSLDoc doc, Class<?> clazz) throws IOException {
         DSL dsl = clazz.getAnnotation(DSL.class);
         if (dsl != null) {
-            if (!doc.getClasses().containsKey(clazz.getName())) {
+            DSLDocClass dslDocClass = doc.getClasses().get(clazz.getName());
+            if (dslDocClass == null) {
                 System.out.format("[doc] %s%n", clazz.getName());
-                DSLDocClass docClass = new DSLDocClass(
+                dslDocClass = new DSLDocClass(
                         clazz.getSimpleName(),
                         getClassDescription(dsl, clazz),
                         getClassSample(clazz)
                 );
-                doc.getClasses().put(clazz.getName(), docClass);
+                doc.getClasses().put(clazz.getName(), dslDocClass);
                 // Methods
                 Method[] methods = clazz.getMethods();
                 for (Method method : methods) {
-                    generateDocMethod(doc, docClass, clazz, method);
+                    generateDocMethod(doc, dslDocClass, clazz, method);
                 }
+                // OK
+                return dslDocClass;
+            } else {
+                return dslDocClass;
             }
+        } else {
+            return null;
         }
     }
 
@@ -124,24 +145,29 @@ public class DSLDocGenerator {
             if (consistent) {
                 DSLDocMethod docMethod = new DSLDocMethod(
                         getMethodId(methodDsl, method),
-                        getMethodName(methodDsl, method),
+                        getMethodName(method),
                         getMethodSignature(method),
-                        getMethodDescription(methodDsl, clazz, method),
+                        getMethodDescription(methodDsl),
                         getMethodLongDescription(methodDsl, clazz, method),
                         getMethodSample(methodDsl, clazz, method)
                 );
                 docClass.getMethods().add(docMethod);
                 // Return type
+                DSLDocClass dslDocClass = null;
                 Type genericReturnType = method.getGenericReturnType();
                 if (genericReturnType instanceof ParameterizedType) {
                     ParameterizedType parameterizedType = (ParameterizedType) genericReturnType;
                     for (Type type : parameterizedType.getActualTypeArguments()) {
                         if (type instanceof Class) {
-                            generateDocClass(doc, (Class) type);
+                            dslDocClass = generateDocClass(doc, (Class) type);
                         }
                     }
                 } else {
-                    generateDocClass(doc, method.getReturnType());
+                    dslDocClass = generateDocClass(doc, method.getReturnType());
+                }
+                // Reference?
+                if (dslDocClass != null && !StringUtils.equals(docClass.getId(), dslDocClass.getId())) {
+                    docMethod.getReferences().add(dslDocClass);
                 }
             }
         }
@@ -211,7 +237,7 @@ public class DSLDocGenerator {
         }
     }
 
-    private String getMethodDescription(DSL methodDsl, Class<?> clazz, Method method) throws IOException {
+    private String getMethodDescription(DSL methodDsl) throws IOException {
         if (StringUtils.isNotBlank(methodDsl.description())) {
             return methodDsl.description();
         } else {
@@ -242,7 +268,7 @@ public class DSLDocGenerator {
         }
     }
 
-    private String getMethodName(DSL methodDsl, Method method) {
+    private String getMethodName(Method method) {
         return method.getName();
     }
 

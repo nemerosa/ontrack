@@ -2,6 +2,9 @@ package net.nemerosa.ontrack.docs;
 
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Documentation for a method
  */
@@ -37,4 +40,9 @@ public class DSLDocMethod {
      * Sample
      */
     private final String sample;
+
+    /**
+     * References
+     */
+    private final List<DSLDocClass> references = new ArrayList<>();
 }
