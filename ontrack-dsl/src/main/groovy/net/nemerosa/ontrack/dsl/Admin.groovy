@@ -1,8 +1,11 @@
 package net.nemerosa.ontrack.dsl
 
+import net.nemerosa.ontrack.dsl.doc.DSL
+
 /**
  * Administration management.
  */
+@DSL(description = "Administration management")
 class Admin {
 
     private final Ontrack ontrack

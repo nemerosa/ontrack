@@ -132,22 +132,27 @@ class Ontrack {
         new Config(this)
     }
 
-    def getAdmin() {
+    @DSL(description = "Access to the administration of Ontrack")
+    Admin getAdmin() {
         new Admin(this)
     }
 
+    @DSL(description = "Runs an arbitrary GET request for a relative path and returns JSON")
     def get(String url) {
         httpClient.get(url) { jsonSlurper.parseText(it) }
     }
 
+    @DSL(description = "Runs an arbitrary GET request for a relative path and returns text")
     def text(String url) {
         httpClient.get(url) { it }
     }
 
+    @DSL(description = "Runs an arbitrary DELETE request for a relative path and returns JSON")
     def delete(String url) {
         httpClient.delete(url) { jsonSlurper.parseText(it) }
     }
 
+    @DSL(description = "Runs an arbitrary POST request for a relative path and some data, and returns JSON")
     def post(String url, Object data) {
         httpClient.post(
                 url,
@@ -158,6 +163,7 @@ class Ontrack {
         ) { jsonSlurper.parseText(it) }
     }
 
+    @DSL(description = "Runs an arbitrary PUT request for a relative path and some data, and returns JSON")
     def put(String url, Object data) {
         httpClient.put(
                 url,
@@ -168,10 +174,12 @@ class Ontrack {
         ) { jsonSlurper.parseText(it) }
     }
 
+    @DSL(description = "Uploads some arbitrary binary data on a relative path and returns some JSON. See <<dsl-ontrack-upload-type>>.")
     def upload(String url, String name, Object o) {
         upload(url, name, o, 'application/x-octet-stream')
     }
 
+    @DSL(description = "Uploads some typed data on a relative path and returns some JSON", id = "upload-type")
     def upload(String url, String name, Object o, String contentType) {
         Document document
         String fileName = 'file'
@@ -226,6 +234,7 @@ class Ontrack {
         ) { it ? jsonSlurper.parseText(it) : [:] }
     }
 
+    @DSL(description = "Downloads an arbitrary document using a relative path.")
     Document download(String url) {
         httpClient.download(url)
     }
