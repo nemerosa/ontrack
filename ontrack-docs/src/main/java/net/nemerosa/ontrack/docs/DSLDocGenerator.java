@@ -111,18 +111,22 @@ public class DSLDocGenerator {
     private void generateDocMethod(DSLDoc doc, DSLDocClass docClass, Class<?> clazz, Method method) throws IOException {
         DSL methodDsl = method.getAnnotation(DSL.class);
         if (methodDsl != null) {
-            DSLDocMethod docMethod = new DSLDocMethod(
-                    getMethodId(methodDsl, method),
-                    getMethodName(methodDsl, method),
-                    getMethodSignature(method),
-                    getMethodDescription(methodDsl, clazz, method),
-                    getMethodLongDescription(methodDsl, clazz, method),
-                    getMethodSample(methodDsl, clazz, method)
-            );
-            docClass.getMethods().add(docMethod);
-            // Return type
-            Class<?> returnType = method.getReturnType();
-            generateDocClass(doc, returnType);
+            // Checks if the method is consistent with the Groovy signature
+            boolean consistent = methodDsl.count() < 0 || methodDsl.count() == method.getParameterTypes().length;
+            if (consistent) {
+                DSLDocMethod docMethod = new DSLDocMethod(
+                        getMethodId(methodDsl, method),
+                        getMethodName(methodDsl, method),
+                        getMethodSignature(method),
+                        getMethodDescription(methodDsl, clazz, method),
+                        getMethodLongDescription(methodDsl, clazz, method),
+                        getMethodSample(methodDsl, clazz, method)
+                );
+                docClass.getMethods().add(docMethod);
+                // Return type
+                Class<?> returnType = method.getReturnType();
+                generateDocClass(doc, returnType);
+            }
         }
     }
 

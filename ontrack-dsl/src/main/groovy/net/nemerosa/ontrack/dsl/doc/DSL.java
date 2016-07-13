@@ -17,4 +17,11 @@ public @interface DSL {
      */
     String id() default "";
 
+    /**
+     * Count of arguments, to distinguish between several Java methods created from the same Groovy
+     * method with parameters having default values. Defaults to -1, meaning that we do not want to
+     * check.
+     */
+    int count() default -1;
+
 }

@@ -23,7 +23,7 @@ class Project extends AbstractProjectResource {
         }
     }
 
-    @DSL(description = "Retrieves or creates a branch for the project")
+    @DSL(description = "Retrieves or creates a branch for the project", count = 3)
     Branch branch(String name, String description = '', boolean getIfExists = false) {
         def node = ontrack.get(link('branches')).resources.find { it.name == name }
         if (node) {
@@ -46,7 +46,7 @@ class Project extends AbstractProjectResource {
         }
     }
 
-    @DSL(description = "Retrieves or creates a branch for the project, and then configures it.", id = "branch-closure")
+    @DSL(description = "Retrieves or creates a branch for the project, and then configures it.", id = "branch-closure", count = 4)
     Branch branch(String name, String description = '', boolean getIfExists = false, Closure closure) {
         Branch b = branch(name, description, getIfExists)
         b(closure)
