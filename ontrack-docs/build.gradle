@@ -12,6 +12,7 @@ plugins {
     id 'com.github.jruby-gradle.base' version '1.2.1'
 }
 
+apply plugin: 'groovy'
 apply plugin: 'org.asciidoctor.convert'
 
 asciidoctorj {

@@ -5,6 +5,8 @@ import net.nemerosa.ontrack.dsl.doc.DSL;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.codehaus.groovy.groovydoc.GroovyClassDoc;
+import org.codehaus.groovy.groovydoc.GroovyMethodDoc;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +15,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -21,15 +24,22 @@ import java.util.stream.Collectors;
  */
 public class DSLDocGenerator {
 
+    private final GroovyDocHelper groovyDocHelper;
+
+    public DSLDocGenerator(String sourcePath) {
+        this.groovyDocHelper = new GroovyDocHelper(sourcePath);
+    }
+
     public static void main(String[] args) throws IOException {
-        String outputPath = args[0];
+        String sourcePath = args[0];
+        String outputPath = args[1];
         // String version = args[1];
 
         File dir = new File(outputPath);
         //noinspection ResultOfMethodCallIgnored
         dir.mkdirs();
 
-        DSLDoc doc = new DSLDocGenerator().generate(Ontrack.class);
+        DSLDoc doc = new DSLDocGenerator(sourcePath).generate(Ontrack.class);
 
         // Writing the output (JSON)
         File jsonFile = new File(dir, "dsl-generated.json");
@@ -116,6 +126,7 @@ public class DSLDocGenerator {
             DSLDocClass dslDocClass = doc.getClasses().get(clazz.getName());
             if (dslDocClass == null) {
                 System.out.format("[doc] %s%n", clazz.getName());
+                GroovyClassDoc groovyClassDoc = groovyDocHelper.getGroovyClassDoc(clazz);
                 dslDocClass = new DSLDocClass(
                         clazz.getSimpleName(),
                         getClassDescription(dsl, clazz),
@@ -125,7 +136,7 @@ public class DSLDocGenerator {
                 // Methods
                 Method[] methods = clazz.getMethods();
                 for (Method method : methods) {
-                    generateDocMethod(doc, dslDocClass, clazz, method);
+                    generateDocMethod(doc, dslDocClass, clazz, groovyClassDoc, method);
                 }
                 // OK
                 return dslDocClass;
@@ -137,16 +148,23 @@ public class DSLDocGenerator {
         }
     }
 
-    private void generateDocMethod(DSLDoc doc, DSLDocClass docClass, Class<?> clazz, Method method) throws IOException {
+    private void generateDocMethod(DSLDoc doc, DSLDocClass docClass, Class<?> clazz, GroovyClassDoc groovyClassDoc, Method method) throws IOException {
         DSL methodDsl = method.getAnnotation(DSL.class);
         if (methodDsl != null) {
             // Checks if the method is consistent with the Groovy signature
             boolean consistent = methodDsl.count() < 0 || methodDsl.count() == method.getParameterTypes().length;
             if (consistent) {
+                // Tries to find the Groovy method documentation
+                GroovyMethodDoc groovyMethodDoc = groovyDocHelper.getAllMethods(clazz).stream()
+                        .filter(gm -> StringUtils.equals(gm.name(), method.getName()))
+                        .filter(gm -> GroovyDocHelper.getMethodFromGroovyMethodDoc(gm, clazz).equals(method))
+                        .findFirst()
+                        .orElseThrow(() -> new IllegalStateException("Cannot find doc for method: " + method));
+                // OK
                 DSLDocMethod docMethod = new DSLDocMethod(
                         getMethodId(methodDsl, method),
                         getMethodName(method),
-                        getMethodSignature(method),
+                        getMethodSignature(groovyMethodDoc, method),
                         getMethodDescription(methodDsl),
                         getMethodLongDescription(methodDsl, clazz, method),
                         getMethodSample(methodDsl, clazz, method)
@@ -181,7 +199,7 @@ public class DSLDocGenerator {
         }
     }
 
-    private String getMethodSignature(Method method) {
+    private String getMethodSignature(GroovyMethodDoc groovyMethodDoc, Method method) {
         StringBuilder s = new StringBuilder();
         // Return
         Type genericReturnType = method.getGenericReturnType();
@@ -203,8 +221,12 @@ public class DSLDocGenerator {
         // Space + name
         s.append(" ").append(method.getName());
         // Parameters
-        // TODO When DSL supports JDK8 only, then we can use the parameter names
         s.append("(");
+        s.append(
+                Arrays.asList(groovyMethodDoc.parameters()).stream()
+                        .map(gp -> String.format("%s %s", gp.typeName(), gp.name()))
+                        .collect(Collectors.joining(", "))
+        );
         int i = 0;
         for (Class<?> paramType : method.getParameterTypes()) {
             if (i > 0) {
