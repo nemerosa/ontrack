@@ -1,5 +1,8 @@
 package net.nemerosa.ontrack.dsl
 
+import net.nemerosa.ontrack.dsl.doc.DSL
+
+@DSL(description = "General configuration of Ontrack.")
 class Config {
 
     private final Ontrack ontrack
@@ -8,9 +11,7 @@ class Config {
         this.ontrack = ontrack
     }
 
-    /**
-     * Gets the security settings
-     */
+    @DSL(description = "Checks if the projects are accessible in anonymous mode.")
     boolean getGrantProjectViewToAll() {
         def settings = ontrack.get('settings/general-security')
         return settings.grantProjectViewToAll
@@ -19,6 +20,7 @@ class Config {
     /**
      * Updates security settings
      */
+    @DSL(description = "Sets if the projects are accessible in anonymous mode.")
     def setGrantProjectViewToAll(boolean grantProjectViewToAll) {
         ontrack.put(
                 'settings/general-security',

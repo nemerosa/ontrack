@@ -120,13 +120,15 @@ class Ontrack {
         }
     }
 
+    @DSL(description = "Configures the general settings of Ontrack. See <<dsl-config>>.")
     def configure(Closure closure) {
         Config configResource = new Config(this)
         closure.delegate = configResource
         closure()
     }
 
-    def getConfig() {
+    @DSL(description = "Access to the general configuration of Ontrack")
+    Config getConfig() {
         new Config(this)
     }
 
