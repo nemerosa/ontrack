@@ -166,6 +166,8 @@ build
                 parameters {
                     // Link based on full version
                     predefinedProp 'VERSION', '${VERSION_DISPLAY}'
+                    // Git
+                    predefinedProp 'COMMIT', '${VERSION_COMMIT}'
                     // Uses the same node in order to have local Docker image available
                     sameNode()
                 }
@@ -196,15 +198,28 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     parameters {
         // Link based on full version
         stringParam('VERSION', '', '')
+        // ... and Git commit
+        stringParam('COMMIT', '', '')
     }
     label 'docker'
+    scm {
+        git {
+            remote {
+                url PROJECT_SCM_URL
+                branch '${COMMIT}'
+            }
+            extensions {
+                wipeOutWorkspace()
+                localBranch "${BRANCH}"
+            }
+        }
+    }
     wrappers {
         buildInDocker {
             dockerfile('seed/docker')
             volume '/var/run/docker.sock', '/var/run/docker.sock'
         }
     }
-    extractDeliveryArtifacts delegate, 'ontrack-acceptance'
     steps {
         // Runs Xfvb in the background - it will be killed when the Docker slave is removed
         shell '''\
@@ -259,7 +274,7 @@ ciAcceptanceTest
             }
         }
         // Use display version
-        ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'ACCEPTANCE'
+        ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION}', 'ACCEPTANCE'
     }
 }
 
