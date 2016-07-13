@@ -22,6 +22,11 @@ public class DSLDocClass {
     private final String description;
 
     /**
+     * Groovy sample
+     */
+    private final String sample;
+
+    /**
      * All methods
      */
     private final List<DSLDocMethod> methods = new ArrayList<>();

@@ -113,6 +113,7 @@ class Ontrack {
         )
     }
 
+    @DSL(description = "Launches a global search based on a token.")
     List<SearchResult> search(String token) {
         post('search', [token: token]).collect {
             new SearchResult(this, it)

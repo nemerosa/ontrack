@@ -52,15 +52,27 @@ public class DSLDocGenerator {
     private static void adocClass(PrintWriter writer, DSLDocClass docClass) {
         writer.format("[[dsl-%s]]%n", docClass.getId());
         writer.format("==== %s%n", docClass.getName());
+        // Description
         if (StringUtils.isNotBlank(docClass.getDescription())) {
             writer.format("%n%s%n", docClass.getDescription());
         }
+        // Sample
+        adocSample(writer, docClass.getSample());
         // Methods
         docClass.getMethods().forEach(
                 dslDocMethod -> adocMethod(writer, docClass, dslDocMethod)
         );
         // Separator
         writer.println();
+    }
+
+    private static void adocSample(PrintWriter writer, String sample) {
+        if (StringUtils.isNotBlank(sample)) {
+            writer.format("%n[source,groovy]%n");
+            writer.format("----%n");
+            writer.println(sample);
+            writer.format("----%n");
+        }
     }
 
     private static void adocMethod(PrintWriter writer, DSLDocClass docClass, DSLDocMethod docMethod) {
@@ -72,12 +84,7 @@ public class DSLDocGenerator {
         if (StringUtils.isNotBlank(docMethod.getLongDescription())) {
             writer.format("%n%s%n", docMethod.getLongDescription());
         }
-        if (StringUtils.isNotBlank(docMethod.getSample())) {
-            writer.format("%n[source,groovy]%n");
-            writer.format("----%n");
-            writer.println(docMethod.getSample());
-            writer.format("----%n");
-        }
+        adocSample(writer, docMethod.getSample());
     }
 
     private DSLDoc generate(Class<?> clazz) throws IOException {
@@ -96,7 +103,8 @@ public class DSLDocGenerator {
                 System.out.format("[doc] %s%n", clazz.getName());
                 DSLDocClass docClass = new DSLDocClass(
                         clazz.getSimpleName(),
-                        getClassDescription(dsl, clazz)
+                        getClassDescription(dsl, clazz),
+                        getClassSample(clazz)
                 );
                 doc.getClasses().put(clazz.getName(), docClass);
                 // Methods
@@ -124,8 +132,17 @@ public class DSLDocGenerator {
                 );
                 docClass.getMethods().add(docMethod);
                 // Return type
-                Class<?> returnType = method.getReturnType();
-                generateDocClass(doc, returnType);
+                Type genericReturnType = method.getGenericReturnType();
+                if (genericReturnType instanceof ParameterizedType) {
+                    ParameterizedType parameterizedType = (ParameterizedType) genericReturnType;
+                    for (Type type : parameterizedType.getActualTypeArguments()) {
+                        if (type instanceof Class) {
+                            generateDocClass(doc, (Class) type);
+                        }
+                    }
+                } else {
+                    generateDocClass(doc, method.getReturnType());
+                }
             }
         }
     }
@@ -176,6 +193,16 @@ public class DSLDocGenerator {
 
     private String getMethodSample(DSL methodDsl, Class<?> clazz, Method method) throws IOException {
         String path = String.format("/%s/%s.groovy", clazz.getName(), getMethodId(methodDsl, method));
+        InputStream in = clazz.getResourceAsStream(path);
+        if (in != null) {
+            return IOUtils.toString(in);
+        } else {
+            return null;
+        }
+    }
+
+    private String getClassSample(Class<?> clazz) throws IOException {
+        String path = String.format("/%s/sample.groovy", clazz.getName());
         InputStream in = clazz.getResourceAsStream(path);
         if (in != null) {
             return IOUtils.toString(in);
