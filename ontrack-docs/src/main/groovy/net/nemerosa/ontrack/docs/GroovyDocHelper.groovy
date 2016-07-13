@@ -33,11 +33,6 @@ class GroovyDocHelper {
         rootDoc.classes().find { it.fullPathName == name }
     }
 
-    static boolean hasAnnotation(GroovyProgramElementDoc doc, Class annotationClass) {
-        GroovyAnnotationRef[] annotations = doc.annotations()
-        annotations.any { it.name() == annotationClass.name.replaceAll('\\.', '/') }
-    }
-
     static Method getMethodFromGroovyMethodDoc(GroovyMethodDoc methodDoc, Class clazz) {
         Method method = clazz.methods.findAll { it.name == methodDoc.name() }.find { Method method ->
 

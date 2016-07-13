@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.dsl.doc.DSL;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.groovy.groovydoc.GroovyClassDoc;
 import org.codehaus.groovy.groovydoc.GroovyMethodDoc;
 import org.codehaus.groovy.groovydoc.GroovyParameter;
 
@@ -126,7 +125,6 @@ public class DSLDocGenerator {
             DSLDocClass dslDocClass = doc.getClasses().get(clazz.getName());
             if (dslDocClass == null) {
                 System.out.format("[doc] %s%n", clazz.getName());
-                GroovyClassDoc groovyClassDoc = groovyDocHelper.getGroovyClassDoc(clazz);
                 dslDocClass = new DSLDocClass(
                         clazz.getSimpleName(),
                         getClassDescription(dsl, clazz),
@@ -136,7 +134,7 @@ public class DSLDocGenerator {
                 // Methods
                 Method[] methods = clazz.getMethods();
                 for (Method method : methods) {
-                    generateDocMethod(doc, dslDocClass, clazz, groovyClassDoc, method);
+                    generateDocMethod(doc, dslDocClass, clazz, method);
                 }
                 // OK
                 return dslDocClass;
@@ -148,7 +146,7 @@ public class DSLDocGenerator {
         }
     }
 
-    private void generateDocMethod(DSLDoc doc, DSLDocClass docClass, Class<?> clazz, GroovyClassDoc groovyClassDoc, Method method) throws IOException {
+    private void generateDocMethod(DSLDoc doc, DSLDocClass docClass, Class<?> clazz, Method method) throws IOException {
         DSL methodDsl = method.getAnnotation(DSL.class);
         if (methodDsl != null) {
             // Checks if the method is consistent with the Groovy signature
