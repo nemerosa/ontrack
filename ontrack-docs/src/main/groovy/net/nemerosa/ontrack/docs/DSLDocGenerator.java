@@ -7,6 +7,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.groovy.groovydoc.GroovyClassDoc;
 import org.codehaus.groovy.groovydoc.GroovyMethodDoc;
+import org.codehaus.groovy.groovydoc.GroovyParameter;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +16,6 @@ import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -222,18 +222,13 @@ public class DSLDocGenerator {
         s.append(" ").append(method.getName());
         // Parameters
         s.append("(");
-        s.append(
-                Arrays.asList(groovyMethodDoc.parameters()).stream()
-                        .map(gp -> String.format("%s %s", gp.typeName(), gp.name()))
-                        .collect(Collectors.joining(", "))
-        );
-        int i = 0;
-        for (Class<?> paramType : method.getParameterTypes()) {
-            if (i > 0) {
-                s.append(",");
-            }
-            s.append(paramType.getSimpleName());
-            i++;
+        GroovyParameter[] parameters = groovyMethodDoc.parameters();
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        for (int i = 0; i < parameterTypes.length; i++) {
+            Class<?> parameterType = parameterTypes[i];
+            String name = parameters[i].name();
+            if (i > 0) s.append(", ");
+            s.append(parameterType.getSimpleName()).append(" ").append(name);
         }
         s.append(")");
         // OK
