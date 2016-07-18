@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.dsl
 
+import groovy.json.JsonOutput
 import org.kohsuke.args4j.CmdLineException
 import org.kohsuke.args4j.CmdLineParser
 
@@ -57,13 +58,16 @@ class Shell {
         }
 
         // Runs the shell
-        run ontrack, local, script, params
+        def result = run(ontrack, local, script, params)
 
         // Output values
         local.values.each { k, v ->
             output.format('%s=%s%n', k, v)
         }
 
+        // Output of result
+        def json = JsonOutput.prettyPrint(JsonOutput.toJson(result))
+        output.println(json)
     }
 
     static def run(Ontrack ontrack, ShellConnector connector, String script, Map<String, String> params) {
