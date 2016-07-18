@@ -36,3 +36,9 @@ bootRepackage {
     classifier = 'shell'
     executable = true
 }
+
+afterEvaluate { prj ->
+    rootProject.tasks.publicationPackage {
+        from prj.bootRepackage
+    }
+}
