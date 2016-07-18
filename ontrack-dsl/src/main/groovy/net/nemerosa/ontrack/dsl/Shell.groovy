@@ -61,13 +61,15 @@ class Shell {
         def result = run(ontrack, local, script, params)
 
         // Output values
-        local.values.each { k, v ->
-            output.format('%s=%s%n', k, v)
+        if (options.discardResult) {
+            local.values.each { k, v ->
+                output.format('%s=%s%n', k, v)
+            }
+        } else {
+            // Output of result
+            def json = JsonOutput.prettyPrint(JsonOutput.toJson(result))
+            output.println(json)
         }
-
-        // Output of result
-        def json = JsonOutput.prettyPrint(JsonOutput.toJson(result))
-        output.println(json)
     }
 
     public static String readScript(ShellOptions options) {

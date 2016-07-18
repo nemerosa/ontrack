@@ -22,4 +22,7 @@ class ShellOptions {
     @Option(name = "--no-ssl", usage = "Disables SSL certificate checks")
     boolean disableSsl = false
 
+    @Option(name = "--discard-result", aliases = "-d", usage = "If set, the result of the script is not written out, only the list of variables set by the script if any")
+    boolean discardResult = false
+
 }
