@@ -96,7 +96,7 @@ class Shell {
     }
 
     public static String readScript(ShellOptions options) {
-        if (options.password == '-') {
+        if (options.path == '-') {
             return System.in.text
         } else {
             return new File(options.path).text
