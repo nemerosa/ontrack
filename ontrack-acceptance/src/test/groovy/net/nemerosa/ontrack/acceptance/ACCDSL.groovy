@@ -1671,7 +1671,7 @@ shell.put('BUILD', build)
 
         // Shell call
         def output = new StringWriter()
-        def shell = Shell.create().withOutput(output)
+        def shell = Shell.withOutput(output)
         List<String> args = [
                 '--discard-result',
                 '--url', baseURL, '--user', 'admin', '--password', adminPassword,

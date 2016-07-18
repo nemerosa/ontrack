@@ -7,16 +7,22 @@ import org.kohsuke.args4j.CmdLineParser
 class Shell {
 
     private final PrintWriter output
+    private final boolean cmdLine
 
-    Shell(PrintWriter output) {
+    Shell(PrintWriter output, boolean cmdLine = false) {
         this.output = output
+        this.cmdLine = cmdLine
     }
 
-    Shell() {
-        this(new PrintWriter(System.out))
+    Shell(boolean cmdLine = false) {
+        this(new PrintWriter(System.out), cmdLine)
     }
 
-    Shell withOutput(Writer writer) {
+    static Shell forCmdLine() {
+        new Shell(true)
+    }
+
+    static Shell withOutput(Writer writer) {
         new Shell(new PrintWriter(writer))
     }
 
@@ -27,9 +33,26 @@ class Shell {
     def call(List<String> args) {
         // Parsing of options
         def options = new ShellOptions()
-        new CmdLineParser(options).parseArgument(args)
-        // Call
-        call options
+        def parser = new CmdLineParser(options)
+        // Help?
+        if (cmdLine && (args.contains("--help") || args.contains("-h"))) {
+            parser.printUsage(System.out)
+        } else {
+            // Parsing
+            try {
+                parser.parseArgument(args)
+            } catch (CmdLineException ex) {
+                if (cmdLine) {
+                    System.err.println ex.message
+                    parser.printUsage(System.out)
+                    System.exit(-1)
+                } else {
+                    throw ex
+                }
+            }
+            // Call
+            call options
+        }
     }
 
     def call(ShellOptions options) {
@@ -95,12 +118,8 @@ class Shell {
         gshell.evaluate(script)
     }
 
-    static Shell create() {
-        new Shell()
-    }
-
     static void main(String... args) {
-        create()(args)
+        forCmdLine()(args)
     }
 
 }
