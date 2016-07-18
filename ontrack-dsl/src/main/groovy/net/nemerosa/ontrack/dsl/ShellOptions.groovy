@@ -13,8 +13,8 @@ class ShellOptions {
     @Option(name = "--password", aliases = "-p", usage = "Ontrack password")
     String password
 
-    @Option(name = "--file", aliases = "-f", usage = "Path to the script file", required = true)
-    String path
+    @Option(name = "--file", aliases = "-f", usage = "Path to the script file or '-' if script is provided on the standard input (default)")
+    String path = "-"
 
     @Option(name = "--value", aliases = "-v", usage = "Name/value to bind to the script, using name=value format")
     List<String> values = []

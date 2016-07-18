@@ -45,7 +45,7 @@ class Shell {
         def local = new ShellConnector()
 
         // Reads the script
-        def script = new File(options.path).text
+        def script = readScript(options)
 
         // Parsing of values
         def params = options.values.collectEntries { token ->
@@ -68,6 +68,14 @@ class Shell {
         // Output of result
         def json = JsonOutput.prettyPrint(JsonOutput.toJson(result))
         output.println(json)
+    }
+
+    public static String readScript(ShellOptions options) {
+        if (options.password == '-') {
+            return System.in.text
+        } else {
+            return new File(options.path).text
+        }
     }
 
     static def run(Ontrack ontrack, ShellConnector connector, String script, Map<String, String> params) {
