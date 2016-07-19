@@ -232,6 +232,50 @@ assert mapping.name == 'ldapGroupName'
 assert mapping.groupName == 'groupName'
 ----
 
+[[dsl-usecases-images]]
+==== Images and documents
+
+Some resources can be associated with images (like promotion levels and validation stamps) and some documents can be
+downloaded.
+
+When uploading a document or an image, the DSL will accept any object (see below), optionally associated with a MIME
+content type (the content type is either read from the source object or defaults to `image/png`).
+
+The object can be any of:
+
+* a `URL` object - the MIME type and the binary content will be downloaded using the URL - the URL must be accessible
+  anonymously
+* a `File` object - the binary content is read from the file and the MIME type must be provided
+* a valid URL string - same as an `URL` - see above
+* a file path - same as a `File` - see above
+
+For example:
+
+[source,groovy]
+----
+ontrack.project('project') {
+   branch('branch') {
+      promotionLevel('COPPER', 'Copper promotion') {
+         image '/path/to/local/file.png', 'image/png'
+      }
+   }
+}
+----
+
+Document and image downloads return a `Document` object with has two properties:
+
+* `content` - byte array
+* `type` - MIME content type
+
+For example, to store a promotion level's image into a file:
+
+[source,groovy]
+----
+File file = ...
+def promotionLevel = ontrack.promotionLevel('project', 'branch', 'COPPER')
+file.bytes = promotionLevel.image.content
+----
+
 [[dsl-doc]]
 === Reference
 
