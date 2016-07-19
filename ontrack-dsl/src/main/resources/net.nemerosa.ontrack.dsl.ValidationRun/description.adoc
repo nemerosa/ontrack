@@ -1,0 +1,21 @@
+You can get a validation run by validating a build:
+
+[source,groovy]
+----
+def run = ontrack.build(branch.project, branch.name, '2').validate('SMOKE', 'FAILED')
+assert run.validationStamp.name == 'SMOKE'
+assert run.validationRunStatuses[0].statusID.id == 'FAILED'
+assert run.validationRunStatuses[0].statusID.name == 'Failed'
+assert run.status == 'FAILED'
+----
+
+or by getting the list of validation runs for a build:
+
+[source,groovy]
+----
+def runs = ontrack.build(branch.project, branch.name, '2').validationRuns
+assert runs.size() == 1
+assert runs[0].validationStamp.name == 'SMOKE'
+assert runs[0].validationRunStatuses[0].statusID.id == 'FAILED'
+assert runs[0].status == 'FAILED'
+----

@@ -70,7 +70,7 @@ class Build extends AbstractProjectResource {
             new PromotionRun(ontrack, it)
         }
     }
-
+    @DSL("Gets the list of validation runs for this build")
     List<ValidationRun> getValidationRuns() {
         ontrack.get(link('validationRuns')).resources.collect {
             new ValidationRun(ontrack, it)
