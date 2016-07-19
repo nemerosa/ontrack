@@ -71,7 +71,8 @@ public class DSLDocGenerator {
                         clazz.getSimpleName(),
                         getClassDescription(dsl),
                         getClassLongDescription(clazz),
-                        getClassSample(clazz)
+                        getClassSample(clazz),
+                        dsl.properties()
                 );
                 doc.getClasses().put(clazz.getName(), dslDocClass);
                 // Methods
@@ -132,7 +133,11 @@ public class DSLDocGenerator {
                 }
                 // Reference?
                 if (dslDocClass != null && !StringUtils.equals(docClass.getId(), dslDocClass.getId())) {
-                    docMethod.getReferences().add(dslDocClass);
+                    if (dslDocClass.isPropertyClass()) {
+                        docClass.getProperties().set(dslDocClass);
+                    } else {
+                        docMethod.getReferences().add(dslDocClass);
+                    }
                 }
             }
         }

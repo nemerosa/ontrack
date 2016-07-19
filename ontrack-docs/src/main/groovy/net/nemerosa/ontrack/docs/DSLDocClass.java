@@ -1,9 +1,11 @@
 package net.nemerosa.ontrack.docs;
 
 import lombok.Data;
+import lombok.experimental.Wither;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Documentation for a class
@@ -36,10 +38,22 @@ public class DSLDocClass {
      */
     private final List<DSLDocMethod> methods = new ArrayList<>();
 
+    /**
+     * Technical ID for the class
+     */
     public String getId() {
-        // TODO Transforms xX into x-x
         return name.toLowerCase();
     }
+
+    /**
+     * Property class?
+     */
+    private final boolean propertyClass;
+
+    /**
+     * Property class (if any)
+     */
+    private final AtomicReference<DSLDocClass> properties = new AtomicReference<>();
 
     /**
      * References

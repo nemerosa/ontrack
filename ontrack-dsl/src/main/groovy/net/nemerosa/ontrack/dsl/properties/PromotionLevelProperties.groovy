@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.PromotionLevel
 import net.nemerosa.ontrack.dsl.doc.DSL
 
-@DSL
+@DSL(properties = true)
 class PromotionLevelProperties extends ProjectEntityProperties {
 
     private final PromotionLevel promotionLevel
