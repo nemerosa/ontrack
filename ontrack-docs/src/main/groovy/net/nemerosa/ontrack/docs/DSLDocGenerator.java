@@ -239,9 +239,14 @@ public class DSLDocGenerator {
         Class<?>[] parameterTypes = method.getParameterTypes();
         for (int i = 0; i < parameterTypes.length; i++) {
             Class<?> parameterType = parameterTypes[i];
-            String name = parameters[i].name();
+            GroovyParameter gp = parameters[i];
+            String name = gp.name();
             if (i > 0) s.append(", ");
             s.append(parameterType.getSimpleName()).append(" ").append(name);
+            String defaultValue = gp.defaultValue();
+            if (defaultValue != null) {
+                s.append(" = ").append(defaultValue);
+            }
         }
         s.append(")");
         // OK
