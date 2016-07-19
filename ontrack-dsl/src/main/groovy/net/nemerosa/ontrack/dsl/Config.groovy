@@ -165,12 +165,12 @@ class Config {
     }
 
     PredefinedValidationStamp predefinedValidationStamp(String name, String description = '', boolean getIfExists = false) {
-        def node = predefinedValidationStamps.find { it.name == name }
-        if (node) {
+        def vs = predefinedValidationStamps.find { it.name == name }
+        if (vs) {
             if (getIfExists) {
                 new PredefinedValidationStamp(
                         ontrack,
-                        ontrack.get(node._self)
+                        ontrack.get(vs.link('self'))
                 )
             } else {
                 throw new ObjectAlreadyExistsException("Predefined validation stamp ${name} already exists.")
