@@ -77,6 +77,7 @@ class Build extends AbstractProjectResource {
         }
     }
 
+    @DSL
     BuildProperties getConfig() {
         new BuildProperties(ontrack, this)
     }

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.docs;
 
 import net.nemerosa.ontrack.dsl.Ontrack;
 import net.nemerosa.ontrack.dsl.doc.DSL;
+import net.nemerosa.ontrack.dsl.doc.DSLProperties;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -72,7 +73,7 @@ public class DSLDocGenerator {
                         getClassDescription(dsl),
                         getClassLongDescription(clazz),
                         getClassSample(clazz),
-                        dsl.properties()
+                        clazz.getAnnotation(DSLProperties.class) != null
                 );
                 doc.getClasses().put(clazz.getName(), dslDocClass);
                 // Methods

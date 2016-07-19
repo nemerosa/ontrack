@@ -30,11 +30,4 @@ public @interface DSL {
      */
     int count() default -1;
 
-    /**
-     * Indicates that the return of this method is the property class of the outer one. The description
-     * of this class will be included as `properties` into the description of the outer class, with an
-     * additional level of indentation.
-     */
-    boolean properties() default false;
-
 }

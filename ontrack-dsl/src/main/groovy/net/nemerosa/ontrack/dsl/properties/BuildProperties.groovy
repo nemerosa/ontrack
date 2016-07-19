@@ -2,16 +2,18 @@ package net.nemerosa.ontrack.dsl.properties
 
 import net.nemerosa.ontrack.dsl.Build
 import net.nemerosa.ontrack.dsl.Ontrack
+import net.nemerosa.ontrack.dsl.doc.DSL
+import net.nemerosa.ontrack.dsl.doc.DSLProperties
 
+@DSL
+@DSLProperties
 class BuildProperties extends ProjectEntityProperties {
 
     BuildProperties(Ontrack ontrack, Build build) {
         super(ontrack, build)
     }
 
-    /**
-     * Sets the Jenkins build property on a build
-     */
+    @DSL("Associates a Jenkins build with this build.")
     def jenkinsBuild(String configuration, String job, int buildNumber) {
         property(
                 'net.nemerosa.ontrack.extension.jenkins.JenkinsBuildPropertyType',
@@ -23,16 +25,12 @@ class BuildProperties extends ProjectEntityProperties {
         )
     }
 
-    /**
-     * Gets the Jenkins build property
-     */
+    @DSL("Gets the Jenkins build property.")
     def getJenkinsBuild() {
         property('net.nemerosa.ontrack.extension.jenkins.JenkinsBuildPropertyType')
     }
 
-    /**
-     * Sets the Release property
-     */
+    @DSL("Sets the Release property.")
     def label(String name) {
         property(
                 'net.nemerosa.ontrack.extension.general.ReleasePropertyType',
@@ -42,9 +40,7 @@ class BuildProperties extends ProjectEntityProperties {
         )
     }
 
-    /**
-     * Gets the Release property
-     */
+    @DSL("Gets the release name associated with this build.")
     def getLabel() {
         property('net.nemerosa.ontrack.extension.general.ReleasePropertyType').name
     }
@@ -52,13 +48,14 @@ class BuildProperties extends ProjectEntityProperties {
     /**
      * Git commit property
      */
-
+    @DSL("Sets a Git commmit associated to this build.")
     def gitCommit(String commit) {
         property('net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType', [
                 commit: commit
         ])
     }
 
+    @DSL("Gets the Git commit associated to this build.")
     def getGitCommit() {
         property('net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType').commit
     }
