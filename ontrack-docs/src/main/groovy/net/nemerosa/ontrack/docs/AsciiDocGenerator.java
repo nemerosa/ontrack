@@ -8,9 +8,12 @@ import java.util.stream.Collectors;
 public class AsciiDocGenerator {
 
     public void generate(PrintWriter writer, DSLDoc doc) {
-        doc.getClasses().values().forEach(
-                dslDocClass -> adocClass(writer, dslDocClass)
-        );
+        doc.getClasses().values()
+                .stream()
+                .filter(dslDocClass -> !dslDocClass.isPropertyClass())
+                .forEach(
+                        dslDocClass -> adocClass(writer, dslDocClass)
+                );
     }
 
     private void adocClass(PrintWriter writer, DSLDocClass docClass) {
@@ -34,9 +37,43 @@ public class AsciiDocGenerator {
         }
         // Sample
         adocSample(writer, docClass.getSample());
+        // Properties
+        DSLDocClass propertyClass = docClass.getProperties().get();
+        if (propertyClass != null) {
+            adocPropertyClass(writer, docClass, propertyClass);
+        }
         // Methods
         docClass.getMethods().forEach(
-                dslDocMethod -> adocMethod(writer, docClass, dslDocMethod)
+                dslDocMethod -> adocMethod(writer, docClass, dslDocMethod, false)
+        );
+        // Separator
+        writer.println();
+    }
+
+    private void adocPropertyClass(PrintWriter writer, DSLDocClass docClass, DSLDocClass propertyClass) {
+        writer.format("[[dsl-%s-properties]]%n", docClass.getId());
+        writer.format("===== Properties%n");
+        // Description
+        if (StringUtils.isNotBlank(propertyClass.getDescription())) {
+            writer.format("%n%s%n", propertyClass.getDescription());
+        }
+        if (StringUtils.isNotBlank(propertyClass.getLongDescription())) {
+            writer.format("%n%s%n", propertyClass.getLongDescription());
+        }
+        // See also section
+        if (!propertyClass.getReferences().isEmpty()) {
+            writer.format(
+                    "%nSee also: %s%n",
+                    propertyClass.getReferences().stream()
+                            .map(AsciiDocGenerator::getRefLink)
+                            .collect(Collectors.joining(", "))
+            );
+        }
+        // Sample
+        adocSample(writer, propertyClass.getSample());
+        // Methods
+        propertyClass.getMethods().forEach(
+                dslDocMethod -> adocMethod(writer, propertyClass, dslDocMethod, true)
         );
         // Separator
         writer.println();
@@ -51,9 +88,9 @@ public class AsciiDocGenerator {
         }
     }
 
-    private void adocMethod(PrintWriter writer, DSLDocClass docClass, DSLDocMethod docMethod) {
+    private void adocMethod(PrintWriter writer, DSLDocClass docClass, DSLDocMethod docMethod, boolean indent) {
         writer.format("%n[[dsl-%s-%s]]%n", docClass.getId(), docMethod.getId());
-        writer.format("===== %s%n", docMethod.getSignature());
+        writer.format("%s %s%n", StringUtils.repeat("=", indent ? 6 : 5), docMethod.getSignature());
         if (StringUtils.isNotBlank(docMethod.getDescription())) {
             writer.format("%n%s%n", docMethod.getDescription());
         }
