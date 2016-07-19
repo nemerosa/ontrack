@@ -38,7 +38,7 @@ class GroovyDocHelper {
     }
 
     static Method getMethodFromGroovyMethodDoc(GroovyMethodDoc methodDoc, Class clazz) {
-        Method method = clazz.methods.findAll { it.name == methodDoc.name() }.find { Method method ->
+        Method method = clazz.declaredMethods.findAll { it.name == methodDoc.name() }.find { Method method ->
 
             List docParamNames = methodDoc.parameters().collect {
                 String name = it.type()?.qualifiedTypeName() ?: it.typeName()
