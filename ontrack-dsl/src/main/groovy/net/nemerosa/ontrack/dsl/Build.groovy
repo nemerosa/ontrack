@@ -1,27 +1,33 @@
 package net.nemerosa.ontrack.dsl
 
+import net.nemerosa.ontrack.dsl.doc.DSL
 import net.nemerosa.ontrack.dsl.properties.BuildProperties
 
+@DSL
 class Build extends AbstractProjectResource {
 
     Build(Ontrack ontrack, Object node) {
         super(ontrack, node)
     }
 
+    @DSL("Configuration of the build in a closure.")
     def call(Closure closure) {
         closure.resolveStrategy = Closure.DELEGATE_FIRST
         closure.delegate = this
         closure()
     }
 
+    @DSL("Gets the build project name.")
     String getProject() {
         node?.branch?.project?.name
     }
 
+    @DSL("Gets the build branch name.")
     String getBranch() {
         node?.branch?.name
     }
 
+    @DSL("Promotes this build to the given promotion level.")
     PromotionRun promote(String promotion) {
         new PromotionRun(
                 ontrack,
@@ -32,12 +38,14 @@ class Build extends AbstractProjectResource {
         )
     }
 
+    @DSL("Promotes this build to the given promotion level and configures the created <<dsl-promotionrun,promotion run>>.")
     PromotionRun promote(String promotion, Closure closure) {
         def run = promote(promotion)
         run(closure)
         run
     }
 
+    @DSL(id = "validate", count = 2)
     ValidationRun validate(String validationStamp, String validationStampStatus = 'PASSED') {
         new ValidationRun(
                 ontrack,
@@ -49,6 +57,7 @@ class Build extends AbstractProjectResource {
         )
     }
 
+    @DSL(id = "validate-closure", count = 3)
     ValidationRun validate(String validationStamp, String validationStampStatus = 'PASSED', Closure closure) {
         def run = validate(validationStamp, validationStampStatus)
         run(closure)

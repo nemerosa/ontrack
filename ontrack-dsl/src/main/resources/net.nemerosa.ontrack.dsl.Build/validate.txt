@@ -1,0 +1,2 @@
+<<dsl-build-validate,Validates>> the build using the given validation stamp and status - and configures the
+resulting <<dsl-validationrun,validation run>>.

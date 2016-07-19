@@ -1,0 +1,2 @@
+Validates the build using the given validation stamp and status - possible values for the status are:
+`PASSED`, `FAILED`, `DEFECTIVE`, `EXPLAINED`, `FIXED`, `INTERRUPTED`, `INVESTIGATING`, `WARNING`
