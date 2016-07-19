@@ -16,7 +16,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * Generation of DSL documentation
@@ -49,77 +48,8 @@ public class DSLDocGenerator {
         File adocFile = new File(dir, "dsl-generated.adoc");
         System.out.format("[doc] Writing AsciiDoc at %s%n", adocFile);
         try (PrintWriter writer = new PrintWriter(adocFile)) {
-            adoc(writer, doc);
+            new AsciiDocGenerator().generate(writer, doc);
         }
-    }
-
-    private static void adoc(PrintWriter writer, DSLDoc doc) {
-        doc.getClasses().values().forEach(
-                dslDocClass -> adocClass(writer, dslDocClass)
-        );
-    }
-
-    private static void adocClass(PrintWriter writer, DSLDocClass docClass) {
-        writer.format("[[dsl-%s]]%n", docClass.getId());
-        writer.format("==== %s%n", docClass.getName());
-        // Description
-        if (StringUtils.isNotBlank(docClass.getDescription())) {
-            writer.format("%n%s%n", docClass.getDescription());
-        }
-        if (StringUtils.isNotBlank(docClass.getLongDescription())) {
-            writer.format("%n%s%n", docClass.getLongDescription());
-        }
-        // See also section
-        if (!docClass.getReferences().isEmpty()) {
-            writer.format(
-                    "%nSee also: %s%n",
-                    docClass.getReferences().stream()
-                            .map(DSLDocGenerator::getRefLink)
-                            .collect(Collectors.joining(", "))
-            );
-        }
-        // Sample
-        adocSample(writer, docClass.getSample());
-        // Methods
-        docClass.getMethods().forEach(
-                dslDocMethod -> adocMethod(writer, docClass, dslDocMethod)
-        );
-        // Separator
-        writer.println();
-    }
-
-    private static void adocSample(PrintWriter writer, String sample) {
-        if (StringUtils.isNotBlank(sample)) {
-            writer.format("%n[source,groovy]%n");
-            writer.format("----%n");
-            writer.println(sample);
-            writer.format("----%n");
-        }
-    }
-
-    private static void adocMethod(PrintWriter writer, DSLDocClass docClass, DSLDocMethod docMethod) {
-        writer.format("%n[[dsl-%s-%s]]%n", docClass.getId(), docMethod.getId());
-        writer.format("===== %s%n", docMethod.getSignature());
-        if (StringUtils.isNotBlank(docMethod.getDescription())) {
-            writer.format("%n%s%n", docMethod.getDescription());
-        }
-        if (StringUtils.isNotBlank(docMethod.getLongDescription())) {
-            writer.format("%n%s%n", docMethod.getLongDescription());
-        }
-        adocSample(writer, docMethod.getSample());
-        // References
-        if (!docMethod.getReferences().isEmpty()) {
-            writer.format(
-                    "%nSee: %s%n",
-                    docMethod.getReferences().stream()
-                            .map(DSLDocGenerator::getRefLink)
-                            .collect(Collectors.joining(", "))
-            );
-        }
-    }
-
-    private static String getRefLink(DSLDocClass ref) {
-        return String.format("<<dsl-%s,%s>>", ref.getId(), ref.getName());
     }
 
     private DSLDoc generate(Class<?> clazz) throws IOException {
