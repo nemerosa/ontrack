@@ -7,19 +7,21 @@ import org.kohsuke.args4j.CmdLineParser
 class Shell {
 
     private final PrintWriter output
+    private final OntrackLogger logger
     private final boolean cmdLine
 
-    Shell(PrintWriter output, boolean cmdLine = false) {
+    Shell(PrintWriter output, boolean cmdLine = false, OntrackLogger logger = null) {
         this.output = output
         this.cmdLine = cmdLine
+        this.logger = logger
     }
 
-    Shell(boolean cmdLine = false) {
-        this(new PrintWriter(System.out), cmdLine)
+    Shell(boolean cmdLine = false, OntrackLogger logger = null) {
+        this(new PrintWriter(System.out), cmdLine, logger)
     }
 
-    static Shell forCmdLine() {
-        new Shell(true)
+    static Shell forCmdLine(OntrackLogger logger = null) {
+        new Shell(true, logger)
     }
 
     static Shell withOutput(Writer writer) {
@@ -61,6 +63,9 @@ class Shell {
         def connection = OntrackConnection.create(options.url).disableSsl(options.disableSsl)
         if (options.user) {
             connection = connection.authenticate(options.user, options.password)
+        }
+        if (logger) {
+            connection = connection.logger(logger)
         }
         def ontrack = connection.build()
 
