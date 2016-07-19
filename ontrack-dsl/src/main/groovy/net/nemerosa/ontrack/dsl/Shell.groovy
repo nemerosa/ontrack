@@ -87,6 +87,15 @@ class Shell {
         // Parsing of values
         def params = options.values
 
+        // Values in file
+        if (options.valueFile) {
+            Properties properties = new Properties()
+            options.valueFile.withInputStream {
+                properties.load(it)
+            }
+            params.putAll(properties as Map)
+        }
+
         // Runs the shell
         def result = run(ontrack, local, script, params)
 

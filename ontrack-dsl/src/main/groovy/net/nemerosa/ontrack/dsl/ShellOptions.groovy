@@ -20,6 +20,9 @@ class ShellOptions {
     @Option(name = "--value", aliases = "-v", usage = "Name and values to bind to the script, using name=value format", handler = MapOptionHandler)
     Map<String, String> values = [:]
 
+    @Option(name = "--values", aliases = "-i", usage = "Path to a file which contains name/value pairs to inject into the script")
+    File valueFile = null
+
     @Option(name = "--no-ssl", usage = "Disables SSL certificate checks")
     boolean disableSsl = false
 
