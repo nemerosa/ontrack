@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.dsl
 
+import net.nemerosa.ontrack.dsl.doc.DSL
+
 class AbstractResource {
 
     protected final Ontrack ontrack
@@ -10,10 +12,12 @@ class AbstractResource {
         this.node = node
     }
 
+    @DSL(description = "Gets the internal JSON representation of this resource.")
     Object getNode() {
         node
     }
 
+    @DSL(description = "Gets a link address.")
     public String link(String name) {
         String link = optionalLink(name)
         if (link) {
@@ -23,10 +27,12 @@ class AbstractResource {
         }
     }
 
+    @DSL(description = "Gets the Web page address for this resource.")
     public String getPage() {
         return link('page')
     }
 
+    @DSL(description = "Gets a link address if it exists.")
     public String optionalLink(String name) {
         String linkName = name.startsWith('_') ? name : '_' + name
         if (node[linkName]) {

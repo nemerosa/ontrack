@@ -155,7 +155,7 @@ public class DSLDocGenerator {
                 // Tries to find the Groovy method documentation
                 GroovyMethodDoc groovyMethodDoc = groovyDocHelper.getAllMethods(clazz).stream()
                         .filter(gm -> StringUtils.equals(gm.name(), method.getName()))
-                        .filter(gm -> GroovyDocHelper.getMethodFromGroovyMethodDoc(gm, clazz).equals(method))
+                        .filter(gm -> Objects.equals(GroovyDocHelper.getMethodFromGroovyMethodDoc(gm, clazz), method))
                         .findFirst()
                         .orElseThrow(() -> new IllegalStateException("Cannot find doc for method: " + method));
                 // OK
