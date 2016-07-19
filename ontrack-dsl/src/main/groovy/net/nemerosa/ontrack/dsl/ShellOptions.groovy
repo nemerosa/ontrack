@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.dsl
 
 import org.kohsuke.args4j.Option
+import org.kohsuke.args4j.spi.MapOptionHandler
 
 class ShellOptions {
 
@@ -16,8 +17,8 @@ class ShellOptions {
     @Option(name = "--file", aliases = "-f", usage = "Path to the script file or '-' if script is provided on the standard input (default)")
     String path = "-"
 
-    @Option(name = "--value", aliases = "-v", usage = "Name/value to bind to the script, using name=value format")
-    List<String> values = []
+    @Option(name = "--value", aliases = "-v", usage = "Name and values to bind to the script, using name=value format", handler = MapOptionHandler)
+    Map<String, String> values = [:]
 
     @Option(name = "--no-ssl", usage = "Disables SSL certificate checks")
     boolean disableSsl = false

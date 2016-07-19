@@ -1677,7 +1677,7 @@ shell.put('BUILD', build)
                 '--url', baseURL, '--user', 'admin', '--password', adminPassword,
                 '--file', file.absolutePath,
                 '--value', "project=${projectName}" as String,
-                '--value', "branch=${branchName}" as String
+                '--value', "branch=${branchName}" as String,
         ]
         if (sslDisabled) {
             args << '--no-ssl'

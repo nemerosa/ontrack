@@ -85,14 +85,7 @@ class Shell {
         def script = readScript(options)
 
         // Parsing of values
-        def params = options.values.collectEntries { token ->
-            List<String> tokens = token.split(/=/).collect { it.trim() }
-            if (tokens.size() != 2) {
-                throw new CmdLineException("Wrong value: ${token}")
-            } else {
-                return [tokens[0], tokens[1]]
-            }
-        }
+        def params = options.values
 
         // Runs the shell
         def result = run(ontrack, local, script, params)
