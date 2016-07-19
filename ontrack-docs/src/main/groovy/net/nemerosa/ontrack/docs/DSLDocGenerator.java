@@ -282,7 +282,7 @@ public class DSLDocGenerator {
     }
 
     private String getMethodLongDescription(DSL methodDsl, Class<?> clazz, Method method) throws IOException {
-        InputStream in = clazz.getResourceAsStream(String.format("/%s/%s.txt", method.getDeclaringClass().getName(), getMethodId(methodDsl, method)));
+        InputStream in = clazz.getResourceAsStream(String.format("/%s/%s.adoc", method.getDeclaringClass().getName(), getMethodId(methodDsl, method)));
         if (in != null) {
             return IOUtils.toString(in);
         } else {
@@ -295,7 +295,7 @@ public class DSLDocGenerator {
         if (!Objects.equals(description, "")) {
             return description;
         } else {
-            InputStream in = clazz.getResourceAsStream(String.format("%s.txt", id));
+            InputStream in = clazz.getResourceAsStream(String.format("%s.adoc", id));
             if (in != null) {
                 return IOUtils.toString(in);
             } else {
