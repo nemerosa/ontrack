@@ -28,7 +28,8 @@ class PromotionLevel extends AbstractProjectResource {
         closure()
     }
 
-    ProjectEntityProperties getConfig() {
+    @DSL("Access to the promotion level properties")
+    PromotionLevelProperties getConfig() {
         new PromotionLevelProperties(ontrack, this)
     }
 

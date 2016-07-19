@@ -225,7 +225,7 @@ public class DSLDocGenerator {
     }
 
     private String getClassLongDescription(Class<?> clazz) throws IOException {
-        InputStream in = clazz.getResourceAsStream(String.format("%s.adoc", clazz.getName()));
+        InputStream in = clazz.getResourceAsStream(String.format("/%s/description.adoc", clazz.getName()));
         if (in != null) {
             return IOUtils.toString(in);
         } else {
