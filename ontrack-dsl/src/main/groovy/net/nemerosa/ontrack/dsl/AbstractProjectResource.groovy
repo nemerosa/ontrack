@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.dsl
 
 import net.nemerosa.ontrack.dsl.doc.DSL
 
+@DSL
 abstract class AbstractProjectResource extends AbstractResource implements ProjectEntity {
 
     AbstractProjectResource(Ontrack ontrack, Object node) {

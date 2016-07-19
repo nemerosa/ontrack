@@ -35,4 +35,9 @@ public class DSLDocClass {
         // TODO Transforms xX into x-x
         return name.toLowerCase();
     }
+
+    /**
+     * References
+     */
+    private final List<DSLDocClass> references = new ArrayList<>();
 }

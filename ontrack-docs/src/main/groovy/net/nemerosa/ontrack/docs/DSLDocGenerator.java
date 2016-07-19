@@ -66,6 +66,15 @@ public class DSLDocGenerator {
         if (StringUtils.isNotBlank(docClass.getDescription())) {
             writer.format("%n%s%n", docClass.getDescription());
         }
+        // See also section
+        if (!docClass.getReferences().isEmpty()) {
+            writer.format(
+                    "%nSee also: %s%n",
+                    docClass.getReferences().stream()
+                            .map(DSLDocGenerator::getRefLink)
+                            .collect(Collectors.joining(", "))
+            );
+        }
         // Sample
         adocSample(writer, docClass.getSample());
         // Methods
@@ -132,9 +141,15 @@ public class DSLDocGenerator {
                 );
                 doc.getClasses().put(clazz.getName(), dslDocClass);
                 // Methods
-                Method[] methods = clazz.getMethods();
+                Method[] methods = clazz.getDeclaredMethods();
                 for (Method method : methods) {
                     generateDocMethod(doc, dslDocClass, clazz, method);
+                }
+                // Super classes
+                Class<?> superclass = clazz.getSuperclass();
+                DSLDocClass dslSuperClass = generateDocClass(doc, superclass);
+                if (dslSuperClass != null) {
+                    dslDocClass.getReferences().add(dslSuperClass);
                 }
                 // OK
                 return dslDocClass;

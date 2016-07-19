@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.dsl
 
 import net.nemerosa.ontrack.dsl.doc.DSL
 
+@DSL
 class AbstractResource {
 
     protected final Ontrack ontrack
