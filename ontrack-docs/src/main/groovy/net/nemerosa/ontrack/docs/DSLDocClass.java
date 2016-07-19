@@ -22,6 +22,11 @@ public class DSLDocClass {
     private final String description;
 
     /**
+     * Long description
+     */
+    private final String longDescription;
+
+    /**
      * Groovy sample
      */
     private final String sample;

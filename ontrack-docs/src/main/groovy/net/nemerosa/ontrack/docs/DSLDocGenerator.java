@@ -66,6 +66,9 @@ public class DSLDocGenerator {
         if (StringUtils.isNotBlank(docClass.getDescription())) {
             writer.format("%n%s%n", docClass.getDescription());
         }
+        if (StringUtils.isNotBlank(docClass.getLongDescription())) {
+            writer.format("%n%s%n", docClass.getLongDescription());
+        }
         // See also section
         if (!docClass.getReferences().isEmpty()) {
             writer.format(
@@ -136,7 +139,8 @@ public class DSLDocGenerator {
                 System.out.format("[doc] %s%n", clazz.getName());
                 dslDocClass = new DSLDocClass(
                         clazz.getSimpleName(),
-                        getClassDescription(dsl, clazz),
+                        getClassDescription(dsl),
+                        getClassLongDescription(clazz),
                         getClassSample(clazz)
                 );
                 doc.getClasses().put(clazz.getName(), dslDocClass);
@@ -290,17 +294,12 @@ public class DSLDocGenerator {
         }
     }
 
-    private String getDescription(DSL dsl, Class<?> clazz, String id) throws IOException {
-        String description = dsl.value();
-        if (!Objects.equals(description, "")) {
-            return description;
+    private String getClassLongDescription(Class<?> clazz) throws IOException {
+        InputStream in = clazz.getResourceAsStream(String.format("%s.adoc", clazz.getName()));
+        if (in != null) {
+            return IOUtils.toString(in);
         } else {
-            InputStream in = clazz.getResourceAsStream(String.format("%s.adoc", id));
-            if (in != null) {
-                return IOUtils.toString(in);
-            } else {
-                return null;
-            }
+            return null;
         }
     }
 
@@ -308,8 +307,12 @@ public class DSLDocGenerator {
         return method.getName();
     }
 
-    private String getClassDescription(DSL dsl, Class<?> clazz) throws IOException {
-        return getDescription(dsl, clazz, String.format("/%s/description", clazz.getName()));
+    private String getClassDescription(DSL dsl) throws IOException {
+        if (StringUtils.isNotBlank(dsl.value())) {
+            return dsl.value();
+        } else {
+            return null;
+        }
     }
 
 }
