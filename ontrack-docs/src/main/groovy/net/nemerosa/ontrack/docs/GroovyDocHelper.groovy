@@ -90,7 +90,7 @@ class GroovyDocHelper {
             ParameterizedType parameterizedType = type as ParameterizedType
             return parameterizedType.rawType.simpleName +
                     "<" +
-                    parameterizedType.actualTypeArguments*.simpleName.join(',') +
+                    parameterizedType.actualTypeArguments*.simpleName.join(', ') +
                     ">"
         } else {
             return type.typeName
