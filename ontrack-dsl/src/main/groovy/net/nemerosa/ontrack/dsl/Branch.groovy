@@ -10,7 +10,7 @@ class Branch extends AbstractProjectResource {
         super(ontrack, node)
     }
 
-    @DSL(description = "Returns the name of the project the branch belongs to.")
+    @DSL(value = "Returns the name of the project the branch belongs to.")
     String getProject() {
         node?.project?.name
     }

@@ -5,6 +5,8 @@ import org.codehaus.groovy.tools.groovydoc.ArrayClassDocWrapper
 import org.codehaus.groovy.tools.groovydoc.GroovyDocTool
 
 import java.lang.reflect.Method
+import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Type
 
 class GroovyDocHelper {
 
@@ -69,11 +71,24 @@ class GroovyDocHelper {
                 }
             }
             docParamNames == method.parameterTypes*.name ||
+                    docParamNames == method.genericParameterTypes.collect { getGenericType(it) } ||
                     docParamNames == method.parameterTypes*.canonicalName ||
                     docParamNames == method.parameterTypes.collect { it.enum ? it.simpleName : it.name }
         }
 
         method
+    }
+
+    private static String getGenericType(Type type) {
+        if (type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = type as ParameterizedType
+            return parameterizedType.rawType.simpleName +
+                    "<" +
+                    parameterizedType.actualTypeArguments*.simpleName.join(',') +
+                    ">"
+        } else {
+            return type.typeName
+        }
     }
 
     List<GroovyMethodDoc> getAllMethods(Class clazz) {

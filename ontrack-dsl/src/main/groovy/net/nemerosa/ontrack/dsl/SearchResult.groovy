@@ -9,27 +9,27 @@ class SearchResult extends AbstractResource {
         super(ontrack, node)
     }
 
-    @DSL(description = "Gets the display name for the search result.")
+    @DSL(value = "Gets the display name for the search result.")
     String getTitle() {
         node['title']
     }
 
-    @DSL(description = "Gets a description for the search result.")
+    @DSL(value = "Gets a description for the search result.")
     String getDescription() {
         node['description']
     }
 
-    @DSL(description = "Gets the URI to access the search result details (API).")
+    @DSL(value = "Gets the URI to access the search result details (API).")
     String getUri() {
         node['uri']
     }
 
-    @DSL(description = "Gets the URI to display the search result details (Web).")
+    @DSL(value = "Gets the URI to display the search result details (Web).")
     String getPage() {
         node['page']
     }
 
-    @DSL(description = "Gets a percentage of accuracy about the result.")
+    @DSL(value = "Gets a percentage of accuracy about the result.")
     int getAccuracy() {
         node['accuracy'] as int
     }

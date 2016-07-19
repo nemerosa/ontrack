@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.dsl.doc.DSL
 /**
  * Administration management.
  */
-@DSL(description = "Administration management")
+@DSL("Administration management")
 class Admin {
 
     private final Ontrack ontrack
@@ -17,7 +17,7 @@ class Admin {
     /**
      * Gets the list of accounts
      */
-
+    @DSL("Returns the list of all accounts.")
     List<Account> getAccounts() {
         ontrack.get('accounts').resources.collect {
             new Account(ontrack, it)
@@ -27,6 +27,7 @@ class Admin {
     /**
      * Creating or updating an account
      */
+    @DSL(value = "Creates or updates an account.", count = 5)
     Account account(String name, String fullName, String email, String password = '', List<String> groupNames = []) {
         // Gets the accounts
         def accounts = ontrack.get('accounts')
@@ -70,7 +71,7 @@ class Admin {
     /**
      * Gets the list of groups
      */
-
+    @DSL("Returns the list of all groups.")
     List<AccountGroup> getGroups() {
         ontrack.get('accounts/groups').resources.collect {
             new AccountGroup(ontrack, it)
@@ -80,6 +81,7 @@ class Admin {
     /**
      * Creating or updating a group
      */
+    @DSL("Creates or updates an account group.")
     AccountGroup accountGroup(String name, String description) {
         // Gets the groups
         def groups = ontrack.get('accounts/groups')
@@ -115,6 +117,7 @@ class Admin {
     /**
      * Gets the list of LDAP mappings
      */
+    @DSL("Gets the list of LDAP mappings.")
     List<GroupMapping> getLdapMappings() {
         ontrack.get('extension/ldap/ldap-mapping').resources.collect { node ->
             new GroupMapping(ontrack, node)
@@ -127,6 +130,7 @@ class Admin {
      * @param groupName Group to map to
      * @return Mapping
      */
+    @DSL("Creates or updates a LDAP mapping.")
     GroupMapping ldapMapping(String name, String groupName) {
         def mappings = ontrack.get('extension/ldap/ldap-mapping')
         // Group ID from the name

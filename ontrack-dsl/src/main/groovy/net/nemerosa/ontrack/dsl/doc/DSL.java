@@ -12,7 +12,7 @@ public @interface DSL {
      *
      * @return Short description to be used for the element
      */
-    String description() default "";
+    String value() default "";
 
     /**
      * Optional ID for the element, used to disambiguate between several methods for example

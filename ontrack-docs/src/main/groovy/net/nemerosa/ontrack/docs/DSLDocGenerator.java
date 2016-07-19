@@ -269,8 +269,8 @@ public class DSLDocGenerator {
     }
 
     private String getMethodDescription(DSL methodDsl) throws IOException {
-        if (StringUtils.isNotBlank(methodDsl.description())) {
-            return methodDsl.description();
+        if (StringUtils.isNotBlank(methodDsl.value())) {
+            return methodDsl.value();
         } else {
             return null;
         }
@@ -286,7 +286,7 @@ public class DSLDocGenerator {
     }
 
     private String getDescription(DSL dsl, Class<?> clazz, String id) throws IOException {
-        String description = dsl.description();
+        String description = dsl.value();
         if (!Objects.equals(description, "")) {
             return description;
         } else {
