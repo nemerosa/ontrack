@@ -23,7 +23,7 @@ dependencies {
     compile 'org.slf4j:slf4j-api'
     compile 'org.apache.httpcomponents:httpclient'
     compile 'org.apache.httpcomponents:httpmime'
-    compile 'org.springframework.boot:spring-boot-starter-logging'
+    compile 'org.springframework.boot:spring-boot-starter'
 }
 
 javadocJar {
