@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.docs
 
-import org.codehaus.groovy.groovydoc.*
+import org.codehaus.groovy.groovydoc.GroovyClassDoc
+import org.codehaus.groovy.groovydoc.GroovyMethodDoc
+import org.codehaus.groovy.groovydoc.GroovyRootDoc
 import org.codehaus.groovy.tools.groovydoc.ArrayClassDocWrapper
 import org.codehaus.groovy.tools.groovydoc.GroovyDocTool
 
@@ -30,7 +32,7 @@ class GroovyDocHelper {
         tool.rootDoc
     }
 
-    GroovyClassDoc getGroovyClassDoc(Class clazz) {
+    private GroovyClassDoc getGroovyClassDoc(Class clazz) {
         String name = '/' + clazz.name.replaceAll('\\.', '/')
         rootDoc.classes().find { it.fullPathName == name }
     }
@@ -93,27 +95,7 @@ class GroovyDocHelper {
 
     List<GroovyMethodDoc> getAllMethods(Class clazz) {
         GroovyClassDoc classDoc = getGroovyClassDoc(clazz)
-        List<GroovyMethodDoc> methodDocs = classDoc?.methods() ?: [] as List
-        Class superclass = clazz.superclass
-        if (superclass) {
-            addSuperclassMethods superclass, methodDocs
-        }
-
-        if (clazz.interface) {
-            clazz.interfaces.each { addSuperclassMethods it, methodDocs }
-        }
-        methodDocs
+        return (classDoc?.methods() ?: []) as List<GroovyMethodDoc>
     }
 
-    private void addSuperclassMethods(Class superclass, List<GroovyMethodDoc> methodDocs) {
-        getAllMethods(superclass).each { GroovyMethodDoc superclassMethod ->
-            boolean overridden = methodDocs.find {
-                it.name() == superclassMethod.name() &&
-                        it.parameters()*.typeName() == superclassMethod.parameters()*.typeName()
-            }
-            if (!overridden) {
-                methodDocs << superclassMethod
-            }
-        }
-    }
 }
