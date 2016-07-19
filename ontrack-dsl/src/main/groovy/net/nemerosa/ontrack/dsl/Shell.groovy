@@ -93,10 +93,12 @@ class Shell {
             local.values.each { k, v ->
                 output.format('%s=%s%n', k, v)
             }
+            output.flush()
         } else {
             // Output of result
             def json = JsonOutput.prettyPrint(JsonOutput.toJson(result))
             output.println(json)
+            output.flush()
         }
     }
 
