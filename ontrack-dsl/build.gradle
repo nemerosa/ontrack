@@ -32,9 +32,12 @@ javadocJar {
 }
 
 bootRepackage {
-    mainClass = 'net.nemerosa.ontrack.dsl.Shell'
     classifier = 'shell'
     executable = true
+}
+
+springBoot {
+    mainClass = 'net.nemerosa.ontrack.dsl.ShellApplication'
 }
 
 afterEvaluate { prj ->
