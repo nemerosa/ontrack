@@ -64,6 +64,7 @@ class Build extends AbstractProjectResource {
         run
     }
 
+    @DSL("Gets the list of promotion runs for this build")
     List<PromotionRun> getPromotionRuns() {
         ontrack.get(link('promotionRuns')).resources.collect {
             new PromotionRun(ontrack, it)
