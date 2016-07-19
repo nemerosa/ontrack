@@ -17,7 +17,6 @@ class PromotionRun extends AbstractProjectResource {
     }
 
     @Override
-    // FIXME @DSL("Access to the properties of this promotion run.")
     PromotionRunProperties getConfig() {
         new PromotionRunProperties(ontrack, this)
     }
