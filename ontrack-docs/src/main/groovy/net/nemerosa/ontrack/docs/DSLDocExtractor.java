@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.docs;
 
 import net.nemerosa.ontrack.dsl.doc.DSL;
+import net.nemerosa.ontrack.dsl.doc.DSLMethod;
 import net.nemerosa.ontrack.dsl.doc.DSLProperties;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -70,7 +71,7 @@ public class DSLDocExtractor {
     }
 
     private void generateDocMethod(DSLDoc doc, DSLDocClass docClass, Class<?> clazz, Method method) throws IOException {
-        DSL methodDsl = method.getAnnotation(DSL.class);
+        DSLMethod methodDsl = method.getAnnotation(DSLMethod.class);
         if (methodDsl != null) {
             // Checks if the method is consistent with the Groovy signature
             boolean consistent = methodDsl.count() < 0 || methodDsl.count() == method.getParameterTypes().length;
@@ -116,7 +117,7 @@ public class DSLDocExtractor {
         }
     }
 
-    private String getMethodId(DSL methodDsl, Method method) {
+    private String getMethodId(DSLMethod methodDsl, Method method) {
         if (StringUtils.isNotBlank(methodDsl.id())) {
             return methodDsl.id();
         } else {
@@ -165,7 +166,7 @@ public class DSLDocExtractor {
         return s.toString();
     }
 
-    private String getMethodSample(DSL methodDsl, Class<?> clazz, Method method) throws IOException {
+    private String getMethodSample(DSLMethod methodDsl, Class<?> clazz, Method method) throws IOException {
         String path = String.format("/%s/%s.groovy", method.getDeclaringClass().getName(), getMethodId(methodDsl, method));
         InputStream in = clazz.getResourceAsStream(path);
         if (in != null) {
@@ -185,7 +186,7 @@ public class DSLDocExtractor {
         }
     }
 
-    private String getMethodDescription(DSL methodDsl) throws IOException {
+    private String getMethodDescription(DSLMethod methodDsl) throws IOException {
         if (StringUtils.isNotBlank(methodDsl.value())) {
             return methodDsl.value();
         } else {
@@ -193,7 +194,7 @@ public class DSLDocExtractor {
         }
     }
 
-    private String getMethodLongDescription(DSL methodDsl, Class<?> clazz, Method method) throws IOException {
+    private String getMethodLongDescription(DSLMethod methodDsl, Class<?> clazz, Method method) throws IOException {
         InputStream in = clazz.getResourceAsStream(String.format("/%s/%s.adoc", method.getDeclaringClass().getName(), getMethodId(methodDsl, method)));
         if (in != null) {
             return IOUtils.toString(in);

@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.dsl
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import net.nemerosa.ontrack.dsl.doc.DSL
+import net.nemerosa.ontrack.dsl.doc.DSLMethod
 import net.nemerosa.ontrack.dsl.http.OTHttpClient
 import org.apache.http.entity.ContentType
 import org.apache.http.entity.StringEntity
@@ -29,7 +30,7 @@ class Ontrack {
     /**
      * Gets the list of projects
      */
-    @DSL(value = "Gets the list of projects")
+    @DSLMethod("Gets the list of projects")
     List<Project> getProjects() {
         return get('structure/projects').resources.collect {
             new Project(this, get(it._self))
@@ -41,7 +42,7 @@ class Ontrack {
      * @param name Name of the project
      * @return Project or null is not found
      */
-    @DSL(value = "Finds a project using its name. Returns null if not found.")
+    @DSLMethod("Finds a project using its name. Returns null if not found.")
     Project findProject(String name) {
         def projectNode = get("structure/projects").resources.find {
             it.name == name
@@ -53,7 +54,7 @@ class Ontrack {
         }
     }
 
-    @DSL(value = "Finds or creates a project.", id = "project", count = 2)
+    @DSLMethod(value = "Finds or creates a project.", id = "project", count = 2)
     Project project(String name, String description = '') {
         def project = findProject(name)
         if (project) {
@@ -74,14 +75,14 @@ class Ontrack {
         }
     }
 
-    @DSL(value = "Finds or creates a project, and configures it.", id = "project-closure", count = 3)
+    @DSLMethod(value = "Finds or creates a project, and configures it.", id = "project-closure", count = 3)
     Project project(String name, String description = '', Closure closure) {
         def project = project(name, description)
         project.call(closure)
         project
     }
 
-    @DSL(value = "Looks for a branch in a project. Fails if not found.")
+    @DSLMethod(value = "Looks for a branch in a project. Fails if not found.")
     Branch branch(String project, String branch) {
         new Branch(
                 this,
@@ -89,7 +90,7 @@ class Ontrack {
         )
     }
 
-    @DSL(value = "Looks for a promotion level by name. Fails if not found.")
+    @DSLMethod(value = "Looks for a promotion level by name. Fails if not found.")
     PromotionLevel promotionLevel(String project, String branch, String promotionLevel) {
         new PromotionLevel(
                 this,
@@ -97,7 +98,7 @@ class Ontrack {
         )
     }
 
-    @DSL(value = "Looks for a validation stamp by name. Fails if not found.")
+    @DSLMethod(value = "Looks for a validation stamp by name. Fails if not found.")
     ValidationStamp validationStamp(String project, String branch, String validationStamp) {
         new ValidationStamp(
                 this,
@@ -105,7 +106,7 @@ class Ontrack {
         )
     }
 
-    @DSL(value = "Looks for a build by name. Fails if not found.")
+    @DSLMethod(value = "Looks for a build by name. Fails if not found.")
     Build build(String project, String branch, String build) {
         new Build(
                 this,
@@ -113,46 +114,46 @@ class Ontrack {
         )
     }
 
-    @DSL(value = "Launches a global search based on a token.")
+    @DSLMethod(value = "Launches a global search based on a token.")
     List<SearchResult> search(String token) {
         post('search', [token: token]).collect {
             new SearchResult(this, it)
         }
     }
 
-    @DSL(value = "Configures the general settings of Ontrack. See <<dsl-config>>.")
+    @DSLMethod(value = "Configures the general settings of Ontrack. See <<dsl-config>>.")
     def configure(Closure closure) {
         Config configResource = new Config(this)
         closure.delegate = configResource
         closure()
     }
 
-    @DSL(value = "Access to the general configuration of Ontrack")
+    @DSLMethod(value = "Access to the general configuration of Ontrack")
     Config getConfig() {
         new Config(this)
     }
 
-    @DSL(value = "Access to the administration of Ontrack")
+    @DSLMethod(value = "Access to the administration of Ontrack")
     Admin getAdmin() {
         new Admin(this)
     }
 
-    @DSL(value = "Runs an arbitrary GET request for a relative path and returns JSON")
+    @DSLMethod(value = "Runs an arbitrary GET request for a relative path and returns JSON")
     def get(String url) {
         httpClient.get(url) { jsonSlurper.parseText(it) }
     }
 
-    @DSL(value = "Runs an arbitrary GET request for a relative path and returns text")
+    @DSLMethod(value = "Runs an arbitrary GET request for a relative path and returns text")
     def text(String url) {
         httpClient.get(url) { it }
     }
 
-    @DSL(value = "Runs an arbitrary DELETE request for a relative path and returns JSON")
+    @DSLMethod(value = "Runs an arbitrary DELETE request for a relative path and returns JSON")
     def delete(String url) {
         httpClient.delete(url) { jsonSlurper.parseText(it) }
     }
 
-    @DSL(value = "Runs an arbitrary POST request for a relative path and some data, and returns JSON")
+    @DSLMethod(value = "Runs an arbitrary POST request for a relative path and some data, and returns JSON")
     def post(String url, Object data) {
         httpClient.post(
                 url,
@@ -163,7 +164,7 @@ class Ontrack {
         ) { jsonSlurper.parseText(it) }
     }
 
-    @DSL(value = "Runs an arbitrary PUT request for a relative path and some data, and returns JSON")
+    @DSLMethod(value = "Runs an arbitrary PUT request for a relative path and some data, and returns JSON")
     def put(String url, Object data) {
         httpClient.put(
                 url,
@@ -174,12 +175,12 @@ class Ontrack {
         ) { jsonSlurper.parseText(it) }
     }
 
-    @DSL(value = "Uploads some arbitrary binary data on a relative path and returns some JSON. See <<dsl-ontrack-upload-type>>.")
+    @DSLMethod(value = "Uploads some arbitrary binary data on a relative path and returns some JSON. See <<dsl-ontrack-upload-type>>.")
     def upload(String url, String name, Object o) {
         upload(url, name, o, 'application/x-octet-stream')
     }
 
-    @DSL(value = "Uploads some typed data on a relative path and returns some JSON", id = "upload-type")
+    @DSLMethod(value = "Uploads some typed data on a relative path and returns some JSON", id = "upload-type")
     def upload(String url, String name, Object o, String contentType) {
         Document document
         String fileName = 'file'
@@ -234,7 +235,7 @@ class Ontrack {
         ) { it ? jsonSlurper.parseText(it) : [:] }
     }
 
-    @DSL(value = "Downloads an arbitrary document using a relative path.")
+    @DSLMethod(value = "Downloads an arbitrary document using a relative path.")
     Document download(String url) {
         httpClient.download(url)
     }

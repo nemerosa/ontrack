@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.dsl
 
 import net.nemerosa.ontrack.dsl.doc.DSL
+import net.nemerosa.ontrack.dsl.doc.DSLMethod
 
 /**
  * Administration management.
@@ -17,7 +18,7 @@ class Admin {
     /**
      * Gets the list of accounts
      */
-    @DSL("Returns the list of all accounts.")
+    @DSLMethod("Returns the list of all accounts.")
     List<Account> getAccounts() {
         ontrack.get('accounts').resources.collect {
             new Account(ontrack, it)
@@ -27,7 +28,7 @@ class Admin {
     /**
      * Creating or updating an account
      */
-    @DSL(value = "Creates or updates an account.", count = 5)
+    @DSLMethod(value = "Creates or updates an account.", count = 5)
     Account account(String name, String fullName, String email, String password = '', List<String> groupNames = []) {
         // Gets the accounts
         def accounts = ontrack.get('accounts')
@@ -71,7 +72,7 @@ class Admin {
     /**
      * Gets the list of groups
      */
-    @DSL("Returns the list of all groups.")
+    @DSLMethod("Returns the list of all groups.")
     List<AccountGroup> getGroups() {
         ontrack.get('accounts/groups').resources.collect {
             new AccountGroup(ontrack, it)
@@ -81,7 +82,7 @@ class Admin {
     /**
      * Creating or updating a group
      */
-    @DSL("Creates or updates an account group.")
+    @DSLMethod("Creates or updates an account group.")
     AccountGroup accountGroup(String name, String description) {
         // Gets the groups
         def groups = ontrack.get('accounts/groups')
@@ -117,7 +118,7 @@ class Admin {
     /**
      * Gets the list of LDAP mappings
      */
-    @DSL("Gets the list of LDAP mappings.")
+    @DSLMethod("Gets the list of LDAP mappings.")
     List<GroupMapping> getLdapMappings() {
         ontrack.get('extension/ldap/ldap-mapping').resources.collect { node ->
             new GroupMapping(ontrack, node)
@@ -130,7 +131,7 @@ class Admin {
      * @param groupName Group to map to
      * @return Mapping
      */
-    @DSL("Creates or updates a LDAP mapping.")
+    @DSLMethod("Creates or updates a LDAP mapping.")
     GroupMapping ldapMapping(String name, String groupName) {
         def mappings = ontrack.get('extension/ldap/ldap-mapping')
         // Group ID from the name
@@ -183,7 +184,7 @@ class Admin {
     /**
      * Sets a global role on an account
      */
-    @DSL("Sets a global role on an account. See <<dsl-usecases-security-account-permissions>>.")
+    @DSLMethod("Sets a global role on an account. See <<dsl-usecases-security-account-permissions>>.")
     public void setAccountGlobalPermission(String accountName, String globalRole) {
         def account = findAccountByName(accountName)
         ontrack.put(
@@ -199,7 +200,7 @@ class Admin {
      * @param accountName Name of the account to get the permissions for
      * @return List of roles
      */
-    @DSL("Gets the list of global roles an account has. See <<dsl-usecases-security-account-permissions>>.")
+    @DSLMethod("Gets the list of global roles an account has. See <<dsl-usecases-security-account-permissions>>.")
     List<Role> getAccountGlobalPermissions(String accountName) {
         def account = findAccountByName(accountName)
         ontrack.get("/accounts/permissions/globals").resources
@@ -215,7 +216,7 @@ class Admin {
     /**
      * Sets a project role on an account
      */
-    @DSL("Sets a project role on an account. See <<dsl-usecases-security-account-permissions>>.")
+    @DSLMethod("Sets a project role on an account. See <<dsl-usecases-security-account-permissions>>.")
     public void setAccountProjectPermission(String projectName, String accountName, String projectRole) {
         def project = ontrack.project(projectName)
         def account = findAccountByName(accountName)
@@ -232,7 +233,7 @@ class Admin {
      * @param accountName Name of the account to get the permissions for
      * @return List of roles
      */
-    @DSL("Gets the list of roles an account has on a project. See <<dsl-usecases-security-account-permissions>>.")
+    @DSLMethod("Gets the list of roles an account has on a project. See <<dsl-usecases-security-account-permissions>>.")
     List<Role> getAccountProjectPermissions(String projectName, String accountName) {
         def project = ontrack.project(projectName)
         def account = findAccountByName(accountName)
@@ -249,7 +250,7 @@ class Admin {
     /**
      * Sets a global role on an account group
      */
-    @DSL("Sets a global role on an account group. See <<dsl-usecases-security-account-group-permissions>>.")
+    @DSLMethod("Sets a global role on an account group. See <<dsl-usecases-security-account-group-permissions>>.")
     public void setAccountGroupGlobalPermission(String groupName, String globalRole) {
         def group = findGroupByName(groupName)
         ontrack.put(
@@ -265,7 +266,7 @@ class Admin {
      * @param groupName Name of the account group to get the permissions for
      * @return List of roles
      */
-    @DSL("Gets the list of global roles an account group has. See <<dsl-usecases-security-account-group-permissions>>.")
+    @DSLMethod("Gets the list of global roles an account group has. See <<dsl-usecases-security-account-group-permissions>>.")
     List<Role> getAccountGroupGlobalPermissions(String groupName) {
         def group = findGroupByName(groupName)
         ontrack.get("/accounts/permissions/globals").resources
@@ -281,7 +282,7 @@ class Admin {
     /**
      * Sets a project role on an account group
      */
-    @DSL("Sets a project role on an account group. See <<dsl-usecases-security-account-group-permissions>>.")
+    @DSLMethod("Sets a project role on an account group. See <<dsl-usecases-security-account-group-permissions>>.")
     public void setAccountGroupProjectPermission(String projectName, String groupName, String projectRole) {
         def project = ontrack.project(projectName)
         def group = findGroupByName(groupName)
@@ -298,7 +299,7 @@ class Admin {
      * @param groupName Name of the account group to get the permissions for
      * @return List of roles
      */
-    @DSL("Gets the list of roles an account group has on a project. See <<dsl-usecases-security-account-group-permissions>>.")
+    @DSLMethod("Gets the list of roles an account group has on a project. See <<dsl-usecases-security-account-group-permissions>>.")
     List<Role> getAccountGroupProjectPermissions(String projectName, String groupName) {
         def project = ontrack.project(projectName)
         def group = findGroupByName(groupName)

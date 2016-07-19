@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.dsl
 
 import net.nemerosa.ontrack.dsl.doc.DSL
+import net.nemerosa.ontrack.dsl.doc.DSLMethod
 
 @DSL("Account group. Just a name and a description.")
 class AccountGroup extends AbstractResource {
@@ -9,17 +10,17 @@ class AccountGroup extends AbstractResource {
         super(ontrack, node)
     }
 
-    @DSL("Unique ID for the group.")
+    @DSLMethod("Unique ID for the group.")
     int getId() {
         node['id'] as int
     }
 
-    @DSL("Name of the group. Unique.")
+    @DSLMethod("Name of the group. Unique.")
     String getName() {
         node['name']
     }
 
-    @DSL("Description of the group.")
+    @DSLMethod("Description of the group.")
     String getDescription() {
         node['description']
     }

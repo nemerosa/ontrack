@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.docs
 
-import net.nemerosa.ontrack.dsl.doc.DSL
+import net.nemerosa.ontrack.dsl.doc.DSLMethod
 import org.codehaus.groovy.groovydoc.GroovyClassDoc
 import org.codehaus.groovy.groovydoc.GroovyMethodDoc
 import org.codehaus.groovy.groovydoc.GroovyRootDoc
@@ -41,7 +41,7 @@ class GroovyDocHelper {
     static Method getMethodFromGroovyMethodDoc(GroovyMethodDoc methodDoc, Class clazz) {
         Method method = clazz.declaredMethods
                 .findAll { it.name == methodDoc.name() }
-                .findAll { it.getAnnotation(DSL) != null }
+                .findAll { it.getAnnotation(DSLMethod) != null }
                 .find { Method method ->
 
             List docParamNames = methodDoc.parameters().collect {

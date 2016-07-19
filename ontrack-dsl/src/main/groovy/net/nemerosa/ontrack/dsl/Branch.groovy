@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.dsl
 
 import net.nemerosa.ontrack.dsl.doc.DSL
+import net.nemerosa.ontrack.dsl.doc.DSLMethod
 import net.nemerosa.ontrack.dsl.properties.BranchProperties
 
 @DSL
@@ -10,7 +11,7 @@ class Branch extends AbstractProjectResource {
         super(ontrack, node)
     }
 
-    @DSL(value = "Returns the name of the project the branch belongs to.")
+    @DSLMethod("Returns the name of the project the branch belongs to.")
     String getProject() {
         node?.project?.name
     }

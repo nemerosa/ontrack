@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.dsl
 
 import net.nemerosa.ontrack.dsl.doc.DSL
+import net.nemerosa.ontrack.dsl.doc.DSLMethod
 import net.nemerosa.ontrack.dsl.properties.ProjectProperties
 
 @DSL
@@ -16,14 +17,14 @@ class Project extends AbstractProjectResource {
         closure()
     }
 
-    @DSL(value = "Gets the list of branches for the project.")
+    @DSLMethod("Gets the list of branches for the project.")
     List<Branch> getBranches() {
         ontrack.get(link('branches')).resources.collect {
             new Branch(ontrack, it)
         }
     }
 
-    @DSL(value = "Retrieves or creates a branch for the project", count = 3)
+    @DSLMethod(value = "Retrieves or creates a branch for the project", count = 3)
     Branch branch(String name, String description = '', boolean getIfExists = false) {
         def node = ontrack.get(link('branches')).resources.find { it.name == name }
         if (node) {
@@ -46,7 +47,7 @@ class Project extends AbstractProjectResource {
         }
     }
 
-    @DSL(value = "Retrieves or creates a branch for the project, and then configures it.", id = "branch-closure", count = 4)
+    @DSLMethod(value = "Retrieves or creates a branch for the project, and then configures it.", id = "branch-closure", count = 4)
     Branch branch(String name, String description = '', boolean getIfExists = false, Closure closure) {
         Branch b = branch(name, description, getIfExists)
         b(closure)

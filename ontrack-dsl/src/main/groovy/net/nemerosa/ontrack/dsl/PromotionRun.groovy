@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.dsl
 
 import net.nemerosa.ontrack.dsl.doc.DSL
+import net.nemerosa.ontrack.dsl.doc.DSLMethod
 import net.nemerosa.ontrack.dsl.properties.PromotionRunProperties
 
 @DSL
@@ -21,7 +22,7 @@ class PromotionRun extends AbstractProjectResource {
         new PromotionRunProperties(ontrack, this)
     }
 
-    @DSL("Gets the associated promotion level")
+    @DSLMethod("Gets the associated promotion level (JSON)")
     def getPromotionLevel() {
         node.promotionLevel
     }
