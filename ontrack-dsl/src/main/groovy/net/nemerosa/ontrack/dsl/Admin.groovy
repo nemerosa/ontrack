@@ -183,6 +183,7 @@ class Admin {
     /**
      * Sets a global role on an account
      */
+    @DSL("Sets a global role on an account. See <<dsl-usecases-security-account-permissions>>.")
     public void setAccountGlobalPermission(String accountName, String globalRole) {
         def account = findAccountByName(accountName)
         ontrack.put(
@@ -198,6 +199,7 @@ class Admin {
      * @param accountName Name of the account to get the permissions for
      * @return List of roles
      */
+    @DSL("Gets the list of global roles an account has. See <<dsl-usecases-security-account-permissions>>.")
     List<Role> getAccountGlobalPermissions(String accountName) {
         def account = findAccountByName(accountName)
         ontrack.get("/accounts/permissions/globals").resources
@@ -213,6 +215,7 @@ class Admin {
     /**
      * Sets a project role on an account
      */
+    @DSL("Sets a project role on an account. See <<dsl-usecases-security-account-permissions>>.")
     public void setAccountProjectPermission(String projectName, String accountName, String projectRole) {
         def project = ontrack.project(projectName)
         def account = findAccountByName(accountName)
@@ -229,6 +232,7 @@ class Admin {
      * @param accountName Name of the account to get the permissions for
      * @return List of roles
      */
+    @DSL("Gets the list of roles an account has on a project. See <<dsl-usecases-security-account-permissions>>.")
     List<Role> getAccountProjectPermissions(String projectName, String accountName) {
         def project = ontrack.project(projectName)
         def account = findAccountByName(accountName)
@@ -245,6 +249,7 @@ class Admin {
     /**
      * Sets a global role on an account group
      */
+    @DSL("Sets a global role on an account group. See <<dsl-usecases-security-account-group-permissions>>.")
     public void setAccountGroupGlobalPermission(String groupName, String globalRole) {
         def group = findGroupByName(groupName)
         ontrack.put(
@@ -260,6 +265,7 @@ class Admin {
      * @param groupName Name of the account group to get the permissions for
      * @return List of roles
      */
+    @DSL("Gets the list of global roles an account group has. See <<dsl-usecases-security-account-group-permissions>>.")
     List<Role> getAccountGroupGlobalPermissions(String groupName) {
         def group = findGroupByName(groupName)
         ontrack.get("/accounts/permissions/globals").resources
@@ -275,6 +281,7 @@ class Admin {
     /**
      * Sets a project role on an account group
      */
+    @DSL("Sets a project role on an account group. See <<dsl-usecases-security-account-group-permissions>>.")
     public void setAccountGroupProjectPermission(String projectName, String groupName, String projectRole) {
         def project = ontrack.project(projectName)
         def group = findGroupByName(groupName)
@@ -291,6 +298,7 @@ class Admin {
      * @param groupName Name of the account group to get the permissions for
      * @return List of roles
      */
+    @DSL("Gets the list of roles an account group has on a project. See <<dsl-usecases-security-account-group-permissions>>.")
     List<Role> getAccountGroupProjectPermissions(String projectName, String groupName) {
         def project = ontrack.project(projectName)
         def group = findGroupByName(groupName)
