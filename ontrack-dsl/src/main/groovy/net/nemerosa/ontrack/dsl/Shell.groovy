@@ -53,7 +53,16 @@ class Shell {
                 }
             }
             // Call
-            call options
+            try {
+                call options
+            } catch (DSLException ex) {
+                if (cmdLine) {
+                    System.err.println ex.message
+                    System.exit(1)
+                } else {
+                    throw ex
+                }
+            }
         }
     }
 
