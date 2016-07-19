@@ -92,8 +92,148 @@ GroovyShell shell = new GroovyShell(binding);
 Object shellResult = shell.evaluate(script);
 ----
 
+[[dsl-usecases]]
+=== Use cases
+
+[[dsl-usecases-security]]
+==== Security
+
+The DSL allows to manage the <<security,accounts>> and the <<security,account groups>>.
+
+[[dsl-usecases-security-accounts]]
+===== Management of accounts
+
+To add or update a _built-in_ account:
+
+[source,groovy]
+----
+ontrack.admin.account(
+   "dcoraboeuf",              // Name
+   "Damien Coraboeuf",        // Display name
+   "dcoraboeuf@nemerosa.net", // Email
+   "my-secret-password",      // Password
+   [                          // List of groups (optional)
+      "Group1",
+      "Group2"
+   ]
+)
+----
+
+To get the list of accounts:
+
+[source,groovy]
+----
+def accounts = ontrack.admin.accounts
+def account = accounts.find { it.name == 'dcoraboeuf' }
+assert account != null
+assert account.fullName == "Damien Coraboeuf"
+assert account.email == "dcoraboeuf@nemerosa.net"
+assert account.authenticationSource.allowingPasswordChange
+assert account.authenticationSource.id == "password"
+assert account.authenticationSource.name == "Built-in"
+assert account.role == "USER"
+assert account.accountGroups.length == 2
+----
+
+IMPORTANT: LDAP accounts cannot be created directly. See the <<security,documentation>> for more details.
+
+[[dsl-usecases-security-account-permissions]]
+===== Account permissions
+
+To give a role to an account:
+
+[source,groovy]
+----
+ontrack.admin.setAccountGlobalPermission(
+   'dcoraboeuf', "ADMINISTRATOR
+)
+ontrack.project('PROJECT')
+ontrack.admin.setAccountProjectPermission(
+   'PROJECT', 'dcoraboeuf', "OWNER
+)
+----
+
+To get the list of permissions for an account:
+
+[source,groovy]
+----
+def permissions = ontrack.admin.getAccountProjectPermissions('PROJECT', 'dcoraboeuf')
+assert permissions != null
+assert permissions.size() == 1
+assert permissions[0].id == 'OWNER'
+assert permissions[0].name == 'Project owner'
+----
+
+[[dsl-usecases-security-account-groups]]
+===== Management of account groups
+
+To add or update an account group:
+
+[source,groovy]
+----
+ontrack.admin.accountGroup('Administrators', "Group of administrators")
+----
+
+To get the list of groups:
+
+[source,groovy]
+----
+def groups = ontrack.admin.groups
+def group = groups.find { it.name == 'Administrators' }
+assert group.name == 'Administrators'
+assert group.description == "Group of administrators"
+----
+
+[[dsl-usecases-security-account-group-permissions]]
+===== Account group permissions
+
+To give a role to an account group:
+
+[source,groovy]
+----
+ontrack.admin.setAccountGroupGlobalPermission(
+   'Administrators', "ADMINISTRATOR"
+)
+ontrack.project('PROJECT')
+ontrack.admin.setAccountGroupProjectPermission(
+   'PROJECT', 'Administrators', "OWNER"
+)
+----
+
+To get the list of permissions for an account group:
+
+[source,groovy]
+----
+def permissions = ontrack.admin.getAccountGroupProjectPermissions('PROJECT', 'Administrators')
+assert permissions != null
+assert permissions.size() == 1
+assert permissions[0].id == 'OWNER'
+assert permissions[0].name == 'Project owner'
+----
+
+[[dsl-usecases-ldap-mapping]]
+==== LDAP mapping
+
+The <<ldap,LDAP mappings>> can be generated using the DSL.
+
+To add or update a LDAP mapping:
+
+[source,groovy]
+----
+ontrack.admin.ldapMapping 'ldapGroupName', 'groupName'
+----
+
+To get the list of LDAP mappings:
+
+[source,groovy]
+----
+LDAPMapping mapping = ontrack.admin.ldapMappings[0]
+assert mapping.name == 'ldapGroupName'
+assert mapping.groupName == 'groupName'
+----
+
 [[dsl-doc]]
-=== DSL documentation
+=== Reference
 
 // This documented in generated
 include::dsl-generated.adoc[]
