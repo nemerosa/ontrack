@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Generated documentation
@@ -14,6 +15,6 @@ public class DSLDoc {
     /**
      * Indexation of classes
      */
-    private final Map<String, DSLDocClass> classes = new LinkedHashMap<>();
+    private final Map<String, DSLDocClass> classes = new TreeMap<>();
 
 }
