@@ -41,7 +41,7 @@ class ProjectEntityProperties {
         ])
     }
 
-    @DSLMethod("See <<dsl-projectentityproperties-links>>.")
+    @DSLMethod(see = "links")
     Map<String, String> getLinks() {
         property('net.nemerosa.ontrack.extension.general.LinkPropertyType').links.collectEntries {
             [it.name, it.value]

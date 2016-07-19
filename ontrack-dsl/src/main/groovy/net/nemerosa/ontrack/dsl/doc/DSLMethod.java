@@ -30,4 +30,9 @@ public @interface DSLMethod {
      */
     int count() default -1;
 
+    /**
+     * Reference to include, as see <<method>>, in the same class.
+     */
+    String see() default "";
+
 }
