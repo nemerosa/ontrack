@@ -10,6 +10,7 @@ import org.codehaus.groovy.tools.groovydoc.GroovyDocTool
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
+import java.lang.reflect.WildcardType
 
 class GroovyDocHelper {
 
@@ -90,11 +91,16 @@ class GroovyDocHelper {
             ParameterizedType parameterizedType = type as ParameterizedType
             return parameterizedType.rawType.simpleName +
                     "<" +
-                    parameterizedType.actualTypeArguments*.simpleName.join(', ') +
+                    parameterizedType.actualTypeArguments.collect { getGenericTypeArgument(it) }.join(', ') +
+                    // parameterizedType.actualTypeArguments*.simpleName.join(', ') +
                     ">"
         } else {
             return type.typeName
         }
+    }
+
+    private static String getGenericTypeArgument(Type type) {
+        return type instanceof WildcardType ? "?" : type.simpleName
     }
 
     List<GroovyMethodDoc> getAllMethods(Class clazz) {

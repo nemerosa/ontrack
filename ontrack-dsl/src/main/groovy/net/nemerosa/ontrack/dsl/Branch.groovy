@@ -16,12 +16,14 @@ class Branch extends AbstractProjectResource {
         node?.project?.name
     }
 
+    @DSLMethod("Configures the branch using a closure.")
     def call(Closure closure) {
         closure.resolveStrategy = Closure.DELEGATE_FIRST
         closure.delegate = this
         closure()
     }
 
+    @DSLMethod("Runs any filter and returns the list of corresponding builds.")
     List<Build> filter(String filterType, Map<String, ?> filterConfig) {
         def url = query(
                 "${link('view')}/${filterType}",
@@ -30,6 +32,7 @@ class Branch extends AbstractProjectResource {
         ontrack.get(url).buildViews.collect { new Build(ontrack, it.build) }
     }
 
+    @DSLMethod("Returns a list of builds for the branch, filtered according to given criteria.")
     List<Build> standardFilter(Map<String, ?> filterConfig) {
         filter('net.nemerosa.ontrack.service.StandardBuildFilterProvider', filterConfig)
     }

@@ -31,7 +31,9 @@ public @interface DSLMethod {
     int count() default -1;
 
     /**
-     * Reference to include, as see <<method>>, in the same class.
+     * Reference to include, as see &lt;&lt;method&gt;&gt;, in the same class.
+     *
+     * @return Name of the reference (ID of the method in the same class)
      */
     String see() default "";
 
