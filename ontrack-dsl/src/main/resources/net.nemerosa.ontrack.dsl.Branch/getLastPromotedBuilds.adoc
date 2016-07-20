@@ -1,0 +1,6 @@
+For example, to get the last promoted build:
+
+[source,groovy]
+----
+def buildName = ontrack.branch('project', 'branch').lastPromotedBuilds[0].name
+----

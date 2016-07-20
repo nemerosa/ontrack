@@ -44,6 +44,7 @@ class Branch extends AbstractProjectResource {
         ])
     }
 
+    @DSLMethod("Returns the last promoted builds.")
     List<Build> getLastPromotedBuilds() {
         filter('net.nemerosa.ontrack.service.PromotionLevelBuildFilterProvider', [:])
     }
