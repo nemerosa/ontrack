@@ -59,18 +59,18 @@ class SVNConfigurationServiceIT extends AbstractServiceTestSupport {
     void 'SVN configuration must point to the repository root - nok'() {
         repo.mkdir "SVNConfigurationSubFolder", "Sub folder"
         def result = configurationService.test(
-                SVNConfiguration.of("test", "svn://localhost/SVNConfigurationSubFolder")
+                SVNConfiguration.of("test", "${repo.url}/SVNConfigurationSubFolder")
                         .withUser("test").withPassword("test")
         )
         assert result.type == ConnectionResult.ConnectionResultType.ERROR
-        assert result.message == "svn://localhost/SVNConfigurationSubFolder must be the root of the repository."
+        assert result.message == "${repo.url}/SVNConfigurationSubFolder must be the root of the repository." as String
     }
 
     @Test
     @IfProfileValue(name = "svn", value = "true")
     void 'SVN configuration must point to the repository root'() {
         def result = configurationService.test(
-                SVNConfiguration.of("test", "svn://localhost")
+                SVNConfiguration.of("test", repo.url.toString())
                         .withUser("test").withPassword("test")
         )
         assert result.type == ConnectionResult.ConnectionResultType.OK
@@ -94,7 +94,7 @@ class SVNConfigurationServiceIT extends AbstractServiceTestSupport {
          * Definition of the repository
          */
 
-        def configuration = SVNTestUtils.repository().configuration
+        def configuration = SVNTestUtils.repository(repo.url.toString()).configuration
 
         // Saves the configuration
         asUser().with(GlobalSettings).call {

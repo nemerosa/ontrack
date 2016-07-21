@@ -8,12 +8,12 @@ final class SVNTestUtils {
     private SVNTestUtils() {
     }
 
-    static SVNRepository repository() {
+    static SVNRepository repository(String url) {
         SVNRepository.of(
                 1,
                 new SVNConfiguration(
                         "test",
-                        "svn://localhost",
+                        url,
                         "test",
                         "test",
                         "",
