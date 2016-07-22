@@ -235,4 +235,18 @@ class Config {
         vs(closure)
         vs
     }
+
+    /**
+     * LDAP settings
+     */
+
+    @DSLMethod(value = "Gets the global LDAP settings", see = "setLdapSettings")
+    def getLdapSettings() {
+        return ontrack.get('settings/ldap')
+    }
+
+    @DSLMethod("Sets the global LDAP settings")
+    def setLdapSettings(Map<String, ?> settings) {
+        ontrack.put('settings/ldap', settings)
+    }
 }
