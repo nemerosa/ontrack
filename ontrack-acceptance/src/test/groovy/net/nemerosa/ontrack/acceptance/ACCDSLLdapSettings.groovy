@@ -21,7 +21,7 @@ class ACCDSLLdapSettings extends AbstractACCDSL {
     void 'LDAP not enabled by default'() {
         // By default, the LDAP authentication is not enabled
         def settings = ontrack.config.ldapSettings
-        assert !settings.enabled
+        assert !settings.data.enabled
     }
 
     @Test
@@ -38,16 +38,16 @@ class ACCDSLLdapSettings extends AbstractACCDSL {
         // Gets the LDAP parameters
         def settings = ontrack.config.ldapSettings
         // Checks values
-        assert settings.enabled
-        assert settings.url == 'ldaps://ldap.company.com:636'
-        assert settings.searchBase == 'dc=company,dc=com'
-        assert settings.searchFilter == '(sAMAccountName={0})'
-        assert settings.user == 'service'
-        assert settings.password == '' // Not sent back
-        assert settings.fullNameAttribute == 'cn'
-        assert settings.emailAttribute == 'email'
-        assert settings.groupAttribute == 'memberOf'
-        assert settings.groupFilter == ''
+        assert settings.data.enabled
+        assert settings.data.url == 'ldaps://ldap.company.com:636'
+        assert settings.data.searchBase == 'dc=company,dc=com'
+        assert settings.data.searchFilter == '(sAMAccountName={0})'
+        assert settings.data.user == 'service'
+        assert settings.data.password == '' // Not sent back
+        assert settings.data.fullNameAttribute == ''
+        assert settings.data.emailAttribute == ''
+        assert settings.data.groupAttribute == ''
+        assert settings.data.groupFilter == ''
     }
 
 }
