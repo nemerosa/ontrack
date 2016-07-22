@@ -89,6 +89,7 @@ class Config {
         ontrack.get('extension/git/configurations/descriptors').resources.collect { it.id }
     }
 
+    @DSLMethod("Creates a or updates a Subversion configuration.")
     def svn(Map<String, ?> parameters, String name) {
         def params = parameters + [name: name]
         ontrack.post(
