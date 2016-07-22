@@ -21,8 +21,10 @@ ontrack.configure {
    svn 'myconfig', url: 'https://myhost/repo'
 }
 // Gets the list of Subversion configuration names
-def names = ontrack.config.svn
+def names = ontrack.config.svn*.name
 ----
+
+NOTE: The configuration password is always returned blank.
 
 Some parameters, like `url` are required. List of parameters is:
 

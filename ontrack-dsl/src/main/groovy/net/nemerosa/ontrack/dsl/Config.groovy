@@ -99,7 +99,7 @@ class Config {
     }
 
     def getSvn() {
-        ontrack.get('extension/svn/configurations/descriptors').resources.collect { it.id }
+        ontrack.get('extension/svn/configurations').resources
     }
 
     /**
