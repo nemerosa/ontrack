@@ -1540,7 +1540,7 @@ class ACCDSL extends AbstractACCDSL {
         def svnName = uid('S')
         ontrack.configure {
             jira jiraName, 'http://jira'
-            svn svnName, url: 'svn://localhost', user: 'admin', password: 'secret', issueServiceConfigurationIdentifier: "jira:${jiraName}"
+            svn svnName, url: 'svn://localhost', user: 'admin', password: 'secret', issueServiceConfigurationIdentifier: "jira//${jiraName}"
         }
         // Checks the SVN configuration
         def svn = ontrack.config.svn.find { it.name == svnName }
@@ -1549,15 +1549,28 @@ class ACCDSL extends AbstractACCDSL {
         assert svn.url == 'svn://localhost'
         assert svn.user == 'admin'
         assert svn.password == ''
-        assert svn.issueServiceConfigurationIdentifier == "jira:${jiraName}"
+        assert svn.issueServiceConfigurationIdentifier == "jira//${jiraName}"
     }
 
-    @Test(expected = OTNotFoundException)
+    @Test
     void 'Configuration - SVN and non existing JIRA'() {
         def jiraName = uid('J')
-        def svnName = uid('S')
-        ontrack.configure {
-            svn svnName, url: 'svn://localhost', user: 'admin', password: 'secret', issueServiceConfigurationIdentifier: "jira:${jiraName}"
+        validationError "Issue service configuration cannot be validated: jira//${jiraName}", {
+            def svnName = uid('S')
+            ontrack.configure {
+                svn svnName, url: 'svn://localhost', user: 'admin', password: 'secret', issueServiceConfigurationIdentifier: "jira//${jiraName}"
+            }
+        }
+    }
+
+    @Test
+    void 'Configuration - SVN and wrong format for JIRA identifier'() {
+        def jiraName = uid('J')
+        validationError "Wrong format for an issue service configuration ID: jira:${jiraName}", {
+            def svnName = uid('S')
+            ontrack.configure {
+                svn svnName, url: 'svn://localhost', user: 'admin', password: 'secret', issueServiceConfigurationIdentifier: "jira:${jiraName}"
+            }
         }
     }
 
