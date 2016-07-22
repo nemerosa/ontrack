@@ -1,4 +1,4 @@
-The LDAP settings are defined using a map of values:
+The LDAP settings are defined using the following values:
 
 |===
 | Parameter | Description
@@ -39,3 +39,17 @@ The LDAP settings are defined using a map of values:
 
 IMPORTANT: When <<dsl-config-getLdapSettings,_getting_>> the LDAP settings,
            the `password` field is always returned as an empty string.
+
+For example, to set the LDAP settings:
+
+[source,groovy]
+----
+ontrack.config.ldapSettings = [
+        enabled     : true,
+        url         : 'ldaps://ldap.company.com:636',
+        searchBase  : 'dc=company,dc=com',
+        searchFilter: '(sAMAccountName={0})',
+        user        : 'service',
+        password    : 'secret',
+]
+----

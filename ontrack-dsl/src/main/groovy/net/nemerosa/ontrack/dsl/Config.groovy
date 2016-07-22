@@ -240,13 +240,14 @@ class Config {
      * LDAP settings
      */
 
-    @DSLMethod(value = "Gets the global LDAP settings", see = "setLdapSettings")
-    def getLdapSettings() {
-        return ontrack.get('settings/ldap')
+    @DSLMethod("Gets the global LDAP settings")
+    LDAPSettings getLdapSettings() {
+        def json = ontrack.get('settings/ldap').data
+        return new LDAPSettings(json as Map)
     }
 
     @DSLMethod("Sets the global LDAP settings")
-    def setLdapSettings(Map<String, ?> settings) {
+    def setLdapSettings(LDAPSettings settings) {
         ontrack.put('settings/ldap', settings)
     }
 }
