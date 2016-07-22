@@ -358,7 +358,7 @@ class SVNSearchIT extends AbstractServiceTestSupport {
          */
 
         def issueServiceIdentifier = MockIssueServiceConfiguration.INSTANCE.toIdentifier().format()
-        def configuration = SVNTestUtils.repository().configuration.withIssueServiceConfigurationIdentifier(issueServiceIdentifier)
+        def configuration = SVNTestUtils.repository(repo.url.toString()).configuration.withIssueServiceConfigurationIdentifier(issueServiceIdentifier)
         def repositoryId = repositoryDao.getOrCreateByName(configuration.name)
         def repository = SVNRepository.of(
                 repositoryId,

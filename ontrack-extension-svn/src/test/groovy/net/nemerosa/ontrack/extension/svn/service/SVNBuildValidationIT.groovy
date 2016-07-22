@@ -81,7 +81,7 @@ class SVNBuildValidationIT extends AbstractServiceTestSupport {
         // Creates a branch
         def branch = doCreateBranch()
         // SVN configuration
-        def configuration = SVNTestUtils.repository().configuration
+        def configuration = SVNTestUtils.repository(repo.url.toString()).configuration
         asUser().with(GlobalSettings).call {
             configuration = svnConfigurationService.newConfiguration(configuration)
         }
@@ -119,7 +119,7 @@ class SVNBuildValidationIT extends AbstractServiceTestSupport {
         // Creates a branch
         def branch = doCreateBranch()
         // SVN configuration
-        def configuration = SVNTestUtils.repository().configuration
+        def configuration = SVNTestUtils.repository(repo.url.toString()).configuration
         asUser().with(GlobalSettings).call {
             configuration = svnConfigurationService.newConfiguration(configuration)
         }
@@ -149,7 +149,7 @@ class SVNBuildValidationIT extends AbstractServiceTestSupport {
     @Test(expected = BuildValidationException)
     void 'Build validation not OK on rename'() {
         // SVN configuration
-        def configuration = SVNTestUtils.repository().configuration
+        def configuration = SVNTestUtils.repository(repo.url.toString()).configuration
         asUser().with(GlobalSettings).call {
             configuration = svnConfigurationService.newConfiguration(configuration)
         }

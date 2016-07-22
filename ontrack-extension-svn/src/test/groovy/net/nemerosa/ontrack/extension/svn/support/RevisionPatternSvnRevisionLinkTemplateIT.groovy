@@ -44,7 +44,7 @@ class RevisionPatternSvnRevisionLinkTemplateIT extends AbstractServiceTestSuppor
     @Test
     void 'Templating with configurable revision pattern'() {
         // Sample configuration
-        def configuration = SVNTestUtils.repository().configuration
+        def configuration = SVNTestUtils.repository(repo.url.toString()).configuration
         asUser().with(GlobalSettings).call {
             configuration = svnConfigurationService.newConfiguration(configuration)
         }
