@@ -110,6 +110,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-build") {
     }
     deliveryPipelineConfiguration('Commit', 'Build')
     jdk 'JDK8u25'
+    label 'master'
     scm {
         git {
             remote {
@@ -185,6 +186,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     }
     deliveryPipelineConfiguration('Commit', 'Local acceptance')
     jdk 'JDK8u25'
+    label 'master'
     parameters {
         // Link based on full version
         stringParam('VERSION', '', '')
@@ -258,6 +260,7 @@ if (release) {
         }
         deliveryPipelineConfiguration('Commit', 'Debian package acceptance')
         jdk 'JDK8u25'
+        label 'master'
         parameters {
             // Link based on full version
             stringParam('VERSION', '', '')
@@ -291,6 +294,7 @@ debAcceptanceTest
             }
             deliveryPipelineConfiguration('Commit', "CentOS ${centOsVersion} package acceptance")
             jdk 'JDK8u25'
+            label 'master'
             parameters {
                 // Link based on full version
                 stringParam('VERSION', '', '')
@@ -325,6 +329,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-docker-push") {
     }
     deliveryPipelineConfiguration('Acceptance', 'Docker push')
     jdk 'JDK8u25'
+    label 'master'
     parameters {
         // Link based on full version
         stringParam('VERSION', '', '')
@@ -364,6 +369,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
     }
     deliveryPipelineConfiguration('Acceptance', 'Digital Ocean')
     jdk 'JDK8u25'
+    label 'master'
     parameters {
         // Link based on full version
         stringParam('VERSION', '', '')
@@ -403,6 +409,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-publish") {
     }
     deliveryPipelineConfiguration('Release', 'Publish')
     jdk 'JDK8u25'
+    label 'master'
     parameters {
         // Link based on full version
         stringParam('VERSION', '', '')
@@ -484,6 +491,7 @@ if (production) {
         }
         deliveryPipelineConfiguration('Release', 'Production')
         jdk 'JDK8u25'
+        label 'master'
         parameters {
             // Link on version
             stringParam('VERSION', '', '')
@@ -526,6 +534,7 @@ productionUpgrade
         }
         deliveryPipelineConfiguration('Release', 'Production acceptance')
         jdk 'JDK8u25'
+        label 'master'
         parameters {
             // Link on version
             stringParam('VERSION', '', '')
@@ -574,6 +583,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-setup") {
         artifactNumToKeep(1)
     }
     jdk 'JDK8u25'
+    label 'master'
     wrappers {
         injectPasswords()
     }
