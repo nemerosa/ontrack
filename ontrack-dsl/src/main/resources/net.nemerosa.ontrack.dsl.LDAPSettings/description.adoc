@@ -1,0 +1,55 @@
+The LDAP settings are defined using the following values:
+
+|===
+| Parameter | Description
+
+| enabled
+| Set to `true` to actually enable the LDAP Authentication
+
+| url
+| URL to the LDAP end point. For example, `ldaps://ldap.company.com:636`
+
+| searchBase
+| DN for the search root, for example, `dc=company,dc=com`
+
+| searchFilter
+| Query to look for an account. `{0}` is replaced by the account name.
+  For example, `(sAMAccountName={0})`
+
+| user
+| Service account user to connect to the LDAP
+
+| password
+| Password of the service account user to connect to the LDAP.
+
+| fullNameAttribute
+| Attribute which contains the display name of the account. Defaults to `cn`
+
+| emailAttribute
+| Attribute which contains the email of the account. Default to `email`.
+
+| groupAttribute
+| Multiple attribute name which contains the groups the account belong to.
+  Defaults to `memberOf`.
+
+| groupFilter
+| When getting the list of groups for an account, filter this list using the
+  `OU` attribute of the group. Defaults to blank (no filtering)
+|===
+
+IMPORTANT: When <<dsl-config-getLdapSettings,_getting_>> the LDAP settings,
+           the `password` field is always returned as an empty string.
+
+For example, to set the LDAP settings:
+
+[source,groovy]
+----
+ontrack.config.ldapSettings = [
+        enabled     : true,
+        url         : 'ldaps://ldap.company.com:636',
+        searchBase  : 'dc=company,dc=com',
+        searchFilter: '(sAMAccountName={0})',
+        user        : 'service',
+        password    : 'secret',
+]
+----

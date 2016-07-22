@@ -174,12 +174,12 @@ class Config {
     }
 
     PredefinedValidationStamp predefinedValidationStamp(String name, String description = '', boolean getIfExists = false) {
-        def node = predefinedValidationStamps.find { it.name == name }
-        if (node) {
+        def vs = predefinedValidationStamps.find { it.name == name }
+        if (vs) {
             if (getIfExists) {
                 new PredefinedValidationStamp(
                         ontrack,
-                        ontrack.get(node._self)
+                        ontrack.get(vs.link('self'))
                 )
             } else {
                 throw new ObjectAlreadyExistsException("Predefined validation stamp ${name} already exists.")
@@ -215,12 +215,12 @@ class Config {
     }
 
     PredefinedPromotionLevel predefinedPromotionLevel(String name, String description = '', boolean getIfExists = false) {
-        def node = predefinedPromotionLevels.find { it.name == name }
-        if (node) {
+        def pl = predefinedPromotionLevels.find { it.name == name }
+        if (pl) {
             if (getIfExists) {
                 new PredefinedPromotionLevel(
                         ontrack,
-                        ontrack.get(node._self)
+                        ontrack.get(pl.link('self'))
                 )
             } else {
                 throw new ObjectAlreadyExistsException("Predefined promotion level ${name} already exists.")
@@ -240,5 +240,20 @@ class Config {
         def vs = predefinedPromotionLevel(name, description, getIfExists)
         vs(closure)
         vs
+    }
+
+    /**
+     * LDAP settings
+     */
+
+    @DSLMethod("Gets the global LDAP settings")
+    LDAPSettings getLdapSettings() {
+        def json = ontrack.get('settings/ldap').data
+        return new LDAPSettings(json as Map)
+    }
+
+    @DSLMethod("Sets the global LDAP settings")
+    def setLdapSettings(LDAPSettings settings) {
+        ontrack.put('settings/ldap', settings)
     }
 }
