@@ -1671,11 +1671,13 @@ shell.put('BUILD', build)
 
         // Shell call
         def output = new StringWriter()
-        def shell = Shell.create().withOutput(output)
+        def shell = Shell.withOutput(output)
         List<String> args = [
-                '--url', baseURL, '--user', 'admin', '--password', adminPassword, '--file', file.absolutePath,
+                '--discard-result',
+                '--url', baseURL, '--user', 'admin', '--password', adminPassword,
+                '--file', file.absolutePath,
                 '--value', "project=${projectName}" as String,
-                '--value', "branch=${branchName}" as String
+                '--value', "branch=${branchName}" as String,
         ]
         if (sslDisabled) {
             args << '--no-ssl'

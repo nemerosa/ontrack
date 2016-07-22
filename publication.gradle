@@ -43,6 +43,8 @@ artifacts {
         archives file: file("publication/${module}-${ontrackVersion}-sources.jar"), name: module, classifier: 'sources'
         archives file: file("publication/${module}-${ontrackVersion}-javadoc.jar"), name: module, classifier: 'javadoc'
     }
+    // Ontrack DSL
+    archives file: file("publication/ontrack-dsl-${ontrackVersion}-shell.jar"), name: 'ontrack-dsl', classifier: 'shell'
 }
 
 signing {
@@ -254,6 +256,13 @@ task publicationGitHubReleaseJarUpload(type: GitHubReleaseUpload) {
     file = project.file("publication/ontrack-ui-${ontrackVersion}.jar")
 }
 
+task publicationGitHubReleaseJarShellUpload(type: GitHubReleaseUpload) {
+    dependsOn publicationGitHubReleaseCreate
+    fileName = 'ontrack-dsl-shell.jar'
+    fileType = 'application/zip'
+    file = project.file("publication/ontrack-dsl-${ontrackVersion}-shell.jar")
+}
+
 task publicationGitHubReleaseDebianUpload(type: GitHubReleaseUpload) {
     dependsOn publicationGitHubReleaseCreate
     fileName = 'ontrack.deb'
@@ -270,6 +279,7 @@ task publicationGitHubReleaseRpmUpload(type: GitHubReleaseUpload) {
 
 task publicationGitHubReleaseUpload {
     dependsOn publicationGitHubReleaseJarUpload
+    dependsOn publicationGitHubReleaseJarShellUpload
     dependsOn publicationGitHubReleaseDebianUpload
     dependsOn publicationGitHubReleaseRpmUpload
 }

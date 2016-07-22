@@ -16,7 +16,7 @@ public class SVNUtils {
     public static SVNURL toURL(String url, String path) {
         SVNURL repoURL = toURL(url);
         try {
-            return repoURL.setPath(path, false);
+            return repoURL.appendPath(path, false);
         } catch (SVNException e) {
             throw new IllegalArgumentException("Cannot get SVN URL for " + path, e);
         }
