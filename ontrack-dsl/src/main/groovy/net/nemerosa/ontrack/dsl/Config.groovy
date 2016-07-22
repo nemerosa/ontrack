@@ -158,6 +158,7 @@ class Config {
      * Predefined validation stamps
      */
 
+    @DSLMethod("Gets the list of validation stamps.")
     List<PredefinedValidationStamp> getPredefinedValidationStamps() {
         ontrack.get('admin/predefinedValidationStamps').resources.collect {
             new PredefinedValidationStamp(
