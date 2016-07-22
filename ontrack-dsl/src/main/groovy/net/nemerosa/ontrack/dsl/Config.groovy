@@ -104,6 +104,7 @@ class Config {
      * Jenkins configuration
      */
 
+    @DSLMethod("Creates or updates a Jenkins configuration.")
     def jenkins(String name, String url, String user = '', String password = '') {
         ontrack.post(
                 'extension/jenkins/configurations/create', [
@@ -122,6 +123,7 @@ class Config {
      * JIRA configuration
      */
 
+    @DSLMethod("Creates or updates a JIRA configuration.")
     def jira(String name, String url, String user = '', String password = '') {
         ontrack.post(
                 'extension/jira/configurations/create', [
@@ -140,6 +142,7 @@ class Config {
      * Artifactory configuration
      */
 
+    @DSLMethod("Creates or updates a Artifactory configuration.")
     def artifactory(String name, String url, String user = '', String password = '') {
         ontrack.post(
                 'extension/artifactory/configurations/create', [
