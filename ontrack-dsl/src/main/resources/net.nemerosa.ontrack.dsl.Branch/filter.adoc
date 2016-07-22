@@ -1,0 +1,2 @@
+This is a low level method and more specialised methods should instead be used like
+<<dsl-branch-standardfilter,`standardFilter`>> and <<dsl-branch-getLastPromotedBuilds,`getLastPromotedBuilds`>>.

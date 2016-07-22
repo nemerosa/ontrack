@@ -1,0 +1,64 @@
+[[development]]
+=== Development
+
+[[development-setup]]
+==== Environment set-up
+
+Following tools must be installed before you can start coding with Ontrack:
+
+* https://www.oracle.com[JDK8u25] or better
+* https://www.docker.com/[Docker 1.11] or more recent
+* https://docs.docker.com/compose/[Docker Compose 1.6.2] or more recent
+
+[[development-build]]
+==== Building locally
+
+[source,bash]
+----
+./gradlew clean build
+----
+
+To launch the integration tests or acceptance tests, see <<testing>>.
+
+[[development-launch]]
+==== Launching the application
+
+Prepare the Web resources by launching:
+
+[source,bash]
+----
+./gradlew dev
+----
+
+In order to launch the application, run the
+`net.nemerosa.ontrack.boot.Application` class with
+`--spring.profiles.active=dev` as argument.
+
+The application is then available at http://localhost:8080
+
+[[development-web]]
+==== Developing for the web
+
+If you develop on the web side, you can enable a
+http://livereload.com/[LiveReload] watch on the web resources:
+
+[source,bash]
+----
+./gradlew watch
+----
+
+Upon a change in the web resources, the browser page will be reloaded automatically.
+
+[[development-test]]
+==== Running the tests
+
+See <<testing>>.
+
+[[development-ide]]
+==== Integration with IDE
+
+[[development-ide-intellij]]
+===== With Intellij
+
+* install the Lombok plugin
+* in `Build, Execution, Deployment > Compiler > Annotation Processors`, check `Enable annotation processing`

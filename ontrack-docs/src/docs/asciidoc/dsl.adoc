@@ -1,0 +1,283 @@
+[[dsl]]
+== DSL
+
+Ontrack provides several ways of interaction:
+
+* the graphical user interface (GUI)
+* the REST API (UI - also used internally by the GUI)
+* the Domain Specific Language (DSL)
+
+Using the DSL, you can write script files which interact remotely with your
+Ontrack instance.
+
+[[dsl-usage]]
+=== DSL Usage
+
+In some cases, like when using the
+https://github.com/nemerosa/ontrack-jenkins[Ontrack Jenkins plug-in], you can
+just write some Ontrack DSL to use it, because the configuration would have
+been done for you.
+
+In some other cases, you have to set-up the Ontrack DSL environment yourself.
+
+[[dsl-usage-embedded]]
+==== Embedded
+
+You can embed the Ontrack DSL in your own code by importing it.
+
+Using Maven:
+
+      <dependencies>
+         <groupId>net.nemerosa.ontrack</groupId>
+         <artifactId>ontrack-dsl</artifactId>
+         <version>{{ontrack-version}}</version>
+      </dependencies>
+
+Using Gradle:
+
+      compile 'net.nemerosa.ontrack:ontrack-dsl:{{ontrack-version}}'
+
+[[dsl-usage-shell]]
+==== Standalone shell
+
+Future versions of https://github.com/nemerosa/ontrack/issues/198[Ontrack] will
+have a standalone executable JAR that you can call from the shell.
+
+[[dsl-usage-connection]]
+==== Connection
+
+Before calling any DSL script, you have to configure an `Ontrack` instance
+which will connect to your remote Ontrack location:
+
+[source,java]
+----
+import net.nemerosa.ontrack.dsl.*;
+
+String url = "http://localhost:8080";
+String user = "admin";
+String password = "admin";
+
+Ontrack ontrack = OntrackConnection.create(url)
+   // Logging
+   .logger(new OTHttpClientLogger() {
+      public void trace(String message) {
+         System.out.println(message);
+      }
+   })
+   // Authentication
+   .authenticate(user, password)
+   // OK
+   .build();
+----
+
+[[dsl-usage-calling]]
+==== Calling the DSL
+
+The Ontrack DSL is expressed through Groovy and can be called using the
+`GroovyShell`:
+
+[source,java]
+----
+import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
+
+Ontrack ontrack = ...
+
+Map<String, Object> values = new HashMap<>();
+values.put("ontrack", ontrack);
+Binding binding = new Binding(values);
+
+GroovyShell shell = new GroovyShell(binding);
+
+Object shellResult = shell.evaluate(script);
+----
+
+[[dsl-usecases]]
+=== Use cases
+
+[[dsl-usecases-security]]
+==== Security
+
+The DSL allows to manage the <<security,accounts>> and the <<security,account groups>>.
+
+[[dsl-usecases-security-accounts]]
+===== Management of accounts
+
+To add or update a _built-in_ account:
+
+[source,groovy]
+----
+ontrack.admin.account(
+   "dcoraboeuf",              // Name
+   "Damien Coraboeuf",        // Display name
+   "dcoraboeuf@nemerosa.net", // Email
+   "my-secret-password",      // Password
+   [                          // List of groups (optional)
+      "Group1",
+      "Group2"
+   ]
+)
+----
+
+To get the list of accounts:
+
+[source,groovy]
+----
+def accounts = ontrack.admin.accounts
+def account = accounts.find { it.name == 'dcoraboeuf' }
+assert account != null
+assert account.fullName == "Damien Coraboeuf"
+assert account.email == "dcoraboeuf@nemerosa.net"
+assert account.authenticationSource.allowingPasswordChange
+assert account.authenticationSource.id == "password"
+assert account.authenticationSource.name == "Built-in"
+assert account.role == "USER"
+assert account.accountGroups.length == 2
+----
+
+IMPORTANT: LDAP accounts cannot be created directly. See the <<security,documentation>> for more details.
+
+[[dsl-usecases-security-account-permissions]]
+===== Account permissions
+
+To give a role to an account:
+
+[source,groovy]
+----
+ontrack.admin.setAccountGlobalPermission(
+   'dcoraboeuf', "ADMINISTRATOR
+)
+ontrack.project('PROJECT')
+ontrack.admin.setAccountProjectPermission(
+   'PROJECT', 'dcoraboeuf', "OWNER
+)
+----
+
+To get the list of permissions for an account:
+
+[source,groovy]
+----
+def permissions = ontrack.admin.getAccountProjectPermissions('PROJECT', 'dcoraboeuf')
+assert permissions != null
+assert permissions.size() == 1
+assert permissions[0].id == 'OWNER'
+assert permissions[0].name == 'Project owner'
+----
+
+[[dsl-usecases-security-account-groups]]
+===== Management of account groups
+
+To add or update an account group:
+
+[source,groovy]
+----
+ontrack.admin.accountGroup('Administrators', "Group of administrators")
+----
+
+To get the list of groups:
+
+[source,groovy]
+----
+def groups = ontrack.admin.groups
+def group = groups.find { it.name == 'Administrators' }
+assert group.name == 'Administrators'
+assert group.description == "Group of administrators"
+----
+
+[[dsl-usecases-security-account-group-permissions]]
+===== Account group permissions
+
+To give a role to an account group:
+
+[source,groovy]
+----
+ontrack.admin.setAccountGroupGlobalPermission(
+   'Administrators', "ADMINISTRATOR"
+)
+ontrack.project('PROJECT')
+ontrack.admin.setAccountGroupProjectPermission(
+   'PROJECT', 'Administrators', "OWNER"
+)
+----
+
+To get the list of permissions for an account group:
+
+[source,groovy]
+----
+def permissions = ontrack.admin.getAccountGroupProjectPermissions('PROJECT', 'Administrators')
+assert permissions != null
+assert permissions.size() == 1
+assert permissions[0].id == 'OWNER'
+assert permissions[0].name == 'Project owner'
+----
+
+[[dsl-usecases-ldap-mapping]]
+==== LDAP mapping
+
+The <<ldap,LDAP mappings>> can be generated using the DSL.
+
+To add or update a LDAP mapping:
+
+[source,groovy]
+----
+ontrack.admin.ldapMapping 'ldapGroupName', 'groupName'
+----
+
+To get the list of LDAP mappings:
+
+[source,groovy]
+----
+LDAPMapping mapping = ontrack.admin.ldapMappings[0]
+assert mapping.name == 'ldapGroupName'
+assert mapping.groupName == 'groupName'
+----
+
+[[dsl-usecases-images]]
+==== Images and documents
+
+Some resources can be associated with images (like promotion levels and validation stamps) and some documents can be
+downloaded.
+
+When uploading a document or an image, the DSL will accept any object (see below), optionally associated with a MIME
+content type (the content type is either read from the source object or defaults to `image/png`).
+
+The object can be any of:
+
+* a `URL` object - the MIME type and the binary content will be downloaded using the URL - the URL must be accessible
+  anonymously
+* a `File` object - the binary content is read from the file and the MIME type must be provided
+* a valid URL string - same as an `URL` - see above
+* a file path - same as a `File` - see above
+
+For example:
+
+[source,groovy]
+----
+ontrack.project('project') {
+   branch('branch') {
+      promotionLevel('COPPER', 'Copper promotion') {
+         image '/path/to/local/file.png', 'image/png'
+      }
+   }
+}
+----
+
+Document and image downloads return a `Document` object with has two properties:
+
+* `content` - byte array
+* `type` - MIME content type
+
+For example, to store a promotion level's image into a file:
+
+[source,groovy]
+----
+File file = ...
+def promotionLevel = ontrack.promotionLevel('project', 'branch', 'COPPER')
+file.bytes = promotionLevel.image.content
+----
+
+[[dsl-doc]]
+=== Reference
+
+// This documented in generated
+include::dsl-generated.adoc[]

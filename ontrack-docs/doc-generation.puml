@@ -1,0 +1,14 @@
+@startuml
+actor Pipeline
+control DSLDocGenerator
+control DSLDocExtractor
+control AsciiDocGenerator
+
+Pipeline -> DSLDocGenerator: generate(sourcePath, outputPath)
+DSLDocGenerator -> DSLDocExtractor: generate(sourcePath)
+DSLDocExtractor --> DSLDocGenerator: dslDoc
+DSLDocGenerator -> AsciiDocGenerator: generate(outputPath, dslDoc)
+AsciiDocGenerator -> AsciiDoc: writes Asciidoc file
+activate AsciiDoc
+deactivate AsciiDoc
+@enduml

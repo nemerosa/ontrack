@@ -1,0 +1,190 @@
+[[extending-properties]]
+==== Extending properties
+
+Any <<model, entity>> in Ontrack can be associated with a set of
+properties. Extensions can contribute to create new ones.
+
+A _property_ is the association some Java components and a HTML template to
+render it on the screen.
+
+[[extending-properties-java]]
+===== Java components
+
+First, a property must be associated with some data. Just create an invariant
+POJO like, for example:
+
+[source,java]
+----
+package net.nemerosa.ontrack.extension.myextension;
+
+import lombok.Data;
+
+@Data
+public class MyProperty {
+    private final String value;
+}
+----
+
+TIP: Note that Ontrack extensions can take benefit of using
+https://projectlombok.org/[Lombok] in order to reduce the typing. But this is
+not mandatory as all.
+
+Then, you create the _property type_ itself, by implementing the `PropertyType`
+interface or more easily by extending the `AbstractPropertyType` class. The
+parameter for this class is the data created above:
+
+[source,java]
+----
+@Component
+public class MyPropertyType extends AbstractPropertyType<MyProperty> {
+}
+----
+
+The `@Component` notation registers the property type in Ontrack.
+
+A property, or any <<extending, extension>> is always associated with an
+extension feature and this one is typically injected:
+
+[source,java]
+----
+@Autowired
+public MyPropertyType(MyExtensionFeature extensionFeature) {
+  super(extensionFeature);
+}
+----
+
+Now, several methods need to be implemented:
+
+* `getName` and `getDescription` return respectively a display name and a short
+description for the property
+
+* `getSupportedEntityTypes` returns the set of <<model, entities>> the
+property can be applied to. For example, if your property can be applied only
+on projects, you can return:
+
+[source,java]
+----
+@Override
+public Set<ProjectEntityType> getSupportedEntityTypes() {
+  return EnumSet.of(ProjectEntityType.PROJECT);
+}
+----
+
+* `canEdit` allows you to control who can create or edit the property for an
+entity. The `SecurityService` allows you to test the authorizations for the
+current user. For example, in this sample, we authorize the edition of our
+property only for users being granted to the project configuration:
+
+[source,java]
+----
+@Override
+public boolean canEdit(ProjectEntity entity, SecurityService securityService) {
+  return securityService.isProjectFunctionGranted(entity, ProjectConfig.class);
+}
+----
+
+* `canView` allows you to control who can view the property for an entity. Like
+for `canEdit`, the `SecurityService` is passed along, but you will typically
+return `true`:
+
+[source,java]
+----
+@Override
+public boolean canView(ProjectEntity entity, SecurityService securityService) {
+  return true;
+}
+----
+
+* `getEditionForm` returns the form being used to create or edit the property.
+Ontrack uses `Form` objects to generate automatically user forms on the client.
+See its Javadoc for more details. In our example, we only need a text box:
+
+[source,java]
+----
+@Override
+public Form getEditionForm(ProjectEntity entity, MyProperty value) {
+  return Form.create()
+          .with(
+                  Text.of("value")
+                          .label("My value")
+                          .length(20)
+                          .value(value !==== null ? value.getValue() : null)
+          );
+}
+----
+
+* the `fromClient` and `fromStorage` methods are used to parse back and forth
+the JSON into a property value. Typically:
+
+[source,java]
+----
+@Override
+public MyProperty fromClient(JsonNode node) {
+  return fromStorage(node);
+}
+
+@Override
+public MyProperty fromStorage(JsonNode node) {
+  return parse(node, ProjectCategoryProperty.class);
+}
+----
+
+* the `getSearchKey` is used to provide an indexed search value for the
+property:
+
+[source,java]
+----
+@Override
+public String getSearchKey(My value) {
+  return value.getValue();
+}
+----
+
+* finally, the `replaceValue` method is called when the property has to be
+cloned for another entity, using a replacement function for the text values:
+
+[source,java]
+----
+@Override
+public MyProperty replaceValue(MyProperty value, Function<String, String> replacementFunction) {
+  return replacementFunction.apply(value);
+}
+----
+
+[[extending-properties-web]]
+===== Web components
+
+A HTML fragment (or template) must be created at:
+
+      src/main/resources
+        \-- static
+           \-- extension
+               \-- myextension
+                  \-- property
+                     \-- net.nemerosa.ontrack.extension.myextension.MyPropertyType.tpl.html
+
+NOTE: Replace `myextension`, the package name and the property type accordingly
+of course.
+
+The `tpl.html` will be used as a template on the client side and will have
+access to the `Property` object. Typically, only its `value` field, of the
+property data type, will be used.
+
+The template is used the
+https://docs.angularjs.org/guide/templates[AngularJS template] mechanism.
+
+For example, to display the property as bold text in our sample:
+
+[source,html]
+----
+<b>{{property.value.value}}</b>
+----
+
+The property must be associated with an icon, typically PNG, 24 x 24, located at:
+
+      src/main/resources
+        \-- static
+           \-- extension
+               \-- myextension
+                  \-- property
+                     \-- net.nemerosa.ontrack.extension.myextension.MyPropertyType.png

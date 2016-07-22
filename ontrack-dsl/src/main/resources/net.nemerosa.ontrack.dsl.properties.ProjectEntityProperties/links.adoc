@@ -1,0 +1,23 @@
+Arbitrary named links can be associated with projects, branches, etc.
+
+[source,groovy]
+----
+ontrack.project('project') {
+   config {
+       links 'project': 'http://project'
+   }
+   branch('test') {
+       config {
+           links 'branch': 'http://branch'
+       }
+       build('1') {
+           config {
+               links 'build': 'http://build'
+           }
+       }
+   }
+}
+assert ontrack.project('project').config.links.project == 'http://project'
+assert ontrack.branch('project', 'test').config.links.branch == 'http://branch'
+assert ontrack.build('project', 'test', '1').config.links.build == 'http://build'
+----

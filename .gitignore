@@ -8,7 +8,7 @@ work
 .DS_Store
 build
 .gradle
-*.txt
+/*.txt
 *.pid
 /*-tests.xml
 /version.properties

@@ -1,0 +1,46 @@
+Builds can be <<promotion-levels-auto-promotion,auto promoted>> to a <<model,promotion level>> when this latter is
+configured to do so.
+
+A promotion level is configured for auto promotion using:
+
+[source,groovy]
+----
+ontrack.promotionLevel('project', 'branch', 'promotionLevel').config {
+   autoPromotion 'VS1', 'VS2'
+}
+----
+
+where `VS1`, `VS2` are the <<model,validation stamps>> which must be `PASSED` in order to promote a build automatically.
+
+To get the list of validation stamps for the auto promotion of a promotion level:
+
+[source,groovy]
+----
+def validationStamps = ontrack.promotionLevel('project', 'branch', 'promotionLevel')
+   .config
+   .autoPromotion
+   .validationStamps
+----
+
+The validation stamps used to define an auto promotion can also be defined using regular expressions:
+
+[source,groovy]
+----
+ontrack.promotionLevel('project', 'branch', 'promotionLevel').config {
+   autoPromotion [], 'VS.*'
+}
+----
+
+In this sample, all validation stamps whose name starts with `VS` will participate in the promotion.
+
+You can also exclude validation stamps using their name:
+
+[source,groovy]
+----
+ontrack.promotionLevel('project', 'branch', 'promotionLevel').config {
+   autoPromotion [], 'VS.*', 'VS/.1'
+}
+----
+
+In this sample, all validation stamps whose name starts with `VS` will participate in the promotion, but for the
+`VS.1` one.

@@ -4,7 +4,10 @@ import net.nemerosa.ontrack.dsl.MetaInfo
 import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.ProjectEntity
 import net.nemerosa.ontrack.dsl.PropertyNotFoundException
+import net.nemerosa.ontrack.dsl.doc.DSL
+import net.nemerosa.ontrack.dsl.doc.DSLMethod
 
+@DSL
 class ProjectEntityProperties {
 
     protected final Ontrack ontrack
@@ -26,6 +29,7 @@ class ProjectEntityProperties {
     /**
      * Links
      */
+    @DSLMethod
     def links(Map<String, String> links) {
         property('net.nemerosa.ontrack.extension.general.LinkPropertyType', [
                 links: links.collect { k, v ->
@@ -37,6 +41,7 @@ class ProjectEntityProperties {
         ])
     }
 
+    @DSLMethod(see = "links")
     Map<String, String> getLinks() {
         property('net.nemerosa.ontrack.extension.general.LinkPropertyType').links.collectEntries {
             [it.name, it.value]

@@ -277,11 +277,19 @@ task publicationGitHubReleaseRpmUpload(type: GitHubReleaseUpload) {
     file = project.file("ontrack-${ontrackVersion}-1.noarch.rpm")
 }
 
+task publicationGitHubReleasePdfUpload(type: GitHubReleaseUpload) {
+    dependsOn publicationGitHubReleaseCreate
+    fileName = 'ontrack.pdf'
+    fileType = 'application/pdf'
+    file = project.file('pdf/index.pdf')
+}
+
 task publicationGitHubReleaseUpload {
     dependsOn publicationGitHubReleaseJarUpload
     dependsOn publicationGitHubReleaseJarShellUpload
     dependsOn publicationGitHubReleaseDebianUpload
     dependsOn publicationGitHubReleaseRpmUpload
+    dependsOn publicationGitHubReleasePdfUpload
 }
 
 task publicationOntrackChangeLog(type: OntrackChangeLog) {

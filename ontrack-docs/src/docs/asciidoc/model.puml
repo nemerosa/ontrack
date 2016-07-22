@@ -1,0 +1,26 @@
+@startuml
+object Project
+object Branch
+object Build
+object "Promotion level" as PromotionLevel
+object "Validation stamp" as ValidationStamp
+object "Promotion run" as PromotionRun
+object "Validation run" as ValidationRun
+object "Validation run status" as ValidationRunStatus
+
+Project o-- "*" Branch
+
+Branch o-- "*" Build
+Branch o-- "*" PromotionLevel
+Branch o-- "*" ValidationStamp
+
+Build o-- "*" PromotionRun
+PromotionRun --> "1" PromotionLevel
+
+Build --> "*" Build
+
+Build o-- "*" ValidationRun
+ValidationRun --> "1" ValidationStamp
+ValidationRun o-- "*" ValidationRunStatus
+
+@enduml
