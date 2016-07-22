@@ -58,6 +58,7 @@ class Config {
      * Stash configurations.
      */
 
+    @DSLMethod("Creates or updates a BitBucket configuration.")
     def stash(Map<String, ?> parameters, String name) {
         def params = parameters + [name: name]
         ontrack.post(
