@@ -220,6 +220,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
             volume '/var/run/docker.sock', '/var/run/docker.sock'
         }
     }
+    extractDeliveryArtifacts delegate, 'ontrack-acceptance'
     steps {
         // Runs Xfvb in the background - it will be killed when the Docker slave is removed
         shell '''\
