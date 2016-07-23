@@ -228,6 +228,10 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
             mkdir -p xvfb-${EXECUTOR_NUMBER}-${BUILD_NUMBER}
             /usr/bin/Xvfb :${EXECUTOR_NUMBER} -screen 0 1024x768x24 -fbdir xvfb-${EXECUTOR_NUMBER}-${BUILD_NUMBER} &
             '''
+        // Display export
+        environmentVariables {
+            env 'DISPLAY', ':${EXECUTOR_NUMBER}'
+        }
         // Runs the CI acceptance tests
         gradle '''\
 ciAcceptanceTest
