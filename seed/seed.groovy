@@ -232,6 +232,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
         gradle '''\
 ciAcceptanceTest
 -PacceptanceJar=ontrack-acceptance-${VERSION}.jar
+-PacceptanceHost=dockerhost
 --info
 --profile
 --console plain
