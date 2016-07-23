@@ -10,3 +10,8 @@ include::usage-validation-stamps.adoc[]
 include::usage-promotion-levels.adoc[]
 
 include::usage-builds.adoc[]
+
+[[topics]]
+== Topics
+
+include::templates.adoc[]
