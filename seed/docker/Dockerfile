@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
     subversion \
     zip \
     xvfb \
+    iceweasel \
     && rm -rf /var/lib/apt/lists/*
 
 # Installing Docker
