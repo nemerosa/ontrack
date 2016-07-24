@@ -230,7 +230,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
             '''
         // Display export
         environmentVariables {
-            env 'DISPLAY', ':${EXECUTOR_NUMBER}'
+            env 'DISPLAY', 'dockerhost:${EXECUTOR_NUMBER}'
         }
         // Runs the CI acceptance tests
         gradle '''\
