@@ -226,11 +226,13 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
         shell '''\
             #!/bin/bash
             mkdir -p xvfb-${EXECUTOR_NUMBER}-${BUILD_NUMBER}
-            /usr/bin/Xvfb :${EXECUTOR_NUMBER} -screen 0 1024x768x24 -fbdir xvfb-${EXECUTOR_NUMBER}-${BUILD_NUMBER} &
+            let 'NUM = EXECUTOR_NUMBER + 1'
+            /usr/bin/Xvfb :${NUM} -screen 0 1024x768x24 -fbdir xvfb-${EXECUTOR_NUMBER}-${BUILD_NUMBER} &
+            echo DISPLAY=:${NUM} > display.properties
             '''
         // Display export
         environmentVariables {
-            env 'DISPLAY', 'dockerhost:${EXECUTOR_NUMBER}'
+            propertiesFile 'display.properties'
         }
         // Runs the CI acceptance tests
         gradle '''\
