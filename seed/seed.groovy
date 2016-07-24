@@ -224,11 +224,11 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     steps {
         // Runs Xfvb in the background - it will be killed when the Docker slave is removed
         shell '''\
-            #!/bin/bash
-            mkdir -p xvfb-${EXECUTOR_NUMBER}-${BUILD_NUMBER}
-            let 'NUM = EXECUTOR_NUMBER + 1'
-            /usr/bin/Xvfb :${NUM} -screen 0 1024x768x24 -fbdir xvfb-${EXECUTOR_NUMBER}-${BUILD_NUMBER} &
-            echo DISPLAY=:${NUM} > display.properties
+#!/bin/bash
+mkdir -p xvfb-${EXECUTOR_NUMBER}-${BUILD_NUMBER}
+let 'NUM = EXECUTOR_NUMBER + 1'
+/usr/bin/Xvfb :${NUM} -screen 0 1024x768x24 -fbdir xvfb-${EXECUTOR_NUMBER}-${BUILD_NUMBER} &
+echo DISPLAY=:${NUM} > display.properties
             '''
         // Display export
         environmentVariables {
