@@ -87,7 +87,7 @@ https://raw.githubusercontent.com/nemerosa/ontrack/master/doc/grafana.json[downl
 as a starting point for defining an Ontrack monitoring system in Grafana:
 
 1. download the https://raw.githubusercontent.com/nemerosa/ontrack/master/doc/grafana.json[`grafana.json`] JSON file
-1. import it in Grafana
+2. import it in Grafana
 
 [[monitoring-metrics-list]]
 ====== List of metrics
