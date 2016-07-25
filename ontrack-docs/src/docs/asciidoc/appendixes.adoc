@@ -1,4 +1,5 @@
 [[appendixes]]
 == Appendixes
 
+include::appendix-deprecations.adoc[]
 include::appendix-certificates.adoc[]

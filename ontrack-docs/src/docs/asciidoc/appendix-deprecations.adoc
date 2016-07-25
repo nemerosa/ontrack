@@ -1,0 +1,16 @@
+[[appendix-deprecations]]
+=== Deprecations and migration notes
+
+[[appendix-deprecations-2.16]]
+==== Since 2.16
+
+WARNING: Support for custom branch and tags patterns in
+         <<usage-subversion,Subversion configurations>> has been **removed**.
+         Ontrack now supports only standard Subversion structure:
+         `project/trunk`, `project/branches` and `project/tags`. This has
+         allowed a better flexibility in the association between builds and
+         Subversion locations.
+
+Association between builds and Subversion locations is now configured through
+a _build revision link_ at branch level. The previous `buildPath` parameter is
+converted automatically to the appropriate <<usage-subversion,type of link>>.
