@@ -20,4 +20,7 @@ include::administration.adoc[]
 include::dsl.adoc[]
 
 include::contributing.adoc[]
+
+include::appendixes.adoc[]
+
 // ========================================================
