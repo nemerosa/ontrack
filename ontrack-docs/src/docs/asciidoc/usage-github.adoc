@@ -1,0 +1,49 @@
+[[usage-github]]
+==== Working with GitHub
+
+https://github.com[GitHub] is an enterprise Git repository manager on the cloud
+or hosted in the premises.
+
+When <<usage-git,working with Git>> in Ontrack, one can configure a project to
+connect to a GitHub repository.
+
+[[usage-github-config]]
+===== General configuration
+
+The access to a GitHub instance must be configured.
+
+1. as <<security,administrator>>, go to the _GitHub configurations_ menu
+2. click on _Create a configuration_
+3. in the configuration dialog, enter the following parameters:
+** **Name**  - unique name for the configuration
+** URL - URL to the GitHub instance. If left blank, it defaults to the https://github.com location
+** User & Password - credentials used to access GitHub - Ontrack only needs a read access to the repositories
+** OAuth2 token - authentication can also be performed using an API token instead of using a user/password pair
+
+The existing configurations can be updated and deleted.
+
+TIP: Although it is possible to work with an anonymous user when accessing
+     GitHub, this is not recommended. The rate of the API call will be limited
+     and can lead to some errors.
+
+[[usage-github-project]]
+===== Project configuration
+
+The link between a project and a GitHub repository is defined by the _GitHub
+configuration_ property:
+
+* **Configuration** - selection of the GitHub configuration created before -
+  this is used for the accesses
+* **Repository** - GitHub repository, like `nemerosa/ontrack`
+* Indexation interval - interval (in minutes) between each synchronisation
+  (Ontrack maintains internally a clone of the GitHub repositories)
+
+Branches can be <<usage-git,configured for Git>> independently.
+
+[[usage-github-issues]]
+===== Issue management
+
+When working with GitHub, the <<usage-issues,issue management>> is
+automatically the one from GitHub itself.
+
+NOTE: As for now, there is no way to use any other issue service.

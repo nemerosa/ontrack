@@ -16,4 +16,6 @@ include::usage-builds.adoc[]
 
 include::templates.adoc[]
 
+include::usage-git.adoc[]
+
 include::changelogs.adoc[]
