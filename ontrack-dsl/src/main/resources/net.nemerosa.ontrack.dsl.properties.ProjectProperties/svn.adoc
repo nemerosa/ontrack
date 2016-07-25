@@ -1,0 +1,23 @@
+To associate a project with an existing <<dsl-config-svn,Subversion configuration>>:
+
+`def svn (String name, String projectPath)`
+
+To get the SVN project configuration:
+
+`def getSvn()`
+
+Example:
+
+[source,groovy]
+----
+// Associates a project with a 'myconfig' SVN configuration
+ontrack.project('project') {
+   config {
+       svn 'myconfig', '/project/trunk'
+   }
+}
+// Gets the SVN configuration
+def cfg = ontrack.project('project').config.svn
+assert cfg.configuration.name == 'myconfig'
+assert cfg.projectPath == '/project/trunk'
+----
