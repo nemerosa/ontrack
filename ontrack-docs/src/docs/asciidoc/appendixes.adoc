@@ -2,4 +2,7 @@
 == Appendixes
 
 include::appendix-deprecations.adoc[]
+
+include::appendix-roadmap.adoc[]
+
 include::appendix-certificates.adoc[]
