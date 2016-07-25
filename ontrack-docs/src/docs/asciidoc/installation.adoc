@@ -122,6 +122,38 @@ is `admin` and should be changed immediately.
 [[installation-debian]]
 === Debian installation
 
+You can install Ontrack using a Debian file (`.deb`) you can download from the
+https://github.com/nemerosa/ontrack/releases[releases] page.
+
+To install Ontrack:
+
+[source,bash]
+----
+dpkg -i ontrack.deb
+----
+
+The following directories are created:
+
+|===
+| Directory | Description
+
+| `/opt/ontrack` | Binaries and scripts
+| `/usr/lib/ontrack` | Working directory
+| `/var/log/ontrack` | Logging directory
+|===
+
+Ontrack is installed as a service using `/etc/init.d/ontrack`.
+
+[source,bash]
+----
+# Starting Ontrack
+service ontrack start
+# Status of Ontrack
+service ontrack status
+# Stopping Ontrack
+service ontrack stop
+----
+
 [[installation-digitalocean]]
 === Installing at DigitalOcean
 
