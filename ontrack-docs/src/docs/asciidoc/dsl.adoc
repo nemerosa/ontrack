@@ -275,9 +275,3 @@ File file = ...
 def promotionLevel = ontrack.promotionLevel('project', 'branch', 'COPPER')
 file.bytes = promotionLevel.image.content
 ----
-
-[[dsl-doc]]
-=== Reference
-
-// This documented in generated
-include::dsl-generated.adoc[]
