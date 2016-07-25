@@ -50,6 +50,7 @@ class ProjectProperties extends ProjectEntityProperties {
      * @param name Configuration name
      * @param parameters Map of GitHub parameters, like 'repository' and 'indexationInterval'
      */
+    @DSLMethod("Configures the project for GitHub.")
     def gitHub(Map<String, ?> parameters, String name) {
         assert parameters.containsKey('repository'): "The 'repository' parameter is required"
         property('net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType',

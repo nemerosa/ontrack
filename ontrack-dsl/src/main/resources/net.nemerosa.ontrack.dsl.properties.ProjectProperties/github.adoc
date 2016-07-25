@@ -1,0 +1,23 @@
+Associates the project with the <<usage-github,GitHub configuration>> with the given `name`.
+
+The parameters are:
+
+* **`repository`** - repository in GitHub
+* `indexationInterval` - interval (in minutes) between each synchronisation (Ontrack maintains internally a clone of
+  the GitHub repositories)
+
+Example:
+
+[source,groovy]
+----
+ontrack.configure {
+   github 'github.com', oauth2Token: 'abcdef'
+}
+ontrack.project('project') {
+   config {
+       gitHub 'github.com', repository: 'nemerosa/ontrack'
+   }
+}
+assert ontrack.project('project').config.gitHub.configuration.name == 'github.com'
+assert ontrack.project('project').config.gitHub.repository == 'nemerosa/ontrack'
+----
