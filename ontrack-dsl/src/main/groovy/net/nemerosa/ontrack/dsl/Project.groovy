@@ -58,6 +58,7 @@ class Project extends AbstractProjectResource {
         new ProjectProperties(ontrack, this)
     }
 
+    @DSLMethod("Searches for builds in the project.")
     List<Build> search(Map<String, ?> form) {
         def url = query(
                 "${link('buildSearch')}/search",

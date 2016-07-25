@@ -1,0 +1,40 @@
+Possible options are:
+
+|===
+| Parameter | Description | Default
+| `maximumCount` | Maximum number of results to return | 10
+| `branchName` | Regular expression for the branch a build belong to | none
+| `buildName` | Regular expression for the build name | none
+| `buildExactMatch` | Considers the `buildName` as being an exact match, and
+  not a regular expression | `false`
+| `promotionName` | Name of a promotion level a build is promoted to | none
+| `validationStampName` | Name of a validation stamp a build has been validated
+  to with status `PASSED` | none
+| `property` | Qualified name of a property that the build must have | none
+| `propertyValue` | Together with `property`, refines the filter by checking
+  the value of the build property. The way the value is matched with the actual
+  value depends on the property | none
+| `linkedFrom` | Selects builds which are _linked from_ the build selected by
+  the criteria. See <<builds-links>> for the exact syntax. | none
+| `linkedTo` | Selects builds which are _linked to_ the build selected by the
+  criteria. See <<builds-links>> for the exact syntax. | none
+|===
+
+Example of build searches:
+
+[source,groovy]
+----
+def project = ontrack.project('project')
+// List of last builds
+def builds = project.search()
+// Last build only
+def build = project.search(maximumCount: 1)[0]
+// Last build promoted to BRONZE
+def build = project.search(promotionName: 'BRONZE', maximumCount: 1)[0]
+// Creating a branch
+ontrack.project('project') {
+   branch 'MyBranch'
+}
+// Getting the list of branches
+assert ontrack.project('project').branches.find { it.name == 'MyBranch' }
+----

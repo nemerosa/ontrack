@@ -1,0 +1,11 @@
+The project is the main <<model,entity>> of Ontrack.
+
+[source,groovy]
+----
+// Getting a project
+def project = ontrack.project('project')
+project {
+   // Creates a branch for the project
+   branch('1.0')
+}
+----
