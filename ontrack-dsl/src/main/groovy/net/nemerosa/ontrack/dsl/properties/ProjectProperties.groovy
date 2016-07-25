@@ -150,12 +150,14 @@ class ProjectProperties extends ProjectEntityProperties {
      * Auto promotion level
      */
 
+    @DSLMethod(count = 1)
     def autoPromotionLevel(boolean autoCreate = true) {
         property('net.nemerosa.ontrack.extension.general.AutoPromotionLevelPropertyType', [
                 autoCreate: autoCreate
         ])
     }
 
+    @DSLMethod(see = "autoPromotionLevel")
     boolean getAutoPromotionLevel() {
         property('net.nemerosa.ontrack.extension.general.AutoPromotionLevelPropertyType')?.autoCreate
     }

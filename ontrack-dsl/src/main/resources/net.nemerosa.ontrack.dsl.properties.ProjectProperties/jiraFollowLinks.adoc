@@ -19,4 +19,4 @@ ontrack.project('project') {
    }
 }
 assert ontrack.project('project').config.jiraFollowLinks == ['Clones', 'Depends']
----
+----
