@@ -9,6 +9,7 @@ Damien Coraboeuf
 :numbered:
 // ========================================================
 :ontrack-version: current
+:spring-boot-version: 1.3.6.RELEASE
 // ========================================================
 
 include::installation.adoc[]

@@ -196,3 +196,5 @@ The `BuildFilterService` is used to manage the build filters:
 
 The service determines the type of `BuildFilter` by using its type, and uses
 injected `BuildFilterProvider`s to get an actual instance.
+
+include::monitoring.adoc[]
