@@ -15,3 +15,5 @@ include::usage-builds.adoc[]
 == Topics
 
 include::templates.adoc[]
+
+include::changelogs.adoc[]
