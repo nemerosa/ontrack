@@ -62,3 +62,46 @@ See <<testing>>.
 
 * install the Lombok plugin
 * in `Build, Execution, Deployment > Compiler > Annotation Processors`, check `Enable annotation processing`
+
+[[delivery]]
+==== Delivery
+
+Official releases for Ontrack are available at:
+
+* https://github.com/nemerosa/ontrack/releases[GitHub] for the JAR, RPM
+  and Debian packages
+* https://registry.hub.docker.com/nemerosa/ontrack[Docker Hub] for the Docker images
+
+See the <<installation>> documentation to know how to install them.
+
+To create a package for delivery, just run:
+
+[source,bash]
+----
+./gradlew \
+   clean \
+   test \
+   integrationTest \
+   dockerLatest \
+   build
+----
+
+This will create:
+
+* a `ontrack-ui.jar`
+* a `nemerosa/ontrack:latest` Docker image in your local registry
+
+TIP: If you're not interested in having a Docker image, just omit the
+     `dockerLatest` task.
+
+[[delivery-versioning]]
+===== Versioning
+
+The version of the Ontrack project is computed automatically from the current
+SCM state, using the
+https://github.com/nemerosa/versioning[Gradle Versioning plug-in].
+
+[[delivery-deploying]]
+===== Deploying in production
+
+See the <<installation>> documentation.
