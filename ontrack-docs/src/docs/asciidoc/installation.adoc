@@ -119,6 +119,61 @@ is `admin` and should be changed immediately.
 [[installation-rpm]]
 === RPM installation
 
+You can install Ontrack using a RPM file you can download from the
+https://github.com/nemerosa/ontrack/releases[releases] page.
+
+The RPM is continuously tested on CentOS 6.7 and CentOS 7.1.
+
+To install Ontrack:
+
+[source,bash]
+----
+rpm -i ontrack.rpm
+----
+
+The following directories are created:
+
+|===
+| Directory | Description
+
+| `/opt/ontrack` | Binaries and scripts
+| `/usr/lib/ontrack` | Working and configuration directory
+| `/var/log/ontrack` | Logging directory
+|===
+
+You can optionally create an `application.yml` configuration file in
+`/usr/lib/ontrack`. For example, to customise the port Ontrack is running on:
+
+[source,yaml]
+----
+server:
+  port: 9080
+----
+
+Ontrack is installed as a service using `/etc/init.d/ontrack`.
+
+[source,bash]
+----
+# Starting Ontrack
+service ontrack start
+# Status of Ontrack
+service ontrack status
+# Stopping Ontrack
+service ontrack stop
+----
+
+To upgrade Ontrack:
+
+[source,bash]
+----
+# Stopping Ontrack
+sudo service ontrack stop
+# Updating
+sudo rpm --upgrade ontrack.rpm
+# Starting Ontrack
+sudo service ontrack start
+----
+
 [[installation-debian]]
 === Debian installation
 
