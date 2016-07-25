@@ -74,6 +74,7 @@ asciidoctor {
     ]
     attributes = [
             'ontrack-version': project.versioning.info.display,
+            'spring-boot-version': springBootVersion, // Defined in dependencies.gradle
             'toc'            : 'left',
     ]
 }
