@@ -113,16 +113,19 @@ class ProjectProperties extends ProjectEntityProperties {
     /**
      * JIRA Follow links
      */
+    @DSLMethod
     def jiraFollowLinks(String... linkNames) {
         jiraFollowLinks(linkNames as List)
     }
 
+    @DSLMethod(see = "jiraFollowLinks", id = "jiraFollowLinks-collection")
     def jiraFollowLinks(Collection<String> linkNames) {
         property('net.nemerosa.ontrack.extension.jira.JIRAFollowLinksPropertyType', [
                 linkNames: linkNames
         ])
     }
 
+    @DSLMethod(see = "jiraFollowLinks")
     List<String> getJiraFollowLinks() {
         property('net.nemerosa.ontrack.extension.jira.JIRAFollowLinksPropertyType').linkNames
     }
