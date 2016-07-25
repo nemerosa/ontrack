@@ -80,12 +80,14 @@ class ProjectProperties extends ProjectEntityProperties {
      * Git configuration
      */
 
+    @DSLMethod("Configures the project for Git.")
     def git(String name) {
         property('net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationPropertyType', [
                 configuration: name,
         ])
     }
 
+    @DSLMethod(see = "git")
     def getGit() {
         property('net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationPropertyType')
     }
