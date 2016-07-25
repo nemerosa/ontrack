@@ -1,0 +1,20 @@
+Associates the project with the <<usage-bitbucket,BitBucket configuration>> with the given `name` and specifies
+the project in BitBucket and the repository.
+
+Example:
+
+[source,groovy]
+----
+ontrack.configure {
+   stash 'MyStash', repository: 'https://stash.example.com', indexationInterval: 30
+}
+ontrack.project('project') {
+   config {
+       stash 'MyStash', 'PROJECT', 'my-repo'
+   }
+}
+assert ontrack.project('project').config.stash.configuration.name == 'MyStash'
+assert ontrack.project('project').config.stash.project == 'PROJECT'
+assert ontrack.project('project').config.stash.repository == 'my-repo'
+assert ontrack.project('project').config.stash.repositoryUrl == 'https://stash.example.com/projects/PROJECT/repos/my-repo'
+----

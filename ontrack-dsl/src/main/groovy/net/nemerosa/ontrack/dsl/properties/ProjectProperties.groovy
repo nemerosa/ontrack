@@ -96,6 +96,7 @@ class ProjectProperties extends ProjectEntityProperties {
      * Stash configuration
      */
 
+    @DSLMethod
     def stash(String name, String project, String repository) {
         property('net.nemerosa.ontrack.extension.stash.property.StashProjectConfigurationPropertyType', [
                 configuration: name,
@@ -104,6 +105,7 @@ class ProjectProperties extends ProjectEntityProperties {
         ])
     }
 
+    @DSLMethod(see = "stash")
     def getStash() {
         property('net.nemerosa.ontrack.extension.stash.property.StashProjectConfigurationPropertyType')
     }
