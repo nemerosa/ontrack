@@ -236,6 +236,8 @@ Other topics:
 * **TODO** Creating services
 * **TODO** Creating jobs
 
+See <<reference-services>> for a list of the core Ontrack services.
+
 [[extending-running]]
 ==== Running an extension
 
