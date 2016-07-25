@@ -3,7 +3,12 @@ package net.nemerosa.ontrack.dsl.properties
 import net.nemerosa.ontrack.dsl.Ontrack
 import net.nemerosa.ontrack.dsl.Project
 import net.nemerosa.ontrack.dsl.PropertyNotFoundException
+import net.nemerosa.ontrack.dsl.doc.DSL
+import net.nemerosa.ontrack.dsl.doc.DSLMethod
+import net.nemerosa.ontrack.dsl.doc.DSLProperties
 
+@DSL
+@DSLProperties
 class ProjectProperties extends ProjectEntityProperties {
 
     ProjectProperties(Ontrack ontrack, Project project) {
@@ -15,6 +20,7 @@ class ProjectProperties extends ProjectEntityProperties {
      *
      * Sets the disabling and deleting durations (in days) on the project.
      */
+    @DSLMethod(value = "Setup of stale branches management.", count = 2)
     def stale(int disablingDuration = 0, int deletingDuration = 0) {
         assert disablingDuration >= 0: "The disabling duration must be >= 0"
         assert deletingDuration >= 0: "The deleting duration must be >= 0"
@@ -27,6 +33,7 @@ class ProjectProperties extends ProjectEntityProperties {
     /**
      * Gets the stale property
      */
+    @DSLMethod(see = "stale")
     def getStale() {
         try {
             return property('net.nemerosa.ontrack.extension.stale.StalePropertyType')

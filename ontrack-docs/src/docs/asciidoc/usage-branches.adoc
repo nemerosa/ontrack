@@ -36,6 +36,7 @@ can either be static or provided by the SCM.
 
 See <<templates>> for details about using this feature.
 
+[[branches-stale]]
 ==== Managing stale branches
 
 By default, Ontrack will keep all the branches of a project forever. This can

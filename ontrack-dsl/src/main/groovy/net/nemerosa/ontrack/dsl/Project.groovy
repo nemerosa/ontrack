@@ -54,6 +54,7 @@ class Project extends AbstractProjectResource {
         b
     }
 
+    @DSLMethod("Access to the project properties")
     ProjectProperties getConfig() {
         new ProjectProperties(ontrack, this)
     }
