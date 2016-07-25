@@ -134,12 +134,14 @@ class ProjectProperties extends ProjectEntityProperties {
      * Auto validation stamp
      */
 
+    @DSLMethod(count = 1)
     def autoValidationStamp(boolean autoCreate = true) {
         property('net.nemerosa.ontrack.extension.general.AutoValidationStampPropertyType', [
                 autoCreate: autoCreate
         ])
     }
 
+    @DSLMethod(see = "autoValidationStamp")
     boolean getAutoValidationStamp() {
         property('net.nemerosa.ontrack.extension.general.AutoValidationStampPropertyType')?.autoCreate
     }

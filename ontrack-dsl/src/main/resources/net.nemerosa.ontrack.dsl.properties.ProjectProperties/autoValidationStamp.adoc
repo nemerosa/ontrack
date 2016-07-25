@@ -1,0 +1,57 @@
+Validation stamps can be <<validation-stamps-auto,automatically created>> for a branch, from a list of predefined
+validation stamps, if the "Auto validation stamps" property is enabled on a project.
+
+To enable this property on a project:
+
+[source,groovy]
+----
+ontrack.project('project') {
+   config {
+      autoValidationStamp()
+   }
+}
+----
+
+or:
+
+[source,groovy]
+----
+ontrack.project('project') {
+   config {
+      autoValidationStamp(true)
+   }
+}
+----
+
+To get the value of this property:
+
+[source,groovy]
+----
+boolean auto = ontrack.project('project').autoValidationStamp
+----
+
+The list of predefined validation stamps is accessible using:
+
+[source,groovy]
+----
+def stamps = ontrack.config.predefinedValidationStamps
+----
+
+Each item contains the following properties:
+
+* `id`
+* `name`
+* `description`
+
+Its image is accessible through the `image` property.
+
+In order to create/update predefined validation stamps, use the following method:
+
+[source,groovy]
+----
+ontrack.config.predefinedValidationStamp('VS') {
+   image new File('my/image.png')
+}
+----
+
+NOTE: You need Administrator rights to be able to update the predefined validation stamps.

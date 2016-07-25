@@ -173,6 +173,7 @@ class Config {
         }
     }
 
+    @DSLMethod(value = "See <<dsl-project-autoValidationStamp>>.", count = 3)
     PredefinedValidationStamp predefinedValidationStamp(String name, String description = '', boolean getIfExists = false) {
         def vs = predefinedValidationStamps.find { it.name == name }
         if (vs) {
@@ -195,6 +196,7 @@ class Config {
         }
     }
 
+    @DSLMethod(value = "See <<dsl-project-autoValidationStamp>>.", count = 4, id = "predefinedValidationStamp-config")
     PredefinedValidationStamp predefinedValidationStamp(String name, String description = '', boolean getIfExists = false, Closure closure) {
         def vs = predefinedValidationStamp(name, description, getIfExists)
         vs(closure)
