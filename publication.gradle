@@ -1,6 +1,6 @@
 import net.nemerosa.httpclient.*
 import net.nemerosa.httpclient.json.*
-import net.nemerosa.ontrack.dsl.*
+import net.nemerosa.ontrack.gradle.OntrackChangeLog
 
 /**
  * Release and publication tasks.
@@ -17,6 +17,10 @@ buildscript {
         classpath 'net.nemerosa.ontrack:ontrack-dsl:2.17.4'
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3"
     }
+}
+
+plugins {
+    id 'org.ajoberstar.github-pages' version '1.5.1'
 }
 
 /**
@@ -73,63 +77,6 @@ nexusStaging {
     password = ossrhPassword
     numberOfRetries = 30
     delayBetweenRetriesInMillis = 10000 // Workaround for OSSRH-21248
-}
-
-/**
- * Ontrack task definitions
- */
-
-class OntrackChangeLog extends DefaultTask {
-
-    String ontrackProject = 'ontrack'
-    String ontrackUrl = project.properties.ontrackUrl
-    String ontrackUser = project.properties.ontrackUser
-    String ontrackPassword = project.properties.ontrackPassword
-
-    String ontrackReleasePromotionLevel = 'RELEASE'
-    String ontrackReleaseBranch = project.properties.ontrackReleaseBranch
-
-    private String changeLog
-
-    protected Ontrack getOntrackClient() {
-        return OntrackConnection.create(ontrackUrl)
-                .logger({ println "[${name}][Ontrack] ${it}" })
-                .authenticate(ontrackUser, ontrackPassword)
-                .build()
-    }
-
-    @TaskAction
-    void run() {
-        if (!ontrackReleaseBranch) throw new GradleException("Missing ontrackReleaseBranch property")
-        println "[${name}] Getting the Ontrack log for ${ontrackProject} since " +
-                "last ${ontrackReleasePromotionLevel} on branch ${ontrackReleaseBranch}"
-        // Gets the Ontrack client
-        def ontrack = ontrackClient
-        // Gest the Ontrack project
-        def project = ontrack.project(ontrackProject)
-        // Gets the last build on the branch to release
-        println "ontrackReleaseBranch = ${ontrackReleaseBranch}"
-        def lastBuild = project.search(branchName: ontrackReleaseBranch)[0]
-        // Gets the last release
-        def lastRelease = project.search(promotionName: ontrackReleasePromotionLevel)[0]
-        // Gets the change log
-        def changeLog = lastBuild.getChangeLog(lastRelease)
-        // Exports the issues
-        this.changeLog = changeLog.exportIssues(
-                format: 'text',
-                groups: [
-                        'Features'    : ['feature'],
-                        'Enhancements': ['enhancement'],
-                        'Bugs'        : ['bug'],
-                ],
-                exclude: ['design', 'delivery']
-
-        )
-    }
-
-    String getChangeLog() {
-        return changeLog
-    }
 }
 
 /**
