@@ -155,6 +155,7 @@ class Config {
         ])
     }
 
+    @DSLMethod(see = "artifactory")
     List<String> getArtifactory() {
         ontrack.get('extension/artifactory/configurations/descriptors').resources.collect { it.id }
     }
