@@ -4,7 +4,7 @@
 [[architecture-modules]]
 ==== Modules
 
-[plantuml]
+[plantuml,"modules",png]
 ----
 include::modules.puml[]
 ----
@@ -228,7 +228,7 @@ One page only, pure AJAX communication between the client and the server.
 [[artifacture-technology-layers]]
 ===== Layers
 
-[plantuml]
+[plantuml,"layers",png]
 ----
 include::architecture-layers.puml[]
 ----
