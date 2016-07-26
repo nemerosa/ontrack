@@ -35,10 +35,12 @@ class Config {
      * Creates or update a GitHub configuration.
      */
 
+    @DSLMethod
     def gitHub(String name) {
         gitHub([:], name)
     }
 
+    @DSLMethod(see = "github", id = "github-name")
     def gitHub(Map<String, ?> parameters, String name) {
         def params = parameters + [name: name]
         ontrack.post(
@@ -50,6 +52,7 @@ class Config {
     /**
      * Gets the list of all GitHub configuration names
      */
+    @DSLMethod(see = "github")
     List<String> getGitHub() {
         ontrack.get('extension/github/configurations/descriptors').resources.collect { it.id }
     }
