@@ -76,6 +76,7 @@ asciidoctor {
             'ontrack-version': project.versioning.info.display,
             'spring-boot-version': springBootVersion, // Defined in dependencies.gradle
             'toc'            : 'left',
+            imagesdir               : file('build/asciidoc/html5'),
     ]
 }
 
