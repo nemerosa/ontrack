@@ -123,6 +123,7 @@ class Config {
         ])
     }
 
+    @DSLMethod(see = "jenkins")
     List<String> getJenkins() {
         ontrack.get('extension/jenkins/configurations/descriptors').resources.collect { it.id }
     }

@@ -1,0 +1,17 @@
+Access to <<usage-jenkins,Jenkins>> is done through the configurations:
+
+`def jenkins(String name, String url, String user = '', String password = '')`
+
+The list of Jenkins configurations is accessible:
+
+`List<String> getJenkins()`
+
+Example:
+
+[source,groovy]
+----
+ontrack.configure {
+   jenkins 'Jenkins', 'http://jenkins'
+}
+assert ontrack.config.jenkins.find { it == 'Jenkins' } != null
+----
