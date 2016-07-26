@@ -74,6 +74,7 @@ class Config {
     /**
      * Creates or update a Git configuration
      */
+    @DSLMethod("Creates or update a Git configuration")
     def git(Map<String, ?> parameters, String name) {
         def params = parameters + [name: name]
         ontrack.post(
@@ -85,6 +86,7 @@ class Config {
     /**
      * Gets the list of all Git configuration names
      */
+    @DSLMethod(see = "git")
     List<String> getGit() {
         ontrack.get('extension/git/configurations/descriptors').resources.collect { it.id }
     }
