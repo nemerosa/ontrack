@@ -70,6 +70,7 @@ class Config {
         )
     }
 
+    @DSLMethod(see = "stash")
     List<String> getStash() {
         ontrack.get('extension/stash/configurations/descriptors').resources.collect { it.id }
     }
