@@ -14,4 +14,4 @@ ontrack.configure {
    artifactory 'Artifactory', 'http://artifactory'
 }
 assert ontrack.config.artifactory.find { it == 'Artifactory' } != null
------
+----

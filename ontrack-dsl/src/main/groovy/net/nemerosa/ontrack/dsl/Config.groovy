@@ -35,7 +35,7 @@ class Config {
      * Creates or update a GitHub configuration.
      */
 
-    @DSLMethod
+    @DSLMethod(id = "github")
     def gitHub(String name) {
         gitHub([:], name)
     }
