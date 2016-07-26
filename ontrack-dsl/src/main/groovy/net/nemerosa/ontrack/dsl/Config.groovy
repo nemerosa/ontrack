@@ -143,6 +143,7 @@ class Config {
         ])
     }
 
+    @DSLMethod(see = "jira")
     List<String> getJira() {
         ontrack.get('extension/jira/configurations/descriptors').resources.collect { it.id }
     }
