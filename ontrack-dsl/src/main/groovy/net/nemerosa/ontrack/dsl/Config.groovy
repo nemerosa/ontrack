@@ -100,6 +100,7 @@ class Config {
         )
     }
 
+    @DSLMethod(see = "svn")
     def getSvn() {
         ontrack.get('extension/svn/configurations').resources
     }

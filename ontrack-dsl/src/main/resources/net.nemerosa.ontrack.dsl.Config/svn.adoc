@@ -28,22 +28,27 @@ NOTE: The configuration password is always returned blank.
 
 Some parameters, like `url` are required. List of parameters is:
 
-* **url** - URL of the Subversion repository (required)
-* user
-* password
-* tagFilterPattern - none by default
-* browserForPath - none by default
-* browserForRevision - none by default
-* browserForChange - none by default
-* indexationInterval - 0 by default
-* indexationStart - revision to start the indexation from (1 by default)
-* issueServiceConfigurationIdentifier - identifier for the issue service (optional)
+|===
+| Parameter | Description
+
+| **url** | URL of the Subversion repository (required)
+| user |
+| password |
+| tagFilterPattern | none by default
+| browserForPath | none by default
+| browserForRevision | none by default
+| browserForChange | none by default
+| indexationInterval | 0 by default
+| indexationStart | revision to start the indexation from (1 by default)
+| issueServiceConfigurationIdentifier | identifier for the issue service (optional) - see <<usage-jira,here>>
+
+|===
 
 Example of issue link (with JIRA):
 [source,groovy]
 ----
 ontrack.configure {
    jira 'MyJIRAConfig', 'http://jira'
-   svn 'myconfig', url: 'https://myhost/repo', issueServiceConfigurationIdentifier: 'jira:MyJIRAConfig'
+   svn 'myconfig', url: 'https://myhost/repo', issueServiceConfigurationIdentifier: 'jira//MyJIRAConfig'
 }
 ----
