@@ -400,3 +400,8 @@ Each item in the `files` collection has the following properties:
 
 NOTE: This covers only the common attributes provided by Ontrack - additional
       properties are also available for a specific SCM.
+
+[[dsl-reference]]
+=== DSL Reference
+
+See the <<dsl-doc,appendixes>>.
