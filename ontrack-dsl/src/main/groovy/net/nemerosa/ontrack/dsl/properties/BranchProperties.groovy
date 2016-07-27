@@ -71,12 +71,15 @@ class BranchProperties extends ProjectEntityProperties {
     /**
      * SVN revision change log issue validator
      */
+
+    @DSLMethod
     def svnValidatorClosedIssues(Collection<String> closedStatuses) {
         property('net.nemerosa.ontrack.extension.svn.property.SVNRevisionChangeLogIssueValidator', [
                 closedStatuses: closedStatuses
         ])
     }
 
+    @DSLMethod(see = "svnValidatorClosedIssues")
     def getSvnValidatorClosedIssues() {
         property('net.nemerosa.ontrack.extension.svn.property.SVNRevisionChangeLogIssueValidator')
     }
