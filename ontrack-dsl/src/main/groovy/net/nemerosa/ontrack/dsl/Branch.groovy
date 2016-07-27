@@ -120,12 +120,14 @@ class Branch extends AbstractProjectResource {
     /**
      * Gets the list of promotion levels for this branch
      */
+    @DSLMethod("Gets the list of promotion levels for this branch.")
     List<PromotionLevel> getPromotionLevels() {
         return ontrack.get(link('promotionLevels')).resources.collect { node ->
             new PromotionLevel(ontrack, node)
         }
     }
 
+    @DSLMethod(value = "Creates a promotion level for this branch.", count = 3)
     PromotionLevel promotionLevel(String name, String description = '', boolean getIfExists = false) {
         def node = ontrack.get(link('promotionLevels')).resources.find { it.name == name }
         if (node) {
@@ -148,6 +150,7 @@ class Branch extends AbstractProjectResource {
         }
     }
 
+    @DSLMethod(value = "Creates a promotion level for this branch and configures it using a closure.", count = 4, id = "promotionLevel-closure")
     PromotionLevel promotionLevel(String name, String description = '', boolean getIfExists = false, Closure closure) {
         def pl = promotionLevel(name, description, getIfExists)
         pl(closure)
@@ -157,12 +160,14 @@ class Branch extends AbstractProjectResource {
     /**
      * Gets the list of validation stamps for this branch
      */
+    @DSLMethod("Gets the list of validation stamps for this branch.")
     List<ValidationStamp> getValidationStamps() {
         ontrack.get(link('validationStamps')).resources.collect { node ->
             new ValidationStamp(ontrack, node)
         }
     }
 
+    @DSLMethod(value = "Creates a validation stamp for this branch.", count = 3)
     ValidationStamp validationStamp(String name, String description = '', boolean getIfExists = false) {
         def node = ontrack.get(link('validationStamps')).resources.find { it.name == name }
         if (node) {
@@ -185,6 +190,7 @@ class Branch extends AbstractProjectResource {
         }
     }
 
+    @DSLMethod(value = "Creates a validation stamp for this branch and configures it using a closure.", count = 4, id = "validationStamp-closure")
     ValidationStamp validationStamp(String name, String description = '', boolean getIfExists = false, Closure closure) {
         def vs = validationStamp(name, description, getIfExists)
         vs(closure)
