@@ -169,6 +169,7 @@ class Build extends AbstractProjectResource {
      * Build links
      */
 
+    @DSLMethod
     def buildLink(String project, String build) {
         ontrack.put(
                 link('buildLinks'),
@@ -182,6 +183,7 @@ class Build extends AbstractProjectResource {
         )
     }
 
+    @DSLMethod(see = "buildLink")
     List<Build> getBuildLinks() {
         return ontrack.get(link('buildLinksFrom')).resources.collect {
             new Build(ontrack, it)
