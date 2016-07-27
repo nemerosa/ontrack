@@ -24,7 +24,7 @@ class BranchProperties extends ProjectEntityProperties {
     /**
      * Git branch property
      */
-    @DSLMethod
+    @DSLMethod(count = 2)
     def gitBranch(String branch, Map<String, ?> params = [:]) {
         property(
                 'net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType',
@@ -41,7 +41,7 @@ class BranchProperties extends ProjectEntityProperties {
      * SVN branch property
      */
 
-    @DSLMethod
+    @DSLMethod(count = 1)
     def svn(Map<String, ?> params = [:]) {
         // Gets the branch path
         String branchPath = params['branchPath'] as String
@@ -88,7 +88,7 @@ class BranchProperties extends ProjectEntityProperties {
      * SVN synchronisation
      */
 
-    @DSLMethod
+    @DSLMethod(count = 2)
     def svnSync(int interval = 0, boolean override = false) {
         property('net.nemerosa.ontrack.extension.svn.property.SVNSyncPropertyType', [
                 override: override,
@@ -105,7 +105,7 @@ class BranchProperties extends ProjectEntityProperties {
      * Artifactory synchronisation
      */
 
-    @DSLMethod
+    @DSLMethod(count = 4)
     def artifactorySync(String configuration, String buildName, String buildNameFilter = '*', int interval = 0) {
         property('net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncPropertyType', [
                 configuration  : configuration,

@@ -52,7 +52,7 @@ class ProjectEntityProperties {
      * Message
      */
 
-    @DSLMethod
+    @DSLMethod(count = 2)
     def message(String text, String type = 'INFO') {
         property('net.nemerosa.ontrack.extension.general.MessagePropertyType', [
                 type: type,
