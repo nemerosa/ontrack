@@ -127,6 +127,7 @@ class BranchProperties extends ProjectEntityProperties {
      * SVN synchronisation
      */
 
+    @DSLMethod
     def svnSync(int interval = 0, boolean override = false) {
         property('net.nemerosa.ontrack.extension.svn.property.SVNSyncPropertyType', [
                 override: override,
@@ -134,6 +135,7 @@ class BranchProperties extends ProjectEntityProperties {
         ])
     }
 
+    @DSLMethod(see = "svnSync")
     def getSvnSync() {
         property('net.nemerosa.ontrack.extension.svn.property.SVNSyncPropertyType')
     }
