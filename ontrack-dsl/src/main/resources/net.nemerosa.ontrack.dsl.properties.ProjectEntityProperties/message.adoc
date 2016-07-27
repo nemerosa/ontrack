@@ -1,0 +1,34 @@
+An arbitrary message, together with a message type, can be associated with any <<model,entity>>.
+
+To set the message on any entity:
+
+[source,groovy]
+----
+entity.message(String text, String type = 'INFO')
+----
+
+Following types of messages are supported:
+
+* `INFO`
+* `WARNING`
+* `ERROR`
+
+For example, on a build:
+
+[source,groovy]
+----
+ontrack.build('project', 'branch', '1').config {
+   message 'My message', 'WARNING'
+}
+----
+
+To get a message:
+
+[source,groovy]
+----
+def msg = ontrack.build('project', 'branch', '1').config.message
+assert msg.type == 'WARNING'
+assert msg.text == 'My message'
+----
+
+See <<property-message>> for more details about this property.
