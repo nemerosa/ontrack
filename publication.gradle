@@ -1,6 +1,7 @@
 import net.nemerosa.httpclient.*
 import net.nemerosa.httpclient.json.*
 import net.nemerosa.ontrack.gradle.OntrackChangeLog
+import net.nemerosa.ontrack.gradle.OntrackLastReleases
 
 /**
  * Release and publication tasks.
@@ -36,8 +37,13 @@ apply plugin: 'io.codearte.nexus-staging'
 
 // Gets the list of modules
 Properties ontrackProperties = new Properties()
-project.file('ontrack.properties').withInputStream { ontrackProperties.load(it) }
-ext.modules = ontrackProperties.getProperty('MODULES').split(',').collect { it.trim() }
+def ontrackPropertyFile = project.file('ontrack.properties')
+if (ontrackPropertyFile.exists()) {
+    ontrackPropertyFile.withInputStream { ontrackProperties.load(it) }
+    ext.modules = ontrackProperties.getProperty('MODULES').split(',').collect { it.trim() }
+} else {
+    ext.modules = []
+}
 println "Modules = ${modules}"
 
 artifacts {
@@ -242,6 +248,12 @@ task publicationGitHubReleaseUpload {
 task publicationOntrackChangeLog(type: OntrackChangeLog) {
     ontrackReleaseBranch = project.properties.ontrackReleaseBranch
     mustRunAfter publicationGitHubReleaseUpload
+}
+
+task publicationOntrackLastReleases(type: OntrackLastReleases) {
+    releaseCount = 3
+    releasePattern = /2\..*/
+    // TODO mustRunAfter publicationGitHubReleaseUpload
 }
 
 task publicationGitHubReleaseDescription(type: GitHubReleaseDescription) {

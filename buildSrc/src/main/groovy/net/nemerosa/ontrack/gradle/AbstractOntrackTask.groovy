@@ -10,10 +10,12 @@ abstract class AbstractOntrackTask extends DefaultTask {
     String ontrackUser = project.properties.ontrackUser
     String ontrackPassword = project.properties.ontrackPassword
 
-    protected Ontrack getOntrackClient() {
-        return OntrackConnection.create(ontrackUrl)
-                .logger({ println "[${name}][Ontrack] ${it}" })
+    protected Ontrack getOntrackClient(boolean logging = true) {
+        def builder = OntrackConnection.create(ontrackUrl)
                 .authenticate(ontrackUser, ontrackPassword)
-                .build()
+        if (logging) {
+            builder = builder.logger({ println "[${name}][Ontrack] ${it}" })
+        }
+        return builder.build()
     }
 }
