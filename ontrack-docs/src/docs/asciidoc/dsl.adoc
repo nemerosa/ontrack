@@ -463,3 +463,85 @@ exception is thrown if the file cannot be found.
 === DSL Reference
 
 See the <<dsl-doc,appendixes>>.
+
+[[dsl-samples]]
+=== DSL Samples
+
+Creating a build:
+
+[source,groovy]
+----
+ontrack.branch('project', 'branch').build('1', 'Build 1')
+----
+
+Promoting a build:
+
+[source,groovy]
+----
+ontrack.build('project', '1', '134').promote('COPPER')
+----
+
+Validating a build:
+
+[source,groovy]
+----
+ontrack.build('project', '1', '134').validate('SMOKETEST', 'PASSED')
+----
+
+Getting the last promoted build:
+
+[source,groovy]
+----
+def buildName = ontrack.branch('project', 'branch').lastPromotedBuilds[0].name
+----
+
+Getting the last build of a given promotion:
+
+[source,groovy]
+----
+def branch = ontrack.branch('project', 'branch')
+def builds = branch.standardFilter withPromotionLevel: 'BRONZE'
+def buildName = builds[0].name
+----
+
+Configuring a whole branch:
+
+[source,groovy]
+----
+ontrack.project('project') {
+   branch('1.0') {
+      promotionLevel 'COPPER', 'Copper promotion'
+      promotionLevel 'BRONZE', 'Bronze promotion'
+      validationStamp 'SMOKE', 'Smoke tests'
+   }
+}
+----
+
+Creating a branch template and an instance out of it:
+
+[source,groovy]
+----
+// Branch template definition
+ontrack.project(project) {
+   config {
+      gitHub 'ontrack'
+   }
+   branch('template') {
+      promotionLevel 'COPPER', 'Copper promotion'
+      promotionLevel 'BRONZE', 'Bronze promotion'
+      validationStamp 'SMOKE', 'Smoke tests'
+      // Git branch
+      config {
+         gitBranch '${gitBranch}'
+      }
+      // Template definition
+      template {
+         parameter 'gitBranch', 'Name of the Git branch'
+      }
+   }
+}
+// Creates a template instance
+ontrack.branch(project, 'template').instance 'TEST', [
+   gitBranch: 'feature/test'
+]
+----
