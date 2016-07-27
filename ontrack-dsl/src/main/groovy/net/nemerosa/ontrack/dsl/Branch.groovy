@@ -197,6 +197,7 @@ class Branch extends AbstractProjectResource {
         vs
     }
 
+    @DSLMethod(value = "Creates a build for the branch", count = 3)
     Build build(String name, String description = '', boolean getIfExists = false) {
         def builds = ontrack.project(this.project).search(branchName: this.name, buildName: name)
         if (builds.empty) {
@@ -217,6 +218,7 @@ class Branch extends AbstractProjectResource {
         }
     }
 
+    @DSLMethod(value = "Creates a build for the branch and configures it using a closure. See <<dsl-branch-build>>.", count = 4, id = "build-closure")
     Build build(String name, String description = '', boolean getIfExists = false, Closure closure) {
         def b = build(name, description, getIfExists)
         b(closure)
