@@ -24,6 +24,7 @@ class BranchProperties extends ProjectEntityProperties {
     /**
      * Git branch property
      */
+    @DSLMethod
     def gitBranch(String branch, Map<String, ?> params = [:]) {
         property(
                 'net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType',
@@ -31,6 +32,7 @@ class BranchProperties extends ProjectEntityProperties {
         )
     }
 
+    @DSLMethod(see = "gitBranch")
     def getGitBranch() {
         property('net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType')
     }
