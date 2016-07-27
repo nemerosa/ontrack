@@ -7,3 +7,5 @@ The `path` is relative to the root of the branch in the SCM and is always return
 
 IMPORTANT: For security, only users allowed to configure the project will be able to download a file from the branch.
            See <<security>> for the list of roles.
+
+See also <<dsl-scm>>.

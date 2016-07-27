@@ -441,6 +441,24 @@ ontrack.branch('project', 'template').instance 'TEST', [
 ]
 ----
 
+[[dsl-scm]]
+=== DSL SCM extensions
+
+If a SCM (<<usage-subversion,Subversion>> or <<usage-git,Git>>) is correctly configured on a branch, it is possible
+to download some files.
+
+IMPORTANT: This is allowed only for the project owner.
+
+For example, the following <<dsl-branch-download,call>>:
+
+[source,groovy]
+----
+def text = ontrack.branch('project', 'branch').download('folder/subfolder/path.txt')
+----
+
+will download the `folder/subfolder/path.txt` file from the corresponding SCM branch. A `OTNotFoundException`
+exception is thrown if the file cannot be found.
+
 [[dsl-reference]]
 === DSL Reference
 
