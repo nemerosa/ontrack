@@ -217,6 +217,7 @@ class Branch extends AbstractProjectResource {
         ontrack.text(query(link('download'), [path: path]))
     }
 
+    @DSLMethod("Access to the branch properties")
     BranchProperties getConfig() {
         new BranchProperties(ontrack, this)
     }
