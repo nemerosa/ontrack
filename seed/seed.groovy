@@ -136,7 +136,6 @@ build
 --info
 --stacktrace
 --profile
---parallel
 '''
         environmentVariables {
             propertiesFile 'build/version.properties'
