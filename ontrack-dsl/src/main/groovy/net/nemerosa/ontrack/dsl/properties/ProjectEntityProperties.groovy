@@ -107,6 +107,7 @@ class ProjectEntityProperties {
      * Jenkins job
      */
 
+    @DSLMethod
     def jenkinsJob(String configuration, String job) {
         property('net.nemerosa.ontrack.extension.jenkins.JenkinsJobPropertyType', [
                 configuration: configuration,
@@ -114,6 +115,7 @@ class ProjectEntityProperties {
         ])
     }
 
+    @DSLMethod(see = "jenkinsJob")
     def getJenkinsJob() {
         property('net.nemerosa.ontrack.extension.jenkins.JenkinsJobPropertyType')
     }

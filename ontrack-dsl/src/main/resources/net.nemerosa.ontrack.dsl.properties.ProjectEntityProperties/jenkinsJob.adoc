@@ -1,0 +1,61 @@
+Projects, branches, promotion levels and validation stamps can have a reference to a Jenkins job:
+
+`def jenkinsJob(String configuration, String job)`
+
+or to get the job reference:
+
+`def getJenkinsJob()`
+
+Example:
+
+[source,groovy]
+----
+ontrack.configure {
+   jenkins 'Jenkins', 'http://jenkins'
+}
+ontrack.project('project') {
+   config {
+       jenkinsJob 'Jenkins', 'MyProject'
+   }
+   branch('test') {
+       config {
+           jenkinsJob 'Jenkins', 'MyBranch'
+       }
+       promotionLevel('COPPER') {
+           config {
+               jenkinsJob 'Jenkins', 'MyPromotion'
+           }
+       }
+       validationStamp('TEST') {
+           config {
+               jenkinsJob 'Jenkins', 'MyValidation'
+           }
+       }
+   }
+}
+
+def j = ontrack.project('project').config.jenkinsJob
+assert j.configuration.name == 'Jenkins'
+assert j.job == 'MyProject'
+assert j.url == 'http://jenkins/job/MyProject'
+
+j = ontrack.branch('project', 'test').config.jenkinsJob
+assert j.configuration.name == 'Jenkins'
+assert j.job == 'MyBranch'
+assert j.url == 'http://jenkins/job/MyBranch'
+
+j = ontrack.promotionLevel('project', 'test', 'COPPER').config.jenkinsJob
+assert j.configuration.name == 'Jenkins'
+assert j.job == 'MyPromotion'
+assert j.url == 'http://jenkins/job/MyPromotion'
+
+j = ontrack.validationStamp('project', 'test', 'TEST').config.jenkinsJob
+assert j.configuration.name == 'Jenkins'
+assert j.job == 'MyValidation'
+assert j.url == 'http://jenkins/job/MyValidation'
+----
+
+Note that https://wiki.jenkins-ci.org/display/JENKINS/CloudBees+Folders+Plugin[Jenkins folders] are supported by giving
+the full job name. For example, the job name to give to the job in _A > B > C_ would be `A/job/B/job/C` or even `A/B/C`.
+
+See also the <<dsl-projectEntityProperties-jenkinsBuild,Jenkins build property>>.
