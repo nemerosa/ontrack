@@ -1,0 +1,47 @@
+Arbitrary <<property-meta,meta information properties>> can be associated with any <<model,entity>>.
+
+To set a list of meta information properties:
+
+[source,groovy]
+----
+entity.config {
+   metaInfo A: '1', B: '2'
+}
+----
+
+CAUTION: This method does not allow to set links and will erase any previous meta information.
+
+The following method is the preferred one:
+
+[source,groovy]
+----
+ontrack.build('project', 'branch', '1').config {
+   metaInfo 'name1', 'value1'
+   metaInfo 'name2', 'value2', 'http://link2'
+   metaInfo 'name3', 'value3', 'http://link3', 'Category'
+}
+----
+
+This allows to keep any previous meta information property and to specify links if needed.
+
+To get the meta information, for example on the previous build:
+
+[source,groovy]
+----
+def list = ontrack.build('project', 'branch', '1').config.metaInfo
+assert list.size() == 3
+assert list[0].name = 'name1'
+assert list[0].value = 'value1'
+assert list[0].link = null
+assert list[0].category = null
+assert list[1].name = 'name2'
+assert list[1].value = 'value2'
+assert list[1].link = 'http://link2'
+assert list[1].category = null
+assert list[2].name = 'name3'
+assert list[2].value = 'value3'
+assert list[2].link = 'http://link3'
+assert list[2].category = 'Category'
+----
+
+See <<property-meta>> for more details about this property.

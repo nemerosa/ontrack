@@ -69,6 +69,7 @@ class ProjectEntityProperties {
      * Meta info properties
      */
 
+    @DSLMethod
     def metaInfo(Map<String, String> map) {
         property('net.nemerosa.ontrack.extension.general.MetaInfoPropertyType', [
                 items: map.collect { name, value ->
@@ -80,8 +81,7 @@ class ProjectEntityProperties {
         ])
     }
 
-
-
+    @DSLMethod(see = "metaInfo", id = "metaInfo-name", count = 4)
     def metaInfo(String name, String value, String link = null, String category = null) {
         // Gets the list of meta info properties
         def items = metaInfo
@@ -95,6 +95,7 @@ class ProjectEntityProperties {
         ])
     }
 
+    @DSLMethod(see = "metaInfo")
     List<MetaInfo> getMetaInfo() {
         try {
             return property('net.nemerosa.ontrack.extension.general.MetaInfoPropertyType').items.collect {
