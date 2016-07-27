@@ -41,6 +41,52 @@ class BranchProperties extends ProjectEntityProperties {
      * SVN branch property
      */
 
+    /**
+     * Compatibility with version 2.15 and older
+     */
+    @Deprecated
+    def svn(String branchPath, String buildPath) {
+        // Build path expression
+        String buildPlaceholderPattern = "\\{(.+)\\}"
+        // Link data
+        String linkId
+        Map linkData = [:]
+        // Detecting the link type
+        // Revision
+        if (buildPath.endsWith('@{build}')) {
+            linkId = 'revision'
+        }
+        // Tag or pattern
+        else {
+            Pattern pattern = Pattern.compile(buildPlaceholderPattern)
+            Matcher matcher = pattern.matcher(buildPath)
+            if (matcher.find()) {
+                String expression = matcher.group(1);
+                if ("build".equals(expression)) {
+                    linkId = 'tag'
+                } else if (expression.startsWith("build:")) {
+                    String buildExpression = expression - "build:";
+                    linkId = 'tagPattern'
+                    linkData = [
+                            pattern: buildExpression,
+                    ]
+                } else {
+                    throw new IllegalStateException("buildPath = ${buildPath} is not supported.")
+                }
+            } else {
+                throw new IllegalStateException("buildPath = ${buildPath} is not supported.")
+            }
+        }
+        // Logging
+        LOGGER.warn("[svn] The svn(branchPath=${branchPath}, buildPath=${buildPath}) call is deprecated and will be deleted in future versions")
+        // New call
+        svn([
+                branchPath: branchPath,
+                link      : linkId,
+                data      : linkData,
+        ])
+    }
+
     @DSLMethod(count = 1)
     def svn(Map<String, ?> params = [:]) {
         // Gets the branch path
