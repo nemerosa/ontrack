@@ -1,7 +1,7 @@
 [[model]]
 The root entity in Ontrack is the _project_.
 
-[plantuml]
+[plantuml,"model",png]
 ----
 include::model.puml[]
 ----

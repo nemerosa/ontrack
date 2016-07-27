@@ -52,6 +52,7 @@ class ProjectEntityProperties {
      * Message
      */
 
+    @DSLMethod(count = 2)
     def message(String text, String type = 'INFO') {
         property('net.nemerosa.ontrack.extension.general.MessagePropertyType', [
                 type: type,
@@ -59,6 +60,7 @@ class ProjectEntityProperties {
         ])
     }
 
+    @DSLMethod(see = "message")
     def getMessage() {
         property('net.nemerosa.ontrack.extension.general.MessagePropertyType')
     }
@@ -67,6 +69,7 @@ class ProjectEntityProperties {
      * Meta info properties
      */
 
+    @DSLMethod
     def metaInfo(Map<String, String> map) {
         property('net.nemerosa.ontrack.extension.general.MetaInfoPropertyType', [
                 items: map.collect { name, value ->
@@ -78,8 +81,7 @@ class ProjectEntityProperties {
         ])
     }
 
-
-
+    @DSLMethod(see = "metaInfo", id = "metaInfo-name", count = 4)
     def metaInfo(String name, String value, String link = null, String category = null) {
         // Gets the list of meta info properties
         def items = metaInfo
@@ -93,6 +95,7 @@ class ProjectEntityProperties {
         ])
     }
 
+    @DSLMethod(see = "metaInfo")
     List<MetaInfo> getMetaInfo() {
         try {
             return property('net.nemerosa.ontrack.extension.general.MetaInfoPropertyType').items.collect {
@@ -107,6 +110,7 @@ class ProjectEntityProperties {
      * Jenkins job
      */
 
+    @DSLMethod
     def jenkinsJob(String configuration, String job) {
         property('net.nemerosa.ontrack.extension.jenkins.JenkinsJobPropertyType', [
                 configuration: configuration,
@@ -114,6 +118,7 @@ class ProjectEntityProperties {
         ])
     }
 
+    @DSLMethod(see = "jenkinsJob")
     def getJenkinsJob() {
         property('net.nemerosa.ontrack.extension.jenkins.JenkinsJobPropertyType')
     }
@@ -122,6 +127,7 @@ class ProjectEntityProperties {
      * Jenkins build
      */
 
+    @DSLMethod
     def jenkinsBuild(String configuration, String job, int build) {
         property('net.nemerosa.ontrack.extension.jenkins.JenkinsBuildPropertyType', [
                 configuration: configuration,
@@ -130,6 +136,7 @@ class ProjectEntityProperties {
         ])
     }
 
+    @DSLMethod(see = "jenkinsBuild")
     def getJenkinsBuild() {
         property('net.nemerosa.ontrack.extension.jenkins.JenkinsBuildPropertyType')
     }

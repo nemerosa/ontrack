@@ -1,0 +1,20 @@
+A label or release can be attached to a build using:
+
+`def label(String name)`
+
+For example:
+
+[source,groovy]
+----
+ontrack.build('project', 'branch', 'build').config {
+   label 'RC1'
+}
+----
+
+To get the label associated with a build:
+
+[source,groovy]
+----
+def name = ontrack.build('project', 'branch', 'build').config.label
+assert name == 'RC1'
+----

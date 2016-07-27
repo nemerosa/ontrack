@@ -1,0 +1,1 @@
+In order to get the change log between two builds, look at the documentation at <<dsl-usecases-changelogs>>.

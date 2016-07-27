@@ -1,0 +1,65 @@
+For builds, promotion runs and validation runs, it is possible to attach a reference to a Jenkins build:
+
+`def jenkinsBuild(String configuration, String job, int buildNumber)`
+
+or to get the build reference:
+
+`def getJenkinsBuild()`
+
+Example:
+
+[source,groovy]
+----
+ontrack.configure {
+   jenkins 'Jenkins', 'http://jenkins'
+}
+def name = uid('P')
+def project = ontrack.project(name)
+def branch = project.branch('test') {
+   promotionLevel('COPPER')
+   validationStamp('TEST')
+}
+def build = branch.build('1') {
+   config {
+       jenkinsBuild 'Jenkins', 'MyBuild', 1
+   }
+   promote('COPPER') {
+       config {
+           jenkinsBuild 'Jenkins', 'MyPromotion', 1
+       }
+   }
+   validate('TEST') {
+       config {
+           jenkinsBuild 'Jenkins', 'MyValidation', 1
+       }
+   }
+}
+
+def j = ontrack.build(name, 'test', '1').config.jenkinsBuild
+assert j.configuration.name == 'Jenkins'
+assert j.job == 'MyBuild'
+assert j.build == 1
+assert j.url == 'http://jenkins/job/MyBuild/1'
+
+// Promotion run build
+
+j = ontrack.build(name, 'test', '1').promotionRuns[0].config.jenkinsBuild
+assert j.configuration.name == 'Jenkins'
+assert j.job == 'MyPromotion'
+assert j.build == 1
+assert j.url == 'http://jenkins/job/MyPromotion/1'
+
+// Validation run build
+
+j = ontrack.build(name, 'test', '1').validationRuns[0].config.jenkinsBuild
+assert j.configuration.name == 'Jenkins'
+assert j.job == 'MyValidation'
+assert j.build == 1
+assert j.url == 'http://jenkins/job/MyValidation/1'
+----
+
+Note that https://wiki.jenkins-ci.org/display/JENKINS/CloudBees+Folders+Plugin[Jenkins folders] are supported by
+giving the full job name. For example, the job name to give to the job in _A > B > C_ would be `A/job/B/job/C` or
+even `A/B/C`.
+
+See also the <<dsl-projectEntityProperties-jenkinsJob,Jenkins job property>>.

@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.docs;
 
 import lombok.Data;
-import lombok.experimental.Wither;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +39,8 @@ public class DSLDocClass {
 
     /**
      * Technical ID for the class
+     *
+     * @return ID used to uniquely identify the class
      */
     public String getId() {
         return name.toLowerCase();

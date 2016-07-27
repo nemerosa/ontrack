@@ -1,0 +1,31 @@
+A <<usage-svn,SVN-enabled branch>> can be associated with a validator
+in order to validate if there are some anomalies for the issues in the change logs.
+
+`def svnValidatorClosedIssues(Collection<String> closedStatuses)`
+
+Sets the list of issues statuses which can raise warnings if one of the issues is present _after_ the change log.
+
+`def getSvnValidatorClosedIssues()`
+
+Gets the list of statuses to look for.
+
+Example:
+
+[source,groovy]
+----
+ontrack.configure {
+   svn 'myconfig', url: 'svn://localhost'
+}
+ontrack.project('project') {
+   config {
+       svn 'myconfig', '/project/trunk'
+   }
+   branch('test') {
+       config {
+           svn '/project/branches/mybranch', '/project/tags/{build:mybranch-*}'
+           svnValidatorClosedIssues(['Closed'])
+       }
+   }
+}
+assert ontrack.branch('project', 'test').config.svnValidatorClosedIssues.closedStatuses == ['Closed']
+----

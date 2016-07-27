@@ -2,12 +2,17 @@ package net.nemerosa.ontrack.dsl.properties
 
 import net.nemerosa.ontrack.dsl.Branch
 import net.nemerosa.ontrack.dsl.Ontrack
+import net.nemerosa.ontrack.dsl.doc.DSL
+import net.nemerosa.ontrack.dsl.doc.DSLMethod
+import net.nemerosa.ontrack.dsl.doc.DSLProperties
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
+@DSL
+@DSLProperties
 class BranchProperties extends ProjectEntityProperties {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BranchProperties)
@@ -19,6 +24,7 @@ class BranchProperties extends ProjectEntityProperties {
     /**
      * Git branch property
      */
+    @DSLMethod(count = 2)
     def gitBranch(String branch, Map<String, ?> params = [:]) {
         property(
                 'net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType',
@@ -26,6 +32,7 @@ class BranchProperties extends ProjectEntityProperties {
         )
     }
 
+    @DSLMethod(see = "gitBranch")
     def getGitBranch() {
         property('net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType')
     }
@@ -34,52 +41,7 @@ class BranchProperties extends ProjectEntityProperties {
      * SVN branch property
      */
 
-    /**
-     * Compatibility with version 2.15 and older
-     */
-    @Deprecated
-    def svn(String branchPath, String buildPath) {
-        // Build path expression
-        String buildPlaceholderPattern = "\\{(.+)\\}"
-        // Link data
-        String linkId
-        Map linkData = [:]
-        // Detecting the link type
-        // Revision
-        if (buildPath.endsWith('@{build}')) {
-            linkId = 'revision'
-        }
-        // Tag or pattern
-        else {
-            Pattern pattern = Pattern.compile(buildPlaceholderPattern)
-            Matcher matcher = pattern.matcher(buildPath)
-            if (matcher.find()) {
-                String expression = matcher.group(1);
-                if ("build".equals(expression)) {
-                    linkId = 'tag'
-                } else if (expression.startsWith("build:")) {
-                    String buildExpression = expression - "build:";
-                    linkId = 'tagPattern'
-                    linkData = [
-                            pattern: buildExpression,
-                    ]
-                } else {
-                    throw new IllegalStateException("buildPath = ${buildPath} is not supported.")
-                }
-            } else {
-                throw new IllegalStateException("buildPath = ${buildPath} is not supported.")
-            }
-        }
-        // Logging
-        LOGGER.warn("[svn] The svn(branchPath=${branchPath}, buildPath=${buildPath}) call is deprecated and will be deleted in future versions")
-        // New call
-        svn([
-                branchPath: branchPath,
-                link      : linkId,
-                data      : linkData,
-        ])
-    }
-
+    @DSLMethod(count = 1)
     def svn(Map<String, ?> params = [:]) {
         // Gets the branch path
         String branchPath = params['branchPath'] as String
@@ -101,6 +63,7 @@ class BranchProperties extends ProjectEntityProperties {
         ])
     }
 
+    @DSLMethod(see = "svn")
     def getSvn() {
         property('net.nemerosa.ontrack.extension.svn.property.SVNBranchConfigurationPropertyType')
     }
@@ -108,12 +71,15 @@ class BranchProperties extends ProjectEntityProperties {
     /**
      * SVN revision change log issue validator
      */
+
+    @DSLMethod
     def svnValidatorClosedIssues(Collection<String> closedStatuses) {
         property('net.nemerosa.ontrack.extension.svn.property.SVNRevisionChangeLogIssueValidator', [
                 closedStatuses: closedStatuses
         ])
     }
 
+    @DSLMethod(see = "svnValidatorClosedIssues")
     def getSvnValidatorClosedIssues() {
         property('net.nemerosa.ontrack.extension.svn.property.SVNRevisionChangeLogIssueValidator')
     }
@@ -122,6 +88,7 @@ class BranchProperties extends ProjectEntityProperties {
      * SVN synchronisation
      */
 
+    @DSLMethod(count = 2)
     def svnSync(int interval = 0, boolean override = false) {
         property('net.nemerosa.ontrack.extension.svn.property.SVNSyncPropertyType', [
                 override: override,
@@ -129,6 +96,7 @@ class BranchProperties extends ProjectEntityProperties {
         ])
     }
 
+    @DSLMethod(see = "svnSync")
     def getSvnSync() {
         property('net.nemerosa.ontrack.extension.svn.property.SVNSyncPropertyType')
     }
@@ -137,6 +105,7 @@ class BranchProperties extends ProjectEntityProperties {
      * Artifactory synchronisation
      */
 
+    @DSLMethod(count = 4)
     def artifactorySync(String configuration, String buildName, String buildNameFilter = '*', int interval = 0) {
         property('net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncPropertyType', [
                 configuration  : configuration,
@@ -146,6 +115,7 @@ class BranchProperties extends ProjectEntityProperties {
         ])
     }
 
+    @DSLMethod(see = "artifactorySync")
     def getArtifactorySync() {
         property('net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncPropertyType')
     }

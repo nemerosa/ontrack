@@ -49,6 +49,7 @@ class Branch extends AbstractProjectResource {
         filter('net.nemerosa.ontrack.service.PromotionLevelBuildFilterProvider', [:])
     }
 
+    @DSLMethod("Configure the branch as a template definition - see <<dsl-templates>>.")
     def template(Closure closure) {
         def definition = new BranchTemplateDefinition()
         // Configuration
@@ -58,6 +59,7 @@ class Branch extends AbstractProjectResource {
         ontrack.put(link('templateDefinition'), definition.data)
     }
 
+    @DSLMethod("Synchronizes the branch template with its associated instances. Will fail if this branch is not a template.")
     def sync() {
         ontrack.post(link('templateSync'), [:])
     }
@@ -65,6 +67,7 @@ class Branch extends AbstractProjectResource {
     /**
      * Gets the template instance parameters
      */
+    @DSLMethod
     TemplateInstance getInstance() {
         def instanceLink = optionalLink('templateInstance')
         if (instanceLink) {
@@ -80,10 +83,12 @@ class Branch extends AbstractProjectResource {
     /**
      * Sync this branch template instance with its template.
      */
+    @DSLMethod("Synchronises the branch instance with its associated template. Will fail if this branch is not a template instance.")
     def syncInstance() {
         ontrack.post(link('templateInstanceSync'), [:])
     }
 
+    @DSLMethod("Creates or updates a new branch from this branch template. See <<dsl-templates>>.")
     Branch instance(String sourceName, Map<String, String> params) {
         new Branch(
                 ontrack,
@@ -95,10 +100,12 @@ class Branch extends AbstractProjectResource {
         )
     }
 
+    @DSLMethod
     def unlink() {
         ontrack.delete(link('templateInstanceDisconnect'))
     }
 
+    @DSLMethod(count = 3)
     def link(String templateName, boolean manual = true, Map<String, String> parameters) {
         // Gets the template id
         def templateId = ontrack.branch(project, templateName).id
@@ -113,12 +120,14 @@ class Branch extends AbstractProjectResource {
     /**
      * Gets the list of promotion levels for this branch
      */
+    @DSLMethod("Gets the list of promotion levels for this branch.")
     List<PromotionLevel> getPromotionLevels() {
         return ontrack.get(link('promotionLevels')).resources.collect { node ->
             new PromotionLevel(ontrack, node)
         }
     }
 
+    @DSLMethod(value = "Creates a promotion level for this branch.", count = 3)
     PromotionLevel promotionLevel(String name, String description = '', boolean getIfExists = false) {
         def node = ontrack.get(link('promotionLevels')).resources.find { it.name == name }
         if (node) {
@@ -141,6 +150,7 @@ class Branch extends AbstractProjectResource {
         }
     }
 
+    @DSLMethod(value = "Creates a promotion level for this branch and configures it using a closure.", count = 4, id = "promotionLevel-closure")
     PromotionLevel promotionLevel(String name, String description = '', boolean getIfExists = false, Closure closure) {
         def pl = promotionLevel(name, description, getIfExists)
         pl(closure)
@@ -150,12 +160,14 @@ class Branch extends AbstractProjectResource {
     /**
      * Gets the list of validation stamps for this branch
      */
+    @DSLMethod("Gets the list of validation stamps for this branch.")
     List<ValidationStamp> getValidationStamps() {
         ontrack.get(link('validationStamps')).resources.collect { node ->
             new ValidationStamp(ontrack, node)
         }
     }
 
+    @DSLMethod(value = "Creates a validation stamp for this branch.", count = 3)
     ValidationStamp validationStamp(String name, String description = '', boolean getIfExists = false) {
         def node = ontrack.get(link('validationStamps')).resources.find { it.name == name }
         if (node) {
@@ -178,12 +190,14 @@ class Branch extends AbstractProjectResource {
         }
     }
 
+    @DSLMethod(value = "Creates a validation stamp for this branch and configures it using a closure.", count = 4, id = "validationStamp-closure")
     ValidationStamp validationStamp(String name, String description = '', boolean getIfExists = false, Closure closure) {
         def vs = validationStamp(name, description, getIfExists)
         vs(closure)
         vs
     }
 
+    @DSLMethod(value = "Creates a build for the branch", count = 3)
     Build build(String name, String description = '', boolean getIfExists = false) {
         def builds = ontrack.project(this.project).search(branchName: this.name, buildName: name)
         if (builds.empty) {
@@ -204,6 +218,7 @@ class Branch extends AbstractProjectResource {
         }
     }
 
+    @DSLMethod(value = "Creates a build for the branch and configures it using a closure. See <<dsl-branch-build>>.", count = 4, id = "build-closure")
     Build build(String name, String description = '', boolean getIfExists = false, Closure closure) {
         def b = build(name, description, getIfExists)
         b(closure)
@@ -213,14 +228,17 @@ class Branch extends AbstractProjectResource {
     /**
      * Download file from the branch SCM
      */
+    @DSLMethod
     String download(String path) {
         ontrack.text(query(link('download'), [path: path]))
     }
 
+    @DSLMethod("Access to the branch properties")
     BranchProperties getConfig() {
         new BranchProperties(ontrack, this)
     }
 
+    @DSLMethod
     String getType() {
         node.type
     }

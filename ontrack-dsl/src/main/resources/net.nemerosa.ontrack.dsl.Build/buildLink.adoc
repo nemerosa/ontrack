@@ -1,0 +1,29 @@
+A <<model,build>> can be linked to other builds.
+
+To create links:
+
+[source,groovy]
+----
+def build = ...
+build.buildLink 'project1', '11.0'
+build.buildLink 'project2', '2.3.1'
+----
+
+TIP: Several links can be attached to a build, by calling the `buildLink` method several times.
+
+IMPORTANT: The target project and build _must_ exist.
+
+To get the list of linked builds:
+
+[source,groovy]
+----
+def links = build.buildLinks
+assert links.size == 2
+def link = links[0]
+assert link.project = 'project1'
+assert link.branch = '...'
+assert link.name = '11.0'
+assert link.page = '...' // URL to the build page
+----
+
+The `page` property of the link is a URL to the page of the link.

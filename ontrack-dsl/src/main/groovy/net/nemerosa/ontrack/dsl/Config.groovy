@@ -35,10 +35,12 @@ class Config {
      * Creates or update a GitHub configuration.
      */
 
+    @DSLMethod(id = "github")
     def gitHub(String name) {
         gitHub([:], name)
     }
 
+    @DSLMethod(see = "github", id = "github-name")
     def gitHub(Map<String, ?> parameters, String name) {
         def params = parameters + [name: name]
         ontrack.post(
@@ -50,6 +52,7 @@ class Config {
     /**
      * Gets the list of all GitHub configuration names
      */
+    @DSLMethod(see = "github")
     List<String> getGitHub() {
         ontrack.get('extension/github/configurations/descriptors').resources.collect { it.id }
     }
@@ -67,6 +70,7 @@ class Config {
         )
     }
 
+    @DSLMethod(see = "stash")
     List<String> getStash() {
         ontrack.get('extension/stash/configurations/descriptors').resources.collect { it.id }
     }
@@ -74,6 +78,7 @@ class Config {
     /**
      * Creates or update a Git configuration
      */
+    @DSLMethod("Creates or update a Git configuration")
     def git(Map<String, ?> parameters, String name) {
         def params = parameters + [name: name]
         ontrack.post(
@@ -85,6 +90,7 @@ class Config {
     /**
      * Gets the list of all Git configuration names
      */
+    @DSLMethod(see = "git")
     List<String> getGit() {
         ontrack.get('extension/git/configurations/descriptors').resources.collect { it.id }
     }
@@ -98,6 +104,7 @@ class Config {
         )
     }
 
+    @DSLMethod(see = "svn")
     def getSvn() {
         ontrack.get('extension/svn/configurations').resources
     }
@@ -117,6 +124,7 @@ class Config {
         ])
     }
 
+    @DSLMethod(see = "jenkins")
     List<String> getJenkins() {
         ontrack.get('extension/jenkins/configurations/descriptors').resources.collect { it.id }
     }
@@ -136,6 +144,7 @@ class Config {
         ])
     }
 
+    @DSLMethod(see = "jira")
     List<String> getJira() {
         ontrack.get('extension/jira/configurations/descriptors').resources.collect { it.id }
     }
@@ -155,6 +164,7 @@ class Config {
         ])
     }
 
+    @DSLMethod(see = "artifactory")
     List<String> getArtifactory() {
         ontrack.get('extension/artifactory/configurations/descriptors').resources.collect { it.id }
     }

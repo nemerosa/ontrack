@@ -92,16 +92,13 @@ GroovyShell shell = new GroovyShell(binding);
 Object shellResult = shell.evaluate(script);
 ----
 
-[[dsl-usecases]]
-=== Use cases
-
 [[dsl-usecases-security]]
-==== Security
+=== DSL Security
 
 The DSL allows to manage the <<security,accounts>> and the <<security,account groups>>.
 
 [[dsl-usecases-security-accounts]]
-===== Management of accounts
+==== Management of accounts
 
 To add or update a _built-in_ account:
 
@@ -138,7 +135,7 @@ assert account.accountGroups.length == 2
 IMPORTANT: LDAP accounts cannot be created directly. See the <<security,documentation>> for more details.
 
 [[dsl-usecases-security-account-permissions]]
-===== Account permissions
+==== Account permissions
 
 To give a role to an account:
 
@@ -165,7 +162,7 @@ assert permissions[0].name == 'Project owner'
 ----
 
 [[dsl-usecases-security-account-groups]]
-===== Management of account groups
+==== Management of account groups
 
 To add or update an account group:
 
@@ -185,7 +182,7 @@ assert group.description == "Group of administrators"
 ----
 
 [[dsl-usecases-security-account-group-permissions]]
-===== Account group permissions
+==== Account group permissions
 
 To give a role to an account group:
 
@@ -212,7 +209,7 @@ assert permissions[0].name == 'Project owner'
 ----
 
 [[dsl-usecases-ldap-mapping]]
-==== LDAP mapping
+=== DSL LDAP mapping
 
 The <<ldap,LDAP mappings>> can be generated using the DSL.
 
@@ -233,7 +230,7 @@ assert mapping.groupName == 'groupName'
 ----
 
 [[dsl-usecases-images]]
-==== Images and documents
+=== DSL Images and documents
 
 Some resources can be associated with images (like promotion levels and validation stamps) and some documents can be
 downloaded.
@@ -274,4 +271,277 @@ For example, to store a promotion level's image into a file:
 File file = ...
 def promotionLevel = ontrack.promotionLevel('project', 'branch', 'COPPER')
 file.bytes = promotionLevel.image.content
+----
+
+[[dsl-usecases-changelogs]]
+=== DSL Change logs
+
+When a branch is configured for a SCM (Git, Subversion), a
+<<changelogs,change log>> can be computed between two builds and following
+collections can be displayed:
+
+* revisions or commits
+* issues
+* file changes
+
+TIP: Change logs can also be computed between builds which belong to different
+     branches, as long as they are in the same project. _This is only
+     supported for Git, not for Subversion._
+
+[[dsl-usecases-changelogs-get]]
+==== Getting the change log
+
+Given two builds, one gets access to the change log using:
+
+[source,groovy]
+----
+def build1 = ontrack.build('proj', 'master', '1')
+def build2 = ontrack.build('proj', 'master', '2')
+
+def changelog = build1.getChangeLog(build2)
+----
+
+NOTE: The returned change log might be `null` if the project and branches are
+      not correctly configured.
+
+On the returned `ChangeLog` object, one can access commits, issues and file
+changes.
+
+[[dsl-usecases-changelogs-commits]]
+==== Commits
+
+The list of commits can be accessed using the `commits` property:
+
+[source,groovy]
+----
+changeLog.commits.each {
+    println "* ${it.shortId} ${it.message} (${it.author} at ${it.timestamp})"
+}
+----
+
+Each item in the `commits` collection has the following properties:
+
+* `id` - identifier, revision or commit hash
+* `shortId` - short identifier, revision or abbreviated commit hash
+* `author` - name of the committer
+* `timestamp` - ISO date for the commit time
+* `message` - raw message for the commit
+* `formattedMessage` - HTML message with links to the issues
+* `link` - link to the commit
+
+NOTE: This covers only the common attributes provided by Ontrack - additional
+      properties are also available for a specific SCM.
+
+[[dsl-usecases-changelogs-issues]]
+==== Issues
+
+The list of issues can be accessed using the `issues` property:
+
+[source,groovy]
+----
+changeLog.issues.each {
+    println "* ${it.displayKey} ${it.status} ${it.summary}"
+}
+----
+
+Each item in the `issues` collection has the following properties:
+
+* `key` - identifier, like `1`
+* `displayKey` - display key (like `#1`)
+* `summary` - short title for the issue
+* `status` - status of the issue
+* `url` - link to the issue
+
+NOTE: This covers only the common attributes provided by Ontrack - additional
+      properties are also available for a specific issue service.
+
+[[dsl-usecases-changelogs-export]]
+==== Exporting the change log
+
+The change log can also be exported as text (HTML and Markdown are also
+available):
+
+[source,groovy]
+----
+String text = changeLog.exportIssues(
+        format: 'text',
+        groups: [
+                'Bugs'        : ['defect'],
+                'Features'    : ['feature'],
+                'Enhancements': ['enhancement'],
+        ],
+        exclude: ['design', 'delivery']
+)
+----
+
+* `format` can be one of `text` (default), `html` or `markdown`
+* `groups` allows to group issues per type. If not defined, no grouping is done
+* `exclude` defines the types of issues to not include in the change log
+* `altGroup` defaults to _Other_ and is the name of the group where remaining
+   issues do not fit.
+
+[[dsl-usecases-changelogs-files]]
+==== File changes
+
+The list of file changes can be accessed using the `files` property:
+
+[source,groovy]
+----
+changeLog.files.each {
+    println "* ${it.path} (${it.changeType})"
+}
+----
+
+Each item in the `files` collection has the following properties:
+
+* `path` - path changed
+* `changeType` - nature of the change
+* `changeTypes` - list of changes on this path
+
+NOTE: This covers only the common attributes provided by Ontrack - additional
+      properties are also available for a specific SCM.
+
+[[dsl-templates]]
+=== DSL Branch template definitions
+
+Using the `template(Closure)` method on a branch, one can define the template
+definition for a branch.
+
+For example:
+
+[source,groovy]
+----
+template {
+   parameter 'gitBranch', 'Name of the Git branch', 'release/${sourceName}'
+   fixedSource '1.0', '1.1'
+}
+----
+
+* `def parameter(String name, String description = '', String expression = '')`
+  — defines a parameter for the template, with an optional expression based on
+  a source name
+
+* `def fixedSource(String... names)` — sets a synchronization source on the
+  template, based on a fixed list of names
+
+You can then use this branch definition in order to generate or update branches
+from it:
+
+[source,groovy]
+----
+// Create a template
+ontrack.branch('project', 'template') {
+   template {
+      parameter 'gitBranch', 'Name of the Git branch', 'release/${sourceName}'
+   }
+}
+// Creates or updates the TEST instance
+ontrack.branch('project', 'template').instance 'TEST', [
+   gitBranch: 'my-branch'
+]
+----
+
+[[dsl-scm]]
+=== DSL SCM extensions
+
+If a SCM (<<usage-subversion,Subversion>> or <<usage-git,Git>>) is correctly configured on a branch, it is possible
+to download some files.
+
+IMPORTANT: This is allowed only for the project owner.
+
+For example, the following <<dsl-branch-download,call>>:
+
+[source,groovy]
+----
+def text = ontrack.branch('project', 'branch').download('folder/subfolder/path.txt')
+----
+
+will download the `folder/subfolder/path.txt` file from the corresponding SCM branch. A `OTNotFoundException`
+exception is thrown if the file cannot be found.
+
+[[dsl-reference]]
+=== DSL Reference
+
+See the <<dsl-doc,appendixes>>.
+
+[[dsl-samples]]
+=== DSL Samples
+
+Creating a build:
+
+[source,groovy]
+----
+ontrack.branch('project', 'branch').build('1', 'Build 1')
+----
+
+Promoting a build:
+
+[source,groovy]
+----
+ontrack.build('project', '1', '134').promote('COPPER')
+----
+
+Validating a build:
+
+[source,groovy]
+----
+ontrack.build('project', '1', '134').validate('SMOKETEST', 'PASSED')
+----
+
+Getting the last promoted build:
+
+[source,groovy]
+----
+def buildName = ontrack.branch('project', 'branch').lastPromotedBuilds[0].name
+----
+
+Getting the last build of a given promotion:
+
+[source,groovy]
+----
+def branch = ontrack.branch('project', 'branch')
+def builds = branch.standardFilter withPromotionLevel: 'BRONZE'
+def buildName = builds[0].name
+----
+
+Configuring a whole branch:
+
+[source,groovy]
+----
+ontrack.project('project') {
+   branch('1.0') {
+      promotionLevel 'COPPER', 'Copper promotion'
+      promotionLevel 'BRONZE', 'Bronze promotion'
+      validationStamp 'SMOKE', 'Smoke tests'
+   }
+}
+----
+
+Creating a branch template and an instance out of it:
+
+[source,groovy]
+----
+// Branch template definition
+ontrack.project(project) {
+   config {
+      gitHub 'ontrack'
+   }
+   branch('template') {
+      promotionLevel 'COPPER', 'Copper promotion'
+      promotionLevel 'BRONZE', 'Bronze promotion'
+      validationStamp 'SMOKE', 'Smoke tests'
+      // Git branch
+      config {
+         gitBranch '${gitBranch}'
+      }
+      // Template definition
+      template {
+         parameter 'gitBranch', 'Name of the Git branch'
+      }
+   }
+}
+// Creates a template instance
+ontrack.branch(project, 'template').instance 'TEST', [
+   gitBranch: 'feature/test'
+]
 ----

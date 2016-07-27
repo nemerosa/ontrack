@@ -1,0 +1,24 @@
+When <<usage-git,working with Git>>, it is needed to associate a build with a commit. It can be done by using the
+build name itself as a commit indicator (full, short, or tag) or by putting the commit as a build property:
+
+`def gitCommit(String commit)`
+
+To get the commit back:
+
+`def getGitCommit()`
+
+Example:
+
+[source,groovy]
+----
+ontrack.project('project') {
+   branch('test') {
+       build('1') {
+           config {
+               gitCommit 'adef13'
+           }
+       }
+   }
+}
+assert ontrack.build('project', 'test', '1').config.gitCommit == 'adef13'
+----

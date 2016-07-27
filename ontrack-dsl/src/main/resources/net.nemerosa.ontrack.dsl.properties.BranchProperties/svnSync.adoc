@@ -1,0 +1,31 @@
+For a <<usage-subversion,Subversion-enabled branch>>, an automated
+synchronisation can be set in order to regularly create builds from the list
+of tags in Subversion.
+
+`def svnSync(int interval = 0, boolean override = false)`
+
+Sets a synchronisation every `interval` minutes (`0` meaning no sync at all).
+The `override` flag is used to allow existing builds to be overridden.
+
+Example:
+
+[source,groovy]
+----
+ontrack.configure {
+   svn 'myconfig', url: 'svn://localhost'
+}
+ontrack.project('project') {
+   config {
+       svn 'myconfig', '/project/trunk'
+   }
+   branch('test') {
+       config {
+           svn '/project/branches/mybranch', '/project/tags/{build:mybranch-*}'
+           svnSync 30
+       }
+   }
+}
+def sync = ontrack.branch('project', 'test').config.svnSync
+assert sync.override == false
+assert sync.interval == 30
+----

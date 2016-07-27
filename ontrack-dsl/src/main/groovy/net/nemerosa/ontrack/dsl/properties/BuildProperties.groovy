@@ -31,7 +31,7 @@ class BuildProperties extends ProjectEntityProperties {
         property('net.nemerosa.ontrack.extension.jenkins.JenkinsBuildPropertyType')
     }
 
-    @DSLMethod("Sets the Release property.")
+    @DSLMethod
     def label(String name) {
         property(
                 'net.nemerosa.ontrack.extension.general.ReleasePropertyType',
@@ -41,7 +41,7 @@ class BuildProperties extends ProjectEntityProperties {
         )
     }
 
-    @DSLMethod("Gets the release name associated with this build.")
+    @DSLMethod(see = "label")
     def getLabel() {
         property('net.nemerosa.ontrack.extension.general.ReleasePropertyType').name
     }
