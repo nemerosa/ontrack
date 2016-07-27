@@ -228,6 +228,7 @@ class Branch extends AbstractProjectResource {
     /**
      * Download file from the branch SCM
      */
+    @DSLMethod
     String download(String path) {
         ontrack.text(query(link('download'), [path: path]))
     }
@@ -237,6 +238,7 @@ class Branch extends AbstractProjectResource {
         new BranchProperties(ontrack, this)
     }
 
+    @DSLMethod
     String getType() {
         node.type
     }
