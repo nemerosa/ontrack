@@ -1,0 +1,8 @@
+Disconnects the branch template instance from its template:
+
+[source,groovy]
+----
+assert ontrack.branch('project', 'test').type == 'TEMPLATE_INSTANCE'
+ontrack.branch('project', 'test').unlink()
+assert ontrack.branch('project', 'test').type == 'CLASSIC'
+----

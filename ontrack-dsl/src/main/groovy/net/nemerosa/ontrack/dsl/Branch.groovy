@@ -49,6 +49,7 @@ class Branch extends AbstractProjectResource {
         filter('net.nemerosa.ontrack.service.PromotionLevelBuildFilterProvider', [:])
     }
 
+    @DSLMethod("Configure the branch as a template definition - see <<dsl-templates>>.")
     def template(Closure closure) {
         def definition = new BranchTemplateDefinition()
         // Configuration
@@ -58,6 +59,7 @@ class Branch extends AbstractProjectResource {
         ontrack.put(link('templateDefinition'), definition.data)
     }
 
+    @DSLMethod("Synchronizes the branch template with its associated instances. Will fail if this branch is not a template.")
     def sync() {
         ontrack.post(link('templateSync'), [:])
     }
@@ -65,6 +67,7 @@ class Branch extends AbstractProjectResource {
     /**
      * Gets the template instance parameters
      */
+    @DSLMethod
     TemplateInstance getInstance() {
         def instanceLink = optionalLink('templateInstance')
         if (instanceLink) {
@@ -80,10 +83,12 @@ class Branch extends AbstractProjectResource {
     /**
      * Sync this branch template instance with its template.
      */
+    @DSLMethod("Synchronises the branch instance with its associated template. Will fail if this branch is not a template instance.")
     def syncInstance() {
         ontrack.post(link('templateInstanceSync'), [:])
     }
 
+    @DSLMethod("Creates or updates a new branch from this branch template. See <<dsl-templates>>.")
     Branch instance(String sourceName, Map<String, String> params) {
         new Branch(
                 ontrack,
@@ -95,10 +100,12 @@ class Branch extends AbstractProjectResource {
         )
     }
 
+    @DSLMethod
     def unlink() {
         ontrack.delete(link('templateInstanceDisconnect'))
     }
 
+    @DSLMethod(count = 3)
     def link(String templateName, boolean manual = true, Map<String, String> parameters) {
         // Gets the template id
         def templateId = ontrack.branch(project, templateName).id

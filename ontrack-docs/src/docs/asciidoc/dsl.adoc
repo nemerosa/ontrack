@@ -401,6 +401,46 @@ Each item in the `files` collection has the following properties:
 NOTE: This covers only the common attributes provided by Ontrack - additional
       properties are also available for a specific SCM.
 
+[[dsl-templates]]
+=== DSL Branch template definitions
+
+Using the `template(Closure)` method on a branch, one can define the template
+definition for a branch.
+
+For example:
+
+[source,groovy]
+----
+template {
+   parameter 'gitBranch', 'Name of the Git branch', 'release/${sourceName}'
+   fixedSource '1.0', '1.1'
+}
+----
+
+* `def parameter(String name, String description = '', String expression = '')`
+  — defines a parameter for the template, with an optional expression based on
+  a source name
+
+* `def fixedSource(String... names)` — sets a synchronization source on the
+  template, based on a fixed list of names
+
+You can then use this branch definition in order to generate or update branches
+from it:
+
+[source,groovy]
+----
+// Create a template
+ontrack.branch('project', 'template') {
+   template {
+      parameter 'gitBranch', 'Name of the Git branch', 'release/${sourceName}'
+   }
+}
+// Creates or updates the TEST instance
+ontrack.branch('project', 'template').instance 'TEST', [
+   gitBranch: 'my-branch'
+]
+----
+
 [[dsl-reference]]
 === DSL Reference
 
