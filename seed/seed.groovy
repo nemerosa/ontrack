@@ -519,7 +519,7 @@ site
     }
     publishers {
         // Use display version
-        ontrackValidate SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'SITE'
+        ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'SITE'
     }
 }
 
