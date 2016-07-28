@@ -256,27 +256,12 @@ task publicationOntrackLastReleases(type: OntrackLastReleases) {
     // TODO mustRunAfter publicationGitHubReleaseUpload
 }
 
-String generateDocLine(String release) {
-    """\
-<tr>
-  <td><a href="https://github.com/nemerosa/ontrack/releases/tag/${release}">${release}</a></td>
-  <td>
-    <a href="release/${release}/doc/index.html">HTML</a>
-    |
-    <a href="release/${release}/index.pdf">PDF</a>
-    |
-    <a href="release/${release}/javadoc/index.html">Javadoc</a>
-  </td>
-</tr>
-"""
-}
-
-task publicationPagesDocFragment {
+task publicationPagesDocJs {
     dependsOn publicationOntrackLastReleases
     doLast {
-        ext.fragment = publicationOntrackLastReleases.releases*.name
-                .collect { generateDocLine(it as String) }
-                .join('\n')
+        project.file('build/pages/javascript').mkdirs()
+        project.file('build/pages/javascript/doc.js').text =
+                "var releases = [${ publicationOntrackLastReleases.releases.collect { "'${it.name}'" }.join(',') }];"
     }
 }
 
