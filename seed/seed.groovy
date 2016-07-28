@@ -463,6 +463,16 @@ docker logout
         }
     }
     publishers {
+        downstreamParameterized {
+            trigger("${SEED_PROJECT}-${SEED_BRANCH}-site") {
+                condition('SUCCESS')
+                parameters {
+                    currentBuild() // VERSION
+                }
+            }
+        }
+    }
+    publishers {
         // Use display version
         ontrackPromotion SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'RELEASE'
         // Use display version
@@ -476,6 +486,40 @@ ontrack.build('${SEED_PROJECT}', '${SEED_BRANCH}', VERSION_DISPLAY).config {
 }
 """
         }
+    }
+}
+
+// Site job
+
+job("${SEED_PROJECT}-${SEED_BRANCH}-site") {
+    logRotator {
+        numToKeep(40)
+        artifactNumToKeep(5)
+    }
+    deliveryPipelineConfiguration('Release', 'Site')
+    jdk 'JDK8u25'
+    label 'master'
+    parameters {
+        // Link based on full version
+        stringParam('VERSION', '', '')
+    }
+    wrappers {
+        injectPasswords()
+    }
+    extractDeliveryArtifacts delegate
+    steps {
+            gradle """\
+--build-file site.gradle
+--info
+--profile
+--stacktrace
+-PontrackVersion=\${VERSION_DISPLAY}
+site
+"""
+    }
+    publishers {
+        // Use display version
+        ontrackValidate SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'SITE'
     }
 }
 
