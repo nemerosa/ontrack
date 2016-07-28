@@ -11,6 +11,8 @@ class OntrackLastReleases extends AbstractOntrackTask {
     int releaseCount = 5
     String releasePattern = '.*'
 
+    private List<Build> releases = []
+
     @TaskAction
     void run() {
         println "[${name}] Getting the last releases"
@@ -19,7 +21,7 @@ class OntrackLastReleases extends AbstractOntrackTask {
         // Gets the Ontrack project
         def project = ontrack.project(ontrackProject)
         // List of releases
-        List<Build> releases = []
+        List<Build> result = []
         // Gets all branches
         int count = 0
         project.branches.reverse().each { branch ->
@@ -30,13 +32,16 @@ class OntrackLastReleases extends AbstractOntrackTask {
                 if (!builds.empty) {
                     def build = builds[0]
                     if (build.name ==~ releasePattern) {
-                        releases.add build
+                        result.add build
                         count++
                     }
                 }
             }
         }
-        releases.each { println  it.name }
+        this.releases = result
     }
 
+    List<Build> getReleases() {
+        return releases
+    }
 }
