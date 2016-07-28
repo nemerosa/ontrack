@@ -19,7 +19,7 @@ For example:
 [source,java]
 ----
 @Component
-public class JobMetrics implements OntrackMetrics {
+public class SampleMetrics implements OntrackMetrics {
     @Override
     public Collection<Metric<?>> metrics() {
       List<Metric<?>> metrics = new ArrayList<>();
@@ -34,3 +34,34 @@ public class JobMetrics implements OntrackMetrics {
 
 This code would export a `gauge.mycount` metric. Any number of metrics can
 be thus exposed.
+
+[IMPORTANT]
+====
+By default, the metrics are collected without any authentication being enabled.
+If the collection needs to be authenticated, inject the
+<<reference-services,`SecurityService`>>
+service in your class and use the `asAdmin` method:
+
+[source,groovy]
+----
+@Component
+public class SampleMetrics implements OntrackMetrics {
+    private final SecurityService securityService;
+    @Autowired
+    public SampleMetrics(SecurityService securityService) {
+      this.securityService = securityService;
+    }
+    @Override
+    public Collection<Metric<?>> metrics() {
+      List<Metric<?>> metrics = new ArrayList<>();
+      securityService.asAdmin(() -> {
+         metrics.add(new Metric<>("gauge.mycount", myCount()));
+      });
+      return metrics;
+    }
+    protected int myCount() {
+      ...
+    }
+}
+----
+====
