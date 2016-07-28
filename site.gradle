@@ -27,6 +27,16 @@ task sitePagesDocJs {
     }
 }
 
+task sitePagesCopy(type: Copy) {
+    /**
+     * This task depends on the publication package being extracted locally (done by the pipeline)
+     */
+    // HTML documentation
+    from 'publication/html5'
+    into "build/site/pages/release/${ontrackVersion}/doc"
+}
+
 task site {
     dependsOn sitePagesDocJs
+    dependsOn sitePagesCopy
 }
