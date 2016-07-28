@@ -1,0 +1,36 @@
+[[extending-metrics]]
+==== Extending metrics
+
+Ontrack exports <<monitoring,metrics>> in order to allow third party
+applications to monitor its state: <<monitoring-metrics-influxdb,InfluxDB>>,
+<<monitoring-metrics-graphite,Graphite>>,
+<<monitoring-metrics-grafana,Grafana>>, etc.
+
+You can contribute to the core metrics in your own <<extending,extensions>>.
+
+Just create a class which implements the `OntrackMetrics` interface and export
+it as a `@Component`.
+
+Implement the `Collection<Metric<?>> metrics()` method. This method will be
+regularly called by Ontrack in order to collect the metrics.
+
+For example:
+
+[source,java]
+----
+@Component
+public class JobMetrics implements OntrackMetrics {
+    @Override
+    public Collection<Metric<?>> metrics() {
+      List<Metric<?>> metrics = new ArrayList<>();
+      metrics.add(new Metric<>("gauge.mycount", myCount()));
+      return metrics;
+    }
+    protected int myCount() {
+      ...
+    }
+}
+----
+
+This code would export a `gauge.mycount` metric. Any number of metrics can
+be thus exposed.
