@@ -1,7 +1,6 @@
 import net.nemerosa.httpclient.*
 import net.nemerosa.httpclient.json.*
 import net.nemerosa.ontrack.gradle.OntrackChangeLog
-import net.nemerosa.ontrack.gradle.OntrackLastReleases
 
 /**
  * Release and publication tasks.
@@ -18,10 +17,6 @@ buildscript {
         classpath 'net.nemerosa.ontrack:ontrack-dsl:2.17.4'
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3"
     }
-}
-
-plugins {
-    id 'org.ajoberstar.github-pages' version '1.5.1'
 }
 
 /**
@@ -248,25 +243,6 @@ task publicationGitHubReleaseUpload {
 task publicationOntrackChangeLog(type: OntrackChangeLog) {
     ontrackReleaseBranch = project.properties.ontrackReleaseBranch
     mustRunAfter publicationGitHubReleaseUpload
-}
-
-task publicationOntrackLastReleases(type: OntrackLastReleases) {
-    releaseCount = 3
-    releasePattern = /2\..*/
-    // TODO mustRunAfter publicationGitHubReleaseUpload
-}
-
-task publicationPagesDocJs {
-    dependsOn publicationOntrackLastReleases
-    doLast {
-        project.file('build/pages/javascript').mkdirs()
-        project.file('build/pages/javascript/doc.js').text =
-                "var releases = [${ publicationOntrackLastReleases.releases.collect { "'${it.name}'" }.join(',') }];"
-    }
-}
-
-task publicationPagesDocGeneration {
-
 }
 
 task publicationGitHubReleaseDescription(type: GitHubReleaseDescription) {

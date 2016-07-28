@@ -1,0 +1,32 @@
+/**
+ * Site generation
+ *
+ * Must be called AFTER the current version has been promoted in Ontrack to the RELEASE promotion level.
+ *
+ * This means having a Site job in the pipeline, after the Publish one, calling the `site` task.
+ */
+
+import net.nemerosa.ontrack.gradle.OntrackLastReleases
+
+plugins {
+    id 'org.ajoberstar.github-pages' version '1.5.1'
+}
+
+task siteOntrackLastReleases(type: OntrackLastReleases) {
+    releaseCount = 3
+    releasePattern = /2\..*/
+    // TODO mustRunAfter publicationGitHubReleaseUpload
+}
+
+task sitePagesDocJs {
+    dependsOn siteOntrackLastReleases
+    doLast {
+        project.file('build/site/pages/javascript').mkdirs()
+        project.file('build/site/pages/javascript/doc.js').text =
+                "var releases = [${siteOntrackLastReleases.releases.collect { "'${it.name}'" }.join(',')}];"
+    }
+}
+
+task site {
+    dependsOn sitePagesDocJs
+}
