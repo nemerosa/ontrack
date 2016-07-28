@@ -20,6 +20,7 @@ task siteOntrackLastReleases(type: OntrackLastReleases) {
 
 task sitePagesDocJs {
     dependsOn siteOntrackLastReleases
+    outputs.file project.file('build/site/pages/javascript/doc.js')
     doLast {
         project.file('build/site/pages/javascript').mkdirs()
         project.file('build/site/pages/javascript/doc.js').text =
@@ -37,8 +38,14 @@ task sitePagesCopyPdf(type: Copy) {
     into "build/site/pages/release/${ontrackVersion}"
 }
 
+task sitePagesCopyJavadoc(type: Copy) {
+    from zipTree('publication/ontrack-javadoc.zip')
+    into "build/site/pages/release/${ontrackVersion}/javadoc"
+}
+
 task site {
     dependsOn sitePagesDocJs
     dependsOn sitePagesCopyHtml
     dependsOn sitePagesCopyPdf
+    dependsOn sitePagesCopyJavadoc
 }
