@@ -201,6 +201,15 @@ sudo rpm --upgrade ontrack.rpm
 sudo service ontrack start
 ----
 
+The optional `/etc/default/ontrack` file can be used to define the
+`JAVA_OPTIONS`, for example:
+
+[source]
+./etc/default/ontrack
+----
+JAVA_OPTIONS=-Xmx2048m
+----
+
 [[installation-debian]]
 === Debian installation
 
@@ -234,6 +243,15 @@ service ontrack start
 service ontrack status
 # Stopping Ontrack
 service ontrack stop
+----
+
+The optional `/etc/default/ontrack` file can be used to define the
+`JAVA_OPTIONS`, for example:
+
+[source]
+./etc/default/ontrack
+----
+JAVA_OPTIONS=-Xmx2048m
 ----
 
 [[installation-digitalocean]]
