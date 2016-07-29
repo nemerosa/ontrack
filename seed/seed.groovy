@@ -505,6 +505,9 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-site") {
     }
     wrappers {
         injectPasswords()
+        credentialsBinding {
+            usernamePassword 'GITHUB_USER', 'GITHUB_PASSWORD', 'jenkins'
+        }
     }
     extractDeliveryArtifacts delegate
     steps {
@@ -515,10 +518,11 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-site") {
 --stacktrace
 -PontrackVersion=\${VERSION_DISPLAY}
 -PontrackGitHubUri=${PROJECT_SCM_URL}
--PontrackGitHubPages=gh-pages-test
+-PontrackGitHubPages=gh-pages
+-PontrackGitHubUser=\${GITHUB_USER}
+-PontrackGitHubPassword=\${GITHUB_PASSWORD}
 site
 """
-        // FIXME Replaces gh-pages-test by gh-pages
     }
     publishers {
         // Use display version
