@@ -223,26 +223,25 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
     extractDeliveryArtifacts delegate, 'ontrack-acceptance'
     steps {
         // Runs Xfvb in the background - it will be killed when the Docker slave is removed
+        // Runs the CI acceptance tests
         shell '''\
 #!/bin/bash
+
 mkdir -p xvfb-${EXECUTOR_NUMBER}-${BUILD_NUMBER}
 let 'NUM = EXECUTOR_NUMBER + 1'
+echo "Display number: ${NUM}"
 /usr/bin/Xvfb :${NUM} -screen 0 1024x768x24 -fbdir xvfb-${EXECUTOR_NUMBER}-${BUILD_NUMBER} &
-echo DISPLAY=:${NUM} > display.properties
-            '''
-        // Display export
-        environmentVariables {
-            propertiesFile 'display.properties'
-        }
-        // Runs the CI acceptance tests
-        gradle '''\
-ciAcceptanceTest
--PacceptanceJar=ontrack-acceptance-${VERSION}.jar
--PciHost=dockerhost
---info
---profile
---console plain
---stacktrace
+
+export DISPLAY=":${NUM}"
+
+./gradlew \\
+    ciAcceptanceTest \\
+    -PacceptanceJar=ontrack-acceptance-${VERSION}.jar \\
+    -PciHost=dockerhost \\
+    --info \\
+    --profile \\
+    --console plain \\
+    --stacktrace
 '''
     }
     publishers {
