@@ -272,13 +272,17 @@ export DISPLAY=":${NUM}"
                     condition 'SUCCESS'
                     parameters {
                         currentBuild()
+                        // Uses the same node in order to have local Docker image available
+                        sameNode()
                     }
                 }
             }
         } else {
             buildPipelineTrigger("${SEED_PROJECT}/${SEED_PROJECT}-${SEED_BRANCH}/${SEED_PROJECT}-${SEED_BRANCH}-docker-push") {
                 parameters {
-                    currentBuild() // VERSION
+                    currentBuild()
+                    // Uses the same node in order to have local Docker image available
+                    sameNode()
                 }
             }
         }
@@ -377,8 +381,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-docker-push") {
         artifactNumToKeep(5)
     }
     deliveryPipelineConfiguration('Acceptance', 'Docker push')
-    jdk 'JDK8u25'
-    label 'master'
+    label 'docker'
     parameters {
         // Link based on full version
         stringParam('VERSION', '', '')
@@ -386,8 +389,6 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-docker-push") {
     wrappers {
         injectPasswords()
     }
-    // Extracts the version information
-    extractDeliveryArtifacts delegate
     steps {
         shell """\
 docker login --email="damien.coraboeuf+nemerosa@gmail.com" --username="nemerosa" --password="\${DOCKER_PASSWORD}"
@@ -405,7 +406,7 @@ docker logout
             }
         }
         // Use display version
-        ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'DOCKER'
+        ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION}', 'DOCKER'
     }
 }
 
@@ -417,28 +418,36 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
         artifactNumToKeep(5)
     }
     deliveryPipelineConfiguration('Acceptance', 'Digital Ocean')
-    jdk 'JDK8u25'
-    label 'master'
+    label 'docker'
     parameters {
         // Link based on full version
         stringParam('VERSION', '', '')
     }
     wrappers {
         injectPasswords()
-        xvfb('default')
     }
     extractDeliveryArtifacts delegate, 'ontrack-acceptance'
     steps {
+        // Runs Xfvb in the background - it will be killed when the Docker slave is removed
         // Runs the CI acceptance tests
-        gradle '''\
-doAcceptanceTest
--PacceptanceJar=ontrack-acceptance-${VERSION}.jar
--PdigitalOceanAccessToken=${DO_TOKEN}
--PontrackVersion=${VERSION}
---info
---profile
---console plain
---stacktrace
+        shell '''\
+#!/bin/bash
+
+mkdir -p xvfb-${EXECUTOR_NUMBER}-${BUILD_NUMBER}
+let 'NUM = EXECUTOR_NUMBER + 1'
+echo "Display number: ${NUM}"
+nohup /usr/bin/Xvfb :${NUM} -screen 0 1024x768x24 -fbdir xvfb-${EXECUTOR_NUMBER}-${BUILD_NUMBER} &
+
+export DISPLAY=":${NUM}"
+
+./gradlew \\
+    doAcceptanceTest \\
+    -PacceptanceJar=ontrack-acceptance-${VERSION}.jar \\
+    -PdigitalOceanAccessToken=${DO_TOKEN} \\
+    --info \\
+    --profile \\
+    --console plain \\
+    --stacktrace
 '''
     }
     publishers {
@@ -448,7 +457,7 @@ doAcceptanceTest
                 currentBuild()
             }
         }
-        ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION_DISPLAY}', 'ACCEPTANCE.DO'
+        ontrackValidation SEED_PROJECT, SEED_BRANCH, '${VERSION}', 'ACCEPTANCE.DO'
     }
 }
 
