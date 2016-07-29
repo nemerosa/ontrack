@@ -12,6 +12,8 @@ import net.nemerosa.ontrack.model.support.SettingsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 @Component
 public class LDAPSettingsManager extends AbstractSettingsManager<LDAPSettings> {
 
@@ -31,15 +33,17 @@ public class LDAPSettingsManager extends AbstractSettingsManager<LDAPSettings> {
     protected void doSaveSettings(LDAPSettings settings) {
         ldapProviderFactory.invalidate();
         settingsRepository.setBoolean(LDAPSettings.class, "enabled", settings.isEnabled());
-        settingsRepository.setString(LDAPSettings.class, "url", settings.getUrl());
-        settingsRepository.setString(LDAPSettings.class, "searchBase", settings.getSearchBase());
-        settingsRepository.setString(LDAPSettings.class, "searchFilter", settings.getSearchFilter());
-        settingsRepository.setString(LDAPSettings.class, "user", settings.getUser());
-        settingsRepository.setPassword(LDAPSettings.class, "password", settings.getPassword(), true, encryptionService::encrypt);
-        settingsRepository.setString(LDAPSettings.class, "fullNameAttribute", settings.getFullNameAttribute());
-        settingsRepository.setString(LDAPSettings.class, "emailAttribute", settings.getEmailAttribute());
-        settingsRepository.setString(LDAPSettings.class, "groupAttribute", settings.getGroupAttribute());
-        settingsRepository.setString(LDAPSettings.class, "groupFilter", settings.getGroupFilter());
+        if (settings.isEnabled()) {
+            settingsRepository.setString(LDAPSettings.class, "url", settings.getUrl());
+            settingsRepository.setString(LDAPSettings.class, "searchBase", settings.getSearchBase());
+            settingsRepository.setString(LDAPSettings.class, "searchFilter", settings.getSearchFilter());
+            settingsRepository.setString(LDAPSettings.class, "user", settings.getUser());
+            settingsRepository.setPassword(LDAPSettings.class, "password", settings.getPassword(), true, encryptionService::encrypt);
+            settingsRepository.setString(LDAPSettings.class, "fullNameAttribute", Objects.toString(settings.getFullNameAttribute(), ""));
+            settingsRepository.setString(LDAPSettings.class, "emailAttribute", Objects.toString(settings.getEmailAttribute(), ""));
+            settingsRepository.setString(LDAPSettings.class, "groupAttribute", Objects.toString(settings.getGroupAttribute(), ""));
+            settingsRepository.setString(LDAPSettings.class, "groupFilter", Objects.toString(settings.getGroupFilter(), ""));
+        }
     }
 
     @Override

@@ -8,7 +8,7 @@ work
 .DS_Store
 build
 .gradle
-*.txt
+/*.txt
 *.pid
 /*-tests.xml
 /version.properties
@@ -17,3 +17,4 @@ build
 /ontrack-dsl-*
 /extensions
 /LOG_FILE_IS_UNDEFINED*
+/publication

@@ -1,0 +1,11 @@
+The `name` parameter is the name of the group in the LDAP.
+
+The `groupName` parameter is the name of the group in Ontrack. It must exist.
+
+[source,groovy]
+----
+ontrack.admin {
+    accountGroup 'MyGroup', 'An Ontrack group'
+    ldapMapping 'GroupInLDAP', 'MyGroup'
+}
+----

@@ -1,0 +1,7 @@
+Returns the type of the branch when it comes to <<templates,templating>>.
+
+Possible values are:
+
+* CLASSIC
+* TEMPLATE_DEFINITION
+* TEMPLATE_INSTANCE

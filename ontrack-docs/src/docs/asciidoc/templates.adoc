@@ -1,0 +1,124 @@
+[[templates]]
+=== Branch templates
+
+In a context where branches are numerous, because the workflow you're working
+with implies the creation of many branches (feature branches, release branches,
+...), each of them associated with its own pipeline, creating the branches by
+hand, even by cloning or copying them would be too much an effort.
+
+Ontrack gives the possibility to create _branch templates_ and to automatically
+create branches using this template according to a list of branches. This list
+of branches can either be static or provided by the SCM.
+
+[[templates-definition]]
+==== Template Definition
+
+We distinguish between:
+
+* the *branch template definition* - which defines a template for a group of
+  branches
+* the *branch template instances* - which are branches based on a template
+  definition
+
+There can be several template definitions per project, each with its own set
+of template instances.
+
+A *template definition* is a branch:
+
+* which is disabled (not visible by default)
+* which has a special decoration for quick identification in the list of
+  branches for a project
+* which has a list of template parameters:
+  * names
+  * description
+
+whose descriptions and property values use `${name}` expressions where name is
+a template parameter.
+
+One can create a template definition from any branch following those rules:
+
+* the user must be authorized to manage branch templates for a project
+* the branch must not be already a _template instance_
+* the branch must not have any existing build
+
+[[templates-instance]]
+==== Template Instances
+
+A *template instance* is also a branch:
+
+* which is linked to a <<templates-definition,template definition>>
+* which has a set of name/values linked to the template parameters
+* which has a special decoration for quick identification in the list of
+  branches for a project
+* it is a "normal branch" as far as the rest of Ontrack is concerned, but:
+** it cannot be edited
+** no property can be edited not deleted (they are linked to the template definition)
+
+There are several ways to create template instances:
+
+* from a definition, we can create one instance by providing:
+** a name for the instance
+** values for each template parameters
+* we can define template synchronization settings linked to a template
+  definition:
+** source of instance names - this is an extension point. This can be:
+*** a list of names
+*** a list of actual branches from a SCM, optionally filtered. The SCM
+    information is taken from the project definition.
+** an interval of synchronization (manual or every x minutes)
+*** a list of template expressions for each template parameter which define
+    how to map an instance name into an actual parameter value (see below)
+
+The actual creation of the instance is done using cloning and copy technics
+already in place in Ontrack. The replacement is done using the template
+parameters and their values (computed or not).
+
+The manual creation of an instance follows the same rules than the creation of
+a branch. If the branch already exists, an error is thrown.
+
+For automatic synchronization from a list of names (static or from a SCM):
+
+* if a previously linked branch does not exist any longer, it is disabled
+  (or deleted directly, according to some additional settings for the
+  synchronization)
+* if a branch already exists with the same name, but is not a template instance,
+  a warning is emitted
+* if a branch exists already, its descriptions and property values are synched
+  again
+* if a branch does not exist, it is created as usual
+
+Reporting about the synchronization (like syncs, errors and warnings) are
+visible in the _Events_ section, in the template definition or in the template
+instances.
+
+The same synchronization principle applies to branch components: promotion
+levels, validation stamps and properties.
+
+Finally, at a higher level, cloning a project would also clone the template
+definitions (not the instances).
+
+[[templates-expressions]]
+==== Template expressions
+
+Those expressions are defined for the synchronization between template
+definitions and template instances. They bind a parameter name and a branch
+name to an actual parameter value.
+
+A template expression is a string that contains references to the branch name
+using the `${...}` construct where the content is a Groovy expression where
+the `branchName` variable is bound to the branch name.
+
+Note that those Groovy expression are executed in a _sand box_ that prevent malicious code execution.
+
+[[templates-expressions-examples]]
+===== Examples
+
+In a SVN context, we can bind the branch SVN configuration (branch location +
+tag pattern) this way, using simple replacements:
+
+	branchLocation: branchName -> /project/branches/${branchName}
+	tagPattern:     branchName -> /project/tags/{build:${branchName}*}
+
+In a Jenkins context, we can bind the job name for a branch:
+
+	jobName: branchName -> PROJECT_${branchName.toUpperCase()}_BUILD

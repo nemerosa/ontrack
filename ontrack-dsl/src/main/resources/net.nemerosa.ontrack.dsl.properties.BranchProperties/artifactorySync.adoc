@@ -1,0 +1,30 @@
+Branch builds can be synchronised with <<usage-artifactory,Artifactory>>:
+
+`def artifactorySync(String configuration, String buildName, String buildNameFilter = '*', int interval = 0)`
+
+and the corresponding configuration can be accessed:
+
+`def getArtifactorySync()`
+
+Example:
+
+[source,groovy]
+----
+ontrack.configure {
+   artifactory 'Artifactory', 'http://artifactory'
+}
+ontrack.project('project') {
+   branch('test') {
+       config {
+           artifactorySync 'Artifactory', 'test', 'test-*', 30
+       }
+   }
+}
+def sync = ontrack.branch('project', 'test').config.artifactorySync
+assert sync.configuration.name == 'Artifactory'
+assert sync.buildName == 'test'
+assert sync.buildNameFilter == 'test-*'
+assert sync.interval == 30
+----
+
+See also <<dsl-config-artifactory,Artifactory configuration>> to have access to the list of available configurations.

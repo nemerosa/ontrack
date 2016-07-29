@@ -1,0 +1,6 @@
+The message is returned as a map containing:
+
+* the `type` of message: `ERROR`, `WARNING` or `INFO`
+* the actual `text` of the message
+
+The returned map is `null` is no message is associated with this entity.

@@ -1,3 +1,12 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.netflix.nebula:gradle-aggregate-javadocs-plugin:3.0.1'
+    }
+}
+
 plugins {
     id 'net.nemerosa.versioning' version '1.7.1'
     id 'nebula.os-package' version '2.2.6'

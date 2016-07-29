@@ -1,27 +1,34 @@
 package net.nemerosa.ontrack.dsl
 
+import net.nemerosa.ontrack.dsl.doc.DSL
+import net.nemerosa.ontrack.dsl.doc.DSLMethod
 import net.nemerosa.ontrack.dsl.properties.BuildProperties
 
+@DSL
 class Build extends AbstractProjectResource {
 
     Build(Ontrack ontrack, Object node) {
         super(ontrack, node)
     }
 
+    @DSLMethod("Configuration of the build in a closure.")
     def call(Closure closure) {
         closure.resolveStrategy = Closure.DELEGATE_FIRST
         closure.delegate = this
         closure()
     }
 
+    @DSLMethod("Gets the build project name.")
     String getProject() {
         node?.branch?.project?.name
     }
 
+    @DSLMethod("Gets the build branch name.")
     String getBranch() {
         node?.branch?.name
     }
 
+    @DSLMethod("Promotes this build to the given promotion level.")
     PromotionRun promote(String promotion) {
         new PromotionRun(
                 ontrack,
@@ -32,12 +39,14 @@ class Build extends AbstractProjectResource {
         )
     }
 
+    @DSLMethod("Promotes this build to the given promotion level and configures the created <<dsl-promotionrun,promotion run>>.")
     PromotionRun promote(String promotion, Closure closure) {
         def run = promote(promotion)
         run(closure)
         run
     }
 
+    @DSLMethod(id = "validate", count = 2)
     ValidationRun validate(String validationStamp, String validationStampStatus = 'PASSED') {
         new ValidationRun(
                 ontrack,
@@ -49,24 +58,28 @@ class Build extends AbstractProjectResource {
         )
     }
 
+    @DSLMethod(id = "validate-closure", count = 3)
     ValidationRun validate(String validationStamp, String validationStampStatus = 'PASSED', Closure closure) {
         def run = validate(validationStamp, validationStampStatus)
         run(closure)
         run
     }
 
+    @DSLMethod("Gets the list of promotion runs for this build")
     List<PromotionRun> getPromotionRuns() {
         ontrack.get(link('promotionRuns')).resources.collect {
             new PromotionRun(ontrack, it)
         }
     }
 
+    @DSLMethod("Gets the list of validation runs for this build")
     List<ValidationRun> getValidationRuns() {
         ontrack.get(link('validationRuns')).resources.collect {
             new ValidationRun(ontrack, it)
         }
     }
 
+    @DSLMethod
     BuildProperties getConfig() {
         new BuildProperties(ontrack, this)
     }
@@ -156,19 +169,21 @@ class Build extends AbstractProjectResource {
      * Build links
      */
 
+    @DSLMethod
     def buildLink(String project, String build) {
         ontrack.put(
                 link('buildLinks'),
                 [
                         addOnly: true,
                         links  : [[
-                                project: project,
-                                build  : build,
-                        ]]
+                                          project: project,
+                                          build  : build,
+                                  ]]
                 ]
         )
     }
 
+    @DSLMethod(see = "buildLink")
     List<Build> getBuildLinks() {
         return ontrack.get(link('buildLinksFrom')).resources.collect {
             new Build(ontrack, it)

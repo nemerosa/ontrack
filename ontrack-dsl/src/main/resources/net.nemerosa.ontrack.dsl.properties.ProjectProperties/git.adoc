@@ -1,0 +1,23 @@
+Associates a project with a <<usage-git,Git configuration>>.
+
+`def git(String name)`
+
+Gets the associated Git configuration:
+
+`def getGit()`
+
+Example:
+
+[source,groovy]
+----
+ontrack.configure {
+   git 'ontrack', remote: 'https://github.com/nemerosa/ontrack.git', user: 'test', password: 'secret'
+}
+ontrack.project('project') {
+   config {
+       git 'ontrack'
+   }
+}
+def cfg = ontrack.project('project').config.git
+assert cfg.configuration.name == 'ontrack'
+----

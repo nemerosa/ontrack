@@ -7,5 +7,7 @@ repositories {
 dependencies {
     compile gradleApi()
     compile 'com.moowork.gradle:gradle-node-plugin:0.11'
-    // compile 'org.springframework.boot:spring-boot-gradle-plugin:1.3.0.RELEASE'
+    compile('net.nemerosa.ontrack:ontrack-dsl:2.23.2') {
+        exclude module: 'groovy-all'
+    }
 }

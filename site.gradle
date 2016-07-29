@@ -1,0 +1,76 @@
+/**
+ * Site generation
+ *
+ * Must be called AFTER the current version has been promoted in Ontrack to the RELEASE promotion level.
+ *
+ * This means having a Site job in the pipeline, after the Publish one, calling the `site` task.
+ */
+
+import net.nemerosa.ontrack.gradle.OntrackLastReleases
+
+plugins {
+    id 'org.ajoberstar.github-pages' version '1.5.1'
+}
+
+task siteOntrackLastReleases(type: OntrackLastReleases) {
+    releaseCount = 1
+    releasePattern = /2\..*/
+}
+
+task sitePagesDocJs {
+    dependsOn 'siteOntrackLastReleases'
+    outputs.file project.file('build/site/pages/javascripts/doc/doc.js')
+    doLast {
+        project.file('build/site/pages/javascripts/doc').mkdirs()
+        project.file('build/site/pages/javascripts/doc/doc.js').text =
+                "var releases = [${siteOntrackLastReleases.releases.collect { "'${it.name}'" }.join(',')}];"
+    }
+}
+
+task sitePagesCopyHtml(type: Copy) {
+    from 'publication/html5'
+    into "build/site/pages/release/${ontrackVersion}/doc"
+}
+
+task sitePagesCopyPdf(type: Copy) {
+    from 'publication/pdf'
+    into "build/site/pages/release/${ontrackVersion}"
+}
+
+task sitePagesCopyJavadoc(type: Copy) {
+    from zipTree('publication/ontrack-javadoc.zip')
+    into "build/site/pages/release/${ontrackVersion}/javadoc"
+}
+
+task sitePrepare {
+    dependsOn 'sitePagesDocJs'
+    dependsOn 'sitePagesCopyHtml'
+    dependsOn 'sitePagesCopyPdf'
+    dependsOn 'sitePagesCopyJavadoc'
+}
+
+prepareGhPages.dependsOn sitePrepare
+
+githubPages {
+    deleteExistingFiles = false
+    repoUri = project.properties.ontrackGitHubUri
+    credentials.username = project.properties.ontrackGitHubUser
+    credentials.password = project.properties.ontrackGitHubPassword
+    targetBranch = project.properties.ontrackGitHubPages
+    pages {
+        from ("build/site/pages/release/${ontrackVersion}") {
+            into "release/${ontrackVersion}"
+        }
+        from ("build/site/pages/release/${ontrackVersion}") {
+            into "release/latest"
+        }
+        from("build/site/pages/javascripts/doc") {
+            include 'doc.js'
+            into "javascripts/doc"
+        }
+    }
+}
+
+task site {
+    dependsOn 'publishGhPages'
+}

@@ -14,6 +14,7 @@ public class LDAPSettings {
     private final String searchBase;
     private final String searchFilter;
     private final String user;
+    @Wither
     private final String password;
     @Wither
     private final String fullNameAttribute;

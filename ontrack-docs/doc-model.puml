@@ -1,0 +1,28 @@
+@startuml
+class DSLDoc
+class DSLDocClass {
+    String name
+    String description
+    String longDescription
+    String sample
+    boolean propertyClass
+    -
+    String getId()
+}
+class DSLDocMethod {
+    String id
+    String name
+    String signature
+    String description
+    String longDescription
+    String sample
+}
+
+DSLDoc *--> "*" DSLDocClass: classes
+
+DSLDocClass *--> "*" DSLDocMethod: methods
+DSLDocClass --> "*" DSLDocClass: references
+DSLDocClass --> "0..1" DSLDocClass: properties
+
+DSLDocMethod --> "*" DSLDocClass: references
+@enduml

@@ -1,0 +1,25 @@
+[[basics]]
+== Basics
+
+include::usage-projects.adoc[]
+
+include::usage-branches.adoc[]
+
+include::usage-validation-stamps.adoc[]
+
+include::usage-promotion-levels.adoc[]
+
+include::usage-builds.adoc[]
+
+include::usage-properties.adoc[]
+
+[[topics]]
+== Topics
+
+include::templates.adoc[]
+
+include::usage-git.adoc[]
+
+include::usage-subversion.adoc[]
+
+include::changelogs.adoc[]

@@ -1,0 +1,57 @@
+Promotion levels can be <<promotion-levels-auto-creation,automatically created>> for a branch, from a list of
+predefined promotion levels, if the "Auto promotion levels" property is enabled on a project.
+
+To enable this property on a project:
+
+[source,groovy]
+----
+ontrack.project('project') {
+   config {
+      autoPromotionLevel()
+   }
+}
+----
+
+or:
+
+[source,groovy]
+----
+ontrack.project('project') {
+   config {
+      autoPromotionLevel(true)
+   }
+}
+----
+
+To get the value of this property:
+
+[source,groovy]
+----
+boolean auto = ontrack.project('project').autoPromotionLevel
+----
+
+The list of predefined promotion levels is accessible using:
+
+[source,groovy]
+----
+def stamps = ontrack.config.predefinedPromotionLevels
+----
+
+Each item contains the following properties:
+
+* `id`
+* `name`
+* `description`
+
+Its image is accessible through the `image` property.
+
+In order to create/update predefined promotion levels, use the following method:
+
+[source,groovy]
+----
+ontrack.config.predefinedPromotionLevel('VS') {
+   image new File('my/image.png')
+}
+----
+
+IMPORTANT: You need Administrator rights to be able to update the predefined promotion levels.

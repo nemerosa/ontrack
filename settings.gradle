@@ -21,6 +21,7 @@ include ':ontrack-ui'
 include ':ontrack-ui-support'
 include ':ontrack-web'
 include ':ontrack-acceptance'
+include ':ontrack-docs'
 
 // Core extensions
 include ':ontrack-extension-artifactory'

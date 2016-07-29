@@ -1,0 +1,6 @@
+[[usage-git]]
+=== Working with Git
+
+include::usage-github.adoc[]
+
+include::usage-bitbucket.adoc[]

@@ -1,0 +1,8 @@
+[[administration]]
+== Administration
+
+include::security.adoc[]
+
+include::ldap.adoc[]
+
+include::admin-console.adoc[]

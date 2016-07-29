@@ -1,0 +1,67 @@
+[[roadmap]]
+=== Roadmap
+
+Here are big ideas for the future of Ontrack. No plan yet, just rough ideas
+or wish lists.
+
+[[roadmap-postgresql]]
+==== Switch to Postgresql for the database layer
+
+NOTE: Partial support in version 3.0.
+
+WARNING: This could be replaced altogether by the support for
+         <<roadmap-neo4j,Neo4j>>.
+
+A migration to Postgres must take the following items into account:
+
+* definition of the schema
+* integration with Liquibase or Flyway (dropping DBInit)
+* definition of the different ways of working:
+** local development
+*** with Docker
+*** with a Postgres instance
+** build
+** docker
+** installation (RPM, Debian, manual)
+* extensions (like `svn`) can contribute to the schema
+* migration procedure (automated if possible)
+* use of JSON columns for configurations, properties, etc.
+* optimization of queries using JSON operators
+
+[[roadmap-jpa]]
+==== Use JPA / Hibernate for SQL queries
+
+* caching (no existent today)
+* see impact on multi Ontrack cluster
+
+[[roadmap-neo4j]]
+==== Using Neo4J as backend
+
+Ontrack basically stores its data as a graph, and Neo4J would be a perfect
+match for the storage.
+
+Consider:
+
+* migration
+* search engine
+
+[[roadmap-dsl]]
+==== Global DSL
+
+The current Ontrack DSL can be used only remotely and cannot be run on the
+server.
+
+We could design a DSL which can be run, either:
+
+* remotely - interacting with the HTTP API
+* in the server - interacting directly with the services
+
+Additionally, the DSL should be extensible so that extensions can contribute
+to it, on the same model than the
+https://github.com/jenkinsci/job-dsl-plugin/wiki/Extending-the-DSL[Jenkins Job DSL].
+
+[[roadmap-webhooks]]
+==== Web hooks
+
+Have the possibility to register Webhooks in Ontrack in order to notify other
+applications about changes and events.

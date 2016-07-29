@@ -1,0 +1,10 @@
+The `configuration` parameter is the name of an existing Jenkins configuration.
+
+The `job` parameter is the path to the Jenkins job. For a job `test` as the Jenkins root, it would be only `test`
+but for a job `test2` in a folder `parent2` which is itself in a folder `parent1` at the root, this would
+be `parent1/parent2/test2`.
+
+The `buildNumber` is the number of the Jenkins build.
+
+TIP: this link is created automatically when using the
+https://wiki.jenkins-ci.org/display/JENKINS/Ontrack+plugin[Ontrack Jenkins plug-in].

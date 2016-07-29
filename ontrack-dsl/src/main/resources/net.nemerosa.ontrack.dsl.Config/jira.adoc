@@ -1,0 +1,17 @@
+Access to <<usage-jira,JIRA>> is done through the configurations:
+
+`def jira(String name, String url, String user = '', String password = '')`
+
+The list of JIRA configurations is accessible:
+
+`List<String> getJira()`
+
+Example:
+
+[source,groovy]
+----
+ontrack.configure {
+   jira 'JIRA', 'http://jira'
+}
+assert ontrack.config.jira.find { it == 'JIRA' } != null
+----

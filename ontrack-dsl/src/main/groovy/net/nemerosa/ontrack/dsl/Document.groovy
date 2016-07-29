@@ -1,6 +1,10 @@
 package net.nemerosa.ontrack.dsl
 
+import net.nemerosa.ontrack.dsl.doc.DSL
+import net.nemerosa.ontrack.dsl.doc.DSLMethod
 
+
+@DSL("Definition for a document, for upload and download methods. See also <<dsl-usecases-images>>.")
 class Document {
 
     private final String type
@@ -13,14 +17,17 @@ class Document {
         this.content = content
     }
 
+    @DSLMethod("Returns the MIME type of the document.")
     String getType() {
         return type
     }
 
+    @DSLMethod("Returns the content of the document as an array of bytes.")
     byte[] getContent() {
         return content
     }
 
+    @DSLMethod("Returns true is the document is empty and has no content.")
     boolean isEmpty() {
         return "".equals(type) || content == null || content.length == 0
     }

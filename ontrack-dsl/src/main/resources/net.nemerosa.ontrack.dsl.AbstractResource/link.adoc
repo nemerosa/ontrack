@@ -1,0 +1,14 @@
+The `name` of the link refers to a link which is embedded in the JSON representation of the resource. In the JSON,
+the link name is prefixed by `_` but the `name` does not have too.
+
+For example, `link('create')` and `link('_create')` are equivalent.
+
+If the link does not exist, an `ResourceMissingLinkException` error is thrown.
+
+The value of the link can be called using the <<dsl-ontrack>> methods:
+
+[source,groovy]
+----
+def project = ontrack.projects[0]
+def projectJson = ontrack.get(project.link('self'))
+----

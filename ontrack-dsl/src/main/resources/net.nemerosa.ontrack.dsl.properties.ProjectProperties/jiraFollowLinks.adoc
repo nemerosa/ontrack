@@ -1,0 +1,22 @@
+Links between <<usage-jira,JIRA issues>> can be followed when getting information about issues.
+
+The links to follow can be configured at the project's level:
+
+* `def jiraFollowLinks(String... linkNames)`
+* `def jiraFollowLinks(Collection<String> linkNames)`
+
+The list of links to follow is accessible through:
+
+* `List<String> getJiraFollowLinks()`
+
+Example:
+
+[source,groovy]
+----
+ontrack.project('project') {
+   config {
+       jiraFollowLinks 'Clones', 'Depends'
+   }
+}
+assert ontrack.project('project').config.jiraFollowLinks == ['Clones', 'Depends']
+----

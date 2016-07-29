@@ -1,0 +1,20 @@
+@startuml
+control Pipeline
+boundary Ontrack
+participant Files
+boundary GitHub
+
+Pipeline -> Ontrack: Gets eligible releases
+note right
+    RELEASE promotion level, five last ones
+end note
+Ontrack --> Pipeline: Build numbers
+Pipeline -> Files: index.html
+note right
+    Generation of links per release
+end note
+Pipeline -> Files: release/xxx/javadoc
+Pipeline -> Files: release/xxx/html
+Pipeline -> Files: release/xxx/ontrack.pdf
+Pipeline -> GitHub: Commits
+@enduml

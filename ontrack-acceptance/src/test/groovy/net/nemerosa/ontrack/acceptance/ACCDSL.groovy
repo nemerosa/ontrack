@@ -1535,6 +1535,46 @@ class ACCDSL extends AbstractACCDSL {
     }
 
     @Test
+    void 'Configuration - SVN and JIRA'() {
+        def jiraName = uid('J')
+        def svnName = uid('S')
+        ontrack.configure {
+            jira jiraName, 'http://jira'
+            svn svnName, url: 'svn://localhost', user: 'admin', password: 'secret', issueServiceConfigurationIdentifier: "jira//${jiraName}"
+        }
+        // Checks the SVN configuration
+        def svn = ontrack.config.svn.find { it.name == svnName }
+        assert svn != null
+        assert svn.name == svnName
+        assert svn.url == 'svn://localhost'
+        assert svn.user == 'admin'
+        assert svn.password == ''
+        assert svn.issueServiceConfigurationIdentifier == "jira//${jiraName}"
+    }
+
+    @Test
+    void 'Configuration - SVN and non existing JIRA'() {
+        def jiraName = uid('J')
+        validationError "Issue service configuration cannot be validated: jira//${jiraName}", {
+            def svnName = uid('S')
+            ontrack.configure {
+                svn svnName, url: 'svn://localhost', user: 'admin', password: 'secret', issueServiceConfigurationIdentifier: "jira//${jiraName}"
+            }
+        }
+    }
+
+    @Test
+    void 'Configuration - SVN and wrong format for JIRA identifier'() {
+        def jiraName = uid('J')
+        validationError "Wrong format for an issue service configuration ID: jira:${jiraName}", {
+            def svnName = uid('S')
+            ontrack.configure {
+                svn svnName, url: 'svn://localhost', user: 'admin', password: 'secret', issueServiceConfigurationIdentifier: "jira:${jiraName}"
+            }
+        }
+    }
+
+    @Test
     void 'Configuration - Artifactory'() {
         def name = uid('A')
         ontrack.configure {
@@ -1556,11 +1596,11 @@ class ACCDSL extends AbstractACCDSL {
         ontrack.configure {
             svn name, url: 'svn://localhost'
         }
-        assert ontrack.config.svn.findAll { it == name } == [name]
+        assert ontrack.config.svn.findAll { it.name == name }.collect { it.url } == ['svn://localhost']
         ontrack.configure {
             svn name, url: 'http://localhost'
         }
-        assert ontrack.config.svn.findAll { it == name } == [name]
+        assert ontrack.config.svn.findAll { it.name == name }.collect { it.url } == ['http://localhost']
     }
 
     @Test
