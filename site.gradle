@@ -19,11 +19,11 @@ task siteOntrackLastReleases(type: OntrackLastReleases) {
 }
 
 task sitePagesDocJs {
-    dependsOn siteOntrackLastReleases
-    outputs.file project.file('build/site/pages/javascript/doc.js')
+    dependsOn 'siteOntrackLastReleases'
+    outputs.file project.file('build/site/pages/javascript/doc/doc.js')
     doLast {
-        project.file('build/site/pages/javascript').mkdirs()
-        project.file('build/site/pages/javascript/doc.js').text =
+        project.file('build/site/pages/javascript/doc').mkdirs()
+        project.file('build/site/pages/javascript/doc/doc.js').text =
                 "var releases = [${siteOntrackLastReleases.releases.collect { "'${it.name}'" }.join(',')}];"
     }
 }
@@ -43,9 +43,29 @@ task sitePagesCopyJavadoc(type: Copy) {
     into "build/site/pages/release/${ontrackVersion}/javadoc"
 }
 
+task sitePrepare {
+    dependsOn 'sitePagesDocJs'
+    dependsOn 'sitePagesCopyHtml'
+    dependsOn 'sitePagesCopyPdf'
+    dependsOn 'sitePagesCopyJavadoc'
+}
+
+publishGhPages.dependsOn sitePrepare
+
+githubPages {
+    repoUri = project.properties.ontrackGitHubUri
+    targetBranch = project.properties.ontrackGitHubPages
+    pages {
+        from ("build/site/pages/release/${ontrackVersion}") {
+            into "release/${ontrackVersion}"
+        }
+        from("build/site/pages/javascript/doc") {
+            include 'doc.js'
+            into "javascript/doc"
+        }
+    }
+}
+
 task site {
-    dependsOn sitePagesDocJs
-    dependsOn sitePagesCopyHtml
-    dependsOn sitePagesCopyPdf
-    dependsOn sitePagesCopyJavadoc
+    dependsOn 'publishGhPages'
 }
