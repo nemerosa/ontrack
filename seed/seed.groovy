@@ -96,6 +96,34 @@ fi
     }
 }
 
+/**
+ * Running a shell in a Xvfb session
+ */
+
+def withXvfb(def steps, String script) {
+    steps.shell """\
+#!/bin/bash
+
+mkdir -p xvfb-\${EXECUTOR_NUMBER}-\${BUILD_NUMBER}
+let 'NUM = EXECUTOR_NUMBER + 1'
+echo "Display number: \${NUM}"
+nohup /usr/bin/Xvfb :\${NUM} -screen 0 1024x768x24 -fbdir xvfb-\${EXECUTOR_NUMBER}-\${BUILD_NUMBER} &
+
+export DISPLAY=":\${NUM}"
+
+${script}
+"""
+}
+
+def inDocker (def job) {
+    job.wrappers {
+        buildInDocker {
+            dockerfile('seed/docker')
+            volume '/var/run/docker.sock', '/var/run/docker.sock'
+        }
+    }
+}
+
 // CentOS versions to tests
 List<String> centOsVersions = [
         '7',
@@ -109,12 +137,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-build") {
         artifactNumToKeep(5)
     }
     label 'docker'
-    wrappers {
-        buildInDocker {
-            dockerfile('seed/docker')
-            volume '/var/run/docker.sock', '/var/run/docker.sock'
-        }
-    }
+    inDocker delegate
     deliveryPipelineConfiguration('Commit', 'Build')
     scm {
         git {
@@ -215,26 +238,12 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
             }
         }
     }
-    wrappers {
-        buildInDocker {
-            dockerfile('seed/docker')
-            volume '/var/run/docker.sock', '/var/run/docker.sock'
-        }
-    }
+    inDocker delegate
     extractDeliveryArtifacts delegate, 'ontrack-acceptance'
     steps {
         // Runs Xfvb in the background - it will be killed when the Docker slave is removed
         // Runs the CI acceptance tests
-        shell '''\
-#!/bin/bash
-
-mkdir -p xvfb-${EXECUTOR_NUMBER}-${BUILD_NUMBER}
-let 'NUM = EXECUTOR_NUMBER + 1'
-echo "Display number: ${NUM}"
-nohup /usr/bin/Xvfb :${NUM} -screen 0 1024x768x24 -fbdir xvfb-${EXECUTOR_NUMBER}-${BUILD_NUMBER} &
-
-export DISPLAY=":${NUM}"
-
+        withXvfb delegate, '''\
 ./gradlew \\
     ciAcceptanceTest \\
     -PacceptanceJar=ontrack-acceptance-${VERSION}.jar \\
@@ -294,7 +303,7 @@ export DISPLAY=":${NUM}"
 // OS packages jobs
 // Only for releases
 
-if (release) {
+// TODO if (release) {
 
     // Debian package acceptance job
 
@@ -304,26 +313,24 @@ if (release) {
             artifactNumToKeep(5)
         }
         deliveryPipelineConfiguration('Commit', 'Debian package acceptance')
-        jdk 'JDK8u25'
-        label 'master'
+        label 'docker'
         parameters {
             // Link based on full version
             stringParam('VERSION', '', '')
         }
-        wrappers {
-            xvfb('default')
-        }
+        inDocker delegate
         extractDeliveryArtifacts delegate, 'ontrack-acceptance'
         steps {
             // Runs the CI acceptance tests
-            gradle """\
-debAcceptanceTest
--PacceptanceJar=ontrack-acceptance-\${VERSION}.jar
--PacceptanceDebianDistributionDir=.
---info
---profile
---console plain
---stacktrace
+            withXvfb delegate, """\
+./gradlew \\
+    debAcceptanceTest \\
+    -PacceptanceJar=ontrack-acceptance-\${VERSION}.jar \\
+    -PacceptanceDebianDistributionDir=. \\
+    --info \\
+    --profile \\
+    --console plain \\
+    --stacktrace
 """
         }
         publishers {
@@ -342,26 +349,24 @@ debAcceptanceTest
                 artifactNumToKeep(5)
             }
             deliveryPipelineConfiguration('Commit', "CentOS ${centOsVersion} package acceptance")
-            jdk 'JDK8u25'
-            label 'master'
+            label 'docker'
             parameters {
                 // Link based on full version
                 stringParam('VERSION', '', '')
             }
-            wrappers {
-                xvfb('default')
-            }
+            inDocker delegate
             extractDeliveryArtifacts delegate, 'ontrack-acceptance'
             steps {
                 // Runs the CI acceptance tests
-                gradle """\
-rpmAcceptanceTest${centOsVersion}
--PacceptanceJar=ontrack-acceptance-\${VERSION}.jar
--PacceptanceRpmDistributionDir=.
---info
---profile
---console plain
---stacktrace
+                withXvfb delegate, """\
+./gradlew \\
+    rpmAcceptanceTest${centOsVersion} \\
+    -PacceptanceJar=ontrack-acceptance-\${VERSION}.jar \\
+    -PacceptanceRpmDistributionDir=. \\
+    --info \\
+    --profile \\
+    --console plain \\
+    --stacktrace \\
 """
             }
             publishers {
@@ -371,7 +376,7 @@ rpmAcceptanceTest${centOsVersion}
         }
     }
 
-}
+// TODO }
 
 // Docker push
 
@@ -423,6 +428,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
         // Link based on full version
         stringParam('VERSION', '', '')
     }
+    inDocker delegate
     wrappers {
         injectPasswords()
     }
@@ -430,16 +436,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-do") {
     steps {
         // Runs Xfvb in the background - it will be killed when the Docker slave is removed
         // Runs the CI acceptance tests
-        shell '''\
-#!/bin/bash
-
-mkdir -p xvfb-${EXECUTOR_NUMBER}-${BUILD_NUMBER}
-let 'NUM = EXECUTOR_NUMBER + 1'
-echo "Display number: ${NUM}"
-nohup /usr/bin/Xvfb :${NUM} -screen 0 1024x768x24 -fbdir xvfb-${EXECUTOR_NUMBER}-${BUILD_NUMBER} &
-
-export DISPLAY=":${NUM}"
-
+        withXvfb delegate, '''\
 ./gradlew \\
     doAcceptanceTest \\
     -PacceptanceJar=ontrack-acceptance-${VERSION}.jar \\
@@ -449,6 +446,7 @@ export DISPLAY=":${NUM}"
     --console plain \\
     --stacktrace
 '''
+
     }
     publishers {
         archiveJunit('*-tests.xml')
