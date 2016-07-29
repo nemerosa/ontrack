@@ -3,15 +3,11 @@ buildscript {
         jcenter()
         mavenCentral()
     }
-
     dependencies {
         classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3'
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.3.6.RELEASE")
+        classpath 'org.asciidoctor:asciidoctorj-diagram:1.5.0'
+        classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.3.6.RELEASE'
     }
-}
-
-plugins {
-    id 'com.github.jruby-gradle.base' version '1.2.1'
 }
 
 apply plugin: 'groovy'
@@ -24,10 +20,9 @@ asciidoctorj {
 
 dependencies {
     asciidoctor 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.11'
-    gems 'rubygems:asciidoctor-diagram:1.4.0'
     compile project(':ontrack-dsl')
     compile project(':ontrack-json')
-    compile libraries.commons_io
+    compile libraries.commons_io as String
 }
 
 task generateDoc(type: JavaExec) {
@@ -57,34 +52,36 @@ import org.asciidoctor.gradle.AsciidoctorTask
 // HTML specific settings
 task generateHtml(type: AsciidoctorTask, description: 'Generates HTML documentation.', group: 'Documentation') {
     backend = 'html5'
-}
-
-// PDF specific settings
-task generatePdf(type: AsciidoctorTask, description: 'Generates PDF documentation.', group: 'Documentation') {
-    backend = 'pdf'
-    attributes([
-            imagesdir: file('build/asciidoc/html5')
-    ])
-    mustRunAfter generateHtml
-}
-
-// common Asciidoctor settings
-tasks.withType(AsciidoctorTask) { docTask ->
-    dependsOn jrubyPrepare
-    dependsOn prepareGeneratedDoc
-    requires = ['asciidoctor-diagram']
-    gemPath = jrubyPrepare.outputDir
-    logDocuments = true
-    sources {
-        include 'index.adoc'
-    }
     attributes = [
             'ontrack-version'    : project.versioning.info.display,
             'spring-boot-version': springBootVersion, // Defined in dependencies.gradle
             'toc'                : 'left',
-            icons                : 'font',
+            'icons'              : 'font',
     ]
 }
 
-build.dependsOn generateHtml
-build.dependsOn generatePdf
+// PDF specific settings
+task generatePdf(type: AsciidoctorTask, description: 'Generates PDF documentation.', group: 'Documentation') {
+    mustRunAfter 'generateHtml'
+    backend = 'pdf'
+    attributes = [
+            'ontrack-version'    : project.versioning.info.display,
+            'spring-boot-version': springBootVersion, // Defined in dependencies.gradle
+            'toc'                : 'left',
+            'icons'              : 'font',
+            'imagesdir'          : file('build/asciidoc/html5'),
+    ]
+}
+
+// common Asciidoctor settings
+tasks.withType(AsciidoctorTask) { docTask ->
+    dependsOn 'prepareGeneratedDoc'
+    requires 'asciidoctor-diagram'
+    logDocuments = true
+    sources {
+        include 'index.adoc'
+    }
+}
+
+build.dependsOn 'generateHtml'
+build.dependsOn 'generatePdf'
