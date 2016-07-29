@@ -13,9 +13,8 @@ plugins {
 }
 
 task siteOntrackLastReleases(type: OntrackLastReleases) {
-    releaseCount = 3
+    releaseCount = 1
     releasePattern = /2\..*/
-    // TODO mustRunAfter publicationGitHubReleaseUpload
 }
 
 task sitePagesDocJs {
