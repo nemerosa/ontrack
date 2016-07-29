@@ -30,12 +30,6 @@ dependencies {
     compile libraries.commons_io
 }
 
-task prepareImages(type: Copy) {
-    from 'src/docs/asciidoc'
-    include '*.png'
-    into 'build/asciidoc/html5'
-}
-
 task generateDoc(type: JavaExec) {
     dependsOn 'classes'
     dependsOn ':ontrack-dsl:classes'
@@ -58,9 +52,25 @@ task prepareGeneratedDoc(type: Copy) {
     into 'src/docs/asciidoc'
 }
 
-asciidoctor {
+import org.asciidoctor.gradle.AsciidoctorTask
+
+// HTML specific settings
+task generateHtml(type: AsciidoctorTask, description: 'Generates HTML documentation.', group: 'Documentation') {
+    backend = 'html5'
+}
+
+// PDF specific settings
+task generatePdf(type: AsciidoctorTask, description: 'Generates PDF documentation.', group: 'Documentation') {
+    backend = 'pdf'
+    attributes([
+            imagesdir: file('build/asciidoc/html5')
+    ])
+    mustRunAfter generateHtml
+}
+
+// common Asciidoctor settings
+tasks.withType(AsciidoctorTask) { docTask ->
     dependsOn jrubyPrepare
-    dependsOn prepareImages
     dependsOn prepareGeneratedDoc
     requires = ['asciidoctor-diagram']
     gemPath = jrubyPrepare.outputDir
@@ -68,17 +78,13 @@ asciidoctor {
     sources {
         include 'index.adoc'
     }
-    backends = [
-            'html5',
-            'pdf',
-    ]
     attributes = [
             'ontrack-version'    : project.versioning.info.display,
             'spring-boot-version': springBootVersion, // Defined in dependencies.gradle
             'toc'                : 'left',
-            imagesdir            : file('build/asciidoc/html5'),
             icons                : 'font',
     ]
 }
 
-build.dependsOn asciidoctor
+build.dependsOn generateHtml
+build.dependsOn generatePdf

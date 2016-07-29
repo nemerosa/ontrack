@@ -7,7 +7,7 @@ the same project. In the <<usage-branches,branch view>>, two radio buttons
 columns are available in the build list, which allow you to select the
 change log boundaries:
 
-image::changelog.selection.png[Change log selection,300]
+image::images/changelog.selection.png[Change log selection,300]
 
 The _Change log_ button displays the change log page, which contains four
 sections:
@@ -31,7 +31,7 @@ configuration (Git or Subversion) is associated with an issue server (like
 This section displays the changes between the two build boundaries. For Git,
 the associated commit graph is also displayed:
 
-image::changelog.commits.png[Git commits,600]
+image::images/changelog.commits.png[Git commits,600]
 
 [[changelogs-issues]]
 ==== Issues
@@ -39,14 +39,14 @@ image::changelog.commits.png[Git commits,600]
 The list of issues associated with the commits between the two build boundaries
 is displayed here:
 
-image::changelog.issues.png[Issues]
+image::images/changelog.issues.png[Issues]
 
 [[changelogs-files]]
 ## File changes
 
 The list of file changes between the two build boundaries is displayed here:
 
-image::changelog.files.png[Change log files,600]
+image::images/changelog.files.png[Change log files,600]
 
 Each file change is associated with the corresponding changes. This includes
 the list of revisions for Subversion.
@@ -56,7 +56,7 @@ access to a list of files impacted by the change log.
 
 By entering a ANT-like pattern, you can display the file paths which match:
 
-image::changelog.files.quickfilter.png[Change log files filter,600]
+image::images/changelog.files.quickfilter.png[Change log files filter,600]
 
 For more complex selections, you can clock on the _Edit_ button and you'll
 have a dialog box which allows you to define:
@@ -64,18 +64,18 @@ have a dialog box which allows you to define:
 * a name for your filter
 * a list of ANT-like patterns to match
 
-image::changelog.files.filterdialog.png[Change log files filter dialog,400]
+image::images/changelog.files.filterdialog.png[Change log files filter dialog,400]
 
 If you are authorized, you can also save this filter for the project, allowing
 its selection by all users.
 
-image::changelog.files.filtershare.png[Change log files filter share,400]
+image::images/changelog.files.filtershare.png[Change log files filter share,400]
 
 In the list of filters, you find the filters you have defined and the ones
 which have been shared for the whole project. The latter ones are marked with
 an asterisk (*):
 
-image::changelog.files.filtershared.png[Change log files filter shared,400]
+image::images/changelog.files.filtershared.png[Change log files filter shared,400]
 
 You can update and delete filters. Note that the shared filters won't be
 actually updated or deleted, unless you are authorized.
@@ -83,7 +83,7 @@ actually updated or deleted, unless you are authorized.
 Finally, you can get the unified diff for the selected filter by clicking on
 the _Diff_ button:
 
-image::changelog.files.filterdiff.png[Change log files filter diff,400]
+image::images/changelog.files.filterdiff.png[Change log files filter diff,400]
 
 This will display a dialog with:
 
@@ -93,4 +93,4 @@ This will display a dialog with:
 You can obtain a quick diff on one file by clicking on the icon at the right
 of a file in the change log:
 
-image::changelog.files.quickdiff.png[Quick diff on file,600]
+image::images/changelog.files.quickdiff.png[Quick diff on file,600]

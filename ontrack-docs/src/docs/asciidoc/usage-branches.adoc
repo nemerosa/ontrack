@@ -16,7 +16,7 @@ icons just on the right of the branch name, following any other decoration:
 * enabling the branch
 * deleting the branch
 
-image::project-page-branch-management.png[Branch commands,600]
+image::images/project-page-branch-management.png[Branch commands,600]
 
 This allows you to have a quick access to the management of the branches in a
 project. Only the deletion of a branch will prompt you about your decision.
@@ -51,11 +51,11 @@ To configure this:
 * go to the project page
 * select the _Stale branches_ property and add it:
 
-image::property-stale-selection.png[Stale property,400]
+image::images/property-stale-selection.png[Stale property,400]
 
 * set the number of days before disabling and the number of days before deleting
 
-image::property-stale-dialog.png[Stale dialog,400]
+image::images/property-stale-dialog.png[Stale dialog,400]
 
 If the _disabling_ days are set to 0, no branch will be ever disabled or
 deleted.

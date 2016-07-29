@@ -58,12 +58,12 @@ to represent dependencies between builds and projects.
 
 If authorized, you'll see a _Build links_ command at the top of the build page:
 
-image::property-build-links-command.png[Build links command,400]
+image::images/property-build-links-command.png[Build links command,400]
 
 Clicking on this link will open a dialog which allows you to define the list
 of links:
 
-image::property-build-links-dialog.png[Build links input,400]
+image::images/property-build-links-dialog.png[Build links input,400]
 
 Note that:
 
@@ -77,16 +77,16 @@ Note that:
 
 The build links are displayed as decorations in the build page header:
 
-image::property-build-links-decoration-header.png[Build links decorations in header,400]
+image::images/property-build-links-decoration-header.png[Build links decorations in header,400]
 
 or in the list of builds:
 
-image::property-build-links-decoration-list.png[Build links decorations in list,400]
+image::images/property-build-links-decoration-list.png[Build links decorations in list,400]
 
 In both cases, the decoration is clickable. If the target build has been
 promoted, the associated promotions will also be displayed.
 
-image::property-build-links-decoration-promotions.png[Build links promotions,400]
+image::images/property-build-links-decoration-promotions.png[Build links promotions,400]
 
 [[builds-links-querying]]
 ===== Querying

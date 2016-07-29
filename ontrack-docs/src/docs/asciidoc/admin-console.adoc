@@ -20,7 +20,7 @@ administrator. From there, you can see:
 * general informations about the jobs: name, description
 * the run statistics
 
-image:admin.jobs.overview.png[Jobs,600]
+image::images/admin.jobs.overview.png[Jobs,600]
 
 [[admin-console-jobs-filter]]
 ===== Filtering the jobs

@@ -8,7 +8,7 @@ optionally some links and categories.
 [[property-meta-input]]
 ===== Input
 
-image::property-meta-information-dialog.png[Meta information input,400]
+image::images/property-meta-information-dialog.png[Meta information input,400]
 
 
 [[property-meta-display]]
@@ -16,7 +16,7 @@ image::property-meta-information-dialog.png[Meta information input,400]
 
 The list of meta information properties is displayed in the list of properties:
 
-image::property-meta-information-display.png[Meta information displayed,400]
+image::images/property-meta-information-display.png[Meta information displayed,400]
 
 [[property-meta-query]]
 ===== Querying
