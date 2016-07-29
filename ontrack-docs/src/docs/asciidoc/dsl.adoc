@@ -456,8 +456,57 @@ For example, the following <<dsl-branch-download,call>>:
 def text = ontrack.branch('project', 'branch').download('folder/subfolder/path.txt')
 ----
 
-will download the `folder/subfolder/path.txt` file from the corresponding SCM branch. A `OTNotFoundException`
-exception is thrown if the file cannot be found.
+will download the `folder/subfolder/path.txt` file from the corresponding SCM
+branch. A `OTNotFoundException` exception is thrown if the file cannot be found.
+
+[[dsl-tool]]
+=== DSL Tool
+
+Ontrack comes with an _Ontrack DSL Shell_ tool that you can download from the
+https://github.com/nemerosa/ontrack/releases[releases page].
+
+The `ontrack-dsl-shell.jar` is a fully executable JAR, published in GitHub
+release and in the Maven Central, and can be used to setup a running instance
+of Ontrack:
+
+[source,bash]
+----
+ontrack-dsl-shell.jar --url ... --user ... --password ... --file ...
+----
+
+TIP: You can display the full list options using `ontrack-dsl-shell.jar --help`.
+
+The `--file` argument is the path to a file containing the <<dsl,Ontrack DSL>>
+to execute. If not set, or set to `-`, the DSL is taken from the standard
+input. For example:
+
+[source,bash]
+----
+cat project-list.groovy | ontrack-dsl-shell.jar --url https://ontrack.nemerosa.net
+----
+
+where `project-list.groovy` contains:
+
+[source,groovy]
+----
+ontrack.projects*.name
+----
+
+This would return a JSON like:
+
+[source,json]
+----
+[
+    "iteach",
+    "ontrack",
+    "ontrack-jenkins",
+    "versioning"
+]
+----
+
+NOTE: The JAR is a
+http://docs.spring.io/spring-boot/docs/1.4.0.RELEASE/reference/htmlsingle/#build-tool-plugins-gradle-repackage-configuration[real executable],
+so there is no need to use `java -jar` on Unix like systems or MacOS.
 
 [[dsl-reference]]
 === DSL Reference
