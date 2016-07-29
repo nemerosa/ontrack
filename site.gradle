@@ -20,10 +20,10 @@ task siteOntrackLastReleases(type: OntrackLastReleases) {
 
 task sitePagesDocJs {
     dependsOn 'siteOntrackLastReleases'
-    outputs.file project.file('build/site/pages/javascript/doc/doc.js')
+    outputs.file project.file('build/site/pages/javascripts/doc/doc.js')
     doLast {
-        project.file('build/site/pages/javascript/doc').mkdirs()
-        project.file('build/site/pages/javascript/doc/doc.js').text =
+        project.file('build/site/pages/javascripts/doc').mkdirs()
+        project.file('build/site/pages/javascripts/doc/doc.js').text =
                 "var releases = [${siteOntrackLastReleases.releases.collect { "'${it.name}'" }.join(',')}];"
     }
 }
@@ -50,18 +50,21 @@ task sitePrepare {
     dependsOn 'sitePagesCopyJavadoc'
 }
 
-publishGhPages.dependsOn sitePrepare
+prepareGhPages.dependsOn sitePrepare
 
 githubPages {
-    repoUri = project.properties.ontrackGitHubUri
+    deleteExistingFiles = false
+    // repoUri = project.properties.ontrackGitHubUri
+    credentials.username = project.properties.ontrackGitHubUser
+    credentials.password = project.properties.ontrackGitHubPassword
     targetBranch = project.properties.ontrackGitHubPages
     pages {
         from ("build/site/pages/release/${ontrackVersion}") {
             into "release/${ontrackVersion}"
         }
-        from("build/site/pages/javascript/doc") {
+        from("build/site/pages/javascripts/doc") {
             include 'doc.js'
-            into "javascript/doc"
+            into "javascripts/doc"
         }
     }
 }
