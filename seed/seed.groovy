@@ -230,7 +230,7 @@ job("${SEED_PROJECT}-${SEED_BRANCH}-acceptance-local") {
 mkdir -p xvfb-${EXECUTOR_NUMBER}-${BUILD_NUMBER}
 let 'NUM = EXECUTOR_NUMBER + 1'
 echo "Display number: ${NUM}"
-/usr/bin/Xvfb :${NUM} -screen 0 1024x768x24 -fbdir xvfb-${EXECUTOR_NUMBER}-${BUILD_NUMBER} &
+nohup /usr/bin/Xvfb :${NUM} -screen 0 1024x768x24 -fbdir xvfb-${EXECUTOR_NUMBER}-${BUILD_NUMBER} &
 
 export DISPLAY=":${NUM}"
 
